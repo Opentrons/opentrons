@@ -1,12 +1,12 @@
-import omitBy from 'lodash/omitBy'
 import {
-  MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
+import omitBy from 'lodash/omitBy'
 import type { ProtocolCalibrationStatus } from '.'
+import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
 
 export function useModuleCalibrationStatus(
   robotName: string,

@@ -1,21 +1,19 @@
 // redux action types to analytics events map
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import * as Alerts from '../alerts'
 import * as CustomLabware from '../custom-labware'
-import * as SystemInfo from '../system-info'
+import * as RobotAdmin from '../robot-admin'
 import * as RobotUpdate from '../robot-update/constants'
 import * as Sessions from '../sessions'
-import * as Alerts from '../alerts'
-import * as Constants from './constants'
 import { sharedCalCommands } from '../sessions/common-calibration/constants'
-import * as RobotAdmin from '../robot-admin'
-
+import * as SystemInfo from '../system-info'
+import type { Action, State } from '../types'
+import * as Constants from './constants'
 import {
-  getBuildrootAnalyticsData,
   getAnalyticsSessionExitDetails,
+  getBuildrootAnalyticsData,
   getSessionInstrumentAnalyticsData,
 } from './selectors'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import type { State, Action } from '../types'
 import type { AnalyticsEvent } from './types'
 
 const EVENT_APP_UPDATE_DISMISSED = 'appUpdateDismissed'

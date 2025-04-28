@@ -1,11 +1,10 @@
 // app-shell self-update tests
-import * as ElectronUpdater from 'electron-updater'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
-import { registerUpdate } from '../update'
+import * as ElectronUpdater from 'electron-updater'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as Cfg from '../config'
-
 import type { Dispatch } from '../types'
+import { registerUpdate } from '../update'
 
 vi.unmock('electron-updater')
 vi.mock('electron-updater')

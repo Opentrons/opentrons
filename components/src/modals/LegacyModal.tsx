@@ -1,11 +1,9 @@
-import { Fragment } from 'react'
 import cx from 'classnames'
-import { RemoveScroll } from 'react-remove-scroll'
-
-import { Overlay } from './Overlay'
-import styles from './modals.module.css'
-
+import { Fragment } from 'react'
 import type { MouseEventHandler, ReactNode, Ref } from 'react'
+import { RemoveScroll } from 'react-remove-scroll'
+import styles from './modals.module.css'
+import { Overlay } from './Overlay'
 
 export interface LegacyModalProps {
   /** handler to close the modal (attached to `Overlay` onClick) */

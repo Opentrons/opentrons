@@ -1,17 +1,17 @@
 import { CUSTOM_LABWARE_DICT_NAME } from '@opentrons/step-generation'
-import { migration } from './migration'
-import { selectors as fileDataSelectors } from '../file-data'
-import { saveFile, savePythonFile } from './utils'
-
 import type { SyntheticEvent } from 'react'
+import { selectors as fileDataSelectors } from '../file-data'
 import type { PDProtocolFile, PythonDesignerApplication } from '../file-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
+import { migration } from './migration'
 import type {
   FileUploadErrorType,
   FileUploadMessage,
   LoadFileAction,
   NewProtocolFields,
 } from './types'
+import { saveFile, savePythonFile } from './utils'
+
 export interface FileUploadMessageAction {
   type: 'FILE_UPLOAD_MESSAGE'
   payload: FileUploadMessage

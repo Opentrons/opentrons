@@ -6,16 +6,14 @@ import {
   getDeckDefFromRobotType,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
-import { useAttachedModules } from '/app/resources/modules'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
-
 import type { CutoutConfig } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useAttachedModules } from '/app/resources/modules'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
+import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 
 export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {
   attachedModuleMatch: AttachedModule | null

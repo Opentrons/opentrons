@@ -1,10 +1,9 @@
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
 import type { NavigateFunction } from 'react-router-dom'
-
-import { Landing } from '../index'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { Landing } from '../index'
 
 const mockNavigate = vi.fn()
 const mockUseTrackEvent = vi.fn()

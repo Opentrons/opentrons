@@ -1,8 +1,7 @@
-import { useRef } from 'react'
-import { Svg } from '../../primitives'
-
-import type { ComponentProps, ReactNode } from 'react'
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
+import { useRef } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
+import { Svg } from '../../primitives'
 
 export interface RobotCoordinateSpaceWithRefRenderProps {
   deckSlotsById: { [slotId: string]: DeckSlot }

@@ -1,5 +1,3 @@
-import round from 'lodash/round'
-import { useTranslation } from 'react-i18next'
 import {
   Box,
   COLORS,
@@ -8,6 +6,8 @@ import {
   POSITION_RELATIVE,
   StyledText,
 } from '@opentrons/components'
+import round from 'lodash/round'
+import { useTranslation } from 'react-i18next'
 import BOTTOM_LAYER from '../../../assets/images/tip_side_bottom_layer.svg'
 import MID_LAYER from '../../../assets/images/tip_side_mid_layer.svg'
 import TOP_LAYER from '../../../assets/images/tip_side_top_layer.svg'

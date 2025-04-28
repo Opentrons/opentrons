@@ -1,19 +1,17 @@
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
-
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 interface AnalysisFailedModalProps {
   errors: string[]

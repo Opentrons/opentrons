@@ -1,5 +1,5 @@
-import { saveAs } from 'file-saver'
 import type { ProtocolFile } from '@opentrons/shared-data'
+import { saveAs } from 'file-saver'
 import type { PDPythonFile } from '../file-types'
 
 export const saveFile = (fileData: ProtocolFile, fileName: string): void => {

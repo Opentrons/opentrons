@@ -1,11 +1,10 @@
+import type { Stats } from 'fs'
 import * as FS from 'fs/promises'
 import path from 'path'
-import { readJson, outputJson } from 'fs-extra'
-
-import type { Stats } from 'fs'
+import { outputJson, readJson } from 'fs-extra'
 import { fetchJson, LocalAbortError } from '../../http'
-import type { ReleaseManifest, ReleaseSetUrls } from '../types'
 import { createLogger } from '../../log'
+import type { ReleaseManifest, ReleaseSetUrls } from '../types'
 
 const log = createLogger('systemUpdate/from-web/provider')
 

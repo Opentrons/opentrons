@@ -1,17 +1,16 @@
-import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Slideout } from '/app/atoms/Slideout'
-
-import type { AttachedPipette } from '/app/redux/pipettes/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import { Slideout } from '/app/atoms/Slideout'
+import type { AttachedPipette } from '/app/redux/pipettes/types'
+import { useTranslation } from 'react-i18next'
 
 interface AboutPipetteSlideoutProps {
   pipetteId: AttachedPipette['id']

@@ -1,8 +1,8 @@
-import { useTranslation } from 'react-i18next'
-import { Flex, StyledText, Chip } from '@opentrons/components'
+import { Chip, Flex, StyledText } from '@opentrons/components'
 import { MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 import type { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import type { MagneticStatus } from '/app/redux/modules/api-types'
+import { useTranslation } from 'react-i18next'
 import {
   MODULE_INFO_DETAIL_CONTAINER_STYLE,
   MODULE_INFO_DETAIL_TEXT_STYLE,

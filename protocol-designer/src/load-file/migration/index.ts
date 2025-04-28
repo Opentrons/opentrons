@@ -1,6 +1,10 @@
 import flow from 'lodash/flow'
 import takeRightWhile from 'lodash/takeRightWhile'
 import semver from 'semver'
+import type {
+  PDProtocolFile,
+  PythonDesignerApplication,
+} from '../../file-types'
 import { migrateFile as migrateFileOne } from './1_1_0'
 import { migrateFile as migrateFileThree } from './3_0_0'
 import { migrateFile as migrateFileFour } from './4_0_0'
@@ -14,11 +18,6 @@ import { migrateFile as migrateFileEightOne } from './8_1_0'
 import { migrateFile as migrateFileEightTwo } from './8_2_0'
 import { migrateFile as migrateFileEightTwoPointTwo } from './8_2_2'
 import { migrateFile as migrateFileEightFive } from './8_5_0'
-
-import type {
-  PDProtocolFile,
-  PythonDesignerApplication,
-} from '../../file-types'
 
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 type Version = string

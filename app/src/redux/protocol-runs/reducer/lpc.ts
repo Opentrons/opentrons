@@ -24,6 +24,13 @@ import {
   UPDATE_LPC_DECK,
   UPDATE_LPC_LABWARE,
 } from '../constants'
+import type {
+  LPCLabwareInfo,
+  LPCWizardAction,
+  LPCWizardState,
+  OffsetSources,
+  SelectedLwOverview,
+} from '../types'
 import {
   clearAllWorkingOffsets,
   getNextStepIdx,
@@ -33,14 +40,6 @@ import {
   updateLPCLabwareInfoFrom,
   updateOffsetsForURI,
 } from './transforms'
-
-import type {
-  LPCLabwareInfo,
-  LPCWizardAction,
-  LPCWizardState,
-  OffsetSources,
-  SelectedLwOverview,
-} from '../types'
 
 // TODO(jh, 01-17-25): A lot of this state should live above the LPC slice, in the general protocolRuns slice instead.
 //  We should make selectors for that state, too!

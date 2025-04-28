@@ -1,5 +1,5 @@
-import type { MouseEventHandler } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
+import type { MouseEventHandler } from 'react'
 
 export type ModalSize = 'small' | 'medium' | 'large'
 

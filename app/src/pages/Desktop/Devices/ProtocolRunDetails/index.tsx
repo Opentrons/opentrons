@@ -1,10 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
-import isEmpty from 'lodash/isEmpty'
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom'
-import styled, { css } from 'styled-components'
-
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   BORDERS,
   Box,
@@ -22,30 +16,33 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
-
+import type { DesktopRouteParams, ProtocolRunDetailsTab } from '/app/App/types'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
-import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
-import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
-import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
 import { BackToTopButton } from '/app/organisms/Desktop/Devices/ProtocolRun/BackToTopButton'
+import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
+import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
+import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+import { useRobot, useRobotType } from '/app/redux-resources/robots'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { fetchProtocols } from '/app/redux/protocol-storage'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import type { Dispatch } from '/app/redux/types'
 import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
   useRunStatuses,
 } from '/app/resources/runs'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { fetchProtocols } from '/app/redux/protocol-storage'
-import { appShellRequestor } from '/app/redux/shell/remote'
-import { useRobot, useRobotType } from '/app/redux-resources/robots'
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
-
+import isEmpty from 'lodash/isEmpty'
+import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom'
 import type { ViewportListRef } from 'react-viewport-list'
-import type { DesktopRouteParams, ProtocolRunDetailsTab } from '/app/App/types'
-import type { Dispatch } from '/app/redux/types'
+import styled, { css } from 'styled-components'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}

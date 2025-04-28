@@ -1,9 +1,9 @@
-import { useQuery } from 'react-query'
+import type { HostConfig, RunCurrentState } from '@opentrons/api-client'
+import { getRunCurrentState } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
-import type { RunCurrentState, HostConfig } from '@opentrons/api-client'
+import { useQuery } from 'react-query'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import { useHost } from '../api'
-import { getRunCurrentState } from '@opentrons/api-client'
 
 export function useRunCurrentState(
   runId: string | null,

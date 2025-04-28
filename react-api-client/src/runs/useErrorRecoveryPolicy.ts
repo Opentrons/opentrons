@@ -1,14 +1,11 @@
-import { useQuery } from 'react-query'
-
 import { getErrorRecoveryPolicy } from '@opentrons/api-client'
-
-import { useHost } from '../api'
-
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   ErrorRecoveryPolicyResponse,
   HostConfig,
 } from '@opentrons/api-client'
+import { useQuery } from 'react-query'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import { useHost } from '../api'
 
 export function useErrorRecoveryPolicy(
   runId: string,

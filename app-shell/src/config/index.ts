@@ -1,11 +1,13 @@
 // app configuration and settings
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
+import type {
+  ConfigV0,
+  ConfigValueChangeAction,
+} from '@opentrons/app/src/redux/config/types'
 import Store from 'electron-store'
 import get from 'lodash/get'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
-
-import { createLogger } from '../log'
 import {
   ADD_UNIQUE_VALUE,
   RESET_VALUE,
@@ -14,17 +16,12 @@ import {
   UI_INITIALIZED,
   UPDATE_VALUE,
 } from '../constants'
-import { DEFAULTS_V0, migrate } from './migrate'
-import { shouldUpdate, getNextValue } from './update'
-import { configInitialized, configValueUpdated } from './actions'
-
-import type {
-  ConfigV0,
-  ConfigValueChangeAction,
-} from '@opentrons/app/src/redux/config/types'
-
+import { createLogger } from '../log'
 import type { Action, Dispatch, Logger } from '../types'
+import { configInitialized, configValueUpdated } from './actions'
+import { DEFAULTS_V0, migrate } from './migrate'
 import type { Config, Overrides } from './types'
+import { getNextValue, shouldUpdate } from './update'
 
 export * from './types'
 

@@ -1,7 +1,6 @@
-import { describe, it, expect } from 'vitest'
-
-import { mockUsbDevice, mockRealtekDevice } from '../__fixtures__'
-import { isRealtekU2EAdapter, getDriverStatus } from '../utils'
+import { describe, expect, it } from 'vitest'
+import { mockRealtekDevice, mockUsbDevice } from '../__fixtures__'
+import { getDriverStatus, isRealtekU2EAdapter } from '../utils'
 
 describe('system info utilities', () => {
   describe('isRealtekU2EAdapter', () => {

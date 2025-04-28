@@ -1,12 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { DeckConfigurationDiscardChangesModal } from '../DeckConfigurationDiscardChangesModal'
-
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { DeckConfigurationDiscardChangesModal } from '../DeckConfigurationDiscardChangesModal'
 
 const mockFunc = vi.fn()
 const mockNavigate = vi.fn()

@@ -1,9 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { getNestedLabwareInfo } from '../getNestedLabwareInfo'
-
 import type { RunTimeCommand } from '@opentrons/shared-data'
+import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
+import { describe, expect, it } from 'vitest'
 import type { LabwareSetupItem } from '../getLabwareSetupItemGroups'
+import { getNestedLabwareInfo } from '../getNestedLabwareInfo'
 
 const MOCK_LABWARE_ID = 'mockLabwareId'
 const MOCK_OTHER_LABWARE_ID = 'mockOtherLabwareId'

@@ -1,9 +1,3 @@
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-import clamp from 'lodash/clamp'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -15,16 +9,19 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
-
+import { IconButton } from '/app/atoms/buttons/IconButton'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '/app/redux/config'
-
 import type { Dispatch } from '/app/redux/types'
+import clamp from 'lodash/clamp'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
 import type { SetSettingOption } from './types'
-import { IconButton } from '/app/atoms/buttons/IconButton'
 
 interface BrightnessTileProps {
   isActive: boolean

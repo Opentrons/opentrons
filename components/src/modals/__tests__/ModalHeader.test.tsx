@@ -1,13 +1,11 @@
-import { screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-
-import { renderWithProviders } from '../../testing/utils'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { COLORS } from '../../helix-design-system'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
+import { renderWithProviders } from '../../testing/utils'
 import { ModalHeader } from '../ModalHeader'
-
-import type { ComponentProps } from 'react'
 
 const mockClose = vi.fn()
 

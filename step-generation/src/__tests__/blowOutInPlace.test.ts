@@ -1,12 +1,12 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import type { BlowoutInPlaceParams } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { blowOutInPlace } from '../commandCreators/atomic/blowOutInPlace'
 import {
-  makeContext,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeContext,
 } from '../fixtures'
-import type { RobotState, InvariantContext } from '../types'
-import type { BlowoutInPlaceParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 describe('blowOutInPlace', () => {
   let invariantContext: InvariantContext

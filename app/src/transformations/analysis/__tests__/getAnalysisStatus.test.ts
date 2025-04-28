@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { getAnalysisStatus } from '../getAnalysisStatus'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
+import { getAnalysisStatus } from '../getAnalysisStatus'
 
 const mockAnalysisOutput = {
   robotType: 'OT-3 Standard',

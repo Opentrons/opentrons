@@ -1,11 +1,9 @@
 import path from 'path'
+import Ajv from 'ajv'
 import glob from 'glob'
 import { describe, expect, it, test } from 'vitest'
-
-import Ajv from 'ajv'
-
-import type { LabwareDefinition3 } from '../types'
 import schema from '../../labware/schemas/3.json'
+import type { LabwareDefinition3 } from '../types'
 
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/3')
 const definitionsDir = path.join(__dirname, '../../labware/definitions/3')

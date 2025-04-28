@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   COLORS,
   DIRECTION_ROW,
@@ -8,8 +6,8 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { StatusLabel } from '/app/atoms/StatusLabel'
+import { useTranslation } from 'react-i18next'
 
 interface CalibrationHealthCheckResultsProps {
   isCalibrationRecommended: boolean

@@ -1,7 +1,5 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { makeEvent } from '../make-event'
 import * as selectors from '../selectors'
 

@@ -1,16 +1,13 @@
-import { useSelector } from 'react-redux'
-
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type { ProtocolAnalyticsData } from '/app/redux/analytics/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
+import type { State } from '/app/redux/types'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useProtocolMetadata } from '/app/resources/protocols'
 import { useProtocolDetailsForRun, useRunTimestamps } from '/app/resources/runs'
-
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { ProtocolAnalyticsData } from '/app/redux/analytics/types'
-
-import type { State } from '/app/redux/types'
-import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import { parseProtocolRunAnalyticsData } from '/app/transformations/analytics'
+import { useSelector } from 'react-redux'
 
 type GetProtocolRunAnalyticsData = () => Promise<{
   protocolRunAnalyticsData: ProtocolAnalyticsData

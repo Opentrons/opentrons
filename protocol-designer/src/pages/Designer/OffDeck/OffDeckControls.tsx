@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import {
   Flex,
   JUSTIFY_CENTER,
@@ -7,15 +5,16 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
-import { START_TERMINAL_ITEM_ID } from '../../../steplist'
-import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
-
-import type { Dispatch, SetStateAction } from 'react'
 import type {
   CoordinateTuple,
   DeckSlotId,
   Dimensions,
 } from '@opentrons/shared-data'
+import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
+import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
 import type { DeckSetupTerminalIdType } from '../types'
 
 interface OffDeckControlsProps extends DeckSetupTerminalIdType {

@@ -1,12 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { vi, it, describe, expect } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
-import { ConfirmExit } from '../ConfirmExit'
-
 import type { ComponentProps } from 'react'
+import { describe, expect, it, vi } from 'vitest'
+import { ConfirmExit } from '../ConfirmExit'
 
 describe('ConfirmExit', () => {
   const mockBack = vi.fn()

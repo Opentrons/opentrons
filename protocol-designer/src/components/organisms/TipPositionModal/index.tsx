@@ -1,20 +1,17 @@
-import { useState } from 'react'
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_CENTER,
+  Banner,
+  Btn,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
-  Modal,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  Btn,
-  JUSTIFY_END,
-  SecondaryButton,
-  PrimaryButton,
-  StyledText,
-  Banner,
   InputField,
+  JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
+  Modal,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -22,21 +19,23 @@ import {
   POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
-import { prefixMap } from '../../../resources/utils'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { getMainPagePortalEl } from '../Portal'
-import { getIsTouchTipField } from '../../../form-types'
-import { TOO_MANY_DECIMALS, PERCENT_RANGE_TO_SHOW_WARNING } from './constants'
-import { usePositionReference } from './hooks'
-import * as utils from './utils'
-import { TipPositionTopView } from './TipPositionTopView'
-import { TipPositionSideView } from './TipPositionSideView'
-
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { PositionReference } from '@opentrons/shared-data'
+import { useState } from 'react'
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { getIsTouchTipField } from '../../../form-types'
 import type { StepFieldName } from '../../../form-types'
 import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
 import type { MoveLiquidPrefixType } from '../../../resources/types'
+import { prefixMap } from '../../../resources/utils'
+import { LINK_BUTTON_STYLE } from '../../atoms'
+import { getMainPagePortalEl } from '../Portal'
+import { PERCENT_RANGE_TO_SHOW_WARNING, TOO_MANY_DECIMALS } from './constants'
+import { usePositionReference } from './hooks'
+import { TipPositionSideView } from './TipPositionSideView'
+import { TipPositionTopView } from './TipPositionTopView'
+import * as utils from './utils'
 
 type Offset = 'x' | 'y' | 'z'
 interface PositionSpec {

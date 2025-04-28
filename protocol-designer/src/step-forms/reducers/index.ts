@@ -1,9 +1,3 @@
-import { handleActions } from 'redux-actions'
-import mapValues from 'lodash/mapValues'
-import cloneDeep from 'lodash/cloneDeep'
-import merge from 'lodash/merge'
-import omit from 'lodash/omit'
-import reduce from 'lodash/reduce'
 import {
   getAllDefinitions,
   getLabwareDefaultEngageHeight,
@@ -13,73 +7,27 @@ import {
   MAGNETIC_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import type { PipetteName } from '@opentrons/shared-data'
 import { GRIPPER_LOCATION } from '@opentrons/step-generation'
-import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
-import { getPDMetadata } from '../../file-types'
-import {
-  getDefaultsForStepType,
-  handleFormChange,
-} from '../../steplist/formLevel'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
-import { getLabwareOnModule } from '../../ui/modules/utils'
-import {
-  getAdditionalEquipmentPythonName,
-  getLabwarePythonName,
-  getModulePythonName,
-} from '../../utils'
-import { nestedCombineReducers } from './nestedCombineReducers'
-import {
-  _getPipetteEntitiesRootState,
-  _getLabwareEntitiesRootState,
-  _getInitialDeckSetupRootState,
-  _getAdditionalEquipmentEntitiesRootState,
-} from '../selectors'
-import {
-  createPresavedStepForm,
-  getDeckItemIdInSlot,
-  getIdsInRange,
-} from '../utils'
-
-import type { Reducer } from 'redux'
-import type { Action as ReduxActionsAction } from 'redux-actions'
 import type {
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
 } from '@opentrons/step-generation'
-import type { PipetteName } from '@opentrons/shared-data'
-import type { RootState as LabwareDefsRootState } from '../../labware-defs'
-import type { LoadFileAction } from '../../load-file'
-import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
-import type {
-  CreateDeckFixtureAction,
-  DeleteDeckFixtureAction,
-  ToggleIsGripperRequiredAction,
-} from '../actions/additionalItems'
-import type {
-  CreateModuleAction,
-  CreatePipettesAction,
-  DeleteModuleAction,
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
-  ChangeBatchEditFieldAction,
-  ResetBatchEditFieldChangesAction,
-  SaveStepFormsMultiAction,
-} from '../actions'
-
-import type {
-  CancelStepFormAction,
-  ChangeFormInputAction,
-  ChangeSavedStepFormAction,
-  DeleteStepAction,
-  DeleteMultipleStepsAction,
-  PopulateFormAction,
-  ReorderStepsAction,
-  FormPatch,
-} from '../../steplist/actions'
+import cloneDeep from 'lodash/cloneDeep'
+import mapValues from 'lodash/mapValues'
+import merge from 'lodash/merge'
+import omit from 'lodash/omit'
+import reduce from 'lodash/reduce'
+import type { Reducer } from 'redux'
+import { handleActions } from 'redux-actions'
+import type { Action as ReduxActionsAction } from 'redux-actions'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { getPDMetadata } from '../../file-types'
+import type { PipetteLoadInfo } from '../../file-types'
 import type { FormData, StepIdType, StepType } from '../../form-types'
+import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
+import type { RootState as LabwareDefsRootState } from '../../labware-defs'
+import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
 import type {
   CreateContainerAction,
   DeleteContainerAction,
@@ -88,27 +36,77 @@ import type {
   RenameStepAction,
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
-import type {
-  AddStepAction,
-  DuplicateStepAction,
-  DuplicateMultipleStepsAction,
-  ReorderSelectedStepAction,
-  SelectStepAction,
-  SelectTerminalItemAction,
-  SelectMultipleStepsAction,
-} from '../../ui/steps/actions/types'
-import type { Action } from '../../types'
-import type { PipetteLoadInfo } from '../../file-types'
+import type { LoadFileAction } from '../../load-file'
 import type {
   AdditionalEquipmentLocationUpdate,
   LocationUpdate,
 } from '../../load-file/migration/utils/getAdditionalEquipmentLocationUpdate'
+import type { EditMultipleModulesAction } from '../../modules'
 import type {
+  CancelStepFormAction,
+  ChangeFormInputAction,
+  ChangeSavedStepFormAction,
+  DeleteMultipleStepsAction,
+  DeleteStepAction,
+  FormPatch,
+  PopulateFormAction,
+  ReorderStepsAction,
+} from '../../steplist/actions'
+import {
+  getDefaultsForStepType,
+  handleFormChange,
+} from '../../steplist/formLevel'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
+import type { Action } from '../../types'
+import { getLabwareOnModule } from '../../ui/modules/utils'
+import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
+import type {
+  AddStepAction,
+  DuplicateMultipleStepsAction,
+  DuplicateStepAction,
+  ReorderSelectedStepAction,
+  SelectMultipleStepsAction,
+  SelectStepAction,
+  SelectTerminalItemAction,
+} from '../../ui/steps/actions/types'
+import {
+  getAdditionalEquipmentPythonName,
+  getLabwarePythonName,
+  getModulePythonName,
+} from '../../utils'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import type {
+  ChangeBatchEditFieldAction,
+  CreateModuleAction,
+  CreatePipettesAction,
+  DeleteModuleAction,
+  DeletePipettesAction,
+  ResetBatchEditFieldChangesAction,
+  SaveStepFormsMultiAction,
+  SubstituteStepFormPipettesAction,
+} from '../actions'
+import type {
+  CreateDeckFixtureAction,
+  DeleteDeckFixtureAction,
+  ToggleIsGripperRequiredAction,
+} from '../actions/additionalItems'
+import {
+  _getAdditionalEquipmentEntitiesRootState,
+  _getInitialDeckSetupRootState,
+  _getLabwareEntitiesRootState,
+  _getPipetteEntitiesRootState,
+} from '../selectors'
+import type {
+  ModuleEntities,
   NormalizedLabware,
   NormalizedLabwareById,
-  ModuleEntities,
 } from '../types'
-import type { EditMultipleModulesAction } from '../../modules'
+import {
+  createPresavedStepForm,
+  getDeckItemIdInSlot,
+  getIdsInRange,
+} from '../utils'
+import { nestedCombineReducers } from './nestedCombineReducers'
 
 type FormState = FormData | null
 const unsavedFormInitialState = null

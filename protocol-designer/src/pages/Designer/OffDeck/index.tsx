@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -16,11 +13,14 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { getOnlyLatestDefs } from '../../../labware-defs'
+import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getSelectedTerminalItemId } from '../../../ui/steps'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { DeckSetupToolbox } from '../DeckSetup/DeckSetupToolbox'
 import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'

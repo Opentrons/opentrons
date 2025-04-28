@@ -1,6 +1,6 @@
 import mixpanel from 'mixpanel-browser'
-import { getHasOptedIn } from './selectors'
 import type { Mixpanel } from '../resources/types'
+import { getHasOptedIn } from './selectors'
 
 export type AnalyticsEvent =
   | {

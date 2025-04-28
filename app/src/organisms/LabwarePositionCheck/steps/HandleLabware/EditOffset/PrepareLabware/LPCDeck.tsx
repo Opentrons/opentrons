@@ -1,34 +1,31 @@
-import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
-
 import {
   ALIGN_FLEX_START,
   BaseDeck,
   Flex,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getModuleType,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import {
   OFFSET_KIND_DEFAULT,
   selectSelectedLwAdapterDef,
   selectSelectedLwDef,
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ModuleOnDeck, LabwareOnDeck } from '@opentrons/components'
-import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import type { State } from '/app/redux/types'
 import type {
   LPCWizardState,
   OffsetLocationDetails,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
+import type { State } from '/app/redux/types'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 /** On the LPC deck, the only visible labware should be the labware with an actively edited offset (the topmost)
  * and the labware immediately beneath the topmost labware.

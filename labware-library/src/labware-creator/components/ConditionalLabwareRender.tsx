@@ -1,7 +1,6 @@
-import { useRef, useState, useLayoutEffect } from 'react'
 import {
-  LabwareRender,
   LabwareOutline,
+  LabwareRender,
   RobotCoordsForeignDiv,
   RobotWorkSpace,
 } from '@opentrons/components'
@@ -9,8 +8,9 @@ import {
   SLOT_LENGTH_MM as DEFAULT_X_DIMENSION,
   SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,
 } from '@opentrons/shared-data'
-import styles from './ConditionalLabwareRender.module.css'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { useLayoutEffect, useRef, useState } from 'react'
+import styles from './ConditionalLabwareRender.module.css'
 
 interface Props {
   definition: LabwareDefinition2 | null

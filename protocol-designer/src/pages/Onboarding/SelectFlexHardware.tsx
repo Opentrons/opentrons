@@ -1,11 +1,10 @@
-import { useTranslation } from 'react-i18next'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import { useTranslation } from 'react-i18next'
 import { HandleEnter } from '../../components/atoms'
 import { HardwareConfigurator } from '../../components/organisms/HardwareConfigurator'
-import { WizardBody } from './WizardBody'
-
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import type { WizardTileProps } from './types'
+import { WizardBody } from './WizardBody'
 
 export function SelectHardware(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props

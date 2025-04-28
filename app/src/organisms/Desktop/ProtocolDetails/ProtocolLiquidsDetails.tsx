@@ -1,27 +1,24 @@
-import { Fragment } from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  JUSTIFY_CENTER,
   Flex,
-  LiquidIcon,
   Icon,
-  SPACING,
+  JUSTIFY_CENTER,
   LegacyStyledText,
+  LiquidIcon,
+  SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
-
-import { Divider } from '/app/atoms/structure'
-
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
+import { Divider } from '/app/atoms/structure'
+import { Fragment } from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 interface ProtocolLiquidsDetailsProps {
   commands: RunTimeCommand[]

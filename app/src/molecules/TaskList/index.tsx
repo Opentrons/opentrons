@@ -1,5 +1,3 @@
-import { useState, useEffect, Fragment } from 'react'
-
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -7,8 +5,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  FLEX_NONE,
   Flex,
+  FLEX_NONE,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -19,10 +17,10 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-
 import { TertiaryButton } from '/app/atoms/buttons'
-
+import { Fragment, useEffect, useState } from 'react'
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'
+
 export type * from './types'
 
 const TASK_CONNECTOR_STYLE = `1px solid ${COLORS.grey40}`

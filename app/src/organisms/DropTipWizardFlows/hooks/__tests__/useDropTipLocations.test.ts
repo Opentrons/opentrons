@@ -1,9 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderHook } from '@testing-library/react'
-
-import { OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useDropTipLocations } from '../useDropTipLocations'
 
 const TRASH_BIN_FIXTURE = 'trashBinAdapter'

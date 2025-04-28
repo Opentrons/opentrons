@@ -1,21 +1,22 @@
-import { useTranslation, Trans } from 'react-i18next'
+import type { AttachedModule } from '@opentrons/api-client'
 import {
+  ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  ALIGN_CENTER,
-  JUSTIFY_FLEX_START,
   Flex,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-  OVERFLOW_SCROLL,
   Icon,
-  COLORS,
+  JUSTIFY_FLEX_START,
+  LegacyStyledText,
+  OVERFLOW_SCROLL,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import type { AttachedModule } from '@opentrons/api-client'
-import { useIsFlex } from '/app/redux-resources/robots'
 import { InterventionModal } from '/app/molecules/InterventionModal'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { Trans, useTranslation } from 'react-i18next'
+
 export interface IncompatibleModuleDesktopModalBodyProps {
   modules: AttachedModule[]
   robotName: string

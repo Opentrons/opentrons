@@ -1,28 +1,23 @@
-import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-
-import {
-  useTrackEvent,
-  ANALYTICS_DESKTOP_APP_ERROR,
-} from '/app/redux/analytics'
-
-import type { FallbackProps } from 'react-error-boundary'
-
 import {
   AlertPrimaryButton,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
   Modal,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-
+import {
+  ANALYTICS_DESKTOP_APP_ERROR,
+  useTrackEvent,
+} from '/app/redux/analytics'
 import { reloadUi } from '/app/redux/shell'
-
 import type { Dispatch } from '/app/redux/types'
+import type { FallbackProps } from 'react-error-boundary'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
   const { t } = useTranslation('app_settings')

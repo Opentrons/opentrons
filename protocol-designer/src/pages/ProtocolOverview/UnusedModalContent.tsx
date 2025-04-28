@@ -5,7 +5,6 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-
 import type { ReactNode } from 'react'
 import type { ModuleOnDeck, PipetteOnDeck } from '../../step-forms'
 import type { HintKey } from '../../tutorial'

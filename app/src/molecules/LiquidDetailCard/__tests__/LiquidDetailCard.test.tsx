@@ -1,19 +1,16 @@
+import { COLORS, SPACING } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
-
-import { SPACING, COLORS } from '@opentrons/components'
-
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  useTrackEvent,
   ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { getIsOnDevice } from '/app/redux/config'
-import { LiquidDetailCard } from '../LiquidDetailCard'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
+import { LiquidDetailCard } from '../LiquidDetailCard'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')

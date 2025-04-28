@@ -1,34 +1,34 @@
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '@opentrons/step-generation'
+import type {
+  LabwareEntities,
+  PipetteEntities,
+} from '@opentrons/step-generation'
 import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
-import { getPipetteSpecsV2 } from '@opentrons/shared-data'
-import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '@opentrons/step-generation'
+import type { FormData, StepFieldName } from '../../../form-types'
 import {
   getMinPipetteVolume,
   getPipetteCapacity,
 } from '../../../pipettes/pipetteData'
+import type { FormPatch } from '../../actions/types'
 import { getWellRatio } from '../../utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 import {
   chainPatchUpdaters,
+  DISPOSAL_VOL_DIGITS,
   fieldHasChanged,
+  getAllWellsFromPrimaryWells,
   getChannels,
   getDefaultWells,
-  getAllWellsFromPrimaryWells,
   getMaxDisposalVolumeForMultidispense,
   volumeInCapacityForMulti,
-  DISPOSAL_VOL_DIGITS,
 } from './utils'
-import type {
-  LabwareEntities,
-  PipetteEntities,
-} from '@opentrons/step-generation'
-import type { FormData, StepFieldName } from '../../../form-types'
-import type { FormPatch } from '../../actions/types'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>

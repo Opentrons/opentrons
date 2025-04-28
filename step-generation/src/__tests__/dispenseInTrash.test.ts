@@ -1,12 +1,12 @@
-import { describe, it, expect, vi } from 'vitest'
+import type { CutoutId } from '@opentrons/shared-data'
+import { describe, expect, it, vi } from 'vitest'
+import { dispenseInTrash } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
   getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
-import { dispenseInTrash } from '../commandCreators/compound'
-import type { CutoutId } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 import { PROTOCOL_CONTEXT_NAME } from '../utils'
 

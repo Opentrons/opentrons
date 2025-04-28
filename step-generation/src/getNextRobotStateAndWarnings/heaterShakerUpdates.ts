@@ -1,10 +1,10 @@
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
-import { getModuleState } from '../robotStateSelectors'
 import type {
-  TemperatureParams,
-  ShakeSpeedParams,
   ModuleOnlyParams,
+  ShakeSpeedParams,
+  TemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import { getModuleState } from '../robotStateSelectors'
 import type {
   HeaterShakerModuleState,
   InvariantContext,

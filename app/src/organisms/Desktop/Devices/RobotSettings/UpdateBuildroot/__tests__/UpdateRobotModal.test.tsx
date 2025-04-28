@@ -1,21 +1,19 @@
-import { createStore } from 'redux'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { createStore } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
-
 import { i18n } from '/app/i18n'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
+import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import {
   getRobotUpdateDisplayInfo,
   getRobotUpdateVersion,
 } from '/app/redux/robot-update'
-import { getDiscoverableRobotByName } from '/app/redux/discovery'
-import { UpdateRobotModal, RELEASE_NOTES_URL_BASE } from '../UpdateRobotModal'
-import { useIsRobotBusy } from '/app/redux-resources/robots'
-
+import type { State } from '/app/redux/types'
 import type { ComponentProps } from 'react'
 import type { Store } from 'redux'
-import type { State } from '/app/redux/types'
+import { RELEASE_NOTES_URL_BASE, UpdateRobotModal } from '../UpdateRobotModal'
 
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/discovery')

@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -9,19 +7,20 @@ import {
   DISPLAY_FLEX,
   Flex,
   JUSTIFY_FLEX_START,
+  LegacyStyledText,
   SIZE_4,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { HistoricalProtocolRun } from './HistoricalProtocolRun'
+import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import {
-  useNotifyAllRunsQuery,
   useCurrentRunId,
+  useNotifyAllRunsQuery,
   useRunStatuses,
 } from '/app/resources/runs'
+import { useTranslation } from 'react-i18next'
+import { HistoricalProtocolRun } from './HistoricalProtocolRun'
 
 interface RecentProtocolRunsProps {
   robotName: string

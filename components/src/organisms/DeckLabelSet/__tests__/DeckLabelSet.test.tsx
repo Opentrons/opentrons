@@ -1,12 +1,10 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { renderWithProviders } from '../../../testing/utils'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { DeckLabelSet } from '..'
 import { BORDERS, COLORS } from '../../../helix-design-system'
 import { DeckLabel } from '../../../molecules/DeckLabel'
-import { DeckLabelSet } from '..'
-
-import type { ComponentProps } from 'react'
+import { renderWithProviders } from '../../../testing/utils'
 
 vi.mock('../../../molecules/DeckLabel')
 

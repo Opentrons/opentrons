@@ -1,6 +1,3 @@
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -11,19 +8,20 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { getIsOnDevice } from '/app/redux/config'
+import type { StyleProps } from '@opentrons/components'
 import { Divider } from '/app/atoms/structure'
 import { labwareImages } from '/app/local-resources/labware'
-import { equipmentImages } from './equipmentImages'
-
+import { getIsOnDevice } from '/app/redux/config'
 import type { ComponentProps } from 'react'
-import type { StyleProps } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
+import { equipmentImages } from './equipmentImages'
 
 interface WizardRequiredEquipmentListProps extends StyleProps {
   equipmentList: Array<ComponentProps<typeof RequiredEquipmentCard>>

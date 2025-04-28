@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { comment } from '../commandCreators/atomic/comment'
 import { getSuccessResult } from '../fixtures'
 

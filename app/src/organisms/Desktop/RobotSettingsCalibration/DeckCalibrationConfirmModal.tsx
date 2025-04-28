@@ -1,17 +1,17 @@
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  Link,
-  PrimaryButton,
-  Modal,
-  SPACING,
   LegacyStyledText,
+  Link,
+  Modal,
+  PrimaryButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 interface DeckCalibrationConfirmModalProps {
   confirm: () => unknown

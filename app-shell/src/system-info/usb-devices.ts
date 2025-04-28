@@ -1,11 +1,10 @@
 import assert from 'assert'
+import { createHmac } from 'crypto'
+import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import execa from 'execa'
 import { usb } from 'usb'
-import { isWindows } from '../os'
 import { createLogger } from '../log'
-import { createHmac } from 'crypto'
-
-import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
+import { isWindows } from '../os'
 
 export type UsbDeviceMonitorOptions = Partial<{
   onDeviceAdd?: (device: UsbDevice) => void

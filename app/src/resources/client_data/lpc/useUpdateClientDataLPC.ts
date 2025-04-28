@@ -1,13 +1,11 @@
 import { useUpdateClientData } from '@opentrons/react-api-client'
-import { useSelector } from 'react-redux'
-
-import { getUserId } from '/app/redux/config'
-import { KEYS } from '../constants'
-
 import type {
   UseUpdateClientDataMutationOptions,
   UseUpdateClientDataMutationResult,
 } from '@opentrons/react-api-client'
+import { getUserId } from '/app/redux/config'
+import { useSelector } from 'react-redux'
+import { KEYS } from '../constants'
 import type { ClientDataLPC } from './types'
 
 export type UseUpdateClientDataLPCResult = Omit<

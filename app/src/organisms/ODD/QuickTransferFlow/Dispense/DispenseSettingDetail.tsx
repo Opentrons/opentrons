@@ -1,13 +1,12 @@
-import { FlowRateEntry } from '../QuickTransferAdvancedSettings/FlowRate'
-import { TipPositionEntry } from '../QuickTransferAdvancedSettings/TipPosition'
-import { Mix } from '../QuickTransferAdvancedSettings/Mix'
-import { Delay } from '../QuickTransferAdvancedSettings/Delay'
-import { TouchTip } from '../QuickTransferAdvancedSettings/TouchTip'
+import type { ComponentType, Dispatch } from 'react'
+import { DISPENSE_SETTING_OPTIONS as SETTING_OPTIONS } from '../constants'
 import { AirGap } from '../QuickTransferAdvancedSettings/AirGap'
 import { BlowOut } from '../QuickTransferAdvancedSettings/BlowOut'
-import { DISPENSE_SETTING_OPTIONS as SETTING_OPTIONS } from '../constants'
-
-import type { ComponentType, Dispatch } from 'react'
+import { Delay } from '../QuickTransferAdvancedSettings/Delay'
+import { FlowRateEntry } from '../QuickTransferAdvancedSettings/FlowRate'
+import { Mix } from '../QuickTransferAdvancedSettings/Mix'
+import { TipPositionEntry } from '../QuickTransferAdvancedSettings/TipPosition'
+import { TouchTip } from '../QuickTransferAdvancedSettings/TouchTip'
 import type {
   DispenseSettingOption,
   QuickTransferSummaryAction,

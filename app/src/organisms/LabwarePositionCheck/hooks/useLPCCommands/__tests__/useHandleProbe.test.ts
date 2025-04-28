@@ -1,15 +1,13 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
+import { LPC_STEP, selectCurrentStep } from '/app/redux/protocol-runs'
+import type { LPCStep } from '/app/redux/protocol-runs'
 import { useSelector } from 'react-redux'
-
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   retractPipetteAxesSequentiallyCommands,
   verifyProbeAttachmentAndHomeCommands,
 } from '../commands'
 import { useHandleProbeCommands } from '../useHandleProbeCommands'
-import { LPC_STEP, selectCurrentStep } from '/app/redux/protocol-runs'
-
-import type { LPCStep } from '/app/redux/protocol-runs'
 
 vi.mock('react-redux')
 vi.mock('../commands')

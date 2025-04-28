@@ -2,16 +2,14 @@
 // and restarting
 
 import path from 'path'
-
-import { fetch, postFile } from '../http'
-import { getSerialPortHttpAgent } from '../usb'
-import { OPENTRONS_USB } from '../constants'
-
-import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
 import type {
   RobotModel,
   ViewableRobot,
 } from '@opentrons/app/src/redux/discovery/types'
+import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
+import { OPENTRONS_USB } from '../constants'
+import { fetch, postFile } from '../http'
+import { getSerialPortHttpAgent } from '../usb'
 
 const PREMIGRATION_WHL_DIR = path.join(
   // NOTE: __dirname refers to output directory

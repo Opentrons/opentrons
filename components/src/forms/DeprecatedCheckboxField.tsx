@@ -1,8 +1,6 @@
 import cx from 'classnames'
+import type { ChangeEventHandler, ComponentProps } from 'react'
 import { Icon } from '../icons'
-
-import type { ComponentProps, ChangeEventHandler } from 'react'
-
 import styles from './forms.module.css'
 
 /**

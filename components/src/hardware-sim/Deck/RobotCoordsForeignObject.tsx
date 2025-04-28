@@ -1,7 +1,6 @@
+import type { ComponentProps, ReactNode } from 'react'
 import { css } from 'styled-components'
 import { Flex, ForeignObject } from '../../primitives'
-
-import type { ComponentProps, ReactNode } from 'react'
 
 export interface RobotCoordsForeignObjectProps {
   width: string | number

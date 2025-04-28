@@ -1,14 +1,13 @@
-import { vi } from 'vitest'
-import { formatTimestamp } from '/app/transformations/runs'
-import type { Mock } from 'vitest'
-
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { TaskListProps } from '/app/molecules/TaskList'
 import type {
-  TipLengthCalibration,
   PipetteOffsetCalibration,
+  TipLengthCalibration,
 } from '/app/redux/calibration/api-types'
 import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
-import type { TaskListProps } from '/app/molecules/TaskList'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import { formatTimestamp } from '/app/transformations/runs'
+import { vi } from 'vitest'
+import type { Mock } from 'vitest'
 
 export const TASK_COUNT = 3
 

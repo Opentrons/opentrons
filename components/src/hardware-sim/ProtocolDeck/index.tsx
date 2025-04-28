@@ -2,19 +2,17 @@ import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
-
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
+import type { ComponentProps } from 'react'
 import { BaseDeck } from '../BaseDeck'
 import { getStandardDeckViewLayerBlockList } from './utils'
 import { getLabwareInfoByLiquidId } from './utils/getLabwareInfoByLiquidId'
 import { getTopMostLabwareInSlots } from './utils/getLabwareInSlots'
 import { getModulesInSlots } from './utils/getModulesInSlots'
 import { getWellFillFromLabwareId } from './utils/getWellFillFromLabwareId'
-
-import type { ComponentProps } from 'react'
-import type {
-  CompletedProtocolAnalysis,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
 
 export * from './utils/getStandardDeckViewLayerBlockList'
 export * from './types'

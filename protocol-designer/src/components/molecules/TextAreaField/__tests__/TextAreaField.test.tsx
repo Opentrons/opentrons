@@ -1,10 +1,8 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { TextAreaField } from '..'
-
+import { fireEvent, screen } from '@testing-library/react'
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { TextAreaField } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
 
 const render = (props: ComponentProps<typeof TextAreaField>) => {
   return renderWithProviders(<TextAreaField {...props} />)

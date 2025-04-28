@@ -1,20 +1,17 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { screen } from '@testing-library/react'
-import { when } from 'vitest-when'
-
-import { renderWithProviders } from '/app/__testing-utils__'
+import type { Protocol } from '@opentrons/api-client'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { Deck } from '../Deck'
-
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { Protocol } from '@opentrons/api-client'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { Deck } from '../Deck'
 
 vi.mock('@opentrons/react-api-client')
 

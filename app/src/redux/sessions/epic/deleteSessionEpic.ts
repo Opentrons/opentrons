@@ -1,20 +1,15 @@
 import { ofType } from 'redux-observable'
-
 import { DELETE } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-
-import * as Actions from '../actions'
-import * as Constants from '../constants'
-
-import type { Action, Epic } from '../../types'
-
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-
-import type { DeleteSessionAction, SessionResponse } from '../types'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
+import type { Action, Epic } from '../../types'
+import * as Actions from '../actions'
+import * as Constants from '../constants'
+import type { DeleteSessionAction, SessionResponse } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<DeleteSessionAction> = action => ({
   method: DELETE,

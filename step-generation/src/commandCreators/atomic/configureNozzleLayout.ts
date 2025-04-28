@@ -1,6 +1,6 @@
-import { formatPyStr, uuid } from '../../utils'
 import type { ConfigureNozzleLayoutParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
+import { formatPyStr, uuid } from '../../utils'
 
 export const configureNozzleLayout: CommandCreator<ConfigureNozzleLayoutParams> = (
   args,

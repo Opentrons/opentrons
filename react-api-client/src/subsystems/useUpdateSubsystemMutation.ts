@@ -1,18 +1,17 @@
-import { useMutation, useQueryClient } from 'react-query'
 import { updateSubsystem } from '@opentrons/api-client'
-import { useHost } from '../api'
-
-import type {
-  UseMutationResult,
-  UseMutateFunction,
-  UseMutationOptions,
-} from 'react-query'
-import type { AxiosError } from 'axios'
 import type {
   HostConfig,
   Subsystem,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
+import type { AxiosError } from 'axios'
+import { useMutation, useQueryClient } from 'react-query'
+import type {
+  UseMutateFunction,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
+import { useHost } from '../api'
 
 export type UseUpdateSubsystemMutationResult = UseMutationResult<
   SubsystemUpdateProgressData,

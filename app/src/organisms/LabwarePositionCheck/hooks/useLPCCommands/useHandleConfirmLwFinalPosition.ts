@@ -1,17 +1,16 @@
+import type {
+  Coordinates,
+  CreateCommand,
+  LoadedPipette,
+} from '@opentrons/shared-data'
+import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 import {
   moduleCleanupDuringLPCCommands,
   moveLabwareOffDeckCommands,
   retractPipetteAxesSequentiallyCommands,
   savePositionCommands,
 } from './commands'
-
-import type {
-  LoadedPipette,
-  Coordinates,
-  CreateCommand,
-} from '@opentrons/shared-data'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
-import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 
 interface UseHandleConfirmPositionProps
   extends UseLPCCommandWithChainRunChildProps {

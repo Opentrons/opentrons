@@ -1,14 +1,13 @@
-import * as React from 'react'
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
   VIEWPORT,
 } from '@opentrons/components'
-import { TextAreaField as TextAreaFieldComponent } from '.'
-
-import type { ComponentProps } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
+import * as React from 'react'
+import type { ComponentProps } from 'react'
+import { TextAreaField as TextAreaFieldComponent } from '.'
 
 const meta: Meta<typeof TextAreaFieldComponent> = {
   // ToDo (kk05/02/2024) this should be in Library but at this moment there is the same name component in components

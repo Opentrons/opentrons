@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
-
-import type { ErrorKind, RecoveryRoute } from '../types'
 import { ERROR_KINDS, RECOVERY_MAP } from '../constants'
+import type { ErrorKind, RecoveryRoute } from '../types'
 
 // Return user-friendly recovery option copy from a given route. Only routes that are
 // recovery options are handled.

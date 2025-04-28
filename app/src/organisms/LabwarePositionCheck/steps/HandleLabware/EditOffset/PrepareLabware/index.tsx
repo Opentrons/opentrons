@@ -1,23 +1,21 @@
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-
+import type { LoadedPipette } from '@opentrons/shared-data'
+import { TwoColumn } from '/app/molecules/InterventionModal'
+import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
+import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import {
   selectActivePipette,
   selectSelectedLwOverview,
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
   setInitialPosition,
 } from '/app/redux/protocol-runs'
-import { LPCDeck } from './LPCDeck'
-
-import type { LoadedPipette } from '@opentrons/shared-data'
 import type {
   OffsetLocationDetails,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
-import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { LPCDeck } from './LPCDeck'
 import { PlaceItemInstruction } from './PlaceItemInstruction'
-import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import { TwoColumn } from '/app/molecules/InterventionModal'
 
 export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
   const {

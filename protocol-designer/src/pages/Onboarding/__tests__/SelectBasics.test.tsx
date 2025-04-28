@@ -1,19 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { IncompatibleTipsModal } from '../../../components/organisms'
-import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { SelectBasics } from '../SelectBasics'
-import { getTiprackOptions } from '../utils'
-
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
+import { IncompatibleTipsModal } from '../../../components/organisms'
 import type { WizardFormState } from '../../../components/organisms'
+import { getAllowAllTipracks } from '../../../feature-flags/selectors'
+import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { SelectBasics } from '../SelectBasics'
 import type { WizardTileProps } from '../types'
+import { getTiprackOptions } from '../utils'
 
 vi.mock('../../../labware-defs/selectors')
 vi.mock('../../../feature-flags/selectors')

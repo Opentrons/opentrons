@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -12,9 +9,10 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 import { OddModal } from '/app/molecules/OddModal'
-import { useIsOEMMode } from '/app/resources/robot-settings'
-
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { useIsOEMMode } from '/app/resources/robot-settings'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 interface RobotSystemVersionModalProps {
   version: string

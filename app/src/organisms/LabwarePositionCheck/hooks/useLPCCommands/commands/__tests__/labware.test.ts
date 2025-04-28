@@ -1,8 +1,6 @@
-import { it, describe, expect } from 'vitest'
-
-import { moveLabwareOffDeckCommands } from '../labware'
-
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import { describe, expect, it } from 'vitest'
+import { moveLabwareOffDeckCommands } from '../labware'
 
 describe('labware commands', () => {
   describe('moveLabwareOffDeckCommands', () => {

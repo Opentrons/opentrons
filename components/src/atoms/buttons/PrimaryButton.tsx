@@ -1,7 +1,7 @@
 import styled from 'styled-components'
-import { TYPOGRAPHY, SPACING } from '../../ui-style-constants'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { NewPrimaryBtn, styleProps } from '../../primitives'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue50};

@@ -1,18 +1,17 @@
-import { useMutation } from 'react-query'
 import { updateRobotSetting } from '@opentrons/api-client'
-import { useHost } from '../api'
-
-import type { AxiosError } from 'axios'
-import type {
-  UseMutateFunction,
-  UseMutationOptions,
-  UseMutationResult,
-} from 'react-query'
 import type {
   ErrorResponse,
   HostConfig,
   RobotSettings,
 } from '@opentrons/api-client'
+import type { AxiosError } from 'axios'
+import { useMutation } from 'react-query'
+import type {
+  UseMutateFunction,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
+import { useHost } from '../api'
 
 export interface UpdateRobotSettingVariables {
   id: string

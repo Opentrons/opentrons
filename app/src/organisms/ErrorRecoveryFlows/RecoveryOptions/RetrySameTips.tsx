@@ -1,8 +1,7 @@
-import { RECOVERY_MAP } from '../constants'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
 import { RetryWithSameTips } from '/app/organisms/ErrorRecoveryFlows/shared'
-
+import { RECOVERY_MAP } from '../constants'
 import type { RecoveryContentProps } from '../types'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 export function RetrySameTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props

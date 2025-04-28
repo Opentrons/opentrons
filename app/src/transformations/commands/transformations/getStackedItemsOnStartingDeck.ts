@@ -1,30 +1,29 @@
+import type { LabwareByLiquidId } from '@opentrons/components'
 import {
-  getLabwareDefURI,
   getAllDefinitions,
   getCutoutDisplayName,
+  getLabwareDefURI,
+  getSlotFromAddressableAreaName,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  getSlotFromAddressableAreaName,
 } from '@opentrons/shared-data'
-import { getLiquidsByIdForLabware } from '../../analysis'
-
 import type {
+  CutoutId,
   LabwareDefinition2,
-  ModuleModel,
-  RunTimeCommand,
+  LoadedLabware,
+  LoadedModule,
   LoadLabwareRunTimeCommand,
+  LoadLidParams,
   LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
-  LoadedLabware,
-  CutoutId,
-  LoadedModule,
-  LoadLidParams,
+  ModuleModel,
   OnAddressableAreaLocationSequenceComponent,
   OnCutoutFixtureLocationSequenceComponent,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '@opentrons/components'
+import { getLiquidsByIdForLabware } from '../../analysis'
 
 export interface LabwareInStack {
   definitionUri: string

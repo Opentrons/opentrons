@@ -1,29 +1,28 @@
 import {
+  FLEX_STACKER_MODULE_V1,
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  FLEX_STACKER_MODULE_V1,
   TRASH_BIN_FIXTURE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
-  MOVABLE_TRASH_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import {
-  getLabwareLocation,
-  getLabwareLocationFromSequence,
-} from './getLabwareLocation'
-
-import type { TFunction } from 'i18next'
-import type {
-  LocationFullParams,
-  LocationSlotOnlyParams,
-} from './getLabwareLocation'
 import type {
   AddressableAreaName,
   LabwareLocation,
   LabwareLocationSequence,
 } from '@opentrons/shared-data'
+import type { TFunction } from 'i18next'
+import {
+  getLabwareLocation,
+  getLabwareLocationFromSequence,
+} from './getLabwareLocation'
+import type {
+  LocationFullParams,
+  LocationSlotOnlyParams,
+} from './getLabwareLocation'
 
 export interface DisplayLocationSlotOnlyParams
   extends Omit<LocationSlotOnlyParams, 'location'> {

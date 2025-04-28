@@ -1,9 +1,8 @@
+import type { ReactNode } from 'react'
 import { Flex } from '../../../primitives'
 import { DIRECTION_COLUMN } from '../../../styles'
 import { SPACING } from '../../../ui-style-constants'
 import { StyledText } from '../../StyledText'
-
-import type { ReactNode } from 'react'
 
 interface ListButtonAccordionProps {
   children: ReactNode

@@ -1,10 +1,9 @@
-import { screen, fireEvent } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { AboutGripperSlideout } from '../AboutGripperSlideout'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { AboutGripperSlideout } from '../AboutGripperSlideout'
 
 const render = (props: ComponentProps<typeof AboutGripperSlideout>) => {
   return renderWithProviders(<AboutGripperSlideout {...props} />, {

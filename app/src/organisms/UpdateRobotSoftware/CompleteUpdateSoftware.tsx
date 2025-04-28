@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -8,12 +6,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { ProgressBar } from '/app/atoms/ProgressBar'
+import { useTranslation } from 'react-i18next'
 
 interface CompleteUpdateSoftwareProps {
   robotName: string

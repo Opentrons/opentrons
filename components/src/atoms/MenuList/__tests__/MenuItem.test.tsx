@@ -1,13 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { renderWithProviders } from '../../../testing/utils'
-import { COLORS } from '../../../helix-design-system'
-import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
-
-import { MenuItem } from '../MenuItem'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
+import { MenuItem } from '../MenuItem'
 
 const render = (props: ComponentProps<typeof MenuItem>) => {
   return renderWithProviders(<MenuItem {...props} />)[0]

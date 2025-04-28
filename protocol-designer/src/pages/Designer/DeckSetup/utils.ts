@@ -1,31 +1,16 @@
-import some from 'lodash/some'
-import { useEffect, useState } from 'react'
 import {
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+  getAreSlotsAdjacent,
+  getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
-  getAreSlotsAdjacent,
-  getModuleType,
 } from '@opentrons/shared-data'
-
-import { getIsAdapter, getStagingAreaAddressableAreas } from '../../../utils'
-import {
-  getLabwareIsCompatible,
-  getLabwareIsCustom,
-} from '../../../utils/labwareModuleCompatibility'
-import {
-  FLEX_MODULE_MODELS,
-  OT2_MODULE_MODELS,
-  RECOMMENDED_LABWARE_BY_MODULE,
-} from './constants'
-
-import type { Dispatch, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
   CoordinateTuple,
@@ -38,6 +23,9 @@ import type {
   ModuleType,
   RobotType,
 } from '@opentrons/shared-data'
+import some from 'lodash/some'
+import { useEffect, useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type {
   AllTemporalPropertiesForTimelineFrame,
@@ -47,8 +35,18 @@ import type {
   SavedStepFormState,
 } from '../../../step-forms'
 import type { Selection } from '../../../ui/steps'
-import type { Fixture } from './constants'
+import { getIsAdapter, getStagingAreaAddressableAreas } from '../../../utils'
+import {
+  getLabwareIsCompatible,
+  getLabwareIsCustom,
+} from '../../../utils/labwareModuleCompatibility'
 import type { AdditionalEquipment } from '../utils'
+import {
+  FLEX_MODULE_MODELS,
+  OT2_MODULE_MODELS,
+  RECOMMENDED_LABWARE_BY_MODULE,
+} from './constants'
+import type { Fixture } from './constants'
 
 const OT2_TC_SLOTS = ['7', '8', '10', '11']
 const FLEX_TC_SLOTS = ['A1', 'B1']

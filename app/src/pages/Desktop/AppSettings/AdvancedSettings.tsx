@@ -1,7 +1,7 @@
 import { Box, SPACING } from '@opentrons/components'
-
 import { Divider } from '/app/atoms/structure'
 import {
+  AdditionalCustomLabwareSourceFolder,
   ClearUnavailableRobots,
   EnableDevTools,
   OT2AdvancedSettings,
@@ -11,7 +11,6 @@ import {
   ShowLabwareOffsetSnippets,
   U2EInformation,
   UpdatedChannel,
-  AdditionalCustomLabwareSourceFolder,
 } from '/app/organisms/Desktop/AdvancedSettings'
 
 export function AdvancedSettings(): JSX.Element {

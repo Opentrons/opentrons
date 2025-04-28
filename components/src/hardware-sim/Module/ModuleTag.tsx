@@ -1,12 +1,11 @@
-import {
-  RobotCoordsForeignDiv,
-  C_MED_LIGHT_GRAY,
-  SPACING_1,
-  JUSTIFY_CENTER,
-  ALIGN_CENTER,
-} from '../../'
-
 import type { ReactNode } from 'react'
+import {
+  ALIGN_CENTER,
+  C_MED_LIGHT_GRAY,
+  JUSTIFY_CENTER,
+  RobotCoordsForeignDiv,
+  SPACING_1,
+} from '../../'
 
 export interface ModuleTagProps {
   x: number

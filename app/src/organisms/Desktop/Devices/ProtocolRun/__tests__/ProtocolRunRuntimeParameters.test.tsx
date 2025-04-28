@@ -1,7 +1,10 @@
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
-import { screen } from '@testing-library/react'
-import { when } from 'vitest-when'
+import type { Run } from '@opentrons/api-client'
 import { InfoScreen } from '@opentrons/components'
+import type {
+  CompletedProtocolAnalysis,
+  RunTimeParameter,
+} from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
@@ -10,18 +13,14 @@ import {
   useRunStatus,
 } from '/app/resources/runs'
 import {
-  mockSucceededRun,
   mockIdleUnstartedRun,
+  mockSucceededRun,
 } from '/app/resources/runs/__fixtures__'
-import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
-
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { Run } from '@opentrons/api-client'
-import type {
-  CompletedProtocolAnalysis,
-  RunTimeParameter,
-} from '@opentrons/shared-data'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()

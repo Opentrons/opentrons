@@ -1,18 +1,16 @@
-import { Component } from 'react'
-import { useLogger } from '../../logger'
-import { LegacyLabwarePositionCheckComponent } from './LegacyLabwarePositionCheckComponent'
-import { FatalErrorModal } from './FatalErrorModal'
-import { getIsOnDevice } from '/app/redux/config'
-import { useSelector } from 'react-redux'
-
+import type { LabwareOffset } from '@opentrons/api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import type { ErrorInfo, ReactNode } from 'react'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
 } from '@opentrons/shared-data'
-import type { LabwareOffset } from '@opentrons/api-client'
+import { getIsOnDevice } from '/app/redux/config'
+import { Component } from 'react'
+import type { ErrorInfo, ReactNode } from 'react'
+import { useSelector } from 'react-redux'
+import { useLogger } from '../../logger'
+import { FatalErrorModal } from './FatalErrorModal'
+import { LegacyLabwarePositionCheckComponent } from './LegacyLabwarePositionCheckComponent'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => void

@@ -1,5 +1,3 @@
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -18,10 +16,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
 import { SmallButton } from '/app/atoms/buttons'
-
 import type { SmallButtonTypes } from '/app/atoms/buttons/SmallButton'
+import { css } from 'styled-components'
 
 const MAX_SUPPORTED_LABELS = 3
 

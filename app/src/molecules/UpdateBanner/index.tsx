@@ -1,9 +1,7 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_START,
-  Btn,
   Banner,
+  Btn,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -12,8 +10,8 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { useIsFlex } from '/app/redux-resources/robots'
-
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useTranslation } from 'react-i18next'
 
 interface UpdateBannerProps {
   robotName: string

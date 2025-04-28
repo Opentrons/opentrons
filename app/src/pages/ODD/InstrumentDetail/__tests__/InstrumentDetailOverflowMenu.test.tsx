@@ -1,22 +1,19 @@
 import NiceModal from '@ebay/nice-modal-react'
-import { fireEvent, screen } from '@testing-library/react'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-
-import { renderWithProviders } from '/app/__testing-utils__'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
-
-import { i18n } from '/app/i18n'
-import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowMenu'
-import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
-import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
-import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-
 import type {
-  PipetteData,
   GripperData,
   HostConfig,
+  PipetteData,
 } from '@opentrons/api-client'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type * as SharedData from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowMenu'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof SharedData>()

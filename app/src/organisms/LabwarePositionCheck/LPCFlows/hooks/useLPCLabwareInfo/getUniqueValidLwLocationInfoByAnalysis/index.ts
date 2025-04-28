@@ -1,14 +1,12 @@
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import { getLPCUniqValidLabwareLocationInfo } from './getLPCUniqValidLabwareLocationInfo'
-import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
-
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
   RobotType,
 } from '@opentrons/shared-data'
+import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
 import type { LabwareLocationInfo } from '/app/redux/protocol-runs'
+import { getLPCUniqValidLabwareLocationInfo } from './getLPCUniqValidLabwareLocationInfo'
 
 export interface GetUniqueValidLwLocationInfoByAnalysisParams {
   protocolData: CompletedProtocolAnalysis | null

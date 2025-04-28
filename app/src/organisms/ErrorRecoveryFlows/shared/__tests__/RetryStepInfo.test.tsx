@@ -1,14 +1,12 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RetryStepInfo } from '../RetryStepInfo'
-import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
+import { RetryStepInfo } from '../RetryStepInfo'
 
 describe('RetryStepInfo', () => {
   let props: ComponentProps<typeof RetryStepInfo>

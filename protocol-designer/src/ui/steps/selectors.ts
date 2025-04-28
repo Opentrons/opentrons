@@ -1,30 +1,6 @@
-import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import uniq from 'lodash/uniq'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
-
-import { getLabwareOnModule } from '../modules/utils'
-import {
-  initialSelectedItemState,
-  SINGLE_STEP_SELECTION_TYPE,
-  TERMINAL_ITEM_SELECTION_TYPE,
-  MULTI_STEP_SELECTION_TYPE,
-} from './reducers'
-
-import {
-  getAspirateLabwareDisabledFields,
-  getDispenseLabwareDisabledFields,
-  getMultiAspiratePathDisabledFields,
-  getMultiDispensePathDisabledFields,
-  getPipetteDifferentAndMultiAspiratePathFields,
-  getPipetteDifferentAndMultiDispensePathFields,
-  getPipetteDifferentDisabledFields,
-  getLabwareDisabledFields,
-} from './utils'
-import type { BaseState, Selector } from '../../types'
-import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
+import { createSelector } from 'reselect'
 import type {
   CountPerStepType,
   FormData,
@@ -32,13 +8,35 @@ import type {
   StepIdType,
   StepType,
 } from '../../form-types'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
+import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
+import type { BaseState, Selector } from '../../types'
+import { getLabwareOnModule } from '../modules/utils'
+import type { Selection } from './actions/types'
+import {
+  initialSelectedItemState,
+  MULTI_STEP_SELECTION_TYPE,
+  SINGLE_STEP_SELECTION_TYPE,
+  TERMINAL_ITEM_SELECTION_TYPE,
+} from './reducers'
 import type {
-  SelectableItem,
-  StepsState,
   CollapsedStepsState,
   HoverableItem,
+  SelectableItem,
+  StepsState,
 } from './reducers'
-import type { Selection } from './actions/types'
+import {
+  getAspirateLabwareDisabledFields,
+  getDispenseLabwareDisabledFields,
+  getLabwareDisabledFields,
+  getMultiAspiratePathDisabledFields,
+  getMultiDispensePathDisabledFields,
+  getPipetteDifferentAndMultiAspiratePathFields,
+  getPipetteDifferentAndMultiDispensePathFields,
+  getPipetteDifferentDisabledFields,
+} from './utils'
 
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 // ======= Selectors ===============================================

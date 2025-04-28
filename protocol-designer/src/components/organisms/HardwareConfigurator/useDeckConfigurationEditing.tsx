@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   ABSORBANCE_READER_CUTOUTS,
   ABSORBANCE_READER_V1,
@@ -30,17 +29,18 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
-import { AddFixtureModal } from './AddFixtureModal'
-import type { UseFormSetValue } from 'react-hook-form'
-import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
   ModuleModel,
 } from '@opentrons/shared-data'
+import { useState } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import type { UseFormSetValue } from 'react-hook-form'
 import type { FormModules } from '../../../step-forms'
 import type { Fixtures, WizardFormState } from '../types'
+import { AddFixtureModal } from './AddFixtureModal'
 import type {
   CutoutConfigExtended,
   InitialDeckStateModules,

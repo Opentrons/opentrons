@@ -1,7 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { sortRuntimeParameters } from '../sortRunTimeParameters'
-
+import { describe, expect, it } from 'vitest'
 import type { CsvFileParameter, RunTimeParameter } from '../..'
+import { sortRuntimeParameters } from '../sortRunTimeParameters'
 
 const mockRunTimeParameters: RunTimeParameter[] = [
   {

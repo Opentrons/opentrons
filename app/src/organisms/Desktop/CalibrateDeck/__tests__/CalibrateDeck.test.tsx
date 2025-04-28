@@ -1,21 +1,18 @@
-import { vi, describe, beforeEach, expect, it } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
-
-import { renderWithProviders } from '/app/__testing-utils__'
 import { getDeckDefinitions } from '@opentrons/shared-data'
-
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import {
+  CalibrationError,
+  useCalibrationError,
+} from '/app/organisms/Desktop/CalibrationError'
+import type { DispatchRequestsType } from '/app/redux/robot-api'
 import * as Sessions from '/app/redux/sessions'
 import { mockDeckCalibrationSessionAttributes } from '/app/redux/sessions/__fixtures__'
-import { CalibrateDeck } from '../index'
-import {
-  useCalibrationError,
-  CalibrationError,
-} from '/app/organisms/Desktop/CalibrationError'
-
-import type { ComponentProps, ComponentType } from 'react'
 import type { DeckCalibrationStep } from '/app/redux/sessions/types'
-import type { DispatchRequestsType } from '/app/redux/robot-api'
+import type { ComponentProps, ComponentType } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { CalibrateDeck } from '../index'
 
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/robot-api/selectors')

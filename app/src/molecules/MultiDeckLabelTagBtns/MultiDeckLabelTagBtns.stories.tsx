@@ -1,6 +1,6 @@
-import { VIEWPORT, Tag, Chip, DeckInfoLabel } from '@opentrons/components'
+import { Chip, DeckInfoLabel, Tag, VIEWPORT } from '@opentrons/components'
+import type { Meta, Story } from '@storybook/react'
 import { MultiDeckLabelTagBtns as MultiDeckLabelTagBtnsComponent } from '.'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Molecules/MultiDeckLabelTagBtns',

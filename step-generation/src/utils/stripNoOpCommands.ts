@@ -1,5 +1,5 @@
-import { removePairs } from './removePairs'
 import type { AspDispAirgapParams, CreateCommand } from '@opentrons/shared-data'
+import { removePairs } from './removePairs'
 
 const _isEqualMix = (
   a: AspDispAirgapParams,

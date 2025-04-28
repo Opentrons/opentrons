@@ -1,6 +1,5 @@
-import { useNotifyAllRunsQuery } from '/app/resources/runs/useNotifyAllRunsQuery'
-
 import type { HostConfig, RunData } from '@opentrons/api-client'
+import { useNotifyAllRunsQuery } from '/app/resources/runs/useNotifyAllRunsQuery'
 import type { UseNotifyAllRunsQueryOptions } from '/app/resources/runs/useNotifyAllRunsQuery'
 
 export function useHistoricRunDetails(

@@ -1,19 +1,18 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ErrorInfo } from '../ErrorInfo'
 import {
   mockHeaterShaker,
   mockTemperatureModule,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
-
-import type { ComponentProps } from 'react'
 import type {
   HeaterShakerModule,
   ThermocyclerModule,
 } from '/app/redux/modules/types'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { ErrorInfo } from '../ErrorInfo'
 
 const mockErrorThermocycler = {
   id: 'thermocycler_id',

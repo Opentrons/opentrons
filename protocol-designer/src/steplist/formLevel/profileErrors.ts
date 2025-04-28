@@ -1,8 +1,7 @@
 import uniqBy from 'lodash/uniqBy'
+import type { ReactNode } from 'react'
 import { THERMOCYCLER_PROFILE } from '../../constants'
 import { PROFILE_STEP } from '../../form-types'
-
-import type { ReactNode } from 'react'
 import type {
   HydratedThermocyclerFormData,
   ProfileStepItem,

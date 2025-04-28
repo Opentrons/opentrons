@@ -1,12 +1,12 @@
-import { useQuery } from 'react-query'
 import { getCommands } from '@opentrons/api-client'
-import { useHost } from '../api'
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
+  CommandsData,
   GetRunCommandsParamsRequest,
   HostConfig,
-  CommandsData,
 } from '@opentrons/api-client'
+import { useQuery } from 'react-query'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import { useHost } from '../api'
 
 const DEFAULT_PAGE_LENGTH = 30
 

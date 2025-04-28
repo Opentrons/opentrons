@@ -1,7 +1,7 @@
-import { generateRobotStateTimeline } from './generateRobotStateTimeline'
-import { generateSubsteps } from './generateSubsteps'
 import type { Timeline } from '@opentrons/step-generation'
+import { generateRobotStateTimeline } from './generateRobotStateTimeline'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
+import { generateSubsteps } from './generateSubsteps'
 import type { GenerateSubstepsArgs } from './generateSubsteps'
 
 type TimelineMessageEvent = MessageEvent<{

@@ -16,12 +16,10 @@ import {
   TYPOGRAPHY,
   useMenuHandleClickOutside,
 } from '@opentrons/components'
-import flexGripper from '/app/assets/images/flex_gripper.png'
-
-import { MenuOverlay } from './MenuOverlay'
-
-import type { ReactNode } from 'react'
 import type { InstrumentDiagramProps, StyleProps } from '@opentrons/components'
+import flexGripper from '/app/assets/images/flex_gripper.png'
+import type { ReactNode } from 'react'
+import { MenuOverlay } from './MenuOverlay'
 import type { MenuOverlayItemProps } from './MenuOverlay'
 
 interface InstrumentCardProps extends StyleProps {

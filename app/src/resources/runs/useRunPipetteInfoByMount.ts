@@ -1,28 +1,27 @@
-import last from 'lodash/last'
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import {
-  getPipetteNameSpecs,
   getLabwareDefURI,
   getLoadedLabwareDefinitionsByUri,
+  getPipetteNameSpecs,
 } from '@opentrons/shared-data'
-import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
-import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '/app/redux/pipettes'
+import type {
+  LabwareDefinition2,
+  LoadPipetteRunTimeCommand,
+  PickUpTipRunTimeCommand,
+} from '@opentrons/shared-data'
+import { INCOMPATIBLE, INEXACT_MATCH, MATCH } from '/app/redux/pipettes'
+import type {
+  AttachedPipette,
+  Mount,
+  PipetteInfo,
+} from '/app/redux/pipettes/types'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
 } from '/app/resources/instruments'
-
+import last from 'lodash/last'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
-import type {
-  PickUpTipRunTimeCommand,
-  LoadPipetteRunTimeCommand,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
-import type {
-  Mount,
-  AttachedPipette,
-  PipetteInfo,
-} from '/app/redux/pipettes/types'
 
 const EMPTY_MOUNTS = { left: null, right: null }
 

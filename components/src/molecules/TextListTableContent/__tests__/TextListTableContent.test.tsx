@@ -1,11 +1,9 @@
-import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { renderWithProviders } from '../../../testing/utils'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { TextListTableContent } from '..'
 import { ListTable } from '../../../atoms/ListTable'
-
-import type { ComponentProps } from 'react'
+import { renderWithProviders } from '../../../testing/utils'
 
 vi.mock('../../../atoms/ListTable')
 

@@ -4,7 +4,6 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,

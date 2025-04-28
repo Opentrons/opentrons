@@ -1,9 +1,7 @@
-import { describe, it, expect } from 'vitest'
-
-import { robotApiReducer } from '../reducer'
-
-import type { RobotApiState } from '../types'
+import { describe, expect, it } from 'vitest'
 import { mockFailedRequestState } from '../__fixtures__'
+import { robotApiReducer } from '../reducer'
+import type { RobotApiState } from '../types'
 
 interface ReducerSpec {
   name: string

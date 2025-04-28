@@ -1,27 +1,24 @@
-import { useState, useEffect } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import type { PipetteData } from '@opentrons/api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  StyledText,
-  PrimaryButton,
   JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
   ModalHeader,
   ModalShell,
+  PrimaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-
+import type { IconProps } from '@opentrons/components'
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { useHomePipettes } from '/app/local-resources/instruments'
-
-import type { PipetteData } from '@opentrons/api-client'
-import type { IconProps } from '@opentrons/components'
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
 import type { TipAttachmentStatusResult } from '/app/resources/instruments'
+import { useEffect, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 type UseProtocolDropTipModalProps = Pick<
   UseHomePipettesProps,

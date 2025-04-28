@@ -1,19 +1,18 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { screen } from '@testing-library/react'
+import type * as Components from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   fixture12Trough,
+  FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { LabwareOnDeck } from '../../../components/organisms'
-import { DeckThumbnail } from '../DeckThumbnail'
-
-import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type * as Components from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { LabwareOnDeck } from '../../../components/organisms'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import { DeckThumbnail } from '../DeckThumbnail'
 
 vi.mock('../../../components/organisms')
 vi.mock('../../../file-data/selectors')

@@ -1,5 +1,3 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
 import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -10,6 +8,14 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  LabwareParameters,
+} from '@opentrons/shared-data'
+import type { LabwareEntity, RobotState } from '@opentrons/step-generation'
+import { fireEvent, screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'
 import { OFFDECK } from '../../../../../constants'
@@ -25,14 +31,6 @@ import {
 } from '../../../../../step-forms/selectors'
 import { getIsMultiSelectMode } from '../../../../../ui/steps'
 import { AddStepButton } from '../AddStepButton'
-
-import type {
-  LabwareDefinition2,
-  LabwareParameters,
-} from '@opentrons/shared-data'
-
-import type { ComponentProps } from 'react'
-import type { LabwareEntity, RobotState } from '@opentrons/step-generation'
 
 vi.mock('../../../../../feature-flags/selectors')
 vi.mock('../../../../../file-data/selectors')

@@ -2,10 +2,8 @@
 // props are string type for flexibility, but try to use constants for safety
 
 import pick from 'lodash/pick'
-
-import type * as Types from './types'
-
 import type { CSSObject } from 'styled-components'
+import type * as Types from './types'
 
 type Text = string | number
 

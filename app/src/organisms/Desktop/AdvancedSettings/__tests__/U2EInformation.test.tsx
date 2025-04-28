@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
   getU2EAdapterDevice,
@@ -9,8 +9,7 @@ import {
   UP_TO_DATE,
 } from '/app/redux/system-info'
 import * as Fixtures from '/app/redux/system-info/__fixtures__'
-import { renderWithProviders } from '/app/__testing-utils__'
-
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { U2EInformation } from '../U2EInformation'
 
 vi.mock('/app/redux/system-info')

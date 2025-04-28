@@ -1,15 +1,15 @@
-import { createAction } from 'redux-actions'
-import { getLiquidEntities } from '../../step-forms/selectors'
-import { selectors } from '../selectors'
-import type { StepFieldName } from '../../form-types'
-import type { DeckSlot, ThunkAction } from '../../types'
-import type { Fixture, IngredInputs } from '../types'
 import type {
   CutoutId,
   LabwareDisplayCategory,
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { LiquidEntities, LiquidEntity } from '@opentrons/step-generation'
+import { createAction } from 'redux-actions'
+import type { StepFieldName } from '../../form-types'
+import { getLiquidEntities } from '../../step-forms/selectors'
+import type { DeckSlot, ThunkAction } from '../../types'
+import { selectors } from '../selectors'
+import type { Fixture, IngredInputs } from '../types'
 
 // ===== Labware selector actions =====
 export interface OpenAddLabwareModalAction {

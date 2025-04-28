@@ -1,21 +1,19 @@
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
-  DISPLAY_FLEX,
-  DIRECTION_COLUMN,
-  SPACING,
   ALIGN_CENTER,
   COLORS,
-  Icon,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   Flex,
-  StyledText,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
-
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import type { DropTipWizardContainerProps } from './types'
 
 export function ErrorInfo({

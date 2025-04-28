@@ -1,11 +1,11 @@
 import {
   FLEX_ROBOT_TYPE,
-  SINGLE,
-  THERMOCYCLER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getDeckDefFromRobotType,
   getFlexSurroundingSlots,
   getPositionFromSlotId,
+  SINGLE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type {
   AddressableArea,
@@ -14,11 +14,11 @@ import type {
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
-  RobotState,
   InvariantContext,
-  PipetteEntity,
-  ModuleEntities,
   LabwareEntity,
+  ModuleEntities,
+  PipetteEntity,
+  RobotState,
 } from '../types'
 
 const A12_column_front_left_bound = { x: -11.03, y: 2 }

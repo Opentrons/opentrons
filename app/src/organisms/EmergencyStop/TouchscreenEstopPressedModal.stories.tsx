@@ -1,15 +1,12 @@
+import { VIEWPORT } from '@opentrons/components'
+import type { Meta, Story } from '@storybook/react'
+import { configReducer } from '/app/redux/config/reducer'
 import type * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { QueryClient, QueryClientProvider } from 'react-query'
-
-import { VIEWPORT } from '@opentrons/components'
-
-import { configReducer } from '/app/redux/config/reducer'
-import { EstopPressedModal } from '.'
-
 import type { Store, StoreEnhancer } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import { EstopPressedModal } from '.'
 
 export default {
   title: 'ODD/Organisms/EstopPressedModal',

@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -14,10 +12,12 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
-  setLocalStorageItem,
   getLocalStorageItem,
   localStorageAnnouncementKey,
+  setLocalStorageItem,
 } from '../../../persist'
 import { RELEASE_NOTES_URL } from '../KnowledgeLink'
 import { useAnnouncements } from './announcements'

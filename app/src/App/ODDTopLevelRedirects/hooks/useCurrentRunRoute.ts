@@ -5,7 +5,6 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-
 import { useNotifyRunQuery } from '/app/resources/runs'
 import { CURRENT_RUN_POLL } from '../constants'
 

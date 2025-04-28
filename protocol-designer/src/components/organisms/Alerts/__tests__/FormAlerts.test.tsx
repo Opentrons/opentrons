@@ -1,23 +1,22 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { FormAlerts } from '../FormAlerts'
-import { i18n } from '../../../../assets/localization'
+import type { ComponentProps } from 'react'
 import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
+import {
+  dismissFormWarning,
+  dismissTimelineWarning,
+} from '../../../../dismiss/actions'
+import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import {
   getDynamicFieldFormErrorsForUnsavedForm,
   getFormLevelErrorsForUnsavedForm,
   getHydratedUnsavedForm,
 } from '../../../../step-forms/selectors'
-import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
 import { getSelectedStepId } from '../../../../ui/steps'
-import {
-  dismissFormWarning,
-  dismissTimelineWarning,
-} from '../../../../dismiss/actions'
-
-import type { ComponentProps } from 'react'
+import { FormAlerts } from '../FormAlerts'
 
 vi.mock('../../../../dismiss/actions')
 vi.mock('../../../../ui/steps')

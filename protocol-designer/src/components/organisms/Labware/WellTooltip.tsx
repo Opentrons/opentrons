@@ -1,10 +1,3 @@
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import map from 'lodash/map'
-import reduce from 'lodash/reduce'
-import styled from 'styled-components'
-import { createPortal } from 'react-dom'
-import { Popper, Reference, Manager } from 'react-popper'
 import {
   BORDERS,
   COLORS,
@@ -16,17 +9,23 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import type { LocationLiquidState } from '@opentrons/step-generation'
+import map from 'lodash/map'
+import reduce from 'lodash/reduce'
+import { useState } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import { Manager, Popper, Reference } from 'react-popper'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 import { getMainPagePortalEl } from '..'
 import { selectors } from '../../../labware-ingred/selectors'
 import {
   formatPercentage,
   formatVolume,
 } from '../../../pages/Designer/ProtocolSteps/Timeline/utils'
-import { swatchColors } from '../DefineLiquidsModal/swatchColors'
-
-import type { MouseEvent, ReactNode } from 'react'
-import type { LocationLiquidState } from '@opentrons/step-generation'
 import type { WellIngredientNames } from '../../../steplist/types'
+import { swatchColors } from '../DefineLiquidsModal/swatchColors'
 
 const DEFAULT_TOOLTIP_OFFSET = 22
 const WELL_BORDER_WIDTH = 4

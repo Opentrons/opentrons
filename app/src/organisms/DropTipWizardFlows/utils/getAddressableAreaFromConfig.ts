@@ -8,7 +8,6 @@ import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-
 import type {
   AddressableAreaName,
   DeckConfiguration,

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { DeckConfigurator } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -9,20 +8,21 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
 import type {
   CutoutConfig,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
+import { useState } from 'react'
+import type { UseFormSetValue } from 'react-hook-form'
 import type { FormModule, FormModules } from '../../../step-forms'
 import type { Fixtures, WizardFormState } from '../types'
-import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutConfigExtended,
   InitialDeckStateModules,
   ModuleExtended,
 } from './AddFixtureModal'
+import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
 
 interface HardwareConfiguratorProps {
   modules: FormModules | InitialDeckStateModules

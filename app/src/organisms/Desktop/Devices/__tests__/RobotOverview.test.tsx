@@ -1,57 +1,55 @@
+import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { screen, fireEvent } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
-import * as DiscoveryClientFixtures from '../../../../../../discovery-client/src/fixtures'
 import { useAuthorization } from '@opentrons/react-api-client'
-
+import type * as ReactApiClient from '@opentrons/react-api-client'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
-import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
-import { getConfig, useFeatureFlag } from '/app/redux/config'
-import {
-  getRobotAddressesByName,
-  getRobotModelByName,
-} from '/app/redux/discovery'
-import {
-  HEALTH_STATUS_OK,
-  OPENTRONS_USB,
-  ROBOT_MODEL_OT3,
-} from '/app/redux/discovery/constants'
 import {
   useIsRobotBusy,
   useIsRobotViewable,
   useRobot,
 } from '/app/redux-resources/robots'
-import { useLights } from '/app/resources/devices'
-import { useCalibrationTaskList } from '../hooks'
+import { getConfig, useFeatureFlag } from '/app/redux/config'
+import type { Config } from '/app/redux/config/types'
 import {
-  expectedBadDeckTaskList,
-  expectedBadDeckAndPipetteOffsetTaskList,
-  expectedBadEverythingTaskList,
-  expectedBadPipetteOffsetTaskList,
-  expectedBadTipLengthTaskList,
-  expectedBadTipLengthAndOffsetTaskList,
-  expectedIncompleteDeckCalTaskList,
-  expectedTaskList,
-} from '../hooks/__fixtures__/taskListFixtures'
+  getRobotAddressesByName,
+  getRobotModelByName,
+} from '/app/redux/discovery'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import {
+  HEALTH_STATUS_OK,
+  OPENTRONS_USB,
+  ROBOT_MODEL_OT3,
+} from '/app/redux/discovery/constants'
+import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import type { State } from '/app/redux/types'
+import { useLights } from '/app/resources/devices'
+import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
+import type { ComponentProps } from 'react'
+import * as DiscoveryClientFixtures from '../../../../../../discovery-client/src/fixtures'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
-import { RobotStatusHeader } from '../RobotStatusHeader'
-import { RobotOverview } from '../RobotOverview'
-import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
 } from '../ErrorRecoveryBanner'
-
-import type { ComponentProps } from 'react'
-import type * as ReactApiClient from '@opentrons/react-api-client'
-import type { Config } from '/app/redux/config/types'
-import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
-import type { State } from '/app/redux/types'
+import { useCalibrationTaskList } from '../hooks'
+import {
+  expectedBadDeckAndPipetteOffsetTaskList,
+  expectedBadDeckTaskList,
+  expectedBadEverythingTaskList,
+  expectedBadPipetteOffsetTaskList,
+  expectedBadTipLengthAndOffsetTaskList,
+  expectedBadTipLengthTaskList,
+  expectedIncompleteDeckCalTaskList,
+  expectedTaskList,
+} from '../hooks/__fixtures__/taskListFixtures'
+import { RobotOverview } from '../RobotOverview'
+import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
+import { RobotStatusHeader } from '../RobotStatusHeader'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()

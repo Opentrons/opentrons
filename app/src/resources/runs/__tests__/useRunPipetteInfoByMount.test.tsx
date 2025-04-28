@@ -1,14 +1,11 @@
-import { renderHook } from '@testing-library/react'
-import { vi, it, expect, describe, beforeEach } from 'vitest'
-import { when } from 'vitest-when'
-
-import {
-  getPipetteNameSpecs,
-  getLoadedLabwareDefinitionsByUri,
-  opentrons96Tiprack10UlV1Uncasted as _tiprack10ul,
-} from '@opentrons/shared-data'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
-
+import {
+  opentrons96Tiprack10UlV1Uncasted as _tiprack10ul,
+  getLoadedLabwareDefinitionsByUri,
+  getPipetteNameSpecs,
+} from '@opentrons/shared-data'
+import type * as SharedData from '@opentrons/shared-data'
+import { renderHook } from '@testing-library/react'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
@@ -17,22 +14,21 @@ import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
 } from '/app/redux/calibration/tip-length/__fixtures__'
+import type { PipetteInfo } from '/app/redux/pipettes'
 import {
   mockLeftProtoPipette,
   mockRightProtoPipette,
 } from '/app/redux/pipettes/__fixtures__'
-import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
-
-import { useRunPipetteInfoByMount } from '../useRunPipetteInfoByMount'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
 } from '/app/resources/instruments'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import { modifiedSimpleV6Protocol as _uncastedModifiedSimpleV6Protocol } from '../__fixtures__'
-
-import type * as SharedData from '@opentrons/shared-data'
-import type { PipetteInfo } from '/app/redux/pipettes'
+import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
+import { useRunPipetteInfoByMount } from '../useRunPipetteInfoByMount'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()

@@ -1,7 +1,8 @@
-import { useDispatch, useSelector } from 'react-redux'
-import isEqual from 'lodash/isEqual'
-
-import { useNotifyAllRunsQuery } from '/app/resources/runs'
+import type {
+  LabwareOffset,
+  Run,
+  StoredLabwareOffset,
+} from '@opentrons/api-client'
 import {
   selectAreOffsetsApplied,
   selectConflictTimestampInfo,
@@ -9,13 +10,10 @@ import {
   selectInitialRunRecordOffsets,
   updateConflictTimestamp,
 } from '/app/redux/protocol-runs'
-
-import type {
-  StoredLabwareOffset,
-  Run,
-  LabwareOffset,
-} from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
+import isEqual from 'lodash/isEqual'
+import { useDispatch, useSelector } from 'react-redux'
 
 // TODO(jh, 03-20-25): This hook can live entirely in Redux if we move run-agnostic data like "allRuns" into the store!
 

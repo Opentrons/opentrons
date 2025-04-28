@@ -1,4 +1,13 @@
+import type {
+  DeckDefinition,
+  ModuleType,
+  WASTE_CHUTE_CUTOUT,
+} from '@opentrons/shared-data'
+import type { SVGProps } from 'react'
+import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
+import type { DeckLabelProps } from '../../molecules'
+import { DeckLabelSet } from '../../organisms'
 import { Flex, Text } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -6,19 +15,9 @@ import {
   JUSTIFY_CENTER,
   TEXT_ALIGN_CENTER,
 } from '../../styles'
-import { DeckLabelSet } from '../../organisms'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotBase } from './SlotBase'
-import type {
-  WASTE_CHUTE_CUTOUT,
-  DeckDefinition,
-  ModuleType,
-} from '@opentrons/shared-data'
-
-import type { SVGProps } from 'react'
-import type { DeckLabelProps } from '../../molecules'
 
 const WASTE_CHUTE_WIDTH = 130
 const WASTE_CHUTE_HEIGHT = 138

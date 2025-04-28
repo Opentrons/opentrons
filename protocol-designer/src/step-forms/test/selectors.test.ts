@@ -1,18 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import {
-  _hasFieldLevelErrors,
-  getEquippedPipetteOptions,
-  getBatchEditFormHasUnsavedChanges,
-  getUnsavedFormIsPristineHeaterShakerForm,
-  getUnsavedFormIsPristineSetTempForm,
-} from '../selectors'
-import { getFieldErrors } from '../../steplist/fieldLevel'
-import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type {
   FormData,
   HydratedPauseFormData,
   HydratedThermocyclerFormData,
 } from '../../form-types'
+import { getFieldErrors } from '../../steplist/fieldLevel'
+import {
+  _hasFieldLevelErrors,
+  getBatchEditFormHasUnsavedChanges,
+  getEquippedPipetteOptions,
+  getUnsavedFormIsPristineHeaterShakerForm,
+  getUnsavedFormIsPristineSetTempForm,
+} from '../selectors'
+import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 
 vi.mock('../../steplist/fieldLevel')
 vi.mock('../utils/getProfileItemsHaveErrors')

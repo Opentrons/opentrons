@@ -1,23 +1,21 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest'
-import { screen, act, renderHook } from '@testing-library/react'
-
+import { act, renderHook, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { InlineNotification } from '/app/atoms/InlineNotification'
-import { StepInfo } from '../StepInfo'
+import { i18n } from '/app/i18n'
 import { OddModal } from '/app/molecules/OddModal'
-import {
-  useErrorDetailsModal,
-  ErrorDetailsModal,
-  OverpressureBanner,
-  TipNotDetectedBanner,
-  GripperErrorBanner,
-  StallErrorBanner,
-  NoLiquidDetectedBanner,
-} from '../ErrorDetailsModal'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { mockRecoveryContentProps } from '../../__fixtures__'
+import {
+  ErrorDetailsModal,
+  GripperErrorBanner,
+  NoLiquidDetectedBanner,
+  OverpressureBanner,
+  StallErrorBanner,
+  TipNotDetectedBanner,
+  useErrorDetailsModal,
+} from '../ErrorDetailsModal'
+import { StepInfo } from '../StepInfo'
 
 vi.mock('react-dom', () => ({
   ...vi.importActual('react-dom'),

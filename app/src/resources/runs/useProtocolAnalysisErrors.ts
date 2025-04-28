@@ -1,12 +1,10 @@
-import last from 'lodash/last'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-
-import { useNotifyRunQuery } from './useNotifyRunQuery'
-
 import type { AnalysisError } from '@opentrons/shared-data'
+import last from 'lodash/last'
+import { useNotifyRunQuery } from './useNotifyRunQuery'
 
 export interface ProtocolAnalysisErrors {
   analysisErrors: AnalysisError[] | null

@@ -1,13 +1,10 @@
-import { it, describe, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
-
 import { GEN1, GEN2, LEFT, RIGHT } from '@opentrons/shared-data'
-
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { InstructionStep } from '../InstructionStep'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, it } from 'vitest'
+import { InstructionStep } from '../InstructionStep'
 
 const render = (props: ComponentProps<typeof InstructionStep>) => {
   return renderWithProviders(<InstructionStep {...props} />, {

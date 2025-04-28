@@ -1,14 +1,14 @@
-import reduce from 'lodash/reduce'
-import {
-  MIXED_WELL_COLOR,
-  swatchColors,
-} from '../DefineLiquidsModal/swatchColors'
-import { AIR } from '@opentrons/step-generation'
 import type { WellFill } from '@opentrons/components'
+import { AIR } from '@opentrons/step-generation'
+import reduce from 'lodash/reduce'
 import type {
   ContentsByWell,
   WellContents,
 } from '../../../labware-ingred/types'
+import {
+  MIXED_WELL_COLOR,
+  swatchColors,
+} from '../DefineLiquidsModal/swatchColors'
 
 const ingredIdsToColor = (
   groupIds: string[],

@@ -1,6 +1,5 @@
-import { POST, request } from '../../request'
-
 import type { CreateCommand } from '@opentrons/shared-data'
+import { POST, request } from '../../request'
 import type { ResponsePromise } from '../../request'
 import type { HostConfig } from '../../types'
 import type { CommandData } from '../types'

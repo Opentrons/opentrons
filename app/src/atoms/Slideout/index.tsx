@@ -1,7 +1,3 @@
-import { useRef, useState, useEffect } from 'react'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   Box,
@@ -12,17 +8,18 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   Overlay,
   POSITION_FIXED,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { Divider } from '../structure'
-
+import { useEffect, useRef, useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+import { Divider } from '../structure'
 
 export interface MultiSlideoutSpecs {
   currentStep: number

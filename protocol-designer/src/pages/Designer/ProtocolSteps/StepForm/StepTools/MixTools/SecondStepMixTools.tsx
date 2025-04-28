@@ -1,6 +1,3 @@
-import { useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Divider,
@@ -9,12 +6,17 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
-import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+import { useRef, useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
 } from '../../../../../../components/molecules'
+import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
+import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+import type { FormData } from '../../../../../../form-types'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -29,16 +31,14 @@ import {
   PositionField,
   WellsOrderField,
 } from '../../PipetteFields'
+import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import {
   getBlowoutLocationOptionsForForm,
   getFormLevelError,
   getLabwareFieldForPositioningField,
 } from '../../utils'
-import { ResetSettingsField } from '../MoveLiquidTools/ResetSettingsField'
-import type { Dispatch, SetStateAction } from 'react'
-import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { ErrorMappedToField } from '../../utils'
-import type { FormData } from '../../../../../../form-types'
+import { ResetSettingsField } from '../MoveLiquidTools/ResetSettingsField'
 
 interface SecondStepMixToolsProps {
   propsForFields: FieldPropsByName

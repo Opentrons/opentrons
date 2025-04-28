@@ -1,10 +1,4 @@
-import { useState, useEffect, Fragment } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-import isEqual from 'lodash/isEqual'
-import last from 'lodash/last'
-
+import type { CsvFileData } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -17,16 +11,19 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
-
-import { getShellUpdateDataFiles } from '/app/redux/shell'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { EmptyFile } from './EmptyFile'
-
 import type {
   CsvFileParameter,
   CsvFileParameterFileData,
 } from '@opentrons/shared-data'
-import type { CsvFileData } from '@opentrons/api-client'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { getShellUpdateDataFiles } from '/app/redux/shell'
+import isEqual from 'lodash/isEqual'
+import last from 'lodash/last'
+import { Fragment, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+import { EmptyFile } from './EmptyFile'
 
 const MAX_CHARS = 52
 const CSV_FILENAME_BREAK_POINT = 42

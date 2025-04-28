@@ -1,11 +1,10 @@
-import { useNotifyAllCommandsQuery } from './useNotifyAllCommandsQuery'
-
-import type { UseQueryOptions } from 'react-query'
 import type {
   CommandsData,
-  RunCommandSummary,
   GetRunCommandsParams,
+  RunCommandSummary,
 } from '@opentrons/api-client'
+import type { UseQueryOptions } from 'react-query'
+import { useNotifyAllCommandsQuery } from './useNotifyAllCommandsQuery'
 
 const REFETCH_INTERVAL = 3000
 

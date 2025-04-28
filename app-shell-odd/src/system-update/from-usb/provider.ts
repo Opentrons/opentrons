@@ -1,9 +1,9 @@
-import tempy from 'tempy'
-import path from 'path'
 import { rm, writeFile } from 'fs/promises'
-import type { UpdateProvider, ResolvedUpdate, ProgressCallback } from '../types'
-import { getLatestMassStorageUpdateFile } from './scan-device'
+import path from 'path'
+import tempy from 'tempy'
 import { createLogger } from '../../log'
+import type { ProgressCallback, ResolvedUpdate, UpdateProvider } from '../types'
+import { getLatestMassStorageUpdateFile } from './scan-device'
 
 export interface USBUpdateSource {
   currentVersion: string

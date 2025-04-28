@@ -1,12 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { EditNickNameModal } from '..'
-import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
-import { renameLabware } from '../../../../labware-ingred/actions'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { EditNickNameModal } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
+import { renameLabware } from '../../../../labware-ingred/actions'
+import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
 
 vi.mock('../../../../ui/labware/selectors')
 vi.mock('../../../../labware-ingred/actions')

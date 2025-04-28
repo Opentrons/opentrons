@@ -1,6 +1,5 @@
 // analytics module
 import { toggleConfigValue } from '../config'
-
 import type { ToggleConfigValueAction } from '../config/types'
 
 export * from './hooks'

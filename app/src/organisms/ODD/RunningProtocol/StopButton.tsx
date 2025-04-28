@@ -1,14 +1,12 @@
-import { css } from 'styled-components'
-
 import {
-  Icon,
-  Btn,
   ALIGN_CENTER,
+  Btn,
   COLORS,
+  Icon,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
+import { css } from 'styled-components'
 
 const STOP_BUTTON_STYLE = css`
   -webkit-tap-highlight-color: transparent;

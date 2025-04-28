@@ -1,5 +1,3 @@
-import { createPortal } from 'react-dom'
-
 import {
   AlertModal,
   Box,
@@ -10,9 +8,8 @@ import {
   SPACING_3,
   Text,
 } from '@opentrons/components'
-
 import { getModalPortalEl } from '/app/App/portal'
-
+import { createPortal } from 'react-dom'
 import styles from './styles.module.css'
 
 const TITLE = 'Are you sure you want to continue?'

@@ -1,17 +1,17 @@
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import {
   ALIGN_FLEX_END,
   Box,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   Link,
+  Modal,
   PrimaryButton,
   SPACING,
-  Modal,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'

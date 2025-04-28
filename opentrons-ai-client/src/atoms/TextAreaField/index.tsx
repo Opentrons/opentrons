@@ -1,5 +1,3 @@
-import { forwardRef } from 'react'
-import styled, { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -16,7 +14,8 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-
+import type { IconName } from '@opentrons/components'
+import { forwardRef } from 'react'
 import type {
   ChangeEventHandler,
   FocusEvent,
@@ -24,7 +23,7 @@ import type {
   MutableRefObject,
   ReactNode,
 } from 'react'
-import type { IconName } from '@opentrons/components'
+import styled, { css } from 'styled-components'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const LEGACY_INPUT_TYPE_TEXT = 'text' as const

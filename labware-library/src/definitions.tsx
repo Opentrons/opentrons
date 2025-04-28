@@ -1,16 +1,15 @@
 // labware definition helpers
 // TODO(mc, 2019-03-18): move to shared-data?
-import { useLocation } from 'react-router-dom'
+import {
+  getAllDefinitions as _getAllDefinitions,
+  LABWAREV2_DO_NOT_LIST,
+} from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'
-import {
-  LABWAREV2_DO_NOT_LIST,
-  getAllDefinitions as _getAllDefinitions,
-} from '@opentrons/shared-data'
-
 import type * as React from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareList, LabwareDefinition } from './types'
+import { useLocation } from 'react-router-dom'
+import type { LabwareDefinition, LabwareList } from './types'
 
 const getOnlyLatestDefs = (labwareList: LabwareList): LabwareList => {
   // group by namespace + loadName

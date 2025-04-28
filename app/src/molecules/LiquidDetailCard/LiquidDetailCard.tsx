@@ -1,5 +1,3 @@
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -20,13 +18,14 @@ import {
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { Divider } from '/app/atoms/structure'
 import {
-  useTrackEvent,
   ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { getIsOnDevice } from '/app/redux/config'
 import { getWellRangeForLiquidLabwarePair } from '/app/transformations/analysis'
-
 import type { Dispatch, SetStateAction } from 'react'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};

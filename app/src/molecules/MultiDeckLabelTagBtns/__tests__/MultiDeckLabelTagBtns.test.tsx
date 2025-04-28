@@ -1,8 +1,8 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { MultiDeckLabelTagBtns } from '..'
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { MultiDeckLabelTagBtns } from '..'
 
 const render = (props: ComponentProps<typeof MultiDeckLabelTagBtns>) => {
   return renderWithProviders(<MultiDeckLabelTagBtns {...props} />)[0]

@@ -1,12 +1,10 @@
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
-
-import { useIsOEMMode } from '/app/resources/robot-settings'
-
 import type {
   PipetteModel,
   PipetteName,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
+import { useIsOEMMode } from '/app/resources/robot-settings'
 
 export function usePipetteSpecsV2(
   name?: PipetteName | PipetteModel

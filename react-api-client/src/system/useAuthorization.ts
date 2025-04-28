@@ -1,13 +1,12 @@
-import { useRef, useEffect } from 'react'
 import { createAuthorization, createRegistration } from '@opentrons/api-client'
-import { useHost } from '../api'
-
 import type {
-  HostConfig,
   AuthorizationToken,
   CreateRegistrationParams,
+  HostConfig,
   RegistrationToken,
 } from '@opentrons/api-client'
+import { useEffect, useRef } from 'react'
+import { useHost } from '../api'
 
 interface UseAuthorizationResult {
   authorizationToken: AuthorizationToken | null

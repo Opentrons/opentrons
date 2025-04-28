@@ -1,22 +1,20 @@
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { fireEvent, waitFor, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
 import {
   useHost,
   useUpdatePipetteSettingsMutation,
 } from '@opentrons/react-api-client'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
-
 import {
   mockLeftSpecs,
   mockPipetteSettingsFieldsMap,
 } from '/app/redux/pipettes/__fixtures__'
-
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
 
 vi.mock('@opentrons/react-api-client')
 

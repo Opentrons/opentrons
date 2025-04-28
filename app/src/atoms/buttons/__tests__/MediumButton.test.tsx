@@ -1,12 +1,10 @@
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { BORDERS, COLORS } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
-import { COLORS, BORDERS } from '@opentrons/components'
 import { renderWithProviders } from '/app/__testing-utils__'
-
-import { MediumButton } from '../MediumButton'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { MediumButton } from '../MediumButton'
 
 const render = (props: ComponentProps<typeof MediumButton>) => {
   return renderWithProviders(<MediumButton {...props} />)[0]

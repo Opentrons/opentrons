@@ -1,14 +1,14 @@
-import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Slideout } from '/app/atoms/Slideout'
+import { useTranslation } from 'react-i18next'
 
 interface AboutGripperSlideoutProps {
   serialNumber: string

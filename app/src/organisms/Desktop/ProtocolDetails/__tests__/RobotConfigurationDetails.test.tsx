@@ -1,14 +1,11 @@
-import { describe, it, expect, afterEach, vi } from 'vitest'
+import { FLEX_STANDARD_MODEL, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
+import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data'
 import { screen } from '@testing-library/react'
-
-import { OT2_STANDARD_MODEL, FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
-
 import type { ComponentProps } from 'react'
-import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
 
 const mockRequiredModuleDetails = [
   {

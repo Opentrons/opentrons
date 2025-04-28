@@ -1,11 +1,10 @@
-import { memo } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import map from 'lodash/map'
-import { COLORS } from '../../../helix-design-system'
-import { Well } from './Well'
-
+import { memo } from 'react'
 import type { MemoExoticComponent, ReactNode } from 'react'
 import type { CSSProperties } from 'styled-components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { COLORS } from '../../../helix-design-system'
+import { Well } from './Well'
 
 export interface FilledWellsProps {
   definition: LabwareDefinition2

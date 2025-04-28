@@ -1,5 +1,4 @@
-import { describe, it, expect } from 'vitest'
-
+import { describe, expect, it } from 'vitest'
 import * as Actions from '../actions'
 import type { RobotApiAction } from '../types'
 

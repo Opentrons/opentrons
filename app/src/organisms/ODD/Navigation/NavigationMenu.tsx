@@ -1,9 +1,3 @@
-import { useState } from 'react'
-import { createPortal } from 'react-dom'
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -15,14 +9,17 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { home, ROBOT } from '/app/redux/robot-controls'
-import { useLights } from '/app/resources/devices'
 import { getTopPortalEl } from '/app/App/portal'
-import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
-
-import type { MouseEventHandler } from 'react'
+import { home, ROBOT } from '/app/redux/robot-controls'
 import type { Dispatch } from '/app/redux/types'
+import { useLights } from '/app/resources/devices'
+import { useState } from 'react'
+import type { MouseEventHandler } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
 interface NavigationMenuProps {
   onClick: MouseEventHandler

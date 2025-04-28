@@ -1,16 +1,15 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  Tabs,
   SPACING,
+  Tabs,
 } from '@opentrons/components'
-
 import type { StyleProps } from '@opentrons/components'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 type TabOptions = 'table' | 'jupyter' | 'cli'
 

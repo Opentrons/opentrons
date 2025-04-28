@@ -1,19 +1,18 @@
-import { useSelector } from 'react-redux'
-import { Trans, useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   ListItem,
   SPACING,
   StyledText,
   Tag,
 } from '@opentrons/components'
-import { getSavedStepForms } from '../../../../step-forms/selectors'
-
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import type { ProfileStepItem } from '../../../../form-types'
+import { getSavedStepForms } from '../../../../step-forms/selectors'
 import type { ThermocyclerCycleType } from '../StepForm/StepTools/ThermocyclerTools/ThermocyclerCycle'
 import type { ThermocyclerStepType } from '../StepForm/StepTools/ThermocyclerTools/ThermocyclerStep'
 

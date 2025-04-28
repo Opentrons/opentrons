@@ -1,14 +1,13 @@
-import {
-  useHost,
-  useUpdateErrorRecoveryPolicy,
-} from '@opentrons/react-api-client'
 import { getErrorRecoveryPolicy } from '@opentrons/api-client'
-
 import type {
   HostConfig,
   RecoveryPolicyRulesParams,
   UpdateErrorRecoveryPolicyResponse,
 } from '@opentrons/api-client'
+import {
+  useHost,
+  useUpdateErrorRecoveryPolicy,
+} from '@opentrons/react-api-client'
 
 /**
  * append - Add a new policy rule to the end of the existing recovery policy.

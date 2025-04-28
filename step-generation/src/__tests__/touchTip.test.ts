@@ -1,13 +1,13 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { touchTip } from '../commandCreators/atomic/touchTip'
 import {
+  DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
-  makeContext,
   getSuccessResult,
-  getErrorResult,
-  DEFAULT_PIPETTE,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
 import type { InvariantContext, RobotState } from '../types'

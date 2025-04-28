@@ -1,16 +1,14 @@
-import { css } from 'styled-components'
-
 import {
   COLORS,
   Flex,
-  ModuleIcon as SharedModuleIcon,
   POSITION_RELATIVE,
+  ModuleIcon as SharedModuleIcon,
   SPACING,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-
 import type { AttachedModule } from '/app/redux/modules/types'
+import { css } from 'styled-components'
 
 const MODULE_ICON_STYLE = css`
   &:hover {

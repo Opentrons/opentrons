@@ -1,13 +1,13 @@
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 export function Loading(): JSX.Element {
   const { t } = useTranslation('protocol_generator')

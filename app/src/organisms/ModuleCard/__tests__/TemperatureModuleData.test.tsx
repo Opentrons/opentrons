@@ -1,11 +1,9 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { TemperatureModuleData } from '../TemperatureModuleData'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { TemperatureModuleData } from '../TemperatureModuleData'
 
 const render = (props: ComponentProps<typeof TemperatureModuleData>) =>
   renderWithProviders(<TemperatureModuleData {...props} />, {

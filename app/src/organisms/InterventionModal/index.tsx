@@ -1,7 +1,14 @@
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
+import type {
+  RunCommandSummary,
+  RunData,
+  RunStatus,
+} from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -12,40 +19,30 @@ import {
   DISPLAY_FLEX,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   PrimaryButton,
+  RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
-  RESPONSIVENESS,
 } from '@opentrons/components'
-import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-} from '@opentrons/api-client'
-
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
-import { InterventionModal as InterventionModalMolecule } from '/app/molecules/InterventionModal'
-import { getIsOnDevice } from '/app/redux/config'
-import { PauseInterventionContent } from './PauseInterventionContent'
-import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
-import { isInterventionCommand } from './utils'
-import { useRobotType } from '/app/redux-resources/robots'
-import { InlineNotification } from '/app/atoms/InlineNotification'
-
-import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type {
-  RunCommandSummary,
-  RunData,
-  RunStatus,
-} from '@opentrons/api-client'
+import { SmallButton } from '/app/atoms/buttons'
+import { InlineNotification } from '/app/atoms/InlineNotification'
+import { InterventionModal as InterventionModalMolecule } from '/app/molecules/InterventionModal'
+import { OddModal } from '/app/molecules/OddModal'
+import { useRobotType } from '/app/redux-resources/robots'
+import { getIsOnDevice } from '/app/redux/config'
+import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
+import { PauseInterventionContent } from './PauseInterventionContent'
+import { isInterventionCommand } from './utils'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,

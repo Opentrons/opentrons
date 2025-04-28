@@ -1,6 +1,3 @@
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -11,8 +8,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
 import { LPC_HREF } from '/app/local-resources/offsets'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 export function LearnAboutOffsetsLink(): JSX.Element {
   const { t } = useTranslation('protocol_setup')

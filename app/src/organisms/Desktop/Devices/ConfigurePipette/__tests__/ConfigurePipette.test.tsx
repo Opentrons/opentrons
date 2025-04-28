@@ -1,17 +1,15 @@
-import { when } from 'vitest-when'
-import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import * as RobotApi from '/app/redux/robot-api'
-import { ConfigurePipette } from '../../ConfigurePipette'
-import { mockPipetteSettingsFieldsMap } from '/app/redux/pipettes/__fixtures__'
 import { getConfig } from '/app/redux/config'
-
-import type { ComponentProps } from 'react'
+import { mockPipetteSettingsFieldsMap } from '/app/redux/pipettes/__fixtures__'
+import * as RobotApi from '/app/redux/robot-api'
 import type { DispatchApiRequestType } from '/app/redux/robot-api'
 import type { State } from '/app/redux/types'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { ConfigurePipette } from '../../ConfigurePipette'
 
 vi.mock('/app/redux/robot-api')
 vi.mock('/app/redux/config')

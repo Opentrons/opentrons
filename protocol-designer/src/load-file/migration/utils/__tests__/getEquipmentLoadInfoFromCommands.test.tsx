@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import type { CreateCommand, LabwareDefinition2 } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
 import doItAllV7 from '../../../../../fixtures/protocol/7/doItAllV7.json'
 import { getEquipmentLoadInfoFromCommands } from '../getEquipmentLoadInfoFromCommands'
-import type { CreateCommand, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { EquipmentLoadInfoFromCommands } from '../getEquipmentLoadInfoFromCommands'
 
 describe('getEquipmentLoadInfoFromCommands', () => {

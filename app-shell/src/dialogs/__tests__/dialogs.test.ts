@@ -1,5 +1,5 @@
 import Electron from 'electron'
-import { describe, it, vi, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import * as Dialogs from '..'
 
 vi.mock('electron')

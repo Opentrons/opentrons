@@ -1,22 +1,20 @@
+import { getTopPortalEl } from '/app/App/portal'
+import { UpdateAppModal } from '/app/organisms/Desktop/UpdateAppModal'
+import type { ReachableRobot, Robot } from '/app/redux/discovery/types'
+import {
+  getRobotSystemType,
+  getRobotUpdateAvailable,
+  getRobotUpdateDownloadError,
+  getRobotUpdateInfo,
+  OT2_BALENA,
+} from '/app/redux/robot-update'
+import { getAvailableShellUpdate } from '/app/redux/shell'
+import type { State } from '/app/redux/types'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
-
-import {
-  OT2_BALENA,
-  getRobotUpdateInfo,
-  getRobotUpdateDownloadError,
-  getRobotSystemType,
-  getRobotUpdateAvailable,
-} from '/app/redux/robot-update'
-import { getAvailableShellUpdate } from '/app/redux/shell'
-import { getTopPortalEl } from '/app/App/portal'
-import { UpdateAppModal } from '/app/organisms/Desktop/UpdateAppModal'
 import { MigrationWarningModal } from './MigrationWarningModal'
 import { UpdateRobotModal } from './UpdateRobotModal'
-
-import type { State } from '/app/redux/types'
-import type { ReachableRobot, Robot } from '/app/redux/discovery/types'
 
 export interface ViewUpdateModalProps {
   robotName: string

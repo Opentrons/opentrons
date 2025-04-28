@@ -1,7 +1,6 @@
-import { describe, it, expect, vi } from 'vitest'
-import { formatRunTimeParameterDefaultValue } from '../formatRunTimeParameterDefaultValue'
-
+import { describe, expect, it, vi } from 'vitest'
 import type { ValueRunTimeParameter } from '../../types'
+import { formatRunTimeParameterDefaultValue } from '../formatRunTimeParameterDefaultValue'
 
 const capitalizeFirstLetter = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1)

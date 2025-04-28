@@ -1,12 +1,10 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '../../../testing/utils'
+import { fireEvent, screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ListAccordion } from '..'
 import { ListTable } from '../../../atoms/ListTable'
 import { Icon } from '../../../icons'
-
-import type { ComponentProps } from 'react'
+import { renderWithProviders } from '../../../testing/utils'
 
 vi.mock('../../../atoms/ListTable')
 

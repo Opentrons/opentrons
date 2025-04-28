@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,10 +6,11 @@ import {
   StyledText,
   WRAP,
 } from '@opentrons/components'
-import { PIPETTE_TYPES } from '../../../pages/Onboarding/constants'
+import type { PipetteMount, RobotType } from '@opentrons/shared-data'
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
-import type { PipetteMount, RobotType } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import { PIPETTE_TYPES } from '../../../pages/Onboarding/constants'
 import type { Gen, PipetteType } from '../../../pages/Onboarding/types'
 import type { FormPipettesByMount } from '../../../step-forms'
 

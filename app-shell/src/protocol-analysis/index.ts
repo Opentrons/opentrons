@@ -1,21 +1,20 @@
-import { createLogger } from '../log'
+import type { BrowserWindow } from 'electron'
 import { getConfig, handleConfigChange } from '../config'
 import { updateConfigValue } from '../config/actions'
-import { getValidLabwareFilePaths } from '../labware'
-import {
-  showOpenDirectoryDialog,
-  openDirectoryInFileExplorer,
-} from '../dialogs'
 import {
   CHANGE_PYTHON_PATH_OVERRIDE,
   OPEN_PYTHON_DIRECTORY,
 } from '../constants'
-import { selectPythonPath, getPythonPath } from './getPythonPath'
-import { executeAnalyzeCli } from './executeAnalyzeCli'
-import { writeFailedAnalysis } from './writeFailedAnalysis'
-
-import type { BrowserWindow } from 'electron'
+import {
+  openDirectoryInFileExplorer,
+  showOpenDirectoryDialog,
+} from '../dialogs'
+import { getValidLabwareFilePaths } from '../labware'
+import { createLogger } from '../log'
 import type { Action, Dispatch } from '../types'
+import { executeAnalyzeCli } from './executeAnalyzeCli'
+import { getPythonPath, selectPythonPath } from './getPythonPath'
+import { writeFailedAnalysis } from './writeFailedAnalysis'
 
 const log = createLogger('protocol-analysis')
 

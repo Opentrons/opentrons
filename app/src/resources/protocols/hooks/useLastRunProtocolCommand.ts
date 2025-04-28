@@ -1,8 +1,6 @@
-import last from 'lodash/last'
-
-import { useCommandQuery } from '@opentrons/react-api-client'
-
 import type { CommandsData, RunCommandSummary } from '@opentrons/api-client'
+import { useCommandQuery } from '@opentrons/react-api-client'
+import last from 'lodash/last'
 
 // Return the last command with a "protocol" intent. If the command does not have "protocol" intent,
 // return the last command with "protocol" intent.

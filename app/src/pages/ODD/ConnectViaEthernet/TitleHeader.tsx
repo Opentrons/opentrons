@@ -1,5 +1,3 @@
-import { useNavigate } from 'react-router-dom'
-
 import {
   ALIGN_CENTER,
   Btn,
@@ -7,12 +5,13 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useNavigate } from 'react-router-dom'
 
 interface TitleHeaderProps {
   title: string

@@ -1,20 +1,27 @@
 import assert from 'assert'
-import zip from 'lodash/zip'
 import {
-  LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
+import type { CutoutId } from '@opentrons/shared-data'
+import zip from 'lodash/zip'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { dropTipInTrash } from './dropTipInTrash'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  CurriedCommandCreator,
+  TransferArgs,
+} from '../../types'
 import {
+  airGapLocationHelper,
   blowoutLocationHelper,
   curryCommandCreator,
-  airGapLocationHelper,
-  reduceCommandCreators,
-  getTrashOrLabware,
-  dispenseLocationHelper,
   delayLocationHelper,
+  dispenseLocationHelper,
+  getTrashOrLabware,
+  reduceCommandCreators,
 } from '../../utils'
 import {
   aspirate,
@@ -25,17 +32,10 @@ import {
   touchTip,
 } from '../atomic'
 import { airGapInWell } from './airGapInWell'
+import { dropTipInTrash } from './dropTipInTrash'
 import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
-import type { CutoutId } from '@opentrons/shared-data'
-import type {
-  TransferArgs,
-  CurriedCommandCreator,
-  CommandCreator,
-  CommandCreatorError,
-} from '../../types'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 
 export const transfer: CommandCreator<TransferArgs> = (
   args,

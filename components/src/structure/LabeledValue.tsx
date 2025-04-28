@@ -1,9 +1,7 @@
 // Card component with drop shadow
 import cx from 'classnames'
-
-import styles from './structure.module.css'
-
 import type { ReactNode } from 'react'
+import styles from './structure.module.css'
 
 export interface LabeledValueProps {
   /** Label */

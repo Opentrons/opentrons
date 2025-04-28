@@ -1,13 +1,13 @@
-import { vi, describe, it, expect, afterEach } from 'vitest'
-import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
-import { getIsHidden } from '../../formSelectors'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import {
   IRREGULAR_LABWARE_ERROR,
-  LOOSE_TIP_FIT_ERROR,
-  LABWARE_TOO_SMALL_ERROR,
   LABWARE_TOO_LARGE_ERROR,
+  LABWARE_TOO_SMALL_ERROR,
+  LOOSE_TIP_FIT_ERROR,
 } from '../../fields'
+import { getIsHidden } from '../../formSelectors'
 import { FormAlerts } from '../alerts/FormAlerts'
 import type { Props as FormAlertProps } from '../alerts/FormAlerts'
 

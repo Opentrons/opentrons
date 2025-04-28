@@ -1,8 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react'
+import { LiquidIcon } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { customViewports } from '../../../../.storybook/preview'
-import { LiquidIcon } from '.'
-import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof LiquidIcon> = {
   title: 'Helix/Molecules/LiquidIcon',

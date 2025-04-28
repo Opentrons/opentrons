@@ -1,10 +1,9 @@
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { usePipetteModelSpecs } from '/app/local-resources/instruments'
-
 import type { PipetteData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 import type { PipetteModel } from '@opentrons/shared-data'
+import { usePipetteModelSpecs } from '/app/local-resources/instruments'
 import type { PipetteInformation } from '/app/redux/pipettes'
 
 export type AttachedPipettesFromInstrumentsQuery = {

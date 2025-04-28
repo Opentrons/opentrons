@@ -1,9 +1,8 @@
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
@@ -11,11 +10,11 @@ import {
   StyledText,
   TYPOGRAPHY,
   WRAP,
-  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { getLabwareDefIsStandard } from '@opentrons/shared-data'
-
 import { useRequiredProtocolLabware } from '/app/resources/protocols'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 import { EmptySection } from './EmptySection'
 
 const Table = styled('table')`

@@ -3,14 +3,13 @@
 import path from 'path'
 import fs from 'fs-extra'
 import tempy from 'tempy'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
-
-import { PROTOCOLS_DIRECTORY_NAME } from '../file-system'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   fetchProtocols,
-  getUnixTimeFromAnalysisPath,
   getParsedAnalysisFromPath,
+  getUnixTimeFromAnalysisPath,
 } from '../'
+import { PROTOCOLS_DIRECTORY_NAME } from '../file-system'
 
 vi.mock('electron-store')
 vi.mock('../../log')

@@ -1,13 +1,21 @@
+import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
-
+import type {
+  CommandStatus,
+  CompletedProtocolAnalysis,
+  ModuleOnlyParams,
+  ModuleType,
+  RunTimeCommand,
+  TemperatureParams,
+} from '@opentrons/shared-data'
 import {
-  useTrackEvent,
-  ANALYTICS_MODULE_COMMAND_ERROR,
   ANALYTICS_MODULE_COMMAND_COMPLETED,
+  ANALYTICS_MODULE_COMMAND_ERROR,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -15,16 +23,6 @@ import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
-
-import type {
-  CommandStatus,
-  ModuleOnlyParams,
-  ModuleType,
-  TemperatureParams,
-  RunTimeCommand,
-  CompletedProtocolAnalysis,
-} from '@opentrons/shared-data'
-import type { CommandData, AttachedModule } from '@opentrons/api-client'
 
 const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
   'thermocycler/closeLid',

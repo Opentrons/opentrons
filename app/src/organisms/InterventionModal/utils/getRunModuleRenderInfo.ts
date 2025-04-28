@@ -1,10 +1,9 @@
+import type { RunData } from '@opentrons/api-client'
 import {
-  SPAN7_8_10_11_SLOT,
   getModuleDef2,
   getPositionFromSlotId,
+  SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
-
-import type { RunData } from '@opentrons/api-client'
 import type {
   DeckDefinition,
   LabwareDefinition2,

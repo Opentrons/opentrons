@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -7,10 +5,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 export function DisplaySearchNetwork(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])

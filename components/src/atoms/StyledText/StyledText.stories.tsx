@@ -1,8 +1,8 @@
 /* eslint-disable storybook/prefer-pascal-case */
-import { SPACING } from '../../ui-style-constants'
-import { Flex } from '../../primitives'
-import { StyledText, ODD_STYLES, HELIX_STYLES } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
+import { Flex } from '../../primitives'
+import { SPACING } from '../../ui-style-constants'
+import { HELIX_STYLES, ODD_STYLES, StyledText } from './index'
 
 const meta: Meta<typeof StyledText> = {
   title: 'Helix/Atoms/StyledText',

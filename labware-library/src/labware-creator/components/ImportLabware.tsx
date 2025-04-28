@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { Icon, PrimaryButton } from '@opentrons/components'
+import * as React from 'react'
 import styles from './importLabware.module.css'
 
 interface Props {

@@ -1,18 +1,18 @@
-import capitalize from 'lodash/capitalize'
-import { useTranslation } from 'react-i18next'
 import {
+  AlertPrimaryButton,
   COLORS,
+  JUSTIFY_FLEX_END,
+  SecondaryButton,
   SPACING,
   TYPOGRAPHY,
-  SecondaryButton,
-  AlertPrimaryButton,
-  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { SmallButton } from '/app/atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
+import capitalize from 'lodash/capitalize'
+import { useTranslation } from 'react-i18next'
 import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'
 

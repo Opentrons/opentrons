@@ -1,9 +1,8 @@
-import { useQuery } from 'react-query'
 import { getCsvFile } from '@opentrons/api-client'
-import { useHost } from '../api'
-
+import type { CsvFileDataResponse, HostConfig } from '@opentrons/api-client'
+import { useQuery } from 'react-query'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { HostConfig, CsvFileDataResponse } from '@opentrons/api-client'
+import { useHost } from '../api'
 
 export function useCsvFileQuery(
   fileId: string,

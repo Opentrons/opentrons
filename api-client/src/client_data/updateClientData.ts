@@ -1,10 +1,9 @@
 import { PUT, request } from '../request'
-
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type {
-  ClientDataResponse,
   ClientDataRequest,
+  ClientDataResponse,
   DefaultClientData,
 } from './types'
 

@@ -1,7 +1,7 @@
-import type * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
-import { ImportLabware } from '../ImportLabware'
+import type * as React from 'react'
 import styles from '../../styles.module.css'
+import { ImportLabware } from '../ImportLabware'
 
 interface Props {
   disabled: boolean

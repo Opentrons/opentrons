@@ -1,9 +1,7 @@
-import { describe, it, expect } from 'vitest'
-
+import { describe, expect, it } from 'vitest'
 import * as Fixtures from '../__fixtures__'
-import * as selectors from '../selectors'
-
 import type { State } from '../../types'
+import * as selectors from '../selectors'
 
 const firstProtocol = { ...Fixtures.storedProtocolData, protocolKey: 'first' }
 const secondProtocol = { ...Fixtures.storedProtocolData, protocolKey: 'second' }

@@ -1,8 +1,4 @@
-import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
+import type { Protocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -15,12 +11,12 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
-  LegacyStyledText,
-  truncateString,
   Tabs,
+  truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -29,32 +25,35 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
+import type { OnDeviceRouteParams } from '/app/App/types'
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { useScrollPosition } from '/app/local-resources/dom-utils'
+import { SmallModalChildren } from '/app/molecules/OddModal'
 import {
-  ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
+  ProtocolDetailsHeaderChipSkeleton,
   ProtocolDetailsSectionContentSkeleton,
 } from '/app/organisms/ODD/ProtocolDetails'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
-import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { getPinnedQuickTransferIds, updateConfigValue } from '/app/redux/config'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import {
   ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
   ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
 } from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { getPinnedQuickTransferIds, updateConfigValue } from '/app/redux/config'
+import type { Dispatch } from '/app/redux/types'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
-import { formatTimeWithUtcLabel } from '/app/resources/runs'
-import { useScrollPosition } from '/app/local-resources/dom-utils'
-
-import type { Protocol } from '@opentrons/api-client'
-import type { Dispatch } from '/app/redux/types'
-import type { OnDeviceRouteParams } from '/app/App/types'
 
 interface QuickTransferHeaderProps {
   title?: string | null

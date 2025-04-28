@@ -1,6 +1,3 @@
-import { useMemo } from 'react'
-import { css } from 'styled-components'
-import { Trans, useTranslation } from 'react-i18next'
 import {
   ALIGN_FLEX_END,
   ALIGN_STRETCH,
@@ -8,30 +5,30 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
-
-import * as Sessions from '/app/redux/sessions'
+import slot5LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
+import slot5LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
+import slot5RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_MULTI_Z.webm'
+import slot5RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_SINGLE_Z.webm'
 import {
   JogControls,
   MEDIUM_STEP_SIZE_MM,
   SMALL_STEP_SIZE_MM,
   VERTICAL_PLANE,
 } from '/app/molecules/JogControls'
-import { formatJogVector } from './utils'
-import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
-
-import slot5LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
-import slot5LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
-import slot5RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_MULTI_Z.webm'
-import slot5RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_SINGLE_Z.webm'
-
-import type { MouseEventHandler } from 'react'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import * as Sessions from '/app/redux/sessions'
+import { useMemo } from 'react'
+import type { MouseEventHandler } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import type { CalibrationPanelProps } from './types'
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+import { formatJogVector } from './utils'
 
 const assetMap = {
   left: {

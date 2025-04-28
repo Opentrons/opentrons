@@ -1,21 +1,20 @@
+import type { StoredLabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
-
-import { getLocationSpecificOffsetDetailsForLabware } from './getLocationSpecificOffsetDetailsForLabware'
-import { getDefaultOffsetDetailsForLabware } from './getDefaultOffsetForLabware'
 import {
   getTotalCountNonHardCodedLocationSpecificOffsets,
   OFFSETS_SOURCE_INITIALIZING,
 } from '/app/redux/protocol-runs'
-import type { UseLPCLabwareInfoProps } from '..'
-import type { StoredLabwareOffset } from '@opentrons/api-client'
 import type {
   LabwareLocationInfo,
   LPCLabwareInfo,
 } from '/app/redux/protocol-runs'
+import type { UseLPCLabwareInfoProps } from '..'
+import { getDefaultOffsetDetailsForLabware } from './getDefaultOffsetForLabware'
+import { getLocationSpecificOffsetDetailsForLabware } from './getLocationSpecificOffsetDetailsForLabware'
 
 interface GetLPCLabwareInfoParams {
   currentOffsets: StoredLabwareOffset[] | undefined

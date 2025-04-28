@@ -1,8 +1,7 @@
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { GET, request } from '../request'
-
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 export function getProtocolAnalysisAsDocument(
   config: HostConfig,

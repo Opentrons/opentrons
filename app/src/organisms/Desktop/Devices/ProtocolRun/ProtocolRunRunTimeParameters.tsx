@@ -1,15 +1,9 @@
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
-
 import {
   RUN_ACTION_TYPE_PLAY,
   RUN_STATUS_STOPPED,
   RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
-import {
-  formatRunTimeParameterValue,
-  sortRuntimeParameters,
-} from '@opentrons/shared-data'
+import type { RunStatus } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   Banner,
@@ -30,16 +24,19 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-
+import {
+  formatRunTimeParameterValue,
+  sortRuntimeParameters,
+} from '@opentrons/shared-data'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 import { Divider } from '/app/atoms/structure'
 import {
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
   useRunStatus,
 } from '/app/resources/runs'
-
-import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { RunStatus } from '@opentrons/api-client'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 
 interface ProtocolRunRuntimeParametersProps {
   runId: string

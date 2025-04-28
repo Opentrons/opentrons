@@ -1,11 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
 import { COLORS, SIZE_2 } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-
-import { ToggleButton } from '..'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ToggleButton } from '..'
 
 const mockOnClick = vi.fn()
 

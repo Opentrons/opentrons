@@ -1,14 +1,12 @@
 // filter helpers
-import { useState, useLayoutEffect } from 'react'
-import queryString from 'query-string'
 import flatMap from 'lodash/flatMap'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
-
-import { getAllDefinitions } from './definitions'
-
-import type { FilterParams, LabwareDefinition, LabwareList } from './types'
+import queryString from 'query-string'
+import { useLayoutEffect, useState } from 'react'
 import type { Location } from 'react-router-dom'
+import { getAllDefinitions } from './definitions'
+import type { FilterParams, LabwareDefinition, LabwareList } from './types'
 
 export const FILTER_OFF = 'all'
 

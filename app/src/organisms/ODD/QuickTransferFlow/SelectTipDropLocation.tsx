@@ -1,7 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import type { ComponentProps, Dispatch } from 'react'
-
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -13,15 +9,16 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
-
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-
 import type { CutoutConfig } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useState } from 'react'
+import type { ComponentProps, Dispatch } from 'react'
+import { useTranslation } from 'react-i18next'
 import type {
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
 
 interface SelectTipDropLocationProps {

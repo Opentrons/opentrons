@@ -1,7 +1,6 @@
-import { CLI_PREFIX, JUPYTER_PREFIX, PYTHON_INDENT } from './constants'
-import { buildLoadCommandCopy } from './buildLoadCommandCopy'
-
 import type { LabwareOffsetSnippetProps } from '/app/molecules/LabwareOffsetSnippet'
+import { buildLoadCommandCopy } from './buildLoadCommandCopy'
+import { CLI_PREFIX, JUPYTER_PREFIX, PYTHON_INDENT } from './constants'
 
 // Returns code snippets with conditional styling based on the snippet mode.
 // Only labware that is LPC-able includes the set_offset() snippet.

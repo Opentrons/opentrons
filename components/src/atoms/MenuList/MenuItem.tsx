@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 import { COLORS } from '../../helix-design-system'
-import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { ALIGN_CENTER } from '../../styles'
 import type { StyleProps } from '../../primitives'
+import { ALIGN_CENTER } from '../../styles'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 interface ButtonProps extends StyleProps {
   /** optional isAlert boolean to turn the background red, only seen in ODD */

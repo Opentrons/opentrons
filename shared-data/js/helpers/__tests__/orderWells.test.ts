@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { orderWells } from '../orderWells'
 import type { WellOrderOption } from '../orderWells'
 

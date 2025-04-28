@@ -1,18 +1,18 @@
-import pick from 'lodash/pick'
-import { getDefaultsForStepType } from '../getDefaultsForStepType'
-import {
-  chainPatchUpdaters,
-  fieldHasChanged,
-  getChannels,
-  getDefaultWells,
-  getAllWellsFromPrimaryWells,
-} from './utils'
 import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
+import pick from 'lodash/pick'
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
+import { getDefaultsForStepType } from '../getDefaultsForStepType'
+import {
+  chainPatchUpdaters,
+  fieldHasChanged,
+  getAllWellsFromPrimaryWells,
+  getChannels,
+  getDefaultWells,
+} from './utils'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>

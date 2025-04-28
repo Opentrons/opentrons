@@ -1,15 +1,12 @@
-import { useSelector } from 'react-redux'
-import { Navigate, useParams } from 'react-router-dom'
-
 import { ApiHostProvider } from '@opentrons/react-api-client'
-
+import type { DesktopRouteParams } from '/app/App/types'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
+import { useRobot } from '/app/redux-resources/robots'
 import { getScanning, OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
+import { useSelector } from 'react-redux'
+import { Navigate, useParams } from 'react-router-dom'
 import { DeviceDetailsComponent } from './DeviceDetailsComponent'
-import { useRobot } from '/app/redux-resources/robots'
-
-import type { DesktopRouteParams } from '/app/App/types'
 
 export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<

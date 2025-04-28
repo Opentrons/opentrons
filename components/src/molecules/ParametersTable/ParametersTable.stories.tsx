@@ -1,11 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react-remove-scroll'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import { ParametersTable } from './index'
-
-import type { Meta, StoryObj } from '@storybook/react'
-import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const runTimeParameters: RunTimeParameter[] = [
   {

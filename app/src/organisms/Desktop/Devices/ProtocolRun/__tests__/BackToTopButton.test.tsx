@@ -1,19 +1,17 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
-import { MemoryRouter } from 'react-router-dom'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
-import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { i18n } from '/app/i18n'
-import {
-  useTrackEvent,
-  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '/app/redux/analytics'
-import { BackToTopButton } from '../BackToTopButton'
 import { useRobot } from '/app/redux-resources/robots'
-
+import {
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  useTrackEvent,
+} from '/app/redux/analytics'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
+import { when } from 'vitest-when'
+import { BackToTopButton } from '../BackToTopButton'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux-resources/robots')

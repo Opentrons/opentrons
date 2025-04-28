@@ -1,15 +1,13 @@
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import isEqual from 'lodash/isEqual'
-
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   OFFSET_KIND_DEFAULT,
   selectSelectedLwDefaultOffsetDetails,
   selectSelectedLwOverview,
   selectSelectedLwWithOffsetDetailsOffsets,
 } from '/app/redux/protocol-runs'
-
-import { useToaster } from '/app/organisms/ToasterOven'
+import isEqual from 'lodash/isEqual'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 export interface UseLPCSnackbarsResult {
   makeSuccessSnackbar: () => void

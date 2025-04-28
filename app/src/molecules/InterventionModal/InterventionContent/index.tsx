@@ -1,14 +1,13 @@
 import {
-  Flex,
-  StyledText,
   DIRECTION_COLUMN,
-  SPACING,
+  Flex,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { InlineNotification } from '/app/atoms/InlineNotification'
-import { InterventionInfo } from './InterventionInfo'
-
 import type { ComponentProps } from 'react'
+import { InterventionInfo } from './InterventionInfo'
 
 export type { InterventionInfoProps } from './InterventionInfo'
 export { InterventionInfo }

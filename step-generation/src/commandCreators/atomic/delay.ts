@@ -1,4 +1,3 @@
-import { formatPyStr, PROTOCOL_CONTEXT_NAME, uuid } from '../../utils'
 import type {
   WaitForDurationCreateCommand,
   WaitForDurationParams,
@@ -6,6 +5,7 @@ import type {
   WaitForResumeParams,
 } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
+import { formatPyStr, PROTOCOL_CONTEXT_NAME, uuid } from '../../utils'
 
 export const delay: CommandCreator<
   WaitForResumeParams | WaitForDurationParams

@@ -1,12 +1,10 @@
+import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-
-import { configReducer } from '../../redux/config/reducer'
-import { EstopMissingModal } from '.'
-
 import type { Store, StoreEnhancer } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import { EstopMissingModal } from '.'
+import { configReducer } from '../../redux/config/reducer'
 
 export default {
   title: 'App/Organisms/EstopMissingModal',

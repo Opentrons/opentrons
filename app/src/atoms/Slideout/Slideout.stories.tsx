@@ -1,15 +1,14 @@
-import { Fragment } from 'react'
-import { action } from '@storybook/addon-actions'
 import {
   COLORS,
+  LegacyStyledText,
   PrimaryBtn,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Slideout as SlideoutComponent } from './index'
-
+import { action } from '@storybook/addon-actions'
 import type { Meta, StoryObj } from '@storybook/react'
+import { Fragment } from 'react'
+import { Slideout as SlideoutComponent } from './index'
 
 const meta: Meta<typeof SlideoutComponent> = {
   title: 'App/Atoms/Slideout',

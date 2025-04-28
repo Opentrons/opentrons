@@ -1,8 +1,6 @@
-import { describe, expect, it } from 'vitest'
-
-import { deserializeExpectedMessages } from '../deserialize'
-
 import type { NotifyResponseData } from '@opentrons/app/src/redux/shell/types'
+import { describe, expect, it } from 'vitest'
+import { deserializeExpectedMessages } from '../deserialize'
 
 const MOCK_VALID_RESPONSE: NotifyResponseData = { refetch: true }
 const MOCK_VALID_STRING_RESPONSE = JSON.stringify(MOCK_VALID_RESPONSE)

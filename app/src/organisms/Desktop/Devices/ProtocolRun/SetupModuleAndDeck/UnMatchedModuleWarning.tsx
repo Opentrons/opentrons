@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
-  DIRECTION_COLUMN,
   Banner,
+  DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export const UnMatchedModuleWarning = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')

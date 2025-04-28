@@ -1,12 +1,10 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../testing/utils'
-import { BORDERS, COLORS } from '../../../helix-design-system'
-
-import { ListItem } from '..'
-
 import type { ComponentProps } from 'react'
+import { ListItem } from '..'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
 
 const render = (props: ComponentProps<typeof ListItem>) =>
   renderWithProviders(<ListItem {...props} />)

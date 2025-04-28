@@ -1,5 +1,5 @@
-import { css } from 'styled-components'
 import { BORDERS, Box, COLORS } from '@opentrons/components'
+import { css } from 'styled-components'
 
 interface SkeletonProps {
   width: string

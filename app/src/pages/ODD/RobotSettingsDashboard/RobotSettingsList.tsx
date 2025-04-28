@@ -1,7 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
-
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -15,15 +11,18 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
+import { InlineNotification } from '/app/atoms/InlineNotification'
 import { LANGUAGES, US_ENGLISH_DISPLAY_NAME } from '/app/i18n'
-import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
-import { getRobotUpdateAvailable } from '/app/redux/robot-update'
-import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
+import { Navigation } from '/app/organisms/ODD/Navigation'
+import {
+  OnOffToggle,
+  RobotSettingButton,
+} from '/app/organisms/ODD/RobotSettingsDashboard'
+import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
 import {
   DEV_INTERNAL_FLAGS,
   getAppLanguage,
@@ -32,19 +31,17 @@ import {
   toggleDevInternalFlag,
   toggleDevtools,
 } from '/app/redux/config'
-import { InlineNotification } from '/app/atoms/InlineNotification'
-import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
+import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
-import { Navigation } from '/app/organisms/ODD/Navigation'
-import { useLEDLights } from '/app/resources/robot-settings'
-import { useNetworkConnection } from '/app/resources/networking'
-import {
-  RobotSettingButton,
-  OnOffToggle,
-} from '/app/organisms/ODD/RobotSettingsDashboard'
-
+import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
+import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import type { Dispatch, State } from '/app/redux/types'
-import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
+import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
+import { useNetworkConnection } from '/app/resources/networking'
+import { useLEDLights } from '/app/resources/robot-settings'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 const HOME_GANTRY_SETTING_ID = 'disableHomeOnBoot'
 interface RobotSettingsListProps {

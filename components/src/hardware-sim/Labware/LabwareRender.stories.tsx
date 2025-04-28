@@ -1,19 +1,16 @@
-import type * as React from 'react'
-
 import {
-  fixture96Plate as _fixture96Plate,
-  fixture24Tuberack as _fixture24Tuberack,
   fixture12Trough as _fixture12Trough,
+  fixture24Tuberack as _fixture24Tuberack,
+  fixture96Plate as _fixture96Plate,
   fixtureTiprack10ul as _fixtureTiprack10ul,
   fixtureTiprack300ul as _fixtureTiprack300ul,
   fixtureTiprack1000ul as _fixtureTiprack1000ul,
 } from '@opentrons/shared-data'
-
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 import { RobotWorkSpace } from '../Deck'
 import { LabwareRender } from './LabwareRender'
-
-import type { Story, Meta } from '@storybook/react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture24Tuberack = _fixture24Tuberack as LabwareDefinition2

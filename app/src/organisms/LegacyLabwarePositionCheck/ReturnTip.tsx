@@ -1,35 +1,33 @@
-import { Trans, useTranslation } from 'react-i18next'
+import type { VectorOffset } from '@opentrons/api-client'
 import {
   DIRECTION_COLUMN,
   Flex,
+  getLabwareDefinitionsFromCommands,
   LegacyStyledText,
   TYPOGRAPHY,
-  getLabwareDefinitionsFromCommands,
 } from '@opentrons/components'
-
 import {
   getLabwareDisplayName,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { UnorderedList } from '/app/molecules/UnorderedList'
-import { getLabwareDef } from './utils/labware'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
-import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '/app/redux/config'
-
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
-  RobotType,
   MoveLabwareCreateCommand,
+  RobotType,
 } from '@opentrons/shared-data'
-import type { VectorOffset } from '@opentrons/api-client'
+import { UnorderedList } from '/app/molecules/UnorderedList'
+import { getIsOnDevice } from '/app/redux/config'
 import type { useChainRunCommands } from '/app/resources/runs'
-import type { ReturnTipStep } from './types'
 import type { TFunction } from 'i18next'
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { PrepareSpace } from './PrepareSpace'
+import { RobotMotionLoader } from './RobotMotionLoader'
+import type { ReturnTipStep } from './types'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { getLabwareDef } from './utils/labware'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis

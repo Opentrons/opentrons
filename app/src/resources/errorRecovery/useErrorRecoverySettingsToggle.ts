@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react'
-
 import {
   useErrorRecoverySettings,
   useUpdateErrorRecoverySettings,
 } from '@opentrons/react-api-client'
+import { useEffect, useState } from 'react'
 
 export interface UseERSettingsToggleResult {
   isEREnabled: boolean

@@ -1,12 +1,11 @@
-import { useTranslation } from 'react-i18next'
-import { Box } from '@opentrons/components'
-
-import { ConfigForm } from './ConfigForm'
-import { ConfigErrorBanner } from './ConfigErrorBanner'
 import type {
   PipetteSettingsFieldsMap,
   UpdatePipetteSettingsData,
 } from '@opentrons/api-client'
+import { Box } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { ConfigErrorBanner } from './ConfigErrorBanner'
+import { ConfigForm } from './ConfigForm'
 
 interface Props {
   closeModal: () => void

@@ -1,7 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import type { ComponentProps, Dispatch } from 'react'
-
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -10,16 +6,18 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getAllLiquidClassDefs } from '@opentrons/shared-data'
-import { useToaster } from '/app/organisms/ToasterOven'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { checkLiquidClassCompatibility } from './utils'
-
 import type { LiquidClass } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useState } from 'react'
+import type { ComponentProps, Dispatch } from 'react'
+import { useTranslation } from 'react-i18next'
 import type {
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
+import { checkLiquidClassCompatibility } from './utils'
 
 interface SelectLiquidClassProps {
   onNext: () => void

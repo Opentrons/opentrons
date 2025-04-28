@@ -1,5 +1,5 @@
-import type { UseFormReturn } from 'react-hook-form'
 import type { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { UseFormReturn } from 'react-hook-form'
 import type { WizardFormState } from '../../components/organisms'
 
 export interface WizardTileProps extends UseFormReturn<WizardFormState> {

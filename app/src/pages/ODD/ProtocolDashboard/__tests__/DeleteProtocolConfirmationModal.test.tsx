@@ -1,17 +1,14 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
-import { act, fireEvent, screen } from '@testing-library/react'
-
-import { getProtocol, deleteProtocol, deleteRun } from '@opentrons/api-client'
-import { renderWithProviders } from '/app/__testing-utils__'
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import type { HostConfig } from '@opentrons/api-client'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
-
+import { act, fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { DeleteProtocolConfirmationModal } from '../DeleteProtocolConfirmationModal'
-
 import type { ComponentProps } from 'react'
-import type { HostConfig } from '@opentrons/api-client'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { DeleteProtocolConfirmationModal } from '../DeleteProtocolConfirmationModal'
 
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')

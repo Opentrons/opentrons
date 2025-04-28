@@ -1,26 +1,23 @@
-import { when } from 'vitest-when'
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, afterEach } from 'vitest'
-
+import type { Modules } from '@opentrons/api-client'
 import { BaseDeck } from '@opentrons/components'
 import {
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
-
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { ProtocolSetupDeckConfiguration } from '..'
-
-import type { ComponentProps } from 'react'
-import type { UseQueryResult } from 'react-query'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { Modules } from '@opentrons/api-client'
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import type { ComponentProps } from 'react'
+import type { UseQueryResult } from 'react-query'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { ProtocolSetupDeckConfiguration } from '..'
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
 vi.mock('@opentrons/react-api-client')

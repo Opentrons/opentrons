@@ -1,14 +1,13 @@
 import * as errorCreators from '../../errorCreators'
 import { absorbanceReaderStateGetter } from '../../robotStateSelectors'
-import { curryCommandCreator, reduceCommandCreators } from '../../utils'
-import { absorbanceReaderCloseLid, absorbanceReaderRead } from '../atomic'
-
 import type {
   AbsorbanceReaderReadArgs,
   CommandCreator,
   CommandCreatorError,
   CurriedCommandCreator,
 } from '../../types'
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import { absorbanceReaderCloseLid, absorbanceReaderRead } from '../atomic'
 
 export const absorbanceReaderCloseRead: CommandCreator<AbsorbanceReaderReadArgs> = (
   args,

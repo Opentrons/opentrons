@@ -1,6 +1,6 @@
-import { it, describe, expect } from 'vitest'
-import { absorbanceReaderFormToArgs } from '../absorbanceReaderFormToArgs'
+import { describe, expect, it } from 'vitest'
 import type { HydratedAbsorbanceReaderFormData } from '../../../../form-types'
+import { absorbanceReaderFormToArgs } from '../absorbanceReaderFormToArgs'
 
 describe('absorbanceReaderFormToArgs', () => {
   it('returns absorbance reader initialize command creator for single mode with reference', () => {

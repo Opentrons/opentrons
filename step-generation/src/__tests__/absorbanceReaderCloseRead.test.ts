@@ -1,22 +1,21 @@
-import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
+import {
+  ABSORBANCE_READER_TYPE,
+  ABSORBANCE_READER_V1,
+} from '@opentrons/shared-data'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { absorbanceReaderCloseRead } from '../commandCreators'
+import { getInitialRobotStateStandard, makeContext } from '../fixtures'
+import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
 import {
   absorbanceReaderStateGetter,
   getModuleState,
 } from '../robotStateSelectors'
-import { getInitialRobotStateStandard, makeContext } from '../fixtures'
-import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
-
 import type {
   AbsorbanceReaderReadArgs,
   AbsorbanceReaderState,
   InvariantContext,
   RobotState,
 } from '../types'
-import {
-  ABSORBANCE_READER_TYPE,
-  ABSORBANCE_READER_V1,
-} from '@opentrons/shared-data'
 
 vi.mock('../robotStateSelectors')
 

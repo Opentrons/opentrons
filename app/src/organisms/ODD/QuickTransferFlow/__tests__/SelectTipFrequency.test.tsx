@@ -1,12 +1,9 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
-import { SelectTipFrequency } from '../SelectTipFrequency'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { SelectTipFrequency } from '../SelectTipFrequency'
 
 const render = (props: ComponentProps<typeof SelectTipFrequency>) => {
   return renderWithProviders(<SelectTipFrequency {...props} />, {

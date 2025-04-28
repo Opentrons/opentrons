@@ -1,14 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { MemoryRouter } from 'react-router-dom'
 import { COLORS } from '@opentrons/components'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { CardButton } from '..'
-
 import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import type { NavigateFunction } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { CardButton } from '..'
 
 const mockNavigate = vi.fn()
 

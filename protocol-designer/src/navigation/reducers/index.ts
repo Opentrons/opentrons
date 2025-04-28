@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
-import { handleActions } from 'redux-actions'
 import type { Reducer } from 'redux'
-import type { BaseState, Action } from '../../types'
+import { handleActions } from 'redux-actions'
+import type { Action, BaseState } from '../../types'
 import type { ToggleNewProtocolModalAction } from '../actions'
 
 const newProtocolModal: Reducer<boolean, any> = handleActions(

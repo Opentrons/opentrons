@@ -1,16 +1,15 @@
 // tests for the app-shell's discovery module
+import {
+  finishDiscovery,
+  startDiscovery,
+} from '@opentrons/app/src/redux/discovery'
+import * as DiscoveryClient from '@opentrons/discovery-client'
 import { app } from 'electron'
 import Store from 'electron-store'
 import noop from 'lodash/noop'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-
-import * as DiscoveryClient from '@opentrons/discovery-client'
-import {
-  startDiscovery,
-  finishDiscovery,
-} from '@opentrons/app/src/redux/discovery'
-import { registerDiscovery } from '../discovery'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as Cfg from '../config'
+import { registerDiscovery } from '../discovery'
 import * as SysInfo from '../system-info'
 import { getSerialPortHttpAgent } from '../usb'
 

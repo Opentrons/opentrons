@@ -1,5 +1,3 @@
-import { Fragment } from 'react'
-
 import {
   BORDERS,
   COLORS,
@@ -9,11 +7,10 @@ import {
   NO_WRAP,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
-
-import { Divider } from '/app/atoms/structure'
-
-import type { MouseEventHandler, MouseEvent, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
+import { Divider } from '/app/atoms/structure'
+import { Fragment } from 'react'
+import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 
 export interface MenuOverlayItemProps {
   label: ReactNode

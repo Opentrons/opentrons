@@ -1,6 +1,3 @@
-import { createPortal } from 'react-dom'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -10,18 +7,21 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  ModalShell,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
-  ModalShell,
   TEXT_ALIGN_CENTER,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { i18n } from '/app/i18n'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 const SUPPORT_EMAIL = 'support@opentrons.com'
 interface FatalErrorProps {

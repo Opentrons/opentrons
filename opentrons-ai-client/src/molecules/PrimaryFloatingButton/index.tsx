@@ -1,4 +1,3 @@
-import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -8,12 +7,12 @@ import {
   DISPLAY_FLEX,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import type { IconName, StyleProps } from '@opentrons/components'
+import { css } from 'styled-components'
 
 interface PrimaryFloatingButtonProps extends StyleProps {
   buttonText: string

@@ -1,9 +1,3 @@
-import { Fragment, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import styled from 'styled-components'
-import uuidv1 from 'uuid/v4'
-
 import {
   BORDERS,
   COLORS,
@@ -13,15 +7,18 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
 import { LANGUAGES } from '/app/i18n'
-import { ANALYTICS_LANGUAGE_UPDATED_ODD_SETTINGS } from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_LANGUAGE_UPDATED_ODD_SETTINGS } from '/app/redux/analytics'
 import { getAppLanguage, updateConfigValue } from '/app/redux/config'
-
-import type { ChangeEvent } from 'react'
 import type { Dispatch } from '/app/redux/types'
+import { Fragment, useEffect } from 'react'
+import type { ChangeEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
+import uuidv1 from 'uuid/v4'
 import type { SetSettingOption } from './types'
 
 interface LabelProps {

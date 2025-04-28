@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_FLEX_END,
   COLORS,
@@ -11,6 +10,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 interface AutoAddPauseUntilTempStepModalProps {
   displayTemperature: string

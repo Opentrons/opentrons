@@ -1,12 +1,11 @@
-import { screen } from '@testing-library/react'
 import { COLORS } from '@opentrons/components'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { FlexStackerModuleData } from '../FlexStackerModuleData'
-
-import type { ComponentProps } from 'react'
 import type { FlexStackerModule } from '/app/redux/modules/types'
+import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { FlexStackerModuleData } from '../FlexStackerModuleData'
 
 const render = (props: ComponentProps<typeof FlexStackerModuleData>) => {
   return renderWithProviders(<FlexStackerModuleData {...props} />, {

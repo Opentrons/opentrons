@@ -1,14 +1,13 @@
 import { screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
-import { MaintenanceRunTakeover } from '../MaintenanceRunTakeover'
+import { i18n } from '/app/i18n'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
-
 import type { ComponentProps } from 'react'
 import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
+import { MaintenanceRunTakeover } from '../MaintenanceRunTakeover'
+import { useMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
 
 vi.mock('../useMaintenanceRunTakeover')
 vi.mock('/app/resources/maintenance_runs')

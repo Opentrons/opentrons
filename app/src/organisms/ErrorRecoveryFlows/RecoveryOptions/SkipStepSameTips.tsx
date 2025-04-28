@@ -1,8 +1,7 @@
-import { SkipStepInfo } from '../shared'
 import { RECOVERY_MAP } from '../constants'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
-
+import { SkipStepInfo } from '../shared'
 import type { RecoveryContentProps } from '../types'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 export function SkipStepSameTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props

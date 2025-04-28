@@ -1,6 +1,5 @@
 import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
-
 import type { ComponentProps } from 'react'
 import type { RecoveryContentProps } from '../types'
 

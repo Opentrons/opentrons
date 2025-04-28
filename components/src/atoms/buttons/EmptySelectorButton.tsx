@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Flex } from '../../primitives'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import {
   ALIGN_CENTER,
   CURSOR_DEFAULT,
@@ -10,8 +10,9 @@ import {
   SPACING,
   StyledText,
 } from '../../index'
-import { BORDERS, COLORS } from '../../helix-design-system'
 import type { IconName } from '../../index'
+import { Flex } from '../../primitives'
+
 interface EmptySelectorButtonProps {
   onClick: () => void
   text: string

@@ -1,10 +1,8 @@
-import { describe, it, expect } from 'vitest'
-
-import { robotAdminReducer } from '../reducer'
-
-import type { PerRobotAdminState } from '../types'
+import { describe, expect, it } from 'vitest'
 import type { RobotApiRequestMeta } from '../../robot-api/types'
 import type { Action } from '../../types'
+import { robotAdminReducer } from '../reducer'
+import type { PerRobotAdminState } from '../types'
 
 type PartialState = Partial<{
   [robotName: string]: undefined | Partial<PerRobotAdminState>

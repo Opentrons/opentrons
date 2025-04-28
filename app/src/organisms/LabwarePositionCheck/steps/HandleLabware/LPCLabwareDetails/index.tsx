@@ -1,32 +1,29 @@
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-
 import {
   DIRECTION_COLUMN,
   Flex,
   RESPONSIVENESS,
   SPACING,
 } from '@opentrons/components'
-
-import { LocationSpecificOffsetsContainer } from './LocationSpecificOffsetsContainer'
-import { DefaultLocationOffset } from './DefaultLocationOffset'
+import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
+import {
+  handleUnsavedOffsetsModalODD,
+  UnsavedOffsetsDesktop,
+} from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   applyWorkingOffsets,
   goBackEditOffsetSubstep,
   selectSelectedLwDisplayName,
   selectWorkingOffsetsByUri,
 } from '/app/redux/protocol-runs'
-import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import {
-  handleUnsavedOffsetsModalODD,
-  UnsavedOffsetsDesktop,
-} from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
-import { getIsOnDevice } from '/app/redux/config'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
+import { DefaultLocationOffset } from './DefaultLocationOffset'
+import { LocationSpecificOffsetsContainer } from './LocationSpecificOffsetsContainer'
 import { OffsetBannerContainer } from './OffsetBannerContainer'
-
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   const { runId, commandUtils } = props

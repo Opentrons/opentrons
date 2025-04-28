@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -7,15 +5,14 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
+import type { IconName } from '@opentrons/components'
 import { StepMeter } from '/app/atoms/StepMeter'
 import { CardButton } from '/app/molecules/CardButton'
-
-import type { IconName } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 const NetworkSetupOptions = [
   {

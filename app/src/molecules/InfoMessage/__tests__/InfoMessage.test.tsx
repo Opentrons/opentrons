@@ -1,10 +1,9 @@
-import { describe, it, beforeEach } from 'vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
 import { screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { InfoMessage } from '..'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, it } from 'vitest'
+import { InfoMessage } from '..'
 
 const render = (props: ComponentProps<typeof InfoMessage>) => {
   return renderWithProviders(<InfoMessage {...props} />, {

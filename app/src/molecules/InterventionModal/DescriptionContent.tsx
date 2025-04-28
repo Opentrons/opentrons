@@ -1,9 +1,9 @@
 import {
-  Flex,
-  SPACING,
   DIRECTION_COLUMN,
-  StyledText,
+  Flex,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 

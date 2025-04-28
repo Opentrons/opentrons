@@ -1,8 +1,7 @@
-import { createContext, useRef } from 'react'
-import { AlertsModal } from '.'
 import { useToaster } from '/app/organisms/ToasterOven'
-
+import { createContext, useRef } from 'react'
 import type { ReactNode } from 'react'
+import { AlertsModal } from '.'
 
 export interface AlertsContextProps {
   removeActiveAppUpdateToast: () => void

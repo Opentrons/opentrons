@@ -1,12 +1,11 @@
-import { describe, it, expect } from 'vitest'
 import {
+  fixtureTiprack300ul,
   getLabwareDefURI,
   opentrons96PcrAdapterV1,
-  fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombos'
-
 import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
+import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombos'
 
 const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
 const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2

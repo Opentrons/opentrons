@@ -1,7 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import mapValues from 'lodash/mapValues'
-
 import {
   ALIGN_CENTER,
   Btn,
@@ -9,8 +5,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   EmptySelectorButton,
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
@@ -19,25 +15,26 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import { PipetteInfoItem } from '../PipetteInfoItem'
-import { changeSavedStepForm } from '../../../steplist/actions'
-import { deletePipettes } from '../../../step-forms/actions'
-import { deleteContainer } from '../../../labware-ingred/actions'
-import { toggleIsGripperRequired } from '../../../step-forms/actions/additionalItems'
-import { getSectionsFromPipetteName } from './utils'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type { RobotType } from '@opentrons/shared-data'
+import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import mapValues from 'lodash/mapValues'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
+import { deleteContainer } from '../../../labware-ingred/actions'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   PipetteOnDeck,
 } from '../../../step-forms'
-import type { ThunkDispatch } from '../../../types'
-import type { PipetteConfig } from './usePipetteConfig'
+import { deletePipettes } from '../../../step-forms/actions'
+import { toggleIsGripperRequired } from '../../../step-forms/actions/additionalItems'
 import { getAdditionalEquipmentEntities } from '../../../step-forms/selectors'
+import { changeSavedStepForm } from '../../../steplist/actions'
+import type { ThunkDispatch } from '../../../types'
+import { LINK_BUTTON_STYLE } from '../../atoms'
+import { PipetteInfoItem } from '../PipetteInfoItem'
+import type { PipetteConfig } from './usePipetteConfig'
+import { getSectionsFromPipetteName } from './utils'
 
 interface Gripper {
   name: AdditionalEquipmentName

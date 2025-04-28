@@ -1,44 +1,42 @@
 import {
-  getDeckDefFromRobotType,
+  ABSORBANCE_READER_V1_FIXTURE,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_FIXTURES,
+  FLEX_STACKER_V1_FIXTURE,
+  getDeckDefFromRobotType,
+  HEATERSHAKER_MODULE_V1_FIXTURE,
+  MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_SLOT_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  TEMPERATURE_MODULE_V2_FIXTURE,
+  THERMOCYCLER_MODULE_CUTOUTS,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_ONLY_FIXTURES,
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-  HEATERSHAKER_MODULE_V1_FIXTURE,
-  TEMPERATURE_MODULE_V2_FIXTURE,
-  MAGNETIC_BLOCK_V1_FIXTURE,
-  ABSORBANCE_READER_V1_FIXTURE,
-  FLEX_STACKER_V1_FIXTURE,
-  FLEX_STACKER_FIXTURES,
-  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-  THERMOCYCLER_MODULE_CUTOUTS,
 } from '@opentrons/shared-data'
-
-import { COLORS } from '../../helix-design-system'
-import { SingleSlotFixture } from '../BaseDeck/SingleSlotFixture'
-import { SlotLabels } from '../Deck'
-import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
-import { EmptyConfigFixture } from './EmptyConfigFixture'
-import { StagingAreaConfigFixture } from './StagingAreaConfigFixture'
-import { TrashBinConfigFixture } from './TrashBinConfigFixture'
-import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
-import { StaticFixture } from './StaticFixture'
-import { TemperatureModuleFixture } from './TemperatureModuleFixture'
-import { HeaterShakerFixture } from './HeaterShakerFixture'
-import { MagneticBlockFixture } from './MagneticBlockFixture'
-import { ThermocyclerFixture } from './ThermocyclerFixture'
-import { AbsorbanceReaderFixture } from './AbsorbanceReaderFixture'
-import { FlexStackerFixture } from './FlexStackerFixture'
-
-import type { ReactNode } from 'react'
 import type {
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
+import type { ReactNode } from 'react'
+import { COLORS } from '../../helix-design-system'
+import { SingleSlotFixture } from '../BaseDeck/SingleSlotFixture'
+import { SlotLabels } from '../Deck'
+import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
+import { AbsorbanceReaderFixture } from './AbsorbanceReaderFixture'
+import { EmptyConfigFixture } from './EmptyConfigFixture'
+import { FlexStackerFixture } from './FlexStackerFixture'
+import { HeaterShakerFixture } from './HeaterShakerFixture'
+import { MagneticBlockFixture } from './MagneticBlockFixture'
+import { StagingAreaConfigFixture } from './StagingAreaConfigFixture'
+import { StaticFixture } from './StaticFixture'
+import { TemperatureModuleFixture } from './TemperatureModuleFixture'
+import { ThermocyclerFixture } from './ThermocyclerFixture'
+import { TrashBinConfigFixture } from './TrashBinConfigFixture'
+import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
 
 export * from './constants'
 

@@ -1,15 +1,15 @@
 import {
-  Flex,
   ALIGN_CENTER,
-  SPACING,
-  Link,
-  TYPOGRAPHY,
   COLORS,
+  Flex,
+  Link,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Controller, useFormContext } from 'react-hook-form'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import { TextAreaField } from '../../atoms/TextAreaField'
 
 export interface ControlledAddTextAreaFieldsProps {

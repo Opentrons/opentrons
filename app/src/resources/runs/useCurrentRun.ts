@@ -1,7 +1,6 @@
-import { useNotifyRunQuery } from './useNotifyRunQuery'
-import { useCurrentRunId } from './useCurrentRunId'
-
 import type { Run } from '@opentrons/api-client'
+import { useCurrentRunId } from './useCurrentRunId'
+import { useNotifyRunQuery } from './useNotifyRunQuery'
 
 const REFETCH_INTERVAL = 5000
 

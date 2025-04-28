@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
-import { migrateFile } from '../8_0_0'
-import _oldDoItAllProtocol from '../../../../fixtures/protocol/7/doItAllV7.json'
 import type { ProtocolFileV7 } from '@opentrons/shared-data'
+import { describe, expect, it, vi } from 'vitest'
+import _oldDoItAllProtocol from '../../../../fixtures/protocol/7/doItAllV7.json'
+import { migrateFile } from '../8_0_0'
 
 vi.mock('../../../labware-defs')
 

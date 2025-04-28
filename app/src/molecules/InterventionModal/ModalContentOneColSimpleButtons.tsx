@@ -1,15 +1,14 @@
-import { useState } from 'react'
 import {
-  Flex,
   DIRECTION_COLUMN,
-  SPACING,
+  Flex,
   LegacyStyledText,
   RadioButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { OneColumn } from './OneColumn'
-
+import { useState } from 'react'
 import type { ChangeEventHandler } from 'react'
+import { OneColumn } from './OneColumn'
 
 export interface ButtonProps {
   label: string

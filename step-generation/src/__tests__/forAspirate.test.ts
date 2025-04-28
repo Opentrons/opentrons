@@ -1,21 +1,21 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import type { AspDispAirgapParams } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { makeImmutableStateUpdater } from '../__utils__'
 import {
-  makeContext,
-  getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  makeContext,
   SOURCE_LABWARE,
   TROUGH_LABWARE,
 } from '../fixtures'
-import { AIR, createTipLiquidState } from '../utils/misc'
-import { makeImmutableStateUpdater } from '../__utils__'
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
-import * as warningCreators from '../warningCreators'
 import type {
   CommandCreatorWarning,
   InvariantContext,
   RobotState,
 } from '../types'
-import type { AspDispAirgapParams } from '@opentrons/shared-data'
+import { AIR, createTipLiquidState } from '../utils/misc'
+import * as warningCreators from '../warningCreators'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)
 

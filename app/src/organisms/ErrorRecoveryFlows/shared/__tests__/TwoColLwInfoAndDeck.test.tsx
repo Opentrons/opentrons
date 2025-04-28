@@ -1,18 +1,15 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
-
 import { MoveLabwareOnDeck } from '@opentrons/components'
-
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
-import { TwoColLwInfoAndDeck } from '../TwoColLwInfoAndDeck'
-import { RECOVERY_MAP } from '../../constants'
-import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
-import { getSlotNameAndLwLocFrom } from '../../hooks/useDeckMapUtils'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
+import { RECOVERY_MAP } from '../../constants'
+import { getSlotNameAndLwLocFrom } from '../../hooks/useDeckMapUtils'
+import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
+import { TwoColLwInfoAndDeck } from '../TwoColLwInfoAndDeck'
 
 vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')

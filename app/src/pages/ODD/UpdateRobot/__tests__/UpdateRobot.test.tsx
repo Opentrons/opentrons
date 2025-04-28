@@ -1,18 +1,14 @@
-import { vi, it, describe, beforeEach, afterEach } from 'vitest'
-import { MemoryRouter } from 'react-router-dom'
-import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
+import { getLocalRobot } from '/app/redux/discovery'
 import * as RobotUpdate from '/app/redux/robot-update'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
-import { getLocalRobot } from '/app/redux/discovery'
-
-import { UpdateRobot } from '../UpdateRobot'
-
 import type { State } from '/app/redux/types'
+import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { UpdateRobot } from '../UpdateRobot'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')

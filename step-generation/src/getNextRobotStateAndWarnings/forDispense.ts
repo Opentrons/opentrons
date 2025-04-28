@@ -1,6 +1,7 @@
-import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 import type { AspDispAirgapParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
+
 export function forDispense(
   params: AspDispAirgapParams,
   invariantContext: InvariantContext,

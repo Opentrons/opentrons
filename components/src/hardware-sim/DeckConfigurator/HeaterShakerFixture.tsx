@@ -1,24 +1,23 @@
-import { Icon } from '../../icons'
-import { Btn, Text } from '../../primitives'
-import { TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
-import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
-import {
-  COLUMN_1_X_ADJUSTMENT,
-  COLUMN_3_X_ADJUSTMENT,
-  CONFIG_STYLE_EDITABLE,
-  CONFIG_STYLE_READ_ONLY,
-  FIXTURE_HEIGHT,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
-  Y_ADJUSTMENT,
-  CONFIG_STYLE_SELECTED,
-} from './constants'
-
 import type {
   CutoutFixtureId,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
+import { COLORS } from '../../helix-design-system'
+import { Icon } from '../../icons'
+import { Btn, Text } from '../../primitives'
+import { TYPOGRAPHY } from '../../ui-style-constants'
+import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
+import {
+  COLUMN_1_X_ADJUSTMENT,
+  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_3_X_ADJUSTMENT,
+  CONFIG_STYLE_EDITABLE,
+  CONFIG_STYLE_READ_ONLY,
+  CONFIG_STYLE_SELECTED,
+  FIXTURE_HEIGHT,
+  Y_ADJUSTMENT,
+} from './constants'
 
 // TODO(BC, 2024-03-21): This component is almost identical to TemperatureModuleFixture, consider consolidating?
 

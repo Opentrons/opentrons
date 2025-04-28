@@ -1,9 +1,7 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import * as Cfg from '..'
-import { configReducer } from '../reducer'
-
 import type { State } from '../../types'
+import { configReducer } from '../reducer'
 
 vi.mock('../../shell/remote', () => ({
   remote: { INITIAL_CONFIG: { isConfig: true } },

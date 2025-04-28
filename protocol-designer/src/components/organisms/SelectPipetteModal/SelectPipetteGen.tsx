@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,8 +6,9 @@ import {
   StyledText,
   WRAP,
 } from '@opentrons/components'
-import { PIPETTE_GENS } from '../../../pages/Onboarding/constants'
 import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
+import { PIPETTE_GENS } from '../../../pages/Onboarding/constants'
 import type { Gen } from '../../../pages/Onboarding/types'
 
 interface SelectPipetteGenProps {

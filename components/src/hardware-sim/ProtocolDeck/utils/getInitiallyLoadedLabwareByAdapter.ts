@@ -1,8 +1,8 @@
-import reduce from 'lodash/reduce'
 import type {
   LoadLabwareRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import reduce from 'lodash/reduce'
 
 export interface LoadedLabwareByAdapter {
   [labwareId: string]: LoadLabwareRunTimeCommand

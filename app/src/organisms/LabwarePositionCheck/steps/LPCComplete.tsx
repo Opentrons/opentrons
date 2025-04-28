@@ -1,22 +1,18 @@
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
-
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
+  Flex,
   RESPONSIVENESS,
   SPACING,
-  Flex,
   StyledText,
-  ALIGN_CENTER,
 } from '@opentrons/components'
-
-import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import { getIsOnDevice } from '/app/redux/config'
-
 import SuccessIcon from '/app/assets/images/icon_success.png'
-
+import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import { getIsOnDevice } from '/app/redux/config'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 export function LPCComplete(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')

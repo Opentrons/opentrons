@@ -1,4 +1,4 @@
-import { it, describe, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { mergeWhen } from '../utils'
 
 function concat(a: string, b: string): string {

@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
-import { vi } from 'vitest'
 import type { Browser, BrowserService, ServiceType } from 'mdns-js'
+import { vi } from 'vitest'
 
 export const mockBaseBrowser: Browser = Object.assign(new EventEmitter(), {
   discover: vi.fn(),

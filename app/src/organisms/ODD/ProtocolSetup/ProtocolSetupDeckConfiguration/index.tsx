@@ -1,7 +1,3 @@
-import { useState } from 'react'
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-
 import {
   BaseDeck,
   DIRECTION_COLUMN,
@@ -9,30 +5,31 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
+import type { ModuleOnDeck } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  getSimplestDeckConfigForProtocol,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
-  getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
-
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { AddFixtureModal } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
-import { DeckConfigurationDiscardChangesModal } from '../../../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { getTopPortalEl } from '/app/App/portal'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-
-import type { Dispatch, SetStateAction } from 'react'
 import type {
   CutoutFixtureId,
   CutoutId,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '@opentrons/components'
+import { getTopPortalEl } from '/app/App/portal'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { AddFixtureModal } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
+import { DeckConfigurationDiscardChangesModal } from '../../../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import type { SetupScreens } from '../types'
 
 interface ProtocolSetupDeckConfigurationProps {

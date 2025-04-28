@@ -1,28 +1,25 @@
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { i18n } from '/app/i18n'
-import { I18nextProvider } from 'react-i18next'
+import { useAllLabware } from '/app/local-resources/labware'
 import { getAllDefs } from '/app/local-resources/labware/utils/getAllDefs'
-
 import {
-  getValidCustomLabware,
   getAddLabwareFailure,
   getAddNewLabwareName,
+  getValidCustomLabware,
 } from '/app/redux/custom-labware'
 import {
   mockDefinition,
   mockValidLabware,
 } from '/app/redux/custom-labware/__fixtures__'
-
-import { useLabwareFailure, useNewLabwareName } from '../hooks'
-import { useAllLabware } from '/app/local-resources/labware'
-
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
-import type { State } from '/app/redux/types'
 import type { FailedLabwareFile } from '/app/redux/custom-labware/types'
+import type { State } from '/app/redux/types'
+import type { FunctionComponent, ReactNode } from 'react'
+import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import type { Store } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { useLabwareFailure, useNewLabwareName } from '../hooks'
 
 vi.mock('/app/redux/custom-labware')
 vi.mock('/app/local-resources/labware/utils/getAllDefs')

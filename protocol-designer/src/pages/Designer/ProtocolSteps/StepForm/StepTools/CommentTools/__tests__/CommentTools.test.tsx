@@ -1,11 +1,9 @@
-import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, it, vi } from 'vitest'
+import { CommentTools } from '..'
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../../assets/localization'
-import { CommentTools } from '..'
-
-import type { ComponentProps } from 'react'
 
 vi.mock('../../../../../../../components/molecules/TextAreaField/index', () => {
   return {

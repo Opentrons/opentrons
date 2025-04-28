@@ -1,10 +1,10 @@
 import { getLabwareDefIsStandard } from '@opentrons/shared-data'
-import { getLabwareCompatibleWithModule } from '../../utils/labwareModuleCompatibility'
 import type { LabwareLocation } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntity,
 } from '@opentrons/step-generation'
+import { getLabwareCompatibleWithModule } from '../../utils/labwareModuleCompatibility'
 import type { ProfileFormError } from './profileErrors'
 
 type HydratedFormData = any

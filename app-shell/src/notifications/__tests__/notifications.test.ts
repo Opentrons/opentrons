@@ -1,11 +1,9 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-
-import { registerNotify, closeAllNotifyConnections } from '..'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
+import { closeAllNotifyConnections, registerNotify } from '..'
+import { closeConnectionsForcefullyFor } from '../connect'
 import { connectionStore } from '../store'
 import { subscribe } from '../subscribe'
-import { closeConnectionsForcefullyFor } from '../connect'
-
-import type { Mock } from 'vitest'
 
 vi.mock('electron-store')
 vi.mock('../store')

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
-import { useScreenIdle } from '../useScreenIdle'
 import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useScreenIdle } from '../useScreenIdle'
 
 const MOCK_EVENTS: Array<keyof DocumentEventMap> = [
   'mousedown',

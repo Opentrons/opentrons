@@ -1,10 +1,8 @@
-import { createSelector } from 'reselect'
-
 import { LPC_STEP } from '/app/redux/protocol-runs'
-
+import type { LPCStep, LPCSubstep, StepInfo } from '/app/redux/protocol-runs'
+import { createSelector } from 'reselect'
 import type { Selector } from 'reselect'
 import type { State } from '../../../types'
-import type { LPCStep, StepInfo, LPCSubstep } from '/app/redux/protocol-runs'
 
 // Returns the current LPC step.
 export const selectCurrentStep = (runId: string): Selector<State, LPCStep> =>

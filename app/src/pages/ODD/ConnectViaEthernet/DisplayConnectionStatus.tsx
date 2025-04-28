@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -10,12 +7,13 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { MediumButton } from '/app/atoms/buttons'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 interface DisplayConnectionStatusProps {
   isConnected: boolean

@@ -1,6 +1,3 @@
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -8,20 +5,22 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
   Modal,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
-import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
-import { getTopPortalEl } from '/app/App/portal'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import { getTopPortalEl } from '/app/App/portal'
+import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 interface NotConfiguredModalProps {
   onCloseClick: () => void

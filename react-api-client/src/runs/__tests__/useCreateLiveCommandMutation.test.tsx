@@ -1,14 +1,12 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook, waitFor } from '@testing-library/react'
 import { createLiveCommand } from '@opentrons/api-client'
+import type { HostConfig } from '@opentrons/api-client'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import type * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { mockAnonLoadCommand } from '../__fixtures__'
 import { useHost } from '../../api'
 import { useCreateLiveCommandMutation } from '../useCreateLiveCommandMutation'
-
-import { mockAnonLoadCommand } from '../__fixtures__'
-
-import type { HostConfig } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

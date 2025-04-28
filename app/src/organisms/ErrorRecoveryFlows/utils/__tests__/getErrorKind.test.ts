@@ -1,9 +1,7 @@
-import { describe, expect, it } from 'vitest'
-
-import { ERROR_KINDS, DEFINED_ERROR_TYPES } from '../../constants'
-import { getErrorKind } from '../getErrorKind'
-
 import type { RunCommandError, RunTimeCommand } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
+import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
+import { getErrorKind } from '../getErrorKind'
 
 describe('getErrorKind', () => {
   it.each([

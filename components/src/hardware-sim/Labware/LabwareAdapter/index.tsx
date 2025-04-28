@@ -1,13 +1,13 @@
-import { Opentrons96DeepWellAdapter } from './Opentrons96DeepWellAdapter'
-import { Opentrons96FlatBottomAdapter } from './Opentrons96FlatBottomAdapter'
-import { OpentronsUniversalFlatAdapter } from './OpentronsUniversalFlatAdapter'
-import { OpentronsAluminumFlatBottomPlate } from './OpentronsAluminumFlatBottomPlate'
-import { OpentronsFlex96TiprackAdapter } from './OpentronsFlex96TiprackAdapter'
-import { OpentronsToughPCRAutoSealingLid } from './OpentronsToughPCRAutoSealingLid'
-import { OpentronsAutoclavableDeckRiser } from './OpentronsAutoclavableDeckRiser'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { COLORS } from '../../../helix-design-system'
 import { LabwareOutline } from '../labwareInternals'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { Opentrons96DeepWellAdapter } from './Opentrons96DeepWellAdapter'
+import { Opentrons96FlatBottomAdapter } from './Opentrons96FlatBottomAdapter'
+import { OpentronsAluminumFlatBottomPlate } from './OpentronsAluminumFlatBottomPlate'
+import { OpentronsAutoclavableDeckRiser } from './OpentronsAutoclavableDeckRiser'
+import { OpentronsFlex96TiprackAdapter } from './OpentronsFlex96TiprackAdapter'
+import { OpentronsToughPCRAutoSealingLid } from './OpentronsToughPCRAutoSealingLid'
+import { OpentronsUniversalFlatAdapter } from './OpentronsUniversalFlatAdapter'
 
 const LABWARE_ADAPTER_LOADNAME_PATHS = {
   opentrons_96_deep_well_adapter: Opentrons96DeepWellAdapter,

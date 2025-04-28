@@ -1,23 +1,20 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  useTrackEvent,
 } from '/app/redux/analytics'
-import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 import {
   analyzeProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '/app/redux/protocol-storage'
-
-import { ProtocolOverflowMenu } from '../ProtocolOverflowMenu'
-
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
+import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
+import { ProtocolOverflowMenu } from '../ProtocolOverflowMenu'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/protocol-storage')

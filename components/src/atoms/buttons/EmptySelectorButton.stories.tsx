@@ -1,6 +1,6 @@
+import type { Meta, StoryObj } from '@storybook/react'
 import { Box } from '../../primitives'
 import { EmptySelectorButton as EmptySelectorButtonComponent } from './EmptySelectorButton'
-import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof EmptySelectorButtonComponent> = {
   title: 'Helix/Atoms/Buttons/EmptySelectorButton',

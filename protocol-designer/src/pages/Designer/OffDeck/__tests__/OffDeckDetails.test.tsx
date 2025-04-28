@@ -1,24 +1,23 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { FLEX_ROBOT_TYPE, fixture12Trough } from '@opentrons/shared-data'
+import type * as Components from '@opentrons/components'
+import { fixture12Trough, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
+import type { ComponentProps } from 'react'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { selectors } from '../../../../labware-ingred/selectors'
+import { i18n } from '../../../../assets/localization'
 import { getRobotType } from '../../../../file-data/selectors'
+import { selectors } from '../../../../labware-ingred/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+import { getAllWellContentsForActiveItem } from '../../../../top-selectors/well-contents'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
 } from '../../../../ui/steps/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
-import { getAllWellContentsForActiveItem } from '../../../../top-selectors/well-contents'
-import { OffDeckDetails } from '../OffDeckDetails'
 import { HighlightOffdeckSlot } from '../HighlightOffdeckSlot'
-
-import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type * as Components from '@opentrons/components'
+import { OffDeckDetails } from '../OffDeckDetails'
 
 vi.mock('../../../../ui/steps/selectors')
 vi.mock('../HighlightOffdeckSlot')

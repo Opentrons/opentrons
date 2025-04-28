@@ -1,5 +1,3 @@
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -12,6 +10,7 @@ import {
 } from '@opentrons/components'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 interface SendButtonProps {
   handleClick: () => void

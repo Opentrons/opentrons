@@ -1,16 +1,15 @@
-import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
 import {
-  Icon,
   Box,
-  SPACING,
+  Icon,
   ProtocolTimelineScrubber,
+  SPACING,
 } from '@opentrons/components'
-import { fetchProtocols, getStoredProtocol } from '/app/redux/protocol-storage'
-
-import type { Dispatch, State } from '/app/redux/types'
 import type { DesktopRouteParams } from '/app/App/types'
+import { fetchProtocols, getStoredProtocol } from '/app/redux/protocol-storage'
+import type { Dispatch, State } from '/app/redux/types'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 export function ProtocolTimeline(): JSX.Element {
   const { protocolKey } = useParams<

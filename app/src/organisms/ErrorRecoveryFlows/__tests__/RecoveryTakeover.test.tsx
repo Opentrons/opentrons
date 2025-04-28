@@ -1,20 +1,17 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
-
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
-
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RecoveryTakeover, RecoveryTakeoverDesktop } from '../RecoveryTakeover'
 import { useUpdateClientDataRecovery } from '/app/resources/client_data'
-import { clickButtonLabeled } from './util'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
+import { RecoveryTakeover, RecoveryTakeoverDesktop } from '../RecoveryTakeover'
+import { clickButtonLabeled } from './util'
 
 vi.mock('/app/resources/client_data')
 

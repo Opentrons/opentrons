@@ -1,17 +1,16 @@
-import { css } from 'styled-components'
-import type { FlattenSimpleInterpolation } from 'styled-components'
 import {
   ALIGN_CENTER,
   Box,
   DIRECTION_COLUMN,
   Flex,
+  PRODUCT,
   SPACING,
   Text,
-  PRODUCT,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import { css } from 'styled-components'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 
 const fontStyles = {
   'Helix Product (Desktop)': [

@@ -1,10 +1,8 @@
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import { OT2SetupLPC } from './OT2SetupLPC'
-import { FlexSetupLPC } from './FlexSetupLPC'
-
 import type { RobotType } from '@opentrons/shared-data'
 import type { UseLPCFlowsResult } from '/app/organisms/LabwarePositionCheck'
+import { FlexSetupLPC } from './FlexSetupLPC'
+import { OT2SetupLPC } from './OT2SetupLPC'
 
 export interface SetupLabwarePositionCheckProps {
   offsetsConfirmed: boolean

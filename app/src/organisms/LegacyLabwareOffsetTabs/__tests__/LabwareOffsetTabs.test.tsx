@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { describe, expect, it } from 'vitest'
 import { LegacyLabwareOffsetTabs } from '..'
 
 const mockTableComponent = <div>Table Component</div>

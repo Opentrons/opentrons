@@ -1,8 +1,7 @@
 import { GET, request } from '../request'
-
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { StoredLabwareOffset, MultiBodyMeta } from './types'
+import type { MultiBodyMeta, StoredLabwareOffset } from './types'
 
 export interface LabwareOffsetsSearchParams {
   cursor?: number

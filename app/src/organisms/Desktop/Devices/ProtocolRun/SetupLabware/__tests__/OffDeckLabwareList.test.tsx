@@ -1,14 +1,12 @@
-import { MemoryRouter } from 'react-router-dom'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { LabwareListItem } from '../LabwareListItem'
 import { OffDeckLabwareList } from '../OffDeckLabwareList'
-
-import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../LabwareListItem')
 

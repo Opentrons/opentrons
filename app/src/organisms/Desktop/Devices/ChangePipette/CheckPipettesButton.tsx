@@ -1,20 +1,19 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { usePipettesQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   PrimaryButton,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
-import { DETACH } from './constants'
-
+import { usePipettesQuery } from '@opentrons/react-api-client'
+import { useState } from 'react'
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { DETACH } from './constants'
 
 export interface CheckPipetteButtonProps {
   robotName: string

@@ -1,11 +1,9 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { renderHook, act, render, screen } from '@testing-library/react'
+import { act, render, renderHook, screen } from '@testing-library/react'
 import { useTranslation } from 'react-i18next'
-
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
 import { DROP_TIP_SPECIAL_ERROR_TYPES } from '../../constants'
 import { useDropTipCommandErrors, useDropTipErrorComponents } from '../errors'
-
-import type { Mock } from 'vitest'
 
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),

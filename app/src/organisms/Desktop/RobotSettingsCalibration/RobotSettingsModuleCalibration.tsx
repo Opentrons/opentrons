@@ -1,17 +1,14 @@
-import { useTranslation } from 'react-i18next'
-
+import type { AttachedModule } from '@opentrons/api-client'
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { ModuleCalibrationItems } from './CalibrationDetails/ModuleCalibrationItems'
-
-import type { AttachedModule } from '@opentrons/api-client'
+import { useTranslation } from 'react-i18next'
 import type { FormattedPipetteOffsetCalibration } from '.'
+import { ModuleCalibrationItems } from './CalibrationDetails/ModuleCalibrationItems'
 
 interface RobotSettingsModuleCalibrationProps {
   attachedModules: AttachedModule[]

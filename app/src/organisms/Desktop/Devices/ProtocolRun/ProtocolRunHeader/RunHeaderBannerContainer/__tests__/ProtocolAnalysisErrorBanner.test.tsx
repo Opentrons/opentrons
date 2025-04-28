@@ -1,11 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ProtocolAnalysisErrorBanner } from '../ProtocolAnalysisErrorBanner'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, it } from 'vitest'
+import { ProtocolAnalysisErrorBanner } from '../ProtocolAnalysisErrorBanner'
 
 const render = (props: ComponentProps<typeof ProtocolAnalysisErrorBanner>) => {
   return renderWithProviders(<ProtocolAnalysisErrorBanner {...props} />, {

@@ -1,26 +1,25 @@
-import { css } from 'styled-components'
 import {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
-  TEMPERATURE_MODULE_V1,
-  TEMPERATURE_MODULE_V2,
-  THERMOCYCLER_MODULE_V1,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-
+import type { ModuleModel } from '@opentrons/shared-data'
+import { css } from 'styled-components'
+import heater_shaker_module_transparent from '../../assets/images/modules/heater_shaker_module_transparent.png'
 import magdeck_gen1 from '../../assets/images/modules/magdeck_gen1.png'
 import magdeck_gen2 from '../../assets/images/modules/magdeck_gen2.png'
-import tempdeck_gen1 from '../../assets/images/modules/tempdeck_gen1.png'
 import temp_deck_gen_2_transparent from '../../assets/images/modules/temp_deck_gen_2_transparent.png'
-import thermocycler from '../../assets/images/modules/thermocycler.png'
+import tempdeck_gen1 from '../../assets/images/modules/tempdeck_gen1.png'
 import thermocycler_gen2 from '../../assets/images/modules/thermocycler_gen2.png'
-import heater_shaker_module_transparent from '../../assets/images/modules/heater_shaker_module_transparent.png'
-import type { ModuleModel } from '@opentrons/shared-data'
+import thermocycler from '../../assets/images/modules/thermocycler.png'
 import type { OT2ModuleType } from '../../types'
 
 interface ModuleDiagramProps {

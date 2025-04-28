@@ -1,10 +1,9 @@
-import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fixture12Trough as _fixture12Trough } from '@opentrons/shared-data'
-import { LabwareWellLabels } from '../LabwareWellLabels'
-
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { LabwareWellLabels } from '../LabwareWellLabels'
 
 const troughFixture12 = _fixture12Trough as LabwareDefinition2
 

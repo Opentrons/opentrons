@@ -1,7 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import styled from 'styled-components'
-
 import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
@@ -13,8 +9,8 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   DISPLAY_INLINE_BLOCK,
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   OVERFLOW_AUTO,
   PRODUCT,
   RadioButton,
@@ -28,29 +24,30 @@ import {
   getAllPipetteNames,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-
-import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getAllowAllTipracks } from '../../../feature-flags/selectors'
+import type { PipetteName, RobotType } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
 import { setFeatureFlags } from '../../../feature-flags/actions'
+import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
-import { getShouldShowPipetteType, getTiprackOptions } from './utils'
-import { removeOpentronsPhrases } from '../../../utils'
+import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import {
   PIPETTE_GENS,
   PIPETTE_TYPES,
   PIPETTE_VOLUMES,
 } from '../../../pages/Onboarding/constants'
-
-import type { PipetteName, RobotType } from '@opentrons/shared-data'
-import type { PipetteOnDeck } from '../../../step-forms'
 import type {
   Gen,
   PipetteInfoByGen,
   PipetteInfoByType,
   PipetteType,
 } from '../../../pages/Onboarding/types'
+import type { PipetteOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
+import { removeOpentronsPhrases } from '../../../utils'
 import type { PipetteConfig } from './usePipetteConfig'
+import { getShouldShowPipetteType, getTiprackOptions } from './utils'
 
 interface PipetteConfigurationProps {
   has96Channel: boolean

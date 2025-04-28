@@ -1,13 +1,12 @@
-import { screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
 import { fixture96Plate, fixtureTiprackAdapter } from '@opentrons/shared-data'
-import { i18n } from '/app/i18n'
-import { renderWithProviders } from '/app/__testing-utils__'
-import { LegacyLabwareOffsetTable } from '../LegacyLabwareOffsetTable'
-
-import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import type { ComponentProps } from 'react'
+import { describe, expect, it } from 'vitest'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
+import { LegacyLabwareOffsetTable } from '../LegacyLabwareOffsetTable'
 
 const mockLabwareDef = fixture96Plate as LabwareDefinition2
 const mockAdapterDef = fixtureTiprackAdapter as LabwareDefinition2

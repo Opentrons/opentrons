@@ -1,9 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, expect } from 'vitest'
+import type { ComponentProps } from 'react'
+import { describe, expect, it, vi } from 'vitest'
+import { ConfirmDeleteEntityInUseModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { ConfirmDeleteEntityInUseModal } from '..'
-import type { ComponentProps } from 'react'
 
 const render = (
   props: ComponentProps<typeof ConfirmDeleteEntityInUseModal>

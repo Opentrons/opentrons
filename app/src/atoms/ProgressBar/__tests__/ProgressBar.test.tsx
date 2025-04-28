@@ -1,12 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { screen } from '@testing-library/react'
-import { css } from 'styled-components'
 import { COLORS } from '@opentrons/components'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { ProgressBar } from '..'
-
 import type { ComponentProps } from 'react'
+import { css } from 'styled-components'
+import { ProgressBar } from '..'
 
 const render = (props: ComponentProps<typeof ProgressBar>) => {
   return renderWithProviders(<ProgressBar {...props} />)

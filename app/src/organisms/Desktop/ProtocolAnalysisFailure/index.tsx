@@ -1,9 +1,3 @@
-import { useState } from 'react'
-import { createPortal } from 'react-dom'
-import { useDispatch } from 'react-redux'
-import { useTranslation, Trans } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   Banner,
@@ -18,12 +12,16 @@ import {
   TYPOGRAPHY,
   WRAP_REVERSE,
 } from '@opentrons/components'
-
-import { analyzeProtocol } from '/app/redux/protocol-storage'
 import { getTopPortalEl } from '/app/App/portal'
-
-import type { MouseEventHandler } from 'react'
+import { analyzeProtocol } from '/app/redux/protocol-storage'
 import type { Dispatch } from '/app/redux/types'
+import { useState } from 'react'
+import type { MouseEventHandler } from 'react'
+import { createPortal } from 'react-dom'
+import { Trans, useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { css } from 'styled-components'
+
 interface ProtocolAnalysisFailureProps {
   errors: string[]
   protocolKey: string

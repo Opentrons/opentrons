@@ -1,7 +1,7 @@
-import type * as React from 'react'
 import { VIEWPORT } from '@opentrons/components'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 import { InlineNotification } from '.'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/InlineNotification',

@@ -1,18 +1,18 @@
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
 import {
-  ALIGN_FLEX_END,
   AlertPrimaryButton,
+  ALIGN_FLEX_END,
   COLORS,
   Flex,
   Icon,
   Modal,
-  SPACING,
   SecondaryButton,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getMainPagePortalEl } from '../Portal'
 import type { MouseEvent } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { getMainPagePortalEl } from '../Portal'
 
 export const DELETE_PROFILE_CYCLE: 'deleteProfileCycle' = 'deleteProfileCycle'
 export const CLOSE_STEP_FORM_WITH_CHANGES: 'closeStepFormWithChanges' =

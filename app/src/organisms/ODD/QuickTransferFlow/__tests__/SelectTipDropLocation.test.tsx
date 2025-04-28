@@ -1,15 +1,11 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
-
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-
-import { SelectTipDropLocation } from '../SelectTipDropLocation'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { SelectTipDropLocation } from '../SelectTipDropLocation'
 
 vi.mock('/app/resources/deck_configuration')
 

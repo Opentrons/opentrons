@@ -1,8 +1,6 @@
-import { describe, it, expect } from 'vitest'
-
+import { describe, expect, it } from 'vitest'
 import { mockRobot } from '../../robot-api/__fixtures__'
 import * as actions from '../actions'
-
 import type { RobotUpdateAction } from '../types'
 
 interface ActionSpec {

@@ -1,18 +1,15 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
-import * as Actions from '../../actions'
-import * as robotAdminSelectors from '../../selectors'
 import * as discoverySelectors from '../../../discovery/selectors'
-
-import { trackRestartsEpic } from '../trackRestartsEpic'
-
 import type {
   ConnectivityStatus,
   DiscoveredRobot,
 } from '../../../discovery/types'
+import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
 import type { Action } from '../../../types'
+import * as Actions from '../../actions'
+import * as robotAdminSelectors from '../../selectors'
+import { trackRestartsEpic } from '../trackRestartsEpic'
 
 vi.mock('../../../discovery/selectors')
 vi.mock('../../selectors')

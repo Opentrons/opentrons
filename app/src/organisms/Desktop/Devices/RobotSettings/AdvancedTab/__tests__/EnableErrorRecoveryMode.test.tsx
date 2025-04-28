@@ -1,11 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, expect, beforeEach } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
-import { EnableErrorRecoveryMode } from '../EnableErrorRecoveryMode'
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { EnableErrorRecoveryMode } from '../EnableErrorRecoveryMode'
 
 vi.mock('/app/resources/errorRecovery')
 

@@ -1,6 +1,7 @@
-import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 import type { BlowoutParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
+
 export function forBlowout(
   params: BlowoutParams,
   invariantContext: InvariantContext,

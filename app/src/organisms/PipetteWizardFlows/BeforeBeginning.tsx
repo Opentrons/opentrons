@@ -1,51 +1,50 @@
-import { useEffect } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 import {
-  COLORS,
   Banner,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
-  WEIGHT_OF_96_CHANNEL,
   WASTE_CHUTE_CUTOUT,
+  WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
-import {
-  SimpleWizardBody,
-  SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
-import { usePipetteNameSpecs } from '/app/local-resources/instruments'
-import {
-  CALIBRATION_PROBE,
-  FLOWS,
-  PIPETTE,
-  HEX_SCREWDRIVER,
-  NINETY_SIX_CHANNEL_PIPETTE,
-  NINETY_SIX_CHANNEL_MOUNTING_PLATE,
-  BODY_STYLE,
-} from './constants'
-import { getIsGantryEmpty } from './utils'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-
-import type { UseMutateFunction } from 'react-query'
-import type { AxiosError } from 'axios'
 import type {
   CreateCommand,
   LoadedPipette,
   PipetteName,
 } from '@opentrons/shared-data'
-import type {
-  CreateMaintenanceRunData,
-  MaintenanceRun,
-} from '@opentrons/api-client'
+import { usePipetteNameSpecs } from '/app/local-resources/instruments'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import type { AxiosError } from 'axios'
+import { useEffect } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import type { UseMutateFunction } from 'react-query'
+import {
+  BODY_STYLE,
+  CALIBRATION_PROBE,
+  FLOWS,
+  HEX_SCREWDRIVER,
+  NINETY_SIX_CHANNEL_MOUNTING_PLATE,
+  NINETY_SIX_CHANNEL_PIPETTE,
+  PIPETTE,
+} from './constants'
 import type { PipetteWizardStepProps } from './types'
+import { getIsGantryEmpty } from './utils'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
   createMaintenanceRun: UseMutateFunction<

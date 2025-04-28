@@ -1,7 +1,3 @@
-import { useState, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-import { createPortal } from 'react-dom'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -13,10 +9,12 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { getTopPortalEl } from '/app/App/portal'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 interface NameQuickTransferProps {
   onSave: (protocolName: string) => void

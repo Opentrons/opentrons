@@ -1,13 +1,12 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { BeforeBeginning } from '../BeforeBeginning'
 import { GRIPPER_FLOW_TYPES } from '../constants'
-
-import type { ComponentProps } from 'react'
 
 vi.mock('/app/molecules/InProgressModal/InProgressModal')
 

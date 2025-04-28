@@ -1,18 +1,14 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-
 import { getDeckDefinitions } from '@opentrons/shared-data'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import * as Sessions from '/app/redux/sessions'
 import { mockCalibrationCheckSessionAttributes } from '/app/redux/sessions/__fixtures__'
-
-import { CheckCalibration } from '../index'
-
-import type { ComponentProps, ComponentType } from 'react'
 import type { RobotCalibrationCheckStep } from '/app/redux/sessions/types'
+import type { ComponentProps, ComponentType } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { CheckCalibration } from '../index'
 
 vi.mock('/app/redux/calibration/selectors')
 vi.mock('/app/redux/config')

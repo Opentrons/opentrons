@@ -1,21 +1,18 @@
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-
+import type { VectorOffset } from '@opentrons/api-client'
 import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
-  StyledText,
   ModalShell,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import type { VectorOffset } from '@opentrons/api-client'
-
+import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { JogControls } from '/app/molecules/JogControls'
-import { getTopPortalEl } from '/app/App/portal'
-
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 export interface LPCJogControlsOddProps extends EditOffsetContentProps {
   toggleJogControls: () => void

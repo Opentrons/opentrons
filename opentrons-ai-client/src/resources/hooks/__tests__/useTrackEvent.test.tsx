@@ -1,14 +1,12 @@
-import { describe, it, vi, expect, afterEach } from 'vitest'
-
+import { renderHook } from '@testing-library/react'
+import type { ReactNode } from 'react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { TestProvider } from '../../../__testing-utils__'
 import { trackEvent } from '../../../analytics/mixpanel'
-import { useTrackEvent } from '../useTrackEvent'
-import { renderHook } from '@testing-library/react'
-import { mixpanelAtom } from '../../atoms'
-
-import type { ReactNode } from 'react'
 import type { AnalyticsEvent } from '../../../analytics/mixpanel'
+import { mixpanelAtom } from '../../atoms'
 import type { Mixpanel } from '../../types'
+import { useTrackEvent } from '../useTrackEvent'
 
 vi.mock('../../../analytics/mixpanel', () => ({
   trackEvent: vi.fn(),

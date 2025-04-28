@@ -1,15 +1,13 @@
 // create logger function
-import { app } from 'electron'
-import { inspect } from 'util'
-import fse from 'fs-extra'
 import path from 'path'
-import dateFormat from 'dateformat'
-import winston from 'winston'
-
-import { getConfig } from './config'
-
-import type Transport from 'winston-transport'
+import { inspect } from 'util'
 import type { ConfigV0 } from '@opentrons/app/src/redux/config/schema-types'
+import dateFormat from 'dateformat'
+import { app } from 'electron'
+import fse from 'fs-extra'
+import winston from 'winston'
+import type Transport from 'winston-transport'
+import { getConfig } from './config'
 
 export const LOG_DIR = path.join(app.getPath('userData'), 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')

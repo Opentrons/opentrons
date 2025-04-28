@@ -1,12 +1,11 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
 import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { mockLeftSpecs } from '/app/redux/pipettes/__fixtures__'
-
 import type { ComponentProps } from 'react'
+import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 
 vi.mock('@opentrons/react-api-client')
 

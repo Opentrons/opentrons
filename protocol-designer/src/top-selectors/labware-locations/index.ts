@@ -1,44 +1,44 @@
-import { createSelector } from 'reselect'
-import mapValues from 'lodash/mapValues'
 import {
-  THERMOCYCLER_MODULE_TYPE,
+  FLEX_MODULE_ADDRESSABLE_AREAS,
+  FLEX_ROBOT_TYPE,
+  FLEX_STACKER_ADDRESSABLE_AREAS,
   getDeckDefFromRobotType,
   getModuleDisplayName,
-  FLEX_ROBOT_TYPE,
-  WASTE_CHUTE_ADDRESSABLE_AREAS,
-  WASTE_CHUTE_CUTOUT,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   isAddressableAreaStandardSlot,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
-  FLEX_MODULE_ADDRESSABLE_AREAS,
-  FLEX_STACKER_ADDRESSABLE_AREAS,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_TYPE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
-import {
-  START_TERMINAL_ITEM_ID,
-  END_TERMINAL_ITEM_ID,
-  PRESAVED_STEP_ID,
-  HARDWARE_ID,
-} from '../../steplist'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { getActiveItem, getSelectedStepId } from '../../ui/steps'
-import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
+import type { RobotState } from '@opentrons/step-generation'
+import mapValues from 'lodash/mapValues'
+import { createSelector } from 'reselect'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { getRobotType } from '../../file-data/selectors'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
 import {
+  getAdditionalEquipmentEntities,
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
-  getAdditionalEquipmentEntities,
 } from '../../step-forms/selectors'
+import {
+  END_TERMINAL_ITEM_ID,
+  HARDWARE_ID,
+  PRESAVED_STEP_ID,
+  START_TERMINAL_ITEM_ID,
+} from '../../steplist'
+import type { Selector } from '../../types'
+import { getActiveItem, getSelectedStepId } from '../../ui/steps'
+import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { getSelectedTerminalItemId } from '../../ui/steps/selectors'
 import { getIsAdapter } from '../../utils'
-import type { CutoutId, AddressableAreaName } from '@opentrons/shared-data'
-import type { RobotState } from '@opentrons/step-generation'
-import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
-import type { Selector } from '../../types'
 
 interface Option {
   name: string

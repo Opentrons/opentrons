@@ -1,8 +1,8 @@
-import robotSideAnalysis from './mockRobotSideAnalysis.json'
-import doItAllAnalysis from './doItAllV10.json'
-import qiaseqAnalysis from './analysis_QIAseqFX24xv4_8.json'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { CommandTextData } from '@opentrons/components'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import qiaseqAnalysis from './analysis_QIAseqFX24xv4_8.json'
+import doItAllAnalysis from './doItAllV10.json'
+import robotSideAnalysis from './mockRobotSideAnalysis.json'
 
 export const mockRobotSideAnalysis: CompletedProtocolAnalysis = robotSideAnalysis as CompletedProtocolAnalysis
 export const mockDoItAllAnalysis: CompletedProtocolAnalysis = doItAllAnalysis as CompletedProtocolAnalysis

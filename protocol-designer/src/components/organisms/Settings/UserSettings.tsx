@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   Btn,
@@ -13,12 +10,12 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { actions as tutorialActions } from '../../../tutorial'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { actions as featureFlagActions } from '../../../feature-flags'
-import { ToggleButton } from '../../atoms/ToggleButton'
-
 import type { FlagTypes } from '../../../feature-flags'
+import { actions as tutorialActions } from '../../../tutorial'
+import { ToggleButton } from '../../atoms/ToggleButton'
 
 const userFacingFlags: FlagTypes[] = [
   'OT_PD_ENABLE_HOT_KEYS_DISPLAY',

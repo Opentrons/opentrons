@@ -1,7 +1,3 @@
-import { useMemo, useState } from 'react'
-import { css } from 'styled-components'
-
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -11,22 +7,24 @@ import {
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
+  getLabwareDefinitionsFromCommands,
   Icon,
   LegacyStyledText,
   OVERFLOW_AUTO,
   SPACING,
   TYPOGRAPHY,
-  getLabwareDefinitionsFromCommands,
 } from '@opentrons/components'
-
-import { CommandIcon } from '/app/molecules/Command'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type {
   CompletedProtocolAnalysis,
+  LabwareDefinition2,
   ProtocolAnalysisOutput,
   RunTimeCommand,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
+import { CommandIcon } from '/app/molecules/Command'
 import type { GroupedCommands, LeafNode } from '/app/redux/protocol-storage'
+import { useMemo, useState } from 'react'
+import { css } from 'styled-components'
 
 interface AnnotatedStepsProps {
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput

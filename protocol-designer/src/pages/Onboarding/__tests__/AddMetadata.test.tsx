@@ -1,13 +1,12 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { AddMetadata } from '../AddMetadata'
-
 import type { ComponentProps } from 'react'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
 import type { WizardFormState } from '../../../components/organisms'
+import { AddMetadata } from '../AddMetadata'
 import type { WizardTileProps } from '../types'
 
 const render = (props: ComponentProps<typeof AddMetadata>) => {

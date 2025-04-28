@@ -1,16 +1,14 @@
-import styled from 'styled-components'
 import {
   ALIGN_FLEX_START,
   DIRECTION_ROW,
   Flex,
   SPACING,
 } from '@opentrons/components'
-
-import { useNotifyAllRunsQuery } from '/app/resources/runs'
-import { PinnedProtocol } from './PinnedProtocol'
-
-import type { Dispatch, SetStateAction } from 'react'
 import type { ProtocolResource } from '@opentrons/shared-data'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
+import type { Dispatch, SetStateAction } from 'react'
+import styled from 'styled-components'
+import { PinnedProtocol } from './PinnedProtocol'
 import type { CardSizeType } from './PinnedProtocol'
 
 interface PinnedProtocolCarouselProps {

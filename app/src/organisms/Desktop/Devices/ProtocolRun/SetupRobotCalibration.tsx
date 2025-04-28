@@ -1,5 +1,4 @@
-import { useTranslation } from 'react-i18next'
-
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -9,21 +8,19 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-
+import { useIsFlex } from '/app/redux-resources/robots'
 import {
-  useTrackEvent,
-  ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
   ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP,
+  ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
+  useTrackEvent,
 } from '/app/redux/analytics'
+import type { ProtocolCalibrationStatus } from '/app/redux/calibration/types'
+import type { StepKey } from '/app/redux/protocol-runs'
+import { useRunHasStarted, useRunStatus } from '/app/resources/runs'
+import { useTranslation } from 'react-i18next'
 import { SetupDeckCalibration } from './SetupDeckCalibration'
 import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
-import { useRunStatus, useRunHasStarted } from '/app/resources/runs'
-import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
-import { useIsFlex } from '/app/redux-resources/robots'
-
-import type { ProtocolCalibrationStatus } from '/app/redux/calibration/types'
-import type { StepKey } from '/app/redux/protocol-runs'
 
 interface SetupRobotCalibrationProps {
   robotName: string

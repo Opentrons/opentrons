@@ -1,22 +1,19 @@
-import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
+  Modal,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
-  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
+import type { AnalysisError } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import { useProtocolAnalysisErrors } from '/app/resources/runs'
-
-import type { AnalysisError } from '@opentrons/shared-data'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 export type UseAnalysisErrorsModalProps = Omit<
   ProtocolAnalysisErrorModalProps,

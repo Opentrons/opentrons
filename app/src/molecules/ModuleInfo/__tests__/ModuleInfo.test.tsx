@@ -1,14 +1,13 @@
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
-import { when } from 'vitest-when'
-import { i18n } from '/app/i18n'
-import { ModuleInfo } from '../ModuleInfo'
-import { useRunHasStarted } from '/app/resources/runs'
-
-import type { ComponentProps } from 'react'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useRunHasStarted } from '/app/resources/runs'
+import type { ComponentProps } from 'react'
+import { when } from 'vitest-when'
+import { ModuleInfo } from '../ModuleInfo'
 
 vi.mock('/app/resources/runs')
 

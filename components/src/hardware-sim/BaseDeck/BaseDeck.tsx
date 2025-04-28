@@ -1,40 +1,21 @@
-import { Fragment } from 'react'
 import {
   getDeckDefFromRobotType,
   getModuleDef2,
   getPositionFromSlotId,
+  HEATERSHAKER_MODULE_V1,
   inferModuleOrientationFromXCoordinate,
-  OT2_ROBOT_TYPE,
+  MODULE_FIXTURES_BY_MODEL,
   MOVABLE_TRASH_CUTOUTS,
+  OT2_ROBOT_TYPE,
   SINGLE_SLOT_FIXTURES,
   STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_ONLY_FIXTURES,
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
-  HEATERSHAKER_MODULE_V1,
-  MODULE_FIXTURES_BY_MODEL,
-  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from '@opentrons/shared-data'
-
-import { DeckInfoLabel } from '../../molecules/DeckInfoLabel'
-import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
-import { Module } from '../Module'
-import { LabwareRender } from '../Labware'
-import { FlexTrash } from '../Deck/FlexTrash'
-import { DeckFromLayers } from '../Deck/DeckFromLayers'
-import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
-import { SlotLabels } from '../Deck'
-import { COLORS } from '../../helix-design-system'
-
-import { SingleSlotFixture } from './SingleSlotFixture'
-import { StagingAreaFixture } from './StagingAreaFixture'
-import { WasteChuteFixture } from './WasteChuteFixture'
-import { WasteChuteStagingAreaFixture } from './WasteChuteStagingAreaFixture'
-
-import type { ComponentProps, ReactNode } from 'react'
-import type { Svg } from '../../primitives'
 import type {
   CutoutFixtureId,
   DeckConfiguration,
@@ -44,9 +25,25 @@ import type {
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
+import { Fragment } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
+import { COLORS } from '../../helix-design-system'
+import { DeckInfoLabel } from '../../molecules/DeckInfoLabel'
+import type { Svg } from '../../primitives'
+import { SlotLabels } from '../Deck'
+import { DeckFromLayers } from '../Deck/DeckFromLayers'
+import { FlexTrash } from '../Deck/FlexTrash'
 import type { TrashCutoutId } from '../Deck/FlexTrash'
-import type { StagingAreaLocation } from './StagingAreaFixture'
+import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
+import { LabwareRender } from '../Labware'
 import type { WellFill, WellGroup } from '../Labware'
+import { Module } from '../Module'
+import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
+import { SingleSlotFixture } from './SingleSlotFixture'
+import { StagingAreaFixture } from './StagingAreaFixture'
+import type { StagingAreaLocation } from './StagingAreaFixture'
+import { WasteChuteFixture } from './WasteChuteFixture'
+import { WasteChuteStagingAreaFixture } from './WasteChuteStagingAreaFixture'
 
 export interface LabwareOnDeck {
   labwareLocation: LabwareLocation

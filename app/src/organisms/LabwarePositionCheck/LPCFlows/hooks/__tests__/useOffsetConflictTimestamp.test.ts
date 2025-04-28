@@ -1,8 +1,10 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import type {
+  ANY_LOCATION,
+  LabwareOffset,
+  Run,
+  StoredLabwareOffset,
+} from '@opentrons/api-client'
 import { renderHook } from '@testing-library/react'
-import { useOffsetConflictTimestamp } from '../useOffsetConflictTimestamp'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import {
   selectAreOffsetsApplied,
   selectConflictTimestampInfo,
@@ -10,12 +12,10 @@ import {
   selectInitialRunRecordOffsets,
   updateConflictTimestamp,
 } from '/app/redux/protocol-runs'
-import type {
-  LabwareOffset,
-  StoredLabwareOffset,
-  Run,
-  ANY_LOCATION,
-} from '@opentrons/api-client'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
+import { useDispatch, useSelector } from 'react-redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useOffsetConflictTimestamp } from '../useOffsetConflictTimestamp'
 
 vi.mock('react-redux')
 vi.mock('/app/resources/runs')

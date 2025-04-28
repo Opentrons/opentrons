@@ -1,31 +1,28 @@
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
-import { screen } from '@testing-library/react'
-import { useNavigate } from 'react-router-dom'
-
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { useModulesQuery } from '@opentrons/react-api-client'
-
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ProtocolRunHeader } from '..'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import {
-  useRunStatus,
-  useProtocolDetailsForRun,
   useNotifyRunQuery,
+  useProtocolDetailsForRun,
+  useRunStatus,
 } from '/app/resources/runs'
-import { RunHeaderModalContainer } from '../RunHeaderModalContainer'
-import { RunHeaderBannerContainer } from '../RunHeaderBannerContainer'
-import { RunHeaderContent } from '../RunHeaderContent'
+import type { ComponentProps } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { ProtocolRunHeader } from '..'
 import { RunProgressMeter } from '../../../../RunProgressMeter'
-import { RunHeaderProtocolName } from '../RunHeaderProtocolName'
 import {
   useRunAnalytics,
   useRunErrors,
   useRunHeaderRunControls,
 } from '../hooks'
-
-import type { ComponentProps } from 'react'
+import { RunHeaderBannerContainer } from '../RunHeaderBannerContainer'
+import { RunHeaderContent } from '../RunHeaderContent'
+import { RunHeaderModalContainer } from '../RunHeaderModalContainer'
+import { RunHeaderProtocolName } from '../RunHeaderProtocolName'
 
 vi.mock('react-router-dom')
 vi.mock('@opentrons/react-api-client')

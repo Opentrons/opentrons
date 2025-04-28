@@ -1,13 +1,13 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { fixture12Trough, fixtureTiprack1000ul } from '@opentrons/shared-data'
-import { addAndSelectStep } from '../thunks'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import * as fileDataSelectors from '../../../../file-data/selectors'
+import type { StepType } from '../../../../form-types'
+import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
+import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 import { addHint } from '../../../../tutorial/actions'
-import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
-import * as fileDataSelectors from '../../../../file-data/selectors'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { StepType } from '../../../../form-types'
+import { addAndSelectStep } from '../thunks'
 
 vi.mock('../../../../tutorial/actions')
 vi.mock('../../../../ui/modules/selectors')

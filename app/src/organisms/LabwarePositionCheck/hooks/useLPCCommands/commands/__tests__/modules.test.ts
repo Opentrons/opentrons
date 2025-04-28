@@ -1,14 +1,12 @@
-import { it, describe, expect } from 'vitest'
-
-import {
-  modulePrepCommands,
-  moduleInitBeforeAnyLPCCommands,
-  moduleInitDuringLPCCommands,
-  moduleCleanupDuringLPCCommands,
-} from '../modules'
-
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import { describe, expect, it } from 'vitest'
+import {
+  moduleCleanupDuringLPCCommands,
+  moduleInitBeforeAnyLPCCommands,
+  moduleInitDuringLPCCommands,
+  modulePrepCommands,
+} from '../modules'
 
 describe('module commands', () => {
   describe('modulePrepCommands', () => {

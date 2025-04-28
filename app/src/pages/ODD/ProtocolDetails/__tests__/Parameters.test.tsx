@@ -1,14 +1,13 @@
-import { when } from 'vitest-when'
-import { it, describe, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-import { i18n } from '/app/i18n'
-import { useToaster } from '/app/organisms/ToasterOven'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useRunTimeParameters } from '/app/resources/protocols'
-import { Parameters } from '../Parameters'
+import { i18n } from '/app/i18n'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
-
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useRunTimeParameters } from '/app/resources/protocols'
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { Parameters } from '../Parameters'
 
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/resources/protocols')

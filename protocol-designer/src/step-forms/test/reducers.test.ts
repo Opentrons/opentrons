@@ -1,57 +1,26 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-
 import {
   MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
-
-import {
-  orderedStepIds,
-  labwareInvariantProperties,
-  moduleInvariantProperties,
-  presavedStepForm,
-  savedStepForms,
-  unsavedForm,
-  batchEditFormChanges,
-} from '../reducers'
-import {
-  _getPipetteEntitiesRootState,
-  _getLabwareEntitiesRootState,
-  _getInitialDeckSetupRootState,
-} from '../selectors'
-import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
-import { moveDeckItem } from '../../labware-ingred/actions'
+import type { ModuleEntity } from '@opentrons/step-generation'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
-  SPAN7_8_10_11_SLOT,
   PAUSE_UNTIL_TEMP,
+  SPAN7_8_10_11_SLOT,
 } from '../../constants'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
-import { createPresavedStepForm } from '../utils/createPresavedStepForm'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
-
-import type { ModuleEntity } from '@opentrons/step-generation'
-import type { DeckSlot } from '../../types'
+import type { FormData, StepType } from '../../form-types'
+import { moveDeckItem } from '../../labware-ingred/actions'
 import type { DeleteContainerAction } from '../../labware-ingred/actions/actions'
 import type {
   ChangeFormInputAction,
   DeleteMultipleStepsAction,
 } from '../../steplist/actions'
-import type { FormData, StepType } from '../../form-types'
-import type {
-  SavedStepFormsActions,
-  UnsavedFormActions,
-  RootState,
-  PresavedStepFormState,
-  PresavedStepFormAction,
-} from '../reducers'
-import type {
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
-} from '../actions/pipettes'
-import type { CreateModuleAction, DeleteModuleAction } from '../actions/modules'
+import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
+import type { DeckSlot } from '../../types'
 import type {
   AddStepAction,
   DuplicateMultipleStepsAction,
@@ -60,11 +29,39 @@ import type {
   SelectStepAction,
   SelectTerminalItemAction,
 } from '../../ui/steps'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import type {
   ChangeBatchEditFieldAction,
-  SaveStepFormsMultiAction,
   ResetBatchEditFieldChangesAction,
+  SaveStepFormsMultiAction,
 } from '../actions'
+import type { CreateModuleAction, DeleteModuleAction } from '../actions/modules'
+import type {
+  DeletePipettesAction,
+  SubstituteStepFormPipettesAction,
+} from '../actions/pipettes'
+import {
+  batchEditFormChanges,
+  labwareInvariantProperties,
+  moduleInvariantProperties,
+  orderedStepIds,
+  presavedStepForm,
+  savedStepForms,
+  unsavedForm,
+} from '../reducers'
+import type {
+  PresavedStepFormAction,
+  PresavedStepFormState,
+  RootState,
+  SavedStepFormsActions,
+  UnsavedFormActions,
+} from '../reducers'
+import {
+  _getInitialDeckSetupRootState,
+  _getLabwareEntitiesRootState,
+  _getPipetteEntitiesRootState,
+} from '../selectors'
+import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 
 vi.mock('../../labware-defs/utils')
 vi.mock('../selectors')

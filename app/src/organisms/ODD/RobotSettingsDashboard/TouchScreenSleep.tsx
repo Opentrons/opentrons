@@ -1,23 +1,20 @@
-import { useEffect, useRef } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   DIRECTION_COLUMN,
   Flex,
   RadioButton,
   SPACING,
 } from '@opentrons/components'
-
+import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '/app/redux/config'
-import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
-
-import type { ChangeEvent } from 'react'
 import type { Dispatch } from '/app/redux/types'
+import { useEffect, useRef } from 'react'
+import type { ChangeEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import type { SetSettingOption } from './types'
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min

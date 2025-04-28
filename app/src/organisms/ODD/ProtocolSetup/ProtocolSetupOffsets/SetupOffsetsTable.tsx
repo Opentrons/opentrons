@@ -1,11 +1,11 @@
 import {
   ALIGN_CENTER,
-  SPACING,
   Flex,
   JUSTIFY_CENTER,
+  SPACING,
 } from '@opentrons/components'
-import type { ProtocolSetupOffsetsProps } from '/app/organisms/ODD/ProtocolSetup'
 import { LabwareOffsetsTable } from '/app/organisms/LabwareOffsetsTable'
+import type { ProtocolSetupOffsetsProps } from '/app/organisms/ODD/ProtocolSetup'
 import { css } from 'styled-components'
 
 export function SetupOffsetsTable(

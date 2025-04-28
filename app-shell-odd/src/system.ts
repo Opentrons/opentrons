@@ -1,7 +1,6 @@
 import { UPDATE_BRIGHTNESS } from './constants'
 import { createLogger } from './log'
 import systemd from './systemd'
-
 import type { Action } from './types'
 
 const log = createLogger('system')

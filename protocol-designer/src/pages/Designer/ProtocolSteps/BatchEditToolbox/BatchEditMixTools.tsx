@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
 import {
   DIRECTION_COLUMN,
   Divider,
@@ -8,23 +6,24 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
 } from '../../../../components/molecules'
+import type { WellOrderOption } from '../../../../form-types'
 import {
   BlowoutLocationField,
   FlowRateField,
   PositionField,
   WellsOrderField,
 } from '../StepForm/PipetteFields'
+import type { FieldPropsByName, LiquidHandlingTab } from '../StepForm/types'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../StepForm/utils'
-
-import type { WellOrderOption } from '../../../../form-types'
-import type { FieldPropsByName, LiquidHandlingTab } from '../StepForm/types'
 
 interface BatchEditMixToolsProps {
   propsForFields: FieldPropsByName

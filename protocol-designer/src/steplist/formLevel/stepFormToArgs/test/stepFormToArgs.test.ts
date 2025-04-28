@@ -1,7 +1,6 @@
-import { describe, it, expect } from 'vitest'
 import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
-import { _castForm } from '../index'
 import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
+import { describe, expect, it } from 'vitest'
 import type {
   HydratedMagnetFormData,
   HydratedMixFormData,
@@ -11,6 +10,7 @@ import type {
   HydratedThermocyclerFormData,
   LabwareEntityWithTouchTip,
 } from '../../../../form-types'
+import { _castForm } from '../index'
 
 describe('form casting', () => {
   it('should cast moveLiquid form fields', () => {

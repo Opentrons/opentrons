@@ -1,15 +1,15 @@
-import { useState } from 'react'
-import { round } from 'lodash'
-import { useTranslation } from 'react-i18next'
 import { DropdownMenu } from '@opentrons/components'
+import type { DropdownOption } from '@opentrons/components'
 import {
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
-import type { DropdownOption } from '@opentrons/components'
 import type { PositionReference } from '@opentrons/shared-data'
+import { round } from 'lodash'
+import { useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface UsePositionReferenceResult {
   positionReferenceDropdown: JSX.Element

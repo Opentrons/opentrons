@@ -1,11 +1,11 @@
-import { describe, it, expect, vi } from 'vitest'
+import type { CutoutId } from '@opentrons/shared-data'
+import { describe, expect, it, vi } from 'vitest'
+import { dropTipInTrash } from '../commandCreators/compound/dropTipInTrash'
 import {
   getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
-import { dropTipInTrash } from '../commandCreators/compound/dropTipInTrash'
-import type { CutoutId } from '@opentrons/shared-data'
 import type { InvariantContext, PipetteEntities, RobotState } from '../types'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')

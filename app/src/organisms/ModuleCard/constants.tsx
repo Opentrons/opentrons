@@ -1,11 +1,11 @@
-import { css } from 'styled-components'
 import {
+  ALIGN_START,
   COLORS,
+  DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  ALIGN_START,
 } from '@opentrons/components'
+import { css } from 'styled-components'
 
 export const MODULE_INFO_CONTAINER_STYLE = css`
   grid-gap: ${SPACING.spacing8};

@@ -1,10 +1,9 @@
-import { renderWithProviders } from '../../../testing/utils'
-import { describe, it, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
-import { ParametersTable } from '../index'
-
-import type { ComponentProps } from 'react'
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, it } from 'vitest'
+import { renderWithProviders } from '../../../testing/utils'
+import { ParametersTable } from '../index'
 
 const tMock = (key: string) => key
 const mockRunTimeParameter: RunTimeParameter[] = [

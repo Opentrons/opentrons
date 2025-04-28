@@ -1,15 +1,14 @@
-import { screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { AttachedModule } from '@opentrons/api-client'
 import { ABSORBANCE_READER_TYPE } from '@opentrons/shared-data'
-import { i18n } from '/app/i18n'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ModuleCalibrationItems } from '../ModuleCalibrationItems'
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 import { formatLastCalibrated } from '../utils'
-import { ModuleCalibrationItems } from '../ModuleCalibrationItems'
-
-import type { ComponentProps } from 'react'
-import type { AttachedModule } from '@opentrons/api-client'
 
 vi.mock('../ModuleCalibrationOverflowMenu')
 

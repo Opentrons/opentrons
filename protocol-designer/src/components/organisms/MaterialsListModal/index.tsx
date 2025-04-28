@@ -1,8 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
-import sum from 'lodash/sum'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -25,18 +20,20 @@ import {
   getModuleDisplayName,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
+import type {
+  AdditionalEquipmentEntity,
+  LiquidEntities,
+} from '@opentrons/step-generation'
+import sum from 'lodash/sum'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { getRobotType } from '../../../file-data/selectors'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
-
-import type {
-  LiquidEntities,
-  AdditionalEquipmentEntity,
-} from '@opentrons/step-generation'
-import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
 
 // ToDo (kk:09/04/2024) this should be removed when break-point is set up
 const MODAL_MIN_WIDTH = '37.125rem'

@@ -1,11 +1,8 @@
-import { Trans, useTranslation } from 'react-i18next'
-
 import { LegacyStyledText } from '@opentrons/components'
-
+import { Trans, useTranslation } from 'react-i18next'
 import { RECOVERY_MAP } from '../constants'
-import { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
-
 import type { RecoveryContentProps } from '../types'
+import { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
 
 export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
   const {

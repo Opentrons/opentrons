@@ -1,31 +1,29 @@
 // robot update files
 import path from 'path'
-import { readFile, ensureDir } from 'fs-extra'
-import { createLogger } from '../log'
-import { UI_INITIALIZED } from '../constants'
-
-import { downloadManifest, getReleaseSet } from './release-manifest'
-import {
-  getUpdateManifestUrls,
-  cacheDirForMachine,
-  cacheDirForMachineFiles,
-} from './constants'
-import { CURRENT_VERSION } from '../update'
-import {
-  getReleaseFiles,
-  readUpdateFileInfo,
-  cleanupReleaseFiles,
-} from './release-files'
-import { startPremigration, uploadSystemFile } from './update'
-
-import type { DownloadProgress } from '../http'
-import type { Action, Dispatch } from '../types'
-import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
 import type {
-  RobotUpdateInfo,
   RobotUpdateAction,
+  RobotUpdateInfo,
   RobotUpdateTarget,
 } from '@opentrons/app/src/redux/robot-update/types'
+import { ensureDir, readFile } from 'fs-extra'
+import { UI_INITIALIZED } from '../constants'
+import type { DownloadProgress } from '../http'
+import { createLogger } from '../log'
+import type { Action, Dispatch } from '../types'
+import { CURRENT_VERSION } from '../update'
+import {
+  cacheDirForMachine,
+  cacheDirForMachineFiles,
+  getUpdateManifestUrls,
+} from './constants'
+import {
+  cleanupReleaseFiles,
+  getReleaseFiles,
+  readUpdateFileInfo,
+} from './release-files'
+import { downloadManifest, getReleaseSet } from './release-manifest'
+import type { ReleaseSetFilepaths, ReleaseSetUrls } from './types'
+import { startPremigration, uploadSystemFile } from './update'
 
 const log = createLogger('robot-update/index')
 

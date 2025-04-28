@@ -1,4 +1,3 @@
-import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -13,10 +12,10 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ODD_FOCUS_VISIBLE } from './constants'
-
-import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
+import type { MouseEventHandler, ReactNode } from 'react'
+import { css } from 'styled-components'
+import { ODD_FOCUS_VISIBLE } from './constants'
 
 export type SmallButtonTypes =
   | 'alert'

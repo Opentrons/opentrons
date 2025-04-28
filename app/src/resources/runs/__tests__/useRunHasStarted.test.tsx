@@ -1,10 +1,8 @@
-import { renderHook } from '@testing-library/react'
-import { vi, it, expect, describe, beforeEach } from 'vitest'
-import { when } from 'vitest-when'
-
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
-
+import { renderHook } from '@testing-library/react'
 import { useRunStatus } from '/app/resources/runs'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import { useRunHasStarted } from '../useRunHasStarted'
 
 vi.mock('/app/resources/runs')

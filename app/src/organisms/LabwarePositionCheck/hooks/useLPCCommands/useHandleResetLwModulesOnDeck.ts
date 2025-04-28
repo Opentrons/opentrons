@@ -1,12 +1,11 @@
+import type { CreateCommand } from '@opentrons/shared-data'
+import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 import {
   fullHomeCommands,
   modulePrepCommands,
   moveLabwareOffDeckCommands,
 } from './commands'
-
-import type { CreateCommand } from '@opentrons/shared-data'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
-import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 
 export interface UseHandleResetLwModulesOnDeckResult {
   handleResetLwModulesOnDeck: (

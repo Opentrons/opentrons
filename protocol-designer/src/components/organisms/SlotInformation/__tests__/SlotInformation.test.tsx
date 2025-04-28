@@ -1,13 +1,11 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest'
-import { screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-
-import { SlotInformation } from '..'
-
+import { screen } from '@testing-library/react'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { SlotInformation } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
 
 const mockLiquids = ['Mastermix', 'Ethanol', 'Water']
 const mockLabwares = ['96 Well Plate']

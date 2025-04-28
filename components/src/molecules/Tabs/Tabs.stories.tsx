@@ -1,7 +1,7 @@
 import { useArgs } from '@storybook/preview-api'
-import { VIEWPORT } from '../../ui-style-constants'
-import { Tabs as TabsComponent } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
+import { Tabs as TabsComponent } from '.'
+import { VIEWPORT } from '../../ui-style-constants'
 
 const meta: Meta<typeof TabsComponent> = {
   title: 'Helix/Molecules/Tabs',

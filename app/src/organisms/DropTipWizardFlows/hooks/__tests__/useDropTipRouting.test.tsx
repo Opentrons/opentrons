@@ -1,9 +1,8 @@
-import { describe, it, expect, vi } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
 import head from 'lodash/head'
-
-import { getInitialRouteAndStep, useDropTipRouting } from '../useDropTipRouting'
+import { describe, expect, it, vi } from 'vitest'
 import { DT_ROUTES } from '../../constants'
+import { getInitialRouteAndStep, useDropTipRouting } from '../useDropTipRouting'
 
 describe('useDropTipRouting', () => {
   it('should initialize with the correct default values', () => {

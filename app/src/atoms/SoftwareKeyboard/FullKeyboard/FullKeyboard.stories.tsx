@@ -1,4 +1,3 @@
-import { useState, useRef } from 'react'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,9 +6,9 @@ import {
   SPACING,
   VIEWPORT,
 } from '@opentrons/components'
-import { FullKeyboard } from '.'
-
 import type { Meta, StoryObj } from '@storybook/react'
+import { useRef, useState } from 'react'
+import { FullKeyboard } from '.'
 
 const meta: Meta<typeof FullKeyboard> = {
   title: 'ODD/Atoms/SoftwareKeyboard/FullKeyboard',

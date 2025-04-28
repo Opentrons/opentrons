@@ -1,22 +1,21 @@
-import { MATCH, INEXACT_MATCH } from '/app/redux/pipettes'
-import { useRunPipetteInfoByMount, useMostRecentCompletedAnalysis } from '.'
-import { useDeckCalibrationStatus } from '/app/resources/calibration'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { isGripperInCommands } from '/app/resources/protocols/utils'
-import { useIsFlex } from '/app/redux-resources/robots'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-
 import type {
   GripperData,
   Instruments,
   PipetteData,
 } from '@opentrons/api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import type {
   CompletedProtocolAnalysis,
   LoadedPipette,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import { useIsFlex } from '/app/redux-resources/robots'
 import type { DeckCalibrationStatus } from '/app/redux/calibration/api-types'
+import { INEXACT_MATCH, MATCH } from '/app/redux/pipettes'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useDeckCalibrationStatus } from '/app/resources/calibration'
+import { isGripperInCommands } from '/app/resources/protocols/utils'
+import { useMostRecentCompletedAnalysis, useRunPipetteInfoByMount } from '.'
 
 export interface ProtocolCalibrationStatus {
   complete: boolean

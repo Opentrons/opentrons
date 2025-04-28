@@ -2,32 +2,29 @@ import Ajv from 'ajv'
 import flatten from 'lodash/flatten'
 import range from 'lodash/range'
 import round from 'lodash/round'
-
 import labwareSchema from '../../labware/schemas/2.json'
-
 import {
-  toWellName,
+  ensureVolumeUnits,
+  getAsciiVolumeUnits,
+  getDisplayVolume,
   sortWells,
   splitWellsOnColumn,
-  getDisplayVolume,
-  getAsciiVolumeUnits,
-  ensureVolumeUnits,
+  toWellName,
 } from '../helpers/index'
-
 import type {
-  LabwareDefinition2 as Definition,
-  LabwareMetadata as Metadata,
-  LabwareDimensions as Dimensions,
   LabwareBrand as Brand,
-  LabwareParameters as Params,
-  LabwareWell as Well,
+  LabwareDefinition2 as Definition,
+  LabwareDimensions as Dimensions,
   LabwareWellProperties as InputWell,
-  LabwareWellMap as WellMap,
-  LabwareWellGroup as WellGroup,
-  LabwareOffset as Offset,
-  LabwareVolumeUnits as VolumeUnits,
-  ModuleModel,
   LabwareOffset,
+  LabwareMetadata as Metadata,
+  ModuleModel,
+  LabwareOffset as Offset,
+  LabwareParameters as Params,
+  LabwareVolumeUnits as VolumeUnits,
+  LabwareWell as Well,
+  LabwareWellGroup as WellGroup,
+  LabwareWellMap as WellMap,
 } from '../types'
 
 // NOTE: leaving this 'beta' to reduce conflicts with future labware cloud namespaces

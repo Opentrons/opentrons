@@ -1,6 +1,5 @@
-import { lazy, Suspense } from 'react'
-
 import { useFeatureFlag } from '/app/redux/config'
+import { lazy, Suspense } from 'react'
 
 // Lazily load to enable devtools when env.process.DEV is false (ex, when dev code is pushed to a physical ODD)
 const ReactQueryTools = lazy(() =>

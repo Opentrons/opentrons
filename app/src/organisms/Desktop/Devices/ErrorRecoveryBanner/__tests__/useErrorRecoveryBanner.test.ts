@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useSelector } from 'react-redux'
+import { renderHook } from '@testing-library/react'
 import { getUserId } from '/app/redux/config'
 import { useClientDataRecovery } from '/app/resources/client_data'
-import { renderHook } from '@testing-library/react'
+import { useSelector } from 'react-redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useErrorRecoveryBanner } from '../index'
 
 vi.mock('react-redux', () => ({

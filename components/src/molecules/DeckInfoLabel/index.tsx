@@ -1,14 +1,12 @@
 import styled from 'styled-components'
-
 import { StyledText } from '../../atoms'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
+import type { IconName, ModuleIconName } from '../../icons'
 import { Flex } from '../../primitives'
+import type { StyleProps } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
-
-import type { IconName, ModuleIconName } from '../../icons'
-import type { StyleProps } from '../../primitives'
 
 interface DeckLabelProps extends StyleProps {
   /** deck label to display */

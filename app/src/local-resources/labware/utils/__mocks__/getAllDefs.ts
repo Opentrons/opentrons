@@ -1,8 +1,8 @@
 import path from 'path'
-import { vi } from 'vitest'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 // replace webpack-specific require.context with Node-based glob in tests
 import glob from 'glob'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { vi } from 'vitest'
 
 // require all definitions in the labware/definitions/2 directory
 // require.context is webpack-specific method

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { LinkOut } from './LinkOut'
 import { LINK_CUSTOM_LABWARE_FORM } from '../fields'
 import styles from '../styles.module.css'
+import { LinkOut } from './LinkOut'
 
 const LINK_CUSTOM_LABWARE_GUIDE =
   'https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions'

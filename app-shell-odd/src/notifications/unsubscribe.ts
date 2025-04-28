@@ -1,7 +1,6 @@
-import { connectionStore } from './store'
-import { notifyLog } from './notifyLog'
-
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
+import { notifyLog } from './notifyLog'
+import { connectionStore } from './store'
 
 export function unsubscribe(topic: NotifyTopic): Promise<void> {
   return new Promise<void>((resolve, reject) => {

@@ -1,8 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { createPortal } from 'react-dom'
-import { css } from 'styled-components'
-
 import {
   BORDERS,
   COLORS,
@@ -13,22 +8,24 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
-import { useErrorName } from '../hooks'
-import { OddModal } from '/app/molecules/OddModal'
-import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
-import { ERROR_KINDS } from '../constants'
-import { InlineNotification } from '/app/atoms/InlineNotification'
-import { StepInfo } from './StepInfo'
-import { getErrorKind } from '../utils'
-
-import type { ReactNode } from 'react'
-import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
 import type { IconProps } from '@opentrons/components'
+import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
+import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
+import { InlineNotification } from '/app/atoms/InlineNotification'
+import { OddModal } from '/app/molecules/OddModal'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
+import { useState } from 'react'
+import type { ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import type { ErrorRecoveryFlowsProps } from '..'
+import { ERROR_KINDS } from '../constants'
+import { useErrorName } from '../hooks'
+import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
 import type { DesktopSizeType, ErrorKind } from '../types'
+import { getErrorKind } from '../utils'
+import { StepInfo } from './StepInfo'
 
 export function useErrorDetailsModal(): {
   showModal: boolean
@@ -70,6 +67,7 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
       case ERROR_KINDS.GRIPPER_ERROR:
       case ERROR_KINDS.STALL_OR_COLLISION:
       case ERROR_KINDS.NO_LIQUID_DETECTED:
+      case ERROR_KINDS.STALL_WHILE_STACKING:
         return true
       default:
         return false
@@ -220,6 +218,8 @@ export function NotificationBanner({
         return <StallErrorBanner />
       case ERROR_KINDS.NO_LIQUID_DETECTED:
         return <NoLiquidDetectedBanner />
+      case ERROR_KINDS.STALL_WHILE_STACKING:
+        return <StackerStallErrorBanner />
       default:
         console.error('Handle error kind notification banners explicitly.')
         return <div />
@@ -273,6 +273,18 @@ export function StallErrorBanner(): JSX.Element {
       type="alert"
       heading={t('stall_or_collision_detected_when')}
       message={t('the_robot_must_return_to_home_position')}
+    />
+  )
+}
+
+export function StackerStallErrorBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('stall_or_collision_detected_when')}
+      message={t('clear_obstructions_before_proceeding')}
     />
   )
 }

@@ -1,11 +1,9 @@
-import { useClientData } from '@opentrons/react-api-client'
-
-import { KEYS } from '../constants'
-import { useNotifyDataReady } from '../../useNotifyDataReady'
-
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { AxiosError } from 'axios'
 import type { ClientDataResponse } from '@opentrons/api-client'
+import { useClientData } from '@opentrons/react-api-client'
+import type { AxiosError } from 'axios'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import { useNotifyDataReady } from '../../useNotifyDataReady'
+import { KEYS } from '../constants'
 import type { ClientDataRecovery } from './types'
 
 export function useNotifyClientDataRecovery(

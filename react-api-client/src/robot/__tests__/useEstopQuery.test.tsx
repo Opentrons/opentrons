@@ -1,13 +1,11 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook, waitFor } from '@testing-library/react'
-
 import { getEstopStatus } from '@opentrons/api-client'
-import { useHost } from '../../api'
+import type { EstopStatus, HostConfig, Response } from '@opentrons/api-client'
+import { renderHook, waitFor } from '@testing-library/react'
+import type * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useEstopQuery } from '..'
-
-import type { HostConfig, Response, EstopStatus } from '@opentrons/api-client'
+import { useHost } from '../../api'
 import type { UseEstopQueryOptions } from '../useEstopQuery'
 
 vi.mock('@opentrons/api-client')

@@ -1,11 +1,10 @@
-import { FLEX_STACKER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
 import {
   DeckInfoLabel,
-  MODULE_ICON_NAME_BY_TYPE,
   Flex,
+  MODULE_ICON_NAME_BY_TYPE,
   SPACING,
 } from '@opentrons/components'
-
+import { FLEX_STACKER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
 
 export interface LabwareOffsetsDeckInfoLabelsProps {

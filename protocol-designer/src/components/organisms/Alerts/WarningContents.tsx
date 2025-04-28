@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-
 import type { AlertLevel } from './types'
 
 interface WarningContentsProps {

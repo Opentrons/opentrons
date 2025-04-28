@@ -1,8 +1,7 @@
-import type * as React from 'react'
 import { VIEWPORT } from '@opentrons/components'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 import { ResetValuesModal } from './ResetValuesModal'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Organisms/ResetValuesModal',

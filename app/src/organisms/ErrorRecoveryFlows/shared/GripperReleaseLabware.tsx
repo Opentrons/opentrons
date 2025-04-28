@@ -1,25 +1,21 @@
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-
 import {
-  SPACING,
   DIRECTION_COLUMN,
-  RESPONSIVENESS,
   Flex,
-  StyledText,
   JUSTIFY_CENTER,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-
-import { TwoColumn } from '/app/molecules/InterventionModal'
-import { InlineNotification } from '/app/atoms/InlineNotification'
-import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
-import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-
 import gripperReleaseAnimation from '/app/assets/videos/error-recovery/Gripper_Release.webm'
-
+import { InlineNotification } from '/app/atoms/InlineNotification'
+import { TwoColumn } from '/app/molecules/InterventionModal'
+import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 import type { JSX } from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import type { RecoveryContentProps } from '../types'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
+import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 export function GripperReleaseLabware({
   routeUpdateActions,

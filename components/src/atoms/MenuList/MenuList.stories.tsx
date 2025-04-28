@@ -1,8 +1,7 @@
 import { action } from '@storybook/addon-actions'
+import type { Meta, StoryObj } from '@storybook/react'
 import { MenuList as MenuListComponent } from './index'
 import { MenuItem } from './MenuItem'
-
-import type { Meta, StoryObj } from '@storybook/react'
 
 const menuBtn = 'example menu btn'
 

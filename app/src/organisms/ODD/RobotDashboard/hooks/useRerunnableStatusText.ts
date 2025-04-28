@@ -1,6 +1,6 @@
+import type { ProtocolHardware } from '/app/transformations/commands'
 import { useTranslation } from 'react-i18next'
 import { useHardwareStatusText } from './useHardwareStatusText'
-import type { ProtocolHardware } from '/app/transformations/commands'
 
 export function useRerunnableStatusText(
   runOk: boolean,

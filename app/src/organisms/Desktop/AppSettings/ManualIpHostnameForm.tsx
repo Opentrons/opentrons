@@ -1,25 +1,22 @@
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { useForm } from 'react-hook-form'
-import styled from 'styled-components'
-
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   SIZE_2,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { TertiaryButton } from '/app/atoms/buttons'
 import { addManualIp } from '/app/redux/config'
 import { startDiscovery } from '/app/redux/discovery'
-
-import type { FieldError, Resolver } from 'react-hook-form'
 import type { Dispatch } from '/app/redux/types'
+import { useForm } from 'react-hook-form'
+import type { FieldError, Resolver } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import styled from 'styled-components'
 
 const FlexForm = styled.form`
   display: flex;

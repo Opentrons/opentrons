@@ -1,15 +1,13 @@
 import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { Flex } from '../primitives'
-import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
-import { LegacyStyledText } from '../atoms'
-import { DIRECTION_COLUMN, JUSTIFY_CENTER } from '../styles'
-import { InstrumentDiagram } from './InstrumentDiagram'
-
 import type { ReactNode } from 'react'
+import { LegacyStyledText } from '../atoms'
+import { Flex } from '../primitives'
 import type { Mount } from '../robot-types'
-import type { InstrumentDiagramProps } from './InstrumentDiagram'
-
+import { DIRECTION_COLUMN, JUSTIFY_CENTER } from '../styles'
+import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
 import styles from './instrument.module.css'
+import { InstrumentDiagram } from './InstrumentDiagram'
+import type { InstrumentDiagramProps } from './InstrumentDiagram'
 
 export interface InstrumentInfoProps {
   /** 'left' or 'right' */

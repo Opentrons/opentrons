@@ -1,9 +1,7 @@
-import { format } from 'date-fns'
-
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { findLabwareDefWithCustom } from '/app/assets/labware/findLabware'
-
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { findLabwareDefWithCustom } from '/app/assets/labware/findLabware'
+import { format } from 'date-fns'
 
 const UNKNOWN_CUSTOM_LABWARE = 'unknown custom tiprack'
 

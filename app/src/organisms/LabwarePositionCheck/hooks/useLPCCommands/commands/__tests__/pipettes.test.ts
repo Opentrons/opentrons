@@ -1,18 +1,16 @@
-import { it, describe, expect, vi } from 'vitest'
-
-import {
-  savePositionCommands,
-  moveToWellCommands,
-  retractSafelyAndHomeCommands,
-  retractPipetteAxesSequentiallyCommands,
-  moveRelativeCommand,
-  moveToMaintenancePosition,
-  verifyProbeAttachmentAndHomeCommands,
-} from '../pipettes'
-import { fullHomeCommands } from '../gantry'
-
 import type { LoadedPipette } from '@opentrons/shared-data'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import { describe, expect, it, vi } from 'vitest'
+import { fullHomeCommands } from '../gantry'
+import {
+  moveRelativeCommand,
+  moveToMaintenancePosition,
+  moveToWellCommands,
+  retractPipetteAxesSequentiallyCommands,
+  retractSafelyAndHomeCommands,
+  savePositionCommands,
+  verifyProbeAttachmentAndHomeCommands,
+} from '../pipettes'
 
 vi.mock('../gantry', () => ({
   fullHomeCommands: vi.fn(() => [

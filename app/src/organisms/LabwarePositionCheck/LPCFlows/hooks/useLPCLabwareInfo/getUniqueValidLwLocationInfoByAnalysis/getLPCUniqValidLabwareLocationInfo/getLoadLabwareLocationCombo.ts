@@ -1,19 +1,18 @@
 import { getLabwareDefURI } from '@opentrons/shared-data'
+import type {
+  LoadedLabware,
+  LoadedModule,
+  LoadLabwareRunTimeCommand,
+} from '@opentrons/shared-data'
+import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
+import type { LabwareLocationInfoWithLocSeq } from '.'
 import {
+  getAddressableAreaNameFrom,
   getClosestBeneathAdapterId,
   getClosestBeneathModuleId,
   getClosestBeneathModuleModel,
   getLwModStackupDetails,
-  getAddressableAreaNameFrom,
 } from './helpers'
-import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
-
-import type {
-  LoadLabwareRunTimeCommand,
-  LoadedLabware,
-  LoadedModule,
-} from '@opentrons/shared-data'
-import type { LabwareLocationInfoWithLocSeq } from '.'
 
 export function getLoadLabwareLocationCombo(
   command: LoadLabwareRunTimeCommand,

@@ -1,46 +1,44 @@
-import { useState, useEffect } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import {
-  CURSOR_POINTER,
-  Banner,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import {
-  NINETY_SIX_CHANNEL,
-  SINGLE_MOUNT_PIPETTES,
-  FLEX_ROBOT_TYPE,
-  LEFT,
-} from '@opentrons/shared-data'
-import {
-  useCurrentSubsystemUpdateQuery,
-  useHost,
-} from '@opentrons/react-api-client'
-import { InstrumentCard } from '/app/molecules/InstrumentCard'
-import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
-import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
-import { handlePipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
-import {
-  DropTipWizardFlows,
-  useDropTipWizardFlows,
-} from '/app/organisms/DropTipWizardFlows'
-
-import { AboutPipetteSlideout } from './AboutPipetteSlideout'
-
-import type { MouseEventHandler } from 'react'
 import type {
   BadPipette,
   HostConfig,
   Mount,
   PipetteData,
 } from '@opentrons/api-client'
+import {
+  Banner,
+  CURSOR_POINTER,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import {
+  useCurrentSubsystemUpdateQuery,
+  useHost,
+} from '@opentrons/react-api-client'
+import {
+  FLEX_ROBOT_TYPE,
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import { InstrumentCard } from '/app/molecules/InstrumentCard'
+import {
+  DropTipWizardFlows,
+  useDropTipWizardFlows,
+} from '/app/organisms/DropTipWizardFlows'
+import { handlePipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import type {
   PipetteWizardFlow,
   SelectablePipettes,
 } from '/app/organisms/PipetteWizardFlows/types'
+import { useEffect, useState } from 'react'
+import type { MouseEventHandler } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
 interface FlexPipetteCardProps {
   attachedPipette: PipetteData | BadPipette | null

@@ -1,9 +1,8 @@
 import { createSelector } from 'reselect'
-import { isRealtekU2EAdapter, getDriverStatus } from './utils'
-import { NOT_APPLICABLE } from './constants'
-
 import type { State } from '../types'
-import type { UsbDevice, DriverStatus, U2EAnalyticsProps } from './types'
+import { NOT_APPLICABLE } from './constants'
+import type { DriverStatus, U2EAnalyticsProps, UsbDevice } from './types'
+import { getDriverStatus, isRealtekU2EAdapter } from './utils'
 
 export const getU2EAdapterDevice: (
   state: State

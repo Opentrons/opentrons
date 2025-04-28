@@ -1,21 +1,19 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
   FillWell,
+  RetryWithNewTips,
   SelectTips,
   TwoColLwInfoAndDeck,
-  RetryWithNewTips,
 } from '/app/organisms/ErrorRecoveryFlows/shared'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { mockRecoveryContentProps } from '../../__fixtures__'
 import { RECOVERY_MAP } from '../../constants'
 import { CancelRun } from '../CancelRun'
-import { SelectRecoveryOption } from '../SelectRecoveryOption'
 import { FillWellAndRetryNewTips } from '../FillWellAndRetryNewTips'
-
-import type { ComponentProps } from 'react'
+import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
 vi.mock('../CancelRun')
 vi.mock('../SelectRecoveryOption')

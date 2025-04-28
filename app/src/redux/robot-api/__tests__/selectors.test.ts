@@ -1,7 +1,6 @@
-import { describe, it, expect } from 'vitest'
-
-import * as Selectors from '../selectors'
+import { describe, expect, it } from 'vitest'
 import type { State } from '../../types'
+import * as Selectors from '../selectors'
 
 interface SelectorSpec {
   name: string

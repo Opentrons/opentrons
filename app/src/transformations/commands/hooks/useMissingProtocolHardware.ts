@@ -1,13 +1,12 @@
-import last from 'lodash/last'
 import {
-  useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
-
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import last from 'lodash/last'
 import type { ProtocolHardware } from './types'
-import { useRequiredProtocolHardwareFromAnalysis } from './useRequiredProtocolHardwareFromAnalysis'
 import { useMissingProtocolHardwareFromRequiredProtocolHardware } from './useMissingProtocolHardwareFromRequiredProtocolHardware'
+import { useRequiredProtocolHardwareFromAnalysis } from './useRequiredProtocolHardwareFromAnalysis'
 
 export const useMissingProtocolHardware = (
   protocolId: string

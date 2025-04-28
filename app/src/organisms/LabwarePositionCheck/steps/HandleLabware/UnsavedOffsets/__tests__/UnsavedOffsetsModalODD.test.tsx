@@ -1,17 +1,16 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
-import { useDispatch } from 'react-redux'
 import NiceModal from '@ebay/nice-modal-react'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { handleUnsavedOffsetsModalODD } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
 import {
-  selectSelectedLwOverview,
   clearSelectedLabwareWorkingOffsets,
   goBackEditOffsetSubstep,
+  selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
+import { useDispatch } from 'react-redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')

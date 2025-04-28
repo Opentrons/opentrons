@@ -1,12 +1,10 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ResetValuesModal } from '../ResetValuesModal'
-
 import type { ComponentProps } from 'react'
-import type { RunTimeParameter } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ResetValuesModal } from '../ResetValuesModal'
 
 const mockGoBack = vi.fn()
 const mockSetRunTimeParametersOverrides = vi.fn()

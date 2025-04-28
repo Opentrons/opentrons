@@ -1,14 +1,11 @@
 // TitledList component
-import { Children } from 'react'
 import cx from 'classnames'
-
-import { Icon } from '../icons'
+import { Children } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import { LegacyStyledText } from '../atoms'
 import { COLORS } from '../helix-design-system'
-
-import type { MouseEvent, ReactNode } from 'react'
+import { Icon } from '../icons'
 import type { IconName, IconProps } from '../icons'
-
 import styles from './lists.module.css'
 
 // TODO(bc, 2021-03-31): reconsider whether this belongs in components library

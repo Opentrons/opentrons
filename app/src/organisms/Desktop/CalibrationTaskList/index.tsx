@@ -1,8 +1,3 @@
-import { useRef, useState, useEffect } from 'react'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -10,25 +5,26 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  Modal,
 } from '@opentrons/components'
-
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import { TaskList } from '/app/molecules/TaskList'
-
 import { useCalibrationTaskList } from '/app/organisms/Desktop/Devices/hooks'
-import { useAttachedPipettes } from '/app/resources/instruments'
-import { useCurrentRunId, useRunHasStarted } from '/app/resources/runs'
-
 import type {
+  DashboardCalDeckInvoker,
   DashboardCalOffsetInvoker,
   DashboardCalTipLengthInvoker,
-  DashboardCalDeckInvoker,
 } from '/app/organisms/Desktop/Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useCurrentRunId, useRunHasStarted } from '/app/resources/runs'
+import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { css } from 'styled-components'
 
 interface CalibrationTaskListProps {
   robotName: string

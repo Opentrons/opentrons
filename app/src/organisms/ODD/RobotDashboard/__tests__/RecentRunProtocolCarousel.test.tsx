@@ -1,12 +1,10 @@
+import type { RunData } from '@opentrons/api-client'
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, it, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
-import { RecentRunProtocolCard, RecentRunProtocolCarousel } from '..'
-
 import type { ComponentProps } from 'react'
-import type { RunData } from '@opentrons/api-client'
+import { beforeEach, describe, it, vi } from 'vitest'
+import { RecentRunProtocolCard, RecentRunProtocolCarousel } from '..'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../RecentRunProtocolCard')

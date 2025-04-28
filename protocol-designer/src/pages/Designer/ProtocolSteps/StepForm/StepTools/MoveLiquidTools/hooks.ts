@@ -1,8 +1,8 @@
+import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { getAllLiquidClassDefs } from '@opentrons/shared-data'
-import { getAllWellsFromPrimaryWells } from '../../../../../../steplist/formLevel/handleFormChange/utils'
+import type { FormData } from '../../../../../../form-types'
 import {
   getCurrentFormIsPresaved,
   getCurrentFormUnsavedChangedFields,
@@ -10,9 +10,9 @@ import {
   getLiquidEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
+import { getAllWellsFromPrimaryWells } from '../../../../../../steplist/formLevel/handleFormChange/utils'
 import { getAllWellContentsForActiveItem } from '../../../../../../top-selectors/well-contents'
 import { getShouldUpdateForLiquidClass } from '../../utils'
-import type { FormData } from '../../../../../../form-types'
 
 export interface LiquidClassOption {
   name: string

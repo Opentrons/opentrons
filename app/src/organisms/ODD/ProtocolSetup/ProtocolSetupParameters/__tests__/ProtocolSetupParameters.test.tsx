@@ -1,27 +1,25 @@
-import { when } from 'vitest-when'
-import { it, describe, beforeEach, vi, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import type { HostConfig } from '@opentrons/api-client'
+import { COLORS } from '@opentrons/components'
 import {
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
   useHost,
   useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
-import { COLORS } from '@opentrons/components'
-
-import { i18n } from '/app/i18n'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { ChooseEnum } from '../ChooseEnum'
-import { ChooseNumber } from '../ChooseNumber'
-import { ChooseCsvFile } from '../ChooseCsvFile'
-import { mockRunTimeParameterData } from '../../__fixtures__'
+import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { ProtocolSetupParameters } from '..'
-
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
-import type { HostConfig } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { ProtocolSetupParameters } from '..'
+import { mockRunTimeParameterData } from '../../__fixtures__'
+import { ChooseCsvFile } from '../ChooseCsvFile'
+import { ChooseEnum } from '../ChooseEnum'
+import { ChooseNumber } from '../ChooseNumber'
 
 const mockNavigate = vi.fn()
 

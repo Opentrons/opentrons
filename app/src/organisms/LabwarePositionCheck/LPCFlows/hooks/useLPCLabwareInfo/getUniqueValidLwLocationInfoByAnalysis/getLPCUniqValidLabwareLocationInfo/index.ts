@@ -1,14 +1,13 @@
-import { appendUniqValidLocCombo } from './appendUniqValidLocCombo'
-import { getLoadLabwareLocationCombo } from './getLoadLabwareLocationCombo'
-import { getMoveLabwareLocationCombo } from './getMoveLabwareLocationCombo'
-import { scanAllCommandsForAllLwUrisByLwId } from './getAllPossibleLwURIsInRun'
-
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
   LabwareLocationSequence,
 } from '@opentrons/shared-data'
 import type { LabwareLocationInfo } from '/app/redux/protocol-runs'
+import { appendUniqValidLocCombo } from './appendUniqValidLocCombo'
+import { scanAllCommandsForAllLwUrisByLwId } from './getAllPossibleLwURIsInRun'
+import { getLoadLabwareLocationCombo } from './getLoadLabwareLocationCombo'
+import { getMoveLabwareLocationCombo } from './getMoveLabwareLocationCombo'
 
 export interface LabwareLocationInfoWithLocSeq extends LabwareLocationInfo {
   locationSequence: LabwareLocationSequence

@@ -1,9 +1,8 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '../../../testing/utils'
-import { InputField } from '..'
-
+import { fireEvent, screen } from '@testing-library/react'
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { InputField } from '..'
+import { renderWithProviders } from '../../../testing/utils'
 
 const render = (props: ComponentProps<typeof InputField>) => {
   return renderWithProviders(<InputField {...props} />)[0]

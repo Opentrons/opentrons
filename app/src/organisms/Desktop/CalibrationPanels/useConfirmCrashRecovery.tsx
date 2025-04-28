@@ -1,18 +1,15 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import * as Sessions from '/app/redux/sessions'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ConfirmCrashRecovery } from './ConfirmCrashRecovery'
-
 import type { CalibrationPanelProps } from './types'
 
 export function useConfirmCrashRecovery(

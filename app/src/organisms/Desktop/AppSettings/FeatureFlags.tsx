@@ -1,21 +1,20 @@
-import { Fragment } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Divider } from '/app/atoms/structure'
 import { ToggleButton } from '/app/atoms/buttons'
+import { Divider } from '/app/atoms/structure'
 import * as Config from '/app/redux/config'
-
 import type { DevInternalFlag } from '/app/redux/config/types'
 import type { Dispatch } from '/app/redux/types'
+import { Fragment } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 export function FeatureFlags(): JSX.Element {
   const { t } = useTranslation('app_settings')

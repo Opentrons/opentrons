@@ -1,9 +1,8 @@
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { LabeledValue } from '../LabeledValue'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, it } from 'vitest'
+import { LabeledValue } from '../LabeledValue'
 
 const render = (props: ComponentProps<typeof LabeledValue>) => {
   return renderWithProviders(<LabeledValue {...props} />)

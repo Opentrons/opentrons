@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   ALIGN_CENTER,
   Box,
@@ -11,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '/app/atoms/structure'
-
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 
 interface ExpandingTitleProps {

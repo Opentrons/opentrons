@@ -1,11 +1,11 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
-import { TimelineAlerts } from '../TimelineAlerts'
 import { selectTerminalItem } from '../../../../ui/steps/actions/actions'
+import { TimelineAlerts } from '../TimelineAlerts'
 
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../ui/steps/actions/actions')

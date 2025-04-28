@@ -1,6 +1,6 @@
-import { uuid } from '../../utils'
 import type { MoveToAddressableAreaForDropTipParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
+import { uuid } from '../../utils'
 
 export const moveToAddressableAreaForDropTip: CommandCreator<MoveToAddressableAreaForDropTipParams> = (
   args,

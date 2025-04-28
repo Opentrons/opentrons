@@ -1,9 +1,8 @@
 import cx from 'classnames'
-import { Icon } from '../icons'
-import styles from './forms.module.css'
-
 import type { ReactNode } from 'react'
+import { Icon } from '../icons'
 import type { HoverTooltipHandlers } from '../tooltips'
+import styles from './forms.module.css'
 
 export interface FormGroupProps {
   /** text label */

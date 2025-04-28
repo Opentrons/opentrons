@@ -1,19 +1,13 @@
-import { Fragment } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import styled from 'styled-components'
-
 import {
   BORDERS,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
-  CURSOR_POINTER,
 } from '@opentrons/components'
-
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
   getDevtoolsEnabled,
@@ -21,9 +15,12 @@ import {
   getUpdateChannelOptions,
   updateConfigValue,
 } from '/app/redux/config'
-
-import type { ChangeEvent } from 'react'
 import type { Dispatch } from '/app/redux/types'
+import { Fragment } from 'react'
+import type { ChangeEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 interface LabelProps {
   isSelected?: boolean

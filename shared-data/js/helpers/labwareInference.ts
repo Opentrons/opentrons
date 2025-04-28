@@ -1,14 +1,14 @@
 import isEqual from 'lodash/isEqual'
-import uniqWith from 'lodash/uniqWith'
 import round from 'lodash/round'
 import sortedUniq from 'lodash/sortedUniq'
 import uniq from 'lodash/uniq'
+import uniqWith from 'lodash/uniqWith'
 import type {
-  LabwareWell,
-  LabwareWellShapeProperties,
-  LabwareDefinition2,
-  LabwareWellGroupMetadata,
   LabwareBrand,
+  LabwareDefinition2,
+  LabwareWell,
+  LabwareWellGroupMetadata,
+  LabwareWellShapeProperties,
 } from '../types'
 
 export interface LabwareWellGroupProperties {

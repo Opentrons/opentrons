@@ -1,7 +1,6 @@
 import { Flex, SPACING, VIEWPORT } from '@opentrons/components'
-import { EmptyFile as EmptyFileComponent } from './EmptyFile'
-
 import type { Meta, StoryObj } from '@storybook/react'
+import { EmptyFile as EmptyFileComponent } from './EmptyFile'
 
 const meta: Meta<typeof EmptyFileComponent> = {
   title: 'ODD/Organisms/EmptyFile',

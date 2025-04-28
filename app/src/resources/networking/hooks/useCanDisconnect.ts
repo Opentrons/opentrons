@@ -1,10 +1,9 @@
-import { useSelector } from 'react-redux'
-import Semver from 'semver'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { getRobotApiVersionByName } from '/app/redux/discovery'
-import { useWifiList } from './useWifiList'
-
 import type { State } from '/app/redux/types'
+import { useSelector } from 'react-redux'
+import Semver from 'semver'
+import { useWifiList } from './useWifiList'
 
 const API_MIN_DISCONNECT_VERSION = '3.17.0-alpha.0'
 

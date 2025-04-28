@@ -1,13 +1,13 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
+import type { FormikConfig } from 'formik'
 import { when } from 'vitest-when'
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
+import type { LabwareFields, LabwareType } from '../../../fields'
 import { getLabwareName } from '../../../utils'
 import { WellBottomAndDepth } from '../../sections/WellBottomAndDepth'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import type { FormikConfig } from 'formik'
-import type { LabwareFields, LabwareType } from '../../../fields'
 
 vi.mock('../../../utils')
 

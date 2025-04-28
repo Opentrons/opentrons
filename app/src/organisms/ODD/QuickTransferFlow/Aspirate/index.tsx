@@ -1,19 +1,16 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
-
 import { MediumButton } from '/app/atoms/buttons'
-import { AspirateSettingItem } from './AspirateSettingItem'
-import { AspirateSettingDetail } from './AspirateSettingDetail'
-import { useAspirateSettingsConfig } from './hooks/useAspirateSettingsConfig'
-
+import { useState } from 'react'
 import type { Dispatch } from 'react'
+import { useTranslation } from 'react-i18next'
 import type {
   AspirateSettingOption,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
+import { AspirateSettingDetail } from './AspirateSettingDetail'
+import { AspirateSettingItem } from './AspirateSettingItem'
+import { useAspirateSettingsConfig } from './hooks/useAspirateSettingsConfig'
 
 const PADDING_TOP_FOR_NAV = '12rem'
 interface AspirateProps {

@@ -1,12 +1,9 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
-
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { SetWifiSsid } from '../../NetworkSettings'
-
+import { useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
+import { SetWifiSsid } from '../../NetworkSettings'
 import type { SetSettingOption } from '../types'
 
 interface RobotSettingsJoinOtherNetworkProps {

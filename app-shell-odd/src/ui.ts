@@ -1,11 +1,10 @@
 // sets up the main window ui
-import { app, BrowserWindow } from 'electron'
 import path from 'path'
+import { app, BrowserWindow } from 'electron'
 import { sendReadyStatus } from './actions'
 import { getConfig } from './config'
 import { createLogger } from './log'
 import systemd from './systemd'
-
 import type { Dispatch } from './types'
 
 const config = getConfig('ui')

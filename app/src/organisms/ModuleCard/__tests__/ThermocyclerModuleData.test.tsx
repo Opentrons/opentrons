@@ -1,18 +1,16 @@
+import type { ChipType } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
   mockThermocycler,
   mockThermocyclerGen2,
 } from '/app/redux/modules/__fixtures__'
-import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
-
-import type { ComponentProps } from 'react'
 import type { ThermocyclerData } from '/app/redux/modules/api-types'
-import type { ChipType } from '@opentrons/components'
-import { COLORS } from '@opentrons/components'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 
 const render = (props: ComponentProps<typeof ThermocyclerModuleData>) => {
   return renderWithProviders(<ThermocyclerModuleData {...props} />, {

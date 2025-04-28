@@ -1,5 +1,6 @@
 import 'cypress-file-upload'
 import { SetupContent } from './SetupSteps'
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {

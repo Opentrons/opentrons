@@ -1,19 +1,18 @@
-import groupBy from 'lodash/groupBy'
-import { useTranslation } from 'react-i18next'
+import { Box, Flex } from '@opentrons/components'
 import {
-  getAllPipetteNames,
-  getPipetteNameSpecs,
+  EIGHT_CHANNEL,
   GEN1,
   GEN2,
+  getAllPipetteNames,
+  getPipetteNameSpecs,
   SINGLE_CHANNEL,
-  EIGHT_CHANNEL,
 } from '@opentrons/shared-data'
-import { Box, Flex } from '@opentrons/components'
-import { Select } from '/app/atoms/SelectField/Select'
-
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
+import { Select } from '/app/atoms/SelectField/Select'
 import type { SelectOption } from '/app/atoms/SelectField/Select'
+import groupBy from 'lodash/groupBy'
+import { useTranslation } from 'react-i18next'
+import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
 
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */

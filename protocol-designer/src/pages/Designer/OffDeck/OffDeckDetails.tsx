@@ -1,7 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_START,
@@ -19,22 +15,26 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import { selectors } from '../../../labware-ingred/selectors'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { OffDeckControls } from './OffDeckControls'
+import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 import { SlotDetailsContainer } from '../../../components/organisms'
 import { wellFillFromWellContents } from '../../../components/organisms/LabwareOnDeck/utils'
 import { getRobotType } from '../../../file-data/selectors'
+import { selectors } from '../../../labware-ingred/selectors'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
 } from '../../../ui/steps/selectors'
 import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
-import { HighlightOffdeckSlot } from './HighlightOffdeckSlot'
-import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 import type { DeckSetupTerminalIdType } from '../types'
+import { HighlightOffdeckSlot } from './HighlightOffdeckSlot'
+import { OffDeckControls } from './OffDeckControls'
 
 const OFF_DECK_MAP_WIDTH = '41.625rem'
 const OFF_DECK_MAP_HEIGHT_FOR_STEP = '30.3rem'

@@ -1,7 +1,7 @@
-import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
-import { LabwareRenderOnDeck } from './LabwareRenderOnDeck'
 import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
+import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
 import type { LabwareOnDeck } from '../../../step-forms'
+import { LabwareRenderOnDeck } from './LabwareRenderOnDeck'
 
 interface SelectedModuleLabwareRenderProps {
   nestedLabwareDef: LabwareDefinition2 | null

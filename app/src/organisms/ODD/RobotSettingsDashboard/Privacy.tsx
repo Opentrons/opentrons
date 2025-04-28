@@ -1,23 +1,20 @@
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { RobotSettingButton } from './RobotSettingButton'
-import { OnOffToggle } from './OnOffToggle'
 import {
   getAnalyticsOptedIn,
   toggleAnalyticsOptedIn,
 } from '/app/redux/analytics'
-
 import type { Dispatch } from '/app/redux/types'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { OnOffToggle } from './OnOffToggle'
+import { RobotSettingButton } from './RobotSettingButton'
 import type { SetSettingOption } from './types'
 
 interface PrivacyProps {

@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-
 import {
   ALIGN_CENTER,
   Box,
@@ -9,8 +6,9 @@ import {
   Icon,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import type { HTMLProps } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 // TODO(bh, 2022-12-7): finish styling when designs finalized
 export function BackButton({

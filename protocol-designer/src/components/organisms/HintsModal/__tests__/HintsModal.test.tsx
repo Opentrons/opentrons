@@ -1,10 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { HintsModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { getHint } from '../../../../tutorial/selectors'
 import { removeHint } from '../../../../tutorial/actions'
-import { HintsModal } from '..'
+import { getHint } from '../../../../tutorial/selectors'
 
 vi.mock('../../../../tutorial/actions')
 vi.mock('../../../../tutorial/selectors')

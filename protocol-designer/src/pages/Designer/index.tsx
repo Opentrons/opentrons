@@ -1,24 +1,23 @@
-import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import {
   Flex,
   INFO_TOAST,
   OVERFLOW_HIDDEN,
   useOnClickOutside,
 } from '@opentrons/components'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
-import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
-import { generateNewProtocol } from '../../labware-ingred/actions'
-import { DefineLiquidsModal } from '../../components/organisms'
-import { getFileMetadata } from '../../file-data/selectors'
-import { selectors } from '../../labware-ingred/selectors'
-import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
-import { ProtocolSteps } from './ProtocolSteps'
-
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { DefineLiquidsModal } from '../../components/organisms'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
+import { getFileMetadata } from '../../file-data/selectors'
+import { generateNewProtocol } from '../../labware-ingred/actions'
+import { selectors } from '../../labware-ingred/selectors'
+import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
+import { ProtocolSteps } from './ProtocolSteps'
 
 export interface OpenSlot {
   cutoutId: CutoutId

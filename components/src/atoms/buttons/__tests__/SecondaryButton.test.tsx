@@ -1,13 +1,11 @@
-import { describe, it, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../testing/utils'
-import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
-import { BORDERS, COLORS } from '../../../helix-design-system'
-
-import { SecondaryButton } from '../SecondaryButton'
-
 import type { ComponentProps } from 'react'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
+import { SecondaryButton } from '../SecondaryButton'
 
 const render = (props: ComponentProps<typeof SecondaryButton>) => {
   return renderWithProviders(<SecondaryButton {...props} />)[0]

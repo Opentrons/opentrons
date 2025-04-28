@@ -1,12 +1,12 @@
-import { vi, describe, it, expect } from 'vitest'
-import { labwareDefToFields } from '../labwareDefToFields'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   fixture_12_trough,
   fixture_24_tuberack,
   fixture_96_plate,
   fixture_irregular_example_1,
 } from '@opentrons/shared-data/labware/fixtures/2'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { describe, expect, it, vi } from 'vitest'
+import { labwareDefToFields } from '../labwareDefToFields'
 
 vi.mock('../../definitions')
 

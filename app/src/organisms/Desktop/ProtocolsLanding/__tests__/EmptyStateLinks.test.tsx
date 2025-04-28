@@ -1,9 +1,8 @@
 import { screen } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
-import { describe, it, expect, afterEach, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { BrowserRouter } from 'react-router-dom'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { EmptyStateLinks } from '../EmptyStateLinks'
 
 describe('EmptyStateLinks', () => {

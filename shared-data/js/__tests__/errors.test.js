@@ -1,8 +1,7 @@
 // tests for error accessors
 import { describe, expect, it } from 'vitest'
-import { getError } from '../errors'
-
 import errorDefinitions from '../../errors/definitions/1/errors.json'
+import { getError } from '../errors'
 
 Object.keys(errorDefinitions.codes).forEach(errorCode =>
   describe(`error ${errorCode} accessors`, () => {

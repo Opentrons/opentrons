@@ -1,6 +1,5 @@
-import { OverflowBtn as OverflowBtnComponent } from './OverflowBtn'
-
 import type { Meta, StoryObj } from '@storybook/react'
+import { OverflowBtn as OverflowBtnComponent } from './OverflowBtn'
 
 const meta: Meta<typeof OverflowBtnComponent> = {
   title: 'Helix/Atoms/MenuList/OverflowBtn',

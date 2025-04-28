@@ -1,18 +1,17 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+import type { PipetteData } from '@opentrons/api-client'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockLeftSpecs } from '/app/redux/pipettes/__fixtures__'
+import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { handlePipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
+import { mockLeftSpecs } from '/app/redux/pipettes/__fixtures__'
+import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { FlexPipetteCard } from '../FlexPipetteCard'
-import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
-import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
-
-import type { ComponentProps } from 'react'
-import type { Mock } from 'vitest'
-import type { PipetteData } from '@opentrons/api-client'
 
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/organisms/PipetteWizardFlows/ChoosePipette')

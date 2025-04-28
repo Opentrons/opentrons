@@ -1,7 +1,6 @@
-import { moveToMaintenancePosition } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/commands'
-
 import type { CommandData } from '@opentrons/api-client'
 import type { LoadedPipette } from '@opentrons/shared-data'
+import { moveToMaintenancePosition } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/commands'
 import type { UseLPCCommandWithChainRunChildProps } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/types'
 
 export interface UseHandleValidMoveToMaintenancePositionResult {

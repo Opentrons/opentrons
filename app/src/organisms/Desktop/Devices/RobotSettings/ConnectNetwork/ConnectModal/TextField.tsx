@@ -1,20 +1,18 @@
-import { useReducer } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
-  LegacyInputField,
   DeprecatedCheckboxField,
-  INPUT_TYPE_TEXT,
   INPUT_TYPE_PASSWORD,
+  INPUT_TYPE_TEXT,
+  LegacyInputField,
 } from '@opentrons/components'
-
-import { FormRow } from './FormRow'
-import { useConnectFormField } from './form-state'
+import { useReducer } from 'react'
 import type {
   ControllerFieldState,
   ControllerRenderProps,
   FieldValues,
 } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useConnectFormField } from './form-state'
+import { FormRow } from './FormRow'
 
 export interface TextFieldProps {
   id: string

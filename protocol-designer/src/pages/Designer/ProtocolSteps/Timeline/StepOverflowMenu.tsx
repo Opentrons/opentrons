@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-
 import {
   BORDERS,
   COLORS,
@@ -11,13 +8,14 @@ import {
   NO_WRAP,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
+import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import type { ThunkDispatch } from 'redux-thunk'
 import { analyticsEvent } from '../../../../analytics/actions'
-import { actions as stepsActions } from '../../../../ui/steps'
-import {
-  hoverOnStep,
-  toggleViewSubstep,
-} from '../../../../ui/steps/actions/actions'
 import { OPEN_STEP_DETAILS_EVENT } from '../../../../analytics/constants'
+import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
+import type { StepIdType } from '../../../../form-types'
 import {
   getBatchEditFormHasUnsavedChanges,
   getCurrentFormHasUnsavedChanges,
@@ -25,12 +23,12 @@ import {
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
-
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
-import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../../../types'
-import type { StepIdType } from '../../../../form-types'
-import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
+import { actions as stepsActions } from '../../../../ui/steps'
+import {
+  hoverOnStep,
+  toggleViewSubstep,
+} from '../../../../ui/steps/actions/actions'
 
 interface StepOverflowMenuProps {
   stepId: string

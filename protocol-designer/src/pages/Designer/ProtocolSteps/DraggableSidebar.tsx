@@ -1,5 +1,3 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
-import styled from 'styled-components'
 import {
   Box,
   COLORS,
@@ -8,6 +6,8 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import styled from 'styled-components'
 import { TimelineToolbox } from './Timeline/TimelineToolbox'
 
 const INITIAL_SIDEBAR_WIDTH = 235

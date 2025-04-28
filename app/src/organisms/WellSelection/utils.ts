@@ -1,9 +1,8 @@
+import type { WellGroup } from '@opentrons/components'
 import {
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
   makeWellSetHelpers,
 } from '@opentrons/shared-data'
-
-import type { WellGroup } from '@opentrons/components'
 import type { WellSetHelpers } from '@opentrons/shared-data'
 import type { BoundingRect, GenericRect } from './types'
 

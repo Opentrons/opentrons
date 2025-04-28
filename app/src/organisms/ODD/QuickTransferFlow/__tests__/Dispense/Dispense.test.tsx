@@ -1,15 +1,11 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
-import { DispenseSettingItem } from '../../Dispense/DispenseSettingItem'
-import { DispenseSettingDetail } from '../../Dispense/DispenseSettingDetail'
-
-import { Dispense } from '../../Dispense'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { Dispense } from '../../Dispense'
+import { DispenseSettingDetail } from '../../Dispense/DispenseSettingDetail'
+import { DispenseSettingItem } from '../../Dispense/DispenseSettingItem'
 
 vi.mock('../../Dispense/DispenseSettingItem')
 vi.mock('../../Dispense/DispenseSettingDetail')

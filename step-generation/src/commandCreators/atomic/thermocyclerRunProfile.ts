@@ -1,11 +1,12 @@
+import type { TCProfileParams } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
 import {
   findThermocyclerProfileRepetitions,
   formatPyStr,
   indentPyLines,
   uuid,
 } from '../../utils'
-import type { TCProfileParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+
 export const thermocyclerRunProfile: CommandCreator<TCProfileParams> = (
   args,
   invariantContext,

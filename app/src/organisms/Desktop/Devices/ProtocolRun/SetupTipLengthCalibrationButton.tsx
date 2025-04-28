@@ -1,33 +1,30 @@
-import { useTranslation } from 'react-i18next'
-
 import {
-  Box,
-  Flex,
-  Link,
-  LegacyTooltip,
-  useHoverTooltip,
   ALIGN_CENTER,
+  Box,
+  COLORS,
+  Flex,
+  LegacyTooltip,
+  Link,
   SIZE_4,
   TEXT_ALIGN_CENTER,
   TOOLTIP_LEFT,
-  COLORS,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
+import type { Mount } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useDeleteCalibrationMutation,
 } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { TertiaryButton } from '/app/atoms/buttons'
-import { useAttachedPipettes } from '/app/resources/instruments'
-import { useRunHasStarted } from '/app/resources/runs'
-import { useDeckCalibrationData } from '../hooks'
 // eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
-
-import type { Mount } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useRunHasStarted } from '/app/resources/runs'
+import { useTranslation } from 'react-i18next'
+import { useDeckCalibrationData } from '../hooks'
 
 export interface SetupTipLengthCalibrationButtonProps {
   robotName: string

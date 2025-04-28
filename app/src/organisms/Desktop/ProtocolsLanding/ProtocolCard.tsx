@@ -1,17 +1,3 @@
-import { format } from 'date-fns'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { ErrorBoundary } from 'react-error-boundary'
-
-import {
-  getModuleType,
-  getPipetteNameSpecs,
-  FLEX_STANDARD_MODEL,
-  getGripperDisplayName,
-  parseAllRequiredModuleModels,
-  parseInitialPipetteNamesByMount,
-} from '@opentrons/shared-data'
 import {
   ALIGN_FLEX_START,
   BORDERS,
@@ -21,6 +7,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
   ModuleIcon,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_ABSOLUTE,
@@ -28,25 +15,35 @@ import {
   SIZE_2,
   SIZE_3,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-
-import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
-import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
-import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
-import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
-import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
-import { getProtocolUsesGripper } from '/app/transformations/commands'
-import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
-import { getRobotTypeDisplayName } from './utils'
-import { getAnalysisStatus } from '/app/transformations/analysis'
-import { getProtocolDisplayName } from '/app/transformations/protocols'
-
+import {
+  FLEX_STANDARD_MODEL,
+  getGripperDisplayName,
+  getModuleType,
+  getPipetteNameSpecs,
+  parseAllRequiredModuleModels,
+  parseInitialPipetteNamesByMount,
+} from '@opentrons/shared-data'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
+import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { State } from '/app/redux/types'
+import { getAnalysisStatus } from '/app/transformations/analysis'
+import { getProtocolUsesGripper } from '/app/transformations/commands'
+import { getProtocolDisplayName } from '/app/transformations/protocols'
+import { format } from 'date-fns'
+import { ErrorBoundary } from 'react-error-boundary'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
+import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
+import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
+import { getRobotTypeDisplayName } from './utils'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void

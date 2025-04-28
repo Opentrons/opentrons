@@ -1,7 +1,3 @@
-import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import flatten from 'lodash/flatten'
-
 import {
   Checkbox,
   DIRECTION_COLUMN,
@@ -12,15 +8,16 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { IconButton } from '/app/atoms/buttons/IconButton'
-
-import type { Dispatch, SetStateAction, ReactNode } from 'react'
 import type { WellGroup } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   PipetteChannels,
 } from '@opentrons/shared-data'
+import { IconButton } from '/app/atoms/buttons/IconButton'
+import flatten from 'lodash/flatten'
+import { useEffect, useState } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface Selection384WellsProps {
   allSelectedWells: WellGroup

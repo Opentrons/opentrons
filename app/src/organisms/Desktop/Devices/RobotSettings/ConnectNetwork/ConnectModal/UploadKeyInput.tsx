@@ -1,13 +1,11 @@
-import { forwardRef, useEffect, useRef } from 'react'
-import styled from 'styled-components'
-import { useSelector } from 'react-redux'
-import last from 'lodash/last'
-
+import { getWifiKeyByRequestId, postWifiKeys } from '/app/redux/networking'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
-import { postWifiKeys, getWifiKeyByRequestId } from '/app/redux/networking'
-
-import type { ChangeEventHandler, ForwardedRef } from 'react'
 import type { State } from '/app/redux/types'
+import last from 'lodash/last'
+import { forwardRef, useEffect, useRef } from 'react'
+import type { ChangeEventHandler, ForwardedRef } from 'react'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 export interface UploadKeyInputProps {
   robotName: string

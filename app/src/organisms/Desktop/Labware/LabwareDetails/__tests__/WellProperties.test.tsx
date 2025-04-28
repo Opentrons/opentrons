@@ -1,11 +1,10 @@
 import { screen } from '@testing-library/react'
-import { describe, it, expect, beforeEach } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockCircularLabwareWellGroupProperties } from '/app/redux/custom-labware/__fixtures__'
-import { WellProperties } from '../WellProperties'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { WellProperties } from '../WellProperties'
 
 const render = (props: ComponentProps<typeof WellProperties>) => {
   return renderWithProviders(<WellProperties {...props} />, {

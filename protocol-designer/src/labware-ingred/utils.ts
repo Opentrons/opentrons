@@ -11,16 +11,16 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
-import { getSlotIsEmpty } from '../step-forms/utils'
-import { getStagingAreaAddressableAreas } from '../utils'
 import type {
-  RobotType,
   CutoutId,
   LabwareDefinition2,
+  RobotType,
 } from '@opentrons/shared-data'
+import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import type { InitialDeckSetup } from '../step-forms/types'
+import { getSlotIsEmpty } from '../step-forms/utils'
 import type { DeckSlot } from '../types'
+import { getStagingAreaAddressableAreas } from '../utils'
 
 export function getNextAvailableDeckSlot(
   initialDeckSetup: InitialDeckSetup,

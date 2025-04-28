@@ -1,9 +1,8 @@
-import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
-import { COLORS } from '../../../helix-design-system'
-
+import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { SVGProps } from 'react'
 import type { CSSProperties } from 'styled-components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { COLORS } from '../../../helix-design-system'
 
 export interface LabwareOutlineProps {
   /** Labware definition to outline */

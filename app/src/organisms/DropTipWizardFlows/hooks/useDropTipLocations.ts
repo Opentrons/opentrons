@@ -1,19 +1,16 @@
-import { useMemo } from 'react'
-
 import {
   getDeckDefFromRobotType,
   OT2_ROBOT_TYPE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
-
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-
 import type {
-  RobotType,
-  CutoutConfig,
   AddressableAreaName,
+  CutoutConfig,
+  RobotType,
 } from '@opentrons/shared-data'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useMemo } from 'react'
 import type { ValidDropTipBlowoutLocation } from '../types'
 
 export type DropTipBlowoutSlotName =

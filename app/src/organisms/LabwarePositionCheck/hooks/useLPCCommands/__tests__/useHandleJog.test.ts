@@ -1,11 +1,10 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
-
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
+import { act, renderHook } from '@testing-library/react'
 import { selectActivePipette } from '/app/redux/protocol-runs'
-import { useHandleJog } from '../useHandleJog'
 import { useSelector } from 'react-redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { moveRelativeCommand, moveToWellCommands } from '../commands'
+import { useHandleJog } from '../useHandleJog'
 
 vi.mock('react-redux')
 vi.mock('/app/redux/protocol-runs')

@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
@@ -8,13 +7,13 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { useTranslation } from 'react-i18next'
 
 interface ConfirmExitProps {
   back: () => void

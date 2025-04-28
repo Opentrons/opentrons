@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { getMigrationVersionsToRunFromVersion } from '../index'
+
 vi.mock('../../../labware-defs/utils')
 describe('runs appropriate migrations for version', () => {
   // purposefully out of order

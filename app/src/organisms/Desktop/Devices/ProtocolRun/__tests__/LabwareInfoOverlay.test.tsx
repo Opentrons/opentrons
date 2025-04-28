@@ -1,12 +1,11 @@
-import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 
 const render = (props: ComponentProps<typeof LabwareInfoOverlay>) => {
   return renderWithProviders(

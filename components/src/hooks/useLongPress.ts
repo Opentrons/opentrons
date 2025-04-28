@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
 import interact from 'interactjs'
 import type PointerEvent from 'interactjs'
+import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, MutableRefObject } from 'react'
 
 const HOLD_DURATION_MS = 1000

@@ -1,6 +1,5 @@
-import type * as React from 'react'
 import cx from 'classnames'
-
+import type * as React from 'react'
 import styles from './styles.module.css'
 
 export interface PageProps {

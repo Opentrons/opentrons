@@ -1,18 +1,17 @@
-import { vi, describe, expect, it } from 'vitest'
-
-import {
-  getHealthyRobotDataForNotifyConnections,
-  cleanUpUnreachableRobots,
-  establishConnections,
-  closeConnectionsForcefullyFor,
-} from '../connect'
-import { connectionStore } from '../store'
-import { FAILURE_STATUSES } from '../../constants'
+import { describe, expect, it, vi } from 'vitest'
 import {
   MOCK_DISCOVERY_ROBOTS,
   MOCK_HEALTHY_ROBOTS,
   MOCK_STORE_ROBOTS,
 } from '../../__fixtures__'
+import { FAILURE_STATUSES } from '../../constants'
+import {
+  cleanUpUnreachableRobots,
+  closeConnectionsForcefullyFor,
+  establishConnections,
+  getHealthyRobotDataForNotifyConnections,
+} from '../connect'
+import { connectionStore } from '../store'
 
 vi.mock('electron-store')
 vi.mock('../notifyLog', () => {

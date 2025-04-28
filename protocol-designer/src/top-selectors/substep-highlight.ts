@@ -1,23 +1,23 @@
-import { createSelector } from 'reselect'
-import mapValues from 'lodash/mapValues'
-import { COLUMN, SINGLE, getWellNamePerMultiTip } from '@opentrons/shared-data'
+import type { WellGroup } from '@opentrons/components'
+import { COLUMN, getWellNamePerMultiTip, SINGLE } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
-import { selectors as stepFormSelectors } from '../step-forms'
+import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
+import mapValues from 'lodash/mapValues'
+import { createSelector } from 'reselect'
 import { selectors as fileDataSelectors } from '../file-data'
+import { selectors as stepFormSelectors } from '../step-forms'
+import type { SubstepItemData } from '../steplist/types'
+import type { Selector } from '../types'
 import {
   getHoveredStepId,
   getHoveredSubstep,
   getSelectedStepId,
 } from '../ui/steps'
 import { getWellSetForMultichannel } from '../utils'
-import type { WellGroup } from '@opentrons/components'
-import type {
-  NozzleConfigurationStyle,
-  CreateCommand,
-} from '@opentrons/shared-data'
-import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
-import type { Selector } from '../types'
-import type { SubstepItemData } from '../steplist/types'
 
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,

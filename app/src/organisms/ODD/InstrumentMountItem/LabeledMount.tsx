@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -9,14 +7,15 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import type { MouseEventHandler } from 'react'
 import type { Mount } from '/app/redux/pipettes/types'
+import type { MouseEventHandler } from 'react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 const MountButton = styled.button<{ isAttached: boolean }>`
   display: flex;

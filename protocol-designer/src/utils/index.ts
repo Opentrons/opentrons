@@ -1,23 +1,14 @@
-import round from 'lodash/round'
-import snakeCase from 'lodash/snakeCase'
-import uuidv1 from 'uuid/v4'
+import type { WellGroup } from '@opentrons/components'
 import {
-  makeWellSetHelpers,
-  getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  isAddressableAreaStandardSlot,
-  INTERACTIVE_WELL_DATA_ATTRIBUTE,
-  LOW_VOLUME_PIPETTES,
+  getDeckDefFromRobotType,
   getTiprackVolume,
+  INTERACTIVE_WELL_DATA_ATTRIBUTE,
+  isAddressableAreaStandardSlot,
+  LOW_VOLUME_PIPETTES,
+  makeWellSetHelpers,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
-import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
-import type {
-  AdditionalEquipmentEntity,
-  LabwareEntities,
-  PipetteEntities,
-  PipetteEntity,
-} from '@opentrons/step-generation'
 import type {
   AddressableAreaName,
   CutoutId,
@@ -28,7 +19,16 @@ import type {
   SupportedTip,
   WellSetHelpers,
 } from '@opentrons/shared-data'
-import type { WellGroup } from '@opentrons/components'
+import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
+import type {
+  AdditionalEquipmentEntity,
+  LabwareEntities,
+  PipetteEntities,
+  PipetteEntity,
+} from '@opentrons/step-generation'
+import round from 'lodash/round'
+import snakeCase from 'lodash/snakeCase'
+import uuidv1 from 'uuid/v4'
 import type { BoundingRect, GenericRect } from '../collision-types'
 
 export const uuid: () => string = uuidv1

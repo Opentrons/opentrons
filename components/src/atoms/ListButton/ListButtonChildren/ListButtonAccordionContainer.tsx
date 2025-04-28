@@ -1,7 +1,6 @@
+import type { ReactNode } from 'react'
 import { Flex } from '../../../primitives'
 import { DIRECTION_COLUMN } from '../../../styles'
-
-import type { ReactNode } from 'react'
 
 interface ListButtonAccordionContainerProps {
   children: ReactNode

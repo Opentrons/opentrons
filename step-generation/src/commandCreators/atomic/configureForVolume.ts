@@ -1,6 +1,6 @@
-import { uuid } from '../../utils'
 import type { ConfigureForVolumeParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
+import { uuid } from '../../utils'
 
 export const configureForVolume: CommandCreator<ConfigureForVolumeParams> = (
   args,

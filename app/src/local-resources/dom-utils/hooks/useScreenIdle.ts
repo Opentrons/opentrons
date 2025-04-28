@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
 import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
+import { useEffect, useRef, useState } from 'react'
 
 const USER_EVENTS: Array<keyof DocumentEventMap> = [
   'click',

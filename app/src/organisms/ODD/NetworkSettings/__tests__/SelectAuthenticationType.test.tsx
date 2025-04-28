@@ -1,17 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { afterEach, beforeEach, describe, it, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
+import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
 import { SetWifiCred } from '../SetWifiCred'
-
-import type { ComponentProps } from 'react'
-import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 const mockSetSelectedAuthType = vi.fn()

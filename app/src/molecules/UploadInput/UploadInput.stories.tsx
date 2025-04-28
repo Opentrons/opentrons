@@ -1,16 +1,16 @@
 import {
   ALIGN_CENTER,
   COLORS,
-  DIRECTION_ROW,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
-import { UploadInput as UploadInputComponent } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
+import { UploadInput as UploadInputComponent } from './index'
 
 const meta: Meta<typeof UploadInputComponent> = {
   title: 'App/Molecules/UploadInput',

@@ -1,13 +1,45 @@
 import assert from 'assert'
+import type { CreateCommand } from '@opentrons/shared-data'
 import produce from 'immer'
+import type {
+  InvariantContext,
+  RobotState,
+  RobotStateAndWarnings,
+} from '../types'
 import { stripNoOpCommands } from '../utils/stripNoOpCommands'
-import { forLoadLiquid } from './forLoadLiquid'
+import {
+  forAbsorbanceReaderCloseLid,
+  forAbsorbanceReaderInitialize,
+  forAbsorbanceReaderOpenLid,
+} from './absorbanceReaderUpdates'
 import { forAspirate } from './forAspirate'
-import { forDispense } from './forDispense'
 import { forBlowout } from './forBlowout'
+import { forConfigureNozzleLayout } from './forConfigureNozzleLayout'
+import { forDispense } from './forDispense'
 import { forDropTip } from './forDropTip'
+import { forLoadLiquid } from './forLoadLiquid'
+import { forMoveLabware } from './forMoveLabware'
 import { forPickUpTip } from './forPickUpTip'
-import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
+import {
+  forHeaterShakerCloseLatch,
+  forHeaterShakerDeactivateHeater,
+  forHeaterShakerOpenLatch,
+  forHeaterShakerSetTargetShakeSpeed,
+  forHeaterShakerSetTargetTemperature,
+  forHeaterShakerStopShake,
+} from './heaterShakerUpdates'
+import {
+  forAspirateInPlace,
+  forBlowOutInPlace,
+  forDispenseInPlace,
+  forDropTipInPlace,
+} from './inPlaceCommandUpdates'
+import { forDisengageMagnet, forEngageMagnet } from './magnetUpdates'
+import {
+  forAwaitTemperature,
+  forDeactivateTemperature,
+  forSetTemperature,
+} from './temperatureUpdates'
 import {
   forThermocyclerAwaitBlockTemperature,
   forThermocyclerAwaitLidTemperature,
@@ -20,39 +52,6 @@ import {
   forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature,
 } from './thermocyclerUpdates'
-import {
-  forAwaitTemperature,
-  forSetTemperature,
-  forDeactivateTemperature,
-} from './temperatureUpdates'
-import {
-  forHeaterShakerCloseLatch,
-  forHeaterShakerDeactivateHeater,
-  forHeaterShakerOpenLatch,
-  forHeaterShakerSetTargetShakeSpeed,
-  forHeaterShakerSetTargetTemperature,
-  forHeaterShakerStopShake,
-} from './heaterShakerUpdates'
-import { forMoveLabware } from './forMoveLabware'
-import {
-  forAspirateInPlace,
-  forBlowOutInPlace,
-  forDispenseInPlace,
-  forDropTipInPlace,
-} from './inPlaceCommandUpdates'
-import {
-  forAbsorbanceReaderCloseLid,
-  forAbsorbanceReaderInitialize,
-  forAbsorbanceReaderOpenLid,
-} from './absorbanceReaderUpdates'
-
-import type { CreateCommand } from '@opentrons/shared-data'
-import type {
-  InvariantContext,
-  RobotState,
-  RobotStateAndWarnings,
-} from '../types'
-import { forConfigureNozzleLayout } from './forConfigureNozzleLayout'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(

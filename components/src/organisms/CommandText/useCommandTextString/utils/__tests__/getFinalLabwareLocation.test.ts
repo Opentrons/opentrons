@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
 import { fixtureTiprack10ul } from '@opentrons/shared-data'
-import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
+import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
 
 describe('getFinalLabwareLocation', () => {
   it('calculates labware location after only load_labware', () => {

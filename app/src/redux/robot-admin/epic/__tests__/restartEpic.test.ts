@@ -1,14 +1,11 @@
-import { vi, describe, it, expect } from 'vitest'
-
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
-
-import * as SettingsSelectors from '../../../robot-settings/selectors'
-import * as DiscoveryActions from '../../../discovery/actions'
+import { describe, expect, it, vi } from 'vitest'
 import * as Fixtures from '../../__fixtures__'
+import * as DiscoveryActions from '../../../discovery/actions'
+import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
+import * as SettingsSelectors from '../../../robot-settings/selectors'
+import type { Action } from '../../../types'
 import * as Actions from '../../actions'
 import { restartEpic, startDiscoveryOnRestartEpic } from '../restartEpic'
-
-import type { Action } from '../../../types'
 
 vi.mock('../../../robot-settings/selectors')
 

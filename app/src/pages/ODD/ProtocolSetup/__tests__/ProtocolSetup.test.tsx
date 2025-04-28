@@ -1,84 +1,81 @@
-import { Route, MemoryRouter, Routes } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
-  useProtocolQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { renderWithProviders } from '/app/__testing-utils__'
-import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import {
-  getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   flexDeckDefV5,
+  getDeckDefFromRobotType,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
-
+import type * as SharedData from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useToaster } from '/app/organisms/ToasterOven'
-import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
-import { useAttachedModules } from '/app/resources/modules'
-import { useRobotType } from '/app/redux-resources/robots'
-import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { getLocalRobot } from '/app/redux/discovery'
-import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
-import {
-  ProtocolSetupLabware,
-  ProtocolSetupModulesAndDeck,
-  ProtocolSetupOffsets,
-  ViewOnlyParameters,
-  ProtocolSetupTitleSkeleton,
-  ProtocolSetupStepSkeleton,
-  getUnmatchedModulesForProtocol,
-  getIncompleteInstrumentCount,
-} from '/app/organisms/ODD/ProtocolSetup'
-import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
-import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupInstruments/__fixtures__'
-import {
-  useProtocolHasRunTimeParameters,
-  useRunControls,
-} from '/app/organisms/RunTimeControl/hooks'
-import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
-import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModal'
-import { ProtocolSetup } from '../'
-import {
-  useNotifyRunQuery,
-  useRunStatus,
-  useRunCreatedAtTimestamp,
-  useLPCDisabledReason,
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
-} from '/app/resources/runs'
-import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
-import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
-import {
-  selectTotalCountLocationSpecificOffsets,
-  selectCountMissingLSOffsetsWithoutDefault,
-  selectAreOffsetsApplied,
-  selectIsAnyNecessaryDefaultOffsetMissing,
-  selectOffsetSource,
-} from '/app/redux/protocol-runs'
-import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import {
   NOT_CONFIGURED,
   useIsDoorOpen,
 } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
-
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
+import {
+  getIncompleteInstrumentCount,
+  getUnmatchedModulesForProtocol,
+  ProtocolSetupLabware,
+  ProtocolSetupModulesAndDeck,
+  ProtocolSetupOffsets,
+  ProtocolSetupStepSkeleton,
+  ProtocolSetupTitleSkeleton,
+  ViewOnlyParameters,
+} from '/app/organisms/ODD/ProtocolSetup'
+import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
+import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupInstruments/__fixtures__'
+import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
+import {
+  useProtocolHasRunTimeParameters,
+  useRunControls,
+} from '/app/organisms/RunTimeControl/hooks'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import { useRobotType } from '/app/redux-resources/robots'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
+import {
+  selectAreOffsetsApplied,
+  selectCountMissingLSOffsetsWithoutDefault,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+  selectOffsetSource,
+  selectTotalCountLocationSpecificOffsets,
+} from '/app/redux/protocol-runs'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { useAttachedModules } from '/app/resources/modules'
+import {
+  useLPCDisabledReason,
+  useModuleCalibrationStatus,
+  useNotifyRunQuery,
+  useProtocolAnalysisErrors,
+  useRunCreatedAtTimestamp,
+  useRunStatus,
+} from '/app/resources/runs'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import type { UseQueryResult } from 'react-query'
-import type * as SharedData from '@opentrons/shared-data'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import type { NavigateFunction } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { ProtocolSetup } from '../'
+import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
+import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModal'
 
 let mockNavigate = vi.fn()
 

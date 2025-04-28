@@ -14,6 +14,8 @@
   "change_tip_pickup_location": "Change tip pick-up location",
   "choose_a_recovery_action": "Choose a recovery action",
   "clear_obstruction_in_stacker_and_retry_step": "Clear obstruction in stacker and retry step",
+  "clear_track_of_obstructions": "Clear track of obstructions",
+  "clear_track_of_obstructions_and_close_door": "<block>Carefully clear the track of any dislodged labware or obstructions.</block><block>Close the robot and stacker door before proceeding.</block>",
   "clear_obstruction_in_stacker_and_skip_to_next_step": "Clear obstruction in stacker and skip to next step",
   "close_door_to_resume": "Close robot door to resume",
   "close_robot_and_stacker_door": "Close the robot and stacker door",
@@ -145,5 +147,6 @@
   "use_dry_unused_tips": "Use dry, unused tips for best results",
   "view_error_details": "View error details",
   "view_recovery_options": "View recovery options",
-  "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection."
+  "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection.",
+  "clear_obstructions_before_proceeding": "Clear obstructions before proceeding"
 }

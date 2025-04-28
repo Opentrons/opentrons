@@ -1,11 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ModuleSetupModal } from '../ModuleSetupModal'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ModuleSetupModal } from '../ModuleSetupModal'
 
 const render = (props: ComponentProps<typeof ModuleSetupModal>) => {
   return renderWithProviders(<ModuleSetupModal {...props} />, {

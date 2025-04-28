@@ -1,15 +1,13 @@
+import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import mqtt from 'mqtt'
-
-import { connectionStore } from './store'
 import {
+  deserializeExpectedMessages,
   sendDeserialized,
   sendDeserializedGenericError,
-  deserializeExpectedMessages,
 } from './deserialize'
-import { unsubscribe } from './unsubscribe'
 import { notifyLog } from './notifyLog'
-
-import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
+import { connectionStore } from './store'
+import { unsubscribe } from './unsubscribe'
 
 // MQTT is somewhat particular about the clientId format and will connect erratically if an unexpected string is supplied.
 const CLIENT_ID = 'odd-' + Math.random().toString(16).slice(2, 8) // Derived from mqttjs

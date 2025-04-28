@@ -1,23 +1,22 @@
-import { useState, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
-  getLabwareInfoByLiquidId,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
+  getLabwareInfoByLiquidId,
   SPACING,
   StyledText,
-  COLORS,
 } from '@opentrons/components'
-import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
-import { LabwareListItem } from './LabwareListItem'
-
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { StackItem } from '/app/transformations/commands'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
+import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
+import type { StackItem } from '/app/transformations/commands'
+import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { LabwareListItem } from './LabwareListItem'
 import { SlotDetailModal } from './SlotDetailModal'
 
 interface SetupLabwareListProps {

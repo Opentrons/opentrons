@@ -1,20 +1,17 @@
-import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import type { Dispatch } from '/app/redux/types'
-
+import { CompleteUpdateSoftware } from '/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
+import { UpdateSoftware } from '/app/organisms/UpdateRobotSoftware/UpdateSoftware'
+import type { ViewableRobot } from '/app/redux/discovery/types'
 import {
   getRobotUpdateSession,
   startRobotUpdate,
 } from '/app/redux/robot-update'
-
-import type { ViewableRobot } from '/app/redux/discovery/types'
-
-import { CompleteUpdateSoftware } from '/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
-import { UpdateSoftware } from '/app/organisms/UpdateRobotSoftware/UpdateSoftware'
-
+import type { Dispatch } from '/app/redux/types'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { CheckUpdates } from './CheckUpdates'
-import { NoUpdateFound } from './NoUpdateFound'
 import { ErrorUpdateSoftware } from './ErrorUpdateSoftware'
+import { NoUpdateFound } from './NoUpdateFound'
+
 export {
   CheckUpdates,
   NoUpdateFound,

@@ -1,13 +1,11 @@
-import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ConfirmRobotName } from '../ConfirmRobotName'
-
 import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import type { NavigateFunction } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ConfirmRobotName } from '../ConfirmRobotName'
 
 const mockNavigate = vi.fn()
 

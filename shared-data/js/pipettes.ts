@@ -1,13 +1,13 @@
-import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/1/pipetteModelSpecs.json'
+import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
 import { OT3_PIPETTES } from './constants'
 import type {
-  PipetteV2Specs,
+  PipetteModelSpecs,
+  PipetteNameSpecs,
   PipetteV2GeneralSpecs,
   PipetteV2GeometrySpecs,
   PipetteV2LiquidSpecs,
-  PipetteNameSpecs,
-  PipetteModelSpecs,
+  PipetteV2Specs,
 } from './types'
 
 type GeneralGeometricModules = PipetteV2GeneralSpecs | PipetteV2GeometrySpecs

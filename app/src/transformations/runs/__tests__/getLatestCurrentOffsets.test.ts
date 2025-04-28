@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { getLatestCurrentOffsets } from '../getLatestCurrentOffsets'
 import type { LabwareOffset } from '@opentrons/api-client'
+import { describe, expect, it } from 'vitest'
+import { getLatestCurrentOffsets } from '../getLatestCurrentOffsets'
 
 describe('getLatestCurrentOffsets', () => {
   it('should return the latest offsets when there are multiple offsets', () => {

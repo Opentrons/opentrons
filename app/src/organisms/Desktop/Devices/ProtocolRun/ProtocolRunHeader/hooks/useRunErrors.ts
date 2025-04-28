@@ -1,10 +1,8 @@
+import type { Run, RunStatus } from '@opentrons/api-client'
 import { useRunCommandErrors } from '@opentrons/react-api-client'
-
-import { isTerminalRunStatus } from '../utils'
-import { getHighestPriorityError } from '/app/transformations/runs'
-
-import type { RunStatus, Run } from '@opentrons/api-client'
 import type { RunCommandError } from '@opentrons/shared-data'
+import { getHighestPriorityError } from '/app/transformations/runs'
+import { isTerminalRunStatus } from '../utils'
 
 // A reasonably high number of commands that a user would realistically care to examine.
 const ALL_COMMANDS_PAGE_LENGTH = 100

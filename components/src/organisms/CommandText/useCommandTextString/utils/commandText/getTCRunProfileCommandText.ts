@@ -1,6 +1,6 @@
-import { formatDurationLabeled } from '../formatDuration'
 import type { TCRunProfileRunTimeCommand } from '@opentrons/shared-data/command'
 import type { GetTCRunProfileCommandTextResult } from '../..'
+import { formatDurationLabeled } from '../formatDuration'
 import type { HandlesCommands } from '../types'
 
 export function getTCRunProfileCommandText({

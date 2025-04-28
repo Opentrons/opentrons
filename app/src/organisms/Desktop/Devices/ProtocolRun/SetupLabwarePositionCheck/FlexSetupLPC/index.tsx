@@ -1,16 +1,14 @@
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
-import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
-
 import { LPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
+import { selectLabwareOffsetsToAddToRun } from '/app/redux/protocol-runs'
+import type { State } from '/app/redux/types'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+import type { SetupLabwarePositionCheckProps } from '..'
+import { LPCOffsetsSnippets } from './LPCOffsetsSnippets'
 import { LPCSetupFlexBtns } from './LPCSetupFlexBtns'
 import { LPCSetupOffsetsTable } from './LPCSetupOffsetsTable'
-import { LPCOffsetsSnippets } from './LPCOffsetsSnippets'
-import { selectLabwareOffsetsToAddToRun } from '/app/redux/protocol-runs'
-import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-
-import type { SetupLabwarePositionCheckProps } from '..'
-import type { State } from '/app/redux/types'
 
 export function FlexSetupLPC(
   props: SetupLabwarePositionCheckProps

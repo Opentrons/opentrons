@@ -5,7 +5,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import type { ProtocolHardware, ProtocolModule, ProtocolFixture } from './types'
+import type { ProtocolFixture, ProtocolHardware, ProtocolModule } from './types'
 
 /**
  * Returns an array of ProtocolHardware objects that are required by the given protocol ID,

@@ -1,8 +1,7 @@
 import { RECOVERY_MAP } from '../constants'
-import { TwoColLwInfoAndDeck, SelectTips, RetryWithNewTips } from '../shared'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
-
+import { RetryWithNewTips, SelectTips, TwoColLwInfoAndDeck } from '../shared'
 import type { RecoveryContentProps } from '../types'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 export function RetryNewTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap, routeUpdateActions } = props

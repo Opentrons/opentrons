@@ -1,18 +1,15 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { act, fireEvent, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-
 import { COLORS, TYPOGRAPHY } from '@opentrons/components'
-
+import type { Chip } from '@opentrons/components'
+import type { ProtocolResource } from '@opentrons/shared-data'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useFeatureFlag } from '/app/redux/config'
-import { PinnedProtocol } from '../PinnedProtocol'
-
 import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import type { NavigateFunction } from 'react-router-dom'
-import type { Chip } from '@opentrons/components'
-import type { ProtocolResource } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { PinnedProtocol } from '../PinnedProtocol'
 
 const mockNavigate = vi.fn()
 

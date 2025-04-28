@@ -1,19 +1,17 @@
 // TODO(mc, 2020-06-11): test all release-files functions
-import { vi, describe, it, expect, afterEach } from 'vitest'
-import { when } from 'vitest-when'
-import path from 'path'
 import { promises as fs } from 'fs'
-
+import path from 'path'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import { fetchToFile as httpFetchToFile } from '../../../http'
-import {
-  ensureCleanReleaseCacheForVersion,
-  getReleaseFiles,
-  downloadReleaseFiles,
-  getOrDownloadReleaseFiles,
-} from '../release-files'
-
-import { directoryWithCleanup } from '../../utils'
 import type { ReleaseSetUrls } from '../../types'
+import { directoryWithCleanup } from '../../utils'
+import {
+  downloadReleaseFiles,
+  ensureCleanReleaseCacheForVersion,
+  getOrDownloadReleaseFiles,
+  getReleaseFiles,
+} from '../release-files'
 
 vi.mock('../../../http')
 vi.mock('../../../log')

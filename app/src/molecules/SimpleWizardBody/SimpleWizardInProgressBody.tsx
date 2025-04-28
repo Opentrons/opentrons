@@ -1,8 +1,7 @@
+import type { StyleProps } from '@opentrons/components'
+import type { ComponentProps } from 'react'
 import { InProgressModal } from '../InProgressModal/InProgressModal'
 import { SimpleWizardBodyContainer } from './SimpleWizardBodyContainer'
-
-import type { ComponentProps } from 'react'
-import type { StyleProps } from '@opentrons/components'
 
 export type SimpleWizardInProgressBodyProps = ComponentProps<
   typeof InProgressModal

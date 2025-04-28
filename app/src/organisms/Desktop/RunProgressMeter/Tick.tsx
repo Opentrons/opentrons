@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { createPortal } from 'react-dom'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -13,11 +10,11 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-
-import { getModalPortalEl } from '/app/App/portal'
-
 import type { IconName } from '@opentrons/components'
 import type { RunTimeCommand } from '@opentrons/shared-data'
+import { getModalPortalEl } from '/app/App/portal'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 interface TickProps {
   index: number

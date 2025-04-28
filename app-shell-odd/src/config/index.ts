@@ -1,26 +1,24 @@
 // app configuration and settings
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
-import Store from 'electron-store'
-import get from 'lodash/get'
-import forEach from 'lodash/forEach'
-import mergeOptions from 'merge-options'
-import yargsParser from 'yargs-parser'
-import { UI_INITIALIZED } from '../constants'
-import * as Cfg from '../constants'
-import { configInitialized, configValueUpdated } from '../actions'
-import systemd from '../systemd'
-import { createLogger } from '../log'
-import { DEFAULTS_V12, migrate } from './migrate'
-import { shouldUpdate, getNextValue } from './update'
-import { setUserDataPath } from '../early'
-
 import type {
   ConfigV12,
   ConfigValueChangeAction,
 } from '@opentrons/app/src/redux/config/types'
-
+import Store from 'electron-store'
+import forEach from 'lodash/forEach'
+import get from 'lodash/get'
+import mergeOptions from 'merge-options'
+import yargsParser from 'yargs-parser'
+import { configInitialized, configValueUpdated } from '../actions'
+import { UI_INITIALIZED } from '../constants'
+import * as Cfg from '../constants'
+import { setUserDataPath } from '../early'
+import { createLogger } from '../log'
+import systemd from '../systemd'
 import type { Action, Dispatch, Logger } from '../types'
+import { DEFAULTS_V12, migrate } from './migrate'
 import type { Config, Overrides } from './types'
+import { getNextValue, shouldUpdate } from './update'
 
 export * from './types'
 

@@ -1,17 +1,14 @@
-import { useEffect } from 'react'
-import omit from 'lodash/omit'
-import isEqual from 'lodash/isEqual'
-import { Trans, useTranslation } from 'react-i18next'
+import type {
+  LabwareOffset,
+  LegacyLabwareOffsetLocation,
+} from '@opentrons/api-client'
 import {
   DIRECTION_COLUMN,
   Flex,
+  getLabwareDefinitionsFromCommands,
   LegacyStyledText,
   TYPOGRAPHY,
-  getLabwareDefinitionsFromCommands,
 } from '@opentrons/components'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
-import { JogToWell } from './JogToWell'
 import {
   FLEX_ROBOT_TYPE,
   getIsTiprack,
@@ -22,34 +19,36 @@ import {
   IDENTITY_VECTOR,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useSelector } from 'react-redux'
-import { getLabwareDef } from './utils/labware'
-import { UnorderedList } from '/app/molecules/UnorderedList'
-import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
-import { getIsOnDevice } from '/app/redux/config'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-
-import type { Dispatch } from 'react'
-import type {
-  LabwareOffset,
-  LegacyLabwareOffsetLocation,
-} from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
+  Coordinates,
   CreateCommand,
   LabwareLocation,
   MoveLabwareCreateCommand,
   RobotType,
-  Coordinates,
 } from '@opentrons/shared-data'
+import type { Jog } from '/app/molecules/JogControls/types'
+import { UnorderedList } from '/app/molecules/UnorderedList'
+import { getIsOnDevice } from '/app/redux/config'
 import type { useChainRunCommands } from '/app/resources/runs'
+import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
+import type { TFunction } from 'i18next'
+import isEqual from 'lodash/isEqual'
+import omit from 'lodash/omit'
+import { useEffect } from 'react'
+import type { Dispatch } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { JogToWell } from './JogToWell'
+import { PrepareSpace } from './PrepareSpace'
+import { RobotMotionLoader } from './RobotMotionLoader'
 import type {
   CheckLabwareStep,
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { Jog } from '/app/molecules/JogControls/types'
-import type { TFunction } from 'i18next'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { getLabwareDef } from './utils/labware'
 
 const PROBE_LENGTH_MM = 44.5
 

@@ -1,15 +1,13 @@
-import Yargs from 'yargs'
 import noop from 'lodash/noop'
-import { createDiscoveryClient, DEFAULT_PORT } from '.'
-
+import Yargs from 'yargs'
 import type { MiddlewareFunction } from 'yargs'
-
+import { createDiscoveryClient, DEFAULT_PORT } from '.'
 import type {
   DiscoveryClient,
   DiscoveryClientRobot,
   DiscoveryClientRobotAddress,
-  LogLevel,
   Logger,
+  LogLevel,
 } from './types'
 
 const LOG_LVLS: LogLevel[] = [

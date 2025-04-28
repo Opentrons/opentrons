@@ -1,13 +1,11 @@
-import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { FailedToConnect } from '../FailedToConnect'
-
-import type { ComponentProps } from 'react'
 import type { RequestState } from '/app/redux/robot-api/types'
+import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { FailedToConnect } from '../FailedToConnect'
 
 const render = (props: ComponentProps<typeof FailedToConnect>) => {
   return renderWithProviders(

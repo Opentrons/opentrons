@@ -1,17 +1,15 @@
-import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useWifiList } from '/app/resources/networking/hooks'
 import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
 import * as Fixtures from '/app/redux/networking/__fixtures__'
+import { useWifiList } from '/app/resources/networking/hooks'
+import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { NetworkDetailsModal } from '../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
-
-import type { ComponentProps } from 'react'
-import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux/networking')

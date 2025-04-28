@@ -1,9 +1,8 @@
 // reusable toggle button with on off styling for connect to robot and opt in/out
 import cx from 'classnames'
 import { IconButton } from '../buttons'
-import styles from './styles.module.css'
-
 import type { ButtonProps } from '../buttons'
+import styles from './styles.module.css'
 
 export interface ToggleButtonProps extends ButtonProps {
   toggledOn: boolean

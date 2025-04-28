@@ -1,10 +1,8 @@
 import { exec } from 'child_process'
 import { promises as fs } from 'fs'
 import path from 'path'
-
-import { createLogger } from '../log'
 import { UI_INITIALIZED } from '../constants'
-
+import { createLogger } from '../log'
 import type { Action, Dispatch } from '../types'
 
 export const PARENT_PROCESSES = [

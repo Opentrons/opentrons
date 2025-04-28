@@ -1,11 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
+import { BORDERS, COLORS, CURSOR_POINTER, SPACING } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
-import { COLORS, SPACING, BORDERS, CURSOR_POINTER } from '@opentrons/components'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { MiniCard } from '../'
-
 import type { ComponentProps } from 'react'
+import { MiniCard } from '../'
 
 const render = (props: ComponentProps<typeof MiniCard>) => {
   return renderWithProviders(<MiniCard {...props} />)[0]

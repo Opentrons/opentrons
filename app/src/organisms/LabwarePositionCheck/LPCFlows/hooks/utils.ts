@@ -1,5 +1,4 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-
 import type { LoadedPipette } from '@opentrons/shared-data'
 
 // Return the pipetteId for the pipette in the protocol with the highest channel count.

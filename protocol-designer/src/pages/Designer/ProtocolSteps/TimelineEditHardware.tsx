@@ -1,8 +1,3 @@
-import { useSelector } from 'react-redux'
-import { getRobotType } from '../../../file-data/selectors'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { FlexHardware } from '../../../components/organisms'
-import { Ot2Modules } from '../../../components/organisms/Ot2Modules'
 import {
   BORDERS,
   COLORS,
@@ -11,7 +6,12 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { FlexHardware } from '../../../components/organisms'
+import { Ot2Modules } from '../../../components/organisms/Ot2Modules'
+import { getRobotType } from '../../../file-data/selectors'
 
 export function TimelineEditHardware(): JSX.Element {
   const { t } = useTranslation('protocol_steps')

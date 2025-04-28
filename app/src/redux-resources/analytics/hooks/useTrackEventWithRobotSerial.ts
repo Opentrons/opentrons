@@ -1,6 +1,6 @@
-import { useSelector } from 'react-redux'
 import { useTrackEvent } from '/app/redux/analytics'
 import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
+import { useSelector } from 'react-redux'
 
 interface AnalyticsEvent {
   name: string

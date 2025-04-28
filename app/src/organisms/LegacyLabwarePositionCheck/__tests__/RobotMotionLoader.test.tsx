@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
-import { describe, it } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { describe, it } from 'vitest'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 
 const mockHeader = 'Stand back, robot needs some space right now'

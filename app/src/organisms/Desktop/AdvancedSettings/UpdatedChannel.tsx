@@ -1,26 +1,23 @@
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { SelectField } from '/app/atoms/SelectField'
+import type { SelectOption } from '/app/atoms/SelectField/Select'
 import {
   getUpdateChannel,
   getUpdateChannelOptions,
   updateConfigValue,
 } from '/app/redux/config'
-
-import type { ComponentProps } from 'react'
-import type { SelectOption } from '/app/atoms/SelectField/Select'
 import type { Dispatch } from '/app/redux/types'
+import type { ComponentProps } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 export function UpdatedChannel(): JSX.Element {
   const { t } = useTranslation('app_settings')

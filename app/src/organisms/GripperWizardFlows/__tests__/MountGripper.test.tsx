@@ -1,14 +1,12 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
-import { MountGripper } from '../MountGripper'
-import { GRIPPER_FLOW_TYPES } from '../constants'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { GRIPPER_FLOW_TYPES } from '../constants'
+import { MountGripper } from '../MountGripper'
 
 vi.mock('@opentrons/react-api-client')
 

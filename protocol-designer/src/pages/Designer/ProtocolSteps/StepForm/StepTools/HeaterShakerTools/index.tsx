@@ -1,5 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import {
   Box,
   COLORS,
@@ -8,15 +6,17 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { getHeaterShakerLabwareOptions } from '../../../../../../ui/modules/selectors'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
+import { getHeaterShakerLabwareOptions } from '../../../../../../ui/modules/selectors'
+import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
 import type { StepFormProps } from '../../types'
+import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 export function HeaterShakerTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData, visibleFormErrors } = props

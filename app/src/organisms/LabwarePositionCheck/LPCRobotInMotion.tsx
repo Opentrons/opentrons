@@ -1,7 +1,3 @@
-import styled, { css } from 'styled-components'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -9,16 +5,17 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import { getIsOnDevice } from '/app/redux/config'
-
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import { getIsOnDevice } from '/app/redux/config'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled, { css } from 'styled-components'
 
 interface RobotMotionLoaderProps extends LPCWizardContentProps {
   header?: string

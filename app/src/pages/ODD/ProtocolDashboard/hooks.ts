@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
 import { formatDistance } from 'date-fns'
-import { useTranslation } from 'react-i18next'
-
 import type { TFunction } from 'i18next'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const UPDATE_TIME_INTERVAL_MS = 60000
 

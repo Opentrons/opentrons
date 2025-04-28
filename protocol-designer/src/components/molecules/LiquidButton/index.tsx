@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -11,6 +8,8 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 interface LiquidButtonProps {
   showLiquidOverflowMenu: (liquidOverflowMenu: boolean) => void

@@ -1,12 +1,10 @@
-import last from 'lodash/last'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-
-import { useNotifyRunQuery } from '/app/resources/runs'
-
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { useNotifyRunQuery } from '/app/resources/runs'
+import last from 'lodash/last'
 
 export function useMostRecentCompletedAnalysis(
   runId: string | null

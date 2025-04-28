@@ -1,20 +1,19 @@
-import {
-  getClosestBeneathAdapterId,
-  getClosestBeneathModuleId,
-  getClosestBeneathModuleModel,
-  getLabwareDefURIFrom,
-  getLwModStackupDetails,
-  getAddressableAreaNameFrom,
-} from './helpers'
-import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
-
 import type {
   LoadedLabware,
   LoadedModule,
   MoveLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
+import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
 import type { LabwareLocationInfoWithLocSeq } from '.'
 import type { AnalysisLwURIsByLwId } from './getAllPossibleLwURIsInRun'
+import {
+  getAddressableAreaNameFrom,
+  getClosestBeneathAdapterId,
+  getClosestBeneathModuleId,
+  getClosestBeneathModuleModel,
+  getLabwareDefURIFrom,
+  getLwModStackupDetails,
+} from './helpers'
 
 export function getMoveLabwareLocationCombo(
   command: MoveLabwareRunTimeCommand,

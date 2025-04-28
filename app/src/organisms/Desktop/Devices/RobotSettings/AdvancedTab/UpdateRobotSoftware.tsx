@@ -1,32 +1,29 @@
-import { useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   Banner,
   Box,
+  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
-  SPACING_AUTO,
-  SPACING,
   LegacyStyledText,
+  SPACING,
+  SPACING_AUTO,
+  StyledText,
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
-  StyledText,
 } from '@opentrons/components'
-
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { TertiaryButton } from '/app/atoms/buttons'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { remote } from '/app/redux/shell/remote'
-
-import type { ChangeEventHandler, MouseEventHandler } from 'react'
 import type { State } from '/app/redux/types'
+import { useRef } from 'react'
+import type { ChangeEventHandler, MouseEventHandler } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 const OT_APP_UPDATE_PAGE_LINK = 'https://opentrons.com/ot-app/'
 const HIDDEN_CSS = css`

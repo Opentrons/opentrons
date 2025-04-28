@@ -1,26 +1,26 @@
-import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
-import {
-  fixture_tiprack_10_ul,
-  fixture_tiprack_300_ul,
-} from '@opentrons/shared-data/labware/fixtures/2'
-import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '@opentrons/step-generation'
-import {
-  dependentFieldsUpdateMoveLiquid,
-  updatePatchBlowoutFields,
-} from '../dependentFieldsUpdateMoveLiquid'
 import {
   fixtureP10SingleV2Specs,
   fixtureP300SingleV2Specs,
 } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type {
-  PipetteEntities,
-  LabwareEntities,
+import {
+  fixture_tiprack_10_ul,
+  fixture_tiprack_300_ul,
+} from '@opentrons/shared-data/labware/fixtures/2'
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+import type {
+  LabwareEntities,
+  PipetteEntities,
+} from '@opentrons/step-generation'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { FormData } from '../../../../form-types'
+import {
+  dependentFieldsUpdateMoveLiquid,
+  updatePatchBlowoutFields,
+} from '../dependentFieldsUpdateMoveLiquid'
 
 const fixtureTiprack10ul = fixture_tiprack_10_ul as LabwareDefinition2
 const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2

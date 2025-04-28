@@ -1,8 +1,6 @@
-import { describe, it, expect } from 'vitest'
-
-import { discoveryReducer } from '../reducer'
-
+import { describe, expect, it } from 'vitest'
 import type { Action } from '../../types'
+import { discoveryReducer } from '../reducer'
 import type { DiscoveryState } from '../types'
 
 describe('discoveryReducer', () => {

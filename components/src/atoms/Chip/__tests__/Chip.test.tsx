@@ -1,11 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { BORDERS, COLORS } from '../../../helix-design-system'
-import { SPACING } from '../../../ui-style-constants'
-import { renderWithProviders } from '../../../testing/utils'
-import { Chip } from '..'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { Chip } from '..'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
+import { SPACING } from '../../../ui-style-constants'
 
 const render = (props: ComponentProps<typeof Chip>) => {
   return renderWithProviders(<Chip {...props} />)

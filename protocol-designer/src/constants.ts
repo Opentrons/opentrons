@@ -1,4 +1,3 @@
-import mapValues from 'lodash/mapValues'
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
@@ -23,6 +22,7 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
+import mapValues from 'lodash/mapValues'
 import type { DeckSlot, WellVolumes } from './types'
 
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>

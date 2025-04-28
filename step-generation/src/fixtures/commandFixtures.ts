@@ -1,15 +1,4 @@
-import { expect } from 'vitest'
-import {
-  tiprackWellNamesFlat,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  AIR_GAP_META,
-  DEFAULT_BLOWOUT_WELL,
-  DEST_LABWARE,
-} from './data'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../constants'
 import { ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
-
 import type {
   AddressableAreaName,
   AspDispAirgapParams,
@@ -18,7 +7,17 @@ import type {
   DispenseParams,
   TouchTipParams,
 } from '@opentrons/shared-data'
-import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
+import { expect } from 'vitest'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../constants'
+import type { CommandCreatorErrorResponse, CommandsAndWarnings } from '../types'
+import {
+  AIR_GAP_META,
+  DEFAULT_BLOWOUT_WELL,
+  DEFAULT_PIPETTE,
+  DEST_LABWARE,
+  SOURCE_LABWARE,
+  tiprackWellNamesFlat,
+} from './data'
 
 /** Used to wrap command creators in tests, effectively casting their results
  **  to normal response or error response

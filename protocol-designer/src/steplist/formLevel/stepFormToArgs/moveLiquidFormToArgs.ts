@@ -1,20 +1,20 @@
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
+import type {
+  ConsolidateArgs,
+  DistributeArgs,
+  InnerMixArgs,
+  TransferArgs,
+} from '@opentrons/step-generation'
 import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
+import type { HydratedMoveLiquidFormData } from '../../../form-types'
+import { getMatchingTipLiquidSpecs } from '../../../utils'
 import { getOrderedWells } from '../../utils'
 import { getMoveLiquidDelayData } from './getDelayData'
-import { getMatchingTipLiquidSpecs } from '../../../utils'
-import type {
-  ConsolidateArgs,
-  DistributeArgs,
-  TransferArgs,
-  InnerMixArgs,
-} from '@opentrons/step-generation'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { HydratedMoveLiquidFormData } from '../../../form-types'
 
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
 export function getAirGapData(

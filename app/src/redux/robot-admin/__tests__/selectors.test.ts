@@ -1,13 +1,12 @@
-import { describe, it, expect } from 'vitest'
-
+import { describe, expect, it } from 'vitest'
 import { CONNECTABLE, REACHABLE } from '../../discovery'
-import {
-  getRobotRestarting,
-  getNextRestartStatus,
-  getResetConfigOptions,
-} from '../selectors'
 import type { ConnectivityStatus } from '../../discovery/types'
 import type { State } from '../../types'
+import {
+  getNextRestartStatus,
+  getResetConfigOptions,
+  getRobotRestarting,
+} from '../selectors'
 
 const START_TIME = new Date('2000-01-01')
 

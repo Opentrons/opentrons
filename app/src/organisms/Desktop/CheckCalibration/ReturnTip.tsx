@@ -3,17 +3,16 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
-import uniq from 'lodash/uniq'
-
-import * as Sessions from '/app/redux/sessions'
-import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
-import type { SessionCommandString } from '/app/redux/sessions/types'
-import { useTranslation } from 'react-i18next'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
+import * as Sessions from '/app/redux/sessions'
+import type { SessionCommandString } from '/app/redux/sessions/types'
+import uniq from 'lodash/uniq'
+import { useTranslation } from 'react-i18next'
 
 export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')

@@ -1,10 +1,10 @@
-import last from 'lodash/last'
 import {
-  useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { useRequiredProtocolHardwareFromAnalysis } from '/app/transformations/commands'
 import type { ProtocolHardware } from '/app/transformations/commands'
+import last from 'lodash/last'
 
 /**
  * Returns an array of ProtocolHardware objects that are required by the given protocol ID.

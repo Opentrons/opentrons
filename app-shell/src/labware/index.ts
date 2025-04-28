@@ -1,7 +1,20 @@
-import fse from 'fs-extra'
+import type {
+  CheckedLabwareFile,
+  DuplicateLabwareFile,
+  CustomLabwareListActionSource as ListSource,
+  UncheckedLabwareFile,
+} from '@opentrons/app/src/redux/custom-labware/types'
 import { app, shell } from 'electron'
+import type { BrowserWindow } from 'electron'
+import fse from 'fs-extra'
 import { getFullConfig, handleConfigChange } from '../config'
-import { showOpenDirectoryDialog, showOpenFileDialog } from '../dialogs'
+import {
+  addCustomLabwareFailure,
+  addNewLabwareName,
+  customLabwareList,
+  customLabwareListFailure,
+  updateConfigValue,
+} from '../config/actions'
 import {
   ADD_CUSTOM_LABWARE,
   ADD_CUSTOM_LABWARE_FILE,
@@ -20,26 +33,11 @@ import {
   UI_INITIALIZED,
   VALID_LABWARE_FILE,
 } from '../constants'
+import { showOpenDirectoryDialog, showOpenFileDialog } from '../dialogs'
+import type { Action, Dispatch } from '../types'
+import { sameIdentity } from './compare'
 import * as Definitions from './definitions'
 import { validateLabwareFiles, validateNewLabwareFile } from './validation'
-import { sameIdentity } from './compare'
-
-import type {
-  UncheckedLabwareFile,
-  DuplicateLabwareFile,
-  CheckedLabwareFile,
-  CustomLabwareListActionSource as ListSource,
-} from '@opentrons/app/src/redux/custom-labware/types'
-
-import type { BrowserWindow } from 'electron'
-import type { Action, Dispatch } from '../types'
-import {
-  addCustomLabwareFailure,
-  addNewLabwareName,
-  customLabwareList,
-  customLabwareListFailure,
-  updateConfigValue,
-} from '../config/actions'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 

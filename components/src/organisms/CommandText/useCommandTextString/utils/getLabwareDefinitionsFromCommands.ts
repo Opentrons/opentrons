@@ -1,10 +1,9 @@
 import { getLabwareDefURI } from '@opentrons/shared-data'
-
 import type {
   LabwareDefinition2,
-  RunTimeCommand,
   LoadLabwareRunTimeCommand,
   LoadLidRunTimeCommand,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 
 // Note: This is an O(n) operation.

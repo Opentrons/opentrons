@@ -1,9 +1,7 @@
-import * as React from 'react'
 import { Box, SIZE_6 } from '@opentrons/components'
-
+import type { Meta, Story } from '@storybook/react'
+import * as React from 'react'
 import { LegacyInputField as InputFieldComponent } from './LegacyInputField'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Library/Molecules/Forms/Input Field',

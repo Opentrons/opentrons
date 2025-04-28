@@ -1,14 +1,12 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { GripperReleaseLabware } from '../GripperReleaseLabware'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '/app/organisms/ErrorRecoveryFlows/__fixtures__'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
+import { GripperReleaseLabware } from '../GripperReleaseLabware'
 
 vi.mock('/app/assets/videos/error-recovery/Gripper_Release.webm', () => ({
   default: 'mocked-animation-path.webm',

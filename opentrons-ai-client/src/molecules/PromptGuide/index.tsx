@@ -1,15 +1,15 @@
-import { Trans, useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { Trans, useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 
 const LABWARE_LIBRARY_URL = 'https://labware.opentrons.com/'
 

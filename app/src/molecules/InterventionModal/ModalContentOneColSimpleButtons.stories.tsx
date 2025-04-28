@@ -1,6 +1,5 @@
-import { ModalContentOneColSimpleButtons as ModalContentOneColSimpleButtonsComponent } from './ModalContentOneColSimpleButtons'
-
 import type { Meta, StoryObj } from '@storybook/react'
+import { ModalContentOneColSimpleButtons as ModalContentOneColSimpleButtonsComponent } from './ModalContentOneColSimpleButtons'
 
 const meta: Meta<typeof ModalContentOneColSimpleButtonsComponent> = {
   title: 'App/Molecules/InterventionModal/ModalContentOneColSimpleButtons',

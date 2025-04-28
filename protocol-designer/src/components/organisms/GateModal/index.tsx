@@ -1,5 +1,3 @@
-import { Trans, useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -11,12 +9,13 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { Trans, useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
 } from '../../../analytics'
+import { LINK_BUTTON_STYLE } from '../../atoms'
 
 const PRIVACY_POLICY_URL = 'https://opentrons.com/privacy-policy'
 const EULA_URL = 'https://opentrons.com/eula'

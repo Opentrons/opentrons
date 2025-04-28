@@ -1,21 +1,21 @@
-import { useRef, useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import { DeckLabelSet } from '@opentrons/components'
+import type { DeckLabelProps } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
+  getModuleDef2,
   HEATERSHAKER_MODULE_TYPE,
   OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
-  getModuleDef2,
 } from '@opentrons/shared-data'
-import { getRobotType } from '../../../file-data/selectors'
-import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
   DeckSlotId,
   ModuleModel,
 } from '@opentrons/shared-data'
+import { useEffect, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { getRobotType } from '../../../file-data/selectors'
 
 interface ModuleLabelProps {
   moduleModel: ModuleModel

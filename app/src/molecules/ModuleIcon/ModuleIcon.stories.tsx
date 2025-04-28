@@ -1,17 +1,14 @@
-import type * as React from 'react'
-
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
-
-import { ModuleIcon } from './index'
-
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 import type { AttachedModule } from '/app/redux/modules/types'
+import type * as React from 'react'
+import { ModuleIcon } from './index'
 
 export default {
   title: 'App/Molecules/ModuleIcon',

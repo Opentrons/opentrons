@@ -1,17 +1,15 @@
-import ReactSelect, { components as reactSelectComponents } from 'react-select'
-
 import cx from 'classnames'
-
-import { Icon } from '../icons'
-import styles from './Select.module.css'
+import ReactSelect, { components as reactSelectComponents } from 'react-select'
 import type {
-  DropdownIndicatorProps,
-  Props as ReactSelectProps,
-  MenuProps,
-  StylesConfig,
   CSSObjectWithLabel,
+  DropdownIndicatorProps,
+  MenuProps,
+  Props as ReactSelectProps,
+  StylesConfig,
 } from 'react-select'
+import { Icon } from '../icons'
 import type { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
+import styles from './Select.module.css'
 
 export { reactSelectComponents }
 

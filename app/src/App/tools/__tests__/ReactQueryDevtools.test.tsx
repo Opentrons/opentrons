@@ -1,10 +1,9 @@
 import { screen } from '@testing-library/react'
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
 import { ReactQueryDevtools } from '/app/App/tools'
+import { i18n } from '/app/i18n'
 import { useFeatureFlag } from '/app/redux/config'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('react-query/devtools/development', () => ({
   ReactQueryDevtools: vi

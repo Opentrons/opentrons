@@ -1,24 +1,21 @@
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  JUSTIFY_CENTER,
+  RESPONSIVENESS,
   SPACING,
   StyledText,
-  JUSTIFY_CENTER,
   TEXT_ALIGN_CENTER,
-  RESPONSIVENESS,
 } from '@opentrons/components'
-
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import { getIsOnDevice } from '/app/redux/config'
-
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import { getIsOnDevice } from '/app/redux/config'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 export function LPCFatalError(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation(['labware_position_check', 'shared', 'branded'])

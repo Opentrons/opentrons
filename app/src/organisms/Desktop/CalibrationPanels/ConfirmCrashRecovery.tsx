@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
@@ -7,11 +5,12 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 export interface ConfirmCrashRecoveryProps {
   back: () => unknown

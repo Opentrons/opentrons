@@ -1,13 +1,12 @@
-import { connectionStore } from './store'
+import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
+import type mqtt from 'mqtt'
 import {
   sendDeserialized,
   sendDeserializedGenericError,
   sendDeserializedRefetch,
 } from './deserialize'
 import { notifyLog } from './notifyLog'
-
-import type mqtt from 'mqtt'
-import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
+import { connectionStore } from './store'
 
 /**
  * @property {number} qos: "Quality of Service", "at least once". Because we use React Query, which does not trigger

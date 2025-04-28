@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { createEmptyLiquidState } from '../utils'
+import { describe, expect, it } from 'vitest'
 import { makeContext, makeState } from '../fixtures'
+import { createEmptyLiquidState } from '../utils'
+
 describe('snapshot tests', () => {
   it('makeContext', () => {
     expect(makeContext()).toMatchSnapshot()

@@ -1,11 +1,10 @@
 import {
-  DIRECTION_COLUMN,
   COLORS,
-  SPACING,
+  DIRECTION_COLUMN,
   Flex,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
-
 import type { ReactNode } from 'react'
 
 interface LabeledValueProps {

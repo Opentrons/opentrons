@@ -1,5 +1,6 @@
-import { useCurrentProtocol } from './useCurrentProtocol'
 import type { RobotType } from '@opentrons/shared-data'
+import { useCurrentProtocol } from './useCurrentProtocol'
+
 interface ProtocolMetadata {
   author?: string
   lastUpdated?: number | null

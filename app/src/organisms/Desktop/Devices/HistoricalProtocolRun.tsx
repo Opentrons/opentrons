@@ -1,25 +1,25 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import type { RunData } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
   Box,
   COLORS,
+  CURSOR_POINTER,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_HIDDEN,
   SPACING,
-  LegacyStyledText,
-  CURSOR_POINTER,
 } from '@opentrons/components'
+import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { formatInterval } from '/app/transformations/commands'
 import { formatTimestamp } from '/app/transformations/runs'
-import { EMPTY_TIMESTAMP } from '/app/resources/runs'
-import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import { HistoricalProtocolRunDrawer as Drawer } from './HistoricalProtocolRunDrawer'
-import type { RunData } from '@opentrons/api-client'
+import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 
 const PROTOCOL_NAME_STYLE = css`
   overflow: ${OVERFLOW_HIDDEN};

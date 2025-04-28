@@ -1,25 +1,23 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import {
-  screen,
   fireEvent,
   renderHook,
+  screen,
   render as testingRender,
 } from '@testing-library/react'
-
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ManageTips, useDropTipFlowUtils } from '../ManageTips'
-import { RECOVERY_MAP } from '../../constants'
 import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
-import { SelectRecoveryOption } from '../SelectRecoveryOption'
-import { clickButtonLabeled } from '../../__tests__/util'
-
+import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import { mockRecoveryContentProps } from '../../__fixtures__'
+import { clickButtonLabeled } from '../../__tests__/util'
+import { RECOVERY_MAP } from '../../constants'
+import { ManageTips, useDropTipFlowUtils } from '../ManageTips'
+import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
 vi.mock('/app/organisms/DropTipWizardFlows')
 vi.mock('../SelectRecoveryOption')

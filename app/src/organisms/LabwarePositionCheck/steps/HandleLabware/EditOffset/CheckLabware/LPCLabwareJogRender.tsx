@@ -1,7 +1,3 @@
-import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -16,18 +12,18 @@ import {
   TEXT_ALIGN_CENTER,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
-
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
+import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
+import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import {
   selectActivePipette,
   selectIsSelectedLwTipRack,
   selectSelectedLwDef,
 } from '/app/redux/protocol-runs'
-
-import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
-import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 // TODO(jh, 03-12-25): Standardize viewboxes.
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'

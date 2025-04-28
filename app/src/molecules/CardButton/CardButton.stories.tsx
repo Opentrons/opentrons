@@ -4,9 +4,8 @@ import {
   SPACING,
   VIEWPORT,
 } from '@opentrons/components'
-import { CardButton as CardButtonComponent } from './index'
-
 import type { Meta, StoryObj } from '@storybook/react'
+import { CardButton as CardButtonComponent } from './index'
 
 const meta: Meta<typeof CardButtonComponent> = {
   title: 'ODD/Molecules/CardButton',

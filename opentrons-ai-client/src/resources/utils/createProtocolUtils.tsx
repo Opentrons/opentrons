@@ -1,4 +1,3 @@
-import startCase from 'lodash/startCase'
 import {
   getFlexNameConversion,
   getLabwareDisplayName,
@@ -6,18 +5,19 @@ import {
   splitLabwareDefURI,
 } from '@opentrons/shared-data'
 import type { PipetteName } from '@opentrons/shared-data'
+import startCase from 'lodash/startCase'
+import type { UseFormWatch } from 'react-hook-form'
 import { OTHER } from '../../organisms/ApplicationSection'
 import {
-  TWO_PIPETTES,
-  OPENTRONS_OT2,
-  OPENTRONS_FLEX,
   FLEX_GRIPPER,
   NO_PIPETTES,
+  OPENTRONS_FLEX,
+  OPENTRONS_OT2,
+  TWO_PIPETTES,
 } from '../../organisms/InstrumentsSection'
-import type { UseFormWatch } from 'react-hook-form'
 import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
-import { getOnlyLatestDefs } from './labware'
 import type { CreatePrompt } from '../types'
+import { getOnlyLatestDefs } from './labware'
 
 export function generatePromptPreviewProtocolFormatItems(
   watch: UseFormWatch<CreateProtocolFormData>,

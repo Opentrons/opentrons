@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -10,8 +8,8 @@ import {
   Divider,
   DropdownMenu,
   EmptySelectorButton,
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
   InputField,
   JUSTIFY_SPACE_BETWEEN,
@@ -24,21 +22,22 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+import type { DropdownOption } from '@opentrons/components'
+import type { TFunction } from 'i18next'
+import { useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
   ABSORBANCE_READER_MAX_WAVELENGTH_NM,
   ABSORBANCE_READER_MIN_WAVELENGTH_NM,
 } from '../../../../../../constants'
-import { maskToInteger } from '../../../../../../steplist/fieldLevel/processing'
-import { getFormErrorsMappedToField } from '../../utils'
-
-import type { Dispatch, SetStateAction } from 'react'
-import type { TFunction } from 'i18next'
-import type { DropdownOption } from '@opentrons/components'
 import type { FormData } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
 import type { InitializationMode } from '../../../../../../step-forms/types'
+import type { StepFormErrors } from '../../../../../../steplist'
+import { maskToInteger } from '../../../../../../steplist/fieldLevel/processing'
 import type { FieldProps, FieldPropsByName } from '../../types'
+import { getFormErrorsMappedToField } from '../../utils'
 import type { ErrorMappedToField } from '../../utils'
 
 const MAX_WAVELENGTHS = 6

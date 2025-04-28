@@ -1,13 +1,13 @@
-import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '/app/atoms/structure'
+import { Trans, useTranslation } from 'react-i18next'
 
 export interface ButtonProps {
   onClick?: () => unknown

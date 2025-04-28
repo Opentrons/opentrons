@@ -1,11 +1,8 @@
-import { it, describe, expect } from 'vitest'
-
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { ANY_LOCATION } from '@opentrons/api-client'
-
-import { getRelevantOffsets } from '../utils'
-
 import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
+import { getRelevantOffsets } from '../utils'
 
 describe('utils', () => {
   describe('getRelevantOffsets', () => {

@@ -1,17 +1,15 @@
+import type { Mount } from '@opentrons/components'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { when } from 'vitest-when'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { useChainLiveCommands, useRunStatuses } from '/app/resources/runs'
 import { mockThermocyclerGen2 } from '/app/redux/modules/__fixtures__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-
-import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
-
+import { useChainLiveCommands, useRunStatuses } from '/app/resources/runs'
 import type { ComponentProps } from 'react'
-import type { Mount } from '@opentrons/components'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ModuleWizardFlows')

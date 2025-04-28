@@ -1,10 +1,8 @@
-import { describe, expect, it, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
-import { DeckInfoLabelTextTag } from '..'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { DeckInfoLabelTextTag } from '..'
 
 const render = (props: ComponentProps<typeof DeckInfoLabelTextTag>) => {
   return renderWithProviders(<DeckInfoLabelTextTag {...props} />)[0]

@@ -1,6 +1,6 @@
-import { useState } from 'react'
 import axios from 'axios'
 import type { AxiosRequestConfig } from 'axios'
+import { useState } from 'react'
 
 interface UseApiCallResult<T> {
   data: T | null

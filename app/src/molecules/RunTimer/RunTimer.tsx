@@ -1,14 +1,12 @@
-import { useState } from 'react'
-
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import {
-  useInterval,
-  TYPOGRAPHY,
   LegacyStyledText,
+  TYPOGRAPHY,
+  useInterval,
 } from '@opentrons/components'
-
-import { formatInterval } from '/app/transformations/commands'
 import { EMPTY_TIMESTAMP } from '/app/resources/runs'
+import { formatInterval } from '/app/transformations/commands'
+import { useState } from 'react'
 import type { CSSProp } from 'styled-components'
 
 export function RunTimer({

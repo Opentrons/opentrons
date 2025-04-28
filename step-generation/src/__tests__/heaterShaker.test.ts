@@ -1,14 +1,13 @@
-import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { heaterShaker } from '../commandCreators'
-import { getModuleState } from '../robotStateSelectors'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
-
-import type { InvariantContext, RobotState, HeaterShakerArgs } from '../types'
+import { getModuleState } from '../robotStateSelectors'
+import type { HeaterShakerArgs, InvariantContext, RobotState } from '../types'
 
 vi.mock('../robotStateSelectors')
 

@@ -1,7 +1,6 @@
+import type { Meta, Story } from '@storybook/react'
 import * as React from 'react'
 import { PipetteSelect as PipetteSelectComponent } from './index'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Molecules/Pipette Select',

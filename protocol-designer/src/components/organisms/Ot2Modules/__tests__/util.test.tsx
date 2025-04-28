@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest'
 import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
-import { getModuleOnSlot } from '../util'
+import { describe, expect, it } from 'vitest'
 import type { ModuleOnDeck } from '../../../../step-forms'
+import { getModuleOnSlot } from '../util'
 
 describe('getModuleOnSlot', () => {
   it('should return false and module id', () => {

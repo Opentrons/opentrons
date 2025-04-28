@@ -1,5 +1,3 @@
-import cx from 'classnames'
-
 import {
   getModuleDisplayName,
   MAGNETIC_MODULE_V1,
@@ -8,13 +6,12 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-
-import { Icon } from '../icons'
+import type { DeckSlot, ModuleModel } from '@opentrons/shared-data'
+import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '../hardware-sim/Deck'
-import styles from './ModuleItem.module.css'
-
+import { Icon } from '../icons'
 import type { IconName } from '../icons'
-import type { ModuleModel, DeckSlot } from '@opentrons/shared-data'
+import styles from './ModuleItem.module.css'
 
 const FLIPPED_SLOTS = ['3', '6', '9']
 export interface ModuleProps {

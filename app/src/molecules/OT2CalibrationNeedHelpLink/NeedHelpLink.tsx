@@ -1,16 +1,15 @@
-import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  Link,
-  Icon,
-  COLORS,
-  TYPOGRAPHY,
-  SIZE_1,
   ALIGN_CENTER,
+  COLORS,
+  Flex,
+  Icon,
+  Link,
+  SIZE_1,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-
 import type { ComponentProps } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const SUPPORT_PAGE_URL = 'https://support.opentrons.com/s/ot2-calibration'
 

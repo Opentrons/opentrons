@@ -1,7 +1,3 @@
-import { useEffect, useRef, useState } from 'react'
-import get from 'lodash/get'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   Btn,
@@ -16,23 +12,31 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import get from 'lodash/get'
+import { useEffect, useRef, useState } from 'react'
+import type { ComponentType } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { analyticsEvent } from '../../../../analytics/actions'
 import {
   FORM_ERRORS_EVENT,
   FORM_WARNINGS_EVENT,
 } from '../../../../analytics/constants'
+import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
 import {
-  LINK_BUTTON_STYLE,
   LINE_CLAMP_TEXT_STYLE,
+  LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '../../../../components/atoms'
 import { FormAlerts } from '../../../../components/organisms'
+import { AdvancedSettingsUpdateConfirmationModal } from '../../../../components/organisms/AdvancedSettingsUpdateConfirmationModal'
 import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import { RenameStepModal } from '../../../../components/organisms/RenameStepModal'
 import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import { getEnableLiquidClasses } from '../../../../feature-flags/selectors'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
 import { stepIconsByType } from '../../../../form-types'
+import type { FormData, StepType } from '../../../../form-types'
 import {
   getAdditionalEquipmentEntities,
   getCurrentFormIsPresaved,
@@ -42,13 +46,14 @@ import {
   getPipetteEntities,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
+import type { FormWarningType } from '../../../../steplist'
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import { updateFieldsForLiquidClass } from '../../../../steplist/formLevel/handleFormChange/utils'
 import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
 import {
   hoverSelection,
   selectDropdownItem,
 } from '../../../../ui/steps/actions/actions'
-import { AdvancedSettingsUpdateConfirmationModal } from '../../../../components/organisms/AdvancedSettingsUpdateConfirmationModal'
 import { useAbsorbanceReaderCommandType } from './hooks'
 import {
   AbsorbanceReaderTools,
@@ -62,25 +67,19 @@ import {
   TemperatureTools,
   ThermocyclerTools,
 } from './StepTools'
-import {
-  getSaveStepSnackbarText,
-  getVisibleFormErrors,
-  getVisibleFormWarnings,
-  capitalizeFirstLetter,
-  getIsErrorOnCurrentPage,
-} from './utils'
-
-import type { ComponentType } from 'react'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FormData, StepType } from '../../../../form-types'
-import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
-import type { FormWarningType } from '../../../../steplist'
 import type {
   FieldPropsByName,
   FocusHandlers,
   LiquidHandlingTab,
   StepFormProps,
 } from './types'
+import {
+  capitalizeFirstLetter,
+  getIsErrorOnCurrentPage,
+  getSaveStepSnackbarText,
+  getVisibleFormErrors,
+  getVisibleFormWarnings,
+} from './utils'
 
 type StepFormMap = {
   [K in StepType]?: ComponentType<StepFormProps> | null

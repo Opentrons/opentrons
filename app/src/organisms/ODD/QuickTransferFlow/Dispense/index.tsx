@@ -1,19 +1,16 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
-
 import { MediumButton } from '/app/atoms/buttons'
-import { DispenseSettingDetail } from './DispenseSettingDetail'
-import { DispenseSettingItem } from './DispenseSettingItem'
-import { useDispenseSettingsConfig } from './hooks/useDispenseSettingsConfig'
-
+import { useState } from 'react'
 import type { Dispatch } from 'react'
+import { useTranslation } from 'react-i18next'
 import type {
   DispenseSettingOption,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
+import { DispenseSettingDetail } from './DispenseSettingDetail'
+import { DispenseSettingItem } from './DispenseSettingItem'
+import { useDispenseSettingsConfig } from './hooks/useDispenseSettingsConfig'
 
 const PADDING_TOP_FOR_NAV = '12rem'
 

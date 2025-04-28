@@ -1,12 +1,10 @@
-import { describe, it, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
-
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { StepsInfo } from '../StepsInfo'
-
-import type { ComponentProps } from 'react'
 import type { InfoScreen } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, it, vi } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
+import { StepsInfo } from '../StepsInfo'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()

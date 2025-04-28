@@ -1,4 +1,3 @@
-import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -8,18 +7,18 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_FLEX_START,
   JUSTIFY_FLEX_END,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  RESPONSIVENESS,
   SPACING,
   StyledText,
   TYPOGRAPHY,
-  RESPONSIVENESS,
-  Link,
 } from '@opentrons/components'
-
-import type { MouseEventHandler } from 'react'
 import type { IconProps, StyleProps } from '@opentrons/components'
+import type { MouseEventHandler } from 'react'
+import { css } from 'styled-components'
 
 type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 

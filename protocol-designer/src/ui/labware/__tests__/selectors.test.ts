@@ -1,4 +1,3 @@
-import { describe, expect, it, beforeEach } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -10,18 +9,18 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
-  getDisposalOptions,
-  getLabwareOptions,
-  _sortLabwareDropdownOptions,
-} from '../selectors'
-import {
-  fixture_tiprack_1000_ul,
-  fixture_tiprack_10_ul,
   fixture_96_plate,
+  fixture_tiprack_10_ul,
+  fixture_tiprack_1000_ul,
   fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
-
 import type { LabwareEntities } from '@opentrons/step-generation'
+import { beforeEach, describe, expect, it } from 'vitest'
+import {
+  _sortLabwareDropdownOptions,
+  getDisposalOptions,
+  getLabwareOptions,
+} from '../selectors'
 
 describe('labware selectors', () => {
   let names: Record<string, string>

@@ -1,15 +1,12 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
-
 import { getAllLiquidClassDefs } from '@opentrons/shared-data'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { checkLiquidClassCompatibility } from '../utils'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { SelectLiquidClass } from '../SelectLiquidClass'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { SelectLiquidClass } from '../SelectLiquidClass'
+import { checkLiquidClassCompatibility } from '../utils'
 
 vi.mock('../utils')
 vi.mock('/app/organisms/ToasterOven')

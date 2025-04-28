@@ -1,15 +1,12 @@
-import { saveAs } from 'file-saver'
-import { useTranslation, Trans } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -17,21 +14,21 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import { TertiaryButton } from '/app/atoms/buttons'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '/app/organisms/Desktop/Devices/hooks'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
-  useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
+  useTrackEvent,
 } from '/app/redux/analytics'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-
+import { saveAs } from 'file-saver'
 import type { MouseEventHandler } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 // TODO(bc, 2022-02-08): replace with support article when available
 const FLEX_CALIBRATION_SUPPORT_URL = 'https://support.opentrons.com'

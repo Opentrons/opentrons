@@ -1,6 +1,4 @@
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
+import type { Run, StoredLabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
@@ -8,18 +6,17 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
+import { sortRunRecordOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore/sortRunRecordOffsets'
+import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
 import {
-  updateLPC,
   LPC_STEPS,
   OFFSETS_SOURCE_INITIALIZING,
+  updateLPC,
 } from '/app/redux/protocol-runs'
-import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
-import { sortRunRecordOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore/sortRunRecordOffsets'
-
-import type { Run, StoredLabwareOffset } from '@opentrons/api-client'
-import type { LPCWizardState, LPCLabwareInfo } from '/app/redux/protocol-runs'
+import type { LPCLabwareInfo, LPCWizardState } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 export interface UseLPCInitialStateProps {
   runId: string | null

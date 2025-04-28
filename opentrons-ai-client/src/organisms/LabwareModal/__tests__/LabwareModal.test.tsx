@@ -1,10 +1,10 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { FormProvider, useForm } from 'react-hook-form'
+import { describe, expect, it, vi } from 'vitest'
 import type { DisplayLabware } from '..'
 import { LabwareModal } from '..'
-import { FormProvider, useForm } from 'react-hook-form'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../i18n'
 
 let displaModalValue = false
 const setDisplayModalMock = vi.fn()

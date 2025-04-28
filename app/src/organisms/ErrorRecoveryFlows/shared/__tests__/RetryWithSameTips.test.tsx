@@ -1,15 +1,13 @@
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
-
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RetryWithSameTips } from '../RetryWithSameTips'
-import { RECOVERY_MAP } from '../../constants'
-import { clickButtonLabeled } from '../../__tests__/util'
-
 import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
+import { mockRecoveryContentProps } from '../../__fixtures__'
+import { clickButtonLabeled } from '../../__tests__/util'
+import { RECOVERY_MAP } from '../../constants'
+import { RetryWithSameTips } from '../RetryWithSameTips'
 
 const render = (props: ComponentProps<typeof RetryWithSameTips>) => {
   return renderWithProviders(<RetryWithSameTips {...props} />, {

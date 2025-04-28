@@ -1,12 +1,10 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-
-import * as selectors from '../selectors'
-import * as Constants from '../constants'
-import { mockReachableRobot } from '../../discovery/__fixtures__'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { HEALTH_STATUS_NOT_OK } from '../../discovery'
+import { mockReachableRobot } from '../../discovery/__fixtures__'
 import * as discoSelectors from '../../discovery/selectors'
-
 import type { State } from '../../types'
+import * as Constants from '../constants'
+import * as selectors from '../selectors'
 
 vi.mock('../../discovery/selectors')
 

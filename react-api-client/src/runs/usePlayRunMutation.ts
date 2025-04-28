@@ -1,14 +1,13 @@
-import { RUN_ACTION_TYPE_PLAY, createRunAction } from '@opentrons/api-client'
+import { createRunAction, RUN_ACTION_TYPE_PLAY } from '@opentrons/api-client'
+import type { HostConfig, RunAction } from '@opentrons/api-client'
+import type { AxiosError } from 'axios'
 import { useMutation } from 'react-query'
-import { useHost } from '../api'
-
 import type {
-  UseMutationResult,
   UseMutateFunction,
   UseMutationOptions,
+  UseMutationResult,
 } from 'react-query'
-import type { AxiosError } from 'axios'
-import type { HostConfig, RunAction } from '@opentrons/api-client'
+import { useHost } from '../api'
 
 export type UsePlayRunMutationResult = UseMutationResult<
   RunAction,

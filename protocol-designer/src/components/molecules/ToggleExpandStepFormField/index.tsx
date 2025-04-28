@@ -1,7 +1,7 @@
 import {
   ALIGN_CENTER,
-  COLORS,
   Check,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -9,10 +9,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
-import { InputStepFormField } from '../InputStepFormField'
-import { ToggleButton } from '../../atoms'
 import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
+import { ToggleButton } from '../../atoms'
+import { InputStepFormField } from '../InputStepFormField'
 
 interface ToggleExpandStepFormFieldProps extends FieldProps {
   title: string

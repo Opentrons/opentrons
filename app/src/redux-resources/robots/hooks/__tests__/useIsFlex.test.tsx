@@ -1,16 +1,13 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
+import { renderHook } from '@testing-library/react'
+import { getRobotModelByName } from '/app/redux/discovery'
+import type { FunctionComponent, ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from 'react-query'
-
-import { getRobotModelByName } from '/app/redux/discovery'
-
-import { useIsFlex } from '..'
-
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { useIsFlex } from '..'
 
 vi.mock('/app/redux/discovery/selectors')
 

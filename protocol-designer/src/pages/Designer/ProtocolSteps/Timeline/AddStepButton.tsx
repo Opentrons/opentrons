@@ -1,10 +1,3 @@
-import { last } from 'lodash'
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -19,9 +12,9 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
+  Tooltip,
   TOOLTIP_FIXED,
   TOOLTIP_TOP,
-  Tooltip,
   useHoverTooltip,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -33,34 +26,38 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
+import { last } from 'lodash'
+import { useState } from 'react'
+import type { MouseEvent } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import type { ThunkDispatch } from 'redux-thunk'
+import { css } from 'styled-components'
+import {
+  CLOSE_UNSAVED_STEP_FORM,
+  ConfirmDeleteModal,
+  getMainPagePortalEl,
+} from '../../../../components/organisms'
 import { OFFDECK } from '../../../../constants'
 import { getEnableComment } from '../../../../feature-flags/selectors'
 import {
   getInitialRobotState,
   getRobotStateTimeline,
 } from '../../../../file-data/selectors'
+import type { StepType } from '../../../../form-types'
 import {
-  CLOSE_UNSAVED_STEP_FORM,
-  ConfirmDeleteModal,
-  getMainPagePortalEl,
-} from '../../../../components/organisms'
-import {
-  selectors as stepFormSelectors,
   getIsModuleOnDeck,
+  selectors as stepFormSelectors,
 } from '../../../../step-forms'
 import { getLabwareEntities } from '../../../../step-forms/selectors'
+import type { BaseState } from '../../../../types'
 import {
-  actions as stepsActions,
   getIsMultiSelectMode,
+  actions as stepsActions,
 } from '../../../../ui/steps'
 import { getIsAdapterFromDef } from '../../../../utils'
 import { AddStepOverflowButton } from './AddStepOverflowButton'
-
-import type { MouseEvent } from 'react'
-import type { ThunkDispatch } from 'redux-thunk'
-import type { BaseState } from '../../../../types'
-import type { StepType } from '../../../../form-types'
 
 interface AddStepButtonProps {
   hasText: boolean

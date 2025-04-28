@@ -1,7 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useRef } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useDrop, useDrag } from 'react-dnd'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -13,29 +9,31 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getCutoutIdFromAddressableArea } from '@opentrons/shared-data'
-
+import type {
+  AddressableAreaName,
+  CutoutId,
+  DeckDefinition,
+  Dimensions,
+  ModuleType,
+} from '@opentrons/shared-data'
+import { useRef } from 'react'
+import { useDrag, useDrop } from 'react-dnd'
+import type { DropTargetMonitor } from 'react-dnd'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { DND_TYPES } from '../../../../constants'
+import { selectors as labwareDefSelectors } from '../../../../labware-defs'
+import { moveDeckItem } from '../../../../labware-ingred/actions'
+import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
 } from '../../../../utils/labwareModuleCompatibility'
-import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
-import { moveDeckItem } from '../../../../labware-ingred/actions'
-import { selectors as labwareDefSelectors } from '../../../../labware-defs'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { DND_TYPES } from '../../../../constants'
 import { DECK_CONTROLS_STYLE } from '../constants'
+import type { DroppedItem, SharedControlsType } from '../types'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
-
-import type { DropTargetMonitor } from 'react-dnd'
-import type {
-  Dimensions,
-  ModuleType,
-  DeckDefinition,
-  CutoutId,
-  AddressableAreaName,
-} from '@opentrons/shared-data'
-import type { SharedControlsType, DroppedItem } from '../types'
 
 interface SlotControlsProps extends SharedControlsType {
   stagingAreaAddressableAreas: AddressableAreaName[]

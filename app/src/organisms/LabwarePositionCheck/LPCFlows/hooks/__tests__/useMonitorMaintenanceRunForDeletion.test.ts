@@ -1,7 +1,7 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
-import { useMonitorMaintenanceRunForDeletion } from '../useMonitorMaintenanceRunForDeletion'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useMonitorMaintenanceRunForDeletion } from '../useMonitorMaintenanceRunForDeletion'
 
 vi.mock('/app/resources/maintenance_runs')
 

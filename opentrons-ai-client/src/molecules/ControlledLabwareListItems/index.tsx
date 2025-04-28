@@ -8,9 +8,9 @@ import {
   SPACING,
 } from '@opentrons/components'
 import type { DropdownBorder } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { Controller, useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { LabwareDiagram } from '../../molecules/LabwareDiagram'
 import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
 import { LABWARES_FIELD_NAME } from '../../organisms/LabwareLiquidsSection'

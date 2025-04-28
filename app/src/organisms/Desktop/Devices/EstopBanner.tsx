@@ -1,22 +1,20 @@
-import { useTranslation } from 'react-i18next'
+import type { EstopState } from '@opentrons/api-client'
 import {
-  Btn,
   Banner,
+  Btn,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import {
+  LOGICALLY_ENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
-  LOGICALLY_ENGAGED,
   useEstopContext,
 } from '/app/organisms/EmergencyStop'
-
-import type { EstopState } from '@opentrons/api-client'
+import { useTranslation } from 'react-i18next'
 
 interface EstopBannerProps {
   status?: EstopState

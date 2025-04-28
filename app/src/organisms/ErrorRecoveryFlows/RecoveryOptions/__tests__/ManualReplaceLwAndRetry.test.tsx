@@ -1,12 +1,10 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ManualReplaceLwAndRetry } from '../ManualReplaceLwAndRetry'
-import { RECOVERY_MAP } from '../../constants'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { RECOVERY_MAP } from '../../constants'
+import { ManualReplaceLwAndRetry } from '../ManualReplaceLwAndRetry'
 
 vi.mock('../../shared', async importOriginal => {
   const mod = (await importOriginal()) as any

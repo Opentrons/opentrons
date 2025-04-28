@@ -1,6 +1,6 @@
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import last from 'lodash/last'
 import { Tick } from './Tick'
-import type { RunTimeCommand } from '@opentrons/shared-data'
 
 // percent of the entire analysis that two individual
 // ticks could appear within before being grouped

@@ -1,5 +1,3 @@
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -13,9 +11,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
-import type { ComponentProps } from 'react'
 import type { IconName } from '@opentrons/components'
+import type { ComponentProps } from 'react'
+import { css } from 'styled-components'
 
 interface FloatingActionButtonProps extends ComponentProps<typeof Btn> {
   buttonText: string

@@ -1,13 +1,11 @@
+import type { ReactNode } from 'react'
 import { css } from 'styled-components'
-
-import { SPACING, RESPONSIVENESS } from '../../ui-style-constants'
-import { ListTable } from '../../atoms/ListTable'
 import { StyledText } from '../../atoms'
+import { ListTable } from '../../atoms/ListTable'
+import type { ListTableProps } from '../../atoms/ListTable'
 import { Flex } from '../../primitives'
 import { DIRECTION_COLUMN } from '../../styles'
-
-import type { ReactNode } from 'react'
-import type { ListTableProps } from '../../atoms/ListTable'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 export interface TextListTableContentProps {
   /* The text that appears above the table. */

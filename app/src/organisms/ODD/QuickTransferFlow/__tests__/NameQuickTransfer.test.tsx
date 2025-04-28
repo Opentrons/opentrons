@@ -1,12 +1,10 @@
+import type { InputField } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { NameQuickTransfer } from '../NameQuickTransfer'
-
 import type { ComponentProps } from 'react'
-import type { InputField } from '@opentrons/components'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { NameQuickTransfer } from '../NameQuickTransfer'
 
 vi.mock('../utils')
 

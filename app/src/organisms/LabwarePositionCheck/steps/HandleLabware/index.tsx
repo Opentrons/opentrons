@@ -1,14 +1,12 @@
-import { useSelector } from 'react-redux'
-
+import { EditOffset } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import {
   HANDLE_LW_SUBSTEP,
   selectCurrentSubstep,
 } from '/app/redux/protocol-runs'
-import { LPCLabwareList } from './LPCLabwareList'
+import { useSelector } from 'react-redux'
 import { LPCLabwareDetails } from './LPCLabwareDetails'
-import { EditOffset } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import { LPCLabwareList } from './LPCLabwareList'
 
 export function HandleLabware(props: LPCWizardContentProps): JSX.Element {
   return <HandleLabwareContent {...props} />

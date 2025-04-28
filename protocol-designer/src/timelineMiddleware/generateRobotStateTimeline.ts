@@ -1,16 +1,16 @@
+import type { CutoutId } from '@opentrons/shared-data'
 import {
-  dropTipInTrash,
-  dropTipInWasteChute,
+  commandCreatorsTimeline,
   curryCommandCreator,
   dropTip,
-  reduceCommandCreators,
-  commandCreatorsTimeline,
+  dropTipInTrash,
+  dropTipInWasteChute,
   getPipetteIdFromCCArgs,
+  reduceCommandCreators,
 } from '@opentrons/step-generation'
+import type * as StepGeneration from '@opentrons/step-generation'
 import { commandCreatorFromStepArgs } from '../file-data/helpers'
 import type { StepArgsAndErrorsById } from '../steplist/types'
-import type * as StepGeneration from '@opentrons/step-generation'
-import type { CutoutId } from '@opentrons/shared-data'
 
 export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById

@@ -1,14 +1,13 @@
-import { when } from 'vitest-when'
-import { it, describe, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import { mockRunTimeParameterData } from '../../__fixtures__'
 import { ViewOnlyParameters } from '../ViewOnlyParameters'
-
-import type { ComponentProps } from 'react'
 
 vi.mock('/app/resources/runs')
 vi.mock('/app/organisms/ToasterOven')

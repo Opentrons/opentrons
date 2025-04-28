@@ -1,15 +1,15 @@
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
-import { Substep } from './Substep'
-import { MultichannelSubstep } from './MultichannelSubstep'
-import type {
-  SourceDestSubstepItem,
-  SubstepIdentifier,
-} from '../../../../steplist'
 import { useSelector } from 'react-redux'
 import {
   getAdditionalEquipment,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
+import type {
+  SourceDestSubstepItem,
+  SubstepIdentifier,
+} from '../../../../steplist'
+import { MultichannelSubstep } from './MultichannelSubstep'
+import { Substep } from './Substep'
 
 interface PipettingSubstepsProps {
   substeps: SourceDestSubstepItem

@@ -1,15 +1,14 @@
-import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
   JUSTIFY_FLEX_END,
-  PrimaryButton,
-  SPACING,
   LegacyStyledText,
   Modal,
+  PrimaryButton,
+  SPACING,
 } from '@opentrons/components'
-
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { useTranslation } from 'react-i18next'
 
 export const UNINSTALL_APP_URL =
   'https://support.opentrons.com/s/article/Uninstall-the-Opentrons-App'

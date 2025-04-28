@@ -1,8 +1,7 @@
+import type { FormikErrors } from 'formik'
+import type { LabwareFields } from './fields'
 import { labwareFormSchemaBaseObject } from './labwareFormSchema'
 import { getLabwareName } from './utils'
-
-import type { LabwareFields } from './fields'
-import type { FormikErrors } from 'formik'
 
 export const FORM_LEVEL_ERRORS = 'FORM_LEVEL_ERRORS'
 export const WELLS_OUT_OF_BOUNDS_X = 'WELLS_OUT_OF_BOUNDS_X'

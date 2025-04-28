@@ -1,14 +1,14 @@
 import {
-  LABWAREV2_DO_NOT_LIST,
-  RETIRED_LABWARE,
   getAllDefinitions as _getAllDefinitions,
   getLabwareDefURI,
+  LABWAREV2_DO_NOT_LIST,
+  RETIRED_LABWARE,
 } from '@opentrons/shared-data'
-import { groupBy } from 'lodash'
 import type {
   LabwareDefByDefURI,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import { groupBy } from 'lodash'
 
 let _definitions: LabwareDefByDefURI | null = null
 

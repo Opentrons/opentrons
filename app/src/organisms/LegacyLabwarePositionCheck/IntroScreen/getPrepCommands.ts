@@ -1,11 +1,11 @@
 import {
+  ABSORBANCE_READER_TYPE,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
-
 import type {
+  AbsorbanceReaderOpenLidCreateCommand,
   CompletedProtocolAnalysis,
   CreateCommand,
   HeaterShakerCloseLatchCreateCommand,
@@ -14,7 +14,6 @@ import type {
   RunTimeCommand,
   SetupRunTimeCommand,
   TCOpenLidCreateCommand,
-  AbsorbanceReaderOpenLidCreateCommand,
 } from '@opentrons/shared-data'
 
 type LPCPrepCommand =

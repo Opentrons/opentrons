@@ -1,8 +1,7 @@
+import type { ComponentProps } from 'react'
 import { SimpleWizardBodyContainer } from './SimpleWizardBodyContainer'
 import { SimpleWizardBodyContent } from './SimpleWizardBodyContent'
 import { SimpleWizardInProgressBody } from './SimpleWizardInProgressBody'
-
-import type { ComponentProps } from 'react'
 
 export {
   SimpleWizardBodyContainer,

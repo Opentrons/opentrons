@@ -1,26 +1,23 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { act, fireEvent, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-
 import { COLORS } from '@opentrons/components'
+import type { Chip } from '@opentrons/components'
 import {
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
-
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
-import { useFeatureFlag } from '/app/redux/config'
-import { ProtocolCard } from '../ProtocolCard'
-
-import type { ComponentProps } from 'react'
-import type { NavigateFunction } from 'react-router-dom'
-import type { UseQueryResult } from 'react-query'
 import type {
   CompletedProtocolAnalysis,
   ProtocolResource,
 } from '@opentrons/shared-data'
-import type { Chip } from '@opentrons/components'
+import { act, fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useFeatureFlag } from '/app/redux/config'
+import type { ComponentProps } from 'react'
+import type { UseQueryResult } from 'react-query'
+import { MemoryRouter } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ProtocolCard } from '../ProtocolCard'
 
 const mockNavigate = vi.fn()
 

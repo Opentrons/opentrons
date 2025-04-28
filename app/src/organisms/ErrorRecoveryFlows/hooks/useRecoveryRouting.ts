@@ -1,7 +1,5 @@
 import { useState } from 'react'
-
 import { RECOVERY_MAP } from '../constants'
-
 import type { IRecoveryMap, RecoveryRoute, ValidDropTipSubMap } from '../types'
 
 // Utils for getting/setting the current submap. See useRecoveryRouting.

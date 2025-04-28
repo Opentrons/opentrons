@@ -1,18 +1,17 @@
+import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-
-import { Flex, Divider, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import {
+  getEnablePartialTipSupport,
+  getEnableReturnTip,
+} from '../../../../../../feature-flags/selectors'
+import type { FormData } from '../../../../../../form-types'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
-import {
-  getEnablePartialTipSupport,
-  getEnableReturnTip,
-} from '../../../../../../feature-flags/selectors'
-
+import type { StepFormErrors } from '../../../../../../steplist'
 import {
   ChangeTipField,
   DropTipField,
@@ -26,10 +25,8 @@ import {
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
-
 import type { FieldPropsByName } from '../../types'
-import type { FormData } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
+import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 interface FirstStepMoveLiquidToolsProps {
   propsForFields: FieldPropsByName

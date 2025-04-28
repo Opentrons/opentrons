@@ -1,7 +1,7 @@
 /** Ensure that the deck schema itself functions as intended,
  *  and that all v4 protocol fixtures will validate */
-import Ajv from 'ajv'
 import path from 'path'
+import Ajv from 'ajv'
 import glob from 'glob'
 import { describe, expect, it } from 'vitest'
 import deckSchema from '../../deck/schemas/3.json'

@@ -1,12 +1,11 @@
 import { CONNECTABLE } from '../discovery'
-import {
-  RESTART_PENDING_STATUS,
-  RESTART_IN_PROGRESS_STATUS,
-  RESTART_SUCCEEDED_STATUS,
-} from './constants'
-
 import type { ConnectivityStatus } from '../discovery/types'
 import type { State } from '../types'
+import {
+  RESTART_IN_PROGRESS_STATUS,
+  RESTART_PENDING_STATUS,
+  RESTART_SUCCEEDED_STATUS,
+} from './constants'
 import type {
   PerRobotAdminState,
   ResetConfigOption,

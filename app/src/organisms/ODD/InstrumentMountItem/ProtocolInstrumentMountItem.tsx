@@ -1,6 +1,4 @@
-import { useState, useMemo } from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import type { InstrumentData } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -17,24 +15,24 @@ import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-
+import type {
+  GripperModel,
+  LoadedPipette,
+  PipetteName,
+} from '@opentrons/shared-data'
 import { SmallButton } from '/app/atoms/buttons'
 import {
   useGripperDisplayName,
   usePipetteNameSpecs,
 } from '/app/local-resources/instruments'
-import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
-import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-
-import type { MouseEventHandler } from 'react'
-import type { InstrumentData } from '@opentrons/api-client'
-import type {
-  GripperModel,
-  PipetteName,
-  LoadedPipette,
-} from '@opentrons/shared-data'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import type { Mount } from '/app/redux/pipettes/types'
+import { useMemo, useState } from 'react'
+import type { MouseEventHandler } from 'react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 export const MountItem = styled.div<{ isReady: boolean }>`
   display: flex;

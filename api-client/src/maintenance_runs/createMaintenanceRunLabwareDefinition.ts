@@ -1,12 +1,11 @@
-import { POST, request } from '../request'
-
-import type { ResponsePromise } from '../request'
-import type { HostConfig } from '../types'
-import type { LabwareDefinitionSummary } from './types'
 import type {
   LabwareDefinition2,
   LabwareDefinition3,
 } from '@opentrons/shared-data'
+import { POST, request } from '../request'
+import type { ResponsePromise } from '../request'
+import type { HostConfig } from '../types'
+import type { LabwareDefinitionSummary } from './types'
 
 export function createMaintenanceRunLabwareDefinition(
   config: HostConfig,

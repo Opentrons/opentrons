@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next'
 import { CategorizedStepContent } from '/app/molecules/InterventionModal'
+import { useTranslation } from 'react-i18next'
 import type { RecoveryContentProps } from '../types'
 
 export function FailedStepNextStep({

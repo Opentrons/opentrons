@@ -1,17 +1,14 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
-
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FLOWS } from '../constants'
 import { DetachProbe } from '../DetachProbe'
-
-import type { ComponentProps } from 'react'
 
 vi.mock('/app/molecules/InProgressModal/InProgressModal')
 

@@ -1,10 +1,9 @@
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
-import { describe, it, expect, beforeEach } from 'vitest'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { renderWithProviders } from '../../testing/utils'
 import { ModalShell } from '../ModalShell'
-
-import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof ModalShell>) => {
   return renderWithProviders(<ModalShell {...props} />)

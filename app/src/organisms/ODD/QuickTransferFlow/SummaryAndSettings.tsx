@@ -1,14 +1,10 @@
-import { useState, useReducer } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { useQueryClient } from 'react-query'
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  COLORS,
-  POSITION_FIXED,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  POSITION_FIXED,
+  SPACING,
   Tabs,
 } from '@opentrons/components'
 import {
@@ -16,28 +12,31 @@ import {
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import {
-  ANALYTICS_QUICK_TRANSFER_TIME_TO_CREATE,
-  ANALYTICS_QUICK_TRANSFER_SAVE_FOR_LATER,
-  ANALYTICS_QUICK_TRANSFER_RUN_NOW,
-} from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import type { SmallButton } from '/app/atoms/buttons'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import {
+  ANALYTICS_QUICK_TRANSFER_RUN_NOW,
+  ANALYTICS_QUICK_TRANSFER_SAVE_FOR_LATER,
+  ANALYTICS_QUICK_TRANSFER_TIME_TO_CREATE,
+} from '/app/redux/analytics'
 import { useFeatureFlag } from '/app/redux/config'
-import { Overview } from './Overview'
-import { TipManagement } from './TipManagement'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useReducer, useState } from 'react'
+import type { ComponentProps } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
+import { useNavigate } from 'react-router-dom'
 import { Aspirate } from './Aspirate'
 import { Dispense } from './Dispense'
+import { Overview } from './Overview'
 import { QuickTransferAdvancedSettings } from './QuickTransferAdvancedSettings'
-import { SaveOrRunModal } from './SaveOrRunModal'
-import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
-import { getInitialSummaryState, createQuickTransferFile } from './utils'
 import { quickTransferSummaryReducer } from './reducers'
-
-import type { ComponentProps } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import { SaveOrRunModal } from './SaveOrRunModal'
+import { TipManagement } from './TipManagement'
 import type { QuickTransferWizardState } from './types'
+import { createQuickTransferFile, getInitialSummaryState } from './utils'
+import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 interface SummaryAndSettingsProps {
   exitButtonProps: ComponentProps<typeof SmallButton>

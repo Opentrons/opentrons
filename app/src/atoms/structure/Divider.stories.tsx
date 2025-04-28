@@ -3,12 +3,12 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Divider as DividerComponent } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
+import { Divider as DividerComponent } from './index'
 
 const meta: Meta<typeof DividerComponent> = {
   title: 'App/Atoms/Divider',

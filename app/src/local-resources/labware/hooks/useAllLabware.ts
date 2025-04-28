@@ -1,7 +1,7 @@
-import { useSelector } from 'react-redux'
 import { getValidCustomLabware } from '/app/redux/custom-labware'
+import { useSelector } from 'react-redux'
+import type { LabwareDefAndDate, LabwareFilter, LabwareSort } from '../types'
 import { getAllDefinitions } from '../utils'
-import type { LabwareSort, LabwareFilter, LabwareDefAndDate } from '../types'
 
 // labware to filter out from the labware tab of the desktop app
 // TODO (sb:1/14/25) remove evotips from blocklist before public launch

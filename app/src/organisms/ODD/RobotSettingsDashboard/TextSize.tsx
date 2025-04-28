@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -16,7 +13,8 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 import type { SetSettingOption } from './types'
 
 interface RectProps {

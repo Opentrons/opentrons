@@ -1,12 +1,11 @@
-import { Box } from '../primitives'
-import { SPACING } from '../ui-style-constants'
+import type { MouseEventHandler, ReactNode } from 'react'
 import { COLORS } from '../helix-design-system'
+import type { IconProps } from '../icons'
+import { Box } from '../primitives'
+import type { StyleProps } from '../primitives'
+import { SPACING } from '../ui-style-constants'
 import { ModalHeader } from './ModalHeader'
 import { ModalShell } from './ModalShell'
-
-import type { MouseEventHandler, ReactNode } from 'react'
-import type { IconProps } from '../icons'
-import type { StyleProps } from '../primitives'
 import type { Position } from './ModalShell'
 
 type ModalType = 'info' | 'warning' | 'error'

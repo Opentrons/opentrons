@@ -1,6 +1,3 @@
-import { useRef, useState, memo, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   Box,
@@ -17,9 +14,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+import { memo, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface SetWifiCredProps {
   password: string

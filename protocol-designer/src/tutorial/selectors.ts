@@ -1,16 +1,16 @@
-import { createSelector } from 'reselect'
 import {
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
-import {
-  getUnsavedForm,
-  getAdditionalEquipmentEntities,
-} from '../step-forms/selectors'
 import isEmpty from 'lodash/isEmpty'
-import type { BaseState, Selector } from '../types'
+import { createSelector } from 'reselect'
 import type { HintKey } from '.'
+import {
+  getAdditionalEquipmentEntities,
+  getUnsavedForm,
+} from '../step-forms/selectors'
+import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
+import type { BaseState, Selector } from '../types'
 
 const rootSelector = (state: BaseState): BaseState['tutorial'] => state.tutorial
 

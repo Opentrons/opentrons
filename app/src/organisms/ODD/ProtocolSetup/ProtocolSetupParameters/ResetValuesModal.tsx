@@ -1,20 +1,17 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
-
+import type { RunTimeParameter } from '@opentrons/shared-data'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-
-import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { useTranslation } from 'react-i18next'
 
 interface ResetValuesModalProps {
   runTimeParametersOverrides: RunTimeParameter[]

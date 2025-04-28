@@ -1,20 +1,18 @@
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { ReactNode } from 'react'
 import { css } from 'styled-components'
-
-import { RobotCoordsForeignDiv } from '../Deck'
+import { COLORS } from '../../helix-design-system'
+import { Box, Flex, Text } from '../../primitives'
 import {
-  DISPLAY_FLEX,
+  ALIGN_FLEX_START,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_FLEX,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_START,
 } from '../../styles'
-import { Box, Flex, Text } from '../../primitives'
-import { TYPOGRAPHY, SPACING } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
-
-import type { ReactNode } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { RobotCoordsForeignDiv } from '../Deck'
 
 const labwareDisplayNameStyle = css`
   ${TYPOGRAPHY.labelSemiBold}

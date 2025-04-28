@@ -1,13 +1,14 @@
 import { screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import { getShellUpdateState } from '/app/redux/shell'
-import { useIsRobotBusy, useIsFlex } from '/app/redux-resources/robots'
+import type { ShellUpdateState } from '/app/redux/shell/types'
+import type * as ShellUpdate from '/app/redux/shell/update'
 import {
   DeviceReset,
   DisplayRobotName,
@@ -24,9 +25,6 @@ import {
   UseOlderAspirateBehavior,
 } from '../AdvancedTab'
 import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
-
-import type { ShellUpdateState } from '/app/redux/shell/types'
-import type * as ShellUpdate from '/app/redux/shell/update'
 
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/robot-settings/selectors')

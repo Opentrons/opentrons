@@ -1,17 +1,17 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 import { RobotCoordsForeignDiv } from '../Deck/RobotCoordsForeignDiv'
 import {
-  MULTI_CHANNEL_PIPETTE_WIDTH,
-  SINGLE_CHANNEL_PIPETTE_WIDTH,
-  SINGLE_CHANNEL_PIPETTE_HEIGHT,
-  MULTI_CHANNEL_PIPETTE_HEIGHT,
   MULTI_CHANNEL_CENTER_Y_NOZZLE,
+  MULTI_CHANNEL_PIPETTE_HEIGHT,
+  MULTI_CHANNEL_PIPETTE_WIDTH,
   MULTI_CHANNEL_Y_OFFSET,
   NINETY_SIX_CHANNEL_PIPETTE_WIDTH,
+  SINGLE_CHANNEL_PIPETTE_HEIGHT,
+  SINGLE_CHANNEL_PIPETTE_WIDTH,
 } from './constants'
-import { EmanatingNozzle } from './EmanatingNozzle'
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+import { EmanatingNozzle } from './EmanatingNozzle'
 
 interface PipetteRenderProps {
   labwareDef: LabwareDefinition2

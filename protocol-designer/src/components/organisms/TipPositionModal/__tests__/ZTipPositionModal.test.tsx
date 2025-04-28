@@ -1,11 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { ZTipPositionModal } from '../ZTipPositionModal'
 import { TipPositionZOnlyView } from '../TipPositionZOnlyView'
-
-import type { ComponentProps } from 'react'
+import { ZTipPositionModal } from '../ZTipPositionModal'
 
 vi.mock('../TipPositionZOnlyView')
 const render = (props: ComponentProps<typeof ZTipPositionModal>) => {

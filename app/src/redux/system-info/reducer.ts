@@ -1,9 +1,8 @@
 // system-info reducer
 
-import * as Constants from './constants'
-
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
+import * as Constants from './constants'
 import type { SystemInfoState } from './types'
 
 const INITIAL_STATE: SystemInfoState = {

@@ -7,9 +7,19 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  CreateCommand,
+  CutoutId,
+  MoveLabwareParams,
+} from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
-import * as warningCreators from '../../warningCreators'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  CommandCreatorWarning,
+} from '../../types'
 import {
   formatPyStr,
   getCutoutIdByAddressableArea,
@@ -19,17 +29,7 @@ import {
   PROTOCOL_CONTEXT_NAME,
   uuid,
 } from '../../utils'
-import type {
-  AddressableAreaName,
-  CreateCommand,
-  CutoutId,
-  MoveLabwareParams,
-} from '@opentrons/shared-data'
-import type {
-  CommandCreator,
-  CommandCreatorError,
-  CommandCreatorWarning,
-} from '../../types'
+import * as warningCreators from '../../warningCreators'
 
 /** Move labware from one location to another, manually or via a gripper. */
 export const moveLabware: CommandCreator<MoveLabwareParams> = (

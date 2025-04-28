@@ -1,13 +1,13 @@
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   COLORS,
   Flex,
   Icon,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 interface RenderResultProps {
   isBadCal: boolean

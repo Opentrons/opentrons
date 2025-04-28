@@ -1,6 +1,3 @@
-import { useRef, useState } from 'react'
-import styled, { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -17,12 +14,14 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
+import { useRef, useState } from 'react'
 import type {
   ChangeEventHandler,
   DragEventHandler,
   MouseEventHandler,
 } from 'react'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 
 const StyledLabel = styled.label`
   display: ${DISPLAY_FLEX};

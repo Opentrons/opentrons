@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -19,13 +16,16 @@ import {
   useMenuHandleClickOutside,
 } from '@opentrons/components'
 import { getLabwareDefIsStandard } from '@opentrons/shared-data'
-import { Divider } from '/app/atoms/structure'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
+import { Divider } from '/app/atoms/structure'
+import type { LabwareDefAndDate } from '/app/local-resources/labware'
 import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
 import { getRequiredLabwareDetailsFromLoadCommands } from '/app/transformations/commands'
+import { useState } from 'react'
 import type { MouseEventHandler } from 'react'
-import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { LabwareDefAndDate } from '/app/local-resources/labware'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 export const ProtocolLabwareDetails = (props: {
   commands: RunTimeCommand[]

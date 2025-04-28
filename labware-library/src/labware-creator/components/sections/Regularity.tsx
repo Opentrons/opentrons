@@ -1,12 +1,11 @@
 import { useFormikContext } from 'formik'
-import { isEveryFieldHidden } from '../../utils'
 import { yesNoOptions } from '../../fields'
+import type { LabwareFields } from '../../fields'
+import styles from '../../styles.module.css'
+import { isEveryFieldHidden } from '../../utils'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { RadioField } from '../RadioField'
 import { SectionBody } from './SectionBody'
-
-import styles from '../../styles.module.css'
-import type { LabwareFields } from '../../fields'
 
 export const Regularity = (): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = ['homogeneousWells']

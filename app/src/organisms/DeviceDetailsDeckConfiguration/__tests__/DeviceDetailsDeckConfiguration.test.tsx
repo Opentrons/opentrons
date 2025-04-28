@@ -1,32 +1,29 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
-import { describe, it, beforeEach, vi, afterEach } from 'vitest'
-
-import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
+import type { MaintenanceRun } from '@opentrons/api-client'
 import { DeckConfigurator } from '@opentrons/components'
+import type * as OpentronsComponents from '@opentrons/components'
 import {
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
-
+import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
+import type { DeckConfiguration } from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useRunStatuses } from '/app/resources/runs'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
-import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-import { DeviceDetailsDeckConfiguration } from '../'
-import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import {
   useDeckConfigurationEditingTools,
   useNotifyDeckConfigurationQuery,
 } from '/app/resources/deck_configuration'
-
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { useRunStatuses } from '/app/resources/runs'
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { MaintenanceRun } from '@opentrons/api-client'
-import type { DeckConfiguration } from '@opentrons/shared-data'
-import type * as OpentronsComponents from '@opentrons/components'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { DeviceDetailsDeckConfiguration } from '../'
+import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()

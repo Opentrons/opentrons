@@ -1,16 +1,15 @@
 // labware dimensions for details page
-import round from 'lodash/round'
 import { getFootprintDiagram } from '@opentrons/components'
+import round from 'lodash/round'
 import {
   FOOTPRINT,
-  MM,
   LABWARE_X_DIM,
   LABWARE_Y_DIM,
   LABWARE_Z_DIM,
+  MM,
 } from '../../localization'
-import { LabeledValueTable, LowercaseText } from '../ui'
-
 import type { LabwareDefinition } from '../../types'
+import { LabeledValueTable, LowercaseText } from '../ui'
 
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)

@@ -1,7 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { useRef } from 'react'
-import { useDrop } from 'react-dnd'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -12,19 +8,22 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
-import { getLabwareIsCustom } from '../../../../utils/labwareModuleCompatibility'
-import { getLabwareEntities } from '../../../../step-forms/selectors'
-import { moveDeckItem } from '../../../../labware-ingred/actions'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { selectors as labwareDefSelectors } from '../../../../labware-defs'
+import type { Dimensions } from '@opentrons/shared-data'
+import { useRef } from 'react'
+import { useDrop } from 'react-dnd'
+import type { DropTargetMonitor } from 'react-dnd'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { DND_TYPES } from '../../../../constants'
+import { selectors as labwareDefSelectors } from '../../../../labware-defs'
+import { moveDeckItem } from '../../../../labware-ingred/actions'
+import { getLabwareEntities } from '../../../../step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+import { getLabwareIsCustom } from '../../../../utils/labwareModuleCompatibility'
 import { DECK_CONTROLS_STYLE } from '../constants'
+import type { DroppedItem, SharedControlsType } from '../types'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
-
-import type { DropTargetMonitor } from 'react-dnd'
-import type { Dimensions } from '@opentrons/shared-data'
-import type { SharedControlsType, DroppedItem } from '../types'
 
 interface AdapterControlsProps extends SharedControlsType {
   slotBoundingBox: Dimensions

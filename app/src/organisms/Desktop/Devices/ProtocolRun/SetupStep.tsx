@@ -1,5 +1,3 @@
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   Box,
@@ -17,8 +15,8 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import type { ReactNode } from 'react'
+import { css } from 'styled-components'
 
 interface SetupStepProps {
   /** whether or not to show the full contents of the step */

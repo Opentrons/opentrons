@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 import {
   ALIGN_CENTER,
   CheckboxField,
@@ -8,19 +5,21 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
-  Link,
-  PrimaryButton,
-  Modal,
-  SPACING,
   LegacyStyledText,
+  Link,
+  Modal,
+  PrimaryButton,
+  SPACING,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { updateConfigValue } from '/app/redux/config'
-
-import type { ChangeEvent } from 'react'
-import type { Dispatch } from '/app/redux/types'
 import type { UpdateConfigValueAction } from '/app/redux/config/types'
+import type { Dispatch } from '/app/redux/types'
+import { useState } from 'react'
+import type { ChangeEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean

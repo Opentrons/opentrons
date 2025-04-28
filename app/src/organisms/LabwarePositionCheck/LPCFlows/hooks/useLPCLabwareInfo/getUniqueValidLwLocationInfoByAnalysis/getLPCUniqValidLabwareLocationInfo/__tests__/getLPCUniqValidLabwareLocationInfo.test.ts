@@ -1,13 +1,11 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getLPCUniqValidLabwareLocationInfo } from '..'
+import type { LabwareLocationInfoWithLocSeq } from '..'
 import { appendUniqValidLocCombo } from '../appendUniqValidLocCombo'
+import { scanAllCommandsForAllLwUrisByLwId } from '../getAllPossibleLwURIsInRun'
 import { getLoadLabwareLocationCombo } from '../getLoadLabwareLocationCombo'
 import { getMoveLabwareLocationCombo } from '../getMoveLabwareLocationCombo'
-import { scanAllCommandsForAllLwUrisByLwId } from '../getAllPossibleLwURIsInRun'
-
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { LabwareLocationInfoWithLocSeq } from '..'
 
 vi.mock('../appendUniqValidLocCombo')
 vi.mock('../getLoadLabwareLocationCombo')

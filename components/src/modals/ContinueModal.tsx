@@ -1,5 +1,4 @@
 import { AlertModal } from './AlertModal'
-
 import type { AlertModalProps } from './AlertModal'
 
 export interface ContinueModalProps extends Omit<AlertModalProps, 'buttons'> {

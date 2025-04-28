@@ -1,4 +1,4 @@
-import isEqual from 'lodash/isEqual'
+import type { LegacyLabwareOffsetLocation } from '@opentrons/api-client'
 import {
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getLabwareDefURI,
@@ -9,7 +9,7 @@ import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LegacyLabwareOffsetLocation } from '@opentrons/api-client'
+import isEqual from 'lodash/isEqual'
 
 export interface LegacyLabwareLocationCombo {
   location: LegacyLabwareOffsetLocation

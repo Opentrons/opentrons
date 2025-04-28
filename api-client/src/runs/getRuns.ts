@@ -1,8 +1,7 @@
 import { GET, request } from '../request'
-
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { Runs, GetRunsParams } from './types'
+import type { GetRunsParams, Runs } from './types'
 
 export function getRuns(
   config: HostConfig,

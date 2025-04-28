@@ -1,22 +1,18 @@
-import path from 'path'
 import { rm } from 'fs/promises'
-
-import { createLogger } from '../../log'
+import path from 'path'
 import { LocalAbortError } from '../../http'
-
+import type { DownloadProgress } from '../../http'
+import { createLogger } from '../../log'
 import type {
-  UpdateProvider,
+  NoUpdate,
+  ProgressCallback,
   ResolvedUpdate,
   UnresolvedUpdate,
-  ProgressCallback,
-  NoUpdate,
+  UpdateProvider,
 } from '../types'
-
-import { getOrDownloadManifest, getReleaseSet } from './release-manifest'
-import { cleanUpAndGetOrDownloadReleaseFiles } from './release-files'
 import { latestVersionForChannel, shouldUpdate } from './latest-update'
-
-import type { DownloadProgress } from '../../http'
+import { cleanUpAndGetOrDownloadReleaseFiles } from './release-files'
+import { getOrDownloadManifest, getReleaseSet } from './release-manifest'
 
 const log = createLogger('systemUpdate/from-web/provider')
 

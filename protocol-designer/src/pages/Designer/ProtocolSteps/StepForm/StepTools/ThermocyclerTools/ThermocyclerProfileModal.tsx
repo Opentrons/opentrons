@@ -1,10 +1,8 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   EmptySelectorButton,
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   InfoScreen,
   JUSTIFY_FLEX_END,
   Modal,
@@ -14,14 +12,14 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
-import { ThermocyclerCycle } from './ThermocyclerCycle'
-import { ThermocyclerStep } from './ThermocyclerStep'
-
+import { useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
+import { ThermocyclerCycle } from './ThermocyclerCycle'
 import type { ThermocyclerCycleType } from './ThermocyclerCycle'
+import { ThermocyclerStep } from './ThermocyclerStep'
 import type { ThermocyclerStepType } from './ThermocyclerStep'
 
 export type ThermocyclerStepTypeGeneral =

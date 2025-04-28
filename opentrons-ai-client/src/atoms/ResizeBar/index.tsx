@@ -4,7 +4,6 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
 } from '@opentrons/components'
-
 import type { MouseEvent } from 'react'
 
 export function ResizeBar({

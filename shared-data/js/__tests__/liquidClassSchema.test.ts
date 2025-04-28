@@ -1,7 +1,7 @@
 /** Ensure that the liquid class schema itself functions as intended,
  *  and that all v1 liquid class fixtures will validate */
-import Ajv from 'ajv'
 import path from 'path'
+import Ajv from 'ajv'
 import glob from 'glob'
 import { describe, expect, it } from 'vitest'
 import liquidClassSchemaV1 from '../../liquid-class/schemas/1.json'

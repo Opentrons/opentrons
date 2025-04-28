@@ -1,10 +1,9 @@
-import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { TipConfirmation } from '../TipConfirmation'
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-
+import { i18n } from '/app/i18n'
 import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { TipConfirmation } from '../TipConfirmation'
 
 const render = (props: ComponentProps<typeof TipConfirmation>) => {
   return renderWithProviders(<TipConfirmation {...props} />, {

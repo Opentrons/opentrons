@@ -1,8 +1,7 @@
-import { createSelector } from 'reselect'
-
-import type { Selector } from 'reselect'
-import type { State } from '/app/redux/types'
 import type { LPCUiState } from '/app/redux/protocol-runs/types/lpc/ui'
+import type { State } from '/app/redux/types'
+import { createSelector } from 'reselect'
+import type { Selector } from 'reselect'
 
 export const selectShowDefaultOffsetInfoBanner = (
   runId: string

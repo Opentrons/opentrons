@@ -1,24 +1,24 @@
-import floor from 'lodash/floor'
 import {
   getPipetteSpecsV2,
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
-import {
-  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
-  PROTOCOL_DESIGNER_SOURCE,
-} from '../../constants'
-import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
-import { getDefaultPushOutVolume } from '../../utils'
-import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
-import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
-import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
 import type {
   LoadLabwareCreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data'
 import type { Ingredients } from '@opentrons/step-generation'
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
+import floor from 'lodash/floor'
+import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
+import {
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
+  PROTOCOL_DESIGNER_SOURCE,
+} from '../../constants'
 import type { PDMetadata } from '../../file-types'
+import { getDefaultPushOutVolume } from '../../utils'
+import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
+import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
+import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
 export const migrateFile = (
   appData: ProtocolFile<DesignerApplicationData>

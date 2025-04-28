@@ -1,24 +1,22 @@
-import { vi, it, expect, describe, beforeEach } from 'vitest'
-import { when } from 'vitest-when'
-import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
 import * as Cfg from '@opentrons/app/src/redux/config'
-
-import * as Dialogs from '../../dialogs'
-import { getConfig, handleConfigChange } from '../../config'
-import { getValidLabwareFilePaths } from '../../labware'
-import { selectPythonPath, getPythonPath } from '../getPythonPath'
-import { executeAnalyzeCli } from '../executeAnalyzeCli'
-import { writeFailedAnalysis } from '../writeFailedAnalysis'
-
+import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
+import type electron from 'electron'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import {
-  registerProtocolAnalysis,
   analyzeProtocolSource,
   CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE,
+  registerProtocolAnalysis,
 } from '..'
-import type electron from 'electron'
+import { getConfig, handleConfigChange } from '../../config'
+import type { Config } from '../../config'
+import * as Dialogs from '../../dialogs'
+import { getValidLabwareFilePaths } from '../../labware'
 import type { createLogger } from '../../log'
 import type { Dispatch } from '../../types'
-import type { Config } from '../../config'
+import { executeAnalyzeCli } from '../executeAnalyzeCli'
+import { getPythonPath, selectPythonPath } from '../getPythonPath'
+import { writeFailedAnalysis } from '../writeFailedAnalysis'
 
 vi.mock('../../labware')
 vi.mock('../../dialogs')

@@ -1,8 +1,8 @@
+import type { ChangeTipOptions } from '@opentrons/step-generation'
 import { useTranslation } from 'react-i18next'
 import { DropdownStepFormField } from '../../../../../components/molecules'
-import { getDisabledChangeTipOptions } from './utils'
-import type { ChangeTipOptions } from '@opentrons/step-generation'
 import type { FieldProps } from '../types'
+import { getDisabledChangeTipOptions } from './utils'
 import type { DisabledChangeTipArgs } from './utils'
 
 const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [

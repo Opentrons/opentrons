@@ -1,11 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ConfirmExitModal } from '../ConfirmExitModal'
-
 import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { ConfirmExitModal } from '../ConfirmExitModal'
 
 const render = (props: ComponentProps<typeof ConfirmExitModal>) => {
   return renderWithProviders(<ConfirmExitModal {...props} />, {

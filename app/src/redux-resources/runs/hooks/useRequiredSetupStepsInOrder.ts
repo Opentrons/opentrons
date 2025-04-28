@@ -1,26 +1,24 @@
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 import {
-  updateRunSetupStepsRequired,
   getSetupStepsRequired,
-  ROBOT_CALIBRATION_STEP_KEY,
-  MODULE_SETUP_STEP_KEY,
-  LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
+  LPC_STEP_KEY,
+  MODULE_SETUP_STEP_KEY,
+  ROBOT_CALIBRATION_STEP_KEY,
   selectTotalCountLocationSpecificOffsets,
+  updateRunSetupStepsRequired,
 } from '/app/redux/protocol-runs'
-
 import type {
   StepKey,
   StepMap,
   UpdateRunSetupStepsRequiredAction,
 } from '/app/redux/protocol-runs'
 import type { Dispatch, State } from '/app/redux/types'
-import type {
-  CompletedProtocolAnalysis,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 export interface UseRequiredSetupStepsInOrderProps {
   runId: string

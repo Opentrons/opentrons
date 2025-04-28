@@ -1,7 +1,3 @@
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import { useLocation } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -19,15 +15,18 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
+import type { MouseEvent, RefObject } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
+import { css } from 'styled-components'
+import * as labwareIngredActions from '../../../labware-ingred/actions'
 import {
   getLiquidEntities,
   getUnsavedForm,
 } from '../../../step-forms/selectors'
-import * as labwareIngredActions from '../../../labware-ingred/actions'
-
-import type { MouseEvent, RefObject } from 'react'
 import type { ThunkDispatch } from '../../../types'
+import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
 
 interface LiquidsOverflowMenuProps {
   onClose: () => void

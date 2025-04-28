@@ -1,7 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import { uuid } from '@opentrons/step-generation'
 import {
   Btn,
   COLORS,
@@ -13,6 +9,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import type { ModalProps } from '@opentrons/components'
 import {
   ABSORBANCE_READER_V1,
   getCutoutDisplayName,
@@ -24,11 +21,6 @@ import {
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { useKitchen } from '../Kitchen/hooks'
-import { getAvailableOptions } from './useDeckConfigurationEditing'
-
-import type { Dispatch, SetStateAction } from 'react'
-import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutConfig,
   CutoutId,
@@ -36,10 +28,17 @@ import type {
   FlexModuleCutoutFixtureId,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { ModalProps } from '@opentrons/components'
+import { uuid } from '@opentrons/step-generation'
+import { useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import type { UseFormSetValue } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import type { FormModules, ModuleOnDeck } from '../../../step-forms'
-import type { Fixtures, WizardFormState } from '../types'
 import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
+import { useKitchen } from '../Kitchen/hooks'
+import type { Fixtures, WizardFormState } from '../types'
+import { getAvailableOptions } from './useDeckConfigurationEditing'
 
 export interface ModuleExtended extends ModuleOnDeck {
   cutoutId: CutoutId

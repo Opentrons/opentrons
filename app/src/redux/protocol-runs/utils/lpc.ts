@@ -1,22 +1,19 @@
-import isEqual from 'lodash/isEqual'
-
+import type { VectorOffset } from '@opentrons/api-client'
 import {
   getVectorDifference,
   getVectorSum,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
-
+import isEqual from 'lodash/isEqual'
 import { RESET_TO_DEFAULT } from '../constants'
-
-import type { VectorOffset } from '@opentrons/api-client'
 import type {
   DefaultOffsetDetails,
-  LocationSpecificOffsetDetails,
-  WorkingOffset,
   ExistingOffset,
+  LocationSpecificOffsetDetails,
+  OffsetLocationDetails,
   WorkingDefaultOffset,
   WorkingLocationSpecificOffset,
-  OffsetLocationDetails,
+  WorkingOffset,
 } from '../types'
 
 // Returns the most recent vector offset from offset details.

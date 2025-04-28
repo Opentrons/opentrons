@@ -1,16 +1,7 @@
-import { Fragment } from 'react'
-import styled from 'styled-components'
-import { useSelector } from 'react-redux'
-import isEqual from 'lodash/isEqual'
-import { useTranslation } from 'react-i18next'
-import {
-  getLabwareDefURI,
-  getLabwareDisplayName,
-  getModuleType,
-  IDENTITY_VECTOR,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import type {
+  LabwareOffset,
+  LegacyLabwareOffsetCreateData,
+} from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -18,38 +9,46 @@ import {
   COLORS,
   DeckInfoLabel,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
+  getLabwareDefinitionsFromCommands,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   MODULE_ICON_NAME_BY_TYPE,
   OVERFLOW_AUTO,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  getLabwareDefinitionsFromCommands,
-  DIRECTION_ROW,
 } from '@opentrons/components'
-import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import {
-  getIsLabwareOffsetCodeSnippetsOn,
-  getIsOnDevice,
-} from '/app/redux/config'
-import { SmallButton } from '/app/atoms/buttons'
-import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  getModuleType,
+  IDENTITY_VECTOR,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type {
-  LabwareOffset,
-  LegacyLabwareOffsetCreateData,
-} from '@opentrons/api-client'
-import type { ResultsSummaryStep, WorkingOffset } from './types'
+import { SmallButton } from '/app/atoms/buttons'
+import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
+import {
+  getIsLabwareOffsetCodeSnippetsOn,
+  getIsOnDevice,
+} from '/app/redux/config'
 import type { TFunction } from 'i18next'
+import isEqual from 'lodash/isEqual'
+import { Fragment } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
+import type { ResultsSummaryStep, WorkingOffset } from './types'
+import { getDisplayLocation } from './utils/getDisplayLocation'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

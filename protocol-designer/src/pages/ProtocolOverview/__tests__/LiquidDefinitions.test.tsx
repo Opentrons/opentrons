@@ -1,13 +1,11 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import type { InfoScreen } from '@opentrons/components'
+import type { LiquidEntities } from '@opentrons/step-generation'
 import { screen } from '@testing-library/react'
-
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { LiquidDefinitions } from '../LiquidDefinitions'
-
-import type { ComponentProps } from 'react'
-import type { LiquidEntities } from '@opentrons/step-generation'
-import type { InfoScreen } from '@opentrons/components'
 
 vi.mock('../../../feature-flags/selectors')
 

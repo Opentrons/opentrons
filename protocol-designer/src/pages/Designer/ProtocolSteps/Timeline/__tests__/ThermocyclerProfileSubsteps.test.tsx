@@ -1,12 +1,11 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'
+import type { FormData } from '../../../../../form-types'
 import { getSavedStepForms } from '../../../../../step-forms/selectors'
 import { ThermocyclerProfileSubsteps } from '../ThermocyclerProfileSubsteps'
-
-import type { ComponentProps } from 'react'
-import type { FormData } from '../../../../../form-types'
 
 const render = (props: ComponentProps<typeof ThermocyclerProfileSubsteps>) => {
   return renderWithProviders(<ThermocyclerProfileSubsteps {...props} />, {

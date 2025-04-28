@@ -1,9 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import Ajv from 'ajv'
-import glob from 'glob'
-import last from 'lodash/last'
 import path from 'path'
 import {
+  commandSchemaV7,
+  labwareSchemaV2,
   protocolSchemaV1,
   protocolSchemaV3,
   protocolSchemaV4,
@@ -11,9 +9,11 @@ import {
   protocolSchemaV6,
   protocolSchemaV7,
   protocolSchemaV8,
-  labwareSchemaV2,
-  commandSchemaV7,
 } from '@opentrons/shared-data'
+import Ajv from 'ajv'
+import glob from 'glob'
+import last from 'lodash/last'
+import { describe, expect, it } from 'vitest'
 
 // TODO: copied from createFile.test.js
 const getAjvValidator = (_protocolSchema: object) => {

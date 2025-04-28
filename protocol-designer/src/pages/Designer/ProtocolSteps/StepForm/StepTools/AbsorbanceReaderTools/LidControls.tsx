@@ -1,12 +1,11 @@
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 import { ToggleStepFormField } from '../../../../../../components/molecules'
-
 import type { FieldProps } from '../../types'
 
 interface LidControlsProps {

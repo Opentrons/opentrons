@@ -1,17 +1,15 @@
-import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
-import { NavigationMenu } from '../NavigationMenu'
-import { Navigation } from '..'
-import { useScrollPosition } from '/app/local-resources/dom-utils'
-
 import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { Navigation } from '..'
+import { NavigationMenu } from '../NavigationMenu'
 
 vi.mock('/app/resources/networking/hooks/useNetworkConnection')
 vi.mock('/app/redux/discovery')

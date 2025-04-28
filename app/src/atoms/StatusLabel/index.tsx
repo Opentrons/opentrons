@@ -1,15 +1,14 @@
-import capitalize from 'lodash/capitalize'
-
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import capitalize from 'lodash/capitalize'
 
 interface StatusLabelProps {
   status: string

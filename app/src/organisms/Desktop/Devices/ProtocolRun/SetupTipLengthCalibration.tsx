@@ -1,19 +1,18 @@
-import { Fragment } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { useRunPipetteInfoByMount } from '/app/resources/runs'
+import { Fragment } from 'react'
+import { useTranslation } from 'react-i18next'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
+
 interface SetupTipLengthCalibrationProps {
   robotName: string
   runId: string

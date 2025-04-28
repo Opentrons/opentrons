@@ -1,10 +1,9 @@
 import { ICON_DATA_BY_NAME } from '@opentrons/components'
+import type { Meta, StoryObj } from '@storybook/react'
 import { InterventionContent } from '.'
-import { TwoColumn } from '../TwoColumn'
 import { StandInContent } from '../story-utils/StandIn'
 import { VisibleContainer } from '../story-utils/VisibleContainer'
-
-import type { Meta, StoryObj } from '@storybook/react'
+import { TwoColumn } from '../TwoColumn'
 
 const meta: Meta<typeof InterventionContent> = {
   title:

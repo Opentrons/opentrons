@@ -1,6 +1,5 @@
+import type { Meta, StoryObj } from '@storybook/react'
 import { Checkbox } from './index'
-
-import type { StoryObj, Meta } from '@storybook/react'
 
 const meta: Meta<typeof Checkbox> = {
   title: 'Helix/Atoms/Checkbox',

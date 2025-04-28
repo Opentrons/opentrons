@@ -1,14 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-
-import {
-  getModuleDisplayName,
-  CELSIUS,
-  HS_TEMP_MIN,
-  HS_TEMP_MAX,
-} from '@opentrons/shared-data'
-import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -18,13 +7,21 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { Slideout } from '/app/atoms/Slideout'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  CELSIUS,
+  getModuleDisplayName,
+  HS_TEMP_MAX,
+  HS_TEMP_MIN,
+} from '@opentrons/shared-data'
+import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
-
-import type { MouseEventHandler } from 'react'
 import type { HeaterShakerModule } from '/app/redux/modules/types'
+import { useState } from 'react'
+import type { MouseEventHandler } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule

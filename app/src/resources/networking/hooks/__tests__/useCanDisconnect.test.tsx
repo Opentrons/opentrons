@@ -1,19 +1,17 @@
-import { when } from 'vitest-when'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createStore } from 'redux'
-import { Provider } from 'react-redux'
-import { renderHook } from '@testing-library/react'
 import { SECURITY_WPA_EAP } from '@opentrons/api-client'
-import { getRobotApiVersionByName } from '/app/redux/discovery'
-
+import type { WifiNetwork } from '@opentrons/api-client'
+import { renderHook } from '@testing-library/react'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { getRobotApiVersionByName } from '/app/redux/discovery'
+import type { State } from '/app/redux/types'
+import type { FunctionComponent, ReactNode } from 'react'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import type { Store } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import { useCanDisconnect } from '../useCanDisconnect'
 import { useWifiList } from '../useWifiList'
-
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
-import type { WifiNetwork } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
 
 vi.mock('../useWifiList')
 vi.mock('/app/redux-resources/robots')

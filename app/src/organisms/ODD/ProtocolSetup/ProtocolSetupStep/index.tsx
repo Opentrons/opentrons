@@ -1,4 +1,3 @@
-import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -15,6 +14,7 @@ import {
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { css } from 'styled-components'
 import { useToaster } from '../../../ToasterOven'
 
 const CSV_FILE_MAX_LENGTH = 18 // truncated text + three dots

@@ -1,18 +1,16 @@
-import { useState, useEffect } from 'react'
-import last from 'lodash/last'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
-  useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
-
-import { useNotifyRunQuery } from './useNotifyRunQuery'
-
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type {
-  RobotType,
   CompletedProtocolAnalysis,
   PendingProtocolAnalysis,
+  RobotType,
 } from '@opentrons/shared-data'
+import last from 'lodash/last'
+import { useEffect, useState } from 'react'
+import { useNotifyRunQuery } from './useNotifyRunQuery'
 
 const ANALYSIS_POLL_MS = 5000
 export interface ProtocolDetails {

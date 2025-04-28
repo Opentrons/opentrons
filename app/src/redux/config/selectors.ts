@@ -1,16 +1,16 @@
-import { createSelector } from 'reselect'
+import type { Language } from '/app/i18n'
 import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
+import type { ProtocolSort } from '/app/redux/protocol-storage'
+import { createSelector } from 'reselect'
 import type { State } from '../types'
 import type {
   Config,
   FeatureFlags,
-  UpdateChannel,
+  OnDeviceDisplaySettings,
   ProtocolsOnDeviceSortKey,
   QuickTransfersOnDeviceSortKey,
-  OnDeviceDisplaySettings,
+  UpdateChannel,
 } from './types'
-import type { Language } from '/app/i18n'
-import type { ProtocolSort } from '/app/redux/protocol-storage'
 
 export interface SelectOption {
   value: string

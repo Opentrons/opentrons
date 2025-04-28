@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -10,9 +7,10 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
-import { ToggleButton } from '../../atoms/ToggleButton'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { actions as analyticsActions } from '../../../analytics'
+import { ToggleButton } from '../../atoms/ToggleButton'
 
 interface PrivacyProps {
   hasOptedIn: boolean

@@ -1,6 +1,3 @@
-import { memo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import {
   Banner,
   DIRECTION_COLUMN,
@@ -8,25 +5,27 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import * as timelineWarningSelectors from '../../../top-selectors/timelineWarnings'
-import { getSelectedStepId } from '../../../ui/steps'
+import type { ProfileItem } from '@opentrons/step-generation'
+import { memo } from 'react'
+import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   actions as dismissActions,
   selectors as dismissSelectors,
 } from '../../../dismiss'
-import { selectors as stepFormSelectors } from '../../../step-forms'
+import type { StepFieldName } from '../../../form-types'
 import {
   getVisibleFormErrors,
   getVisibleFormWarnings,
   getVisibleProfileFormLevelErrors,
 } from '../../../pages/Designer/ProtocolSteps/StepForm/utils'
-import { WarningContents } from './WarningContents'
-
-import type { ReactNode } from 'react'
-import type { ProfileItem } from '@opentrons/step-generation'
-import type { StepFieldName } from '../../../form-types'
+import { selectors as stepFormSelectors } from '../../../step-forms'
 import type { ProfileFormError } from '../../../steplist/formLevel/profileErrors'
+import * as timelineWarningSelectors from '../../../top-selectors/timelineWarnings'
+import { getSelectedStepId } from '../../../ui/steps'
 import type { MakeAlert } from './types'
+import { WarningContents } from './WarningContents'
 
 interface FormAlertsProps {
   showFormErrors: boolean

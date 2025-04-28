@@ -1,12 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { FillWell } from '/app/organisms/ErrorRecoveryFlows/shared'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { mockRecoveryContentProps } from '../../__fixtures__'
 
 vi.mock('../LeftColumnLabwareInfo', () => ({
   LeftColumnLabwareInfo: vi.fn(props => (

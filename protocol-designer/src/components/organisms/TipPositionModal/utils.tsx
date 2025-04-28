@@ -1,19 +1,18 @@
-import floor from 'lodash/floor'
-import round from 'lodash/round'
 import {
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
+import type { PositionReference } from '@opentrons/shared-data'
+import floor from 'lodash/floor'
+import round from 'lodash/round'
 import {
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getIsTouchTipField } from '../../../form-types'
-import { DECIMALS_ALLOWED, TOO_MANY_DECIMALS } from './constants'
-
-import type { PositionReference } from '@opentrons/shared-data'
 import type { StepFieldName } from '../../../form-types'
+import { DECIMALS_ALLOWED, TOO_MANY_DECIMALS } from './constants'
 
 export function getDefaultMmFromEdge(args: {
   name: StepFieldName

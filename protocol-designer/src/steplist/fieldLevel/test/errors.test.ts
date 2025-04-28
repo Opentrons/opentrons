@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
-  minFieldValue,
   maxFieldValue,
+  minFieldValue,
   temperatureRangeFieldValue,
 } from '../errors'
 import type { ErrorChecker } from '../errors'

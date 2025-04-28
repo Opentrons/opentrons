@@ -1,21 +1,18 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
-
 import {
   FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_V1,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
+import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
-import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
-
-import type { ComponentProps } from 'react'
-import type { Mock } from 'vitest'
 
 vi.mock('/app/redux/config')
 vi.mock('../../Desktop/Devices/hooks')

@@ -3,15 +3,13 @@ import {
   OT2_ROBOT_TYPE,
   ot2DeckDefV5,
 } from '@opentrons/shared-data'
-
-import { SlotBase } from '../BaseDeck/SlotBase'
-
-import type { SVGProps } from 'react'
 import type {
   DeckDefinition,
   DeckSlot,
   RobotType,
 } from '@opentrons/shared-data'
+import type { SVGProps } from 'react'
+import { SlotBase } from '../BaseDeck/SlotBase'
 
 interface LegacyDeckSlotLocationProps extends SVGProps<SVGGElement> {
   robotType: RobotType

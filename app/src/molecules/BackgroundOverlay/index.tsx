@@ -1,8 +1,6 @@
-import { css } from 'styled-components'
-
 import { COLORS, Flex, POSITION_FIXED } from '@opentrons/components'
-
 import type { ComponentProps, MouseEventHandler } from 'react'
+import { css } from 'styled-components'
 
 const BACKGROUND_OVERLAY_STYLE = css`
   position: ${POSITION_FIXED};

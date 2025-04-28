@@ -1,24 +1,21 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { screen } from '@testing-library/react'
-import { useParams } from 'react-router-dom'
-
+import type { Instruments } from '@opentrons/api-client'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import type * as SharedData from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-
 import { i18n } from '/app/i18n'
-import { InstrumentDetail } from '..'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
 } from '/app/local-resources/instruments'
-import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
 } from '/app/organisms/DropTipWizardFlows'
-
-import type { Instruments } from '@opentrons/api-client'
-import type * as SharedData from '@opentrons/shared-data'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
+import { useParams } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { InstrumentDetail } from '..'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof SharedData>()

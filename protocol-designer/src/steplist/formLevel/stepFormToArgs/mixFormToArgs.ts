@@ -1,15 +1,16 @@
 import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
+import type { MixArgs } from '@opentrons/step-generation'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
-  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
+import type { HydratedMixFormData } from '../../../form-types'
+import { getMatchingTipLiquidSpecs } from '../../../utils'
 import { getOrderedWells } from '../../utils'
 import { getMixDelayData } from './getDelayData'
-import { getMatchingTipLiquidSpecs } from '../../../utils'
-import type { HydratedMixFormData } from '../../../form-types'
-import type { MixArgs } from '@opentrons/step-generation'
+
 type MixStepArgs = MixArgs
 export const mixFormToArgs = (
   hydratedFormData: HydratedMixFormData

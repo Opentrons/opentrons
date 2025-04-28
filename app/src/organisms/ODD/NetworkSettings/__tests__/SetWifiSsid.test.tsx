@@ -1,12 +1,10 @@
-import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { SetWifiSsid } from '../SetWifiSsid'
-
 import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { SetWifiSsid } from '../SetWifiSsid'
 
 const mockSetSelectedSsid = vi.fn()
 const render = (props: ComponentProps<typeof SetWifiSsid>) => {

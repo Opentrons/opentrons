@@ -1,7 +1,4 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-import { useDispatch } from 'react-redux'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { MockLPCContentContainer } from '/app/organisms/LabwarePositionCheck/__fixtures__'
@@ -12,8 +9,9 @@ import {
   goBackEditOffsetSubstep,
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
-
 import type { ComponentProps } from 'react'
+import { useDispatch } from 'react-redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
 
 vi.mock('react-redux', async () => {

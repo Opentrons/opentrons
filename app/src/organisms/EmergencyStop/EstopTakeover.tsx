@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import type { EstopState } from '@opentrons/api-client'
 import { useEstopQuery } from '@opentrons/react-api-client'
-
-import { EstopPressedModal } from './EstopPressedModal'
-import { EstopMissingModal } from './EstopMissingModal'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { getLocalRobot } from '/app/redux/discovery'
-import { PHYSICALLY_ENGAGED, NOT_PRESENT, DISENGAGED } from './constants'
-import type { EstopState } from '@opentrons/api-client'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { DISENGAGED, NOT_PRESENT, PHYSICALLY_ENGAGED } from './constants'
+import { EstopMissingModal } from './EstopMissingModal'
+import { EstopPressedModal } from './EstopPressedModal'
 
 const ESTOP_CURRENTLY_DISENGAGED_REFETCH_INTERVAL_MS = 10000
 const ESTOP_CURRENTLY_ENGAGED_REFETCH_INTERVAL_MS = 1000

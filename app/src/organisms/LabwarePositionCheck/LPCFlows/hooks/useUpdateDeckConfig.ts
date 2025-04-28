@@ -1,8 +1,7 @@
-import { useEffect } from 'react'
-import { updateLPCDeck } from '/app/redux/protocol-runs'
-import { useDispatch } from 'react-redux'
-
 import type { DeckConfiguration } from '@opentrons/shared-data'
+import { updateLPCDeck } from '/app/redux/protocol-runs'
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 
 // The deck config may change after LPC state initialization, and LPC needs to account
 // for those changes.

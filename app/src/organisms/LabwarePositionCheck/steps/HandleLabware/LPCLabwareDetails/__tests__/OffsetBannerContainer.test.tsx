@@ -1,12 +1,8 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-import { useDispatch } from 'react-redux'
-
 import { renderWithProviders } from '/app/__testing-utils__'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 import { i18n } from '/app/i18n'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__'
-import { InlineNotification } from '/app/atoms/InlineNotification'
-import { OffsetBannerContainer } from '../OffsetBannerContainer'
 import {
   selectIsAnyOffsetHardCoded,
   selectIsDefaultOffsetAbsent,
@@ -14,8 +10,10 @@ import {
   selectShowDefaultOffsetInfoBanner,
   toggleDefaultOffsetInfoBanner,
 } from '/app/redux/protocol-runs'
-
 import type { ComponentProps } from 'react'
+import { useDispatch } from 'react-redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { OffsetBannerContainer } from '../OffsetBannerContainer'
 
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')

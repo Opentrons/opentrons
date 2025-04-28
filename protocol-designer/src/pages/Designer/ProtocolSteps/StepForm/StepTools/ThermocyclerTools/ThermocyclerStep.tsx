@@ -1,6 +1,3 @@
-import { css } from 'styled-components'
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -18,20 +15,22 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useState } from 'react'
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
-  temperatureRangeFieldValue,
   isTimeFormatMinutesSeconds,
+  temperatureRangeFieldValue,
 } from '../../../../../../steplist/fieldLevel/errors'
 import {
   maskToFloat,
   maskToTime,
 } from '../../../../../../steplist/fieldLevel/processing'
 import { uuid } from '../../../../../../utils'
-import { getTimeFromString, getStepIndex } from './utils'
-
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerStepTypeGeneral } from './ThermocyclerProfileModal'
+import { getStepIndex, getTimeFromString } from './utils'
 
 export interface ThermocyclerStepType {
   durationMinutes: string

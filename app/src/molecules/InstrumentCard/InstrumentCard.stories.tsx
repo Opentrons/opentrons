@@ -1,7 +1,6 @@
+import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
 import { InstrumentCard } from './'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Molecules/InstrumentCard',

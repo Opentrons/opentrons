@@ -1,14 +1,8 @@
-import { useState, useCallback } from 'react'
-import head from 'lodash/head'
-
-import { useHost } from '@opentrons/react-api-client'
 import {
   getCommands,
   getInstruments,
   getRunCurrentState,
 } from '@opentrons/api-client'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
-
 import type {
   HostConfig,
   Mount,
@@ -16,7 +10,11 @@ import type {
   Run,
   RunCommandSummary,
 } from '@opentrons/api-client'
+import { useHost } from '@opentrons/react-api-client'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import head from 'lodash/head'
+import { useCallback, useState } from 'react'
 
 export interface PipetteWithTip {
   mount: Mount

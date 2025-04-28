@@ -1,6 +1,5 @@
-import { COLORS } from '../../helix-design-system'
-
 import type { SVGProps } from 'react'
+import { COLORS } from '../../helix-design-system'
 
 export function SlotClip(props: SVGProps<SVGPathElement>): JSX.Element {
   return (

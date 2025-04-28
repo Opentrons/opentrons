@@ -6,17 +6,15 @@ import {
   MoveLabwareOnDeck,
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
-
-import { useTranslation } from 'react-i18next'
-import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { TwoColumn, DeckMapContent } from '/app/molecules/InterventionModal'
-import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
-import { RECOVERY_MAP } from '../constants'
-
-import type { ComponentProps } from 'react'
-import type { RecoveryContentProps } from '../types'
+import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
 import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+import type { ComponentProps } from 'react'
+import { useTranslation } from 'react-i18next'
+import { RECOVERY_MAP } from '../constants'
+import type { RecoveryContentProps } from '../types'
+import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
+import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 export function TwoColLwInfoAndDeck(
   props: RecoveryContentProps

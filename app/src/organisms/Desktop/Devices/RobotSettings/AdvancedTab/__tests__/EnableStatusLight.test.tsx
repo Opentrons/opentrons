@@ -1,13 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
-
 import { i18n } from '/app/i18n'
 import { useLEDLights } from '/app/resources/robot-settings'
-import { EnableStatusLight } from '../EnableStatusLight'
-
 import type { ComponentProps } from 'react'
+import { EnableStatusLight } from '../EnableStatusLight'
 
 vi.mock('/app/resources/robot-settings')
 

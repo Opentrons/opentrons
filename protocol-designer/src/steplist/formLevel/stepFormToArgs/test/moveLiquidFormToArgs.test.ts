@@ -1,25 +1,25 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   fixtureP10SingleV2Specs,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   fixture_12_trough,
   fixture_96_plate,
 } from '@opentrons/shared-data/labware/fixtures/2'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
-import {
-  moveLiquidFormToArgs,
-  getAirGapData,
-  getMixData,
-} from '../moveLiquidFormToArgs'
-import { getOrderedWells } from '../../../utils'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HydratedMoveLiquidFormData,
   PathOption,
 } from '../../../../form-types'
+import { getOrderedWells } from '../../../utils'
+import {
+  getAirGapData,
+  getMixData,
+  moveLiquidFormToArgs,
+} from '../moveLiquidFormToArgs'
 
 vi.mock('../../../utils')
 vi.mock('assert')

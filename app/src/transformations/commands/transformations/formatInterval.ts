@@ -1,5 +1,6 @@
-import { intervalToDuration } from 'date-fns'
 import { formatDuration } from '@opentrons/components'
+import { intervalToDuration } from 'date-fns'
+
 /**
  * utility to format a date interval to a hh:mm:ss duration
  * @param start date string

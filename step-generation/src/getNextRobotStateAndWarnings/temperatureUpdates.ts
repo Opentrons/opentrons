@@ -1,19 +1,19 @@
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
-import { getModuleState } from '../robotStateSelectors'
-import {
-  TEMPERATURE_APPROACHING_TARGET,
-  TEMPERATURE_DEACTIVATED,
-  TEMPERATURE_AT_TARGET,
-} from '../constants'
 import type {
+  ModuleOnlyParams,
   TemperatureModuleAwaitTemperatureParams,
   TemperatureParams,
-  ModuleOnlyParams,
 } from '@opentrons/shared-data'
+import {
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_DEACTIVATED,
+} from '../constants'
+import { getModuleState } from '../robotStateSelectors'
 import type {
   InvariantContext,
-  RobotStateAndWarnings,
   ModuleTemporalProperties,
+  RobotStateAndWarnings,
   TemperatureStatus,
 } from '../types'
 

@@ -1,7 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { getVolumeRange } from '../../utils'
-
+import { describe, expect, it } from 'vitest'
 import type { QuickTransferWizardState } from '../../types'
+import { getVolumeRange } from '../../utils'
 
 describe('getVolumeRange', () => {
   const state: QuickTransferWizardState = {

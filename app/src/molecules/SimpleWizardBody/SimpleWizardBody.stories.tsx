@@ -1,13 +1,12 @@
+import { COLORS, ModalShell, PrimaryButton } from '@opentrons/components'
+import type { Meta, Story } from '@storybook/react'
+import { configReducer } from '/app/redux/config/reducer'
 import type * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { COLORS, PrimaryButton, ModalShell } from '@opentrons/components'
-import { WizardHeader } from '../WizardHeader'
-import { configReducer } from '/app/redux/config/reducer'
-import { SimpleWizardBody } from './index'
-
 import type { Store, StoreEnhancer } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import { WizardHeader } from '../WizardHeader'
+import { SimpleWizardBody } from './index'
 
 export default {
   title: 'App/Molecules/SimpleWizardBody',

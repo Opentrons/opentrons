@@ -1,19 +1,19 @@
-import { createSelector } from 'reselect'
-import reduce from 'lodash/reduce'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import {
-  getSelectedWells,
-  getHighlightedWells,
-} from '../../well-selection/selectors'
 import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
-import type { Selector } from '../../types'
+import reduce from 'lodash/reduce'
+import { createSelector } from 'reselect'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import type {
   ContentsByWell,
   WellContentsByLabware,
 } from '../../labware-ingred/types'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import type { Selector } from '../../types'
+import {
+  getHighlightedWells,
+  getSelectedWells,
+} from '../../well-selection/selectors'
 
 const _getWellContents = (
   labwareDef: LabwareDefinition2,

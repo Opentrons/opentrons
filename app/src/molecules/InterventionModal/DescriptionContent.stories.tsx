@@ -1,5 +1,5 @@
-import { DescriptionContent as DescriptionContentComponent } from './'
 import type { Meta, StoryObj } from '@storybook/react'
+import { DescriptionContent as DescriptionContentComponent } from './'
 
 const meta: Meta<DescriptionContentComponent> = {
   title: 'App/Molecules/InterventionModal/DescriptionContent',

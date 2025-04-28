@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { createPortal } from 'react-dom'
-import { Trans, useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   CheckboxField,
@@ -8,24 +5,25 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
+  ModalShell,
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  ModalShell,
 } from '@opentrons/components'
-import { useDispatch } from 'react-redux'
-
-import styles from './styles.module.css'
+import { getTopPortalEl } from '/app/App/portal'
 import { labwareImages } from '/app/local-resources/labware'
 import { WizardHeader } from '/app/molecules/WizardHeader'
-import { getTopPortalEl } from '/app/App/portal'
 import { setUseTrashSurfaceForTipCal } from '/app/redux/calibration'
-
-import type { ChangeEvent } from 'react'
 import type { Dispatch } from '/app/redux/types'
+import { useState } from 'react'
+import type { ChangeEvent } from 'react'
+import { createPortal } from 'react-dom'
+import { Trans, useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import styles from './styles.module.css'
 
 const BLOCK_REQUEST_EMAIL_BODY =
   '• Full name\n• Company or institution name\n• Shipping address\n• VAT ID (if outside the US)'

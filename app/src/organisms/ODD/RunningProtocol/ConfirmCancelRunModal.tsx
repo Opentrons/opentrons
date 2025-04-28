@@ -1,32 +1,29 @@
-import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 import {
-  useStopRunMutation,
   useDeleteRunMutation,
   useDismissCurrentRunMutation,
+  useStopRunMutation,
 } from '@opentrons/react-api-client'
-
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { useRunStatus } from '/app/resources/runs'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useRunStatus } from '/app/resources/runs'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { CancelingRunModal } from './CancelingRunModal'
-
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string

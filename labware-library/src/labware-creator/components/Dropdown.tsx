@@ -1,18 +1,18 @@
-import cx from 'classnames'
-import type * as React from 'react'
 import {
   Box,
-  SelectField,
   LegacyTooltip,
+  SelectField,
   useHoverTooltip,
 } from '@opentrons/components'
+import type { SelectOption, StyleProps } from '@opentrons/components'
+import cx from 'classnames'
 import { Field } from 'formik'
+import type * as React from 'react'
 import { reportFieldEdit } from '../analyticsUtils'
 import { getLabel } from '../fields'
-import fieldStyles from './fieldStyles.module.css'
-import styles from './Dropdown.module.css'
-import type { SelectOption, StyleProps } from '@opentrons/components'
 import type { LabwareFields, RichOption, RichOptions } from '../fields'
+import styles from './Dropdown.module.css'
+import fieldStyles from './fieldStyles.module.css'
 
 export interface DropdownProps extends StyleProps {
   name: keyof LabwareFields

@@ -1,5 +1,5 @@
-import _pipetteNameSpecFixtures from './pipetteNameSpecFixtures.json'
 import type { PipetteName, PipetteNameSpecs } from '../../../js'
+import _pipetteNameSpecFixtures from './pipetteNameSpecFixtures.json'
 
 export const pipetteNameSpecFixtures = _pipetteNameSpecFixtures as Record<
   PipetteName,

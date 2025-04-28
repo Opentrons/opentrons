@@ -1,7 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { getMoveLabwareOptions } from '../../../../../../ui/labware/selectors'
+import { useDispatch, useSelector } from 'react-redux'
 import { DropdownStepFormField } from '../../../../../../components/molecules'
+import { getMoveLabwareOptions } from '../../../../../../ui/labware/selectors'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
 import type { FieldProps } from '../../types'
 

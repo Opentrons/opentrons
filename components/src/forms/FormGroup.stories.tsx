@@ -1,9 +1,7 @@
+import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
-
-import { FormGroup as FormGroupComponent } from './FormGroup'
 import { DeprecatedCheckboxField } from './DeprecatedCheckboxField.stories'
-
-import type { Story, Meta } from '@storybook/react'
+import { FormGroup as FormGroupComponent } from './FormGroup'
 
 export default {
   title: 'Library/Molecules/Forms/Form Group',

@@ -1,18 +1,17 @@
-import { Trans, useTranslation } from 'react-i18next'
-import capitalize from 'lodash/capitalize'
 import {
   COLORS,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
 import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-import { getPipetteAnimations96 } from './utils'
+import capitalize from 'lodash/capitalize'
+import { Trans, useTranslation } from 'react-i18next'
 import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
-
 import type { PipetteWizardStepProps } from './types'
+import { getPipetteAnimations96 } from './utils'
 
 export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
   const {

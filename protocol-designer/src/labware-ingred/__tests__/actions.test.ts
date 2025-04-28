@@ -1,18 +1,18 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
-import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   fixture_96_plate,
   fixture_tiprack_10_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
+import configureMockStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { getRobotType } from '../../file-data/selectors'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import { uuid } from '../../utils'
-import { getRobotType } from '../../file-data/selectors'
-import { renameLabware, createContainer } from '../actions'
+import { createContainer, renameLabware } from '../actions'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../labware-defs/selectors')
 vi.mock('../../step-forms/selectors')

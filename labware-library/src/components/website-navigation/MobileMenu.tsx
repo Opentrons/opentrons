@@ -1,6 +1,6 @@
-import type * as React from 'react'
-import cx from 'classnames'
 import { Icon } from '@opentrons/components'
+import cx from 'classnames'
+import type * as React from 'react'
 import styles from './styles.module.css'
 
 interface Props {

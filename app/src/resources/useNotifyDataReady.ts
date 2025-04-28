@@ -1,20 +1,16 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
-
-import { useDispatch } from 'react-redux'
-
+import type { HostConfig } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
-
-import { appShellListener } from '/app/redux/shell/remote'
-import { notifySubscribeAction } from '/app/redux/shell'
 import {
-  useTrackEvent,
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { useFeatureFlag } from '/app/redux/config'
-
+import { notifySubscribeAction } from '/app/redux/shell'
+import { appShellListener } from '/app/redux/shell/remote'
+import type { NotifyResponseData, NotifyTopic } from '/app/redux/shell/types'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { UseQueryOptions } from 'react-query'
-import type { HostConfig } from '@opentrons/api-client'
-import type { NotifyTopic, NotifyResponseData } from '/app/redux/shell/types'
+import { useDispatch } from 'react-redux'
 
 export type HTTPRefetchFrequency = 'once' | null
 

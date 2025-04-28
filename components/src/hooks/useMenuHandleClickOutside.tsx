@@ -1,8 +1,7 @@
 import { useState } from 'react'
+import type { Dispatch, MouseEventHandler, SetStateAction } from 'react'
 import { COLORS } from '../helix-design-system'
 import { Overlay } from '../modals'
-
-import type { Dispatch, MouseEventHandler, SetStateAction } from 'react'
 
 interface MenuHandleClickOutside {
   menuOverlay: JSX.Element

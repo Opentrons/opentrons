@@ -1,18 +1,16 @@
 import { ofType } from 'redux-observable'
-
 import { GET } from '../../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../../robot-api/operators'
-import * as Actions from '../actions'
-import * as Constants from '../constants'
-
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../../robot-api/operators'
-import type { Action, Epic } from '../../../types'
-import type { FetchTipLengthCalibrationsAction } from '../types'
-import type { AllTipLengthCalibrations } from '../../api-types'
 import type { RobotApiErrorResponse } from '../../../robot-api/types'
+import type { Action, Epic } from '../../../types'
+import type { AllTipLengthCalibrations } from '../../api-types'
+import * as Actions from '../actions'
+import * as Constants from '../constants'
+import type { FetchTipLengthCalibrationsAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchTipLengthCalibrationsAction> = action => ({
   method: GET,

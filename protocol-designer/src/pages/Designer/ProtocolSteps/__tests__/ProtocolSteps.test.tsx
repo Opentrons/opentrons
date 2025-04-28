@@ -1,8 +1,13 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
+import { ProtocolSteps } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
+import { LiquidButton } from '../../../../components/molecules/LiquidButton'
+import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
+import { getRobotStateTimeline } from '../../../../file-data/selectors'
+import type { SavedStepFormState } from '../../../../step-forms'
 import {
   getSavedStepForms,
   getUnsavedForm,
@@ -12,17 +17,11 @@ import {
   getSelectedStepId,
   getSelectedSubstep,
 } from '../../../../ui/steps/selectors'
-import { getRobotStateTimeline } from '../../../../file-data/selectors'
-import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
-import { LiquidButton } from '../../../../components/molecules/LiquidButton'
 import { DeckSetupContainer } from '../../DeckSetup'
 import { OffDeck } from '../../OffDeck'
+import { DraggableSidebar } from '../DraggableSidebar'
 import { SubStepsToolbox } from '../Timeline'
 import { getUserOS } from '../Timeline/utils'
-import { DraggableSidebar } from '../DraggableSidebar'
-import { ProtocolSteps } from '..'
-
-import type { SavedStepFormState } from '../../../../step-forms'
 
 vi.mock('../../OffDeck')
 vi.mock('../../../../step-forms/selectors')

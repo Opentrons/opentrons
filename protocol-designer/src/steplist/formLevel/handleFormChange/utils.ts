@@ -1,14 +1,9 @@
-import round from 'lodash/round'
-import uniq from 'lodash/uniq'
 import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
   linearInterpolate,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
-import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
-import { getPipetteCapacity } from '../../../pipettes/pipetteData'
-import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import type {
   BlowoutProperties,
   ByTipTypeSetting,
@@ -30,12 +25,17 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
+import round from 'lodash/round'
+import uniq from 'lodash/uniq'
 import type { FormData, PathOption, StepFieldName } from '../../../form-types'
 import type {
   FieldPropsByName,
   LiquidHandlingTab,
 } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
+import { getPipetteCapacity } from '../../../pipettes/pipetteData'
+import { canPipetteUseLabware, getWellSetForMultichannel } from '../../../utils'
 import type { FormPatch } from '../../actions/types'
+import { getDefaultsForStepType } from '../getDefaultsForStepType'
 
 type LiquidClassSettingsType = 'aspirate' | 'dispense' | 'all'
 

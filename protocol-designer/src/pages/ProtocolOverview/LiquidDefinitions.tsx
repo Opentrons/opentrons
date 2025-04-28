@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -12,14 +10,15 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { getEnableLiquidClasses } from '../../feature-flags/selectors'
-import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
-
 import type {
   AllIngredGroupFields,
   IngredInputs,
 } from '../../labware-ingred/types'
+import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
 
 const getLiquidDescription = (
   liquid: IngredInputs,

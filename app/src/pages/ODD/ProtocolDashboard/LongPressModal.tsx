@@ -1,9 +1,3 @@
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { createPortal } from 'react-dom'
-
 import {
   Flex,
   Icon,
@@ -12,16 +6,19 @@ import {
   MenuList,
   SPACING,
 } from '@opentrons/components'
+import type { UseLongPressResult } from '@opentrons/components'
 import { useCreateRunMutation } from '@opentrons/react-api-client'
-
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
+import { getTopPortalEl } from '/app/App/portal'
 import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
-import { getTopPortalEl } from '/app/App/portal'
-
-import type { UseLongPressResult } from '@opentrons/components'
 import type { Dispatch } from '/app/redux/types'
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 interface LongPressModalProps {
   longpress: UseLongPressResult

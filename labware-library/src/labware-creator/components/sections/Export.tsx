@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
+import type * as React from 'react'
 import styles from '../../styles.module.css'
 
 interface ExportProps {

@@ -1,9 +1,7 @@
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import { LPCWizardFlex } from './LPCWizardFlex'
-import { LegacyLabwarePositionCheck } from '/app/organisms/LegacyLabwarePositionCheck'
-
 import type { LegacySupportLPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows'
+import { LegacyLabwarePositionCheck } from '/app/organisms/LegacyLabwarePositionCheck'
+import { LPCWizardFlex } from './LPCWizardFlex'
 
 export function LPCWizardContainer(
   props: LegacySupportLPCFlowsProps

@@ -1,13 +1,13 @@
-import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { pickUpTip } from '../commandCreators/atomic'
 import {
-  getRobotStateWithTipStandard,
-  makeContext,
-  getSuccessResult,
   DEFAULT_PIPETTE,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeContext,
   TIPRACK_1,
 } from '../fixtures'
 import type { InvariantContext, RobotState } from '../types'
-import { pickUpTip } from '../commandCreators/atomic'
 
 describe('pickUpTip', () => {
   let robotStateWithTip: RobotState

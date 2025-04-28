@@ -1,21 +1,20 @@
-import noop from 'lodash/noop'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { app } from 'electron'
-import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
-import * as SystemInfo from '@opentrons/app/src/redux/system-info'
 import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
-import * as OS from '../../os'
-import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
-import {
-  getActiveInterfaces,
-  createNetworkInterfaceMonitor,
-} from '../network-interfaces'
+import * as SystemInfo from '@opentrons/app/src/redux/system-info'
+import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
+import { app } from 'electron'
+import noop from 'lodash/noop'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { registerSystemInfo } from '..'
-
-import type { Dispatch } from '../../types'
-import type { UsbDeviceMonitor } from '../usb-devices'
-import type { NetworkInterfaceMonitor } from '../network-interfaces'
 import type { createLogger } from '../../log'
+import * as OS from '../../os'
+import type { Dispatch } from '../../types'
+import {
+  createNetworkInterfaceMonitor,
+  getActiveInterfaces,
+} from '../network-interfaces'
+import type { NetworkInterfaceMonitor } from '../network-interfaces'
+import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
+import type { UsbDeviceMonitor } from '../usb-devices'
 
 vi.mock('../../os')
 vi.mock('../usb-devices')

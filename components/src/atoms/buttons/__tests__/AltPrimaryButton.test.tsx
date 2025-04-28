@@ -1,12 +1,11 @@
-import { describe, it, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../testing/utils'
-import { BORDERS, COLORS } from '../../../helix-design-system'
-import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
-import { AltPrimaryButton } from '../AltPrimaryButton'
-
 import type { ComponentProps } from 'react'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
+import { AltPrimaryButton } from '../AltPrimaryButton'
 
 const render = (props: ComponentProps<typeof AltPrimaryButton>) => {
   return renderWithProviders(<AltPrimaryButton {...props} />)[0]

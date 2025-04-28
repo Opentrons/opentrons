@@ -1,6 +1,5 @@
-import { PromptButton as PromptButtonComponent } from '.'
-
 import type { Meta, StoryObj } from '@storybook/react'
+import { PromptButton as PromptButtonComponent } from '.'
 
 const buttonTextOptions = [
   'Reagent Transfer',

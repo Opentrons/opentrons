@@ -1,26 +1,23 @@
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-
+import { RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 import {
+  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  StyledText,
-  SPACING,
-  ALIGN_CENTER,
   JUSTIFY_END,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
-import { RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
-
-import {
-  RecoverySingleColumnContentWrapper,
-  RecoveryFooterButtons,
-} from './shared'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import { RECOVERY_MAP } from './constants'
-
+import {
+  RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
+} from './shared'
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from './types'
 
 // There are two code paths that render this component:

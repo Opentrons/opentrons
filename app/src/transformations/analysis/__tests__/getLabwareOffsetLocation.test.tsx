@@ -1,22 +1,21 @@
-import { when } from 'vitest-when'
-import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
-
 import {
   getLabwareDefURI,
   multiple_tipacks_with_tc,
   opentrons96PcrAdapterV1,
 } from '@opentrons/shared-data'
-import { getLegacyLabwareOffsetLocation } from '../getLegacyLabwareOffsetLocation'
-import {
-  getModuleInitialLoadInfo,
-  getLabwareLocation,
-} from '/app/transformations/commands'
 import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition2,
   LoadedLabware,
   LoadedModule,
-  LabwareDefinition2,
-  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
+import {
+  getLabwareLocation,
+  getModuleInitialLoadInfo,
+} from '/app/transformations/commands'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { getLegacyLabwareOffsetLocation } from '../getLegacyLabwareOffsetLocation'
 
 vi.mock('/app/transformations/commands')
 

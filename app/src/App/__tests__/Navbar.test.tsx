@@ -1,10 +1,8 @@
-import { describe, it } from 'vitest'
-import { screen, render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-
-import { Navbar } from '../Navbar'
-
+import { describe, it } from 'vitest'
 import type { RouteProps } from '..//types'
+import { Navbar } from '../Navbar'
 
 const ROUTE_PROPS: RouteProps[] = [
   { name: 'foo', navLinkTo: '/foo', path: '/foo', Component: () => null },

@@ -1,7 +1,6 @@
-import * as React from 'react'
-
-import type { AxiosRequestConfig } from 'axios'
 import type { HostConfig, ResponsePromise } from '@opentrons/api-client'
+import type { AxiosRequestConfig } from 'axios'
+import * as React from 'react'
 
 export const ApiHostContext = React.createContext<HostConfig | null>(null)
 

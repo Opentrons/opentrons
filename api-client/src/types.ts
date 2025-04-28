@@ -1,6 +1,6 @@
+import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
 import type { AxiosRequestConfig } from 'axios'
 import type { ResponsePromise } from './request'
-import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
 
 export interface HostConfig {
   hostname: string

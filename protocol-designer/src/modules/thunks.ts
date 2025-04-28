@@ -1,9 +1,9 @@
-import { getModulePythonName } from '../utils'
-import { getModuleEntities } from '../step-forms/selectors'
 import type { ModuleEntity } from '@opentrons/step-generation'
 import type { ModuleEntities } from '../step-forms'
 import type { DeleteModuleAction } from '../step-forms/actions'
+import { getModuleEntities } from '../step-forms/selectors'
 import type { ThunkAction } from '../types'
+import { getModulePythonName } from '../utils'
 
 export interface EditMultipleModulesAction {
   type: 'EDIT_MULTIPLE_MODULES_PYTHON_NAME'

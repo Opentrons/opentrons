@@ -1,24 +1,21 @@
-import isEqual from 'lodash/isEqual'
-
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
-
-import { getLabwareDefinitionUri } from '/app/transformations/protocols'
-import { getLegacyLabwareOffsetLocation } from '/app/transformations/analysis'
-import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
-
-import type {
-  RunTimeCommand,
-  LoadedLabware,
-  LoadedModule,
-  LoadLabwareRunTimeCommand,
-  LoadModuleRunTimeCommand,
-} from '@opentrons/shared-data'
 import type {
   LabwareOffsetCreateData,
   LegacyLabwareOffsetCreateData,
   LegacyLabwareOffsetLocation,
 } from '@opentrons/api-client'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import type {
+  LoadedLabware,
+  LoadedModule,
+  LoadLabwareRunTimeCommand,
+  LoadModuleRunTimeCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
 import type { LabwareOffsetSnippetProps } from '/app/molecules/LabwareOffsetSnippet'
+import { getLegacyLabwareOffsetLocation } from '/app/transformations/analysis'
+import { getLabwareDefinitionUri } from '/app/transformations/protocols'
+import isEqual from 'lodash/isEqual'
 
 // Returns all copy for all load commands.
 export function buildLoadCommandCopy(

@@ -1,5 +1,4 @@
 import { ANY_LOCATION } from '@opentrons/api-client'
-
 import type { SearchLabwareOffsetsRequest } from '@opentrons/api-client'
 import type { LabwareLocationInfo } from '/app/redux/protocol-runs'
 

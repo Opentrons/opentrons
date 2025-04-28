@@ -1,6 +1,3 @@
-import { describe, it, vi, beforeEach } from 'vitest'
-import { when } from 'vitest-when'
-
 import {
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
@@ -8,11 +5,11 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
 } from '@opentrons/shared-data'
-
-import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQuery'
-
-import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import { beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQuery'
 
 vi.mock('../useNotifyDeckConfigurationQuery')
 

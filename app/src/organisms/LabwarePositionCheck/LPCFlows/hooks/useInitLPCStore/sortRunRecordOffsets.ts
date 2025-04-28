@@ -1,6 +1,5 @@
-import isEqual from 'lodash/isEqual'
-
 import type { LabwareOffset } from '@opentrons/api-client'
+import isEqual from 'lodash/isEqual'
 
 // Sort offsets by most recent first, removing duplicates.
 export function sortRunRecordOffsets(

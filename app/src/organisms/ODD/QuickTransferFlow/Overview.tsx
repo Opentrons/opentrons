@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -15,11 +14,10 @@ import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
-
 import { useToaster } from '/app/organisms/ToasterOven'
-import { CONSOLIDATE, DISTRIBUTE } from './constants'
 import { useFeatureFlag } from '/app/redux/config'
-
+import { useTranslation } from 'react-i18next'
+import { CONSOLIDATE, DISTRIBUTE } from './constants'
 import type { QuickTransferSummaryState } from './types'
 
 interface OverviewProps {

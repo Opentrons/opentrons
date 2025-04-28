@@ -1,4 +1,3 @@
-import some from 'lodash/some'
 import {
   getAreFlexSlotsAdjacent,
   getAreSlotsAdjacent,
@@ -9,14 +8,13 @@ import {
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-
 import type { PipetteV2Specs, RobotType } from '@opentrons/shared-data'
-
+import some from 'lodash/some'
 import type {
-  LabwareEntities,
-  RobotState,
   DeckSlot,
+  LabwareEntities,
   LabwareEntity,
+  RobotState,
 } from '../types'
 
 export const getIsHeaterShakerEastWestWithLatchOpen = (

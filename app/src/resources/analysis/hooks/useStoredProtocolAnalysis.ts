@@ -1,13 +1,10 @@
-import { useSelector } from 'react-redux'
-
 import { useProtocolQuery } from '@opentrons/react-api-client'
-
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
+import type { State } from '/app/redux/types'
 import { useNotifyRunQuery } from '/app/resources/runs'
 import { parseProtocolAnalysisOutput } from '/app/transformations/analysis'
-
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { State } from '/app/redux/types'
+import { useSelector } from 'react-redux'
 
 export function useStoredProtocolAnalysis(
   runId: string | null

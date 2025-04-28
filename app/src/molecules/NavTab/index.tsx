@@ -1,9 +1,7 @@
-import styled, { css } from 'styled-components'
-import { NavLink } from 'react-router-dom'
-
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
-
 import type { ComponentProps } from 'react'
+import { NavLink } from 'react-router-dom'
+import styled, { css } from 'styled-components'
 
 export const TAB_BORDER_STYLE = css`
   border-bottom-style: ${BORDERS.styleSolid};

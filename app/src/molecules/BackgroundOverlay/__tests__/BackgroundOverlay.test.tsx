@@ -1,9 +1,8 @@
-import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { BackgroundOverlay } from '..'
-
 import type { ComponentProps } from 'react'
+import { describe, expect, it, vi } from 'vitest'
+import { BackgroundOverlay } from '..'
 
 const render = (props: ComponentProps<typeof BackgroundOverlay>) => {
   return renderWithProviders(<BackgroundOverlay {...props} />)[0]

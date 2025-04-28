@@ -1,14 +1,12 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
-
-import { renderWithProviders } from '/app/__testing-utils__'
-import { mockRecoveryContentProps, mockFailedCommand } from '../../__fixtures__'
-import { i18n } from '/app/i18n'
-import { StepInfo } from '../StepInfo'
 import { CommandText } from '@opentrons/components'
-
-import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { mockFailedCommand, mockRecoveryContentProps } from '../../__fixtures__'
+import { StepInfo } from '../StepInfo'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof OpentronsComponents>()

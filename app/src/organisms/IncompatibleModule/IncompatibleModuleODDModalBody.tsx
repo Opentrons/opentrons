@@ -1,5 +1,4 @@
-import { useTranslation, Trans } from 'react-i18next'
-import capitalize from 'lodash/capitalize'
+import type { AttachedModule } from '@opentrons/api-client'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -11,8 +10,10 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { OddModal } from '/app/molecules/OddModal'
-import type { AttachedModule } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import capitalize from 'lodash/capitalize'
+import { Trans, useTranslation } from 'react-i18next'
+
 export interface IncompatibleModuleODDModalBodyProps {
   modules: AttachedModule[]
 }

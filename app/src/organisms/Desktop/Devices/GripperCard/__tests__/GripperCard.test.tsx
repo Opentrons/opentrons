@@ -1,14 +1,13 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+import type { GripperData } from '@opentrons/api-client'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-import { AboutGripperSlideout } from '../AboutGripperSlideout'
-import { GripperCard } from '../'
-
 import type { ComponentProps } from 'react'
-import type { GripperData } from '@opentrons/api-client'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { GripperCard } from '../'
+import { AboutGripperSlideout } from '../AboutGripperSlideout'
 
 vi.mock('/app/organisms/GripperWizardFlows')
 vi.mock('../AboutGripperSlideout')

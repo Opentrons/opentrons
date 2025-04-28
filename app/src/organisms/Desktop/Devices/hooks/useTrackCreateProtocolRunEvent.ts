@@ -1,9 +1,8 @@
-import { useTrackEvent } from '/app/redux/analytics'
-import { parseProtocolRunAnalyticsData } from '/app/transformations/analytics'
-import { parseProtocolAnalysisOutput } from '/app/transformations/analysis'
-
-import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import { useRobot } from '/app/redux-resources/robots'
+import { useTrackEvent } from '/app/redux/analytics'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import { parseProtocolAnalysisOutput } from '/app/transformations/analysis'
+import { parseProtocolRunAnalyticsData } from '/app/transformations/analytics'
 
 type CreateProtocolRunEventName =
   | 'createProtocolRecordRequest'

@@ -1,43 +1,41 @@
-import { MemoryRouter } from 'react-router-dom'
-import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getRobotModelByName } from '/app/redux/discovery'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import {
+  HEALTH_STATUS_OK,
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
+} from '/app/redux/discovery/constants'
+import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
+import {
+  mockLeftProtoPipette,
+  mockRightProtoPipette,
+} from '/app/redux/pipettes/__fixtures__'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import type { State } from '/app/redux/types'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useAttachedModules } from '/app/resources/modules'
+import type { ComponentProps } from 'react'
 import {
   mockOT2HealthResponse,
   mockOT2ServerHealthResponse,
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
 } from '../../../../../../discovery-client/src/fixtures'
-
-import { i18n } from '/app/i18n'
-import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
-import {
-  mockLeftProtoPipette,
-  mockRightProtoPipette,
-} from '/app/redux/pipettes/__fixtures__'
-import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
-import { getRobotModelByName } from '/app/redux/discovery'
-import { useAttachedModules } from '/app/resources/modules'
-import {
-  HEALTH_STATUS_OK,
-  ROBOT_MODEL_OT2,
-  ROBOT_MODEL_OT3,
-} from '/app/redux/discovery/constants'
-import { useAttachedPipettes } from '/app/resources/instruments'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
-import { RobotOverflowMenu } from '../RobotOverflowMenu'
-import { RobotStatusHeader } from '../RobotStatusHeader'
-import { RobotCard } from '../RobotCard'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
 } from '../ErrorRecoveryBanner'
-
-import type { ComponentProps } from 'react'
-import type { State } from '/app/redux/types'
+import { RobotCard } from '../RobotCard'
+import { RobotOverflowMenu } from '../RobotOverflowMenu'
+import { RobotStatusHeader } from '../RobotStatusHeader'
 
 vi.mock('/app/redux/robot-update/selectors')
 vi.mock('/app/redux/discovery/selectors')

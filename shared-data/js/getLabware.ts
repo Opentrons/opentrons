@@ -1,11 +1,9 @@
 import mapValues from 'lodash/mapValues'
-
 import {
   FIXED_TRASH_RENDER_HEIGHT,
   OPENTRONS_LABWARE_NAMESPACE,
   SLOT_RENDER_HEIGHT,
 } from './constants'
-
 import type {
   LabwareDefinition1,
   LabwareDefinition2,

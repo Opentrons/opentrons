@@ -1,7 +1,6 @@
+import type { ChangeEventHandler, MouseEventHandler, ReactNode } from 'react'
 import styled, { css } from 'styled-components'
-import { Flex } from '../../primitives'
-import { COLORS, BORDERS } from '../../helix-design-system'
-import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_START,
@@ -15,11 +14,11 @@ import {
   StyledText,
   Tag,
 } from '../..'
-
-import type { ChangeEventHandler, ReactNode, MouseEventHandler } from 'react'
-import type { FlattenSimpleInterpolation } from 'styled-components'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import type { IconName } from '../../icons'
+import { Flex } from '../../primitives'
 import type { StyleProps } from '../../primitives'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 export interface RadioButtonSubLabel {
   /* Optional subtext */

@@ -1,10 +1,3 @@
-import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
-import { useFormContext } from 'react-hook-form'
-import { useAtom } from 'jotai'
-import { v4 as uuidv4 } from 'uuid'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -15,6 +8,14 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import type { ProtocolFile } from '@opentrons/shared-data'
+import type { AxiosRequestConfig } from 'axios'
+import { useAtom } from 'jotai'
+import { useEffect, useState } from 'react'
+import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
+import { v4 as uuidv4 } from 'uuid'
 import { SendButton } from '../../atoms/SendButton'
 import {
   chatDataAtom,
@@ -24,28 +25,25 @@ import {
   tokenAtom,
   updateProtocolChatAtom,
 } from '../../resources/atoms'
-import { useApiCall } from '../../resources/hooks'
-import { calcTextAreaHeight } from '../../resources/utils'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import {
-  STAGING_END_POINT,
-  PROD_END_POINT,
+  LOCAL_CREATE_PROTOCOL_END_POINT,
   LOCAL_END_POINT,
   LOCAL_UPDATE_PROTOCOL_END_POINT,
-  PROD_UPDATE_PROTOCOL_END_POINT,
-  STAGING_UPDATE_PROTOCOL_END_POINT,
-  LOCAL_CREATE_PROTOCOL_END_POINT,
   PROD_CREATE_PROTOCOL_END_POINT,
+  PROD_END_POINT,
+  PROD_UPDATE_PROTOCOL_END_POINT,
   STAGING_CREATE_PROTOCOL_END_POINT,
+  STAGING_END_POINT,
+  STAGING_UPDATE_PROTOCOL_END_POINT,
 } from '../../resources/constants'
-
-import type { AxiosRequestConfig } from 'axios'
+import { useApiCall } from '../../resources/hooks'
+import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import type {
   ChatData,
   CreatePrompt,
   UpdatePrompt,
 } from '../../resources/types'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import { calcTextAreaHeight } from '../../resources/utils'
 
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')

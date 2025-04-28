@@ -1,10 +1,8 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../testing/utils'
-
-import { Banner } from '..'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { Banner } from '..'
+import { renderWithProviders } from '../../../testing/utils'
 
 const render = (props: ComponentProps<typeof Banner>) => {
   return renderWithProviders(<Banner {...props} />)[0]

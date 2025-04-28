@@ -1,20 +1,17 @@
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   Box,
   DISPLAY_GRID,
   Flex,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-
-import { LabeledValue } from './LabeledValue'
-import { DisplayRunStatus } from '../DisplayRunStatus'
 import { RunTimer } from '/app/molecules/RunTimer'
-import { ActionButton } from './ActionButton'
-import { useRunTimestamps, useRunCreatedAtTimestamp } from '/app/resources/runs'
-
+import { useRunCreatedAtTimestamp, useRunTimestamps } from '/app/resources/runs'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import type { RunHeaderContentProps } from '.'
+import { DisplayRunStatus } from '../DisplayRunStatus'
+import { ActionButton } from './ActionButton'
+import { LabeledValue } from './LabeledValue'
 
 // The upper row of Protocol Run Header.
 export function RunHeaderSectionUpper(

@@ -1,12 +1,12 @@
-import * as React from 'react'
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
   VIEWPORT,
 } from '@opentrons/components'
-import { InputField as InputFieldComponent } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
+import * as React from 'react'
+import { InputField as InputFieldComponent } from './index'
 
 const meta: Meta<typeof InputFieldComponent> = {
   // ToDo (kk05/02/2024) this should be in Library but at this moment there is the same name component in components

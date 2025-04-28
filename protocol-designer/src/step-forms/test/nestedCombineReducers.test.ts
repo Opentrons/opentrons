@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { nestedCombineReducers } from '../reducers/nestedCombineReducers'
 import type { Action } from 'redux'
+import { describe, expect, it } from 'vitest'
+import { nestedCombineReducers } from '../reducers/nestedCombineReducers'
 
 // typical reducer, only gets its own substate
 const fruits = (

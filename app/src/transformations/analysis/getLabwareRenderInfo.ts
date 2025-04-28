@@ -4,9 +4,9 @@ import type {
   DeckDefinition,
   LabwareDefinition2,
   LoadLabwareRunTimeCommand,
-  ProtocolAnalysisOutput,
   LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
 export interface LabwareRenderInfoById {

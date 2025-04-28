@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   Btn,
@@ -12,11 +10,10 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { DOC_URL } from '..'
-
 import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
+import { DOC_URL } from '..'
+import { LINK_BUTTON_STYLE } from '../../atoms'
 
 interface AppInfoProps {
   setShowAnnouncementModal: Dispatch<SetStateAction<boolean>>

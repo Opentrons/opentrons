@@ -1,17 +1,15 @@
-import mqtt from 'mqtt'
-
-import { connectionStore } from './store'
-import {
-  sendDeserialized,
-  sendDeserializedGenericError,
-  deserializeExpectedMessages,
-} from './deserialize'
-import { unsubscribe } from './unsubscribe'
-import { notifyLog } from './notifyLog'
-import { FAILURE_STATUSES, HEALTH_STATUS_OK } from '../constants'
-
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
+import mqtt from 'mqtt'
+import { FAILURE_STATUSES, HEALTH_STATUS_OK } from '../constants'
+import {
+  deserializeExpectedMessages,
+  sendDeserialized,
+  sendDeserializedGenericError,
+} from './deserialize'
+import { notifyLog } from './notifyLog'
+import { connectionStore } from './store'
+import { unsubscribe } from './unsubscribe'
 
 // MQTT is somewhat particular about the clientId format and will connect erratically if an unexpected string is supplied.
 const CLIENT_ID = 'app-' + Math.random().toString(16).slice(2, 8) // Derived from mqttjs

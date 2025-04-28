@@ -1,6 +1,6 @@
-import { getAnalyticsState } from './utils'
 import { trackWithMixpanel } from './mixpanel'
 import type { AnalyticsEvent } from './types'
+import { getAnalyticsState } from './utils'
 
 // NOTE: right now we report with only mixpanel, this fn is meant
 // to be a general interface to any analytics event reporting

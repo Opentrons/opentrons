@@ -1,16 +1,14 @@
-import labwareSchemaV2 from '../labware/schemas/2.json'
-
-import fixture96Plate from '../labware/fixtures/2/fixture_96_plate.json'
 import fixture12Trough from '../labware/fixtures/2/fixture_12_trough.json'
 import fixture24Tuberack from '../labware/fixtures/2/fixture_24_tuberack.json'
-import fixtureTiprack10ul from '../labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.json'
+import fixture96Plate from '../labware/fixtures/2/fixture_96_plate.json'
+import fixture384Plate from '../labware/fixtures/2/fixture_384_plate.json'
+import fixtureCalibrationBlock from '../labware/fixtures/2/fixture_calibration_block.json'
 import fixtureTiprack1000ul from '../labware/fixtures/2/fixture_flex_96_tiprack_1000ul.json'
 import fixtureTiprackAdapter from '../labware/fixtures/2/fixture_flex_96_tiprack_adapter.json'
-import fixtureCalibrationBlock from '../labware/fixtures/2/fixture_calibration_block.json'
-import fixture384Plate from '../labware/fixtures/2/fixture_384_plate.json'
+import fixtureTiprack10ul from '../labware/fixtures/2/fixture_tiprack_10_ul.json'
+import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixtureTrash from '../labware/fixtures/2/fixture_trash.json'
-
+import labwareSchemaV2 from '../labware/schemas/2.json'
 import type {
   LabwareDefByDefURI,
   LabwareDefinition1,

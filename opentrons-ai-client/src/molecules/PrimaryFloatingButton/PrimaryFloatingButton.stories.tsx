@@ -1,6 +1,5 @@
-import { PrimaryFloatingButton as PrimaryFloatingButtonComponent } from './index'
-
 import type { Meta, StoryObj } from '@storybook/react'
+import { PrimaryFloatingButton as PrimaryFloatingButtonComponent } from './index'
 
 const meta: Meta<typeof PrimaryFloatingButtonComponent> = {
   title: 'AI/molecules/PrimaryFloatingButton',

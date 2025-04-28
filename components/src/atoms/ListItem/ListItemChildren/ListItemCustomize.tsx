@@ -1,13 +1,14 @@
 import { css } from 'styled-components'
-import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { COLORS } from '../../../helix-design-system'
+import { DropdownMenu } from '../../../molecules/DropdownMenu'
+import type { DropdownMenuProps } from '../../../molecules/DropdownMenu'
 import { Flex, Link } from '../../../primitives'
+import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 import { StyledText } from '../../StyledText'
-import { DropdownMenu } from '../../../molecules/DropdownMenu'
 import { Tag } from '../../Tag/index'
-import type { DropdownMenuProps } from '../../../molecules/DropdownMenu'
 import type { TagProps } from '../../Tag/index'
+
 interface ListItemCustomizeProps {
   header: string
   //  this is either an image or an icon

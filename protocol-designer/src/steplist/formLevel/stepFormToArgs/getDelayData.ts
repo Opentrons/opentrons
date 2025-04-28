@@ -1,5 +1,5 @@
-import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../constants'
 import type { InnerDelayArgs } from '@opentrons/step-generation'
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../constants'
 import type {
   DelayCheckboxBaseFields,
   DelayCheckboxMoveLiquidFields,

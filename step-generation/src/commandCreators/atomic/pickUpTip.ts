@@ -1,15 +1,15 @@
 import { ALL } from '@opentrons/shared-data'
-import {
-  pipettingIntoColumn4,
-  possiblePipetteCollision,
-} from '../../errorCreators'
-import { COLUMN_4_SLOTS } from '../../constants'
-import { uuid, getIsSafePipetteMovement } from '../../utils'
 import type {
   NozzleConfigurationStyle,
   PickUpTipParams,
 } from '@opentrons/shared-data'
+import { COLUMN_4_SLOTS } from '../../constants'
+import {
+  pipettingIntoColumn4,
+  possiblePipetteCollision,
+} from '../../errorCreators'
 import type { CommandCreator, CommandCreatorError } from '../../types'
+import { getIsSafePipetteMovement, uuid } from '../../utils'
 
 interface PickUpTipAtomicParams extends PickUpTipParams {
   nozzles?: NozzleConfigurationStyle

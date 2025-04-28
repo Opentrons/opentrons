@@ -1,15 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
 import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
-
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
-import { EstopPressedModal } from '../EstopPressedModal'
 import { usePlacePlateReaderLid } from '/app/resources/modules'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { EstopPressedModal } from '../EstopPressedModal'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/config')

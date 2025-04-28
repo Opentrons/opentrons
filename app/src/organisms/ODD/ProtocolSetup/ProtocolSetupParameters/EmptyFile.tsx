@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -7,10 +6,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 export function EmptyFile(): JSX.Element {
   const { t } = useTranslation('protocol_setup')

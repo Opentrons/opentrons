@@ -1,12 +1,10 @@
+import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import execa from 'execa'
 import { usb } from 'usb'
-import { vi, it, expect, describe, afterEach } from 'vitest'
-
-import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
-import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
-import { isWindows } from '../../os'
-
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { createLogger } from '../../log'
+import { isWindows } from '../../os'
+import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 
 vi.mock('execa')
 vi.mock('usb')

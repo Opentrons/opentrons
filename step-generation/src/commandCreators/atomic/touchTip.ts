@@ -1,7 +1,7 @@
-import { formatPyStr, uuid } from '../../utils'
-import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
 import type { CreateCommand, TouchTipParams } from '@opentrons/shared-data'
+import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
 import type { CommandCreator, CommandCreatorError } from '../../types'
+import { formatPyStr, uuid } from '../../utils'
 
 interface TouchTipAtomicParams extends Omit<TouchTipParams, 'wellLocation'> {
   zOffsetFromTop: number

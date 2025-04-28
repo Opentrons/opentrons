@@ -1,8 +1,7 @@
-import { describe, it, expect } from 'vitest'
-
+import { describe, expect, it } from 'vitest'
 import { mockRobot } from '../../robot-api/__fixtures__'
-import { INITIAL_STATE, robotUpdateReducer } from '../reducer'
 import type { Action } from '../../types'
+import { INITIAL_STATE, robotUpdateReducer } from '../reducer'
 import type { RobotUpdateState } from '../types'
 
 const BASE_SESSION = {

@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'vitest'
 // discovery client reducer
 import {
+  mockHealthErrorJsonResponse,
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
-  mockHealthErrorJsonResponse,
 } from '../../fixtures/health'
-
+import type { HealthResponse, ServerHealthResponse } from '../../types'
 import * as Actions from '../actions'
 import { reducer, robotsByNameReducer } from '../reducer'
-import type { HealthResponse, ServerHealthResponse } from '../../types'
 import type { Action, RobotsByNameMap } from '../types'
 
 describe('robotsByName reducer', () => {

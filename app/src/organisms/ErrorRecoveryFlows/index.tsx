@@ -1,6 +1,3 @@
-import { useLayoutEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
@@ -15,25 +12,25 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { RunStatus } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
-
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { getIsOnDevice } from '/app/redux/config'
+import { useRunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
+import type { RunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
+import { useLayoutEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
-import { RecoverySplash, useRecoverySplash } from './RecoverySplash'
-import { RecoveryTakeover } from './RecoveryTakeover'
 import {
   useCurrentlyRecoveringFrom,
   useERUtils,
   useRecoveryTakeover,
   useRetainedFailedCommandBySource,
 } from './hooks'
-import { useRunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
-
-import type { RunStatus } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { RecoverySplash, useRecoverySplash } from './RecoverySplash'
+import { RecoveryTakeover } from './RecoveryTakeover'
 import type { FailedCommand } from './types'
-import type { RunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,

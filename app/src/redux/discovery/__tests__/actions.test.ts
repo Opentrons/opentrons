@@ -1,7 +1,6 @@
-import { describe, it, expect } from 'vitest'
-
-import * as actions from '../actions'
+import { describe, expect, it } from 'vitest'
 import type { Action } from '../../types'
+import * as actions from '../actions'
 
 describe('discovery actions', () => {
   const SPECS: Array<{

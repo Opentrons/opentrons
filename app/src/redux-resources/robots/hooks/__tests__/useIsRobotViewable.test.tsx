@@ -1,20 +1,18 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from 'react-query'
-
 import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { useIsRobotViewable } from '../useIsRobotViewable'
-
 import type { FunctionComponent, ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
 import type { Store } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { useIsRobotViewable } from '../useIsRobotViewable'
 
 vi.mock('/app/redux/discovery')
 

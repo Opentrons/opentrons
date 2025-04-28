@@ -1,8 +1,7 @@
 import { createSelector } from 'reselect'
-import { getGroupedCommands } from './utils'
-
 import type { State } from '../types'
 import type { GroupedCommands, StoredProtocolData } from './types'
+import { getGroupedCommands } from './utils'
 
 export const getStoredProtocols: (
   state: State

@@ -1,14 +1,14 @@
-import { describe, it, expect } from 'vitest'
 import {
   fixture96Plate,
   fixtureP1000SingleV2Specs,
 } from '@opentrons/shared-data'
+import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
 import {
   getLabwareLoadInfo,
   getModulesLoadInfo,
   getPipettesLoadInfo,
 } from '../selectors/utils'
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 
 describe('getPipettesLoadInfo', () => {
   it('returns pipettes from pipette entities', () => {

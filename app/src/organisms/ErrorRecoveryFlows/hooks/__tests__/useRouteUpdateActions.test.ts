@@ -1,13 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
-
-import {
-  useRouteUpdateActions,
-  getRecoveryRouteNavigation,
-} from '../useRouteUpdateActions'
-import { INVALID, RECOVERY_MAP } from '../../constants'
-
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
+import { INVALID, RECOVERY_MAP } from '../../constants'
+import {
+  getRecoveryRouteNavigation,
+  useRouteUpdateActions,
+} from '../useRouteUpdateActions'
 import type { GetRouteUpdateActionsParams } from '../useRouteUpdateActions'
 
 describe('useRouteUpdateActions', () => {

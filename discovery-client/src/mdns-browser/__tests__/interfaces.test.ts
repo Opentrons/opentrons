@@ -1,9 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { mockBaseBrowser } from '../__fixtures__'
-import { getBrowserInterfaces, compareInterfaces } from '../interfaces'
-
 import type { Socket } from 'dgram'
 import type { Browser as BaseBrowser } from 'mdns-js'
+import { describe, expect, it } from 'vitest'
+import { mockBaseBrowser } from '../__fixtures__'
+import { compareInterfaces, getBrowserInterfaces } from '../interfaces'
 
 const socket = (address: string): Socket =>
   ({ address: () => ({ address, port: 0 }) } as Socket)

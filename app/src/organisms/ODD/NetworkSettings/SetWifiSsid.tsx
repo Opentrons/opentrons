@@ -1,6 +1,3 @@
-import { useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -11,11 +8,11 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
-
+import { useRef } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface SetWifiSsidProps {
   errorMessage?: string | null

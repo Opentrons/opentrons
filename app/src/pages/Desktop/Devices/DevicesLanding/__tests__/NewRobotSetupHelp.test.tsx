@@ -1,8 +1,7 @@
-import { it, describe, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { describe, expect, it } from 'vitest'
 import { NewRobotSetupHelp } from '../NewRobotSetupHelp'
 
 const render = () => {

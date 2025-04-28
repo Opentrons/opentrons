@@ -1,15 +1,15 @@
-import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Box,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
-import { labwareImages } from '/app/local-resources/labware'
-
 import type { SelectOption } from '@opentrons/components'
+import { labwareImages } from '/app/local-resources/labware'
+import { css } from 'styled-components'
+
 export interface ChosenTipRackRenderProps {
   selectedValue: SelectOption
 }

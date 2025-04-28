@@ -1,9 +1,8 @@
-import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
-import { describe, it, afterEach, vi, expect } from 'vitest'
-
-import { useNotifyAllRunsQuery } from '../useNotifyAllRunsQuery'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import { useMostRecentRunId } from '../useMostRecentRunId'
+import { useNotifyAllRunsQuery } from '../useNotifyAllRunsQuery'
 
 vi.mock('/app/resources/runs/useNotifyAllRunsQuery')
 

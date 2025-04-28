@@ -1,10 +1,8 @@
-import { describe, it, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { renderWithProviders } from '../../../testing/utils'
-import { SubListTable } from '..'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, it } from 'vitest'
+import { SubListTable } from '..'
+import { renderWithProviders } from '../../../testing/utils'
 
 const render = (props: ComponentProps<typeof SubListTable>) => {
   return renderWithProviders(<SubListTable {...props} />)[0]

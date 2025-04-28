@@ -1,13 +1,13 @@
-import { vi, it, expect, describe, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   instrumentsResponseLeftPipetteFixture,
   instrumentsResponseRightPipetteFixture,
 } from '@opentrons/api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react'
 import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
-import { useAttachedPipettesFromInstrumentsQuery } from '..'
 import type { FunctionComponent, ReactNode } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useAttachedPipettesFromInstrumentsQuery } from '..'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/robot-settings/hooks')

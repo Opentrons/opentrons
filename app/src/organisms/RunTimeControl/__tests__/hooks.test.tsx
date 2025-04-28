@@ -1,26 +1,23 @@
-import { when } from 'vitest-when'
 import { act, renderHook } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import '@testing-library/jest-dom/vitest'
+import type { Run } from '@opentrons/api-client'
 import { useRunActionMutations } from '@opentrons/react-api-client'
-
-import { useRunControls, useCurrentRunStatus, useRunErrors } from '../hooks'
+import type * as ApiClient from '@opentrons/react-api-client'
 import {
-  useNotifyRunQuery,
-  useCurrentRunId,
-  useRunStatus,
   useCloneRun,
+  useCurrentRunId,
+  useNotifyRunQuery,
+  useRunStatus,
 } from '/app/resources/runs'
-
 import {
-  RUN_ID_2,
   mockPausedRun,
   mockRunningRun,
+  RUN_ID_2,
 } from '/app/resources/runs/__fixtures__'
-
 import type { UseQueryResult } from 'react-query'
-import type { Run } from '@opentrons/api-client'
-import type * as ApiClient from '@opentrons/react-api-client'
+import { useCurrentRunStatus, useRunControls, useRunErrors } from '../hooks'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ApiClient>()

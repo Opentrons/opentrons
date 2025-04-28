@@ -1,7 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { createPortal } from 'react-dom'
-import { useCallback, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -15,10 +11,14 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getHint } from '../../../tutorial/selectors'
-import { removeHint } from '../../../tutorial/actions'
-import { getMainPagePortalEl } from '../Portal'
+import { useCallback, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import type { HintKey } from '../../../tutorial'
+import { removeHint } from '../../../tutorial/actions'
+import { getHint } from '../../../tutorial/selectors'
+import { getMainPagePortalEl } from '../Portal'
 
 export const HintsModal = (): JSX.Element | null => {
   const { t, i18n } = useTranslation(['alert', 'shared'])

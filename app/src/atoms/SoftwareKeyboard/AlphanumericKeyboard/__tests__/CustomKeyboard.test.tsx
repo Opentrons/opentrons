@@ -1,11 +1,10 @@
 import { useRef } from 'react'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { AlphanumericKeyboard } from '..'
-
 import type { ComponentProps } from 'react'
+import { AlphanumericKeyboard } from '..'
 
 const render = (props: ComponentProps<typeof AlphanumericKeyboard>) => {
   return renderWithProviders(<AlphanumericKeyboard {...props} />)[0]

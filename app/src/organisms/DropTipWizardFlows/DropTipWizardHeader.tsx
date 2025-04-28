@@ -1,7 +1,5 @@
-import { useTranslation } from 'react-i18next'
-
 import { WizardHeader } from '/app/molecules/WizardHeader'
-
+import { useTranslation } from 'react-i18next'
 import type { DropTipWizardProps } from './DropTipWizard'
 import type { ErrorDetails } from './types'
 

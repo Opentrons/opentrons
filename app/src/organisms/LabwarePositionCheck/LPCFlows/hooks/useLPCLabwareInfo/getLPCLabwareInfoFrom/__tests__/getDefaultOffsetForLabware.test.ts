@@ -1,12 +1,10 @@
-import { vi, it, describe, expect } from 'vitest'
 import { ANY_LOCATION } from '@opentrons/api-client'
-import { getLabwareDefURI } from '@opentrons/shared-data'
-
-import { getDefaultOffsetDetailsForLabware } from '../getDefaultOffsetForLabware'
-import { OFFSET_KIND_DEFAULT } from '/app/redux/protocol-runs'
-
 import type { StoredLabwareOffset } from '@opentrons/api-client'
+import { getLabwareDefURI } from '@opentrons/shared-data'
+import { OFFSET_KIND_DEFAULT } from '/app/redux/protocol-runs'
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
+import { describe, expect, it, vi } from 'vitest'
+import { getDefaultOffsetDetailsForLabware } from '../getDefaultOffsetForLabware'
 
 vi.mock(import('@opentrons/shared-data'), async importOriginal => {
   const actual = await importOriginal()

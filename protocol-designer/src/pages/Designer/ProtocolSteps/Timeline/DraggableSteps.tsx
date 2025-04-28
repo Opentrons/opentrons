@@ -1,7 +1,3 @@
-import { useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { useDrop, useDrag } from 'react-dnd'
 import {
   Box,
   COLORS,
@@ -9,14 +5,18 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { DND_TYPES } from '../../../../constants'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { stepIconsByType } from '../../../../form-types'
-import { StepContainer } from './StepContainer'
-import { ConnectedStepInfo } from './ConnectedStepInfo'
+import { useRef, useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
+import { useDrag, useDrop } from 'react-dnd'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { DND_TYPES } from '../../../../constants'
+import { stepIconsByType } from '../../../../form-types'
 import type { StepIdType } from '../../../../form-types'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { ConnectedStepInfo } from './ConnectedStepInfo'
+import { StepContainer } from './StepContainer'
 
 export interface ConnectedStepItemProps {
   stepId: StepIdType

@@ -1,13 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { BlowOut } from '../../QuickTransferAdvancedSettings/BlowOut'
-
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { BlowOut } from '../../QuickTransferAdvancedSettings/BlowOut'
 import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/resources/deck_configuration')

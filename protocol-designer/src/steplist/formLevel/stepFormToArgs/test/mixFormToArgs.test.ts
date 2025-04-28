@@ -1,14 +1,14 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import {
   fixtureP10SingleV2Specs,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
-import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
-import { mixFormToArgs } from '../mixFormToArgs'
-import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'
-import { getOrderedWells } from '../../../utils'
-import type { HydratedMixFormData } from '../../../../form-types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'
+import type { HydratedMixFormData } from '../../../../form-types'
+import { getOrderedWells } from '../../../utils'
+import { mixFormToArgs } from '../mixFormToArgs'
 
 vi.mock('../../../utils')
 

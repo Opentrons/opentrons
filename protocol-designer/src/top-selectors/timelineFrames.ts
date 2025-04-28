@@ -1,28 +1,28 @@
-import { createSelector } from 'reselect'
-import { selectors as fileDataSelectors } from '../file-data'
-import { selectors as stepFormSelectors } from '../step-forms'
-import {
-  getActiveItem,
-  getSelectedStepId,
-  getSelectedTerminalItemId,
-} from '../ui/steps/selectors'
-import {
-  START_TERMINAL_ITEM_ID,
-  PRESAVED_STEP_ID,
-  HARDWARE_ID,
-} from '../steplist'
-import {
-  SINGLE_STEP_SELECTION_TYPE,
-  TERMINAL_ITEM_SELECTION_TYPE,
-} from '../ui/steps/reducers'
 import type {
   CommandsAndRobotState,
   RobotState,
   Timeline,
 } from '@opentrons/step-generation'
-import type { Selector } from '../types'
+import { createSelector } from 'reselect'
+import { selectors as fileDataSelectors } from '../file-data'
+import { selectors as stepFormSelectors } from '../step-forms'
+import {
+  HARDWARE_ID,
+  PRESAVED_STEP_ID,
+  START_TERMINAL_ITEM_ID,
+} from '../steplist'
 import type { TerminalItemId } from '../steplist'
+import type { Selector } from '../types'
+import {
+  SINGLE_STEP_SELECTION_TYPE,
+  TERMINAL_ITEM_SELECTION_TYPE,
+} from '../ui/steps/reducers'
 import type { HoverableItem } from '../ui/steps/reducers'
+import {
+  getActiveItem,
+  getSelectedStepId,
+  getSelectedTerminalItemId,
+} from '../ui/steps/selectors'
 
 const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   activeItem: HoverableItem | null,

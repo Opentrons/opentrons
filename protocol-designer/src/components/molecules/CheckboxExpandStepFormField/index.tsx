@@ -1,8 +1,8 @@
 import {
   ALIGN_CENTER,
   Btn,
-  COLORS,
   Check,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -12,7 +12,6 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-
 import type { ReactNode } from 'react'
 import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
 

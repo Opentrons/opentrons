@@ -1,9 +1,7 @@
 import cx from 'classnames'
-
 import { Button } from './Button'
-import styles from './buttons.module.css'
-
 import type { ButtonProps } from './Button'
+import styles from './buttons.module.css'
 
 /**
  * Button with no background fill and a dark border.

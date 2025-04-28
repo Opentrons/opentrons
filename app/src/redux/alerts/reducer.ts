@@ -1,9 +1,8 @@
 import union from 'lodash/union'
 import without from 'lodash/without'
-import * as Constants from './constants'
-
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
+import * as Constants from './constants'
 import type { AlertsState } from './types'
 
 const INITIAL_STATE = {

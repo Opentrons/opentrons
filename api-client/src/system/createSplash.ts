@@ -1,7 +1,7 @@
 import { POST, request } from '../request'
-import { sanitizeFileName } from './utils'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
+import { sanitizeFileName } from './utils'
 
 export function createSplash(
   config: HostConfig,

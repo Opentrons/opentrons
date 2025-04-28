@@ -1,10 +1,4 @@
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import { yupResolver } from '@hookform/resolvers/yup'
-import * as Yup from 'yup'
-import { Controller, useForm } from 'react-hook-form'
-import { getSortedLiquidClassDefs } from '@opentrons/shared-data'
 import {
   Btn,
   COLORS,
@@ -22,18 +16,23 @@ import {
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
+import { getSortedLiquidClassDefs } from '@opentrons/shared-data'
+import type { Ingredient } from '@opentrons/step-generation'
+import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import type { ThunkDispatch } from 'redux-thunk'
+import * as Yup from 'yup'
+import { getEnableLiquidClasses } from '../../../feature-flags/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import type { BaseState } from '../../../types'
 import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { TextAreaField } from '../../molecules'
-import { getEnableLiquidClasses } from '../../../feature-flags/selectors'
-import { swatchColors } from './swatchColors'
-import { LiquidColorPicker } from './LiquidColorPicker'
 import { LiquidClassDropdown } from './LiquidClassDropdown'
-
-import type { Ingredient } from '@opentrons/step-generation'
-import type { ThunkDispatch } from 'redux-thunk'
-import type { BaseState } from '../../../types'
+import { LiquidColorPicker } from './LiquidColorPicker'
+import { swatchColors } from './swatchColors'
 
 const liquidEditFormSchema: any = Yup.object().shape({
   displayName: Yup.string().required('liquid name is required'),

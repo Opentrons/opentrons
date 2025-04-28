@@ -1,12 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-
-import { i18n } from '../../assets/localization'
+import type { FallbackProps } from 'react-error-boundary'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../__testing-utils__'
 import { analyticsEvent } from '../../analytics/actions'
+import { i18n } from '../../assets/localization'
 import { ProtocolDesignerAppFallback } from '../ProtocolDesignerAppFallback'
-
-import type { FallbackProps } from 'react-error-boundary'
 
 vi.mock('../../analytics/actions')
 

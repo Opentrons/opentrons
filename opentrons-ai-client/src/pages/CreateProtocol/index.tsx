@@ -1,17 +1,23 @@
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useEffect, useRef, useState } from 'react'
-import { PromptPreview } from '../../molecules/PromptPreview'
-import { useForm, FormProvider } from 'react-hook-form'
-import { useAtom } from 'jotai'
-
 import {
   Flex,
   JUSTIFY_SPACE_EVENLY,
   POSITION_RELATIVE,
   SPACING,
 } from '@opentrons/components'
-
+import { useAtom } from 'jotai'
+import { useEffect, useRef, useState } from 'react'
+import type { MouseEvent } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { ResizeBar } from '../../atoms/ResizeBar'
+import { PromptPreview } from '../../molecules/PromptPreview'
+import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
+import type { DisplayModules } from '../../organisms/ModulesSection'
+import {
+  ProtocolSectionsContainer,
+  sections,
+} from '../../organisms/ProtocolSectionsContainer'
 import {
   chatDataAtom,
   chatHistoryAtom,
@@ -20,21 +26,11 @@ import {
   headerWithMeterAtom,
   updateProtocolChatAtom,
 } from '../../resources/atoms'
-
-import {
-  ProtocolSectionsContainer,
-  sections,
-} from '../../organisms/ProtocolSectionsContainer'
+import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import {
   generateChatPrompt,
   generatePromptPreviewData,
 } from '../../resources/utils/createProtocolUtils'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
-import { ResizeBar } from '../../atoms/ResizeBar'
-
-import type { MouseEvent } from 'react'
-import type { DisplayModules } from '../../organisms/ModulesSection'
-import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
 
 export interface CreateProtocolFormData {
   protocol_format: 'Protocol Designer' | 'Python'

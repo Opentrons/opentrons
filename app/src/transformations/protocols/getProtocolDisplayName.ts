@@ -1,5 +1,5 @@
-import first from 'lodash/first'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import first from 'lodash/first'
 
 export function getProtocolDisplayName(
   protocolKey: string,

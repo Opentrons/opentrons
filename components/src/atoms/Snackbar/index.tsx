@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { css } from 'styled-components'
-import { ALIGN_CENTER } from '../../styles'
-import { Flex } from '../../primitives'
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
+import type { StyleProps } from '../../primitives'
+import { ALIGN_CENTER } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
-
-import type { StyleProps } from '../../primitives'
 
 export interface SnackbarProps extends StyleProps {
   message: string

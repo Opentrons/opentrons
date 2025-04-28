@@ -1,19 +1,16 @@
-import { renderHook, act } from '@testing-library/react'
-import { describe, it, expect, beforeEach } from 'vitest'
-
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
-
-import { useShowDoorInfo } from '../useShowDoorInfo'
+import { act, renderHook } from '@testing-library/react'
 import {
-  RECOVERY_MAP,
   GRIPPER_MOVE_STEPS,
+  RECOVERY_MAP,
 } from '/app/organisms/ErrorRecoveryFlows/constants'
-
+import { beforeEach, describe, expect, it } from 'vitest'
 import type { IRecoveryMap, RouteStep } from '../../types'
+import { useShowDoorInfo } from '../useShowDoorInfo'
 
 describe('useShowDoorInfo', () => {
   let initialProps: Parameters<typeof useShowDoorInfo>[0]

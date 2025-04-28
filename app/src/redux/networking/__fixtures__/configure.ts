@@ -5,9 +5,8 @@ import {
   makeResponseFixtures,
   mockFailureBody,
 } from '../../robot-api/__fixtures__'
-import { WIFI_CONFIGURE_PATH } from '../constants'
-
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
+import { WIFI_CONFIGURE_PATH } from '../constants'
 import type { WifiConfigureResponse } from '../types'
 
 const {

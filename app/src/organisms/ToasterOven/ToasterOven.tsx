@@ -1,28 +1,25 @@
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import { v4 as uuidv4 } from 'uuid'
-
 import {
-  Flex,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN_REVERSE,
+  Flex,
   JUSTIFY_CENTER,
   POSITION_FIXED,
-  SPACING,
   Snackbar,
+  SPACING,
   Toast,
 } from '@opentrons/components'
-
-import { getIsOnDevice } from '/app/redux/config'
-import { ToasterContext } from './ToasterContext'
-
-import type { ReactNode } from 'react'
 import type { SnackbarProps } from '@opentrons/components'
 import type {
   ToastProps,
   ToastType,
 } from '@opentrons/components/src/atoms/Toast'
+import { getIsOnDevice } from '/app/redux/config'
+import { useState } from 'react'
+import type { ReactNode } from 'react'
+import { useSelector } from 'react-redux'
+import { v4 as uuidv4 } from 'uuid'
+import { ToasterContext } from './ToasterContext'
 import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
 
 interface ToasterOvenProps {

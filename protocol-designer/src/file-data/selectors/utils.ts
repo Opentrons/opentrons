@@ -1,8 +1,3 @@
-import mapValues from 'lodash/mapValues'
-import map from 'lodash/map'
-import reduce from 'lodash/reduce'
-import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
-import { COLUMN_4_SLOTS, uuid } from '@opentrons/step-generation'
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -12,19 +7,24 @@ import type {
   LoadPipetteCreateCommand,
   PipetteName,
 } from '@opentrons/shared-data'
+import { COLUMN_4_SLOTS, uuid } from '@opentrons/step-generation'
 import type {
   LabwareEntities,
-  LabwareLiquidState,
-  PipetteEntities,
-  RobotState,
-  ModuleEntities,
-  TimelineFrame,
-  LiquidEntities,
-  PipetteEntity,
-  ModuleEntity,
   LabwareEntity,
+  LabwareLiquidState,
+  LiquidEntities,
+  ModuleEntities,
+  ModuleEntity,
+  PipetteEntities,
+  PipetteEntity,
+  RobotState,
+  TimelineFrame,
 } from '@opentrons/step-generation'
+import map from 'lodash/map'
+import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
 import type { Labware, Modules, Pipettes } from '../../file-types'
+import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 
 interface MappedPipettes {
   [pipetteId: string]: { name: PipetteName }

@@ -1,4 +1,4 @@
-import { Box, BORDERS } from '@opentrons/components'
+import { BORDERS, Box } from '@opentrons/components'
 import type { ReactNode } from 'react'
 
 export function StandInContent({

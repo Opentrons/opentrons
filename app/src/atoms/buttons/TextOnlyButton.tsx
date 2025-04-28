@@ -1,8 +1,7 @@
-import { css } from 'styled-components'
-import { Btn, StyledText, COLORS, RESPONSIVENESS } from '@opentrons/components'
-
-import type { ReactNode } from 'react'
+import { Btn, COLORS, RESPONSIVENESS, StyledText } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
+import type { ReactNode } from 'react'
+import { css } from 'styled-components'
 
 const GO_BACK_BUTTON_STYLE = css`
   color: ${COLORS.grey50};

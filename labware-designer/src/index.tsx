@@ -1,5 +1,4 @@
 import * as sharedData from '@opentrons/shared-data'
-
 import ReactDOM from 'react-dom/client'
 import { App } from './App'
 

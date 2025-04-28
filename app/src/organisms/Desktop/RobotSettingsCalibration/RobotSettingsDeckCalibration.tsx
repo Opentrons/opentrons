@@ -1,22 +1,19 @@
-import { useRef, useEffect } from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
 } from '@opentrons/components'
-
-import { formatLastModified } from '../CalibrationPanels/utils'
 import { useDeckCalibrationData } from '/app/organisms/Desktop/Devices/hooks'
 import { useRobot } from '/app/redux-resources/robots'
 import * as RobotApi from '/app/redux/robot-api'
-
 import type { State } from '/app/redux/types'
+import { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { formatLastModified } from '../CalibrationPanels/utils'
 
 interface RobotSettingsDeckCalibrationProps {
   robotName: string

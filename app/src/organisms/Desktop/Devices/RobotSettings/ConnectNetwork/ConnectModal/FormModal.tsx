@@ -1,20 +1,19 @@
-import { Controller } from 'react-hook-form'
-import styled, { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import {
-  FONT_SIZE_BODY_1,
   BUTTON_TYPE_SUBMIT,
   Flex,
+  FONT_SIZE_BODY_1,
 } from '@opentrons/components'
-import { SECURITY_WPA_PSK, SECURITY_WPA_EAP } from '/app/redux/networking'
 import { ScrollableAlertModal } from '/app/molecules/modals'
-import { TextField } from './TextField'
+import { SECURITY_WPA_EAP, SECURITY_WPA_PSK } from '/app/redux/networking'
+import { Controller } from 'react-hook-form'
+import type { Control } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
+import { FIELD_TYPE_KEY_FILE, FIELD_TYPE_SECURITY } from '../constants'
+import type { ConnectFormField, ConnectFormValues, WifiNetwork } from '../types'
 import { KeyFileField } from './KeyFileField'
 import { SecurityField } from './SecurityField'
-import { FIELD_TYPE_KEY_FILE, FIELD_TYPE_SECURITY } from '../constants'
-
-import type { Control } from 'react-hook-form'
-import type { ConnectFormField, ConnectFormValues, WifiNetwork } from '../types'
+import { TextField } from './TextField'
 
 const fieldStyle = css`
   min-width: 12rem;

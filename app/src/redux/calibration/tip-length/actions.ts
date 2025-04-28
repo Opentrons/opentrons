@@ -1,12 +1,10 @@
+import type {
+  RobotApiErrorResponse,
+  RobotApiRequestMeta,
+} from '../../robot-api/types'
+import type { AllTipLengthCalibrations } from '../api-types'
 import * as Constants from './constants'
 import type * as Types from './types'
-
-import type { AllTipLengthCalibrations } from '../api-types'
-
-import type {
-  RobotApiRequestMeta,
-  RobotApiErrorResponse,
-} from '../../robot-api/types'
 
 export const fetchTipLengthCalibrations = (
   robotName: string

@@ -1,23 +1,22 @@
 // TODO: replace this by making these props true of interventionmodal content wrappers
 // once error recovery uses interventionmodal consistently
 
-import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   Flex,
+  JUSTIFY_SPACE_BETWEEN,
   RESPONSIVENESS,
+  SPACING,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
 import {
   OneColumn,
-  TwoColumn,
   OneColumnOrTwoColumn,
+  TwoColumn,
 } from '/app/molecules/InterventionModal'
-import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-
 import type { ComponentProps, ReactNode } from 'react'
+import { css } from 'styled-components'
+import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 interface SingleColumnContentWrapperProps {
   children: ReactNode

@@ -1,5 +1,4 @@
 import { css } from 'styled-components'
-
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'

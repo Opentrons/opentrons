@@ -1,25 +1,24 @@
-import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import {
-  getInitialRobotStateStandard,
-  getInitialRobotStateWithOffDeckLabwareStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
-  getStateAndContextTempTCModules,
-  SOURCE_LABWARE,
-  TIPRACK_1,
-  DEST_LABWARE,
-} from '../fixtures'
-import { moveLabware } from '../commandCreators/atomic'
-
 import type {
   LabwareDefinition2,
   MoveLabwareParams,
 } from '@opentrons/shared-data'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { moveLabware } from '../commandCreators/atomic'
+import {
+  DEST_LABWARE,
+  getErrorResult,
+  getInitialRobotStateStandard,
+  getInitialRobotStateWithOffDeckLabwareStandard,
+  getStateAndContextTempTCModules,
+  getSuccessResult,
+  makeContext,
+  SOURCE_LABWARE,
+  TIPRACK_1,
+} from '../fixtures'
 import type { InvariantContext, RobotState } from '../types'
 
 const mockWasteChuteId = 'mockWasteChuteId'

@@ -1,5 +1,6 @@
-import { uuid } from '../../utils'
 import type { CommandCreator } from '../../types'
+import { uuid } from '../../utils'
+
 interface DropTipArgs {
   pipette: string
   dropTipLocation: string

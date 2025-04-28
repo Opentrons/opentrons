@@ -1,8 +1,7 @@
-import { useSelector } from 'react-redux'
+import type { RobotSettingsField } from '@opentrons/api-client'
 import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 import { getIsOnDevice } from '/app/redux/config'
-
-import type { RobotSettingsField } from '@opentrons/api-client'
+import { useSelector } from 'react-redux'
 
 /**
  * a hook to tell the ODD that the robot is in OEM mode

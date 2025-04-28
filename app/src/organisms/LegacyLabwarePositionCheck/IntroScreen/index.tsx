@@ -1,8 +1,4 @@
-import { useState } from 'react'
-import { createPortal } from 'react-dom'
-import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import type { LabwareOffset } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   Box,
@@ -10,37 +6,39 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  getLabwareDefinitionsFromCommands,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  PrimaryButton,
-  ModalShell,
-  getLabwareDefinitionsFromCommands,
-  SPACING,
   LegacyStyledText,
+  ModalShell,
+  PrimaryButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { RobotMotionLoader } from '../RobotMotionLoader'
-import { getPrepCommands } from './getPrepCommands'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
-import { getLatestCurrentOffsets } from '/app/transformations/runs'
-import { getIsOnDevice } from '/app/redux/config'
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
-import { useSelector } from 'react-redux'
-import { TwoUpTileLayout } from '../TwoUpTileLayout'
-import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
-import { CALIBRATION_PROBE } from '/app/organisms/PipetteWizardFlows/constants'
-import { TerseOffsetTable } from '../ResultsSummary'
-
-import type { Dispatch } from 'react'
-import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { useChainRunCommands } from '/app/resources/runs'
-import type { RegisterPositionAction } from '../types'
+import { getTopPortalEl } from '/app/App/portal'
+import { SmallButton } from '/app/atoms/buttons'
 import type { Jog } from '/app/molecules/JogControls'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+import { CALIBRATION_PROBE } from '/app/organisms/PipetteWizardFlows/constants'
+import { getIsOnDevice } from '/app/redux/config'
+import type { useChainRunCommands } from '/app/resources/runs'
+import { getLatestCurrentOffsets } from '/app/transformations/runs'
+import { useState } from 'react'
+import type { Dispatch } from 'react'
+import { createPortal } from 'react-dom'
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+import { TerseOffsetTable } from '../ResultsSummary'
+import { RobotMotionLoader } from '../RobotMotionLoader'
+import { TwoUpTileLayout } from '../TwoUpTileLayout'
+import type { RegisterPositionAction } from '../types'
+import { getPrepCommands } from './getPrepCommands'
 
 export const INTERVAL_MS = 3000
 

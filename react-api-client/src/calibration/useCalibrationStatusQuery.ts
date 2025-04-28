@@ -1,9 +1,8 @@
 import { getCalibrationStatus } from '@opentrons/api-client'
-import { useQuery } from 'react-query'
-import { useHost } from '../api'
-
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { CalibrationStatus, HostConfig } from '@opentrons/api-client'
+import { useQuery } from 'react-query'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import { useHost } from '../api'
 
 export function useCalibrationStatusQuery(
   options: UseQueryOptions<

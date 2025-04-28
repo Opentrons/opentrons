@@ -1,9 +1,7 @@
 import classnames from 'classnames'
-
 import { Button } from './Button'
-import styles from './buttons.module.css'
-
 import type { ButtonProps } from './Button'
+import styles from './buttons.module.css'
 
 /**
  * Flat-styled button with a default width of `9rem` and no background fill

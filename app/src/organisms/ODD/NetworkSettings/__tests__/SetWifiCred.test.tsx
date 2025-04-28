@@ -1,12 +1,10 @@
-import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { SetWifiCred } from '../SetWifiCred'
-
 import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { SetWifiCred } from '../SetWifiCred'
 
 const mockSetPassword = vi.fn()
 vi.mock('/app/redux/discovery')

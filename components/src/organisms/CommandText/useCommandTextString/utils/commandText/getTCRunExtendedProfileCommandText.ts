@@ -1,10 +1,10 @@
-import { formatDurationLabeled } from '../formatDuration'
 import type {
-  TCRunExtendedProfileRunTimeCommand,
-  TCProfileCycle,
   AtomicProfileStep,
+  TCProfileCycle,
+  TCRunExtendedProfileRunTimeCommand,
 } from '@opentrons/shared-data/command'
 import type { GetTCRunExtendedProfileCommandTextResult } from '../..'
+import { formatDurationLabeled } from '../formatDuration'
 import type { HandlesCommands } from '../types'
 
 export interface TCProfileStepText {

@@ -1,9 +1,7 @@
 import cx from 'classnames'
-
 import { Button } from './Button'
-import styles from './buttons.module.css'
-
 import type { ButtonProps } from './Button'
+import styles from './buttons.module.css'
 
 /**
  * Primary application button. Fills its container and has a dark

@@ -1,16 +1,13 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
-
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { useTranslation } from 'react-i18next'
 
 interface ConfirmSetupStepsCompleteModalProps {
   onCloseClick: () => void

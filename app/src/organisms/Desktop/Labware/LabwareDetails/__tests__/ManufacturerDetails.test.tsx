@@ -1,10 +1,9 @@
 import { screen } from '@testing-library/react'
-import { describe, it, expect, beforeEach } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ManufacturerDetails } from '../ManufacturerDetails'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { ManufacturerDetails } from '../ManufacturerDetails'
 
 const render = (props: ComponentProps<typeof ManufacturerDetails>) => {
   return renderWithProviders(<ManufacturerDetails {...props} />, {

@@ -1,7 +1,6 @@
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { PAUSE_UNTIL_TIME } from '../../constants'
-
 import type { ProtocolFile } from '@opentrons/shared-data'
+import { PAUSE_UNTIL_TIME } from '../../constants'
 import type { HydratedPauseFormData } from '../../form-types'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 

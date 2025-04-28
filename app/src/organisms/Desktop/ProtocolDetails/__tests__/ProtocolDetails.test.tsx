@@ -1,13 +1,11 @@
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import { act, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout'
 import {
-  useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware/selectors'
 import {
@@ -16,18 +14,18 @@ import {
   getScanning,
   getUnreachableRobots,
 } from '/app/redux/discovery'
-import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage/selectors'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
 import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
-import { ProtocolDetails } from '..'
-
+import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage/selectors'
 import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { ProtocolDetails } from '..'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/custom-labware/selectors')

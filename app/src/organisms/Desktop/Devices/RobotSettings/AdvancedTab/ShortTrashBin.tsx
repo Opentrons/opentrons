@@ -1,22 +1,19 @@
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { ToggleButton } from '/app/atoms/buttons'
 import { updateSetting } from '/app/redux/robot-settings'
-
-import type { MouseEventHandler } from 'react'
-import type { Dispatch } from '/app/redux/types'
 import type { RobotSettingsField } from '/app/redux/robot-settings/types'
+import type { Dispatch } from '/app/redux/types'
+import type { MouseEventHandler } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 interface ShortTrashBinProps {
   settings: RobotSettingsField | undefined

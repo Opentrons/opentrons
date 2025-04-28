@@ -1,6 +1,3 @@
-import { useState, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -8,18 +5,18 @@ import {
   InputField,
   SPACING,
 } from '@opentrons/components'
-
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { getVolumeRange } from './utils'
-import { CONSOLIDATE, DISTRIBUTE } from './constants'
-
-import type { ComponentProps, Dispatch } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useRef, useState } from 'react'
+import type { ComponentProps, Dispatch } from 'react'
+import { useTranslation } from 'react-i18next'
+import { CONSOLIDATE, DISTRIBUTE } from './constants'
 import type {
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
+import { getVolumeRange } from './utils'
 
 interface VolumeEntryProps {
   onNext: () => void

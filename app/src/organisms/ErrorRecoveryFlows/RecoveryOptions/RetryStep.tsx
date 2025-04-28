@@ -1,8 +1,7 @@
 import { RECOVERY_MAP } from '../constants'
 import { RetryStepInfo } from '../shared'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
-
 import type { RecoveryContentProps } from '../types'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 export function RetryStep(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props

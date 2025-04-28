@@ -1,9 +1,7 @@
-import { createSelector } from 'reselect'
-
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-
-import type { Selector } from 'reselect'
 import type { LoadedPipette, PipetteChannels } from '@opentrons/shared-data'
+import { createSelector } from 'reselect'
+import type { Selector } from 'reselect'
 import type { State } from '../../../types'
 
 // Returns the "active" pipette, the pipette used for LPC.

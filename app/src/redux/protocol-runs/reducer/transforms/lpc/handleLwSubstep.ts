@@ -1,5 +1,4 @@
 import { HANDLE_LW_SUBSTEP } from '../../../constants'
-
 import type { HandleLwSubstepType, LPCWizardState } from '../../../types'
 
 // Handles proceed to next substep for the "handle labware" core LPC flow.

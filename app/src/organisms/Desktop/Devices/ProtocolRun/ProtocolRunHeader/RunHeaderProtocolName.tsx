@@ -1,13 +1,11 @@
-import { Link } from 'react-router-dom'
-
 import {
   COLORS,
   Flex,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { useProtocolDetailsForRun } from '/app/resources/runs'
+import { Link } from 'react-router-dom'
 
 interface RunHeaderProtocolNameProps {
   runId: string

@@ -1,15 +1,12 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
-
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { updateConfigValue } from '/app/redux/config'
-import { WelcomeModal } from '../WelcomeModal'
-
 import type { ComponentProps } from 'react'
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { WelcomeModal } from '../WelcomeModal'
 
 vi.mock('/app/redux/config')
 vi.mock('@opentrons/react-api-client')

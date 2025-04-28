@@ -1,17 +1,15 @@
-import { beforeEach, describe, it, vi, afterEach, expect } from 'vitest'
 import { act, renderHook, screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockRecoveryContentProps } from '../__fixtures__'
+import { RECOVERY_MAP } from '../constants'
 import {
+  GRIPPER_RELEASE_COUNTDOWN_S,
   RecoveryInProgress,
   useGripperRelease,
-  GRIPPER_RELEASE_COUNTDOWN_S,
 } from '../RecoveryInProgress'
-import { RECOVERY_MAP } from '../constants'
-
-import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof RecoveryInProgress>) => {
   return renderWithProviders(<RecoveryInProgress {...props} />, {

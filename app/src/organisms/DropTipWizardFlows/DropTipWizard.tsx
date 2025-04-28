@@ -1,28 +1,27 @@
+import {
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  ModalShell,
+  OVERFLOW_AUTO,
+  OVERFLOW_HIDDEN,
+  POSITION_ABSOLUTE,
+  RESPONSIVENESS,
+  SPACING,
+  useConditionalConfirm,
+} from '@opentrons/components'
+import { getTopPortalEl } from '/app/App/portal'
+import { InProgressModal } from '/app/molecules/InProgressModal'
+import { getIsOnDevice } from '/app/redux/config'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
-
-import {
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  RESPONSIVENESS,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  POSITION_ABSOLUTE,
-  SPACING,
-  useConditionalConfirm,
-  ModalShell,
-  DISPLAY_FLEX,
-  OVERFLOW_HIDDEN,
-  OVERFLOW_AUTO,
-} from '@opentrons/components'
-
-import { getTopPortalEl } from '/app/App/portal'
-import { getIsOnDevice } from '/app/redux/config'
-import { ExitConfirmation } from './ExitConfirmation'
+import type { DropTipWizardFlowsProps } from '.'
 import {
   BEFORE_BEGINNING,
   BLOWOUT_SUCCESS,
@@ -35,27 +34,25 @@ import {
   POSITION_AND_BLOWOUT,
   POSITION_AND_DROP_TIP,
 } from './constants'
-import {
-  BeforeBeginning,
-  ChooseLocation,
-  ChooseDeckLocation,
-  JogToPosition,
-  Success,
-  ConfirmPosition,
-  useConfirmPosition,
-} from './steps'
-import { InProgressModal } from '/app/molecules/InProgressModal'
-import { useDropTipErrorComponents } from './hooks'
 import { DropTipWizardHeader } from './DropTipWizardHeader'
 import { ErrorInfo } from './ErrorInfo'
-
-import type { DropTipWizardFlowsProps } from '.'
-import type { DropTipWizardContainerProps, IssuedCommandsType } from './types'
+import { ExitConfirmation } from './ExitConfirmation'
+import { useDropTipErrorComponents } from './hooks'
 import type {
+  DropTipBlowoutLocationDetails,
   UseDropTipRoutingResult,
   UseDropTipWithTypeResult,
-  DropTipBlowoutLocationDetails,
 } from './hooks'
+import {
+  BeforeBeginning,
+  ChooseDeckLocation,
+  ChooseLocation,
+  ConfirmPosition,
+  JogToPosition,
+  Success,
+  useConfirmPosition,
+} from './steps'
+import type { DropTipWizardContainerProps, IssuedCommandsType } from './types'
 
 export type DropTipWizardProps = DropTipWizardFlowsProps &
   UseDropTipWithTypeResult &

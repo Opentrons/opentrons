@@ -11,7 +11,6 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-
 import { ToggleButton } from '../../atoms'
 
 interface ToggleStepFormFieldProps {

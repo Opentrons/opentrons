@@ -1,12 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, expect, vi } from 'vitest'
-
+import type { ComponentProps } from 'react'
+import type * as ReactHookForm from 'react-hook-form'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { reagentTransfer } from '../../../assets/prompts'
 import { PromptButton } from '../index'
-
-import type { ComponentProps } from 'react'
-import type * as ReactHookForm from 'react-hook-form'
 
 vi.mock('react-hook-form', async importOriginal => {
   const actual = await importOriginal<typeof ReactHookForm>()

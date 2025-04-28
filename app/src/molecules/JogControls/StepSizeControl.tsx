@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
 import {
   ALIGN_FLEX_START,
   BORDERS,
@@ -17,11 +15,11 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
+import type { MouseEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 import { ControlContainer } from './ControlContainer'
 import { TouchControlButton } from './TouchControlButton'
-
-import type { MouseEvent } from 'react'
 import type { StepSize } from './types'
 
 const JUMP_SIZE_SUBTITLE = '- / +'

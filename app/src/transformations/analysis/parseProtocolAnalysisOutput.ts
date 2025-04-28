@@ -1,7 +1,7 @@
 import {
-  parseRequiredModulesEntity,
   parseInitialLoadedLabwareEntity,
   parsePipetteEntity,
+  parseRequiredModulesEntity,
 } from '@opentrons/shared-data'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 

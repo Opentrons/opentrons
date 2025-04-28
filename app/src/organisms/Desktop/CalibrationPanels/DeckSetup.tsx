@@ -1,28 +1,26 @@
-import { useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
-import map from 'lodash/map'
-
 import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   RobotWorkSpace,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
 import {
   getDeckDefinitions,
   getLabwareDisplayName,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
-import * as Sessions from '/app/redux/sessions'
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
-import { CalibrationLabwareRender } from './CalibrationLabwareRender'
-
 import type { AddressableArea } from '@opentrons/shared-data'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import * as Sessions from '/app/redux/sessions'
+import map from 'lodash/map'
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
+import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 import type { CalibrationPanelProps } from './types'
 
 const TIPRACK = 'tip rack'

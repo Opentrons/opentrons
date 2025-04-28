@@ -1,19 +1,17 @@
 /* eslint-disable testing-library/no-node-access */
 import { screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { getLocalRobot } from '/app/redux/discovery'
-import { useWifiList } from '/app/resources/networking/hooks'
-import { WifiConnectionDetails } from '../WifiConnectionDetails'
-import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
-import { NetworkSettings } from '..'
-
-import type { ComponentProps } from 'react'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { WifiNetwork } from '/app/redux/networking/types'
+import { useWifiList } from '/app/resources/networking/hooks'
+import type { ComponentProps } from 'react'
+import { NetworkSettings } from '..'
+import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
+import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/networking/hooks')

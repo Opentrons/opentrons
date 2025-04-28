@@ -1,23 +1,28 @@
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
-
-import {
-  getHoveredTerminalItemId,
-  getSelectedTerminalItemId,
-  getIsMultiSelectMode,
-  actions as stepsActions,
-} from '../../../../ui/steps'
-import {
-  getCurrentFormIsPresaved,
-  getCurrentFormHasUnsavedChanges,
-} from '../../../../step-forms/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
 } from '../../../../components/organisms'
+import {
+  getCurrentFormHasUnsavedChanges,
+  getCurrentFormIsPresaved,
+} from '../../../../step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+import type { TerminalItemId } from '../../../../steplist'
+import type { ThunkDispatch } from '../../../../types'
+import {
+  getHoveredTerminalItemId,
+  getIsMultiSelectMode,
+  getSelectedTerminalItemId,
+  actions as stepsActions,
+} from '../../../../ui/steps'
+import type {
+  HoverOnTerminalItemAction,
+  SelectTerminalItemAction,
+} from '../../../../ui/steps'
 import {
   deselectAllSteps,
   hoverOnStep,
@@ -25,13 +30,6 @@ import {
   toggleViewSubstep,
 } from '../../../../ui/steps/actions/actions'
 import { StepContainer } from './StepContainer'
-
-import type {
-  SelectTerminalItemAction,
-  HoverOnTerminalItemAction,
-} from '../../../../ui/steps'
-import type { TerminalItemId } from '../../../../steplist'
-import type { ThunkDispatch } from '../../../../types'
 
 export interface TerminalItemStepProps {
   id: TerminalItemId

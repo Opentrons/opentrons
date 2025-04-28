@@ -1,8 +1,4 @@
-import { useState, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
-import { createPortal } from 'react-dom'
-
+import type { LabwareOffsetCreateData } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -22,14 +18,15 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import { getModalPortalEl } from '/app/App/portal'
-import { LearnAboutOffsetsLink } from '/app/organisms/Desktop/Devices/ProtocolRun/LearnAboutOffsetsLink'
-import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
-
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { LabwareOffsetCreateData } from '@opentrons/api-client'
+import { getModalPortalEl } from '/app/App/portal'
+import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { LearnAboutOffsetsLink } from '/app/organisms/Desktop/Devices/ProtocolRun/LearnAboutOffsetsLink'
 import type { SetupLabwarePositionCheckProps } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck'
+import { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 
 interface LPCOffsetsSnippetsProps extends SetupLabwarePositionCheckProps {
   protocolData: CompletedProtocolAnalysis

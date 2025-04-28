@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -13,27 +11,26 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
+import { useRobotType } from '/app/redux-resources/robots'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
-import { useRobotType } from '/app/redux-resources/robots'
 import {
+  useModuleCalibrationStatus,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
-  useModuleCalibrationStatus,
 } from '/app/resources/runs'
-import { SetupModulesMap } from './SetupModulesMap'
-import { SetupModulesList } from './SetupModulesList'
+import { useTranslation } from 'react-i18next'
 import { SetupFixtureList } from './SetupFixtureList'
-
-import type {
-  CompletedProtocolAnalysis,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
+import { SetupModulesList } from './SetupModulesList'
+import { SetupModulesMap } from './SetupModulesMap'
 
 interface SetupModuleAndDeckProps {
   expandLabwarePositionCheckStep: () => void

@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -6,8 +5,8 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
 import type { LiquidClassOption } from './hooks'

@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest'
-import { getPrimaryPipetteId } from '../getPrimaryPipetteId'
 import type {
   LoadedPipette,
   LoadPipetteRunTimeCommand,
 } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
+import { getPrimaryPipetteId } from '../getPrimaryPipetteId'
 
 describe('getPrimaryPipetteId', () => {
   it('should return the one and only pipette if there is only one pipette in the protocol', () => {

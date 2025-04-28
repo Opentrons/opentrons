@@ -1,9 +1,7 @@
-import { describe, it, expect } from 'vitest'
-
-import * as Selectors from '../selectors'
+import { describe, expect, it } from 'vitest'
 import * as Fixtures from '../__fixtures__'
-
 import type { State } from '../../../types'
+import * as Selectors from '../selectors'
 
 const mockState: State = {
   calibration: {

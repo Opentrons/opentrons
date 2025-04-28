@@ -1,41 +1,39 @@
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DeckInfoLabel,
   Flex,
+  LegacyStyledText,
   ModuleIcon,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
+  getFixtureDisplayName,
   getModuleDisplayName,
   getModuleType,
-  getFixtureDisplayName,
   GRIPPER_V1_2,
   MAGNETIC_BLOCK_FIXTURES,
   MAGNETIC_BLOCK_TYPE,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
 import {
   useGripperDisplayName,
   usePipetteNameSpecs,
 } from '/app/local-resources/instruments'
 import { useRequiredProtocolHardware } from '/app/resources/protocols'
-import { EmptySection } from './EmptySection'
-
-import type { TFunction } from 'i18next'
 import type {
   ProtocolHardware,
   ProtocolPipette,
 } from '/app/transformations/commands'
+import type { TFunction } from 'i18next'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+import { EmptySection } from './EmptySection'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}

@@ -1,5 +1,4 @@
 import cookie from 'cookie'
-
 import { initializeMixpanel, mixpanelOptIn, mixpanelOptOut } from './mixpanel'
 import type { AnalyticsState } from './types'
 

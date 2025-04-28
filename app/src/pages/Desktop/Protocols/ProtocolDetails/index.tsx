@@ -1,16 +1,14 @@
-import { useEffect } from 'react'
-import { useParams, Navigate } from 'react-router-dom'
-
-import { useDispatch, useSelector } from 'react-redux'
+import type { DesktopRouteParams } from '/app/App/types'
+import { ProtocolDetails as ProtocolDetailsContents } from '/app/organisms/Desktop/ProtocolDetails'
 import {
   fetchProtocols,
   getStoredProtocol,
   getStoredProtocolGroupedCommands,
 } from '/app/redux/protocol-storage'
-import { ProtocolDetails as ProtocolDetailsContents } from '/app/organisms/Desktop/ProtocolDetails'
-
 import type { Dispatch, State } from '/app/redux/types'
-import type { DesktopRouteParams } from '/app/App/types'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Navigate, useParams } from 'react-router-dom'
 
 export function ProtocolDetails(): JSX.Element {
   const { protocolKey } = useParams<

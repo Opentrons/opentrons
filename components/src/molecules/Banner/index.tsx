@@ -1,17 +1,16 @@
+import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import { css } from 'styled-components'
-import { Btn, Flex } from '../../primitives'
-import { Icon } from '../../icons'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { Icon } from '../../icons'
+import type { IconProps } from '../../icons'
+import { Btn, Flex } from '../../primitives'
+import type { StyleProps } from '../../primitives'
 import {
   ALIGN_CENTER,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
-
-import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
-import type { StyleProps } from '../../primitives'
-import type { IconProps } from '../../icons'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 export type BannerType =
   | 'success'

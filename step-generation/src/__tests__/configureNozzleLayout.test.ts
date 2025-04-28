@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
 import { ALL, COLUMN, fixtureP100096V2Specs } from '@opentrons/shared-data'
-import { getSuccessResult } from '../fixtures'
+import { describe, expect, it } from 'vitest'
 import { configureNozzleLayout } from '../commandCreators/atomic/configureNozzleLayout'
+import { getSuccessResult } from '../fixtures'
 
 const getRobotInitialState = (): any => {
   return {}

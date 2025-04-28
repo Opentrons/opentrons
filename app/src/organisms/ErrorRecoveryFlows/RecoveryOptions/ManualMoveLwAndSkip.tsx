@@ -2,13 +2,12 @@ import { RECOVERY_MAP } from '../constants'
 import {
   GripperIsHoldingLabware,
   GripperReleaseLabware,
+  RecoveryDoorOpenSpecial,
   SkipStepInfo,
   TwoColLwInfoAndDeck,
-  RecoveryDoorOpenSpecial,
 } from '../shared'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
-
 import type { RecoveryContentProps } from '../types'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 export function ManualMoveLwAndSkip(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props

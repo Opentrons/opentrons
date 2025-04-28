@@ -1,8 +1,7 @@
 import cx from 'classnames'
+import type { ChangeEventHandler, FocusEventHandler, ReactNode } from 'react'
 import { Icon } from '../icons'
 import styles from './forms.module.css'
-
-import type { ChangeEventHandler, FocusEventHandler, ReactNode } from 'react'
 
 export interface RadioOption {
   name: string

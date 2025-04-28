@@ -1,11 +1,9 @@
-import { describe, it, expect } from 'vitest'
-
+import { describe, expect, it } from 'vitest'
+import type { Choice } from '../../types'
 import {
   isNumeric,
   orderRuntimeParameterRangeOptions,
 } from '../orderRuntimeParameterRangeOptions'
-
-import type { Choice } from '../../types'
 
 describe('isNumeric', () => {
   it('should return true when input is "2"', () => {

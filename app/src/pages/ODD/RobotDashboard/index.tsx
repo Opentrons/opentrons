@@ -1,27 +1,25 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-
+import type { RunData } from '@opentrons/api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
-
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
 } from '/app/organisms/ODD/RobotDashboard'
-import { getOnDeviceDisplaySettings } from '/app/redux/config'
-import { WelcomeModal } from './WelcomeModal'
 import { ServerInitializing } from '/app/organisms/ODD/RobotDashboard/ServerInitializing'
+import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
-import type { RunData } from '@opentrons/api-client'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { WelcomeModal } from './WelcomeModal'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 

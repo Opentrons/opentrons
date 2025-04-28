@@ -1,29 +1,30 @@
-import mapValues from 'lodash/mapValues'
-import { castField } from '../../../steplist/fieldLevel'
-import { mixFormToArgs } from './mixFormToArgs'
-import { pauseFormToArgs } from './pauseFormToArgs'
-import { magnetFormToArgs } from './magnetFormToArgs'
-import { temperatureFormToArgs } from './temperatureFormToArgs'
-import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
-import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
-import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
-import { moveLabwareFormToArgs } from './moveLabwareFormToArgs'
-import { commentFormToArgs } from './commentFormToArgs'
-import { absorbanceReaderFormToArgs } from './absorbanceReaderFormToArgs'
 import type { CommandCreatorArgs } from '@opentrons/step-generation'
+import mapValues from 'lodash/mapValues'
 import type {
   HydratedAbsorbanceReaderFormData,
   HydratedCommentFormData,
+  HydratedFormData,
   HydratedHeaterShakerFormData,
   HydratedMagnetFormData,
   HydratedMixFormData,
   HydratedMoveLabwareFormData,
   HydratedMoveLiquidFormData,
-  HydratedTemperatureFormData,
   HydratedPauseFormData,
+  HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
-  HydratedFormData,
 } from '../../../form-types'
+import { castField } from '../../../steplist/fieldLevel'
+import { absorbanceReaderFormToArgs } from './absorbanceReaderFormToArgs'
+import { commentFormToArgs } from './commentFormToArgs'
+import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
+import { magnetFormToArgs } from './magnetFormToArgs'
+import { mixFormToArgs } from './mixFormToArgs'
+import { moveLabwareFormToArgs } from './moveLabwareFormToArgs'
+import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
+import { pauseFormToArgs } from './pauseFormToArgs'
+import { temperatureFormToArgs } from './temperatureFormToArgs'
+import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
+
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
 // in order to generate command creators

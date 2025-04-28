@@ -1,7 +1,12 @@
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
+import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_3_X_ADJUSTMENT,
@@ -13,12 +18,6 @@ import {
   STAGING_AREA_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
-
-import type {
-  CutoutFixtureId,
-  CutoutId,
-  DeckDefinition,
-} from '@opentrons/shared-data'
 
 interface StagingAreaConfigFixtureProps {
   deckDefinition: DeckDefinition

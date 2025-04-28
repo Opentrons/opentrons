@@ -1,12 +1,11 @@
-import { css } from 'styled-components'
-
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   RESPONSIVENESS,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
+import { css } from 'styled-components'
 
 const WIZARD_CONTAINER_STYLE = css`
   min-height: 394px;

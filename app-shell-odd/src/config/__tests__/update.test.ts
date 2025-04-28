@@ -1,8 +1,7 @@
-import { describe, it, expect } from 'vitest'
 import * as Cfg from '@opentrons/app/src/redux/config'
-import { shouldUpdate, getNextValue } from '../update'
-
+import { describe, expect, it } from 'vitest'
 import type { Config } from '../types'
+import { getNextValue, shouldUpdate } from '../update'
 
 const CONFIG = ({
   devtools: false,

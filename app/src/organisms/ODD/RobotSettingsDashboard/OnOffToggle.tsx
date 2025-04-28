@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -9,6 +8,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
   const { t } = useTranslation('shared')

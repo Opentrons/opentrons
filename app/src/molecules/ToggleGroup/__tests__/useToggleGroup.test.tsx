@@ -1,14 +1,13 @@
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook, render, fireEvent, screen } from '@testing-library/react'
+import { fireEvent, render, renderHook, screen } from '@testing-library/react'
 import { useTrackEvent } from '/app/redux/analytics'
-import { useToggleGroup } from '../useToggleGroup'
-
+import type { State } from '/app/redux/types'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
-import type { State } from '/app/redux/types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useToggleGroup } from '../useToggleGroup'
 
 vi.mock('/app/redux/analytics')
 

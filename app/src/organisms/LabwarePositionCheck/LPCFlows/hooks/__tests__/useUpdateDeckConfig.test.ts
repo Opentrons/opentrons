@@ -1,9 +1,8 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
-import { useDispatch } from 'react-redux'
-
-import { useUpdateDeckConfig } from '../useUpdateDeckConfig'
 import { updateLPCDeck } from '/app/redux/protocol-runs'
+import { useDispatch } from 'react-redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useUpdateDeckConfig } from '../useUpdateDeckConfig'
 
 vi.mock('react-redux')
 vi.mock('/app/redux/protocol-runs')

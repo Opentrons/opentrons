@@ -1,8 +1,8 @@
+import type { DropdownOption } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { getAllTiprackOptions } from '../../../../../ui/labware/selectors'
 import { DropdownStepFormField } from '../../../../../components/molecules'
-import type { DropdownOption } from '@opentrons/components'
+import { getAllTiprackOptions } from '../../../../../ui/labware/selectors'
 import type { FieldProps } from '../types'
 
 export function PickUpTipField(props: FieldProps): JSX.Element {

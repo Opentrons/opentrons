@@ -1,34 +1,33 @@
-import { when } from 'vitest-when'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, beforeEach, expect, vi } from 'vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import {
-  mockMagneticModule as mockMagneticModuleFixture,
-  mockHeaterShaker,
-} from '/app/redux/modules/__fixtures__/index'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import {
+  mockHeaterShaker,
+  mockMagneticModule as mockMagneticModuleFixture,
+} from '/app/redux/modules/__fixtures__/index'
 import {
   useChainLiveCommands,
-  useRunCalibrationStatus,
   useModuleRenderInfoForProtocolById,
+  useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
-import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
-import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
-import { SetupModulesList } from '../SetupModulesList'
-import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
-
 import type { ComponentProps } from 'react'
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
+import { SetupModulesList } from '../SetupModulesList'
+import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')

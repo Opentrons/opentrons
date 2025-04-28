@@ -1,21 +1,20 @@
+import type { Mount } from '@opentrons/api-client'
 import {
   getTipTypeFromTipRackDefinition,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
-
 import type {
-  LabwareDefinition2,
-  PipetteV2Specs,
   DeckConfiguration,
+  LabwareDefinition2,
   LiquidClass,
+  PipetteV2Specs,
 } from '@opentrons/shared-data'
-import type { Mount } from '@opentrons/api-client'
 import type {
+  ChangeTipOptions,
+  PathOption,
   QuickTransferSummaryState,
   TransferType,
-  PathOption,
-  ChangeTipOptions,
 } from '../types'
 
 interface InitialSummaryStateProps {

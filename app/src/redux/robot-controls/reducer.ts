@@ -1,8 +1,7 @@
-import * as Constants from './constants'
-
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { RobotControlsState, PerRobotControlsState } from './types'
+import * as Constants from './constants'
+import type { PerRobotControlsState, RobotControlsState } from './types'
 
 const INITIAL_STATE: RobotControlsState = {}
 

@@ -2,6 +2,7 @@
 // ignore the real-life data to emphasize overhangs etc
 import { SPAN7_8_10_11_SLOT } from '../constants'
 import type { ModuleOrientation } from '../types'
+
 // NOTE: all dims are in 'left' orientation. Rotate & transform to obtain 'right' orientation.
 
 export interface ModuleVizDims {

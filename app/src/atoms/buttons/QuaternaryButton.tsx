@@ -1,12 +1,12 @@
-import styled from 'styled-components'
 import {
+  BORDERS,
+  COLORS,
   NewSecondaryBtn,
   SPACING,
-  COLORS,
-  BORDERS,
-  TYPOGRAPHY,
   styleProps,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import styled from 'styled-components'
 
 export const QuaternaryButton = styled(NewSecondaryBtn)`
   background-color: ${COLORS.white};

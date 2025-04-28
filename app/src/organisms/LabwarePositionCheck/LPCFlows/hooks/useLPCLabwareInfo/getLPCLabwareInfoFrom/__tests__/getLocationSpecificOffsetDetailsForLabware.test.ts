@@ -1,9 +1,9 @@
-import { vi, it, describe, expect } from 'vitest'
-import { getLocationSpecificOffsetDetailsForLabware } from '../getLocationSpecificOffsetDetailsForLabware'
-import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
 import { ANY_LOCATION } from '@opentrons/api-client'
 import type { StoredLabwareOffset } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
+import { describe, expect, it, vi } from 'vitest'
+import { getLocationSpecificOffsetDetailsForLabware } from '../getLocationSpecificOffsetDetailsForLabware'
 
 vi.mock('/app/local-resources/offsets', () => ({
   getLwOffsetLocSeqFromLocSeq: vi.fn().mockImplementation(locSeq => locSeq),

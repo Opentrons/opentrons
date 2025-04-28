@@ -1,10 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-
-import { renderWithProviders } from '../../../testing/utils'
-import { MenuList } from '..'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { MenuList } from '..'
+import { renderWithProviders } from '../../../testing/utils'
 
 const render = (props: ComponentProps<typeof MenuList>) => {
   return renderWithProviders(<MenuList {...props} />)[0]

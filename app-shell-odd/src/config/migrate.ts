@@ -1,7 +1,4 @@
 import path from 'path'
-import { app } from 'electron'
-import uuid from 'uuid/v4'
-
 import type {
   Config,
   ConfigV12,
@@ -20,6 +17,9 @@ import type {
   ConfigV25,
   ConfigV26,
 } from '@opentrons/app/src/redux/config/types'
+import { app } from 'electron'
+import uuid from 'uuid/v4'
+
 // format
 // base config v12 defaults
 // any default values for later config versions are specified in the migration

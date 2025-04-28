@@ -1,15 +1,13 @@
-import { useTranslation } from 'react-i18next'
-import { Controller } from 'react-hook-form'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
   DropdownMenu,
   Flex,
 } from '@opentrons/components'
-
-import type { Control, UseFormSetValue } from 'react-hook-form'
 import type { Ingredient } from '@opentrons/step-generation'
+import { Controller } from 'react-hook-form'
+import type { Control, UseFormSetValue } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 
 interface LiquidClassDropdownProps {
   control: Control<Ingredient, any>

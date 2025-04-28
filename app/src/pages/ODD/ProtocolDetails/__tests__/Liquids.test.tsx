@@ -1,7 +1,4 @@
-import { vi, it, describe, beforeEach } from 'vitest'
-import { when } from 'vitest-when'
-import { screen } from '@testing-library/react'
-
+import type { Protocol } from '@opentrons/api-client'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -10,15 +7,15 @@ import {
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
-
+import type * as SharedData from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { Liquids } from '../Liquids'
-
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { Protocol } from '@opentrons/api-client'
-import type * as SharedData from '@opentrons/shared-data'
+import { beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { Liquids } from '../Liquids'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()

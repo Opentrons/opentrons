@@ -1,5 +1,3 @@
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -9,10 +7,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   truncateString,
 } from '@opentrons/components'
+import { css } from 'styled-components'
 
 const FILE_UPLOAD_STYLE = css`
 &:hover > svg {

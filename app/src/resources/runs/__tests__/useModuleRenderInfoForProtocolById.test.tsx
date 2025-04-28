@@ -1,23 +1,9 @@
-import { renderHook } from '@testing-library/react'
-import { vi, it, expect, describe, beforeEach } from 'vitest'
-import { when } from 'vitest-when'
-
 import {
+  heater_shaker_commands_with_results_key,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
   TEMPERATURE_MODULE_V2_FIXTURE,
-  heater_shaker_commands_with_results_key,
 } from '@opentrons/shared-data'
-import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useAttachedModules } from '/app/resources/modules'
-import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import {
-  mockTemperatureModuleGen2,
-  mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
 import type {
   CutoutConfig,
   DeckConfiguration,
@@ -25,8 +11,21 @@ import type {
   ModuleType,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { UseQueryResult } from 'react-query'
+import { renderHook } from '@testing-library/react'
+import {
+  mockTemperatureModuleGen2,
+  mockThermocycler,
+} from '/app/redux/modules/__fixtures__'
 import type { AttachedModule } from '/app/redux/modules/types'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useAttachedModules } from '/app/resources/modules'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import type { UseQueryResult } from 'react-query'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'
+import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/resources/modules')

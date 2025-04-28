@@ -1,5 +1,5 @@
-import type { Dispatch, SetStateAction } from 'react'
 import type { CoordinateTuple } from '@opentrons/shared-data'
+import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '../../../step-forms'
 import type { DeckSetupTerminalIdType } from '../types'
 

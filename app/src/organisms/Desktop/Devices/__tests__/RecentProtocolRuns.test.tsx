@@ -1,16 +1,15 @@
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
+import type { Runs } from '@opentrons/api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useNotifyAllRunsQuery, useRunStatuses } from '/app/resources/runs'
 import { i18n } from '/app/i18n'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
-import { RecentProtocolRuns } from '../RecentProtocolRuns'
-import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
-
-import type { UseQueryResult } from 'react-query'
-import type { Runs } from '@opentrons/api-client'
+import { useNotifyAllRunsQuery, useRunStatuses } from '/app/resources/runs'
 import type { AxiosError } from 'axios'
+import type { UseQueryResult } from 'react-query'
+import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
+import { RecentProtocolRuns } from '../RecentProtocolRuns'
 
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')

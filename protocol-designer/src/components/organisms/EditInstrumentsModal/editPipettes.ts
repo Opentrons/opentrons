@@ -1,22 +1,20 @@
+import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
+import type { NormalizedPipette } from '@opentrons/step-generation'
 import filter from 'lodash/filter'
 import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
-
-import { actions as stepFormActions } from '../../../step-forms'
-import { actions as steplistActions } from '../../../steplist'
-import { uuid } from '../../../utils'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
+import type { StepIdType } from '../../../form-types'
 import {
   createContainer,
   deleteContainer,
 } from '../../../labware-ingred/actions'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
-
-import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { NormalizedPipette } from '@opentrons/step-generation'
-import type { ThunkDispatch } from '../../../types'
+import { actions as stepFormActions } from '../../../step-forms'
 import type { LabwareOnDeck, PipetteOnDeck } from '../../../step-forms'
-import type { StepIdType } from '../../../form-types'
+import { actions as steplistActions } from '../../../steplist'
+import type { ThunkDispatch } from '../../../types'
+import { uuid } from '../../../utils'
 
 const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 

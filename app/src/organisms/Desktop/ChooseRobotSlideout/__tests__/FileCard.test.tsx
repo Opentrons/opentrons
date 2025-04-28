@@ -1,13 +1,11 @@
-import { vi, it, describe, expect } from 'vitest'
-import { MemoryRouter } from 'react-router-dom'
+import type { CsvFileParameter } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { FileCard } from '../FileCard'
-
 import type { ComponentProps } from 'react'
-import type { CsvFileParameter } from '@opentrons/shared-data'
+import { MemoryRouter } from 'react-router-dom'
+import { describe, expect, it, vi } from 'vitest'
+import { FileCard } from '../FileCard'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')

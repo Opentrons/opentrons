@@ -1,8 +1,8 @@
+import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
 import { createPortal } from 'react-dom'
-import { IncompatibleModuleODDModalBody } from './IncompatibleModuleODDModalBody'
-import { IncompatibleModuleDesktopModalBody } from './IncompatibleModuleDesktopModalBody'
-import { getTopPortalEl, getModalPortalEl } from '/app/App/portal'
 import { useIncompatibleModulesAttached } from './hooks'
+import { IncompatibleModuleDesktopModalBody } from './IncompatibleModuleDesktopModalBody'
+import { IncompatibleModuleODDModalBody } from './IncompatibleModuleODDModalBody'
 
 const POLL_INTERVAL_MS = 5000
 

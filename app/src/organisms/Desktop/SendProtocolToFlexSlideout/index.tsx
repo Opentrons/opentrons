@@ -1,32 +1,28 @@
+import {
+  ERROR_TOAST,
+  INFO_TOAST,
+  PrimaryButton,
+  SUCCESS_TOAST,
+} from '@opentrons/components'
+import type { IconProps, StyleProps } from '@opentrons/components'
+import { useCreateProtocolMutation } from '@opentrons/react-api-client'
+import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import type { Robot } from '/app/redux/discovery/types'
+import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import type { State } from '/app/redux/types'
+import { getAnalysisStatus } from '/app/transformations/analysis'
+import { getProtocolDisplayName } from '/app/transformations/protocols'
+import type { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-
-import { useCreateProtocolMutation } from '@opentrons/react-api-client'
-
-import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import {
-  PrimaryButton,
-  ERROR_TOAST,
-  INFO_TOAST,
-  SUCCESS_TOAST,
-} from '@opentrons/components'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
-import { getAnalysisStatus } from '/app/transformations/analysis'
-import { getProtocolDisplayName } from '/app/transformations/protocols'
-import { useToaster } from '/app/organisms/ToasterOven'
-import { appShellRequestor } from '/app/redux/shell/remote'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
-import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
-
-import type { AxiosError } from 'axios'
-import type { IconProps, StyleProps } from '@opentrons/components'
-import type { Robot } from '/app/redux/discovery/types'
-import type { StoredProtocolData } from '/app/redux/protocol-storage'
-import type { State } from '/app/redux/types'
 
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]

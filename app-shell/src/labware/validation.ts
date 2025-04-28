@@ -1,23 +1,22 @@
-import Ajv from 'ajv'
-import sortBy from 'lodash/sortBy'
+import type {
+  CheckedLabwareFile,
+  UncheckedLabwareFile,
+} from '@opentrons/app/src/redux/custom-labware/types'
 import {
   getLabwareDefIsStandard,
   labwareSchemaV2 as labwareSchema,
   validateCustomLabwareHelper,
 } from '@opentrons/shared-data'
-import { sameIdentity } from './compare'
-
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type {
-  UncheckedLabwareFile,
-  CheckedLabwareFile,
-} from '@opentrons/app/src/redux/custom-labware/types'
+import Ajv from 'ajv'
+import sortBy from 'lodash/sortBy'
 import {
   DUPLICATE_LABWARE_FILE,
   INVALID_LABWARE_FILE,
   OPENTRONS_LABWARE_FILE,
   VALID_LABWARE_FILE,
 } from '../constants'
+import { sameIdentity } from './compare'
 
 const ajv = new Ajv()
 const validateDefinition = ajv.compile(labwareSchema)

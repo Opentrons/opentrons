@@ -1,17 +1,14 @@
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
-import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
-import { CurrentRunningProtocolCommand } from '../CurrentRunningProtocolCommand'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { CurrentRunningProtocolCommand } from '../CurrentRunningProtocolCommand'
 
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/protocols/hooks')

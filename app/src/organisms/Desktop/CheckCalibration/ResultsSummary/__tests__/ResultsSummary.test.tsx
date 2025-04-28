@@ -1,18 +1,15 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { saveAs } from 'file-saver'
 import { fireEvent, screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import * as Fixtures from '/app/redux/sessions/__fixtures__'
-import * as Sessions from '/app/redux/sessions'
-import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
-import { RenderMountInformation } from '../RenderMountInformation'
-import { CalibrationResult } from '../CalibrationResult'
-
-import { ResultsSummary } from '../'
-
 import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
+import * as Sessions from '/app/redux/sessions'
+import * as Fixtures from '/app/redux/sessions/__fixtures__'
+import { saveAs } from 'file-saver'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ResultsSummary } from '../'
+import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
+import { CalibrationResult } from '../CalibrationResult'
+import { RenderMountInformation } from '../RenderMountInformation'
 
 // file-saver has circular dep, need to mock with factory to prevent error
 vi.mock('file-saver', async importOriginal => {

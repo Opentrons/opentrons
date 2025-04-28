@@ -1,26 +1,23 @@
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-
 import {
-  Flex,
-  StyledText,
-  SPACING,
   DIRECTION_COLUMN,
+  Flex,
   ListTable,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import {
   selectSelectedLwOverview,
   selectSortedLSOffsetDetailsWithCopy,
 } from '/app/redux/protocol-runs'
+import type { SelectedLwOverview } from '/app/redux/protocol-runs'
+import type { TFunction } from 'i18next'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 import { LabwareLocationItem } from './LabwareLocationItem'
 import { OffsetTableHeaders } from './OffsetTableHeaders'
-
-import type { TFunction } from 'i18next'
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-import type { SelectedLwOverview } from '/app/redux/protocol-runs'
 
 export function LocationSpecificOffsetsContainer(
   props: LPCWizardContentProps

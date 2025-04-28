@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   COLORS,
   DISPLAY_GRID,
@@ -8,6 +5,8 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 // These headers are special-cased by design and do not follow the Design system's ListTable headers.
 // The headers largely mimic the column styling of the child components rendered

@@ -1,9 +1,5 @@
-import { useMemo, useState, forwardRef, useRef } from 'react'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { ViewportList } from 'react-viewport-list'
-
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
+import type { RunStatus } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -13,31 +9,32 @@ import {
   DISPLAY_FLEX,
   DISPLAY_NONE,
   Flex,
+  getLabwareDefinitionsFromCommands,
   InfoScreen,
   LegacyStyledText,
   OVERFLOW_SCROLL,
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
-  getLabwareDefinitionsFromCommands,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
+import type { RobotType } from '@opentrons/shared-data'
+import { NAV_BAR_WIDTH } from '/app/App/constants'
+import { Divider } from '/app/atoms/structure'
+import { CommandIcon } from '/app/molecules/Command'
 import {
+  useLastRunCommand,
+  useMostRecentCompletedAnalysis,
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
   useRunStatus,
-  useMostRecentCompletedAnalysis,
-  useLastRunCommand,
 } from '/app/resources/runs'
-import { CommandIcon } from '/app/molecules/Command'
-import { Divider } from '/app/atoms/structure'
-import { NAV_BAR_WIDTH } from '/app/App/constants'
-
+import { forwardRef, useMemo, useRef, useState } from 'react'
 import type { ForwardedRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import { ViewportList } from 'react-viewport-list'
 import type { ViewportListRef } from 'react-viewport-list'
-import type { RunStatus } from '@opentrons/api-client'
-import type { RobotType } from '@opentrons/shared-data'
+import { css } from 'styled-components'
 
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000

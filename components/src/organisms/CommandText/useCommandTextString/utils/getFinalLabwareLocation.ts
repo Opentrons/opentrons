@@ -1,12 +1,11 @@
-import { findLastAt } from './helpers'
-
 import type {
   LabwareLocation,
-  RunTimeCommand,
+  LabwareLocationSequence,
   LoadLabwareRunTimeCommand,
   MoveLabwareRunTimeCommand,
-  LabwareLocationSequence,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
+import { findLastAt } from './helpers'
 
 /**
  * given a list of commands and a labwareId, calculate the resulting location

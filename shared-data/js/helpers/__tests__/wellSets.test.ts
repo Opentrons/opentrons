@@ -1,18 +1,17 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { get96Channel384WellPlateWells, orderWells } from '..'
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
 import fixture_overlappy_wellplate from '../../../labware/fixtures/2/fixture_overlappy_wellplate.json'
 import {
-  fixtureP100096V2Specs,
   fixtureP10MultiV2Specs,
   fixtureP10SingleV2Specs,
+  fixtureP100096V2Specs,
 } from '../../pipettes'
-import { makeWellSetHelpers } from '../wellSets'
-import { findWellAt } from '../getWellNamePerMultiTip'
-import { get96Channel384WellPlateWells, orderWells } from '..'
-
 import type { LabwareDefinition2 } from '../../types'
+import { findWellAt } from '../getWellNamePerMultiTip'
+import { makeWellSetHelpers } from '../wellSets'
 import type { WellSetHelpers } from '../wellSets'
 
 const fixture12Trough = fixture_12_trough as LabwareDefinition2

@@ -9,7 +9,6 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import type { SettingItem } from '../types'
 
 interface AspirateSettingItemProps {

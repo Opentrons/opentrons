@@ -1,16 +1,16 @@
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useTrackEvent, ANALYTICS_JUPYTER_OPEN } from '/app/redux/analytics'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ANALYTICS_JUPYTER_OPEN, useTrackEvent } from '/app/redux/analytics'
+import { useTranslation } from 'react-i18next'
 
 const EVENT_JUPYTER_OPEN = { name: ANALYTICS_JUPYTER_OPEN, properties: {} }
 

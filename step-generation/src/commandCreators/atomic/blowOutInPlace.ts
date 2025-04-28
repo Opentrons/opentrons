@@ -1,6 +1,6 @@
-import { uuid } from '../../utils'
-import type { CommandCreator } from '../../types'
 import type { BlowoutInPlaceParams } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
+import { uuid } from '../../utils'
 
 export const blowOutInPlace: CommandCreator<BlowoutInPlaceParams> = (
   args,

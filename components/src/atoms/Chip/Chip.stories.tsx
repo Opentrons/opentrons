@@ -1,8 +1,8 @@
-import { Flex, STYLE_PROPS } from '../../primitives'
-import { COLORS } from '../../helix-design-system'
-import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { Chip as ChipComponent } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
+import { Chip as ChipComponent } from '.'
+import { COLORS } from '../../helix-design-system'
+import { Flex, STYLE_PROPS } from '../../primitives'
+import { SPACING, VIEWPORT } from '../../ui-style-constants'
 
 const meta: Meta<typeof ChipComponent> = {
   title: 'Helix/Atoms/Chip',

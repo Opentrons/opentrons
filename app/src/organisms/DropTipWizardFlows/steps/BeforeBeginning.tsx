@@ -1,32 +1,28 @@
-import { useState } from 'react'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  DIRECTION_COLUMN,
   CURSOR_POINTER,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   StyledText,
 } from '@opentrons/components'
-
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+import blowoutVideo from '../../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
+import droptipVideo from '../../../assets/videos/droptip-wizard/Drop-tip.webm'
 import { MediumButton } from '../../../atoms/buttons'
 import { DT_ROUTES } from '../constants'
 import { DropTipFooterButtons } from '../shared'
-
-import blowoutVideo from '../../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
-import droptipVideo from '../../../assets/videos/droptip-wizard/Drop-tip.webm'
-
 import type { DropTipWizardContainerProps } from '../types'
 
 type FlowType = 'blowout' | 'drop_tips' | null

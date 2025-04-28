@@ -1,7 +1,6 @@
 // shell update substate
 // TODO(mc, 2020-06-10): move to shell/actions and shell/selectors
 import { createSelector } from 'reselect'
-
 import type { State } from '../types'
 import type { ShellUpdateAction, ShellUpdateState } from './types'
 

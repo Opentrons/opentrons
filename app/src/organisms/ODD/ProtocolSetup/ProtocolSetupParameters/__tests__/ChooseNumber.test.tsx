@@ -1,14 +1,13 @@
-import { it, describe, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
+import type { NumberParameter } from '@opentrons/shared-data'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
+import type { ComponentProps } from 'react'
 import { mockRunTimeParameterData } from '../../__fixtures__'
 import { ChooseNumber } from '../ChooseNumber'
-
-import type { ComponentProps } from 'react'
-import type { NumberParameter } from '@opentrons/shared-data'
 
 vi.mock('/app/organisms/ToasterOven')
 

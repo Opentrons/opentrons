@@ -1,14 +1,11 @@
-import { useSelector } from 'react-redux'
-
-import { Flex, POSITION_FIXED, DIRECTION_ROW } from '@opentrons/components'
-
+import { DIRECTION_ROW, Flex, POSITION_FIXED } from '@opentrons/components'
 import { GlobalStyle } from '/app/atoms/GlobalStyle'
 import { getConfig, getIsOnDevice } from '/app/redux/config'
+import type { MouseEvent } from 'react'
+import { useSelector } from 'react-redux'
 import { DesktopApp } from './DesktopApp'
 import { OnDeviceDisplayApp } from './OnDeviceDisplayApp'
 import { TopPortalRoot } from './portal'
-
-import type { MouseEvent } from 'react'
 
 const stopEvent = (event: MouseEvent): void => {
   event.preventDefault()

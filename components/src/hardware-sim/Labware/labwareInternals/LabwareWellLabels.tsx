@@ -1,10 +1,9 @@
-import { memo } from 'react'
-import { C_BLACK, C_BLUE } from '../../../styles/colors'
-import { RobotCoordsText } from '../../Deck'
-import { TYPOGRAPHY } from '../../../ui-style-constants'
-
-import type { MemoExoticComponent } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { memo } from 'react'
+import type { MemoExoticComponent } from 'react'
+import { C_BLACK, C_BLUE } from '../../../styles/colors'
+import { TYPOGRAPHY } from '../../../ui-style-constants'
+import { RobotCoordsText } from '../../Deck'
 import type { HighlightedWellLabels } from './types'
 
 // magic layout numbers to make the letters close to the edges of the labware

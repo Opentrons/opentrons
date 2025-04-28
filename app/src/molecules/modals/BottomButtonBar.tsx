@@ -1,12 +1,10 @@
 // bottom button bar for modals
 // TODO(mc, 2018-08-18): maybe make this the default AlertModal behavior
-import cx from 'classnames'
-
 import { OutlineButton } from '@opentrons/components'
-import styles from './styles.module.css'
-
-import type { ReactNode } from 'react'
 import type { ButtonProps } from '@opentrons/components'
+import cx from 'classnames'
+import type { ReactNode } from 'react'
+import styles from './styles.module.css'
 
 type MaybeButtonProps = ButtonProps | null | undefined
 interface Props {

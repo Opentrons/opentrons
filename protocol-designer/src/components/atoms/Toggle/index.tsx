@@ -1,4 +1,3 @@
-import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Btn,
@@ -8,6 +7,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { css } from 'styled-components'
 
 interface ToggleProps {
   isSelected: boolean

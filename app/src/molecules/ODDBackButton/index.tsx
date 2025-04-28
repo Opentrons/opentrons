@@ -4,11 +4,10 @@ import {
   COLORS,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import type { HTMLProps } from 'react'
 
 export function ODDBackButton(

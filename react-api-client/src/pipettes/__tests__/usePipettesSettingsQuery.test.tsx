@@ -1,19 +1,18 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook, waitFor } from '@testing-library/react'
 import {
   getPipetteSettings,
   pipetteSettingsResponseFixture,
 } from '@opentrons/api-client'
-import { useHost } from '../../api'
-import { usePipetteSettingsQuery } from '..'
-
 import type {
   HostConfig,
   PipetteSettings,
   Response,
 } from '@opentrons/api-client'
+import { renderHook, waitFor } from '@testing-library/react'
+import type * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { usePipetteSettingsQuery } from '..'
+import { useHost } from '../../api'
 import type { UsePipetteSettingsQueryOptions } from '../usePipetteSettingsQuery'
 
 vi.mock('@opentrons/api-client')

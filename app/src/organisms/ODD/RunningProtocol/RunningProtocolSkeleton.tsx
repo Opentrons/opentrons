@@ -1,19 +1,17 @@
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
-  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
-
-import { PlayPauseButton } from './PlayPauseButton'
-import { StopButton } from './StopButton'
 import { Skeleton } from '/app/atoms/Skeleton'
-
 // eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import type { ScreenOption } from '/app/pages/ODD/RunningProtocol'
+import { PlayPauseButton } from './PlayPauseButton'
+import { StopButton } from './StopButton'
 
 const CURRENT_RUNNING_PROTOCOL_COMMAND_SIZE = '99rem' // CurrentRunningProtocolCommand screen
 const RUNNING_PROTOCOL_COMMAND_LIST_SIZE = '389rem' // RunningProtocolCommandList screen

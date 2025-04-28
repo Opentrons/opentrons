@@ -1,24 +1,21 @@
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import styled, { css } from 'styled-components'
-
 import {
   BORDERS,
   COLORS,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { useAttachedPipettes } from '/app/resources/instruments'
+import type { Mount } from '@opentrons/components'
 import { getCustomLabwareDefinitions } from '/app/redux/custom-labware'
+import type { State } from '/app/redux/types'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled, { css } from 'styled-components'
+import type { FormattedPipetteOffsetCalibration } from '..'
+import type { FormattedTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
-
-import type { Mount } from '@opentrons/components'
-import type { State } from '/app/redux/types'
-import type { FormattedTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
-import type { FormattedPipetteOffsetCalibration } from '..'
 
 const StyledTable = styled.table`
   width: 100%;

@@ -1,4 +1,3 @@
-import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -6,13 +5,13 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import type { ReactNode } from 'react'
+import styled from 'styled-components'
 
 interface Props {
   //  optional override of the spinner

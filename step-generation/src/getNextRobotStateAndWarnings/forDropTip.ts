@@ -1,6 +1,6 @@
-import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 import type { DropTipParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 
 //  NOTE(jr, 12/1/23): this state update is not in use currently for PD 8.0
 //  since we only support dropping tip into the waste chute or trash bin

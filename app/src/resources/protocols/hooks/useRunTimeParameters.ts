@@ -1,10 +1,9 @@
-import last from 'lodash/last'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import last from 'lodash/last'
 
 /**
  * Returns an array of RunTimeParameters objects that are optional by the given protocol ID.

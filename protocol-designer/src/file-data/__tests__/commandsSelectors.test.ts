@@ -1,10 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   fixture_12_trough,
   fixture_96_plate,
   fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
-
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getLabwareLiquidState } from '../selectors'
 
 vi.mock('../../labware-defs/utils')

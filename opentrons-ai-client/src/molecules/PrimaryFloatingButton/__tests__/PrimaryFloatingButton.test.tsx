@@ -1,10 +1,9 @@
-import { describe, it, beforeEach, expect } from 'vitest'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
-import { BORDERS, COLORS, TYPOGRAPHY, SPACING } from '@opentrons/components'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { PrimaryFloatingButton } from '../index'
-
-import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof PrimaryFloatingButton>) => {
   return renderWithProviders(<PrimaryFloatingButton {...props} />)

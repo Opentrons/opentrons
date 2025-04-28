@@ -1,8 +1,7 @@
-import { VIEWPORT } from '../../ui-style-constants'
-import { STYLE_PROPS } from '../../primitives'
-import { MenuItem as MenuItemComponent } from './MenuItem'
-
 import type { Meta, StoryObj } from '@storybook/react'
+import { STYLE_PROPS } from '../../primitives'
+import { VIEWPORT } from '../../ui-style-constants'
+import { MenuItem as MenuItemComponent } from './MenuItem'
 
 const meta: Meta<typeof MenuItemComponent> = {
   title: 'Helix/Atoms/MenuItem',

@@ -1,33 +1,30 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { formatDistance } from 'date-fns'
-import { MemoryRouter } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
-
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import { COLORS } from '@opentrons/components'
 import {
-  useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
 import { Skeleton } from '/app/atoms/Skeleton'
-import { useMissingProtocolHardware } from '/app/transformations/commands'
+import { i18n } from '/app/i18n'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
-  useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { useCloneRun, useNotifyAllRunsQuery } from '/app/resources/runs'
-import { useRerunnableStatusText } from '../hooks'
-import { RecentRunProtocolCard } from '../'
-
-import type { ComponentProps } from 'react'
-import type { NavigateFunction } from 'react-router-dom'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
 import type { ProtocolHardware } from '/app/transformations/commands'
+import { formatDistance } from 'date-fns'
+import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { RecentRunProtocolCard } from '../'
+import { useRerunnableStatusText } from '../hooks'
 
 const mockNavigate = vi.fn()
 

@@ -1,7 +1,7 @@
-import { it, describe, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
-  mergeSubstepRowsSingleChannel,
   mergeSubstepRowsMultiChannel,
+  mergeSubstepRowsSingleChannel,
 } from '../generateSubstepItem'
 
 const ingred1Id = 'ingred1Id'

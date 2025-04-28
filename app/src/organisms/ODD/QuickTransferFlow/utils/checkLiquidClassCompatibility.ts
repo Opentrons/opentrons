@@ -1,5 +1,4 @@
 import { getFlexNameConversion } from '@opentrons/shared-data'
-
 import type { LiquidClass } from '@opentrons/shared-data'
 import type { QuickTransferWizardState } from '../types'
 

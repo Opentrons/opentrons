@@ -1,16 +1,13 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
-
 import { useConditionalConfirm } from '@opentrons/components'
-
+import type * as OpentronsComponents from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEvent } from '/app/redux/analytics'
-import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
-
 import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
-import type * as OpentronsComponents from '@opentrons/components'
+import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 
 vi.mock('/app/redux/analytics')
 

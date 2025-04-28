@@ -1,12 +1,11 @@
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { ANY_LOCATION } from '@opentrons/api-client'
-
 import type {
   LabwareOffset,
   LabwareOffsetCreateData,
   LegacyLabwareOffsetCreateData,
   StoredLabwareOffset,
 } from '@opentrons/api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type { RobotType } from '@opentrons/shared-data'
 
 // Returns the offsets to use during maintenance run creation depending on the robot type.

@@ -1,7 +1,6 @@
-import styled from 'styled-components'
-import { SPACING, LegacyStyledText } from '@opentrons/components'
-
+import { LegacyStyledText, SPACING } from '@opentrons/components'
 import type { ReactNode } from 'react'
+import styled from 'styled-components'
 
 const ListItem = styled.li`
   margin-left: ${SPACING.spacing24};

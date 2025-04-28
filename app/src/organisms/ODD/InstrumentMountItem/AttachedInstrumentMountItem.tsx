@@ -1,24 +1,21 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-
+import type { InstrumentData } from '@opentrons/api-client'
 import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
-
+import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
 } from '/app/local-resources/instruments'
+import type { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
+import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
+import type { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
-import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
-import { LabeledMount } from './LabeledMount'
-
-import type { ComponentProps, MouseEventHandler } from 'react'
-import type { InstrumentData } from '@opentrons/api-client'
-import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
-import type { Mount } from '/app/redux/pipettes/types'
 import type { SelectablePipettes } from '/app/organisms/PipetteWizardFlows/types'
-import type { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-import type { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import type { Mount } from '/app/redux/pipettes/types'
+import { useState } from 'react'
+import type { ComponentProps, MouseEventHandler } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { LabeledMount } from './LabeledMount'
 
 interface AttachedInstrumentMountItemProps {
   mount: Mount | 'extension'

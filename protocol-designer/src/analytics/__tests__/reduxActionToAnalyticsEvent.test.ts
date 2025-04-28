@@ -1,16 +1,16 @@
-import { vi, describe, expect, afterEach, beforeEach, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { reduxActionToAnalyticsEvent } from '../middleware'
 import {
   getFileMetadata,
   getRobotStateTimeline,
 } from '../../file-data/selectors'
+import type { SaveStepFormsMultiAction } from '../../step-forms/actions'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
   getSavedStepForms,
 } from '../../step-forms/selectors'
-import type { SaveStepFormsMultiAction } from '../../step-forms/actions'
+import { reduxActionToAnalyticsEvent } from '../middleware'
 
 vi.mock('../../file-data/selectors')
 vi.mock('../../step-forms/selectors')

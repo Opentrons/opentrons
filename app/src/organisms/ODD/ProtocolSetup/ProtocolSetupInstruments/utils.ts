@@ -1,13 +1,12 @@
 import type {
-  CompletedProtocolAnalysis,
-  LoadedPipette,
-} from '@opentrons/shared-data'
-import type {
   GripperData,
   Instruments,
   PipetteData,
 } from '@opentrons/api-client'
-
+import type {
+  CompletedProtocolAnalysis,
+  LoadedPipette,
+} from '@opentrons/shared-data'
 import { getProtocolUsesGripper } from '/app/transformations/commands'
 
 export function getAttachedGripper(

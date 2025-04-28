@@ -1,16 +1,16 @@
-import { expect, describe, it, beforeEach } from 'vitest'
-import { getIsSafePipetteMovement } from '../utils'
 import {
   COLUMN,
-  TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_MODULE_V2,
   fixture96Plate,
   fixtureP100096V2Specs,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it } from 'vitest'
 import type { InvariantContext, RobotState } from '../types'
+import { getIsSafePipetteMovement } from '../utils'
 
 const mockLabwareId = 'labwareId'
 const mockPipId = 'pip'

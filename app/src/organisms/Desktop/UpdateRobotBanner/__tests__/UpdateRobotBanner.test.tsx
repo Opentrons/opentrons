@@ -1,17 +1,16 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-import * as Buildroot from '/app/redux/robot-update'
+import { i18n } from '/app/i18n'
 import {
   mockConnectableRobot,
   mockReachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { handleUpdateBuildroot } from '../../Devices/RobotSettings/UpdateBuildroot'
-import { UpdateRobotBanner } from '..'
-
+import * as Buildroot from '/app/redux/robot-update'
 import type { ComponentProps } from 'react'
+import { UpdateRobotBanner } from '..'
+import { handleUpdateBuildroot } from '../../Devices/RobotSettings/UpdateBuildroot'
 
 vi.mock('/app/redux/robot-update')
 vi.mock('../../Devices/RobotSettings/UpdateBuildroot')

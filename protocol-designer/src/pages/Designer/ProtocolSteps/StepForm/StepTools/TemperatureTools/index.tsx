@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
 import {
   Box,
   COLORS,
@@ -7,15 +5,16 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
 } from '../../../../../../components/molecules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
-
+import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
+import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
 import type { StepFormProps } from '../../types'
+import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 export function TemperatureTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData, visibleFormErrors } = props

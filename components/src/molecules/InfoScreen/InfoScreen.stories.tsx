@@ -1,11 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react-remove-scroll'
+import { COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
 import { InfoScreen as InfoScreenComponent } from './index'
-
-import type { Meta, StoryObj } from '@storybook/react'
 
 const mockContent = [
   'No deck hardware',

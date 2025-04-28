@@ -1,11 +1,10 @@
-import { useRef } from 'react'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { Svg } from '../../primitives'
-import { DeckFromLayers } from './DeckFromLayers'
-
-import type { ReactNode } from 'react'
-import type { StyleProps } from '../../primitives'
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
+import { useRef } from 'react'
+import type { ReactNode } from 'react'
+import { Svg } from '../../primitives'
+import type { StyleProps } from '../../primitives'
+import { DeckFromLayers } from './DeckFromLayers'
 
 export interface RobotWorkSpaceRenderProps {
   deckSlotsById: { [slotId: string]: DeckSlot }

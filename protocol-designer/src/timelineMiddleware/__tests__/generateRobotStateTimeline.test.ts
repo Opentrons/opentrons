@@ -1,21 +1,21 @@
-import { describe, it, expect, vi } from 'vitest'
 import {
   fixtureTiprack300ul,
   getLabwareDefURI,
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
-  getInitialRobotStateStandard,
-  makeContext,
   DEFAULT_PIPETTE,
-  MULTI_PIPETTE,
-  SOURCE_LABWARE,
   DEST_LABWARE,
   FIXED_TRASH_ID,
+  getInitialRobotStateStandard,
+  makeContext,
+  MULTI_PIPETTE,
+  SOURCE_LABWARE,
 } from '@opentrons/step-generation'
-import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { describe, expect, it, vi } from 'vitest'
 import type { StepArgsAndErrorsById } from '../../steplist'
+import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
 
 vi.mock('../../labware-defs/utils')
 

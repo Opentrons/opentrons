@@ -1,10 +1,9 @@
-import last from 'lodash/last'
-
 import { Flex, ProtocolDeck, SPACING } from '@opentrons/components'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
+import last from 'lodash/last'
 
 export const Deck = (props: { transferId: string }): JSX.Element => {
   const { data: transferData } = useProtocolQuery(props.transferId)

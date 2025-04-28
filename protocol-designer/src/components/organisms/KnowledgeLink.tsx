@@ -1,6 +1,6 @@
 import { Link } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../atoms'
 import type { ReactNode } from 'react'
+import { LINK_BUTTON_STYLE } from '../atoms'
 
 interface KnowledgeLinkProps {
   children: ReactNode

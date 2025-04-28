@@ -1,4 +1,3 @@
-import styled from 'styled-components'
 import {
   ALIGN_FLEX_START,
   DIRECTION_ROW,
@@ -7,11 +6,10 @@ import {
   OVERFLOW_SCROLL,
   SPACING,
 } from '@opentrons/components'
-
-import { PinnedTransfer } from './PinnedTransfer'
-
-import type { Dispatch, SetStateAction } from 'react'
 import type { ProtocolResource } from '@opentrons/shared-data'
+import type { Dispatch, SetStateAction } from 'react'
+import styled from 'styled-components'
+import { PinnedTransfer } from './PinnedTransfer'
 import type { CardSizeType } from './PinnedTransfer'
 
 export function PinnedTransferCarousel(props: {

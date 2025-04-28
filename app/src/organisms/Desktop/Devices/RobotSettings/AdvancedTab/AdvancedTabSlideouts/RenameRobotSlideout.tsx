@@ -1,12 +1,7 @@
-import { useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { useForm, Controller } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
-
+import type { UpdatedRobotName } from '@opentrons/api-client'
 import {
-  COLORS,
   Banner,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   InputField,
@@ -16,21 +11,23 @@ import {
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-
+import { Slideout } from '/app/atoms/Slideout'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'
 import {
-  removeRobot,
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
+  removeRobot,
 } from '/app/redux/discovery'
-import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '/app/redux/analytics'
-import { Slideout } from '/app/atoms/Slideout'
-import { useIsFlex } from '/app/redux-resources/robots'
-
+import type { Dispatch, State } from '/app/redux/types'
+import { useState } from 'react'
 import type { ChangeEvent } from 'react'
-import type { Resolver, FieldError } from 'react-hook-form'
-import type { UpdatedRobotName } from '@opentrons/api-client'
-import type { State, Dispatch } from '/app/redux/types'
+import { Controller, useForm } from 'react-hook-form'
+import type { FieldError, Resolver } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 interface RenameRobotSlideoutProps {
   isExpanded: boolean

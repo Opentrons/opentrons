@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest'
 import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+import { describe, expect, it } from 'vitest'
 import {
   capitalizeFirstLetter,
   getBlowoutLocationOptionsForForm,

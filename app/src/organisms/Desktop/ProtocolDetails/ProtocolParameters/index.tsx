@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   Banner,
   DIRECTION_COLUMN,
@@ -9,8 +7,8 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
 
 interface ProtocolParametersProps {
   runTimeParameters: RunTimeParameter[]

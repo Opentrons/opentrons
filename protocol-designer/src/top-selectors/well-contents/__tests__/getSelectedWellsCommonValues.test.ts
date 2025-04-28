@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { getSelectedWellsCommonValues } from '../'
 import type { LabwareLiquidState } from '@opentrons/step-generation'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { getSelectedWellsCommonValues } from '../'
 
 let ingredLocations: LabwareLiquidState
 let selectedLabwareId: string

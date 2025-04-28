@@ -1,14 +1,12 @@
-import { SketchPicker } from 'react-color'
-import { Controller } from 'react-hook-form'
-
 import { Flex, POSITION_ABSOLUTE } from '@opentrons/components'
 import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
-import { rgbaToHex } from './util'
-
-import type { RefObject } from 'react'
-import type { Control, UseFormSetValue } from 'react-hook-form'
-import type { ColorResult } from 'react-color'
 import type { Ingredient } from '@opentrons/step-generation'
+import type { RefObject } from 'react'
+import { SketchPicker } from 'react-color'
+import type { ColorResult } from 'react-color'
+import { Controller } from 'react-hook-form'
+import type { Control, UseFormSetValue } from 'react-hook-form'
+import { rgbaToHex } from './util'
 
 interface LiquidColorPickerProps {
   chooseColorWrapperRef: RefObject<HTMLDivElement>

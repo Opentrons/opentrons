@@ -1,5 +1,3 @@
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -12,8 +10,8 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
 import type { ReactNode } from 'react'
+import { css } from 'styled-components'
 
 const MAX_SUPPORTED_LABELS = 3
 

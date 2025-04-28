@@ -1,13 +1,13 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import '@testing-library/jest-dom/vitest'
+import type { FormikConfig } from 'formik'
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
+import type { LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { File } from '../../sections/File'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import type { FormikConfig } from 'formik'
-import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../../utils')
 

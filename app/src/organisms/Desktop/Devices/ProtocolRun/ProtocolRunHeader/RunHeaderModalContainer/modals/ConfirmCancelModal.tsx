@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-
+import {
+  RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
+} from '@opentrons/api-client'
+import type { RunStatus } from '@opentrons/api-client'
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
@@ -10,25 +11,21 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
   Link,
   Modal,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_STOP_REQUESTED,
-} from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
-
 import { getTopPortalEl } from '/app/App/portal'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
-
+import { useEffect, useState } from 'react'
 import type { MouseEventHandler } from 'react'
-import type { RunStatus } from '@opentrons/api-client'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 export interface UseConfirmCancelModalResult {
   showModal: boolean

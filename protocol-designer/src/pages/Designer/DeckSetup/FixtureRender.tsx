@@ -1,5 +1,3 @@
-import { Fragment } from 'react'
-import { useSelector } from 'react-redux'
 import {
   COLORS,
   FixedTrash,
@@ -10,21 +8,16 @@ import {
   WasteChuteFixture,
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
+import type {
+  DeckLabelProps,
+  StagingAreaLocation,
+  TrashCutoutId,
+} from '@opentrons/components'
 import {
-  OT2_ROBOT_TYPE,
   getModuleDef2,
   getPositionFromSlotId,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { getLabwareSlot } from '@opentrons/step-generation'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
-import { lightFill, darkFill } from './DeckSetupContainer'
-import { getAdjacentSlots } from './utils'
-import type {
-  TrashCutoutId,
-  StagingAreaLocation,
-  DeckLabelProps,
-} from '@opentrons/components'
 import type {
   AddressableAreaName,
   CutoutId,
@@ -32,7 +25,14 @@ import type {
   RobotType,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { getLabwareSlot } from '@opentrons/step-generation'
+import { Fragment } from 'react'
+import { useSelector } from 'react-redux'
+import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import type { Fixture } from './constants'
+import { darkFill, lightFill } from './DeckSetupContainer'
+import { getAdjacentSlots } from './utils'
 
 interface FixtureRenderProps {
   fixture: Fixture

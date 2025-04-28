@@ -1,14 +1,11 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
-
 import { COLORS } from '@opentrons/components'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RecoveryFooterButtons } from '../RecoveryFooterButtons'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
+import { RecoveryFooterButtons } from '../RecoveryFooterButtons'
 
 const render = (props: ComponentProps<typeof RecoveryFooterButtons>) => {
   return renderWithProviders(<RecoveryFooterButtons {...props} />, {

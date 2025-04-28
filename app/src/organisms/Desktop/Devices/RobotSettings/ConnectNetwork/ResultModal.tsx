@@ -1,12 +1,10 @@
-import { useTranslation } from 'react-i18next'
 import { AlertModal, SpinnerModal } from '@opentrons/components'
-
 import { ErrorModal } from '/app/molecules/modals'
-import { DISCONNECT } from './constants'
-import { PENDING, FAILURE } from '/app/redux/robot-api'
-
-import type { NetworkChangeType } from './types'
+import { FAILURE, PENDING } from '/app/redux/robot-api'
 import type { RequestStatus } from '/app/redux/robot-api/types'
+import { useTranslation } from 'react-i18next'
+import { DISCONNECT } from './constants'
+import type { NetworkChangeType } from './types'
 
 export interface ResultModalProps {
   type: NetworkChangeType

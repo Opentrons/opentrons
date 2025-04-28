@@ -1,17 +1,16 @@
-import { Trans, useTranslation } from 'react-i18next'
 import { LegacyStyledText } from '@opentrons/components'
+import { Trans, useTranslation } from 'react-i18next'
 import { RECOVERY_MAP } from '../constants'
 import {
-  TwoColTextAndFailedStepNextStep,
-  TwoColLwInfoAndDeck,
-  SelectTips,
   RecoveryDoorOpenSpecial,
   RetryStepInfo,
+  SelectTips,
+  TwoColLwInfoAndDeck,
+  TwoColTextAndFailedStepNextStep,
 } from '../shared'
+import type { RecoveryContentProps } from '../types'
 import { ManageTips } from './ManageTips'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
-
-import type { RecoveryContentProps } from '../types'
 
 const { HOME_AND_RETRY } = RECOVERY_MAP
 export function HomeAndRetry(props: RecoveryContentProps): JSX.Element {

@@ -1,7 +1,7 @@
-import { curryWithoutPython, reduceCommandCreators } from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
-import { dropTipInPlace, moveToAddressableArea } from '../atomic'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
+import { curryWithoutPython, reduceCommandCreators } from '../../utils'
+import { dropTipInPlace, moveToAddressableArea } from '../atomic'
 
 interface DropTipInWasteChuteArgs {
   pipetteId: string

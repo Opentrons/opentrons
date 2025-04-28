@@ -1,20 +1,20 @@
+import type { RobotState, Timeline } from '@opentrons/step-generation/src/types'
 import last from 'lodash/last'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import * as utils from '../../../../utils'
-import * as stepFormSelectors from '../../../../step-forms/selectors'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
+import * as stepFormSelectors from '../../../../step-forms/selectors'
+import * as utils from '../../../../utils'
 import { getMultiSelectLastSelected } from '../../selectors'
-import { selectAllSteps, deselectAllSteps } from '../actions'
+import { deselectAllSteps, selectAllSteps } from '../actions'
 import {
-  duplicateStep,
   duplicateMultipleSteps,
+  duplicateStep,
   saveHeaterShakerFormWithAddedPauseUntilTemp,
   saveSetTempFormWithAddedPauseUntilTemp,
 } from '../thunks'
-import type { Timeline, RobotState } from '@opentrons/step-generation/src/types'
 
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../selectors')

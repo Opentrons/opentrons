@@ -1,15 +1,12 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
-
 import { InputField } from '@opentrons/components'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { PipettePath } from '../../QuickTransferAdvancedSettings/PipettePath'
-import { useBlowOutLocationOptions } from '../../QuickTransferAdvancedSettings/BlowOut'
-
 import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { useBlowOutLocationOptions } from '../../QuickTransferAdvancedSettings/BlowOut'
+import { PipettePath } from '../../QuickTransferAdvancedSettings/PipettePath'
 import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')

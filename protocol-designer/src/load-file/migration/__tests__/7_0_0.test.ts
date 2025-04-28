@@ -1,7 +1,7 @@
-import { describe, it, expect, afterEach, vi } from 'vitest'
-import { migrateFile } from '../7_0_0'
-import _oldDoItAllProtocol from '../../../../fixtures/protocol/6/doItAllV4MigratedToV6.json'
 import type { ProtocolFileV6 } from '@opentrons/shared-data'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import _oldDoItAllProtocol from '../../../../fixtures/protocol/6/doItAllV4MigratedToV6.json'
+import { migrateFile } from '../7_0_0'
 
 const oldDoItAllProtocol = (_oldDoItAllProtocol as unknown) as ProtocolFileV6<any>
 

@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   Btn,
@@ -12,10 +11,10 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
+import { useTranslation } from 'react-i18next'
 import {
-  LINK_BUTTON_STYLE,
   LINE_CLAMP_TEXT_STYLE,
+  LINK_BUTTON_STYLE,
 } from '../../components/atoms'
 
 const REQUIRED_APP_VERSION = '8.4.0'

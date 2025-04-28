@@ -1,10 +1,10 @@
-import { describe, it, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { i18n } from '../../../../assets/localization'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { getRobotType } from '../../../../file-data/selectors'
+import { i18n } from '../../../../assets/localization'
 import { FlexHardware, Ot2Modules } from '../../../../components/organisms'
+import { getRobotType } from '../../../../file-data/selectors'
 import { TimelineEditHardware } from '../TimelineEditHardware'
 
 vi.mock('../../../../components/organisms/FlexHardware')

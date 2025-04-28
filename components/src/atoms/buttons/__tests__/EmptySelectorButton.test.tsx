@@ -1,11 +1,10 @@
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../../testing/utils'
-import { JUSTIFY_CENTER, JUSTIFY_START } from '../../../styles'
-import { EmptySelectorButton } from '../EmptySelectorButton'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { JUSTIFY_CENTER, JUSTIFY_START } from '../../../styles'
+import { renderWithProviders } from '../../../testing/utils'
+import { EmptySelectorButton } from '../EmptySelectorButton'
 
 const render = (props: ComponentProps<typeof EmptySelectorButton>) => {
   return renderWithProviders(<EmptySelectorButton {...props} />)[0]

@@ -1,12 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, expect } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
-import { ExitConfirmation } from '../ExitConfirmation'
-import { GRIPPER_FLOW_TYPES } from '../constants'
-
 import type { ComponentProps } from 'react'
+import { describe, expect, it, vi } from 'vitest'
+import { GRIPPER_FLOW_TYPES } from '../constants'
+import { ExitConfirmation } from '../ExitConfirmation'
 
 describe('ExitConfirmation', () => {
   const mockBack = vi.fn()

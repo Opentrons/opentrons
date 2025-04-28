@@ -1,7 +1,7 @@
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
 import type {
-  DeckCalibrationSessionDetails,
   CalibrationLabware,
+  DeckCalibrationSessionDetails,
 } from '../types'
 
 export const mockDeckCalTipRack: CalibrationLabware = {

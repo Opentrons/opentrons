@@ -1,5 +1,3 @@
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -15,9 +13,9 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-
-import { useResponsiveBreakpoints } from '../../resources/hooks/useResponsiveBreakpoints'
 import type { DropdownMenuProps, TagProps } from '@opentrons/components'
+import { css } from 'styled-components'
+import { useResponsiveBreakpoints } from '../../resources/hooks/useResponsiveBreakpoints'
 
 interface PDListItemCustomizeProps {
   header: string

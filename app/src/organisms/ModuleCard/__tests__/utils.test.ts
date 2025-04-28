@@ -1,6 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
-
+import { act, renderHook } from '@testing-library/react'
 import {
   mockHeaterShaker,
   mockMagneticModule,
@@ -10,8 +8,9 @@ import {
   mockThermocycler,
   mockThermocyclerGen2,
 } from '/app/redux/modules/__fixtures__'
-import { getModuleCardImage, useModuleApiRequests } from '../utils'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { getModuleCardImage, useModuleApiRequests } from '../utils'
 
 vi.mock('/app/redux/robot-api')
 

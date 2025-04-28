@@ -1,16 +1,15 @@
-import { Route, MemoryRouter, Routes } from 'react-router-dom'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import type * as ReactApiClient from '@opentrons/react-api-client'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { vi, describe, it, afterEach, beforeEach, expect } from 'vitest'
-
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { i18n } from '/app/i18n'
-import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-import { InstrumentsDashboard } from '..'
+import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { InstrumentsDashboard } from '..'
 import { InstrumentDetail } from '../../InstrumentDetail'
-import type * as ReactApiClient from '@opentrons/react-api-client'
 
 const mockGripperData = {
   instrumentModel: 'gripperV1',

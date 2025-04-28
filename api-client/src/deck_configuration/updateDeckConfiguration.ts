@@ -1,6 +1,5 @@
-import { PUT, request } from '../request'
-
 import type { DeckConfiguration } from '@opentrons/shared-data'
+import { PUT, request } from '../request'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type {

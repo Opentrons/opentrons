@@ -2,12 +2,11 @@
 import fs from 'fs'
 import fsPromises from 'fs/promises'
 import { Transform } from 'stream'
-import pump from 'pump'
-import _fetch from 'node-fetch'
-import FormData from 'form-data'
-
-import type { Request, RequestInit, Response } from 'node-fetch'
 import type { Readable } from 'stream'
+import FormData from 'form-data'
+import _fetch from 'node-fetch'
+import type { Request, RequestInit, Response } from 'node-fetch'
+import pump from 'pump'
 
 type RequestInput = Request | string
 

@@ -1,7 +1,9 @@
-import { useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
-
+import type { PipetteEntities } from '@opentrons/step-generation'
+import { useTranslation } from 'react-i18next'
 import { InputStepFormField } from '../../../../../../components/molecules'
+import type { FormData } from '../../../../../../form-types'
+import type { StepFormErrors } from '../../../../../../steplist'
 import {
   ChangeTipField,
   DropTipField,
@@ -14,14 +16,9 @@ import {
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
-
-import { getFormLevelError } from '../../utils'
-
-import type { PipetteEntities } from '@opentrons/step-generation'
 import type { FieldPropsByName } from '../../types'
+import { getFormLevelError } from '../../utils'
 import type { ErrorMappedToField } from '../../utils'
-import type { FormData } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
 
 interface FirstStepMixToolsProps {
   propsForFields: FieldPropsByName

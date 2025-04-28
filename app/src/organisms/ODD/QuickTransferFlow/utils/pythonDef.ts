@@ -1,4 +1,4 @@
-import upperCase from 'lodash/upperCase'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import {
   consolidate,
   distribute,
@@ -11,14 +11,14 @@ import {
   PROTOCOL_CONTEXT_NAME,
   transfer,
 } from '@opentrons/step-generation'
-import { generateQuickTransferArgs } from './generateQuickTransferArgs'
 import type {
   CommandCreatorResult,
   InvariantContext,
   TimelineFrame,
 } from '@opentrons/step-generation'
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import upperCase from 'lodash/upperCase'
 import type { QuickTransferSummaryState } from '../types'
+import { generateQuickTransferArgs } from './generateQuickTransferArgs'
 import type { MoveLiquidStepArgs } from './generateQuickTransferArgs'
 
 interface QuickTransferStepCommandsProps {

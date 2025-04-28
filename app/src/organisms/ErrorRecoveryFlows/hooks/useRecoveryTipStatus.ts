@@ -1,18 +1,16 @@
-import { useState } from 'react'
-import head from 'lodash/head'
-
+import type { Instruments, PipetteData, Run } from '@opentrons/api-client'
 import { useRunCurrentState } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useTipAttachmentStatus } from '/app/resources/instruments'
 import { ERROR_KINDS } from '/app/organisms/ErrorRecoveryFlows/constants'
+import type { ERUtilsProps } from '/app/organisms/ErrorRecoveryFlows/hooks/useERUtils'
 import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
-
-import type { Run, Instruments, PipetteData } from '@opentrons/api-client'
+import { useTipAttachmentStatus } from '/app/resources/instruments'
 import type {
   PipetteWithTip,
   TipAttachmentStatusResult,
 } from '/app/resources/instruments'
-import type { ERUtilsProps } from '/app/organisms/ErrorRecoveryFlows/hooks/useERUtils'
+import head from 'lodash/head'
+import { useState } from 'react'
 
 interface UseRecoveryTipStatusProps {
   runId: string

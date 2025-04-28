@@ -1,7 +1,3 @@
-import isEqual from 'lodash/isEqual'
-
-import { connectionStore } from './store'
-
 import type {
   NotifyBrokerResponses,
   NotifyRefetchData,
@@ -9,7 +5,9 @@ import type {
   NotifyTopic,
   NotifyUnsubscribeData,
 } from '@opentrons/app/src/redux/shell/types'
+import isEqual from 'lodash/isEqual'
 import { FAILURE_STATUSES } from '../constants'
+import { connectionStore } from './store'
 
 interface SendToBrowserParams {
   ip: string

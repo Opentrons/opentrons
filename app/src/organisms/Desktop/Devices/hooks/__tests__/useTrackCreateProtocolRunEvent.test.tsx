@@ -1,20 +1,18 @@
-import { createStore } from 'redux'
-import { Provider } from 'react-redux'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { waitFor, renderHook } from '@testing-library/react'
-
-import { STORED_PROTOCOL_ANALYSIS } from '/app/resources/analysis/hooks/__fixtures__/storedProtocolAnalysis'
-import { useTrackCreateProtocolRunEvent } from '../useTrackCreateProtocolRunEvent'
-import { parseProtocolRunAnalyticsData } from '/app/transformations/analytics'
-import { parseProtocolAnalysisOutput } from '/app/transformations/analysis'
+import { renderHook, waitFor } from '@testing-library/react'
 import { useTrackEvent } from '/app/redux/analytics'
-import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
-
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Mock } from 'vitest'
-import type { Store } from 'redux'
 import type { ProtocolAnalyticsData } from '/app/redux/analytics/types'
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
+import { STORED_PROTOCOL_ANALYSIS } from '/app/resources/analysis/hooks/__fixtures__/storedProtocolAnalysis'
+import { parseProtocolAnalysisOutput } from '/app/transformations/analysis'
+import { parseProtocolRunAnalyticsData } from '/app/transformations/analytics'
+import type { FunctionComponent, ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import type { Store } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
+import { useTrackCreateProtocolRunEvent } from '../useTrackCreateProtocolRunEvent'
 
 vi.mock('../../hooks')
 vi.mock('/app/transformations/analytics')

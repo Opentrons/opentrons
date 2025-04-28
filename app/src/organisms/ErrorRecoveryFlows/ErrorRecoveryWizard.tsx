@@ -1,42 +1,39 @@
-import { useState, useEffect } from 'react'
+import { CURSOR_POINTER, StyledText } from '@opentrons/components'
+import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-
-import { CURSOR_POINTER, StyledText } from '@opentrons/components'
-
-import { RecoveryError } from './RecoveryError'
+import type { ErrorRecoveryFlowsProps } from '.'
+import { RECOVERY_MAP } from './constants'
+import type { ERUtilsResults, useRetainedFailedCommandBySource } from './hooks'
 import { RecoveryDoorOpen } from './RecoveryDoorOpen'
+import { RecoveryError } from './RecoveryError'
+import { RecoveryInProgress } from './RecoveryInProgress'
 import {
-  SelectRecoveryOption,
-  RetryStep,
   CancelRun,
-  RetryNewTips,
-  ManageTips,
+  FillWellAndRetryNewTips,
   FillWellAndRetrySameTips,
-  RetrySameTips,
-  SkipStepSameTips,
-  SkipStepNewTips,
+  HomeAndRetry,
   IgnoreErrorSkipStep,
+  ManageTips,
   ManualMoveLwAndSkip,
   ManualReplaceLwAndRetry,
-  HomeAndRetry,
-  FillWellAndRetryNewTips,
+  RetryNewTips,
+  RetrySameTips,
+  RetryStep,
+  SelectRecoveryOption,
+  SkipStepNewTips,
+  SkipStepSameTips,
 } from './RecoveryOptions'
 import {
-  useErrorDetailsModal,
   ErrorDetailsModal,
-  RecoveryInterventionModal,
   RecoveryDoorOpenSpecial,
+  RecoveryInterventionModal,
+  useErrorDetailsModal,
 } from './shared'
-import { RecoveryInProgress } from './RecoveryInProgress'
+import type { RecoveryContentProps, RecoveryRoute, RouteStep } from './types'
 import { getErrorKind } from './utils'
-import { RECOVERY_MAP } from './constants'
-
-import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
-import type { RecoveryRoute, RouteStep, RecoveryContentProps } from './types'
-import type { ErrorRecoveryFlowsProps } from '.'
-import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
-import type { ERUtilsResults, useRetainedFailedCommandBySource } from './hooks'
 
 export interface UseERWizardResult {
   hasLaunchedRecovery: boolean

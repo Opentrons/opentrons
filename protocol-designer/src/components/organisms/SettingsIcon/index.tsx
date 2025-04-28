@@ -1,6 +1,3 @@
-import { useLocation, useNavigate } from 'react-router-dom'
-import { css } from 'styled-components'
-
 import {
   BORDERS,
   Btn,
@@ -10,6 +7,8 @@ import {
   Icon,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { css } from 'styled-components'
 
 const BUTTON_NAME = 'SettingsIconButton'
 

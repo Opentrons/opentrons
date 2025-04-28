@@ -1,10 +1,10 @@
-import { screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
-import { i18n } from '../../../../../../../assets/localization'
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
-import { InitializationSettings } from '../InitializationSettings'
-import type { ComponentProps } from 'react'
 import type { Initialization } from '@opentrons/step-generation'
+import { screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
+import { describe, expect, it } from 'vitest'
+import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { i18n } from '../../../../../../../assets/localization'
+import { InitializationSettings } from '../InitializationSettings'
 
 // Mocking constants
 const INITIALIZATION_SINGLE_NO_REFERENCE: Initialization = {

@@ -1,24 +1,23 @@
-import { useState } from 'react'
 import {
-  Flex,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN_REVERSE,
+  Flex,
   JUSTIFY_CENTER,
   POSITION_FIXED,
+  Snackbar,
   SPACING,
   Toast,
-  Snackbar,
 } from '@opentrons/components'
-import { uuid } from '../../../utils'
-import { KitchenContext } from './KitchenContext'
-
-import type { ReactNode } from 'react'
 import type {
   SnackbarProps,
   ToastProps,
   ToastType,
 } from '@opentrons/components'
+import { useState } from 'react'
+import type { ReactNode } from 'react'
+import { uuid } from '../../../utils'
+import { KitchenContext } from './KitchenContext'
 import type { BakeOptions, MakeSnackbarOptions } from './KitchenContext'
 
 interface PantryProps {

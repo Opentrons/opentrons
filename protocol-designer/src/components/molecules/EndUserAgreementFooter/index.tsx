@@ -1,5 +1,3 @@
-import { Trans, useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -10,7 +8,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
+import { Trans, useTranslation } from 'react-i18next'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { getYearFromDate } from './utils'
 

@@ -1,5 +1,4 @@
 import { Slideout } from './index'
-
 import type { MultiSlideoutSpecs, SlideoutProps } from './index'
 
 type MultiSlideoutProps = SlideoutProps & MultiSlideoutSpecs

@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchSettings,
   getRobotSettings,
@@ -7,6 +5,8 @@ import {
 } from '/app/redux/robot-settings'
 import type { RobotSettings } from '/app/redux/robot-settings/types'
 import type { Dispatch, State } from '/app/redux/types'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 // not releveant to the OT-2, this controls the front LED lights on the Flex
 export function useLEDLights(

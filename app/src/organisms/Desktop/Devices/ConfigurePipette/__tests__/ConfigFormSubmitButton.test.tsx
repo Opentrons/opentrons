@@ -1,11 +1,9 @@
-import { it, expect, describe, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ConfigFormSubmitButton } from '../ConfigFormSubmitButton'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { ConfigFormSubmitButton } from '../ConfigFormSubmitButton'
 
 const render = (props: ComponentProps<typeof ConfigFormSubmitButton>) => {
   return renderWithProviders(<ConfigFormSubmitButton {...props} />, {

@@ -1,10 +1,8 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../testing/utils'
-
-import { ListButtonRadioButton } from '..'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ListButtonRadioButton } from '..'
+import { renderWithProviders } from '../../../testing/utils'
 
 const render = (props: ComponentProps<typeof ListButtonRadioButton>) =>
   renderWithProviders(<ListButtonRadioButton {...props} />)

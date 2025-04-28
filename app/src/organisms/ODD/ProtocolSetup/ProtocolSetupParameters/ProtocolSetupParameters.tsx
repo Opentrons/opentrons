@@ -1,13 +1,4 @@
-import { useEffect, useState, Fragment } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import {
-  useCreateProtocolAnalysisMutation,
-  useCreateRunMutation,
-  useHost,
-  useUploadCsvFileMutation,
-} from '@opentrons/react-api-client'
-import { useQueryClient } from 'react-query'
+import type { FileData } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -15,33 +6,41 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
+  useCreateProtocolAnalysisMutation,
+  useCreateRunMutation,
+  useHost,
+  useUploadCsvFileMutation,
+} from '@opentrons/react-api-client'
+import {
   formatRunTimeParameterValue,
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
-
+import type {
+  ChoiceParameter,
+  CompletedProtocolAnalysis,
+  CsvFileParameter,
+  CsvFileParameterFileData,
+  NumberParameter,
+  RunTimeParameter,
+  ValueRunTimeParameter,
+} from '@opentrons/shared-data'
+import { useScrollRef } from '/app/App/hooks'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { ResetValuesModal } from './ResetValuesModal'
+import { Fragment, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
+import { useNavigate } from 'react-router-dom'
+import { ProtocolSetupStep } from '../ProtocolSetupStep'
+import type { ProtocolSetupStepStatus } from '../ProtocolSetupStep'
+import { ChooseCsvFile } from './ChooseCsvFile'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
-import { ChooseCsvFile } from './ChooseCsvFile'
-import { useToaster } from '/app/organisms/ToasterOven'
-import { ProtocolSetupStep } from '../ProtocolSetupStep'
-import { useScrollRef } from '/app/App/hooks'
-import type {
-  CompletedProtocolAnalysis,
-  ChoiceParameter,
-  CsvFileParameter,
-  NumberParameter,
-  RunTimeParameter,
-  ValueRunTimeParameter,
-  CsvFileParameterFileData,
-} from '@opentrons/shared-data'
-import type { ProtocolSetupStepStatus } from '../ProtocolSetupStep'
-import type { FileData } from '@opentrons/api-client'
+import { ResetValuesModal } from './ResetValuesModal'
 
 interface ProtocolSetupParametersProps {
   protocolId: string

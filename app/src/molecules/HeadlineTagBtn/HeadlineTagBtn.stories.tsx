@@ -1,8 +1,6 @@
 import { Tag, VIEWPORT } from '@opentrons/components'
-
+import type { Meta, Story } from '@storybook/react'
 import { HeadlineTagBtn as HeadlineTagBtnComponent } from '.'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Molecules/HeadlineTagBtn',

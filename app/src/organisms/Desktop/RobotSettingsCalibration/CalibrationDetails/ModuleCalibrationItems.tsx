@@ -1,23 +1,20 @@
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
-
+import type { AttachedModule } from '@opentrons/api-client'
 import {
   BORDERS,
   COLORS,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  getModuleDisplayName,
   ABSORBANCE_READER_TYPE,
+  getModuleDisplayName,
 } from '@opentrons/shared-data'
-
-import { formatLastCalibrated } from './utils'
-import { ModuleCalibrationOverflowMenu } from './ModuleCalibrationOverflowMenu'
-
-import type { AttachedModule } from '@opentrons/api-client'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 import type { FormattedPipetteOffsetCalibration } from '..'
+import { ModuleCalibrationOverflowMenu } from './ModuleCalibrationOverflowMenu'
+import { formatLastCalibrated } from './utils'
 
 interface ModuleCalibrationItemsProps {
   attachedModules: AttachedModule[]

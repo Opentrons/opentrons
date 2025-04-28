@@ -1,21 +1,20 @@
-import { ErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
+import type { RunStatus } from '@opentrons/api-client'
 import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
+import { ErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
+import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
+import { ConfirmAttachmentModal } from '/app/organisms/ModuleCard/ConfirmAttachmentModal'
+import type { RunControls } from '/app/organisms/RunTimeControl'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import type { UseRunHeaderModalContainerResult } from '.'
+import type { UseRunErrorsResult } from '../hooks'
 import {
   ConfirmCancelModal,
+  ConfirmMissingStepsModal,
   HeaterShakerIsRunningModal,
   ProtocolAnalysisErrorModal,
   ProtocolDropTipModal,
   RunFailedModal,
-  ConfirmMissingStepsModal,
 } from './modals'
-import { ConfirmAttachmentModal } from '/app/organisms/ModuleCard/ConfirmAttachmentModal'
-import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
-
-import type { RunStatus } from '@opentrons/api-client'
-import type { RunControls } from '/app/organisms/RunTimeControl'
-import type { UseRunErrorsResult } from '../hooks'
-import type { UseRunHeaderModalContainerResult } from '.'
 
 export interface RunHeaderModalContainerProps {
   runId: string

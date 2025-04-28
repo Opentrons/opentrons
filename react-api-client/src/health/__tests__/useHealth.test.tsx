@@ -1,14 +1,12 @@
 // tests for the useHealth hooks
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook, waitFor } from '@testing-library/react'
-
 import { getHealth } from '@opentrons/api-client'
-import { useHost } from '../../api'
+import type { Health, HostConfig, Response } from '@opentrons/api-client'
+import { renderHook, waitFor } from '@testing-library/react'
+import type * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useHealth } from '..'
-
-import type { HostConfig, Response, Health } from '@opentrons/api-client'
+import { useHost } from '../../api'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

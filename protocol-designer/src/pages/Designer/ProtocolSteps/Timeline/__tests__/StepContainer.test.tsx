@@ -1,15 +1,14 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { fireEvent, screen } from '@testing-library/react'
 import { COLORS } from '@opentrons/components'
+import type { OverflowBtn } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'
 import { getUnsavedForm } from '../../../../../step-forms/selectors'
 import { StepContainer } from '../StepContainer'
 import { StepOverflowMenu } from '../StepOverflowMenu'
-
-import type { ComponentProps } from 'react'
-import type { OverflowBtn } from '@opentrons/components'
 
 vi.mock('../../../../../step-forms/selectors')
 vi.mock('../../../../../ui/steps/actions/actions')

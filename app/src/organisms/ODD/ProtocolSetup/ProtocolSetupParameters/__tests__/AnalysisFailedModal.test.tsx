@@ -1,14 +1,12 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { when } from 'vitest-when'
-import { fireEvent, screen } from '@testing-library/react'
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { AnalysisFailedModal } from '../AnalysisFailedModal'
-
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { AnalysisFailedModal } from '../AnalysisFailedModal'
 
 const PROTOCOL_ID = 'mockProtocolId'
 const RUN_ID = 'mockRunId'

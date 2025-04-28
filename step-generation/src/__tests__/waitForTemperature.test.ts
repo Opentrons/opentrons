@@ -1,16 +1,16 @@
-import { beforeEach, describe, it, expect } from 'vitest'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import type { TemperatureParams } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { waitForTemperature } from '../commandCreators/atomic/waitForTemperature'
 import {
-  TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../constants'
-import { waitForTemperature } from '../commandCreators/atomic/waitForTemperature'
 import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../fixtures'
-import type { TemperatureParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
 describe('waitForTemperature', () => {

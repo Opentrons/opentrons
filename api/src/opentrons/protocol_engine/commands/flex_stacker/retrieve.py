@@ -198,6 +198,15 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )
+        try:
+            raise FlexStackerStallError(serial="123", axis='y')
+        except (
+                FlexStackerStallError,
+                FlexStackerShuttleMissingError,
+                FlexStackerHopperLabwareError,
+        ) as e:
+            return self.handle_recoverable_error(e, '123',
+            update_types.StateUpdate())
         location = self._state_view.modules.get_location(params.moduleId)
 
         if stacker_state.pool_primary_definition is None:

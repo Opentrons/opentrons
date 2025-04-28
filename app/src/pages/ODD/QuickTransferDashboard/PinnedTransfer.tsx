@@ -1,7 +1,3 @@
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import styled, { css } from 'styled-components'
-
 import {
   ALIGN_FLEX_START,
   BORDERS,
@@ -10,19 +6,20 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   TYPOGRAPHY,
   useLongPress,
-  LegacyStyledText,
 } from '@opentrons/components'
-
-import { LongPressModal } from './LongPressModal'
-import { formatTimeWithUtcLabel } from '/app/resources/runs'
-
-import type { Dispatch, SetStateAction } from 'react'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
+import { useEffect } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { useNavigate } from 'react-router-dom'
+import styled, { css } from 'styled-components'
+import { LongPressModal } from './LongPressModal'
 
 export type CardSizeType = 'full' | 'half' | 'regular'
 

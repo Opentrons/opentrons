@@ -1,15 +1,12 @@
 import cx from 'classnames'
 import omit from 'lodash/omit'
-
-import { Icon } from '../icons'
-import styles from './buttons.module.css'
-
-import { BUTTON_TYPE_BUTTON } from '../primitives'
-
 import type { ComponentType, MouseEventHandler, ReactNode } from 'react'
-import type { BUTTON_TYPE_SUBMIT, BUTTON_TYPE_RESET } from '../primitives'
+import { Icon } from '../icons'
 import type { IconName } from '../icons'
+import { BUTTON_TYPE_BUTTON } from '../primitives'
+import type { BUTTON_TYPE_RESET, BUTTON_TYPE_SUBMIT } from '../primitives'
 import type { UseHoverTooltipTargetProps } from '../tooltips'
+import styles from './buttons.module.css'
 
 export interface ButtonProps {
   /** id attribute */

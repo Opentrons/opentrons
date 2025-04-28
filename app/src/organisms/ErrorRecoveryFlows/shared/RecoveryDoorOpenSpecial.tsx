@@ -1,7 +1,4 @@
-import { useEffect, useState } from 'react'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-
+import { RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -14,17 +11,17 @@ import {
   StyledText,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
-import { RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
-
-import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { RECOVERY_MAP } from '../constants'
-
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import type {
   RecoveryContentProps,
   RecoveryRoute,
   RouteStep,
 } from '../../ErrorRecoveryFlows/types'
+import { RECOVERY_MAP } from '../constants'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
+import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 // Whenever a step uses a custom "close the robot door" view, use this component.
 // Note that the allowDoorOpen metadata for the route must be set to true for this view to render.

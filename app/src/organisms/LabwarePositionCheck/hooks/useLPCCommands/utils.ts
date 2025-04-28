@@ -1,5 +1,4 @@
 import { splitLabwareDefURI } from '@opentrons/shared-data'
-
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 export interface StackerLwDetails {

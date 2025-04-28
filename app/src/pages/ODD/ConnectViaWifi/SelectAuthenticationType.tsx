@@ -1,11 +1,8 @@
-import { useTranslation } from 'react-i18next'
-
-import { Flex, DIRECTION_COLUMN } from '@opentrons/components'
-
+import type { WifiSecurityType } from '@opentrons/api-client'
+import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { SelectAuthenticationType as SelectAuthenticationTypeComponent } from '/app/organisms/ODD/NetworkSettings'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
-
-import type { WifiSecurityType } from '@opentrons/api-client'
+import { useTranslation } from 'react-i18next'
 import type { WifiScreenOption } from './'
 
 interface SelectAuthenticationTypeProps {

@@ -1,7 +1,5 @@
-import { useTranslation } from 'react-i18next'
-
-import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
-
+import type { WifiSecurityType } from '@opentrons/api-client'
+import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import {
   ConnectingNetwork,
   FailedToConnect,
@@ -9,9 +7,8 @@ import {
 } from '/app/organisms/ODD/NetworkSettings'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 import * as RobotApi from '/app/redux/robot-api'
-
-import type { WifiSecurityType } from '@opentrons/api-client'
 import type { RequestState } from '/app/redux/robot-api/types'
+import { useTranslation } from 'react-i18next'
 import type { WifiScreenOption } from './'
 
 interface WifiConnectStatusProps {

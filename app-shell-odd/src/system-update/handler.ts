@@ -1,19 +1,17 @@
 // system update handler
 
 import Semver from 'semver'
-
-import { CONFIG_INITIALIZED, VALUE_UPDATED } from '../constants'
-import { createLogger } from '../log'
-import { postFile } from '../http'
 import { getConfig } from '../config'
-import { getSystemUpdateDir } from './directories'
-import { SYSTEM_FILENAME, FLEX_MANIFEST_URL } from './constants'
-import { getProvider as getWebUpdateProvider } from './from-web'
-import { getProvider as getUsbUpdateProvider } from './from-usb'
-
+import { CONFIG_INITIALIZED, VALUE_UPDATED } from '../constants'
+import { postFile } from '../http'
+import { createLogger } from '../log'
 import type { Action, Dispatch } from '../types'
-import type { UpdateProvider, UnresolvedUpdate, ReadyUpdate } from './types'
+import { FLEX_MANIFEST_URL, SYSTEM_FILENAME } from './constants'
+import { getSystemUpdateDir } from './directories'
+import { getProvider as getUsbUpdateProvider } from './from-usb'
 import type { USBUpdateSource } from './from-usb'
+import { getProvider as getWebUpdateProvider } from './from-web'
+import type { ReadyUpdate, UnresolvedUpdate, UpdateProvider } from './types'
 
 export const CURRENT_SYSTEM_VERSION = _PKG_VERSION_
 

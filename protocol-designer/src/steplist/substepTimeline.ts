@@ -1,24 +1,21 @@
-import last from 'lodash/last'
-import pick from 'lodash/pick'
+import type { Channels } from '@opentrons/components'
 import {
-  getWellsForTips,
-  getNextRobotStateAndWarningsSingleCommand,
-  getCutoutIdByAddressableArea,
-} from '@opentrons/step-generation'
-import {
-  FLEX_ROBOT_TYPE,
   ALL,
   COLUMN,
+  FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   SINGLE,
 } from '@opentrons/shared-data'
-
-import type { Channels } from '@opentrons/components'
 import type {
   AddressableAreaName,
   CreateCommand,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
+import {
+  getCutoutIdByAddressableArea,
+  getNextRobotStateAndWarningsSingleCommand,
+  getWellsForTips,
+} from '@opentrons/step-generation'
 import type {
   CommandCreatorError,
   CommandsAndWarnings,
@@ -26,7 +23,9 @@ import type {
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
-import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
+import last from 'lodash/last'
+import pick from 'lodash/pick'
+import type { SourceDestData, SubstepTimelineFrame, TipLocation } from './types'
 
 const wasteChuteddressableAreaNamesPipette = [
   '1ChannelWasteChute',

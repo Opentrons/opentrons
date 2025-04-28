@@ -1,23 +1,22 @@
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-
+import { useAuth0 } from '@auth0/auth0-react'
 import {
-  Flex,
-  StyledText,
-  Link as LinkButton,
-  POSITION_ABSOLUTE,
-  TYPOGRAPHY,
-  COLORS,
-  POSITION_RELATIVE,
   ALIGN_CENTER,
+  COLORS,
+  Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  Link as LinkButton,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAuth0 } from '@auth0/auth0-react'
+import { useAtom } from 'jotai'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+import { displayExitConfirmModalAtom } from '../../resources/atoms'
 import { CLIENT_MAX_WIDTH } from '../../resources/constants'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
-import { useAtom } from 'jotai'
-import { displayExitConfirmModalAtom } from '../../resources/atoms'
 
 const HeaderBar = styled(Flex)`
   position: ${POSITION_RELATIVE};

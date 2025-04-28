@@ -1,11 +1,11 @@
-import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
-import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
-import { getLabwareName } from '../getLabwareName'
 import type {
   LiquidProbeRunTimeCommand,
   RunTimeCommand,
   TryLiquidProbeRunTimeCommand,
 } from '@opentrons/shared-data'
+import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
+import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
+import { getLabwareName } from '../getLabwareName'
 import type { HandlesCommands } from '../types'
 
 type LiquidProbeRunTimeCommands =

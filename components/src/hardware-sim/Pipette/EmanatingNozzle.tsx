@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
+import { COLORS } from '../../helix-design-system'
 import { C_TRANSPARENT } from '../../styles'
 import { SINGLE_CHANNEL_PIPETTE_HEIGHT } from './constants'
-import { COLORS } from '../../helix-design-system'
 
 export const EmanatingNozzle = (props: {
   cx: number

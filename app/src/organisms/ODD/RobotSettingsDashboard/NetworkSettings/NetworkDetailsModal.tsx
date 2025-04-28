@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -8,14 +6,13 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { OddModal } from '/app/molecules/OddModal'
-
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { useTranslation } from 'react-i18next'
 
 interface NetworkDetailsModalProps {
   setShowNetworkDetailModal: (showNetworkDetailModal: boolean) => void

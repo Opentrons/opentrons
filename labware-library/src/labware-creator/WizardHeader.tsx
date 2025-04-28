@@ -1,17 +1,17 @@
-import type * as React from 'react'
-import { css } from 'styled-components'
 import {
   Box,
   Btn,
+  COLORS,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  COLORS,
   SPACING,
-  Text,
   StepMeter,
+  Text,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import type * as React from 'react'
+import { css } from 'styled-components'
 
 interface WizardHeaderProps {
   title: string

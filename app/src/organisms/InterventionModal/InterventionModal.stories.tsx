@@ -1,22 +1,19 @@
-import type * as React from 'react'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { QueryClient, QueryClientProvider } from 'react-query'
-
 import { fixture96Plate } from '@opentrons/shared-data'
-
+import type { Meta, Story } from '@storybook/react'
 import { configReducer } from '/app/redux/config/reducer'
-import { mockRunData } from './__fixtures__'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import * as DiscoveryClientFixtures from '../../../../discovery-client/src/fixtures'
 import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
-import { InterventionModal as InterventionModalComponent } from './'
-
+import type * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
 import type { Store, StoreEnhancer } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import * as DiscoveryClientFixtures from '../../../../discovery-client/src/fixtures'
+import { InterventionModal as InterventionModalComponent } from './'
+import { mockRunData } from './__fixtures__'
 
 const dummyConfig = {
   discovery: {

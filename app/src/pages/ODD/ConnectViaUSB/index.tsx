@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -10,15 +8,17 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
-import { StepMeter } from '/app/atoms/StepMeter'
 import { MediumButton } from '/app/atoms/buttons'
+import { StepMeter } from '/app/atoms/StepMeter'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 export function ConnectViaUSB(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared', 'branded'])

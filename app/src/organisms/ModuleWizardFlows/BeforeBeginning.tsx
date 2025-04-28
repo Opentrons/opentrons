@@ -1,16 +1,14 @@
-import { Trans, useTranslation } from 'react-i18next'
-
+import type { AttachedModule } from '@opentrons/api-client'
+import { LegacyStyledText } from '@opentrons/components'
 import {
+  getModuleDisplayName,
   HEATERSHAKER_MODULE_MODELS,
   TEMPERATURE_MODULE_MODELS,
   THERMOCYCLER_MODULE_MODELS,
-  getModuleDisplayName,
 } from '@opentrons/shared-data'
-import { LegacyStyledText } from '@opentrons/components'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
-
-import type { AttachedModule } from '@opentrons/api-client'
+import { Trans, useTranslation } from 'react-i18next'
 import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface EqipmentItem {

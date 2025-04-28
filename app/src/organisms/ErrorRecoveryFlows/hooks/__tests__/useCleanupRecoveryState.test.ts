@@ -1,8 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
-
-import { useCleanupRecoveryState } from '../useCleanupRecoveryState'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RECOVERY_MAP } from '../../constants'
+import { useCleanupRecoveryState } from '../useCleanupRecoveryState'
 
 describe('useCleanupRecoveryState', () => {
   let props: Parameters<typeof useCleanupRecoveryState>[0]

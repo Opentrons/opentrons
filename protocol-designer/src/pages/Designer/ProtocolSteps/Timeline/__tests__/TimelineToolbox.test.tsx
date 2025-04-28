@@ -1,26 +1,25 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
+import type { NavigateFunction } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'
-import {
-  selectDropdownItem,
-  selectTerminalItem,
-} from '../../../../../ui/steps/actions/actions'
+import { getFileMetadata } from '../../../../../file-data/selectors'
 import {
   getInitialDeckSetup,
   getOrderedStepIds,
   getUnsavedForm,
 } from '../../../../../step-forms/selectors'
-import { getFileMetadata } from '../../../../../file-data/selectors'
-import { TerminalItemStep } from '../TerminalItemStep'
-import { DraggableSteps } from '../DraggableSteps'
-import { PresavedStep } from '../PresavedStep'
+import {
+  selectDropdownItem,
+  selectTerminalItem,
+} from '../../../../../ui/steps/actions/actions'
 import { AddStepButton } from '../AddStepButton'
-import { TimelineToolbox } from '../TimelineToolbox'
+import { DraggableSteps } from '../DraggableSteps'
 import { HardwareStep } from '../HardwareStep'
-
-import type { ComponentProps } from 'react'
-import type { NavigateFunction } from 'react-router-dom'
+import { PresavedStep } from '../PresavedStep'
+import { TerminalItemStep } from '../TerminalItemStep'
+import { TimelineToolbox } from '../TimelineToolbox'
 
 const mockNavigate = vi.fn()
 

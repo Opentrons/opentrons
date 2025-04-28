@@ -1,10 +1,8 @@
 import cx from 'classnames'
-
+import type { ChangeEventHandler, ReactNode } from 'react'
 import { DeprecatedCheckboxField } from '../forms'
 import { LabeledControl } from './LabeledControl'
 import styles from './styles.module.css'
-
-import type { ChangeEventHandler, ReactNode } from 'react'
 
 export interface LabeledCheckboxProps {
   label: string

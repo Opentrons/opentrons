@@ -1,4 +1,3 @@
-import type * as React from 'react'
 import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
@@ -12,12 +11,11 @@ import {
   fixtureTiprack10ul,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
-
-import { SmallButton } from '/app/atoms/buttons'
-import { TerseOffsetTable } from './ResultsSummary'
-
-import type { Story, Meta } from '@storybook/react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Meta, Story } from '@storybook/react'
+import { SmallButton } from '/app/atoms/buttons'
+import type * as React from 'react'
+import { TerseOffsetTable } from './ResultsSummary'
 
 export default {
   title: 'ODD/Organisms/TerseOffsetTable',

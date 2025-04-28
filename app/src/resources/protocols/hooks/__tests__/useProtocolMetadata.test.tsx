@@ -1,15 +1,14 @@
 // tests for the HostConfig context and hook
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
+import { renderHook } from '@testing-library/react'
+import type { State } from '/app/redux/types'
+import type { FunctionComponent, ReactNode } from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
+import type { Store } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import { useCurrentProtocol } from '../useCurrentProtocol'
 import { useProtocolMetadata } from '../useProtocolMetadata'
-
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
-import type { State } from '/app/redux/types'
 
 vi.mock('../useCurrentProtocol')
 

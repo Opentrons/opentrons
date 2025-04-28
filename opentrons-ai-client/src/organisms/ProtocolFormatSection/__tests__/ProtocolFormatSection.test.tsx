@@ -1,9 +1,9 @@
 import { screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { FormProvider, useForm } from 'react-hook-form'
+import { describe, expect, it } from 'vitest'
+import { ProtocolFormatSection } from '../'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { ProtocolFormatSection } from '../'
-import { FormProvider, useForm } from 'react-hook-form'
 
 const TestFormProviderComponent = () => {
   const methods = useForm({

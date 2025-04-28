@@ -1,10 +1,8 @@
-import { describe, it, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { renderWithProviders } from '../../../testing/utils'
-import { ListTable } from '..'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, it } from 'vitest'
+import { ListTable } from '..'
+import { renderWithProviders } from '../../../testing/utils'
 
 const render = (props: ComponentProps<typeof ListTable>) => {
   return renderWithProviders(<ListTable {...props} />)[0]

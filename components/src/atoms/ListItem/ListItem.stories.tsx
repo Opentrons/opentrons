@@ -1,12 +1,12 @@
-import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { DIRECTION_COLUMN } from '../../styles'
-import { Flex } from '../../primitives'
-import { StyledText } from '../StyledText'
-import { ListItemDescriptor } from './ListItemChildren/ListItemDescriptor'
+import type { Meta, StoryObj } from '@storybook/react'
 import { ListItem as ListItemComponent, ListItemCustomize } from '.'
 import exampleImage from '../../images/labware/measurement-guide/images/spacing/spacing-well-rectangular@3x.png'
-import type { Meta, StoryObj } from '@storybook/react'
 import type { DropdownMenuProps } from '../../molecules'
+import { Flex } from '../../primitives'
+import { DIRECTION_COLUMN } from '../../styles'
+import { SPACING, VIEWPORT } from '../../ui-style-constants'
+import { StyledText } from '../StyledText'
+import { ListItemDescriptor } from './ListItemChildren/ListItemDescriptor'
 
 const meta: Meta<typeof ListItemComponent> = {
   title: 'ListItem',

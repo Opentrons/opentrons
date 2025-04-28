@@ -1,11 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { vi, it, expect, describe, beforeEach } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ConfigFormResetButton } from '../ConfigFormResetButton'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ConfigFormResetButton } from '../ConfigFormResetButton'
 
 const render = (props: ComponentProps<typeof ConfigFormResetButton>) => {
   return renderWithProviders(<ConfigFormResetButton {...props} />, {

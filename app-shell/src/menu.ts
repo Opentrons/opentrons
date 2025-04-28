@@ -2,7 +2,6 @@
 // application menu
 import { Menu, shell } from 'electron'
 import type { MenuItemConstructorOptions } from 'electron'
-
 import { LOG_DIR } from './log'
 
 const PRODUCT_NAME: string = _PKG_PRODUCT_NAME_

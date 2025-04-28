@@ -1,11 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
-import { ChildNavigation } from '..'
-
-import type { ComponentProps } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ChildNavigation } from '..'
 
 const render = (props: ComponentProps<typeof ChildNavigation>) =>
   renderWithProviders(<ChildNavigation {...props} />)

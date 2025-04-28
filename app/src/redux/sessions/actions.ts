@@ -1,9 +1,9 @@
-import * as Constants from './constants'
-import type * as Types from './types'
 import type {
   RobotApiRequestMeta,
   RobotApiV2ErrorResponseBody,
 } from '../robot-api/types'
+import * as Constants from './constants'
+import type * as Types from './types'
 
 export const createSession = (
   robotName: string,

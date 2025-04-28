@@ -1,15 +1,13 @@
+import { TwoColumn } from '/app/molecules/InterventionModal'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import { RECOVERY_MAP } from '../constants'
-import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { TwoColumn } from '/app/molecules/InterventionModal'
-import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
-import { TipSelectionModal } from './TipSelectionModal'
-import { TipSelection } from './TipSelection'
-
 import type { RecoveryContentProps } from '../types'
+import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
+import { RecoveryFooterButtons } from './RecoveryFooterButtons'
+import { TipSelection } from './TipSelection'
+import { TipSelectionModal } from './TipSelectionModal'
 
 export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
   const {

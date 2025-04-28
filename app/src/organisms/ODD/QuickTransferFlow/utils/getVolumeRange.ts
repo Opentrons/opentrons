@@ -1,5 +1,5 @@
-import { getSelectedWellCount } from './'
 import type { QuickTransferWizardState } from '../types'
+import { getSelectedWellCount } from './'
 
 export function getVolumeRange(
   state: QuickTransferWizardState

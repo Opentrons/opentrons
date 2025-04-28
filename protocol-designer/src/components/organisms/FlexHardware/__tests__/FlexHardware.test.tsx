@@ -1,17 +1,17 @@
-import { describe, it, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
 import { DeckConfigurator } from '@opentrons/components'
 import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+import { FlexHardware } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
 } from '../../../../step-forms/selectors'
-import { FlexHardware } from '..'
 
 vi.mock('../../../../step-forms/selectors')
 vi.mock('@opentrons/components', async importOriginal => {

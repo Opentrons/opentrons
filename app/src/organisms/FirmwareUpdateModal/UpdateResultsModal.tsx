@@ -1,4 +1,4 @@
-import { useTranslation, Trans } from 'react-i18next'
+import type { InstrumentData, PipetteData } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -6,16 +6,15 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
 import { usePipetteModelSpecs } from '/app/local-resources/instruments'
-
-import type { InstrumentData, PipetteData } from '@opentrons/api-client'
+import { OddModal } from '/app/molecules/OddModal'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { Trans, useTranslation } from 'react-i18next'
 
 interface UpdateResultsModalProps {
   isSuccess: boolean

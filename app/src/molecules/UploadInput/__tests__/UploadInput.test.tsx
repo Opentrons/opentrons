@@ -1,17 +1,17 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { fireEvent, screen } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
-import { i18n } from '/app/i18n'
-import { UploadInput } from '..'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { BrowserRouter } from 'react-router-dom'
+import { UploadInput } from '..'
 
 describe('UploadInput', () => {
   let onUpload: any

@@ -1,15 +1,14 @@
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 import { InputStepFormField } from '../../../../../../components/molecules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
-
 import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldPropsByName } from '../../types'
+import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 interface ProfileSettingsProps {
   propsForFields: FieldPropsByName

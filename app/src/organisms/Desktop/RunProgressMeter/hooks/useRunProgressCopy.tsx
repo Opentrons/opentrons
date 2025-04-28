@@ -1,26 +1,24 @@
-import { useMemo } from 'react'
-
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
 } from '@opentrons/api-client'
-import { useTranslation } from 'react-i18next'
+import type { CommandDetail, RunStatus } from '@opentrons/api-client'
 import {
-  LegacyStyledText,
   CommandText,
   getCommandTextData,
   getLabwareDefinitionsFromCommands,
+  LegacyStyledText,
 } from '@opentrons/components'
-import { TERMINAL_RUN_STATUSES } from '../constants'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
-
-import type { ReactNode } from 'react'
-import type { CommandDetail, RunStatus } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
+import { useMemo } from 'react'
+import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { TERMINAL_RUN_STATUSES } from '../constants'
 
 interface UseRunProgressResult {
   currentStepContents: ReactNode

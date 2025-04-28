@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -17,14 +15,15 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { selectors } from '../../labware-ingred/selectors'
-import * as wellContentsSelectors from '../../top-selectors/well-contents'
-import { getRobotType } from '../../file-data/selectors'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
-import { wellFillFromWellContents } from '../../components/organisms/LabwareOnDeck/utils'
-import { SlotHover } from './SlotHover'
-
 import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { wellFillFromWellContents } from '../../components/organisms/LabwareOnDeck/utils'
+import { getRobotType } from '../../file-data/selectors'
+import { selectors } from '../../labware-ingred/selectors'
+import { getInitialDeckSetup } from '../../step-forms/selectors'
+import * as wellContentsSelectors from '../../top-selectors/well-contents'
+import { SlotHover } from './SlotHover'
 
 interface OffDeckThumbnailProps {
   hover: string | null

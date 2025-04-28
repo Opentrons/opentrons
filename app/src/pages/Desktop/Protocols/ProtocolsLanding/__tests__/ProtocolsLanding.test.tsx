@@ -1,11 +1,10 @@
-import { vi, it, describe } from 'vitest'
 import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-
+import { ProtocolList } from '/app/organisms/Desktop/ProtocolsLanding/ProtocolList'
 import { ProtocolsEmptyState } from '/app/organisms/Desktop/ProtocolsLanding/ProtocolsEmptyState'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
 import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
-import { ProtocolList } from '/app/organisms/Desktop/ProtocolsLanding/ProtocolList'
+import { describe, it, vi } from 'vitest'
 import { ProtocolsLanding } from '..'
 
 vi.mock('/app/redux/protocol-storage')

@@ -1,16 +1,14 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  TYPOGRAPHY,
   LegacyStyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-
 import type { Mount } from '/app/redux/pipettes/types'
 import type { CalibrationCheckInstrument } from '/app/redux/sessions/types'
+import { useTranslation } from 'react-i18next'
 
 interface MountInformationProps {
   mount: Mount

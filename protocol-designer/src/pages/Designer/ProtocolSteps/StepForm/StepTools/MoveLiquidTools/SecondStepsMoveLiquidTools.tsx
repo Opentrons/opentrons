@@ -1,7 +1,3 @@
-import { useMemo, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { round } from 'lodash'
 import {
   DIRECTION_COLUMN,
   Divider,
@@ -12,30 +8,31 @@ import {
 } from '@opentrons/components'
 import { getMinXYDimension } from '@opentrons/shared-data'
 import { getTrashOrLabware } from '@opentrons/step-generation'
-import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+import { round } from 'lodash'
+import { useMemo, useRef, useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
+import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
+import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+import type { FormData, StepFieldName } from '../../../../../../form-types'
 import {
   getAdditionalEquipmentEntities,
   getInvariantContext,
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
-
+import type { StepFormErrors } from '../../../../../../steplist'
+import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
 import {
   getMaxConditioningVolume,
   getMaxPushOutVolume,
 } from '../../../../../../utils'
-import {
-  getBlowoutLocationOptionsForForm,
-  getFormErrorsMappedToField,
-  getFormLevelError,
-  getLabwareFieldForPositioningField,
-} from '../../utils'
 import {
   BlowoutLocationField,
   BlowoutOffsetField,
@@ -44,15 +41,16 @@ import {
   PositionField,
   WellsOrderField,
 } from '../../PipetteFields'
-import { MultiInputField } from './MultiInputField'
-import { ResetSettingsField } from './ResetSettingsField'
-
-import type { Dispatch, SetStateAction } from 'react'
-import type { StepInputFieldProps } from './MultiInputField'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
-import type { FormData, StepFieldName } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
-import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
+import {
+  getBlowoutLocationOptionsForForm,
+  getFormErrorsMappedToField,
+  getFormLevelError,
+  getLabwareFieldForPositioningField,
+} from '../../utils'
+import { MultiInputField } from './MultiInputField'
+import type { StepInputFieldProps } from './MultiInputField'
+import { ResetSettingsField } from './ResetSettingsField'
 
 const addPrefix = (prefix: string) => (fieldName: string): StepFieldName =>
   `${prefix}_${fieldName}`

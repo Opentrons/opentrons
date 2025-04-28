@@ -1,17 +1,16 @@
+import type { Meta, Story } from '@storybook/react'
 import * as React from 'react'
+import { COLORS } from '../../helix-design-system'
 import { Flex, Link } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
-import { PrimaryButton } from '../buttons'
 import {
   TOOLTIP_AUTO,
   TOOLTIP_TOP_START,
   useHoverTooltip,
 } from '../../tooltips'
-
+import { TYPOGRAPHY } from '../../ui-style-constants'
+import { PrimaryButton } from '../buttons'
 import { Tooltip } from './index'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/Tooltip',

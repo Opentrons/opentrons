@@ -1,19 +1,19 @@
-import some from 'lodash/some'
-import reduce from 'lodash/reduce'
 import {
   FIXED_TRASH_ID,
   FLEX_ROBOT_TYPE,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import { getStagingAreaAddressableAreas } from '../../utils'
 import type {
   AddressableAreaName,
   CreateCommand,
   CutoutId,
   RobotType,
 } from '@opentrons/shared-data'
+import reduce from 'lodash/reduce'
+import some from 'lodash/some'
 import type { InitialDeckSetup, SavedStepFormState } from '../../step-forms'
+import { getStagingAreaAddressableAreas } from '../../utils'
 
 interface AdditionalEquipment {
   [additionalEquipmentId: string]: {

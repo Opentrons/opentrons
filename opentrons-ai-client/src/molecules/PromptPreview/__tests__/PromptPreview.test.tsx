@@ -1,10 +1,9 @@
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { PromptPreview } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { PromptPreview } from '..'
-
-import type { ComponentProps } from 'react'
 
 const PROMPT_PREVIEW_PLACEHOLDER_MESSAGE =
   'As you complete the sections on the left, your prompt will be built here. When all requirements are met you will be able to generate the protocol.'

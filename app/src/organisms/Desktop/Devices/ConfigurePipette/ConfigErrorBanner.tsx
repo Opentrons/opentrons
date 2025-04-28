@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { AlertItem } from '@opentrons/components'
+import { useState } from 'react'
 import styles from './styles.module.css'
 
 interface Props {

@@ -1,7 +1,6 @@
+import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
 import { Svg as SvgComponent } from './Svg'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Library/Atoms/Svg',

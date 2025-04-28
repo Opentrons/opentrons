@@ -1,28 +1,26 @@
-import { Fragment } from 'react'
-import styled from 'styled-components'
-import isEqual from 'lodash/isEqual'
-import { useTranslation } from 'react-i18next'
-
+import type { LegacyLabwareOffsetCreateData } from '@opentrons/api-client'
+import {
+  BORDERS,
+  COLORS,
+  DeckInfoLabel,
+  DIRECTION_ROW,
+  Flex,
+  LegacyStyledText,
+  MODULE_ICON_NAME_BY_TYPE,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import {
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleType,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
-import {
-  BORDERS,
-  COLORS,
-  DeckInfoLabel,
-  Flex,
-  MODULE_ICON_NAME_BY_TYPE,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-  DIRECTION_ROW,
-} from '@opentrons/components'
-
-import type { LegacyLabwareOffsetCreateData } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import isEqual from 'lodash/isEqual'
+import { Fragment } from 'react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 export interface TerseOffsetTableProps {
   offsets: LegacyLabwareOffsetCreateData[]

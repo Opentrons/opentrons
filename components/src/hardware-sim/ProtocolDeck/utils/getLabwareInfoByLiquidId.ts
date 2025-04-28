@@ -1,8 +1,8 @@
-import reduce from 'lodash/reduce'
 import type {
   LoadLiquidRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import reduce from 'lodash/reduce'
 import type { LabwareByLiquidId } from '../types'
 
 export function getLabwareInfoByLiquidId(

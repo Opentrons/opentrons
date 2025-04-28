@@ -1,17 +1,15 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook, waitFor } from '@testing-library/react'
-
 import { getRobotSettings } from '@opentrons/api-client'
-import { useHost } from '../../api'
-import { useRobotSettingsQuery } from '..'
-
 import type {
   HostConfig,
   Response,
   RobotSettingsResponse,
 } from '@opentrons/api-client'
+import { renderHook, waitFor } from '@testing-library/react'
+import type * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { useRobotSettingsQuery } from '..'
+import { useHost } from '../../api'
 import type { UseRobotSettingsQueryOptions } from '../useRobotSettingsQuery'
 
 vi.mock('@opentrons/api-client')

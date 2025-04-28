@@ -1,10 +1,8 @@
-import { describe, it, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../testing/utils'
-
-import { ListButtonAccordion } from '..'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, it } from 'vitest'
+import { ListButtonAccordion } from '..'
+import { renderWithProviders } from '../../../testing/utils'
 
 const render = (props: ComponentProps<typeof ListButtonAccordion>) =>
   renderWithProviders(<ListButtonAccordion {...props} />)

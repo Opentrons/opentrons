@@ -1,7 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { formatRunTimeParameterMinMax } from '../formatRunTimeParameterMinMax'
-
+import { describe, expect, it } from 'vitest'
 import type { RunTimeParameter } from '../../types'
+import { formatRunTimeParameterMinMax } from '../formatRunTimeParameterMinMax'
 
 describe('utils-formatRunTimeParameterMinMax', () => {
   it('should return int min and max', () => {

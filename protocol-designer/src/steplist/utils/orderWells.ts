@@ -1,7 +1,8 @@
-import intersection from 'lodash/intersection'
 import { orderWells } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import intersection from 'lodash/intersection'
 import type { WellOrderOption } from '../../form-types'
+
 export function getOrderedWells(
   unorderedWells: string[],
   labwareDef: LabwareDefinition2,

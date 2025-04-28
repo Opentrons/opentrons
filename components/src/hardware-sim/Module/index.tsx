@@ -8,30 +8,29 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  C_DARK_GRAY,
-  C_MED_LIGHT_GRAY,
-  SPACING_1,
-  JUSTIFY_CENTER,
-  DISPLAY_FLEX,
-  FONT_WEIGHT_SEMIBOLD,
-  DIRECTION_COLUMN,
-  ALIGN_CENTER,
-} from '../../styles'
-import { RobotCoordsForeignObject } from '../Deck'
-import { multiplyMatrices } from '../utils'
-import { Thermocycler } from './Thermocycler'
-import { HeaterShaker } from './HeaterShaker'
-import { Temperature } from './Temperature'
-import { MagneticBlock } from './MagneticBlock'
-import { MagneticModule } from './MagneticModule'
-import { PlateReader } from './PlateReader'
-
-import type { ComponentProps, ReactNode } from 'react'
 import type {
   ModuleDefinition,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import type { ComponentProps, ReactNode } from 'react'
+import {
+  ALIGN_CENTER,
+  C_DARK_GRAY,
+  C_MED_LIGHT_GRAY,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  FONT_WEIGHT_SEMIBOLD,
+  JUSTIFY_CENTER,
+  SPACING_1,
+} from '../../styles'
+import { RobotCoordsForeignObject } from '../Deck'
+import { multiplyMatrices } from '../utils'
+import { HeaterShaker } from './HeaterShaker'
+import { MagneticBlock } from './MagneticBlock'
+import { MagneticModule } from './MagneticModule'
+import { PlateReader } from './PlateReader'
+import { Temperature } from './Temperature'
+import { Thermocycler } from './Thermocycler'
 
 export * from './Thermocycler'
 

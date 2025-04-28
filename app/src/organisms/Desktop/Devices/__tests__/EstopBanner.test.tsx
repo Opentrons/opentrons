@@ -1,11 +1,10 @@
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { EstopBanner } from '../EstopBanner'
-
 import type { ComponentProps } from 'react'
+import { EstopBanner } from '../EstopBanner'
 
 const render = (props: ComponentProps<typeof EstopBanner>) =>
   renderWithProviders(<EstopBanner {...props} />, { i18nInstance: i18n })

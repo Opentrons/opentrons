@@ -1,10 +1,8 @@
-import { describe, it, expect } from 'vitest'
-
+import { describe, expect, it } from 'vitest'
 import * as Fixtures from '../__fixtures__'
+import type { Action } from '../../types'
 import * as Actions from '../actions'
 import { systemInfoReducer } from '../reducer'
-
-import type { Action } from '../../types'
 import type { SystemInfoState } from '../types'
 
 interface ReducerSpec {

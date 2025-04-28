@@ -1,13 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { RobotSystemVersionModal } from '../RobotSystemVersionModal'
-
+import { i18n } from '/app/i18n'
 import type { ComponentProps } from 'react'
 import type * as Dom from 'react-router-dom'
+import { RobotSystemVersionModal } from '../RobotSystemVersionModal'
 
 const mockFn = vi.fn()
 const mockNavigate = vi.fn()

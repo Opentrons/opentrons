@@ -1,14 +1,12 @@
-import { describe, it, expect, vi } from 'vitest'
-import { when } from 'vitest-when'
-import { renderHook, waitFor } from '@testing-library/react'
-
-import { useNotifyAllRunsQuery } from '/app/resources/runs/useNotifyAllRunsQuery'
-import { useHistoricRunDetails } from '../useHistoricRunDetails'
-import { mockRunningRun } from '/app/resources/runs/__fixtures__'
-import { mockSuccessQueryResults } from '../../../../__fixtures__'
-
-import type { FunctionComponent, ReactNode } from 'react'
 import type { RunData } from '@opentrons/api-client'
+import { renderHook, waitFor } from '@testing-library/react'
+import { mockRunningRun } from '/app/resources/runs/__fixtures__'
+import { useNotifyAllRunsQuery } from '/app/resources/runs/useNotifyAllRunsQuery'
+import type { FunctionComponent, ReactNode } from 'react'
+import { describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { mockSuccessQueryResults } from '../../../../__fixtures__'
+import { useHistoricRunDetails } from '../useHistoricRunDetails'
 
 vi.mock('/app/resources/runs/useNotifyAllRunsQuery')
 

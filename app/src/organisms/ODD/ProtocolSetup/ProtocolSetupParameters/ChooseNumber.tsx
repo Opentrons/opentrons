@@ -1,6 +1,3 @@
-import { useRef, useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -10,11 +7,12 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { useToaster } from '/app/organisms/ToasterOven'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import type { NumberParameter } from '@opentrons/shared-data'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ChooseNumberProps {
   handleGoBack: () => void

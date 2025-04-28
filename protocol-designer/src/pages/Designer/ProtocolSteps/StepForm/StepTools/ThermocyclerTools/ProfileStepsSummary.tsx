@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -8,11 +5,13 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { getMainPagePortalEl } from '../../../../../../components/organisms'
-import { ThermocyclerProfileModal } from './ThermocyclerProfileModal'
-
 import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
+import { ThermocyclerProfileModal } from './ThermocyclerProfileModal'
 
 interface ProfileStepsSummaryProps {
   formData: FormData

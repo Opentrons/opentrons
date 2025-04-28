@@ -1,10 +1,8 @@
-import { useMemo, useState, useRef } from 'react'
-import { useSelector } from 'react-redux'
-
 import { getRobotUpdateDownloadProgress } from '/app/redux/robot-update'
-
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { State } from '/app/redux/types'
+import { useMemo, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 export function useRobotUpdateInfo(
   robotName: string,

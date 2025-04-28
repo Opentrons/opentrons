@@ -1,19 +1,15 @@
-import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { getEnableLiquidClasses } from '../../../../../../../feature-flags/selectors'
-import { getLiquidEntities } from '../../../../../../../step-forms/selectors'
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
-
-import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
-import { SecondStepsMoveLiquidTools } from '../SecondStepsMoveLiquidTools'
-import { LiquidClassesStepTools } from '../LiquidClassesStepTools'
-
-import { MoveLiquidTools } from '../'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, it, vi } from 'vitest'
+import { MoveLiquidTools } from '../'
+import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { getEnableLiquidClasses } from '../../../../../../../feature-flags/selectors'
 import type { FormData } from '../../../../../../../form-types'
+import { getLiquidEntities } from '../../../../../../../step-forms/selectors'
 import type { StepFormErrors } from '../../../../../../../steplist'
+import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
+import { LiquidClassesStepTools } from '../LiquidClassesStepTools'
+import { SecondStepsMoveLiquidTools } from '../SecondStepsMoveLiquidTools'
 
 vi.mock('../../../../../../../feature-flags/selectors')
 vi.mock('../../../../../../../step-forms/selectors')

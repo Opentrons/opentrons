@@ -1,15 +1,15 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { airGapInWell } from '../commandCreators/compound'
+import type { AirGapInWellType } from '../commandCreators/compound/airGapInWell'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../constants'
 import {
-  makeContext,
+  DEST_LABWARE,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeContext,
   SOURCE_LABWARE,
-  DEST_LABWARE,
 } from '../fixtures'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../constants'
-import { airGapInWell } from '../commandCreators/compound'
-import type { RobotState, InvariantContext } from '../types'
-import type { AirGapInWellType } from '../commandCreators/compound/airGapInWell'
+import type { InvariantContext, RobotState } from '../types'
 
 describe('airGapInWell', () => {
   let invariantContext: InvariantContext

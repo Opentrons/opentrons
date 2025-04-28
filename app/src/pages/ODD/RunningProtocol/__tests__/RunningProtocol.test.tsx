@@ -1,58 +1,55 @@
-import { Route, MemoryRouter, Routes } from 'react-router-dom'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
-import { screen } from '@testing-library/react'
-
 import {
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
   RUN_STATUS_STOP_REQUESTED,
-  RUN_STATUS_AWAITING_RECOVERY,
-  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
+import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
 import {
   useProtocolAnalysesQuery,
   useProtocolQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
-
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
-import {
-  CurrentRunningProtocolCommand,
-  RunningProtocolSkeleton,
-} from '/app/organisms/ODD/RunningProtocol'
 /* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/Desktop/RunProgressMeter/__fixtures__'
-import { getLocalRobot } from '/app/redux/discovery'
-import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
-import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
-import { RunningProtocol } from '..'
 import {
-  useRunStatus,
-  useRunTimestamps,
-  useNotifyRunQuery,
-  useNotifyAllCommandsQuery,
-  useMostRecentCompletedAnalysis,
-  useLastRunCommand,
-} from '/app/resources/runs'
-import { useFeatureFlag } from '/app/redux/config'
+  NOT_CONFIGURED,
+  useIsDoorOpen,
+} from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
   ErrorRecoveryFlows,
   useErrorRecoveryFlows,
 } from '/app/organisms/ErrorRecoveryFlows'
 import {
-  useInterventionModal,
   InterventionModal,
+  useInterventionModal,
 } from '/app/organisms/InterventionModal'
-
-import type { UseQueryResult } from 'react-query'
-import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
+import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import {
-  NOT_CONFIGURED,
-  useIsDoorOpen,
-} from '/app/organisms/DoorOpenControl/useIsDoorOpen'
+  CurrentRunningProtocolCommand,
+  RunningProtocolSkeleton,
+} from '/app/organisms/ODD/RunningProtocol'
+import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import { useFeatureFlag } from '/app/redux/config'
+import { getLocalRobot } from '/app/redux/discovery'
+import {
+  useLastRunCommand,
+  useMostRecentCompletedAnalysis,
+  useNotifyAllCommandsQuery,
+  useNotifyRunQuery,
+  useRunStatus,
+  useRunTimestamps,
+} from '/app/resources/runs'
+import type { UseQueryResult } from 'react-query'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { RunningProtocol } from '..'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/analytics')

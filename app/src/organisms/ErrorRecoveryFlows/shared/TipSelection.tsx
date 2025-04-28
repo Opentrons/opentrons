@@ -1,7 +1,6 @@
-import { WellSelection } from '../../WellSelection'
-
 import type { WellGroup } from '@opentrons/components'
 import type { NozzleLayoutDetails } from '@opentrons/shared-data'
+import { WellSelection } from '../../WellSelection'
 import type { RecoveryContentProps } from '../types'
 
 export type TipSelectionProps = RecoveryContentProps & {

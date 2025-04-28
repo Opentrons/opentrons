@@ -1,6 +1,3 @@
-import { Fragment } from 'react'
-import values from 'lodash/values'
-
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
@@ -11,22 +8,23 @@ import {
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getStagingAreaAddressableAreas } from '../../utils'
-import { getSlotIdsBlockedBySpanningForThermocycler } from '../../step-forms'
-import { LabwareOnDeck } from '../../components/organisms'
-import { SlotHover } from './SlotHover'
-
-import type { Dispatch, SetStateAction } from 'react'
 import type {
   CutoutId,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
+import values from 'lodash/values'
+import { Fragment } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { LabwareOnDeck } from '../../components/organisms'
+import { getSlotIdsBlockedBySpanningForThermocycler } from '../../step-forms'
 import type {
   InitialDeckSetup,
-  ModuleOnDeck,
   LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
 } from '../../step-forms'
+import { getStagingAreaAddressableAreas } from '../../utils'
+import { SlotHover } from './SlotHover'
 
 interface DeckSetupDetailsProps {
   initialDeckSetup: InitialDeckSetup

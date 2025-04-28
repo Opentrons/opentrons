@@ -1,11 +1,10 @@
+import { titleCase } from '@opentrons/shared-data'
 import i18n from 'i18next'
+import type { InitOptions } from 'i18next'
 import capitalize from 'lodash/capitalize'
 import startCase from 'lodash/startCase'
 import { initReactI18next } from 'react-i18next'
 import { resources } from './assets/localization'
-import { titleCase } from '@opentrons/shared-data'
-
-import type { InitOptions } from 'i18next'
 
 export const US_ENGLISH = 'en-US'
 export const SIMPLIFIED_CHINESE = 'zh-CN'

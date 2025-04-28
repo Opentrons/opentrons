@@ -1,29 +1,26 @@
+import { COLORS } from '@opentrons/components'
+import type {
+  WellFill,
+  WellGroup,
+  WellMouseEvent,
+  WellStroke,
+} from '@opentrons/components'
+import { COLUMN, SINGLE } from '@opentrons/shared-data'
 import reduce from 'lodash/reduce'
 import { useEffect } from 'react'
-
-import { COLUMN, SINGLE } from '@opentrons/shared-data'
-import { COLORS } from '@opentrons/components'
-
+import type { ComponentProps } from 'react'
+import type { GenericRect } from '../../../collision-types'
+import type { ContentsByWell } from '../../../labware-ingred/types'
+import type { WellIngredientNames } from '../../../steplist/types'
+import type { NozzleType } from '../../../types'
 import {
   arrayToWellGroup,
   getCollidingWells,
   getWellSetForMultichannel,
 } from '../../../utils'
+import { SelectionRect } from './SelectionRect'
 import { SingleLabware } from './SingleLabware'
 import { WellTooltip } from './WellTooltip'
-import { SelectionRect } from './SelectionRect'
-
-import type { ComponentProps } from 'react'
-import type {
-  WellMouseEvent,
-  WellGroup,
-  WellFill,
-  WellStroke,
-} from '@opentrons/components'
-import type { ContentsByWell } from '../../../labware-ingred/types'
-import type { WellIngredientNames } from '../../../steplist/types'
-import type { GenericRect } from '../../../collision-types'
-import type { NozzleType } from '../../../types'
 
 export interface SelectableLabwareProps {
   labwareProps: Omit<ComponentProps<typeof SingleLabware>, 'selectedWells'>

@@ -1,7 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   Box,
@@ -14,16 +10,17 @@ import {
   ToggleGroup,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
+import type { RobotType } from '@opentrons/shared-data'
+import { useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 import { SlotDetailsContainer } from '../../components/organisms'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
+import type { DeckSlot } from '../../types'
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
-
-import type { Dispatch, SetStateAction } from 'react'
-import type { RobotType } from '@opentrons/shared-data'
-import type { DeckSlot } from '../../types'
 
 interface StartingDeckProps {
   robotType: RobotType

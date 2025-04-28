@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react'
-
+import type { PipetteData } from '@opentrons/api-client'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
-import { buildLoadPipetteCommand } from './useDropTipCommands'
-
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { PipetteData } from '@opentrons/api-client'
+import { useEffect, useState } from 'react'
 import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
+import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 const RUN_REFETCH_INTERVAL_MS = 5000
 

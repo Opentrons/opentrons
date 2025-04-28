@@ -1,5 +1,3 @@
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -8,13 +6,15 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
 import { NOT_CONFIGURED } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 export interface OpenDoorModalProps {
   moduleDoorLocation: string | null

@@ -1,6 +1,6 @@
-import { it, describe, expect, beforeEach } from 'vitest'
-import { dependentFieldsUpdateHeaterShaker } from '../dependentFieldsUpdateHeaterShaker'
+import { beforeEach, describe, expect, it } from 'vitest'
 import type { FormData } from '../../../../form-types'
+import { dependentFieldsUpdateHeaterShaker } from '../dependentFieldsUpdateHeaterShaker'
 
 describe('dependentFieldsUpdateHeaterShaker', () => {
   let formData: FormData

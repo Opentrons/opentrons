@@ -1,12 +1,10 @@
+import { LegacyStyledText } from '@opentrons/components'
+import type { Meta, StoryObj } from '@storybook/react'
+import { configReducer } from '/app/redux/config/reducer'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-
-import { LegacyStyledText } from '@opentrons/components'
-import { configReducer } from '/app/redux/config/reducer'
-import { InterventionModal as InterventionModalComponent } from './'
-
 import type { Store, StoreEnhancer } from 'redux'
-import type { Meta, StoryObj } from '@storybook/react'
+import { InterventionModal as InterventionModalComponent } from './'
 
 const dummyConfig = {
   config: {

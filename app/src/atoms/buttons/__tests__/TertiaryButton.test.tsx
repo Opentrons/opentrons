@@ -1,12 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { beforeEach, describe, expect, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { COLORS, SPACING, TYPOGRAPHY, BORDERS } from '@opentrons/components'
-
-import { TertiaryButton } from '..'
-
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import { TertiaryButton } from '..'
 
 const render = (props: ComponentProps<typeof TertiaryButton>) => {
   return renderWithProviders(<TertiaryButton {...props} />)[0]

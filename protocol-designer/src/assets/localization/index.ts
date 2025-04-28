@@ -1,8 +1,8 @@
+import { titleCase } from '@opentrons/shared-data'
 import i18n from 'i18next'
 import capitalize from 'lodash/capitalize'
 import startCase from 'lodash/startCase'
 import { initReactI18next } from 'react-i18next'
-import { titleCase } from '@opentrons/shared-data'
 import { en } from './en'
 
 i18n.use(initReactI18next).init(

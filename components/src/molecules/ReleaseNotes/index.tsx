@@ -3,7 +3,6 @@ import { LegacyStyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Box } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-
 import styles from './styles.module.css'
 
 export interface ReleaseNotesProps {

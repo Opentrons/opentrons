@@ -1,9 +1,5 @@
-import { MemoryRouter } from 'react-router-dom'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
-
 import { i18n } from '/app/i18n'
 import {
   AdditionalCustomLabwareSourceFolder,
@@ -17,7 +13,8 @@ import {
   U2EInformation,
   UpdatedChannel,
 } from '/app/organisms/Desktop/AdvancedSettings'
-
+import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AdvancedSettings } from '../AdvancedSettings'
 
 vi.mock('/app/redux/config')

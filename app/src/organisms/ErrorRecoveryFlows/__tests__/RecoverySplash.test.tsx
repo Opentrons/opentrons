@@ -1,27 +1,24 @@
-import { MemoryRouter } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, screen, waitFor, renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { Provider } from 'react-redux'
-
 import {
-  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
-
+import { fireEvent, renderHook, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockRecoveryContentProps } from '../__fixtures__'
 import { getIsOnDevice } from '/app/redux/config'
-import { useRecoverySplash, RecoverySplash } from '../RecoverySplash'
-import { StepInfo } from '../shared'
-import { useToaster } from '../../ToasterOven'
-import { clickButtonLabeled } from './util'
-
 import type { ComponentProps, FunctionComponent, ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { MemoryRouter } from 'react-router-dom'
+import { createStore } from 'redux'
 import type { Store } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { mockRecoveryContentProps } from '../__fixtures__'
+import { useToaster } from '../../ToasterOven'
+import { RecoverySplash, useRecoverySplash } from '../RecoverySplash'
+import { StepInfo } from '../shared'
+import { clickButtonLabeled } from './util'
 
 vi.mock('/app/redux/config')
 vi.mock('../shared')

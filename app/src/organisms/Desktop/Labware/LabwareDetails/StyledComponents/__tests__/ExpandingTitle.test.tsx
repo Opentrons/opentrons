@@ -1,10 +1,9 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, beforeEach } from 'vitest'
 import { getFootprintDiagram } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { ExpandingTitle } from '../ExpandingTitle'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { ExpandingTitle } from '../ExpandingTitle'
 
 const render = (props: ComponentProps<typeof ExpandingTitle>) => {
   return renderWithProviders(<ExpandingTitle {...props} />)

@@ -1,13 +1,10 @@
-import { vi, describe, it, expect, afterEach } from 'vitest'
-
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
-import * as RobotApiHttp from '../../../robot-api/http'
-
-import * as Fixtures from '../../__fixtures__'
-import * as Actions from '../../actions'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { sessionsEpic } from '..'
-
+import * as Fixtures from '../../__fixtures__'
+import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
+import * as RobotApiHttp from '../../../robot-api/http'
 import type { Action } from '../../../types'
+import * as Actions from '../../actions'
 import type { CreateSessionCommandAction } from '../../types'
 
 vi.mock('../../../robot-api/http')

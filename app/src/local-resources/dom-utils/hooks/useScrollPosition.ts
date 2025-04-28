@@ -1,5 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
-
+import { useEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 
 export function useScrollPosition(): {

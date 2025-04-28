@@ -1,18 +1,17 @@
-import find from 'lodash/find'
-import { Select } from './Select'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { css } from 'styled-components'
-
+import find from 'lodash/find'
 import type { ReactNode } from 'react'
-import type { SelectProps, SelectOption } from './Select'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
+import { css } from 'styled-components'
+import { Select } from './Select'
+import type { SelectOption, SelectProps } from './Select'
 
 export interface SelectFieldProps {
   /** optional HTML id for container */

@@ -1,18 +1,18 @@
 import isEqual from 'lodash/isEqual'
-import {
-  getArgsAndErrorsByStepId,
-  getOrderedStepIds,
-  getInvariantContext,
-} from '../step-forms/selectors'
-import { getInitialRobotState } from '../file-data/selectors'
+import type { Middleware } from 'redux'
 import {
   computeRobotStateTimelineRequest,
   computeRobotStateTimelineSuccess,
 } from '../file-data/actions'
-import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
 import type { ComputeRobotStateTimelineSuccessAction } from '../file-data/actions'
-import type { Middleware } from 'redux'
+import { getInitialRobotState } from '../file-data/selectors'
+import {
+  getArgsAndErrorsByStepId,
+  getInvariantContext,
+  getOrderedStepIds,
+} from '../step-forms/selectors'
 import type { Action, BaseState } from '../types'
+import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 import type { SubstepsArgsNoTimeline, WorkerResponse } from './types'
 

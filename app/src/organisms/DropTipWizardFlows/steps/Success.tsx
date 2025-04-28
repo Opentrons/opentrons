@@ -1,21 +1,17 @@
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-
 import {
-  StyledText,
   ALIGN_CENTER,
-  Flex,
-  SPACING,
   DIRECTION_COLUMN,
-  RESPONSIVENESS,
+  Flex,
   JUSTIFY_CENTER,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-
-import { DropTipFooterButtons } from '../shared'
-import { DT_ROUTES } from '../constants'
-
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import SuccessIcon from '../../../assets/images/icon_success.png'
-
+import { DT_ROUTES } from '../constants'
+import { DropTipFooterButtons } from '../shared'
 import type { DropTipWizardContainerProps } from '../types'
 
 export const Success = ({

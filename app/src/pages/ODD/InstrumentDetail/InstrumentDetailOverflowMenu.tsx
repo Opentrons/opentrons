@@ -1,8 +1,9 @@
-import { useState } from 'react'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
-import { useTranslation } from 'react-i18next'
-import { createPortal } from 'react-dom'
-
+import type {
+  GripperData,
+  HostConfig,
+  PipetteData,
+} from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -14,24 +15,20 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  SINGLE_MOUNT_PIPETTES,
-  NINETY_SIX_CHANNEL,
-} from '@opentrons/shared-data'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-
-import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
-import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
-import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
+import {
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
-
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
+import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
+import { useState } from 'react'
 import type { ComponentProps, MouseEventHandler } from 'react'
-import type {
-  PipetteData,
-  GripperData,
-  HostConfig,
-} from '@opentrons/api-client'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 interface InstrumentDetailsOverflowMenuProps {
   instrument: PipetteData | GripperData

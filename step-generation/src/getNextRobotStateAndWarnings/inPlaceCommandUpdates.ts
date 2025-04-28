@@ -1,5 +1,3 @@
-import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
-
 import type {
   AspirateInPlaceParams,
   BlowoutInPlaceParams,
@@ -7,6 +5,7 @@ import type {
   DropTipInPlaceParams,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 
 export const forAspirateInPlace = (
   params: AspirateInPlaceParams,

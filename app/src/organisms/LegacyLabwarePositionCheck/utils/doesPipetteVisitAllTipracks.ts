@@ -1,11 +1,9 @@
 import { getIsTiprack } from '@opentrons/shared-data'
-
 import type {
+  LabwareDefinition2,
   LoadedLabware,
   RunTimeCommand,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
-
 import {
   getPickUpTipCommandsWithPipette,
   getTipracksVisited,

@@ -4,12 +4,10 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
-
-import { isCancellableStatus } from '../utils'
-
 import type { RunHeaderBannerContainerProps } from '.'
 import type { DoorResult } from '../../../../../DoorOpenControl/useIsDoorOpen'
 import { NOT_CONFIGURED } from '../../../../../DoorOpenControl/useIsDoorOpen'
+import { isCancellableStatus } from '../utils'
 
 interface ShowGenericRunHeaderBannersParams {
   runStatus: RunHeaderBannerContainerProps['runStatus']

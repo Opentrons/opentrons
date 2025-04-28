@@ -1,9 +1,7 @@
+import type { RunCommandSummary } from '@opentrons/api-client'
 import { describe, expect, it } from 'vitest'
-
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { getNextStep, getNextSteps } from '../getNextStep'
-
-import type { RunCommandSummary } from '@opentrons/api-client'
 
 const mockFailedCommand = mockRecoveryContentProps.failedCommand
 

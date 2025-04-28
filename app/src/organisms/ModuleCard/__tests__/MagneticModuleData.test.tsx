@@ -1,12 +1,10 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, it, expect } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { MagneticModuleData } from '../MagneticModuleData'
 import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { MagneticModuleData } from '../MagneticModuleData'
 
 const render = (props: ComponentProps<typeof MagneticModuleData>) => {
   return renderWithProviders(<MagneticModuleData {...props} />, {

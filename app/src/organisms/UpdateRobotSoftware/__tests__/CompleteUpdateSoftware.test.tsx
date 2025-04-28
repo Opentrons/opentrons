@@ -1,11 +1,10 @@
 import { screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { CompleteUpdateSoftware } from '../CompleteUpdateSoftware'
-
+import { i18n } from '/app/i18n'
 import type { ComponentProps } from 'react'
+import { CompleteUpdateSoftware } from '../CompleteUpdateSoftware'
 
 vi.mock('/app/redux/robot-admin')
 

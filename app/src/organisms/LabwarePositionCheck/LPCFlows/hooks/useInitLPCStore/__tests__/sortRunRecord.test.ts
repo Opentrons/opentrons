@@ -1,8 +1,6 @@
-import { it, describe, expect } from 'vitest'
-
-import { sortRunRecordOffsets } from '../sortRunRecordOffsets'
-
 import type { LabwareOffset } from '@opentrons/api-client'
+import { describe, expect, it } from 'vitest'
+import { sortRunRecordOffsets } from '../sortRunRecordOffsets'
 
 describe('sortRunRecordOffsets', () => {
   const LABWARE_URI_1 = 'opentrons/labware-1'

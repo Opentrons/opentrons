@@ -11,14 +11,14 @@ import {
   StyledText,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
-import welcomeImage from '../../assets/images/welcome_dashboard.png'
-import { useTranslation } from 'react-i18next'
-import { useIsMobile } from '../../resources/hooks/useIsMobile'
-import { useNavigate } from 'react-router-dom'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import { useAtom } from 'jotai'
-import { headerWithMeterAtom } from '../../resources/atoms'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import welcomeImage from '../../assets/images/welcome_dashboard.png'
+import { headerWithMeterAtom } from '../../resources/atoms'
+import { useIsMobile } from '../../resources/hooks/useIsMobile'
+import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 
 export function Landing(): JSX.Element | null {
   const navigate = useNavigate()

@@ -1,18 +1,15 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import {
   mockTemperatureModule,
   mockTemperatureModuleGen2,
 } from '/app/redux/modules/__fixtures__'
-import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
-
 import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/analytics')

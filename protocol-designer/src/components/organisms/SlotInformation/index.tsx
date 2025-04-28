@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useLocation } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -20,11 +18,12 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
-import { useDeckSetupWindowBreakPoint } from '../../../pages/Designer/DeckSetup/utils'
-
-import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
+import type { FC } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router-dom'
+import { useDeckSetupWindowBreakPoint } from '../../../pages/Designer/DeckSetup/utils'
+import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 
 interface SlotInformationProps {
   location: string

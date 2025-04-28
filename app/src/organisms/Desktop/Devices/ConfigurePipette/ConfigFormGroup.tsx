@@ -1,4 +1,3 @@
-import { Controller } from 'react-hook-form'
 import {
   CheckboxField,
   DIRECTION_COLUMN,
@@ -9,11 +8,11 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import styles from './styles.module.css'
-
 import type { ReactNode } from 'react'
+import { Controller } from 'react-hook-form'
 import type { Control } from 'react-hook-form'
 import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
+import styles from './styles.module.css'
 
 export interface FormColumnProps {
   children: ReactNode

@@ -1,7 +1,4 @@
-import { useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { css } from 'styled-components'
-
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   BORDERS,
   COLORS,
@@ -10,27 +7,27 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
-
 import { useIsRobotViewable } from '/app/redux-resources/robots'
-import { RunProgressMeter } from '../../../RunProgressMeter'
 import {
   useNotifyRunQuery,
   useProtocolDetailsForRun,
   useRunStatus,
 } from '/app/resources/runs'
-import { RunHeaderProtocolName } from './RunHeaderProtocolName'
+import { useEffect, useRef } from 'react'
+import type { RefObject } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { css } from 'styled-components'
+import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
+import { RunProgressMeter } from '../../../RunProgressMeter'
+import { useRunAnalytics, useRunErrors, useRunHeaderRunControls } from './hooks'
+import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
+import { RunHeaderContent } from './RunHeaderContent'
 import {
   RunHeaderModalContainer,
   useRunHeaderModalContainer,
 } from './RunHeaderModalContainer'
-import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
-import { useRunAnalytics, useRunErrors, useRunHeaderRunControls } from './hooks'
-import { RunHeaderContent } from './RunHeaderContent'
-import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
+import { RunHeaderProtocolName } from './RunHeaderProtocolName'
 import { isCancellableStatus } from './utils'
-
-import type { RefObject } from 'react'
 
 export interface ProtocolRunHeaderProps {
   protocolRunHeaderRef: RefObject<HTMLDivElement> | null

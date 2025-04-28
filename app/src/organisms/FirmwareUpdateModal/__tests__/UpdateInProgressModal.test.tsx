@@ -1,11 +1,10 @@
-import { describe, it, beforeEach } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { UpdateInProgressModal } from '../UpdateInProgressModal'
-
 import type { ComponentProps } from 'react'
+import { UpdateInProgressModal } from '../UpdateInProgressModal'
 
 const render = (props: ComponentProps<typeof UpdateInProgressModal>) => {
   return renderWithProviders(<UpdateInProgressModal {...props} />, {

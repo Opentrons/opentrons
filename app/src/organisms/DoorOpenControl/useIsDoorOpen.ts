@@ -1,20 +1,16 @@
-import { useSelector } from 'react-redux'
-
-import { useDoorQuery, useModulesQuery } from '@opentrons/react-api-client'
-
-import { getRobotSettings } from '/app/redux/robot-settings'
-import { useIsFlex } from '/app/redux-resources/robots'
-import { EQUIPMENT_POLL_MS } from './constants'
-
-import type { State } from '/app/redux/types'
 import type { AttachedModule } from '@opentrons/api-client'
-
+import { useDoorQuery, useModulesQuery } from '@opentrons/react-api-client'
 import type { CutoutConfig } from '@opentrons/shared-data'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getCutoutDisplayName,
 } from '@opentrons/shared-data'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { getRobotSettings } from '/app/redux/robot-settings'
+import type { State } from '/app/redux/types'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useSelector } from 'react-redux'
+import { EQUIPMENT_POLL_MS } from './constants'
 
 export const NOT_CONFIGURED: 'moduleLocationNotConfigured' =
   'moduleLocationNotConfigured'

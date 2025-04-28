@@ -1,12 +1,12 @@
+import type { CutoutId, DropTipInPlaceParams } from '@opentrons/shared-data'
+import type { CommandCreator, CurriedCommandCreator } from '../../types'
 import {
+  curryWithoutPython,
   getTrashBinAddressableAreaName,
   reduceCommandCreators,
-  curryWithoutPython,
 } from '../../utils'
-import { moveToAddressableAreaForDropTip } from '../atomic/moveToAddressableAreaForDropTip'
 import { dropTipInPlace } from '../atomic/dropTipInPlace'
-import type { CurriedCommandCreator, CommandCreator } from '../../types'
-import type { CutoutId, DropTipInPlaceParams } from '@opentrons/shared-data'
+import { moveToAddressableAreaForDropTip } from '../atomic/moveToAddressableAreaForDropTip'
 
 interface DropTipInTrashParams extends DropTipInPlaceParams {
   trashLocation: CutoutId

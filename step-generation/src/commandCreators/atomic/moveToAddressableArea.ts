@@ -1,14 +1,14 @@
-import {
-  getTrashBinAddressableAreaName,
-  getWasteChuteAddressableAreaNamePip,
-  uuid,
-} from '../../utils'
 import type {
   AddressableAreaName,
   CutoutId,
   MoveToAddressableAreaParams,
 } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
+import {
+  getTrashBinAddressableAreaName,
+  getWasteChuteAddressableAreaNamePip,
+  uuid,
+} from '../../utils'
 
 interface MoveToAddressableAreaAtomicParams
   extends Omit<MoveToAddressableAreaParams, 'addressableAreaName'> {

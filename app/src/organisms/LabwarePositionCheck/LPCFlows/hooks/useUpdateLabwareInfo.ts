@@ -1,8 +1,7 @@
-import { useEffect } from 'react'
 import { updateLPCLabware } from '/app/redux/protocol-runs'
-import { useDispatch } from 'react-redux'
-
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 
 // Update the store with new labware info when this app is *not* the app actively
 // performing LPC.

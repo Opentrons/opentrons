@@ -1,7 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { createPortal } from 'react-dom'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -10,14 +6,17 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getPipetteEntities } from '../../../../../step-forms/selectors'
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import {
-  SelectWellsModal,
   getMainPagePortalEl,
+  SelectWellsModal,
 } from '../../../../../components/organisms'
-import { getNozzleType } from '../utils'
-
+import { getPipetteEntities } from '../../../../../step-forms/selectors'
 import type { FieldProps } from '../types'
+import { getNozzleType } from '../utils'
 
 type TipWellSelectionFieldProps = FieldProps & {
   pipetteId: unknown

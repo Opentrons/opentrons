@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -9,14 +7,14 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { useRunHasStarted } from '/app/resources/runs'
 import { formatTimestamp } from '/app/transformations/runs'
+import { useTranslation } from 'react-i18next'
 
 interface SetupCalibrationItemProps {
   calibratedDate: string | null

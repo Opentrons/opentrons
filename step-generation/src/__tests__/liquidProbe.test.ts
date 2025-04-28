@@ -1,4 +1,5 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import type { LiquidProbeParams } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { liquidProbe } from '../commandCreators/atomic'
 import {
   DEFAULT_PIPETTE,
@@ -7,8 +8,7 @@ import {
   getSuccessResult,
   makeContext,
 } from '../fixtures'
-import type { LiquidProbeParams } from '@opentrons/shared-data'
-import type { RobotState, InvariantContext } from '../types'
+import type { InvariantContext, RobotState } from '../types'
 
 const p300SingleId = DEFAULT_PIPETTE
 

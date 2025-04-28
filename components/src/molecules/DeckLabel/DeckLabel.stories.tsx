@@ -1,6 +1,5 @@
-import { DeckLabel as DeckLabelComponent } from '.'
-
 import type { Meta, StoryObj } from '@storybook/react'
+import { DeckLabel as DeckLabelComponent } from '.'
 
 const meta: Meta<typeof DeckLabelComponent> = {
   title: 'Helix/Molecules/DeckLabel',

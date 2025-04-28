@@ -1,7 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -10,14 +6,16 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { HandleEnter } from '../../components/atoms'
-import { TextAreaField } from '../../components/molecules'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { analyticsEvent } from '../../analytics/actions'
 import { ONBOARDING_FLOW_DURATION_EVENT } from '../../analytics/constants'
-import { WizardBody } from './WizardBody'
-
 import type { AnalyticsEvent } from '../../analytics/mixpanel'
+import { HandleEnter } from '../../components/atoms'
+import { TextAreaField } from '../../components/molecules'
 import type { WizardTileProps } from './types'
+import { WizardBody } from './WizardBody'
 
 const FLEX_METADATA_WIZARD_STEP = 4
 const OT2_METADATA_WIZARD_STEP = 3

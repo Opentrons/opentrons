@@ -1,6 +1,3 @@
-import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -10,20 +7,20 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   FLEX_WIDTH_ALERT_INFO_STYLE,
   ICON_SIZE_ALERT_INFO_STYLE,
   RECOVERY_MAP,
 } from '../constants'
+import type { ERUtilsResults } from '../hooks'
 import {
   RecoveryFooterButtons,
   RecoverySingleColumnContentWrapper,
 } from '../shared'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
-
 import type { RecoveryContentProps } from '../types'
-import type { ERUtilsResults } from '../hooks'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 export function CancelRun(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props

@@ -1,7 +1,7 @@
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import { RobotCoordsForeignDiv, TYPOGRAPHY } from '@opentrons/components'
 import type { ModuleOrientation } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 interface Props {
   x: number

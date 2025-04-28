@@ -1,8 +1,3 @@
-import { useState } from 'react'
-import { useQueryClient } from 'react-query'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
@@ -16,12 +11,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
-
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { useToaster } from '/app/organisms/ToasterOven'
-
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
+import styled from 'styled-components'
 
 interface DeleteProtocolConfirmationModalProps {
   protocolId: string

@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
-
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { useEffect, useState } from 'react'
 
 const RUN_REFETCH_INTERVAL = 5000
 

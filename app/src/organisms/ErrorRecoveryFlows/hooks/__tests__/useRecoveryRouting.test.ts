@@ -1,10 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
-
-import { useRecoveryRouting } from '../useRecoveryRouting'
+import { act, renderHook } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 import { RECOVERY_MAP } from '../../constants'
-
 import type { IRecoveryMap } from '../../types'
+import { useRecoveryRouting } from '../useRecoveryRouting'
 
 describe('useRecoveryRouting', () => {
   it('should initialize with the default recovery map', () => {

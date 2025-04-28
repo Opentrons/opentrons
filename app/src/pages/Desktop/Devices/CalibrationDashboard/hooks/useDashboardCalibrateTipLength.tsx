@@ -1,28 +1,26 @@
-import { useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
-import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import { ModalShell } from '@opentrons/components'
-
 import { getTopPortalEl } from '/app/App/portal'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { CalibrateTipLength } from '/app/organisms/Desktop/CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '/app/organisms/Desktop/CalibrateTipLength/AskForCalibrationBlockModal'
 import { LoadingState } from '/app/organisms/Desktop/CalibrationPanels'
-import * as RobotApi from '/app/redux/robot-api'
-import * as Sessions from '/app/redux/sessions'
+import type { DashboardCalTipLengthInvoker } from '/app/organisms/Desktop/Devices/hooks/useCalibrationTaskList'
 import { tipLengthCalibrationStarted } from '/app/redux/analytics'
 import { getHasCalibrationBlock } from '/app/redux/config'
-import { getTipLengthCalibrationSession } from '/app/redux/sessions/tip-length-calibration/selectors'
-
+import * as RobotApi from '/app/redux/robot-api'
 import type { RequestState } from '/app/redux/robot-api/types'
+import * as Sessions from '/app/redux/sessions'
+import { getTipLengthCalibrationSession } from '/app/redux/sessions/tip-length-calibration/selectors'
 import type {
   SessionCommandString,
   TipLengthCalibrationSession,
   TipLengthCalibrationSessionParams,
 } from '/app/redux/sessions/types'
 import type { State } from '/app/redux/types'
-import type { DashboardCalTipLengthInvoker } from '/app/organisms/Desktop/Devices/hooks/useCalibrationTaskList'
+import { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 // tip length calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [

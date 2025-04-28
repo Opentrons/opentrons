@@ -1,8 +1,3 @@
-import { useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import last from 'lodash/last'
-
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
@@ -11,14 +6,13 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
   Link,
+  Modal,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
-  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
 import {
@@ -26,17 +20,20 @@ import {
   getNetworkInterfaces,
   postWifiDisconnect,
 } from '/app/redux/networking'
-import { useWifiList } from '/app/resources/networking/hooks'
 import {
   dismissRequest,
-  getRequestById,
-  useDispatchApiRequest,
-  PENDING,
   FAILURE,
+  getRequestById,
+  PENDING,
   SUCCESS,
+  useDispatchApiRequest,
 } from '/app/redux/robot-api'
-
 import type { Dispatch, State } from '/app/redux/types'
+import { useWifiList } from '/app/resources/networking/hooks'
+import last from 'lodash/last'
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 export interface DisconnectModalProps {
   onCancel: () => unknown

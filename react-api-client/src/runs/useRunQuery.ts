@@ -1,11 +1,10 @@
 import { getRun } from '@opentrons/api-client'
-import { useQuery, useQueryClient } from 'react-query'
-import { useHost } from '../api'
-import { useEffect } from 'react'
-import { some } from 'lodash'
 import type { HostConfig, Run, RunError } from '@opentrons/api-client'
-
-import type { UseQueryResult, UseQueryOptions } from 'react-query'
+import { some } from 'lodash'
+import { useEffect } from 'react'
+import { useQuery, useQueryClient } from 'react-query'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import { useHost } from '../api'
 
 export function useRunQuery<TError = Error>(
   runId: string | null,

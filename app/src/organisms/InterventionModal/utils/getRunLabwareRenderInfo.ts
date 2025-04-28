@@ -1,9 +1,8 @@
+import type { RunData } from '@opentrons/api-client'
 import {
   getPositionFromSlotId,
   getSlotHasMatingSurfaceUnitVector,
 } from '@opentrons/shared-data'
-
-import type { RunData } from '@opentrons/api-client'
 import type {
   DeckDefinition,
   LabwareDefinition2,

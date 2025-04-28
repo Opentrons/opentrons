@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest'
-import { doesPipetteVisitAllTipracks } from '../doesPipetteVisitAllTipracks'
 import { multiple_tipracks, one_tiprack } from '@opentrons/shared-data'
 import type {
   LoadedLabware,
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
+import { doesPipetteVisitAllTipracks } from '../doesPipetteVisitAllTipracks'
 
 // TODO: update these fixtures to be v6 protocols
 const protocolMultipleTipracks = (multiple_tipracks as unknown) as ProtocolAnalysisOutput

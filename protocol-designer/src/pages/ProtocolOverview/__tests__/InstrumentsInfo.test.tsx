@@ -1,16 +1,13 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
-
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { GRIPPER_LOCATION } from '@opentrons/step-generation'
-
+import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
+import { fireEvent, screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
-import { InstrumentsInfo } from '../InstrumentsInfo'
-
-import type { ComponentProps } from 'react'
-import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
 import type { PipetteOnDeck } from '../../../step-forms'
+import { InstrumentsInfo } from '../InstrumentsInfo'
 
 const mockSetShowEditInstrumentsModal = vi.fn()
 const mockPipettes = [

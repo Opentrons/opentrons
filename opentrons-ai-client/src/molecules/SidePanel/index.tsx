@@ -1,19 +1,19 @@
-import styled, { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   Link,
   OVERFLOW_AUTO,
   POSITION_FIXED,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { PromptButton } from '../../organisms/PromptButton'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 import LOGO_PATH from '../../assets/images/opentrons_logo.svg'
+import { PromptButton } from '../../organisms/PromptButton'
 
 const IMAGE_ALT = 'Opentrons logo'
 const FEEDBACK_FORM_LINK = 'https://opentrons-ai-beta.paperform.co/'

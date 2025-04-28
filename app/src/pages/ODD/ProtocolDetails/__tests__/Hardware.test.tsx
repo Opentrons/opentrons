@@ -1,17 +1,16 @@
-import { vi, it, describe, beforeEach, afterEach } from 'vitest'
-import { screen } from '@testing-library/react'
-import { when } from 'vitest-when'
 import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useRequiredProtocolHardware } from '/app/resources/protocols'
-import { Hardware } from '../Hardware'
-
 import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { Hardware } from '../Hardware'
 
 vi.mock('/app/resources/protocols')
 vi.mock('/app/redux/config')

@@ -1,10 +1,3 @@
-import { useEffect, useState, Fragment } from 'react'
-import first from 'lodash/first'
-import { Trans, useTranslation } from 'react-i18next'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -37,38 +30,42 @@ import {
   useHoverTooltip,
   useTooltip,
 } from '@opentrons/components'
+import type { DropdownOption } from '@opentrons/components'
 import {
   ApiHostProvider,
   useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, sortRuntimeParameters } from '@opentrons/shared-data'
-
-import { useLogger } from '/app/logger'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { getStoredProtocols } from '/app/redux/protocol-storage'
-import { appShellRequestor } from '/app/redux/shell/remote'
-import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 import { ToggleButton } from '/app/atoms/buttons'
+import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import { useLogger } from '/app/logger'
 import { MiniCard } from '/app/molecules/MiniCard'
 import { UploadInput } from '/app/molecules/UploadInput'
-import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
 import { useCreateRunFromProtocol } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
+import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
+import { getAnalysisStatus } from '/app/organisms/Desktop/ProtocolsLanding/utils'
 import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { FileCard } from '../ChooseRobotSlideout/FileCard'
+import { useRobotType } from '/app/redux-resources/robots'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import type { Robot } from '/app/redux/discovery/types'
+import { getStoredProtocols } from '/app/redux/protocol-storage'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import type { State } from '/app/redux/types'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
-import { getAnalysisStatus } from '/app/organisms/Desktop/ProtocolsLanding/utils'
-import { useRobotType } from '/app/redux-resources/robots'
-
+import first from 'lodash/first'
+import { Fragment, useEffect, useState } from 'react'
 import type { MouseEventHandler } from 'react'
-import type { DropdownOption } from '@opentrons/components'
-import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { Robot } from '/app/redux/discovery/types'
-import type { StoredProtocolData } from '/app/redux/protocol-storage'
-import type { State } from '/app/redux/types'
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { css } from 'styled-components'
+import { FileCard } from '../ChooseRobotSlideout/FileCard'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};

@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -8,9 +7,10 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { PIPETTE_VOLUMES } from '../../../pages/Onboarding/constants'
-import type { Dispatch, SetStateAction } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
+import type { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
+import { PIPETTE_VOLUMES } from '../../../pages/Onboarding/constants'
 import type {
   Gen,
   PipetteInfoByGen,

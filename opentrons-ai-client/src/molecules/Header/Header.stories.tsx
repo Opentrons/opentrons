@@ -1,6 +1,6 @@
+import { COLORS, Flex, SPACING } from '@opentrons/components'
 import type { Meta, StoryObj } from '@storybook/react'
 import { Header as HeaderComponent } from '.'
-import { COLORS, Flex, SPACING } from '@opentrons/components'
 
 const meta: Meta<typeof HeaderComponent> = {
   title: 'AI/Molecules/Header',

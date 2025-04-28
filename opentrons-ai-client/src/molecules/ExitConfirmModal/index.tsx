@@ -9,9 +9,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { useAtom } from 'jotai'
-import { displayExitConfirmModalAtom } from '../../resources/atoms'
-import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { displayExitConfirmModalAtom } from '../../resources/atoms'
 
 export function ExitConfirmModal(): JSX.Element {
   const [

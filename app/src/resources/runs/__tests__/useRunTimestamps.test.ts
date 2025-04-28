@@ -1,22 +1,20 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { when } from 'vitest-when'
+import type { Run } from '@opentrons/api-client'
 import { renderHook } from '@testing-library/react'
-
-import { useRunTimestamps } from '../useRunTimestamps'
-import { useRunCommands } from '../useRunCommands'
-import { useNotifyRunQuery } from '../useNotifyRunQuery'
+import type { UseQueryResult } from 'react-query'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import {
-  RUN_ID_2,
+  mockCommand,
+  mockFailedRun,
   mockPausedRun,
   mockRunningRun,
-  mockFailedRun,
   mockStoppedRun,
   mockSucceededRun,
-  mockCommand,
+  RUN_ID_2,
 } from '../__fixtures__'
-
-import type { UseQueryResult } from 'react-query'
-import type { Run } from '@opentrons/api-client'
+import { useNotifyRunQuery } from '../useNotifyRunQuery'
+import { useRunCommands } from '../useRunCommands'
+import { useRunTimestamps } from '../useRunTimestamps'
 
 vi.mock('../useRunCommands')
 vi.mock('../useNotifyRunQuery')

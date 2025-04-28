@@ -1,5 +1,5 @@
-import mapValues from 'lodash/mapValues'
 import type { FormikTouched } from 'formik'
+import mapValues from 'lodash/mapValues'
 import type { LabwareFields } from '../fields'
 
 interface MakeAutofillOnChangeArgs {

@@ -1,12 +1,11 @@
+import type { Meta, Story } from '@storybook/react'
 import * as React from 'react'
-
-import { Toast } from './index'
 import { Flex, STYLE_PROPS } from '../../primitives'
 import { DIRECTION_COLUMN, DIRECTION_ROW } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 import { PrimaryButton } from '../buttons'
 import { LegacyStyledText } from '../StyledText'
-import type { Story, Meta } from '@storybook/react'
+import { Toast } from './index'
 
 export default {
   title: 'Helix/Atoms/Toast',

@@ -1,10 +1,9 @@
 import Axios from 'axios'
-
 import type {
-  AxiosRequestConfig,
-  Method,
   AxiosPromise,
+  AxiosRequestConfig,
   AxiosResponse,
+  Method,
 } from 'axios'
 import type { HostConfig } from './types'
 

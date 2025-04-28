@@ -1,6 +1,3 @@
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -8,17 +5,17 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-
-import type { Dispatch, SetStateAction } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { Dispatch, SetStateAction } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 interface TakeoverModalProps {
   title: string

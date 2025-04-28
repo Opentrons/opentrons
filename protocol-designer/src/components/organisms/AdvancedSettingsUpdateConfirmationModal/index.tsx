@@ -1,5 +1,3 @@
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   Flex,
@@ -11,9 +9,11 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import type { FormData } from '../../../form-types'
 import { getMainPagePortalEl } from '../Portal'
 import { useConfirmationContent } from './useConfirmationContent'
-import type { FormData } from '../../../form-types'
 
 interface AdvancedSettingsUpdateConfirmationModalProps {
   formData: FormData

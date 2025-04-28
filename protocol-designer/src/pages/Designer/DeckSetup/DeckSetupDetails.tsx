@@ -1,8 +1,5 @@
-import values from 'lodash/values'
-import { Fragment, useCallback, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
 import { Module } from '@opentrons/components'
+import type { ThermocyclerVizProps } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
   getLabwareHasQuirk,
@@ -13,38 +10,6 @@ import {
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  getSlotIdsBlockedBySpanningForThermocycler,
-  getSlotIsEmpty,
-} from '../../../step-forms'
-import { selectors } from '../../../labware-ingred/selectors'
-import { getSlotsWithCollisions } from '../../../components/organisms/utils'
-import { getStagingAreaAddressableAreas } from '../../../utils'
-import { editSlotInfo } from '../../../labware-ingred/actions'
-import { getRobotType } from '../../../file-data/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../steplist'
-import { LabwareOnDeck } from '../../../components/organisms'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getSlotInformation } from '../utils'
-import { HighlightLabware } from '../HighlightLabware'
-import { SlotOverflowMenu } from './SlotOverflowMenu'
-import { HoveredItem } from './HoveredItem'
-import { SelectedHoveredItems } from './SelectedHoveredItems'
-import {
-  getAdjacentLabware,
-  getSwapBlockedAdapter,
-  getSwapBlockedModule,
-} from './utils'
-import { SlotWarning } from './SlotWarning'
-import { HighlightItems } from './HighlightItems'
-import { SlotControls, AdapterControls, LabwareControls } from './Overlays'
-
-import type { ComponentProps, Dispatch, SetStateAction } from 'react'
-import type { ThermocyclerVizProps } from '@opentrons/components'
-import type {
-  ModuleTemporalProperties,
-  ThermocyclerModuleState,
-} from '@opentrons/step-generation'
 import type {
   AddressableAreaName,
   CutoutId,
@@ -52,11 +17,44 @@ import type {
   DeckSlotId,
 } from '@opentrons/shared-data'
 import type {
+  ModuleTemporalProperties,
+  ThermocyclerModuleState,
+} from '@opentrons/step-generation'
+import values from 'lodash/values'
+import { Fragment, useCallback, useEffect, useState } from 'react'
+import type { ComponentProps, Dispatch, SetStateAction } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { LabwareOnDeck } from '../../../components/organisms'
+import { getSlotsWithCollisions } from '../../../components/organisms/utils'
+import { getRobotType } from '../../../file-data/selectors'
+import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { editSlotInfo } from '../../../labware-ingred/actions'
+import { selectors } from '../../../labware-ingred/selectors'
+import {
+  getSlotIdsBlockedBySpanningForThermocycler,
+  getSlotIsEmpty,
+} from '../../../step-forms'
+import type {
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../../step-forms'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
+import { getStagingAreaAddressableAreas } from '../../../utils'
+import { HighlightLabware } from '../HighlightLabware'
 import type { DeckSetupTerminalIdType } from '../types'
+import { getSlotInformation } from '../utils'
+import { HighlightItems } from './HighlightItems'
+import { HoveredItem } from './HoveredItem'
+import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
+import { SelectedHoveredItems } from './SelectedHoveredItems'
+import { SlotOverflowMenu } from './SlotOverflowMenu'
+import { SlotWarning } from './SlotWarning'
+import {
+  getAdjacentLabware,
+  getSwapBlockedAdapter,
+  getSwapBlockedModule,
+} from './utils'
 
 interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   activeDeckSetup: InitialDeckSetup

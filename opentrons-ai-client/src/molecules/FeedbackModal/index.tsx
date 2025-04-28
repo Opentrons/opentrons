@@ -1,22 +1,22 @@
 import {
-  Modal,
-  Flex,
-  SPACING,
   ALIGN_FLEX_END,
-  SecondaryButton,
-  StyledText,
-  PrimaryButton,
+  Flex,
   InputField,
+  Modal,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
+import type { AxiosRequestConfig } from 'axios'
 import { useAtom } from 'jotai'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { feedbackModalAtom, tokenAtom } from '../../resources/atoms'
-import { useState } from 'react'
-import type { AxiosRequestConfig } from 'axios'
 import {
-  STAGING_FEEDBACK_END_POINT,
-  PROD_FEEDBACK_END_POINT,
   LOCAL_FEEDBACK_END_POINT,
+  PROD_FEEDBACK_END_POINT,
+  STAGING_FEEDBACK_END_POINT,
 } from '../../resources/constants'
 import { useApiCall } from '../../resources/hooks'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'

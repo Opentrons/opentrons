@@ -1,7 +1,3 @@
-import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -14,7 +10,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
+import type { DropdownOption } from '@opentrons/components'
 import { LANGUAGES } from '/app/i18n'
 import {
   ANALYTICS_LANGUAGE_UPDATED_DESKTOP_APP_MODAL,
@@ -26,9 +22,10 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 import { getSystemLanguage } from '/app/redux/shell'
-
-import type { DropdownOption } from '@opentrons/components'
 import type { Dispatch } from '/app/redux/types'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 type ArrayElement<
   ArrayType extends readonly unknown[]

@@ -1,21 +1,20 @@
-import type * as React from 'react'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
 import {
   DIRECTION_COLUMN,
   Flex,
-  PrimaryButton,
-  SPACING,
   LegacyStyledText,
   ModalShell,
+  PrimaryButton,
+  SPACING,
 } from '@opentrons/components'
+import type { Meta, Story } from '@storybook/react'
 import { Skeleton } from '/app/atoms/Skeleton'
-import { WizardHeader } from '../WizardHeader'
 import { configReducer } from '/app/redux/config/reducer'
-import { GenericWizardTile } from './index'
-
+import type * as React from 'react'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
 import type { Store, StoreEnhancer } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import { WizardHeader } from '../WizardHeader'
+import { GenericWizardTile } from './index'
 
 const dummyConfig = {
   config: {

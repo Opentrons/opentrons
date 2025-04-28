@@ -1,14 +1,13 @@
 import { useFormikContext } from 'formik'
 import { makeMaskToDecimal } from '../../fieldMasks'
+import type { LabwareFields } from '../../fields'
+import footprintImage from '../../images/footprint.svg'
+import styles from '../../styles.module.css'
 import { isEveryFieldHidden } from '../../utils'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { XYDimensionAlerts } from '../alerts/XYDimensionAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
-import footprintImage from '../../images/footprint.svg'
-
-import styles from '../../styles.module.css'
-import type { LabwareFields } from '../../fields'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 

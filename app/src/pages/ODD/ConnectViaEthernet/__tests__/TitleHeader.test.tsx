@@ -1,11 +1,9 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
-import { TitleHeader } from '../TitleHeader'
-
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { TitleHeader } from '../TitleHeader'
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {

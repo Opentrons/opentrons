@@ -1,6 +1,5 @@
-import { useState, useLayoutEffect } from 'react'
-
 import type { RunTimeCommand } from '@opentrons/shared-data'
+import { useLayoutEffect, useState } from 'react'
 import type { ErrorRecoveryFlowsProps } from '..'
 
 // TODO(jh, 08-06-24): Revisit this. Can the server reasonably supply the failed command via useCurrentlyRecoveringFrom

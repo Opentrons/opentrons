@@ -1,6 +1,5 @@
-import { Box, COLORS, SPACING } from '../..'
-
 import type { ComponentProps } from 'react'
+import { Box, COLORS, SPACING } from '../..'
 
 type Props = ComponentProps<typeof Box>
 

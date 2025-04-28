@@ -1,6 +1,5 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
+import { InlineNotification } from '/app/atoms/InlineNotification'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import {
   selectIsAnyOffsetHardCoded,
   selectIsDefaultOffsetAbsent,
@@ -8,9 +7,8 @@ import {
   selectShowDefaultOffsetInfoBanner,
   toggleDefaultOffsetInfoBanner,
 } from '/app/redux/protocol-runs'
-import { InlineNotification } from '/app/atoms/InlineNotification'
-
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 type RenderedBanner = 'defaultInfo' | 'defaultAlert' | 'hardcodedInfo' | null
 

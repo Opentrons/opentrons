@@ -2,12 +2,11 @@ import {
   getLabwareDisplayName,
   getLabwareStackCountAndLocation,
 } from '@opentrons/shared-data'
-
 import type {
   LoadLabwareRunTimeCommand,
-  RunTimeCommand,
   LoadModuleRunTimeCommand,
   ModuleModel,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 
 export interface LocationInfoNames {

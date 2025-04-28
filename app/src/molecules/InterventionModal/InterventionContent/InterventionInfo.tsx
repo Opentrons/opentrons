@@ -1,24 +1,22 @@
-import { css } from 'styled-components'
-
 import {
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DeckInfoLabel,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
-  COLORS,
-  BORDERS,
-  SPACING,
-  DIRECTION_COLUMN,
-  StyledText,
-  ALIGN_CENTER,
   RESPONSIVENESS,
-  Tag,
+  SPACING,
   SPACING_1,
   SPACING_2,
+  StyledText,
+  Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Divider } from '/app/atoms/structure/Divider'
-
 import type { DeckInfoLabelProps } from '@opentrons/components'
+import { Divider } from '/app/atoms/structure/Divider'
+import { css } from 'styled-components'
 
 export interface BaseInterventionInfo {
   layout: 'default' | 'stacked'

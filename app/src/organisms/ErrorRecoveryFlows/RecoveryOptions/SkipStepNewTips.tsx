@@ -1,8 +1,7 @@
 import { RECOVERY_MAP } from '../constants'
-import { TwoColLwInfoAndDeck, SelectTips, SkipStepInfo } from '../shared'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
-
+import { SelectTips, SkipStepInfo, TwoColLwInfoAndDeck } from '../shared'
 import type { RecoveryContentProps } from '../types'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 export function SkipStepNewTips(
   props: RecoveryContentProps

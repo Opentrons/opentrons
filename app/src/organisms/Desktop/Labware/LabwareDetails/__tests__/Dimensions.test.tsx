@@ -1,11 +1,10 @@
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { Dimensions } from '../Dimensions'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, it } from 'vitest'
+import { Dimensions } from '../Dimensions'
 
 const render = (props: ComponentProps<typeof Dimensions>) => {
   return renderWithProviders(<Dimensions {...props} />, {

@@ -1,6 +1,6 @@
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { useIsFlex } from '/app/redux-resources/robots'
 import type { RobotType } from '@opentrons/shared-data'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 export function useRobotType(robotName: string): RobotType {
   const isFlex = useIsFlex(robotName)

@@ -1,8 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react'
 import { Flex, STYLE_PROPS } from '../primitives'
 import { SPACING } from '../ui-style-constants'
-import { ICON_DATA_BY_NAME } from './icon-data'
 import { Icon as IconComponent } from './Icon'
-import type { Meta, StoryObj } from '@storybook/react'
+import { ICON_DATA_BY_NAME } from './icon-data'
 
 const meta: Meta<typeof IconComponent> = {
   title: 'Library/Atoms/Icon',

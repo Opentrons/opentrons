@@ -1,13 +1,13 @@
-import { useRef, useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import { DeckLabelSet } from '@opentrons/components'
-import { getSelectedTerminalItemId } from '../../ui/steps'
-import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import { useEffect, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { START_TERMINAL_ITEM_ID } from '../../steplist'
+import { getSelectedTerminalItemId } from '../../ui/steps'
 
 interface LabwareLabelProps {
   position: CoordinateTuple

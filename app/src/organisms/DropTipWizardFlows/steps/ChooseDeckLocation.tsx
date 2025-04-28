@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -9,13 +6,13 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
-
-import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
-import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
-import { DropTipFooterButtons } from '/app/organisms/DropTipWizardFlows/shared'
-
 import type { ModuleLocation } from '@opentrons/shared-data'
+import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
+import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
+import { DropTipFooterButtons } from '/app/organisms/DropTipWizardFlows/shared'
 import type { DropTipWizardContainerProps } from '/app/organisms/DropTipWizardFlows/types'
+import { useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 export function ChooseDeckLocation({
   robotType,

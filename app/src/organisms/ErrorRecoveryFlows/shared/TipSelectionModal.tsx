@@ -1,11 +1,9 @@
-import { useTranslation } from 'react-i18next'
-import { createPortal } from 'react-dom'
-
-import { OddModal } from '/app/molecules/OddModal'
 import { getTopPortalEl } from '/app/App/portal'
-import { TipSelection } from './TipSelection'
-
+import { OddModal } from '/app/molecules/OddModal'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { TipSelection } from './TipSelection'
 import type { TipSelectionProps } from './TipSelection'
 
 type TipSelectionModalProps = TipSelectionProps & {

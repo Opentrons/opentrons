@@ -1,18 +1,15 @@
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import { renderHook } from '@testing-library/react'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { mockMagneticModuleGen2 } from '/app/redux/modules/__fixtures__'
+import type { FunctionComponent, ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-
 import { useModuleCalibrationStatus } from '../useModuleCalibrationStatus'
 import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'
-import { useIsFlex } from '/app/redux-resources/robots'
-
-import { mockMagneticModuleGen2 } from '/app/redux/modules/__fixtures__'
-
-import type { FunctionComponent, ReactNode } from 'react'
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 vi.mock('/app/redux-resources/robots')
 vi.mock('../useModuleRenderInfoForProtocolById')

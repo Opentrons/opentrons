@@ -1,28 +1,27 @@
-import { useEffect, useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import type { LabwareOffset } from '@opentrons/api-client'
 import {
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { ProbeNotAttached } from '/app/organisms/PipetteWizardFlows/ProbeNotAttached'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
-import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
-import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-
-import type { Dispatch } from 'react'
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
 } from '@opentrons/shared-data'
-import type { LabwareOffset } from '@opentrons/api-client'
+import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
+import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
+import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import type { Jog } from '/app/molecules/JogControls/types'
+import { ProbeNotAttached } from '/app/organisms/PipetteWizardFlows/ProbeNotAttached'
 import type { useChainRunCommands } from '/app/resources/runs'
+import { useEffect, useState } from 'react'
+import type { Dispatch } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+import { RobotMotionLoader } from './RobotMotionLoader'
 import type {
   AttachProbeStep,
   RegisterPositionAction,

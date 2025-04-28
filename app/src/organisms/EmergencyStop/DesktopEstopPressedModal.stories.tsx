@@ -1,13 +1,11 @@
+import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { QueryClient, QueryClientProvider } from 'react-query'
-
-import { configReducer } from '../../redux/config/reducer'
-import { EstopPressedModal } from '.'
-
 import type { Store, StoreEnhancer } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import { EstopPressedModal } from '.'
+import { configReducer } from '../../redux/config/reducer'
 
 export default {
   title: 'App/Organisms/EstopPressedModal',

@@ -1,6 +1,5 @@
-import { css } from 'styled-components'
-
 import type { ComponentProps, ReactNode } from 'react'
+import { css } from 'styled-components'
 
 export interface RobotCoordsTextProps extends ComponentProps<'text'> {
   x: number

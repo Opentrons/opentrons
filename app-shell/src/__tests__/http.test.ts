@@ -1,11 +1,9 @@
-import fetch from 'node-fetch'
-import isError from 'lodash/isError'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-
 import { HTTP_API_VERSION } from '@opentrons/app/src/redux/robot-api/constants'
-import * as Http from '../http'
-
+import isError from 'lodash/isError'
+import fetch from 'node-fetch'
 import type { Request, Response } from 'node-fetch'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import * as Http from '../http'
 
 vi.mock('../config')
 vi.mock('node-fetch')

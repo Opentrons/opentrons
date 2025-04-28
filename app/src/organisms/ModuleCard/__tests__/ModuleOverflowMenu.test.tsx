@@ -1,22 +1,20 @@
+import type { TemperatureStatus } from '@opentrons/api-client'
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useIsFlex } from '/app/redux-resources/robots'
 import {
+  mockHeaterShaker,
   mockMagneticModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
-  mockHeaterShaker,
   mockThermocyclerGen2,
 } from '/app/redux/modules/__fixtures__'
 import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
-import { useIsFlex } from '/app/redux-resources/robots'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
-import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
-
 import type { ComponentProps } from 'react'
-import type { TemperatureStatus } from '@opentrons/api-client'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
 vi.mock('/app/resources/legacy_sessions')
 vi.mock('/app/redux-resources/robots')

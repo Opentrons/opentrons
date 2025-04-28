@@ -1,7 +1,3 @@
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   Box,
@@ -15,7 +11,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
-
+import type { ProtocolResource } from '@opentrons/shared-data'
 import { SmallButton } from '/app/atoms/buttons'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
@@ -23,16 +19,17 @@ import {
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
 } from '/app/redux/config'
-import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
-import { sortProtocols } from './utils'
-import { ProtocolCard } from './ProtocolCard'
-import { NoProtocols } from './NoProtocols'
-import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
-import { useNotifyAllRunsQuery } from '/app/resources/runs'
-
-import type { Dispatch } from '/app/redux/types'
 import type { ProtocolsOnDeviceSortKey } from '/app/redux/config/types'
-import type { ProtocolResource } from '@opentrons/shared-data'
+import type { Dispatch } from '/app/redux/types'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
+import { NoProtocols } from './NoProtocols'
+import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
+import { ProtocolCard } from './ProtocolCard'
+import { sortProtocols } from './utils'
 
 export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()

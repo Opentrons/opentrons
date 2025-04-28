@@ -1,7 +1,6 @@
 import { VIEWPORT } from '@opentrons/components'
-import { SmallButton } from './'
-
 import type { Meta, StoryObj } from '@storybook/react'
+import { SmallButton } from './'
 
 const meta: Meta<typeof SmallButton> = {
   title: 'ODD/Atoms/Buttons/SmallButton',

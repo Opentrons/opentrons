@@ -1,7 +1,6 @@
 import { writeFile } from 'fs/promises'
-import uuid from 'uuid/v4'
-
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import uuid from 'uuid/v4'
 
 const UNEXPECTED_ERROR_TYPE = 'UnexpectedAnalysisError'
 

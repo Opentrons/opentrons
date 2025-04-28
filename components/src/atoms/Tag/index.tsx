@@ -1,13 +1,12 @@
 import { css } from 'styled-components'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { Icon } from '../../icons'
+import type { IconName } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
-import { Icon } from '../../icons'
 import { StyledText } from '../StyledText'
-
-import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { IconName } from '../../icons'
 
 export type TagType = 'default' | 'interactive' | 'branded' | 'onColor'
 

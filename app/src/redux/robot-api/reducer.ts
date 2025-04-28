@@ -4,15 +4,14 @@
 // be fairly broken; make sure you have unit tests in place when changing
 
 import omit from 'lodash/omit'
+import type { Action } from '../types'
 import {
+  DISMISS_ALL_REQUESTS,
+  DISMISS_REQUEST,
+  FAILURE,
   PENDING,
   SUCCESS,
-  FAILURE,
-  DISMISS_REQUEST,
-  DISMISS_ALL_REQUESTS,
 } from './constants'
-
-import type { Action } from '../types'
 import type { RobotApiState } from './types'
 
 export function robotApiReducer(

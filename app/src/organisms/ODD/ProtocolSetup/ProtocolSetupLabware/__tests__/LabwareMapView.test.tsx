@@ -1,24 +1,21 @@
-import { MemoryRouter } from 'react-router-dom'
-import { when } from 'vitest-when'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
-
 import { BaseDeck, EXTENDED_DECK_CONFIG_FIXTURE } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'
-
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
-import { getLabwareRenderInfo } from '/app/transformations/analysis'
-import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import { mockProtocolModuleInfo } from '../__fixtures__'
-import { LabwareMapView } from '../LabwareMapView'
-
-import type { ComponentProps } from 'react'
+import { fixtureTiprack300ul, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type {
-  getSimplestDeckConfigForProtocol,
   CompletedProtocolAnalysis,
+  getSimplestDeckConfigForProtocol,
   LabwareDefinition2,
   ModuleModel,
 } from '@opentrons/shared-data'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { getLabwareRenderInfo } from '/app/transformations/analysis'
+import type { ComponentProps } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { mockProtocolModuleInfo } from '../__fixtures__'
+import { LabwareMapView } from '../LabwareMapView'
 
 vi.mock('/app/transformations/analysis')
 vi.mock('@opentrons/components/src/hardware-sim/Labware/LabwareRender')

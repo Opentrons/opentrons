@@ -1,19 +1,17 @@
+import {
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-
-import {
-  Flex,
-  StyledText,
-  PrimaryButton,
-  Icon,
-  COLORS,
-  SPACING,
-  BORDERS,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  RESPONSIVENESS,
-} from '@opentrons/components'
-
 import type { FlattenSimpleInterpolation } from 'styled-components'
 
 // A one-off designed button for default offsets.

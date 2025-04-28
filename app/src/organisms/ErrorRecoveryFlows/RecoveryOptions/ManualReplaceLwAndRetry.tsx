@@ -1,19 +1,18 @@
-import { Trans, useTranslation } from 'react-i18next'
 import { LegacyStyledText } from '@opentrons/components'
+import { Trans, useTranslation } from 'react-i18next'
 import { RECOVERY_MAP } from '../constants'
 import {
   GripperIsHoldingLabware,
   GripperReleaseLabware,
+  RecoveryDoorOpenSpecial,
+  RetryStepInfo,
+  SkipStepInfo,
   TwoColLwInfoAndDeck,
   TwoColTextAndFailedStepNextStep,
-  RetryStepInfo,
-  RecoveryDoorOpenSpecial,
-  SkipStepInfo,
 } from '../shared'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
-
-import type { RecoveryContentProps, RouteStep } from '../types'
 import { TwoColTextAndImage } from '../shared/TwoColTextAndImage'
+import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 export function ManualReplaceLwAndRetry(
   props: RecoveryContentProps
@@ -35,8 +34,9 @@ export function ManualReplaceLwAndRetry(
   const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
   const { homeShuttle } = recoveryCommands
 
-  const homeShuttleRoutes = [LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
-    MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+  const homeShuttleRoutes: RecoveryRoute[] = [
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
+    MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
   ]
 
   const primaryBtnOnClick = (): Promise<void> => {
@@ -64,14 +64,19 @@ export function ManualReplaceLwAndRetry(
       switch (route) {
         case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
           return RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS
-            .CONFIRM_RETRY
+            .CLEAR_TRACK_OF_OBSTRUCTIONS
         case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
           return RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS
             .MANUAL_REPLACE
         default:
-          return MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
+          return MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS
+            .CLEAR_TRACK_OF_OBSTRUCTIONS
       }
     }
+  }
+
+  const buildTitle = (): string => {
+    return t('prepare_track_for_homing')
   }
 
   const buildBodyText = (): JSX.Element => (
@@ -96,13 +101,14 @@ export function ManualReplaceLwAndRetry(
       case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE:
         return <TwoColLwInfoAndDeck {...props} />
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE:
+      case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
         return <TwoColTextAndImage {...props} />
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
         return (
           <TwoColTextAndFailedStepNextStep
             {...props}
-            leftColTitle={t('prepare_track_for_homing')}
+            leftColTitle={buildTitle()}
             leftColBodyText={buildBodyText()}
             primaryBtnCopy={t('home_now')}
             primaryBtnOnClick={primaryBtnOnClick}

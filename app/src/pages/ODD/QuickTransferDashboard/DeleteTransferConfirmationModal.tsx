@@ -1,8 +1,3 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useQueryClient } from 'react-query'
-import { Trans, useTranslation } from 'react-i18next'
-
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
@@ -14,12 +9,14 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
-
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { useToaster } from '/app/organisms/ToasterOven'
-
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
+import { useNavigate } from 'react-router-dom'
 
 interface DeleteTransferConfirmationModalProps {
   transferId: string

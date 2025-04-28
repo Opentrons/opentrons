@@ -1,48 +1,46 @@
-import { useNavigate } from 'react-router-dom'
+import type { AttachedModule, Run, RunStatus } from '@opentrons/api-client'
+import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
+import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
+import type { RunControls } from '/app/organisms/RunTimeControl'
+import {
+  useRobotAnalyticsData,
+  useTrackProtocolRunEvent,
+} from '/app/redux-resources/analytics'
+import { useRobot, useRobotType } from '/app/redux-resources/robots'
+import {
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
+  useTrackEvent,
+} from '/app/redux/analytics'
+import { OFFSETS_CONFLICT, selectOffsetSource } from '/app/redux/protocol-runs'
+import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
 import { useSelector } from 'react-redux'
-
+import { useNavigate } from 'react-router-dom'
+import type { ProtocolRunHeaderProps } from '..'
+import type { UseRunErrorsResult } from '../hooks'
+import { getFallbackRobotSerialNumber } from '../utils'
+import {
+  useHeaterShakerConfirmationModal,
+  useMissingStepsModal,
+  useRunHeaderDropTip,
+} from './hooks'
+import type {
+  UseHeaterShakerConfirmationModalResult,
+  UseMissingStepsModalResult,
+  UseRunHeaderDropTipResult,
+} from './hooks'
 import {
   useConfirmCancelModal,
   useHeaterShakerIsRunningModal,
   useProtocolAnalysisErrorsModal,
   useRunFailedModal,
 } from './modals'
-import {
-  useHeaterShakerConfirmationModal,
-  useMissingStepsModal,
-  useRunHeaderDropTip,
-} from './hooks'
-import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
-import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
-import { getFallbackRobotSerialNumber } from '../utils'
-import {
-  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-  ANALYTICS_PROTOCOL_RUN_ACTION,
-  useTrackEvent,
-} from '/app/redux/analytics'
-import {
-  useRobotAnalyticsData,
-  useTrackProtocolRunEvent,
-} from '/app/redux-resources/analytics'
-import { useRobot, useRobotType } from '/app/redux-resources/robots'
-import { OFFSETS_CONFLICT, selectOffsetSource } from '/app/redux/protocol-runs'
-
-import type { AttachedModule, RunStatus, Run } from '@opentrons/api-client'
-import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
-import type {
-  UseRunHeaderDropTipResult,
-  UseMissingStepsModalResult,
-  UseHeaterShakerConfirmationModalResult,
-} from './hooks'
 import type {
   UseAnalysisErrorsModalResult,
   UseConfirmCancelModalResult,
   UseHeaterShakerIsRunningModalResult,
   UseRunFailedModalResult,
 } from './modals'
-import type { ProtocolRunHeaderProps } from '..'
-import type { RunControls } from '/app/organisms/RunTimeControl'
-import type { UseRunErrorsResult } from '../hooks'
 
 interface OffsetCOnflictModalUtils {
   showModal: boolean

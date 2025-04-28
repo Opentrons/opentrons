@@ -1,7 +1,6 @@
+import type { Meta, Story } from '@storybook/react'
 import * as React from 'react'
-
 import { Toast } from '.'
-import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { Flex } from '../../primitives'
 import {
   DIRECTION_COLUMN,
@@ -9,9 +8,9 @@ import {
   JUSTIFY_CENTER,
   POSITION_FIXED,
 } from '../../styles'
+import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { PrimaryButton } from '../buttons'
 import { LegacyStyledText } from '../StyledText'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Toast',

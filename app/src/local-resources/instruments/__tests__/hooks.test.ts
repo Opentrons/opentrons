@@ -1,15 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
+import type { PipetteV2Specs } from '@opentrons/shared-data'
 import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
-
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
   usePipetteNameSpecs,
   usePipetteSpecsV2,
 } from '../hooks'
-
-import type { PipetteV2Specs } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/robot-settings/hooks')
 

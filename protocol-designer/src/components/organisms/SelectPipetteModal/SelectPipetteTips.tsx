@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
@@ -19,17 +16,19 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { removeOpentronsPhrases } from '../../../utils'
-import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { createCustomTiprackDef } from '../../../labware-defs/actions'
-import { setFeatureFlags } from '../../../feature-flags/actions'
-import { useKitchen } from '../Kitchen/hooks'
-
+import type { PipetteMount, RobotType } from '@opentrons/shared-data'
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import type { ThunkDispatch } from 'redux-thunk'
-import type { PipetteMount, RobotType } from '@opentrons/shared-data'
+import styled from 'styled-components'
+import { setFeatureFlags } from '../../../feature-flags/actions'
+import { getAllowAllTipracks } from '../../../feature-flags/selectors'
+import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import type { BaseState } from '../../../types'
+import { removeOpentronsPhrases } from '../../../utils'
+import { useKitchen } from '../Kitchen/hooks'
 
 interface SelectPipetteTipsProps {
   mount: PipetteMount

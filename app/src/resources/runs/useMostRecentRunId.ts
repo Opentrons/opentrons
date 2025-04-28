@@ -1,5 +1,4 @@
 import last from 'lodash/last'
-
 import { useNotifyAllRunsQuery } from './useNotifyAllRunsQuery'
 
 export function useMostRecentRunId(): string | null {

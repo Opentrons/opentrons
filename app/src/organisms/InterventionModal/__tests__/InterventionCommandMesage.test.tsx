@@ -1,15 +1,14 @@
 import { screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { InterventionCommandMessage } from '../InterventionCommandMessage'
+import type { ComponentProps } from 'react'
+import { describe, expect, it } from 'vitest'
 import {
   longCommandMessage,
   shortCommandMessage,
   truncatedCommandMessage,
 } from '../__fixtures__'
-
-import type { ComponentProps } from 'react'
+import { InterventionCommandMessage } from '../InterventionCommandMessage'
 
 const render = (props: ComponentProps<typeof InterventionCommandMessage>) => {
   return renderWithProviders(<InterventionCommandMessage {...props} />, {

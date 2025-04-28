@@ -1,11 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+import type { RunTimeCommand } from '../../../protocol'
+import type { CompletedProtocolAnalysis } from '../../types'
 import {
   FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
   getSimplestDeckConfigForProtocol,
 } from '../getSimplestFlexDeckConfig'
-
-import type { RunTimeCommand } from '../../../protocol'
-import type { CompletedProtocolAnalysis } from '../../types'
 
 const RUN_TIME_COMMAND_STUB_MIXIN: Pick<
   RunTimeCommand,

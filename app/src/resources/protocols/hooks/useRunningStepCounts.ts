@@ -1,9 +1,7 @@
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-
-import { useLastRunProtocolCommand } from './useLastRunProtocolCommand'
-
 import type { CommandsData } from '@opentrons/api-client'
 import { getRunningStepCountsFrom } from '/app/resources/protocols'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { useLastRunProtocolCommand } from './useLastRunProtocolCommand'
 
 export interface StepCounts {
   /* Excludes "fixit" commands. Returns null if the step is not found. */

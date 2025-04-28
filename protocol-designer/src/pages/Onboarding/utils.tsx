@@ -3,7 +3,6 @@ import {
   getLabwareDisplayName,
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
-
 import type {
   LabwareDefByDefURI,
   LabwareDefinition2,

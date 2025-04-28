@@ -1,16 +1,15 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
-import { renderHook } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { useAllPipetteOffsetCalibrationsQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
 } from '/app/redux/calibration/pipette-offset/__fixtures__'
-import { usePipetteOffsetCalibrations } from '..'
-
 import type { FunctionComponent, ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { usePipetteOffsetCalibrations } from '..'
 
 vi.mock('@opentrons/react-api-client')
 

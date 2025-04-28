@@ -1,8 +1,3 @@
-import { useSelector, useDispatch } from 'react-redux'
-import styled, { css } from 'styled-components'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   Banner,
@@ -12,26 +7,28 @@ import {
   Flex,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
+  ReleaseNotes,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
-  ReleaseNotes,
-  Modal,
 } from '@opentrons/components'
-
-import {
-  getShellUpdateState,
-  getAvailableShellUpdate,
-  downloadShellUpdate,
-  applyShellUpdate,
-} from '/app/redux/shell'
-import { useIsOEMMode } from '/app/resources/robot-settings'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { ProgressBar } from '/app/atoms/ProgressBar'
-import { useRemoveActiveAppUpdateToast } from '../Alerts'
-
+import {
+  applyShellUpdate,
+  downloadShellUpdate,
+  getAvailableShellUpdate,
+  getShellUpdateState,
+} from '/app/redux/shell'
 import type { Dispatch } from '/app/redux/types'
+import { useIsOEMMode } from '/app/resources/robot-settings'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import styled, { css } from 'styled-components'
+import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
 interface PlaceHolderErrorProps {
   errorMessage?: string

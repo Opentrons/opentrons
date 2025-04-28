@@ -1,17 +1,15 @@
+import type { ReactNode } from 'react'
 import { css } from 'styled-components'
-
-import { StyledText } from '../StyledText'
+import type { FlattenSimpleInterpolation } from 'styled-components'
+import { COLORS } from '../../helix-design-system'
 import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   DISPLAY_GRID,
   FLEX_MAX_CONTENT,
 } from '../../styles'
-import { SPACING, RESPONSIVENESS } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
-
-import type { ReactNode } from 'react'
-import type { FlattenSimpleInterpolation } from 'styled-components'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { StyledText } from '../StyledText'
 
 export interface ListTableProps {
   children: ReactNode

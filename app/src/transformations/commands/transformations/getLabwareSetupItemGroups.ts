@@ -1,6 +1,4 @@
-import partition from 'lodash/partition'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-
 import type {
   LabwareDefinition2,
   LabwareLocation,
@@ -9,6 +7,7 @@ import type {
   ModuleModel,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import partition from 'lodash/partition'
 
 export interface LabwareSetupItem {
   definition: LabwareDefinition2

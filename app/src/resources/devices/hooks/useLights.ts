@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
 import {
   useLightsQuery,
   useSetLightsMutation,
 } from '@opentrons/react-api-client'
+import { useEffect, useState } from 'react'
 
 const LIGHTS_POLL_MS = 5000
 export function useLights(): {

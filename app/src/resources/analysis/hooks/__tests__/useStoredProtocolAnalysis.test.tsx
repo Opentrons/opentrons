@@ -1,10 +1,4 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
-
+import type { Protocol, Run } from '@opentrons/api-client'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 import {
   OT2_ROBOT_TYPE,
@@ -12,24 +6,27 @@ import {
   parsePipetteEntity,
   parseRequiredModulesEntity,
 } from '@opentrons/shared-data'
-
-import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
+import type * as SharedData from '@opentrons/shared-data'
+import { renderHook } from '@testing-library/react'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
-import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
+import { useNotifyRunQuery } from '/app/resources/runs'
+import type { FunctionComponent, ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import type { UseQueryResult } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import type { Store } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import {
   LABWARE_ENTITY,
   MODULE_ENTITY,
   PIPETTE_ENTITY,
   STORED_PROTOCOL_ANALYSIS,
 } from '../__fixtures__/storedProtocolAnalysis'
-import { useNotifyRunQuery } from '/app/resources/runs'
-
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
-import type { UseQueryResult } from 'react-query'
-import type { Protocol, Run } from '@opentrons/api-client'
-import type * as SharedData from '@opentrons/shared-data'
-import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()

@@ -1,17 +1,14 @@
-import { describe, it, vi, beforeEach, afterEach } from 'vitest'
-import { screen } from '@testing-library/react'
-
 import { BaseDeck } from '@opentrons/components'
 import {
   FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
-
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
-
 import type { ComponentProps } from 'react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('@opentrons/api-client')

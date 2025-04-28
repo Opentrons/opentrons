@@ -1,10 +1,9 @@
-import { createContext } from 'react'
-
 import type {
+  SnackbarProps,
   ToastProps,
   ToastType,
-  SnackbarProps,
 } from '@opentrons/components'
+import { createContext } from 'react'
 
 export type MakeToastOptions = Omit<
   ToastProps,

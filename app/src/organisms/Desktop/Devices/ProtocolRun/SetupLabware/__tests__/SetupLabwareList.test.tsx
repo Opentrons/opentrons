@@ -1,16 +1,13 @@
-import { MemoryRouter } from 'react-router-dom'
-import { describe, it, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
-
 import { multiple_tipacks_with_tc } from '@opentrons/shared-data'
-
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { SetupLabwareList } from '../SetupLabwareList'
-import { LabwareListItem } from '../LabwareListItem'
-
 import type { ComponentProps } from 'react'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { MemoryRouter } from 'react-router-dom'
+import { beforeEach, describe, it, vi } from 'vitest'
+import { LabwareListItem } from '../LabwareListItem'
+import { SetupLabwareList } from '../SetupLabwareList'
 
 vi.mock('../LabwareListItem')
 

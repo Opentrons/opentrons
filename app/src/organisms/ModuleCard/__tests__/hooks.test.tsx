@@ -1,14 +1,9 @@
-import { Provider } from 'react-redux'
-import { when } from 'vitest-when'
-import { createStore } from 'redux'
-import { I18nextProvider } from 'react-i18next'
-import { act, renderHook } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { heater_shaker_commands_with_results_key } from '@opentrons/shared-data'
-
+import { act, renderHook } from '@testing-library/react'
 import { i18n } from '/app/i18n'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   mockHeaterShaker,
   mockMagneticModuleGen2,
@@ -16,23 +11,24 @@ import {
   mockThermocycler,
   mockThermocyclerGen2,
 } from '/app/redux/modules/__fixtures__'
-import { useIsRobotBusy } from '/app/redux-resources/robots'
-
+import type { State } from '/app/redux/types'
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
   useRunStatuses,
 } from '/app/resources/runs'
+import type { FunctionComponent, ReactNode } from 'react'
+import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import type { Store } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import {
+  useIsHeaterShakerInProtocol,
   useLatchControls,
   useModuleOverflowMenu,
-  useIsHeaterShakerInProtocol,
 } from '../hooks'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
-
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
-import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')

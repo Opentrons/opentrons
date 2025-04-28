@@ -1,5 +1,5 @@
-import { createGlobalStyle } from 'styled-components'
 import { COLORS, PRODUCT } from '@opentrons/components'
+import { createGlobalStyle } from 'styled-components'
 import 'typeface-open-sans'
 import '@fontsource/dejavu-sans'
 import '@fontsource/public-sans'

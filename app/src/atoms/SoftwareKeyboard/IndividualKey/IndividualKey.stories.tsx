@@ -1,4 +1,3 @@
-import { useState, useRef } from 'react'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,9 +6,9 @@ import {
   SPACING,
   VIEWPORT,
 } from '@opentrons/components'
-import { IndividualKey } from '.'
-
 import type { Meta, StoryObj } from '@storybook/react'
+import { useRef, useState } from 'react'
+import { IndividualKey } from '.'
 
 const meta: Meta<typeof IndividualKey> = {
   title: 'ODD/Atoms/SoftwareKeyboard/IndividualKey',

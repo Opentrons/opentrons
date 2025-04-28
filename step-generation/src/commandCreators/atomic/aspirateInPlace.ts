@@ -1,6 +1,6 @@
-import { uuid } from '../../utils'
-import type { CommandCreator } from '../../types'
 import type { AspirateInPlaceParams } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
+import { uuid } from '../../utils'
 
 export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
   args,

@@ -1,19 +1,16 @@
-import { useMutation } from 'react-query'
-
 import {
-  RUN_ACTION_TYPE_RESUME_FROM_RECOVERY,
   createRunAction,
+  RUN_ACTION_TYPE_RESUME_FROM_RECOVERY,
 } from '@opentrons/api-client'
-
-import { useHost } from '../api'
-
+import type { HostConfig, RunAction } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
+import { useMutation } from 'react-query'
 import type {
   UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { HostConfig, RunAction } from '@opentrons/api-client'
+import { useHost } from '../api'
 
 export type UseResumeRunFromRecoveryMutationResult = UseMutationResult<
   RunAction,

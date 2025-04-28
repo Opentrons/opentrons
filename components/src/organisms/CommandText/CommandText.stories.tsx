@@ -1,9 +1,9 @@
-import * as Fixtures from '../../../../app/src/molecules/Command/__fixtures__'
-import { getLabwareDefinitionsFromCommands } from './useCommandTextString/utils'
-import { Box } from '../../primitives'
-import { CommandText as CommandTextComponent } from './index'
 import type { RobotType } from '@opentrons/shared-data'
 import type { Meta, StoryObj } from '@storybook/react'
+import * as Fixtures from '../../../../app/src/molecules/Command/__fixtures__'
+import { Box } from '../../primitives'
+import { CommandText as CommandTextComponent } from './index'
+import { getLabwareDefinitionsFromCommands } from './useCommandTextString/utils'
 
 interface StorybookArgs {
   onDevice: boolean

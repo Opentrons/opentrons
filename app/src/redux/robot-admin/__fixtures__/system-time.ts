@@ -1,12 +1,11 @@
 import { GET } from '../../robot-api'
-import { SYSTEM_TIME_PATH } from '../constants'
 import {
   makeResponseFixtures,
   mockFailureBody,
 } from '../../robot-api/__fixtures__'
-
-import type { SystemTimeData } from '../api-types'
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
+import type { SystemTimeData } from '../api-types'
+import { SYSTEM_TIME_PATH } from '../constants'
 
 export const mockSystemTime = '2020-09-08T18:02:01.318292+00:00'
 

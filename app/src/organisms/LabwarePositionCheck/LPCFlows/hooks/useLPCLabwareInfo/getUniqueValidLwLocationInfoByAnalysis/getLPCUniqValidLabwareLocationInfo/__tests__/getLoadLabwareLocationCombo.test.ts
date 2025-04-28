@@ -1,19 +1,19 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { getLoadLabwareLocationCombo } from '../getLoadLabwareLocationCombo'
 import { getLabwareDefURI } from '@opentrons/shared-data'
+import type {
+  LoadedLabware,
+  LoadedModule,
+  LoadLabwareRunTimeCommand,
+} from '@opentrons/shared-data'
+import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { getLoadLabwareLocationCombo } from '../getLoadLabwareLocationCombo'
 import {
+  getAddressableAreaNameFrom,
   getClosestBeneathAdapterId,
   getClosestBeneathModuleId,
   getClosestBeneathModuleModel,
   getLwModStackupDetails,
-  getAddressableAreaNameFrom,
 } from '../helpers'
-import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
-import type {
-  LoadLabwareRunTimeCommand,
-  LoadedLabware,
-  LoadedModule,
-} from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', () => ({
   getLabwareDefURI: vi.fn(),

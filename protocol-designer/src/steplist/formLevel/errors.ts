@@ -3,33 +3,23 @@ import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
-
+import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
+import type { ReactNode } from 'react'
 import {
   ABSORBANCE_READER_INITIALIZE,
   ABSORBANCE_READER_MAX_WAVELENGTH_NM,
   ABSORBANCE_READER_MIN_WAVELENGTH_NM,
   ABSORBANCE_READER_READ,
-  MIN_ENGAGE_HEIGHT_V1,
   MAX_ENGAGE_HEIGHT_V1,
-  MIN_ENGAGE_HEIGHT_V2,
   MAX_ENGAGE_HEIGHT_V2,
+  MIN_ENGAGE_HEIGHT_V1,
+  MIN_ENGAGE_HEIGHT_V2,
   PAUSE_UNTIL_RESUME,
-  PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
-import { getPipetteCapacity } from '../../pipettes/pipetteData'
-import {
-  canPipetteUseLabware,
-  getMaxConditioningVolume,
-  getMaxPushOutVolume,
-} from '../../utils'
-import { getWellRatio } from '../utils'
-import { getTimeFromForm } from '../utils/getTimeFromForm'
-
-import type { ReactNode } from 'react'
-import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
-import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
   HydratedFormData,
@@ -43,8 +33,17 @@ import type {
   HydratedThermocyclerFormData,
   StepFieldName,
 } from '../../form-types'
-import type { ModuleEntities } from '../../step-forms'
 import type { LiquidHandlingTab } from '../../pages/Designer/ProtocolSteps/StepForm/types'
+import { getPipetteCapacity } from '../../pipettes/pipetteData'
+import type { ModuleEntities } from '../../step-forms'
+import {
+  canPipetteUseLabware,
+  getMaxConditioningVolume,
+  getMaxPushOutVolume,
+} from '../../utils'
+import { getWellRatio } from '../utils'
+import { getTimeFromForm } from '../utils/getTimeFromForm'
+
 /*******************
  ** Error Messages **
  ********************/

@@ -1,18 +1,16 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   Box,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
 } from '@opentrons/components'
-
 import { ToggleButton } from '/app/atoms/buttons'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
+import { useTranslation } from 'react-i18next'
 
 export function EnableErrorRecoveryMode({
   isRobotBusy,

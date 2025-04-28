@@ -1,7 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { alertsReducer } from '../reducer'
+import { describe, expect, it } from 'vitest'
 import * as Actions from '../actions'
-
+import { alertsReducer } from '../reducer'
 import type { AlertId, AlertsState } from '../types'
 
 const MOCK_ALERT_ID: AlertId = 'mockAlert' as any

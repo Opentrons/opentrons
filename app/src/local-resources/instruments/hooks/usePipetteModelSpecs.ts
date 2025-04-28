@@ -1,12 +1,10 @@
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-
-import { usePipetteNameSpecs } from './usePipetteNameSpecs'
-
 import type {
   PipetteModel,
   PipetteModelSpecs,
   PipetteName,
 } from '@opentrons/shared-data'
+import { usePipetteNameSpecs } from './usePipetteNameSpecs'
 
 export function usePipetteModelSpecs(
   model: PipetteModel

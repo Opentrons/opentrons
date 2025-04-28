@@ -1,6 +1,3 @@
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -19,21 +16,20 @@ import {
   RESPONSIVENESS,
   SPACING,
 } from '@opentrons/components'
-
+import type { IconName } from '@opentrons/components'
 import { getIsOnDevice } from '/app/redux/config'
-
+import type { MouseEvent, ReactNode } from 'react'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+import type { FlattenSimpleInterpolation } from 'styled-components'
+import { CategorizedStepContent } from './CategorizedStepContent'
+import { DeckMapContent } from './DeckMapContent'
+import { DescriptionContent } from './DescriptionContent'
+import { ModalContentMixed } from './ModalContentMixed'
 import { ModalContentOneColSimpleButtons } from './ModalContentOneColSimpleButtons'
-import { TwoColumn } from './TwoColumn'
 import { OneColumn } from './OneColumn'
 import { OneColumnOrTwoColumn } from './OneColumnOrTwoColumn'
-import { ModalContentMixed } from './ModalContentMixed'
-import { DescriptionContent } from './DescriptionContent'
-import { DeckMapContent } from './DeckMapContent'
-import { CategorizedStepContent } from './CategorizedStepContent'
-
-import type { MouseEvent, ReactNode } from 'react'
-import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { IconName } from '@opentrons/components'
+import { TwoColumn } from './TwoColumn'
 
 export {
   ModalContentOneColSimpleButtons,

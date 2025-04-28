@@ -1,11 +1,10 @@
-import { describe, it, expect } from 'vitest'
-
-import { transfer_settings, ot2DeckDefV5 } from '@opentrons/shared-data'
-import { getLabwareRenderInfo } from '../getLabwareRenderInfo'
+import { ot2DeckDefV5, transfer_settings } from '@opentrons/shared-data'
 import type {
   CompletedProtocolAnalysis,
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
+import { getLabwareRenderInfo } from '../getLabwareRenderInfo'
 
 const protocolWithMagTempTC = (transfer_settings as unknown) as CompletedProtocolAnalysis
 const standardDeckDef = ot2DeckDefV5 as any

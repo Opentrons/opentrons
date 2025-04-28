@@ -1,11 +1,9 @@
-import { useTranslation } from 'react-i18next'
-import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
-import {
-  useModulesQuery,
-  usePipettesQuery,
-  useInstrumentsQuery,
-} from '@opentrons/react-api-client'
-
+import type {
+  BadGripper,
+  BadPipette,
+  GripperData,
+  PipetteData,
+} from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -14,29 +12,28 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   SIZE_3,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
-import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
-import { useIsFlex, useIsRobotViewable } from '/app/redux-resources/robots'
+import {
+  useInstrumentsQuery,
+  useModulesQuery,
+  usePipettesQuery,
+} from '@opentrons/react-api-client'
+import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import { ModuleCard } from '/app/organisms/ModuleCard'
+import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
+import { useIsFlex, useIsRobotViewable } from '/app/redux-resources/robots'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
+import { useTranslation } from 'react-i18next'
+import { GripperCard } from './GripperCard'
 import { PipetteCard } from './PipetteCard'
 import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
-import { GripperCard } from './GripperCard'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
-
-import type {
-  BadGripper,
-  BadPipette,
-  GripperData,
-  PipetteData,
-} from '@opentrons/api-client'
+import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
 
 const EQUIPMENT_POLL_MS = 5000
 interface InstrumentsAndModulesProps {

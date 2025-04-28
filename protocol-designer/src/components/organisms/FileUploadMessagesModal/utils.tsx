@@ -1,4 +1,3 @@
-import { Trans, useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -6,8 +5,8 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
 import type { ReactNode } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import type { FileUploadMessage } from '../../../load-file'
 
 export interface ModalContents {

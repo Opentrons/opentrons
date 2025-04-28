@@ -1,8 +1,6 @@
-import { describe, it, expect } from 'vitest'
-
-import { robotControlsReducer } from '../reducer'
-
+import { describe, expect, it } from 'vitest'
 import type { Action } from '../../types'
+import { robotControlsReducer } from '../reducer'
 import type { PerRobotControlsState } from '../types'
 
 interface ReducerSpec {

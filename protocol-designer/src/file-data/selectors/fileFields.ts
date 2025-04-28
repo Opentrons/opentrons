@@ -1,8 +1,8 @@
+import type { RobotType } from '@opentrons/shared-data'
 import { createSelector } from 'reselect'
 import type { BaseState, Selector } from '../../types'
 import type { RootState } from '../reducers'
 import type { FileMetadataFields } from '../types'
-import type { RobotType } from '@opentrons/shared-data'
 
 export const rootSelector = (state: BaseState): RootState => state.fileData
 export const getCurrentProtocolExists: Selector<boolean> = createSelector(

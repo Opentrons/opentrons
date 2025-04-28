@@ -1,7 +1,7 @@
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 import { FeedbackModal } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
 import { i18n } from '../../../i18n'
 import { feedbackModalAtom } from '../../../resources/atoms'
 

@@ -1,7 +1,3 @@
-import { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_FLEX_END,
   COLORS,
@@ -9,21 +5,22 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   Link,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { ManualIpHostnameForm } from './ManualIpHostnameForm'
-import { ManualIpHostnameList } from './ManualIpHostnameList'
-import { Slideout } from '/app/atoms/Slideout'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { Slideout } from '/app/atoms/Slideout'
 import { Divider } from '/app/atoms/structure'
 import { getScanning, startDiscovery } from '/app/redux/discovery'
-
 import type { Dispatch, State } from '/app/redux/types'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { ManualIpHostnameForm } from './ManualIpHostnameForm'
+import { ManualIpHostnameList } from './ManualIpHostnameList'
 
 const SUPPORT_PAGE_LINK =
   'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'

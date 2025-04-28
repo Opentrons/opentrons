@@ -1,10 +1,4 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Trans, useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
-import last from 'lodash/last'
-import { css } from 'styled-components'
-
+import { deleteProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -24,22 +18,25 @@ import {
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
+import type { UseLongPressResult } from '@opentrons/components'
 import {
   useHost,
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
-import { deleteProtocol } from '@opentrons/api-client'
-
+import type { ProtocolResource } from '@opentrons/shared-data'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { LongPressModal } from './LongPressModal'
-import { formatTimeWithUtcLabel } from '/app/resources/runs'
-
-import type { Dispatch, SetStateAction } from 'react'
-import type { UseLongPressResult } from '@opentrons/components'
-import type { ProtocolResource } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
+import last from 'lodash/last'
+import { useEffect, useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
+import { useNavigate } from 'react-router-dom'
+import { css } from 'styled-components'
+import { LongPressModal } from './LongPressModal'
 
 const REFETCH_INTERVAL = 5000
 

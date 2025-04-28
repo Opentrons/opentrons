@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -6,12 +5,13 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 const PROTOCOL_LIBRARY_URL = 'https://library.opentrons.com'
 const PROTOCOL_DESIGNER_URL = 'https://designer.opentrons.com'

@@ -1,6 +1,7 @@
-import { uuid } from '../../utils'
 import type { ModuleOnlyParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
+import { uuid } from '../../utils'
+
 export const heaterShakerCloseLatch: CommandCreator<ModuleOnlyParams> = (
   args,
   invariantContext,

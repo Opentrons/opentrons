@@ -1,9 +1,7 @@
-import { useMemo, useState, useEffect } from 'react'
 import head from 'lodash/head'
 import last from 'lodash/last'
-
+import { useEffect, useMemo, useState } from 'react'
 import { BEFORE_BEGINNING_STEPS, DT_ROUTES, INVALID } from '../constants'
-
 import type {
   DropTipFlowsRoute,
   DropTipFlowsStep,

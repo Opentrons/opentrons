@@ -1,14 +1,12 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { SkipStepInfo } from '../SkipStepInfo'
-import { RECOVERY_MAP } from '../../constants'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
+import { RECOVERY_MAP } from '../../constants'
+import { SkipStepInfo } from '../SkipStepInfo'
 
 describe('SkipStepInfo', () => {
   let props: ComponentProps<typeof SkipStepInfo>

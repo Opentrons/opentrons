@@ -1,14 +1,11 @@
-import { describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { useRecoveryOptionCopy } from '../useRecoveryOptionCopy'
-import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
-
-import type { ErrorKind, RecoveryRoute } from '../../types'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
 import type { ComponentProps } from 'react'
+import { describe, it } from 'vitest'
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
+import type { ErrorKind, RecoveryRoute } from '../../types'
+import { useRecoveryOptionCopy } from '../useRecoveryOptionCopy'
 
 function MockRenderCmpt({
   route,

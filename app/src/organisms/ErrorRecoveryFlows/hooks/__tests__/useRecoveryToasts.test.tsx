@@ -1,22 +1,19 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { I18nextProvider } from 'react-i18next'
-import { i18n } from '/app/i18n'
-import { renderHook, render, screen } from '@testing-library/react'
-
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
+import { render, renderHook, screen } from '@testing-library/react'
+import { i18n } from '/app/i18n'
+import { useCommandTextString } from '/app/local-resources/commands'
+import type { ReactElement } from 'react'
+import { I18nextProvider } from 'react-i18next'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
+import { useToaster } from '../../../ToasterOven'
+import { RECOVERY_MAP } from '../../constants'
 import {
-  useRecoveryToasts,
-  useRecoveryToastText,
   getStepNumber,
   useRecoveryFullCommandText,
+  useRecoveryToasts,
+  useRecoveryToastText,
 } from '../useRecoveryToasts'
-import { RECOVERY_MAP } from '../../constants'
-import { useToaster } from '../../../ToasterOven'
-import { useCommandTextString } from '/app/local-resources/commands'
-
-import type { ReactElement } from 'react'
-import type { Mock } from 'vitest'
 import type { BuildToast } from '../useRecoveryToasts'
 
 vi.mock('../../../ToasterOven')

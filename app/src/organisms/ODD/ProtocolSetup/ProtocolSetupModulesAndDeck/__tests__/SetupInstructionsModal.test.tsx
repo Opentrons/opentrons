@@ -1,12 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
-import { SetupInstructionsModal } from '../SetupInstructionsModal'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { SetupInstructionsModal } from '../SetupInstructionsModal'
 
 const mockSetShowSetupInstructionsModal = vi.fn()
 const QR_CODE_IMAGE_FILE =

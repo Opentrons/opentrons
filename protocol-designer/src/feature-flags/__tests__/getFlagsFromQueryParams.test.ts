@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { getFlagsFromQueryParams } from '../utils'
+
 describe('getFlagsFromQueryParams', () => {
   it('should enable the flag passed in via query params when it is set to 1', () => {
     // replace window location search

@@ -1,8 +1,6 @@
-import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
-
 import type { MutableRefObject } from 'react'
+import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
-
 import '../index.css'
 import './index.css'
 

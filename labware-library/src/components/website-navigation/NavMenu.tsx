@@ -1,6 +1,5 @@
 import { NavLink } from './NavLink'
 import styles from './styles.module.css'
-
 import type { Submenu } from './types'
 
 interface Props extends Submenu {

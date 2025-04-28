@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -8,12 +5,13 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { TertiaryButton } from '/app/atoms/buttons'
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 

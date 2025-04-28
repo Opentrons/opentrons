@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -14,18 +11,19 @@ import {
   ListButton,
   SPACING,
   StyledText,
-  TEXT_DECORATION_UNDERLINE,
   Tag,
+  TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
-
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { getEnableLiquidClasses } from '../../../feature-flags/selectors'
 import { removeWellsContents } from '../../../labware-ingred/actions'
+import type { SelectedContainerId } from '../../../labware-ingred/reducers'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { getLabwareEntities } from '../../../step-forms/selectors'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-
-import type { SelectedContainerId } from '../../../labware-ingred/reducers'
+import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import type { LiquidInfo } from './LiquidToolbox'
 
 interface LiquidCardProps {

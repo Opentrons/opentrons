@@ -1,7 +1,4 @@
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -9,17 +6,17 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import {
   clearSelectedLabwareWorkingOffsets,
   goBackEditOffsetSubstep,
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
-
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 export const handleUnsavedOffsetsModalODD = (
   props: LPCWizardContentProps

@@ -1,10 +1,10 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { scanAllCommandsForAllLwUrisByLwId } from '../getAllPossibleLwURIsInRun'
 import type {
+  FlexStackerRetrieveRunTimeCommand,
   LoadedLabware,
   RunTimeCommand,
-  FlexStackerRetrieveRunTimeCommand,
 } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { scanAllCommandsForAllLwUrisByLwId } from '../getAllPossibleLwURIsInRun'
 
 describe('scanAllCommandsForAllLwUrisByLwId', () => {
   const LABWARE_ID_1 = 'labware-1'

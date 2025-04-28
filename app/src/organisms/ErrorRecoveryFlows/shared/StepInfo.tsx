@@ -1,14 +1,12 @@
-import { useTranslation } from 'react-i18next'
-
 import {
-  Flex,
-  DISPLAY_INLINE,
-  StyledText,
   CommandText,
+  DISPLAY_INLINE,
+  Flex,
+  StyledText,
 } from '@opentrons/components'
-
-import type { ComponentProps } from 'react'
 import type { StyleProps } from '@opentrons/components'
+import type { ComponentProps } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { RecoveryContentProps } from '../types'
 
 interface StepInfoProps extends StyleProps {

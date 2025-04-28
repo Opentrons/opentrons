@@ -1,7 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
-import without from 'lodash/without'
-import { useTranslation } from 'react-i18next'
-
+import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
+import type {
+  DisplayLocationSlotOnlyParams,
+  WellGroup,
+} from '@opentrons/components'
+import {
+  getLabwareDisplayLocation,
+  getLoadedLabware,
+} from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getAllLabwareDefs,
@@ -9,35 +14,28 @@ import {
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 import type {
-  DisplayLocationSlotOnlyParams,
-  WellGroup,
-} from '@opentrons/components'
-import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
-import type {
-  LabwareDefinition2,
-  LoadedLabware,
-  PickUpTipRunTimeCommand,
   AspirateRunTimeCommand,
   DispenseRunTimeCommand,
-  LiquidProbeRunTimeCommand,
-  MoveLabwareRunTimeCommand,
-  FlexStackerRetrieveRunTimeCommand,
-  LabwareLocation,
-  LoadedModule,
   Failed,
-  RunCommandFlexStackerError,
+  FlexStackerRetrieveRunTimeCommand,
+  LabwareDefinition2,
+  LabwareLocation,
+  LiquidProbeRunTimeCommand,
+  LoadedLabware,
+  LoadedModule,
+  MoveLabwareRunTimeCommand,
+  PickUpTipRunTimeCommand,
   RunCommandError,
+  RunCommandFlexStackerError,
 } from '@opentrons/shared-data'
-
-import {
-  getLoadedLabware,
-  getLabwareDisplayLocation,
-} from '@opentrons/components'
-import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
-import { getErrorKind } from '../utils'
+import without from 'lodash/without'
+import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { ErrorRecoveryFlowsProps } from '..'
-import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
+import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
 import type { ErrorKind } from '../types'
+import { getErrorKind } from '../utils'
+import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 
 interface UseFailedLabwareUtilsProps {
   failedCommand: FailedCommandBySource | null
@@ -119,7 +117,6 @@ export function useFailedLabwareUtils({
       getLabwareDisplayNamesFromFailedCmd(
         protocolAnalysis,
         recentRelevantFailedLabwareCmd,
-        errorKind,
         runRecord
       ),
     [protocolAnalysis?.id, recentRelevantFailedLabwareCmd?.key, errorKind]
@@ -402,15 +399,28 @@ export function getFailedLabwareQuantity(
 }
 
 export function getRelevantLabwareIdFromFailedCmd(
-  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
-  errorKind: ErrorKind
+  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware
 ): string | null {
   const isStackerError = (
     error?: RunCommandError | null
   ): error is RunCommandFlexStackerError =>
     error != null &&
     error.isDefined &&
-    STACKER_ERROR_KINDS.includes(errorKind)
+    [
+      'flexStackerStallOrCollision',
+      'flexStackerShuttleMissing',
+      'flexStackerHopperLabwareFailed',
+    ].includes(error.errorType)
+  //STACKER_ERROR_KINDS.includes(error.errorType as ErrorKind)
+
+  console.log(
+    'isStackerError(recentRelevantFailedLabwareCmd?.error: ',
+    isStackerError(recentRelevantFailedLabwareCmd?.error)
+  )
+  console.log(
+    'recentRelevantFailedLabwareCmd: ',
+    recentRelevantFailedLabwareCmd?.error
+  )
   if (recentRelevantFailedLabwareCmd == null) {
     return null
   } else if (isStackerError(recentRelevantFailedLabwareCmd?.error)) {
@@ -428,12 +438,10 @@ export function getRelevantLabwareIdFromFailedCmd(
 export function getLabwareDisplayNamesFromFailedCmd(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
-  errorKind: ErrorKind,
   runRecord?: Run
 ): { name: string | null; nickname: string | null } | null {
   const labwareId = getRelevantLabwareIdFromFailedCmd(
-    recentRelevantFailedLabwareCmd,
-    errorKind
+    recentRelevantFailedLabwareCmd
   )
   if (labwareId == null) {
     return null

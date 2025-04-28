@@ -1,14 +1,10 @@
-import { it, describe, expect, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
-
 import { COLORS, SIZE_1 } from '@opentrons/components'
-
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
-import { RenderResult } from '../RenderResult'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { RenderResult } from '../RenderResult'
 
 const render = (props: ComponentProps<typeof RenderResult>) => {
   return renderWithProviders(<RenderResult {...props} />, {

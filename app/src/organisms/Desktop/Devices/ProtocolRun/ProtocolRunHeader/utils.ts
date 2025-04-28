@@ -1,21 +1,19 @@
 import {
-  RUN_STATUS_IDLE,
-  RUN_STATUS_PAUSED,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_FAILED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_SUCCEEDED,
-  RUN_STATUS_RUNNING,
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-
-import { getRobotSerialNumber } from '/app/redux/discovery'
-
 import type { RunStatus } from '@opentrons/api-client'
+import { getRobotSerialNumber } from '/app/redux/discovery'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 const START_RUN_STATUSES: RunStatus[] = [

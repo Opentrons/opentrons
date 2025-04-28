@@ -1,17 +1,17 @@
-import { vi, beforeEach, afterEach, it, expect, describe } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
 // json protocol file validator tests
 import fixtureV1JsonProtocol from '../../../protocol/fixtures/1/simple.json'
 import fixtureV3JsonProtocol from '../../../protocol/fixtures/3/simple.json'
 import fixtureV4JsonProtocol from '../../../protocol/fixtures/4/simpleV4.json'
 import fixtureV5JsonProtocol from '../../../protocol/fixtures/5/simpleV5.json'
 import {
-  fileExtensionIsPython,
   fileExtensionIsJson,
+  fileExtensionIsPython,
   fileExtensionIsZip,
-  validateJsonProtocolFileContents,
   parseProtocolData,
+  validateJsonProtocolFileContents,
 } from '../parseProtocolData'
-import type { Mock } from 'vitest'
 
 describe('validateJsonProtocolFileContents', () => {
   let handleError: Mock

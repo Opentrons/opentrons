@@ -1,8 +1,7 @@
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
-import { UAParser } from 'ua-parser-js'
-
 import type { MouseEvent } from 'react'
+import { UAParser } from 'ua-parser-js'
 import type { StepIdType } from '../../../../form-types'
 
 export const capitalizeFirstLetterAfterNumber = (title: string): string =>

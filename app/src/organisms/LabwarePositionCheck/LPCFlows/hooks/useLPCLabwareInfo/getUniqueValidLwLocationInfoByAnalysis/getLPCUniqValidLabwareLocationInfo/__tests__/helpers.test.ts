@@ -1,20 +1,18 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-
-import {
-  getClosestBeneathModuleId,
-  getClosestBeneathModuleModel,
-  getClosestBeneathAdapterId,
-  getAddressableAreaNameFrom,
-  getLabwareDefURIFrom,
-  getLwModStackupDetails,
-} from '../helpers'
-
+import type { LabwareOffsetLocationSequence } from '@opentrons/api-client'
 import type {
   LabwareLocationSequence,
   LoadedModule,
 } from '@opentrons/shared-data'
-import type { LabwareOffsetLocationSequence } from '@opentrons/api-client'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AnalysisLwURIsByLwId } from '../getAllPossibleLwURIsInRun'
+import {
+  getAddressableAreaNameFrom,
+  getClosestBeneathAdapterId,
+  getClosestBeneathModuleId,
+  getClosestBeneathModuleModel,
+  getLabwareDefURIFrom,
+  getLwModStackupDetails,
+} from '../helpers'
 
 describe('getClosestBeneathModuleId', () => {
   it('should return undefined when no module in sequence', () => {

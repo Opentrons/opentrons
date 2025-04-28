@@ -1,10 +1,9 @@
 import { css } from 'styled-components'
-import { Box } from '../../primitives'
-import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
-import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
-
+import { Box } from '../../primitives'
 import type { StyleProps } from '../../primitives'
+import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 interface StepMeterProps extends StyleProps {
   totalSteps: number

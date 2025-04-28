@@ -1,21 +1,19 @@
 import { useSelector } from 'react-redux'
-
-import {
-  getLabwareEntities,
-  getPipetteEntities,
-} from '../../../../../../step-forms/selectors'
 import {
   getEnableLiquidClasses,
   getEnablePartialTipSupport,
   getEnableReturnTip,
 } from '../../../../../../feature-flags/selectors'
+import {
+  getLabwareEntities,
+  getPipetteEntities,
+} from '../../../../../../step-forms/selectors'
+import type { StepFormProps } from '../../types'
 import { getFormErrorsMappedToField } from '../../utils'
-import { FirstStepMixTools } from './FirstStepMixTools'
-import { SecondStepMixTools } from './SecondStepMixTools'
 import { useAssignLiquidClass } from '../MoveLiquidTools/hooks'
 import { LiquidClassesStepTools } from '../MoveLiquidTools/LiquidClassesStepTools'
-
-import type { StepFormProps } from '../../types'
+import { FirstStepMixTools } from './FirstStepMixTools'
+import { SecondStepMixTools } from './SecondStepMixTools'
 
 export function MixTools(
   props: Omit<

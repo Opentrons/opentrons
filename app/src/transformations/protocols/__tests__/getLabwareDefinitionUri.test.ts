@@ -1,7 +1,7 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { getLabwareDefURI } from '@opentrons/shared-data'
+import type { LabwareDefinition2, LoadedLabware } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getLabwareDefinitionUri } from '../getLabwareDefinitionUri'
-import type { LoadedLabware, LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data')
 

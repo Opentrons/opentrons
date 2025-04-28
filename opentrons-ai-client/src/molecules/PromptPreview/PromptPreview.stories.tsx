@@ -1,8 +1,8 @@
-import { I18nextProvider } from 'react-i18next'
 import { COLORS, Flex, SPACING } from '@opentrons/components'
-import { i18n } from '../../i18n'
 import type { Meta, StoryObj } from '@storybook/react'
+import { I18nextProvider } from 'react-i18next'
 import { PromptPreview } from '.'
+import { i18n } from '../../i18n'
 
 const meta: Meta<typeof PromptPreview> = {
   title: 'AI/molecules/PromptPreview',

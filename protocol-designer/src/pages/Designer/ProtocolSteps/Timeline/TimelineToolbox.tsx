@@ -1,7 +1,3 @@
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   Btn,
@@ -15,36 +11,38 @@ import {
   StyledText,
   Toolbox,
 } from '@opentrons/components'
-
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import {
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '../../../../components/atoms'
-import {
-  END_TERMINAL_ITEM_ID,
-  START_TERMINAL_ITEM_ID,
-  actions as steplistActions,
-} from '../../../../steplist'
 import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
-import { actions as stepsActions } from '../../../../ui/steps'
 import { getFileMetadata } from '../../../../file-data/selectors'
-import {
-  selectDropdownItem,
-  selectTerminalItem,
-} from '../../../../ui/steps/actions/actions'
+import type { StepIdType } from '../../../../form-types'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import {
   getInitialDeckSetup,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
-import { TerminalItemStep } from './TerminalItemStep'
+import {
+  END_TERMINAL_ITEM_ID,
+  START_TERMINAL_ITEM_ID,
+  actions as steplistActions,
+} from '../../../../steplist'
+import type { ThunkDispatch } from '../../../../types'
+import { actions as stepsActions } from '../../../../ui/steps'
+import {
+  selectDropdownItem,
+  selectTerminalItem,
+} from '../../../../ui/steps/actions/actions'
 import { AddStepButton } from './AddStepButton'
-import { PresavedStep } from './PresavedStep'
 import { DraggableSteps } from './DraggableSteps'
 import { HardwareStep } from './HardwareStep'
-
-import type { StepIdType } from '../../../../form-types'
-import type { ThunkDispatch } from '../../../../types'
+import { PresavedStep } from './PresavedStep'
+import { TerminalItemStep } from './TerminalItemStep'
 
 const SIDEBAR_MIN_WIDTH_FOR_ICON = 170
 const SIDEBAR_MIN_WIDTH_FOR_BACK_TEXT = 100

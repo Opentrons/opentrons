@@ -1,15 +1,9 @@
-import { when } from 'vitest-when'
-import { vi, it, expect, describe, beforeEach } from 'vitest'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
-
+import { renderHook } from '@testing-library/react'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
@@ -18,12 +12,15 @@ import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
 } from '/app/redux/calibration/tip-length/__fixtures__'
-
-import { useAttachedPipetteCalibrations } from '..'
-
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
 import type { State } from '/app/redux/types'
+import type { FunctionComponent, ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import type { Store } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+import { useAttachedPipetteCalibrations } from '..'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/calibration')

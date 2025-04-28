@@ -1,9 +1,8 @@
 import { RECOVERY_MAP } from '../constants'
-import { CancelRun } from './CancelRun'
 import { FillWell, RetryWithSameTips } from '../shared'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
-
 import type { RecoveryContentProps } from '../types'
+import { CancelRun } from './CancelRun'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 export function FillWellAndRetrySameTips(
   props: RecoveryContentProps

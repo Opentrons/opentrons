@@ -11,8 +11,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/Colors',

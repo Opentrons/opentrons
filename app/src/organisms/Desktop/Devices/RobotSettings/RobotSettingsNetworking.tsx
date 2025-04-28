@@ -1,9 +1,3 @@
-import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
-
 import {
   ALIGN_CENTER,
   Box,
@@ -11,30 +5,33 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  LegacyStyledText,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   useInterval,
 } from '@opentrons/components'
-
-import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
+import { getModalPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { Divider } from '/app/atoms/structure'
-
+import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
 import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
-import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
+import type { Dispatch, State } from '/app/redux/types'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { SelectNetwork } from './SelectNetwork'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { State, Dispatch } from '/app/redux/types'
-import { getModalPortalEl } from '/app/App/portal'
 interface NetworkingProps {
   robotName: string
   updateRobotStatus: (isRobotBusy: boolean) => void

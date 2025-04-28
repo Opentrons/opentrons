@@ -1,9 +1,8 @@
-import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
+import { describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../testing/utils'
 import { ToggleGroup } from '../index'
-
-import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof ToggleGroup>) => {
   return renderWithProviders(<ToggleGroup {...props} />)

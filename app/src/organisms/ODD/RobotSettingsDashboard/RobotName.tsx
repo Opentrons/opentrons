@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   Btn,
   DIRECTION_COLUMN,
@@ -8,7 +6,7 @@ import {
   JUSTIFY_FLEX_START,
   LegacyStyledText,
 } from '@opentrons/components'
-
+import { useTranslation } from 'react-i18next'
 import type { SetSettingOption } from './types'
 
 interface RobotNameProps {

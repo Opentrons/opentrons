@@ -1,20 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
-
+import type { Run } from '@opentrons/api-client'
 import {
   useCreateProtocolAnalysisMutation,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
-
-import {
-  ANALYTICS_LPC_ANALYSIS_KIND,
-  useTrackEvent,
-} from '/app/redux/analytics'
-
-import type { Run } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import {
+  ANALYTICS_LPC_ANALYSIS_KIND,
+  useTrackEvent,
+} from '/app/redux/analytics'
+import { useEffect, useRef, useState } from 'react'
 
 // TODO(jh, 03-14-25): Remove this adapter logic and Mixpanel event once analytics
 //  indicate that users no longer run old analyses.

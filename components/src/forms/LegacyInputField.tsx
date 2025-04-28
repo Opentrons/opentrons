@@ -1,13 +1,12 @@
 import cx from 'classnames'
-import { Icon } from '../icons'
-import styles from './forms.module.css'
-
 import type {
   ChangeEventHandler,
   FocusEvent,
   MouseEvent,
   ReactNode,
 } from 'react'
+import { Icon } from '../icons'
+import styles from './forms.module.css'
 
 export const INPUT_TYPE_TEXT: 'text' = 'text'
 export const INPUT_TYPE_PASSWORD: 'password' = 'password'

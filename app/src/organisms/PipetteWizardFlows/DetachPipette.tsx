@@ -1,8 +1,4 @@
-import { useState, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import { RIGHT, WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import type { PipetteData } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -18,19 +14,22 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { RIGHT, WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
+import { SmallButton } from '/app/atoms/buttons'
+import { Skeleton } from '/app/atoms/Skeleton'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { Skeleton } from '/app/atoms/Skeleton'
-import { SmallButton } from '/app/atoms/buttons'
-import { BODY_STYLE, SECTIONS } from './constants'
-import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
-
+import { useMemo, useState } from 'react'
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
-import type { PipetteData } from '@opentrons/api-client'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+import { BODY_STYLE, SECTIONS } from './constants'
 import type { PipetteWizardStepProps } from './types'
+import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 
 interface DetachPipetteProps extends PipetteWizardStepProps {
   isFetching: boolean

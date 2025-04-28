@@ -1,21 +1,19 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
-
-import { mockRecoveryContentProps } from '../../__fixtures__'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { SkipStepInfo } from '/app/organisms/ErrorRecoveryFlows/shared'
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
+import { mockRecoveryContentProps } from '../../__fixtures__'
+import { clickButtonLabeled } from '../../__tests__/util'
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 import {
   IgnoreErrorSkipStep,
   IgnoreErrorStepHome,
   IgnoreOptions,
 } from '../IgnoreErrorSkipStep'
-import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
-import { clickButtonLabeled } from '../../__tests__/util'
-import { SkipStepInfo } from '/app/organisms/ErrorRecoveryFlows/shared'
-
-import type { ComponentProps } from 'react'
-import type { Mock } from 'vitest'
 
 vi.mock('/app/organisms/ErrorRecoveryFlows/shared', async () => {
   const actual = await vi.importActual(

@@ -1,10 +1,9 @@
+import type { Meta, StoryObj } from '@storybook/react'
 import { PrimaryButton, StyledText } from '../atoms'
-import { SPACING } from '../ui-style-constants'
 import { Flex, STYLE_PROPS } from '../primitives'
 import { JUSTIFY_END } from '../styles'
+import { SPACING } from '../ui-style-constants'
 import { Modal as ModalComponent } from './Modal'
-
-import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof ModalComponent> = {
   title: 'Helix/Molecules/Modal',

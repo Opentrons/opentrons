@@ -2,17 +2,17 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+import type { TemperatureParams } from '@opentrons/shared-data'
 import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
-import { getModuleState } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
-import * as warningCreators from '../../warningCreators'
-import type { TemperatureParams } from '@opentrons/shared-data'
+import { getModuleState } from '../../robotStateSelectors'
 import type { CommandCreator, CommandCreatorWarning } from '../../types'
+import { uuid } from '../../utils'
+import * as warningCreators from '../../warningCreators'
 
 /** Set temperature target for specified module. */
 export const waitForTemperature: CommandCreator<TemperatureParams> = (

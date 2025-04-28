@@ -1,5 +1,5 @@
-import type { RunSetupStatus, RunSetupStepsAction } from './setup'
 import type { LPCWizardAction, LPCWizardState } from './lpc'
+import type { RunSetupStatus, RunSetupStepsAction } from './setup'
 
 export * from './setup'
 export * from './lpc'

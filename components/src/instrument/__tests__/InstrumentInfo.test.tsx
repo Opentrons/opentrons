@@ -1,11 +1,10 @@
+import { fixtureP1000SingleV2Specs, LEFT, RIGHT } from '@opentrons/shared-data'
 import { screen } from '@testing-library/react'
-import { describe, beforeEach, it, vi } from 'vitest'
-import { LEFT, RIGHT, fixtureP1000SingleV2Specs } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../testing/utils'
-import { InstrumentInfo } from '../InstrumentInfo'
-import { InstrumentDiagram } from '../InstrumentDiagram'
-
 import type { ComponentProps } from 'react'
+import { beforeEach, describe, it, vi } from 'vitest'
+import { renderWithProviders } from '../../testing/utils'
+import { InstrumentDiagram } from '../InstrumentDiagram'
+import { InstrumentInfo } from '../InstrumentInfo'
 
 vi.mock('../InstrumentDiagram')
 

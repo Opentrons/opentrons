@@ -1,24 +1,22 @@
-import { useMemo } from 'react'
 import { BaseDeck, Flex, getWellFillFromLabwareId } from '@opentrons/components'
+import type { LabwareOnDeck } from '@opentrons/components'
+import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-
-import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
-import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-
-import type { Dispatch, SetStateAction } from 'react'
-import type { LabwareOnDeck } from '@opentrons/components'
-import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
+import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 import type {
-  StackedItemsOnDeck,
   ModuleInStack,
+  StackedItemsOnDeck,
   StackItem,
 } from '/app/transformations/commands'
+import { useMemo } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 
 interface LabwareMapViewProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]
