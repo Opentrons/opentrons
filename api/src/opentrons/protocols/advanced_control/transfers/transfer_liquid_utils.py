@@ -48,7 +48,7 @@ def raise_if_location_inside_liquid(
         liquid_height_from_bottom = well_core.current_liquid_height()
     except LiquidHeightUnknownError:
         liquid_height_from_bottom = None
-    if liquid_height_from_bottom is not None:
+    if isinstance(liquid_height_from_bottom, (int, float)):
         if liquid_height_from_bottom + well_core.get_bottom(0).z > location.point.z:
             raise RuntimeError(
                 f"{location_check_descriptors.location_type.capitalize()} location {location} is"
