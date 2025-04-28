@@ -593,12 +593,6 @@ def test_blow_out_to_well_meniscus_location(
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
-    decoy.when(
-        mock_validation.validate_location(
-            location=input_location, last_location=last_location
-        )
-    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
-
     subject.blow_out(location=input_location)
 
     mock_instrument_core.blow_out(
@@ -1172,6 +1166,8 @@ def test_touch_tip(
 
     decoy.when(mock_well.parent.quirks).then_return([])
 
+    # touch_tip() with the old `radius` argument:
+
     subject.touch_tip(mock_well, radius=0.123, v_offset=4.56, speed=42.0)
 
     decoy.verify(
@@ -1181,8 +1177,30 @@ def test_touch_tip(
             radius=0.123,
             z_offset=4.56,
             speed=42.0,
+            mm_from_edge=None,
         )
     )
+
+    # touch_tip() with the new `mm_from_edge` argument:
+
+    subject.touch_tip(mock_well, v_offset=4.56, speed=42.0, mm_from_edge=0.5)
+
+    decoy.verify(
+        mock_instrument_core.touch_tip(
+            location=Location(point=Point(1, 2, 3), labware=mock_well),
+            well_core=mock_well._core,
+            radius=1,
+            z_offset=4.56,
+            speed=42.0,
+            mm_from_edge=0.5,
+        )
+    )
+
+    # `radius` and `mm_from_edge` are mutually exclusive, should raise if both specified:
+    with pytest.raises(ValueError):
+        subject.touch_tip(
+            mock_well, radius=0.75, v_offset=4.56, speed=42.0, mm_from_edge=0.5
+        )
 
 
 def test_return_height(
