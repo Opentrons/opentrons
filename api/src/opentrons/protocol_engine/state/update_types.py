@@ -61,16 +61,6 @@ Unfortunately, mypy doesn't let us write `Literal[CLEAR]`. Use this instead.
 """
 
 
-class _SimulatedEnum(enum.Enum):
-    SIMULATED = enum.auto()
-
-
-SIMULATED: typing.Final = _SimulatedEnum.SIMULATED
-"""A sentinel value to indicate that a liquid probe return value is simulated.
-
-Useful to avoid throwing unnecessary errors in protocol analysis."""
-
-
 @dataclasses.dataclass(frozen=True)
 class Well:
     """Designates a well in a labware."""
