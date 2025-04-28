@@ -5,6 +5,7 @@ import {
   getCutoutDisplayName,
   getLabwareDefURI,
   getSlotFromAddressableAreaName,
+  SPAN7_8_10_11_SLOT,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_V1,

@@ -84,9 +84,8 @@ export interface HopperLabwareProps {
   hopperStacked: boolean
 }
 
-// these ugly consts are unfortunately necessary as the stacker and hopper locations
-// exist outside of our deck definition so the render doesn't follow our normal conventions
-export const STACKER_MODULE_X_OFFSET = 165
+// these ugly consts are unfortunately necessary as the hopper location exists
+// outside of our deck definition so the render doesn't follow our normal conventions
 export const STACKER_MODULE_Y_OFFSET = -6
 export const STACKER_HOPPER_LABWARE_X_OFFSET = 178.5
 export const STACKER_HOPPER_LABWARE_Y_OFFSET = 7
@@ -336,10 +335,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             highlightLabware,
             highlightShadowLabware,
           }) => {
-            const slotPosition = getPositionFromSlotId(
-              moduleLocation.slotName,
-              deckDef
+            const stackerSlotName = getStackerLocationFromSlot(
+              moduleLocation.slotName
             )
+            const slotPosition = getPositionFromSlotId(stackerSlotName, deckDef)
             const moduleDef = getModuleDef2(moduleModel)
             return slotPosition != null ? (
               <>
@@ -354,7 +353,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 <Module
                   key={`${moduleModel} ${moduleLocation.slotName}`}
                   def={moduleDef}
-                  x={slotPosition[0] + STACKER_MODULE_X_OFFSET}
+                  x={slotPosition[0]}
                   y={slotPosition[1] + STACKER_MODULE_Y_OFFSET}
                   orientation={inferModuleOrientationFromXCoordinate(
                     slotPosition[0]
@@ -437,7 +436,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         {modulesOnDeck.map(
           ({ moduleModel, moduleLocation, stacked = false }) => {
             const slotPosition = getPositionFromSlotId(
-              moduleLocation.slotName,
+              moduleModel === FLEX_STACKER_MODULE_V1
+                ? getStackerLocationFromSlot(moduleLocation.slotName)
+                : moduleLocation.slotName,
               deckDef
             )
             const moduleDef = getModuleDef2(moduleModel)
@@ -446,10 +447,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               y: nestedLabwareOffsetY,
             } = moduleDef.labwareOffset
             if (moduleDef.model === FLEX_STACKER_MODULE_V1) {
-              nestedLabwareOffsetX +=
-                STACKER_MODULE_X_OFFSET + STACKER_HOPPER_LABWARE_X_OFFSET
-              nestedLabwareOffsetY +=
-                STACKER_MODULE_Y_OFFSET + STACKER_HOPPER_LABWARE_Y_OFFSET
+              nestedLabwareOffsetX += STACKER_HOPPER_LABWARE_X_OFFSET
             }
             // labwareOffset values are more accurate than our SVG renderings, so ignore any deviations under a certain threshold
             const clampedLabwareOffsetX =
@@ -521,4 +519,8 @@ function StackedBadge(): JSX.Element {
       />
     </RobotCoordsForeignObject>
   )
+}
+
+function getStackerLocationFromSlot(slotName: string): string {
+  return `${slotName.charAt(0)}4`
 }
