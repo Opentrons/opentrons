@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { screen } from '@testing-library/react'
-import { describe, it, vi } from 'vitest'
+import { describe, it } from 'vitest'
 
 import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '../../../../../../testing/utils'

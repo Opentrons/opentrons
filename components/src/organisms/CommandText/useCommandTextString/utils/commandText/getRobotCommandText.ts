@@ -2,7 +2,6 @@ import { EXTENSION, LEFT, RIGHT } from '@opentrons/shared-data'
 
 import type { TFunction } from 'i18next'
 import type {
-  GantryMount,
   MotorAxis,
   RobotCloseGripperJawRunTimeCommand,
   RobotMotorAxisMap,
