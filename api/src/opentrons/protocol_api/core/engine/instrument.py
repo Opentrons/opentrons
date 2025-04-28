@@ -1018,7 +1018,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
 
     def get_nozzle_map(self) -> NozzleMapInterface:
-        return self._engine_client.state.tips.get_pipette_nozzle_map(self._pipette_id)
+        return self._engine_client.state.pipettes.get_nozzle_configuration(
+            self._pipette_id
+        )
 
     def has_tip(self) -> bool:
         return (

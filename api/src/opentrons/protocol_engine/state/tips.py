@@ -417,17 +417,6 @@ class TipView:
         """Get the number of channels being used in the given pipette's configuration."""
         return self._state.pipette_info_by_pipette_id[pipette_id].active_channels
 
-    def get_pipette_nozzle_map(self, pipette_id: str) -> NozzleMap:
-        """Get the current nozzle map the given pipette's configuration."""
-        return self._state.pipette_info_by_pipette_id[pipette_id].nozzle_map
-
-    def get_pipette_nozzle_maps(self) -> Dict[str, NozzleMap]:
-        """Get current nozzle maps keyed by pipette id."""
-        return {
-            pipette_id: pipette_info.nozzle_map
-            for pipette_id, pipette_info in self._state.pipette_info_by_pipette_id.items()
-        }
-
     def has_clean_tip(self, labware_id: str, well_name: str) -> bool:
         """Get whether a well in a labware has a clean tip.
 

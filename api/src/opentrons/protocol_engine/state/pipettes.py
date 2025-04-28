@@ -727,6 +727,10 @@ class PipetteView:
         nozzle_map = self._state.nozzle_configuration_by_id[pipette_id]
         return nozzle_map.starting_nozzle
 
+    def get_nozzle_configurations(self) -> Dict[str, NozzleMap]:
+        """Get the nozzle maps of all pipettes, keyed by pipette ID."""
+        return self._state.nozzle_configuration_by_id.copy()
+
     def get_nozzle_configuration(self, pipette_id: str) -> NozzleMap:
         """Get the nozzle map of the pipette."""
         return self._state.nozzle_configuration_by_id[pipette_id]
