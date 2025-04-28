@@ -1,11 +1,13 @@
 // jotai's atoms
 import { atom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils'
 
 import type {
   Chat,
   ChatData,
   CreatePrompt,
   CreateProtocolAtomProps,
+  FeatureFlags,
   HeaderWithMeterAtomProps,
   Mixpanel,
   UpdatePrompt,
@@ -74,3 +76,26 @@ export const createProtocolAtom = atom<CreateProtocolAtomProps>({
 })
 
 export const displayExitConfirmModalAtom = atom<boolean>(false)
+
+export const displayFeatureFlagsModalAtom = atom<boolean>(false)
+
+// feature flag atoms are a bit more fancy
+// they leverage local storage to persist settings across browser refreshes
+
+const rawFeatureFlagsAtom = atomWithStorage<FeatureFlags>(
+  'opentrons_ai_feature_flags',
+  {
+    enablePrereleaseMode: false,
+    enablePDProtocolGeneration: false,
+  }
+)
+
+export const featureFlagsAtom = atom(
+  get => get(rawFeatureFlagsAtom),
+  (get, set, update: Partial<FeatureFlags>) => {
+    set(rawFeatureFlagsAtom, {
+      ...get(rawFeatureFlagsAtom),
+      ...update,
+    })
+  }
+)

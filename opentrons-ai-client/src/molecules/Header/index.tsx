@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,
+  Box,
   COLORS,
   Flex,
   JUSTIFY_CENTER,
@@ -12,13 +13,19 @@ import {
   Link as LinkButton,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { displayExitConfirmModalAtom } from '../../resources/atoms'
+import {
+  displayExitConfirmModalAtom,
+  displayFeatureFlagsModalAtom,
+  featureFlagsAtom,
+} from '../../resources/atoms'
 import { CLIENT_MAX_WIDTH } from '../../resources/constants'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
+import { SettingsButton } from '../SettingsButton'
 
 const HeaderBar = styled(Flex)`
   position: ${POSITION_RELATIVE};
@@ -62,6 +69,10 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
   const { logout } = useAuth0()
   const trackEvent = useTrackEvent()
   const [, setDisplayExitConfirmModal] = useAtom(displayExitConfirmModalAtom)
+  const [featureFlags] = useAtom(featureFlagsAtom)
+  const [, setDisplayFeatureFlagsModalAtom] = useAtom(
+    displayFeatureFlagsModalAtom
+  )
 
   async function handleLoginOrExitClick(): Promise<void> {
     if (isExitButton) {
@@ -80,9 +91,21 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
           <HeaderTitle>{t('opentrons')}</HeaderTitle>
           <HeaderGradientTitle>{t('ai')}</HeaderGradientTitle>
         </Flex>
-        <LogoutOrExitButton onClick={handleLoginOrExitClick}>
-          {isExitButton ? t('exit') : t('logout')}
-        </LogoutOrExitButton>
+        <Flex>
+          <LogoutOrExitButton onClick={handleLoginOrExitClick}>
+            {isExitButton ? t('exit') : t('logout')}
+          </LogoutOrExitButton>
+
+          {featureFlags.enablePrereleaseMode && (
+            <Box marginLeft={SPACING.spacing32} marginTop="-.5rem">
+              <SettingsButton
+                onClick={() => {
+                  setDisplayFeatureFlagsModalAtom(true)
+                }}
+              />
+            </Box>
+          )}
+        </Flex>
       </HeaderBarContent>
     </HeaderBar>
   )
