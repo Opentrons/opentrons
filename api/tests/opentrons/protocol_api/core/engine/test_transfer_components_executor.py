@@ -27,7 +27,7 @@ from opentrons.protocols.advanced_control.transfers import (
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
 )
-from opentrons.types import Location, Point
+from opentrons.types import Location, Point, Mount
 
 
 @pytest.fixture
@@ -57,19 +57,16 @@ def patch_mock_raise_if_location_inside_liquid(
 
 """ Test aspirate properties:
 "submerge": {
-  "positionReference": "well-top",
-  "offset": {"x": 1, "y": 2, "z": 3},
+  "startPosition": {"positionReference": "well-top", "offset": {"x": 1, "y": 2, "z": 3}},
   "speed": 100,
   "delay": {"enable": true, "params": {"duration": 10.0}}},
 "retract": {
-  "positionReference": "well-top",
-  "offset": {"x": 3, "y": 2, "z": 1},
+  "endPosition": {"positionReference": "well-top", "offset": {"x": 3, "y": 2, "z": 1}},
   "speed": 50,
   "airGapByVolume": [[1.0, 0.1], [49.9, 0.1], [50.0, 0.0]],
-  "touchTip": {"enable": true, "params": {"zOffset": -1, "mmToEdge": 0.5, "speed": 30}},
+  "touchTip": {"enable": true, "params": {"zOffset": -1, "mmFromEdge": 0.5, "speed": 30}},
   "delay": {"enable": true, "params": {"duration": 20}}},
-"positionReference": "well-bottom",
-"offset": {"x": 10, "y": 20, "z": 30},
+"aspiratePosition": {"positionReference": "well-bottom", "offset": {"x": 10, "y": 20, "z": 30}},
 "flowRateByVolume": [[1.0, 35.0], [10.0, 24.0], [50.0, 35.0]],
 "correctionByVolume": [[0.0, 0.0]],
 "preWet": true,
@@ -86,7 +83,7 @@ def patch_mock_raise_if_location_inside_liquid(
     ],
     argvalues=[(0.123, 123, 123), (1.23, 0.123, 1.23)],
 )
-def test_submerge_without_lpd(
+def test_submerge(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     sample_transfer_props: TransferProperties,
@@ -122,34 +119,11 @@ def test_submerge_without_lpd(
     decoy.when(source_well.get_bottom(0)).then_return(well_bottom_point)
     decoy.when(source_well.get_top(0)).then_return(well_top_point)
     decoy.when(source_well.get_top(2)).then_return(Point(1, 2, 6))
-    decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
     subject.submerge(
         submerge_properties=sample_transfer_props.aspirate.submerge,
         post_submerge_action="aspirate",
-        volume_for_pipette_mode_configuration=123,
     )
-
     decoy.verify(
-        mock_instrument_core.move_to(
-            location=Location(point=Point(1, 2, 6), labware=None),
-            well_core=source_well,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
-        ),
-        mock_instrument_core.dispense(
-            location=Location(Point(x=2, y=4, z=7), labware=None),
-            well_core=None,
-            volume=air_gap_volume,
-            rate=1,
-            flow_rate=expected_air_gap_flow_rate,
-            in_place=True,
-            push_out=0,
-            correction_volume=air_gap_correction_by_vol,
-        ),
-        mock_instrument_core.delay(0.5),
-        mock_instrument_core.configure_for_volume(123),
-        mock_instrument_core.prepare_to_aspirate(),
         tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(x=2, y=4, z=7), labware=None),
             well_location=Location(Point(x=1, y=2, z=3), labware=None),
@@ -167,6 +141,11 @@ def test_submerge_without_lpd(
             minimum_z_height=None,
             speed=None,
         ),
+        mock_instrument_core.remove_air_gap_during_transfer_with_liquid_class(
+            last_air_gap=air_gap_volume,
+            dispense_props=sample_transfer_props.dispense,
+            location=Location(Point(x=2, y=4, z=7), labware=None),
+        ),
         mock_instrument_core.move_to(
             location=Location(Point(1, 2, 3), labware=None),
             well_core=source_well,
@@ -178,7 +157,7 @@ def test_submerge_without_lpd(
     )
 
 
-def test_submerge_with_lpd(
+def test_submerge_without_starting_air_gap(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     sample_transfer_props: TransferProperties,
@@ -187,14 +166,12 @@ def test_submerge_with_lpd(
     source_well = decoy.mock(cls=WellCore)
     well_top_point = Point(1, 2, 4)
     well_bottom_point = Point(4, 5, 6)
-    air_gap_flow_rate_by_vol = 1234
-    air_gap_correction_by_vol = 0.321
-
+    air_gap_volume = 0
     sample_transfer_props.dispense.flow_rate_by_volume.set_for_volume(
-        123, air_gap_flow_rate_by_vol
+        air_gap_volume, 1234
     )
     sample_transfer_props.dispense.correction_by_volume.set_for_volume(
-        123, air_gap_correction_by_vol
+        air_gap_volume, 1234
     )
 
     subject = TransferComponentsExecutor(
@@ -204,44 +181,30 @@ def test_submerge_with_lpd(
         target_well=source_well,
         tip_state=TipState(
             ready_to_aspirate=True,
-            last_liquid_and_air_gap_in_tip=LiquidAndAirGapPair(liquid=0, air_gap=123),
+            last_liquid_and_air_gap_in_tip=LiquidAndAirGapPair(
+                liquid=0, air_gap=air_gap_volume
+            ),
         ),
         transfer_type=TransferType.ONE_TO_ONE,
     )
     decoy.when(source_well.get_bottom(0)).then_return(well_bottom_point)
     decoy.when(source_well.get_top(0)).then_return(well_top_point)
     decoy.when(source_well.get_top(2)).then_return(Point(1, 2, 6))
-    decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(True)
     subject.submerge(
         submerge_properties=sample_transfer_props.aspirate.submerge,
         post_submerge_action="aspirate",
-        volume_for_pipette_mode_configuration=123,
     )
-
     decoy.verify(
-        mock_instrument_core.move_to(
-            location=Location(point=Point(1, 2, 6), labware=None),
-            well_core=source_well,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
-        ),
-        mock_instrument_core.dispense(
+        tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(x=2, y=4, z=7), labware=None),
-            well_core=None,
-            volume=123,
-            rate=1,
-            flow_rate=air_gap_flow_rate_by_vol,
-            in_place=True,
-            push_out=0,
-            correction_volume=air_gap_correction_by_vol,
+            well_location=Location(Point(x=1, y=2, z=3), labware=None),
+            well_core=source_well,
+            location_check_descriptors=LocationCheckDescriptors(
+                location_type="submerge start",
+                pipetting_action="aspirate",
+            ),
+            logger=matchers.Anything(),
         ),
-        mock_instrument_core.delay(0.5),
-        mock_instrument_core.liquid_probe_with_recovery(
-            source_well, Location(Point(x=2, y=4, z=7), labware=None)
-        ),
-        mock_instrument_core.configure_for_volume(123),
-        mock_instrument_core.prepare_to_aspirate(),
         mock_instrument_core.move_to(
             location=Location(Point(x=2, y=4, z=7), labware=None),
             well_core=source_well,
@@ -299,7 +262,6 @@ def test_submerge_raises_when_submerge_point_is_invalid(
         subject.submerge(
             submerge_properties=sample_transfer_props.aspirate.submerge,
             post_submerge_action="aspirate",
-            volume_for_pipette_mode_configuration=123,
         )
 
 
@@ -318,7 +280,9 @@ def test_aspirate_and_wait(
 ) -> None:
     """It should execute an aspirate and a delay according to properties."""
     source_well = decoy.mock(cls=WellCore)
-    sample_transfer_props.aspirate.position_reference = position_reference
+    sample_transfer_props.aspirate.aspirate_position.position_reference = (
+        position_reference
+    )
     aspirate_flow_rate = (
         sample_transfer_props.aspirate.flow_rate_by_volume.get_for_volume(10)
     )
@@ -387,7 +351,9 @@ def test_dispense_and_wait(
 ) -> None:
     """It should execute a dispense and a delay according to properties."""
     source_well = decoy.mock(cls=WellCore)
-    sample_transfer_props.dispense.position_reference = position_reference
+    sample_transfer_props.dispense.dispense_position.position_reference = (
+        position_reference
+    )
     dispense_flow_rate = (
         sample_transfer_props.dispense.flow_rate_by_volume.get_for_volume(10)
     )
@@ -898,22 +864,19 @@ Single dispense properties:
 
 "singleDispense": {
     "submerge": {
-      "positionReference": "well-top",
-      "offset": {"x": 30, "y": 20, "z": 10},
+      "startPosition": {"positionReference": "well-top", "offset": {"x": 30, "y": 20, "z": 10}},
       "speed": 100,
       "delay": {"enable": true, "params": { "duration": 0.0 }}
     },
     "retract": {
-      "positionReference": "well-top",
-      "offset": {"x": 11, "y": 22, "z": 33},
+      "endPosition": {"positionReference": "well-top", "offset": {"x": 11, "y": 22, "z": 33}},
       "speed": 50,
       "airGapByVolume": [[1.0, 0.1], [49.9, 0.1], [50.0, 0.0]],
       "blowout": { "enable": true , "params": {"location": "source", "flowRate": 100}},
-      "touchTip": { "enable": true, "params": { "zOffset": -1, "mmToEdge": 0.5, "speed": 30}},
+      "touchTip": { "enable": true, "params": { "zOffset": -1, "mmFromEdge": 0.5, "speed": 30}},
       "delay": {"enable": true, "params": { "duration": 10 }}
     },
-    "positionReference": "well-bottom",
-    "offset": {"x": 33, "y": 22, "z": 11},
+    "dispensePosition": {"positionReference": "well-bottom", "offset": {"x": 33, "y": 22, "z": 11}},
     "flowRateByVolume": [[1.0, 50.0]],
     "correctionByVolume": [[0.0, 0.0]],
     "mix": { "enable": true, "params": { "repetitions": 1, "volume": 50 }},
@@ -1701,7 +1664,7 @@ def test_multi_dispense_retract_raises_for_invalid_retract_point(
         (
             PositionReference.LIQUID_MENISCUS,
             Coordinate(x=41, y=42, z=43),
-            Point(51, 53, 55),
+            Point(45, 47, 61),
         ),
     ],
 )
@@ -1717,15 +1680,24 @@ def test_absolute_point_from_position_reference_and_offset(
     well_top_point = Point(1, 2, 3)
     well_bottom_point = Point(4, 5, 6)
     well_center_point = Point(7, 8, 9)
-    liquid_meniscus_point = Point(10, 11, 12)
+    estimated_liquid_height = 12
     decoy.when(well.get_bottom(0)).then_return(well_bottom_point)
     decoy.when(well.get_top(0)).then_return(well_top_point)
     decoy.when(well.get_center()).then_return(well_center_point)
-    decoy.when(well.get_meniscus()).then_return(liquid_meniscus_point)
+    decoy.when(
+        well.estimate_liquid_height_after_pipetting(
+            operation_volume=123, mount=Mount.RIGHT
+        ),
+    ).then_return(estimated_liquid_height)
+    decoy.when(well.get_bottom(12)).then_return(Point(4, 5, 18))
 
     assert (
         absolute_point_from_position_reference_and_offset(
-            well=well, position_reference=position_reference, offset=offset
+            well=well,
+            well_volume_difference=123,
+            position_reference=position_reference,
+            offset=offset,
+            mount=Mount.RIGHT,
         )
         == expected_result
     )
@@ -1739,6 +1711,8 @@ def test_absolute_point_from_position_reference_and_offset_raises_errors(
     with pytest.raises(ValueError, match="Unknown position reference"):
         absolute_point_from_position_reference_and_offset(
             well=well,
+            well_volume_difference=123,
             position_reference="PositionReference",  # type: ignore[arg-type]
             offset=Coordinate(x=0, y=0, z=0),
+            mount=Mount.RIGHT,
         )
