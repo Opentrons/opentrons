@@ -7,6 +7,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Divider,
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
@@ -23,7 +24,6 @@ import {
   parseAllRequiredModuleModels,
 } from '@opentrons/shared-data'
 
-import { Line } from '/app/atoms/structure'
 import { InfoMessage } from '/app/molecules/InfoMessage'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
@@ -399,7 +399,7 @@ export function ProtocolRunSetup({
                     </SetupStep>
                   )}
                   {index !== orderedSteps.length - 1 ? (
-                    <Line marginTop={SPACING.spacing24} />
+                    <Divider marginTop={SPACING.spacing24} marginBottom={0} />
                   ) : null}
                 </Flex>
               )
