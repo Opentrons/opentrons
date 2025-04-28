@@ -846,7 +846,7 @@ if __name__ == "__main__":
     else:
         with open(path + cal_fn, 'r') as openfile:
             deck_slot = json.load(openfile)
-    tip_length = {"T1K": 95.6, "T200": 58.35, "T50": 57.9}
+    tip_length = {"T1K": 95.6, "T200": 58.35, "T50": 57.9, "T20": 52.0}
     tip_overlap = 10.5
     if args.mount == "left":
         mount = OT3Mount.LEFT
