@@ -34,6 +34,7 @@ import { InterventionModal as InterventionModalMolecule } from '/app/molecules/I
 import { getIsOnDevice } from '/app/redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
+import { StackerEmptyInterventionContent } from './StackerEmptyInterventionContent'
 import { isInterventionCommand } from './utils'
 import { useRobotType } from '/app/redux-resources/robots'
 import { InlineNotification } from '/app/atoms/InlineNotification'
@@ -156,6 +157,13 @@ export function InterventionModal({
             isOnDevice={isOnDevice}
           />
         )
+      case 'flexStacker/empty':
+        return (
+          <StackerEmptyInterventionContent
+            {...{ command, run, analysis, robotType }}
+            isOnDevice={isOnDevice}
+          />
+        )
       default:
         console.warn(
           'Unhandled command passed to InterventionModal: ',
@@ -181,6 +189,13 @@ export function InterventionModal({
           headerTitle: t('move_labware_on', { robot_name: robotName }),
           headerTitleOnDevice: t('move_labware'),
           iconSize: SPACING.spacing32,
+        }
+      case 'flexStacker/empty':
+        return {
+          iconName: null,
+          headerTitle: t('empty_stacker', { robot_name: robotName }),
+          headerTitleOnDevice: t('empty_stacker'),
+          iconSize: undefined,
         }
       default:
         console.warn(
