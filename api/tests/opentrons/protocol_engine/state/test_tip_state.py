@@ -17,7 +17,7 @@ from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.tips import TipStore, TipView, TipRackWellState
+from opentrons.protocol_engine.state.tips import TipStore, TipView, _TipRackWellState
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     FlowRates,
@@ -1525,13 +1525,15 @@ def test_handle_batch_labware_loaded_update(
         )
     )
 
+    # todo(mm, 2025-04-28): Test observable behavior as seen through TipView,
+    # instead of inspecting TipState directly.
     assert "some-labware-id" in subject._state.tips_by_labware_id
     assert "some-other-labware-id" in subject._state.tips_by_labware_id
     for well_state in subject._state.tips_by_labware_id["some-labware-id"].values():
-        assert well_state == TipRackWellState.CLEAN
+        assert well_state == _TipRackWellState.CLEAN
     for well_state in subject._state.tips_by_labware_id[
         "some-other-labware-id"
     ].values():
-        assert well_state == TipRackWellState.CLEAN
+        assert well_state == _TipRackWellState.CLEAN
     assert "some-labware-id" in subject._state.column_by_labware_id
     assert "some-other-labware-id" in subject._state.column_by_labware_id
