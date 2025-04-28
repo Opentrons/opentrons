@@ -196,11 +196,11 @@ class GeometryView:
 
         return self._get_highest_z_from_labware_data(labware_data)
 
-    def _is_deck_obstacle(self, labware_id: str) -> bool:
+    def _is_obstacle_labware(self, labware_id: str) -> bool:
         """Check if the labware is a deck obstacle."""
         for loc in self.get_location_sequence(labware_id):
-            if isinstance(
-                loc, [InStackerHopperLocation, NotOnDeckLocationSequenceComponent]
+            if isinstance(loc, InStackerHopperLocation) or isinstance(
+                loc, NotOnDeckLocationSequenceComponent
             ):
                 return False
         # TODO: (AA 4/28/25) re-evaluate this logic, this doesn't make sense
@@ -209,29 +209,36 @@ class GeometryView:
             return False
         return True
 
-    def get_all_obstacle_highest_z(self) -> float:
-        """Get the highest Z-point across all obstacles that the instruments need to fly over."""
-        highest_labware_z = max(
+    def _get_tallest_obstacle_labware(self) -> float:
+        """Get the highest Z-point of all labware on the deck."""
+        all_labware = self._labware.get_all()
+        if not all_labware:
+            return 0.0
+        return max(
             (
                 self._get_highest_z_from_labware_data(lw_data)
-                for lw_data in self._labware.get_all()
-                if self._is_deck_obstacle(lw_data.id)
+                for lw_data in all_labware
+                if self._is_obstacle_labware(lw_data.id)
             ),
             default=0.0,
         )
 
+    def _get_tallest_obstacle_module(self) -> float:
+        """Get the highest Z-point of all modules on the deck."""
+        all_module = self._modules.get_all()
+        if not all_module:
+            return 0.0
         # Fixme (spp, 2023-12-04): the overall height is not the true highest z of modules
         #  on a Flex.
-        highest_module_z = max(
-            (
-                self._modules.get_overall_height(module.id)
-                for module in self._modules.get_all()
-            ),
+        return max(
+            (self._modules.get_overall_height(module.id) for module in all_module),
             default=0.0,
         )
 
-        cutout_fixture_names = self._addressable_areas.get_all_cutout_fixtures()
-        if cutout_fixture_names is None:
+    def _get_tallest_obstacle_fixture(self) -> float:
+        """Get the highest Z-point of all fixtures on the deck."""
+        all_fixtures = self._addressable_areas.get_all_cutout_fixtures()
+        if all_fixtures is None:
             # We're using a simulated deck config (see `Config.use_simulated_deck_config`).
             # We only know the addressable areas referenced by the protocol, not the fixtures
             # providing them. And there is more than one possible configuration of fixtures
@@ -242,20 +249,21 @@ class GeometryView:
             # fixture must be on the deck, and then it uses long tips that wouldn't be able to
             # clear the top of that fixture. We should perhaps raise an analysis error for that,
             # but defaulting to 0 here means we won't.
-            highest_fixture_z = 0.0
-        else:
-            highest_fixture_z = max(
-                (
-                    self._addressable_areas.get_fixture_height(cutout_fixture_name)
-                    for cutout_fixture_name in cutout_fixture_names
-                ),
-                default=0.0,
-            )
-
+            return 0.0
         return max(
-            highest_labware_z,
-            highest_module_z,
-            highest_fixture_z,
+            (
+                self._addressable_areas.get_fixture_height(cutout_fixture_name)
+                for cutout_fixture_name in all_fixtures
+            ),
+            default=0.0,
+        )
+
+    def get_all_obstacle_highest_z(self) -> float:
+        """Get the highest Z-point across all obstacles that the instruments need to fly over."""
+        return max(
+            self._get_tallest_obstacle_labware(),
+            self._get_tallest_obstacle_module(),
+            self._get_tallest_obstacle_fixture(),
         )
 
     def get_highest_z_in_slot(
