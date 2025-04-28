@@ -491,11 +491,13 @@ class TransferComponentsExecutor:
                 minimum_z_height=None,
                 speed=retract_props.speed,
             )
-            retract_delay = retract_props.delay
-            if retract_delay.enabled and retract_delay.duration:
-                self._instrument.delay(retract_delay.duration)
         else:
             retract_location = self._target_location
+
+        # TODO should we delay here for a trash despite not having a "retract"?
+        retract_delay = retract_props.delay
+        if retract_delay.enabled and retract_delay.duration:
+            self._instrument.delay(retract_delay.duration)
 
         blowout_props = retract_props.blowout
         if (
