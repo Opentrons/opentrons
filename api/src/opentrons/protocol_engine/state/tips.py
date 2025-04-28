@@ -41,7 +41,7 @@ class TipState:
     """State of all tips."""
 
     tips_by_labware_id: Dict[str, _TipRackStateByWellName]
-    column_by_labware_id: Dict[str, List[List[str]]]
+    columns_by_labware_id: Dict[str, List[List[str]]]
 
     pipette_info_by_pipette_id: Dict[str, _PipetteInfo]
 
@@ -55,7 +55,7 @@ class TipStore(HasState[TipState], HandlesActions):
         """Initialize a liquid store and its state."""
         self._state = TipState(
             tips_by_labware_id={},
-            column_by_labware_id={},
+            columns_by_labware_id={},
             pipette_info_by_pipette_id={},
         )
 
@@ -107,7 +107,7 @@ class TipStore(HasState[TipState], HandlesActions):
                     for column in definition.ordering
                     for well_name in column
                 }
-                self._state.column_by_labware_id[labware_id] = [
+                self._state.columns_by_labware_id[labware_id] = [
                     column for column in definition.ordering
                 ]
         if state_update.batch_loaded_labware != update_types.NO_CHANGE:
@@ -121,12 +121,12 @@ class TipStore(HasState[TipState], HandlesActions):
                         for column in definition.ordering
                         for well_name in column
                     }
-                    self._state.column_by_labware_id[labware_id] = [
+                    self._state.columns_by_labware_id[labware_id] = [
                         column for column in definition.ordering
                     ]
 
     def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
-        columns = self._state.column_by_labware_id.get(labware_id, [])
+        columns = self._state.columns_by_labware_id.get(labware_id, [])
         wells = self._state.tips_by_labware_id.get(labware_id, {})
         nozzle_map = self._state.pipette_info_by_pipette_id[pipette_id].nozzle_map
         for well in wells_covered_dense(nozzle_map, well_name, columns):
@@ -155,7 +155,7 @@ class TipView:
     ) -> Optional[str]:
         """Get the next available clean tip. Does not support use of a starting tip if the pipette used is in a partial configuration."""
         wells = self._state.tips_by_labware_id.get(labware_id, {})
-        columns = self._state.column_by_labware_id.get(labware_id, [])
+        columns = self._state.columns_by_labware_id.get(labware_id, [])
 
         # TODO(sf): I'm pretty sure this can be replaced with wells_covered_96 but I'm not quite sure how
         def _identify_tip_cluster(
