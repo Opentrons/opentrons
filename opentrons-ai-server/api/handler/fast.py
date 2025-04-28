@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import re
 import time
 from typing import Annotated, Any, Awaitable, Callable, List, Literal, Optional, Union, cast
 
@@ -223,14 +224,25 @@ def _generate_llm_response(
 def _format_response(response: Optional[str], protocol_format: Optional[ProtocolFormat], is_fake: bool) -> ChatResponse:
     """Format the LLM response according to the protocol format."""
     if response is None or response == "":
-        return ChatResponse(reply="No response was generated", fake=bool(is_fake))
+        return ChatResponse(reply="No response was generated, please try again.", fake=bool(is_fake))
 
     if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
         logger.debug("Formatting response for Protocol Designer")
         try:
-            pd_content = claude.fillup_pd(response)
-            pd_json = json.loads(pd_content)
-            return ChatResponse(reply="Here is your Protocol Designer protocol", fake=bool(is_fake), protocol_content=pd_json)
+            tag = "LIMITATION_REPLY"
+            if f"<{tag}>" in response:
+                pattern = rf"<{tag}>\s*(.*?)\s*</{tag}>"
+                match = re.search(pattern, response, flags=re.DOTALL | re.IGNORECASE)
+                if match is not None:
+                    return ChatResponse(reply=match.group(1).strip(), fake=bool(is_fake))
+                # Fallback if pattern unexpectedly not found
+                return ChatResponse(
+                    reply=f"LLM limitation reply detected but could not parse message. {response[:200]}", fake=bool(is_fake)
+                )
+            else:
+                pd_content = claude.fillup_pd(response)
+                pd_json = json.loads(pd_content)
+                return ChatResponse(reply="Here is your Protocol Designer protocol", fake=bool(is_fake), protocol_content=pd_json)
         except json.JSONDecodeError as e:
             logger.error(f"JSON parsing error: {str(e)}", extra={"response": response[:100]})
             return ChatResponse(reply=f"Failed to parse Protocol Designer JSON: {str(e)}", fake=bool(is_fake))
@@ -273,7 +285,6 @@ async def create_chat_completion(
             protocol_format=protocol_format,
             protocol_action=protocol_action,
         )
-
         return _format_response(response, protocol_format, bool(body.fake))
 
     except Exception as e:

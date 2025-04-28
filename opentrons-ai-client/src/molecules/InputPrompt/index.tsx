@@ -147,19 +147,23 @@ export function InputPrompt(): JSX.Element {
           ? chatHistory
           : chatHistory.map(msg => {
               if (msg.protocol_content != null) {
-                const rawPdJson: Record<string, unknown> =
-                  typeof msg.protocol_content === 'string'
-                    ? (() => {
-                        try {
-                          return JSON.parse(msg.protocol_content)
-                        } catch {
-                          return {}
-                        }
-                      })()
-                    : ((msg.protocol_content as unknown) as Record<
-                        string,
-                        unknown
-                      >)
+                const rawPdJson: Record<string, unknown> = (() => {
+                  let parsed: unknown
+                  if (typeof msg.protocol_content === 'string') {
+                    try {
+                      parsed = JSON.parse(msg.protocol_content)
+                    } catch {
+                      parsed = {}
+                    }
+                  } else {
+                    parsed = msg.protocol_content as unknown
+                  }
+
+                  // Ensure result is a non-null object; otherwise fall back to {}
+                  return parsed != null && typeof parsed === 'object'
+                    ? (parsed as Record<string, unknown>)
+                    : {}
+                })()
 
                 // Remove labwareDefinitions without using the `delete` operator
                 const {
