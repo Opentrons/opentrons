@@ -4127,6 +4127,7 @@ def test_get_location_sequence_deck_slot(
             cutoutId="cutoutC2", possibleCutoutFixtureIds=["singleCenterSlot"]
         ),
     ]
+    assert subject._is_deck_obstacle("labware-id-1")
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -4189,6 +4190,7 @@ def test_get_location_sequence_module(
             cutoutId="cutoutA3", possibleCutoutFixtureIds=["temperatureModuleV2"]
         ),
     ]
+    assert subject._is_deck_obstacle("labware-id-1")
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -4265,6 +4267,7 @@ def test_get_location_sequence_module_with_adapter(
             cutoutId="cutoutA3", possibleCutoutFixtureIds=["temperatureModuleV2"]
         ),
     ]
+    assert subject._is_deck_obstacle("labware-id-1")
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -4292,6 +4295,7 @@ def test_get_location_sequence_off_deck(
     assert location_sequence == [
         NotOnDeckLocationSequenceComponent(logicalLocationName=OFF_DECK_LOCATION)
     ]
+    assert not subject._is_deck_obstacle("labware-id-1")
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -4355,6 +4359,7 @@ def test_get_location_sequence_stacker_hopper(
             cutoutId="cutoutA3",
         ),
     ]
+    assert not subject._is_deck_obstacle("labware-id-1")
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -4416,6 +4421,7 @@ def test_get_predicted_location_sequence_with_pending_labware(
             cutoutId="cutoutA3", possibleCutoutFixtureIds=["temperatureModuleV2"]
         ),
     ]
+    assert subject._is_deck_obstacle("adapter-id-1")
 
 
 @pytest.mark.parametrize("use_mocks", [False])

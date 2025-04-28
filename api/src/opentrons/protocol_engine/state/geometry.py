@@ -196,15 +196,16 @@ class GeometryView:
 
         return self._get_highest_z_from_labware_data(labware_data)
 
-    def is_deck_obstacle(self, lw_data: LoadedLabware) -> bool:
+    def _is_deck_obstacle(self, labware_id: str) -> bool:
         """Check if the labware is a deck obstacle."""
-        # is it offdeck?
-        if isinstance(
-            lw_data.location, InStackerHopperLocation
-        ) or lw_data.location in [OFF_DECK_LOCATION, SYSTEM_LOCATION]:
-            return False
-        # is it a lid?
-        if self._labware.get_labware_by_lid_id(lw_data.id) is not None:
+        for loc in self.get_location_sequence(labware_id):
+            if isinstance(
+                loc, [InStackerHopperLocation, NotOnDeckLocationSequenceComponent]
+            ):
+                return False
+        # TODO: (AA 4/28/25) re-evaluate this logic, this doesn't make sense
+        # to me but keeping it to preserve existing behavior
+        if self._labware.get_labware_by_lid_id(labware_id) is not None:
             return False
         return True
 
@@ -214,7 +215,7 @@ class GeometryView:
             (
                 self._get_highest_z_from_labware_data(lw_data)
                 for lw_data in self._labware.get_all()
-                if self.is_deck_obstacle(lw_data)
+                if self._is_deck_obstacle(lw_data.id)
             ),
             default=0.0,
         )
