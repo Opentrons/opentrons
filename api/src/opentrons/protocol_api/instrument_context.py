@@ -498,6 +498,7 @@ class InstrumentContext(publisher.CommandPublisher):
         rate: float = 1.0,
         aspirate_delay: Optional[float] = None,
         dispense_delay: Optional[float] = None,
+        final_push_out: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Mix a volume of liquid by repeatedly aspirating and dispensing it in a single location.
@@ -524,6 +525,8 @@ class InstrumentContext(publisher.CommandPublisher):
                      :ref:`new-plunger-flow-rates`.
         :param aspirate_delay: How long to wait after each aspirate in the mix, in seconds.
         :param dispense_delay: How long to wait after each dispense in the mix, in seconds.
+        :param final_push_out: Optional ``push_out`` value. If not specified, it will emit the
+                               default non-zero amount.
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
         :returns: This instance.
 
@@ -537,7 +540,7 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.21
             Does not repeatedly check for liquid presence.
         .. versionchanged:: 2.24
-            Adds the ``aspirate_delay`` and ``dispense_delay`` parameters.
+            Adds the ``aspirate_delay``, ``dispense_delay``, and ``final_push_out`` parameters.
         """
         _log.debug(
             "mixing {}uL with {} repetitions in {} at rate={}".format(
@@ -561,6 +564,12 @@ class InstrumentContext(publisher.CommandPublisher):
         if dispense_delay and self.api_version < APIVersion(2, 24):
             raise APIVersionError(
                 api_element="dispense_delay",
+                until_version="2.24",
+                current_version=f"{self._api_version}",
+            )
+        if final_push_out and self.api_version < APIVersion(2, 24):
+            raise APIVersionError(
+                api_element="final_push_out",
                 until_version="2.24",
                 current_version=f"{self._api_version}",
             )
@@ -611,7 +620,10 @@ class InstrumentContext(publisher.CommandPublisher):
                     # aspirate location was set above, do subsequent aspirates in-place:
                     aspirate_with_delay(location=None)
                     repetitions -= 1
-                dispense_with_delay(push_out=None)
+                if self.api_version >= APIVersion(2, 24) and final_push_out is not None:
+                    dispense_with_delay(push_out=final_push_out)
+                else:
+                    dispense_with_delay(push_out=None)
         return self
 
     @requires_version(2, 0)
