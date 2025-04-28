@@ -1,12 +1,10 @@
+import { useCommandTextString } from '/app/local-resources/commands'
+import type { UseCommandTextStringParams } from '/app/local-resources/commands'
+import type { StepCounts } from '/app/resources/protocols/hooks'
 import { useTranslation } from 'react-i18next'
-
 import { useToaster } from '../../ToasterOven'
 import { RECOVERY_MAP } from '../constants'
-import { useCommandTextString } from '/app/local-resources/commands'
-
-import type { StepCounts } from '/app/resources/protocols/hooks'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
-import type { UseCommandTextStringParams } from '/app/local-resources/commands'
 
 export type BuildToast = Omit<UseCommandTextStringParams, 'command'> & {
   isOnDevice: boolean
@@ -158,13 +156,12 @@ export function getStepNumber(
 
 // Recovery options can be categorized into broad categories of behavior, currently performing the same step again
 // or skipping to the next step.
-function handleRecoveryOptionAction<T>(
+export function handleRecoveryOptionAction<T>(
   selectedRecoveryOption: CurrentRecoveryOptionUtils['selectedRecoveryOption'],
   currentStepReturnVal: T,
   nextStepReturnVal: T
 ): T | null {
   switch (selectedRecoveryOption) {
-    case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE:
     case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
     case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
     case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
@@ -176,8 +173,11 @@ function handleRecoveryOptionAction<T>(
     case RECOVERY_MAP.RETRY_STEP.ROUTE:
     case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
     case RECOVERY_MAP.HOME_AND_RETRY.ROUTE:
+    case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
+    case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE:
       return currentStepReturnVal
     default: {
+      console.error('Unhandled recovery toast case. Handle explicitly.')
       return null
     }
   }
