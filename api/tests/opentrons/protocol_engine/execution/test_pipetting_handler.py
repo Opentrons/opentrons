@@ -332,7 +332,10 @@ async def test_hw_aspirate_while_tracking(
 
     decoy.when(
         mock_state_view.geometry.get_liquid_handling_z_change(
-            labware_id="labware-id", well_name="A1", operation_volume=-25.0
+            labware_id="labware-id",
+            well_name="A1",
+            pipette_id="pipette_id",
+            operation_volume=-25.0,
         )
     ).then_return(4.544)
 
