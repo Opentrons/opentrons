@@ -593,12 +593,6 @@ def test_blow_out_to_well_meniscus_location(
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
-    decoy.when(
-        mock_validation.validate_location(
-            location=input_location, last_location=last_location
-        )
-    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
-
     subject.blow_out(location=input_location)
 
     mock_instrument_core.blow_out(
