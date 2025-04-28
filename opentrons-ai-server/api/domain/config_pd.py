@@ -97,6 +97,10 @@ Please refer to <TIP_HANDLING> in <DOCUMENTS>
     - "labwareId" is an ID that is generated automatically.
     - If description says a specific tiprack such as `opentrons_96_tiprack_20ul`, then use it. Do not use `opentrons_96_tiprack_300ul`.
     - `Filter tiprack` and `tiprack` are different things: opentrons_96_tiprack_20ul vs opentrons_96_filtertiprack_20ul
+    - Unless otherwise specified, when a moveLiquid step is used, the trash bin should be specified as
+      `"trashBinLocationUpdate": "trashbin-1": "cutout12" ` in the `__INITIAL_DECK_SETUP_STEP__`.
+      Correspondingly, in the moveLiquid step, the `"dropTip_location"` field must be specified as
+      `"dropTip_location": "trashbin-1"`, not `"dropTip_location": "trashId"`.
 
 10. Steptype rules
     - if thermocycler is used, then it must be opened before transfer liquid.
