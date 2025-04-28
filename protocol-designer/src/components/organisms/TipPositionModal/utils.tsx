@@ -1,15 +1,27 @@
 import floor from 'lodash/floor'
 import round from 'lodash/round'
-import { getIsTouchTipField } from '../../../form-types'
+
+import {
+  POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_CENTER,
+  POSITION_REFERENCE_TOP,
+} from '@opentrons/shared-data'
+
 import {
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
+import { getIsTouchTipField } from '../../../form-types'
 import { DECIMALS_ALLOWED, TOO_MANY_DECIMALS } from './constants'
+
+import type { PositionReference } from '@opentrons/shared-data'
 import type { StepFieldName } from '../../../form-types'
 
-export function getDefaultMmFromEdge(args: { name: StepFieldName }): number {
-  const { name } = args
+export function getDefaultMmFromEdge(args: {
+  name: StepFieldName
+  wellDepth?: number
+}): number {
+  const { name, wellDepth = 0 } = args
 
   switch (name) {
     case 'mix_mmFromBottom':
@@ -20,7 +32,9 @@ export function getDefaultMmFromEdge(args: { name: StepFieldName }): number {
     case 'aspirate_retract_mmFromBottom':
     case 'dispense_retract_mmFromBottom':
       return DEFAULT_MM_OFFSET_FROM_BOTTOM
-
+    case 'aspirate_submerge_mmFromBottom':
+    case 'dispense_submerge_mmFromBottom':
+      return round(wellDepth + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP, 1)
     default:
       // touch tip fields
       console.assert(
@@ -106,4 +120,40 @@ export const getMinMaxWidth = (width: number): MinMaxValues => {
     minValue: -width * 0.5,
     maxValue: width * 0.5,
   }
+}
+
+export const getMmFromBottom = (
+  zValue: number,
+  reference: PositionReference,
+  wellDepth: number
+): number => {
+  switch (reference) {
+    case POSITION_REFERENCE_BOTTOM:
+      return zValue
+    case POSITION_REFERENCE_CENTER:
+      return wellDepth / 2 + zValue
+    case POSITION_REFERENCE_TOP:
+      return wellDepth + zValue
+    default:
+      return zValue
+  }
+}
+
+export const getIsZValueAtBottom = (
+  zValue: string,
+  wellDepth: number,
+  reference: PositionReference
+): boolean => {
+  let minZValue = 0
+  switch (reference) {
+    case POSITION_REFERENCE_CENTER:
+      minZValue = -wellDepth / 2
+      break
+    case POSITION_REFERENCE_TOP:
+      minZValue = -wellDepth
+      break
+    default:
+      break
+  }
+  return round(parseFloat(zValue), 1) === round(minZValue, 1)
 }

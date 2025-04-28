@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { NavLink, Navigate, useParams, useNavigate } from 'react-router-dom'
+import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom'
+import isEmpty from 'lodash/isEmpty'
 import styled, { css } from 'styled-components'
 
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   BORDERS,
   Box,
@@ -22,24 +23,25 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
-import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
-import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
-import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
 import { BackToTopButton } from '/app/organisms/Desktop/Devices/ProtocolRun/BackToTopButton'
+import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import {
-  useCurrentRunId,
-  useMostRecentCompletedAnalysis,
-  useRunHasStarted,
-  useModuleRenderInfoForProtocolById,
-  useRunStatuses,
-} from '/app/resources/runs'
+import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
+import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { useRobot, useRobotType } from '/app/redux-resources/robots'
+import {
+  useCurrentRunId,
+  useModuleRenderInfoForProtocolById,
+  useMostRecentCompletedAnalysis,
+  useRunStatuses,
+} from '/app/resources/runs'
 
 import type { ViewportListRef } from 'react-viewport-list'
 import type { DesktopRouteParams, ProtocolRunDetailsTab } from '/app/App/types'
@@ -297,24 +299,37 @@ interface SetupTabProps {
   protocolRunDetailsTab?: ProtocolRunDetailsTab
 }
 
+const RUN_STATUS_POLL_MS = 5000
+
 const SetupTab = (props: SetupTabProps): JSX.Element | null => {
   const { robotName, runId, protocolRunDetailsTab } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
+  const currentRunStatus = useCurrentRunStatus({
+    refetchInterval: RUN_STATUS_POLL_MS,
+  })
   const navigate = useNavigate()
-  const runHasStarted = useRunHasStarted(currentRunId)
   const disabled = currentRunId !== runId
   const tabDisabledReason = `${t('setup')} ${t(
     'not_available_for_a_completed_run'
   )}`
 
-  // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
-  // If "run again" is clicked, the user should NOT be directed back to the "setup" tab.
   useEffect(() => {
-    if (runHasStarted && protocolRunDetailsTab !== 'run-preview') {
+    // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
+    if (
+      currentRunStatus !== RUN_STATUS_IDLE &&
+      protocolRunDetailsTab !== 'run-preview'
+    ) {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     }
-  }, [runHasStarted])
+    // On initial render or on a clone run, navigate to "run setup" if the run hasn't started.
+    else if (
+      currentRunStatus === RUN_STATUS_IDLE &&
+      protocolRunDetailsTab !== 'setup'
+    ) {
+      navigate(`/devices/${robotName}/protocol-runs/${runId}/setup`)
+    }
+  }, [currentRunStatus])
 
   return (
     <RoundTab

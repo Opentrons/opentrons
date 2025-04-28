@@ -1,5 +1,7 @@
-import { it, describe, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
+
 import { volumeTooHigh } from '../errors'
 
 const mockTiprack = 'mockTiprack:fixture_tiprack_10_ul/1'

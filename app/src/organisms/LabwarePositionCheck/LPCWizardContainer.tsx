@@ -1,7 +1,8 @@
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { LPCWizardFlex } from './LPCWizardFlex'
 import { LegacyLabwarePositionCheck } from '/app/organisms/LegacyLabwarePositionCheck'
+
+import { LPCWizardFlex } from './LPCWizardFlex'
 
 import type { LegacySupportLPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 
@@ -12,7 +13,14 @@ export function LPCWizardContainer(
     case FLEX_ROBOT_TYPE:
       return <LPCWizardFlex {...props} />
     case OT2_ROBOT_TYPE:
-      return <LegacyLabwarePositionCheck {...props} />
+      return (
+        <LegacyLabwarePositionCheck
+          {...props}
+          existingOffsets={props.ot2Offsets}
+          mostRecentAnalysis={props.analysis}
+          isDeletingMaintenanceRun={props.isClosing}
+        />
+      )
     default: {
       console.error('Unhandled robot type in LPC.')
       return <></>

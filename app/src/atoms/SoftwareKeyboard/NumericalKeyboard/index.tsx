@@ -1,5 +1,6 @@
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
-import { numericalKeyboardLayout, numericalCustom } from '../constants'
+
+import { numericalCustom, numericalKeyboardLayout } from '../constants'
 
 import type { MutableRefObject } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'

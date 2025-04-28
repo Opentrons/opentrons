@@ -16,6 +16,7 @@ from .movement_common import (
     LiquidHandlingWellLocationMixin,
     DestinationPositionResult,
     StallOrCollisionError,
+    move_to_well,
 )
 from .command import (
     AbstractCommandImpl,
@@ -24,13 +25,14 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
+from ..state.update_types import StateUpdate
 from ..errors.exceptions import PipetteNotReadyToAspirateError
 from opentrons.hardware_control import HardwareControlAPI
 from ..state.update_types import CLEAR
-from ..types import CurrentWell, DeckPoint
+from ..types import DeckPoint
 
 if TYPE_CHECKING:
-    from ..execution import PipettingHandler, GantryMover
+    from ..execution import PipettingHandler, GantryMover, MovementHandler
     from ..resources import ModelUtils
     from ..state.state import StateView
     from ..notes import CommandNoteAdder
@@ -75,6 +77,7 @@ class AspirateWhileTrackingImplementation(
         command_note_adder: CommandNoteAdder,
         model_utils: ModelUtils,
         gantry_mover: GantryMover,
+        movement: MovementHandler,
         **kwargs: object,
     ) -> None:
         self._pipetting = pipetting
@@ -83,6 +86,7 @@ class AspirateWhileTrackingImplementation(
         self._command_note_adder = command_note_adder
         self._model_utils = model_utils
         self._gantry_mover = gantry_mover
+        self._movement = movement
 
     async def execute(self, params: AspirateWhileTrackingParams) -> _ExecuteReturn:
         """Move to and aspirate from the requested well.
@@ -100,9 +104,22 @@ class AspirateWhileTrackingImplementation(
                 " The first aspirate following a blow-out must be from a specific well"
                 " so the plunger can be reset in a known safe position."
             )
+        state_update = StateUpdate()
 
-        current_position = await self._gantry_mover.get_position(params.pipetteId)
-        current_location = self._state_view.pipettes.get_current_location()
+        move_result = await move_to_well(
+            movement=self._movement,
+            model_utils=self._model_utils,
+            pipette_id=params.pipetteId,
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+            well_location=params.wellLocation,
+            operation_volume=-params.volume,
+        )
+        state_update.append(move_result.state_update)
+        if isinstance(move_result, DefinedErrorData):
+            return DefinedErrorData(
+                public=move_result.public, state_update=state_update
+            )
 
         aspirate_result = await aspirate_while_tracking(
             pipette_id=params.pipetteId,
@@ -112,9 +129,9 @@ class AspirateWhileTrackingImplementation(
             flow_rate=params.flowRate,
             location_if_error={
                 "retryLocation": (
-                    current_position.x,
-                    current_position.y,
-                    current_position.z,
+                    move_result.public.position.x,
+                    move_result.public.position.y,
+                    move_result.public.position.z,
                 )
             },
             command_note_adder=self._command_note_adder,
@@ -130,58 +147,40 @@ class AspirateWhileTrackingImplementation(
             z=position_after_aspirate.z,
         )
         if isinstance(aspirate_result, DefinedErrorData):
-            if (
-                isinstance(current_location, CurrentWell)
-                and current_location.pipette_id == params.pipetteId
-            ):
-                return DefinedErrorData(
-                    public=aspirate_result.public,
-                    state_update=aspirate_result.state_update.set_liquid_operated(
-                        labware_id=current_location.labware_id,
-                        well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
-                            current_location.labware_id,
-                            current_location.well_name,
-                            params.pipetteId,
-                        ),
-                        volume_added=CLEAR,
+            return DefinedErrorData(
+                public=aspirate_result.public,
+                state_update=aspirate_result.state_update.set_liquid_operated(
+                    labware_id=params.labwareId,
+                    well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                        params.labwareId,
+                        params.wellName,
+                        params.pipetteId,
                     ),
-                    state_update_if_false_positive=aspirate_result.state_update_if_false_positive,
-                )
-            else:
-                return aspirate_result
-        else:
-            if (
-                isinstance(current_location, CurrentWell)
-                and current_location.pipette_id == params.pipetteId
-            ):
-                return SuccessData(
-                    public=AspirateWhileTrackingResult(
-                        volume=aspirate_result.public.volume,
-                        position=result_deck_point,
-                    ),
-                    state_update=aspirate_result.state_update.set_liquid_operated(
-                        labware_id=current_location.labware_id,
-                        well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
-                            current_location.labware_id,
-                            current_location.well_name,
-                            params.pipetteId,
-                        ),
-                        volume_added=-aspirate_result.public.volume
-                        * self._state_view.geometry.get_nozzles_per_well(
-                            current_location.labware_id,
-                            current_location.well_name,
-                            params.pipetteId,
-                        ),
-                    ),
-                )
-            else:
-                return SuccessData(
-                    public=AspirateWhileTrackingResult(
-                        volume=aspirate_result.public.volume,
-                        position=result_deck_point,
-                    ),
-                    state_update=aspirate_result.state_update,
-                )
+                    volume_added=CLEAR,
+                ),
+                state_update_if_false_positive=aspirate_result.state_update_if_false_positive,
+            )
+
+        return SuccessData(
+            public=AspirateWhileTrackingResult(
+                volume=aspirate_result.public.volume,
+                position=result_deck_point,
+            ),
+            state_update=aspirate_result.state_update.set_liquid_operated(
+                labware_id=params.labwareId,
+                well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                    params.labwareId,
+                    params.wellName,
+                    params.pipetteId,
+                ),
+                volume_added=-aspirate_result.public.volume
+                * self._state_view.geometry.get_nozzles_per_well(
+                    params.labwareId,
+                    params.wellName,
+                    params.pipetteId,
+                ),
+            ),
+        )
 
 
 class AspirateWhileTracking(

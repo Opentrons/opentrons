@@ -1,21 +1,23 @@
 import styled, { css } from 'styled-components'
+
 import {
   formatRunTimeParameterDefaultValue,
   formatRunTimeParameterMinMax,
   orderRuntimeParameterRangeOptions,
 } from '@opentrons/shared-data'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import {
-  SPACING,
-  TYPOGRAPHY as LEGACY_TYPOGERAPHY,
-} from '../../ui-style-constants/index'
-import { TYPOGRAPHY } from '../../helix-design-system/product'
+
 import { Chip } from '../../atoms/Chip'
 import { StyledText } from '../../atoms/StyledText'
-import { LegacyTooltip, useHoverTooltip } from '../../tooltips'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { TYPOGRAPHY } from '../../helix-design-system/product'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { DISPLAY_INLINE, FLEX_MAX_CONTENT } from '../../styles'
+import { LegacyTooltip, useHoverTooltip } from '../../tooltips'
+import {
+  TYPOGRAPHY as LEGACY_TYPOGERAPHY,
+  SPACING,
+} from '../../ui-style-constants/index'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 

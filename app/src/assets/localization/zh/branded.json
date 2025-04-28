@@ -30,6 +30,7 @@
   "gripper_successfully_detached": "Flex转板抓手已成功卸下",
   "help_us_improve_send_error_report": "通过向{{support_email}}发送错误报告，帮助我们改进您的使用体验",
   "ip_description_second": "Opentrons建议您联系网络管理员，为工作站分配静态IP地址。",
+  "labware_offsets_conflict_description": "您的 Flex 存储耗材校准数据已在最后一次运行后更新 <strong>{{timestamp}}</strong>。您想使用哪些耗材校准数据来再次运行此协议？",
   "language_preference_description": "Opentrons APP默认匹配与您的系统语言，您也可以选择使用下方其他语言。当然，后续您也可以在APP设置中进行语言更改。",
   "learn_uninstalling": "了解更多有关卸载Opentrons应用程序的信息",
   "loosen_screws_and_detach": "松开螺丝并卸下Flex转板抓手",

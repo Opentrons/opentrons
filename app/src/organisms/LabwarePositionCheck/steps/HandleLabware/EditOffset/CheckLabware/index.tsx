@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -9,7 +9,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  getLabwareDisplayLocation,
   JUSTIFY_FLEX_END,
   LegacyStyledText,
   RESPONSIVENESS,
@@ -18,7 +17,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   getVectorDifference,
   getVectorSum,
   IDENTITY_VECTOR,
@@ -26,31 +24,32 @@ import {
 
 import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
 import { JogControls } from '/app/molecules/JogControls'
+import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
+import { LPCJogControlsOdd } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCJogControlsOdd'
+import { LPCLabwareJogRender } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCLabwareJogRender'
+import { getIsOnDevice } from '/app/redux/config'
 import {
-  selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
+  getFlexSlotNameOnly,
+  goBackEditOffsetSubstep,
+  proceedEditOffsetSubstep,
   selectActivePipette,
   selectIsSelectedLwTipRack,
   selectSelectedLwOverview,
-  goBackEditOffsetSubstep,
-  proceedEditOffsetSubstep,
+  selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
 } from '/app/redux/protocol-runs'
-import { getIsOnDevice } from '/app/redux/config'
-import { LPCJogControlsOdd } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCJogControlsOdd'
-import { LPCLabwareJogRender } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCLabwareJogRender'
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
-import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 
-import type { LoadedPipette, Coordinates } from '@opentrons/shared-data'
+import type { TFunction } from 'i18next'
 import type { VectorOffset } from '@opentrons/api-client'
-import type { DisplayLocationParams } from '@opentrons/components'
+import type { LoadedPipette, Vector3D } from '@opentrons/shared-data'
+import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import type {
   LPCWizardState,
-  SelectedLwOverview,
   OffsetLocationDetails,
+  SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
-import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
 interface CheckLabwareProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void
@@ -109,21 +108,11 @@ export function CheckLabware(props: CheckLabwareProps): JSX.Element {
     }
   }, [])
 
-  const buildDisplayParams = (): Omit<
-    DisplayLocationParams,
-    'detailLevel'
-  > => ({
-    t: commandTextT,
-    loadedModules: protocolData.modules,
-    loadedLabwares: protocolData.labware,
-    robotType: FLEX_ROBOT_TYPE,
-    location: selectedLwInfo.offsetLocationDetails,
-  })
-
-  const slotOnlyDisplayLocation = getLabwareDisplayLocation({
-    detailLevel: 'slot-only',
-    ...buildDisplayParams(),
-  })
+  const slotOnlyDisplayLocation = getFlexSlotNameOnly(
+    selectedLwInfo.offsetLocationDetails,
+    protocolData,
+    commandTextT as TFunction
+  )
 
   const buildSectionHeader = (): string =>
     t('check_item_in_location', {
@@ -181,7 +170,7 @@ interface CheckLabwareContentProps extends CheckLabwareProps {
   handleGoBack: () => void
   handleResetJog: () => void
   setJoggedPosition: (vector: VectorOffset) => void
-  liveOffset: Coordinates
+  liveOffset: Vector3D
   isLwTiprack: boolean
 }
 
@@ -219,9 +208,8 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
               </StyledText>
               <Trans
                 t={t}
-                i18nKey={'ensure_nozzle_position_odd'}
+                i18nKey={'ensure_probe_position_odd'}
                 values={{
-                  tip_type: t('calibration_probe'),
                   item_location: isLwTiprack
                     ? t('check_tip_location')
                     : t('check_well_location'),
@@ -309,9 +297,8 @@ function CheckLabwareContentDesktop(
             </StyledText>
             <Trans
               t={t}
-              i18nKey={'ensure_nozzle_position_desktop'}
+              i18nKey={'ensure_probe_position_desktop'}
               values={{
-                tip_type: t('calibration_probe'),
                 item_location: isLwTiprack
                   ? t('check_tip_location')
                   : t('check_well_location'),

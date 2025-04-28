@@ -1,39 +1,43 @@
+import type { LoadedLabwareLocation, RunTimeCommand } from '../command/types'
+import type { CommandAnnotation } from '../commandAnnotation/types'
+import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
-  TEMPERATURE_MODULE_V1,
-  TEMPERATURE_MODULE_V2,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
-  HEATERSHAKER_MODULE_V1,
-  ABSORBANCE_READER_V1,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
+  ABSORBANCE_READER_V1,
+  EXTENSION,
+  FLEX,
+  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
   GEN1,
   GEN2,
-  FLEX,
-  LEFT,
-  RIGHT,
   GRIPPER_V1,
   GRIPPER_V1_1,
   GRIPPER_V1_2,
   GRIPPER_V1_3,
-  EXTENSION,
+  HEATERSHAKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_V1,
+  LEFT,
+  MAGDECK,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
-  FLEX_STACKER_MODULE_V1,
-  FLEX_STACKER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+  POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_CENTER,
+  POSITION_REFERENCE_LIQUID_MENISCUS,
+  POSITION_REFERENCE_TOP,
+  RIGHT,
+  TEMPDECK,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
 } from './constants'
-import type { RunTimeCommand, LoadedLabwareLocation } from '../command/types'
-import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { PipetteName } from './pipettes'
-import type { CommandAnnotation } from '../commandAnnotation/types'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -111,12 +115,17 @@ export interface LabwareDimensions {
   zDimension: number
 }
 
-export interface Coordinates {
+export interface Vector2D {
+  x: number
+  y: number
+}
+export interface Vector3D {
   x: number
   y: number
   z: number
 }
-export type LabwareOffset = Coordinates
+
+export type LabwareOffset = Vector3D
 
 // 1. Valid pipette type for a container (i.e. is there multi channel access?)
 // 2. Is the container a tiprack?
@@ -126,6 +135,7 @@ export interface LabwareParameters {
   isTiprack: boolean
   tipLength?: number
   isMagneticModuleCompatible: boolean
+  isDeckSlotCompatible?: boolean
   magneticModuleEngageHeight?: number
   quirks?: string[]
 }
@@ -235,6 +245,21 @@ export interface LabwareWellGroup {
   brand?: LabwareBrand
 }
 
+export interface AxisAlignedBoundingBox2D {
+  backLeft: Vector2D
+  frontRight: Vector2D
+}
+
+export interface AxisAlignedBoundingBox3D {
+  backLeftBottom: Vector3D
+  frontRightTop: Vector3D
+}
+
+export interface Extents {
+  total: AxisAlignedBoundingBox3D
+  footprint: AxisAlignedBoundingBox2D
+}
+
 export type LabwareRoles =
   | 'labware'
   | 'adapter'
@@ -260,6 +285,8 @@ export interface LabwareDefinition2 {
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
   stackLimit?: number
+  compatibleParentLabware?: string[]
+  innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
 export interface LabwareDefinition3 {
@@ -268,8 +295,7 @@ export interface LabwareDefinition3 {
   schemaVersion: 3
   namespace: string
   metadata: LabwareMetadata
-  dimensions: LabwareDimensions
-  cornerOffsetFromSlot: LabwareOffset
+  extents: Extents
   parameters: LabwareParameters
   brand: LabwareBrand
   ordering: string[][]
@@ -278,6 +304,8 @@ export interface LabwareDefinition3 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
+  stackLimit?: number
+  compatibleParentLabware?: string[]
   innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
@@ -468,9 +496,9 @@ export interface ModuleLayer {
 export interface ModuleDefinition {
   moduleType: ModuleType
   model: ModuleModel
-  labwareOffset: Coordinates
+  labwareOffset: Vector3D
   dimensions: ModuleDimensions
-  cornerOffsetFromSlot: Coordinates
+  cornerOffsetFromSlot: Vector3D
   calibrationPoint: ModuleCalibrationPoint
   displayName: string
   quirks: string[]
@@ -501,6 +529,13 @@ export interface FlowRateSpec {
   value: number
   min: number
   max: number
+}
+
+interface PlungerPositionsConfiguration {
+  top: number
+  bottom: number
+  blowout: number
+  drop: number
 }
 
 interface pressAndCamConfigurationValues {
@@ -538,12 +573,8 @@ export interface PipetteV2GeneralSpecs {
     run: number
   }
   plungerPositionsConfigurations: {
-    default: {
-      top: number
-      bottom: number
-      blowout: number
-      drop: number
-    }
+    default: PlungerPositionsConfiguration
+    lowVolumeDefault?: PlungerPositionsConfiguration
   }
   availableSensors: {
     sensors: string[]
@@ -704,26 +735,31 @@ export interface Liquid {
 }
 
 // TODO(ND, 12/17/2024): investigate why typescript doesn't allow Array<[number, number]>
-type LiquidHandlingPropertyByVolume = number[][]
-type PositionReference =
-  | 'well-bottom'
-  | 'well-top'
-  | 'well-center'
-  | 'liquid-meniscus'
+export type LiquidHandlingPropertyByVolume = number[][]
+export type PositionReference =
+  | typeof POSITION_REFERENCE_BOTTOM
+  | typeof POSITION_REFERENCE_CENTER
+  | typeof POSITION_REFERENCE_TOP
+  | typeof POSITION_REFERENCE_LIQUID_MENISCUS
+
 type BlowoutLocation = 'source' | 'destination' | 'trash'
 interface DelayParams {
   duration: number
 }
-interface DelayProperties {
+export interface TipPosition {
+  positionReference: PositionReference
+  offset: Vector3D
+}
+export interface DelayProperties {
   enable: boolean
   params?: DelayParams
 }
 interface TouchTipParams {
   zOffset: number
-  mmToEdge: number
+  mmFromEdge: number
   speed: number
 }
-interface TouchTipProperties {
+export interface TouchTipProperties {
   enable: boolean
   params?: TouchTipParams
 }
@@ -732,7 +768,7 @@ interface MixParams {
   repetitions: number
   volume: number
 }
-interface MixProperties {
+export interface MixProperties {
   enable: boolean
   params?: MixParams
 }
@@ -740,52 +776,52 @@ interface BlowoutParams {
   location: BlowoutLocation
   flowRate: number
 }
-interface BlowoutProperties {
+export interface BlowoutProperties {
   enable: boolean
   params?: BlowoutParams
 }
-interface Submerge {
-  positionReference: PositionReference
-  offset: Coordinates
+export interface Submerge {
+  startPosition: TipPosition
   speed: number
   delay: DelayProperties
 }
 interface BaseRetract {
-  positionReference: PositionReference
-  offset: Coordinates
+  endPosition: TipPosition
   speed: number
   airGapByVolume: LiquidHandlingPropertyByVolume
   touchTip: TouchTipProperties
   delay: DelayProperties
 }
-type RetractAspirate = BaseRetract
-interface RetractDispense extends BaseRetract {
+export type RetractAspirate = BaseRetract
+export interface RetractDispense extends BaseRetract {
   blowout: BlowoutProperties
 }
 interface BaseLiquidHandlingProperties<RetractType> {
   submerge: Submerge
   retract: RetractType
-  positionReference: PositionReference
-  offset: Coordinates
   flowRateByVolume: LiquidHandlingPropertyByVolume
   correctionByVolume: LiquidHandlingPropertyByVolume
   delay: DelayProperties
 }
-interface AspirateProperties
+export interface AspirateProperties
   extends BaseLiquidHandlingProperties<RetractAspirate> {
+  aspiratePosition: TipPosition
   preWet: boolean
   mix: MixProperties
 }
-interface SingleDispenseProperties
+export interface SingleDispenseProperties
   extends BaseLiquidHandlingProperties<RetractDispense> {
+  dispensePosition: TipPosition
   mix: MixProperties
   pushOutByVolume: LiquidHandlingPropertyByVolume
 }
-interface MultiDispenseProperties {
+export interface MultiDispenseProperties
+  extends BaseLiquidHandlingProperties<RetractDispense> {
+  dispensePosition: TipPosition
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
 }
-interface ByTipTypeSetting {
+export interface ByTipTypeSetting {
   tiprack: string
   aspirate: AspirateProperties
   singleDispense: SingleDispenseProperties

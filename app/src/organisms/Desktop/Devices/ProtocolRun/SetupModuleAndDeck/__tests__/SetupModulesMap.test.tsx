@@ -1,30 +1,31 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import {
-  mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
+  mockThermocycler as mockThermocyclerFixture,
 } from '/app/redux/modules/__fixtures__/index'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { ModuleInfo } from '/app/molecules/ModuleInfo'
-import { SetupModulesMap } from '../SetupModulesMap'
 import { getAttachedProtocolModuleMatches } from '/app/transformations/analysis'
 
+import { SetupModulesMap } from '../SetupModulesMap'
+
 import type { ComponentProps } from 'react'
+import type * as OpentronsComponents from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
+  inferModuleOrientationFromXCoordinate,
   ModuleModel,
   ModuleType,
-  inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof OpentronsComponents>()

@@ -1,15 +1,15 @@
-import type { MutableRefObject } from 'react'
-import { useRef, useCallback } from 'react'
+import { useCallback, useRef } from 'react'
+import head from 'lodash/head'
 import last from 'lodash/last'
 
-import head from 'lodash/head'
-
 import {
+  GRIPPER_MOVE_STEPS,
   INVALID,
   RECOVERY_MAP,
   STEP_ORDER,
-  GRIPPER_MOVE_STEPS,
 } from '../constants'
+
+import type { MutableRefObject } from 'react'
 import type {
   IRecoveryMap,
   RecoveryRoute,

@@ -1,19 +1,23 @@
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
   absorbanceReaderCollision,
+  formatPyStr,
+  formatPyWellLocation,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getLabwareSlot,
   modulePipetteCollision,
-  thermocyclerPipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getLabwareSlot,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  thermocyclerPipetteCollision,
   uuid,
 } from '../../utils'
-import { COLUMN_4_SLOTS } from '../../constants'
+
 import type { CreateCommand, MoveToWellParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
@@ -34,9 +38,8 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
   const actionName = 'moveToWell'
   const errors: CommandCreatorError[] = []
   const labwareState = prevRobotState.labware
-  // TODO(2020-07-30, IL): the below is duplicated or at least similar
-  // across aspirate/dispense/blowout, we can probably DRY it up
-  const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
+  const { pipetteEntities, labwareEntities } = invariantContext
+  const pipetteSpec = pipetteEntities[pipetteId]?.spec
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
@@ -160,7 +163,7 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
         prevRobotState.modules,
         slotName,
         pipetteSpec,
-        invariantContext.labwareEntities[labwareId]
+        labwareEntities[labwareId]
       )
     ) {
       errors.push(
@@ -173,6 +176,9 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
       errors,
     }
   }
+
+  const pipettePythonName = pipetteEntities[pipetteId].pythonName
+  const labwarePythonName = labwareEntities[labwareId].pythonName
 
   const commands: CreateCommand[] = [
     {
@@ -188,7 +194,11 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
       },
     },
   ]
+  //  NOTE: forceDirect and minimumZHeight were never wired up in the form or stepArgs
   return {
     commands,
+    python: `${pipettePythonName}.move_to(${labwarePythonName}[${formatPyStr(
+      wellName
+    )}]${formatPyWellLocation(wellLocation)})`,
   }
 }

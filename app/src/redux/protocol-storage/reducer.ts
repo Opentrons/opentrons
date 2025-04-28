@@ -1,11 +1,12 @@
 // protocol storage reducer
 import keyBy from 'lodash/keyBy'
 import without from 'lodash/without'
+
 import * as Actions from './actions'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { ProtocolStorageState } from './types'
-import type { Reducer } from 'redux'
 
 export const INITIAL_STATE: ProtocolStorageState = {
   protocolKeys: [],

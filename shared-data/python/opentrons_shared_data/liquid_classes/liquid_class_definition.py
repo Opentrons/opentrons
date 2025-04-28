@@ -66,6 +66,17 @@ class Coordinate(BaseModel):
     z: _Number
 
 
+class TipPosition(BaseModel):
+    """Properties for tip position reference and relative offset."""
+
+    positionReference: PositionReference = Field(
+        ..., description="Position reference for tip position."
+    )
+    offset: Coordinate = Field(
+        ..., description="Relative offset from position reference."
+    )
+
+
 class DelayParams(BaseModel):
     """Parameters for delay."""
 
@@ -105,7 +116,7 @@ class LiquidClassTouchTipParams(BaseModel):
         ...,
         description="Offset from the top of the well for touch-tip, in millimeters.",
     )
-    mmToEdge: _Number = Field(
+    mmFromEdge: _Number = Field(
         ..., description="Offset away from the the well edge, in millimeters."
     )
     speed: _GreaterThanZeroNumber = Field(
@@ -139,15 +150,18 @@ class MixParams(BaseModel):
     """Parameters for mix."""
 
     repetitions: _StrictNonNegativeInt = Field(
-        ..., description="Number of mixing repetitions."
+        ...,
+        description="Number of mixing repetitions. 0 is valid, but no mixing will occur.",
     )
-    volume: _Number = Field(..., description="Volume used for mixing, in microliters.")
+    volume: _GreaterThanZeroNumber = Field(
+        ..., description="Volume used for mixing, in microliters."
+    )
 
 
 class MixProperties(BaseModel):
     """Mixing properties."""
 
-    enable: bool = Field(..., description="Whether mix is enabled.")
+    enable: StrictBool = Field(..., description="Whether mix is enabled.")
     params: MixParams | SkipJsonSchema[None] = Field(
         None,
         description="Parameters for the mix function.",
@@ -170,7 +184,7 @@ class BlowoutParams(BaseModel):
     location: BlowoutLocation = Field(
         ..., description="Location well or trash entity for blow out."
     )
-    flowRate: _NonNegativeNumber = Field(
+    flowRate: _GreaterThanZeroNumber = Field(
         ..., description="Flow rate for blow out, in microliters per second."
     )
 
@@ -178,7 +192,7 @@ class BlowoutParams(BaseModel):
 class BlowoutProperties(BaseModel):
     """Blowout properties."""
 
-    enable: bool = Field(..., description="Whether blow-out is enabled.")
+    enable: StrictBool = Field(..., description="Whether blow-out is enabled.")
     params: BlowoutParams | SkipJsonSchema[None] = Field(
         None,
         description="Parameters for the blowout function.",
@@ -200,10 +214,9 @@ class BlowoutProperties(BaseModel):
 class Submerge(BaseModel):
     """Shared properties for the submerge function before aspiration or dispense."""
 
-    positionReference: PositionReference = Field(
-        ..., description="Position reference for submerge."
+    startPosition: TipPosition = Field(
+        ..., description="Tip position before starting the submerge."
     )
-    offset: Coordinate = Field(..., description="Relative offset for submerge.")
     speed: _NonNegativeNumber = Field(
         ..., description="Speed of submerging, in millimeters per second."
     )
@@ -213,11 +226,8 @@ class Submerge(BaseModel):
 class RetractAspirate(BaseModel):
     """Shared properties for the retract function after aspiration."""
 
-    positionReference: PositionReference = Field(
-        ..., description="Position reference for retract after aspirate."
-    )
-    offset: Coordinate = Field(
-        ..., description="Relative offset for retract after aspirate."
+    endPosition: TipPosition = Field(
+        ..., description="Tip position at the end of the retract."
     )
     speed: _NonNegativeNumber = Field(
         ..., description="Speed of retraction, in millimeters per second."
@@ -236,11 +246,8 @@ class RetractAspirate(BaseModel):
 class RetractDispense(BaseModel):
     """Shared properties for the retract function after dispense."""
 
-    positionReference: PositionReference = Field(
-        ..., description="Position reference for retract after dispense."
-    )
-    offset: Coordinate = Field(
-        ..., description="Relative offset for retract after dispense."
+    endPosition: TipPosition = Field(
+        ..., description="Tip position at the end of the retract."
     )
     speed: _NonNegativeNumber = Field(
         ..., description="Speed of retraction, in millimeters per second."
@@ -266,10 +273,9 @@ class AspirateProperties(BaseModel):
     retract: RetractAspirate = Field(
         ..., description="Pipette retract settings after an aspirate."
     )
-    positionReference: PositionReference = Field(
-        ..., description="Position reference for aspiration."
+    aspiratePosition: TipPosition = Field(
+        ..., description="Tip position during aspirate."
     )
-    offset: Coordinate = Field(..., description="Relative offset for aspiration.")
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
         description="Settings for flow rate keyed by target aspiration volume.",
@@ -295,10 +301,9 @@ class SingleDispenseProperties(BaseModel):
     retract: RetractDispense = Field(
         ..., description="Pipette retract settings after a single dispense."
     )
-    positionReference: PositionReference = Field(
-        ..., description="Position reference for single dispense."
+    dispensePosition: TipPosition = Field(
+        ..., description="Tip position during dispense."
     )
-    offset: Coordinate = Field(..., description="Relative offset for single dispense.")
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
         description="Settings for flow rate keyed by target dispense volume.",
@@ -322,11 +327,8 @@ class MultiDispenseProperties(BaseModel):
     retract: RetractDispense = Field(
         ..., description="Pipette retract settings after a multi-dispense."
     )
-    positionReference: PositionReference = Field(
-        ..., description="Position reference for multi-dispense."
-    )
-    offset: Coordinate = Field(
-        ..., description="Relative offset for single multi-dispense."
+    dispensePosition: TipPosition = Field(
+        ..., description="Tip position during dispense."
     )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,

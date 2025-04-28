@@ -1,11 +1,17 @@
-import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import {
+  ABSORBANCE_READER_TYPE,
+  ABSORBANCE_READER_V1,
+} from '@opentrons/shared-data'
+
 import { absorbanceReaderCloseInitialize } from '../commandCreators'
+import { getInitialRobotStateStandard, makeContext } from '../fixtures'
+import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
 import {
   absorbanceReaderStateGetter,
   getModuleState,
 } from '../robotStateSelectors'
-import { getInitialRobotStateStandard, makeContext } from '../fixtures'
-import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
 
 import type {
   AbsorbanceReaderInitializeArgs,
@@ -13,10 +19,6 @@ import type {
   InvariantContext,
   RobotState,
 } from '../types'
-import {
-  ABSORBANCE_READER_TYPE,
-  ABSORBANCE_READER_V1,
-} from '@opentrons/shared-data'
 
 vi.mock('../robotStateSelectors')
 
@@ -24,7 +26,6 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
   let absorbanceReaderCloseInitializeArgs: AbsorbanceReaderInitializeArgs
   const ABSORBANCE_READER_MODULE_ID = 'absorbanceReaderModuleId'
   const ABSORBANCE_READER_MODULE_SLOT = 'D3'
-  const GRIPPER_ID = 'gripperId'
   let robotState: RobotState
   let invariantContext: InvariantContext
   beforeEach(() => {
@@ -46,10 +47,9 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
           pythonName: 'mock_absorbance_plate_reader_1',
         },
       },
-      additionalEquipmentEntities: {
-        [GRIPPER_ID]: {
-          id: GRIPPER_ID,
-          name: 'gripper',
+      gripperEntities: {
+        gripperId: {
+          id: 'gripperId',
         },
       },
     }

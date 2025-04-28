@@ -1,63 +1,63 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 
 import {
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_STOP_REQUESTED,
+} from '@opentrons/api-client'
+import {
   ALIGN_CENTER,
+  ALIGN_FLEX_END,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  getLabwareDefinitionsFromCommands,
   JUSTIFY_CENTER,
   OVERFLOW_HIDDEN,
-  POSITION_RELATIVE,
   POSITION_ABSOLUTE,
-  ALIGN_FLEX_END,
+  POSITION_RELATIVE,
   SPACING,
-  getLabwareDefinitionsFromCommands,
   useSwipe,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
-import {
-  RUN_STATUS_STOP_REQUESTED,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-} from '@opentrons/api-client'
 
 import { StepMeter } from '/app/atoms/StepMeter'
-
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
-  useRunStatus,
-  useRunTimestamps,
-  useNotifyRunQuery,
-  useMostRecentCompletedAnalysis,
-  useLastRunCommand,
-} from '/app/resources/runs'
+  ErrorRecoveryFlows,
+  useErrorRecoveryFlows,
+} from '/app/organisms/ErrorRecoveryFlows'
 import {
   InterventionModal,
   useInterventionModal,
 } from '/app/organisms/InterventionModal'
+import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
 } from '/app/organisms/ODD/RunningProtocol'
-import { useRobotType } from '/app/redux-resources/robots'
-import {
-  useTrackProtocolRunEvent,
-  useRobotAnalyticsData,
-} from '/app/redux-resources/analytics'
 import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol/ConfirmCancelRunModal'
-import { getLocalRobot } from '/app/redux/discovery'
-import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import {
-  useErrorRecoveryFlows,
-  ErrorRecoveryFlows,
-} from '/app/organisms/ErrorRecoveryFlows'
+  useRobotAnalyticsData,
+  useTrackProtocolRunEvent,
+} from '/app/redux-resources/analytics'
+import { useRobotType } from '/app/redux-resources/robots'
+import { getLocalRobot } from '/app/redux/discovery'
+import {
+  useLastRunCommand,
+  useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
+  useRunStatus,
+  useRunTimestamps,
+} from '/app/resources/runs'
 
 import type { OnDeviceRouteParams } from '/app/App/types'
 
@@ -126,6 +126,7 @@ export function RunningProtocol(): JSX.Element {
     runId,
     runStatus
   )
+  const doorStatus = useIsDoorOpen(robotName)
   const {
     showModal: showIntervention,
     modalProps: interventionProps,
@@ -177,7 +178,9 @@ export function RunningProtocol(): JSX.Element {
         />
       ) : null}
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR && !showIntervention ? (
-        <OpenDoorAlertModal />
+        <OpenDoorAlertModal
+          moduleDoorLocation={doorStatus.moduleDoorLocation}
+        />
       ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
       {/* note: this zindex is here to establish a zindex context for the bullets

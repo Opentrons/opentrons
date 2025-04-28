@@ -1,5 +1,5 @@
-import { it, describe, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { COLORS, SIZE_1 } from '@opentrons/components'
 

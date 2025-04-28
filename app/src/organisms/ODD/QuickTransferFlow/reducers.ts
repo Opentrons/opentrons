@@ -1,9 +1,10 @@
 import { CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
+
 import type {
-  QuickTransferWizardState,
+  QuickTransferSummaryAction,
   QuickTransferSummaryState,
   QuickTransferWizardAction,
-  QuickTransferSummaryAction,
+  QuickTransferWizardState,
   TransferType,
 } from './types'
 
@@ -87,6 +88,30 @@ export function quickTransferWizardReducer(
         destinationWells: state.destinationWells,
         transferType: state.transferType,
         volume: action.volume,
+      }
+    }
+    case 'SET_PIPETTE_PATH': {
+      return {
+        ...state,
+        path: action.path,
+      }
+    }
+    case 'SET_CHANGE_TIP': {
+      return {
+        ...state,
+        changeTip: action.changeTip,
+      }
+    }
+    case 'SET_DROP_TIP_LOCATION': {
+      return {
+        ...state,
+        dropTipLocation: action.location,
+      }
+    }
+    case 'SET_LIQUID_CLASS': {
+      return {
+        ...state,
+        liquidClass: action.liquidClass,
       }
     }
   }

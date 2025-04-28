@@ -1,4 +1,3 @@
-import { getHasWasteChute } from '@opentrons/step-generation'
 import { WASTE_CHUTE_DISPLAY_NAME } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -6,6 +5,7 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import type { RobotType } from '@opentrons/shared-data'
 import type { InitialDeckSetup, SavedStepFormState } from '../../step-forms'
 
@@ -48,7 +48,10 @@ export function getLabwareLatestSlotFromCurrentStepIndex(
 ): string | null {
   const { modules, labware, additionalEquipmentOnDeck } = initialDeckSetup
   const initialSlot = labware[labwareId]?.slot
-  const hasWasteChute = getHasWasteChute(additionalEquipmentOnDeck)
+  const hasWasteChute =
+    Object.values(additionalEquipmentOnDeck).find(
+      ae => ae.name === 'wasteChute'
+    ) != null
 
   //  latest moveLabware step related to labwareId at given index
   const moveLabwareStepId = filteredSavedStepFormIds

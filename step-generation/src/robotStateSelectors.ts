@@ -1,15 +1,21 @@
 // TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
 import min from 'lodash/min'
+
 import {
   ABSORBANCE_READER_TYPE,
   ALL,
   COLUMN,
+  getLabwareDefIsStandard,
   getLabwareDefURI,
   getTiprackVolume,
   orderWells,
+  SINGLE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import { COLUMN_4_SLOTS } from './constants'
+
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
   InvariantContext,
@@ -17,7 +23,6 @@ import type {
   RobotState,
   ThermocyclerModuleState,
 } from './types'
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 
 export function sortLabwareBySlot(
   labwareState: RobotState['labware']
@@ -62,7 +67,7 @@ export function _getNextTip(args: {
   const hasTip = (wellName: string): boolean => tiprackWellsState[wellName]
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
-  if (pipetteChannels === 1) {
+  if (pipetteChannels === 1 || nozzles === SINGLE) {
     const well = orderedWells.find(hasTip)
     return well || null
   }
@@ -132,7 +137,7 @@ export function getNextTiprack(
       const has96TiprackAdapterId =
         adapterEntity?.def.parameters.loadName ===
           'opentrons_flex_96_tiprack_adapter' &&
-        adapterEntity?.def.namespace === 'opentrons'
+        getLabwareDefIsStandard(adapterEntity?.def)
 
       return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
     }

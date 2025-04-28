@@ -1,14 +1,16 @@
 import { css } from 'styled-components'
+
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
-import { Icon } from '../../icons'
 import { StyledText } from '../StyledText'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { IconName } from '../../icons'
 
-export type TagType = 'default' | 'interactive' | 'branded'
+export type TagType = 'default' | 'interactive' | 'branded' | 'onColor'
 
 export interface TagProps {
   /** Tag content */
@@ -17,7 +19,7 @@ export interface TagProps {
   type: TagType
   /** iconLocation */
   iconPosition?: 'left' | 'right'
-  /** Tagicon */
+  /** Tag icon */
   iconName?: IconName
   shrinkToContent?: boolean
 }
@@ -40,40 +42,14 @@ const TAG_PROPS_BY_TYPE: Record<
     backgroundColor: COLORS.blue50,
     color: COLORS.white,
   },
+  onColor: {
+    backgroundColor: COLORS.white,
+    color: COLORS.black90,
+  },
 }
 
 export function Tag(props: TagProps): JSX.Element {
   const { iconName, type, text, iconPosition, shrinkToContent = false } = props
-
-  const DEFAULT_CONTAINER_STYLE = css`
-    padding: ${SPACING.spacing2} ${SPACING.spacing8};
-    border-radius: ${BORDERS.borderRadius4};
-    width: ${shrinkToContent ? FLEX_MAX_CONTENT : 'inherit'};
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      border-radius: ${BORDERS.borderRadius8};
-      padding: ${SPACING.spacing8} ${SPACING.spacing12};
-    }
-  `
-
-  const INTERACTIVE_CONTAINER_STYLE = css`
-    ${DEFAULT_CONTAINER_STYLE}
-    &:hover {
-      background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
-    }
-    &:focus-visible {
-      box-shadow: 0 0 0 3px ${COLORS.blue50};
-      outline: none;
-    }
-  `
-
-  const ICON_STYLE = css`
-    width: ${SPACING.spacing16};
-    height: ${SPACING.spacing16};
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      width: ${SPACING.spacing24};
-      height: ${SPACING.spacing24};
-    }
-  `
 
   return (
     <Flex
@@ -83,8 +59,8 @@ export function Tag(props: TagProps): JSX.Element {
       backgroundColor={TAG_PROPS_BY_TYPE[type].backgroundColor}
       css={
         type === 'interactive'
-          ? INTERACTIVE_CONTAINER_STYLE
-          : DEFAULT_CONTAINER_STYLE
+          ? INTERACTIVE_CONTAINER_STYLE(shrinkToContent)
+          : DEFAULT_CONTAINER_STYLE(shrinkToContent)
       }
       gridGap={SPACING.spacing4}
       data-testid={`Tag_${type}`}
@@ -109,3 +85,37 @@ export function Tag(props: TagProps): JSX.Element {
     </Flex>
   )
 }
+
+const DEFAULT_CONTAINER_STYLE = (
+  shrinkToContent: boolean
+): FlattenSimpleInterpolation => css`
+  padding: ${SPACING.spacing2} ${SPACING.spacing8};
+  border-radius: ${BORDERS.borderRadius4};
+  width: ${shrinkToContent ? FLEX_MAX_CONTENT : 'inherit'};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    border-radius: ${BORDERS.borderRadius8};
+    padding: ${SPACING.spacing8} ${SPACING.spacing12};
+  }
+`
+
+const INTERACTIVE_CONTAINER_STYLE = (
+  shrinkToContent: boolean
+): FlattenSimpleInterpolation => css`
+  ${DEFAULT_CONTAINER_STYLE(shrinkToContent)}
+  &:hover {
+    background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
+  }
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.blue50};
+    outline: none;
+  }
+`
+
+const ICON_STYLE = css`
+  width: ${SPACING.spacing16};
+  height: ${SPACING.spacing16};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: ${SPACING.spacing24};
+    height: ${SPACING.spacing24};
+  }
+`

@@ -17,6 +17,9 @@ from robot_server.persistence.tables import (
     labware_offset_table,
     labware_offset_location_sequence_components_table,
 )
+from robot_server.service.notifications.publishers.labware_offsets_publisher import (
+    LabwareOffsetsPublisher,
+)
 from .models import (
     ANY_LOCATION,
     AnyLocation,
@@ -49,7 +52,11 @@ class IncomingStoredLabwareOffset:
 class LabwareOffsetStore:
     """A persistent store for labware offsets, to support the `/labwareOffsets` endpoints."""
 
-    def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
+    def __init__(
+        self,
+        sql_engine: sqlalchemy.engine.Engine,
+        labware_offsets_publisher: LabwareOffsetsPublisher | None,
+    ) -> None:
         """Initialize the store.
 
         Params:
@@ -57,28 +64,31 @@ class LabwareOffsetStore:
                 have all the proper tables set up.
         """
         self._sql_engine = sql_engine
+        self._labware_offsets_publisher = labware_offsets_publisher
 
     def add(
         self,
-        offset: IncomingStoredLabwareOffset,
+        offsets: list[IncomingStoredLabwareOffset],
     ) -> None:
-        """Store a new labware offset."""
+        """Store new labware offsets."""
         with self._sql_engine.begin() as transaction:
-            offset_row_id = transaction.execute(
-                sqlalchemy.insert(labware_offset_table).values(
-                    _pydantic_to_sql_offset(offset)
+            for offset in offsets:
+                offset_row_id = transaction.execute(
+                    sqlalchemy.insert(labware_offset_table).values(
+                        _pydantic_to_sql_offset(offset)
+                    )
+                ).inserted_primary_key.row_id
+                location_components_to_insert = list(
+                    _pydantic_to_sql_location_sequence_iterator(offset, offset_row_id)
                 )
-            ).inserted_primary_key.row_id
-            location_components_to_insert = list(
-                _pydantic_to_sql_location_sequence_iterator(offset, offset_row_id)
-            )
-            if location_components_to_insert:
-                transaction.execute(
-                    sqlalchemy.insert(
-                        labware_offset_location_sequence_components_table
-                    ),
-                    location_components_to_insert,
-                )
+                if location_components_to_insert:
+                    transaction.execute(
+                        sqlalchemy.insert(
+                            labware_offset_location_sequence_components_table
+                        ),
+                        location_components_to_insert,
+                    )
+        self._publish_change_notification()
 
     def get_all(self) -> list[StoredLabwareOffset]:
         """Return all offsets from oldest to newest.
@@ -123,7 +133,7 @@ class LabwareOffsetStore:
                 .where(labware_offset_table.c.offset_id == offset_id)
                 .values(active=False)
             )
-
+        self._publish_change_notification()
         return next(_collate_sql_to_pydantic(offset_rows))
 
     def delete_all(self) -> None:
@@ -132,6 +142,11 @@ class LabwareOffsetStore:
             transaction.execute(
                 sqlalchemy.update(labware_offset_table).values(active=False)
             )
+        self._publish_change_notification()
+
+    def _publish_change_notification(self) -> None:
+        if self._labware_offsets_publisher:
+            self._labware_offsets_publisher.publish_labware_offsets()
 
 
 class LabwareOffsetNotFoundError(KeyError):

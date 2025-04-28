@@ -1,27 +1,28 @@
 import type {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
   CreateCommand,
+  HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
-  ModuleType,
-  ModuleModel,
-  PipetteName,
-  NozzleConfigurationStyle,
   LabwareLocation,
-  PipetteMount as Mount,
-  PipetteV2Specs,
-  ShakeSpeedParams,
   LabwareMovementStrategy,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  ModuleModel,
+  ModuleType,
+  PipetteMount as Mount,
+  NozzleConfigurationStyle,
+  PipetteName,
+  PipetteV2Specs,
+  PositionReference,
+  ShakeSpeedParams,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
-  TEMPERATURE_DEACTIVATED,
-  TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_DEACTIVATED,
 } from './constants'
 
 // Copied from PD
@@ -149,7 +150,7 @@ export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: AdditionalEquipmentName
     id: string
-    location?: string
+    location: string
     //  Note: leaving as optional since gripper and stagingArea
     //  will never need a pythonName
     pythonName?: string
@@ -159,6 +160,37 @@ export interface NormalizedAdditionalEquipmentById {
 export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
 export interface AdditionalEquipmentEntities {
   [additionalEquipmentId: string]: AdditionalEquipmentEntity
+}
+
+interface TrashEntity {
+  id: string
+  location: string
+  pythonName: string
+}
+
+export type WasteChuteEntity = TrashEntity
+export interface WasteChuteEntities {
+  [wasteChuteId: string]: WasteChuteEntity
+}
+
+export type TrashBinEntity = TrashEntity
+export interface TrashBinEntities {
+  [trashBinId: string]: TrashBinEntity
+}
+
+export interface StagingAreaEntity {
+  id: string
+  location: string
+}
+export interface StagingAreaEntities {
+  [stagingAreaId: string]: StagingAreaEntity
+}
+
+export interface GripperEntity {
+  id: string
+}
+export interface GripperEntities {
+  [gripperId: string]: GripperEntity
 }
 
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
@@ -256,6 +288,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   dispenseXOffset: number
   /** y offset mm */
   dispenseYOffset: number
+  /** will be non-null once introduced to quick transfer */
+  pushOut: number | null
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {
@@ -340,11 +374,14 @@ export type MixArgs = CommonArgs & {
   /** y offset */
   yOffset: number
   /** flow rates in uL/sec */
+  zOffset: number
+  positionReference: PositionReference
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   /** delays */
   aspirateDelaySeconds: number | null | undefined
   dispenseDelaySeconds: number | null | undefined
+  finalPushOut: number
 }
 
 export type PauseArgs = CommonArgs & {
@@ -542,7 +579,10 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  wasteChuteEntities: WasteChuteEntities
+  trashBinEntities: TrashBinEntities
+  stagingAreaEntities: StagingAreaEntities
+  gripperEntities: GripperEntities
   liquidEntities: LiquidEntities
   config: Config
 }
@@ -581,9 +621,11 @@ export interface TimelineFrame {
         [well: string]: LocationLiquidState
       }
     }
-    additionalEquipment: {
-      /** for the waste chute and trash bin */
-      [additionalEquipmentId: string]: LocationLiquidState
+    trashBins: {
+      [trashBinId: string]: LocationLiquidState
+    }
+    wasteChute: {
+      [wasteChuteId: string]: LocationLiquidState
     }
   }
 }

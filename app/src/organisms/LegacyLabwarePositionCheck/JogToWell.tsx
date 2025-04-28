@@ -3,12 +3,15 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
   LegacyStyledText,
@@ -19,6 +22,7 @@ import {
   RobotWorkSpace,
   SecondaryButton,
   SPACING,
+  TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
@@ -29,29 +33,31 @@ import {
   getVectorSum,
 } from '@opentrons/shared-data'
 
-import levelWithTip from '/app/assets/images/lpc_level_with_tip.svg'
-import levelWithLabware from '/app/assets/images/lpc_level_with_labware.svg'
-import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
-import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
-import { getIsOnDevice } from '/app/redux/config'
 import { getTopPortalEl } from '/app/App/portal'
+import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
+import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
+import levelWithLabware from '/app/assets/images/lpc_level_with_labware.svg'
+import levelWithTip from '/app/assets/images/lpc_level_with_tip.svg'
 import { SmallButton } from '/app/atoms/buttons'
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { JogControls } from '/app/molecules/JogControls'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { getIsOnDevice } from '/app/redux/config'
+
 import { LiveOffsetValue } from './LiveOffsetValue'
 
 import type { ReactNode } from 'react'
-import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
-import type { WellStroke } from '@opentrons/components'
 import type { VectorOffset } from '@opentrons/api-client'
+import type { WellStroke } from '@opentrons/components'
+import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls'
 
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 const LPC_HELP_LINK_URL =
-  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
+  'https://support.opentrons.com/s/article/creating-labware-offsets'
 
 interface JogToWellProps {
-  handleConfirmPosition: () => void
+  handleConfirmPositionAndApply: () => void
+  isApplyingOffsets: boolean
   handleGoBack: () => void
   handleJog: Jog
   pipetteName: PipetteName
@@ -69,7 +75,8 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     body,
     pipetteName,
     labwareDef,
-    handleConfirmPosition,
+    handleConfirmPositionAndApply,
+    isApplyingOffsets,
     handleGoBack,
     handleJog,
     initialPosition,
@@ -159,12 +166,19 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
               </>
             )}
           </RobotWorkSpace>
-          <img
-            width="89px"
-            height="145px"
-            src={levelSrc}
-            alt={`level with ${isTipRack ? 'tip' : 'labware'}`}
-          />
+          <Flex css={LEVEL_CONTAINER_STYLE}>
+            <img
+              width="89px"
+              height={isTipRack ? '145px' : '125px'}
+              src={levelSrc}
+              alt={`level with ${isTipRack ? 'tip' : 'labware'}`}
+            />
+            {!isTipRack && (
+              <Flex css={LEVEL_LABWARE_COPY_STYLE}>
+                {t('align_to_top_of_labware')}
+              </Flex>
+            )}
+          </Flex>
         </Flex>
       </Flex>
       {isOnDevice ? (
@@ -189,7 +203,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
             />
             <SmallButton
               buttonText={t('shared:confirm_position')}
-              onClick={handleConfirmPosition}
+              onClick={handleConfirmPositionAndApply}
             />
           </Flex>
           {showFullJogControls
@@ -250,11 +264,27 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           >
             <NeedHelpLink href={LPC_HELP_LINK_URL} />
             <Flex gridGap={SPACING.spacing8}>
-              <SecondaryButton onClick={handleGoBack}>
+              <SecondaryButton
+                onClick={handleGoBack}
+                disabled={isApplyingOffsets}
+              >
                 {t('shared:go_back')}
               </SecondaryButton>
-              <PrimaryButton onClick={handleConfirmPosition}>
-                {t('shared:confirm_position')}
+              <PrimaryButton
+                onClick={handleConfirmPositionAndApply}
+                disabled={isApplyingOffsets}
+              >
+                <Flex>
+                  {isApplyingOffsets ? (
+                    <Icon
+                      size="1rem"
+                      spin
+                      name="ot-spinner"
+                      marginRight={SPACING.spacing8}
+                    />
+                  ) : null}
+                  {t('shared:confirm_position')}
+                </Flex>
               </PrimaryButton>
             </Flex>
           </Flex>
@@ -270,4 +300,22 @@ const Header = styled.h1`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }
+`
+
+const LEVEL_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
+  gap: ${SPACING.spacing16};
+`
+
+const LEVEL_LABWARE_COPY_STYLE = css`
+  width: 93px;
+  height: 57px;
+
+  text-align: ${TEXT_ALIGN_CENTER};
+  color: ${COLORS.blue50};
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 100%;
 `

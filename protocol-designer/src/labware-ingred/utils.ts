@@ -12,12 +12,14 @@ import {
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
+
 import { getSlotIsEmpty } from '../step-forms/utils'
 import { getStagingAreaAddressableAreas } from '../utils'
+
 import type {
-  RobotType,
   CutoutId,
   LabwareDefinition2,
+  RobotType,
 } from '@opentrons/shared-data'
 import type { InitialDeckSetup } from '../step-forms/types'
 import type { DeckSlot } from '../types'
@@ -52,7 +54,7 @@ export function getNextAvailableDeckSlot(
     const addressableAreaName = stagingAreaAddressableAreaNames.find(
       aa => aa === slot.id
     )
-    let isSlotEmpty: boolean = getSlotIsEmpty(initialDeckSetup, slot.id)
+    let isSlotEmpty: boolean = getSlotIsEmpty(initialDeckSetup, slot.id, true)
     if (addressableAreaName == null && COLUMN_4_SLOTS.includes(slot.id)) {
       isSlotEmpty = false
     } else if (

@@ -1,14 +1,17 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  mockLPCContentProps,
   mockLocationSpecificOffsetDetails,
+  mockLPCContentProps,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { LocationSpecificOffsetsContainer } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails/LocationSpecificOffsetsContainer'
-import { selectSelectedLwLocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
+import {
+  selectSelectedLwOverview,
+  selectSortedLSOffsetDetailsWithCopy,
+} from '/app/redux/protocol-runs'
 
 import type { ComponentProps } from 'react'
 
@@ -30,6 +33,8 @@ vi.mock(
 )
 vi.mock('/app/redux/protocol-runs', () => ({
   selectSelectedLwLocationSpecificOffsetDetails: vi.fn(),
+  selectSortedLSOffsetDetailsWithCopy: vi.fn(),
+  selectSelectedLwOverview: vi.fn(),
 }))
 
 const render = (
@@ -63,10 +68,13 @@ describe('LocationSpecificOffsetsContainer', () => {
     }
 
     vi.mocked(
-      selectSelectedLwLocationSpecificOffsetDetails
+      selectSortedLSOffsetDetailsWithCopy
     ).mockImplementation((runId: string) => () =>
       mockLocationSpecificOffsetDetails
     )
+    vi.mocked(
+      selectSelectedLwOverview
+    ).mockImplementation((runId: string) => () => ({ uri: 'mock-uri' } as any))
   })
 
   it('renders the header text', () => {
@@ -90,9 +98,9 @@ describe('LocationSpecificOffsetsContainer', () => {
     render(props)
 
     const items = screen.getAllByTestId(/^location-item-/)
-    expect(items[0]).toHaveTextContent('A2')
-    expect(items[1]).toHaveTextContent('B3')
-    expect(items[2]).toHaveTextContent('C1')
+    expect(items[0]).toHaveTextContent('C1')
+    expect(items[1]).toHaveTextContent('A2')
+    expect(items[2]).toHaveTextContent('B3')
   })
 
   it('correctly passes slotCopy to LabwareLocationItem', () => {

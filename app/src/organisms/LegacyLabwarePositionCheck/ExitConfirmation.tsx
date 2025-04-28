@@ -1,5 +1,7 @@
-import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
+
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
@@ -9,17 +11,17 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
   RESPONSIVENESS,
   SecondaryButton,
   SIZE_3,
   SPACING,
-  LegacyStyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '/app/redux/config'
+
 import { SmallButton } from '/app/atoms/buttons'
+import { getIsOnDevice } from '/app/redux/config'
 
 interface ExitConfirmationProps {
   onGoBack: () => void

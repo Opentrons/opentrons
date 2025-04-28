@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { startRobotUpdate, clearRobotUpdateSession } from './actions'
+
+import { clearRobotUpdateSession, startRobotUpdate } from './actions'
 import { getRobotUpdateDisplayInfo } from './selectors'
 
 import type { Dispatch, State } from '../types'

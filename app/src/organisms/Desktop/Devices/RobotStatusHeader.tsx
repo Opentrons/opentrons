@@ -1,9 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useProtocolQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
@@ -22,17 +21,18 @@ import {
   useHoverTooltip,
   useInterval,
 } from '@opentrons/components'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { QuaternaryButton } from '/app/atoms/buttons'
-import { useIsFlex } from '/app/redux-resources/robots'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
-import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
-import { useNotifyRunQuery, useCurrentRunId } from '/app/resources/runs'
+import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
+import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import type { MouseEvent } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'

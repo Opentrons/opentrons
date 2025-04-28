@@ -1,9 +1,12 @@
-import { beforeEach, describe, it, expect } from 'vitest'
-import { getLabwareDefURI, fixtureTiprack300ul } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
+
 import { consolidate } from '../commandCreators/compound/consolidate'
 import { FIXED_TRASH_ID } from '../constants'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  blowoutInPlaceHelper,
   DEFAULT_PIPETTE,
   delayCommand,
   delayWithOffset,
@@ -15,18 +18,18 @@ import {
   getInitialRobotStateStandard,
   getRobotStatePickedUpTipStandard,
   getSuccessResult,
+  makeAirGapAfterAspirateHelper,
   makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
   makeDispenseHelper,
+  makeMoveToWellHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
-  blowoutInPlaceHelper,
-  makeMoveToWellHelper,
-  makeAirGapAfterAspirateHelper,
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
+
 import type {
   AspDispAirgapParams,
   CreateCommand,
@@ -49,11 +52,14 @@ function tripleMix(
   const { delayAfterAspirate, delayAfterDispense } = delayParams
 
   return [...Array(3)].reduce(
-    (acc, _) => [
+    (acc, _, i) => [
       ...acc,
       aspirateHelper(wellName, volume, params),
       ...(delayAfterAspirate ? [delayCommand(12)] : []),
-      dispenseHelper(wellName, volume, params),
+      dispenseHelper(wellName, volume, {
+        ...params,
+        ...(i === 2 ? {} : { pushOut: 0 }),
+      }),
       ...(delayAfterDispense ? [delayCommand(12)] : []),
     ],
     []
@@ -135,11 +141,11 @@ describe('consolidate single-channel', () => {
 
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      wasteChuteEntities: {
         wasteChuteId: {
-          name: 'wasteChute',
           id: 'wasteChuteId',
           location: 'cutoutD3',
+          pythonName: 'waste_chute',
         },
       },
     }
@@ -421,6 +427,7 @@ describe('consolidate single-channel', () => {
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       aspirateHelper('A1', 50),
       dispenseHelper('A1', 50, {
@@ -433,6 +440,7 @@ describe('consolidate single-channel', () => {
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       aspirateHelper('A1', 50),
       dispenseHelper('A1', 50, {
@@ -463,6 +471,7 @@ describe('consolidate single-channel', () => {
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       aspirateHelper('A3', 50),
       dispenseHelper('A3', 50, {
@@ -475,6 +484,7 @@ describe('consolidate single-channel', () => {
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       aspirateHelper('A3', 50),
       dispenseHelper('A3', 50, {
@@ -609,7 +619,18 @@ describe('consolidate single-channel', () => {
       changeTip: 'once',
       mixInDestination: { times: 3, volume: 54 },
       blowoutLocation: FIXED_TRASH_ID,
+      dropTipLocation: 'trashBinId',
     } as ConsolidateArgs
+    invariantContext = {
+      ...invariantContext,
+      trashBinEntities: {
+        trashBinId: {
+          pythonName: 'trash_bin_1',
+          id: 'trashBinId',
+          location: 'cutoutA3',
+        },
+      },
+    }
 
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
@@ -1136,7 +1157,18 @@ describe('consolidate single-channel', () => {
         blowoutFlowRateUlSec: 2.3,
         blowoutOffsetFromTopMm: 3.3,
         dispenseAirGapVolume: 35,
+        dropTipLocation: 'trashBinId',
       } as ConsolidateArgs
+      invariantContext = {
+        ...invariantContext,
+        trashBinEntities: {
+          trashBinId: {
+            pythonName: 'trash_bin_1',
+            id: 'trashBinId',
+            location: 'cutoutA3',
+          },
+        },
+      }
 
       const result = consolidate(
         args,
@@ -1266,11 +1298,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -1360,11 +1392,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A2',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -1626,11 +1658,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A3',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -1775,11 +1807,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -1973,11 +2005,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -2066,11 +2098,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A2',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -2347,11 +2379,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A3',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -2511,11 +2543,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -2730,11 +2762,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -2823,11 +2855,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A2',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -2988,11 +3020,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -3155,11 +3187,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A3',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -3320,11 +3352,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },

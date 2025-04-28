@@ -2,28 +2,26 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { useLPCCommands } from '/app/organisms/LabwarePositionCheck/hooks'
+import { useLPCHeaderCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/useLPCHeaderCommands'
 import {
-  BeforeBeginning,
-  HandleLabware,
   AttachProbe,
+  BeforeBeginning,
   DetachProbe,
+  HandleLabware,
   LPCComplete,
 } from '/app/organisms/LabwarePositionCheck/steps'
-import { LPCRobotInMotion } from './LPCRobotInMotion'
-import { LPCFatalError } from './LPCFatalError'
-import { LPCProbeNotAttached } from './LPCProbeNotAttached'
-import {
-  useLPCCommands,
-  useLPCInitialState,
-} from '/app/organisms/LabwarePositionCheck/hooks'
 import {
   closeLPC,
-  proceedStep as proceedStepDispatch,
   goBackLastStep as goBackStepDispatch,
   LPC_STEP,
+  proceedStep as proceedStepDispatch,
   selectCurrentStep,
 } from '/app/redux/protocol-runs'
-import { useLPCHeaderCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/useLPCHeaderCommands'
+
+import { LPCFatalError } from './LPCFatalError'
+import { LPCProbeNotAttached } from './LPCProbeNotAttached'
+import { LPCRobotInMotion } from './LPCRobotInMotion'
 
 import type { LPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
@@ -32,8 +30,6 @@ import type { LPCStep } from '/app/redux/protocol-runs'
 export interface LPCWizardFlexProps extends Omit<LPCFlowsProps, 'robotType'> {}
 
 export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
-  const { onCloseClick, ...rest } = props
-
   const proceedStep = (toStep?: LPCStep): void => {
     dispatch(proceedStepDispatch(props.runId, toStep))
   }
@@ -44,10 +40,7 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
   const dispatch = useDispatch()
   const LPCHandlerUtils = useLPCCommands({
     ...props,
-    onCloseClick,
   })
-
-  useLPCInitialState({ ...rest })
 
   // Clean up state on LPC close.
   useEffect(() => {

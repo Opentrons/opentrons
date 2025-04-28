@@ -1,32 +1,43 @@
 import {
+  FLEX_STACKER_MODULE_V1,
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
   TRASH_BIN_FIXTURE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import { getLabwareLocation } from './getLabwareLocation'
+
+import {
+  getLabwareLocation,
+  getLabwareLocationFromSequence,
+} from './getLabwareLocation'
 
 import type { TFunction } from 'i18next'
-
-import type { AddressableAreaName } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  LabwareLocation,
+  LabwareLocationSequence,
+} from '@opentrons/shared-data'
 import type {
   LocationFullParams,
   LocationSlotOnlyParams,
 } from './getLabwareLocation'
 
-export interface DisplayLocationSlotOnlyParams extends LocationSlotOnlyParams {
+export interface DisplayLocationSlotOnlyParams
+  extends Omit<LocationSlotOnlyParams, 'location'> {
   t: TFunction
   isOnDevice?: boolean
+  location?: LabwareLocation | LabwareLocationSequence | null
 }
-
-export interface DisplayLocationFullParams extends LocationFullParams {
+export interface DisplayLocationFullParams
+  extends Omit<LocationFullParams, 'location'> {
   t: TFunction
   isOnDevice?: boolean
+  location?: LabwareLocation | LabwareLocationSequence | null
 }
-
 export type DisplayLocationParams =
   | DisplayLocationSlotOnlyParams
   | DisplayLocationFullParams
@@ -37,17 +48,33 @@ export type DisplayLocationParams =
 export function getLabwareDisplayLocation(
   params: DisplayLocationParams
 ): string {
-  const { t, isOnDevice = false } = params
-  const locationResult = getLabwareLocation(params)
-
+  const { t, isOnDevice = false, location } = params
+  const locationResult = Array.isArray(location)
+    ? getLabwareLocationFromSequence({
+        ...params,
+        locationSequence: location,
+      })
+    : getLabwareLocation({
+        ...params,
+        location: location ?? null,
+      })
   if (locationResult == null) {
     return ''
   }
 
-  const { slotName, moduleModel, adapterName } = locationResult
+  const { slotName: initialSlotName, moduleModel, adapterName } = locationResult
+  const slotName =
+    moduleModel === THERMOCYCLER_MODULE_V1 ||
+    moduleModel === THERMOCYCLER_MODULE_V2
+      ? 'A1+B1'
+      : initialSlotName
 
   if (slotName === 'offDeck' || slotName === 'systemLocation') {
     return t('off_deck')
+  } else if (slotName === 'systemLocation') {
+    // returning system location for slot name which we'll use to swap out
+    // run log copy, this should never reach the user
+    return slotName
   }
   // Simple slot location
   else if (moduleModel == null && adapterName == null) {
@@ -57,21 +84,35 @@ export function getLabwareDisplayLocation(
   // Module location without adapter
   else if (moduleModel != null && adapterName == null) {
     if (params.detailLevel === 'slot-only') {
-      return moduleModel === THERMOCYCLER_MODULE_V1 ||
-        moduleModel === THERMOCYCLER_MODULE_V2
-        ? t('slot', { slot_name: 'A1+B1' })
-        : t('slot', { slot_name: slotName })
-    } else {
-      return isOnDevice
-        ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
-        : t('module_in_slot', {
-            count: getOccludedSlotCountForModule(
-              getModuleType(moduleModel),
-              params.robotType
-            ),
-            module: getModuleDisplayName(moduleModel),
-            slot_name: slotName,
+      switch (moduleModel) {
+        case THERMOCYCLER_MODULE_V1:
+        case THERMOCYCLER_MODULE_V2:
+          return t('slot', { slot_name: 'A1+B1' })
+        case FLEX_STACKER_MODULE_V1:
+          return t('stacker_display_name', {
+            stacker_slot: getSlotColumn(slotName),
           })
+        default:
+          return t('slot', { slot_name: slotName })
+      }
+    } else {
+      switch (moduleModel) {
+        case FLEX_STACKER_MODULE_V1:
+          return t('stacker_column_display_name', {
+            stacker_slot: getSlotColumn(slotName),
+          })
+        default:
+          return isOnDevice
+            ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
+            : t('module_in_slot', {
+                count: getOccludedSlotCountForModule(
+                  getModuleType(moduleModel),
+                  params.robotType
+                ),
+                module: getModuleDisplayName(moduleModel),
+                slot_name: slotName,
+              })
+      }
     }
   }
   // Adapter locations
@@ -97,6 +138,10 @@ export function getLabwareDisplayLocation(
   }
 }
 
+function getSlotColumn(slotName: string): string {
+  return slotName.charAt(0)
+}
+
 // Sometimes we don't want to show the actual slotName, so we special case the text here.
 function handleSpecialSlotNames(
   slotName: string,
@@ -104,7 +149,10 @@ function handleSpecialSlotNames(
 ): { odd: string; desktop: string } {
   if (WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotName as AddressableAreaName)) {
     return { odd: t('waste_chute'), desktop: t('waste_chute') }
-  } else if (slotName === TRASH_BIN_FIXTURE) {
+  } else if (
+    slotName === TRASH_BIN_FIXTURE ||
+    MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slotName as AddressableAreaName)
+  ) {
     return { odd: t('trash_bin'), desktop: t('trash_bin') }
   } else {
     return {

@@ -1,13 +1,17 @@
-import { expect, describe, it, beforeEach } from 'vitest'
-import { getIsSafePipetteMovement } from '../utils'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
-  TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_MODULE_V2,
+  COLUMN,
   fixture96Plate,
   fixtureP100096V2Specs,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
+
+import { getIsSafePipetteMovement } from '../utils'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
@@ -62,7 +66,10 @@ describe('getIsSafePipetteMovement', () => {
         },
       },
       moduleEntities: {},
-      additionalEquipmentEntities: {},
+      trashBinEntities: {},
+      wasteChuteEntities: {},
+      stagingAreaEntities: {},
+      gripperEntities: {},
       liquidEntities: {},
       config: {
         OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
@@ -76,12 +83,18 @@ describe('getIsSafePipetteMovement', () => {
       },
       modules: {},
       tipState: { tipracks: {}, pipettes: {} },
-      liquidState: { pipettes: {}, labware: {}, additionalEquipment: {} },
+      liquidState: {
+        pipettes: {},
+        labware: {},
+        trashBins: {},
+        wasteChute: {},
+      },
     }
   })
 
   it('returns true when the labware id is a trash bin', () => {
     const result = getIsSafePipetteMovement(
+      COLUMN,
       {
         labware: {},
         pipettes: {},
@@ -94,9 +107,16 @@ describe('getIsSafePipetteMovement', () => {
         pipetteEntities: {},
         moduleEntities: {},
         liquidEntities: {},
-        additionalEquipmentEntities: {
-          trashBin: { name: 'trashBin', location: 'A3', id: 'trashBin' },
+        trashBinEntities: {
+          trashBin: {
+            pythonName: 'trash_bin_1',
+            location: 'A3',
+            id: 'trashBin',
+          },
         },
+        wasteChuteEntities: {},
+        stagingAreaEntities: {},
+        gripperEntities: {},
         config: {} as any,
       },
       'mockId',
@@ -108,6 +128,7 @@ describe('getIsSafePipetteMovement', () => {
   })
   it('returns false when within pipette extents is false', () => {
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,
@@ -131,6 +152,7 @@ describe('getIsSafePipetteMovement', () => {
       },
     }
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,
@@ -148,6 +170,7 @@ describe('getIsSafePipetteMovement', () => {
       [mockAdapter]: { slot: 'D1' },
     }
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,
@@ -180,6 +203,7 @@ describe('getIsSafePipetteMovement', () => {
       },
     }
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,

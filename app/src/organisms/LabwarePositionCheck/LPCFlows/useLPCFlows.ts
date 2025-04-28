@@ -4,17 +4,27 @@ import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
-  useRunLoadedLabwareDefinitions,
 } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
+import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   useCreateTargetedMaintenanceRunMutation,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
 } from '/app/resources/runs'
-import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useLPCLabwareInfo } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks'
+
+import {
+  useCompatibleAnalysis,
+  useHandleClientAppliedOffsets,
+  useLPCLabwareInfo,
+  useMonitorMaintenanceRunForDeletion,
+  useOffsetConflictTimestamp,
+  useUpdateDeckConfig,
+  useUpdateLabware,
+} from './hooks'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type {
@@ -26,6 +36,7 @@ interface UseLPCFlowsBase {
   showLPC: boolean
   lpcProps: LPCFlowsProps | null
   isLaunchingLPC: boolean
+  isFlexLPCInitializing: boolean
   launchLPC: () => Promise<void>
 }
 interface UseLPCFlowsIdle extends UseLPCFlowsBase {
@@ -40,7 +51,7 @@ interface UseLPCFlowsLaunched extends UseLPCFlowsBase {
 export type UseLPCFlowsResult = UseLPCFlowsIdle | UseLPCFlowsLaunched
 
 export interface UseLPCFlowsProps {
-  runId: string
+  runId: string | null
   robotType: RobotType
   protocolName: string | undefined
 }
@@ -54,21 +65,53 @@ export function useLPCFlows({
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
 
+  const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
-  const currentOffsets = runRecord?.data?.labwareOffsets ?? []
+  const { data: runRecord } = useNotifyRunQuery(runId ?? null)
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const compatibleFlexAnalysis = useCompatibleAnalysis(
+    runId,
+    runRecord,
+    mostRecentAnalysis,
+    isFlex
+  )
+  const compatibleRobotAnalysis = isFlex
+    ? compatibleFlexAnalysis
+    : mostRecentAnalysis
 
   const labwareDefs = useMemo(() => {
     const labwareDefsFromCommands = getLabwareDefinitionsFromCommands(
-      mostRecentAnalysis?.commands ?? []
+      compatibleRobotAnalysis?.commands ?? []
     )
     return labwareDefsFromCommands
-  }, [mostRecentAnalysis != null])
-  const labwareInfo = useLPCLabwareInfo({
-    currentOffsets,
+  }, [compatibleRobotAnalysis?.commands.length])
+
+  const {
+    labwareInfo,
+    storedOffsets: flexOffsets,
+    legacyOffsets: ot2Offsets,
+  } = useLPCLabwareInfo({
     labwareDefs,
-    protocolData: mostRecentAnalysis,
+    protocolData: compatibleRobotAnalysis,
+    robotType,
+    runId,
+  })
+
+  useOffsetConflictTimestamp(isFlex, runId, runRecord)
+  useUpdateDeckConfig(isFlex, runId, deckConfig)
+  useUpdateLabware(isFlex, runId, maintenanceRunId, labwareInfo)
+  useHandleClientAppliedOffsets(isFlex, runId)
+  useInitLPCStore({
+    runId,
+    runRecord,
+    analysis: compatibleRobotAnalysis,
+    protocolName,
+    maintenanceRunId,
+    labwareDefs,
+    labwareInfo,
+    deckConfig,
+    isFlex,
+    flexStoredOffsets: flexOffsets,
   })
 
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
@@ -79,44 +122,51 @@ export function useLPCFlows({
   const {
     createLabwareDefinition,
   } = useCreateMaintenanceRunLabwareDefinitionMutation()
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
-  // TODO(jh, 01-14-25): There's no external error handing if LPC fails this series of POST requests.
-  // If the server doesn't absorb this functionality for the redesign, add error handling.
-  useRunLoadedLabwareDefinitions(runId, {
-    onSuccess: res => {
+  const {
+    deleteMaintenanceRun,
+    isLoading: isClosing,
+  } = useDeleteMaintenanceRunMutation()
+
+  // After the maintenance run is created, add labware defs to the maintenance run.
+  useEffect(() => {
+    if (maintenanceRunId != null) {
       void Promise.all(
-        res.data.map(def => {
-          if ('schemaVersion' in def) {
-            return createLabwareDefinition({
-              maintenanceRunId: maintenanceRunId as string,
-              labwareDef: def,
-            })
-          }
+        labwareDefs.map(def => {
+          return createLabwareDefinition({
+            maintenanceRunId,
+            labwareDef: def,
+          })
         })
-      ).then(() => {
-        setHasCreatedLPCRun(true)
-      })
-    },
-    onSettled: () => {
-      setIsLaunching(false)
-    },
-    enabled: maintenanceRunId != null,
-  })
+      )
+        .then(() => {
+          setHasCreatedLPCRun(true)
+        })
+        .finally(() => {
+          setIsLaunching(false)
+        })
+    }
+  }, [maintenanceRunId])
 
   const launchLPC = (): Promise<void> => {
-    setIsLaunching(true)
+    // Avoid accidentally creating several maintenance runs if a request is ongoing.
+    if (!isLaunching) {
+      setIsLaunching(true)
+      const labwareOffsets = getRelevantOffsets(
+        robotType,
+        ot2Offsets,
+        flexOffsets ?? []
+      )
+      const createRunData = labwareOffsets != null ? { labwareOffsets } : {}
 
-    return createTargetedMaintenanceRun({
-      labwareOffsets: currentOffsets.map(
-        ({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        })
-      ),
-    }).then(maintenanceRun => {
-      setMaintenanceRunId(maintenanceRun.data.id)
-    })
+      return createTargetedMaintenanceRun(createRunData).then(
+        maintenanceRun => {
+          setMaintenanceRunId(maintenanceRun.data.id)
+        }
+      )
+    } else {
+      console.warn('Attempted to launch LPC while already launching.')
+      return Promise.resolve()
+    }
   }
 
   const handleCloseLPC = (): void => {
@@ -130,76 +180,41 @@ export function useLPCFlows({
     }
   }
 
+  const isFlexLPCInitializing = flexOffsets == null
+
   const showLPC =
+    runId != null &&
     hasCreatedLPCRun &&
     maintenanceRunId != null &&
     protocolName != null &&
-    mostRecentAnalysis != null &&
+    compatibleRobotAnalysis != null &&
     deckConfig != null
 
   return showLPC
     ? {
         launchLPC,
         isLaunchingLPC: false,
+        isFlexLPCInitializing,
         showLPC,
         lpcProps: {
           onCloseClick: handleCloseLPC,
+          isClosing,
           runId,
           robotType,
           deckConfig,
           labwareDefs,
           labwareInfo,
-          mostRecentAnalysis,
+          analysis: compatibleRobotAnalysis,
           protocolName,
           maintenanceRunId,
-          existingOffsets: currentOffsets,
+          ot2Offsets,
         },
       }
-    : { launchLPC, isLaunchingLPC: isLaunching, lpcProps: null, showLPC }
-}
-
-const RUN_REFETCH_INTERVAL = 5000
-
-// TODO(jh, 01-02-25): Monitor for deletion behavior exists in several other flows. We should consolidate it.
-
-// Closes the modal in case the run was deleted by the terminate activity modal on the ODD
-function useMonitorMaintenanceRunForDeletion({
-  maintenanceRunId,
-  setMaintenanceRunId,
-}: {
-  maintenanceRunId: string | null
-  setMaintenanceRunId: (id: string | null) => void
-}): void {
-  const [
-    monitorMaintenanceRunForDeletion,
-    setMonitorMaintenanceRunForDeletion,
-  ] = useState<boolean>(false)
-
-  // We should start checking for run deletion only after the maintenance run is created
-  // and the useCurrentRun poll has returned that created id
-  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
-    refetchInterval: RUN_REFETCH_INTERVAL,
-    enabled: maintenanceRunId != null,
-  })
-
-  useEffect(() => {
-    if (maintenanceRunId === null) {
-      setMonitorMaintenanceRunForDeletion(false)
-    } else if (
-      maintenanceRunId !== null &&
-      maintenanceRunData?.data.id === maintenanceRunId
-    ) {
-      setMonitorMaintenanceRunForDeletion(true)
-    } else if (
-      maintenanceRunData?.data.id !== maintenanceRunId &&
-      monitorMaintenanceRunForDeletion
-    ) {
-      setMaintenanceRunId(null)
-    }
-  }, [
-    maintenanceRunData?.data.id,
-    maintenanceRunId,
-    monitorMaintenanceRunForDeletion,
-    setMaintenanceRunId,
-  ])
+    : {
+        launchLPC,
+        isLaunchingLPC: isLaunching,
+        isFlexLPCInitializing,
+        lpcProps: null,
+        showLPC,
+      }
 }

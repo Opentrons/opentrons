@@ -1,6 +1,6 @@
+import type { ReleaseNoteInfo } from 'builder-util-runtime'
 import type { IpcMainEvent } from 'electron'
 import type { UpdateFileInfo } from 'electron-updater'
-import type { ReleaseNoteInfo } from 'builder-util-runtime'
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
 
@@ -146,13 +146,14 @@ export interface RobotMassStorageDeviceRemoved {
 
 export type NotifyTopic =
   | 'ALL_TOPICS'
+  | `robot-server/clientData/${string}`
+  | 'robot-server/deck_configuration'
+  | 'robot-server/labwareOffsets'
   | 'robot-server/maintenance_runs/current_run'
   | 'robot-server/runs/commands_links'
   | 'robot-server/runs'
   | `robot-server/runs/${string}`
-  | 'robot-server/deck_configuration'
   | `robot-server/runs/pre_serialized_commands/${string}`
-  | `robot-server/clientData/${string}`
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -14,24 +15,26 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { getWellsDepth, getWellDimension } from '@opentrons/shared-data'
-import { prefixMap } from '../../../../../resources/utils'
+import { getWellDimension, getWellsDepth } from '@opentrons/shared-data'
+
 import {
   TipPositionModal,
   ZTipPositionModal,
 } from '../../../../../components/organisms'
-import { getIsDelayPositionField } from '../../../../../form-types'
 import { getDefaultMmFromEdge } from '../../../../../components/organisms/TipPositionModal/utils'
+import { getIsDelayPositionField } from '../../../../../form-types'
+import { prefixMap } from '../../../../../resources/utils'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 
+import type { PositionSpecs } from '../../../../../components/organisms'
 import type {
+  ReferenceFields,
   TipXOffsetFields,
   TipYOffsetFields,
   TipZOffsetFields,
 } from '../../../../../form-types'
-import type { PositionSpecs } from '../../../../../components/organisms'
-import type { FieldPropsByName } from '../types'
 import type { MoveLiquidPrefixType } from '../../../../../resources/types'
+import type { FieldPropsByName } from '../types'
 
 interface PositionFieldProps {
   prefix: MoveLiquidPrefixType
@@ -43,6 +46,7 @@ interface PositionFieldProps {
   padding?: string
   showButton?: boolean
   isNested?: boolean
+  referenceField?: ReferenceFields
 }
 
 export function PositionField(props: PositionFieldProps): JSX.Element {
@@ -56,6 +60,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
     padding = `0 ${SPACING.spacing16}`,
     showButton = false,
     isNested = false,
+    referenceField,
   } = props
   const {
     name: zName,
@@ -68,7 +73,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
 
   const { t, i18n } = useTranslation(['application', 'protocol_steps'])
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const [isModalOpen, setModalOpen] = useState<boolean>(false)
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const labwareDef =
     labwareId != null && labwareEntities[labwareId] != null
@@ -100,15 +105,15 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
   }
 
   const handleOpen = (has3Specs: boolean): void => {
-    if (has3Specs && wellDepthMm && wellXWidthMm && wellYWidthMm) {
-      setModalOpen(true)
-    }
-    if (!has3Specs && wellDepthMm) {
-      setModalOpen(true)
+    if (
+      wellDepthMm != null &&
+      (has3Specs ? wellXWidthMm != null && wellYWidthMm != null : true)
+    ) {
+      setIsModalOpen(true)
     }
   }
   const handleClose = (): void => {
-    setModalOpen(false)
+    setIsModalOpen(false)
   }
   const isDelayPositionField = getIsDelayPositionField(zName)
   let zValue: string | number = '0'
@@ -116,7 +121,9 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
   const mmFromBottom = typeof rawZValue === 'number' ? rawZValue : null
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
-    zValue = mmFromBottom ?? getDefaultMmFromEdge({ name: zName })
+    zValue =
+      mmFromBottom ??
+      getDefaultMmFromEdge({ name: zName, wellDepth: wellDepthMm })
   }
 
   let modal = (
@@ -168,11 +175,18 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
         isIndeterminate={isIndeterminate}
         specs={specs}
         prefix={prefix}
+        reference={
+          referenceField != null ? propsForFields[referenceField] : null
+        }
       />
     )
   }
 
-  const isRetract = prefixMap[prefix] === 'retract'
+  const referencePosition =
+    referenceField != null ? propsForFields[referenceField].value : null
+  const referencePositionText = t(
+    `protocol_steps:reference_positions.${referencePosition}`
+  )
 
   return (
     <>
@@ -207,9 +221,9 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
             <StyledText desktopStyle="bodyDefaultRegular">
               {xField != null && yField != null
                 ? t(
-                    isRetract
-                      ? 'protocol_steps:well_position_xyz'
-                      : 'protocol_steps:well_position',
+                    isNested
+                      ? 'protocol_steps:well_position_with_reference_nested'
+                      : 'protocol_steps:well_position_with_reference',
                     {
                       x:
                         propsForFields[xField].value != null
@@ -220,6 +234,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
                           ? Number(propsForFields[yField].value)
                           : 0,
                       z: zValue,
+                      reference: referencePositionText,
                     }
                   )
                 : t('protocol_steps:well_position_z_only', {

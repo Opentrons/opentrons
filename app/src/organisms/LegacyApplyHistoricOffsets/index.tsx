@@ -1,30 +1,34 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import pick from 'lodash/pick'
-import { Trans, useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   CheckboxField,
   DIRECTION_COLUMN,
   Flex,
+  getLabwareDefinitionsFromCommands,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  Link,
-  SIZE_1,
-  SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
+  Link,
   ModalHeader,
   ModalShell,
-  getLabwareDefinitionsFromCommands,
+  SIZE_1,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
-import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
-import { LabwareOffsetTable } from './LabwareOffsetTable'
+import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
+
+import { LegacyLabwareOffsetTable } from './LegacyLabwareOffsetTable'
 
 import type { ChangeEvent } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -35,7 +39,7 @@ import type {
 } from '@opentrons/shared-data'
 
 const HOW_OFFSETS_WORK_SUPPORT_URL =
-  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
+  'https://support.opentrons.com/s/article/creating-labware-offsets'
 export interface OffsetCandidate extends LabwareOffset {
   runCreatedAt: string
   labwareDisplayName: string
@@ -66,21 +70,23 @@ export function LegacyApplyHistoricOffsets(
     getIsLabwareOffsetCodeSnippetsOn
   )
   const JupyterSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="jupyter"
       labwareOffsets={offsetCandidates.map(o =>
         pick(o, ['definitionUri', 'vector', 'location'])
       )}
       {...{ labware, modules, commands }}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
   const CommandLineSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="cli"
       labwareOffsets={offsetCandidates.map(o =>
         pick(o, ['definitionUri', 'vector', 'location'])
       )}
       {...{ labware, modules, commands }}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
   const noOffsetData = offsetCandidates.length < 1
@@ -161,9 +167,9 @@ export function LegacyApplyHistoricOffsets(
                 </ExternalLink>
                 {!noOffsetData ? (
                   isLabwareOffsetCodeSnippetsOn ? (
-                    <LabwareOffsetTabs
+                    <LegacyLabwareOffsetTabs
                       TableComponent={
-                        <LabwareOffsetTable
+                        <LegacyLabwareOffsetTable
                           offsetCandidates={offsetCandidates}
                           labwareDefinitions={getLabwareDefinitionsFromCommands(
                             commands
@@ -174,7 +180,7 @@ export function LegacyApplyHistoricOffsets(
                       CommandLineComponent={CommandLineSnippet}
                     />
                   ) : (
-                    <LabwareOffsetTable
+                    <LegacyLabwareOffsetTable
                       offsetCandidates={offsetCandidates}
                       labwareDefinitions={getLabwareDefinitionsFromCommands(
                         commands

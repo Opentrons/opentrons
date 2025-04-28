@@ -1,31 +1,34 @@
-import { COLUMN, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
   absorbanceReaderCollision,
-  modulePipetteCollision,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getLabwareSlot,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  uuid,
-  getIsSafePipetteMovement,
   formatPyStr,
   formatPyWellLocation,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getIsSafePipetteMovement,
+  getLabwareSlot,
   indentPyLines,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+  uuid,
 } from '../../utils'
-import { COLUMN_4_SLOTS } from '../../constants'
+
 import type {
+  AspDispAirgapParams,
   CreateCommand,
   NozzleConfigurationStyle,
-  AspDispAirgapParams,
 } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { Point } from '../../utils'
+
 export interface ExtendedAspirateParams extends AspDispAirgapParams {
   tipRack: string
   nozzles: NozzleConfigurationStyle | null
@@ -114,13 +117,14 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     )
   }
 
-  const is96Channel =
-    invariantContext.pipetteEntities[pipetteId]?.spec.channels === 96
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
 
   if (
-    is96Channel &&
-    nozzles === COLUMN &&
+    isMultiChannelPipette &&
+    nozzles !== ALL &&
     !getIsSafePipetteMovement(
+      nozzles,
       prevRobotState,
       invariantContext,
       pipetteId,

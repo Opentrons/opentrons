@@ -4,14 +4,15 @@ import {
   savePositionCommands,
 } from './commands'
 
-import type {
-  MoveLabwareCreateCommand,
-  Coordinates,
-  CreateCommand,
-} from '@opentrons/shared-data'
 import type { VectorOffset } from '@opentrons/api-client'
-import type { UseLPCCommandWithChainRunChildProps } from './types'
+import type {
+  CreateCommand,
+  LabwareLocation,
+  MoveLabwareCreateCommand,
+  Vector3D,
+} from '@opentrons/shared-data'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 export interface UseHandleConfirmPlacementProps
   extends UseLPCCommandWithChainRunChildProps {
@@ -25,22 +26,22 @@ export interface UseHandleConfirmPlacementResult {
     offsetLocationDetails: OffsetLocationDetails,
     pipetteId: string,
     initialVectorOffset?: VectorOffset | null
-  ) => Promise<Coordinates>
+  ) => Promise<Vector3D>
 }
 
 export function useHandleConfirmLwModulePlacement({
   chainLPCCommands,
-  mostRecentAnalysis,
+  analysis,
   setErrorMessage,
 }: UseHandleConfirmPlacementProps): UseHandleConfirmPlacementResult {
   const handleConfirmLwModulePlacement = (
     offsetLocationDetails: OffsetLocationDetails,
     pipetteId: string,
     initialVectorOffset?: VectorOffset | null
-  ): Promise<Coordinates> => {
+  ): Promise<Vector3D> => {
     const confirmCommands: CreateCommand[] = [
       ...buildMoveLabwareCommand(offsetLocationDetails),
-      ...moduleInitDuringLPCCommands(mostRecentAnalysis),
+      ...moduleInitDuringLPCCommands(analysis),
       ...moveToWellCommands(
         offsetLocationDetails,
         pipetteId,
@@ -75,46 +76,48 @@ export function useHandleConfirmLwModulePlacement({
 function buildMoveLabwareCommand(
   offsetLocationDetails: OffsetLocationDetails
 ): MoveLabwareCreateCommand[] {
-  const { labwareId, moduleId, adapterId, slotName } = offsetLocationDetails
+  return offsetLocationDetails.lwModOnlyStackupDetails.reduce<
+    MoveLabwareCreateCommand[]
+  >((acc, component, idx, lwModOnlyLocSeqsWithIds) => {
+    if (component.kind === 'module') {
+      return acc
+    } else {
+      // If the previous item in the lw stackup is a module, we need to move the
+      // labware on top of the module.
+      const closestBeneathModuleId =
+        idx > 0 && lwModOnlyLocSeqsWithIds[idx - 1].kind === 'module'
+          ? lwModOnlyLocSeqsWithIds[idx - 1].id
+          : null
+      // If the previous item in the lw stackup is a lw, we need to move the
+      // labware on top of the lw.
+      const closestBeneathLwId =
+        idx > 0 && lwModOnlyLocSeqsWithIds[idx - 1].kind === 'labware'
+          ? lwModOnlyLocSeqsWithIds[idx - 1].id
+          : null
 
-  const locationSpecificSlotName = slotName as string
+      const buildNewLocation = (): LabwareLocation => {
+        if (closestBeneathModuleId != null) {
+          return { moduleId: closestBeneathModuleId }
+        } else if (closestBeneathLwId != null) {
+          return { labwareId: closestBeneathLwId }
+        } else {
+          return {
+            addressableAreaName: offsetLocationDetails.addressableAreaName,
+          }
+        }
+      }
 
-  const newLocationLabware =
-    moduleId != null ? { moduleId } : { slotName: locationSpecificSlotName }
-  const newLocationAdapter =
-    adapterId != null
-      ? { labwareId: adapterId }
-      : { slotName: locationSpecificSlotName }
-
-  if (adapterId != null) {
-    return [
-      {
-        commandType: 'moveLabware' as const,
-        params: {
-          labwareId: adapterId,
-          newLocation: newLocationLabware,
-          strategy: 'manualMoveWithoutPause',
+      return [
+        ...acc,
+        {
+          commandType: 'moveLabware',
+          params: {
+            labwareId: component.id,
+            newLocation: buildNewLocation(),
+            strategy: 'manualMoveWithoutPause',
+          },
         },
-      },
-      {
-        commandType: 'moveLabware' as const,
-        params: {
-          labwareId,
-          newLocation: newLocationAdapter,
-          strategy: 'manualMoveWithoutPause',
-        },
-      },
-    ]
-  } else {
-    return [
-      {
-        commandType: 'moveLabware' as const,
-        params: {
-          labwareId,
-          newLocation: newLocationLabware,
-          strategy: 'manualMoveWithoutPause',
-        },
-      },
-    ]
-  }
+      ]
+    }
+  }, [])
 }

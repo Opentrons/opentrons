@@ -1,32 +1,45 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   BORDERS,
   Box,
   COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_GRID,
   Flex,
   JUSTIFY_CENTER,
+  JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
+
 import { selectors } from '../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
+import { deselectWells, selectWells } from '../../../well-selection/actions'
 import { getSelectedWells } from '../../../well-selection/selectors'
+import { NAV_BAR_HEIGHT_REM } from '../../atoms'
+import { LiquidButton } from '../../molecules'
 import { SelectableLabware } from '../Labware/SelectableLabware'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
-import { deselectWells, selectWells } from '../../../well-selection/actions'
-import { NAV_BAR_HEIGHT_REM } from '../../atoms'
 import { LiquidToolbox } from './LiquidToolbox'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
 
-export function AssignLiquidsModal(): JSX.Element | null {
+interface AssignLiquidsModalProps {
+  showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
+}
+export function AssignLiquidsModal(
+  props: AssignLiquidsModalProps
+): JSX.Element | null {
+  const { showLiquidOverflowMenu } = props
   const { t } = useTranslation('liquids')
   const [highlightedWells, setHighlightedWells] = useState<WellGroup | {}>({})
   const navigate = useNavigate()
@@ -58,49 +71,56 @@ export function AssignLiquidsModal(): JSX.Element | null {
       padding={SPACING.spacing12}
       gridGap={SPACING.spacing12}
     >
-      <Flex
-        width="100%"
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-      >
-        <Box
-          width="50vw"
-          padding={SPACING.spacing60}
-          backgroundColor={COLORS.white}
-          borderRadius={BORDERS.borderRadius12}
-        >
-          <Flex
-            marginBottom={SPACING.spacing12}
-            justifyContent={JUSTIFY_CENTER}
-            width="100%"
-            color={COLORS.grey60}
+      <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
+        <Flex justifyContent={JUSTIFY_END}>
+          <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
+        </Flex>
+        <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
+          <Box
+            width="50vw"
+            padding={SPACING.spacing60}
+            backgroundColor={COLORS.white}
+            borderRadius={BORDERS.borderRadius12}
+            display={DISPLAY_GRID}
+            gap={SPACING.spacing12}
           >
-            <StyledText desktopStyle="headingSmallRegular">
-              {t('click_and_drag')}
-            </StyledText>
-          </Flex>
-          <SelectableLabware
-            showBorder={false}
-            labwareProps={{
-              wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
-              definition: labwareDef,
-              highlightedWells: highlightedWells,
-              wellFill: wellFillFromWellContents(
-                wellContents,
-                liquidDisplayColors
-              ),
-            }}
-            selectedPrimaryWells={selectedWells}
-            selectWells={(wells: WellGroup) => dispatch(selectWells(wells))}
-            deselectWells={(wells: WellGroup) => dispatch(deselectWells(wells))}
-            updateHighlightedWells={(wells: WellGroup) => {
-              setHighlightedWells(wells)
-            }}
-            ingredNames={liquidNamesById}
-            wellContents={wellContents}
-            nozzleType={null}
-          />
-        </Box>
+            <Flex
+              justifyContent={JUSTIFY_CENTER}
+              width="100%"
+              color={COLORS.grey60}
+            >
+              <StyledText
+                desktopStyle="headingSmallRegular"
+                css={{ userSelect: 'none' }}
+              >
+                {t('click_and_drag')}
+              </StyledText>
+            </Flex>
+            <SelectableLabware
+              showBorder={false}
+              labwareProps={{
+                wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
+                definition: labwareDef,
+                highlightedWells,
+                wellFill: wellFillFromWellContents(
+                  wellContents,
+                  liquidDisplayColors
+                ),
+              }}
+              selectedPrimaryWells={selectedWells}
+              selectWells={(wells: WellGroup) => dispatch(selectWells(wells))}
+              deselectWells={(wells: WellGroup) =>
+                dispatch(deselectWells(wells))
+              }
+              updateHighlightedWells={(wells: WellGroup) => {
+                setHighlightedWells(wells)
+              }}
+              ingredNames={liquidNamesById}
+              wellContents={wellContents}
+              nozzleType={null}
+            />
+          </Box>
+        </Flex>
       </Flex>
       <LiquidToolbox
         onClose={() => {

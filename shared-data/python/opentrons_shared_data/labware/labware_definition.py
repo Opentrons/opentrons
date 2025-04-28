@@ -52,15 +52,30 @@ _NonNegativeNumber = _StrictNonNegativeInt | _StrictNonNegativeFloat
 """Non-negative JSON number type, written to preserve lack of decimal point."""
 
 
-class Vector(BaseModel):
+class Vector2D(BaseModel):
+    x: _Number
+    y: _Number
+
+
+class Vector3D(BaseModel):
     x: _Number
     y: _Number
     z: _Number
 
 
+class AxisAlignedBoundingBox2D(BaseModel):
+    backLeft: Vector2D
+    frontRight: Vector2D
+
+
+class AxisAlignedBoundingBox3D(BaseModel):
+    backLeftBottom: Vector3D
+    frontRightTop: Vector3D
+
+
 class GripperOffsets(BaseModel):
-    pickUpOffset: Vector
-    dropOffset: Vector
+    pickUpOffset: Vector3D
+    dropOffset: Vector3D
 
 
 class BrandData(BaseModel):
@@ -106,11 +121,12 @@ class Parameters2(BaseModel):
     tipOverlap: _NonNegativeNumber | None = None
     loadName: Annotated[str, Field(pattern=SAFE_STRING_REGEX)]
     isMagneticModuleCompatible: bool
+    isDeckSlotCompatible: bool | None = None
     magneticModuleEngageHeight: _NonNegativeNumber | None = None
 
 
 class Parameters3(Parameters2, BaseModel):
-    isDeckSlotCompatible: bool | None = None
+    pass  # Currently equivalent to Parameters2.
 
 
 class Dimensions(BaseModel):
@@ -127,6 +143,7 @@ class _WellCommon2(BaseModel):
     x: _NonNegativeNumber
     y: _NonNegativeNumber
     z: _NonNegativeNumber
+    geometryDefinitionId: str | None = None
 
 
 class CircularWellDefinition2(_WellCommon2, BaseModel):
@@ -141,35 +158,22 @@ class RectangularWellDefinition2(_WellCommon2, BaseModel):
 
 
 WellDefinition2 = Annotated[
-    CircularWellDefinition2 | RectangularWellDefinition2, Field(discriminator="shape")
+    CircularWellDefinition2 | RectangularWellDefinition2, Discriminator("shape")
 ]
 
 
-class _WellCommon3(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    depth: _NonNegativeNumber
-    totalLiquidVolume: _NonNegativeNumber
-    x: _NonNegativeNumber
-    y: _NonNegativeNumber
-    z: _NonNegativeNumber
-    geometryDefinitionId: str | None = None
+class CircularWellDefinition3(CircularWellDefinition2):
+    # Currently equivalent to CircularWellDefinition2.
+    pass
 
 
-class CircularWellDefinition3(_WellCommon3, BaseModel):
-    shape: Literal["circular"]
-    diameter: _NonNegativeNumber
-
-
-class RectangularWellDefinition3(_WellCommon3, BaseModel):
-    shape: Literal["rectangular"]
-    xDimension: _NonNegativeNumber
-    yDimension: _NonNegativeNumber
+class RectangularWellDefinition3(RectangularWellDefinition2):
+    # Currently equivalent to RectangularWellDefinition2.
+    pass
 
 
 WellDefinition3 = Annotated[
-    CircularWellDefinition3 | RectangularWellDefinition3,
-    Discriminator("shape"),
+    CircularWellDefinition3 | RectangularWellDefinition3, Discriminator("shape")
 ]
 
 
@@ -483,6 +487,11 @@ class InnerWellGeometry(BaseModel):
     sections: Annotated[list[WellSegment], Field(min_length=1)]
 
 
+class Extents(BaseModel):
+    total: AxisAlignedBoundingBox3D
+    footprint: AxisAlignedBoundingBox2D
+
+
 class LabwareDefinition2(BaseModel):
     schemaVersion: Literal[2]
     version: Annotated[int, Field(ge=1)]
@@ -490,18 +499,20 @@ class LabwareDefinition2(BaseModel):
     metadata: Metadata
     brand: BrandData
     parameters: Parameters2
-    cornerOffsetFromSlot: Vector
+    cornerOffsetFromSlot: Vector3D
     ordering: list[list[str]]
     dimensions: Dimensions
     wells: dict[str, WellDefinition2]
     groups: list[Group]
-    stackingOffsetWithLabware: dict[str, Vector] = Field(default_factory=dict)
-    stackingOffsetWithModule: dict[str, Vector] = Field(default_factory=dict)
+    stackingOffsetWithLabware: dict[str, Vector3D] = Field(default_factory=dict)
+    stackingOffsetWithModule: dict[str, Vector3D] = Field(default_factory=dict)
     allowedRoles: list[LabwareRole] = Field(default_factory=list)
     gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
     gripForce: float | None = None
     gripHeightFromLabwareBottom: float | None = None
     stackLimit: int | None = None
+    compatibleParentLabware: list[str] | None = None
+    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
 
 
 class LabwareDefinition3(BaseModel):
@@ -514,20 +525,19 @@ class LabwareDefinition3(BaseModel):
     metadata: Metadata
     brand: BrandData
     parameters: Parameters3
-    cornerOffsetFromSlot: Vector
     ordering: list[list[str]]
-    dimensions: Dimensions
+    extents: Extents
     wells: dict[str, WellDefinition3]
     groups: list[Group]
-    stackingOffsetWithLabware: dict[str, Vector] = Field(default_factory=dict)
-    stackingOffsetWithModule: dict[str, Vector] = Field(default_factory=dict)
+    stackingOffsetWithLabware: dict[str, Vector3D] = Field(default_factory=dict)
+    stackingOffsetWithModule: dict[str, Vector3D] = Field(default_factory=dict)
     allowedRoles: list[LabwareRole] = Field(default_factory=list)
     gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
     gripForce: float | None = None
     gripHeightFromLabwareBottom: float | None = None
     stackLimit: int | None = None
-    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
     compatibleParentLabware: list[str] | None = None
+    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
 
 
 LabwareDefinition = Annotated[

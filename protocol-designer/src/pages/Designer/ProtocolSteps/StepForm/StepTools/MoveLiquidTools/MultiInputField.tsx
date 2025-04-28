@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -11,11 +12,13 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+
 import { InputStepFormField } from '../../../../../../components/molecules'
 import { PositionField } from '../../PipetteFields'
 
-import type { FieldPropsByName } from '../../types'
+import type { ReferenceFields } from '../../../../../../form-types'
 import type { MoveLiquidPrefixType } from '../../../../../../resources/types'
+import type { FieldPropsByName } from '../../types'
 
 export interface StepInputFieldProps {
   fieldTitle: string
@@ -31,6 +34,7 @@ interface MultiInputFieldProps {
   prefix: MoveLiquidPrefixType
   isWellPosition?: boolean | null
   labwareId?: string | null
+  referenceField?: ReferenceFields
 }
 
 export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
@@ -42,6 +46,7 @@ export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
     prefix,
     propsForFields,
     labwareId,
+    referenceField,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation(['protocol_steps', 'form', 'tooltip'])
@@ -93,6 +98,7 @@ export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
               yField={`${prefix}_y_position`}
               labwareId={labwareId}
               isNested
+              referenceField={referenceField}
             />
           )}
         </Flex>

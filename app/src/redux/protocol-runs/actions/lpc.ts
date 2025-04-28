@@ -1,38 +1,58 @@
 import {
-  PROCEED_STEP,
-  SET_INITIAL_POSITION,
-  SET_FINAL_POSITION,
-  START_LPC,
+  APPLIED_OFFSETS_TO_RUN,
+  APPLY_WORKING_OFFSETS,
+  CLEAR_SNACKBAR_STATUS,
+  CLEAR_WORKING_OFFSETS,
   FINISH_LPC,
+  GO_BACK_HANDLE_LW_SUBSTEP,
   GO_BACK_LAST_STEP,
+  PROCEED_HANDLE_LW_SUBSTEP,
+  PROCEED_STEP,
+  RESET_OFFSET_TO_DEFAULT,
+  SET_FINAL_POSITION,
+  SET_INITIAL_POSITION,
   SET_SELECTED_LABWARE,
   SET_SELECTED_LABWARE_URI,
-  APPLY_WORKING_OFFSETS,
-  PROCEED_HANDLE_LW_SUBSTEP,
-  GO_BACK_HANDLE_LW_SUBSTEP,
-  RESET_OFFSET_TO_DEFAULT,
-  CLEAR_WORKING_OFFSETS,
+  SOURCE_OFFSETS_FROM_DATABASE,
+  SOURCE_OFFSETS_FROM_RUN,
+  TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
+  UPDATE_CONFLICT_TIMESTAMP,
+  UPDATE_LPC,
+  UPDATE_LPC_DECK,
+  UPDATE_LPC_LABWARE,
 } from '../constants'
 
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
+  AppliedOffsetsToRunAction,
+  ApplyWorkingOffsetsAction,
+  ClearSelectedLabwareWorkingOffsetsAction,
+  ClearSnackbarStatus,
+  ConflictTimestampInfo,
   FinalPositionAction,
-  InitialPositionAction,
-  StartLPCAction,
-  LPCWizardState,
-  PositionParams,
-  ProceedStepAction,
   FinishLPCAction,
+  GoBackHandleLwSubstepAction,
   GoBackStepAction,
+  InitialPositionAction,
+  LocationSpecificOffsetLocationDetails,
+  LPCLabwareInfo,
+  LPCStep,
+  LPCWizardState,
+  OffsetLocationDetails,
+  PositionParams,
+  ProceedHandleLwSubstepAction,
+  ProceedStepAction,
+  ResetLocationSpecificOffsetToDefaultAction,
+  SavedOffsets,
   SelectedLabwareAction,
   SelectedLabwareNameAction,
-  OffsetLocationDetails,
-  ApplyWorkingOffsetsAction,
-  LPCStep,
-  ProceedHandleLwSubstepAction,
-  GoBackHandleLwSubstepAction,
-  LocationSpecificOffsetLocationDetails,
-  ResetLocationSpecificOffsetToDefaultAction,
-  ClearSelectedLabwareWorkingOffsetsAction,
+  SourceOffsetsFromDatabaseAction,
+  SourceOffsetsFromRunAction,
+  ToggleDefaultOffsetInfoBanner,
+  UpdateConflictTimestampAction,
+  UpdateLPCAction,
+  UpdateLPCDeckAction,
+  UpdateLPCLabwareAction,
 } from '../types'
 
 export const proceedStep = (
@@ -82,10 +102,11 @@ export const setInitialPosition = (
 
 export const setFinalPosition = (
   runId: string,
+  isOnDevice: boolean,
   params: PositionParams
 ): FinalPositionAction => ({
   type: SET_FINAL_POSITION,
-  payload: { ...params, runId },
+  payload: { ...params, runId, isOnDevice },
 })
 
 export const resetLocationSpecificOffsetToDefault = (
@@ -107,18 +128,34 @@ export const clearSelectedLabwareWorkingOffsets = (
 
 export const applyWorkingOffsets = (
   runId: string,
-  labwareUri: string
+  saveResult: SavedOffsets
 ): ApplyWorkingOffsetsAction => ({
   type: APPLY_WORKING_OFFSETS,
-  payload: { runId, labwareUri },
+  payload: { runId, saveResult },
 })
 
-export const startLPC = (
+export const updateLPC = (
   runId: string,
   state: LPCWizardState
-): StartLPCAction => ({
-  type: START_LPC,
+): UpdateLPCAction => ({
+  type: UPDATE_LPC,
   payload: { runId, state },
+})
+
+export const updateLPCDeck = (
+  runId: string,
+  deck: DeckConfiguration
+): UpdateLPCDeckAction => ({
+  type: UPDATE_LPC_DECK,
+  payload: { runId, deck },
+})
+
+export const updateLPCLabware = (
+  runId: string,
+  labware: LPCLabwareInfo['labware']
+): UpdateLPCLabwareAction => ({
+  type: UPDATE_LPC_LABWARE,
+  payload: { runId, labware },
 })
 
 export const closeLPC = (runId: string): FinishLPCAction => ({
@@ -138,5 +175,46 @@ export const goBackEditOffsetSubstep = (
   runId: string
 ): GoBackHandleLwSubstepAction => ({
   type: GO_BACK_HANDLE_LW_SUBSTEP,
+  payload: { runId },
+})
+
+export const appliedOffsetsToRun = (
+  runId: string
+): AppliedOffsetsToRunAction => ({
+  type: APPLIED_OFFSETS_TO_RUN,
+  payload: { runId },
+})
+
+export const sourceOffsetsFromRun = (
+  runId: string
+): SourceOffsetsFromRunAction => ({
+  type: SOURCE_OFFSETS_FROM_RUN,
+  payload: { runId },
+})
+
+export const sourceOffsetsFromDatabase = (
+  runId: string
+): SourceOffsetsFromDatabaseAction => ({
+  type: SOURCE_OFFSETS_FROM_DATABASE,
+  payload: { runId },
+})
+
+export const updateConflictTimestamp = (
+  runId: string,
+  info: ConflictTimestampInfo
+): UpdateConflictTimestampAction => ({
+  type: UPDATE_CONFLICT_TIMESTAMP,
+  payload: { runId, info },
+})
+
+export const toggleDefaultOffsetInfoBanner = (
+  runId: string
+): ToggleDefaultOffsetInfoBanner => ({
+  type: TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
+  payload: { runId },
+})
+
+export const clearSnackbarStatus = (runId: string): ClearSnackbarStatus => ({
+  type: CLEAR_SNACKBAR_STATUS,
   payload: { runId },
 })

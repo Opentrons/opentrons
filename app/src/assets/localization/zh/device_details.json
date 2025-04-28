@@ -64,6 +64,7 @@
   "firmware_update_occurring": "固件更新正在进行中...",
   "firmware_updated_successfully": "固件更新成功",
   "fixture": "配置模组",
+  "flex_stacker_door_status": "前门状态： {{status}}",
   "have_not_run": "无最近运行记录",
   "have_not_run_description": "运行一些协议后，它们会在这里显示。",
   "heater": "加热器",

@@ -20,6 +20,7 @@ import type {
   ConfigV25,
   ConfigV26,
 } from '@opentrons/app/src/redux/config/types'
+
 // format
 // base config v12 defaults
 // any default values for later config versions are specified in the migration

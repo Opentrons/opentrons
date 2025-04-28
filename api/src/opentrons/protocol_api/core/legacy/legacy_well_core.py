@@ -5,7 +5,7 @@ from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocols.api_support.util import APIVersionError
 
-from opentrons.types import Point
+from opentrons.types import Point, Mount
 
 from opentrons.protocol_engine.types.liquid_level_detection import (
     SimulatedProbeResult,
@@ -129,6 +129,7 @@ class LegacyWellCore(AbstractWellCore):
 
     def estimate_liquid_height_after_pipetting(
         self,
+        mount: Mount | str,
         operation_volume: float,
     ) -> LiquidTrackingType:
         """Estimate what the liquid height will be after pipetting, without raising an error."""
@@ -140,6 +141,14 @@ class LegacyWellCore(AbstractWellCore):
 
     def get_liquid_volume(self) -> LiquidTrackingType:
         """Get the current well volume."""
+        return 0.0
+
+    def height_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the height in a well corresponding to a given volume."""
+        return 0.0
+
+    def volume_from_height(self, height: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the volume contained in a well at any height."""
         return 0.0
 
     # TODO(mc, 2022-10-28): is this used and/or necessary?

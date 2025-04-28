@@ -1,27 +1,31 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
-import { OT2_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
+
+import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { moveToWell } from '../commandCreators/atomic/moveToWell'
 import {
-  absorbanceReaderCollision,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
-import {
-  getRobotStateWithTipStandard,
-  getInitialRobotStateWithOffDeckLabwareStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
   DEFAULT_PIPETTE,
+  getErrorResult,
+  getInitialRobotStateWithOffDeckLabwareStandard,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
+import {
+  absorbanceReaderCollision,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+
+import type { WellOrigin } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/absorbanceReaderCollision')
@@ -46,6 +50,10 @@ describe('moveToWell', () => {
       pipetteId: DEFAULT_PIPETTE,
       labwareId: SOURCE_LABWARE,
       wellName: 'A1',
+      wellLocation: {
+        origin: 'bottom' as WellOrigin,
+        offset: { z: 1 },
+      },
     }
     const result = moveToWell(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
@@ -56,9 +64,18 @@ describe('moveToWell', () => {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,
           wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom' as any,
+            offset: {
+              z: 1,
+            },
+          },
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mockPythonName.move_to(mockPythonName["A1"].bottom(z=1))'
+    )
   })
   it('should apply the optional params to the command', () => {
     const params = {

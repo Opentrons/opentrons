@@ -1,8 +1,10 @@
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockCircularLabwareWellGroupProperties } from '/app/redux/custom-labware/__fixtures__'
+
 import { WellSpacing } from '../WellSpacing'
 
 import type { ComponentProps } from 'react'

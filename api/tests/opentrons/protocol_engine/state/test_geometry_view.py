@@ -18,12 +18,18 @@ from opentrons.protocol_engine.state.update_types import (
 )
 
 from opentrons_shared_data import get_shared_data_root, load_shared_data
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV5, CutoutFixture
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.types import Point, DeckSlotName, MountType, StagingSlotName
+from opentrons.types import (
+    Point,
+    DeckSlotName,
+    MountType,
+    StagingSlotName,
+    MeniscusTrackingTarget,
+)
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.labware.labware_definition import (
     CuboidalFrustum,
@@ -34,12 +40,11 @@ from opentrons_shared_data.labware.labware_definition import (
     Parameters2 as LabwareDefinition2Parameters,
     RectangularWellDefinition3,
     SphericalSegment,
-    Vector as LabwareDefinitionVector,
+    Vector3D as LabwareDefinitionVector3D,
     ConicalFrustum,
     labware_definition_type_adapter,
 )
 from opentrons_shared_data.labware import load_definition as load_labware_definition
-
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
@@ -83,6 +88,10 @@ from opentrons.protocol_engine.types import (
     OnCutoutFixtureLocationSequenceComponent,
     InStackerHopperLocation,
     PotentialCutoutFixture,
+    AddressableArea,
+    AreaType,
+    AddressableOffsetVector,
+    WellLocationFunction,
 )
 from opentrons.protocol_engine.commands import (
     CommandStatus,
@@ -127,6 +136,7 @@ from opentrons_shared_data.robot.types import (
     paddingOffset,
     mountOffset,
 )
+
 
 from .command_fixtures import (
     create_comment_command,
@@ -648,6 +658,9 @@ def test_get_labware_origin_position(
     ).then_return(Point(1, 2, 3))
 
     expected_parent = Point(1, 2, 3)
+    assert (
+        well_plate_def.schemaVersion == 2
+    )  # For the presence of cornerOffsetFromSlot.
     expected_offset = Point(
         x=well_plate_def.cornerOffsetFromSlot.x,
         y=well_plate_def.cornerOffsetFromSlot.y,
@@ -662,7 +675,6 @@ def test_get_labware_origin_position(
 
 def test_get_labware_highest_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
@@ -679,8 +691,8 @@ def test_get_labware_highest_z(
     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
+    decoy.when(mock_labware_view.get_dimensions(labware_id="labware-id")).then_return(
+        Dimensions(x=999, y=999, z=100)
     )
     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
@@ -691,12 +703,11 @@ def test_get_labware_highest_z(
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
-    assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3)
+    assert highest_z == (100 + 3 + 3)
 
 
 def test_get_module_labware_highest_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
@@ -716,7 +727,10 @@ def test_get_module_labware_highest_z(
 
     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
+        sentinel.well_plate_def
+    )
+    decoy.when(mock_labware_view.get_dimensions(labware_id="labware-id")).then_return(
+        Dimensions(x=999, y=999, z=100)
     )
     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
@@ -748,13 +762,13 @@ def test_get_module_labware_highest_z(
     )
     decoy.when(
         mock_labware_view.get_module_overlap_offsets(
-            well_plate_def, ModuleModel.MAGNETIC_MODULE_V2
+            sentinel.well_plate_def, ModuleModel.MAGNETIC_MODULE_V2
         )
     ).then_return(OverlapOffset(x=0, y=0, z=0))
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
-    assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3 + 6 + 0.5)
+    assert highest_z == (100 + 3 + 3 + 6 + 0.5)
 
 
 def test_get_all_obstacle_highest_z_no_equipment(
@@ -776,9 +790,6 @@ def test_get_all_obstacle_highest_z_no_equipment(
 
 def test_get_all_obstacle_highest_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    reservoir_def: LabwareDefinition,
-    falcon_tuberack_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
@@ -819,12 +830,16 @@ def test_get_all_obstacle_highest_z(
     decoy.when(mock_labware_view.get("off-deck-plate-id")).then_return(off_deck_lw)
     decoy.when(mock_labware_view.get("reservoir-id")).then_return(reservoir)
 
-    decoy.when(mock_labware_view.get_definition("plate-id")).then_return(well_plate_def)
-    decoy.when(mock_labware_view.get_definition("off-deck-plate-id")).then_return(
-        falcon_tuberack_def  # Something tall.
+    decoy.when(mock_labware_view.get_dimensions(labware_id="plate-id")).then_return(
+        Dimensions(x=0, y=0, z=10)
     )
-    decoy.when(mock_labware_view.get_definition("reservoir-id")).then_return(
-        reservoir_def
+    decoy.when(
+        mock_labware_view.get_dimensions(labware_id="off-deck-plate-id")
+    ).then_return(
+        Dimensions(x=0, y=0, z=10000)  # Something tall.
+    )
+    decoy.when(mock_labware_view.get_dimensions(labware_id="reservoir-id")).then_return(
+        Dimensions(x=0, y=0, z=20)
     )
 
     decoy.when(mock_labware_view.get_labware_offset_vector("plate-id")).then_return(
@@ -854,8 +869,6 @@ def test_get_all_obstacle_highest_z(
 
 def test_get_all_obstacle_highest_z_with_staging_area(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    falcon_tuberack_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
@@ -887,9 +900,11 @@ def test_get_all_obstacle_highest_z_with_staging_area(
     decoy.when(mock_labware_view.get("plate-id")).then_return(plate)
     decoy.when(mock_labware_view.get("staging-id")).then_return(staging_lw)
 
-    decoy.when(mock_labware_view.get_definition("plate-id")).then_return(well_plate_def)
-    decoy.when(mock_labware_view.get_definition("staging-id")).then_return(
-        falcon_tuberack_def  # Something tall.
+    decoy.when(mock_labware_view.get_dimensions(labware_id="plate-id")).then_return(
+        Dimensions(x=0, y=0, z=10)
+    )
+    decoy.when(mock_labware_view.get_dimensions(labware_id="staging-id")).then_return(
+        Dimensions(x=0, y=0, z=10000)  # Something tall.
     )
 
     decoy.when(mock_labware_view.get_labware_offset_vector("plate-id")).then_return(
@@ -962,7 +977,6 @@ def test_get_highest_z_in_slot_with_single_labware(
     mock_labware_view: LabwareView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
-    well_plate_def: LabwareDefinition,
 ) -> None:
     """It should get the highest Z in slot with just a single labware."""
     # Case: Slot has a labware that doesn't have any other labware on it. Highest z is equal to labware height.
@@ -983,9 +997,9 @@ def test_get_highest_z_in_slot_with_single_labware(
         errors.LabwareNotLoadedOnLabwareError("no more labware")
     )
     decoy.when(mock_labware_view.get("just-labware-id")).then_return(labware_in_slot)
-    decoy.when(mock_labware_view.get_definition("just-labware-id")).then_return(
-        well_plate_def
-    )
+    decoy.when(
+        mock_labware_view.get_dimensions(labware_id="just-labware-id")
+    ).then_return(Dimensions(x=0, y=0, z=1000))
     decoy.when(
         mock_labware_view.get_labware_offset_vector("just-labware-id")
     ).then_return(calibration_offset)
@@ -993,7 +1007,7 @@ def test_get_highest_z_in_slot_with_single_labware(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(slot_pos)
 
-    expected_highest_z = well_plate_def.dimensions.zDimension + 3 + 3
+    expected_highest_z = 1000 + 3 + 3
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
         == expected_highest_z
@@ -1046,7 +1060,6 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
     mock_labware_view: LabwareView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
-    well_plate_def: LabwareDefinition,
 ) -> None:
     """It should get the highest z in slot of the topmost labware in stack.
 
@@ -1095,11 +1108,15 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
     decoy.when(mock_labware_view.get("top-labware-id")).then_return(top_labware)
 
     decoy.when(mock_labware_view.get_definition("top-labware-id")).then_return(
-        well_plate_def
+        sentinel.well_plate_def
     )
     decoy.when(mock_labware_view.get_definition("middle-labware-id")).then_return(
         sentinel.middle_labware_def
     )
+
+    decoy.when(
+        mock_labware_view.get_dimensions(labware_id="top-labware-id")
+    ).then_return(Dimensions(x=0, y=0, z=1000))
 
     decoy.when(
         mock_labware_view.get_labware_offset_vector("top-labware-id")
@@ -1113,7 +1130,7 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
 
     decoy.when(
         mock_labware_view.get_labware_overlap_offsets(
-            well_plate_def, below_labware_name="middle-labware-name"
+            sentinel.well_plate_def, below_labware_name="middle-labware-name"
         )
     ).then_return(OverlapOffset(x=4, y=5, z=6))
     decoy.when(
@@ -1126,9 +1143,7 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(slot_pos)
 
-    expected_highest_z = (
-        slot_pos.z + well_plate_def.dimensions.zDimension - 6 + 30 - 9 + 13 + 3
-    )
+    expected_highest_z = slot_pos.z + 1000 - 6 + 30 - 9 + 13 + 3
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
         == expected_highest_z
@@ -1144,7 +1159,6 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
-    well_plate_def: LabwareDefinition,
     ot2_standard_deck_def: DeckDefinitionV5,
 ) -> None:
     """It should get the highest z in slot of labware on module.
@@ -1193,8 +1207,11 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         ot2_standard_deck_def
     )
     decoy.when(mock_labware_view.get_definition("top-labware-id")).then_return(
-        well_plate_def
+        sentinel.well_plate_def
     )
+    decoy.when(
+        mock_labware_view.get_dimensions(labware_id="top-labware-id")
+    ).then_return(Dimensions(x=0, y=0, z=1000))
 
     decoy.when(mock_labware_view.get("adapter-id")).then_return(adapter)
     decoy.when(mock_labware_view.get_definition("adapter-id")).then_return(
@@ -1210,7 +1227,7 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
     )
     decoy.when(
         mock_labware_view.get_labware_overlap_offsets(
-            definition=well_plate_def, below_labware_name="adapter-name"
+            definition=sentinel.well_plate_def, below_labware_name="adapter-name"
         )
     ).then_return(OverlapOffset(x=4, y=5, z=6))
 
@@ -1237,9 +1254,7 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(slot_pos)
 
-    expected_highest_z = (
-        slot_pos.z + 60 + 30 - 3.3 + well_plate_def.dimensions.zDimension - 6 + 3
-    )
+    expected_highest_z = slot_pos.z + 60 + 30 - 3.3 + 1000 - 6 + 3
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
         == expected_highest_z
@@ -1260,7 +1275,6 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
 )
 def test_get_min_travel_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
@@ -1279,8 +1293,8 @@ def test_get_min_travel_z(
     )
 
     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
+    decoy.when(mock_labware_view.get_dimensions(labware_id="labware-id")).then_return(
+        Dimensions(x=0, y=0, z=14.22)
     )
     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
         LabwareOffsetVector(x=0, y=0, z=3)
@@ -1331,6 +1345,9 @@ def test_get_labware_position(
 
     position = subject.get_labware_position(labware_id="labware-id")
 
+    assert (
+        well_plate_def.schemaVersion == 2
+    )  # For the presence of cornerOffsetFromSlot.
     assert position == Point(
         x=slot_pos[0] + well_plate_def.cornerOffsetFromSlot.x + 1,
         y=slot_pos[1] + well_plate_def.cornerOffsetFromSlot.y - 2,
@@ -1763,6 +1780,10 @@ def test_get_well_position_with_meniscus_and_literal_volume_offset(
     slot_pos = Point(4, 5, 6)
     well_def = well_plate_def.wells["B2"]
 
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
         well_plate_def
@@ -1833,7 +1854,10 @@ def test_get_well_position_with_meniscus_and_float_volume_offset(
     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
     well_def = well_plate_def.wells["B2"]
-
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
         well_plate_def
@@ -1930,6 +1954,10 @@ def test_get_well_position_raises_validation_error(
     )
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
         _TEST_INNER_WELL_GEOMETRY
+    )
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
     )
     decoy.when(
         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
@@ -2052,8 +2080,14 @@ def test_get_relative_well_location(
     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
         well_def
     )
+    decoy.when(subject.get_labware_origin_position("labware-id")).then_return(
+        Point(1, 2, 3)
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
 
-    result = subject.get_relative_well_location(
+    result, _ = subject.get_relative_well_location(
         labware_id="labware-id",
         well_name="B2",
         absolute_point=Point(
@@ -2061,8 +2095,8 @@ def test_get_relative_well_location(
             y=slot_pos[1] - 2 + well_def.y + 8,
             z=slot_pos[2] + 3 + well_def.z + well_def.depth + 9,
         ),
+        location_type=WellLocationFunction.BASE,
     )
-
     assert result == WellLocation(
         origin=WellOrigin.TOP,
         offset=WellOffset.model_construct(
@@ -2081,11 +2115,43 @@ def test_get_relative_liquid_handling_well_location(
     subject: GeometryView,
 ) -> None:
     """It should get the relative location of a well given an absolute position."""
-    result = subject.get_relative_liquid_handling_well_location(
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="b",
+        definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId=None,
+    )
+    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_position("3")
+    ).then_return(Point(1, 2, 3))
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(subject.get_labware_origin_position("labware-id")).then_return(
+        Point(1, 2, 3)
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+
+    (result, dynamic_liquid_tracking) = subject.get_relative_well_location(
         labware_id="labware-id",
         well_name="B2",
         absolute_point=Point(x=0, y=0, z=-2),
-        is_meniscus=True,
+        meniscus_tracking=MeniscusTrackingTarget.END,
+        location_type=WellLocationFunction.LIQUID_HANDLING,
     )
 
     assert result == LiquidHandlingWellLocation(
@@ -2095,6 +2161,7 @@ def test_get_relative_liquid_handling_well_location(
             y=0.0,
             z=cast(float, pytest.approx(-2)),
         ),
+        volumeOffset="operationVolume",
     )
 
 
@@ -2570,28 +2637,88 @@ def test_get_slot_item(
     decoy: Decoy,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
+    ot3_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
 ) -> None:
     """It should get items in certain slots."""
     labware = LoadedLabware.model_construct(id="cool-labware")  # type: ignore[call-arg]
     module = LoadedModule.model_construct(id="cool-module")  # type: ignore[call-arg]
+    chute_fixture = CutoutFixture(
+        id="wasteChuteRightAdapterNoCover",
+        mayMountTo=["cutoutD3"],
+        providesAddressableAreas={
+            "cutoutD3": [
+                "1ChannelWasteChute",
+                "8ChannelWasteChute",
+                "96ChannelWasteChute",
+                "gripperWasteChute",
+            ]
+        },
+        displayName="Waste Chute Adapter for 96 Channel Pipette or Gripper",
+        fixtureGroup={},
+        expectOpentronsModuleSerialNumber=False,
+        height=124.5,
+    )
+    chute_area = AddressableArea(
+        area_name="1ChannelWasteChute",
+        area_type=AreaType.WASTE_CHUTE,
+        base_slot=DeckSlotName.SLOT_D3,
+        display_name="",
+        bounding_box=Dimensions(x=0, y=0, z=0),
+        position=AddressableOffsetVector(x=0, y=0, z=0),
+        compatible_module_types=[],
+    )
+    subject._addressable_areas = AddressableAreaView(
+        state=AddressableAreaState(
+            loaded_addressable_areas_by_name={
+                "1ChannelWasteChute": chute_area,
+            },
+            potential_cutout_fixtures_by_cutout_id={
+                "cutoutD3": {
+                    PotentialCutoutFixture(
+                        cutout_id="cutoutD3",
+                        cutout_fixture_id="cool_chute",
+                        provided_addressable_areas=frozenset({chute_area.area_name}),
+                    )
+                },
+                "cutoutC3": {
+                    PotentialCutoutFixture(
+                        cutout_id="cutoutC3",
+                        cutout_fixture_id="cool_trash",
+                        provided_addressable_areas=frozenset({chute_area.area_name}),
+                    )
+                },
+            },
+            deck_definition=ot3_standard_deck_def,
+            deck_configuration=[
+                ("cutoutC1", "singleLeftSlot", None),
+                ("cutoutD1", "singleLeftSlot", None),
+                ("cutoutD2", "singleCenterSlot", None),
+                ("cutoutD3", "wasteChuteRightAdapterNoCover", None),
+            ],
+            robot_type=subject._addressable_areas._state.robot_type,
+            use_simulated_deck_config=subject._addressable_areas._state.use_simulated_deck_config,
+            robot_definition=subject._addressable_areas._state.robot_definition,
+        )
+    )
 
-    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
-    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(labware)
-    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
+    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_D1)).then_return(None)
+    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_D2)).then_return(labware)
+    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_C1)).then_return(None)
 
-    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
-    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(None)
-    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(module)
+    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_D1)).then_return(module)
+    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_D2)).then_return(None)
+    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_C1)).then_return(None)
 
     assert (
         subject.get_slot_item(
-            DeckSlotName.SLOT_1,
+            DeckSlotName.SLOT_C1,
         )
         is None
     )
-    assert subject.get_slot_item(DeckSlotName.SLOT_2) == labware
-    assert subject.get_slot_item(DeckSlotName.SLOT_3) == module
+    assert subject.get_slot_item(DeckSlotName.SLOT_D2) == labware
+    assert subject.get_slot_item(DeckSlotName.SLOT_D1) == module
+    assert subject.get_slot_item(DeckSlotName.SLOT_D3) == chute_fixture
 
 
 def test_get_slot_item_that_is_overflowed_module(
@@ -3029,7 +3156,7 @@ def test_check_gripper_labware_tip_collision(
             isTiprack=True,
             isMagneticModuleCompatible=False,
         ),
-        cornerOffsetFromSlot=LabwareDefinitionVector.model_construct(x=1, y=2, z=3),
+        cornerOffsetFromSlot=LabwareDefinitionVector3D.model_construct(x=1, y=2, z=3),
         ordering=[],
     )
 
@@ -3058,10 +3185,14 @@ def test_check_gripper_labware_tip_collision(
         Point(1, 2, 3)
     )
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(subject._get_highest_z_from_labware_data(labware_data)).then_return(1000)
+    decoy.when(mock_labware_view.get_dimensions(labware_id="labware-id")).then_return(
+        Dimensions(
+            x=definition.dimensions.xDimension,
+            y=definition.dimensions.yDimension,
+            z=definition.dimensions.zDimension,
+        )
+    )
 
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(subject.get_labware_highest_z("labware-id")).then_return(100.0)
     decoy.when(
         mock_addressable_area_view.get_addressable_area_center(
             addressable_area_name=DeckSlotName.SLOT_1.id
@@ -3071,12 +3202,6 @@ def test_check_gripper_labware_tip_collision(
         mock_labware_view.get_grip_height_from_labware_bottom(definition)
     ).then_return(1.0)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(
-        subject.get_labware_grip_point(
-            labware_definition=definition,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        )
-    ).then_return(Point(x=100.0, y=100.0, z=0.0))
 
     with pytest.raises(errors.LabwareMovementNotAllowedError):
         subject.check_gripper_labware_tip_collision(
@@ -3596,7 +3721,7 @@ def test_get_well_height_at_volume(
     """Test getting the well height at a given volume."""
 
     def _get_labware_def() -> LabwareDefinition:
-        def_dir = str(get_shared_data_root()) + f"/labware/definitions/3/{labware_id}"
+        def_dir = str(get_shared_data_root()) + f"/labware/definitions/2/{labware_id}"
         version_str = max([str(version) for version in listdir(def_dir)])
         def_path = path.join(def_dir, version_str)
         _labware_def = labware_definition_type_adapter.validate_python(
@@ -3605,9 +3730,7 @@ def test_get_well_height_at_volume(
         return _labware_def
 
     labware_def = _get_labware_def()
-    assert (
-        labware_def.schemaVersion == 3 and labware_def.innerLabwareGeometry is not None
-    )
+    assert labware_def.innerLabwareGeometry is not None
     well_geometry = labware_def.innerLabwareGeometry.get(well_name)
     assert well_geometry is not None
     well_definition = [
@@ -3664,7 +3787,7 @@ def test_get_well_volume_at_height(
     """Test getting the volume at a given height."""
 
     def _get_labware_def() -> LabwareDefinition:
-        def_dir = str(get_shared_data_root()) + f"/labware/definitions/3/{labware_id}"
+        def_dir = str(get_shared_data_root()) + f"/labware/definitions/2/{labware_id}"
         version_str = max([str(version) for version in listdir(def_dir)])
         def_path = path.join(def_dir, version_str)
         _labware_def = labware_definition_type_adapter.validate_python(
@@ -3673,9 +3796,7 @@ def test_get_well_volume_at_height(
         return _labware_def
 
     labware_def = _get_labware_def()
-    assert (
-        labware_def.schemaVersion == 3 and labware_def.innerLabwareGeometry is not None
-    )
+    assert labware_def.innerLabwareGeometry is not None
     well_geometry = labware_def.innerLabwareGeometry.get(well_name)
     assert well_geometry is not None
     well_definition = [
@@ -4051,7 +4172,7 @@ def test_get_predicted_location_sequence_with_pending_labware(
             [
                 labware_definition_type_adapter.validate_python(
                     load_labware_definition(
-                        "opentrons_flex_tiprack_lid", version=1, schema=3
+                        "opentrons_flex_tiprack_lid", version=1, schema=2
                     )
                 ),
                 labware_definition_type_adapter.validate_python(
@@ -4079,17 +4200,27 @@ def test_virtual_get_well_height_after_liquid_handling_no_error(
     decoy: Decoy,
     subject: GeometryView,
     mock_labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
+    well_plate_def: LabwareDefinition,
     initial_liquid_height: LiquidTrackingType,
 ) -> None:
     """Make sure SimulatedLiquidProbe doesn't change geometry behavior."""
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
         _TEST_INNER_WELL_GEOMETRY
     )
     operation_volume = 1000.0
-
     result_estimate = subject.get_well_height_after_liquid_handling_no_error(
         labware_id="labware-id",
         well_name="B2",
+        pipette_id="pipette-id",
         initial_height=initial_liquid_height,
         volume=operation_volume,
     )
@@ -4118,3 +4249,48 @@ def test_virtual_find_height_and_volume(
     #  SimulatedProbeResult
     if isinstance(target_height_volume, SimulatedProbeResult):
         assert height_estimate == volume_estimate == target_height_volume
+
+
+def test_get_liquid_handling_z_change(
+    decoy: Decoy,
+    subject: GeometryView,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
+    mock_well_view: WellView,
+) -> None:
+    """Test for get_liquid_handling_z_change math."""
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
+
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
+        RectangularWellDefinition3.model_construct(totalLiquidVolume=1100000)  # type: ignore[call-arg]
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "A1")).then_return(
+        _TEST_INNER_WELL_GEOMETRY
+    )
+    probe_time = datetime.now()
+    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "A1")).then_return(
+        probe_time
+    )
+    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "A1")).then_return(
+        WellLiquidInfo(
+            loaded_volume=None,
+            probed_height=ProbedHeightInfo(height=40.0, last_probed=probe_time),
+            probed_volume=None,
+        )
+    )
+    # make sure that liquid handling z change math stays the same
+    change = subject.get_liquid_handling_z_change(
+        labware_id="labware-id",
+        well_name="A1",
+        pipette_id="pipette-id",
+        operation_volume=199.0,
+    )
+    expected_change = 3.2968
+    assert isclose(change, expected_change)

@@ -1,57 +1,60 @@
+import isEmpty from 'lodash/isEmpty'
 import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import isEmpty from 'lodash/isEmpty'
 import { createSelector } from 'reselect'
+
 import {
-  getLabwareDisplayName,
+  ABSORBANCE_READER_TYPE,
   getLabwareDefURI,
+  getLabwareDisplayName,
+  getPipetteSpecsV2,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
-  ABSORBANCE_READER_TYPE,
-  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import * as featureFlagSelectors from '../../feature-flags/selectors'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
+import { getFieldErrors } from '../../steplist/fieldLevel'
 import {
-  getFormWarnings,
   getFormErrors,
+  getFormWarnings,
   stepFormToArgs,
 } from '../../steplist/formLevel'
-import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
 import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
-import { getFieldErrors } from '../../steplist/fieldLevel'
-import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
-import * as featureFlagSelectors from '../../feature-flags/selectors'
+import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
 import { denormalizePipetteEntities, getHydratedForm } from '../utils'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
-import type { ComponentProps } from 'react'
+import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
+
 import type { Selector } from 'reselect'
+import type { ComponentProps } from 'react'
+import type {
+  DropdownOption,
+  InstrumentGroup,
+  InstrumentInfoProps,
+  Mount,
+} from '@opentrons/components'
+import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntities,
-  NormalizedAdditionalEquipmentById,
+  AdditionalEquipmentEntity,
+  GripperEntities,
   InvariantContext,
-  LabwareEntity,
   LabwareEntities,
-  ModuleEntities,
-  PipetteEntities,
+  LabwareEntity,
   LiquidEntities,
+  ModuleEntities,
+  NormalizedAdditionalEquipmentById,
+  PipetteEntities,
+  StagingAreaEntities,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '@opentrons/step-generation'
-import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
-import type {
-  InstrumentGroup,
-  DropdownOption,
-  Mount,
-  InstrumentInfoProps,
-} from '@opentrons/components'
-import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { FormWarning } from '../../steplist/formLevel'
-import type { BaseState, DeckSlot } from '../../types'
 import type {
   FormData,
   HydratedAbsorbanceReaderFormData,
@@ -68,33 +71,38 @@ import type {
   ProfileItem,
   StepIdType,
 } from '../../form-types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { RootState as LabwareIngredRootState } from '../../labware-ingred/reducers'
+import type { FormWarning } from '../../steplist/formLevel'
+import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type {
   StepArgsAndErrorsById,
   StepFormErrors,
 } from '../../steplist/types'
+import type { BaseState, DeckSlot } from '../../types'
+import type { DeckConfigurationState } from '../actions'
 import type {
-  InitialDeckSetup,
-  NormalizedLabwareById,
-  NormalizedLabware,
-  LabwareOnDeck,
-  MagneticModuleState,
-  ModuleOnDeck,
-  ModulesForEditModulesCard,
-  PipetteOnDeck,
-  FormPipettesByMount,
-  TemperatureModuleState,
-  ThermocyclerModuleState,
-  HeaterShakerModuleState,
-  MagneticBlockState,
-  AbsorbanceReaderState,
-} from '../types'
-import type {
+  BatchEditFormChangesState,
   PresavedStepFormState,
   RootState,
   SavedStepFormState,
-  BatchEditFormChangesState,
 } from '../reducers'
-import type { RootState as LabwareIngredRootState } from '../../labware-ingred/reducers'
+import type {
+  AbsorbanceReaderState,
+  FormPipettesByMount,
+  HeaterShakerModuleState,
+  InitialDeckSetup,
+  LabwareOnDeck,
+  MagneticBlockState,
+  MagneticModuleState,
+  ModuleOnDeck,
+  ModulesForEditModulesCard,
+  NormalizedLabware,
+  NormalizedLabwareById,
+  PipetteOnDeck,
+  TemperatureModuleState,
+  ThermocyclerModuleState,
+} from '../types'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 const labwareIngredRootSelector = (state: BaseState): LabwareIngredRootState =>
@@ -572,6 +580,27 @@ export const getCurrentFormHasUnsavedChanges: Selector<
     return !isEqual(unsavedForm, savedForm)
   }
 )
+export const getCurrentFormUnsavedChangedFields: Selector<
+  BaseState,
+  string[]
+> = createSelector(
+  getUnsavedForm,
+  getSavedStepForms,
+  (unsavedForm, savedStepForms) => {
+    const id = unsavedForm?.id
+    const savedForm = id != null ? savedStepForms[id] : null
+
+    if (savedForm == null || unsavedForm == null) {
+      // nonexistent = no unsaved changes
+      return []
+    }
+    const fields = Object.keys(savedForm)
+    return fields.reduce<string[]>((acc, field) => {
+      return savedForm[field] !== unsavedForm[field] ? [...acc, field] : acc
+    }, [])
+  }
+)
+
 export const getBatchEditFieldChanges: Selector<
   BaseState,
   BatchEditFormChangesState
@@ -583,9 +612,15 @@ export const getBatchEditFormHasUnsavedChanges: Selector<
 
 const _formLevelErrors = (
   hydratedForm: HydratedFormData,
-  moduleEntities: ModuleEntities
+  moduleEntities: ModuleEntities,
+  labwareEntities: LabwareEntities
 ): StepFormErrors => {
-  return getFormErrors(hydratedForm.stepType, hydratedForm, moduleEntities)
+  return getFormErrors(
+    hydratedForm.stepType,
+    hydratedForm,
+    moduleEntities,
+    labwareEntities
+  )
 }
 
 const _dynamicFieldFormErrors = (
@@ -668,7 +703,11 @@ export const _hasFormLevelErrors = (
   invariantContext: InvariantContext
 ): boolean => {
   if (
-    _formLevelErrors(hydratedForm, invariantContext.moduleEntities).length > 0
+    _formLevelErrors(
+      hydratedForm,
+      invariantContext.moduleEntities,
+      invariantContext.labwareEntities
+    ).length > 0
   )
     return true
 
@@ -716,17 +755,75 @@ export const getInvariantContext: Selector<
     additionalEquipmentEntities,
     disableModuleRestrictions,
     allowAllTipracks
-  ) => ({
-    labwareEntities,
-    moduleEntities,
-    pipetteEntities,
-    liquidEntities,
-    additionalEquipmentEntities,
-    config: {
-      OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
-      OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
-    },
-  })
+  ) => {
+    const stagingAreaEntities = Object.values(
+      additionalEquipmentEntities
+    ).reduce((acc: StagingAreaEntities, entity: AdditionalEquipmentEntity) => {
+      if (entity.name === 'stagingArea') {
+        acc[entity.id] = { id: entity.id, location: entity.location }
+        return acc
+      } else {
+        return acc
+      }
+    }, {})
+    const trashBinEntities = Object.values(additionalEquipmentEntities).reduce(
+      (acc: TrashBinEntities, entity: AdditionalEquipmentEntity) => {
+        if (entity.name === 'trashBin' && entity.pythonName != null) {
+          acc[entity.id] = {
+            id: entity.id,
+            location: entity.location,
+            pythonName: entity.pythonName,
+          }
+          return acc
+        } else {
+          return acc
+        }
+      },
+      {}
+    )
+    const wasteChuteEntities = Object.values(
+      additionalEquipmentEntities
+    ).reduce((acc: WasteChuteEntities, entity: AdditionalEquipmentEntity) => {
+      if (entity.name === 'wasteChute' && entity.pythonName != null) {
+        acc[entity.id] = {
+          id: entity.id,
+          pythonName: entity.pythonName,
+          location: entity.location,
+        }
+        return acc
+      } else {
+        return acc
+      }
+    }, {})
+    const gripperEntities = Object.values(additionalEquipmentEntities).reduce(
+      (acc: GripperEntities, entity: AdditionalEquipmentEntity) => {
+        if (entity.name === 'gripper') {
+          acc[entity.id] = {
+            id: entity.id,
+          }
+          return acc
+        } else {
+          return acc
+        }
+      },
+      {}
+    )
+
+    return {
+      labwareEntities,
+      moduleEntities,
+      pipetteEntities,
+      liquidEntities,
+      trashBinEntities,
+      wasteChuteEntities,
+      stagingAreaEntities,
+      gripperEntities,
+      config: {
+        OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
+        OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
+      },
+    }
+  }
 )
 export const getHydratedUnsavedForm: Selector<
   BaseState,
@@ -770,7 +867,8 @@ export const getFormLevelErrorsForUnsavedForm: Selector<
 
     const errors = _formLevelErrors(
       hydratedForm,
-      invariantContext.moduleEntities
+      invariantContext.moduleEntities,
+      invariantContext.labwareEntities
     )
 
     return errors
@@ -871,3 +969,7 @@ export const getFormLevelWarningsPerStep: Selector<
       return getFormWarnings(form.stepType, hydratedForm)
     })
 )
+
+export const getDeckConfiguration = (
+  state: BaseState
+): DeckConfigurationState => rootSelector(state).deckConfiguration

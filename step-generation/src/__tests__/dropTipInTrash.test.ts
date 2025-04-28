@@ -1,10 +1,13 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+import { dropTipInTrash } from '../commandCreators/compound/dropTipInTrash'
 import {
   getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
-import { dropTipInTrash } from '../commandCreators/compound/dropTipInTrash'
+
+import type { CutoutId } from '@opentrons/shared-data'
 import type { InvariantContext, PipetteEntities, RobotState } from '../types'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
@@ -24,9 +27,9 @@ const mockCutout = 'cutoutA3'
 const invariantContext: InvariantContext = {
   ...makeContext(),
   pipetteEntities: mockPipEntities,
-  additionalEquipmentEntities: {
+  trashBinEntities: {
     [mockTrashBinId]: {
-      name: 'trashBin' as const,
+      pythonName: 'trash_bin_1',
       location: mockCutout,
       id: mockTrashBinId,
     },
@@ -41,6 +44,7 @@ describe('dropTipInTrash', () => {
   it('returns correct commands for drop tip', () => {
     const args = {
       pipetteId: mockId,
+      trashLocation: 'cutoutA3' as CutoutId,
     }
     const result = dropTipInTrash(args, invariantContext, prevRobotState)
     expect(getSuccessResult(result).commands).toEqual([

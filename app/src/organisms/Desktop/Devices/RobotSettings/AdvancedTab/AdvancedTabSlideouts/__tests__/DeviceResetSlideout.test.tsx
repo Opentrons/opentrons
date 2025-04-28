@@ -1,11 +1,14 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getResetConfigOptions } from '/app/redux/robot-admin'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { getResetConfigOptions } from '/app/redux/robot-admin'
+
 import { DeviceResetSlideout } from '../DeviceResetSlideout'
 
 vi.mock('/app/redux/config')
@@ -93,8 +96,9 @@ describe('RobotSettings DeviceResetSlideout', () => {
     screen.getByText('Clear deck calibration')
     screen.getByText('Clear pipette offset calibrations')
     screen.getByText('Clear tip length calibrations')
-    screen.getByText('Protocol run History')
+    screen.getByText('Protocol run data')
     screen.getByText('Clear protocol run history')
+    screen.getByText('Clear labware offset data')
     screen.getByText('Boot scripts')
     screen.getByText('Clear custom boot scripts')
     screen.getByText('Clear SSH public keys')

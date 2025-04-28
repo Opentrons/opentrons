@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -9,17 +10,17 @@ import {
   JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   POSITION_ABSOLUTE,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import SuccessIcon from '/app/assets/images/icon_success.png'
-import { getIsOnDevice } from '/app/redux/config'
 
+import SuccessIcon from '/app/assets/images/icon_success.png'
 import { Skeleton } from '/app/atoms/Skeleton'
+import { getIsOnDevice } from '/app/redux/config'
 
 import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'

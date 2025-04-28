@@ -1,13 +1,14 @@
-import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/1/pipetteModelSpecs.json'
+import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
 import { OT3_PIPETTES } from './constants'
+
 import type {
-  PipetteV2Specs,
+  PipetteModelSpecs,
+  PipetteNameSpecs,
   PipetteV2GeneralSpecs,
   PipetteV2GeometrySpecs,
   PipetteV2LiquidSpecs,
-  PipetteNameSpecs,
-  PipetteModelSpecs,
+  PipetteV2Specs,
 } from './types'
 
 type GeneralGeometricModules = PipetteV2GeneralSpecs | PipetteV2GeometrySpecs
@@ -287,4 +288,14 @@ export const getPipetteSpecsV2 = (
   }
 
   return pipetteV2Specs
+}
+
+const DEFAULT_LIQUID_TYPE = 'default'
+//  Flex pipette api names are different from pipetteName
+//  p1000_multi_flex -> flex_8channel_1000
+//  we do not need to worry about -_em pipette in PD
+export const getFlexNameConversion = (pipetteSpec: PipetteV2Specs): string => {
+  const channels = pipetteSpec.channels
+  const maxVolume = pipetteSpec.liquids[DEFAULT_LIQUID_TYPE].maxVolume
+  return `flex_${channels}channel_${maxVolume}`
 }

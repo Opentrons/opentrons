@@ -1,7 +1,8 @@
 import styled from 'styled-components'
-import { TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { NewAlertPrimaryBtn, styleProps } from '../../primitives'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   background-color: ${COLORS.red50};

@@ -1,18 +1,22 @@
 import flatMap from 'lodash/flatMap'
+
 import {
-  LOW_VOLUME_PIPETTES,
-  COLUMN,
+  ALL,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
-import {
-  repeatArray,
-  blowoutUtil,
-  curryCommandCreator,
-  reduceCommandCreators,
-  getIsSafePipetteMovement,
-  getHasWasteChute,
-} from '../../utils'
+
 import * as errorCreators from '../../errorCreators'
+import {
+  blowoutLocationHelper,
+  curryCommandCreator,
+  curryWithoutPython,
+  formatPyStr,
+  formatPyWellLocation,
+  getIsSafePipetteMovement,
+  indentPyLines,
+  reduceCommandCreators,
+} from '../../utils'
 import {
   aspirate,
   configureForVolume,
@@ -22,12 +26,17 @@ import {
 } from '../atomic'
 import { replaceTip } from './replaceTip'
 
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
-  MixArgs,
+  NozzleConfigurationStyle,
+  WellLocation,
+} from '@opentrons/shared-data'
+import type {
   CommandCreator,
   CurriedCommandCreator,
+  InvariantContext,
+  MixArgs,
 } from '../../types'
+
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil(args: {
   pipette: string
@@ -44,6 +53,8 @@ export function mixUtil(args: {
   aspirateDelaySeconds?: number | null | undefined
   dispenseDelaySeconds?: number | null | undefined
   nozzles: NozzleConfigurationStyle | null
+  invariantContext: InvariantContext
+  finalPushOut: number | null
 }): CurriedCommandCreator[] {
   const {
     pipette,
@@ -60,58 +71,111 @@ export function mixUtil(args: {
     xOffset,
     yOffset,
     nozzles,
+    invariantContext,
+    finalPushOut,
   } = args
+  //  If delay is specified to something other than 0,
+  //  emit individual py commands. Otherwise, emit mix()
+  const hasUnsupportedMixApiArg =
+    (aspirateDelaySeconds != null && aspirateDelaySeconds !== 0) ||
+    (dispenseDelaySeconds != null && dispenseDelaySeconds !== 0) ||
+    finalPushOut != null
+
+  const curryCreator = hasUnsupportedMixApiArg
+    ? curryCommandCreator
+    : curryWithoutPython
 
   const getDelayCommand = (seconds?: number | null): CurriedCommandCreator[] =>
     seconds
       ? [
-          curryCommandCreator(delay, {
+          curryCreator(delay, {
             seconds,
           }),
         ]
       : []
 
-  return repeatArray(
-    [
-      curryCommandCreator(aspirate, {
-        pipetteId: pipette,
-        volume,
-        labwareId: labware,
-        wellName: well,
-        flowRate: aspirateFlowRateUlSec,
-        tipRack,
-        wellLocation: {
-          origin: 'bottom',
-          offset: {
-            z: offsetFromBottomMm,
-            x: xOffset,
-            y: yOffset,
+  const pythonCommandCreator: CurriedCommandCreator = () => {
+    const { pipetteEntities, labwareEntities } = invariantContext
+    const pipettePythonName = pipetteEntities[pipette].pythonName
+    const labwarePythonName = labwareEntities[labware].pythonName
+    const pythonWellLocation: WellLocation = {
+      origin: 'bottom',
+      offset: { x: xOffset, y: yOffset, z: offsetFromBottomMm },
+    }
+    const pythonArgs = [
+      `repetitions=${times}`,
+      `volume=${volume}`,
+      `location=${labwarePythonName}[${formatPyStr(
+        well
+      )}]${formatPyWellLocation(pythonWellLocation)}`,
+      // TODO (nd, 04/09/2025): uncomment next line once PAPI supports new `final_push_out` arg
+      // `final_push_out=${finalPushOut}`
+    ]
+    return {
+      commands: [],
+      //  Note: we do not support mix in trashBin or wasteChute so location
+      //  will always be a well
+      python:
+        `${pipettePythonName}.flow_rate.aspirate = ${aspirateFlowRateUlSec}\n` +
+        `${pipettePythonName}.flow_rate.dispense = ${dispenseFlowRateUlSec}\n` +
+        `${pipettePythonName}.mix(\n${indentPyLines(
+          pythonArgs.join(',\n')
+        )},\n)`,
+    }
+  }
+
+  const commandCreators = []
+  for (let i = 0; i < times; i++) {
+    commandCreators.push(
+      ...[
+        curryCreator(aspirate, {
+          pipetteId: pipette,
+          volume,
+          labwareId: labware,
+          wellName: well,
+          flowRate: aspirateFlowRateUlSec,
+          tipRack,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: offsetFromBottomMm,
+              x: xOffset,
+              y: yOffset,
+            },
           },
-        },
-        nozzles: null,
-      }),
-      ...getDelayCommand(aspirateDelaySeconds),
-      curryCommandCreator(dispense, {
-        pipetteId: pipette,
-        volume,
-        labwareId: labware,
-        wellName: well,
-        wellLocation: {
-          origin: 'bottom',
-          offset: {
-            z: offsetFromBottomMm,
-            x: xOffset,
-            y: yOffset,
+          nozzles: null,
+        }),
+        ...getDelayCommand(aspirateDelaySeconds),
+        curryCreator(dispense, {
+          pipetteId: pipette,
+          volume,
+          labwareId: labware,
+          wellName: well,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: offsetFromBottomMm,
+              x: xOffset,
+              y: yOffset,
+            },
           },
-        },
-        flowRate: dispenseFlowRateUlSec,
-        tipRack,
-        nozzles: nozzles,
-      }),
-      ...getDelayCommand(dispenseDelaySeconds),
-    ],
-    times
-  )
+          flowRate: dispenseFlowRateUlSec,
+          tipRack,
+          nozzles: nozzles,
+          ...(i < times - 1
+            ? { pushOut: 0 }
+            : finalPushOut == null
+            ? {}
+            : { pushOut: finalPushOut }), // only push out if final repetition
+        }),
+        ...getDelayCommand(dispenseDelaySeconds),
+      ]
+    )
+  }
+  return [
+    ...commandCreators,
+    ...(hasUnsupportedMixApiArg ? [] : [pythonCommandCreator]),
+  ]
 }
 export const mix: CommandCreator<MixArgs> = (
   data,
@@ -147,10 +211,11 @@ export const mix: CommandCreator<MixArgs> = (
     xOffset,
     yOffset,
     nozzles,
+    finalPushOut,
   } = data
 
-  const is96Channel =
-    invariantContext.pipetteEntities[pipette]?.spec.channels === 96
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipette]?.spec.channels !== 1
 
   // Errors
   if (
@@ -179,9 +244,8 @@ export const mix: CommandCreator<MixArgs> = (
   }
 
   const initialLabwareSlot = prevRobotState.labware[labware]?.slot
-  const hasWasteChute = getHasWasteChute(
-    invariantContext.additionalEquipmentEntities
-  )
+  const hasWasteChute =
+    Object.keys(invariantContext.wasteChuteEntities).length > 0
 
   if (
     hasWasteChute &&
@@ -192,13 +256,15 @@ export const mix: CommandCreator<MixArgs> = (
 
   if (
     !dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[dropTipLocation]
+    (invariantContext.wasteChuteEntities[dropTipLocation] == null &&
+      invariantContext.trashBinEntities[dropTipLocation] == null)
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
-  if (is96Channel && data.nozzles === COLUMN) {
+  if (isMultiChannelPipette && nozzles !== ALL) {
     const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
+      data.nozzles,
       prevRobotState,
       invariantContext,
       pipette,
@@ -207,6 +273,7 @@ export const mix: CommandCreator<MixArgs> = (
       { x: xOffset, y: yOffset }
     )
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement(
+      data.nozzles,
       prevRobotState,
       invariantContext,
       pipette,
@@ -254,16 +321,11 @@ export const mix: CommandCreator<MixArgs> = (
               pipetteId: pipette,
               labwareId: labware,
               wellName: well,
-              wellLocation: {
-                origin: 'top',
-                offset: {
-                  z: data.touchTipMmFromTop,
-                },
-              },
+              zOffsetFromTop: data.touchTipMmFromTop,
             }),
           ]
         : []
-      const blowoutCommand = blowoutUtil({
+      const blowoutCommand = blowoutLocationHelper({
         pipette: data.pipette,
         sourceLabwareId: data.labware,
         sourceWell: well,
@@ -289,6 +351,8 @@ export const mix: CommandCreator<MixArgs> = (
         xOffset,
         yOffset,
         nozzles,
+        invariantContext,
+        finalPushOut,
       })
       return [
         ...tipCommands,

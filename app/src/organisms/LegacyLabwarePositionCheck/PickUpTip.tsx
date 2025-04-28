@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
+
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   getLabwareDefinitionsFromCommands,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -16,33 +18,38 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
-import { JogToWell } from './JogToWell'
-import { UnorderedList } from '/app/molecules/UnorderedList'
-import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
-import { TipConfirmation } from './TipConfirmation'
-import { getLabwareDef } from './utils/labware'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '/app/redux/config'
 
+import { UnorderedList } from '/app/molecules/UnorderedList'
+import { getIsOnDevice } from '/app/redux/config'
+import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
+
+import { JogToWell } from './JogToWell'
+import { PrepareSpace } from './PrepareSpace'
+import { RobotMotionLoader } from './RobotMotionLoader'
+import { TipConfirmation } from './TipConfirmation'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { getLabwareDef } from './utils/labware'
+
+import type { TFunction } from 'i18next'
 import type { Dispatch } from 'react'
+import type {
+  LabwareOffset,
+  LegacyLabwareOffsetLocation,
+} from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
   MoveLabwareCreateCommand,
   RobotType,
+  Vector3D,
 } from '@opentrons/shared-data'
-import type { useChainRunCommands } from '/app/resources/runs'
 import type { Jog } from '/app/molecules/JogControls/types'
+import type { useChainRunCommands } from '/app/resources/runs'
 import type {
   PickUpTipStep,
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { LabwareOffset } from '@opentrons/api-client'
-import type { TFunction } from 'i18next'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -50,6 +57,14 @@ interface PickUpTipProps extends PickUpTipStep {
   registerPosition: Dispatch<RegisterPositionAction>
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   setFatalError: (errorMessage: string) => void
+  calculateAndApplyOffset: (
+    initialPosition: Vector3D | null,
+    finalPosition: Vector3D | null,
+    labwareId: string,
+    location: LegacyLabwareOffsetLocation
+  ) => Promise<void>
+  onSkip: () => void
+  isApplyingOffsets: boolean
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
   handleJog: Jog
@@ -58,6 +73,7 @@ interface PickUpTipProps extends PickUpTipStep {
   protocolHasModules: boolean
   currentStepIndex: number
 }
+
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const {
@@ -70,8 +86,11 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     registerPosition,
     handleJog,
     isRobotMoving,
+    isApplyingOffsets,
+    calculateAndApplyOffset,
     existingOffsets,
     workingOffsets,
+    onSkip,
     setFatalError,
     adapterId,
     robotType,
@@ -227,6 +246,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             initialPosition != null && position != null
               ? getVectorDifference(position, initialPosition)
               : undefined
+
           registerPosition({
             type: 'finalPosition',
             labwareId,
@@ -234,7 +254,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             position,
           })
           registerPosition({ type: 'tipPickUpOffset', offset: offset ?? null })
-          chainRunCommands(
+
+          return chainRunCommands(
             [
               {
                 commandType: 'pickUpTip',
@@ -247,16 +268,20 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
               },
             ],
             false
-          )
-            .then(() => {
-              setShowTipConfirmation(true)
-            })
-            .catch((e: Error) => {
-              setFatalError(
-                `PickUpTip failed to move from final position with message: ${e.message}`
+          ).then(() => {
+            setShowTipConfirmation(true)
+            if (position != null) {
+              return calculateAndApplyOffset(
+                initialPosition ?? null,
+                position,
+                labwareId,
+                location
               )
-            })
+            }
+            return Promise.resolve()
+          })
         }
+        return Promise.resolve()
       })
       .catch((e: Error) => {
         setFatalError(
@@ -435,7 +460,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           }
           labwareDef={labwareDef}
           pipetteName={pipetteName}
-          handleConfirmPosition={handleConfirmPosition}
+          handleConfirmPositionAndApply={handleConfirmPosition}
+          isApplyingOffsets={isApplyingOffsets}
           handleGoBack={handleGoBack}
           handleJog={handleJog}
           initialPosition={initialPosition}
@@ -451,6 +477,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           })}
           body={<UnorderedList items={instructions} />}
           labwareDef={labwareDef}
+          onSkip={onSkip}
           confirmPlacement={handleConfirmPlacement}
           robotType={robotType}
         />

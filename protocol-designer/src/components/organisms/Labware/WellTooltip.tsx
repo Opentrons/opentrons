@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
+import { Manager, Popper, Reference } from 'react-popper'
 import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import styled from 'styled-components'
-import { createPortal } from 'react-dom'
-import { Popper, Reference, Manager } from 'react-popper'
+
 import {
   BORDERS,
   COLORS,
@@ -16,6 +17,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { getMainPagePortalEl } from '..'
 import { selectors } from '../../../labware-ingred/selectors'
 import {

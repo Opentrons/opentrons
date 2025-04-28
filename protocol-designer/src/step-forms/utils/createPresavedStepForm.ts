@@ -1,11 +1,20 @@
 import last from 'lodash/last'
+
 import {
   ABSORBANCE_READER_TYPE,
+  ALL,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import {
+  ABSORBANCE_READER_INITIALIZE,
+  ABSORBANCE_READER_LID,
+  ABSORBANCE_READER_READ,
+} from '../../constants'
+import { maskField } from '../../steplist/fieldLevel'
 import {
   createBlankForm,
   getNextDefaultEngageHeight,
@@ -16,27 +25,22 @@ import {
   handleFormChange,
 } from '../../steplist/formLevel'
 import {
-  getModuleOnDeckByType,
   getMagnetLabwareEngageHeight,
+  getModuleOnDeckByType,
 } from '../../ui/modules/utils'
-import { maskField } from '../../steplist/fieldLevel'
+
 import type {
-  PipetteEntities,
+  AbsorbanceReaderState,
+  AdditionalEquipmentEntities,
   LabwareEntities,
+  PipetteEntities,
   RobotState,
   Timeline,
-  AdditionalEquipmentEntities,
-  AbsorbanceReaderState,
 } from '@opentrons/step-generation'
-import type { FormData, StepType, StepIdType } from '../../form-types'
-import type { InitialDeckSetup } from '../types'
+import type { FormData, StepIdType, StepType } from '../../form-types'
 import type { FormPatch } from '../../steplist/actions/types'
-import type { SavedStepFormState, OrderedStepIdsState } from '../reducers'
-import {
-  ABSORBANCE_READER_READ,
-  ABSORBANCE_READER_INITIALIZE,
-  ABSORBANCE_READER_LID,
-} from '../../constants'
+import type { OrderedStepIdsState, SavedStepFormState } from '../reducers'
+import type { InitialDeckSetup } from '../types'
 
 export interface CreatePresavedStepFormArgs {
   stepId: StepIdType
@@ -81,6 +85,32 @@ const _patchDefaultPipette = (args: {
     const updatedFields = handleFormChange(
       {
         pipette: defaultPipetteId,
+      },
+      formData,
+      pipetteEntities,
+      labwareEntities
+    )
+    return updatedFields
+  }
+
+  return null
+}
+
+const _patchDefaultNozzle = (args: {
+  labwareEntities: LabwareEntities
+  pipetteEntities: PipetteEntities
+}): FormUpdater => formData => {
+  const { labwareEntities, pipetteEntities } = args
+  const hasPartialTipSupportedChannel = Object.values(pipetteEntities).find(
+    pip => pip.spec.channels === 96 || pip.spec.channels === 8
+  )
+
+  const formHasNozzlesField = formData && 'nozzles' in formData
+
+  if (formHasNozzlesField && hasPartialTipSupportedChannel) {
+    const updatedFields = handleFormChange(
+      {
+        nozzles: ALL,
       },
       formData,
       pipetteEntities,
@@ -409,6 +439,11 @@ export const createPresavedStepForm = ({
     stepType,
   })
 
+  const updateDefaultNozzles = _patchDefaultNozzle({
+    labwareEntities,
+    pipetteEntities,
+  })
+
   const updateDefaultDropTip = _patchDefaultDropTipLocation({
     labwareEntities,
     pipetteEntities,
@@ -481,6 +516,7 @@ export const createPresavedStepForm = ({
     updateAbsorbanceReaderModuleId,
     updateDefaultLabwareLocations,
     updateMoveLabwareFields,
+    updateDefaultNozzles,
   ].reduce<FormData>(
     (acc, updater: FormUpdater) => {
       const updates = updater(acc)

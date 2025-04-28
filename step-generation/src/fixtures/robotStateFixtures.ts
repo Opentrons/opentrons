@@ -1,40 +1,36 @@
 import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
+
 import {
-  getLabwareDefURI,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  fixture96Plate as _fixture96Plate,
   fixture12Trough as _fixture12Trough,
+  fixture96Plate as _fixture96Plate,
   fixtureTiprack10ul as _fixtureTiprack10ul,
   fixtureTiprack300ul as _fixtureTiprack300ul,
   fixtureTiprack1000ul as _fixtureTiprack1000ul,
   fixtureTiprackAdapter as _fixtureTiprackAdapter,
-  fixtureP10SingleV2Specs,
   fixtureP10MultiV2Specs,
-  fixtureP300SingleV2Specs,
+  fixtureP10SingleV2Specs,
   fixtureP300MultiV2Specs,
+  fixtureP300SingleV2Specs,
   fixtureP100096V2Specs,
+  getLabwareDefURI,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../constants'
 import { makeInitialRobotState } from '../utils'
 import {
   DEFAULT_PIPETTE,
+  DEST_LABWARE,
   MULTI_PIPETTE,
   PIPETTE_96,
   SOURCE_LABWARE,
-  DEST_LABWARE,
-  TROUGH_LABWARE,
   tiprackWellNamesFlat,
+  TROUGH_LABWARE,
 } from './data'
-import { TEMPERATURE_DEACTIVATED, FIXED_TRASH_ID } from '../constants'
 
-import type {
-  TEMPERATURE_APPROACHING_TARGET,
-  TEMPERATURE_AT_TARGET,
-} from '../constants'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { AdditionalEquipmentEntities } from '../types'
 import type {
   Config,
   InvariantContext,
@@ -43,6 +39,11 @@ import type {
   RobotState,
   RobotStateAndWarnings,
 } from '../'
+import type {
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+} from '../constants'
+import type { TrashBinEntities } from '../types'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2
@@ -137,11 +138,11 @@ export function makeContext(): InvariantContext {
     },
   }
   const moduleEntities: ModuleEntities = {}
-  const additionalEquipmentEntities: AdditionalEquipmentEntities = {
+  const trashBinEntities: TrashBinEntities = {
     [FIXED_TRASH_ID]: {
       id: FIXED_TRASH_ID,
-      name: 'trashBin',
       location: 'cutoutA3',
+      pythonName: 'trash_bin_1',
     },
   }
   const pipetteEntities: PipetteEntities = {
@@ -191,7 +192,10 @@ export function makeContext(): InvariantContext {
     labwareEntities,
     moduleEntities,
     pipetteEntities,
-    additionalEquipmentEntities,
+    trashBinEntities,
+    wasteChuteEntities: {},
+    stagingAreaEntities: {},
+    gripperEntities: {},
     liquidEntities: {},
     config: DEFAULT_CONFIG,
   }

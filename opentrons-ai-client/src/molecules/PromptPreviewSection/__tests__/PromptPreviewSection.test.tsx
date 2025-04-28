@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-
 import { PromptPreviewSection } from '../index'
 
 import type { ComponentProps } from 'react'

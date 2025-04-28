@@ -1,14 +1,14 @@
-import { describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
+import { describe, it } from 'vitest'
 
-import { useRecoveryOptionCopy } from '../useRecoveryOptionCopy'
-import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
-
-import type { ErrorKind, RecoveryRoute } from '../../types'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
+import { useRecoveryOptionCopy } from '../useRecoveryOptionCopy'
+
 import type { ComponentProps } from 'react'
+import type { ErrorKind, RecoveryRoute } from '../../types'
 
 function MockRenderCmpt({
   route,
@@ -75,10 +75,16 @@ describe('useRecoveryOptionCopy', () => {
     screen.getByText('Retry with same tips')
   })
 
-  it(`renders the correct copy for ${RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE}`, () => {
-    render({ route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE })
+  it(`renders the correct copy for ${RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE}`, () => {
+    render({ route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE })
 
-    screen.getByText('Manually fill well and skip to next step')
+    screen.getByText('Manually fill well and retry with same tips')
+  })
+
+  it(`renders the correct copy for ${RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE}`, () => {
+    render({ route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE })
+
+    screen.getByText('Manually fill well and retry with new tips')
   })
 
   it(`renders the correct copy for ${RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE}`, () => {

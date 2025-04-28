@@ -1,32 +1,38 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
-  TYPOGRAPHY,
+  DIRECTION_COLUMN,
+  Flex,
   LegacyStyledText,
-  getLabwareDisplayLocation,
+  RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import {
-  selectSelectedLwRelatedAdapterDisplayName,
-  selectIsSelectedLwTipRack,
-  selectSelectedLwOverview,
-  selectSelectedLwDisplayName,
-  OFFSET_KIND_DEFAULT,
-} from '/app/redux/protocol-runs'
-import { UnorderedList } from '/app/molecules/UnorderedList'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 import { DescriptionContent } from '/app/molecules/InterventionModal'
+import { UnorderedList } from '/app/molecules/UnorderedList'
+import {
+  getFlexSlotNameOnly,
+  OFFSET_KIND_DEFAULT,
+  selectActivePipetteChannelCount,
+  selectIsSelectedLwTipRack,
+  selectLwDisplayName,
+  selectSelectedLwOverview,
+} from '/app/redux/protocol-runs'
 
-import type { DisplayLocationParams } from '@opentrons/components'
+import type { TFunction } from 'i18next'
+import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type {
+  LabwareStackupDetail,
   LPCWizardState,
-  SelectedLwOverview,
   OffsetLocationDetails,
+  SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
 export function PlaceItemInstruction(
   props: EditOffsetContentProps
@@ -34,14 +40,17 @@ export function PlaceItemInstruction(
   const { runId } = props
   const { t: commandTextT } = useTranslation('protocol_command_text')
   const { t } = useTranslation('labware_position_check')
-  const { protocolData, labwareDefs } = useSelector(
+  const { protocolData } = useSelector(
     (state: State) => state.protocolRuns[runId]?.lpc as LPCWizardState
   )
+  const isActivePipette96ch =
+    useSelector(selectActivePipetteChannelCount(runId)) === 96
   const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(runId)
   ) as SelectedLwOverview
   const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const isDefaultOffset = offsetLocationDetails.kind === OFFSET_KIND_DEFAULT
 
   const buildHeader = (): string =>
     t('prepare_item_in_location', {
@@ -49,76 +58,93 @@ export function PlaceItemInstruction(
       location: slotOnlyDisplayLocation,
     })
 
-  const buildDisplayParams = (): Omit<
-    DisplayLocationParams,
-    'detailLevel'
-  > => ({
-    t: commandTextT,
-    loadedModules: protocolData.modules,
-    loadedLabwares: protocolData.labware,
-    robotType: FLEX_ROBOT_TYPE,
-    location: offsetLocationDetails,
-  })
+  const slotOnlyDisplayLocation = getFlexSlotNameOnly(
+    offsetLocationDetails,
+    protocolData,
+    commandTextT as TFunction
+  )
 
-  const slotOnlyDisplayLocation = getLabwareDisplayLocation({
-    detailLevel: 'slot-only',
-    ...buildDisplayParams(),
-  })
-  const fullDisplayLocation = getLabwareDisplayLocation({
-    detailLevel: 'full',
-    allRunDefs: labwareDefs,
-    ...buildDisplayParams(),
-  })
+  // The "clear deck" copy handles the module case.
+  const lwOnlyLocSeq = offsetLocationDetails.lwModOnlyStackupDetails.filter(
+    c => c.kind === 'labware'
+  ) as LabwareStackupDetail[]
 
   return (
-    <DescriptionContent
-      headline={buildHeader()}
-      message={
-        <UnorderedList
-          items={[
-            <ClearDeckCopy
-              {...props}
-              key="clear_deck"
-              isLwTiprack={isLwTiprack}
-              slotOnlyDisplayLocation={slotOnlyDisplayLocation}
-              fullDisplayLocation={fullDisplayLocation}
-              labwareInfo={selectedLwInfo}
-            />,
-            <PlaceItemInstructionContents
-              key={slotOnlyDisplayLocation}
-              isLwTiprack={isLwTiprack}
-              slotOnlyDisplayLocation={slotOnlyDisplayLocation}
-              fullDisplayLocation={fullDisplayLocation}
-              labwareInfo={selectedLwInfo}
-              {...props}
-            />,
-          ]}
+    <Flex css={CONATINER_STYLE}>
+      <DescriptionContent
+        headline={buildHeader()}
+        message={
+          <UnorderedList
+            items={[
+              <ClearDeckCopy
+                {...props}
+                key="clear_deck"
+                slotOnlyDisplayLocation={slotOnlyDisplayLocation}
+                labwareInfo={selectedLwInfo}
+              />,
+              ...lwOnlyLocSeq.map((component, index) => (
+                <PlaceItemInstructionContent
+                  key={`${slotOnlyDisplayLocation}-${index}`}
+                  isActivePipette96ch={isActivePipette96ch}
+                  isDefaultOffset={isDefaultOffset}
+                  isLwTiprack={isLwTiprack}
+                  slotOnlyDisplayLocation={slotOnlyDisplayLocation}
+                  labwareInfo={selectedLwInfo}
+                  lwComponent={component}
+                  isFirstItemInStackup={index === 0}
+                  {...props}
+                />
+              )),
+            ]}
+          />
+        }
+      />
+      {isActivePipette96ch && isDefaultOffset && (
+        <InlineNotification
+          type="alert"
+          heading={t('ensure_tip_rack_accurately_placed')}
         />
-      }
-    />
+      )}
+    </Flex>
   )
 }
 
+const CONATINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  gap: ${SPACING.spacing12};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    gap: ${SPACING.spacing24};
+  }
+`
+
 interface PlaceItemInstructionContentProps extends LPCWizardContentProps {
   isLwTiprack: boolean
+  isDefaultOffset: boolean
+  isActivePipette96ch: boolean
   slotOnlyDisplayLocation: string
-  fullDisplayLocation: string
   labwareInfo: SelectedLwOverview
+  lwComponent: LabwareStackupDetail
+  isFirstItemInStackup: boolean
 }
 
 // See LPCDeck for clarification of deck behavior.
 function ClearDeckCopy({
   slotOnlyDisplayLocation,
   labwareInfo,
-}: PlaceItemInstructionContentProps): JSX.Element {
+}: Pick<
+  PlaceItemInstructionContentProps,
+  'labwareInfo' | 'slotOnlyDisplayLocation'
+>): JSX.Element {
   const { t } = useTranslation('labware_position_check')
 
   const {
     kind: offsetKind,
-    moduleModel,
+    closestBeneathModuleModel,
   } = labwareInfo.offsetLocationDetails as OffsetLocationDetails
 
-  return offsetKind === OFFSET_KIND_DEFAULT || moduleModel == null ? (
+  return offsetKind === OFFSET_KIND_DEFAULT ||
+    closestBeneathModuleModel == null ? (
     <Trans
       t={t}
       i18nKey="clear_deck_all_lw_all_modules_from"
@@ -130,48 +156,38 @@ function ClearDeckCopy({
   )
 }
 
-function PlaceItemInstructionContents({
+function PlaceItemInstructionContent({
   runId,
   isLwTiprack,
   slotOnlyDisplayLocation,
-  fullDisplayLocation,
-  labwareInfo,
+  lwComponent,
+  isFirstItemInStackup,
+  isActivePipette96ch,
+  isDefaultOffset,
 }: PlaceItemInstructionContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
 
-  const { adapterId } = labwareInfo.offsetLocationDetails ?? { adapterId: null }
-  const labwareDisplayName = useSelector(selectSelectedLwDisplayName(runId))
-  const adapterDisplayName = useSelector(
-    selectSelectedLwRelatedAdapterDisplayName(runId)
+  const displayName = useSelector(
+    selectLwDisplayName(runId, lwComponent.labwareUri)
   )
+
+  const buildIsLwTipRackCopy = (): string => {
+    if (isActivePipette96ch && isDefaultOffset) {
+      return 'place_a_full_tip_rack_in_location_96ch_default'
+    } else {
+      return isFirstItemInStackup
+        ? 'place_a_full_tip_rack_in_location'
+        : 'next_place_a_full_tip_rack_in_location'
+    }
+  }
 
   if (isLwTiprack) {
     return (
       <Trans
         t={t}
-        i18nKey="place_a_full_tip_rack_in_location"
+        i18nKey={buildIsLwTipRackCopy()}
         tOptions={{
-          tip_rack: labwareDisplayName,
-          location: fullDisplayLocation,
-        }}
-        components={{
-          bold: (
-            <LegacyStyledText
-              as="span"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            />
-          ),
-        }}
-      />
-    )
-  } else if (adapterId != null) {
-    return (
-      <Trans
-        t={t}
-        i18nKey="place_labware_in_adapter_in_location"
-        tOptions={{
-          adapter: adapterDisplayName,
-          labware: labwareDisplayName,
+          tip_rack: displayName,
           location: slotOnlyDisplayLocation,
         }}
         components={{
@@ -188,10 +204,14 @@ function PlaceItemInstructionContents({
     return (
       <Trans
         t={t}
-        i18nKey="place_labware_in_location"
+        i18nKey={
+          isFirstItemInStackup
+            ? 'place_labware_in_location'
+            : 'next_place_labware_in_location'
+        }
         tOptions={{
-          labware: labwareDisplayName,
-          location: fullDisplayLocation,
+          labware: displayName,
+          location: slotOnlyDisplayLocation,
         }}
         components={{
           bold: (

@@ -1,11 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-
 import { i18n } from '/app/i18n'
+
 import { BackButton } from '..'
 
 import type { HTMLProps } from 'react'

@@ -1,8 +1,9 @@
 import { css } from 'styled-components'
-import { Flex } from '../../primitives'
-import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
 import { FLEX_MAX_CONTENT } from '../../styles'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 import type { ReactNode } from 'react'
 import type { StyleProps } from '../../primitives'
@@ -79,7 +80,7 @@ export function ListItem(props: ListItemProps): JSX.Element {
   const listItemProps = LISTITEM_PROPS_BY_TYPE[type]
 
   const LIST_ITEM_STYLE = css`
-    background-color: ${listItemProps.backgroundColor};
+    background-color: ${props.backgroundColor ?? listItemProps.backgroundColor};
     color: ${listItemProps.color ?? COLORS.black90};
     width: 100%;
     height: ${FLEX_MAX_CONTENT};

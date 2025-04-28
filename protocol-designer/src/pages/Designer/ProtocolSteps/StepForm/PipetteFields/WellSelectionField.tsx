@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -18,15 +18,15 @@ import {
 import { COLUMN } from '@opentrons/shared-data'
 
 import {
-  actions as stepsActions,
-  getSelectedStepId,
-  getWellSelectionLabwareKey,
-} from '../../../../../ui/steps'
+  getMainPagePortalEl,
+  SelectWellsModal,
+} from '../../../../../components/organisms'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 import {
-  SelectWellsModal,
-  getMainPagePortalEl,
-} from '../../../../../components/organisms'
+  getSelectedStepId,
+  getWellSelectionLabwareKey,
+  actions as stepsActions,
+} from '../../../../../ui/steps'
 import { getNozzleType } from '../utils'
 
 import type { FieldProps } from '../types'

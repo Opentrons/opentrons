@@ -1,4 +1,5 @@
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -15,6 +16,7 @@ import {
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { useToaster } from '../../../ToasterOven'
 
 const CSV_FILE_MAX_LENGTH = 18 // truncated text + three dots
@@ -24,7 +26,7 @@ export type ProtocolSetupStepStatus =
   | 'not ready'
   | 'general'
   | 'inform'
-interface ProtocolSetupStepProps {
+export interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
   status: ProtocolSetupStepStatus
   title: string
@@ -130,7 +132,7 @@ export function ProtocolSetupStep({
         status !== 'inform' &&
         hasLeftIcon ? (
           <Icon
-            color={status === 'ready' ? COLORS.green50 : COLORS.yellow50}
+            color={status === 'ready' ? COLORS.green60 : COLORS.yellow60}
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />

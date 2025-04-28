@@ -121,8 +121,8 @@ def test_round_trip(
     )
 
     with TemporaryDirectory() as tmp_dir, make_sql_engine(Path(tmp_dir)) as sql_engine:
-        subject = LabwareOffsetStore(sql_engine)
-        subject.add(offset_to_add)
+        subject = LabwareOffsetStore(sql_engine, labware_offsets_publisher=None)
+        subject.add([offset_to_add])
         [offset_retrieved_by_get_all] = subject.get_all()
         [offset_retrieved_by_search] = subject.search([SearchFilter(id=id)])
 
@@ -142,20 +142,21 @@ class SimulatedStore:
     def __init__(self) -> None:
         self._entries: list[StoredLabwareOffset] = []
 
-    def add(self, offset: IncomingStoredLabwareOffset) -> None:  # noqa: D102
-        id_already_exists = any(
-            existing_offset.id == offset.id for existing_offset in self._entries
-        )
-        assert not id_already_exists
-        self._entries.append(
-            StoredLabwareOffset(
-                id=offset.id,
-                createdAt=offset.createdAt,
-                definitionUri=offset.definitionUri,
-                locationSequence=offset.locationSequence,
-                vector=offset.vector,
+    def add(self, offsets: list[IncomingStoredLabwareOffset]) -> None:  # noqa: D102
+        for offset in offsets:
+            id_already_exists = any(
+                existing_offset.id == offset.id for existing_offset in self._entries
             )
-        )
+            assert not id_already_exists
+            self._entries.append(
+                StoredLabwareOffset(
+                    id=offset.id,
+                    createdAt=offset.createdAt,
+                    definitionUri=offset.definitionUri,
+                    locationSequence=offset.locationSequence,
+                    vector=offset.vector,
+                )
+            )
 
     def get_all(self) -> list[StoredLabwareOffset]:  # noqa: D102
         return self._entries
@@ -228,7 +229,7 @@ class LabwareStoreMachine(hypothesis.stateful.RuleBasedStateMachine):
         self._exit_stack = ExitStack()
         temp_dir = Path(self._exit_stack.enter_context(TemporaryDirectory()))
         sql_engine = self._exit_stack.enter_context(make_sql_engine(temp_dir))
-        self._subject = LabwareOffsetStore(sql_engine)
+        self._subject = LabwareOffsetStore(sql_engine, labware_offsets_publisher=None)
         self._simulated_model = SimulatedStore()
         self._added_ids = set[str]()
 
@@ -274,8 +275,11 @@ class LabwareStoreMachine(hypothesis.stateful.RuleBasedStateMachine):
             # different floats. Different floats are tried in the round-trip test.
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
-        self._subject.add(to_add)
-        self._simulated_model.add(to_add)
+        # todo(mm, 2025-04-01): We should probably Hypothesis-test adding multiple
+        # offsets in a single add() call, but this RuleBasedStateMachine is already
+        # taking a lot of time searching the state space--time to break it up?
+        self._subject.add([to_add])
+        self._simulated_model.add([to_add])
         self._added_ids.add(to_add.id)
 
     @hypothesis.stateful.rule()

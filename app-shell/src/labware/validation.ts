@@ -1,19 +1,25 @@
 import Ajv from 'ajv'
 import sortBy from 'lodash/sortBy'
-import { labwareSchemaV2 as labwareSchema } from '@opentrons/shared-data'
-import { sameIdentity } from './compare'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type {
-  UncheckedLabwareFile,
-  CheckedLabwareFile,
-} from '@opentrons/app/src/redux/custom-labware/types'
+import {
+  getLabwareDefIsStandard,
+  labwareSchemaV2 as labwareSchema,
+  validateCustomLabwareHelper,
+} from '@opentrons/shared-data'
+
 import {
   DUPLICATE_LABWARE_FILE,
   INVALID_LABWARE_FILE,
   OPENTRONS_LABWARE_FILE,
   VALID_LABWARE_FILE,
 } from '../constants'
+import { sameIdentity } from './compare'
+
+import type {
+  CheckedLabwareFile,
+  UncheckedLabwareFile,
+} from '@opentrons/app/src/redux/custom-labware/types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const ajv = new Ajv()
 const validateDefinition = ajv.compile(labwareSchema)
@@ -34,15 +40,18 @@ export function validateLabwareFiles(
     // check file against the schema
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const definition = data && validateLabwareDefinition(data)
-    if (definition === null) {
+
+    const hasValidWellInfo = validateCustomLabwareHelper(definition)
+
+    if (definition === null || !hasValidWellInfo) {
       return { filename, modified, type: INVALID_LABWARE_FILE }
     }
 
     const props = { filename, modified, definition }
 
-    return definition.namespace !== 'opentrons'
-      ? { ...props, type: VALID_LABWARE_FILE }
-      : { ...props, type: OPENTRONS_LABWARE_FILE }
+    return getLabwareDefIsStandard(definition)
+      ? { ...props, type: OPENTRONS_LABWARE_FILE }
+      : { ...props, type: VALID_LABWARE_FILE }
   })
 
   return validated.map(v => {

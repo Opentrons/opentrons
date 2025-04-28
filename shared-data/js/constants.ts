@@ -1,5 +1,6 @@
-import type { CutoutFixtureId, CutoutId, AddressableAreaName } from '../deck'
-import type { ModuleModel, ModuleType } from './types'
+import type { WellOrigin } from '../command'
+import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
+import type { ModuleModel, ModuleType, PositionReference } from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
@@ -465,6 +466,18 @@ export const FLEX_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   ...MAGNETIC_BLOCK_ADDRESSABLE_AREAS,
 ]
 
+export const FLEX_STAGING_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  ...FLEX_STACKER_ADDRESSABLE_AREAS,
+  A4_ADDRESSABLE_AREA,
+  B4_ADDRESSABLE_AREA,
+  C4_ADDRESSABLE_AREA,
+  D4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_A4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_B4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_C4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA,
+]
+
 export const ADDRESSABLE_AREA_1: '1' = '1'
 export const ADDRESSABLE_AREA_2: '2' = '2'
 export const ADDRESSABLE_AREA_3: '3' = '3'
@@ -657,3 +670,26 @@ export const DEPRECATED_WHALE_GREY = '#9395a0'
 // method in PD (not react code) and we do not want non react code loading
 // react code because the web worker context does not play nicely with react
 export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
+
+export const POSITION_REFERENCE_TOP: 'well-top' = 'well-top'
+export const POSITION_REFERENCE_BOTTOM: 'well-bottom' = 'well-bottom'
+export const POSITION_REFERENCE_CENTER: 'well-center' = 'well-center'
+export const POSITION_REFERENCE_LIQUID_MENISCUS: 'liquid-meniscus' =
+  'liquid-meniscus'
+
+export const WELL_ORIGIN_TOP: 'top' = 'top'
+export const WELL_ORIGIN_BOTTOM: 'bottom' = 'bottom'
+export const WELL_ORIGIN_CENTER: 'center' = 'center'
+export const WELL_ORIGIN_MENISCUS: 'meniscus' = 'meniscus'
+
+export const POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN: Record<
+  PositionReference,
+  WellOrigin
+> = {
+  [POSITION_REFERENCE_TOP]: WELL_ORIGIN_TOP,
+  [POSITION_REFERENCE_BOTTOM]: WELL_ORIGIN_BOTTOM,
+  [POSITION_REFERENCE_CENTER]: WELL_ORIGIN_CENTER,
+  [POSITION_REFERENCE_LIQUID_MENISCUS]: WELL_ORIGIN_MENISCUS,
+}
+
+export const SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM = 2

@@ -10,6 +10,7 @@ from opentrons.drivers.asyncio.communication.serial_connection import (
 from opentrons.drivers.flex_stacker.driver import (
     DEFAULT_FS_TIMEOUT,
     FS_MOVE_TIMEOUT,
+    FS_TOF_INIT_TIMEOUT,
     FS_TOF_TIMEOUT,
     FlexStackerDriver,
 )
@@ -70,8 +71,7 @@ async def test_get_device_info(
 async def test_stop_motors(subject: FlexStackerDriver, connection: AsyncMock) -> None:
     """It should send a stop motors command"""
     connection.send_command.return_value = "M0"
-    response = await subject.stop_motors()
-    assert response
+    await subject.stop_motors()
 
     stop_motors = types.GCODE.STOP_MOTORS.build_command()
     connection.send_command.assert_any_call(stop_motors)
@@ -89,7 +89,6 @@ async def test_get_motion_params(
     connection.send_command.return_value = "M120 M:X V:200.000 A:1500.000 D:5.000"
     response = await subject.get_motion_params(types.StackerAxis.X)
     assert response == types.MoveParams(
-        axis=types.StackerAxis.X,
         acceleration=1500.0,
         max_speed=200.0,
         max_speed_discont=5.0,
@@ -110,8 +109,7 @@ async def test_set_serial_number(
     connection.send_command.return_value = "M996"
 
     serial_number = "FSTA1020250119001"
-    response = await subject.set_serial_number(serial_number)
-    assert response
+    await subject.set_serial_number(serial_number)
 
     set_serial_number = types.GCODE.SET_SERIAL_NUMBER.build_command().add_element(
         serial_number
@@ -122,7 +120,7 @@ async def test_set_serial_number(
     # Test invalid response
     connection.send_command.return_value = "M9nn"
     with pytest.raises(ValueError):
-        response = await subject.set_serial_number(serial_number)
+        await subject.set_serial_number(serial_number)
 
     set_serial_number = types.GCODE.SET_SERIAL_NUMBER.build_command().add_element(
         serial_number
@@ -132,7 +130,7 @@ async def test_set_serial_number(
 
     # Test invalid serial number
     with pytest.raises(ValueError):
-        response = await subject.set_serial_number("invalid")
+        await subject.set_serial_number("invalid")
 
     connection.send_command.assert_not_called()
     connection.reset_mock()
@@ -141,8 +139,7 @@ async def test_set_serial_number(
 async def test_enable_motors(subject: FlexStackerDriver, connection: AsyncMock) -> None:
     """It should send a enable motors command"""
     connection.send_command.return_value = "M17"
-    response = await subject.enable_motors([types.StackerAxis.X])
-    assert response
+    await subject.enable_motors([types.StackerAxis.X])
 
     move_to = types.GCODE.ENABLE_MOTORS.build_command().add_element(
         types.StackerAxis.X.value
@@ -151,8 +148,7 @@ async def test_enable_motors(subject: FlexStackerDriver, connection: AsyncMock) 
     connection.reset_mock()
 
     # Test no arg to disable all motors
-    response = await subject.enable_motors(list(types.StackerAxis))
-    assert response
+    await subject.enable_motors(list(types.StackerAxis))
 
     move_to = types.GCODE.ENABLE_MOTORS.build_command()
     move_to.add_element(types.StackerAxis.X.value)
@@ -346,16 +342,14 @@ async def test_home_axis(subject: FlexStackerDriver, connection: AsyncMock) -> N
 async def test_set_led(subject: FlexStackerDriver, connection: AsyncMock) -> None:
     """It should send a set led command"""
     connection.send_command.return_value = "M200"
-    response = await subject.set_led(1, types.LEDColor.RED)
-    assert response
+    await subject.set_led(1, types.LEDColor.RED)
 
     set_led = types.GCODE.SET_LED.build_command().add_float("P", 1).add_int("C", 1)
     connection.send_command.assert_any_call(set_led)
     connection.reset_mock()
 
     # test setting only external leds
-    response = await subject.set_led(1, types.LEDColor.RED, external=True)
-    assert response
+    await subject.set_led(1, types.LEDColor.RED, external=True)
 
     set_led = (
         types.GCODE.SET_LED.build_command()
@@ -390,8 +384,7 @@ async def test_set_stallguard_threshold(
     enable = True
     threshold = 2
     connection.send_command.return_value = "M910"
-    response = await subject.set_stallguard_threshold(axis, enable, threshold)
-    assert response
+    await subject.set_stallguard_threshold(axis, enable, threshold)
 
     set_threshold = (
         types.GCODE.SET_STALLGUARD.build_command()
@@ -403,7 +396,7 @@ async def test_set_stallguard_threshold(
 
     # test invalid threshold
     with pytest.raises(ValueError):
-        response = await subject.set_stallguard_threshold(axis, enable, 1000)
+        await subject.set_stallguard_threshold(axis, enable, 1000)
 
     connection.send_command.assert_not_called()
     connection.reset_mock()
@@ -429,8 +422,7 @@ async def test_set_motor_driver_register(
 ) -> None:
     """It should set the motor driver register."""
     connection.send_command.return_value = "M921"
-    response = await subject.set_motor_driver_register(types.StackerAxis.Z, 1, 2)
-    assert response
+    await subject.set_motor_driver_register(types.StackerAxis.Z, 1, 2)
 
     set_register = (
         types.GCODE.SET_MOTOR_DRIVER_REGISTER.build_command()
@@ -446,8 +438,7 @@ async def test_enable_tof_sensor(
 ) -> None:
     """It should send a enable tof sensor command."""
     connection.send_command.return_value = "M224"
-    response = await subject.enable_tof_sensor(types.TOFSensor.X, False)
-    assert response
+    await subject.enable_tof_sensor(types.TOFSensor.X, False)
 
     enable_tof = types.GCODE.ENABLE_TOF_SENSOR.build_command().add_int(
         types.TOFSensor.X.name, 0
@@ -456,8 +447,7 @@ async def test_enable_tof_sensor(
     connection.reset_mock()
 
     # Test enable, with longer timeout
-    response = await subject.enable_tof_sensor(types.TOFSensor.X, True)
-    assert response
+    await subject.enable_tof_sensor(types.TOFSensor.X, True)
 
     enable_tof = types.GCODE.ENABLE_TOF_SENSOR.build_command().add_int(
         types.TOFSensor.X.name, 1
@@ -486,8 +476,7 @@ async def test_set_tof_driver_register(
 ) -> None:
     """It should set the tof driver register."""
     connection.send_command.return_value = "M223"
-    response = await subject.set_tof_driver_register(types.TOFSensor.X, 1, 1)
-    assert response
+    await subject.set_tof_driver_register(types.TOFSensor.X, 1, 1)
 
     set_register = (
         types.GCODE.SET_TOF_DRIVER_REGISTER.build_command()
@@ -514,7 +503,7 @@ async def test_get_tof_sensor_status(
     tof_status = types.GCODE.GET_TOF_SENSOR_STATUS.build_command().add_element(
         types.TOFSensor.Z.name
     )
-    connection.send_command.assert_any_call(tof_status)
+    connection.send_command.assert_any_call(tof_status, timeout=FS_TOF_INIT_TIMEOUT)
     connection.reset_mock()
 
     # Test invalid response
@@ -525,7 +514,7 @@ async def test_get_tof_sensor_status(
     tof_status = types.GCODE.GET_TOF_SENSOR_STATUS.build_command().add_element(
         types.TOFSensor.Z.name
     )
-    connection.send_command.assert_any_call(tof_status)
+    connection.send_command.assert_any_call(tof_status, timeout=FS_TOF_INIT_TIMEOUT)
 
 
 async def test_manage_tof_measurement(
@@ -663,7 +652,7 @@ async def test_get_tof_histogram(
     subject: FlexStackerDriver,
     connection: AsyncMock,
     decoy: Decoy,
-    histogram_bins: Dict[int, List[int]],
+    histogram_bins: Dict[int, List[float]],
 ) -> None:
     """it should send a start and get tof measurements until full payload is transfered"""
     connection.send_command.side_effect = [
@@ -711,4 +700,53 @@ async def test_get_tof_histogram(
     )
     connection.send_command.assert_any_call(manage_measurement)
     connection.send_command.assert_any_call(get_measurement)
+    connection.reset_mock()
+
+
+async def test_get_tof_configuration(
+    subject: FlexStackerDriver, connection: AsyncMock
+) -> None:
+    """It should get the tof sensor configuration."""
+    connection.send_command.return_value = "M228 X I:14 A:110 K:4000 P:500 H:1"
+    response = await subject.get_tof_configuration(types.TOFSensor.X)
+    assert response == types.TOFConfiguration(
+        types.TOFSensor.X,
+        types.SpadMapID.SPAD_MAP_ID_14,
+        types.ActiveRange.SHORT_RANGE,
+        4000,
+        500,
+        True,
+    )
+
+    get_config = types.GCODE.GET_TOF_CONFIGURATION.build_command().add_element(
+        types.TOFSensor.X.name
+    )
+    connection.send_command.assert_any_call(get_config)
+    connection.reset_mock()
+
+
+async def test_set_tof_configuration(
+    subject: FlexStackerDriver, connection: AsyncMock
+) -> None:
+    """It should set the tof sensor configuration."""
+    connection.send_command.return_value = "M227"
+    await subject.set_tof_configuration(
+        types.TOFSensor.X,
+        types.SpadMapID.SPAD_MAP_ID_1,
+        types.ActiveRange.LONG_RANGE,
+        3000,
+        200,
+        True,
+    )
+
+    set_config = (
+        types.GCODE.SET_TOF_CONFIGURATION.build_command()
+        .add_element(types.TOFSensor.X.name)
+        .add_int("I", types.SpadMapID.SPAD_MAP_ID_1.value)
+        .add_int("A", types.ActiveRange.LONG_RANGE.value)
+        .add_int("K", 3000)
+        .add_int("P", 200)
+        .add_int("H", 1)
+    )
+    connection.send_command.assert_any_call(set_config)
     connection.reset_mock()

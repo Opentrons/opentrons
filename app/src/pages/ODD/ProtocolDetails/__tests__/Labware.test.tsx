@@ -1,16 +1,17 @@
-import { vi, it, describe, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import {
+  fixture96Plate,
   fixtureTiprack10ul,
   fixtureTiprack300ul,
-  fixture96Plate,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useRequiredProtocolLabware } from '/app/resources/protocols'
+
 import { Labware } from '../Labware'
 
 import type { ComponentProps } from 'react'
@@ -36,32 +37,21 @@ describe('Labware', () => {
       .calledWith(MOCK_PROTOCOL_ID)
       .thenReturn([
         {
-          definition: fixtureTiprack10ul as LabwareDefinition2,
-          initialLocation: { slotName: '1' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixtureTiprack10ul as LabwareDefinition2,
+          lidDisplayName: 'tiprack lid',
+          quantity: 1,
         },
         {
-          definition: fixtureTiprack300ul as LabwareDefinition2,
-          initialLocation: { slotName: '3' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixtureTiprack300ul as LabwareDefinition2,
+          quantity: 2,
         },
         {
-          definition: fixture96Plate as LabwareDefinition2,
-          initialLocation: { slotName: '5' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixture96Plate as LabwareDefinition2,
+          quantity: 1,
         },
         {
-          definition: fixtureTiprack10ul as LabwareDefinition2,
-          initialLocation: { slotName: '7' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixtureTiprack10ul as LabwareDefinition2,
+          quantity: 1,
         },
       ])
   })
@@ -76,8 +66,10 @@ describe('Labware', () => {
   })
   it('should render the correct location, name, and connected status in each table row', () => {
     render(props)
-    screen.getByRole('row', { name: 'Opentrons GEB 10uL Tiprack 2' })
-    screen.getByRole('row', { name: '300ul Tiprack FIXTURE 1' })
+    screen.getByRole('row', {
+      name: 'Opentrons GEB 10uL Tiprack with tiprack lid 1',
+    })
+    screen.getByRole('row', { name: '300ul Tiprack FIXTURE 2' })
     screen.getByRole('row', { name: 'ANSI 96 Standard Microplate 1' })
   })
 })

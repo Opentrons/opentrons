@@ -1,6 +1,9 @@
-import { updatePipetteSettings } from '@opentrons/api-client'
 import { useMutation, useQueryClient } from 'react-query'
+
+import { updatePipetteSettings } from '@opentrons/api-client'
+
 import { useHost } from '../api'
+
 import type { AxiosError } from 'axios'
 import type {
   UseMutateAsyncFunction,

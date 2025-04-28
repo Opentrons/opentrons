@@ -1,12 +1,4 @@
 import {
-  createUpdatedWorkingDefaultOffset,
-  createUpdatedWorkingLocationSpecificOffset,
-  findMatchingLocationOffset,
-  findLocationSpecificOffsetWithFallbacks,
-  vectorEqualsDefault,
-} from '../../../utils'
-import {
-  APPLY_WORKING_OFFSETS,
   CLEAR_WORKING_OFFSETS,
   OFFSET_KIND_DEFAULT,
   RESET_OFFSET_TO_DEFAULT,
@@ -14,38 +6,33 @@ import {
   SET_FINAL_POSITION,
 } from '/app/redux/protocol-runs'
 
+import {
+  createUpdatedWorkingDefaultOffset,
+  createUpdatedWorkingLocationSpecificOffset,
+  findLocationSpecificOffsetWithFallbacks,
+  findMatchingLocationOffset,
+  vectorEqualsDefault,
+} from '../../../utils'
+
 import type {
-  ApplyWorkingOffsetsAction,
-  ClearSelectedLabwareWorkingOffsetsAction,
   DefaultOffsetDetails,
-  FinalPositionAction,
-  InitialPositionAction,
-  LwGeometryDetails,
   LocationSpecificOffsetDetails,
-  LPCWizardState,
-  ResetLocationSpecificOffsetToDefaultAction,
   LocationSpecificOffsetLocationDetails,
+  LPCWizardState,
+  LwGeometryDetails,
 } from '../../../types'
-
-type PositionAction = InitialPositionAction | FinalPositionAction
-type ResetPositionAction = ResetLocationSpecificOffsetToDefaultAction
-
-type UpdateOffsetsAction =
-  | PositionAction
-  | ResetPositionAction
-  | ClearSelectedLabwareWorkingOffsetsAction
-  | ApplyWorkingOffsetsAction
+import type {
+  PositionAction,
+  ResetPositionAction,
+  UpdateOffsetsAction,
+} from './types'
 
 // Handle vector position updates, only updating the appropriate working/existing offsets.
 export function updateOffsetsForURI(
   state: LPCWizardState,
   action: UpdateOffsetsAction
 ): LwGeometryDetails {
-  if (action.type === APPLY_WORKING_OFFSETS) {
-    return handleApplyWorkingOffsets(
-      state.labwareInfo.labware[action.payload.labwareUri]
-    )
-  } else if (action.type === CLEAR_WORKING_OFFSETS) {
+  if (action.type === CLEAR_WORKING_OFFSETS) {
     return handleClearWorkingOffsets(
       state.labwareInfo.labware[action.payload.labwareUri]
     )
@@ -86,57 +73,6 @@ export function updateOffsetsForURI(
         ),
       }
     }
-  }
-}
-
-// Apply any working offsets to make them the new existing offsets.
-function handleApplyWorkingOffsets(
-  lwDetails: LwGeometryDetails
-): LwGeometryDetails {
-  // Process location-specific offsets
-  const updatedLSOffsetDetails = lwDetails.locationSpecificOffsetDetails.map(
-    offset => {
-      if (offset.workingOffset?.confirmedVector != null) {
-        if (offset.workingOffset.confirmedVector === RESET_TO_DEFAULT) {
-          // Delete the location-specific offset.
-          return { ...offset, workingOffset: null, existingOffset: null }
-        }
-        // Apply confirmed vector as new existing offset
-        else {
-          return {
-            ...offset,
-            workingOffset: null,
-            existingOffset: {
-              vector: offset.workingOffset.confirmedVector,
-              // TODO(jh, 03-07-25): Use the server response preferably.
-              createdAt: new Date().getTime().toString(),
-            },
-          }
-        }
-      } else {
-        return offset
-      }
-    }
-  )
-
-  // Process default offset
-  const updatedDefaultOffsetDetails: DefaultOffsetDetails =
-    lwDetails.defaultOffsetDetails.workingOffset?.confirmedVector != null
-      ? {
-          ...lwDetails.defaultOffsetDetails,
-          workingOffset: null,
-          existingOffset: {
-            vector:
-              lwDetails.defaultOffsetDetails.workingOffset.confirmedVector,
-            createdAt: new Date().getTime().toString(),
-          },
-        }
-      : { ...lwDetails.defaultOffsetDetails }
-
-  return {
-    ...lwDetails,
-    defaultOffsetDetails: updatedDefaultOffsetDetails,
-    locationSpecificOffsetDetails: updatedLSOffsetDetails,
   }
 }
 
@@ -259,68 +195,60 @@ function updateLocationSpecificOffsetDetails(
         ...locationSpecificOffsetDetails.slice(relevantDetailsIdx + 1),
       ]
 
-      // Safety check for unexpected reset
-      if (relevantDetail?.workingOffset?.confirmedVector === RESET_TO_DEFAULT) {
-        console.error(
-          'Unexpected reset to default supplied when vector value expected.'
-        )
-        return locationSpecificOffsetDetails
-      } else {
-        // Get the most valid vector for the relevant location-specific offset.
-        const mostValidVector = findLocationSpecificOffsetWithFallbacks(
-          relevantDetail,
-          lwDetails.defaultOffsetDetails
+      // Get the most valid vector for the relevant location-specific offset.
+      const mostValidVector = findLocationSpecificOffsetWithFallbacks(
+        relevantDetail,
+        lwDetails.defaultOffsetDetails
+      )
+
+      // Create updated working offset.
+      const newWorkingDetail = createUpdatedWorkingLocationSpecificOffset(
+        type,
+        position,
+        relevantDetail?.workingOffset ?? null,
+        mostValidVector
+      )
+
+      // Get current default vector for comparison.
+      const currentDefaultVector =
+        lwDetails.defaultOffsetDetails.workingOffset?.confirmedVector ??
+        lwDetails.defaultOffsetDetails.existingOffset?.vector ??
+        null
+      const newVectorEqualsDefaultVector =
+        type === SET_FINAL_POSITION &&
+        vectorEqualsDefault(
+          newWorkingDetail.confirmedVector,
+          currentDefaultVector
         )
 
-        // Create updated working offset.
-        const newWorkingDetail = createUpdatedWorkingLocationSpecificOffset(
-          type,
-          position,
-          relevantDetail?.workingOffset ?? null,
-          mostValidVector
-        )
-
-        // Get current default vector for comparison.
-        const currentDefaultVector =
-          lwDetails.defaultOffsetDetails.workingOffset?.confirmedVector ??
-          lwDetails.defaultOffsetDetails.existingOffset?.vector ??
-          null
-        const newVectorEqualsDefaultVector =
-          type === SET_FINAL_POSITION &&
-          vectorEqualsDefault(
-            newWorkingDetail.confirmedVector,
-            currentDefaultVector
-          )
-
-        if (newVectorEqualsDefaultVector) {
-          // If we have an existing offset, mark it for reset.
-          if (relevantDetail?.existingOffset != null) {
-            return [
-              ...newOffsetDetails,
-              {
-                ...relevantDetail,
-                workingOffset: {
-                  ...newWorkingDetail,
-                  confirmedVector: RESET_TO_DEFAULT,
-                },
+      if (newVectorEqualsDefaultVector) {
+        // If we have an existing offset, mark it for reset.
+        if (relevantDetail?.existingOffset != null) {
+          return [
+            ...newOffsetDetails,
+            {
+              ...relevantDetail,
+              workingOffset: {
+                ...newWorkingDetail,
+                confirmedVector: RESET_TO_DEFAULT,
               },
-            ]
-          }
-          // If there's no existing offset, just remove the working offset.
-          else {
-            return [
-              ...newOffsetDetails,
-              { ...relevantDetail, workingOffset: null },
-            ]
-          }
+            },
+          ]
         }
-        // Use the calculated vector.
+        // If there's no existing offset, just remove the working offset.
         else {
           return [
             ...newOffsetDetails,
-            { ...relevantDetail, workingOffset: newWorkingDetail },
+            { ...relevantDetail, workingOffset: null },
           ]
         }
+      }
+      // Use the calculated vector.
+      else {
+        return [
+          ...newOffsetDetails,
+          { ...relevantDetail, workingOffset: newWorkingDetail },
+        ]
       }
     }
   }
@@ -356,10 +284,8 @@ function handleResetToDefault(
       workingOffset:
         relevantDetail.existingOffset != null
           ? {
-              initialPosition:
-                relevantDetail.workingOffset?.initialPosition ?? null,
-              finalPosition:
-                relevantDetail.workingOffset?.finalPosition ?? null,
+              initialPosition: null,
+              finalPosition: null,
               confirmedVector: RESET_TO_DEFAULT,
             }
           : null,

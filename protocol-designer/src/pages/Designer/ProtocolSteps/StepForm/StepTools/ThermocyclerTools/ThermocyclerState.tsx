@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   SPACING,
   StyledText,
 } from '@opentrons/components'

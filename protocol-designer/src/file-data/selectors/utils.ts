@@ -1,8 +1,11 @@
-import mapValues from 'lodash/mapValues'
 import map from 'lodash/map'
+import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+
 import { COLUMN_4_SLOTS, uuid } from '@opentrons/step-generation'
+
+import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -11,19 +14,18 @@ import type {
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
   PipetteName,
-  PipetteV2Specs,
 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
-  LabwareLiquidState,
-  PipetteEntities,
-  RobotState,
-  ModuleEntities,
-  TimelineFrame,
-  LiquidEntities,
-  PipetteEntity,
-  ModuleEntity,
   LabwareEntity,
+  LabwareLiquidState,
+  LiquidEntities,
+  ModuleEntities,
+  ModuleEntity,
+  PipetteEntities,
+  PipetteEntity,
+  RobotState,
+  TimelineFrame,
 } from '@opentrons/step-generation'
 import type { Labware, Modules, Pipettes } from '../../file-types'
 
@@ -237,14 +239,4 @@ export const getLabwareLoadInfo = (
     }),
     {}
   )
-}
-
-const DEFAULT_LIQUID_TYPE = 'default'
-//  Flex pipette api names are different from pipetteName
-//  p1000_multi_flex -> flex_8channel_1000
-//  we do not need to worry about -_em pipette in PD
-export const getFlexNameConversion = (pipetteSpec: PipetteV2Specs): string => {
-  const channels = pipetteSpec.channels
-  const maxVolume = pipetteSpec.liquids[DEFAULT_LIQUID_TYPE].maxVolume
-  return `flex_${channels}channel_${maxVolume}`
 }

@@ -1,7 +1,8 @@
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { useDrag, useDrop } from 'react-dnd'
 import { useEffect, useRef } from 'react'
+import { useDrag, useDrop } from 'react-dnd'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -12,9 +13,12 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
   TYPOGRAPHY,
+  WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
+
 import { DND_TYPES } from '../../../../constants'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
@@ -22,7 +26,7 @@ import { SlotOverlay } from './SlotOverlay'
 import type { DropTargetMonitor } from 'react-dnd'
 import type { LabwareOnDeck } from '../../../../step-forms'
 import type { ThunkDispatch } from '../../../../types'
-import type { SharedControlsType, DroppedItem } from '../types'
+import type { DroppedItem, SharedControlsType } from '../types'
 
 interface LabwareControlsProps extends SharedControlsType {
   labwareOnDeck: LabwareOnDeck
@@ -44,7 +48,7 @@ export const LabwareControls = (
     setHover,
     setShowMenuListForId,
     isSelected,
-    tab,
+    terminalItemId,
     itemId,
   } = props
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -108,7 +112,11 @@ export const LabwareControls = (
 
   drag(drop(ref))
 
-  if (tab === 'protocolSteps' || isSelected || slotPosition == null) {
+  if (
+    terminalItemId !== START_TERMINAL_ITEM_ID ||
+    isSelected ||
+    slotPosition == null
+  ) {
     return null
   }
   const isLabwareSwapping =
@@ -134,9 +142,7 @@ export const LabwareControls = (
   }
 
   let hoverOpacity = '0'
-  if (!isDragging && isBeingDragged) {
-    hoverOpacity = '0'
-  } else if ((isOver && canDrop) || hover === itemId) {
+  if ((isOver && canDrop) || hover === itemId) {
     hoverOpacity = '1'
   }
 
@@ -147,11 +153,19 @@ export const LabwareControls = (
       height={height}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
-      color={COLORS.white}
+      color={!isDragging ? COLORS.white : `${COLORS.black90}cc`}
       textAlign={TYPOGRAPHY.textAlignCenter}
     >
       <Link role="button">
-        <StyledText desktopStyle="bodyLargeSemiBold">
+        <StyledText
+          desktopStyle="bodyLargeSemiBold"
+          whiteSpace={WHITE_SPACE_PRE_WRAP}
+          width={
+            getDisplayText() === t('deck:overlay.slot.drag_to_new_slot')
+              ? '5.125rem'
+              : '100%'
+          }
+        >
           {getDisplayText()}
         </StyledText>
       </Link>
@@ -170,6 +184,8 @@ export const LabwareControls = (
           // NOTE: cursor is inconsistent when dragging due to an active
           // react dnd bug: https://github.com/react-dnd/react-dnd/issues/325
           cursor: CURSOR_GRAB,
+          backgroundColor:
+            draggedLabware != null ? COLORS.white : `${COLORS.black90}cc`,
         },
         onMouseEnter: () => {
           setHover(itemId)

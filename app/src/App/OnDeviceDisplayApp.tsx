@@ -1,64 +1,67 @@
-import { useEffect, useState, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { css } from 'styled-components'
+import { useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useDispatch, useSelector } from 'react-redux'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import NiceModal from '@ebay/nice-modal-react'
+import { css } from 'styled-components'
 
 import {
   Box,
   COLORS,
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
-  useScrolling,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import NiceModal from '@ebay/nice-modal-react'
 
+import { ReactQueryDevtools } from '/app/App/tools'
 import { SleepScreen } from '/app/atoms/SleepScreen'
-import { LocalizationProvider } from '../LocalizationProvider'
-import { ToasterOven } from '/app/organisms/ToasterOven'
-import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
+import { SLEEP_NEVER_MS, useScreenIdle } from '/app/local-resources/dom-utils'
+import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
-import { EstopTakeover } from '/app/organisms/EmergencyStop'
+import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
+import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
+import { ToasterOven } from '/app/organisms/ToasterOven'
 import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
 import { ConnectViaWifi } from '/app/pages/ODD/ConnectViaWifi'
+import { DeckConfigurationEditor } from '/app/pages/ODD/DeckConfiguration'
 import { EmergencyStop } from '/app/pages/ODD/EmergencyStop'
+import { InitialLoadingScreen } from '/app/pages/ODD/InitialLoadingScreen'
+import { InstrumentDetail } from '/app/pages/ODD/InstrumentDetail'
+import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
 import { NameRobot } from '/app/pages/ODD/NameRobot'
 import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
-import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
-import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
-import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
-import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
+import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
 import { QuickTransferDashboard } from '/app/pages/ODD/QuickTransferDashboard'
 import { QuickTransferDetails } from '/app/pages/ODD/QuickTransferDetails'
+import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
+import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
 import { RunningProtocol } from '/app/pages/ODD/RunningProtocol'
 import { RunSummary } from '/app/pages/ODD/RunSummary'
 import { UpdateRobot } from '/app/pages/ODD/UpdateRobot/UpdateRobot'
 import { UpdateRobotDuringOnboarding } from '/app/pages/ODD/UpdateRobot/UpdateRobotDuringOnboarding'
-import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
-import { InstrumentDetail } from '/app/pages/ODD/InstrumentDetail'
 import { Welcome } from '/app/pages/ODD/Welcome'
-import { InitialLoadingScreen } from '/app/pages/ODD/InitialLoadingScreen'
-import { DeckConfigurationEditor } from '/app/pages/ODD/DeckConfiguration'
-import { PortalRoot as ModalPortalRoot } from './portal'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '/app/redux/config'
 import { updateBrightness } from '/app/redux/shell'
-import { useScreenIdle, SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
-import { useProtocolReceiptToast, useSoftwareUpdatePoll } from './hooks'
-import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
-import { ReactQueryDevtools } from '/app/App/tools'
 
-import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
-
+import { LocalizationProvider } from '../LocalizationProvider'
 import { hackWindowNavigatorOnLine } from './hacks'
+import {
+  useProtocolReceiptToast,
+  useScrollRef,
+  useSoftwareUpdatePoll,
+} from './hooks'
+import { SharedScrollRefProvider } from './ODDProviders/ScrollRefProvider'
+import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
+import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
+import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { Dispatch } from '/app/redux/types'
 
@@ -199,7 +202,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                     <NiceModal.Provider>
                       <ToasterOven>
                         <ProtocolReceiptToasts />
-                        <OnDeviceDisplayAppRoutes />
+                        <SharedScrollRefProvider>
+                          <OnDeviceDisplayAppRoutes />
+                        </SharedScrollRefProvider>
                       </ToasterOven>
                     </NiceModal.Provider>
                   </MaintenanceRunTakeover>
@@ -225,14 +230,10 @@ const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
 // split to a separate function because scrollRef rerenders on every route change
 // this avoids rerendering parent providers as well
 export function OnDeviceDisplayAppRoutes(): JSX.Element {
-  const [currentNode, setCurrentNode] = useState<null | HTMLElement>(null)
-  const scrollRef = useCallback((node: HTMLElement | null) => {
-    setCurrentNode(node)
-  }, [])
-  const isScrolling = useScrolling(currentNode)
+  const { isScrolling, refCallback, element } = useScrollRef()
   const location = useLocation()
   useEffect(() => {
-    currentNode?.scrollTo({
+    element?.scrollTo({
       top: 0,
       left: 0,
       behavior: 'auto',
@@ -271,7 +272,7 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
           key={path}
           path={path}
           element={
-            <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+            <Box css={TOUCH_SCREEN_STYLE} ref={refCallback}>
               <ModalPortalRoot />
               {getPathComponent(path)}
             </Box>

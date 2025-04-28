@@ -1,52 +1,40 @@
 import floor from 'lodash/floor'
-import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
-import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
-import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
-import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
+
+import {
+  getPipetteSpecsV2,
+  POSITION_REFERENCE_BOTTOM,
+} from '@opentrons/shared-data'
+
+import {
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
+  PROTOCOL_DESIGNER_SOURCE,
+} from '../../constants'
+import { getDefaultPushOutVolume } from '../../utils'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
+import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
+
 import type {
   LoadLabwareCreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data'
-import type { Ingredients } from '@opentrons/step-generation'
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 import type { PDMetadata } from '../../file-types'
 
 export const migrateFile = (
-  appData: ProtocolFile<DesignerApplicationData>
+  appData: ProtocolFile<PDMetadata>
 ): ProtocolFile<PDMetadata> => {
-  const {
-    designerApplication,
-    commands,
-    labwareDefinitions,
-    liquids,
-    robot,
-  } = appData
-
+  const { designerApplication, commands, labwareDefinitions } = appData
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
-  const savedStepForms = designerApplication.data
-    ?.savedStepForms as DesignerApplicationData['savedStepForms']
-
-  const ingredients = designerApplication.data.ingredients
-
-  const migratedIngredients: Ingredients = Object.entries(
-    ingredients
-  ).reduce<Ingredients>((acc, [id, ingredient]) => {
-    acc[id] = {
-      displayName: ingredient.name ?? '',
-      liquidClass: ingredient.liquidClass,
-      description: ingredient.description ?? null,
-      liquidGroupId: id,
-      displayColor: liquids[id].displayColor ?? swatchColors(id),
-    }
-    return acc
-  }, {})
+  const { savedStepForms } = designerApplication.data
 
   const loadLabwareCommands = commands.filter(
     (command): command is LoadLabwareCreateCommand =>
       command.commandType === 'loadLabware'
+  )
+  const equipmentLoadInfoFromCommands = getEquipmentLoadInfoFromCommands(
+    commands,
+    labwareDefinitions
   )
 
   const savedStepsWithUpdatedMoveLiquidFields = Object.values(
@@ -60,6 +48,7 @@ export const migrateFile = (
         aspirate_labware,
         dispense_labware,
         liquidClassesSupported,
+        liquidClass,
         ...rest
       } = form
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
@@ -74,6 +63,20 @@ export const migrateFile = (
         dispense_labware as string,
         'dispense'
       )
+      const tipRackDef = labwareDefinitions[form.tipRack]
+      const pipetteName =
+        equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
+        null
+      const pipetteSpecs =
+        pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
+      const defaultPushOutVolume =
+        pipetteSpecs == null
+          ? null
+          : getDefaultPushOutVolume(
+              Number(form.volume),
+              pipetteSpecs,
+              tipRackDef
+            )
 
       return {
         ...acc,
@@ -108,8 +111,27 @@ export const migrateFile = (
           dispense_submerge_speed: null,
           aspirate_touchTip_speed: null,
           dispense_touchTip_speed: null,
+          aspirate_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE, // this field and the following were previously not configurable and defaulted to 0mm
+          dispense_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
+          aspirate_position_reference: POSITION_REFERENCE_BOTTOM,
+          aspirate_retract_position_reference: POSITION_REFERENCE_BOTTOM,
+          aspirate_submerge_mmFromBottom: null,
+          aspirate_submerge_x_position: null,
+          aspirate_submerge_y_position: null,
+          aspirate_submerge_position_reference: POSITION_REFERENCE_BOTTOM,
+          dispense_position_reference: POSITION_REFERENCE_BOTTOM,
+          dispense_retract_position_reference: POSITION_REFERENCE_BOTTOM,
+          dispense_submerge_mmFromBottom: null,
+          dispense_submerge_x_position: null,
+          dispense_submerge_y_position: null,
+          dispense_submerge_position_reference: POSITION_REFERENCE_BOTTOM,
           liquidClassesSupported: liquidClassesSupported ?? false,
-          liquidClass: null,
+          liquidClass: 'none',
+          pushOut_checkbox:
+            defaultPushOutVolume != null && defaultPushOutVolume > 0,
+          pushOut_volume: defaultPushOutVolume,
+          conditioning_checkbox: false,
+          conditioning_volume: null,
         },
       }
     }
@@ -126,6 +148,21 @@ export const migrateFile = (
           liquidClassesSupported,
           ...rest
         } = form
+        const tipRackDef = labwareDefinitions[form.tipRack]
+        const pipetteName =
+          equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
+          null
+        const pipetteSpecs =
+          pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
+        const defaultPushOutVolume =
+          pipetteSpecs === null
+            ? null
+            : getDefaultPushOutVolume(
+                Number(form.volume),
+                pipetteSpecs,
+                tipRackDef
+              )
+
         const matchingLabwareWellDepth = getMigratedPositionFromTop(
           labwareDefinitions,
           loadLabwareCommands,
@@ -145,7 +182,12 @@ export const migrateFile = (
                     mix_touchTip_mmFromBottom - matchingLabwareWellDepth,
                     1
                   ),
+            mix_position_reference: POSITION_REFERENCE_BOTTOM,
             liquidClassesSupported: liquidClassesSupported ?? false,
+            liquidClass: 'none',
+            pushOut_checkbox:
+              defaultPushOutVolume != null && defaultPushOutVolume > 0,
+            pushOut_volume: defaultPushOutVolume,
           },
         }
       }
@@ -154,30 +196,6 @@ export const migrateFile = (
     {}
   )
 
-  const updatedInitialStep = Object.values(savedStepForms).reduce(
-    (acc, form) => {
-      const { id } = form
-      if (id === '__INITIAL_DECK_SETUP_STEP__') {
-        return {
-          ...acc,
-          [id]: {
-            ...form,
-            ...getAdditionalEquipmentLocationUpdate(
-              commands,
-              robot.model,
-              savedStepForms
-            ),
-          },
-        }
-      }
-      return acc
-    },
-    {}
-  )
-  const equipmentLoadInfoFromCommands = getEquipmentLoadInfoFromCommands(
-    commands,
-    labwareDefinitions
-  )
   return {
     ...appData,
     metadata: {
@@ -188,11 +206,8 @@ export const migrateFile = (
       ...designerApplication,
       data: {
         ...designerApplication.data,
-        ingredients: migratedIngredients,
-        ...equipmentLoadInfoFromCommands,
         savedStepForms: {
           ...designerApplication.data.savedStepForms,
-          ...updatedInitialStep,
           ...savedStepsWithUpdatedMoveLiquidFields,
           ...savedStepsWithUpdatedMixFields,
         },

@@ -1,18 +1,15 @@
-import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { getEnableLiquidClasses } from '../../../../../../../feature-flags/selectors'
-import { getLiquidEntities } from '../../../../../../../step-forms/selectors'
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
-
-import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
-import { SecondStepsMoveLiquidTools } from '../SecondStepsMoveLiquidTools'
-import { LiquidClassesStepTools } from '../LiquidClassesStepTools'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 import { MoveLiquidTools } from '../'
+import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { getEnableLiquidClasses } from '../../../../../../../feature-flags/selectors'
+import { getLiquidEntities } from '../../../../../../../step-forms/selectors'
+import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
+import { LiquidClassesStepTools } from '../LiquidClassesStepTools'
+import { SecondStepsMoveLiquidTools } from '../SecondStepsMoveLiquidTools'
 
 import type { ComponentProps } from 'react'
-import type { FieldPropsByName } from '../../../types'
 import type { FormData } from '../../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../../steplist'
 
@@ -21,6 +18,7 @@ vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../FirstStepMoveLiquidTools')
 vi.mock('../SecondStepsMoveLiquidTools')
 vi.mock('../LiquidClassesStepTools')
+vi.mock('../hooks')
 
 const render = (props: ComponentProps<typeof MoveLiquidTools>) => {
   return renderWithProviders(<MoveLiquidTools {...props} />)
@@ -32,7 +30,9 @@ describe('MoveLiquidTools', () => {
   beforeEach(() => {
     props = {
       toolboxStep: 0,
-      propsForFields: {} as FieldPropsByName,
+      propsForFields: {
+        liquidClass: { updateValue: vi.fn() },
+      } as any,
       formData: {} as FormData,
       visibleFormErrors: {} as StepFormErrors,
       tab: 'aspirate',

@@ -1,10 +1,10 @@
 // full-width labware details
 import { getUniqueWellProperties } from '@opentrons/shared-data'
-import { getWellLabel, WellProperties, ManufacturerStats } from '../labware-ui'
-import { DetailsBox } from '../ui'
-import { WellDimensions } from './WellDimensions'
 
+import { getWellLabel, ManufacturerStats, WellProperties } from '../labware-ui'
+import { DetailsBox } from '../ui'
 import styles from './styles.module.css'
+import { WellDimensions } from './WellDimensions'
 
 import type { LabwareDefinition } from '../../types'
 

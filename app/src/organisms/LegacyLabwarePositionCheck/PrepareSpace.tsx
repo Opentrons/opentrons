@@ -1,25 +1,27 @@
-import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import {
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  RESPONSIVENESS,
-  SPACING,
-  Flex,
-  DIRECTION_ROW,
-  JUSTIFY_CENTER,
-  TYPOGRAPHY,
-  JUSTIFY_FLEX_END,
-  PrimaryButton,
-  BaseDeck,
-  ALIGN_FLEX_START,
-} from '@opentrons/components'
-import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
+import styled, { css } from 'styled-components'
 
-import { getIsOnDevice } from '/app/redux/config'
+import {
+  ALIGN_FLEX_START,
+  BaseDeck,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SecondaryButton,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import { getModuleType, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+
 import { SmallButton } from '/app/atoms/buttons'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { ReactNode } from 'react'
@@ -31,7 +33,7 @@ import type {
 import type { CheckLabwareStep } from './types'
 
 const LPC_HELP_LINK_URL =
-  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
+  'https://support.opentrons.com/s/article/creating-labware-offsets'
 
 const TILE_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -61,13 +63,23 @@ interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
   labwareDef: LabwareDefinition2
   protocolData: CompletedProtocolAnalysis
   confirmPlacement: () => void
+  onSkip: () => void
   header: ReactNode
   body: ReactNode
   robotType: RobotType
 }
 export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { i18n, t } = useTranslation(['labware_position_check', 'shared'])
-  const { location, labwareDef, protocolData, header, body, robotType } = props
+  const {
+    location,
+    labwareDef,
+    protocolData,
+    header,
+    body,
+    robotType,
+    section,
+    onSkip,
+  } = props
 
   const isOnDevice = useSelector(getIsOnDevice)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
@@ -131,9 +143,14 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
       ) : (
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
-          <PrimaryButton onClick={props.confirmPlacement}>
-            {i18n.format(t('shared:confirm_placement'), 'capitalize')}
-          </PrimaryButton>
+          <Flex gap={SPACING.spacing8}>
+            {section !== 'PICK_UP_TIP' && section !== 'RETURN_TIP' && (
+              <SecondaryButton onClick={onSkip}>{t('skip')}</SecondaryButton>
+            )}
+            <PrimaryButton onClick={props.confirmPlacement}>
+              {i18n.format(t('shared:confirm_placement'), 'capitalize')}
+            </PrimaryButton>
+          </Flex>
         </Flex>
       )}
     </Flex>

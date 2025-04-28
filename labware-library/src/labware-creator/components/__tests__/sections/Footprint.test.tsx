@@ -1,12 +1,16 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { when } from 'vitest-when'
+
 import { render, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
+
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState } from '../../../fields'
+import { isEveryFieldHidden } from '../../../utils'
 import { Footprint } from '../../sections/Footprint'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import { isEveryFieldHidden } from '../../../utils'
+
 import type { FormikConfig } from 'formik'
 import type { LabwareFields } from '../../../fields'
 
@@ -83,7 +87,7 @@ describe('Footprint', () => {
       exact: false,
     })
     expect(warning.textContent).toEqual(
-      'Our recommended footprint for labware is 127.76 by 85.47 +/- 1mm. If you can fit your labware snugly into a single slot on the deck continue through the form. If not please request custom labware via this form.'
+      'Our recommended footprint for labware is 127.76 by 85.47 +/- 1mm. If you can fit your labware snugly into a single slot on the deck continue through the form. If not please contact Opentrons Support.'
     )
   })
 

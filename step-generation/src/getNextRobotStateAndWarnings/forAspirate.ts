@@ -1,17 +1,21 @@
-import range from 'lodash/range'
 import isEmpty from 'lodash/isEmpty'
+import range from 'lodash/range'
 import uniq from 'lodash/uniq'
-import { COLUMN } from '@opentrons/shared-data'
+
+import { COLUMN, SINGLE } from '@opentrons/shared-data'
+
 import {
   AIR,
+  getLocationTotalVolume,
+  getWellsForTips,
   mergeLiquid,
   splitLiquid,
-  getWellsForTips,
-  getLocationTotalVolume,
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
+
 import type { AspDispAirgapParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
+
 export function forAspirate(
   params: AspDispAirgapParams,
   invariantContext: InvariantContext,
@@ -24,7 +28,12 @@ export function forAspirate(
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
   const isReservoir = labwareDef.metadata.displayCategory === 'reservoir'
-  const channels = nozzles === COLUMN ? 8 : pipetteSpec.channels
+  let channels = pipetteSpec.channels
+  if (nozzles === COLUMN) {
+    channels = 8
+  } else if (nozzles === SINGLE) {
+    channels = 1
+  }
 
   const { allWellsShared, wellsForTips } = getWellsForTips(
     channels,

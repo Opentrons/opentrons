@@ -3,6 +3,7 @@
 from datetime import datetime, timezone
 from typing import Sequence
 
+from decoy import Decoy
 import pytest
 import sqlalchemy
 
@@ -32,24 +33,38 @@ from robot_server.labware_offsets.models import (
     StoredLabwareOffsetLocationSequenceComponents,
     UnknownLabwareOffsetLocationSequenceComponent,
 )
+from robot_server.service.notifications.publishers.labware_offsets_publisher import (
+    LabwareOffsetsPublisher,
+)
 
 
 @pytest.fixture
-def subject(sql_engine: sqlalchemy.engine.Engine) -> LabwareOffsetStore:
+def mock_labware_offsets_publisher(decoy: Decoy) -> LabwareOffsetsPublisher:
+    """Return a mock in the shape of a LabwareOffsetsPublisher."""
+    return decoy.mock(cls=LabwareOffsetsPublisher)
+
+
+@pytest.fixture
+def subject(
+    sql_engine: sqlalchemy.engine.Engine,
+    mock_labware_offsets_publisher: LabwareOffsetsPublisher,
+) -> LabwareOffsetStore:
     """Return a test subject."""
-    return LabwareOffsetStore(sql_engine)
+    return LabwareOffsetStore(sql_engine, mock_labware_offsets_publisher)
 
 
 def test_empty_search(subject: LabwareOffsetStore) -> None:
     """Searching with no filters should return no results."""
     subject.add(
-        IncomingStoredLabwareOffset(
-            id="id",
-            createdAt=datetime.now(timezone.utc),
-            definitionUri="namespace/load_name/1",
-            locationSequence="anyLocation",
-            vector=LabwareOffsetVector(x=1, y=2, z=3),
-        )
+        [
+            IncomingStoredLabwareOffset(
+                id="id",
+                createdAt=datetime.now(timezone.utc),
+                definitionUri="namespace/load_name/1",
+                locationSequence="anyLocation",
+                vector=LabwareOffsetVector(x=1, y=2, z=3),
+            )
+        ]
     )
     assert subject.search([]) == []
 
@@ -66,13 +81,15 @@ def test_search_most_recent_only(subject: LabwareOffsetStore) -> None:
     ]
     for id, definition_uri in ids_and_definition_uris:
         subject.add(
-            IncomingStoredLabwareOffset(
-                id=id,
-                definitionUri=definition_uri,
-                createdAt=datetime.now(timezone.utc),
-                locationSequence="anyLocation",
-                vector=LabwareOffsetVector(x=1, y=2, z=3),
-            )
+            [
+                IncomingStoredLabwareOffset(
+                    id=id,
+                    definitionUri=definition_uri,
+                    createdAt=datetime.now(timezone.utc),
+                    locationSequence="anyLocation",
+                    vector=LabwareOffsetVector(x=1, y=2, z=3),
+                )
+            ]
         )
 
     results = subject.search([SearchFilter(mostRecentOnly=True)])
@@ -250,7 +267,7 @@ def test_filter_fields(
         ),
     }
     for offset in offsets.values():
-        subject.add(offset)
+        subject.add([offset])
     results = subject.search(
         [
             SearchFilter(
@@ -260,7 +277,7 @@ def test_filter_fields(
             )
         ]
     )
-    assert sorted(results, key=lambda o: o.id,) == sorted(
+    assert sorted(results, key=lambda o: o.id) == sorted(
         [
             StoredLabwareOffset(
                 id=offsets[id_].id,
@@ -310,8 +327,7 @@ def test_filter_field_combinations(subject: LabwareOffsetStore) -> None:
         for offset in labware_offsets
     ]
 
-    for labware_offset in labware_offsets:
-        subject.add(labware_offset)
+    subject.add(labware_offsets)
 
     # Filter accepting any value for each field (i.e. a return-everything filter):
     result = subject.search([SearchFilter()])
@@ -355,13 +371,15 @@ def test_filter_combinations(subject: LabwareOffsetStore) -> None:
     ]
     for id, definition_uri in ids_and_definition_uris:
         subject.add(
-            IncomingStoredLabwareOffset(
-                id=id,
-                createdAt=datetime.now(timezone.utc),
-                definitionUri=definition_uri,
-                locationSequence=ANY_LOCATION,
-                vector=LabwareOffsetVector(x=1, y=2, z=3),
-            )
+            [
+                IncomingStoredLabwareOffset(
+                    id=id,
+                    createdAt=datetime.now(timezone.utc),
+                    definitionUri=definition_uri,
+                    locationSequence=ANY_LOCATION,
+                    vector=LabwareOffsetVector(x=1, y=2, z=3),
+                )
+            ]
         )
 
     # Multiple filters should be OR'd together.
@@ -416,9 +434,7 @@ def test_delete(subject: LabwareOffsetStore) -> None:
     with pytest.raises(LabwareOffsetNotFoundError):
         subject.delete("b")
 
-    subject.add(a)
-    subject.add(b)
-    subject.add(c)
+    subject.add([a, b, c])
 
     assert subject.delete(b.id) == out_b
     assert subject.get_all() == [out_a, out_c]
@@ -460,7 +476,7 @@ def test_handle_unknown(
         ],
         vector=incoming_valid.vector,
     )
-    subject.add(incoming_valid)
+    subject.add([incoming_valid])
     with sql_engine.begin() as transaction:
         transaction.execute(
             sqlalchemy.insert(labware_offset_location_sequence_components_table).values(
@@ -473,3 +489,28 @@ def test_handle_unknown(
             )
         )
     assert subject.search([SearchFilter(id="id-a")]) == [outgoing_offset]
+
+
+def test_notifications(
+    subject: LabwareOffsetStore,
+    decoy: Decoy,
+    mock_labware_offsets_publisher: LabwareOffsetsPublisher,
+) -> None:
+    """It should publish notifications any time the set of labware offsets changes."""
+    decoy.verify(mock_labware_offsets_publisher.publish_labware_offsets(), times=0)
+    subject.add(
+        [
+            IncomingStoredLabwareOffset(
+                id="id",
+                createdAt=datetime.now(timezone.utc),
+                definitionUri="definitionUri",
+                locationSequence=ANY_LOCATION,
+                vector=LabwareOffsetVector(x=1, y=2, z=3),
+            )
+        ]
+    )
+    decoy.verify(mock_labware_offsets_publisher.publish_labware_offsets(), times=1)
+    subject.delete("id")
+    decoy.verify(mock_labware_offsets_publisher.publish_labware_offsets(), times=2)
+    subject.delete_all()
+    decoy.verify(mock_labware_offsets_publisher.publish_labware_offsets(), times=3)

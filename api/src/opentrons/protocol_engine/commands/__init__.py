@@ -397,26 +397,34 @@ from .liquid_probe import (
     TryLiquidProbeCommandType,
 )
 
-from .evotip_seal_pipette import (
-    EvotipSealPipette,
-    EvotipSealPipetteParams,
-    EvotipSealPipetteCreate,
-    EvotipSealPipetteResult,
-    EvotipSealPipetteCommandType,
+from .seal_pipette_to_tip import (
+    SealPipetteToTip,
+    SealPipetteToTipParams,
+    SealPipetteToTipCreate,
+    SealPipetteToTipResult,
+    SealPipetteToTipCommandType,
 )
-from .evotip_unseal_pipette import (
-    EvotipUnsealPipette,
-    EvotipUnsealPipetteParams,
-    EvotipUnsealPipetteCreate,
-    EvotipUnsealPipetteResult,
-    EvotipUnsealPipetteCommandType,
+from .unseal_pipette_from_tip import (
+    UnsealPipetteFromTip,
+    UnsealPipetteFromTipParams,
+    UnsealPipetteFromTipCreate,
+    UnsealPipetteFromTipResult,
+    UnsealPipetteFromTipCommandType,
 )
-from .evotip_dispense import (
-    EvotipDispense,
-    EvotipDispenseParams,
-    EvotipDispenseCreate,
-    EvotipDispenseResult,
-    EvotipDispenseCommandType,
+from .pressure_dispense import (
+    PressureDispense,
+    PressureDispenseParams,
+    PressureDispenseCreate,
+    PressureDispenseResult,
+    PressureDispenseCommandType,
+)
+
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleParams,
+    IdentifyModuleCreate,
+    IdentifyModuleResult,
+    IdentifyModuleCommandType,
 )
 
 __all__ = [
@@ -536,6 +544,12 @@ __all__ = [
     "LoadModuleParams",
     "LoadModuleResult",
     "LoadModuleCommandType",
+    # identify module command models
+    "IdentifyModule",
+    "IdentifyModuleParams",
+    "IdentifyModuleCreate",
+    "IdentifyModuleResult",
+    "IdentifyModuleCommandType",
     # load pipette command models
     "LoadPipette",
     "LoadPipetteCreate",
@@ -722,22 +736,22 @@ __all__ = [
     "TryLiquidProbeCreate",
     "TryLiquidProbeResult",
     "TryLiquidProbeCommandType",
-    # evotip seal command bundle
-    "EvotipSealPipette",
-    "EvotipSealPipetteParams",
-    "EvotipSealPipetteCreate",
-    "EvotipSealPipetteResult",
-    "EvotipSealPipetteCommandType",
-    # evotip unseal command bundle
-    "EvotipUnsealPipette",
-    "EvotipUnsealPipetteParams",
-    "EvotipUnsealPipetteCreate",
-    "EvotipUnsealPipetteResult",
-    "EvotipUnsealPipetteCommandType",
-    # evotip dispense command bundle
-    "EvotipDispense",
-    "EvotipDispenseParams",
-    "EvotipDispenseCreate",
-    "EvotipDispenseResult",
-    "EvotipDispenseCommandType",
+    # seal command bundle
+    "SealPipetteToTip",
+    "SealPipetteToTipParams",
+    "SealPipetteToTipCreate",
+    "SealPipetteToTipResult",
+    "SealPipetteToTipCommandType",
+    # unseal command bundle
+    "UnsealPipetteFromTip",
+    "UnsealPipetteFromTipParams",
+    "UnsealPipetteFromTipCreate",
+    "UnsealPipetteFromTipResult",
+    "UnsealPipetteFromTipCommandType",
+    # pressure dispense command bundle
+    "PressureDispense",
+    "PressureDispenseParams",
+    "PressureDispenseCreate",
+    "PressureDispenseResult",
+    "PressureDispenseCommandType",
 ]

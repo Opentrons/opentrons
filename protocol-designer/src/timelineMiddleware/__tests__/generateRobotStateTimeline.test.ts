@@ -1,15 +1,22 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
 import {
-  getInitialRobotStateStandard,
-  makeContext,
+  fixtureTiprack300ul,
+  getLabwareDefURI,
+  POSITION_REFERENCE_BOTTOM,
+} from '@opentrons/shared-data'
+import {
   DEFAULT_PIPETTE,
-  MULTI_PIPETTE,
-  SOURCE_LABWARE,
   DEST_LABWARE,
   FIXED_TRASH_ID,
+  getInitialRobotStateStandard,
+  makeContext,
+  MULTI_PIPETTE,
+  SOURCE_LABWARE,
 } from '@opentrons/step-generation'
-import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
+
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StepArgsAndErrorsById } from '../../steplist'
 
@@ -58,6 +65,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateYOffset: 0,
           dispenseXOffset: 0,
           dispenseYOffset: 0,
+          pushOut: null,
         },
       },
       b: {
@@ -100,6 +108,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateYOffset: 0,
           dispenseXOffset: 0,
           dispenseYOffset: 0,
+          pushOut: null,
         },
       },
       c: {
@@ -129,6 +138,9 @@ describe('generateRobotStateTimeline', () => {
           tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
           xOffset: 0,
           yOffset: 0,
+          finalPushOut: 0,
+          zOffset: 0,
+          positionReference: POSITION_REFERENCE_BOTTOM,
         },
       },
     }

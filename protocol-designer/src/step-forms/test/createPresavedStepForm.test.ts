@@ -1,20 +1,23 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
+  fixtureP10SingleV2Specs,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
-  fixtureP10SingleV2Specs,
 } from '@opentrons/shared-data'
 import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import { getStateAndContextTempTCModules } from '@opentrons/step-generation'
+
 import {
   DEFAULT_DELAY_SECONDS,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
 } from '../../constants'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
+
 import type { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
 
 const stepId = 'stepId123'
@@ -160,14 +163,22 @@ describe('createPresavedStepForm', () => {
       aspirate_mix_times: null,
       aspirate_mix_volume: null,
       aspirate_mmFromBottom: null,
+      aspirate_position_reference: null,
+      aspirate_retract_position_reference: null,
       aspirate_retract_delay_seconds: null,
       aspirate_retract_mmFromBottom: null,
       aspirate_retract_speed: null,
       aspirate_retract_x_position: 0,
       aspirate_retract_y_position: 0,
+      aspirate_submerge_position_reference: null,
+      aspirate_submerge_mmFromBottom: null,
+      aspirate_submerge_x_position: 0,
+      aspirate_submerge_y_position: 0,
+
       aspirate_submerge_delay_seconds: null,
       aspirate_submerge_speed: null,
       aspirate_touchTip_checkbox: false,
+      aspirate_touchTip_mmFromEdge: null,
       aspirate_touchTip_mmFromTop: null,
       aspirate_touchTip_speed: null,
       aspirate_wellOrder_first: 't2b',
@@ -185,14 +196,21 @@ describe('createPresavedStepForm', () => {
       dispense_mix_times: null,
       dispense_mix_volume: null,
       dispense_mmFromBottom: null,
+      dispense_position_reference: null,
       dispense_retract_delay_seconds: null,
+      dispense_retract_position_reference: null,
       dispense_retract_mmFromBottom: null,
       dispense_retract_speed: null,
       dispense_retract_x_position: 0,
       dispense_retract_y_position: 0,
+      dispense_submerge_position_reference: null,
+      dispense_submerge_mmFromBottom: null,
+      dispense_submerge_x_position: 0,
+      dispense_submerge_y_position: 0,
       dispense_submerge_delay_seconds: null,
       dispense_submerge_speed: null,
       dispense_touchTip_checkbox: false,
+      dispense_touchTip_mmFromEdge: null,
       dispense_touchTip_mmFromTop: null,
       dispense_touchTip_speed: null,
       dispense_wellOrder_first: 't2b',
@@ -202,6 +220,10 @@ describe('createPresavedStepForm', () => {
       disposalVolume_volume: '1',
       path: 'single',
       preWetTip: false,
+      pushOut_checkbox: null,
+      pushOut_volume: null,
+      conditioning_checkbox: false,
+      conditioning_volume: null,
       stepDetails: '',
       stepName: 'transfer',
       volume: null,
@@ -212,7 +234,7 @@ describe('createPresavedStepForm', () => {
       blowout_z_offset: 0,
       blowout_flowRate: null,
       liquidClassesSupported: true,
-      liquidClass: null,
+      liquidClass: 'none',
     })
   })
   describe('mix step', () => {
@@ -254,6 +276,10 @@ describe('createPresavedStepForm', () => {
         tipRack: null,
         blowout_flowRate: null,
         liquidClassesSupported: true,
+        liquidClass: 'none',
+        pushOut_checkbox: null,
+        pushOut_volume: null,
+        mix_position_reference: null,
       })
     })
   })

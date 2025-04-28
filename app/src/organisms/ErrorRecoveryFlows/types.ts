@@ -1,10 +1,10 @@
 import type { RunCommandSummary } from '@opentrons/api-client'
-import type { ERROR_KINDS, INVALID, RECOVERY_MAP } from './constants'
-import type { ErrorRecoveryWizardProps } from './ErrorRecoveryWizard'
 import type {
   DropTipFlowsRoute,
   DropTipFlowsStep,
 } from '/app/organisms/DropTipWizardFlows/types'
+import type { ERROR_KINDS, INVALID, RECOVERY_MAP } from './constants'
+import type { ErrorRecoveryWizardProps } from './ErrorRecoveryWizard'
 
 /**
  * Misc Recovery Types
@@ -49,6 +49,7 @@ export type RobotMovingRoute =
   | typeof RECOVERY_MAP['ROBOT_PICKING_UP_TIPS']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_SKIPPING_STEP']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_RELEASING_LABWARE']['ROUTE']
+  | typeof RECOVERY_MAP['ROBOT_RELEASING_LABWARE_LATCH']['ROUTE']
 
 type OriginalRouteKey = keyof RecoveryMap
 type StepsForRoute<R extends RouteKey> = RecoveryMap[{

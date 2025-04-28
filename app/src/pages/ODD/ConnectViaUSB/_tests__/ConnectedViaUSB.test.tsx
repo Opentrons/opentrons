@@ -1,16 +1,17 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '/app/__testing-utils__'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { ConnectViaUSB } from '../'
 
 import type { UseQueryResult } from 'react-query'
-import type { ActiveConnections } from '@opentrons/api-client'
 import type { NavigateFunction } from 'react-router-dom'
+import type { ActiveConnections } from '@opentrons/api-client'
 
 const mockNavigate = vi.fn()
 

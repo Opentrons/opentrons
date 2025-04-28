@@ -1,12 +1,15 @@
-import some from 'lodash/some'
 import reduce from 'lodash/reduce'
+import some from 'lodash/some'
+
 import {
   FIXED_TRASH_ID,
   FLEX_ROBOT_TYPE,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
+
 import { getStagingAreaAddressableAreas } from '../../utils'
+
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -61,11 +64,6 @@ export const getUnusedStagingAreas = (
   const stagingAreaCutoutIds = Object.values(additionalEquipment)
     .filter(equipment => equipment?.name === 'stagingArea')
     .map(equipment => {
-      if (equipment.location == null) {
-        console.error(
-          `expected to find staging area slot location with id ${equipment.id} but could not.`
-        )
-      }
       return equipment.location ?? ''
     })
 

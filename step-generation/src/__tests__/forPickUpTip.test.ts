@@ -1,14 +1,16 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest'
 import merge from 'lodash/merge'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { makeImmutableStateUpdater } from '../__utils__'
 import {
-  getInitialRobotStateStandard,
-  makeContext,
-  getTipColumn,
   DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  getTipColumn,
+  makeContext,
 } from '../fixtures'
-import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
+
 import type { InvariantContext, RobotState } from '../types'
 
 const forPickUpTip = makeImmutableStateUpdater(_forPickUpTip)

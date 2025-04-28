@@ -1,5 +1,6 @@
-import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   Divider,
@@ -8,6 +9,7 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
+
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
@@ -127,11 +129,7 @@ export function BatchEditMixTools(props: BatchEditMixToolsProps): JSX.Element {
             t('form:step_edit_form.field.delay.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_delay_checkbox`].value}
-          isChecked={propsForFields[`${tab}_delay_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_delay_checkbox`].updateValue
-          }
+          fieldProps={propsForFields[`${tab}_delay_checkbox`]}
         >
           {propsForFields[`${tab}_delay_checkbox`].value === true ? (
             <InputStepFormField
@@ -150,9 +148,7 @@ export function BatchEditMixTools(props: BatchEditMixToolsProps): JSX.Element {
                 t('form:step_edit_form.field.blowout.label'),
                 'capitalize'
               )}
-              checkboxValue={propsForFields.blowout_checkbox.value}
-              isChecked={propsForFields.blowout_checkbox.value === true}
-              checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
+              fieldProps={propsForFields.blowout_checkbox}
             >
               {propsForFields.blowout_checkbox.value === true ? (
                 <BlowoutLocationField
@@ -169,11 +165,7 @@ export function BatchEditMixTools(props: BatchEditMixToolsProps): JSX.Element {
                 t('form:step_edit_form.field.touchTip.label'),
                 'capitalize'
               )}
-              checkboxValue={propsForFields.mix_touchTip_checkbox.value}
-              isChecked={propsForFields.mix_touchTip_checkbox.value === true}
-              checkboxUpdateValue={
-                propsForFields.mix_touchTip_checkbox.updateValue
-              }
+              fieldProps={propsForFields.mix_touchTip_checkbox}
             >
               {propsForFields.mix_touchTip_checkbox.value === true ? (
                 <PositionField

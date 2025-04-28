@@ -1,13 +1,16 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
+  fixture96Plate,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   WASTE_CHUTE_CUTOUT,
-  fixture96Plate,
 } from '@opentrons/shared-data'
-import { getSlotInformation, formatTime } from '../utils'
+
+import { formatTime, getSlotInformation } from '../utils'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
@@ -129,7 +132,7 @@ describe('getSlotInformation', () => {
       createdModuleForSlot: mockHS,
       createdLabwareForSlot: mockLabOnDeck1,
       createdNestedLabwareForSlot: mockLabOnDeck2,
-      createFixtureForSlots: [],
+      createdFixtureForSlots: [],
       slotPosition: null,
     })
   })
@@ -139,7 +142,7 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       createdLabwareForSlot: mockLabOnDeck3,
-      createFixtureForSlots: [],
+      createdFixtureForSlots: [],
       slotPosition: null,
     })
   })
@@ -155,7 +158,7 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
-      createFixtureForSlots: [],
+      createdFixtureForSlots: [],
     })
   })
   it('renders a trashbin for a Flex on slot A3', () => {
@@ -164,7 +167,7 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
-      createFixtureForSlots: [mockTrash],
+      createdFixtureForSlots: [mockTrash],
       preSelectedFixture: 'trashBin',
     })
   })
@@ -177,7 +180,7 @@ describe('getSlotInformation', () => {
       createdModuleForSlot: mockHSFlex,
       createdLabwareForSlot: mockLabOnDeck1,
       createdNestedLabwareForSlot: mockLabOnDeck2,
-      createFixtureForSlots: [],
+      createdFixtureForSlots: [],
     })
   })
   it('renders the waste chute and staging area for slot D3 for Flex', () => {
@@ -186,7 +189,7 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: mockLabOnStagingArea,
       slotPosition: null,
-      createFixtureForSlots: [mockWasteChute, mockStagingArea],
+      createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
     })
   })
@@ -197,7 +200,7 @@ describe('getSlotInformation', () => {
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
       createdLabwareForSlot: mockLabOnStagingArea,
-      createFixtureForSlots: [mockWasteChute, mockStagingArea],
+      createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
     })
   })

@@ -1,6 +1,6 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { act, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -8,22 +8,26 @@ import {
   MockLPCContentContainer,
   mockLPCContentProps,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
+import {
+  useLPCSnackbars,
+  useLPCToasts,
+} from '/app/organisms/LabwarePositionCheck/hooks'
 import { LPCLabwareDetails } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { getIsOnDevice } from '/app/redux/config'
 import {
-  selectSelectedLwOverview,
-  selectSelectedLwDisplayName,
-  selectWorkingOffsetsByUri,
-  selectIsDefaultOffsetAbsent,
-  selectStepInfo,
-  goBackEditOffsetSubstep,
   applyWorkingOffsets,
+  goBackEditOffsetSubstep,
+  selectIsAnyOffsetHardCoded,
+  selectIsDefaultOffsetAbsent,
+  selectSelectedLwDisplayName,
+  selectSelectedLwOverview,
+  selectSnackbarStatus,
+  selectStepInfo,
+  selectWorkingOffsetsByUri,
 } from '/app/redux/protocol-runs'
-import { handleUnsavedOffsetsModalODD } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock(
   '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails/DefaultLocationOffset',
@@ -39,6 +43,9 @@ vi.mock(
     ),
   })
 )
+vi.mock('../OffsetBannerContainer', () => ({
+  OffsetBannerContainer: () => <div>MOCK_OFFSET_BANNER_CONTAINER</div>,
+}))
 vi.mock('/app/atoms/InlineNotification', () => ({
   InlineNotification: vi.fn(({ type, heading, message }) => (
     <div
@@ -77,13 +84,17 @@ vi.mock('/app/redux/protocol-runs', () => ({
   selectSelectedLwDisplayName: vi.fn(),
   selectWorkingOffsetsByUri: vi.fn(),
   selectIsDefaultOffsetAbsent: vi.fn(),
+  selectCountNonHardcodedLocationSpecificOffsetsForLw: vi.fn(),
+  selectIsAnyOffsetHardCoded: vi.fn(),
   selectStepInfo: vi.fn(),
   goBackEditOffsetSubstep: vi.fn(),
   applyWorkingOffsets: vi.fn(),
+  selectSnackbarStatus: vi.fn(),
 }))
 vi.mock('/app/redux/config', () => ({
   getIsOnDevice: vi.fn(),
 }))
+vi.mock('/app/organisms/LabwarePositionCheck/hooks')
 
 const render = (props: ComponentProps<typeof LPCLabwareDetails>) => {
   const mockState = {
@@ -105,19 +116,25 @@ const render = (props: ComponentProps<typeof LPCLabwareDetails>) => {
 describe('LPCLabwareDetails', () => {
   let props: ComponentProps<typeof LPCLabwareDetails>
   let mockDispatch: Mock
-  let mockHandleUnsavedOffsetsModalODD: Mock
+  let mockSaveWorkingOffsets: Mock
+  let mockMakeSnackbar: Mock
+  let mockMakeSuccessToast: Mock
 
   beforeEach(() => {
     mockDispatch = vi.fn()
+    mockMakeSnackbar = vi.fn()
+    mockMakeSuccessToast = vi.fn()
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
-    mockHandleUnsavedOffsetsModalODD = vi.mocked(handleUnsavedOffsetsModalODD)
+    mockSaveWorkingOffsets = vi.fn(() => Promise.resolve('mock-data'))
 
     props = {
       ...mockLPCContentProps,
+      commandUtils: {
+        saveWorkingOffsets: mockSaveWorkingOffsets,
+        isSavingWorkingOffsetsLoading: false,
+      } as any,
     }
 
-    vi.mocked(InlineNotification).mockClear()
-    mockHandleUnsavedOffsetsModalODD.mockClear()
     vi.mocked(getIsOnDevice).mockReturnValue(false)
 
     vi.mocked(
@@ -131,14 +148,26 @@ describe('LPCLabwareDetails', () => {
     vi.mocked(selectSelectedLwDisplayName).mockImplementation(() => () =>
       'Test Labware'
     )
-    vi.mocked(selectWorkingOffsetsByUri).mockImplementation(() => () => ({}))
+    vi.mocked(selectWorkingOffsetsByUri).mockImplementation(() => () =>
+      ({
+        test: {},
+      } as any)
+    )
     vi.mocked(selectIsDefaultOffsetAbsent).mockImplementation(() => () => false)
+    vi.mocked(selectIsAnyOffsetHardCoded).mockImplementation(() => () => false)
     vi.mocked(goBackEditOffsetSubstep).mockReturnValue({
       type: 'GO_BACK_HANDLE_LW_SUBSTEP',
     } as any)
     vi.mocked(applyWorkingOffsets).mockReturnValue({
       type: 'APPLY_WORKING_OFFSETS',
     } as any)
+    vi.mocked(selectSnackbarStatus).mockImplementation(() => () => null)
+    vi.mocked(useLPCSnackbars).mockReturnValue({
+      makeSuccessSnackbar: mockMakeSnackbar,
+    } as any)
+    vi.mocked(useLPCToasts).mockReturnValue({
+      makeSuccessToast: mockMakeSuccessToast,
+    })
   })
 
   it('passes correct header props to LPCContentContainer', () => {
@@ -157,47 +186,47 @@ describe('LPCLabwareDetails', () => {
 
     screen.getByText('MOCK_DEFAULT_LOCATION_OFFSET')
     screen.getByText('MOCK_LOCATION_SPECIFIC_OFFSETS_CONTAINER')
+    screen.getByText('MOCK_OFFSET_BANNER_CONTAINER')
   })
 
-  it('shows InlineNotification when default offset is absent', () => {
-    vi.mocked(selectIsDefaultOffsetAbsent).mockImplementation(() => () => true)
-
+  it('dispatches actions when save is clicked with working offsets', async () => {
     render(props)
 
-    const notification = screen.getByTestId('inline-notification')
-    expect(notification).toBeInTheDocument()
-    expect(notification.getAttribute('data-type')).toBe('alert')
-    expect(notification.getAttribute('data-heading')).toBe(
-      'Add a default offset to automatically apply it to all placements of this labware on the deck'
-    )
-    expect(notification.textContent).toBe(
-      'Specific slot locations can be adjusted as needed'
-    )
+    const primaryButton = screen.getByTestId('primary-button')
+    primaryButton.click()
+
+    await act(async () => {
+      await expect(mockSaveWorkingOffsets).toHaveBeenCalled()
+    })
+
+    expect(mockDispatch).toHaveBeenCalledTimes(2)
+    expect(applyWorkingOffsets).toHaveBeenCalledWith(props.runId, 'mock-data')
+    expect(goBackEditOffsetSubstep).toHaveBeenCalledWith(props.runId)
+    expect(mockMakeSuccessToast).not.toHaveBeenCalled()
   })
 
-  it('does not show InlineNotification when default offset is present', () => {
-    render(props)
-
-    expect(screen.queryByTestId('inline-notification')).not.toBeInTheDocument()
-  })
-
-  it('dispatches actions when save is clicked with working offsets', () => {
-    vi.mocked(selectWorkingOffsetsByUri).mockImplementation(() => () =>
-      ({
-        'labware-uri-1': true,
-      } as any)
-    )
+  it('make a success toast if on an odd on save click', async () => {
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
 
     render(props)
 
     const primaryButton = screen.getByTestId('primary-button')
     primaryButton.click()
 
-    expect(mockDispatch).toHaveBeenCalledTimes(2)
-    expect(applyWorkingOffsets).toHaveBeenCalledWith(
-      props.runId,
-      'labware-uri-1'
+    await act(async () => {
+      await expect(mockSaveWorkingOffsets).toHaveBeenCalled()
+    })
+
+    expect(mockMakeSuccessToast).toHaveBeenCalled()
+  })
+
+  it('calls make success snackbar if the snackbar status is not null', () => {
+    vi.mocked(selectSnackbarStatus).mockImplementation(() => () =>
+      'locationSpecificAdjusted'
     )
-    expect(goBackEditOffsetSubstep).toHaveBeenCalledWith(props.runId)
+
+    render(props)
+
+    expect(mockMakeSnackbar).toHaveBeenCalled()
   })
 })

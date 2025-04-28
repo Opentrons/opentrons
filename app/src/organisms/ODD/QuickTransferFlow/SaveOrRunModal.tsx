@@ -1,15 +1,18 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
-  SPACING,
   COLORS,
-  LegacyStyledText,
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
+  LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { OddModal } from '/app/molecules/OddModal'
+
 import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+
 import { NameQuickTransfer } from './NameQuickTransfer'
 
 interface SaveOrRunModalProps {

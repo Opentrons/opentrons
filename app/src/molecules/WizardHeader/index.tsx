@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -9,12 +10,13 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { StepMeter } from '/app/atoms/StepMeter'
 
 interface WizardHeaderProps {
@@ -85,7 +87,11 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   return (
     <Box css={BOX_STYLE}>
       <Flex css={HEADER_CONTAINER_STYLE}>
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          gap={SPACING.spacing8}
+        >
           <StyledText
             desktopStyle="bodyLargeSemiBold"
             oddStyle="bodyTextSemiBold"

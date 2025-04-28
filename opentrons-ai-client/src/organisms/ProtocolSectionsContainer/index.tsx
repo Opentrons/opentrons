@@ -1,3 +1,9 @@
+import { useEffect } from 'react'
+import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useAtom } from 'jotai'
+import styled from 'styled-components'
+
 import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
@@ -6,39 +12,75 @@ import {
   LargeButton,
   SPACING,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
-import { Accordion } from '../../molecules/Accordion'
-import styled from 'styled-components'
-import { ApplicationSection } from '../../organisms/ApplicationSection'
-import { createProtocolAtom } from '../../resources/atoms'
-import { useAtom } from 'jotai'
-import { InstrumentsSection } from '../InstrumentsSection'
-import { ModulesSection } from '../ModulesSection'
-import { LabwareLiquidsSection } from '../LabwareLiquidsSection'
-import { StepsSection } from '../StepsSection'
-import { useFormContext } from 'react-hook-form'
 import { COLUMN } from '@opentrons/shared-data'
 
-export const APPLICATION_STEP = 0
-export const INSTRUMENTS_STEP = 1
-export const MODULES_STEP = 2
-export const LABWARE_LIQUIDS_STEP = 3
-export const STEPS_STEP = 4
+import { Accordion } from '../../molecules/Accordion'
+import { ApplicationSection } from '../../organisms/ApplicationSection'
+import { createProtocolAtom } from '../../resources/atoms'
+import { InstrumentsSection } from '../InstrumentsSection'
+import { LabwareLiquidsSection } from '../LabwareLiquidsSection'
+import { ModulesSection } from '../ModulesSection'
+import { ProtocolFormatSection } from '../ProtocolFormatSection'
+import { StepsSection } from '../StepsSection'
+
+export const PROTOCOL_FORMAT_STEP = 0
+export const APPLICATION_STEP = 1
+export const INSTRUMENTS_STEP = 2
+export const MODULES_STEP = 3
+export const LABWARE_LIQUIDS_STEP = 4
+export const STEPS_STEP = 5
+
+export const sections = [
+  {
+    sectionNumber: PROTOCOL_FORMAT_STEP,
+    title: 'protocol_format_title',
+    Component: ProtocolFormatSection,
+  },
+  {
+    sectionNumber: APPLICATION_STEP,
+    title: 'application_title',
+    Component: ApplicationSection,
+  },
+  {
+    sectionNumber: INSTRUMENTS_STEP,
+    title: 'instruments_title',
+    Component: InstrumentsSection,
+  },
+  {
+    sectionNumber: MODULES_STEP,
+    title: 'modules_title',
+    Component: ModulesSection,
+  },
+  {
+    sectionNumber: LABWARE_LIQUIDS_STEP,
+    title: 'labware_liquids_title',
+    Component: LabwareLiquidsSection,
+  },
+  {
+    sectionNumber: STEPS_STEP,
+    title: 'steps_title',
+    Component: StepsSection,
+  },
+]
 
 export function ProtocolSectionsContainer(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const {
     formState: { isValid },
+    trigger,
   } = useFormContext()
   const [{ currentSection, focusSection }, setCreateProtocolAtom] = useAtom(
     createProtocolAtom
   )
 
+  useEffect(() => {
+    trigger()
+  }, [focusSection])
+
   function handleSectionClick(stepNumber: number): void {
     currentSection >= stepNumber &&
-      isValid &&
       setCreateProtocolAtom({
-        currentSection,
+        currentSection: stepNumber,
         focusSection: stepNumber,
       })
   }
@@ -59,33 +101,7 @@ export function ProtocolSectionsContainer(): JSX.Element | null {
 
   return (
     <ProtocolSections>
-      {[
-        {
-          sectionNumber: APPLICATION_STEP,
-          title: 'application_title',
-          Component: ApplicationSection,
-        },
-        {
-          sectionNumber: INSTRUMENTS_STEP,
-          title: 'instruments_title',
-          Component: InstrumentsSection,
-        },
-        {
-          sectionNumber: MODULES_STEP,
-          title: 'modules_title',
-          Component: ModulesSection,
-        },
-        {
-          sectionNumber: LABWARE_LIQUIDS_STEP,
-          title: 'labware_liquids_title',
-          Component: LabwareLiquidsSection,
-        },
-        {
-          sectionNumber: STEPS_STEP,
-          title: 'steps_title',
-          Component: StepsSection,
-        },
-      ].map(({ sectionNumber, title, Component }) => (
+      {sections.map(({ sectionNumber, title, Component }) => (
         <Accordion
           key={sectionNumber}
           heading={t(title)}
