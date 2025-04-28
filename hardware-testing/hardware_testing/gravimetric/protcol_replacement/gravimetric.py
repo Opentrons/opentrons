@@ -57,13 +57,18 @@ if os.getenv("RUNNING_ON_VERDIN") is None:
     else:
         _download_and_extract(release, base_dir)
     sys.path.append(base_dir)
-    from hardware_testing.data import create_run_id
+    from hardware_testing.data import create_run_id, get_git_description
+    from hardware_testing.gravimetric.measurement import (
+        create_measurement_tag,
+        MeasurementType,
+    )
     from hardware_testing.gravimetric.measurement.scale import Scale
     from hardware_testing.gravimetric.measurement.record import (
         GravimetricRecorder,
         GravimetricRecorderConfig,
     )
     from hardware_testing.drivers import asair_sensor as AsairDriver
+    from hardware_testing.gravimetric import helpers, report
 
 
 @dataclass
@@ -71,23 +76,29 @@ class FixtureSettings:
     """Dataclass to hold all the options for a gravimetric script."""
 
     name: str
+    increment: bool
     run_id: str
     mount: str
     pipette: InstrumentContext
     pipette_volume: int
     pipette_channels: int
-    tips: List[int]
+    tip_sizes: List[int]
     trials: int
     return_tip: bool
     touch_tip: bool
     liquid: Liquid
     liquid_class: LiquidClass
-    tipracks: Dict[int, List[Labware]]
+    tips: Dict[int, List[Well]]
     liquid_source: Well
     volumes: Dict[int, List[float]]
     scale: Scale
     recorder: GravimetricRecorder
     env_sensor: AsairDriver.AsairSensorBase
+    robot_serial: str
+    scale_serial: str
+    env_serial: str
+    pipette_tag: str
+    test_report: report.CSVReport
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -103,10 +114,11 @@ class FixtureSettings:
             ctx.params.qc_test_profile.parse_as_csv()  # type: ignore [attr-defined]
         )
         name = lookup_key("name", csv_params)[0]
+        increment = bool(lookup_key("increment", csv_params)[0])
         mount = lookup_key("mount", csv_params)[0]
         pipette_volume = int(lookup_key("pipette", csv_params)[0])
         pipette_channels = int(lookup_key("pipette", csv_params)[1])
-        tips = [int(tip) for tip in lookup_key("tips", csv_params)]
+        tip_sizes = [int(tip) for tip in lookup_key("tips", csv_params)]
         trials = int(lookup_key("trials", csv_params)[0])
         return_tip = bool(lookup_key("return_tip", csv_params)[0] == "True")
         touch_tip = bool(lookup_key("touch_tip", csv_params)[0] == "True")
@@ -142,6 +154,12 @@ class FixtureSettings:
             200: volumes_to_test_200ul,
             1000: volumes_to_test_1000ul,
         }
+        volumes_flat = (
+            volumes_to_test_20ul
+            + volumes_to_test_50ul
+            + volumes_to_test_200ul
+            + volumes_to_test_1000ul
+        )
 
         tipracks_20ul_lw = [
             ctx.load_labware("opentrons_flex_96_tiprack_20uL", slot)
@@ -159,12 +177,20 @@ class FixtureSettings:
             ctx.load_labware("opentrons_flex_96_tiprack_1000uL", slot)
             for slot in tipracks_1000ul
         ]
-        tipracks = {
-            20: tipracks_20ul_lw,
-            50: tipracks_50ul_lw,
-            200: tipracks_200ul_lw,
-            1000: tipracks_1000ul_lw,
-        }
+        tips = {}
+
+        def add_tips(size: int, tipracks: List[Labware]) -> None:
+            if len(tipracks) > 0:
+                wells = []
+                for rack in tipracks:
+                    wells += rack.wells()
+                tips[size] = wells
+
+        add_tips(20, tipracks_20ul_lw)
+        add_tips(50, tipracks_50ul_lw)
+        add_tips(200, tipracks_200ul_lw)
+        add_tips(1000, tipracks_1000ul_lw)
+
         source_well = ctx.load_labware(labware_on_scale, slot_scale)[
             labware_on_scale_well_name
         ]
@@ -178,6 +204,7 @@ class FixtureSettings:
         simulating = ctx.is_simulating()
         run_id = create_run_id()
         scale = Scale.build(simulating)
+        scale_serial = scale.read_serial_number()
         recorder = GravimetricRecorder(
             GravimetricRecorderConfig(
                 test_name=name,
@@ -192,26 +219,61 @@ class FixtureSettings:
         )
         recorder.record(in_thread=True)
         env_sensor = AsairDriver.BuildAsairSensor(simulating)
+        env_serial = env_sensor.get_serial()
+        pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
+        ot3api = ctx._core.get_hardware()
+        robot_serial = str(ot3api.get_serial_number())
+        fw_version = ot3api.fw_version
+        git_description = get_git_description()
+        operator_name = "unused"
+
+        test_report = report.create_csv_test_report(
+            volumes=volumes_flat,
+            pipette_channels=pipette_channels,
+            increment=increment,
+            trials=trials,
+            name=name,
+            run_id=run_id,
+        )
+        test_report.set_tag(pipette_tag)
+        test_report.set_operator(operator_name)
+        test_report.set_version(git_description)
+        test_report.set_firmware(fw_version)
+        report.store_serial_numbers(
+            test_report,
+            robot=robot_serial,
+            pipette=pipette_tag,
+            tips=ctx.params.tip_batch,  # type: ignore [attr-defined]
+            scale=recorder.serial_number,
+            environment=env_serial,
+            liquid=liquid_name,
+        )
 
         return cls(
             name=name,
+            increment=increment,
             run_id=run_id,
             mount=mount,
             pipette=pipette,
             pipette_volume=pipette_volume,
             pipette_channels=pipette_channels,
-            tips=tips,
+            tip_sizes=tip_sizes,
             trials=trials,
             return_tip=return_tip,
             touch_tip=touch_tip,
             liquid=liquid,
             liquid_class=liquid_class,
-            tipracks=tipracks,
+            tips=tips,
             liquid_source=source_well,
             volumes=volumes,
             scale=scale,
             recorder=recorder,
             env_sensor=env_sensor,
+            robot_serial=robot_serial,
+            scale_serial=scale_serial,
+            env_serial=env_serial,
+            pipette_tag=pipette_tag,
+            test_report=test_report,
         )
 
     def validate_settings(self) -> bool:
@@ -265,16 +327,60 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
+def remove_tip(fixture_settings: FixtureSettings) -> None:
+    """Either return or drop tip(s)."""
+    if fixture_settings.return_tip:
+        fixture_settings.pipette.return_tip()
+    else:
+        fixture_settings.pipette.drop_tip()
+
+
+def retract_and_wait(
+    fixture_settings: FixtureSettings,
+    mode: MeasurementType,
+    tip: int,
+    volume: float,
+    trial: int,
+) -> None:
+    """Retract away from the scale and record the weight."""
+    pass
+
+
+def aspirate_with_liquid_class(
+    fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
+) -> None:
+    """Aspirate with liquid class."""
+    pass
+
+
+def dispense_with_liquid_class(
+    fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
+) -> None:
+    """Dispense with Liquid Class."""
+    pass
+
+
 def run_one_test(
     fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
 ) -> None:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
-    pass
+    tip_well = fixture_settings.tips[tip].pop(0)
+    fixture_settings.pipette.pick_up_tip(tip_well)
+    retract_and_wait(fixture_settings, MeasurementType.INIT, tip, volume, trial)
+    aspirate_with_liquid_class(fixture_settings, tip, volume, trial)
+    retract_and_wait(fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial)
+    dispense_with_liquid_class(fixture_settings, tip, volume, trial)
+    retract_and_wait(fixture_settings, MeasurementType.DISPENSE, tip, volume, trial)
+    remove_tip(fixture_settings)
 
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
     fixture_settings = FixtureSettings.build(ctx)
+    first_tip = fixture_settings.tips[list(fixture_settings.tips)[0]].pop(0)
+    fixture_settings.pipette.pick_up_tip(first_tip)
+    fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+    remove_tip(fixture_settings)
     for tip in fixture_settings.tips:
         for volume in fixture_settings.volumes[tip]:
             for trial in range(fixture_settings.trials):
