@@ -4,7 +4,6 @@ import { useAtom } from 'jotai'
 import {
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_FLEX_END,
   Modal,
   PrimaryButton,
   SPACING,

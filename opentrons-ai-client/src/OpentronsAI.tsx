@@ -18,7 +18,6 @@ import { Footer } from './molecules/Footer'
 import { Header } from './molecules/Header'
 import { HeaderWithMeter } from './molecules/HeaderWithMeter'
 import { Loading } from './molecules/Loading'
-import { SettingsButton } from './molecules/SettingsButton'
 import { OpentronsAIRoutes } from './OpentronsAIRoutes'
 import { FeatureFlagsModal } from './organisms/FeatureFlagsModal'
 import {
