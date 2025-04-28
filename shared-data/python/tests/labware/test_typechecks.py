@@ -1,5 +1,6 @@
 """Test that our bindings can validate and parse our standard labware definitions."""
 
+from typing import Literal
 
 import pytest
 import typeguard
@@ -45,7 +46,7 @@ def test_schema_3_types(loadname: str, version: int) -> None:
     + [(loadname, version, 3) for loadname, version in get_ot_defs(schema=3)],
 )
 def test_all_schema_union_types(
-    loadname: str, version: int, schema_version: int
+    loadname: str, version: int, schema_version: Literal[2, 3]
 ) -> None:
     """Test parsing and validating into the types that represent a union of all schemas."""
     defdict = load_definition(
