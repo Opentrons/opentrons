@@ -311,6 +311,16 @@ export function useCommandTextString(
         commandText: utils.getRailLightsCommandText({ ...fullParams, command }),
       }
 
+    case 'robot/moveTo':
+    case 'robot/moveAxesTo':
+    case 'robot/moveAxesRelative':
+    case 'robot/openGripperJaw':
+    case 'robot/closeGripperJaw':
+      return {
+        kind: 'generic',
+        commandText: utils.getRobotCommandText({ ...fullParams, command }),
+      }
+
     case undefined:
     case null:
       return { kind: 'generic', commandText: '' }
