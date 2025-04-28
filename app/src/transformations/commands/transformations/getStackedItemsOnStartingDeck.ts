@@ -240,7 +240,17 @@ export function getStackedItemsOnStartingDeck(
           ): sequenceItem is OnCutoutFixtureLocationSequenceComponent =>
             sequenceItem.kind === 'onCutoutFixture'
         )?.cutoutId
-        location = getCutoutDisplayName(cutoutId as CutoutId)
+        const addressableArea = locationSequence.find(
+          (
+            sequenceItem
+          ): sequenceItem is OnAddressableAreaLocationSequenceComponent =>
+            sequenceItem.kind === 'onAddressableArea'
+        )?.addressableAreaName
+        if (cutoutId == null && addressableArea == null) return acc
+        location =
+          addressableArea != null
+            ? getSlotFromAddressableAreaName(addressableArea)
+            : getCutoutDisplayName(cutoutId as CutoutId)
         if (cutoutId == null || Object.keys(acc).includes(location)) {
           return acc
         }
