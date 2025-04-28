@@ -450,7 +450,7 @@ def _drop_wells_before_starting_tip(
 ) -> _TipRackStateByWellName:
     """Drop any wells that come before the starting tip and return the remaining ones after."""
     seen_starting_well = False
-    remaining_wells = {}
+    remaining_wells: dict[str, _TipRackWellState] = {}
     for well_name, tip_state in wells.items():
         if well_name == starting_tip_name:
             seen_starting_well = True
