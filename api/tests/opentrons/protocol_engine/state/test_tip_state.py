@@ -9,22 +9,17 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     Parameters2 as LabwareDefinition2Parameters,
 )
-from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.tips import TipStore, TipView, _TipRackWellState
+from opentrons.protocol_engine.state.tips import TipStore, TipView
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
-    FlowRates,
     OFF_DECK_LOCATION,
 )
-from opentrons.protocol_engine.resources.pipette_data_provider import (
-    LoadedStaticPipetteData,
-)
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.pipette.pipette_definition import (
     AvailableSensorDefinition,
@@ -104,49 +99,9 @@ def _dummy_command() -> commands.Command:
 def test_get_next_tip_returns_none(
     load_labware_action: actions.SucceedCommandAction,
     subject: TipStore,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """It should start at the first tip in the labware."""
     subject.handle_action(load_labware_action)
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=96,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
-            back_left_corner_offset=Point(0, 0, 0),
-            front_right_corner_offset=Point(0, 0, 0),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
@@ -163,57 +118,9 @@ def test_get_next_tip_returns_first_tip(
     load_labware_action: actions.SucceedCommandAction,
     subject: TipStore,
     input_tip_amount: int,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """It should start at the first tip in the labware."""
     subject.handle_action(load_labware_action)
-
-    pipette_name_type = PipetteNameType.P1000_96
-    if input_tip_amount == 1:
-        pipette_name_type = PipetteNameType.P300_SINGLE_GEN2
-    elif input_tip_amount == 8:
-        pipette_name_type = PipetteNameType.P300_MULTI_GEN2
-    else:
-        pipette_name_type = PipetteNameType.P1000_96
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=input_tip_amount,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(pipette_name_type),
-            back_left_corner_offset=Point(0, 0, 0),
-            front_right_corner_offset=Point(0, 0, 0),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
@@ -231,50 +138,9 @@ def test_get_next_tip_used_starting_tip(
     subject: TipStore,
     input_tip_amount: int,
     result_well_name: str,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """It should start searching at the given starting tip."""
     subject.handle_action(load_labware_action)
-
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=input_tip_amount,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
-            back_left_corner_offset=Point(0, 0, 0),
-            front_right_corner_offset=Point(0, 0, 0),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
@@ -307,13 +173,10 @@ def test_get_next_tip_skips_picked_up_tip(
     get_next_tip_tips: int,
     input_starting_tip: Optional[str],
     result_well_name: Optional[str],
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """It should get the next tip in the column if one has been picked up."""
     subject.handle_action(load_labware_action)
 
-    channels_num = input_tip_amount
     if input_starting_tip is not None:
         pipette_name_type = PipetteNameType.P1000_96
         if input_tip_amount == 1:
@@ -323,7 +186,6 @@ def test_get_next_tip_skips_picked_up_tip(
         else:
             pipette_name_type = PipetteNameType.P1000_96
     else:
-        channels_num = get_next_tip_tips
         pipette_name_type = PipetteNameType.P1000_96
         if get_next_tip_tips == 1:
             pipette_name_type = PipetteNameType.P300_SINGLE_GEN2
@@ -331,50 +193,15 @@ def test_get_next_tip_skips_picked_up_tip(
             pipette_name_type = PipetteNameType.P300_MULTI_GEN2
         else:
             pipette_name_type = PipetteNameType.P1000_96
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=channels_num,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(pipette_name_type),
-            back_left_corner_offset=Point(0, 0, 0),
-            front_right_corner_offset=Point(0, 0, 0),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
+
+    nozzle_map = get_default_nozzle_map(pipette_name_type)
 
     pick_up_tip_state_update = update_types.StateUpdate(
         tips_used=update_types.TipsUsedUpdate(
-            pipette_id="pipette-id",
             labware_id="cool-labware",
-            well_name="A1",
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                labware_id="cool-labware", well_name="A1", nozzle_map=nozzle_map
+            ),
         )
     )
     subject.handle_action(
@@ -388,7 +215,7 @@ def test_get_next_tip_skips_picked_up_tip(
         labware_id="cool-labware",
         num_tips=get_next_tip_tips,
         starting_tip_name=input_starting_tip,
-        nozzle_map=config_update.config.nozzle_map,
+        nozzle_map=nozzle_map,
     )
 
     assert result == result_well_name
@@ -397,61 +224,27 @@ def test_get_next_tip_skips_picked_up_tip(
 def test_get_next_tip_with_starting_tip(
     subject: TipStore,
     load_labware_action: actions.SucceedCommandAction,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """It should return the starting tip, and then the following tip after that."""
+    nozzle_map = get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2)
+
     subject.handle_action(load_labware_action)
 
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=1,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
-            back_left_corner_offset=Point(x=1, y=2, z=3),
-            front_right_corner_offset=Point(x=4, y=5, z=6),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name="B2",
-        nozzle_map=config_update.config.nozzle_map,
+        nozzle_map=nozzle_map,
     )
-
     assert result == "B2"
 
     pick_up_tip_state_update = update_types.StateUpdate(
-        tips_used=update_types.TipsUsedUpdate("pipette-id", "cool-labware", "B2")
+        tips_used=update_types.TipsUsedUpdate(
+            labware_id="cool-labware",
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                labware_id="cool-labware", well_name="B2", nozzle_map=nozzle_map
+            ),
+        )
     )
     subject.handle_action(
         actions.SucceedCommandAction(
@@ -464,59 +257,19 @@ def test_get_next_tip_with_starting_tip(
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name="B2",
-        nozzle_map=config_update.config.nozzle_map,
+        nozzle_map=nozzle_map,
     )
-
     assert result == "C2"
 
 
 def test_get_next_tip_with_starting_tip_8_channel(
     subject: TipStore,
     load_labware_action: actions.SucceedCommandAction,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """It should return the starting tip, and then the following tip after that."""
-    subject.handle_action(load_labware_action)
+    nozzle_map = get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2)
 
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=8,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
-            back_left_corner_offset=Point(0, 0, 0),
-            front_right_corner_offset=Point(0, 0, 0),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
+    subject.handle_action(load_labware_action)
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
@@ -524,12 +277,14 @@ def test_get_next_tip_with_starting_tip_8_channel(
         starting_tip_name="A2",
         nozzle_map=None,
     )
-
     assert result == "A2"
 
     pick_up_tip_state_update = update_types.StateUpdate(
         tips_used=update_types.TipsUsedUpdate(
-            pipette_id="pipette-id", labware_id="cool-labware", well_name="A2"
+            labware_id="cool-labware",
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                labware_id="cool-labware", well_name="A2", nozzle_map=nozzle_map
+            ),
         )
     )
     subject.handle_action(
@@ -552,107 +307,35 @@ def test_get_next_tip_with_starting_tip_8_channel(
 def test_get_next_tip_with_1_channel_followed_by_8_channel(
     subject: TipStore,
     load_labware_action: actions.SucceedCommandAction,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """It should return the first tip of column 2 for the 8 channel after performing a single tip pickup on column 1."""
-    subject.handle_action(load_labware_action)
+    nozzle_map_1_channel = get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2)
+    nozzle_map_8_channel = get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2)
 
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=1,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
-            back_left_corner_offset=Point(0, 0, 0),
-            front_right_corner_offset=Point(0, 0, 0),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
-    config_update_2 = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id2",
-        serial_number="pipette-serial2",
-        config=LoadedStaticPipetteData(
-            channels=8,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name2",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
-            back_left_corner_offset=Point(0, 0, 0),
-            front_right_corner_offset=Point(0, 0, 0),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update_2),
-            command=_dummy_command(),
-        )
-    )
+    subject.handle_action(load_labware_action)
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name=None,
-        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+        nozzle_map=nozzle_map_1_channel,
     )
-
     assert result == "A1"
 
-    pick_up_tip_2_state_update = update_types.StateUpdate(
+    pick_up_tip_1_channel_state_update = update_types.StateUpdate(
         tips_used=update_types.TipsUsedUpdate(
-            pipette_id="pipette-id2", labware_id="cool-labware", well_name="A1"
+            labware_id="cool-labware",
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                labware_id="cool-labware",
+                well_name="A1",
+                nozzle_map=nozzle_map_1_channel,
+            ),
         )
     )
     subject.handle_action(
         actions.SucceedCommandAction(
             command=_dummy_command(),
-            state_update=pick_up_tip_2_state_update,
+            state_update=pick_up_tip_1_channel_state_update,
         )
     )
 
@@ -660,59 +343,17 @@ def test_get_next_tip_with_1_channel_followed_by_8_channel(
         labware_id="cool-labware",
         num_tips=8,
         starting_tip_name=None,
-        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
+        nozzle_map=nozzle_map_8_channel,
     )
-
     assert result == "A2"
 
 
 def test_get_next_tip_with_starting_tip_out_of_tips(
     subject: TipStore,
     load_labware_action: actions.SucceedCommandAction,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """It should return the starting tip of H12 and then None after that."""
     subject.handle_action(load_labware_action)
-
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=1,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
-            back_left_corner_offset=Point(0, 0, 0),
-            front_right_corner_offset=Point(0, 0, 0),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
@@ -720,12 +361,16 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
         starting_tip_name="H12",
         nozzle_map=None,
     )
-
     assert result == "H12"
 
     pick_up_tip_state_update = update_types.StateUpdate(
         tips_used=update_types.TipsUsedUpdate(
-            pipette_id="pipette-id", labware_id="cool-labware", well_name="H12"
+            labware_id="cool-labware",
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                labware_id="cool-labware",
+                well_name="H12",
+                nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+            ),
         )
     )
     subject.handle_action(
@@ -748,50 +393,9 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
 def test_get_next_tip_with_column_and_starting_tip(
     subject: TipStore,
     load_labware_action: actions.SucceedCommandAction,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """It should return the first tip in a column, taking starting tip into account."""
     subject.handle_action(load_labware_action)
-
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=8,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
-            back_left_corner_offset=Point(0, 0, 0),
-            front_right_corner_offset=Point(0, 0, 0),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
@@ -806,60 +410,17 @@ def test_get_next_tip_with_column_and_starting_tip(
 def test_reset_tips(
     subject: TipStore,
     load_labware_action: actions.SucceedCommandAction,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """It should be able to reset tip tracking state."""
     subject.handle_action(load_labware_action)
-
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=1,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
-            back_left_corner_offset=Point(x=1, y=2, z=3),
-            front_right_corner_offset=Point(x=4, y=5, z=6),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
 
     subject.handle_action(
         actions.SucceedCommandAction(
             command=_dummy_command(),
             state_update=update_types.StateUpdate(
                 tips_used=update_types.TipsUsedUpdate(
-                    pipette_id="pipette-id",
                     labware_id="cool-labware",
-                    well_name="A1",
+                    well_names=["A1", "A2", "A3"],
                 )
             ),
         )
@@ -909,177 +470,28 @@ def test_has_tip_tip_rack(
     assert result is True
 
 
-def test_next_tip_uses_active_channels(
-    subject: TipStore,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-    load_labware_action: actions.SucceedCommandAction,
-    available_sensors: AvailableSensorDefinition,
-) -> None:
-    """Test that tip tracking logic uses pipette's active channels."""
-    # Load labware
-    subject.handle_action(load_labware_action)
-
-    # Load pipette
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=96,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
-            back_left_corner_offset=Point(x=1, y=2, z=3),
-            front_right_corner_offset=Point(x=4, y=5, z=6),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
-
-    # Configure nozzle for partial configuration
-    state_update = update_types.StateUpdate(
-        pipette_nozzle_map=update_types.PipetteNozzleMapUpdate(
-            pipette_id="pipette-id",
-            nozzle_map=NozzleMap.build(
-                physical_nozzles=NINETY_SIX_MAP,
-                physical_rows=NINETY_SIX_ROWS,
-                physical_columns=NINETY_SIX_COLS,
-                starting_nozzle="A12",
-                back_left_nozzle="A12",
-                front_right_nozzle="H12",
-                valid_nozzle_maps=ValidNozzleMaps(
-                    maps={
-                        "A12_H12": [
-                            "A12",
-                            "B12",
-                            "C12",
-                            "D12",
-                            "E12",
-                            "F12",
-                            "G12",
-                            "H12",
-                        ]
-                    }
-                ),
-            ),
-        )
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            command=_dummy_command(),
-            state_update=state_update,
-        )
-    )
-    # Pick up partial tips
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            command=_dummy_command(),
-            state_update=update_types.StateUpdate(
-                tips_used=update_types.TipsUsedUpdate(
-                    pipette_id="pipette-id",
-                    labware_id="cool-labware",
-                    well_name="A1",
-                )
-            ),
-        )
-    )
-
-    result = TipView(subject.state).get_next_tip(
-        labware_id="cool-labware",
-        num_tips=5,
-        starting_tip_name=None,
-        nozzle_map=None,
-    )
-    assert result == "A2"
-
-
 def test_next_tip_automatic_tip_tracking_with_partial_configurations(
     subject: TipStore,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
     load_labware_action: actions.SucceedCommandAction,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """Test tip tracking logic using multiple pipette configurations."""
-    # Load labware
     subject.handle_action(load_labware_action)
 
-    # Load pipette
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=96,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
-            back_left_corner_offset=Point(x=1, y=2, z=3),
-            front_right_corner_offset=Point(x=4, y=5, z=6),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
-
-    def _assert_and_pickup(well: str, nozzle_map: NozzleMap) -> None:
+    def _assert_and_pickup(expected_next_tip: str, nozzle_map: NozzleMap) -> None:
         result = TipView(subject.state).get_next_tip(
             labware_id="cool-labware",
             num_tips=0,
             starting_tip_name=None,
             nozzle_map=nozzle_map,
         )
-        assert result is not None and result == well
+        assert result is not None and result == expected_next_tip
 
         pick_up_tip_state_update = update_types.StateUpdate(
             tips_used=update_types.TipsUsedUpdate(
-                pipette_id="pipette-id",
                 labware_id="cool-labware",
-                well_name=result,
+                well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                    labware_id="cool-labware", well_name=result, nozzle_map=nozzle_map
+                ),
             )
         )
 
@@ -1090,8 +502,8 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
             )
         )
 
-    def _reconfigure_nozzle_layout(start: str, back_l: str, front_r: str) -> NozzleMap:
-        nozzle_map = NozzleMap.build(
+    def _build_nozzle_map(start: str, back_l: str, front_r: str) -> NozzleMap:
+        return NozzleMap.build(
             physical_nozzles=NINETY_SIX_MAP,
             physical_rows=NINETY_SIX_ROWS,
             physical_columns=NINETY_SIX_COLS,
@@ -1147,85 +559,30 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
                 }
             ),
         )
-        state_update = update_types.StateUpdate(
-            pipette_nozzle_map=update_types.PipetteNozzleMapUpdate(
-                pipette_id="pipette-id",
-                nozzle_map=nozzle_map,
-            )
-        )
-        subject.handle_action(
-            actions.SucceedCommandAction(
-                command=_dummy_command(),
-                state_update=state_update,
-            )
-        )
-        return nozzle_map
 
-    map = _reconfigure_nozzle_layout("A1", "A1", "H3")
+    map = _build_nozzle_map("A1", "A1", "H3")
     _assert_and_pickup("A10", map)
-    map = _reconfigure_nozzle_layout("A1", "A1", "F2")
+    map = _build_nozzle_map("A1", "A1", "F2")
     _assert_and_pickup("C8", map)
 
     # Configure to single tip pickups
-    map = _reconfigure_nozzle_layout("H12", "H12", "H12")
+    map = _build_nozzle_map("H12", "H12", "H12")
     _assert_and_pickup("A1", map)
-    map = _reconfigure_nozzle_layout("H1", "H1", "H1")
+    map = _build_nozzle_map("H1", "H1", "H1")
     _assert_and_pickup("A9", map)
-    map = _reconfigure_nozzle_layout("A12", "A12", "A12")
+    map = _build_nozzle_map("A12", "A12", "A12")
     _assert_and_pickup("H1", map)
-    map = _reconfigure_nozzle_layout("A1", "A1", "A1")
+    map = _build_nozzle_map("A1", "A1", "A1")
     _assert_and_pickup("B9", map)
 
 
 def test_next_tip_automatic_tip_tracking_tiprack_limits(
     subject: TipStore,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
     load_labware_action: actions.SucceedCommandAction,
-    available_sensors: AvailableSensorDefinition,
 ) -> None:
     """Test tip tracking logic to ensure once a tiprack is consumed it returns None when consuming tips using multiple pipette configurations."""
     # Load labware
     subject.handle_action(load_labware_action)
-
-    # Load pipette
-    config_update = update_types.PipetteConfigUpdate(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=96,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
-            back_left_corner_offset=Point(x=1, y=2, z=3),
-            front_right_corner_offset=Point(x=4, y=5, z=6),
-            pipette_lld_settings={},
-            plunger_positions={
-                "top": 0.0,
-                "bottom": 5.0,
-                "blow_out": 19.0,
-                "drop_tip": 20.0,
-            },
-            shaft_ul_per_mm=5.0,
-            available_sensors=available_sensors,
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            state_update=update_types.StateUpdate(pipette_config=config_update),
-            command=_dummy_command(),
-        )
-    )
 
     def _get_next_and_pickup(nozzle_map: NozzleMap) -> str | None:
         result = TipView(subject.state).get_next_tip(
@@ -1237,7 +594,12 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
         if result is not None:
             pick_up_tip_state_update = update_types.StateUpdate(
                 tips_used=update_types.TipsUsedUpdate(
-                    pipette_id="pipette-id", labware_id="cool-labware", well_name=result
+                    labware_id="cool-labware",
+                    well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                        labware_id="cool-labware",
+                        well_name=result,
+                        nozzle_map=nozzle_map,
+                    ),
                 )
             )
 
@@ -1250,8 +612,8 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
 
         return result
 
-    def _reconfigure_nozzle_layout(start: str, back_l: str, front_r: str) -> NozzleMap:
-        nozzle_map = NozzleMap.build(
+    def _build_nozzle_map(start: str, back_l: str, front_r: str) -> NozzleMap:
+        return NozzleMap.build(
             physical_nozzles=NINETY_SIX_MAP,
             physical_rows=NINETY_SIX_ROWS,
             physical_columns=NINETY_SIX_COLS,
@@ -1280,39 +642,28 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
                 }
             ),
         )
-        state_update = update_types.StateUpdate(
-            pipette_nozzle_map=update_types.PipetteNozzleMapUpdate(
-                pipette_id="pipette-id", nozzle_map=nozzle_map
-            )
-        )
-        subject.handle_action(
-            actions.SucceedCommandAction(
-                command=_dummy_command(), state_update=state_update
-            )
-        )
-        return nozzle_map
 
-    map = _reconfigure_nozzle_layout("A1", "A1", "A1")
+    map = _build_nozzle_map("A1", "A1", "A1")
     for _ in range(96):
-        _get_next_and_pickup(map)
+        assert _get_next_and_pickup(map) is not None
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
-    map = _reconfigure_nozzle_layout("A12", "A12", "A12")
+    map = _build_nozzle_map("A12", "A12", "A12")
     for _ in range(96):
-        _get_next_and_pickup(map)
+        assert _get_next_and_pickup(map) is not None
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
-    map = _reconfigure_nozzle_layout("H1", "H1", "H1")
+    map = _build_nozzle_map("H1", "H1", "H1")
     for _ in range(96):
-        _get_next_and_pickup(map)
+        assert _get_next_and_pickup(map) is not None
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
-    map = _reconfigure_nozzle_layout("H12", "H12", "H12")
+    map = _build_nozzle_map("H12", "H12", "H12")
     for _ in range(96):
-        _get_next_and_pickup(map)
+        assert _get_next_and_pickup(map) is not None
     assert _get_next_and_pickup(map) is None
 
 
