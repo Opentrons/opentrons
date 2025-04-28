@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Optional, Union
 
-from opentrons.types import Point
+from opentrons.types import Point, Mount
 from opentrons.protocol_engine.types import LiquidTrackingType
 
 from .._liquid import Liquid
@@ -91,6 +91,7 @@ class AbstractWellCore(ABC):
     @abstractmethod
     def estimate_liquid_height_after_pipetting(
         self,
+        mount: Mount | str,
         operation_volume: float,
     ) -> LiquidTrackingType:
         """Estimate what the liquid height will be after pipetting, without raising an error."""

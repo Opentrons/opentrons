@@ -21,7 +21,6 @@ import {
 } from '/app/resources/runs'
 
 import type {
-  FlexStackerPrepareShuttleCreateCommand,
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
@@ -32,6 +31,7 @@ import type {
   TCDeactivateLidCreateCommand,
   TCOpenLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
+  UnsafeFlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
 
@@ -305,8 +305,8 @@ export function useModuleOverflowMenu(
       })
   }
 
-  const homeShuttleCommand: FlexStackerPrepareShuttleCreateCommand = {
-    commandType: 'flexStacker/prepareShuttle',
+  const homeShuttleCommand: UnsafeFlexStackerPrepareShuttleCreateCommand = {
+    commandType: 'unsafe/flexStacker/prepareShuttle',
     params: {
       moduleId: module.id,
     },

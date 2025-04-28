@@ -50,7 +50,7 @@
   "stagingArea": "Staging area",
   "swap_pipette_mounts": "Swap pipette mounts",
   "tell_us": "Tell us about your protocol",
-  "trash_required": "A trash entity is required",
+  "trash_required": "A trash bin or waste chute is required",
   "trashBin": "Trash Bin",
   "up_to_3_tipracks": "Up to 3 tip rack types are allowed per pipette",
   "vol_label": "{{volume}} µL",

@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
@@ -91,6 +92,7 @@ describe('useRecoveryCommands', () => {
     ).mockReturnValue({
       mutateAsync: mockResumeRunFromRecoveryAssumingFalsePositive,
     } as any)
+    vi.mocked(useErrorRecoveryPolicy).mockReturnValue({} as any)
   })
 
   it('should call chainRunRecoveryCommands with continuePastCommandFailure set to false', async () => {
@@ -337,7 +339,7 @@ describe('useRecoveryCommands', () => {
   it('should call flexStacker/perpareShuttle and resolve the promise', async () => {
     const mockFailedCommandWithError = {
       ...mockFailedCommand,
-      commandType: 'flexStacker/prepareShuttle',
+      commandType: 'unsafe/flexStacker/prepareShuttle',
       params: {
         moduleId: '123',
       },
@@ -359,7 +361,7 @@ describe('useRecoveryCommands', () => {
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [
         {
-          commandType: 'flexStacker/prepareShuttle',
+          commandType: 'unsafe/flexStacker/prepareShuttle',
           params: {
             moduleId: '123',
           },
@@ -380,7 +382,49 @@ describe('useRecoveryCommands', () => {
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [
         {
-          commandType: 'flexStacker/prepareShuttle',
+          commandType: 'unsafe/flexStacker/prepareShuttle',
+          params: {
+            moduleId: '',
+          },
+          intent: 'fixit',
+        },
+      ],
+      false
+    )
+  })
+
+  it('should call flexStacker/openLatch with moduleId', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
+
+    await act(async () => {
+      await result.current.releaseLabwareLatch()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'flexStacker/openLatch',
+          params: {
+            moduleId: '',
+          },
+          intent: 'fixit',
+        },
+      ],
+      false
+    )
+  })
+
+  it('should call flexStacker/closeLatch with moduleId', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
+
+    await act(async () => {
+      await result.current.closeLabwareLatch()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'flexStacker/closeLatch',
           params: {
             moduleId: '',
           },

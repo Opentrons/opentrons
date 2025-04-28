@@ -539,6 +539,7 @@ class GeometryView:
                 well_location=well_location,
                 well_depth=well_depth,
                 operation_volume=operation_volume,
+                pipette_id=pipette_id,
             )
             if not isinstance(offset_adjustment, SimulatedProbeResult):
                 offset = offset.model_copy(update={"z": offset.z + offset_adjustment})
@@ -1847,6 +1848,7 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
+        pipette_id: str,
         operation_volume: float,
     ) -> float:
         """Get the change in height from a liquid handling operation."""
@@ -1856,6 +1858,7 @@ class GeometryView:
         final_height = self.get_well_height_after_liquid_handling(
             labware_id=labware_id,
             well_name=well_name,
+            pipette_id=pipette_id,
             initial_height=initial_handling_height,
             volume=operation_volume,
         )
@@ -1876,6 +1879,7 @@ class GeometryView:
         well_name: str,
         well_location: WellLocationType,
         well_depth: float,
+        pipette_id: Optional[str] = None,
         operation_volume: Optional[float] = None,
     ) -> LiquidTrackingType:
         """Return a z-axis distance that accounts for well handling height and operation volume.
@@ -1909,9 +1913,14 @@ class GeometryView:
                 volume = well_location.volumeOffset
 
         if volume:
+            if pipette_id is None:
+                raise ValueError(
+                    "cannot get liquid handling offset without pipette id."
+                )
             liquid_height_after = self.get_well_height_after_liquid_handling(
                 labware_id=labware_id,
                 well_name=well_name,
+                pipette_id=pipette_id,
                 initial_height=initial_handling_height,
                 volume=volume,
             )
@@ -2033,6 +2042,7 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
+        pipette_id: str,
         initial_height: LiquidTrackingType,
         volume: float,
     ) -> LiquidTrackingType:
@@ -2047,7 +2057,14 @@ class GeometryView:
             initial_volume = find_volume_at_well_height(
                 target_height=initial_height, well_geometry=well_geometry
             )
-            final_volume = initial_volume + volume
+            final_volume = initial_volume + (
+                volume
+                * self.get_nozzles_per_well(
+                    labware_id=labware_id,
+                    target_well_name=well_name,
+                    pipette_id=pipette_id,
+                )
+            )
             return find_height_at_well_volume(
                 target_volume=final_volume, well_geometry=well_geometry
             )
@@ -2061,6 +2078,7 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
+        pipette_id: str,
         initial_height: LiquidTrackingType,
         volume: float,
     ) -> LiquidTrackingType:
@@ -2076,7 +2094,14 @@ class GeometryView:
             initial_volume = find_volume_at_well_height(
                 target_height=initial_height, well_geometry=well_geometry
             )
-            final_volume = initial_volume + volume
+            final_volume = initial_volume + (
+                volume
+                * self.get_nozzles_per_well(
+                    labware_id=labware_id,
+                    target_well_name=well_name,
+                    pipette_id=pipette_id,
+                )
+            )
             well_volume = find_height_at_well_volume(
                 target_volume=final_volume,
                 well_geometry=well_geometry,

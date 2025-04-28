@@ -268,6 +268,8 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
     case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
     case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+    case RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+    case RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
       return buildManualReplaceLwAndRetry()
     case RECOVERY_MAP.ROBOT_DOOR_OPEN_SPECIAL.ROUTE:
       return buildRecoveryDoorOpenSpecial()
@@ -278,6 +280,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE:
     case RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE:
     case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
+    case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
       return buildRecoveryInProgress()
     case RECOVERY_MAP.ROBOT_DOOR_OPEN.ROUTE:
       return buildManuallyRouteToDoorOpen()

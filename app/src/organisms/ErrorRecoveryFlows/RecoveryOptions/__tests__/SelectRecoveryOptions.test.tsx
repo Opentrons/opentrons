@@ -12,6 +12,7 @@ import {
   GENERAL_ERROR_OPTIONS,
   getRecoveryOptions,
   GRIPPER_ERROR_OPTIONS,
+  LABWARE_MISSING_IN_SHUTTLE_OPTIONS,
   NO_LIQUID_DETECTED_OPTIONS,
   OVERPRESSURE_PREPARE_TO_ASPIRATE,
   OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
@@ -322,6 +323,18 @@ describe('RecoveryOptions', () => {
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.HOME_AND_RETRY.ROUTE, expect.any(String))
       .thenReturn('Home gantry and retry')
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(
+        RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+        expect.any(String)
+      )
+      .thenReturn('manually_load_labware_into_shuttle_and_skips')
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+        expect.any(String)
+      )
+      .thenReturn('replace_labware_in_stacker_and_retry')
   })
 
   it('renders valid recovery options for a general error errorKind', () => {
@@ -391,6 +404,21 @@ describe('RecoveryOptions', () => {
 
     screen.getByRole('label', { name: 'Skip to next step with same tips' })
     screen.getByRole('label', { name: 'Skip to next step with new tips' })
+    screen.getByRole('label', { name: 'Cancel run' })
+  })
+
+  it(`renders valid recovery options for a ${ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE} errorKind`, () => {
+    props = {
+      ...props,
+      validRecoveryOptions: LABWARE_MISSING_IN_SHUTTLE_OPTIONS,
+    }
+
+    renderRecoveryOptions(props)
+
+    screen.getByRole('label', { name: 'replace_labware_in_stacker_and_retry' })
+    screen.getByRole('label', {
+      name: 'manually_load_labware_into_shuttle_and_skips',
+    })
     screen.getByRole('label', { name: 'Cancel run' })
   })
 
@@ -522,5 +550,14 @@ describe('getRecoveryOptions', () => {
       ERROR_KINDS.STALL_OR_COLLISION
     )
     expect(stallOrCollisionOptions).toBe(STALL_OR_COLLISION_OPTIONS)
+  })
+
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE}`, () => {
+    const labwareMissingInShuttleOptions = getRecoveryOptions(
+      ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE
+    )
+    expect(labwareMissingInShuttleOptions).toBe(
+      LABWARE_MISSING_IN_SHUTTLE_OPTIONS
+    )
   })
 })
