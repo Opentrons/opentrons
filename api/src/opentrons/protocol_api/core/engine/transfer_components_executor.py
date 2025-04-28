@@ -135,7 +135,8 @@ class TransferComponentsExecutor:
         will be used to initialize info about the dispense by assigning values
         to class attributes as follows-
         - target_location: the dispense location
-        - target_well: the well associated with dispense location
+        - target_well: the well associated with dispense location, will be None when the
+                        target_location argument is a TrashBin or WasteChute
         - tip_state: the state of the tip before dispense component steps are executed
         - transfer_type: whether the dispense component is being called as a part of a
                         1-to-1 transfer or a consolidation or a distribution
