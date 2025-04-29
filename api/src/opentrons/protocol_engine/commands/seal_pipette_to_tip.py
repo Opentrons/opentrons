@@ -1,12 +1,15 @@
 """Seal tips to pipette command request, result, and implementation models."""
 
 from __future__ import annotations
-from pydantic import Field, BaseModel
 from typing import TYPE_CHECKING, Optional, Type, Union
+
+from typing_extensions import Literal
+from pydantic import Field, BaseModel
+
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
+
 from opentrons.types import MountType
 from opentrons.protocol_engine.types import MotorAxis
-from typing_extensions import Literal
-
 from ..resources import ModelUtils, ensure_ot3_hardware
 from ..types import PickUpTipWellLocation, FluidKind, AspiratedFluid
 from .pipetting_common import (
@@ -27,7 +30,6 @@ from .command import (
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis
-from ..state.update_types import StateUpdate
 
 if TYPE_CHECKING:
     from ..state.state import StateView
@@ -138,28 +140,50 @@ class SealPipetteToTipImplementation(
         """A relative press-fit pick up command using gantry moves."""
         prep_distance = tip_pick_up_params.prepDistance
         press_distance = tip_pick_up_params.pressDistance
-        retract_distance = -1 * (prep_distance + press_distance)
+        retract_distance = -1 * (press_distance) / 2
 
         mount_axis = MotorAxis.LEFT_Z if mount == MountType.LEFT else MotorAxis.RIGHT_Z
-
+        ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
         # TODO chb, 2025-01-29): Factor out the movement constants and relocate this logic into the hardware controller
-        await self._gantry_mover.move_axes(
-            axis_map={mount_axis: prep_distance}, speed=10, relative_move=True
+        try:
+            await self._gantry_mover.move_axes(
+                axis_map={mount_axis: prep_distance},
+                speed=10,
+                relative_move=True,
+                expect_stalls=True,
+            )
+        except PositionUnknownError:
+            # if this happens it's from the get position after the move and we can ignore it
+            pass
+
+        await ot3_hardware_api.update_axis_position_estimations(
+            self._gantry_mover.motor_axes_to_present_hardware_axes([mount_axis])
         )
 
         # Drive mount down for press-fit
-        await self._gantry_mover.move_axes(
-            axis_map={mount_axis: press_distance},
-            speed=10.0,
-            relative_move=True,
-            expect_stalls=True,
-        )
-        # retract cam : 11.05
-        await self._gantry_mover.move_axes(
-            axis_map={mount_axis: retract_distance}, speed=5.5, relative_move=True
+        try:
+            await self._gantry_mover.move_axes(
+                axis_map={mount_axis: press_distance},
+                speed=10.0,
+                relative_move=True,
+                expect_stalls=True,
+            )
+        except PositionUnknownError:
+            # if this happens it's from the get position after the move and we can ignore it
+            pass
+
+        await ot3_hardware_api.update_axis_position_estimations(
+            self._gantry_mover.motor_axes_to_present_hardware_axes([mount_axis])
         )
 
-        ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
+        try:
+            await self._gantry_mover.move_axes(
+                axis_map={mount_axis: retract_distance}, speed=5.5, relative_move=True
+            )
+        except PositionUnknownError:
+            # if this happens it's from the get position after the move and we can ignore it
+            pass
+
         await ot3_hardware_api.update_axis_position_estimations(
             self._gantry_mover.motor_axes_to_present_hardware_axes([mount_axis])
         )
@@ -283,13 +307,10 @@ class SealPipetteToTipImplementation(
             if hw_instr is not None:
                 hw_instr.set_current_volume(_SAFE_TOP_VOLUME)
 
-        state_update = StateUpdate()
-        state_update.update_pipette_tip_state(
+        state_update = move_result.state_update.update_pipette_tip_state(
             pipette_id=pipette_id,
             tip_geometry=tip_geometry,
-        )
-
-        state_update.set_fluid_aspirated(
+        ).set_fluid_aspirated(
             pipette_id=pipette_id,
             fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=_SAFE_TOP_VOLUME),
         )
