@@ -55,10 +55,10 @@ DEFAULT_TIP_MENISCUS_TARGET: Literal["start", "end", "dynamic"] = "dynamic"
 # NOTE: (sigler) disabling formatter here, b/c spatial deck-maps are nice...
 # fmt: off
 SLOTS: Dict[str, str] = {
-    "tips_2":   "A1",   "tips_3":           "A2",   "reader":           "A3",
-    "tips_1":   "B1",   "test_labware":     "B2",   "stack":            "B3",
-    "shaker":   "C1",   "empty_0":          "C2",   "stack_end":        "C3",
-    "trash":    "D1",   "src_reservoir":    "D2",   "water_reservoir":  "D3",
+    "tips_2":           "A1",   "tips_3":           "A2",   "reader":       "A3",
+    "tips_1":           "B1",   "test_labware":     "B2",   "stack":        "B3",
+    "shaker":           "C1",   "empty_0":          "C2",   "stack_end":    "C3",
+    "water_reservoir":  "D1",   "src_reservoir":    "D2",   "chute":        "D3",
 }
 # fmt: on
 
@@ -613,7 +613,9 @@ def run(ctx: ProtocolContext) -> None:
     )
 
     # LOAD LABWARE
-    ctx.load_trash_bin(SLOTS["trash"])
+    assert SLOTS["chute"] == "A3", \
+        f"waste chute must be in A3, not {SLOTS['chute']}"
+    ctx.load_waste_chute()
     src_reservoir = ctx.load_labware(
         ctx.params.reservoir,  # type: ignore[attr-defined]
         SLOTS["src_reservoir"],
