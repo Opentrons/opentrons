@@ -1,4 +1,4 @@
-import {RunData} from '@opentrons/api-client'
+import { RunData } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -14,8 +14,8 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {useRunCurrentState} from '@opentrons/react-api-client'
-import {getLoadedLabwareDefinitionsByUri} from '@opentrons/shared-data'
+import { useRunCurrentState } from '@opentrons/react-api-client'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import type {
   CompletedProtocolAnalysis,
   FlexStackerEmptyRunTimeCommand,
@@ -37,13 +37,6 @@ const LABWARE_DESCRIPTION_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     background-color: ${COLORS.grey35};
     border-radius: ${BORDERS.borderRadius8};
-  }
-`
-
-const LABWARE_NAME_TITLE_STYLE = css`
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    display: ${DISPLAY_NONE};
   }
 `
 
@@ -86,18 +79,13 @@ export interface StackerEmptyInterventionProps {
   command: FlexStackerEmptyRunTimeCommand
   analysis: CompletedProtocolAnalysis | null
   run: RunData
-  robotType: RobotType
-  isOnDevice: boolean
 }
 
 export function StackerEmptyInterventionContent({
   command,
   analysis,
   run,
-  robotType,
-  isOnDevice,
 }: StackerEmptyInterventionProps): JSX.Element | null {
-  const { t } = useTranslation(['protocol_setup', 'protocol_command_text'])
 
   //const runId = useCurrentRunId()
   const { data: runCurrentState } = useRunCurrentState(run.id)
@@ -132,16 +120,6 @@ export function StackerEmptyInterventionContent({
   const moduleLocation =
     run?.modules.find(m => m.id === command.params.moduleId)?.location ?? null
 
-  const message = command.params.message
-
-  console.log(
-    'mod loc: ' +
-      moduleLocation +
-      ' labwareName:' +
-      labwareName +
-      ' stacker:' +
-      flexStacker
-  )
   if (
     moduleLocation?.slotName == null ||
     labwareName == null ||
@@ -162,10 +140,7 @@ export function StackerEmptyInterventionContent({
         >
           <Flex css={LABWARE_DESCRIPTION_STYLE}>
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText as="h2" css={LABWARE_NAME_TITLE_STYLE}>
-                {t('labware_name')}
-              </LegacyStyledText>
-              <LegacyStyledText as="p" css={LABWARE_NAME_STYLE}>
+              <LegacyStyledText as="h2" css={LABWARE_NAME_STYLE}>
                 {labwareName}
               </LegacyStyledText>
             </Flex>
@@ -181,7 +156,7 @@ export function StackerEmptyInterventionContent({
         <Flex width="50%" css={STACKER_IMAGE_STYLE}>
           <Box margin="0 auto" width="100%">
             <LegacyStyledText as="p">
-              {'Replace me with a Stacker Empty image'}
+              {'Replace me with a Stacker Empty image/animation'}
             </LegacyStyledText>
           </Box>
         </Flex>

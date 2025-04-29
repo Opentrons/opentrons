@@ -160,8 +160,7 @@ export function InterventionModal({
       case 'flexStacker/empty':
         return (
           <StackerEmptyInterventionContent
-            {...{ command, run, analysis, robotType }}
-            isOnDevice={isOnDevice}
+            {...{ command, run, analysis }}
           />
         )
       default:
