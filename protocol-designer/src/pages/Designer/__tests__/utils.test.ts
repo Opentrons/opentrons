@@ -9,7 +9,11 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { formatTime, getSlotInformation } from '../utils'
+import {
+  _sortLabwareDropdownOptions,
+  formatTime,
+  getSlotInformation,
+} from '../utils'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
@@ -221,5 +225,19 @@ describe('formatTime', () => {
   })
   it('input is 0:03 and output is 00:03', () => {
     expect(formatTime('0:03')).toEqual('00:03')
+  })
+})
+
+describe('_sortLabwareDropdownOptions', () => {
+  const zzzPlateOption = { name: 'Zzz Plate', value: 'zzz' }
+  const aaaPlateOption = { name: 'Aaa Plate', value: 'aaa' }
+  it('should sort labware ids in alphabetical order', () => {
+    const result = _sortLabwareDropdownOptions([aaaPlateOption, zzzPlateOption])
+    expect(result).toEqual([aaaPlateOption, zzzPlateOption])
+  })
+
+  it('should handle {} case', () => {
+    const result = _sortLabwareDropdownOptions([])
+    expect(result).toEqual([])
   })
 })

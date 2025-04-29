@@ -1,18 +1,36 @@
-import { getPositionFromSlotId } from '@opentrons/shared-data'
+import { useSelector } from 'react-redux'
+import { reduce } from 'lodash'
 
+import {
+  FLEX_ROBOT_TYPE,
+  getIsTiprack,
+  getPositionFromSlotId,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+
+import { getRobotType } from '../../file-data/selectors'
+import { getLabwareEntities } from '../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
+import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import { getStagingAreaAddressableAreas } from '../../utils'
 
+import type { DropdownOption } from '@opentrons/components'
 import type {
   CoordinateTuple,
   CutoutId,
   DeckDefinition,
+  RobotType,
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentName,
   DeckSlot,
+  LabwareEntity,
 } from '@opentrons/step-generation'
 import type {
   AllTemporalPropertiesForTimelineFrame,
+  InitialDeckSetup,
   LabwareOnDeck,
   ModuleOnDeck,
 } from '../../step-forms'
@@ -122,4 +140,109 @@ export const formatTime = (input: string): string => {
       seconds.toString().padStart(2, '0'),
     ].join(':')
   }
+}
+
+export const _sortLabwareDropdownOptions = (
+  options: DropdownOption[]
+): DropdownOption[] =>
+  options.sort((a, b) => {
+    return a.name.localeCompare(b.name)
+  })
+
+function resolveSlotLocation(
+  modules: InitialDeckSetup['modules'],
+  labware: InitialDeckSetup['labware'],
+  location: string,
+  robotType: RobotType
+): string {
+  const TCSlot =
+    robotType === FLEX_ROBOT_TYPE
+      ? TC_MODULE_LOCATION_OT3
+      : TC_MODULE_LOCATION_OT2
+  if (location === 'offDeck') {
+    return 'offDeck'
+  } else if (modules[location] != null) {
+    return modules[location].type === THERMOCYCLER_MODULE_TYPE
+      ? TCSlot
+      : modules[location].slot
+  } else if (labware[location] != null) {
+    const adapter = labware[location]
+    if (modules[adapter.slot] != null) {
+      return modules[adapter.slot].type === THERMOCYCLER_MODULE_TYPE
+        ? TCSlot
+        : modules[adapter.slot].slot
+    } else {
+      return adapter.slot
+    }
+  } else {
+    return location
+  }
+}
+
+const getNickname = (
+  nicknamesById: Record<string, string>,
+  activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
+  labwareId: string,
+  robotType: RobotType
+): string => {
+  const { labware, modules } = activeDeckSetup
+  const slot = activeDeckSetup.labware[labwareId].slot
+  const latestSlot = resolveSlotLocation(modules, labware, slot, robotType)
+
+  let nickName: string = nicknamesById[labwareId]
+  if (latestSlot != null && latestSlot !== 'offDeck') {
+    nickName = `${nicknamesById[labwareId]} in ${latestSlot}`
+  } else if (latestSlot != null && latestSlot === 'offDeck') {
+    nickName = `${nicknamesById[labwareId]} off-deck`
+  }
+  return nickName
+}
+
+export const useLabwareDropdownOptions = (
+  type: 'moveLabware' | 'labware'
+): DropdownOption[] => {
+  const labwareEntities = useSelector(getLabwareEntities)
+  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+  const nicknamesById = useSelector(getLabwareNicknamesById)
+  const robotType = useSelector(getRobotType)
+  const moveLabwareOptions = reduce(
+    labwareEntities,
+    (
+      acc: DropdownOption[],
+      labwareEntity: LabwareEntity,
+      labwareId: string
+    ): DropdownOption[] => {
+      const isLabwareInWasteChute =
+        activeDeckSetup.labware[labwareId].slot === 'gripperWasteChute'
+
+      const isAdapter =
+        labwareEntity.def.allowedRoles?.includes('adapter') ?? false
+      const nickName = getNickname(
+        nicknamesById,
+        activeDeckSetup,
+        labwareId,
+        robotType
+      )
+      const isTiprack = getIsTiprack(labwareEntity.def)
+      const isOffDeck = activeDeckSetup.labware[labwareId].slot === 'offDeck'
+
+      //  filter out moving adapters, and labware in
+      //  waste chute for moveLabware, labware off-deck and
+      //  labware that is a tiprack for the labware dropdown only
+      return isAdapter ||
+        isLabwareInWasteChute ||
+        (type === 'labware' && isTiprack) ||
+        isOffDeck
+        ? acc
+        : [
+            ...acc,
+            {
+              name: nickName,
+              value: labwareId,
+            },
+          ]
+    },
+    []
+  )
+  return _sortLabwareDropdownOptions(moveLabwareOptions)
 }

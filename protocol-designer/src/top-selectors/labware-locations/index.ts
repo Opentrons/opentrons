@@ -20,11 +20,9 @@ import {
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 
 import { selectors as fileDataSelectors } from '../../file-data'
-import { getRobotType } from '../../file-data/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getAdditionalEquipmentEntities,
-  getInitialDeckSetup,
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
@@ -42,7 +40,7 @@ import { getIsAdapter } from '../../utils'
 
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
 import type { RobotState } from '@opentrons/step-generation'
-import type { InitialDeckSetup } from '../../step-forms'
+import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
 import type { Selector } from '../../types'
 
 interface Option {
@@ -127,10 +125,19 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
   }
 )
 
-export const getDeckSetupForActiveItem: Selector<InitialDeckSetup> = createSelector(
+export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelineFrame> = createSelector(
   getRobotStateAtActiveItem,
-  getInitialDeckSetup,
-  (robotState, initialDeckSetup) => {
+  getPipetteEntities,
+  getModuleEntities,
+  getLabwareEntities,
+  getAdditionalEquipmentEntities,
+  (
+    robotState,
+    pipetteEntities,
+    moduleEntities,
+    labwareEntities,
+    additionalEquipmentEntities
+  ) => {
     if (robotState == null)
       return {
         pipettes: {},
@@ -138,28 +145,27 @@ export const getDeckSetupForActiveItem: Selector<InitialDeckSetup> = createSelec
         modules: {},
         additionalEquipmentOnDeck: {},
       }
-    const {
-      pipettes,
-      modules,
-      labware,
-      additionalEquipmentOnDeck,
-    } = initialDeckSetup
 
+    const filteredAdditionalEquipment = Object.fromEntries(
+      Object.entries(additionalEquipmentEntities).filter(
+        ([_, entity]) => entity.name !== 'gripper'
+      )
+    )
     return {
-      pipettes: mapValues(pipettes, (pipEntity, pipId) => ({
+      pipettes: mapValues(pipetteEntities, (pipEntity, pipId) => ({
         ...pipEntity,
         ...robotState.pipettes[pipId],
       })),
-      labware: mapValues(labware, (lwEntity, lwId) => ({
+      labware: mapValues(labwareEntities, (lwEntity, lwId) => ({
         ...lwEntity,
         ...robotState.labware[lwId],
       })),
-      modules: mapValues(modules, (modEntity, modId) => ({
+      modules: mapValues(moduleEntities, (modEntity, modId) => ({
         ...modEntity,
         ...robotState.modules[modId],
       })),
       additionalEquipmentOnDeck: mapValues(
-        additionalEquipmentOnDeck,
+        filteredAdditionalEquipment,
         additionalEquipmentEntity => ({
           ...additionalEquipmentEntity,
         })
@@ -173,15 +179,16 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
   Option[] | null
 > = createSelector(
   getRobotStateAtActiveItem,
-  // getRobotType,
-  getInitialDeckSetup,
-  (robotState, initialDeckSetup) => {
-    const {
-      modules: moduleEntities,
-      labware: labwareEntities,
-      additionalEquipmentOnDeck,
-    } = initialDeckSetup
-    const robotType = Object.values(additionalEquipmentOnDeck).some(
+  getModuleEntities,
+  getLabwareEntities,
+  getAdditionalEquipmentEntities,
+  (
+    robotState,
+    moduleEntities,
+    labwareEntities,
+    additionalEquipmentEntities
+  ) => {
+    const robotType = Object.values(additionalEquipmentEntities).some(
       ae => ae.name === 'trashBin' && ae.location === 'cutout12'
     )
       ? OT2_ROBOT_TYPE
@@ -189,7 +196,7 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
     const deckDef = getDeckDefFromRobotType(robotType)
     const cutoutFixtures = deckDef.cutoutFixtures
     const hasWasteChute =
-      Object.values(additionalEquipmentOnDeck).find(
+      Object.values(additionalEquipmentEntities).find(
         ae => ae.name === 'wasteChute'
       ) != null
     const allSlotIds = deckDef.locations.addressableAreas.reduce<
@@ -197,14 +204,14 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
     >((acc, slot) => {
       return hasWasteChute && slot.id === 'D3' ? acc : [...acc, slot.id]
     }, [])
-    const stagingAreaCutoutIds = Object.values(additionalEquipmentOnDeck)
+    const stagingAreaCutoutIds = Object.values(additionalEquipmentEntities)
       .filter(aE => aE.name === 'stagingArea')
       //  TODO(jr, 11/13/23): fix AdditionalEquipment['location'] from type string to CutoutId
       .map(aE => aE.location as CutoutId)
 
     if (robotState == null) return null
 
-    const trashCutouts = Object.values(additionalEquipmentOnDeck).reduce<
+    const trashCutouts = Object.values(additionalEquipmentEntities).reduce<
       string[]
     >(
       (acc, { name, location }) =>
