@@ -1,0 +1,23 @@
+site_name: Opentrons Python Protocol API
+nav:
+  - Welcome: index.md
+  - API Reference: api-reference.md
+theme: material
+
+plugins:
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: sphinx
+            show_source: false
+            merge_init_into_class: false
+            separate_signature: true
+            annotations_path: brief
+            line_length: 80
+            group_by_category: false
+            filters: 
+              - "public"
+              - "!^__"
+            heading_level: 3
