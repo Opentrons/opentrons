@@ -224,61 +224,53 @@ class ConicalFrustum(BaseModel):
 
     def height_from_volume_search(self, target_volume: float) -> float:
         total_height = self.topHeight - self.bottomHeight
-        y = prev_y = total_height / 2
-        volume_at_y = volume_at_prev_y = self.volume_from_height_circular(
+        max_height, min_height = total_height, 0.0
+        volume_at_max_height = self.volume_from_height_circular(
+            top_radius=self.topDiameter / 2,
+            bottom_radius=self.bottomDiameter / 2,
+            target_height=total_height,
+            total_height=total_height,
+        )
+        if target_volume == volume_at_max_height:
+            return max_height
+        volume_at_min_height = self.volume_from_height_circular(
+            top_radius=self.topDiameter / 2,
+            bottom_radius=self.bottomDiameter / 2,
+            target_height=0,
+            total_height=total_height,
+        )
+        if target_volume == volume_at_min_height:
+            return min_height
+
+        y = total_height / 2
+        volume_at_y = self.volume_from_height_circular(
             top_radius=self.topDiameter / 2,
             bottom_radius=self.bottomDiameter / 2,
             target_height=y,
             total_height=total_height,
         )
-        guesses = [(volume_at_y, y)]
-        max_height, min_height = total_height, 0.0
+        guesses = [
+            (volume_at_min_height, min_height), (volume_at_max_height, max_height)
+        ]
         while abs(volume_at_y - target_volume) > RECURSIVE_SEARCH_VOLUME_TOLERANCE:
-            target_above_last_two_guesses = (
-                target_volume > volume_at_y and target_volume > volume_at_prev_y
-            )
+            max_height, max_volume = guesses[-1][1], guesses[-1][0]
+            min_height, min_volume = guesses[0][1], guesses[0][0]
+        
 
-            target_between_last_two_guesses = (
-                volume_at_y < target_volume < volume_at_prev_y or
-                volume_at_prev_y < target_volume < volume_at_y
-            )
-            
-            target_below_last_two_guesses = (
-                target_volume < volume_at_y and target_volume < volume_at_prev_y
-            )
+            # between volume_at_y and max value- undershot
+            if volume_at_y < target_volume < max_volume:
+                guesses = [(volume_at_y, y), (max_volume, max_height)]
+            # overshot
+            elif min_volume < target_volume < volume_at_y:
+                guesses = [(min_volume, min_height),  (volume_at_y, y)]
+            y = (guesses[0][1] + guesses[1][1]) / 2
 
-            a, b, c = (
-                target_above_last_two_guesses,
-                target_between_last_two_guesses,
-                target_below_last_two_guesses
-            )
-            # breakpoint()
-
-            prev_y_copy = y
-            if target_above_last_two_guesses:
-                min_height = y
-                y = (max_height + y) / 2
-            elif target_between_last_two_guesses:
-                y = (y + prev_y) / 2
-            elif target_below_last_two_guesses:
-                # breakpoint()
-                max_height = y
-                y = (y + min_height)/ 2
-            prev_y = prev_y_copy
-            volume_at_prev_y = volume_at_y
-            volume_at_next_y = self.volume_from_height_circular(
-                top_radius=self.topDiameter / 2,
-                bottom_radius=self.bottomDiameter / 2,
-                target_height=y,
-                total_height=total_height,
-            )
             volume_at_y = self.volume_from_height_circular(
                 top_radius=self.topDiameter / 2,
                 bottom_radius=self.bottomDiameter / 2,
                 target_height=y,
                 total_height=total_height,
             )
-            guesses.append((volume_at_y, y))
         return y
 
     def volume_from_height_circular(

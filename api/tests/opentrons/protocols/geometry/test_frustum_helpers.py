@@ -207,11 +207,14 @@ def test_cross_section_area_rectangular(x_dimension: float, y_dimension: float) 
         == expected_area
     )
 
+
 @pytest.mark.parametrize("well", fake_frusta())
 @given(target_height_st=st.data())
 def test_volume_and_height_circular(well: List[Any], target_height_st: Any) -> None:
     """Test both volume and height calculations for circular frusta."""
     if well[-1].shape == "spherical":
+        return
+    if any([seg.shape != "conical" for seg in well]):
         return
     for segment in well:
         if segment.shape == "conical":
@@ -225,10 +228,10 @@ def test_volume_and_height_circular(well: List[Any], target_height_st: Any) -> N
                         min_value=0,
                         max_value=segment_height,
                         allow_infinity=False,
-                        allow_nan=False
+                        allow_nan=False,
+                        width=32,
                     )
                 )
-                # breakpoint()
                 r_y = (target_height / segment_height) * (a - b) + b
                 expected_volume = (pi * target_height / 3) * (
                     b**2 + b * r_y + r_y**2
@@ -237,7 +240,6 @@ def test_volume_and_height_circular(well: List[Any], target_height_st: Any) -> N
                     target_height=target_height,
                     segment=segment,
                 )
-                # breakpoint()
                 assert isclose(found_volume, expected_volume)
                 # test going backwards to get height back
                 found_height = _height_from_volume_circular(

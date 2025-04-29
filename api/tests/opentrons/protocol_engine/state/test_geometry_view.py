@@ -4,10 +4,9 @@ import inspect
 import json
 from datetime import datetime
 from math import isclose
-from typing import cast, List, Tuple, Optional, NamedTuple, Dict, Any
+from typing import cast, List, Tuple, Optional, NamedTuple, Dict
 from unittest.mock import sentinel
 from os import listdir, path
-from hypothesis.strategies import data, floats
 
 import pytest
 from decoy import Decoy
@@ -3485,11 +3484,9 @@ def test_rectangular_frustum_math_helpers(
         _find_volume_from_height_(i)
 
 
-@given(data())
 @pytest.mark.parametrize("frustum", CIRCULAR_TEST_EXAMPLES)
 def test_circular_frustum_math_helpers(
     frustum: Dict[str, List[float]],
-    heights_st: Any=get_well_heights_strategy
 ) -> None:
     """Test both height and volume calculation within a given circular frustum."""
     total_frustum_height = frustum["height"][0]
@@ -3520,16 +3517,8 @@ def test_circular_frustum_math_helpers(
 
         assert isclose(found_height, frustum["height"][index], abs_tol=0.001)
 
-    # for i in range(len(frustum["height"])):
-    for i in range(50):
-        target_height = data.draw(
-            floats(
-                min_value=0, max_value=total_frustum_height, allow_infinity=False, allow_nan=False
-            )
-        )
-        breakpoint()
-
-        # _find_volume_from_height_(i)
+    for i in range(len(frustum["height"])):
+        _find_volume_from_height_(i)
 
 
 def test_validate_dispense_volume_into_well_bottom(
