@@ -2719,7 +2719,6 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
     subject: GeometryView,
 ) -> None:
     """It should return the grip point for labware directly on a module."""
-
     addressable_area_view = AddressableAreaView(
         state=AddressableAreaState(
             loaded_addressable_areas_by_name={},
@@ -2757,9 +2756,9 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
             sentinel.labware_definition
         )
     ).then_return(500)
-    decoy.when(mock_labware_view.get(labware_id=f"below-id-0")).then_return(
+    decoy.when(mock_labware_view.get(labware_id="below-id-0")).then_return(
         LoadedLabware(
-            id=f"below-id-0",
+            id="below-id-0",
             loadName="below-name",
             definitionUri="1234",
             location=ModuleLocation(moduleId="module-id"),

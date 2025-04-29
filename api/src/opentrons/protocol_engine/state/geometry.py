@@ -1068,7 +1068,6 @@ class GeometryView:
             self._labware.get_grip_height_from_labware_bottom(labware_definition)
         )
         location_name: str
-        module_location: ModuleLocation | None = None
         offset = self._get_offset_from_parent_addressable_area(
             child_definition=labware_definition, parent=location
         ) + self._get_calibrated_module_offset(location)
@@ -1288,9 +1287,9 @@ class GeometryView:
                 pipette_mount=pipette_mount,
                 labware_slot_column=labware_slot_column,
             )
-            self._last_drop_tip_location_spot[addressable_area_name] = (
-                _TipDropSection.LEFT
-            )
+            self._last_drop_tip_location_spot[
+                addressable_area_name
+            ] = _TipDropSection.LEFT
         else:
             # Drop tip in RIGHT section
             x_offset = self._get_drop_tip_well_x_offset(
@@ -1300,9 +1299,9 @@ class GeometryView:
                 pipette_mount=pipette_mount,
                 labware_slot_column=labware_slot_column,
             )
-            self._last_drop_tip_location_spot[addressable_area_name] = (
-                _TipDropSection.RIGHT
-            )
+            self._last_drop_tip_location_spot[
+                addressable_area_name
+            ] = _TipDropSection.RIGHT
 
         return AddressableOffsetVector(x=x_offset, y=0, z=0)
 
