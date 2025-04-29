@@ -1,6 +1,7 @@
 import pytest
 from math import pi, isclose
 from typing import Any, List, cast
+from hypothesis import given, strategies as st
 
 from opentrons_shared_data.labware.labware_definition import (
     ConicalFrustum,
@@ -206,9 +207,9 @@ def test_cross_section_area_rectangular(x_dimension: float, y_dimension: float) 
         == expected_area
     )
 
-
 @pytest.mark.parametrize("well", fake_frusta())
-def test_volume_and_height_circular(well: List[Any]) -> None:
+@given(target_height_st=st.data())
+def test_volume_and_height_circular(well: List[Any], target_height_st: Any) -> None:
     """Test both volume and height calculations for circular frusta."""
     if well[-1].shape == "spherical":
         return
@@ -218,7 +219,16 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
             b = segment.bottomDiameter / 2
             # test volume within a bunch of arbitrary heights
             segment_height = segment.topHeight - segment.bottomHeight
-            for target_height in range(round(segment_height)):
+            for i in range(50):
+                target_height = target_height_st.draw(
+                    st.floats(
+                        min_value=0,
+                        max_value=segment_height,
+                        allow_infinity=False,
+                        allow_nan=False
+                    )
+                )
+                # breakpoint()
                 r_y = (target_height / segment_height) * (a - b) + b
                 expected_volume = (pi * target_height / 3) * (
                     b**2 + b * r_y + r_y**2
@@ -227,6 +237,7 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
                     target_height=target_height,
                     segment=segment,
                 )
+                # breakpoint()
                 assert isclose(found_volume, expected_volume)
                 # test going backwards to get height back
                 found_height = _height_from_volume_circular(

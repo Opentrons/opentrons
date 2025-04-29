@@ -140,7 +140,7 @@ def _height_from_volume_circular(
     target_volume: float, segment: ConicalFrustum
 ) -> float:
     """Find the height given a volume within a squared cone segment."""
-    return segment.height_from_volume_binary_search(target_volume)
+    return segment.height_from_volume_search(target_volume)
 
 
 def _height_from_volume_rectangular(

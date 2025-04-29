@@ -34,6 +34,7 @@ from .constants import (
 )
 
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
+RECURSIVE_SEARCH_VOLUME_TOLERANCE = 0.001
 
 
 _StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
@@ -221,7 +222,7 @@ class ConicalFrustum(BaseModel):
         table[total_height] = (pi * total_height / 3) * (b**2 + a * b + a**2)
         return table
 
-    def height_from_volume_binary_search(self, target_volume: float) -> float:
+    def height_from_volume_search(self, target_volume: float) -> float:
         total_height = self.topHeight - self.bottomHeight
         y = prev_y = total_height / 2
         volume_at_y = volume_at_prev_y = self.volume_from_height_circular(
@@ -232,7 +233,7 @@ class ConicalFrustum(BaseModel):
         )
         guesses = [(volume_at_y, y)]
         max_height, min_height = total_height, 0.0
-        while abs(volume_at_y - target_volume) > 0.001:
+        while abs(volume_at_y - target_volume) > RECURSIVE_SEARCH_VOLUME_TOLERANCE:
             target_above_last_two_guesses = (
                 target_volume > volume_at_y and target_volume > volume_at_prev_y
             )
@@ -251,6 +252,7 @@ class ConicalFrustum(BaseModel):
                 target_between_last_two_guesses,
                 target_below_last_two_guesses
             )
+            # breakpoint()
 
             prev_y_copy = y
             if target_above_last_two_guesses:
@@ -259,6 +261,7 @@ class ConicalFrustum(BaseModel):
             elif target_between_last_two_guesses:
                 y = (y + prev_y) / 2
             elif target_below_last_two_guesses:
+                # breakpoint()
                 max_height = y
                 y = (y + min_height)/ 2
             prev_y = prev_y_copy
