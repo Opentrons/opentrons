@@ -32,7 +32,8 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 metadata = {"protocolName": "Flex ABR High Volumes"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
-assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"]
+assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"], \
+    f"api level: {requirements['apiLevel']}"
 
 SHAKER_MAX_UL = 250
 SHAKER_RPM_250ul = 1100  # NOTE: 200ul in well is 1500 rpm
@@ -166,7 +167,7 @@ def _legacy_src_dest_from_liquid_class_props(
         cls_props.aspirate.aspirate_position.position_reference
         == cls_props.dispense.dispense_position.position_reference
         == PositionReference.LIQUID_MENISCUS
-    )
+    ), "position references not all set to liquid-meniscus"
     _src_loc = src_well.meniscus(
         target=DEFAULT_TIP_MENISCUS_TARGET,
         z=cls_props.aspirate.aspirate_position.offset.z,
@@ -314,7 +315,7 @@ class _TestTrial:
                 remove_props.aspirate.aspirate_position.position_reference
                 == remove_props.dispense.dispense_position.position_reference
                 == PositionReference.LIQUID_MENISCUS
-            )
+            ), "not all properties were set to liquid-meniscus"
             pipette.aspirate(self.ul_to_remove / pipette.channels, src_loc)
             for loc in dest_loc_list:
                 pipette.dispense(self.dispense_ul, loc)
@@ -433,7 +434,7 @@ def _pick_up_tip_and_zero_min_height(
             ][
                 "minHeight"
             ] = 0.0
-            assert pipette.get_minimum_liquid_sense_height() == 0.0
+            assert pipette.get_minimum_liquid_sense_height() == 0.0, "pipette min-LLD not set to 0.0"
 
 
 def _shake_then_read(
