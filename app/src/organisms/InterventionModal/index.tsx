@@ -47,6 +47,7 @@ import type {
   RunData,
   RunStatus,
 } from '@opentrons/api-client'
+import { StackerFillInterventionContent } from './StackerFillInterventionContent'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,
@@ -163,6 +164,12 @@ export function InterventionModal({
             {...{ command, run, analysis }}
           />
         )
+      case 'flexStacker/fill':
+        return (
+          <StackerFillInterventionContent
+            {...{ command, run, analysis }}
+          />
+        )
       default:
         console.warn(
           'Unhandled command passed to InterventionModal: ',
@@ -191,9 +198,16 @@ export function InterventionModal({
         }
       case 'flexStacker/empty':
         return {
-          iconName: null,
+          iconName: 'move-xy-circle' as IconName,
           headerTitle: t('empty_stacker', { robot_name: robotName }),
           headerTitleOnDevice: t('empty_stacker'),
+          iconSize: undefined,
+        }
+      case 'flexStacker/fill':
+        return {
+          iconName: 'move-xy-circle' as IconName,
+          headerTitle: t('fill_stacker', { robot_name: robotName }),
+          headerTitleOnDevice: t('fill_stacker'),
           iconSize: undefined,
         }
       default:

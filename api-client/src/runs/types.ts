@@ -249,4 +249,5 @@ export interface FlexStackerState {
   adapterLabwareURI: string
   lidLabwareURI: string
   count: number
+  maxCount: number
 }

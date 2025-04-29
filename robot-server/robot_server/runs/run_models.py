@@ -362,6 +362,7 @@ class FlexStackerState(BaseModel):
         None, description="The URI of the lid labware."
     )
     count: int = Field(0, description="The number of labware current in the hopper.")
+    maxCount: int = Field(0, description="The maximum number of labware allowed in the hopper.")
 
 
 class RunCurrentState(BaseModel):

@@ -8,6 +8,7 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_NONE,
   Flex,
+  Icon,
   LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
@@ -18,7 +19,7 @@ import { useRunCurrentState } from '@opentrons/react-api-client'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import type {
   CompletedProtocolAnalysis,
-  FlexStackerEmptyRunTimeCommand,
+  FlexStackerFillRunTimeCommand,
   ModuleLocation,
 } from '@opentrons/shared-data'
 import { Divider } from '/app/atoms/structure'
@@ -41,6 +42,20 @@ const LABWARE_NAME_STYLE = css`
   color: ${COLORS.grey60};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.bodyTextBold}
+    color: ${COLORS.black90};
+  }
+`
+
+const QUANTITY_STYLE = css`
+//TODO - make the grey box smaller
+  align-items: ${ALIGN_CENTER};
+  color: ${COLORS.grey60};
+  background-color: ${COLORS.grey40};
+  padding: ${SPACING.spacing4};
+  border-radius: ${BORDERS.borderRadius4};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.bodyTextBold}
+    grid-gap: ${SPACING.spacing8};
     color: ${COLORS.black90};
   }
 `
@@ -72,17 +87,17 @@ function stackerNameFormat(moduleLocation: ModuleLocation): string {
   return 'Stacker ' + moduleLocation.slotName.charAt(0)
 }
 
-export interface StackerEmptyInterventionProps {
-  command: FlexStackerEmptyRunTimeCommand
+export interface StackerFillInterventionProps {
+  command: FlexStackerFillRunTimeCommand
   analysis: CompletedProtocolAnalysis | null
   run: RunData
 }
 
-export function StackerEmptyInterventionContent({
+export function StackerFillInterventionContent({
   command,
   analysis,
   run,
-}: StackerEmptyInterventionProps): JSX.Element | null {
+}: StackerFillInterventionProps): JSX.Element | null {
 
   //const runId = useCurrentRunId()
   const { data: runCurrentState } = useRunCurrentState(run.id)
@@ -94,9 +109,13 @@ export function StackerEmptyInterventionContent({
 
   // Get the name of the labware to be removed from the stacker
   let labwareName: string | null = null
+  let labwareCount = command.params.count ?? null
   if (flexStacker) {
     const labwareDef = labwareDefsByUri?.[flexStacker.primaryLabwareURI] ?? null
     labwareName = labwareDef?.metadata.displayName ?? null
+    if (labwareCount == null){
+      labwareCount = flexStacker.maxCount
+    }
   }
 
   const moduleLocation =
@@ -126,6 +145,11 @@ export function StackerEmptyInterventionContent({
                 {labwareName}
               </LegacyStyledText>
             </Flex>
+            <Flex>
+              <LegacyStyledText as="p" css={QUANTITY_STYLE}>
+                  {'Quantity: ' + labwareCount}
+              </LegacyStyledText>
+            </Flex>
             <Divider css={DIVIDER_STYLE} />
             <Flex css={LABWARE_DIRECTION_STYLE}>
               <DeckInfoLabel deckLabel={stackerNameFormat(moduleLocation)} />
@@ -138,7 +162,7 @@ export function StackerEmptyInterventionContent({
         <Flex width="50%" css={STACKER_IMAGE_STYLE}>
           <Box margin="0 auto" width="100%">
             <LegacyStyledText as="p">
-              {'Replace me with a Stacker Empty image/animation'}
+              {'Replace me with a Stacker Fill image/animation'}
             </LegacyStyledText>
           </Box>
         </Flex>
