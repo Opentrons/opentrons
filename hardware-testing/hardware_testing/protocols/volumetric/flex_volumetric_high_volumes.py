@@ -30,7 +30,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 
 
 metadata = {"protocolName": "Flex ABR High Volumes"}
-requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"]
 
@@ -163,15 +163,19 @@ def _legacy_src_dest_from_liquid_class_props(
 ) -> Tuple[Location, List[Location]]:
     cls_props = cls_in_use.get_for(pipette, pipette.tip_racks[0])
     assert (
-        cls_props.aspirate.position_reference
-        == cls_props.dispense.position_reference
+        cls_props.aspirate.aspirate_position.position_reference
+        == cls_props.dispense.dispense_position.position_reference
         == PositionReference.LIQUID_MENISCUS
     )
     _src_loc = src_well.meniscus(
-        target=DEFAULT_TIP_MENISCUS_TARGET, z=cls_props.aspirate.offset.z
+        target=DEFAULT_TIP_MENISCUS_TARGET,
+        z=cls_props.aspirate.aspirate_position.offset.z,
     )
     _dest_wells: List[Location] = [
-        w.meniscus(target=DEFAULT_TIP_MENISCUS_TARGET, z=cls_props.dispense.offset.z)
+        w.meniscus(
+            target=DEFAULT_TIP_MENISCUS_TARGET,
+            z=cls_props.dispense.dispense_position.offset.z,
+        )
         for w in dest_wells
     ]
     return _src_loc, _dest_wells
@@ -208,9 +212,11 @@ class _TestTrial:
 
         # NOTE: error will raise if "tip_clearance_at_well_bottom"
         #       is less than the minimum LLD height of the pipette + tip
-        min_vol = _binary_search_liquid_volume_at_height(well, minimum_liquid_height)
+        min_vol = _binary_search_liquid_volume_at_height(
+            pipette.mount, well, minimum_liquid_height
+        )
         max_vol = _binary_search_liquid_volume_at_height(
-            well, well.depth + p.liquid_clearance_at_well_top  # type: ignore[attr-defined]
+            pipette.mount, well, well.depth + p.liquid_clearance_at_well_top  # type: ignore[attr-defined]
         )
 
         # always try to aspirate 1000ul (b/c it creates largest Z travel)
@@ -305,8 +311,8 @@ class _TestTrial:
             # NOTE: use liquid-class properties to control legacy behavior
             remove_props = add_liquid_class.get_for(pipette, pipette.tip_racks[0])
             assert (
-                remove_props.aspirate.position_reference
-                == remove_props.dispense.position_reference
+                remove_props.aspirate.aspirate_position.position_reference
+                == remove_props.dispense.dispense_position.position_reference
                 == PositionReference.LIQUID_MENISCUS
             )
             pipette.aspirate(self.ul_to_remove / pipette.channels, src_loc)
@@ -370,7 +376,11 @@ def calibrate_tip_overlap(ctx: ProtocolContext, pipette: InstrumentContext) -> N
 
 
 def _binary_search_liquid_volume_at_height(
-    well: Well, height: float, tolerance_mm: float = 0.1, max_iterations: int = 100
+    mount: str,
+    well: Well,
+    height: float,
+    tolerance_mm: float = 0.1,
+    max_iterations: int = 100,
 ) -> float:
     """Binary search to find a close-enough volume for a given height."""
     # FIXME: (sigler) replace with public API method,
@@ -381,7 +391,7 @@ def _binary_search_liquid_volume_at_height(
     best_diff = float("inf")
     for _ in range(max_iterations):
         mid_vol = (min_vol + max_vol) / 2.0
-        mid_vol_height = well.estimate_liquid_height_after_pipetting(mid_vol)
+        mid_vol_height = well.estimate_liquid_height_after_pipetting(mount, mid_vol)
         diff_mm = abs(cast(float, mid_vol_height - height))
         if diff_mm < best_diff:
             best_diff = diff_mm
@@ -563,8 +573,9 @@ def _define_liquid_class(
         "multi_dispense": DISPENSE_MM_FROM_MENISCUS,
     }
     for attr, offset_z in offset_z_by_action.items():
-        getattr(_props, attr).position_reference = "liquid-meniscus"
-        getattr(_props, attr).offset.z = offset_z
+        pos_name = attr.split("_")[-1] + "_position"
+        getattr(getattr(_props, attr), pos_name).position_reference = "liquid-meniscus"
+        getattr(getattr(_props, attr), pos_name).offset.z = offset_z
     if multi_touch_tip:
         _retract = _props.multi_dispense.retract  # type: ignore[union-attr]
         _retract.touch_tip.enabled = True  # type: ignore[union-attr]
@@ -613,8 +624,7 @@ def run(ctx: ProtocolContext) -> None:
     )
 
     # LOAD LABWARE
-    assert SLOTS["chute"] == "A3", \
-        f"waste chute must be in A3, not {SLOTS['chute']}"
+    assert SLOTS["chute"] == "D3", f"waste chute must be in D3, not {SLOTS['chute']}"
     ctx.load_waste_chute()
     src_reservoir = ctx.load_labware(
         ctx.params.reservoir,  # type: ignore[attr-defined]
