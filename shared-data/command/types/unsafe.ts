@@ -20,6 +20,7 @@ export type UnsafeCreateCommand =
   | UnsafeEngageAxesCreateCommand
   | UnsafeUngripLabwareCreateCommand
   | UnsafePlaceLabwareCreateCommand
+  | UnsafeManualRetrieveCreateCommand
 
 export interface UnsafeBlowoutInPlaceParams {
   pipetteId: string
@@ -104,4 +105,13 @@ export interface UnsafePlaceLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
     UnsafePlaceLabwareCreateCommand {
   result?: any
+}
+export interface UnsafeManualRetrieveParams{
+  moduleId: string
+}
+export interface UnsafeManualRetrieveCreateCommand
+  extends CommonCommandRunTimeInfo {
+      commandType: 'unsafe/manualRetrieve'
+      params: UnsafeManualRetrieveParams
+      result?: any
 }

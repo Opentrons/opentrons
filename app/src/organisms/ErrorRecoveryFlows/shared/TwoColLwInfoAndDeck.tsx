@@ -27,6 +27,7 @@ export function TwoColLwInfoAndDeck(
     currentRecoveryOptionUtils,
     isOnDevice,
     recoveryMap,
+    recoveryCommands,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -41,10 +42,12 @@ export function TwoColLwInfoAndDeck(
     HOPPER_MANUAL_LOAD_AND_RETRY,
     HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
+  const { manualRetrieve } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
     relevantPickUpTipWellName,
     relevantPickUpTipLabware,
+    labwareQuantity,
   } = failedLabwareUtils
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { step } = recoveryMap
@@ -52,6 +55,11 @@ export function TwoColLwInfoAndDeck(
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
+    switch (step) {
+      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE:
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
+        void manualRetrieve().then(() => proceedNextStep())
+    }
     void proceedNextStep()
   }
 
@@ -98,7 +106,7 @@ export function TwoColLwInfoAndDeck(
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('ensure_stacker_has_labware')
       case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
-        return t('load_labware_into_stacker')
+        return t('load_labware_into_stacker', { quantity: labwareQuantity })
       default:
         console.error(
           `TwoColLwInfoAndDeck: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`

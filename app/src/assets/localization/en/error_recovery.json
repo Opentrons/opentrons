@@ -56,7 +56,7 @@
   "inspect_the_robot": "<block>First, inspect the robot to ensure it's prepared to continue the run from the next step.</block><block>Then, close the robot door before proceeding.</block>",
   "labware_released_from_current_height": "The labware will be released from its current height.",
   "launch_recovery_mode": "Launch recovery mode",
-  "load_labware_into_stacker": "Load <#> labware into Stacker",
+  "load_labware_into_stacker": "Load {{quantity}} labware into Stacker",
   "load_labware_into_stacker_and_retry_step": "Load labware into Stacker and retry step",
   "load_labware_shuttle_and_retry_step": "Load labware shuttle and retry step",
   "load_labware_shuttle_onto_track": "Load labware shuttle onto track",
@@ -148,5 +148,6 @@
   "view_error_details": "View error details",
   "view_recovery_options": "View recovery options",
   "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection.",
-  "clear_obstructions_before_proceeding": "Clear obstructions before proceeding"
+  "clear_obstructions_before_proceeding": "Clear obstructions before proceeding",
+  "quantity": "Quantity: {{quantity}}"
 }

@@ -338,7 +338,7 @@ export function getFailedLabwareQuantity(
   runCommands: CommandsData | undefined,
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
   errorKind: ErrorKind
-): string | null {
+): number | null {
   if (STACKER_ERROR_KINDS.includes(errorKind) && runCommands != null) {
     const failedCommandIndex = runCommands?.data.findIndex(
       x => x.id === recentRelevantFailedLabwareCmd?.id
@@ -393,7 +393,7 @@ export function getFailedLabwareQuantity(
         quantity = total - retreiveCmds + storeCmds
       }
     }
-    return `Quantity: ${quantity}`
+    return quantity
   }
   return null
 }

@@ -74,6 +74,8 @@ export interface UseRecoveryCommandsResult {
   homeAll: () => Promise<CommandData[]>
   /* A non-terminal recovery-command */
   homeShuttle: () => Promise<CommandData[]>
+  /* A non-terminal recovery-command */
+  manualRetrieve: () => Promise<CommandData[]>
 }
 
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
@@ -326,6 +328,15 @@ export function useRecoveryCommands({
     }
   }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
+  const manualRetrieve = useCallback((): Promise<CommandData[]> => {
+    const manualRetrieveCommand = buildManualRetrieve(unvalidatedFailedCommand)
+    if (manualRetrieveCommand == null) {
+      return Promise.reject(new Error('Invalid use of manual retrieve command'))
+    } else {
+      return chainRunRecoveryCommands([manualRetrieveCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+
   const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
     const moveLabwareCmd = buildMoveLabwareWithoutPause(
       unvalidatedFailedCommand
@@ -350,6 +361,7 @@ export function useRecoveryCommands({
     ignoreErrorKindThisRun,
     homeAll,
     homeShuttle,
+    manualRetrieve,
   }
 }
 
@@ -413,6 +425,26 @@ const buildHomeShuttle = (
       : ''
   return {
     commandType: 'flexStacker/prepareShuttle',
+    params: {
+      moduleId: moduleId,
+    },
+    intent: 'fixit',
+  }
+}
+
+const buildManualRetrieve = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) {
+    return null
+  }
+  const storeOrRetriveFailedCommandParams = failedCommand.params
+  const moduleId =
+    'moduleId' in storeOrRetriveFailedCommandParams
+      ? storeOrRetriveFailedCommandParams.moduleId
+      : ''
+  return {
+    commandType: 'unsafe/manualRetrieve',
     params: {
       moduleId: moduleId,
     },
