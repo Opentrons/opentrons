@@ -1624,9 +1624,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
-                starting_tip=self.starting_tip._core
-                if self.starting_tip is not None
-                else None,
+                starting_tip=(
+                    self.starting_tip._core if self.starting_tip is not None else None
+                ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )
@@ -1740,9 +1740,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
-                starting_tip=self.starting_tip._core
-                if self.starting_tip is not None
-                else None,
+                starting_tip=(
+                    self.starting_tip._core if self.starting_tip is not None else None
+                ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )
@@ -1856,9 +1856,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
-                starting_tip=self.starting_tip._core
-                if self.starting_tip is not None
-                else None,
+                starting_tip=(
+                    self.starting_tip._core if self.starting_tip is not None else None
+                ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )
@@ -2032,7 +2032,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=well,
             ),
         ):
-            self._core.resin_tip_unseal(location=well.top(), well_core=well._core)
+            self._core.resin_tip_unseal(location=None, well_core=well._core)
 
         return self
 

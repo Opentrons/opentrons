@@ -722,6 +722,7 @@ class GeometryView:
         labware_id: str,
         well_location: DropTipWellLocation,
         partially_configured: bool = False,
+        override_default_offset: float | None = None,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette.
 
@@ -740,8 +741,9 @@ class GeometryView:
                 origin=WellOrigin(well_location.origin.value),
                 offset=well_location.offset,
             )
-
-        if self._labware.get_definition(labware_id).parameters.isTiprack:
+        if override_default_offset is not None:
+            z_offset = override_default_offset
+        elif self._labware.get_definition(labware_id).parameters.isTiprack:
             z_offset = self._labware.get_tip_drop_z_offset(
                 labware_id=labware_id,
                 length_scale=self._pipettes.get_return_tip_scale(pipette_id),
