@@ -19,7 +19,14 @@ import { Header } from './molecules/Header'
 import { HeaderWithMeter } from './molecules/HeaderWithMeter'
 import { Loading } from './molecules/Loading'
 import { OpentronsAIRoutes } from './OpentronsAIRoutes'
-import { headerWithMeterAtom, mixpanelAtom, tokenAtom } from './resources/atoms'
+import { FeatureFlagsModal } from './organisms/FeatureFlagsModal'
+import {
+  displayFeatureFlagsModalAtom,
+  featureFlagsAtom,
+  headerWithMeterAtom,
+  mixpanelAtom,
+  tokenAtom,
+} from './resources/atoms'
 import { CLIENT_MAX_WIDTH } from './resources/constants'
 import { useGetAccessToken } from './resources/hooks'
 import { useTrackEvent } from './resources/hooks/useTrackEvent'
@@ -30,6 +37,9 @@ export function OpentronsAI(): JSX.Element | null {
   const [{ displayHeaderWithMeter, progress }] = useAtom(headerWithMeterAtom)
   const [mixpanelState, setMixpanelState] = useAtom(mixpanelAtom)
   const { getAccessToken } = useGetAccessToken()
+  const [featureFlags, setFeatureFlags] = useAtom(featureFlagsAtom)
+  const [displayFeatureFlagsModal] = useAtom(displayFeatureFlagsModalAtom)
+
   const trackEvent = useTrackEvent()
 
   const fetchAccessToken = async (): Promise<void> => {
@@ -69,6 +79,10 @@ export function OpentronsAI(): JSX.Element | null {
     return null
   }
 
+  global.enablePrereleaseMode = () => {
+    setFeatureFlags({ enablePrereleaseMode: true })
+  }
+
   return (
     <Flex
       id="opentrons-ai"
@@ -76,6 +90,9 @@ export function OpentronsAI(): JSX.Element | null {
       height={'100vh'}
       flexDirection={DIRECTION_COLUMN}
     >
+      {displayFeatureFlagsModal && featureFlags.enablePrereleaseMode && (
+        <FeatureFlagsModal />
+      )}
       <StickyHeader>
         {displayHeaderWithMeter ? (
           <HeaderWithMeter progressPercentage={progress} />
