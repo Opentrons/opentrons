@@ -55,10 +55,10 @@ DEFAULT_TIP_MENISCUS_TARGET: Literal["start", "end", "dynamic"] = "dynamic"
 # NOTE: (sigler) disabling formatter here, b/c spatial deck-maps are nice...
 # fmt: off
 SLOTS: Dict[str, str] = {
-    "tips_2":           "A1",   "tips_3":           "A2",   "reader":       "A3",
-    "tips_1":           "B1",   "test_labware":     "B2",   "stack":        "B3",
-    "shaker":           "C1",   "empty_0":          "C2",   "stack_end":    "C3",
-    "water_reservoir":  "D1",   "src_reservoir":    "D2",   "chute":        "D3",
+    "tips_2":           "A1",   "tips_3":           "A2",   "reader":       "A3",   "reader_stage": "A4",
+    "tips_1":           "B1",   "test_labware":     "B2",   "block":        "B3",   "stack":        "B4",
+    "shaker":           "C1",   "empty_0":          "C2",   "empty_1":      "C3",   "stack_end":    "C4",
+    "water_reservoir":  "D1",   "src_reservoir":    "D2",   "chute":        "D3",   "chute_stage":  "D4",
 }
 # fmt: on
 
@@ -74,9 +74,9 @@ LOAD_NAME_SRC_RESERVOIRS: Dict[str, float] = {
     "nest_96_wellplate_2ml_deep": 300,
 }
 
-# TODO: (sigler) let's add the Artel (aka Corning?) plate
-#       to shared-data in a separate pull-request, and modify the
-#       Corning plate to be stackable with it
+# FIXME: (sigler) let's add the Artel (aka Corning?) plate
+#        to shared-data in a separate pull-request, and modify the
+#        Corning plate to be stackable with it
 DST_LABWARE = "stackable_corning_96_wellplate_360ul_flat"
 DE_STATIC_LOAD_NAME = "de_static_fixture"
 

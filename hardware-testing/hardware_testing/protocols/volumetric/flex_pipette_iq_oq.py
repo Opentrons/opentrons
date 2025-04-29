@@ -75,10 +75,10 @@ TRIALS_BY_PIPETTE_BY_TIP = {
 # FIXME: create plate stack, to reduce number of slots in use (and increase plates)
 # TODO: discuss with SW how to handle more tip-racks from off-deck (eg: stacker)
 SLOTS = {
-    "tips_diluent": "A1",   "diluent":  "A2",   "reader":   "A3",   "empty_1": "A4",
-    "plate":        "B1",   "dye_0":    "B2",   "tips_1":   "B3",   "tips_3":  "B4",
-    "stack_end":    "C1",   "dye_1":    "C2",   "tips_0":   "C3",   "tips_2":  "C4",
-    "stack_start":  "D1",   "dye_2":    "D2",   "chute":    "D3",   "empty_0": "D4",
+    "tips_diluent": "A1",   "diluent":  "A2",   "reader":   "A3",   "reader_stage": "A4",
+    "plate":        "B1",   "dye_0":    "B2",   "tips_1":   "B3",   "tips_3":       "B4",
+    "stack_end":    "C1",   "dye_1":    "C2",   "tips_0":   "C3",   "tips_2":       "C4",
+    "stack_start":  "D1",   "dye_2":    "D2",   "chute":    "D3",   "chute_stage":  "D4",
 }
 # fmt: on
 
