@@ -3226,22 +3226,13 @@ def test_check_gripper_labware_tip_collision(
     decoy.when(subject._get_highest_z_from_labware_data(labware_data)).then_return(1000)
 
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(subject.get_labware_highest_z("labware-id")).then_return(100.0)
     decoy.when(
-        mock_addressable_area_view.get_addressable_area_center(
-            addressable_area_name=DeckSlotName.SLOT_1.id
-        )
-    ).then_return(Point(x=11, y=22, z=33))
+        mock_labware_view.get_dimensions(labware_definition=definition)
+    ).then_return(Dimensions(x=1, y=2, z=67))
     decoy.when(
         mock_labware_view.get_grip_height_from_labware_bottom(definition)
     ).then_return(1.0)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(
-        subject.get_labware_grip_point(
-            labware_definition=definition,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        )
-    ).then_return(Point(x=100.0, y=100.0, z=0.0))
 
     with pytest.raises(errors.LabwareMovementNotAllowedError):
         subject.check_gripper_labware_tip_collision(
