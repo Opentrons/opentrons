@@ -23,7 +23,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     home_ot3,
     move_plunger_absolute_ot3,
     get_plunger_positions_ot3,
-    update_pick_up_speed,
+    # update_pick_up_speed,
     _get_pipette_from_mount,
 )
 
@@ -457,6 +457,12 @@ async def _main() -> None:
     for noz in range(1, args.nozzles+1):
         dial_data.update({f'Tip_{noz}': None})
     print(f'Dictionary: {dial_data}')
+
+    pipette = _get_pipette_from_mount(hw_api, mount)
+    config_model = pipette.pick_up_configurations
+    current_val = config_model.press_fit.configuration_by_nozzle_map['Column1']['default'].current
+    input(f"current_val" {current_val})
+
     m_current = float(input("motor_current in amps: "))
     input_str = input("Pick one[columns, rows, single tip]?")
     instrument = hw_api._pipette_handler.get_pipette(OT3Mount.LEFT)
