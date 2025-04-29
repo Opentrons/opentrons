@@ -165,6 +165,9 @@ dist-macos-latest: dist-osx
 .PHONY: dist-ubuntu-latest
 dist-ubuntu-latest: dist-linux
 
+.PHONY: dist-ubuntu-24.04-arm
+dist-ubuntu-24.04-arm: dist-linux-arm64
+
 .PHONY: dist-ubuntu-22.04
 dist-ubuntu-22.04: dist-linux
 

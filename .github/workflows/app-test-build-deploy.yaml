@@ -234,7 +234,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest', 'ubuntu-24.04-arm']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
         target: ['desktop', 'odd']
         exclude:
