@@ -151,10 +151,13 @@ def load_tip_racks(
     trials_list = TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul_int]
     num_tips_needed = sum(trials_list) * pipette.channels
     num_racks_needed = ceil(num_tips_needed / 96)
-    available_rack_slot_names = [s for n, s in SLOTS.items() for i in range(10) if f"tips_{i}" in n]
-    assert num_racks_needed <= len(available_rack_slot_names), \
-        f"protocol requires {num_racks_needed}, " \
+    available_rack_slot_names = [
+        s for n, s in SLOTS.items() for i in range(10) if f"tips_{i}" in n
+    ]
+    assert num_racks_needed <= len(available_rack_slot_names), (
+        f"protocol requires {num_racks_needed}, "
         f"but {len(available_rack_slot_names)} are available"
+    )
     accessible_rack_slot_names = [s for s in available_rack_slot_names if "4" not in s]
     if pipette.channels == 96:
         rack_ln = "opentrons_flex_96_tiprack_adapter"
@@ -193,7 +196,9 @@ def load_labware(
     # diluent reservoir
     reservoir_diluent = ctx.load_labware(DILUENT_RESERVOIR, SLOTS["diluent"])
     if len(reservoir_diluent.wells()) > 1:
-        raise NotImplementedError("multiple wells in diluent reservoir not yet supported")
+        raise NotImplementedError(
+            "multiple wells in diluent reservoir not yet supported"
+        )
     reservoir_diluent.load_empty(reservoir_diluent.wells())
 
     # dye reservoir(s)
@@ -220,9 +225,7 @@ def load_labware(
     # FIXME: support a stack of plates
     if num_plates_needed > 1:
         raise NotImplementedError("multiple plates not implemented yet")
-    plates = [
-        ctx.load_labware("corning_96_wellplate_360ul_flat", SLOTS[f"plate"])
-    ]
+    plates = [ctx.load_labware("corning_96_wellplate_360ul_flat", SLOTS[f"plate"])]
     for plate in plates:
         plate.load_empty(plate.wells())
 
@@ -249,19 +252,26 @@ def load_liquid_diluent(
     trials = TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul]
     if pipette.channels == 1:
         trials = [_round_up_to(multiple_of=8, value=t) for t in trials]
-    total_diluent_aspirated_ul = sum([
-        max(DYE_READER_IDEAL_UL - v, 0) * pipette.channels * t
-        for v, t in zip(volumes, trials)
-    ])
+    total_diluent_aspirated_ul = sum(
+        [
+            max(DYE_READER_IDEAL_UL - v, 0) * pipette.channels * t
+            for v, t in zip(volumes, trials)
+        ]
+    )
     critical_ul = CRITICAL_UL_BY_LABWARE[reservoir.load_name]
-    assert total_diluent_aspirated_ul < critical_ul["setup_max"] - critical_ul["dead"], \
-        f"{reservoir.load_name} unable to hold {total_diluent_aspirated_ul} ul " \
+    assert (
+        total_diluent_aspirated_ul < critical_ul["setup_max"] - critical_ul["dead"]
+    ), (
+        f"{reservoir.load_name} unable to hold {total_diluent_aspirated_ul} ul "
         f"(min={critical_ul['dead']}, max={critical_ul['setup_max']})"
+    )
 
     diluent = ctx.define_liquid(
         "diluent", "diluent", display_color=DYE_CONFIGS["diluent"][2]
     )
-    reservoir["A1"].load_liquid(diluent, critical_ul["dead"] + total_diluent_aspirated_ul)
+    reservoir["A1"].load_liquid(
+        diluent, critical_ul["dead"] + total_diluent_aspirated_ul
+    )
 
 
 def load_liquid_dye(
@@ -348,9 +358,7 @@ def run(ctx: ProtocolContext) -> None:
     dye_wells_by_volume = load_liquid_dye(
         ctx, test_pipette, reservoirs_dye, volumes, tip_ul
     )
-    load_liquid_diluent(
-        ctx, test_pipette, reservoir_diluent, volumes, tip_ul
-    )
+    load_liquid_diluent(ctx, test_pipette, reservoir_diluent, volumes, tip_ul)
     # liquid-classes
     diluent_class = ctx.define_liquid_class("water")
     test_class: Optional[LiquidClass] = None
