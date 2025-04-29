@@ -1525,15 +1525,7 @@ def test_handle_batch_labware_loaded_update(
         )
     )
 
-    # todo(mm, 2025-04-28): Test observable behavior as seen through TipView,
-    # instead of inspecting TipState directly.
-    assert "some-labware-id" in subject._state.tips_by_labware_id
-    assert "some-other-labware-id" in subject._state.tips_by_labware_id
-    for well_state in subject._state.tips_by_labware_id["some-labware-id"].values():
-        assert well_state == _TipRackWellState.CLEAN
-    for well_state in subject._state.tips_by_labware_id[
-        "some-other-labware-id"
-    ].values():
-        assert well_state == _TipRackWellState.CLEAN
-    assert "some-labware-id" in subject._state.column_by_labware_id
-    assert "some-other-labware-id" in subject._state.column_by_labware_id
+    # The use of has_clean_tip() is arbitrary here. We just need anything that can make
+    # sure each labware in the batch has actually been ingested.
+    assert TipView(subject.state).has_clean_tip("some-labware-id", "A1")
+    assert TipView(subject.state).has_clean_tip("some-other-labware-id", "A1")
