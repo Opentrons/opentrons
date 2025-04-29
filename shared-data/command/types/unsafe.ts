@@ -106,12 +106,11 @@ export interface UnsafePlaceLabwareRunTimeCommand
     UnsafePlaceLabwareCreateCommand {
   result?: any
 }
-export interface UnsafeManualRetrieveParams{
+export interface UnsafeManualRetrieveParams {
   moduleId: string
 }
 export interface UnsafeManualRetrieveCreateCommand
-  extends CommonCommandRunTimeInfo {
-      commandType: 'unsafe/manualRetrieve'
-      params: UnsafeManualRetrieveParams
-      result?: any
+  extends CommonCommandCreateInfo {
+  commandType: 'unsafe/manualRetrieve'
+  params: UnsafeManualRetrieveParams
 }
