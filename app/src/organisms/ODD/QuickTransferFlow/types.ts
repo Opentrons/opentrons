@@ -68,6 +68,10 @@ export interface QuickTransferSummaryState {
     mixVolume: number
     repititions: number
   }
+  submergeAspirate?: {
+    speed: number
+    positionFromBottom: number
+  }
   delayAspirate?: {
     delayDuration: number
     positionFromBottom: number
@@ -79,6 +83,10 @@ export interface QuickTransferSummaryState {
   mixOnDispense?: {
     mixVolume: number
     repititions: number
+  }
+  submergeDispense?: {
+    speed: number
+    positionFromBottom: number
   }
   delayDispense?: {
     delayDuration: number
@@ -176,8 +184,10 @@ interface SetAirGapAspirate {
 }
 interface SetSubmergeAspirate {
   type: typeof ACTIONS.SET_SUBMERGE_ASPIRATE
-  speed: number
-  positionFromBottom: number
+  submergeSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
 }
 interface SetDispenseTipPosition {
   type: typeof ACTIONS.SET_DISPENSE_TIP_POSITION
@@ -208,8 +218,10 @@ interface SetAirGapDispense {
 }
 interface SetSubmergeDispense {
   type: typeof ACTIONS.SET_SUBMERGE_DISPENSE
-  speed: number
-  positionFromBottom: number
+  submergeSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
 }
 interface SetChangeTip {
   type: typeof ACTIONS.SET_CHANGE_TIP

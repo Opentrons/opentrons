@@ -225,6 +225,8 @@ export function QuickTransferAdvancedSettings(
     },
   ]
 
+  const aspirateSettingsItemsForLiquidClass = [...aspirateSettingsItems, {}]
+
   const dispenseSettingsItems = [
     {
       option: 'dispense_tip_position',

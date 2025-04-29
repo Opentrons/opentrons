@@ -3,9 +3,9 @@ import { AirGap } from '../QuickTransferAdvancedSettings/AirGap'
 import { Delay } from '../QuickTransferAdvancedSettings/Delay'
 import { FlowRateEntry } from '../QuickTransferAdvancedSettings/FlowRate'
 import { Mix } from '../QuickTransferAdvancedSettings/Mix'
+import { Submerge } from '../QuickTransferAdvancedSettings/Submerge'
 import { TipPositionEntry } from '../QuickTransferAdvancedSettings/TipPosition'
 import { TouchTip } from '../QuickTransferAdvancedSettings/TouchTip'
-import { Submerge } from '../QuickTransferCommonSettings/Submerge'
 
 import type { ComponentType, Dispatch } from 'react'
 import type {
