@@ -34,7 +34,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '../../../components/atoms'
-import { getEnableStacking } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { createCustomLabwareDef } from '../../../labware-defs/actions'
@@ -105,7 +104,6 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const has96Channel = getHas96Channel(pipetteEntities)
   const defs = getOnlyLatestDefs()
-  const enableStacking = useSelector(getEnableStacking)
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
@@ -384,11 +382,8 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                             />
 
                             {uri === selectedLabwareDefUri &&
-                              getLabwareCompatibleWithAdapter(
-                                defs,
-                                enableStacking,
-                                loadName
-                              )?.length > 0 && (
+                              getLabwareCompatibleWithAdapter(defs, loadName)
+                                ?.length > 0 && (
                                 <ListButtonAccordionContainer
                                   id={`nestedAccordionContainer_${loadName}`}
                                 >
@@ -439,7 +434,6 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                                         )
                                       : getLabwareCompatibleWithAdapter(
                                           { ...defs, ...customLabwareDefs },
-                                          enableStacking,
                                           loadName
                                         ).map(nestedDefUri => {
                                           const nestedDef =
