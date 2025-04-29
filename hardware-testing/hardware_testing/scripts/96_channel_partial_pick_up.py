@@ -267,6 +267,18 @@ def update_pick_up_current(api, mount, current) -> None:
     config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t50'].current = current
     config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t50'].current = current
     config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t50'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['Column1']['default'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['Column12']['default'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['Column1']['t200'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['Column12']['t200'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['Column1']['t50'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['Column12']['t50'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['RowA']['default'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['RowH']['default'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['RowA']['t200'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['RowH']['t200'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['RowA']['t50'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['RowH']['t50'].current = current
     pipette.pick_up_configurations = config_model
     # print(pipette.pick_up_configurations)
 
