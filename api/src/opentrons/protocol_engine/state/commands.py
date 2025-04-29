@@ -611,49 +611,35 @@ class CommandView:
         """Get a subset of commands around a given cursor.
 
         If the cursor is omitted, a cursor will be selected automatically
-        based on the currently running or most recently executed command.
+        based on the currently running or most recently executed command,
+        and the slice of commands returned is the previous `length` commands
+        inclusive of the currently running or most recently executed command.
         """
         command_ids = self._state.command_history.get_filtered_command_ids(
             include_fixit_commands=include_fixit_commands
         )
-        running_command = self._state.command_history.get_running_command()
-        queued_command_ids = self._state.command_history.get_queue_ids()
         total_length = len(command_ids)
 
-        # TODO(mm, 2024-05-17): This looks like it's attempting to do the same thing
-        # as self.get_current(), but in a different way. Can we unify them?
         if cursor is None:
-            if running_command is not None:
-                cursor = running_command.index
-            elif len(queued_command_ids) > 0:
-                # Get the most recently executed command,
-                # which we can find just before the first queued command.
-                cursor = (
-                    self._state.command_history.get(queued_command_ids.head()).index - 1
-                )
-            elif (
-                self._state.run_result
-                and self._state.run_result == RunResult.FAILED
-                and self._state.failed_command
-            ):
-                # Currently, if the run fails, we mark all the commands we didn't
-                # reach as failed. This makes command status alone insufficient to
-                # find the most recent command that actually executed, so we need to
-                # store that separately.
-                cursor = self._state.failed_command.index
+            current_pointer = self.get_current()
+
+            if current_pointer is not None:
+                cursor = current_pointer.index
             else:
-                cursor = total_length - length
+                cursor = total_length - 1
+
+            cursor = max(cursor - length + 1, 0)
 
         # start is inclusive, stop is exclusive
-        actual_cursor = max(0, min(cursor, total_length - 1))
-        stop = min(total_length, actual_cursor + length)
+        start = max(0, min(cursor, total_length - 1))
+        stop = min(total_length, start + length)
         commands = self._state.command_history.get_slice(
-            start=actual_cursor, stop=stop, command_ids=command_ids
+            start=start, stop=stop, command_ids=command_ids
         )
 
         return CommandSlice(
             commands=commands,
-            cursor=actual_cursor,
+            cursor=start,
             total_length=total_length,
         )
 
