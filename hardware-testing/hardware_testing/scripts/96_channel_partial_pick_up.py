@@ -209,10 +209,10 @@ async def update_pickup_tip_speed(api, mount, speed) -> None:
     config_model.press_fit.configuration_by_nozzle_map['SingleA12']['default'].speed = speed
     config_model.press_fit.configuration_by_nozzle_map['SingleH1']['default'].speed = speed
     config_model.press_fit.configuration_by_nozzle_map['SingleH12']['default'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t1000'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t1000'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t1000'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t1000'].speed = speed
+    # config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t1000'].speed = speed
+    # config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t1000'].speed = speed
+    # config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t1000'].speed = speed
+    # config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t1000'].speed = speed
     config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t200'].speed = speed
     config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t200'].speed = speed
     config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t200'].speed = speed
@@ -231,10 +231,10 @@ def update_pickup_tip_distance(api, mount, distance) -> None:
     config_model.press_fit.configuration_by_nozzle_map['SingleA12']['default'].distance = distance
     config_model.press_fit.configuration_by_nozzle_map['SingleH1']['default'].distance = distance
     config_model.press_fit.configuration_by_nozzle_map['SingleH12']['default'].distance = distance
-    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t1000'].distance = distance
-    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t1000'].distance = distance
-    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t1000'].distance = distance
-    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t1000'].distance = distance
+    # config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t1000'].distance = distance
+    # config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t1000'].distance = distance
+    # config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t1000'].distance = distance
+    # config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t1000'].distance = distance
     config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t200'].distance = distance
     config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t200'].distance = distance
     config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t200'].distance = distance
@@ -255,10 +255,10 @@ def update_pick_up_current(api, mount, current) -> None:
     config_model.press_fit.configuration_by_nozzle_map['SingleA12']['default'].current = current
     config_model.press_fit.configuration_by_nozzle_map['SingleH1']['default'].current = current
     config_model.press_fit.configuration_by_nozzle_map['SingleH12']['default'].current = current
-    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t1000'].current = current
-    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t1000'].current = current
-    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t1000'].current = current
-    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t1000'].current = current
+    # config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t1000'].current = current
+    # config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t1000'].current = current
+    # config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t1000'].current = current
+    # config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t1000'].current = current
     config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t200'].current = current
     config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t200'].current = current
     config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t200'].current = current
@@ -458,11 +458,6 @@ async def _main() -> None:
         dial_data.update({f'Tip_{noz}': None})
     print(f'Dictionary: {dial_data}')
 
-    pipette = _get_pipette_from_mount(hw_api, mount)
-    config_model = pipette.pick_up_configurations
-    current_val = config_model.press_fit.configuration_by_nozzle_map['Column1']['default'].current
-    input(f"current_val" {current_val})
-
     m_current = float(input("motor_current in amps: "))
     input_str = input("Pick one[columns, rows, single tip]?")
     instrument = hw_api._pipette_handler.get_pipette(OT3Mount.LEFT)
@@ -485,6 +480,12 @@ async def _main() -> None:
             pick_up_distance = float(input("pick up distance in mm: "))
             update_pickup_tip_distance(hw_api, mount, pick_up_distance)
         update_pick_up_current(hw_api, mount, m_current)
+
+        pipette = _get_pipette_from_mount(hw_api, mount)
+        config_model = pipette.pick_up_configurations
+        current_val = config_model.press_fit.configuration_by_nozzle_map['Column1']['default'].current
+        input(f"current_val: {current_val}")
+
         # await update_pick_up_speed(hw_api, mount, pick_up_speed, args.nozzles)
         if (args.measure_nozzles):
             cp = CriticalPoint.NOZZLE
