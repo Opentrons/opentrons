@@ -302,7 +302,7 @@ class FlexStacker(mod_abc.AbstractModule):
         old_hold_current = self._reader.motion_params[axis].hold_current
         new_hold_current = default.hold_current
         if new_hold_current != old_hold_current:
-            await self._driver.set_ihold_current(axis, default.hold_current)
+            await self._driver.set_ihold_current(axis, new_hold_current)
             self._reader.motion_params[axis].hold_current = new_hold_current
 
         motion_params = default.move_params.update(
@@ -333,7 +333,7 @@ class FlexStacker(mod_abc.AbstractModule):
         old_hold_current = self._reader.motion_params[axis].hold_current
         new_hold_current = default.hold_current
         if new_hold_current != old_hold_current:
-            await self._driver.set_ihold_current(axis, default.hold_current)
+            await self._driver.set_ihold_current(axis, new_hold_current)
             self._reader.motion_params[axis].hold_current = new_hold_current
 
         motion_params = default.move_params.update(
