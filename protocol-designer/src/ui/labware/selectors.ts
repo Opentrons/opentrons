@@ -6,27 +6,18 @@ import {
   TRASH_BIN_DISPLAY_NAME,
   WASTE_CHUTE_DISPLAY_NAME,
 } from '@opentrons/components'
-import {
-  FLEX_ROBOT_TYPE,
-  getIsTiprack,
-  getLabwareDisplayName,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import * as stepFormSelectors from '../../step-forms/selectors'
-import { getLabwareLatestSlotFromCurrentStepIndex } from './utils'
+import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations/index'
 
 import type { DropdownOption } from '@opentrons/components'
-import type { RobotType } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntity,
 } from '@opentrons/step-generation'
-import type {
-  AllTemporalPropertiesForTimelineFrame,
-  SavedStepFormState,
-} from '../../step-forms'
+import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
 import type { Selector } from '../../types'
 
 export const getLabwareNicknamesById: Selector<
@@ -45,28 +36,15 @@ export const _sortLabwareDropdownOptions = (
   options: DropdownOption[]
 ): DropdownOption[] =>
   options.sort((a, b) => {
-    // special case for trash (always at the bottom of the list)
-    if (a.name === TRASH_BIN_DISPLAY_NAME) return 1
-    if (b.name === TRASH_BIN_DISPLAY_NAME) return -1
-    // sort by name everything else by name
     return a.name.localeCompare(b.name)
   })
 
 const getNickname = (
   nicknamesById: Record<string, string>,
-  initialDeckSetup: AllTemporalPropertiesForTimelineFrame,
-  labwareId: string,
-  savedStepForms: SavedStepFormState,
-  robotType: RobotType,
-  filteredSavedStepFormIds: string[]
+  activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
+  labwareId: string
 ): string => {
-  const latestSlot = getLabwareLatestSlotFromCurrentStepIndex(
-    initialDeckSetup,
-    savedStepForms ?? {},
-    labwareId,
-    robotType,
-    filteredSavedStepFormIds
-  )
+  const latestSlot = activeDeckSetup.labware[labwareId].slot
 
   let nickName: string = nicknamesById[labwareId]
   if (latestSlot != null && latestSlot !== 'offDeck') {
@@ -83,14 +61,14 @@ const getNickname = (
 export const getMoveLabwareOptions: Selector<DropdownOption[]> = createSelector(
   stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
-  stepFormSelectors.getInitialDeckSetup,
+  getDeckSetupForActiveItem,
   stepFormSelectors.getSavedStepForms,
   stepFormSelectors.getAdditionalEquipmentEntities,
   stepFormSelectors.getUnsavedForm,
   (
     labwareEntities,
     nicknamesById,
-    initialDeckSetup,
+    activeDeckSetup,
     savedStepForms,
     additionalEquipmentEntities,
     unsavedForm
@@ -107,11 +85,6 @@ export const getMoveLabwareOptions: Selector<DropdownOption[]> = createSelector(
     const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
       aE => aE.name === 'wasteChute'
     )?.location
-    const trashBinLocation = Object.values(additionalEquipmentEntities).find(
-      aE => aE.name === 'trashBin'
-    )?.location
-    const robotType =
-      trashBinLocation === 'cutout12' ? OT2_ROBOT_TYPE : FLEX_ROBOT_TYPE
 
     const moveLabwareOptions = reduce(
       labwareEntities,
@@ -130,14 +103,7 @@ export const getMoveLabwareOptions: Selector<DropdownOption[]> = createSelector(
 
         const isAdapter =
           labwareEntity.def.allowedRoles?.includes('adapter') ?? false
-        const nickName = getNickname(
-          nicknamesById,
-          initialDeckSetup,
-          labwareId,
-          savedStepForms,
-          robotType,
-          filteredSavedStepFormIds
-        )
+        const nickName = getNickname(nicknamesById, activeDeckSetup, labwareId)
 
         //  filter out moving trash, adapters, and labware in
         //  waste chute for moveLabware
@@ -163,14 +129,14 @@ export const getMoveLabwareOptions: Selector<DropdownOption[]> = createSelector(
 export const getLabwareOptions: Selector<DropdownOption[]> = createSelector(
   stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
-  stepFormSelectors.getInitialDeckSetup,
+  getDeckSetupForActiveItem,
   stepFormSelectors.getSavedStepForms,
   stepFormSelectors.getAdditionalEquipmentEntities,
   stepFormSelectors.getUnsavedForm,
   (
     labwareEntities,
     nicknamesById,
-    initialDeckSetup,
+    activeDeckSetup,
     savedStepForms,
     additionalEquipmentEntities,
     unsavedForm
@@ -187,11 +153,6 @@ export const getLabwareOptions: Selector<DropdownOption[]> = createSelector(
     const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
       aE => aE.name === 'wasteChute'
     )?.location
-    const trashBinLocation = Object.values(additionalEquipmentEntities).find(
-      aE => aE.name === 'trashBin'
-    )?.location
-    const robotType =
-      trashBinLocation === 'cutout12' ? OT2_ROBOT_TYPE : FLEX_ROBOT_TYPE
 
     const labwareOptions = reduce(
       labwareEntities,
@@ -210,14 +171,7 @@ export const getLabwareOptions: Selector<DropdownOption[]> = createSelector(
 
         const isAdapter =
           labwareEntity.def.allowedRoles?.includes('adapter') ?? false
-        const nickName = getNickname(
-          nicknamesById,
-          initialDeckSetup,
-          labwareId,
-          savedStepForms,
-          robotType,
-          filteredSavedStepFormIds
-        )
+        const nickName = getNickname(nicknamesById, activeDeckSetup, labwareId)
 
         return getIsTiprack(labwareEntity.def) ||
           isAdapter ||
