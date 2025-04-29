@@ -160,15 +160,11 @@ export function InterventionModal({
         )
       case 'flexStacker/empty':
         return (
-          <StackerEmptyInterventionContent
-            {...{ command, run, analysis }}
-          />
+          <StackerEmptyInterventionContent {...{ command, run, analysis }} />
         )
       case 'flexStacker/fill':
         return (
-          <StackerFillInterventionContent
-            {...{ command, run, analysis }}
-          />
+          <StackerFillInterventionContent {...{ command, run, analysis }} />
         )
       default:
         console.warn(

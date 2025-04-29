@@ -666,7 +666,9 @@ async def get_current_state(  # noqa: C901
             adapterLabwareURI=adapter_uri,
             lidLabwareURI=lid_uri,
             count=len(flex_stacker_substates[module_id].get_contained_labware()),
-            maxCount=flex_stacker_substates[module_id].get_max_pool_count() if flex_stacker_substates[module_id].get_max_pool_count() is not None else 0,
+            maxCount=flex_stacker_substates[module_id].get_max_pool_count()
+            if flex_stacker_substates[module_id].get_max_pool_count() is not None
+            else 0,
         )
 
     last_completed_command = run_data_manager.get_last_completed_command(run_id=runId)

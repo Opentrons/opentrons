@@ -83,7 +83,6 @@ export function StackerEmptyInterventionContent({
   analysis,
   run,
 }: StackerEmptyInterventionProps): JSX.Element | null {
-
   //const runId = useCurrentRunId()
   const { data: runCurrentState } = useRunCurrentState(run.id)
   const flexStacker =

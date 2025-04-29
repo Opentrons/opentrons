@@ -8,7 +8,6 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_NONE,
   Flex,
-  Icon,
   LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
@@ -47,7 +46,6 @@ const LABWARE_NAME_STYLE = css`
 `
 
 const QUANTITY_STYLE = css`
-//TODO - make the grey box smaller
   align-items: ${ALIGN_CENTER};
   color: ${COLORS.grey60};
   background-color: ${COLORS.grey40};
@@ -98,7 +96,6 @@ export function StackerFillInterventionContent({
   analysis,
   run,
 }: StackerFillInterventionProps): JSX.Element | null {
-
   //const runId = useCurrentRunId()
   const { data: runCurrentState } = useRunCurrentState(run.id)
   const flexStacker =
@@ -113,7 +110,7 @@ export function StackerFillInterventionContent({
   if (flexStacker) {
     const labwareDef = labwareDefsByUri?.[flexStacker.primaryLabwareURI] ?? null
     labwareName = labwareDef?.metadata.displayName ?? null
-    if (labwareCount == null){
+    if (labwareCount == null) {
       labwareCount = flexStacker.maxCount
     }
   }
@@ -147,7 +144,7 @@ export function StackerFillInterventionContent({
             </Flex>
             <Flex>
               <LegacyStyledText as="p" css={QUANTITY_STYLE}>
-                  {'Quantity: ' + labwareCount}
+                {'Quantity: ' + labwareCount}
               </LegacyStyledText>
             </Flex>
             <Divider css={DIVIDER_STYLE} />
