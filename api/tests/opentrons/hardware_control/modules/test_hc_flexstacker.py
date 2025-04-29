@@ -50,9 +50,9 @@ async def subject(
         reader=reader,
         poller=poller,
         device_info={
-            "serial": "dummySerialST",
-            "model": "dummyModelST",
-            "version": "dummyVersionST",
+            "serial": "dummySerialFS",
+            "model": "a1",
+            "version": "stacker-fw",
         },
         hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
