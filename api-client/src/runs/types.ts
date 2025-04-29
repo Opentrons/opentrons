@@ -134,7 +134,7 @@ export interface RunCurrentStateData {
   activeNozzleLayouts: Record<string, NozzleLayoutValues> // keyed by pipetteId
   tipStates: Record<string, TipStates> // keyed by pipetteId
   placeLabwareState?: PlaceLabwareState
-  flexStackerState: Record<string, FlexStackerState> // keyed by moduleId
+  flexStackerStates: Record<string, FlexStackerState> // keyed by moduleId
 }
 
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'

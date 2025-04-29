@@ -1,6 +1,4 @@
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import {RunData} from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -10,55 +8,25 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_NONE,
   Flex,
-  Icon,
-  LabwareRender,
-  Module,
-  MoveLabwareOnDeck,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
-  getLoadedLabware,
-  getLoadedModule,
 } from '@opentrons/components'
-import {
-  OT2_ROBOT_TYPE,
-  TC_MODULE_LOCATION_OT2,
-  TC_MODULE_LOCATION_OT3,
-  THERMOCYCLER_MODULE_TYPE,
-  inferModuleOrientationFromXCoordinate,
-  getDeckDefFromRobotType,
-  getLoadedLabwareDefinitionsByUri,
-  getModuleType,
-} from '@opentrons/shared-data'
-
-import {
-  getRunLabwareRenderInfo,
-  getRunModuleRenderInfo,
-  getLabwareNameFromRunData,
-  getModuleModelFromRunData,
-} from './utils'
-import { Divider } from '/app/atoms/structure'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-
+import {useRunCurrentState} from '@opentrons/react-api-client'
+import {getLoadedLabwareDefinitionsByUri} from '@opentrons/shared-data'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinitionsByUri,
-  LabwareLocation,
-  MoveLabwareRunTimeCommand,
   FlexStackerEmptyRunTimeCommand,
+  ModuleLocation,
   RobotType,
 } from '@opentrons/shared-data'
-
-import { useRunningStepCounts } from '/app/resources/protocols'
-import { CommandsData, RunData } from '@opentrons/api-client'
-import { useCurrentRunId } from '../../resources/runs'
-import {
-  useModulesQuery,
-  useRunCurrentState,
-} from '@opentrons/react-api-client'
-import { OFF_DECK } from '@opentrons/step-generation'
+import { Divider } from '/app/atoms/structure'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+import { InterventionCommandMessage } from './InterventionCommandMessage'
 
 const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -102,12 +70,17 @@ const LABWARE_DIRECTION_STYLE = css`
   }
 `
 
-const ICON_STYLE = css`
-  height: 1.5rem;
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: 2.5rem;
-  }
+const STACKER_IMAGE_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing8};
+  padding: ${SPACING.spacing16};
+  background-color: ${COLORS.grey35};
+  border-radius: ${BORDERS.lineBorder};
 `
+
+function stackerNameFormat(moduleLocation: ModuleLocation): string {
+  return 'Stacker ' + moduleLocation.slotName.charAt(0)
+}
 
 export interface StackerEmptyInterventionProps {
   command: FlexStackerEmptyRunTimeCommand
@@ -130,47 +103,50 @@ export function StackerEmptyInterventionContent({
   const { data: runCurrentState } = useRunCurrentState(run.id)
   //const runCurrentState = useRunCurrentState(run.id)?.data ?? null
   const flexStacker =
-    runCurrentState?.data.flexStackerState[command.params.moduleId] ?? null
-  console.log(
-    'run ID:' +
-      run.id +
-      'run state: ' +
-      runCurrentState +
-      ' stacker: ' +
-      flexStacker
-  )
+    runCurrentState?.data.flexStackerStates[command.params.moduleId] ?? null
 
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
-  const deckDef = getDeckDefFromRobotType(robotType)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
-
-  const moduleRenderInfo = getRunModuleRenderInfo(
-    run,
-    deckDef,
-    labwareDefsByUri
-  )
-  const labwareRenderInfo = getRunLabwareRenderInfo(
-    run,
-    labwareDefsByUri,
-    deckDef
-  )
 
   // Get the name of the labware to be removed from the stacker
   let labwareName: string | null = null
   if (flexStacker) {
-    labwareName =
-      labwareDefsByUri[flexStacker.primaryLabwareURI].metadata.displayName
+    const labwareDef = labwareDefsByUri?.[flexStacker.primaryLabwareURI] ?? null
+    labwareName = labwareDef?.metadata.displayName ?? null
   }
 
   // Get the location of the module in question
+  // do this by serial number insread
+  console.log(
+    'modules len:' +
+      analysis?.modules.length +
+      ' analysis: ' +
+      analysis?.modules[0].model +
+      ' zero id:' +
+      analysis?.modules[0].id +
+      ' command ID:' +
+      command.params.moduleId
+  )
+
   const moduleLocation =
-    analysis?.modules.find(m => m.id === command.params.moduleId)?.location ??
-    null
+    run?.modules.find(m => m.id === command.params.moduleId)?.location ?? null
 
   const message = command.params.message
 
-  if (moduleLocation == null || labwareName == null || flexStacker == null)
+  console.log(
+    'mod loc: ' +
+      moduleLocation +
+      ' labwareName:' +
+      labwareName +
+      ' stacker:' +
+      flexStacker
+  )
+  if (
+    moduleLocation?.slotName == null ||
+    labwareName == null ||
+    flexStacker == null
+  )
     return null
   return (
     <Flex
@@ -195,155 +171,21 @@ export function StackerEmptyInterventionContent({
             </Flex>
             <Divider css={DIVIDER_STYLE} />
             <Flex css={LABWARE_DIRECTION_STYLE}>
-              <LabwareDisplayLocation
-                protocolData={run}
-                location={moduleLocation}
-                robotType={robotType}
-                labwareDefsByUri={labwareDefsByUri}
-              />
-
-              <Icon name="arrow-right" css={ICON_STYLE} />
-              <LabwareDisplayLocation
-                protocolData={run}
-                location={'offDeck'}
-                robotType={robotType}
-                labwareDefsByUri={labwareDefsByUri}
-              />
+              <DeckInfoLabel deckLabel={stackerNameFormat(moduleLocation)} />
             </Flex>
           </Flex>
+          <InterventionCommandMessage
+            commandMessage={command.params.message ?? null}
+          />
         </Flex>
-        <Flex width="50%">
+        <Flex width="50%" css={STACKER_IMAGE_STYLE}>
           <Box margin="0 auto" width="100%">
-            <MoveLabwareOnDeck
-              robotType={robotType}
-              deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
-              initialLabwareLocation={moduleLocation}
-              finalLabwareLocation={'offDeck'}
-              movedLabwareDef={labwareDefsByUri[flexStacker.primaryLabwareURI]}
-              loadedModules={run.modules}
-              loadedLabware={run.labware}
-              deckConfig={deckConfig}
-              backgroundItems={
-                <>
-                  {moduleRenderInfo.map(
-                    ({ x, y, moduleId, moduleDef, nestedLabwareDef }) => (
-                      <Module
-                        key={moduleId}
-                        def={moduleDef}
-                        x={x}
-                        y={y}
-                        orientation={inferModuleOrientationFromXCoordinate(x)}
-                      >
-                        {nestedLabwareDef != null ? (
-                          <LabwareRender definition={nestedLabwareDef} />
-                        ) : null}
-                      </Module>
-                    )
-                  )}
-                  {labwareRenderInfo
-                    .filter(
-                      l =>
-                        l.labwareDef !==
-                        labwareDefsByUri[flexStacker.primaryLabwareURI]
-                    )
-                    .map(({ x, y, labwareDef, labwareId }) => (
-                      <g key={labwareId} transform={`translate(${x},${y})`}>
-                        {labwareDef != null ? (
-                          <LabwareRender definition={labwareDef} />
-                        ) : null}
-                      </g>
-                    ))}
-                </>
-              }
-            />
+            <LegacyStyledText as="p">
+              {'Replace me with a Stacker Empty image'}
+            </LegacyStyledText>
           </Box>
         </Flex>
       </Flex>
     </Flex>
   )
-}
-
-interface LabwareDisplayLocationProps {
-  protocolData: RunData
-  location: LabwareLocation
-  robotType: RobotType
-  labwareDefsByUri: LabwareDefinitionsByUri
-}
-function LabwareDisplayLocation(
-  props: LabwareDisplayLocationProps
-): JSX.Element {
-  const { t } = useTranslation('protocol_command_text')
-  const { protocolData, location, robotType } = props
-  let displayLocation: string = ''
-  if (location === 'offDeck' || location === 'systemLocation') {
-    // TODO(BC, 08/28/23): remove this string cast after update i18next to >23 (see https://www.i18next.com/overview/typescript#argument-of-type-defaulttfuncreturn-is-not-assignable-to-parameter-of-type-xyz)
-    displayLocation = String(t('offdeck'))
-  } else if ('slotName' in location) {
-    displayLocation = location.slotName
-  } else if ('addressableAreaName' in location) {
-    displayLocation = location.addressableAreaName
-  } else if ('moduleId' in location) {
-    const moduleModel = getModuleModelFromRunData(
-      protocolData,
-      location.moduleId
-    )
-    if (moduleModel == null) {
-      console.warn('labware is located on an unknown module model')
-    } else {
-      const slotName =
-        getLoadedModule(protocolData.modules, location.moduleId)?.location
-          ?.slotName ?? ''
-      const isModuleUnderAdapterThermocycler =
-        getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
-      if (isModuleUnderAdapterThermocycler) {
-        displayLocation =
-          robotType === OT2_ROBOT_TYPE
-            ? TC_MODULE_LOCATION_OT2
-            : TC_MODULE_LOCATION_OT3
-      } else {
-        displayLocation = slotName
-      }
-    }
-  } else if ('labwareId' in location) {
-    const adapter = protocolData.labware.find(
-      lw => lw.id === location.labwareId
-    )
-    if (adapter == null) {
-      console.warn('labware is located on an unknown adapter')
-    } else if (
-      adapter.location === 'offDeck' ||
-      adapter.location === 'systemLocation'
-    ) {
-      displayLocation = t('off_deck')
-    } else if ('slotName' in adapter.location) {
-      displayLocation = adapter.location.slotName
-    } else if ('addressableAreaName' in adapter.location) {
-      displayLocation = adapter.location.addressableAreaName
-    } else if ('moduleId' in adapter.location) {
-      const moduleIdUnderAdapter = adapter.location.moduleId
-      const moduleModel = protocolData.modules.find(
-        module => module.id === moduleIdUnderAdapter
-      )?.model
-      if (moduleModel == null) {
-        console.warn('labware is located on an adapter on an unknown module')
-      } else {
-        const slotName =
-          getLoadedModule(protocolData.modules, adapter.location.moduleId)
-            ?.location?.slotName ?? ''
-        const isModuleUnderAdapterThermocycler =
-          getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
-        if (isModuleUnderAdapterThermocycler) {
-          displayLocation =
-            robotType === OT2_ROBOT_TYPE
-              ? TC_MODULE_LOCATION_OT2
-              : TC_MODULE_LOCATION_OT3
-        } else {
-          displayLocation = slotName
-        }
-      }
-    } else {
-      console.warn('display location could not be established: ', location)
-    }
-  }
-  return <DeckInfoLabel deckLabel={displayLocation} />
 }
