@@ -1,8 +1,7 @@
+import type { RunCommandSummary } from '@opentrons/api-client'
+import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-
-import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
-
 import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
 import {
   getFailedLabwareQuantity,
@@ -12,35 +11,6 @@ import {
   useFailedLabwareUtils,
   useRelevantFailedLwLocations,
 } from '../useFailedLabwareUtils'
-
-import type { RunCommandSummary } from '@opentrons/api-client'
-
-vi.mock('@opentrons/shared-data', async () => {
-  const actual = await vi.importActual('@opentrons/shared-data')
-  return {
-    ...actual,
-    getLabwareDisplayName: vi.fn(() => 'Mock Labware Name'),
-    getAllLabwareDefs: vi.fn(() => ({
-      'opentrons/thermoscientificnunc_96_wellplate_1300ul/1': {
-        some: 'definition',
-      },
-    })),
-    getLoadedLabwareDefinitionsByUri: vi.fn(() => ({
-      'some/uri': { some: 'definition' },
-    })),
-  }
-})
-
-vi.mock('@opentrons/components', async () => {
-  const actual = await vi.importActual('@opentrons/components')
-  return {
-    ...actual,
-    getLabwareDisplayLocation: vi.fn(params =>
-      params.location ? `Slot ${params.location.slotName}` : ''
-    ),
-    getLoadedLabware: vi.fn(() => ({ displayName: 'Mock Nickname' })),
-  }
-})
 
 vi.mock('@opentrons/shared-data', async () => {
   const actual = await vi.importActual('@opentrons/shared-data')
@@ -386,6 +356,78 @@ describe('getFailedLabwareQuantity', () => {
             commandType: 'flexStacker/retrieve',
             params: {
               moduleId: 'module-id',
+            },
+          } as any,
+          { ...failedLocalRetriveCommand },
+        ] as RunCommandSummary[],
+        meta: {
+          totalLength: 10,
+          pageLength: 1,
+        },
+        links: {},
+      }
+      const result = getFailedLabwareQuantity(
+        localRunCommands,
+        failedLocalRetriveCommand,
+        errorType
+      )
+      expect(result).toEqual('Quantity: 4')
+    })
+  })
+
+  it('should return the quantity for stacker error kinds based on result property', () => {
+    const errors = [
+      ERROR_KINDS.SHUTTLE_MISSING,
+      ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
+      ERROR_KINDS.STALL_WHILE_STACKING,
+    ]
+    errors.forEach(errorType => {
+      const failedLocalRetriveCommand = {
+        ...failedCommand,
+        commandType: 'flexStacker/retrieve',
+        error: {
+          isDefined: true,
+          errorType,
+        },
+      }
+      const localRunCommands = {
+        data: [
+          {
+            id: 'set-stored-labware-1',
+            commandType: 'flexStacker/setStoredLabware',
+            params: {
+              initialCount: 2,
+            },
+          } as any,
+          {
+            id: 'retrive-id-1',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          {
+            id: 'retrive-id-2',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          {
+            id: 'set-stored-labware',
+            commandType: 'flexStacker/setStoredLabware',
+            params: {
+              initialCount: 5,
+            },
+          } as any,
+          {
+            id: 'retrive-id',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+            result: {
+              primaryLocationSequence: [1, 2, 3, 4],
             },
           } as any,
           { ...failedLocalRetriveCommand },

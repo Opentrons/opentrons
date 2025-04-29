@@ -1,19 +1,15 @@
-import { act, renderHook } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
 import {
-  useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
-
+import { act, renderHook } from '@testing-library/react'
 import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {
   useChainRunCommands,
   useUpdateRecoveryPolicyWithStrategy,
 } from '/app/resources/runs'
-
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 import {
   buildIgnorePolicyRules,
@@ -92,7 +88,6 @@ describe('useRecoveryCommands', () => {
     ).mockReturnValue({
       mutateAsync: mockResumeRunFromRecoveryAssumingFalsePositive,
     } as any)
-    vi.mocked(useErrorRecoveryPolicy).mockReturnValue({} as any)
   })
 
   it('should call chainRunRecoveryCommands with continuePastCommandFailure set to false', async () => {
@@ -296,33 +291,6 @@ describe('useRecoveryCommands', () => {
     )
   })
 
-  it('should reject with error and call proceedToRouteAndStep when pickUpTips has invalid input', async () => {
-    const testProps = {
-      ...props,
-      failedLabwareUtils: {
-        ...mockFailedLabwareUtils,
-        selectedTipLocations: null,
-        relevantPickUpTipLabware: null,
-      },
-    }
-
-    const { result } = renderHook(() => useRecoveryCommands(testProps))
-
-    await act(async () => {
-      await expect(result.current.pickUpTips()).rejects.toThrow(
-        'Invalid use of pickUpTips command'
-      )
-    })
-
-    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-      RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE
-    )
-    expect(mockReportActionSelectedResult).toHaveBeenCalledWith(
-      RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
-      'failed'
-    )
-  })
-
   it('should call releaseGripperJaws and resolve the promise', async () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 
@@ -339,7 +307,7 @@ describe('useRecoveryCommands', () => {
   it('should call flexStacker/perpareShuttle and resolve the promise', async () => {
     const mockFailedCommandWithError = {
       ...mockFailedCommand,
-      commandType: 'unsafe/flexStacker/prepareShuttle',
+      commandType: 'flexStacker/prepareShuttle',
       params: {
         moduleId: '123',
       },
@@ -361,7 +329,7 @@ describe('useRecoveryCommands', () => {
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [
         {
-          commandType: 'unsafe/flexStacker/prepareShuttle',
+          commandType: 'flexStacker/prepareShuttle',
           params: {
             moduleId: '123',
           },
@@ -382,49 +350,7 @@ describe('useRecoveryCommands', () => {
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [
         {
-          commandType: 'unsafe/flexStacker/prepareShuttle',
-          params: {
-            moduleId: '',
-          },
-          intent: 'fixit',
-        },
-      ],
-      false
-    )
-  })
-
-  it('should call flexStacker/openLatch with moduleId', async () => {
-    const { result } = renderHook(() => useRecoveryCommands(props))
-
-    await act(async () => {
-      await result.current.releaseLabwareLatch()
-    })
-
-    expect(mockChainRunCommands).toHaveBeenCalledWith(
-      [
-        {
-          commandType: 'flexStacker/openLatch',
-          params: {
-            moduleId: '',
-          },
-          intent: 'fixit',
-        },
-      ],
-      false
-    )
-  })
-
-  it('should call flexStacker/closeLatch with moduleId', async () => {
-    const { result } = renderHook(() => useRecoveryCommands(props))
-
-    await act(async () => {
-      await result.current.closeLabwareLatch()
-    })
-
-    expect(mockChainRunCommands).toHaveBeenCalledWith(
-      [
-        {
-          commandType: 'flexStacker/closeLatch',
+          commandType: 'flexStacker/prepareShuttle',
           params: {
             moduleId: '',
           },

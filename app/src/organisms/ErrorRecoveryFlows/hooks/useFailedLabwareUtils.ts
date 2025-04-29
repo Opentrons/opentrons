@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import without from 'lodash/without'
-
+import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
+import type {
+  DisplayLocationSlotOnlyParams,
+  WellGroup,
+} from '@opentrons/components'
 import {
   getLabwareDisplayLocation,
   getLoadedLabware,
@@ -12,15 +13,6 @@ import {
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
-
-import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
-import { getErrorKind } from '../utils'
-
-import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
-import type {
-  DisplayLocationSlotOnlyParams,
-  WellGroup,
-} from '@opentrons/components'
 import type {
   AspirateRunTimeCommand,
   DispenseRunTimeCommand,
@@ -36,8 +28,13 @@ import type {
   RunCommandError,
   RunCommandFlexStackerError,
 } from '@opentrons/shared-data'
+import without from 'lodash/without'
+import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { ErrorRecoveryFlowsProps } from '..'
+import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
 import type { ErrorKind } from '../types'
+import { getErrorKind } from '../utils'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 
 interface UseFailedLabwareUtilsProps {
@@ -107,7 +104,7 @@ export function useFailedLabwareUtils({
         failedCommand,
         runCommands,
       }),
-    [failedCommand, runCommands]
+    [failedCommandByRunRecord?.key, runCommands?.meta.totalLength]
   )
   const relevantPickUpTipCommand = getRelevantPickUpTipCommand(
     failedCommandByRunRecord,
@@ -122,7 +119,7 @@ export function useFailedLabwareUtils({
         recentRelevantFailedLabwareCmd,
         runRecord
       ),
-    [protocolAnalysis, recentRelevantFailedLabwareCmd, runRecord]
+    [protocolAnalysis?.id, recentRelevantFailedLabwareCmd?.key, errorKind]
   )
   const relevantPickUpTipCmdDetails = useMemo(
     () =>
@@ -131,16 +128,16 @@ export function useFailedLabwareUtils({
         relevantPickUpTipCommand,
         runRecord
       ),
-    [protocolAnalysis, relevantPickUpTipCommand, runRecord]
+    [protocolAnalysis?.id, relevantPickUpTipCommand?.key]
   )
 
   const failedLabware = useMemo(
     () => getLabwareInfoFrom(recentRelevantFailedLabwareCmd, runRecord),
-    [recentRelevantFailedLabwareCmd, runRecord]
+    [recentRelevantFailedLabwareCmd?.key]
   )
   const relevantPickUpTipLabware = useMemo(
     () => getLabwareInfoFrom(relevantPickUpTipCommand, runRecord),
-    [relevantPickUpTipCommand, runRecord]
+    [recentRelevantFailedLabwareCmd?.key]
   )
   const relevantPickUpTipLwLocs = useRelevantFailedLwLocations({
     failedLabware: relevantPickUpTipLabware,
@@ -221,7 +218,6 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.STALL_WHILE_STACKING:
     case ERROR_KINDS.SHUTTLE_MISSING:
     case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
-    case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
       return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(
@@ -342,41 +338,62 @@ export function getFailedLabwareQuantity(
   runCommands: CommandsData | undefined,
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
   errorKind: ErrorKind
-): string | null {
+): number | null {
   if (STACKER_ERROR_KINDS.includes(errorKind) && runCommands != null) {
     const failedCommandIndex = runCommands?.data.findIndex(
       x => x.id === recentRelevantFailedLabwareCmd?.id
     )
+
     const commandsBeforefailedCmd = runCommands?.data.slice(
       0,
       failedCommandIndex ?? 0
     )
-    const setStoredLabwareLast = commandsBeforefailedCmd?.findLast(
-      cmd => cmd.commandType === 'flexStacker/setStoredLabware'
-    )
-    const setStoredLabwareLastIndex = commandsBeforefailedCmd?.findLastIndex(
-      cmd => cmd.commandType === 'flexStacker/setStoredLabware'
-    )
-    const itemsToCheck = commandsBeforefailedCmd?.slice(
-      setStoredLabwareLastIndex ?? 0,
-      failedCommandIndex ?? 0
-    )
 
+    const storeOrRetrieveLabwareLast = commandsBeforefailedCmd?.findLast(
+      cmd =>
+        cmd.commandType === 'flexStacker/retrieve' ||
+        cmd.commandType === 'flexStacker/store'
+    )
+    let quantity = 0
     if (
-      setStoredLabwareLast != null &&
-      'initialCount' in setStoredLabwareLast.params
+      storeOrRetrieveLabwareLast != null &&
+      'result' in storeOrRetrieveLabwareLast
     ) {
-      const total = setStoredLabwareLast?.params.initialCount ?? 0
-      const retreiveCmds =
-        itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/retrieve')
-          .length ?? 0
-      const storeCmds =
-        itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/store')
-          .length ?? 0
-      return 'Quantity: ' + (total - retreiveCmds + storeCmds)
-    } else {
-      return 'Quantity: 0'
+      quantity =
+        storeOrRetrieveLabwareLast.commandType === 'flexStacker/retrieve'
+          ? storeOrRetrieveLabwareLast?.result?.primaryLocationSequence.length
+          : storeOrRetrieveLabwareLast?.result
+              ?.eventualDestinationLocationSequence.length
     }
+    // in case there is no result calculate based on setStoredLabware count
+    else {
+      const setStoredLabwareLast = commandsBeforefailedCmd?.findLast(
+        cmd => cmd.commandType === 'flexStacker/setStoredLabware'
+      )
+      const setStoredLabwareLastIndex = commandsBeforefailedCmd?.findLastIndex(
+        cmd => cmd.commandType === 'flexStacker/setStoredLabware'
+      )
+      const itemsToCheck = commandsBeforefailedCmd?.slice(
+        setStoredLabwareLastIndex ?? 0,
+        failedCommandIndex ?? 0
+      )
+
+      if (
+        setStoredLabwareLast != null &&
+        'initialCount' in setStoredLabwareLast.params
+      ) {
+        const total = setStoredLabwareLast?.params.initialCount ?? 0
+        const retreiveCmds =
+          itemsToCheck?.filter(
+            cmd => cmd.commandType === 'flexStacker/retrieve'
+          ).length ?? 0
+        const storeCmds =
+          itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/store')
+            .length ?? 0
+        quantity = total - retreiveCmds + storeCmds
+      }
+    }
+    return quantity
   }
   return null
 }
@@ -394,6 +411,16 @@ export function getRelevantLabwareIdFromFailedCmd(
       'flexStackerShuttleMissing',
       'flexStackerHopperLabwareFailed',
     ].includes(error.errorType)
+  //STACKER_ERROR_KINDS.includes(error.errorType as ErrorKind)
+
+  console.log(
+    'isStackerError(recentRelevantFailedLabwareCmd?.error: ',
+    isStackerError(recentRelevantFailedLabwareCmd?.error)
+  )
+  console.log(
+    'recentRelevantFailedLabwareCmd: ',
+    recentRelevantFailedLabwareCmd?.error
+  )
   if (recentRelevantFailedLabwareCmd == null) {
     return null
   } else if (isStackerError(recentRelevantFailedLabwareCmd?.error)) {

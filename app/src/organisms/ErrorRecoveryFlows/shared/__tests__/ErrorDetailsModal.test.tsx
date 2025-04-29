@@ -1,11 +1,10 @@
 import { act, renderHook, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 import { i18n } from '/app/i18n'
 import { OddModal } from '/app/molecules/OddModal'
-
+import type { ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import {
   ErrorDetailsModal,
@@ -14,11 +13,11 @@ import {
   OverpressureBanner,
   StallErrorBanner,
   TipNotDetectedBanner,
+  StackerStallErrorBanner,
+  LabwareMissingErrorBanner,
   useErrorDetailsModal,
 } from '../ErrorDetailsModal'
 import { StepInfo } from '../StepInfo'
-
-import type { ComponentProps } from 'react'
 
 vi.mock('react-dom', () => ({
   ...vi.importActual('react-dom'),
@@ -244,6 +243,51 @@ describe('NoLiquidDectedBanner', () => {
         heading:
           'Droplets or liquid in the tips may cause liquid level detection to fail',
         message: 'Use dry, unused tips for best results',
+      }),
+      {}
+    )
+  })
+})
+// this should fail
+describe('StackerStallErrorBanner', () => {
+  beforeEach(() => {
+    vi.mocked(InlineNotification).mockReturnValue(
+      <div>MOCK_INLINE_NOTIFICATION</div>
+    )
+  })
+  it('renders the InlineNotification', () => {
+    renderWithProviders(<StackerStallErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Droplets or liquid in the tips may cause liquid level detection to fail',
+        message: 'Use dry, unused tips for best results',
+      }),
+      {}
+    )
+  })
+})
+
+describe('LabwareMissingErrorBanner', () => {
+  beforeEach(() => {
+    vi.mocked(InlineNotification).mockReturnValue(
+      <div>MOCK_INLINE_NOTIFICATION</div>
+    )
+  })
+  it('renders the InlineNotification', () => {
+    renderWithProviders(<LabwareMissingErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Stacker empty errors occur when the robot tries to retrieve labware from an empty stacker',
+        message:
+          'Load the stacker with the correct labware to complete the stacker retrieve step.',
       }),
       {}
     )
