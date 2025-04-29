@@ -176,7 +176,7 @@ class CorsHeadersResponse(BaseModel):
 def _validate_request(data: Any, field_name: str) -> None:
     """Generic request validation for empty fields."""
     value = getattr(data, field_name, None)
-    if not value or value == "":
+    if not value:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=EmptyRequestError(message=f"{field_name} is empty").model_dump()
         )
@@ -302,7 +302,7 @@ def _determine_protocol_action(body: ChatRequest) -> str:
     # Check if first history message indicates a create action
     if body.history:
         message = body.history[0]
-        if isinstance(message, dict) and "content" in message and message["content"] is not None:
+        if isinstance(message, dict) and message.get("content") is not None:
             first_message_content = str(message["content"])
             if "Write a protocol using" in first_message_content:
                 protocol_action = "create"
