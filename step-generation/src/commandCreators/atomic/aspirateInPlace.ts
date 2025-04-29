@@ -6,7 +6,7 @@ import type { CommandCreator } from '../../types'
 export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
   args,
   invariantContext,
-  robotState
+  prevRobotState
 ) => {
   const { pipetteId, volume, flowRate } = args
 
@@ -21,8 +21,6 @@ export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
       },
     },
   ]
-  console.log(pipetteId)
-  console.log(invariantContext.pipetteEntities)
 
   const pipettePythonName =
     invariantContext.pipetteEntities[pipetteId].pythonName
