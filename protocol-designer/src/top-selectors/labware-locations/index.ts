@@ -9,7 +9,6 @@ import {
   getModuleDisplayName,
   isAddressableAreaStandardSlot,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
-  OT2_ROBOT_TYPE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
@@ -20,6 +19,7 @@ import {
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 
 import { selectors as fileDataSelectors } from '../../file-data'
+import { getRobotType } from '../../file-data/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getAdditionalEquipmentEntities,
@@ -125,74 +125,22 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
   }
 )
 
-export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelineFrame> = createSelector(
-  getRobotStateAtActiveItem,
-  getPipetteEntities,
-  getModuleEntities,
-  getLabwareEntities,
-  getAdditionalEquipmentEntities,
-  (
-    robotState,
-    pipetteEntities,
-    moduleEntities,
-    labwareEntities,
-    additionalEquipmentEntities
-  ) => {
-    if (robotState == null)
-      return {
-        pipettes: {},
-        labware: {},
-        modules: {},
-        additionalEquipmentOnDeck: {},
-      }
-
-    const filteredAdditionalEquipment = Object.fromEntries(
-      Object.entries(additionalEquipmentEntities).filter(
-        ([_, entity]) => entity.name !== 'gripper'
-      )
-    )
-    return {
-      pipettes: mapValues(pipetteEntities, (pipEntity, pipId) => ({
-        ...pipEntity,
-        ...robotState.pipettes[pipId],
-      })),
-      labware: mapValues(labwareEntities, (lwEntity, lwId) => ({
-        ...lwEntity,
-        ...robotState.labware[lwId],
-      })),
-      modules: mapValues(moduleEntities, (modEntity, modId) => ({
-        ...modEntity,
-        ...robotState.modules[modId],
-      })),
-      additionalEquipmentOnDeck: mapValues(
-        filteredAdditionalEquipment,
-        additionalEquipmentEntity => ({
-          ...additionalEquipmentEntity,
-        })
-      ),
-    }
-  }
-)
-
 //  TODO(jr, 9/20/23): we should test this util since it does a lot.
 export const getUnoccupiedLabwareLocationOptions: Selector<
   Option[] | null
 > = createSelector(
   getRobotStateAtActiveItem,
   getModuleEntities,
+  getRobotType,
   getLabwareEntities,
   getAdditionalEquipmentEntities,
   (
     robotState,
     moduleEntities,
+    robotType,
     labwareEntities,
     additionalEquipmentEntities
   ) => {
-    const robotType = Object.values(additionalEquipmentEntities).some(
-      ae => ae.name === 'trashBin' && ae.location === 'cutout12'
-    )
-      ? OT2_ROBOT_TYPE
-      : FLEX_ROBOT_TYPE
     const deckDef = getDeckDefFromRobotType(robotType)
     const cutoutFixtures = deckDef.cutoutFixtures
     const hasWasteChute =
@@ -351,5 +299,54 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
           ...unoccupiedSlotOptions,
           offDeck,
         ]
+  }
+)
+
+export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelineFrame> = createSelector(
+  getRobotStateAtActiveItem,
+  getPipetteEntities,
+  getModuleEntities,
+  getLabwareEntities,
+  getAdditionalEquipmentEntities,
+  (
+    robotState,
+    pipetteEntities,
+    moduleEntities,
+    labwareEntities,
+    additionalEquipmentEntities
+  ) => {
+    if (robotState == null)
+      return {
+        pipettes: {},
+        labware: {},
+        modules: {},
+        additionalEquipmentOnDeck: {},
+      }
+
+    const filteredAdditionalEquipment = Object.fromEntries(
+      Object.entries(additionalEquipmentEntities).filter(
+        ([_, entity]) => entity.name !== 'gripper'
+      )
+    )
+    return {
+      pipettes: mapValues(pipetteEntities, (pipEntity, pipId) => ({
+        ...pipEntity,
+        ...robotState.pipettes[pipId],
+      })),
+      labware: mapValues(labwareEntities, (lwEntity, lwId) => ({
+        ...lwEntity,
+        ...robotState.labware[lwId],
+      })),
+      modules: mapValues(moduleEntities, (modEntity, modId) => ({
+        ...modEntity,
+        ...robotState.modules[modId],
+      })),
+      additionalEquipmentOnDeck: mapValues(
+        filteredAdditionalEquipment,
+        additionalEquipmentEntity => ({
+          ...additionalEquipmentEntity,
+        })
+      ),
+    }
   }
 )
