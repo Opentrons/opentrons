@@ -68,9 +68,7 @@ import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useUpdateClientLPC } from '/app/resources/client_data'
-// TODO(jh, 04-30-25): Relocate this util.
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { getIncompleteInstrumentCount } from '/app/organisms/ODD/ProtocolSetup'
+import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 
 import type { RefObject } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
