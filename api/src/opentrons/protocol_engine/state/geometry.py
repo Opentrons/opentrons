@@ -211,13 +211,10 @@ class GeometryView:
 
     def _get_tallest_obstacle_labware(self) -> float:
         """Get the highest Z-point of all labware on the deck."""
-        all_labware = self._labware.get_all()
-        if not all_labware:
-            return 0.0
         return max(
             (
                 self._get_highest_z_from_labware_data(lw_data)
-                for lw_data in all_labware
+                for lw_data in self._labware.get_all()
                 if self._is_obstacle_labware(lw_data.id)
             ),
             default=0.0,
@@ -225,13 +222,13 @@ class GeometryView:
 
     def _get_tallest_obstacle_module(self) -> float:
         """Get the highest Z-point of all modules on the deck."""
-        all_module = self._modules.get_all()
-        if not all_module:
-            return 0.0
         # Fixme (spp, 2023-12-04): the overall height is not the true highest z of modules
         #  on a Flex.
         return max(
-            (self._modules.get_overall_height(module.id) for module in all_module),
+            (
+                self._modules.get_overall_height(module.id)
+                for module in self._modules.get_all()
+            ),
             default=0.0,
         )
 

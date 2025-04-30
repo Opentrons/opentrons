@@ -79,7 +79,6 @@ from opentrons.protocol_engine.types import (
     ProbedVolumeInfo,
     LoadedVolumeInfo,
     WellLiquidInfo,
-    LabwareLocationSequence,
     OnAddressableAreaOffsetLocationSequenceComponent,
     OnModuleOffsetLocationSequenceComponent,
     OnLabwareOffsetLocationSequenceComponent,
@@ -790,66 +789,135 @@ def test_get_all_obstacle_highest_z_no_equipment(
     assert result == 0
 
 
-def test_get_higest_z_for_all_labware(
+def test_get_all_obstacle_highest_z(
     decoy: Decoy,
-    monkeypatch: pytest.MonkeyPatch,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should get the highest Z amongst all labware."""
-    plate_loc_seq: LabwareLocationSequence = [
-        OnAddressableAreaLocationSequenceComponent(
-            addressableAreaName=DeckSlotName.SLOT_3.id
-        )
-    ]
-
-    off_deck_loc_seq: LabwareLocationSequence = [
-        NotOnDeckLocationSequenceComponent(logicalLocationName=OFF_DECK_LOCATION),
-    ]
-
-    in_hopper_loq_seq: LabwareLocationSequence = [
-        InStackerHopperLocation(moduleId="stacker-id"),
-        OnAddressableAreaLocationSequenceComponent(
-            addressableAreaName="singleCenterSlot"
-        ),
-        OnCutoutFixtureLocationSequenceComponent(
-            cutoutId="cutoutC2", possibleCutoutFixtureIds=["singleCenterSlot"]
-        ),
-    ]
-
-    mock_get_location_seq = decoy.mock(func=subject.get_location_sequence)
-    monkeypatch.setattr(subject, "get_location_sequence", mock_get_location_seq)
-    mock_highest_z_from_lw = decoy.mock(func=subject._get_highest_z_from_labware_data)
-    monkeypatch.setattr(
-        subject, "_get_highest_z_from_labware_data", mock_highest_z_from_lw
+    plate = LoadedLabware(
+        id="plate-id",
+        loadName="plate-load-name",
+        definitionUri="plate-definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId="plate-offset-id",
+    )
+    off_deck_lw = LoadedLabware(
+        id="off-deck-plate-id",
+        loadName="off-deck-plate-load-name",
+        definitionUri="off-deck-plate-definition-uri",
+        location=OFF_DECK_LOCATION,
+        offsetId="offdeck-offset-id",
+    )
+    in_hopper_lw = LoadedLabware(
+        id="hopper-plate-id",
+        loadName="hopper-plate-load-name",
+        definitionUri="hopper-plate-definition-uri",
+        location=InStackerHopperLocation(moduleId="module-id"),
+        offsetId="hopper-plate-offset-id",
+    )
+    reservoir = LoadedLabware(
+        id="reservoir-id",
+        loadName="reservoir-load-name",
+        definitionUri="reservoir-definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="reservoir-offset-id",
     )
 
-    decoy.when(mock_labware_view.get_all()).then_return(
-        [sentinel.on_deck_plate, sentinel.off_deck_labware, sentinel.hopper_labware],
-    )
-    sentinel.on_deck_plate.id = "on-deck-plate-id"
-    sentinel.off_deck_labware.id = "off-deck-labware-id"
-    sentinel.hopper_labware.id = "hopper-labware-id"
+    lw_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(mock_module_view.get_all()).then_return([])
     decoy.when(mock_addressable_area_view.get_all()).then_return([])
 
-    decoy.when(mock_get_location_seq("on-deck-plate-id")).then_return(plate_loc_seq)
-    decoy.when(mock_get_location_seq(sentinel.off_deck_labware.id)).then_return(
-        off_deck_loc_seq
+    decoy.when(mock_labware_view.get_all()).then_return(
+        [plate, off_deck_lw, reservoir, in_hopper_lw]
     )
-    decoy.when(mock_get_location_seq(sentinel.hopper_labware.id)).then_return(
-        in_hopper_loq_seq
+    decoy.when(mock_labware_view.get("plate-id")).then_return(plate)
+    decoy.when(mock_labware_view.get("off-deck-plate-id")).then_return(off_deck_lw)
+    decoy.when(mock_labware_view.get("reservoir-id")).then_return(reservoir)
+    decoy.when(mock_labware_view.get("hopper-plate-id")).then_return(in_hopper_lw)
+
+    decoy.when(mock_labware_view.get_location("off-deck-plate-id")).then_return(
+        OFF_DECK_LOCATION
+    )
+    decoy.when(mock_labware_view.get_location("hopper-plate-id")).then_return(
+        InStackerHopperLocation(moduleId="module-id")
     )
 
-    decoy.when(mock_highest_z_from_lw(sentinel.on_deck_plate)).then_return(20)
-    decoy.when(mock_highest_z_from_lw(sentinel.off_deck_labware)).then_return(50)
-    decoy.when(mock_highest_z_from_lw(sentinel.hopper_labware)).then_return(60)
+    decoy.when(mock_labware_view.get_dimensions(labware_id="plate-id")).then_return(
+        Dimensions(x=0, y=0, z=10)
+    )
+    decoy.when(
+        mock_labware_view.get_dimensions(labware_id="off-deck-plate-id")
+    ).then_return(
+        Dimensions(x=0, y=0, z=10000)  # Something tall.
+    )
+    decoy.when(mock_labware_view.get_dimensions(labware_id="reservoir-id")).then_return(
+        Dimensions(x=0, y=0, z=20)
+    )
+    decoy.when(
+        mock_labware_view.get_dimensions(labware_id="hopper-plate-id")
+    ).then_return(
+        Dimensions(x=0, y=0, z=20000)  # Something tall.
+    )
 
-    # should only consider the on-deck labware
-    assert subject.get_all_obstacle_highest_z() == 20.0
+    decoy.when(mock_labware_view.get_labware_offset_vector("plate-id")).then_return(
+        lw_offset
+    )
+    decoy.when(
+        mock_labware_view.get_labware_offset_vector("off-deck-plate-id")
+    ).then_return(lw_offset)
+    decoy.when(mock_labware_view.get_labware_offset_vector("reservoir-id")).then_return(
+        lw_offset
+    )
+    decoy.when(
+        mock_labware_view.get_labware_offset_vector("hopper-plate-id")
+    ).then_return(lw_offset)
+
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(Point(1, 2, 3))
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(Point(4, 5, 6))
+
+    decoy.when(mock_module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_D3.id)
+    )
+    decoy.when(mock_module_view.get_provided_addressable_area("module-id")).then_return(
+        AddressableAreaLocation(addressableAreaName="flexStackerV1D4")
+    )
+    decoy.when(mock_module_view.get_connected_model("module-id")).then_return("model")
+    decoy.when(
+        mock_module_view.ensure_and_convert_module_fixture_location(
+            DeckSlotName.SLOT_D3, "model"
+        )
+    ).then_return("flexStackerV1D4")
+
+    decoy.when(
+        mock_addressable_area_view.get_current_potential_cutout_fixtures_for_addressable_area(
+            "flexStackerV1D4"
+        )
+    ).then_return(
+        (
+            "cutoutD3",
+            [
+                PotentialCutoutFixture(
+                    cutout_id="cutoutD3",
+                    cutout_fixture_id="flexStackerModuleV1",
+                    provided_addressable_areas=frozenset(),
+                )
+            ],
+        )
+    )
+    plate_z = subject.get_labware_highest_z("plate-id")
+    reservoir_z = subject.get_labware_highest_z("reservoir-id")
+    all_z = subject.get_all_obstacle_highest_z()
+
+    # Should exclude the off-deck or hopper plate.
+    assert all_z == max(plate_z, reservoir_z)
 
 
 def test_get_all_obstacle_highest_z_with_staging_area(
