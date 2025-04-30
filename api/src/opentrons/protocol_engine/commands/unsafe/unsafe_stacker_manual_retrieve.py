@@ -269,7 +269,9 @@ class UnsafeFlexStackerManualRetrieve(
 ):
     """A command to manually retrieve a labware from a Flex Stacker."""
 
-    commandType: UnsafeFlexStackerManualRetrieveCommandType = "unsafe/flexStacker/manualRetrieve"
+    commandType: UnsafeFlexStackerManualRetrieveCommandType = (
+        "unsafe/flexStacker/manualRetrieve"
+    )
     params: UnsafeFlexStackerManualRetrieveParams
     result: UnsafeFlexStackerManualRetrieveResult | None = None
 
@@ -283,7 +285,9 @@ class UnsafeFlexStackerManualRetrieveCreate(
 ):
     """A request to execute a Flex Stacker manual retrieve command."""
 
-    commandType: UnsafeFlexStackerManualRetrieveCommandType = "unsafe/flexStacker/manualRetrieve"
+    commandType: UnsafeFlexStackerManualRetrieveCommandType = (
+        "unsafe/flexStacker/manualRetrieve"
+    )
     params: UnsafeFlexStackerManualRetrieveParams
 
     _CommandCls: Type[UnsafeFlexStackerManualRetrieve] = UnsafeFlexStackerManualRetrieve
