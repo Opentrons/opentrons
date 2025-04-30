@@ -123,6 +123,13 @@ export function useRecoveryCommands({
   )
   const { makeSuccessToast } = recoveryToastUtils
 
+  const reportAndRouteFailedCmd = (e: Error): Promise<never> => {
+    console.warn(`Error executing "fixit" command: ${e}`)
+    analytics.reportActionSelectedResult(selectedRecoveryOption, 'failed')
+    void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
+
+    return Promise.reject(new Error(`Could not execute command: ${e}`))
+  }
   // TODO(jh, 11-21-24): Some commands return a 200 with an error body. We should catch these and propagate the error.
   const chainRunRecoveryCommands = useCallback(
     (
