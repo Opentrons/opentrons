@@ -89,6 +89,7 @@
   "pick_up_tips": "Pick up tips",
   "pipette_overpressure": "Pipette overpressure",
   "prepare_deck_for_homing": "Prepare deck for homing",
+  "prepare_for_stacker_latch_reengage": "Prepare for stacker latch to re-engage",
   "prepare_track_for_homing": "Prepare for shuttle to move backwards",
   "proceed_to_cancel": "Proceed to cancel",
   "proceed_to_home": "Proceed to home",
