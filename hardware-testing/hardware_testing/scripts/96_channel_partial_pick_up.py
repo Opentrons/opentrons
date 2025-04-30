@@ -605,12 +605,19 @@ async def _main() -> None:
         x_coord_offset = 0
         y_coord_offset = 0
         true_tip_count = 1
-        trial = 1
+        # trial = 1
         num_of_columns = args.num_cols
-        print(f'Trial: {trial}')
-        while True:
+        # print(f'Trial: {trial}')
+        # while True:
+        if args.nozzles > 1:
+            cycles = int(96/args.nozzles)
+        else:
+            cycles = 12
+        for i in range(cycles):
+            print(f'Trial: {i+1}/{args.nozzles}')
             measurements = []
             encoder_pos = []
+            measurement_map = {}
             cp = CriticalPoint.TIP
             if args.dial_indicator:
                 tip_count = 0
@@ -632,6 +639,7 @@ async def _main() -> None:
                     print("\r", end="")
                     # print("tip-",tip_count, "(mm): " ,tip_measurement,"\r", end="")
                     measurements.append(tip_measurement)
+                    measurement_map.update({tip: tip_measurement})
                     if tip_count % num_of_columns == 0:
                         d_str = ''
                         for m in measurements:
@@ -651,6 +659,9 @@ async def _main() -> None:
                         x_offset = 0
                 print(measurements)
                 print(encoder_pos)
+                print(f"Tip Measurements: {measurement_map}\n")
+                for key in measurement_map:
+                    print(f"{measurement_map[key]}")
 
             if args.trough:
                 await hw_api.prepare_for_aspirate(mount)
@@ -693,8 +704,8 @@ async def _main() -> None:
                                     pickup_loc[2])
             await move_to_point(hw_api, mount, pu_location, cp)
             initial_press_dist = await hw_api.encoder_current_position_ot3(mount, cp)
-            trial += 1
-            print(f'Trial: {trial}')
+            # trial += 1
+            # print(f'Trial: {trial}')
             print(f'inital press position: {initial_press_dist[Axis.by_mount(mount)]}')
             await hw_api.pick_up_tip(mount, tip_length=(tip_length[args.tip_size]-tip_overlap), presses = 1,
                                      increment = 0)
