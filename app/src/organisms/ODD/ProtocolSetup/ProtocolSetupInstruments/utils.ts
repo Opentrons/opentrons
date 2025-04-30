@@ -1,6 +1,7 @@
 import type {
   CompletedProtocolAnalysis,
   LoadedPipette,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type {
   GripperData,
@@ -59,7 +60,7 @@ export function getAreInstrumentsReady(
 }
 
 export function getIncompleteInstrumentCount(
-  analysis: CompletedProtocolAnalysis,
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   attachedInstruments: Instruments
 ): number {
   const speccedPipettes = analysis?.pipettes ?? []

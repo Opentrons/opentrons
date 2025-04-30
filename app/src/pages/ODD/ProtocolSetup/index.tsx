@@ -754,8 +754,8 @@ export function ProtocolSetup(): JSX.Element {
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
     robotName,
-    hasMissingModulesForOdd: isMissingModules,
-    hasMissingCalForOdd:
+    hasMissingModulesForFlex: isMissingModules,
+    hasMissingCalForFlex:
       incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
   })
   const protocolName =

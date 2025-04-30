@@ -21,7 +21,10 @@ import {
   OT2_ROBOT_TYPE,
   parseAllRequiredModuleModels,
 } from '@opentrons/shared-data'
-import { useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  useProtocolQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
 
 import { Line } from '/app/atoms/structure'
 import { InfoMessage } from '/app/molecules/InfoMessage'
@@ -65,6 +68,9 @@ import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useUpdateClientLPC } from '/app/resources/client_data'
+// TODO(jh, 04-30-25): Relocate this util.
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { getIncompleteInstrumentCount } from '/app/organisms/ODD/ProtocolSetup'
 
 import type { RefObject } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
@@ -181,6 +187,13 @@ export function ProtocolRunSetup({
 
   const isMissingModule = missingModuleIds.length > 0
 
+  const { data: attachedInstruments } = useInstrumentsQuery()
+
+  const incompleteInstrumentCount: number | null =
+    protocolAnalysis != null && attachedInstruments != null
+      ? getIncompleteInstrumentCount(protocolAnalysis, attachedInstruments)
+      : null
+
   const hasModules = protocolAnalysis != null && modules.length > 0
   // need config compatibility (including check for single slot conflicts)
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
@@ -285,6 +298,10 @@ export function ProtocolRunSetup({
             }
           }}
           offsetsConfirmed={offsetsConfirmed}
+          hasMissingModulesForFlex={isMissingModule}
+          hasMissingCalForFlex={
+            incompleteInstrumentCount != null && incompleteInstrumentCount > 0
+          }
           lpcUtils={lpcUtils}
         />
       ),
