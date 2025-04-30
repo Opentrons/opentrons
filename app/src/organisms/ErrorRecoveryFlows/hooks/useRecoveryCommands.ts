@@ -498,7 +498,27 @@ const buildHomeShuttle = (
       ? storeOrRetriveFailedCommandParams.moduleId
       : ''
   return {
-    commandType: 'flexStacker/prepareShuttle',
+        commandType: 'unsafe/flexStacker/prepareShuttle',
+    params: {
+      moduleId: moduleId,
+    },
+    intent: 'fixit',
+  }
+}
+
+const buildOpenLatch = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) {
+    return null
+  }
+  const storeOrRetriveFailedCommandParams = failedCommand.params
+  const moduleId =
+    'moduleId' in storeOrRetriveFailedCommandParams
+      ? storeOrRetriveFailedCommandParams.moduleId
+      : ''
+  return {
+    commandType: 'flexStacker/openLatch',
     params: {
       moduleId: moduleId,
     },
