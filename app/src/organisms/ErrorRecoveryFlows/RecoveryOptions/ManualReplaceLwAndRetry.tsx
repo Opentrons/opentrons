@@ -151,6 +151,7 @@ export function ManualReplaceLwAndRetry(
         return <RetryStepInfo {...props} />
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.SKIP:
       case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.SKIP:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.SKIP:
         return <SkipStepInfo {...props} />
       default:
         console.warn(
