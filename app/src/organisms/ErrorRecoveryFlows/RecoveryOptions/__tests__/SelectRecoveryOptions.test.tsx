@@ -405,6 +405,21 @@ describe('RecoveryOptions', () => {
     screen.getByRole('label', { name: 'Skip to next step with new tips' })
     screen.getByRole('label', { name: 'Cancel run' })
   })
+  
+    it(`renders valid recovery options for a ${ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE} errorKind`, () => {
+    props = {
+      ...props,
+      validRecoveryOptions: LABWARE_MISSING_IN_SHUTTLE_OPTIONS,
+    }
+
+    renderRecoveryOptions(props)
+
+    screen.getByRole('label', { name: 'replace_labware_in_stacker_and_retry' })
+    screen.getByRole('label', {
+      name: 'manually_load_labware_into_shuttle_and_skips',
+    })
+    screen.getByRole('label', { name: 'Cancel run' })
+  })
 
   it(`renders valid recovery options for a ${ERROR_KINDS.TIP_NOT_DETECTED} errorKind`, () => {
     props = {
