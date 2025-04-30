@@ -98,7 +98,21 @@ export const mockMoveLabwareCommandToOffDeck = {
     labwareId: 'offDeckMove',
     newLocation: 'offDeck',
   },
-  strategy: 'manualMoveWithPause',
+} as any
+
+export const mockEmptyStackerCommand = {
+  commandType: 'flexStacker/empty',
+  params: {
+    moduleId: 'mockModuleID',
+  },
+} as any
+
+export const mockFillStackerCommand = {
+  commandType: 'flexStacker/fill',
+  params: {
+    moduleId: 'mockModuleID',
+    quantity: 4,
+  },
 } as any
 
 export const mockLabwareOnModule: LoadedLabware = {

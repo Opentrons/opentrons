@@ -1,4 +1,4 @@
-import { RunData } from '@opentrons/api-client'
+import type { RunData } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -96,7 +96,6 @@ export function StackerFillInterventionContent({
   analysis,
   run,
 }: StackerFillInterventionProps): JSX.Element | null {
-  //const runId = useCurrentRunId()
   const { data: runCurrentState } = useRunCurrentState(run.id)
   const flexStacker =
     runCurrentState?.data.flexStackerStates[command.params.moduleId] ?? null
