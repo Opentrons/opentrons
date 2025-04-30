@@ -408,7 +408,7 @@ export function useRecoveryCommands({
   const manualRetrieve = useCallback((): Promise<CommandData[]> => {
     const manualRetrieveCommand = buildManualRetrieve(unvalidatedFailedCommand)
     if (manualRetrieveCommand == null) {
-      return Promise.reject(new Error('Invalid use of manual retrieve command'))
+      return reportAndRouteFailedCmd(new Error('Invalid use of manual retrieve command'))
     } else {
       return chainRunRecoveryCommands([manualRetrieveCommand])
     }
