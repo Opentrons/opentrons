@@ -105,7 +105,7 @@ export function TwoColLwInfoAndDeck(
           step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
           step ===
             HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS
-              .HOOPER_MANUAL_REPLACE ||
+              .HOPPER_MANUAL_REPLACE ||
           step === MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
         ) {
           return t('load_labware_into_labware_shuttle')
