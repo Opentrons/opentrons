@@ -9,7 +9,7 @@ from enum import Enum
 from math import sqrt, asin
 from typing import Final
 from numpy import pi, trapz
-from functools import cached_property, lru_cache
+from functools import cached_property
 
 from pydantic import (
     ConfigDict,
@@ -250,19 +250,19 @@ class ConicalFrustum(BaseModel):
             total_height=total_height,
         )
         guesses = [
-            (volume_at_min_height, min_height), (volume_at_max_height, max_height)
+            (volume_at_min_height, min_height),
+            (volume_at_max_height, max_height),
         ]
         while abs(volume_at_y - target_volume) > RECURSIVE_SEARCH_VOLUME_TOLERANCE:
             max_height, max_volume = guesses[-1][1], guesses[-1][0]
             min_height, min_volume = guesses[0][1], guesses[0][0]
-        
 
             # between volume_at_y and max value- undershot
             if volume_at_y < target_volume < max_volume:
                 guesses = [(volume_at_y, y), (max_volume, max_height)]
             # overshot
             elif min_volume < target_volume < volume_at_y:
-                guesses = [(min_volume, min_height),  (volume_at_y, y)]
+                guesses = [(min_volume, min_height), (volume_at_y, y)]
             y = (guesses[0][1] + guesses[1][1]) / 2
 
             volume_at_y = self.volume_from_height_circular(
