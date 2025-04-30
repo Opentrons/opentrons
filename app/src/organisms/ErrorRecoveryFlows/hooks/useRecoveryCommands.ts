@@ -424,7 +424,9 @@ return reportAndRouteFailedCmd(
       unvalidatedFailedCommand
     )
     if (moveLabwareCmd == null) {
-      return Promise.reject(new Error('Invalid use of MoveLabware command'))
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of MoveLabware command')
+      )
     } else {
       return chainRunRecoveryCommands([moveLabwareCmd])
     }
