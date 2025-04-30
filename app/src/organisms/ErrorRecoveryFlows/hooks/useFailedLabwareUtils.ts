@@ -363,17 +363,16 @@ export function getFailedLabwareQuantity(
         cmd.commandType === 'flexStacker/retrieve' ||
         cmd.commandType === 'flexStacker/store'
     )
-    let quantity = 0
     if (
       storeOrRetrieveLabwareLast != null &&
       'result' in storeOrRetrieveLabwareLast
     ) {
-      quantity =
+      return (
         storeOrRetrieveLabwareLast.commandType === 'flexStacker/retrieve'
           ? storeOrRetrieveLabwareLast?.result?.primaryLocationSequence
               .length ?? 0
           : storeOrRetrieveLabwareLast?.result
-              ?.eventualDestinationLocationSequence?.length ?? 0
+              ?.eventualDestinationLocationSequence?.length ?? 0 )
     }
     // in case there is no result calculate based on setStoredLabware count
     else {
@@ -400,10 +399,10 @@ export function getFailedLabwareQuantity(
         const storeCmds =
           itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/store')
             .length ?? 0
-        quantity = total - retreiveCmds + storeCmds
+        return total - retreiveCmds + storeCmds
       }
     }
-    return quantity
+    return 0
   }
   return null
 }

@@ -120,6 +120,11 @@ export interface UnsafeManualRetrieveCreateCommand
   commandType: 'unsafe/manualRetrieve'
   params: UnsafeManualRetrieveParams
 }
+export interface UnsafeManualRetrieveLatchRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+  UnsafeManualRetrieveCreateCommand {
+  result?: any
+}
 export interface UnsafeFlexStackerCloseLatchParams {
   moduleId: string
 }
