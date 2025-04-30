@@ -231,7 +231,7 @@ export const RECOVERY_MAP = {
   HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP: {
     ROUTE: 'hopper-manual-load-in-shuttle-and-skip',
     STEPS: {
-      HOOPER_MANUAL_REPLACE: 'hooper-manual-replace',
+      HOPPER_MANUAL_REPLACE: 'hopper-manual-replace',
       CONFIRM_RETRY: 'confirm-retry',
       SKIP: 'skip',
     },
