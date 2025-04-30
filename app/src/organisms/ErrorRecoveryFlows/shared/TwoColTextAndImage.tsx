@@ -21,7 +21,7 @@ import type { RecoveryContentProps } from '../types'
 export function TwoColTextAndImage(
   props: RecoveryContentProps
 ): JSX.Element | null {
-  const { routeUpdateActions, recoveryMap } = props
+  const { routeUpdateActions, recoveryMap, recoveryCommands } = props
   const {
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
     MANUAL_REPLACE_STACKER_AND_RETRY,
