@@ -78,6 +78,15 @@ async def test_success(
         )
     ).then_return(TipGeometry(length=42, diameter=5, volume=300))
 
+    decoy.when(state_view.pipettes.get_nozzle_configuration("pipette-id")).then_return(
+        sentinel.nozzle_configuration
+    )
+    decoy.when(
+        state_view.tips.compute_tips_to_mark_as_used(
+            "labware-id", "A3", sentinel.nozzle_configuration
+        )
+    ).then_return(sentinel.tips_to_mark_as_used)
+
     result = await subject.execute(
         PickUpTipParams(
             pipetteId="pipette-id",
@@ -105,7 +114,7 @@ async def test_success(
                 tip_geometry=TipGeometry(length=42, diameter=5, volume=300),
             ),
             tips_used=update_types.TipsUsedUpdate(
-                pipette_id="pipette-id", labware_id="labware-id", well_name="A3"
+                labware_id="labware-id", well_names=sentinel.tips_to_mark_as_used
             ),
             pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                 pipette_id="pipette-id", clean_tip=True
@@ -165,6 +174,15 @@ async def test_tip_physically_missing_error(
     decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(model_utils.get_timestamp()).then_return(error_created_at)
 
+    decoy.when(state_view.pipettes.get_nozzle_configuration(pipette_id)).then_return(
+        sentinel.nozzle_configuration
+    )
+    decoy.when(
+        state_view.tips.compute_tips_to_mark_as_used(
+            labware_id, well_name, sentinel.nozzle_configuration
+        )
+    ).then_return(sentinel.tips_to_mark_as_used)
+
     result = await subject.execute(
         PickUpTipParams(pipetteId=pipette_id, labwareId=labware_id, wellName=well_name)
     )
@@ -182,7 +200,7 @@ async def test_tip_physically_missing_error(
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
             ),
             tips_used=update_types.TipsUsedUpdate(
-                pipette_id="pipette-id", labware_id="labware-id", well_name="well-name"
+                labware_id="labware-id", well_names=sentinel.tips_to_mark_as_used
             ),
             pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                 pipette_id="pipette-id"
@@ -196,7 +214,7 @@ async def test_tip_physically_missing_error(
                 pipette_id="pipette-id", clean_tip=True
             ),
             tips_used=update_types.TipsUsedUpdate(
-                pipette_id="pipette-id", labware_id="labware-id", well_name="well-name"
+                labware_id="labware-id", well_names=sentinel.tips_to_mark_as_used
             ),
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id",
