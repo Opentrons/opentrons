@@ -49,6 +49,25 @@ import type {
   UpdatePrompt,
 } from '../../resources/types'
 
+// Helper to safely parse the `protocol_content` field that may be a JSON string or an object.
+const parseProtocolContent = (content: unknown): Record<string, unknown> => {
+  let parsed: unknown
+  if (typeof content === 'string') {
+    try {
+      parsed = JSON.parse(content)
+    } catch {
+      parsed = {}
+    }
+  } else {
+    parsed = content
+  }
+
+  // Ensure result is a non-null object; otherwise fall back to {}
+  return parsed != null && typeof parsed === 'object'
+    ? (parsed as Record<string, unknown>)
+    : {}
+}
+
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const { register, watch, reset, setValue } = useFormContext()
@@ -147,23 +166,8 @@ export function InputPrompt(): JSX.Element {
           ? chatHistory
           : chatHistory.map(msg => {
               if (msg.protocol_content != null) {
-                const rawPdJson: Record<string, unknown> = (() => {
-                  let parsed: unknown
-                  if (typeof msg.protocol_content === 'string') {
-                    try {
-                      parsed = JSON.parse(msg.protocol_content)
-                    } catch {
-                      parsed = {}
-                    }
-                  } else {
-                    parsed = msg.protocol_content as unknown
-                  }
-
-                  // Ensure result is a non-null object; otherwise fall back to {}
-                  return parsed != null && typeof parsed === 'object'
-                    ? (parsed as Record<string, unknown>)
-                    : {}
-                })()
+                // Use helper to parse the protocol content into a plain object
+                const rawPdJson = parseProtocolContent(msg.protocol_content)
 
                 // Remove labwareDefinitions without using the `delete` operator
                 const {

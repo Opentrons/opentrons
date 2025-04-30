@@ -15,7 +15,7 @@ import {
   OPENTRONS_OT2,
   TWO_PIPETTES,
 } from '../../organisms/InstrumentsSection'
-import { PYTHON } from '../../organisms/ProtocolFormatSection'
+import { PYTHON } from '../constants'
 import { getOnlyLatestDefs } from './labware'
 
 import type { UseFormWatch } from 'react-hook-form'

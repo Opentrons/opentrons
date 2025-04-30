@@ -5,10 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Banner, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { ControlledRadioButtonGroup } from '../../molecules/ControlledRadioButtonGroup'
-
-export const PD = 'Protocol Designer'
-export const PYTHON = 'Python'
-export const PROTOCOL_FORMAT = 'protocol_format'
+import { PD, PROTOCOL_FORMAT, PYTHON } from '../../resources/constants'
 
 export function ProtocolFormatSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
@@ -51,11 +48,11 @@ export function ProtocolFormatSection(): JSX.Element | null {
         rules={{ required: true }}
       />
       {/* Only show banner when Protocol Designer is selected */}
-      {selectedFormat === PD && (
+      {selectedFormat === PD ? (
         <Banner type="informing" marginBottom={SPACING.spacing16} height="4rem">
           {t('pd_prompt_warning')}
         </Banner>
-      )}
+      ) : null}
     </Flex>
   )
 }
