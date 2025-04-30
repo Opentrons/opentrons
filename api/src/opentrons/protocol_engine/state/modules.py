@@ -930,10 +930,39 @@ class ModuleView:
         Includes the slot-specific transform. Does not include the child's
         Labware Position Check offset.
         """
-        if (
-            self._state.deck_type == DeckType.OT2_STANDARD
-            or self._state.deck_type == DeckType.OT2_SHORT_TRASH
-        ):
+        base = self.get_nominal_offset_to_child_from_addressable_area(module_id)
+        if self.get_deck_supports_module_fixtures():
+            module_addressable_area = self.get_provided_addressable_area(module_id)
+            module_addressable_area_position = (
+                addressable_areas.get_addressable_area_offsets_from_cutout(
+                    module_addressable_area
+                )
+            )
+            return base + LabwareOffsetVector(
+                x=module_addressable_area_position.x,
+                y=module_addressable_area_position.y,
+                z=module_addressable_area_position.z,
+            )
+        else:
+            return base
+
+    def get_nominal_offset_to_child_from_addressable_area(
+        self, module_id: str
+    ) -> LabwareOffsetVector:
+        """Get the position offset for a child of this module from the nearest AA.
+
+        On the Flex, this is always (0, 0, 0); on the OT-2, since modules load on top
+        of addressable areas rather than providing addressable areas, the offset is
+        the labwareOffset from the module definition, rotated by the module's
+        slotTransform if appropriate.
+        """
+        if self.get_deck_supports_module_fixtures():
+            return LabwareOffsetVector(
+                x=0,
+                y=0,
+                z=0,
+            )
+        else:
             definition = self.get_definition(module_id)
             slot = self.get_location(module_id).slotName.id
 
@@ -967,18 +996,6 @@ class ModuleView:
                 x=xformed[0],
                 y=xformed[1],
                 z=xformed[2],
-            )
-        else:
-            module_addressable_area = self.get_provided_addressable_area(module_id)
-            module_addressable_area_position = (
-                addressable_areas.get_addressable_area_offsets_from_cutout(
-                    module_addressable_area
-                )
-            )
-            return LabwareOffsetVector(
-                x=module_addressable_area_position.x,
-                y=module_addressable_area_position.y,
-                z=module_addressable_area_position.z,
             )
 
     def get_module_calibration_offset(
