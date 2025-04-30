@@ -158,5 +158,7 @@
   "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection.",
   "is_there_labware_stuck_on_the_stacker_latch": "Is there labware stuck on the stacker latch?",
   "release_labware_from_latch": "Release labware from latch",
-  "latch_will_release_in_s": "Latch will release labware in {{seconds}} seconds"
+  "latch_will_release_in_s": "Latch will release labware in {{seconds}} seconds",
+  "stacker_latch_jammed_errors_occur_when": "Stacker latch jammed errors occur when labware gets stuck in between the stacker latch. This is usually caused by improperly placed labware or inaccurate labware definitions",
+  "if_issue_persists_call_support": "If the issue persists, cancel the run and reach out to Opentrons support"
 }

@@ -73,6 +73,7 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
       case ERROR_KINDS.NO_LIQUID_DETECTED:
       case ERROR_KINDS.STALL_WHILE_STACKING:
       case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
+      case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
         return true
       default:
         return false
@@ -227,6 +228,8 @@ export function NotificationBanner({
         return <StackerStallErrorBanner />
       case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
         return <LabwareMissingErrorBanner />
+      case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
+        return <LabwareMissingOnShuttleErrorBanner />
       default:
         console.error('Handle error kind notification banners explicitly.')
         return <div />
@@ -304,6 +307,18 @@ export function LabwareMissingErrorBanner(): JSX.Element {
       type="alert"
       heading={t('labware_missing_detected_when')}
       message={t('load_stacker_with_correct_labware')}
+    />
+  )
+}
+
+export function LabwareMissingOnShuttleErrorBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('stacker_latch_jammed_errors_occur_when')}
+      message={t('if_issue_persists_call_support')}
     />
   )
 }

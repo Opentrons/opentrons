@@ -14,6 +14,7 @@ import {
   NoLiquidDetectedBanner,
   OverpressureBanner,
   StackerStallErrorBanner,
+  LabwareMissingOnShuttleErrorBanner,
   StallErrorBanner,
   TipNotDetectedBanner,
   useErrorDetailsModal,
@@ -291,6 +292,29 @@ describe('LabwareMissingErrorBanner', () => {
           'Stacker empty errors occur when the robot tries to retrieve labware from an empty stacker',
         message:
           'Load the stacker with the correct labware to complete the stacker retrieve step.',
+      }),
+      {}
+    )
+  })
+})
+
+describe('LabwareMissingOnShuttleErrorBanner', () => {
+  beforeEach(() => {
+    vi.mocked(InlineNotification).mockReturnValue(
+      <div>MOCK_INLINE_NOTIFICATION</div>
+    )
+  })
+  it('renders the InlineNotification', () => {
+    renderWithProviders(<LabwareMissingOnShuttleErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Stacker latch jammed errors occur when labware gets stuck in between the stacker latch. This is usually caused by improperly placed labware or inaccurate labware definitions',
+        message:
+          'If the issue persists, cancel the run and reach out to Opentrons support',
       }),
       {}
     )
