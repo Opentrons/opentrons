@@ -426,7 +426,7 @@ class GeometryView:
         else:
             raise errors.LabwareNotOnDeckError(
                 "Cannot access labware since it is not on the deck. "
-                "Either it has been loaded off-deck or its been moved off-deck."
+                "Either it has been loaded off-deck or it has been moved off-deck."
             )
 
     def _normalize_module_calibration_offset(
