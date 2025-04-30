@@ -112,17 +112,17 @@ export interface UnsafePlaceLabwareRunTimeCommand
     UnsafePlaceLabwareCreateCommand {
   result?: any
 }
-export interface UnsafeManualRetrieveParams {
+export interface UnsafeFlexStackerManualRetrieveParams {
   moduleId: string
 }
-export interface UnsafeManualRetrieveCreateCommand
+export interface UnsafeFlexStackerManualRetrieveCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'unsafe/manualRetrieve'
-  params: UnsafeManualRetrieveParams
+  commandType: 'unsafe/flexStacker/manualRetrieve'
+  params: UnsafeFlexStackerManualRetrieveParams
 }
-export interface UnsafeManualRetrieveLatchRunTimeCommand
+export interface UnsafeFlexStackerManualRetrieveLatchRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  UnsafeManualRetrieveCreateCommand {
+    UnsafeFlexStackerManualRetrieveCreateCommand {
   result?: any
 }
 export interface UnsafeFlexStackerCloseLatchParams {

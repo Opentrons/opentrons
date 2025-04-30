@@ -525,7 +525,7 @@ const buildManualRetrieve = (
       ? storeOrRetriveFailedCommandParams.moduleId
       : ''
   return {
-    commandType: 'unsafe/manualRetrieve',
+    commandType: 'unsafe/flexStacker/manualRetrieve',
     params: {
       moduleId: moduleId,
     },

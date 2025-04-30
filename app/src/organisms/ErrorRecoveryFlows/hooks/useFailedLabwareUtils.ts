@@ -367,12 +367,11 @@ export function getFailedLabwareQuantity(
       storeOrRetrieveLabwareLast != null &&
       'result' in storeOrRetrieveLabwareLast
     ) {
-      return (
-        storeOrRetrieveLabwareLast.commandType === 'flexStacker/retrieve'
-          ? storeOrRetrieveLabwareLast?.result?.primaryLocationSequence
-              .length ?? 0
-          : storeOrRetrieveLabwareLast?.result
-              ?.eventualDestinationLocationSequence?.length ?? 0 )
+      return storeOrRetrieveLabwareLast.commandType === 'flexStacker/retrieve'
+        ? storeOrRetrieveLabwareLast?.result?.primaryLocationSequence.length ??
+            0
+        : storeOrRetrieveLabwareLast?.result
+            ?.eventualDestinationLocationSequence?.length ?? 0
     }
     // in case there is no result calculate based on setStoredLabware count
     else {
