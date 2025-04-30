@@ -24,8 +24,8 @@ from opentrons.protocol_engine.state.module_substates import (
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import unsafe
 from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.unsafe.unsafe_manual_retrieve import (
-    UnsafeManualRetrieveImpl,
+from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_manual_retrieve import (
+    UnsafeFlexStackerManualRetrieveImpl,
 )
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
@@ -113,9 +113,9 @@ def _stacker_base_loc_seq(stacker_id: str) -> LabwareLocationSequence:
 @pytest.fixture
 def subject(
     state_view: StateView, equipment: EquipmentHandler, model_utils: ModelUtils
-) -> UnsafeManualRetrieveImpl:
+) -> UnsafeFlexStackerManualRetrieveImpl:
     """Get a retrieve command to test."""
-    return UnsafeManualRetrieveImpl(
+    return UnsafeFlexStackerManualRetrieveImpl(
         state_view=state_view, equipment=equipment, model_utils=model_utils
     )
 
@@ -124,7 +124,7 @@ async def test_manual_retrieve_raises_when_empty(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: UnsafeManualRetrieveImpl,
+    subject: UnsafeFlexStackerManualRetrieveImpl,
     flex_50uL_tiprack: LabwareDefinition,
     stacker_id: FlexStackerId,
 ) -> None:
@@ -155,7 +155,7 @@ async def test_manual_retrieve_primary_only(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: UnsafeManualRetrieveImpl,
+    subject: UnsafeFlexStackerManualRetrieveImpl,
     flex_50uL_tiprack: LabwareDefinition,
     stacker_id: FlexStackerId,
     stacker_hardware: FlexStacker,
@@ -199,7 +199,7 @@ async def test_manual_retrieve_primary_only(
     result = await subject.execute(data)
 
     assert result == SuccessData(
-        public=unsafe.UnsafeManualRetrieveResult(
+        public=unsafe.UnsafeFlexStackerManualRetrieveResult(
             labwareId="primary-id-1",
             primaryLocationSequence=_stacker_base_loc_seq(stacker_id),
             primaryLabwareURI="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -229,7 +229,7 @@ async def test_manual_retrieve_primary_and_lid(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: UnsafeManualRetrieveImpl,
+    subject: UnsafeFlexStackerManualRetrieveImpl,
     flex_50uL_tiprack: LabwareDefinition,
     tiprack_lid_def: LabwareDefinition,
     stacker_id: FlexStackerId,
@@ -281,7 +281,7 @@ async def test_manual_retrieve_primary_and_lid(
     result = await subject.execute(data)
 
     assert result == SuccessData(
-        public=unsafe.UnsafeManualRetrieveResult(
+        public=unsafe.UnsafeFlexStackerManualRetrieveResult(
             labwareId="primary-id-1",
             lidId="lid-id-1",
             primaryLocationSequence=_stacker_base_loc_seq(stacker_id),
@@ -329,7 +329,7 @@ async def test_manual_retrieve_primary_and_adapter(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: UnsafeManualRetrieveImpl,
+    subject: UnsafeFlexStackerManualRetrieveImpl,
     flex_50uL_tiprack: LabwareDefinition,
     tiprack_adapter_def: LabwareDefinition,
     stacker_id: FlexStackerId,
@@ -382,7 +382,7 @@ async def test_manual_retrieve_primary_and_adapter(
     result = await subject.execute(data)
 
     assert result == SuccessData(
-        public=unsafe.UnsafeManualRetrieveResult(
+        public=unsafe.UnsafeFlexStackerManualRetrieveResult(
             labwareId="primary-id-1",
             adapterId="adapter-id-1",
             primaryLocationSequence=(
@@ -430,7 +430,7 @@ async def test_manual_retrieve_primary_adapter_and_lid(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: UnsafeManualRetrieveImpl,
+    subject: UnsafeFlexStackerManualRetrieveImpl,
     flex_50uL_tiprack: LabwareDefinition,
     tiprack_adapter_def: LabwareDefinition,
     tiprack_lid_def: LabwareDefinition,
@@ -512,7 +512,7 @@ async def test_manual_retrieve_primary_adapter_and_lid(
     result = await subject.execute(data)
 
     assert result == SuccessData(
-        public=unsafe.UnsafeManualRetrieveResult(
+        public=unsafe.UnsafeFlexStackerManualRetrieveResult(
             labwareId="primary-id-1",
             adapterId="adapter-id-1",
             lidId="lid-id-1",
@@ -586,7 +586,7 @@ async def test_manual_retrieve_fails_due_to_platform_state(
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
-    subject: UnsafeManualRetrieveImpl,
+    subject: UnsafeFlexStackerManualRetrieveImpl,
     model_utils: ModelUtils,
     stacker_id: FlexStackerId,
     flex_50uL_tiprack: LabwareDefinition,

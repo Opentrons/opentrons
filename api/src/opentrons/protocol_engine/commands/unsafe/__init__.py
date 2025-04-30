@@ -65,12 +65,12 @@ from .unsafe_place_labware import (
     UnsafePlaceLabwareCreate,
 )
 
-from .unsafe_manual_retrieve import (
-    UnsafeManualRetrieveCommandType,
+from .unsafe_stacker_manual_retrieve import (
+    UnsafeFlexStackerManualRetrieveCommandType,
     UnsafeManualRetrieveParams,
-    UnsafeManualRetrieveResult,
+    UnsafeFlexStackerManualRetrieveResult,
     UnsafeManualRetrieve,
-    UnsafeManualRetrieveCreate,
+    UnsafeFlexStackerManualRetrieveCreate,
 )
 
 from .unsafe_stacker_close_latch import (
@@ -135,11 +135,11 @@ __all__ = [
     "UnsafePlaceLabware",
     "UnsafePlaceLabwareCreate",
     # Unsafe manual retrieve
-    "UnsafeManualRetrieveCommandType",
+    "UnsafeFlexStackerManualRetrieveCommandType",
     "UnsafeManualRetrieveParams",
-    "UnsafeManualRetrieveResult",
+    "UnsafeFlexStackerManualRetrieveResult",
     "UnsafeManualRetrieve",
-    "UnsafeManualRetrieveCreate",
+    "UnsafeFlexStackerManualRetrieveCreate",
     # Unsafe flex stacker close latch
     "UnsafeFlexStackerCloseLatchCommandType",
     "UnsafeFlexStackerCloseLatchParams",

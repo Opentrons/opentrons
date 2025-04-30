@@ -42,14 +42,16 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-UnsafeManualRetrieveCommandType = Literal["unsafe/manualRetrieve"]
+UnsafeFlexStackerManualRetrieveCommandType = Literal[
+    "unsafe/flexStacker/manualRetrieve"
+]
 
 
 def _remove_default(s: dict[str, Any]) -> None:
     s.pop("default", None)
 
 
-class UnsafeManualRetrieveParams(BaseModel):
+class UnsafeFlexStackerManualRetrieveParams(BaseModel):
     """Input parameters for a labware retrieval command."""
 
     moduleId: str = Field(
@@ -78,7 +80,7 @@ class UnsafeManualRetrieveParams(BaseModel):
     )
 
 
-class UnsafeManualRetrieveResult(BaseModel):
+class UnsafeFlexStackerManualRetrieveResult(BaseModel):
     """Result data from a labware retrieval command."""
 
     labwareId: str = Field(
@@ -127,13 +129,13 @@ class UnsafeManualRetrieveResult(BaseModel):
 
 
 _ExecuteReturn = Union[
-    SuccessData[UnsafeManualRetrieveResult],
+    SuccessData[UnsafeFlexStackerManualRetrieveResult],
     DefinedErrorData[FlexStackerStallOrCollisionError],
 ]
 
 
-class UnsafeManualRetrieveImpl(
-    AbstractCommandImpl[UnsafeManualRetrieveParams, _ExecuteReturn]
+class UnsafeFlexStackerManualRetrieveImpl(
+    AbstractCommandImpl[UnsafeFlexStackerManualRetrieveParams, _ExecuteReturn]
 ):
     """Implementation of a labware retrieval command."""
 
@@ -148,7 +150,9 @@ class UnsafeManualRetrieveImpl(
         self._equipment = equipment
         self._model_utils = model_utils
 
-    async def execute(self, params: UnsafeManualRetrieveParams) -> _ExecuteReturn:
+    async def execute(
+        self, params: UnsafeFlexStackerManualRetrieveParams
+    ) -> _ExecuteReturn:
         """Execute the labware retrieval command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
@@ -221,7 +225,7 @@ class UnsafeManualRetrieveImpl(
         )
 
         return SuccessData(
-            public=UnsafeManualRetrieveResult(
+            public=UnsafeFlexStackerManualRetrieveResult(
                 labwareId=to_retrieve.primaryLabwareId,
                 adapterId=to_retrieve.adapterLabwareId,
                 lidId=to_retrieve.lidLabwareId,
@@ -256,22 +260,30 @@ class UnsafeManualRetrieveImpl(
         )
 
 
-class UnsafeManualRetrieve(
-    BaseCommand[UnsafeManualRetrieveParams, UnsafeManualRetrieveResult, ErrorOccurrence]
+class UnsafeFlexStackerManualRetrieve(
+    BaseCommand[
+        UnsafeFlexStackerManualRetrieveParams,
+        UnsafeFlexStackerManualRetrieveResult,
+        ErrorOccurrence,
+    ]
 ):
     """A command to manually retrieve a labware from a Flex Stacker."""
 
-    commandType: UnsafeManualRetrieveCommandType = "unsafe/manualRetrieve"
-    params: UnsafeManualRetrieveParams
-    result: UnsafeManualRetrieveResult | None = None
+    commandType: UnsafeFlexStackerManualRetrieveCommandType = "unsafe/manualRetrieve"
+    params: UnsafeFlexStackerManualRetrieveParams
+    result: UnsafeFlexStackerManualRetrieveResult | None = None
 
-    _ImplementationCls: Type[UnsafeManualRetrieveImpl] = UnsafeManualRetrieveImpl
+    _ImplementationCls: Type[
+        UnsafeFlexStackerManualRetrieveImpl
+    ] = UnsafeFlexStackerManualRetrieveImpl
 
 
-class UnsafeManualRetrieveCreate(BaseCommandCreate[UnsafeManualRetrieveParams]):
+class UnsafeFlexStackerManualRetrieveCreate(
+    BaseCommandCreate[UnsafeFlexStackerManualRetrieveParams]
+):
     """A request to execute a Flex Stacker manual retrieve command."""
 
-    commandType: UnsafeManualRetrieveCommandType = "unsafe/manualRetrieve"
-    params: UnsafeManualRetrieveParams
+    commandType: UnsafeFlexStackerManualRetrieveCommandType = "unsafe/manualRetrieve"
+    params: UnsafeFlexStackerManualRetrieveParams
 
-    _CommandCls: Type[UnsafeManualRetrieve] = UnsafeManualRetrieve
+    _CommandCls: Type[UnsafeFlexStackerManualRetrieve] = UnsafeFlexStackerManualRetrieve
