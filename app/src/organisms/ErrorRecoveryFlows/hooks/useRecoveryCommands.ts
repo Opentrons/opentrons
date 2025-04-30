@@ -266,7 +266,9 @@ chainRunCommands(commands, continuePastFailure)
     )
 
     if (pickUpTipCmd == null) {
-      return Promise.reject(new Error('Invalid use of pickUpTips command'))
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of pickUpTips command')
+      )
     } else {
       return chainRunRecoveryCommands([pickUpTipCmd])
     }
