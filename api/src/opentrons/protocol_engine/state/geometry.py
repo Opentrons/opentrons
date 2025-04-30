@@ -193,7 +193,6 @@ class GeometryView:
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
         labware_data = self._labware.get(labware_id)
-
         return self._get_highest_z_from_labware_data(labware_data)
 
     def _is_obstacle_labware(self, labware_id: str) -> bool:
@@ -203,10 +202,6 @@ class GeometryView:
                 loc, NotOnDeckLocationSequenceComponent
             ):
                 return False
-        # TODO: (AA 4/28/25) re-evaluate this logic, this doesn't make sense
-        # to me but keeping it to preserve existing behavior
-        if self._labware.get_labware_by_lid_id(labware_id) is not None:
-            return False
         return True
 
     def _get_tallest_obstacle_labware(self) -> float:
@@ -222,11 +217,9 @@ class GeometryView:
 
     def _get_tallest_obstacle_module(self) -> float:
         """Get the highest Z-point of all modules on the deck."""
-        # Fixme (spp, 2023-12-04): the overall height is not the true highest z of modules
-        #  on a Flex.
         return max(
             (
-                self._modules.get_overall_height(module.id)
+                self._modules.get_module_highest_z(module.id, self._addressable_areas)
                 for module in self._modules.get_all()
             ),
             default=0.0,
