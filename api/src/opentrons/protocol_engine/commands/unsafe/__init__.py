@@ -67,9 +67,9 @@ from .unsafe_place_labware import (
 
 from .unsafe_stacker_manual_retrieve import (
     UnsafeFlexStackerManualRetrieveCommandType,
-    UnsafeManualRetrieveParams,
+    UnsafeFlexStackerManualRetrieveParams,
     UnsafeFlexStackerManualRetrieveResult,
-    UnsafeManualRetrieve,
+    UnsafeFlexStackerManualRetrieve,
     UnsafeFlexStackerManualRetrieveCreate,
 )
 
