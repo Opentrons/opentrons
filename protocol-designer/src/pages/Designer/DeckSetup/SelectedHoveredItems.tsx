@@ -44,7 +44,7 @@ export const SelectedHoveredItems = (
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getAllLabwareDefs()
   const deckSetup = useSelector(getInitialDeckSetup)
-  const { labware, modules } = deckSetup
+  const { labware } = deckSetup
   const matchingSelectedLabwareOnDeck = Object.values(labware).find(labware => {
     const matchingSlot = getSlotInLocationStack(labware.stack)
     return (

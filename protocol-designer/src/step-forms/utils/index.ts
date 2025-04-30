@@ -1,4 +1,3 @@
-import find from 'lodash/find'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'

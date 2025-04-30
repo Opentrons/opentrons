@@ -421,9 +421,9 @@ export const getSwapBlockedAdapter = (
   }
 
   const adapterSourceToDestLoadname: string | null =
-    labwareById[draggedLabware.stack]?.def.parameters.loadName ?? null
+    labwareById[draggedLabware.stack[1]]?.def.parameters.loadName ?? null
   const adapterDestToSourceLoadname: string | null =
-    labwareById[hoveredLabware.slot]?.def.parameters.loadName ?? null
+    labwareById[hoveredLabware.stack[1]]?.def.parameters.loadName ?? null
 
   const labwareSourceToDestBlocked =
     adapterSourceToDestLoadname != null

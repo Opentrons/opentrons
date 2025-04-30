@@ -159,9 +159,7 @@ export function SlotOverflowMenu(
     }
 
     labwareStackOnSlot.forEach(labware => {
-      if (deckSetupLabware[labware].def.allowedRoles?.includes('adapter')) {
-        return
-      } else {
+      if (!deckSetupLabware[labware].def.allowedRoles?.includes('adapter')) {
         dispatch(duplicateLabware(deckSetupLabware[labware].id))
       }
     })

@@ -171,7 +171,7 @@ function resolveSlotLocation(
     robotType === FLEX_ROBOT_TYPE
       ? TC_MODULE_LOCATION_OT3
       : TC_MODULE_LOCATION_OT2
-  let location = getSlotInLocationStack(locationStack)
+  const location = getSlotInLocationStack(locationStack)
   const stackHasThermocycler = locationStack.some(
     item =>
       modules[item] != null && modules[item].type === THERMOCYCLER_MODULE_TYPE

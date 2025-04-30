@@ -11,17 +11,10 @@ import {
   LOW_VOLUME_PIPETTES,
   makeWellSetHelpers,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  STANDARD_FLEX_SLOTS,
-  STANDARD_OT2_SLOTS,
 } from '@opentrons/shared-data'
 import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
 
-import {
-  InitialDeckSetup,
-  LabwareOnDeck,
-  ModuleEntities,
-  ModuleOnDeck,
-} from '../step-forms'
+import { InitialDeckSetup, LabwareOnDeck, ModuleEntities } from '../step-forms'
 
 import type { WellGroup } from '@opentrons/components'
 import type {

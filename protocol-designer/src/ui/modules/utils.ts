@@ -49,9 +49,7 @@ export function getLabwareOnModule(
     moduleId,
     initialDeckSetup.labware
   )
-  {
-    return labwareId != null ? initialDeckSetup.labware[labwareId] : null
-  }
+  return labwareId != null ? initialDeckSetup.labware[labwareId] : null
 }
 
 export const getModuleShortNames = (type: ModuleType): string => {
