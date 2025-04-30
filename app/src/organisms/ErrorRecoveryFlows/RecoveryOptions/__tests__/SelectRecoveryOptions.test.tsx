@@ -550,4 +550,13 @@ describe('getRecoveryOptions', () => {
     )
     expect(stallOrCollisionOptions).toBe(STALL_OR_COLLISION_OPTIONS)
   })
+  
+    it(`returns valid options when the errorKind is ${ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE}`, () => {
+    const labwareMissingInShuttleOptions = getRecoveryOptions(
+      ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE
+    )
+    expect(labwareMissingInShuttleOptions).toBe(
+      LABWARE_MISSING_IN_SHUTTLE_OPTIONS
+    )
+  })
 })
