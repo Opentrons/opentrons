@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pydantic import Field
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Final
 from typing_extensions import Literal
 
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
@@ -54,6 +54,8 @@ _ExecuteReturn = (
     SuccessData[UnsealPipetteFromTipResult] | DefinedErrorData[StallOrCollisionError]
 )
 
+CUSTOM_TIP_LENGTH_MARGIN: Final = 10
+
 
 class UnsealPipetteFromTipImplementation(
     AbstractCommandImpl[UnsealPipetteFromTipParams, _ExecuteReturn]
@@ -95,7 +97,7 @@ class UnsealPipetteFromTipImplementation(
             labware_id=labware_id,
             well_location=well_location,
             partially_configured=is_partially_configured,
-            override_default_offset=-(tip_geometry.length - 10),
+            override_default_offset=-(tip_geometry.length - CUSTOM_TIP_LENGTH_MARGIN),
         )
 
         move_result = await move_to_well(
