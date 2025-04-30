@@ -78,7 +78,7 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   /* Names of the labware from which the last tip was picked up before failure, if any. */
   relevantPickUpTipLwNames: LabwareNames
   /* Details relating to the labware quantity in the stacker. */
-  labwareQuantity: string | null
+  labwareQuantity: number | null
 }
 
 /** Utils for labware relating to the failedCommand.
@@ -221,6 +221,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.STALL_WHILE_STACKING:
     case ERROR_KINDS.SHUTTLE_MISSING:
     case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
+    case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
       return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(

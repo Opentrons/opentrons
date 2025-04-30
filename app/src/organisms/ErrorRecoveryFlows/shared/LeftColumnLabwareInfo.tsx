@@ -98,7 +98,7 @@ export function LeftColumnLabwareInfo({
     }
   }
 
-  const buildQuantity = (): string | null => {
+  const buildQuantity = (): number | null => {
     switch (step) {
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:

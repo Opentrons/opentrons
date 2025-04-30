@@ -155,5 +155,8 @@
   "use_dry_unused_tips": "Use dry, unused tips for best results",
   "view_error_details": "View error details",
   "view_recovery_options": "View recovery options",
-  "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection."
+  "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection.",
+  "is_there_labware_stuck_on_the_stacker_latch": "Is there labware stuck on the stacker latch?",
+  "release_labware_from_latch": "Release labware from latch",
+  "latch_will_release_in_s": "Latch will release labware in {{seconds}} seconds"
 }
