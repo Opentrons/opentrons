@@ -139,7 +139,6 @@ export function useRecoveryCommands({
 chainRunCommands(commands, continuePastFailure)
         // the catch never occurs if continuePastCommandFailure is "true"
 .catch((e: Error) => reportAndRouteFailedCmd(e)),
-        return Promise.reject(new Error(`Could not execute command: ${e}`))
       }),
     [analytics, selectedRecoveryOption]
   )
