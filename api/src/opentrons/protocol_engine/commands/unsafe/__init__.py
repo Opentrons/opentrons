@@ -136,9 +136,9 @@ __all__ = [
     "UnsafePlaceLabwareCreate",
     # Unsafe manual retrieve
     "UnsafeFlexStackerManualRetrieveCommandType",
-    "UnsafeManualRetrieveParams",
+    "UnsafeFlexStackerManualRetrieveParams",
     "UnsafeFlexStackerManualRetrieveResult",
-    "UnsafeManualRetrieve",
+    "UnsafeFlexStackerManualRetrieve",
     "UnsafeFlexStackerManualRetrieveCreate",
     # Unsafe flex stacker close latch
     "UnsafeFlexStackerCloseLatchCommandType",

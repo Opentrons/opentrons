@@ -129,7 +129,7 @@ async def test_manual_retrieve_raises_when_empty(
     stacker_id: FlexStackerId,
 ) -> None:
     """It should raise an exception when called on an empty pool."""
-    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
+    data = unsafe.UnsafeFlexStackerManualRetrieveParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -161,7 +161,7 @@ async def test_manual_retrieve_primary_only(
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should be able to retrieve a labware."""
-    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
+    data = unsafe.UnsafeFlexStackerManualRetrieveParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -236,7 +236,7 @@ async def test_manual_retrieve_primary_and_lid(
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should be able to retrieve a labware with a lid on it."""
-    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
+    data = unsafe.UnsafeFlexStackerManualRetrieveParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -336,7 +336,7 @@ async def test_manual_retrieve_primary_and_adapter(
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should be able to retrieve a labware on an adapter."""
-    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
+    data = unsafe.UnsafeFlexStackerManualRetrieveParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -438,7 +438,7 @@ async def test_manual_retrieve_primary_adapter_and_lid(
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should be able to retrieve a labware on an adapter."""
-    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
+    data = unsafe.UnsafeFlexStackerManualRetrieveParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -593,7 +593,7 @@ async def test_manual_retrieve_fails_due_to_platform_state(
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should raise a CannotPerformModuleAction error."""
-    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
+    data = unsafe.UnsafeFlexStackerManualRetrieveParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
