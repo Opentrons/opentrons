@@ -299,7 +299,7 @@ chainRunCommands(commands, continuePastFailure)
         return updateErrorRecoveryPolicy(ignorePolicyRules, 'append')
           .then(() => Promise.resolve())
           .catch((e: Error) =>
-            Promise.reject(
+reportAndRouteFailedCmd(
               new Error(`Failed to update recovery policy: ${e.message}`)
             )
           )
