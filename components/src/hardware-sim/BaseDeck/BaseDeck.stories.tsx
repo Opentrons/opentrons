@@ -1,4 +1,3 @@
-import type * as React from 'react'
 import {
   fixture96Plate,
   fixtureTiprack1000ul,
@@ -17,6 +16,7 @@ import {
 import { BaseDeck as BaseDeckComponent } from './BaseDeck'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type * as React from 'react'
 import type {
   DeckConfiguration,
   LabwareDefinition2,

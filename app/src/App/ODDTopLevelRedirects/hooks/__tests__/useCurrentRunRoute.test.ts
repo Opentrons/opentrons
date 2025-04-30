@@ -1,7 +1,6 @@
 import { renderHook } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
-import { useCurrentRunRoute } from '../useCurrentRunRoute'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import { describe, expect, it, vi } from 'vitest'
+
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FAILED,
@@ -9,6 +8,10 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
+
+import { useNotifyRunQuery } from '/app/resources/runs'
+
+import { useCurrentRunRoute } from '../useCurrentRunRoute'
 
 vi.mock('/app/resources/runs')
 

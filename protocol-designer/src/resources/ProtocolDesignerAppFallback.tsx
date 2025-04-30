@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import { captureException } from '@sentry/react'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
@@ -13,12 +15,14 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { actions } from '../load-file'
 import { analyticsEvent } from '../analytics/actions'
+import { actions } from '../load-file'
 
 import type { FallbackProps } from 'react-error-boundary'
-import type { ThunkDispatch } from '../types'
 import type { AnalyticsEvent } from '../analytics/mixpanel'
+import type { ThunkDispatch } from '../types'
+
+const LOG_LEVEL = 'error'
 
 export function ProtocolDesignerAppFallback({
   error,
@@ -27,9 +31,9 @@ export function ProtocolDesignerAppFallback({
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()
 
-  // Note (kk:02/12/25) this is to track a users' error since many users send a screenshot.
+  // Note errorId will be used to track a specific user's error
+  // when the support team share the data(screenshot or errorId) with us
   const errorId = uuidv4()
-
   const errorEvent: AnalyticsEvent = {
     name: 'protocolDesignerAppError',
     properties: {
@@ -46,6 +50,12 @@ export function ProtocolDesignerAppFallback({
   const handleDownloadProtocol = (): void => {
     dispatch(actions.saveProtocolFile())
   }
+
+  useEffect(() => {
+    if (error) {
+      captureException(error, { extra: { errorId }, level: LOG_LEVEL })
+    }
+  }, [error, errorId])
 
   return (
     <Modal type="warning" title={t('error_boundary_title')} marginLeft="0">

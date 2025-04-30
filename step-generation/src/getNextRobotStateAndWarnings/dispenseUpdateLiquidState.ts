@@ -1,18 +1,21 @@
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+
 import { COLUMN, SINGLE } from '@opentrons/shared-data'
+
 import {
-  splitLiquid,
-  mergeLiquid,
-  getWellsForTips,
   getLocationTotalVolume,
+  getWellsForTips,
+  mergeLiquid,
+  splitLiquid,
 } from '../utils/misc'
+
 import type {
-  RobotState,
   InvariantContext,
   LocationLiquidState,
-  SourceAndDest,
+  RobotState,
   RobotStateAndWarnings,
+  SourceAndDest,
 } from '../types'
 
 type LiquidState = RobotState['liquidState']

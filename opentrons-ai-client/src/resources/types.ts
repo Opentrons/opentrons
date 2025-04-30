@@ -1,5 +1,5 @@
-import type { ProtocolFile } from '@opentrons/shared-data'
 import type { FC } from 'react'
+import type { ProtocolFile } from '@opentrons/shared-data'
 
 /** assistant: ChatGPT API, user: user */
 type Role = 'assistant' | 'user'
@@ -110,4 +110,9 @@ export interface PromptData {
       instruments: string[]
     }
   }
+}
+
+export interface FeatureFlags {
+  enablePrereleaseMode: boolean
+  enablePDProtocolGeneration: boolean
 }

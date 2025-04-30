@@ -1,15 +1,18 @@
 import { isEqual } from 'lodash'
-import { SECTIONS } from '../constants'
-import { getLabwareDefURI, getPipetteNameSpecs } from '@opentrons/shared-data'
-import { getLegacyLabwareLocationCombos } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
+
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
+import { getLabwareDefURI, getPipetteNameSpecs } from '@opentrons/shared-data'
+
+import { getLegacyLabwareLocationCombos } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
+
+import { SECTIONS } from '../constants'
 
 import type {
   CompletedProtocolAnalysis,
   LoadedPipette,
 } from '@opentrons/shared-data'
-import type { LabwarePositionCheckStep, CheckPositionsStep } from '../types'
 import type { LegacyLabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
+import type { CheckPositionsStep, LabwarePositionCheckStep } from '../types'
 
 function getPrimaryPipetteId(pipettes: LoadedPipette[]): string {
   if (pipettes.length < 1) {

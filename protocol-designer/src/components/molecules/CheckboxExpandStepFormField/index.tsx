@@ -1,8 +1,8 @@
 import {
   ALIGN_CENTER,
   Btn,
-  COLORS,
   Check,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,

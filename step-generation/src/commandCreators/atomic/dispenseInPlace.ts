@@ -1,6 +1,7 @@
 import { uuid } from '../../utils'
-import type { CommandCreator } from '../../types'
+
 import type { DispenseInPlaceParams } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
 
 export const dispenseInPlace: CommandCreator<DispenseInPlaceParams> = (
   args,

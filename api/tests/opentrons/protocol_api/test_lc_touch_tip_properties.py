@@ -25,7 +25,7 @@ def test_touch_tip_properties_enable_and_disable() -> None:
     tp = _build_touch_tip_properties(
         TouchTipProperties(
             enable=False,
-            params=LiquidClassTouchTipParams(zOffset=1, mmToEdge=1, speed=100),
+            params=LiquidClassTouchTipParams(zOffset=1, mmFromEdge=1, speed=100),
         )
     )
     tp.enabled = True
@@ -38,19 +38,19 @@ def test_touch_tip_properties_none_instantiation_combos() -> None:
     """Test handling of None combinations in TouchTipProperties instantiation."""
     with pytest.raises(ValidationError):
         _build_touch_tip_properties(
-            TouchTipProperties(enable=True, params=LiquidClassTouchTipParams(zOffset=None, mmToEdge=None, speed=None))  # type: ignore
+            TouchTipProperties(enable=True, params=LiquidClassTouchTipParams(zOffset=None, mmFromEdge=None, speed=None))  # type: ignore
         )
     with pytest.raises(ValidationError):
         _build_touch_tip_properties(
-            TouchTipProperties(enable=None, params=LiquidClassTouchTipParams(zOffset=None, mmToEdge=1, speed=1))  # type: ignore
+            TouchTipProperties(enable=None, params=LiquidClassTouchTipParams(zOffset=None, mmFromEdge=1, speed=1))  # type: ignore
         )
     with pytest.raises(ValidationError):
         _build_touch_tip_properties(
-            TouchTipProperties(enable=True, params=LiquidClassTouchTipParams(zOffset=1, mmToEdge=None, speed=1))  # type: ignore
+            TouchTipProperties(enable=True, params=LiquidClassTouchTipParams(zOffset=1, mmFromEdge=None, speed=1))  # type: ignore
         )
     with pytest.raises(ValidationError):
         _build_touch_tip_properties(
-            TouchTipProperties(enable=True, params=LiquidClassTouchTipParams(zOffset=1, mmToEdge=1, speed=None))  # type: ignore
+            TouchTipProperties(enable=True, params=LiquidClassTouchTipParams(zOffset=1, mmFromEdge=1, speed=None))  # type: ignore
         )
 
 
@@ -62,13 +62,13 @@ def test_touch_tip_properties_enabled_bad_values(bad_value: Any) -> None:
         _build_touch_tip_properties(
             TouchTipProperties(
                 enable=bad_value,
-                params=LiquidClassTouchTipParams(zOffset=1, mmToEdge=1, speed=1),
+                params=LiquidClassTouchTipParams(zOffset=1, mmFromEdge=1, speed=1),
             )
         )
     tp = _build_touch_tip_properties(
         TouchTipProperties(
             enable=False,
-            params=LiquidClassTouchTipParams(zOffset=1, mmToEdge=1, speed=1),
+            params=LiquidClassTouchTipParams(zOffset=1, mmFromEdge=1, speed=1),
         )
     )
     with pytest.raises(ValueError):
@@ -82,13 +82,15 @@ def test_touch_tip_properties_z_offset(good_value: Union[int, float]) -> None:
     _build_touch_tip_properties(
         TouchTipProperties(
             enable=True,
-            params=LiquidClassTouchTipParams(zOffset=good_value, mmToEdge=1, speed=10),
+            params=LiquidClassTouchTipParams(
+                zOffset=good_value, mmFromEdge=1, speed=10
+            ),
         )
     )
     tp = _build_touch_tip_properties(
         TouchTipProperties(
             enable=False,
-            params=LiquidClassTouchTipParams(zOffset=0, mmToEdge=1, speed=10),
+            params=LiquidClassTouchTipParams(zOffset=0, mmFromEdge=1, speed=10),
         )
     )
     tp.z_offset = good_value
@@ -104,14 +106,14 @@ def test_touch_tip_properties_z_offset_bad_values(bad_value: Any) -> None:
             TouchTipProperties(
                 enable=True,
                 params=LiquidClassTouchTipParams(
-                    zOffset=bad_value, mmToEdge=1, speed=10
+                    zOffset=bad_value, mmFromEdge=1, speed=10
                 ),
             )
         )
     tp = _build_touch_tip_properties(
         TouchTipProperties(
             enable=False,
-            params=LiquidClassTouchTipParams(zOffset=0, mmToEdge=1, speed=10),
+            params=LiquidClassTouchTipParams(zOffset=0, mmFromEdge=1, speed=10),
         )
     )
     with pytest.raises(ValueError):
@@ -120,45 +122,47 @@ def test_touch_tip_properties_z_offset_bad_values(bad_value: Any) -> None:
 
 @given(good_value=reasonable_numbers)
 @settings(deadline=None, max_examples=50)
-def test_touch_tip_properties_mm_to_edge(good_value: Union[int, float]) -> None:
-    """Test valid mm_to_edge."""
+def test_touch_tip_properties_mm_from_edge(good_value: Union[int, float]) -> None:
+    """Test valid mm_from_edge."""
     _build_touch_tip_properties(
         TouchTipProperties(
             enable=True,
-            params=LiquidClassTouchTipParams(zOffset=0, mmToEdge=good_value, speed=10),
+            params=LiquidClassTouchTipParams(
+                zOffset=0, mmFromEdge=good_value, speed=10
+            ),
         )
     )
     tp = _build_touch_tip_properties(
         TouchTipProperties(
             enable=False,
-            params=LiquidClassTouchTipParams(zOffset=0, mmToEdge=1, speed=10),
+            params=LiquidClassTouchTipParams(zOffset=0, mmFromEdge=1, speed=10),
         )
     )
-    tp.mm_to_edge = good_value
-    assert tp.mm_to_edge == float(good_value)
+    tp.mm_from_edge = good_value
+    assert tp.mm_from_edge == float(good_value)
 
 
 @given(bad_value=invalid_values)
 @settings(deadline=None, max_examples=50)
-def test_touch_tip_properties_mm_to_edge_bad_values(bad_value: Any) -> None:
-    """Test invalid mm_to_edge values."""
+def test_touch_tip_properties_mm_from_edge_bad_values(bad_value: Any) -> None:
+    """Test invalid mm_from_edge values."""
     with pytest.raises(ValidationError):
         _build_touch_tip_properties(
             TouchTipProperties(
                 enable=True,
                 params=LiquidClassTouchTipParams(
-                    zOffset=bad_value, mmToEdge=1, speed=10
+                    zOffset=bad_value, mmFromEdge=1, speed=10
                 ),
             )
         )
     tp = _build_touch_tip_properties(
         TouchTipProperties(
             enable=True,
-            params=LiquidClassTouchTipParams(zOffset=0, mmToEdge=1, speed=10),
+            params=LiquidClassTouchTipParams(zOffset=0, mmFromEdge=1, speed=10),
         )
     )
     with pytest.raises(ValueError):
-        tp.mm_to_edge = bad_value
+        tp.mm_from_edge = bad_value
 
 
 @given(good_value=positive_non_zero_floats_and_ints)
@@ -168,13 +172,13 @@ def test_touch_tip_properties_speed(good_value: Union[int, float]) -> None:
     _build_touch_tip_properties(
         TouchTipProperties(
             enable=True,
-            params=LiquidClassTouchTipParams(zOffset=0, mmToEdge=1, speed=good_value),
+            params=LiquidClassTouchTipParams(zOffset=0, mmFromEdge=1, speed=good_value),
         )
     )
     tp = _build_touch_tip_properties(
         TouchTipProperties(
             enable=False,
-            params=LiquidClassTouchTipParams(zOffset=0, mmToEdge=1, speed=10),
+            params=LiquidClassTouchTipParams(zOffset=0, mmFromEdge=1, speed=10),
         )
     )
     tp.speed = good_value
@@ -190,14 +194,14 @@ def test_touch_tip_properties_speed_bad_values(bad_value: Any) -> None:
             TouchTipProperties(
                 enable=True,
                 params=LiquidClassTouchTipParams(
-                    zOffset=0, mmToEdge=1, speed=bad_value
+                    zOffset=0, mmFromEdge=1, speed=bad_value
                 ),
             )
         )
     tp = _build_touch_tip_properties(
         TouchTipProperties(
             enable=False,
-            params=LiquidClassTouchTipParams(zOffset=0, mmToEdge=1, speed=10),
+            params=LiquidClassTouchTipParams(zOffset=0, mmFromEdge=1, speed=10),
         )
     )
     with pytest.raises(ValueError):

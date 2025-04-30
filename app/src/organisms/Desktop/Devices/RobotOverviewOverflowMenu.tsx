@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { css } from 'styled-components'
 
 import {
   BORDERS,
@@ -24,19 +24,20 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
-import { DisconnectModal } from './RobotSettings/ConnectNetwork/DisconnectModal'
-import { handleUpdateBuildroot } from './RobotSettings/UpdateBuildroot'
-import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { UNREACHABLE, CONNECTABLE, REACHABLE } from '/app/redux/discovery'
-import { checkShellUpdate } from '/app/redux/shell'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
+import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
 import { restartRobot } from '/app/redux/robot-admin'
 import { home, ROBOT } from '/app/redux/robot-controls'
-import { useIsRobotBusy } from '/app/redux-resources/robots'
-import { useCanDisconnect } from '/app/resources/networking/hooks'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { checkShellUpdate } from '/app/redux/shell'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useCanDisconnect } from '/app/resources/networking/hooks'
 import { useCurrentRunId } from '/app/resources/runs'
 
-import type { MouseEventHandler, MouseEvent } from 'react'
+import { DisconnectModal } from './RobotSettings/ConnectNetwork/DisconnectModal'
+import { handleUpdateBuildroot } from './RobotSettings/UpdateBuildroot'
+
+import type { MouseEvent, MouseEventHandler } from 'react'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { Dispatch } from '/app/redux/types'
 

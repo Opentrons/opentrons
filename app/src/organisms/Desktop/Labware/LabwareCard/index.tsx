@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
+import startCase from 'lodash/startCase'
 
 import {
   ALIGN_CENTER,
@@ -8,20 +8,25 @@ import {
   Box,
   COLORS,
   DIRECTION_COLUMN,
+  DISPLAY_GRID,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   RobotWorkSpace,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  DISPLAY_GRID,
 } from '@opentrons/components'
-import { getLabwareDefIsStandard } from '@opentrons/shared-data'
+import {
+  getLabwareDefIsStandard,
+  getLabwareDisplayName,
+} from '@opentrons/shared-data'
+
 import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
+
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 export interface LabwareCardProps {
@@ -33,7 +38,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { t } = useTranslation(['labware_landing', 'branded'])
   const { definition, modified, filename } = props.labware
   const apiName = definition.parameters.loadName
-  const displayName = definition?.metadata.displayName
+  const displayName = getLabwareDisplayName(definition)
   const displayCategory = startCase(definition.metadata.displayCategory)
   const isCustomDefinition = !getLabwareDefIsStandard(definition)
   const xDimensionOverride =

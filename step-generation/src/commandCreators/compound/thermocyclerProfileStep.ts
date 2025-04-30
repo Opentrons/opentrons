@@ -1,16 +1,18 @@
-import { curryCommandCreator, reduceCommandCreators } from '../../utils'
-import { thermocyclerStateGetter } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
-import { thermocyclerWaitForLidTemperature } from '../atomic/thermocyclerWaitForLidTemperature'
+import { thermocyclerStateGetter } from '../../robotStateSelectors'
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import { thermocyclerCloseLid } from '../atomic/thermocyclerCloseLid'
 import { thermocyclerRunProfile } from '../atomic/thermocyclerRunProfile'
 import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
-import { thermocyclerCloseLid } from '../atomic/thermocyclerCloseLid'
+import { thermocyclerWaitForLidTemperature } from '../atomic/thermocyclerWaitForLidTemperature'
 import { thermocyclerStateStep } from './thermocyclerStateStep'
+
 import type {
   CommandCreator,
   CurriedCommandCreator,
   ThermocyclerProfileStepArgs,
 } from '../../types'
+
 export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs> = (
   args,
   invariantContext,

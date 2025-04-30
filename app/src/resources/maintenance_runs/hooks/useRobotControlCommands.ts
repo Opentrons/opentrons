@@ -2,11 +2,11 @@ import { useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
 import { useCreateTargetedMaintenanceRunMutation } from '../../runs'
+import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
 
-import type { CreateCommand } from '@opentrons/shared-data'
 import type { MaintenanceRun, Mount } from '@opentrons/api-client'
+import type { CreateCommand } from '@opentrons/shared-data'
 
 export interface PipetteDetails {
   mount: Mount

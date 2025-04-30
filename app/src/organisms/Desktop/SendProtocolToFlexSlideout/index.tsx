@@ -2,25 +2,25 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { useCreateProtocolMutation } from '@opentrons/react-api-client'
-
-import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import {
-  PrimaryButton,
   ERROR_TOAST,
   INFO_TOAST,
+  PrimaryButton,
   SUCCESS_TOAST,
 } from '@opentrons/components'
-import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
-import { getAnalysisStatus } from '/app/transformations/analysis'
-import { getProtocolDisplayName } from '/app/transformations/protocols'
+import { useCreateProtocolMutation } from '@opentrons/react-api-client'
+import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { useToaster } from '/app/organisms/ToasterOven'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { getAnalysisStatus } from '/app/transformations/analysis'
+import { getProtocolDisplayName } from '/app/transformations/protocols'
+
+import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 
 import type { AxiosError } from 'axios'
 import type { IconProps, StyleProps } from '@opentrons/components'

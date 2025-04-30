@@ -1,5 +1,6 @@
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   JUSTIFY_END,
@@ -9,6 +10,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { HandleEnter } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
 

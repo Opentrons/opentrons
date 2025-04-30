@@ -1,17 +1,18 @@
 import { useTranslation } from 'react-i18next'
+
 import * as utils from './utils'
 
 import type { TFunction } from 'i18next'
 import type {
-  RunTimeCommand,
-  RobotType,
   LabwareDefinition2,
+  RobotType,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { CommandTextData } from '../../ProtocolTimelineScrubber/types'
 import type {
-  TCProfileStepText,
-  TCProfileCycleText,
   GetDirectTranslationCommandText,
+  TCProfileCycleText,
+  TCProfileStepText,
 } from './utils'
 
 export * from './utils'
@@ -308,6 +309,16 @@ export function useCommandTextString(
       return {
         kind: 'generic',
         commandText: utils.getRailLightsCommandText({ ...fullParams, command }),
+      }
+
+    case 'robot/moveTo':
+    case 'robot/moveAxesTo':
+    case 'robot/moveAxesRelative':
+    case 'robot/openGripperJaw':
+    case 'robot/closeGripperJaw':
+      return {
+        kind: 'generic',
+        commandText: utils.getRobotCommandText({ ...fullParams, command }),
       }
 
     case undefined:

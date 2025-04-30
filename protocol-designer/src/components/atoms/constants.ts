@@ -1,9 +1,11 @@
 import { css } from 'styled-components'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
   OVERFLOW_HIDDEN,
 } from '@opentrons/components'
+
 import type { FlattenSimpleInterpolation } from 'styled-components'
 
 export const LINK_BUTTON_STYLE = css`

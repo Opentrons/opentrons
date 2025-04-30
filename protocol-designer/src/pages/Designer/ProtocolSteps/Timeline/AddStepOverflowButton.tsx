@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -7,7 +8,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { stepIconsByType } from '../../../../form-types'
+
 import type { StepType } from '../../../../form-types'
 
 export interface AddStepOverflowButtonProps {

@@ -1,7 +1,14 @@
 import { Fragment, useEffect, useState } from 'react'
 import { css } from 'styled-components'
 
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { StyledText } from '../../atoms/StyledText'
+import { LegacyStyledText } from '../../atoms/StyledText/LegacyStyledText'
+import { Tooltip } from '../../atoms/Tooltip'
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { Icon } from '../../icons'
+import { useOnClickOutside } from '../../interaction-enhancers'
+import { Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
   CURSOR_DEFAULT,
@@ -14,20 +21,13 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
 } from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { Flex } from '../../primitives'
-import { Icon } from '../../icons'
 import { useHoverTooltip } from '../../tooltips'
-import { useOnClickOutside } from '../../interaction-enhancers'
-import { LegacyStyledText } from '../../atoms/StyledText/LegacyStyledText'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Tooltip } from '../../atoms/Tooltip'
-import { StyledText } from '../../atoms/StyledText'
-import { LiquidIcon } from '../LiquidIcon'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { DeckInfoLabel } from '../DeckInfoLabel'
+import { LiquidIcon } from '../LiquidIcon'
 
-import type { FocusEventHandler } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { FocusEventHandler } from 'react'
 
 export interface DropdownOption {
   name: string

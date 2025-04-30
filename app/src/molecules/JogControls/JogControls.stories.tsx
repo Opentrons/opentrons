@@ -1,8 +1,7 @@
-import type * as React from 'react'
-
 import { JogControls } from './index'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'App/Molecules/JogControls',

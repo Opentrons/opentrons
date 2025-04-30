@@ -1,24 +1,38 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
 } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure'
+import { getTopPortalEl } from '/app/App/portal'
 import { ToggleButton } from '/app/atoms/buttons'
+import { Divider } from '/app/atoms/structure'
+import {
+  useIsFlex,
+  useIsRobotBusy,
+  useRobot,
+} from '/app/redux-resources/robots'
+import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
+import {
+  fetchSettings,
+  getRobotSettings,
+  updateSetting,
+} from '/app/redux/robot-settings'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+
 import {
   DeviceReset,
   DisplayRobotName,
-  EnableStatusLight,
   EnableErrorRecoveryMode,
+  EnableStatusLight,
   FactoryMode,
   GantryHoming,
   LegacySettings,
@@ -31,32 +45,19 @@ import {
   UsageSettings,
   UseOlderAspirateBehavior,
 } from './AdvancedTab'
-import {
-  useRobot,
-  useIsFlex,
-  useIsRobotBusy,
-} from '/app/redux-resources/robots'
-import {
-  updateSetting,
-  getRobotSettings,
-  fetchSettings,
-} from '/app/redux/robot-settings'
-import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
-import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
+import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
 import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryModeSlideout'
+import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
-import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
-import { getTopPortalEl } from '/app/App/portal'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { MouseEventHandler } from 'react'
-import type { State, Dispatch } from '/app/redux/types'
+import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 import type {
   RobotSettings,
   RobotSettingsField,
 } from '/app/redux/robot-settings/types'
-import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface RobotSettingsAdvancedProps {
   robotName: string

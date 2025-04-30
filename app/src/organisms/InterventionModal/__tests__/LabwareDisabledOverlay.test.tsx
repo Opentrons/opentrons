@@ -1,7 +1,10 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { COLORS } from '@opentrons/components'
+
 import { LabwareDisabledOverlay } from '../LabwareDisabledOverlay'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockLabwareDef = {

@@ -1,11 +1,12 @@
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { i18n } from '/app/i18n'
-import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 import { HeaterShakerModuleData } from '/app/organisms/ModuleCard/HeaterShakerModuleData'
+import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
+
+import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 
 import type { ComponentProps } from 'react'
 

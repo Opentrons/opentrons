@@ -1,31 +1,34 @@
-import { beforeEach, describe, it, expect } from 'vitest'
 import merge from 'lodash/merge'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
-import {
-  forHeaterShakerSetTargetTemperature as _forHeaterShakerSetTargetTemperature,
-  forHeaterShakerAwaitTemperature as _forHeaterShakerAwaitTemperature,
-  forHeaterShakerDeactivateHeater as _forHeaterShakerDeactivateHeater,
-  forHeaterShakerSetTargetShakeSpeed as _forHeaterShakerSetTargetShakeSpeed,
-  forHeaterShakerStopShake as _forHeaterShakerStopShake,
-  forHeaterShakerOpenLatch as _forHeaterShakerOpenLatch,
-  forHeaterShakerCloseLatch as _forHeaterShakerCloseLatch,
-} from '../getNextRobotStateAndWarnings/heaterShakerUpdates'
+
 import { makeImmutableStateUpdater } from '../__utils__'
-import { makeContext, getInitialRobotStateStandard } from '../fixtures'
+import { getInitialRobotStateStandard, makeContext } from '../fixtures'
+import {
+  forHeaterShakerAwaitTemperature as _forHeaterShakerAwaitTemperature,
+  forHeaterShakerCloseLatch as _forHeaterShakerCloseLatch,
+  forHeaterShakerDeactivateHeater as _forHeaterShakerDeactivateHeater,
+  forHeaterShakerOpenLatch as _forHeaterShakerOpenLatch,
+  forHeaterShakerSetTargetShakeSpeed as _forHeaterShakerSetTargetShakeSpeed,
+  forHeaterShakerSetTargetTemperature as _forHeaterShakerSetTargetTemperature,
+  forHeaterShakerStopShake as _forHeaterShakerStopShake,
+} from '../getNextRobotStateAndWarnings/heaterShakerUpdates'
+
+import type {
+  ModuleOnlyParams,
+  ShakeSpeedParams,
+  TemperatureParams,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { ImmutableStateUpdater } from '../__utils__'
 import type {
   HeaterShakerModuleState,
   InvariantContext,
   RobotState,
 } from '../types'
-import type { ImmutableStateUpdater } from '../__utils__'
-import type {
-  TemperatureParams,
-  ModuleOnlyParams,
-  ShakeSpeedParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 const forHeaterShakerSetTargetTemperature = makeImmutableStateUpdater(
   _forHeaterShakerSetTargetTemperature

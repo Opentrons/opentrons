@@ -1,18 +1,19 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { MoveLabwareOnDeck } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
-import { TwoColLwInfoAndDeck } from '../TwoColLwInfoAndDeck'
-import { RECOVERY_MAP } from '../../constants'
-import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
-import { getSlotNameAndLwLocFrom } from '../../hooks/useDeckMapUtils'
 
-import type { ComponentProps } from 'react'
+import { RECOVERY_MAP } from '../../constants'
+import { getSlotNameAndLwLocFrom } from '../../hooks/useDeckMapUtils'
+import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
+import { TwoColLwInfoAndDeck } from '../TwoColLwInfoAndDeck'
+
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')
@@ -182,6 +183,23 @@ describe('TwoColLwInfoAndDeck', () => {
       RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE
     props.recoveryMap.step =
       RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
+    render(props)
+    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Ensure stacker has labware',
+        type: 'location',
+        bannerText:
+          'Make sure you load the correct number of labware into the stacker.',
+      }),
+      expect.anything()
+    )
+  })
+
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE} with NOT manual replace step`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE
+    props.recoveryMap.step =
+      RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
       expect.objectContaining({

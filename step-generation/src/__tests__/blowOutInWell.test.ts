@@ -1,18 +1,20 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import {
-  makeContext,
-  getInitialRobotStateStandard,
-  getRobotStateWithTipStandard,
-  getInitialRobotStateWithOffDeckLabwareStandard,
-  getErrorResult,
-  getSuccessResult,
   DEFAULT_PIPETTE,
+  getErrorResult,
+  getInitialRobotStateStandard,
+  getInitialRobotStateWithOffDeckLabwareStandard,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
+
 import type { BlowoutParams } from '@opentrons/shared-data'
-import type { RobotState, InvariantContext } from '../types'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/heaterShakerCollision')
 

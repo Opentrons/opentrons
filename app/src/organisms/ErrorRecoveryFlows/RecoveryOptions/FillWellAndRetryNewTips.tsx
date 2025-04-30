@@ -1,11 +1,11 @@
 import { RECOVERY_MAP } from '../constants'
-import { CancelRun } from './CancelRun'
 import {
   FillWell,
+  RetryWithNewTips,
   SelectTips,
   TwoColLwInfoAndDeck,
-  RetryWithNewTips,
 } from '../shared'
+import { CancelRun } from './CancelRun'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'

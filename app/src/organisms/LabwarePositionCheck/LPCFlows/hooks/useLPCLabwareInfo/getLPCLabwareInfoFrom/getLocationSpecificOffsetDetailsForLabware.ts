@@ -1,8 +1,9 @@
 import isEqual from 'lodash/isEqual'
 
-import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
 import { ANY_LOCATION } from '@opentrons/api-client'
+
 import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
+import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
 
 import type { LabwareOffsetLocationSequence } from '@opentrons/api-client'
 import type {

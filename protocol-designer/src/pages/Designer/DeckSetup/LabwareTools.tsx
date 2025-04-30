@@ -1,8 +1,9 @@
 import { Fragment, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
 import styled from 'styled-components'
-import { useDispatch, useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   CheckboxField,
@@ -22,49 +23,48 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
-  OT2_ROBOT_TYPE,
   getAreSlotsHorizontallyAdjacent,
   getIsLabwareAboveHeight,
   getLabwareDefIsStandard,
   getLabwareDefURI,
   getModuleType,
+  HEATERSHAKER_MODULE_TYPE,
+  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '../../../components/atoms'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { getOnlyLatestDefs } from '../../../labware-defs'
-import {
-  ADAPTER_96_CHANNEL,
-  getLabwareCompatibleWithModule,
-} from '../../../utils/labwareModuleCompatibility'
-import { getHas96Channel } from '../../../utils'
-import { createCustomLabwareDef } from '../../../labware-defs/actions'
 import { getRobotType } from '../../../file-data/selectors'
+import { getOnlyLatestDefs } from '../../../labware-defs'
+import { createCustomLabwareDef } from '../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getPipetteEntities } from '../../../step-forms/selectors'
-import { selectors } from '../../../labware-ingred/selectors'
-import { getEnableStacking } from '../../../feature-flags/selectors'
 import {
   selectLabware,
   selectNestedLabware,
 } from '../../../labware-ingred/actions'
+import { selectors } from '../../../labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import { getPipetteEntities } from '../../../step-forms/selectors'
+import { getHas96Channel } from '../../../utils'
+import {
+  ADAPTER_96_CHANNEL,
+  getLabwareCompatibleWithModule,
+} from '../../../utils/labwareModuleCompatibility'
 import {
   ALL_ORDERED_CATEGORIES,
   CUSTOM_CATEGORY,
   ORDERED_CATEGORIES,
 } from './constants'
 import {
-  getLabwareIsRecommended,
   getLabwareCompatibleWithAdapter,
+  getLabwareIsRecommended,
 } from './utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type { ModuleOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
-import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type { CategoryExpand } from './DeckSetupToolbox'
 
 const STANDARD_X_DIMENSION = 127.75
@@ -104,7 +104,6 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const has96Channel = getHas96Channel(pipetteEntities)
   const defs = getOnlyLatestDefs()
-  const enableStacking = useSelector(getEnableStacking)
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
@@ -383,11 +382,8 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                             />
 
                             {uri === selectedLabwareDefUri &&
-                              getLabwareCompatibleWithAdapter(
-                                defs,
-                                enableStacking,
-                                loadName
-                              )?.length > 0 && (
+                              getLabwareCompatibleWithAdapter(defs, loadName)
+                                ?.length > 0 && (
                                 <ListButtonAccordionContainer
                                   id={`nestedAccordionContainer_${loadName}`}
                                 >
@@ -438,7 +434,6 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                                         )
                                       : getLabwareCompatibleWithAdapter(
                                           { ...defs, ...customLabwareDefs },
-                                          enableStacking,
                                           loadName
                                         ).map(nestedDefUri => {
                                           const nestedDef =

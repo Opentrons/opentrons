@@ -4,8 +4,8 @@ import { Flex, VIEWPORT } from '@opentrons/components'
 
 import { SubListTable as SubListTableComponent } from './index'
 
+import type { Meta, Story } from '@storybook/react'
 import type { ComponentProps } from 'react'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Helix/Atoms/SubListTable',

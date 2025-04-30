@@ -1,13 +1,14 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { createRunAction } from '@opentrons/api-client'
-import { useHost } from '../../api'
+
 import { useStopRunMutation } from '..'
+import { mockStopRunAction, RUN_ID_1 } from '../__fixtures__'
+import { useHost } from '../../api'
 
-import { RUN_ID_1, mockStopRunAction } from '../__fixtures__'
-
+import type * as React from 'react'
 import type { HostConfig, Response, RunAction } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   Box,
   COLORS,
@@ -7,10 +8,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
+
 import type { LabwareBrand } from '@opentrons/shared-data'
 
 export interface ManufacturerDetailsProps {

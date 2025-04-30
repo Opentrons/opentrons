@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
@@ -14,20 +14,21 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { useErrorName } from '../hooks'
-import { OddModal } from '/app/molecules/OddModal'
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
-import { ERROR_KINDS } from '../constants'
 import { InlineNotification } from '/app/atoms/InlineNotification'
-import { StepInfo } from './StepInfo'
+import { OddModal } from '/app/molecules/OddModal'
+
+import { ERROR_KINDS } from '../constants'
+import { useErrorName } from '../hooks'
 import { getErrorKind } from '../utils'
+import { StepInfo } from './StepInfo'
 
 import type { ReactNode } from 'react'
-import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
 import type { IconProps } from '@opentrons/components'
+import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
 import type { ErrorRecoveryFlowsProps } from '..'
+import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
 import type { DesktopSizeType, ErrorKind } from '../types'
 
 export function useErrorDetailsModal(): {

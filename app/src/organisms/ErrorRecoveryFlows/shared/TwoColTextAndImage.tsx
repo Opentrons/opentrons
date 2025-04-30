@@ -1,3 +1,6 @@
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -6,32 +9,64 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { useTranslation } from 'react-i18next'
-import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { TwoColumn } from '/app/molecules/InterventionModal'
+
+import { RECOVERY_MAP, REENGAGE_LATCH_ROUTES } from '../constants'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { RECOVERY_MAP } from '../constants'
 
 import type { RecoveryContentProps } from '../types'
-import { css } from 'styled-components'
 
 export function TwoColTextAndImage(
   props: RecoveryContentProps
 ): JSX.Element | null {
-  const { routeUpdateActions, recoveryMap } = props
-  const { LOAD_LABWARE_SHUTTLE_AND_RETRY } = RECOVERY_MAP
-  const { route } = recoveryMap
-  const { proceedNextStep, goBackPrevStep } = routeUpdateActions
+  const { routeUpdateActions, recoveryMap, recoveryCommands } = props
+  const {
+    LOAD_LABWARE_SHUTTLE_AND_RETRY,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
+    ROBOT_IN_MOTION,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+  } = RECOVERY_MAP
+  const { route, step } = recoveryMap
+  const {
+    proceedNextStep,
+    goBackPrevStep,
+    handleMotionRouting,
+  } = routeUpdateActions
+  const { closeLabwareLatch } = recoveryCommands
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
-    void proceedNextStep()
+    switch (route) {
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
+          void handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
+            void closeLabwareLatch().then(() => {
+              void proceedNextStep()
+            })
+          })
+        } else {
+          void proceedNextStep()
+        }
+        break
+      default:
+        void proceedNextStep()
+        break
+    }
   }
 
   const buildTitle = (): string => {
     switch (route) {
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('load_labware_shuttle_onto_track')
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
+          return t('prepare_for_stacker_latch_reengage')
+        } else {
+          return t('empty_stacker_of_labware_above_latch')
+        }
       default:
         console.error(
           `TwoColTextAndImage: Unexpected recovery option: ${route}. Handle retry step copy explicitly.`
@@ -44,11 +79,35 @@ export function TwoColTextAndImage(
     switch (route) {
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('take_any_necessary_precautions_before_loading_shuttle')
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
+          return t('stacker_latch_will_reengage')
+        } else {
+          return t('empty_stacker_of_labware_above_latch_labware_stuck')
+        }
       default:
         console.error(
           `TwoColTextAndImage:buildBannerText: Unexpected recovery option ${route}. Handle retry step copy explicitly.`
         )
         return 'UNEXPECTED RECOVERY OPTION'
+    }
+  }
+
+  const buildButtonText = (): string => {
+    switch (route) {
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
+          return t('re_engage_latch')
+        } else {
+          return t('continue')
+        }
+      default:
+        console.error(
+          `TwoColTextAndImage:buildButtonText: Unexpected recovery option ${route}. Handle retry step copy explicitly.`
+        )
+        return t('continue')
     }
   }
 
@@ -95,6 +154,7 @@ export function TwoColTextAndImage(
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={primaryOnClick}
+        primaryBtnTextOverride={buildButtonText()}
         secondaryBtnOnClick={goBackPrevStep}
       ></RecoveryFooterButtons>
     </RecoverySingleColumnContentWrapper>

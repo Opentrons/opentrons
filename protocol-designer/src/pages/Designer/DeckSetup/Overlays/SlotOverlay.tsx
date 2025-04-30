@@ -1,5 +1,6 @@
-import { useSelector } from 'react-redux'
 import { useEffect, useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -15,8 +16,9 @@ import {
   getDeckDefFromRobotType,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
+
 import { getRobotType } from '../../../../file-data/selectors'
+import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { getFlexHoverDimensions, getOT2HoverDimensions } from '../utils'
 
 import type { MutableRefObject, ReactNode } from 'react'

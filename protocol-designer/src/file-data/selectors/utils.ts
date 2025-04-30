@@ -1,8 +1,11 @@
-import mapValues from 'lodash/mapValues'
 import map from 'lodash/map'
+import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+
 import { COLUMN_4_SLOTS, uuid } from '@opentrons/step-generation'
+
+import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -14,15 +17,15 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
-  LabwareLiquidState,
-  PipetteEntities,
-  RobotState,
-  ModuleEntities,
-  TimelineFrame,
-  LiquidEntities,
-  PipetteEntity,
-  ModuleEntity,
   LabwareEntity,
+  LabwareLiquidState,
+  LiquidEntities,
+  ModuleEntities,
+  ModuleEntity,
+  PipetteEntities,
+  PipetteEntity,
+  RobotState,
+  TimelineFrame,
 } from '@opentrons/step-generation'
 import type { Labware, Modules, Pipettes } from '../../file-types'
 

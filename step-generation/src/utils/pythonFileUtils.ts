@@ -1,20 +1,23 @@
 import {
+  FLEX_ROBOT_TYPE,
   getCutoutDisplayName,
+  getFlexNameConversion,
   getLabwareDefIsStandard,
   getLabwareDefURI,
   isFlexPipette,
-  FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
-  getFlexNameConversion,
 } from '@opentrons/shared-data'
+
 import {
+  CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
   formatPyStr,
   indentPyLines,
-  CUSTOM_LABWARE_DICT_NAME,
   OFF_DECK,
   PROTOCOL_CONTEXT_NAME,
 } from './pythonFormat'
+
+import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntities,
@@ -27,7 +30,6 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '../types'
-import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 
 const PAPI_VERSION = '2.24' // latest version from api/src/opentrons/protocols/api_support/definitions.py
 

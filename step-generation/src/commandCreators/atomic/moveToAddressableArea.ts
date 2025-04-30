@@ -3,6 +3,7 @@ import {
   getWasteChuteAddressableAreaNamePip,
   uuid,
 } from '../../utils'
+
 import type {
   AddressableAreaName,
   CutoutId,

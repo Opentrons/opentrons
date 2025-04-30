@@ -1,15 +1,15 @@
 import {
   CONNECTABLE,
+  HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_OK,
   REACHABLE,
   UNREACHABLE,
-  HEALTH_STATUS_OK,
-  HEALTH_STATUS_NOT_OK,
 } from '../constants'
 
 import type {
   BaseRobot,
-  Robot,
   ReachableRobot,
+  Robot,
   UnreachableRobot,
 } from '../types'
 

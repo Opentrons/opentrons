@@ -1,25 +1,69 @@
-// reusable toggle button with on off styling for connect to robot and opt in/out
-import cx from 'classnames'
-import { IconButton } from '../buttons'
-import styles from './styles.module.css'
+import { css } from 'styled-components'
 
-import type { ButtonProps } from '../buttons'
+import { COLORS } from '../helix-design-system'
+import { Icon } from '../icons'
+import { Btn, Flex } from '../primitives'
 
-export interface ToggleButtonProps extends ButtonProps {
+import type { MouseEvent } from 'react'
+import type { StyleProps } from '../primitives'
+
+const TOGGLE_DISABLED_STYLES = css`
+  color: ${COLORS.grey50};
+
+  &:hover {
+    color: ${COLORS.grey55};
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
+  }
+
+  &:disabled {
+    color: ${COLORS.grey30};
+  }
+`
+
+const TOGGLE_ENABLED_STYLES = css`
+  color: ${COLORS.blue50};
+
+  &:hover {
+    color: ${COLORS.blue55};
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
+  }
+
+  &:disabled {
+    color: ${COLORS.grey30};
+  }
+`
+
+interface ToggleButtonProps extends StyleProps {
   toggledOn: boolean
+  label?: string | null
+  disabled?: boolean | null
+  id?: string
+  onClick?: (e: MouseEvent) => void
 }
 
 export function ToggleButton(props: ToggleButtonProps): JSX.Element {
-  // TODO(mc, 2020-02-04): destructuring `name` to avoid flow error
-  // ButtonProps::name conflicts with IconProps::name, and IconButton
-  // has `name` prop to pass to Icon. IconButton will need to be redone
-  const { toggledOn, name, ...buttonProps } = props
-  const className = cx(styles.robot_item_icon, props.className, {
-    [styles.toggled_on]: toggledOn,
-    [styles.toggled_off]: !toggledOn,
-  })
+  const { label, toggledOn, disabled, size, ...buttonProps } = props
+  const iconName = toggledOn ? 'ot-toggle-input-on' : 'ot-toggle-input-off'
 
-  const toggleIcon = toggledOn ? 'ot-toggle-switch-on' : 'ot-toggle-switch-off'
-
-  return <IconButton {...buttonProps} name={toggleIcon} className={className} />
+  return (
+    <Btn
+      disabled={disabled ?? false}
+      role="switch"
+      aria-label={label}
+      aria-checked={toggledOn}
+      size={size ?? '2rem'}
+      css={props.toggledOn ? TOGGLE_ENABLED_STYLES : TOGGLE_DISABLED_STYLES}
+      {...buttonProps}
+    >
+      <Flex>
+        <Icon name={iconName} size="2rem" />
+      </Flex>
+    </Btn>
+  )
 }

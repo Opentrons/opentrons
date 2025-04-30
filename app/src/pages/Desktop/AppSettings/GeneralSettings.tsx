@@ -1,8 +1,8 @@
 // app info card with version and updated
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import uuidv1 from 'uuid/v4'
 
 import {
@@ -16,39 +16,39 @@ import {
   DropdownMenu,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  Link,
-  SPACING_AUTO,
-  SPACING,
   LegacyStyledText,
+  Link,
+  SPACING,
+  SPACING_AUTO,
   TYPOGRAPHY,
   useMountEffect,
 } from '@opentrons/components'
 
+import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton, ToggleButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { Divider } from '/app/atoms/structure'
 import { LANGUAGES } from '/app/i18n'
-import {
-  CURRENT_VERSION,
-  getAvailableShellUpdate,
-  checkShellUpdate,
-} from '/app/redux/shell'
+import { ConnectRobotSlideout } from '/app/organisms/Desktop/AppSettings/ConnectRobotSlideout'
+import { PreviousVersionModal } from '/app/organisms/Desktop/AppSettings/PreviousVersionModal'
+import { UpdateAppModal } from '/app/organisms/Desktop/UpdateAppModal'
 import {
   ALERT_APP_UPDATE_AVAILABLE,
-  getAlertIsPermanentlyIgnored,
   alertPermanentlyIgnored,
   alertUnignored,
+  getAlertIsPermanentlyIgnored,
 } from '/app/redux/alerts'
 import {
-  useTrackEvent,
   ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
   ANALYTICS_LANGUAGE_UPDATED_DESKTOP_APP_SETTINGS,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { getAppLanguage, updateConfigValue } from '/app/redux/config'
-import { UpdateAppModal } from '/app/organisms/Desktop/UpdateAppModal'
-import { PreviousVersionModal } from '/app/organisms/Desktop/AppSettings/PreviousVersionModal'
-import { ConnectRobotSlideout } from '/app/organisms/Desktop/AppSettings/ConnectRobotSlideout'
-import { getTopPortalEl } from '/app/App/portal'
+import {
+  checkShellUpdate,
+  CURRENT_VERSION,
+  getAvailableShellUpdate,
+} from '/app/redux/shell'
 
 import type { Dispatch, State } from '/app/redux/types'
 

@@ -2,12 +2,13 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
+
 import { OddModal } from './index'
 
 interface SmallModalChildrenProps {

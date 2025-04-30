@@ -1,7 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { getModuleDef2 } from '@opentrons/shared-data'
 
 import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'
+
 import { getUnmatchedModulesForProtocol } from '../utils'
 
 const temperatureProtocolModule = {

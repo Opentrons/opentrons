@@ -5,9 +5,9 @@ import {
 
 import type {
   LoadLabwareRunTimeCommand,
-  RunTimeCommand,
   LoadModuleRunTimeCommand,
   ModuleModel,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 
 export interface LocationInfoNames {

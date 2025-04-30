@@ -1,10 +1,11 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type {
-  PipetteMount,
   GantryMount,
   LabwareOffset,
-  Coordinates,
+  PipetteMount,
+  Vector3D,
 } from '../../../../js/types'
+
 // TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
 export interface CalibratePipetteCreateCommand extends CommonCommandCreateInfo {
   commandType: 'calibration/calibratePipette'
@@ -62,7 +63,7 @@ interface CalibratePipetteParams {
 }
 interface CalibrateGripperParams {
   jaw: 'front' | 'rear'
-  otherJawOffset?: Coordinates
+  otherJawOffset?: Vector3D
 }
 interface CalibrateModuleParams {
   moduleId: string
@@ -73,12 +74,12 @@ interface CalibratePipetteResult {
   pipetteOffset: LabwareOffset
 }
 interface CalibrateGripperResult {
-  jawOffset: Coordinates
+  jawOffset: Vector3D
 }
 interface MoveToMaintenancePositionParams {
   mount: GantryMount
   maintenancePosition?: 'attachPlate' | 'attachInstrument'
 }
 interface CalibrateModuleResult {
-  moduleOffset: Coordinates
+  moduleOffset: Vector3D
 }

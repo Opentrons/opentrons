@@ -9,18 +9,19 @@ import {
 } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
-import { OddModal } from '/app/molecules/OddModal'
 import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
+import { OddModal } from '/app/molecules/OddModal'
 import {
-  getLiquidsByIdForLabware,
   getDisabledWellFillFromLabwareId,
-  getWellGroupForLiquidId,
   getDisabledWellGroupForLiquidId,
+  getLiquidsByIdForLabware,
+  getWellGroupForLiquidId,
 } from '/app/transformations/analysis'
+
 import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 import type {
-  LabwareDefinition2,
   CompletedProtocolAnalysis,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 
 interface LabwareLiquidsDetailModalProps {

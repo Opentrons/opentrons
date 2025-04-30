@@ -1,19 +1,25 @@
-import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import { DeckConfigurator } from '@opentrons/components'
 import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
+
+import { FlexHardware } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import {
   getAdditionalEquipmentEntities,
+  getDeckConfiguration,
   getInitialDeckSetup,
+  getSavedStepForms,
 } from '../../../../step-forms/selectors'
-import { FlexHardware } from '..'
+import { useKitchen } from '../../Kitchen/hooks'
 
 vi.mock('../../../../step-forms/selectors')
+vi.mock('../../Kitchen/hooks')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof DeckConfigurator>()
   return {
@@ -30,6 +36,12 @@ const render = () => {
 
 describe('FlexHardware', () => {
   beforeEach(() => {
+    vi.mocked(useKitchen).mockReturnValue({
+      makeSnackbar: vi.fn(),
+      eatToast: vi.fn(),
+      bakeToast: vi.fn(),
+    })
+    vi.mocked(getSavedStepForms).mockReturnValue({})
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       modules: {
@@ -45,6 +57,7 @@ describe('FlexHardware', () => {
       labware: {},
       additionalEquipmentOnDeck: {},
     })
+    vi.mocked(getDeckConfiguration).mockReturnValue({ deckConfig: [] })
     vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
     vi.mocked(DeckConfigurator).mockReturnValue(
       <div>mock DeckConfigurator</div>

@@ -1,10 +1,11 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { mockCalibrationCheckLabware } from '/app/redux/sessions/__fixtures__'
-import * as Sessions from '/app/redux/sessions'
 import { i18n } from '/app/i18n'
+import * as Sessions from '/app/redux/sessions'
+import { mockCalibrationCheckLabware } from '/app/redux/sessions/__fixtures__'
+
 import { Introduction } from '../'
 import { ChooseTipRack } from '../../ChooseTipRack'
 

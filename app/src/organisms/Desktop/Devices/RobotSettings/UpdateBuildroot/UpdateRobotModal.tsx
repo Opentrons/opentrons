@@ -20,22 +20,22 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import {
-  getRobotUpdateDisplayInfo,
-  robotUpdateChangelogSeen,
-  OT2_BALENA,
-  UPGRADE,
-  REINSTALL,
-  DOWNGRADE,
-  getRobotUpdateVersion,
-} from '/app/redux/robot-update'
-import { useIsOEMMode } from '/app/resources/robot-settings'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
+import {
+  DOWNGRADE,
+  getRobotUpdateDisplayInfo,
+  getRobotUpdateVersion,
+  OT2_BALENA,
+  REINSTALL,
+  robotUpdateChangelogSeen,
+  UPGRADE,
+} from '/app/redux/robot-update'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
+import { useIsOEMMode } from '/app/resources/robot-settings'
 
-import type { State, Dispatch } from '/app/redux/types'
 import type { RobotSystemType } from '/app/redux/robot-update/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export const RELEASE_NOTES_URL_BASE =
   'https://github.com/Opentrons/opentrons/releases/tag/v'

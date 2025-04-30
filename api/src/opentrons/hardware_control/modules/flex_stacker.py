@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Dict, Optional, Mapping
+from typing import Any, Awaitable, Callable, Dict, Optional, Mapping
 
 from opentrons.drivers.flex_stacker.types import (
+    AxisParams,
     Direction,
     LEDColor,
     LEDPattern,
@@ -13,6 +14,9 @@ from opentrons.drivers.flex_stacker.types import (
     StackerAxis,
     TOFSensor,
     HardwareRevision,
+    TOFSensorMode,
+    TOFSensorState,
+    TOFSensorStatus,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.flex_stacker.driver import (
@@ -50,7 +54,7 @@ from opentrons_shared_data.module import load_tof_baseline_data
 
 log = logging.getLogger(__name__)
 
-POLL_PERIOD = 1.0
+POLL_PERIOD = 2.0
 SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
 
 DFU_PID = "df11"
@@ -131,6 +135,9 @@ class FlexStacker(mod_abc.AbstractModule):
             disconnected_callback=disconnected_callback,
         )
 
+        # Set initialized callback
+        reader.set_initialized_callback(module._initialized_callback)
+
         # Enable stallguard
         for axis, config in STALLGUARD_CONFIG.items():
             await driver.set_stallguard_threshold(
@@ -167,9 +174,14 @@ class FlexStacker(mod_abc.AbstractModule):
         self._driver = driver
         self._reader = reader
         self._poller = poller
-        self._stacker_status = FlexStackerStatus.IDLE
         self._stall_detected = False
+        self._stacker_status = FlexStackerStatus.IDLE
         self._last_status_bar_event: Optional[StatusBarUpdateEvent] = None
+
+    async def _initialized_callback(self) -> None:
+        """Called by the reader once the module is initialized."""
+        if self._last_status_bar_event:
+            await self._handle_status_bar_event(self._last_status_bar_event)
 
     async def cleanup(self) -> None:
         """Stop the poller task"""
@@ -202,6 +214,11 @@ class FlexStacker(mod_abc.AbstractModule):
     def platform_state(self) -> PlatformState:
         """The state of the platform."""
         return self._reader.platform_state
+
+    @property
+    def initialized(self) -> bool:
+        """The stacker is ready..."""
+        return self._reader.initialized
 
     @property
     def hopper_door_state(self) -> HopperDoorState:
@@ -276,10 +293,18 @@ class FlexStacker(mod_abc.AbstractModule):
     ) -> bool:
         """Move the axis in a direction by the given distance in mm."""
         default = STACKER_MOTION_CONFIG[axis]["move"]
-        await self._driver.set_run_current(
-            axis, current if current is not None else default.run_current
-        )
-        await self._driver.set_ihold_current(axis, default.hold_current)
+        old_run_current = self._reader.motion_params[axis].run_current
+        new_run_current = current if current is not None else default.run_current
+        if new_run_current != old_run_current:
+            await self._driver.set_run_current(axis, new_run_current)
+            self._reader.motion_params[axis].run_current = new_run_current
+
+        old_hold_current = self._reader.motion_params[axis].hold_current
+        new_hold_current = default.hold_current
+        if new_hold_current != old_hold_current:
+            await self._driver.set_ihold_current(axis, new_hold_current)
+            self._reader.motion_params[axis].hold_current = new_hold_current
+
         motion_params = default.move_params.update(
             max_speed=speed, acceleration=acceleration
         )
@@ -299,10 +324,18 @@ class FlexStacker(mod_abc.AbstractModule):
         current: Optional[float] = None,
     ) -> bool:
         default = STACKER_MOTION_CONFIG[axis]["home"]
-        await self._driver.set_run_current(
-            axis, current if current is not None else default.run_current
-        )
-        await self._driver.set_ihold_current(axis, default.hold_current)
+        old_run_current = self._reader.motion_params[axis].run_current
+        new_run_current = current if current is not None else default.run_current
+        if new_run_current != old_run_current:
+            await self._driver.set_run_current(axis, new_run_current)
+            self._reader.motion_params[axis].run_current = new_run_current
+
+        old_hold_current = self._reader.motion_params[axis].hold_current
+        new_hold_current = default.hold_current
+        if new_hold_current != old_hold_current:
+            await self._driver.set_ihold_current(axis, new_hold_current)
+            self._reader.motion_params[axis].hold_current = new_hold_current
+
         motion_params = default.move_params.update(
             max_speed=speed, acceleration=acceleration
         )
@@ -368,7 +401,7 @@ class FlexStacker(mod_abc.AbstractModule):
         await self._prepare_for_action()
 
         # Move platform along the X then Z axis
-        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
 
         # TODO: (AA 2025-04-03) - The EVT Flex Stacker hardware has issues
         # reading the platform sensor on the extended side. This is a temporary
@@ -390,7 +423,7 @@ class FlexStacker(mod_abc.AbstractModule):
 
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_MD)
         return True
 
     async def store_labware(
@@ -404,7 +437,7 @@ class FlexStacker(mod_abc.AbstractModule):
         # Move X then Z axis
         offset = OFFSET_MD if labware_height < MEDIUM_LABWARE_Z_LIMIT else OFFSET_LG * 2
         distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
-        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
 
         # TODO: (AA 2025-04-03) - The EVT Flex Stacker hardware has issues
         # reading the platform sensor on the extended side. This is a temporary
@@ -434,7 +467,7 @@ class FlexStacker(mod_abc.AbstractModule):
 
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, False)
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_MD)
         return True
 
     async def _move_and_home_axis(
@@ -465,7 +498,7 @@ class FlexStacker(mod_abc.AbstractModule):
         is useful when we want the shuttle to be out of the way for error
         recovery (e.g. when the latch is stuck open).
         """
-        await self._reader.read()
+        await self._reader.get_limit_switch_status()
         # we should always be able to home the X axis first
         await self.home_axis(StackerAxis.X, Direction.RETRACT)
         # If latch is open, we must first close it
@@ -509,7 +542,7 @@ class FlexStacker(mod_abc.AbstractModule):
 
     async def verify_shuttle_location(self, expected: PlatformState) -> None:
         """Verify the shuttle is present and in the expected location."""
-        await self._reader.read()
+        await self._reader.get_platform_sensor_state()
         # Validate the platform state matches, ignore EXTENDED checks on EVT
         if self.platform_state != expected:
             if (
@@ -545,12 +578,13 @@ class FlexStacker(mod_abc.AbstractModule):
 
     def event_listener(self, event: Any) -> None:
         if isinstance(event, StatusBarUpdateEvent):
+            self._last_status_bar_event = event
             asyncio.run_coroutine_threadsafe(
                 self._handle_status_bar_event(event), self._loop
             )
 
     async def _handle_status_bar_event(self, event: StatusBarUpdateEvent) -> None:
-        if event.enabled:
+        if event.enabled and self.initialized:
             match event.state:
                 case StatusBarState.RUNNING:
                     await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.STATIC)
@@ -587,20 +621,43 @@ class FlexStackerReader(Reader):
         self.limit_switch_status = {
             axis: StackerAxisState.UNKNOWN for axis in StackerAxis
         }
+        self.tof_sensor_status: Dict[TOFSensor, TOFSensorStatus] = {
+            s: TOFSensorStatus(
+                s, TOFSensorState.INITIALIZING, TOFSensorMode.UNKNOWN, False
+            )
+            for s in TOFSensor
+        }
+        self.motion_params: Dict[StackerAxis, AxisParams] = {
+            axis: AxisParams(0, 0, MoveParams(0, 0, 0)) for axis in StackerAxis
+        }
         self.platform_state = PlatformState.UNKNOWN
         self.hopper_door_closed = False
-        self.motion_params: Dict[StackerAxis, Optional[MoveParams]] = {
-            axis: None for axis in StackerAxis
-        }
-        self.get_config = True
+        self.initialized = False
+        self._initialized_callback: Optional[Callable[[], Awaitable[None]]] = None
+
+    def set_initialized_callback(self, callback: Callable[[], Awaitable[None]]) -> None:
+        """Sets the callback used when done initializing the module."""
+        self._initialized_callback = callback
 
     async def read(self) -> None:
-        await self.get_limit_switch_status()
-        await self.get_platform_sensor_state()
         await self.get_door_closed()
-        if self.get_config:
+        await self.get_platform_sensor_state()
+        if not self.initialized:
+            initialized = True
+            await self.get_limit_switch_status()
             await self.get_motion_parameters()
-            self.get_config = False
+            for sensor, status in self.tof_sensor_status.items():
+                if status.state == TOFSensorState.INITIALIZING:
+                    status = await self._driver.get_tof_sensor_status(sensor)
+                    self.tof_sensor_status[sensor] = status
+                    initialized &= status.ok
+
+            # We are done initializing, sync the led state
+            if initialized:
+                self.initialized = True
+                if self._initialized_callback:
+                    await self._initialized_callback()
+
         self._set_error(None)
 
     async def get_limit_switch_status(self) -> None:
@@ -612,9 +669,10 @@ class FlexStackerReader(Reader):
 
     async def get_motion_parameters(self) -> None:
         """Get the motion parameters used by the axis motors."""
-        self.motion_params = {
-            axis: await self._driver.get_motion_params(axis) for axis in StackerAxis
-        }
+        for axis in StackerAxis:
+            self.motion_params[axis].move_params = await self._driver.get_motion_params(
+                axis
+            )
 
     async def get_platform_sensor_state(self) -> None:
         """Get the platform state."""

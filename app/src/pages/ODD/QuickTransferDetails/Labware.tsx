@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -13,6 +14,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { getLabwareDefIsStandard } from '@opentrons/shared-data'
+
 import { useRequiredProtocolLabware } from '/app/resources/protocols'
 
 const Table = styled('table')`

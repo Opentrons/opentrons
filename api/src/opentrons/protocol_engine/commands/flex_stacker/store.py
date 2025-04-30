@@ -177,19 +177,20 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )
+
         location = self._state_view.modules.get_location(params.moduleId)
+        pool_definitions = stacker_state.get_pool_definition_ordered_list()
+        if pool_definitions is None:
+            raise FlexStackerLabwarePoolNotYetDefinedError(
+                message=f"The Flex Stacker in {location} has not been configured yet and cannot be filled."
+            )
+
         if (
             len(stacker_state.contained_labware_bottom_first)
             == stacker_state.max_pool_count
         ):
             raise CannotPerformModuleAction(
                 f"Cannot store labware in Flex Stacker in {location} because it is full"
-            )
-
-        pool_definitions = stacker_state.get_pool_definition_ordered_list()
-        if pool_definitions is None:
-            raise FlexStackerLabwarePoolNotYetDefinedError(
-                message=f"The Flex Stacker in {location} has not been configured yet and cannot be filled."
             )
 
         primary_id, maybe_adapter_id, maybe_lid_id = self._verify_labware_to_store(

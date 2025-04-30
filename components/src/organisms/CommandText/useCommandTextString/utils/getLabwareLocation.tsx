@@ -1,24 +1,25 @@
 import {
+  FLEX_STACKER_MODULE_V1,
+  getCutoutDisplayName,
   getLabwareDefURI,
   getLabwareDisplayName,
-  getCutoutDisplayName,
-  getSlotFromAddressableAreaName,
   getModuleModelFromAddressableArea,
+  getSlotFromAddressableAreaName,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
-  FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
+
 import { getModuleDisplayLocation } from './getModuleDisplayLocation'
 import { getModuleModel } from './getModuleModel'
 
 import type {
+  AddressableAreaName,
+  CutoutId,
   LabwareDefinition2,
   LabwareLocation,
+  LabwareLocationSequence,
   ModuleModel,
   RobotType,
-  LabwareLocationSequence,
-  CutoutId,
-  AddressableAreaName,
 } from '@opentrons/shared-data'
 import type { LoadedLabwares, LoadedModules } from './types'
 
@@ -130,7 +131,7 @@ export function getLabwareLocationFromSequence(
           }
         }
       }
-      // TODO(tz, 4-16-25): add inHooperLocation when logic is merged
+      // TODO(tz, 4-16-25): add inHopperLocation when logic is merged
       else if (detailLevel === 'full') {
         const { allRunDefs } = params as SequenceFullParams
         if (sequenceItem.kind === 'onLabware' && acc.adapterName == null) {

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -9,16 +9,17 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { getVolumeRange } from './utils'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
+import { getVolumeRange } from './utils'
 
 import type { ComponentProps, Dispatch } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
 
 interface VolumeEntryProps {

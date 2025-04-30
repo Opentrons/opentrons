@@ -1,8 +1,8 @@
-import { last } from 'lodash'
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { last } from 'lodash'
 import { css } from 'styled-components'
 
 import {
@@ -19,9 +19,9 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
+  Tooltip,
   TOOLTIP_FIXED,
   TOOLTIP_TOP,
-  Tooltip,
   useHoverTooltip,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -34,6 +34,11 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import {
+  CLOSE_UNSAVED_STEP_FORM,
+  ConfirmDeleteModal,
+  getMainPagePortalEl,
+} from '../../../../components/organisms'
 import { OFFDECK } from '../../../../constants'
 import { getEnableComment } from '../../../../feature-flags/selectors'
 import {
@@ -41,26 +46,21 @@ import {
   getRobotStateTimeline,
 } from '../../../../file-data/selectors'
 import {
-  CLOSE_UNSAVED_STEP_FORM,
-  ConfirmDeleteModal,
-  getMainPagePortalEl,
-} from '../../../../components/organisms'
-import {
-  selectors as stepFormSelectors,
   getIsModuleOnDeck,
+  selectors as stepFormSelectors,
 } from '../../../../step-forms'
 import { getLabwareEntities } from '../../../../step-forms/selectors'
 import {
-  actions as stepsActions,
   getIsMultiSelectMode,
+  actions as stepsActions,
 } from '../../../../ui/steps'
 import { getIsAdapterFromDef } from '../../../../utils'
 import { AddStepOverflowButton } from './AddStepOverflowButton'
 
-import type { MouseEvent } from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
-import type { BaseState } from '../../../../types'
+import type { MouseEvent } from 'react'
 import type { StepType } from '../../../../form-types'
+import type { BaseState } from '../../../../types'
 
 interface AddStepButtonProps {
   hasText: boolean

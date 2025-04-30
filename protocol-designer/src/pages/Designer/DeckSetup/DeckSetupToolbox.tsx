@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   Btn,
@@ -13,8 +14,13 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getSavedStepForms } from '../../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+
+import {
+  LINK_BUTTON_STYLE,
+  NAV_BAR_HEIGHT_REM,
+} from '../../../components/atoms'
+import { ConfirmDeleteEntityInUseModal } from '../../../components/organisms'
+import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import {
   createContainer,
   deleteContainer,
@@ -22,17 +28,14 @@ import {
   selectZoomedIntoSlot,
 } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
-import {
-  LINK_BUTTON_STYLE,
-  NAV_BAR_HEIGHT_REM,
-} from '../../../components/atoms'
-import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
-import { ConfirmDeleteEntityInUseModal } from '../../../components/organisms'
+import { getSavedStepForms } from '../../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getSlotInformation } from '../utils'
 import { ALL_ORDERED_CATEGORIES } from './constants'
 import { LabwareTools } from './LabwareTools'
 import { getIsLabwareOnSlotInUse } from './utils'
+
 import type { ThunkDispatch } from '../../../types'
 
 interface DeckSetupToolsProps {
