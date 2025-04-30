@@ -1,6 +1,6 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict
+from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 import os
 import sys
@@ -20,6 +20,8 @@ from opentrons.config import infer_config_base_dir
 
 metadata = {"protocolName": "Gravimetric QC"}
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+
+SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
 
 def _download_and_extract(version_str: str, base_dir: str) -> None:
@@ -57,24 +59,32 @@ if os.getenv("RUNNING_ON_VERDIN") is None:
     else:
         _download_and_extract(release, base_dir)
     sys.path.append(base_dir)
-    from hardware_testing.data import create_run_id, get_git_description
-    from hardware_testing.gravimetric.measurement import (
-        create_measurement_tag,
-        MeasurementType,
-    )
-    from hardware_testing.gravimetric.measurement.scale import Scale
-    from hardware_testing.gravimetric.measurement.record import (
-        GravimetricRecorder,
-        GravimetricRecorderConfig,
-    )
-    from hardware_testing.drivers import asair_sensor as AsairDriver
-    from hardware_testing.gravimetric import helpers, report
+
+from hardware_testing.data import create_run_id, get_git_description  # noqa: E402
+from hardware_testing.gravimetric.measurement import (  # noqa: E402
+    create_measurement_tag,
+    record_measurement_data,
+    calculate_change_in_volume,
+    MeasurementType,
+    MeasurementData,
+    SupportedLiquid,
+)
+from hardware_testing.gravimetric.measurement.scale import Scale  # noqa: E402
+from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
+    GravimetricRecorder,
+    GravimetricRecorderConfig,
+)
+from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
+from hardware_testing.gravimetric import helpers, report  # noqa: E402
+
+_MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
 
 @dataclass
 class FixtureSettings:
     """Dataclass to hold all the options for a gravimetric script."""
 
+    ctx: ProtocolContext
     name: str
     increment: bool
     run_id: str
@@ -86,6 +96,7 @@ class FixtureSettings:
     trials: int
     return_tip: bool
     touch_tip: bool
+    liquid_name: str
     liquid: Liquid
     liquid_class: LiquidClass
     tips: Dict[int, List[Well]]
@@ -99,6 +110,8 @@ class FixtureSettings:
     env_serial: str
     pipette_tag: str
     test_report: report.CSVReport
+    scale_delay: int
+    blank_trials: int
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -235,6 +248,7 @@ class FixtureSettings:
             name=name,
             run_id=run_id,
         )
+        os.makedirs(f"{test_report.parent}/{test_report._run_id}", exist_ok=True)
         test_report.set_tag(pipette_tag)
         test_report.set_operator(operator_name)
         test_report.set_version(git_description)
@@ -250,6 +264,7 @@ class FixtureSettings:
         )
 
         return cls(
+            ctx=ctx,
             name=name,
             increment=increment,
             run_id=run_id,
@@ -261,6 +276,7 @@ class FixtureSettings:
             trials=trials,
             return_tip=return_tip,
             touch_tip=touch_tip,
+            liquid_name=liquid_name,
             liquid=liquid,
             liquid_class=liquid_class,
             tips=tips,
@@ -274,6 +290,8 @@ class FixtureSettings:
             env_serial=env_serial,
             pipette_tag=pipette_tag,
             test_report=test_report,
+            scale_delay=10,
+            blank_trials=10,
         )
 
     def validate_settings(self) -> bool:
@@ -335,43 +353,123 @@ def remove_tip(fixture_settings: FixtureSettings) -> None:
         fixture_settings.pipette.drop_tip()
 
 
+"""
+def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
+    # update this regularly, because the script may exit early
+    env_data_list = [m.environment for tag, m in _MEASUREMENTS]
+    first_data = env_data_list[0]
+    last_data = env_data_list[-1]
+    min_data = get_min_reading(env_data_list)
+    max_data = get_max_reading(env_data_list)
+    report.store_environment(
+        test_report, report.EnvironmentReportState.FIRST, first_data
+    )
+    report.store_environment(test_report, report.EnvironmentReportState.LAST, last_data)
+    report.store_environment(test_report, report.EnvironmentReportState.MIN, min_data)
+    report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
+"""
+
+
 def retract_and_wait(
     fixture_settings: FixtureSettings,
     mode: MeasurementType,
     tip: int,
     volume: float,
     trial: int,
-) -> None:
+    channel: int = 1,  # TODO hookup
+    blank: bool = False,  # TODO hookup
+) -> MeasurementData:
     """Retract away from the scale and record the weight."""
-    pass
+    m_tag = create_measurement_tag(mode, None if blank else volume, channel, trial)
+    fixture_settings.pipette._retract()
+    m_data = record_measurement_data(
+        fixture_settings.ctx,
+        m_tag,
+        fixture_settings.recorder,
+        fixture_settings.mount,
+        True,  # Stable is always true
+        fixture_settings.env_sensor,
+        False,  # Shorten is always false
+        fixture_settings.scale_delay,
+    )
+    report.store_measurement(fixture_settings.test_report, m_tag, m_data)
+    _MEASUREMENTS.append(
+        (
+            m_tag,
+            m_data,
+        )
+    )
+    # _update_environment_first_last_min_max(fixture_settings.test_report)
+    return m_data
 
 
 def aspirate_with_liquid_class(
-    fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
+    fixture_settings: FixtureSettings,
+    tip: int,
+    volume: float,
+    trial: int,
+    submerge_depth_override: Optional[float] = None,
 ) -> None:
     """Aspirate with liquid class."""
     pass
 
 
 def dispense_with_liquid_class(
-    fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
+    fixture_settings: FixtureSettings,
+    tip: int,
+    volume: float,
+    trial: int,
+    submerge_depth_override: Optional[float] = None,
 ) -> None:
     """Dispense with Liquid Class."""
     pass
 
 
-def run_one_test(
+def run_blank_test(
     fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
-) -> None:
+) -> List[MeasurementData]:
+    """Run a "blank" trial to measure the evaporation."""
+    pre_aspriate = retract_and_wait(
+        fixture_settings, MeasurementType.INIT, tip, volume, trial, blank=True
+    )
+    aspirate_with_liquid_class(
+        fixture_settings, tip, volume, trial, submerge_depth_override=15
+    )
+    post_aspirate = retract_and_wait(
+        fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial, blank=True
+    )
+    dispense_with_liquid_class(
+        fixture_settings, tip, volume, trial, submerge_depth_override=15
+    )
+    post_dispense = retract_and_wait(
+        fixture_settings, MeasurementType.DISPENSE, tip, volume, trial, blank=True
+    )
+    return [pre_aspriate, post_aspirate, post_dispense]
+
+
+def run_one_test(
+    fixture_settings: FixtureSettings,
+    tip: int,
+    volume: float,
+    trial: int,
+    last_measurement: MeasurementData,
+) -> List[MeasurementData]:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
     tip_well = fixture_settings.tips[tip].pop(0)
     fixture_settings.pipette.pick_up_tip(tip_well)
-    retract_and_wait(fixture_settings, MeasurementType.INIT, tip, volume, trial)
+    pre_aspriate = retract_and_wait(
+        fixture_settings, MeasurementType.INIT, tip, volume, trial
+    )
     aspirate_with_liquid_class(fixture_settings, tip, volume, trial)
-    retract_and_wait(fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial)
+    post_aspirate = retract_and_wait(
+        fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial
+    )
     dispense_with_liquid_class(fixture_settings, tip, volume, trial)
-    retract_and_wait(fixture_settings, MeasurementType.DISPENSE, tip, volume, trial)
+    post_dispense = retract_and_wait(
+        fixture_settings, MeasurementType.DISPENSE, tip, volume, trial
+    )
     remove_tip(fixture_settings)
+    return [pre_aspriate, post_aspirate, post_dispense]
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -380,8 +478,75 @@ def run(ctx: ProtocolContext) -> None:
     first_tip = fixture_settings.tips[list(fixture_settings.tips)[0]].pop(0)
     fixture_settings.pipette.pick_up_tip(first_tip)
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+    blank_measurments: List[List[MeasurementData]] = []
+    measurements: List[List[MeasurementData]] = []
+    ctx.delay(
+        seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
+        msg=f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} for scale to stabalize",
+    )
+    for i in range(fixture_settings.blank_trials):
+        blank_measurments.append(
+            run_blank_test(
+                fixture_settings,
+                fixture_settings.tip_sizes[0],
+                fixture_settings.volumes[fixture_settings.tip_sizes[0]][0],
+                i,
+            )
+        )
+    liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
+    asp_evaps = [
+        calculate_change_in_volume(blank[0], blank[1], liq)
+        for blank in blank_measurments
+    ]
+    disp_evaps = [
+        calculate_change_in_volume(blank[1], blank[2], liq)
+        for blank in blank_measurments
+    ]
+    avg_asp_evap = sum(asp_evaps) / len(asp_evaps)
+    avg_disp_evap = sum(disp_evaps) / len(disp_evaps)
+    report.store_average_evaporation(
+        fixture_settings.test_report,
+        avg_asp_evap,
+        avg_disp_evap,
+    )
+    volume_lost_during_blank = calculate_change_in_volume(
+        blank_measurments[0][0], blank_measurments[-1][-1], liq
+    )
+    if not ctx.is_simulating():
+        fixture_settings.liquid_source.load_liquid(
+            fixture_settings.liquid,
+            fixture_settings.liquid_source.current_liquid_volume()  # type: ignore[arg-type]
+            - volume_lost_during_blank,
+        )
     remove_tip(fixture_settings)
+
+    last_measurement = blank_measurments[-1][-1]
     for tip in fixture_settings.tips:
         for volume in fixture_settings.volumes[tip]:
             for trial in range(fixture_settings.trials):
-                print(f"{tip} {volume} {trial}")
+                measurements.append(
+                    run_one_test(fixture_settings, tip, volume, trial, last_measurement)
+                )
+                asp_with_evap = (
+                    calculate_change_in_volume(
+                        measurements[-1][0], measurements[-1][1], liq
+                    )
+                    - avg_asp_evap
+                )
+                disp_with_evap = (
+                    calculate_change_in_volume(
+                        measurements[-1][1], measurements[-1][2], liq
+                    )
+                    + avg_disp_evap
+                )
+                cur_height = fixture_settings.liquid_source.current_liquid_height()
+                report.store_trial(
+                    fixture_settings.test_report,
+                    trial,
+                    volume,
+                    1,  # channel
+                    asp_with_evap,
+                    disp_with_evap,
+                    cur_height,  # type: ignore[arg-type]
+                )
+                last_measurement = measurements[-1][-1]
