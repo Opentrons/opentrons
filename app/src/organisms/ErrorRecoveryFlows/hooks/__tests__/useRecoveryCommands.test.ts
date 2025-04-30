@@ -337,7 +337,7 @@ describe('useRecoveryCommands', () => {
   it('should call flexStacker/perpareShuttle and resolve the promise', async () => {
     const mockFailedCommandWithError = {
       ...mockFailedCommand,
-      commandType: 'flexStacker/prepareShuttle',
+      commandType: 'unsafe/flexStacker/prepareShuttle',
       params: {
         moduleId: '123',
       },
