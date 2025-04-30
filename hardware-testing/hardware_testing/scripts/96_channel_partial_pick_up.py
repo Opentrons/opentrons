@@ -441,8 +441,16 @@ async def _main() -> None:
 
         pipette = _get_pipette_from_mount(hw_api, mount)
         config_model = pipette.pick_up_configurations
-        current_val = config_model.press_fit.configuration_by_nozzle_map['Column1']['default'].current
-        input(f"current_val: {current_val}")
+        config = ''
+        if input_str == 'columns':
+            config = input("Pick one[1, 12]?")
+        elif input_str == 'rows':
+            config = input("Pick one[A, H]?")
+        elif input_str == 'single tip':
+            config = input("Pick one[A1, A12, H1, H12]?")
+        if config:
+            current_val = config_model.press_fit.configuration_by_nozzle_map[config]['t200'].current
+            input(f"current_val: {current_val}A")
 
         if (args.measure_nozzles):
             cp = CriticalPoint.NOZZLE
