@@ -108,7 +108,7 @@ export function ProtocolSetupLabware({
   )
   const sortedStartingDeckEntries = Object.entries(startingDeck)
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key]) => key !== 'offDeck')
+    .filter(([key, value]) => (key !== 'offDeck' && value.some((item): item is LabwareInStack => 'labwareId' in item)))
   const offDeckItems = Object.keys(startingDeck).includes('offDeck')
     ? startingDeck.offDeck
     : null
@@ -463,12 +463,12 @@ function RowLabware({
       type="noActive"
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.grey35}
-      gridGap={SPACING.spacing32}
+      gridGap={SPACING.spacing24}
       onClick={() => {
         onClick([slotName, labwareInStack])
       }}
     >
-      <Flex gridGap={SPACING.spacing4} width="7.6875rem">
+      <Flex gridGap={SPACING.spacing4} flexWrap="wrap" width="11rem">
         {location}
         {matchedModule != null ? (
           <DeckInfoLabel
@@ -482,7 +482,7 @@ function RowLabware({
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         flexDirection={DIRECTION_ROW}
-        width="75%"
+        width="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
           {labwareLiquidRenderInfo.map((labware, index) => (

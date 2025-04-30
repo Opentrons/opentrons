@@ -1,6 +1,10 @@
 import { FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
-
-import type { ProtocolAnalysisOutput, RobotType } from '@opentrons/shared-data'
+import type {
+  ProtocolAnalysisOutput,
+  RobotType,
+  LoadLabwareRunTimeCommand,
+  LoadLidStackRunTimeCommand,
+} from '@opentrons/shared-data'
 
 type AnalysisStatus =
   | 'missing'
@@ -20,7 +24,18 @@ export function getAnalysisStatus(
   if (analysis == null || analysis === undefined) {
     return 'missing'
   }
-  if (analysis.liquids == null || analysis.runTimeParameters == null) {
+  if (
+    analysis.commands.some(
+      (
+        command
+      ): command is LoadLabwareRunTimeCommand | LoadLidStackRunTimeCommand =>
+        (command.commandType === 'loadLabware' &&
+          command.result?.locationSequence == null) ||
+        (command.commandType === 'loadLidStack' &&
+          command.result?.locationSequences == null)
+    ) ||
+    analysis.runTimeParameters == null
+  ) {
     return 'stale'
   }
   if (analysis.result === 'parameter-value-required') {

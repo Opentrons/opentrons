@@ -2,6 +2,7 @@ import partition from 'lodash/partition'
 import { Fragment } from 'react'
 
 import {
+  FLEX_STACKER_MODULE_V1,
   getDeckDefFromRobotType,
   getModuleDef2,
   getPositionFromSlotId,

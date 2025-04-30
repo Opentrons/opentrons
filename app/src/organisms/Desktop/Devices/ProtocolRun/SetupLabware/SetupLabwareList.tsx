@@ -20,7 +20,7 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
-import type { StackItem } from '/app/transformations/commands'
+import type { StackItem, LabwareInStack } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 interface SetupLabwareListProps {
@@ -57,7 +57,7 @@ export function SetupLabwareList(
   )
   const sortedStartingDeckEntries = Object.entries(startingDeck)
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key]) => key !== 'offDeck')
+    .filter(([key, value]) => (key !== 'offDeck' && value.some((item): item is LabwareInStack => 'labwareId' in item)))
   const offDeckItems = Object.keys(startingDeck).includes('offDeck')
     ? startingDeck.offDeck
     : null
