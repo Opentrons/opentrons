@@ -107,7 +107,7 @@ export function useFailedLabwareUtils({
         failedCommand,
         runCommands,
       }),
-    [failedCommandByRunRecord?.key, runCommands?.meta.totalLength]
+    [failedCommand, runCommands]
   )
   const relevantPickUpTipCommand = getRelevantPickUpTipCommand(
     failedCommandByRunRecord,
