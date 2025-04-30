@@ -930,9 +930,6 @@ class ModuleView:
         Includes the slot-specific transform. Does not include the child's
         Labware Position Check offset.
         """
-        # todo(sf, 2025-04-29): This extra offset makes the vector be relative to the
-        # cutout in the Flex case, which is weird, and seems incorrect. If we didn't do
-        # this life would be much simpler.
         base = self.get_nominal_offset_to_child_from_addressable_area(module_id)
         if self.get_deck_supports_module_fixtures():
             module_addressable_area = self.get_provided_addressable_area(module_id)

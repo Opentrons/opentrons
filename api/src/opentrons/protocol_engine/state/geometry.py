@@ -388,6 +388,8 @@ class GeometryView:
         OT-2. See
         protocol_engine.state.modules.get_nominal_offset_to_child_from_addressable_area
         for more.
+
+        This does not incorporate LPC offsets or module calibration offsets.
         """
         if isinstance(parent, (AddressableAreaLocation, DeckSlotLocation)):
             return LabwareOffsetVector(x=0, y=0, z=0)
