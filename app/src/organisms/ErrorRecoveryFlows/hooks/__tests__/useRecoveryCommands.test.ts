@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-useErrorRecoveryPolicy,
+  useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
@@ -381,7 +381,7 @@ describe('useRecoveryCommands', () => {
       [
         {
           commandType: 'unsafe/flexStacker/prepareShuttle',
-                    params: {
+          params: {
             moduleId: '',
           },
           intent: 'fixit',

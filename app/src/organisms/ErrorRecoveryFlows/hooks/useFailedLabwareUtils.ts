@@ -122,7 +122,7 @@ export function useFailedLabwareUtils({
         recentRelevantFailedLabwareCmd,
         runRecord
       ),
-[protocolAnalysis, recentRelevantFailedLabwareCmd, runRecord]
+    [protocolAnalysis, recentRelevantFailedLabwareCmd, runRecord]
   )
   const relevantPickUpTipCmdDetails = useMemo(
     () =>
@@ -131,7 +131,7 @@ export function useFailedLabwareUtils({
         relevantPickUpTipCommand,
         runRecord
       ),
-[protocolAnalysis, relevantPickUpTipCommand, runRecord]
+    [protocolAnalysis, relevantPickUpTipCommand, runRecord]
   )
 
   const failedLabware = useMemo(

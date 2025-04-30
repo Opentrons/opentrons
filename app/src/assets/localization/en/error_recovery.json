@@ -141,7 +141,7 @@
   "stacker_door_open_robot_home": "The robot needs to safely move to its home location before you manually move the labware.",
   "stacker_empty": "Stacker empty",
   "stacker_latch_jammed_errors_occur_when": "Stacker latch jammed errors occur when labware gets stuck in between the stacker latch. This is usually caused by improperly placed labware or inaccurate labware definitions",
-"stacker_latch_will_reengage": "The stacker latch will re-engage so that you can reload the stacker. Make sure that any obstructions have been cleared.",
+  "stacker_latch_will_reengage": "The stacker latch will re-engage so that you can reload the stacker. Make sure that any obstructions have been cleared.",
   "stacker_stall_or_collision_error": "Stacker stalled",
   "stall_or_collision_detected_when": "A stall or collision is detected when the robot's motors are blocked",
   "stall_or_collision_error": "Stall or collision",

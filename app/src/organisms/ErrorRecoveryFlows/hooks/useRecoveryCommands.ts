@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import head from 'lodash/head'
 
 import {
-useErrorRecoveryPolicy,
+  useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
@@ -102,11 +102,6 @@ export function useRecoveryCommands({
   const [ignoreErrors, setIgnoreErrors] = useState(false)
 
   const { proceedToRouteAndStep } = routeUpdateActions
- const { chainRunCommands } = useChainRunCommands(
-    runId,
-    unvalidatedFailedCommand?.id,
-    currentRecoveryPolicy
-  )
   const {
     mutateAsync: resumeRunFromRecovery,
   } = useResumeRunFromRecoveryMutation()
@@ -115,7 +110,7 @@ export function useRecoveryCommands({
   } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
   const { stopRun } = useStopRunMutation()
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
-    const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
+  const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
   const { chainRunCommands } = useChainRunCommands(
     runId,
     unvalidatedFailedCommand?.id,
@@ -136,9 +131,9 @@ export function useRecoveryCommands({
       commands: CreateCommand[],
       continuePastFailure: boolean = false
     ): Promise<CommandData[]> =>
-chainRunCommands(commands, continuePastFailure)
+      chainRunCommands(commands, continuePastFailure)
         // the catch never occurs if continuePastCommandFailure is "true"
-.catch((e: Error) => reportAndRouteFailedCmd(e)),
+        .catch((e: Error) => reportAndRouteFailedCmd(e)),
     [analytics, selectedRecoveryOption]
   )
 
@@ -299,12 +294,12 @@ chainRunCommands(commands, continuePastFailure)
         return updateErrorRecoveryPolicy(ignorePolicyRules, 'append')
           .then(() => Promise.resolve())
           .catch((e: Error) =>
-reportAndRouteFailedCmd(
+            reportAndRouteFailedCmd(
               new Error(`Failed to update recovery policy: ${e.message}`)
             )
           )
       } else {
-return reportAndRouteFailedCmd(
+        return reportAndRouteFailedCmd(
           new Error('Could not execute command. No failed command.')
         )
       }
@@ -510,7 +505,7 @@ const buildHomeShuttle = (
       ? storeOrRetriveFailedCommandParams.moduleId
       : ''
   return {
-        commandType: 'unsafe/flexStacker/prepareShuttle',
+    commandType: 'unsafe/flexStacker/prepareShuttle',
     params: {
       moduleId: moduleId,
     },

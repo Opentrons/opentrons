@@ -25,7 +25,6 @@ export function TwoColTextAndImage(
   const {
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
     MANUAL_REPLACE_STACKER_AND_RETRY,
-      REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
     ROBOT_IN_MOTION,
     MANUAL_LOAD_IN_STACKER_AND_SKIP,
     MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
@@ -38,15 +37,10 @@ export function TwoColTextAndImage(
     handleMotionRouting,
   } = routeUpdateActions
   const { closeLabwareLatch } = recoveryCommands
-    proceedNextStep,
-    goBackPrevStep,
-    handleMotionRouting,
-  } = routeUpdateActions
-  const { closeLabwareLatch } = recoveryCommands
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
-switch (route) {
+    switch (route) {
       case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         if (REENGAGE_LATCH_ROUTES.includes(step)) {
