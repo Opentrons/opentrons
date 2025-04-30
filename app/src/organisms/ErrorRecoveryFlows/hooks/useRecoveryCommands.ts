@@ -102,9 +102,10 @@ export function useRecoveryCommands({
   const [ignoreErrors, setIgnoreErrors] = useState(false)
 
   const { proceedToRouteAndStep } = routeUpdateActions
-  const { chainRunCommands } = useChainRunCommands(
+ const { chainRunCommands } = useChainRunCommands(
     runId,
-    unvalidatedFailedCommand?.id
+    unvalidatedFailedCommand?.id,
+    currentRecoveryPolicy
   )
   const {
     mutateAsync: resumeRunFromRecovery,
