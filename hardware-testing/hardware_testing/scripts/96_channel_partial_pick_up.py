@@ -444,12 +444,15 @@ async def _main() -> None:
         config = ''
         if input_str == 'columns':
             config = input("Pick one[1, 12]?")
+            config = "Column" + config
         elif input_str == 'rows':
             config = input("Pick one[A, H]?")
+            config = "Row" + config
         elif input_str == 'single tip':
             config = input("Pick one[A1, A12, H1, H12]?")
+            config = "Single" + config
         if config:
-            current_val = config_model.press_fit.configuration_by_nozzle_map[config]['t200'].current
+            current_val = config_model.press_fit.configuration_by_nozzle_map[config]['default'].current
             input(f"current_val: {current_val}A")
 
         if (args.measure_nozzles):
@@ -658,7 +661,7 @@ async def _main() -> None:
                 await move_to_point(hw_api, mount, trough_loc, cp)
                 await hw_api.dispense(mount)
             cp = CriticalPoint.TIP
-            drop_tip_location =  Point(30 , 60 , 104.5)
+            drop_tip_location =  Point(30 , 60 , 60.5)
              # 299.66 , 389.04 , 104.5
             await move_to_point(hw_api, mount, drop_tip_location, cp)
             await hw_api.drop_tip(mount)
