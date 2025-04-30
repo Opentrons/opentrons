@@ -415,16 +415,6 @@ export function getRelevantLabwareIdFromFailedCmd(
       'flexStackerShuttleMissing',
       'flexStackerHopperLabwareFailed',
     ].includes(error.errorType)
-  //STACKER_ERROR_KINDS.includes(error.errorType as ErrorKind)
-
-  console.log(
-    'isStackerError(recentRelevantFailedLabwareCmd?.error: ',
-    isStackerError(recentRelevantFailedLabwareCmd?.error)
-  )
-  console.log(
-    'recentRelevantFailedLabwareCmd: ',
-    recentRelevantFailedLabwareCmd?.error
-  )
   if (recentRelevantFailedLabwareCmd == null) {
     return null
   } else if (isStackerError(recentRelevantFailedLabwareCmd?.error)) {
