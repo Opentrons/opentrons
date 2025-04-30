@@ -322,6 +322,18 @@ describe('RecoveryOptions', () => {
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.HOME_AND_RETRY.ROUTE, expect.any(String))
       .thenReturn('Home gantry and retry')
+          when(mockGetRecoveryOptionCopy)
+      .calledWith(
+        RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+        expect.any(String)
+      )
+      .thenReturn('manually_load_labware_into_shuttle_and_skips')
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+        expect.any(String)
+      )
+      .thenReturn('replace_labware_in_stacker_and_retry')
   })
 
   it('renders valid recovery options for a general error errorKind', () => {
