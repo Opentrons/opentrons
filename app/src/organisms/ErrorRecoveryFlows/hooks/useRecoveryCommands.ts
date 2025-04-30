@@ -369,8 +369,8 @@ export function useRecoveryCommands({
   const releaseLabwareLatch = useCallback((): Promise<CommandData[]> => {
     const buildOpenLatchCommand = buildOpenLatch(unvalidatedFailedCommand)
     if (buildOpenLatchCommand == null) {
-      return Promise.reject(
-        new Error('Invalid use of open labware latch command')
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of open latch command')
       )
     } else {
       return chainRunRecoveryCommands([buildOpenLatchCommand])
@@ -380,8 +380,8 @@ export function useRecoveryCommands({
   const closeLabwareLatch = useCallback((): Promise<CommandData[]> => {
     const buildCloseLatchCommand = buildCloseLatch(unvalidatedFailedCommand)
     if (buildCloseLatchCommand == null) {
-      return Promise.reject(
-        new Error('Invalid use of close labware latch command')
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of close latch command')
       )
     } else {
       return chainRunRecoveryCommands([buildCloseLatchCommand])
@@ -408,7 +408,9 @@ export function useRecoveryCommands({
   const manualRetrieve = useCallback((): Promise<CommandData[]> => {
     const manualRetrieveCommand = buildManualRetrieve(unvalidatedFailedCommand)
     if (manualRetrieveCommand == null) {
-      return reportAndRouteFailedCmd(new Error('Invalid use of manual retrieve command'))
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of manual retrieve command')
+      )
     } else {
       return chainRunRecoveryCommands([manualRetrieveCommand])
     }
