@@ -13,13 +13,13 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_V1,
+  getModuleType,
   getSimplestDeckConfigForProtocol,
   THERMOCYCLER_MODULE_V1,
-  FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
   getLabwareDefinitionsByURIForProtocol,
   getStackedItemsOnStartingDeck,
@@ -32,6 +32,7 @@ import { SlotDetailModal } from './SlotDetailModal'
 import type { LabwareOnDeck } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
+  ModuleModel,  
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type {
@@ -113,6 +114,7 @@ export function SetupLabwareMap({
         protocolAnalysis.liquids,
         labwareByLiquidId
       )
+      const moduleType =  module?.moduleModel == null ? null : getModuleType(module.moduleModel)
 
       return {
         moduleModel: module?.moduleModel ?? ('' as ModuleModel),
@@ -155,12 +157,12 @@ export function SetupLabwareMap({
                 runId={runId}
                 labwareHasLiquid={Object.values(wellFill).length > 0}
                 xOffset={
-                  module?.moduleModel === FLEX_STACKER_MODULE_V1
+                  moduleType === FLEX_STACKER_MODULE_TYPE
                     ? STACKER_HOPPER_LABWARE_X_OFFSET
                     : 0
                 }
                 yOffset={
-                  module?.moduleModel === FLEX_STACKER_MODULE_V1
+                  moduleType === FLEX_STACKER_MODULE_TYPE
                     ? STACKER_HOPPER_LABWARE_Y_OFFSET
                     : 0
                 }

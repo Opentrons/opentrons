@@ -1,9 +1,10 @@
 import {
-  FLEX_STACKER_MODULE_V1,
+  FLEX_STACKER_MODULE_TYPE,
   FlexStackerFillRunTimeCommand,
   FlexStackerSetStoredLabwareRunTimeCommand,
   getCutoutDisplayName,
   getLabwareDefURI,
+  getModuleType,
   getSlotFromAddressableAreaName,
   SPAN7_8_10_11_SLOT,
   TC_MODULE_LOCATION_OT2,
@@ -218,7 +219,7 @@ export function getStackedItemsOnStartingDeck(
               const module = loadedModules.find(
                 lm =>
                   lm.id === sequenceItem.moduleId &&
-                  lm.model !== FLEX_STACKER_MODULE_V1
+                  getModuleType(lm.model) !== FLEX_STACKER_MODULE_TYPE
               )
               if (module == null) return sequenceAcc
               const moduleSlotName =

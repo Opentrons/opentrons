@@ -2,9 +2,10 @@ import partition from 'lodash/partition'
 import { Fragment } from 'react'
 
 import {
-  FLEX_STACKER_MODULE_V1,
+  FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getModuleDef2,
+  getModuleType,
   getPositionFromSlotId,
   HEATERSHAKER_MODULE_V1,
   inferModuleOrientationFromXCoordinate,
@@ -168,7 +169,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
 
   const [singleLocationModules, stackerModules] = partition(
     modulesOnDeck,
-    module => module.moduleModel !== FLEX_STACKER_MODULE_V1
+    module => getModuleType(module.moduleModel) !== FLEX_STACKER_MODULE_TYPE
   )
 
   return (
@@ -436,18 +437,18 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         {/* render stacked badge on module labware */}
         {modulesOnDeck.map(
           ({ moduleModel, moduleLocation, stacked = false }) => {
+            const moduleDef = getModuleDef2(moduleModel)
             const slotPosition = getPositionFromSlotId(
-              moduleModel === FLEX_STACKER_MODULE_V1
+              moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
                 ? getStackerLocationFromSlot(moduleLocation.slotName)
                 : moduleLocation.slotName,
               deckDef
             )
-            const moduleDef = getModuleDef2(moduleModel)
             let {
               x: nestedLabwareOffsetX,
               y: nestedLabwareOffsetY,
             } = moduleDef.labwareOffset
-            if (moduleDef.model === FLEX_STACKER_MODULE_V1) {
+            if (moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE) {
               nestedLabwareOffsetX += STACKER_HOPPER_LABWARE_X_OFFSET
             }
             // labwareOffset values are more accurate than our SVG renderings, so ignore any deviations under a certain threshold
