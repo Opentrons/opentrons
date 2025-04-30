@@ -1045,6 +1045,12 @@ class Protocols:
         file_extension="json",
         robot="Flex",
     )
+    #analyses-snapshot-testing/files/protocols/OT2_M_P300GEN2_Smoke_8_4_4.json
+    OT2_M_P300GEN2_Smoke_8_4_4: Protocol = Protocol(
+        file_stem="OT2_M_P300GEN2_Smoke_8_4_4",
+        file_extension="json",
+        robot="OT2",
+    )
 
     # analyses-snapshot-testing/files/protocols/OT2_S_PD_8_4_2_smoketest.json
 
@@ -1053,3 +1059,5 @@ class Protocols:
         file_extension="json",
         robot="OT2",
     )
+
+    
