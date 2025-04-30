@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import head from 'lodash/head'
 
 import {
+useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
