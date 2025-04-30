@@ -23,7 +23,6 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     home_ot3,
     move_plunger_absolute_ot3,
     get_plunger_positions_ot3,
-    # update_pick_up_speed,
     _get_pipette_from_mount,
 )
 
@@ -201,28 +200,6 @@ async def countdown(count_time: float):
         print("\r", end="")
     print("")
 
-async def update_pickup_tip_speed(api, mount, speed) -> None:
-    """Update drop-tip speed."""
-    pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.pick_up_configurations
-    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['default'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['default'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['default'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['default'].speed = speed
-    # config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t1000'].speed = speed
-    # config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t1000'].speed = speed
-    # config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t1000'].speed = speed
-    # config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t1000'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t200'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t200'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t200'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t200'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t50'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t50'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t50'].speed = speed
-    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t50'].speed = speed
-    pipette.pick_up_configurations = config_model
-
 def update_pickup_tip_distance(api, mount, distance) -> None:
     """Update drop-tip distance."""
     pipette = _get_pipette_from_mount(api, mount)
@@ -275,10 +252,6 @@ def update_pick_up_current(api, mount, current) -> None:
     config_model.press_fit.configuration_by_nozzle_map['Column12']['t50'].current = current
     config_model.press_fit.configuration_by_nozzle_map['RowA']['default'].current = current
     config_model.press_fit.configuration_by_nozzle_map['RowH']['default'].current = current
-    config_model.press_fit.configuration_by_nozzle_map['RowA']['t200'].current = current
-    config_model.press_fit.configuration_by_nozzle_map['RowH']['t200'].current = current
-    config_model.press_fit.configuration_by_nozzle_map['RowA']['t50'].current = current
-    config_model.press_fit.configuration_by_nozzle_map['RowH']['t50'].current = current
     pipette.pick_up_configurations = config_model
     # print(pipette.pick_up_configurations)
 
@@ -343,26 +316,12 @@ async def calibrate_tiprack(api, home_position, mount):
                         tiprack_loc[Axis.by_mount(mount)])
     initial_press_dist = await api.encoder_current_position_ot3(mount, cp)
     print(f'Initial Press Position: {initial_press_dist[Axis.by_mount(mount)]}')
-    press_dist  = await api.pick_up_tip(
-        mount, tip_length=(tip_length[args.tip_size]-tip_overlap))
-    print(f'Press Position:{press_dist[Axis.by_mount(mount)]}')
+    await api.pick_up_tip(mount, tip_length=(tip_length[args.tip_size]-tip_overlap))
     await api.move_rel(mount, Point(0, 0, 10))
     tip_status = await api.get_tip_presence_status(mount)
-    tip_offset = 1.0
-    # enc_tipoverlap = initial_press_dist[Axis.by_mount(mount)] - press_dist[Axis.by_mount(mount)] - tip_offset
-    # print(f'Enc TipOverlap: {enc_tipoverlap}')
-    # instr = api._pipette_handler.get_pipette(mount)
-    # print(f'current_tipL: {instr.current_tip_length}')
-    # instr.remove_tip()
-    # current_position = await api.current_position_ot3(mount)
-    # print(current_position)
-    # instr.add_tip((tip_length[args.tip_size]-enc_tipoverlap))
-    # print(f'new_current_tipL: {instr.current_tip_length}')
     await api.home([Axis.Z_L])
-    # cp = CriticalPoint.TIP
-    # await asyncio.sleep(1)
     home_with_tip = await api.current_position(mount, cp)
-    return tiprack_loc, initial_press_dist, press_dist
+    return tiprack_loc, initial_press_dist
 
 async def update_nozzle_manager(api, mount, tip_count, nozzle_config):
     if args.nozzles == 1:
@@ -436,18 +395,6 @@ def pickup_direction(nozzle):
         raise('Check Nozzle Config')
     return x_direction, y_direction
 
-# async def update_pick_up_current(api, mount, tip_count, current) -> None:
-#     """Update pick-up-tip current."""
-#     pipette = _get_pipette_from_mount(api, mount)
-#     pipette.get_pick_up_configuration_for_tip_count(tip_count).current_by_tip_count.update({tip_count: current})
-#     print(f'Settings: {pipette.get_pick_up_configuration_for_tip_count(tip_count)}')
-
-# async def update_pick_up_distance(api, mount, tip_count, distance) -> None:
-#     """Update pick-up-tip current."""
-#     pipette = _get_pipette_from_mount(api, mount)
-#     pipette.get_pick_up_configuration_for_tip_count(tip_count).distance = distance
-#     print(f'Settings: {pipette.get_pick_up_configuration_for_tip_count(tip_count)}')
-
 async def _main() -> None:
     today = datetime.date.today()
     hw_api = await build_async_ot3_hardware_api(
@@ -486,7 +433,6 @@ async def _main() -> None:
         home_position = await hw_api.current_position_ot3(mount)
         start_time = time.perf_counter()
         m_current = float(input("motor_current in amps: "))
-        pick_up_speed = float(input("pick up tip speed in mm/s: "))
         # hw_api.clamp_tip_speed = float(input("clamp pick up Speed: "))
         if input_str == 'single tip':
             pick_up_distance = float(input("pick up distance in mm: "))
@@ -498,7 +444,6 @@ async def _main() -> None:
         current_val = config_model.press_fit.configuration_by_nozzle_map['Column1']['default'].current
         input(f"current_val: {current_val}")
 
-        # await update_pick_up_speed(hw_api, mount, pick_up_speed, args.nozzles)
         if (args.measure_nozzles):
             cp = CriticalPoint.NOZZLE
             home_wo_tip = await hw_api.current_position_ot3(mount, cp)
@@ -533,19 +478,7 @@ async def _main() -> None:
                     print(f'nozzle_position: {nozzle_dist[Axis.by_mount(mount)]}')
                     nozzle_measurement = gauge.read()
                     nozzle_measurement_map.append(nozzle_measurement)
-                    print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
-                    print("\r", end="")
-                    # measurements.append(nozzle_measurement)
-                    # if nozzle_count % num_of_columns == 0:
-                    #     d_str = ''
-                    #     for m in measurements:
-                    #         d_str += str(m) + ','
-                    #     d_str = d_str[:-1] + '\n'
-                    #     print(f"{d_str}")
-                    #     data.append_data_to_file(test_n, test_id, test_f, d_str)
-                    #     # Reset Measurements list
-                    #     measurements = []
-                    print("\r\n")
+                    print(f"nozzle-{nozzle_count} (mm): {nozzle_measurement}")
                     x_offset -= 9
                     if nozzle_count % num_of_columns == 0:
                         y_offset += 9
@@ -566,8 +499,7 @@ async def _main() -> None:
                     await asyncio.sleep(1)
                     nozzle_measurement = gauge.read()
                     nozzle_measurement_map.append(nozzle_measurement)
-                    print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
-                    print("\r", end="")
+                    print(f"nozzle-{nozzle_count} (mm): {nozzle_measurement}")
                     measurements.append(nozzle_measurement)
                     if nozzle_count % num_of_columns == 0:
                         d_str = ''
@@ -615,7 +547,7 @@ async def _main() -> None:
                 print(f'Nozzle Measurements: {nozzle_measurement_map}')
         # Calibrate to tiprack
         if (args.calibrate):
-            pickup_loc, initial_press_dist, press_dist = await calibrate_tiprack(hw_api, home_position, mount)
+            pickup_loc, initial_press_dist = await calibrate_tiprack(hw_api, home_position, mount)
             deck_slot['deck_slot'][args.tiprack_slot][Axis.X.name] = pickup_loc.x
             deck_slot['deck_slot'][args.tiprack_slot][Axis.Y.name] = pickup_loc.y
             deck_slot['deck_slot'][args.tiprack_slot]['Z'] = pickup_loc.z
@@ -693,7 +625,6 @@ async def _main() -> None:
                         d_str = ''
                         for m in measurements:
                             d_str +=  str(initial_press_dist[Axis.by_mount(mount)]) + ',' \
-                                      + str(press_dist[Axis.by_mount(mount)]) + ',' \
                                       + str(encoder_pos[0]) + ',' \
                                       + str(m) + ','
                         d_str = d_str[:-1] + '\n'
@@ -718,28 +649,13 @@ async def _main() -> None:
                 await countdown(leak_test_time)
                 await move_to_point(hw_api, mount, trough_loc, cp)
                 await hw_api.dispense(mount)
-                # await hw_api.home_z(mount)
-            # hw_api.clamp_drop_tip_speed = float(input("Drop tip speed: "))
-            # await update_drop_tip_speed(hw_api, mount, hw_api.clamp_drop_tip_speed )
             cp = CriticalPoint.TIP
             drop_tip_location =  Point(30 , 60 , 104.5)
              # 299.66 , 389.04 , 104.5
             await move_to_point(hw_api, mount, drop_tip_location, cp)
             await hw_api.drop_tip(mount)
-            # await hw_api.home_z(mount)
-            # m_current = float(input("motor_current in amps: "))
-            # pick_up_speed = float(input("prep pick up tip speed in mm/s: "))
-            # Pick up distance i originally used was 16.5
-            # pick_up_distance = float(input("pick up distance in mm: "))
-            # hw_api.clamp_tip_speed = float(input("clamp pick up Speed: "))
-            # num_of_columns = int(input("How many Columns: "))
-            # num_of_rows = int(input("Number of Rows: "))
-            # tips_to_use = (num_of_rows * num_of_columns)
             tips_to_use = args.nozzles
-            # tips_to_use = num_of_columns * 8
             update_pick_up_current(hw_api, mount, m_current)
-            # await update_pick_up_speed(hw_api, mount, pick_up_speed)
-            # await update_pick_up_distance(hw_api, mount, pick_up_distance)
             cp = CriticalPoint.NOZZLE
             if args.columns:
                 x_dir, y_dir = pickup_direction(args.nozzle_config)
@@ -769,26 +685,14 @@ async def _main() -> None:
             trial += 1
             print(f'Trial: {trial}')
             print(f'inital press position: {initial_press_dist[Axis.by_mount(mount)]}')
-            press_dist = await hw_api.pick_up_tip(mount,
-                                    tip_length=(tip_length[args.tip_size]-tip_overlap),
-                                    presses = 1,
-                                    increment = 0)
+            await hw_api.pick_up_tip(mount, tip_length=(tip_length[args.tip_size]-tip_overlap), presses = 1,
+                                     increment = 0)
 
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)
             await hw_api.move_rel(mount, Point(0, 0, 10))
             tip_status = await hw_api.get_tip_presence_status(mount)
-            print(f'Press Position: {press_dist[Axis.by_mount(mount)]}')
             tip_offset = 1.0
-            # enc_tipoverlap = initial_press_dist[Axis.by_mount(mount)] - press_dist[Axis.by_mount(mount)] - tip_offset
-            # print(f'Enc TipOverlap: {enc_tipoverlap}')
-            # instr = hw_api._pipette_handler.get_pipette(mount)
-            # print(f'current_tipL: {instr.current_tip_length}')
-            # instr.remove_tip()
-            # current_position = await hw_api.current_position_ot3(mount)
-            # print(current_position)
-            # instr.add_tip((tip_length[args.tip_size]-enc_tipoverlap))
-            # print(f'new_current_tipL: {instr.current_tip_length}')
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)
             print(current_position)
