@@ -88,10 +88,12 @@ def _circular_frustum_polynomial_roots(
 def _volume_from_height_circular(
     target_height: float, segment: ConicalFrustum
 ) -> float:
-    """Find the volume given a height within a circular frustum."""
-    heights = segment.height_to_volume_table.keys()
-    best_fit_height = min(heights, key=lambda x: abs(x - target_height))
-    return segment.height_to_volume_table[best_fit_height]
+    return segment.volume_from_height_circular(
+        top_radius=segment.topDiameter / 2,
+        bottom_radius=segment.bottomDiameter / 2,
+        target_height=target_height,
+        total_height=segment.topHeight - segment.bottomHeight,
+    )
 
 
 def _volume_from_height_rectangular(
@@ -138,9 +140,7 @@ def _height_from_volume_circular(
     target_volume: float, segment: ConicalFrustum
 ) -> float:
     """Find the height given a volume within a squared cone segment."""
-    volumes = segment.volume_to_height_table.keys()
-    best_fit_volume = min(volumes, key=lambda x: abs(x - target_volume))
-    return segment.volume_to_height_table[best_fit_volume]
+    return segment.height_from_volume_search(target_volume)
 
 
 def _height_from_volume_rectangular(
@@ -401,8 +401,12 @@ def _find_height_in_partial_frustum(
 ) -> float:
     """Look through a sorted list of frusta for a target volume, and find the height at that volume."""
     bottom_section_volume = 0.0
+    if target_volume == 0.0:
+        return 0.0
     for section, capacity in zip(sorted_well, volumetric_capacity):
         section_top_height, section_volume = capacity
+        if target_volume == section_volume + bottom_section_volume:
+            return section_top_height
         if (
             bottom_section_volume
             <= target_volume
