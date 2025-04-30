@@ -305,7 +305,6 @@ reportAndRouteFailedCmd(
           )
       } else {
 return reportAndRouteFailedCmd(
-        return Promise.reject(
           new Error('Could not execute command. No failed command.')
         )
       }
