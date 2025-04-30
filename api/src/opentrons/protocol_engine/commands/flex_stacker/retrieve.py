@@ -201,6 +201,11 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
 
     async def execute(self, params: RetrieveParams) -> _ExecuteReturn:
         """Execute the labware retrieval command."""
+        try:
+            raise FlexStackerShuttleLabwareError(serial="123", labware_expected=False, shuttle_state="")
+        except FlexStackerShuttleLabwareError as e:
+            return self.handle_recoverable_error(e, '123',
+            update_types.StateUpdate())
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )

@@ -12,7 +12,7 @@ import {
 
 import { TwoColumn } from '/app/molecules/InterventionModal'
 
-import { RECOVERY_MAP } from '../constants'
+import { RECOVERY_MAP, REENGAGE_LATCH_ROUTES } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
@@ -26,8 +26,10 @@ export function TwoColTextAndImage(
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
     MANUAL_REPLACE_STACKER_AND_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
   } = RECOVERY_MAP
-  const { route } = recoveryMap
+  const { route, step } = recoveryMap
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { t } = useTranslation('error_recovery')
 
@@ -39,6 +41,13 @@ export function TwoColTextAndImage(
     switch (route) {
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('load_labware_shuttle_onto_track')
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
+          return t('prepare_for_stacker_latch_reengage')
+        } else {
+          return t('empty_stacker_of_labware_above_latch')
+        }
       case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
         return t('clear_track_of_obstructions')
@@ -57,11 +66,35 @@ export function TwoColTextAndImage(
       case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
         return t('clear_track_of_obstructions_and_close_door')
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
+          return t('stacker_latch_will_reengage')
+        } else {
+          return t('empty_stacker_of_labware_above_latch_labware_stuck')
+        }
       default:
         console.error(
           `TwoColTextAndImage:buildBannerText: Unexpected recovery option ${route}. Handle retry step copy explicitly.`
         )
         return 'UNEXPECTED RECOVERY OPTION'
+    }
+  }
+
+  const buildButtonText = (): string => {
+    switch (route) {
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
+          return t('re_engage_latch')
+        } else {
+          return t('continue')
+        }
+      default:
+        console.error(
+          `TwoColTextAndImage:buildButtonText: Unexpected recovery option ${route}. Handle retry step copy explicitly.`
+        )
+        return t('continue')
     }
   }
 
@@ -113,6 +146,7 @@ export function TwoColTextAndImage(
       <RecoveryFooterButtons
         primaryBtnOnClick={primaryOnClick}
         secondaryBtnOnClick={goBackPrevStep}
+        primaryBtnTextOverride={buildButtonText()}
       ></RecoveryFooterButtons>
     </RecoverySingleColumnContentWrapper>
   )

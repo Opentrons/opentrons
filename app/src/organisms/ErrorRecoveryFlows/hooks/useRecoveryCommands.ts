@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react'
 import head from 'lodash/head'
 
 import {
-  useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
@@ -72,10 +71,6 @@ export interface UseRecoveryCommandsResult {
   /* A non-terminal recovery command */
   releaseGripperJaws: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
-  releaseLabwareLatch: () => Promise<CommandData[]>
-  /* A non-terminal recovery command */
-  closeLabwareLatch: () => Promise<CommandData[]>
-  /* A non-terminal recovery command */
   homeExceptPlungers: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
   moveLabwareWithoutPause: () => Promise<CommandData[]>
@@ -83,6 +78,8 @@ export interface UseRecoveryCommandsResult {
   homeAll: () => Promise<CommandData[]>
   /* A non-terminal recovery-command */
   homeShuttle: () => Promise<CommandData[]>
+  /* A non-terminal recovery-command */
+  manualRetrieve: () => Promise<CommandData[]>
 }
 
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
@@ -100,6 +97,10 @@ export function useRecoveryCommands({
   const [ignoreErrors, setIgnoreErrors] = useState(false)
 
   const { proceedToRouteAndStep } = routeUpdateActions
+  const { chainRunCommands } = useChainRunCommands(
+    runId,
+    unvalidatedFailedCommand?.id
+  )
   const {
     mutateAsync: resumeRunFromRecovery,
   } = useResumeRunFromRecoveryMutation()
@@ -108,22 +109,7 @@ export function useRecoveryCommands({
   } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
   const { stopRun } = useStopRunMutation()
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
-  const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
-  const { chainRunCommands } = useChainRunCommands(
-    runId,
-    unvalidatedFailedCommand?.id,
-    currentRecoveryPolicy
-  )
-
   const { makeSuccessToast } = recoveryToastUtils
-
-  const reportAndRouteFailedCmd = (e: Error): Promise<never> => {
-    console.warn(`Error executing "fixit" command: ${e}`)
-    analytics.reportActionSelectedResult(selectedRecoveryOption, 'failed')
-    void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
-
-    return Promise.reject(new Error(`Could not execute command: ${e}`))
-  }
 
   // TODO(jh, 11-21-24): Some commands return a 200 with an error body. We should catch these and propagate the error.
   const chainRunRecoveryCommands = useCallback(
@@ -131,9 +117,13 @@ export function useRecoveryCommands({
       commands: CreateCommand[],
       continuePastFailure: boolean = false
     ): Promise<CommandData[]> =>
-      chainRunCommands(commands, continuePastFailure)
+      chainRunCommands(commands, continuePastFailure).catch(e => {
+        console.warn(`Error executing "fixit" command: ${e}`)
+        analytics.reportActionSelectedResult(selectedRecoveryOption, 'failed')
         // the catch never occurs if continuePastCommandFailure is "true"
-        .catch((e: Error) => reportAndRouteFailedCmd(e)),
+        void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
+        return Promise.reject(new Error(`Could not execute command: ${e}`))
+      }),
     [analytics, selectedRecoveryOption]
   )
 
@@ -221,9 +211,7 @@ export function useRecoveryCommands({
     )
 
     if (pickUpTipCmd == null) {
-      return reportAndRouteFailedCmd(
-        new Error('Invalid use of pickUpTips command')
-      )
+      return Promise.reject(new Error('Invalid use of pickUpTips command'))
     } else {
       return chainRunRecoveryCommands([pickUpTipCmd])
     }
@@ -254,12 +242,13 @@ export function useRecoveryCommands({
         return updateErrorRecoveryPolicy(ignorePolicyRules, 'append')
           .then(() => Promise.resolve())
           .catch((e: Error) =>
-            reportAndRouteFailedCmd(
+            Promise.reject(
               new Error(`Failed to update recovery policy: ${e.message}`)
             )
           )
       } else {
-        return reportAndRouteFailedCmd(
+        void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
+        return Promise.reject(
           new Error('Could not execute command. No failed command.')
         )
       }
@@ -326,28 +315,6 @@ export function useRecoveryCommands({
     return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
   }, [chainRunRecoveryCommands])
 
-  const releaseLabwareLatch = useCallback((): Promise<CommandData[]> => {
-    const buildOpenLatchCommand = buildOpenLatch(unvalidatedFailedCommand)
-    if (buildOpenLatchCommand == null) {
-      return Promise.reject(
-        new Error('Invalid use of open labware latch command')
-      )
-    } else {
-      return chainRunRecoveryCommands([buildOpenLatchCommand])
-    }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
-
-  const closeLabwareLatch = useCallback((): Promise<CommandData[]> => {
-    const buildCloseLatchCommand = buildCloseLatch(unvalidatedFailedCommand)
-    if (buildCloseLatchCommand == null) {
-      return Promise.reject(
-        new Error('Invalid use of close labware latch command')
-      )
-    } else {
-      return chainRunRecoveryCommands([buildCloseLatchCommand])
-    }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
-
   const homeExceptPlungers = useCallback((): Promise<CommandData[]> => {
     return chainRunRecoveryCommands([HOME_EXCEPT_PLUNGERS])
   }, [chainRunRecoveryCommands])
@@ -365,14 +332,21 @@ export function useRecoveryCommands({
     }
   }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
+  const manualRetrieve = useCallback((): Promise<CommandData[]> => {
+    const manualRetrieveCommand = buildManualRetrieve(unvalidatedFailedCommand)
+    if (manualRetrieveCommand == null) {
+      return Promise.reject(new Error('Invalid use of manual retrieve command'))
+    } else {
+      return chainRunRecoveryCommands([manualRetrieveCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+
   const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
     const moveLabwareCmd = buildMoveLabwareWithoutPause(
       unvalidatedFailedCommand
     )
     if (moveLabwareCmd == null) {
-      return reportAndRouteFailedCmd(
-        new Error('Invalid use of MoveLabware command')
-      )
+      return Promise.reject(new Error('Invalid use of MoveLabware command'))
     } else {
       return chainRunRecoveryCommands([moveLabwareCmd])
     }
@@ -385,14 +359,13 @@ export function useRecoveryCommands({
     homePipetteZAxes,
     pickUpTips,
     releaseGripperJaws,
-    releaseLabwareLatch,
-    closeLabwareLatch,
     homeExceptPlungers,
     moveLabwareWithoutPause,
     skipFailedCommand,
     ignoreErrorKindThisRun,
     homeAll,
     homeShuttle,
+    manualRetrieve,
   }
 }
 
@@ -455,7 +428,7 @@ const buildHomeShuttle = (
       ? storeOrRetriveFailedCommandParams.moduleId
       : ''
   return {
-    commandType: 'unsafe/flexStacker/prepareShuttle',
+    commandType: 'flexStacker/prepareShuttle',
     params: {
       moduleId: moduleId,
     },
@@ -463,7 +436,7 @@ const buildHomeShuttle = (
   }
 }
 
-const buildOpenLatch = (
+const buildManualRetrieve = (
   failedCommand: FailedCommand | null
 ): CreateCommand | null => {
   if (failedCommand == null) {
@@ -475,27 +448,7 @@ const buildOpenLatch = (
       ? storeOrRetriveFailedCommandParams.moduleId
       : ''
   return {
-    commandType: 'flexStacker/openLatch',
-    params: {
-      moduleId: moduleId,
-    },
-    intent: 'fixit',
-  }
-}
-
-const buildCloseLatch = (
-  failedCommand: FailedCommand | null
-): CreateCommand | null => {
-  if (failedCommand == null) {
-    return null
-  }
-  const storeOrRetriveFailedCommandParams = failedCommand.params
-  const moduleId =
-    'moduleId' in storeOrRetriveFailedCommandParams
-      ? storeOrRetriveFailedCommandParams.moduleId
-      : ''
-  return {
-    commandType: 'flexStacker/closeLatch',
+    commandType: 'unsafe/manualRetrieve',
     params: {
       moduleId: moduleId,
     },
