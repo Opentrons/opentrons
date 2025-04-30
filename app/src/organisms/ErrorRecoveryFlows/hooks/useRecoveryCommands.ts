@@ -304,7 +304,7 @@ reportAndRouteFailedCmd(
             )
           )
       } else {
-        void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
+return reportAndRouteFailedCmd(
         return Promise.reject(
           new Error('Could not execute command. No failed command.')
         )
