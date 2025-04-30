@@ -112,7 +112,8 @@ export function getLoadAdapters(
     .map(adapter => {
       const { id, def, pythonName } = adapter
       const { parameters, namespace, version } = def
-      const adapterSlot = labwareRobotState[id].slot
+      // 2nd item in stack is the slot the adapter is on
+      const adapterSlot = labwareRobotState[id].stack[1]
       const onModule = moduleEntities[adapterSlot] != null
 
       let parentName: string
@@ -173,7 +174,8 @@ export function getLoadLabware(
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
-      const labwareSlot = labwareRobotState[id].slot
+      // 2nd item in stack is the slot the labware is on
+      const labwareSlot = labwareRobotState[id].stack[1]
       const onModule = moduleEntities[labwareSlot] != null
       const onAdapter = allLabwareEntities[labwareSlot] != null
 

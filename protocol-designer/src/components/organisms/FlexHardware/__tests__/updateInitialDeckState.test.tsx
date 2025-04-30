@@ -120,7 +120,7 @@ describe('updateInitialDeckState', () => {
         pipettes: {},
         labware: {
           labware: {
-            slot: 'D1',
+            stack: ['labware', 'D1'],
             def: fixture12Trough as LabwareDefinition2,
             labwareDefURI: 'mockURI',
             id: 'labware',
@@ -218,7 +218,7 @@ describe('updateInitialDeckState', () => {
         ...mockEmptyIntialDeckSetup,
         labware: {
           labware: {
-            slot: 'A3',
+            stack: ['labware', 'A3'],
             def: fixture12Trough as LabwareDefinition2,
             labwareDefURI: 'mockURI',
             id: 'labware',
@@ -330,7 +330,7 @@ describe('updateInitialDeckState', () => {
         ...mockInitialDeckSetup,
         labware: {
           labware: {
-            slot: 'B4',
+            stack: ['labware', 'B4'],
             def: fixture12Trough as LabwareDefinition2,
             labwareDefURI: 'mockURI',
             id: 'labware',
@@ -412,7 +412,7 @@ describe('updateInitialDeckState', () => {
         ...mockInitialDeckSetup,
         labware: {
           labware: {
-            slot: 'D4',
+            stack: ['labware', 'D4'],
             def: fixture12Trough as LabwareDefinition2,
             labwareDefURI: 'mockURI',
             id: 'labware',

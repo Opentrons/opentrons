@@ -10,6 +10,7 @@ import {
   getUnoccupiedLabwareLocationOptions,
 } from '../../../../../../top-selectors/labware-locations'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
+import { getSlotInLocationStack } from '../../../../../../utils'
 
 import type { FieldProps } from '../../types'
 
@@ -29,7 +30,10 @@ export function LabwareLocationField(
   const dispatch = useDispatch()
   const robotState = useSelector(getRobotStateAtActiveItem)
   const isLabwareOffDeck =
-    labware != null ? robotState?.labware[labware]?.slot === 'offDeck' : false
+    labware != null
+      ? getSlotInLocationStack(robotState?.labware[labware]?.stack ?? []) ===
+        'offDeck'
+      : false
 
   let unoccupiedLabwareLocationsOptions =
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []

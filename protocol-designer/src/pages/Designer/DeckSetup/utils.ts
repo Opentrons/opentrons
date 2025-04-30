@@ -14,8 +14,13 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { getIsAdapter, getStagingAreaAddressableAreas } from '../../../utils'
+import {
+  getIsAdapter,
+  getModuleIdFromStack,
+  getStagingAreaAddressableAreas,
+} from '../../../utils'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
@@ -209,7 +214,7 @@ export const getDeckErrors = (props: DeckErrorsProps): string | null => {
       }
     } else if (getModuleType(selectedModel) === THERMOCYCLER_MODULE_TYPE) {
       const isLabwareInTCSlots = Object.values(labware).some(lw =>
-        OT2_TC_SLOTS.includes(lw.slot)
+        OT2_TC_SLOTS.includes(getSlotInLocationStack(lw.stack))
       )
       if (isLabwareInTCSlots) {
         error = 'tc_slots_occupied_ot2'
@@ -218,7 +223,7 @@ export const getDeckErrors = (props: DeckErrorsProps): string | null => {
   } else {
     if (getModuleType(selectedModel) === THERMOCYCLER_MODULE_TYPE) {
       const isLabwareInTCSlots = Object.values(labware).some(lw =>
-        FLEX_TC_SLOTS.includes(lw.slot)
+        FLEX_TC_SLOTS.includes(getSlotInLocationStack(lw.stack))
       )
       if (isLabwareInTCSlots) {
         error = 'tc_slots_occupied_flex'
@@ -297,7 +302,8 @@ export const getAdjacentLabware = (
 
     adjacentLabware =
       Object.values(labware).find(
-        lw => lw.slot === stagingAreaAddressableAreaName[0]
+        lw =>
+          getSlotInLocationStack(lw.stack) === stagingAreaAddressableAreaName[0]
       ) ?? null
   }
   return adjacentLabware
@@ -369,10 +375,13 @@ export const getSwapBlockedModule = (args: SwapBlockedModuleArgs): boolean => {
     return false
   }
 
+  const sourceModuleId = getModuleIdFromStack(draggedLabware.stack, modulesById)
+  const destModuleId = getModuleIdFromStack(hoveredLabware.stack, modulesById)
   const sourceModuleType: ModuleType | null =
-    modulesById[draggedLabware.slot]?.type || null
+    sourceModuleId != null ? modulesById[sourceModuleId].type : null
+
   const destModuleType: ModuleType | null =
-    modulesById[hoveredLabware.slot]?.type || null
+    destModuleId != null ? modulesById[destModuleId].type : null
 
   const draggedLabwareIsCustom = getLabwareIsCustom(
     customLabwareDefs,
@@ -412,7 +421,7 @@ export const getSwapBlockedAdapter = (
   }
 
   const adapterSourceToDestLoadname: string | null =
-    labwareById[draggedLabware.slot]?.def.parameters.loadName ?? null
+    labwareById[draggedLabware.stack]?.def.parameters.loadName ?? null
   const adapterDestToSourceLoadname: string | null =
     labwareById[hoveredLabware.slot]?.def.parameters.loadName ?? null
 
@@ -541,7 +550,7 @@ export function getHighlightLabwareAndModules(
           item.id != null &&
           labware[item.id] != null &&
           getIsAdapter(item.id, labware)
-            ? modules[labware[item.id].slot]?.id
+            ? getModuleIdFromStack(labware[item.id].stack, modules)
             : null
 
         const updatedItem =

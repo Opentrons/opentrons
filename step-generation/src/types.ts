@@ -30,7 +30,7 @@ export type DeckSlot = string
 type THERMOCYCLER_STATE = 'thermocyclerState'
 type THERMOCYCLER_PROFILE = 'thermocyclerProfile'
 export interface LabwareTemporalProperties {
-  slot: DeckSlot
+  stack: string[] // a stack of ids from top to bottom
 }
 
 export interface PipetteTemporalProperties {

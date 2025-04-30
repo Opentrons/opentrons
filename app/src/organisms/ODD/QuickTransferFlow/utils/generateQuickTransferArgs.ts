@@ -9,7 +9,10 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
-import { makeInitialRobotState } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  makeInitialRobotState,
+} from '@opentrons/step-generation'
 
 import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
@@ -104,7 +107,7 @@ function getInvariantContextAndRobotState(
     }
     labwareLocations = {
       [adapterId]: {
-        slot: 'B2',
+        stack: [adapterId, 'B2'],
       },
     }
   }
@@ -135,10 +138,11 @@ function getInvariantContextAndRobotState(
   labwareLocations = {
     ...labwareLocations,
     [tipRackId]: {
-      slot: adapterId ?? 'B2',
+      stack:
+        adapterId != null ? [tipRackId, adapterId, 'B2'] : [tipRackId, 'B2'],
     },
     [sourceLabwareId]: {
-      slot: 'C2',
+      stack: [sourceLabwareId, 'C2'],
     },
   }
 
@@ -159,7 +163,7 @@ function getInvariantContextAndRobotState(
     labwareLocations = {
       ...labwareLocations,
       [destLabwareId]: {
-        slot: 'D2',
+        stack: [destLabwareId, 'D2'],
       },
     }
   }
@@ -343,7 +347,8 @@ export function generateQuickTransferArgs(
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
 
   const sourceLabwareId = Object.keys(robotState.labware).find(
-    labwareId => robotState.labware[labwareId].slot === 'C2'
+    labwareId =>
+      getSlotInLocationStack(robotState.labware[labwareId].stack) === 'C2'
   )
   const sourceLabwareEntity =
     sourceLabwareId != null
@@ -352,7 +357,8 @@ export function generateQuickTransferArgs(
   let destLabwareEntity = sourceLabwareEntity
   if (quickTransferState.destination !== 'source') {
     const destinationLabwareId = Object.keys(robotState.labware).find(
-      labwareId => robotState.labware[labwareId].slot === 'D2'
+      labwareId =>
+        getSlotInLocationStack(robotState.labware[labwareId].stack) === 'D2'
     )
     destLabwareEntity =
       destinationLabwareId != null

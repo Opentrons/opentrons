@@ -51,7 +51,9 @@ import type {
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
+  LabwareTemporalProperties,
   LocationLiquidState,
+  ModuleTemporalProperties,
   PipetteEntity,
   RobotState,
   SourceAndDest,
@@ -852,4 +854,51 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
+}
+
+export function getSlotInLocationStack(stack?: string[]): string {
+  if (stack == null) {
+    console.error('expected to find stack but could not')
+    return 'unknown slot'
+  } else {
+    return stack[stack.length - 1]
+  }
+}
+
+export function getTopLocationInStack(stack?: string[]): string {
+  if (stack == null) {
+    console.error('expected to find stack but could not')
+    return 'unknown top location'
+  } else {
+    return stack[0]
+  }
+}
+
+export function getModuleIdFromRobotStateStack(
+  modules: RobotState['modules'],
+  stack?: string[]
+): string | null {
+  return stack?.find(id => modules[id] != null) ?? null
+}
+
+export function getFullStackFromLabwares(
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  },
+  slot: string
+): string[] {
+  return Object.values(labware)
+    .filter(lw => lw.stack.includes(slot))
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+}
+
+export function getTopmostLabwareOnModuleFromStackRobotState(
+  moduleId: string,
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  }
+): string {
+  return Object.values(labware)
+    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
 }

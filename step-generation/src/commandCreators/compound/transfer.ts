@@ -15,6 +15,7 @@ import {
   curryCommandCreator,
   delayLocationHelper,
   dispenseLocationHelper,
+  getSlotInLocationStack,
   getTrashOrLabware,
   reduceCommandCreators,
 } from '../../utils'
@@ -134,8 +135,12 @@ export const transfer: CommandCreator<TransferArgs> = (
     )
   }
 
-  const initialDestLabwareSlot = prevRobotState.labware[destLabware]?.slot
-  const initialSourceLabwareSlot = prevRobotState.labware[sourceLabware]?.slot
+  const initialDestLabwareSlot = getSlotInLocationStack(
+    prevRobotState.labware[destLabware]?.stack
+  )
+  const initialSourceLabwareSlot = getSlotInLocationStack(
+    prevRobotState.labware[sourceLabware]?.stack
+  )
   const hasWasteChute =
     Object.keys(invariantContext.wasteChuteEntities).length > 0
 

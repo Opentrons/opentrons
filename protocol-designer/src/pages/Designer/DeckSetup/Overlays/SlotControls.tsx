@@ -14,6 +14,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getCutoutIdFromAddressableArea } from '@opentrons/shared-data'
+import { getTopLocationInStack } from '@opentrons/step-generation'
 
 import { DND_TYPES } from '../../../../constants'
 import { selectors as labwareDefSelectors } from '../../../../labware-defs'
@@ -113,7 +114,11 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
       drop: (item: DroppedItem) => {
         const droppedLabware = item
         if (droppedLabware.labwareOnDeck != null) {
-          const droppedSlot = droppedLabware.labwareOnDeck.slot
+          const droppedSlot =
+            droppedLabware.labwareOnDeck.stack[
+              droppedLabware.labwareOnDeck.stack.length - 1
+            ]
+
           dispatch(moveDeckItem(droppedSlot, slotId))
         }
       },

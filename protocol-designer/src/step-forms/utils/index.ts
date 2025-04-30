@@ -212,20 +212,13 @@ export const getSlotIsEmpty = (
             : slot.includes(moduleOnDeck.slot)
         }
       ),
-      ...values(initialDeckSetup.labware).filter(
-        (labware: LabwareOnDeckType) => labware.slot === slot
+      ...values(initialDeckSetup.labware).filter((labware: LabwareOnDeckType) =>
+        labware.stack.includes(slot)
       ),
     ].length === 0
   )
 }
-export const getLabwareOnSlot = (
-  initialDeckSetup: InitialDeckSetup,
-  slot: string
-): LabwareOnDeckType | null => {
-  return (
-    find(initialDeckSetup.labware, labware => labware.slot === slot) ?? null
-  )
-}
+
 export const getIsCrashablePipetteSelected = (
   pipettesByMount: FormPipettesByMount
 ): boolean => {

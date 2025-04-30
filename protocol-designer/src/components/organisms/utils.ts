@@ -55,9 +55,11 @@ export const getLabwareNotCompatibleWithModule = (
 ): string | null => {
   const slot = cutoutId.split('cutout')[1]
   const isThermocycler = moduleType === THERMOCYCLER_MODULE_TYPE
-  const labwareOnSlot = Object.values(labware).find(lw => lw.slot === slot)
+  const labwareOnSlot = Object.values(labware).find(lw =>
+    lw.stack.includes(slot)
+  )
   const isLabwareOnOtherTCSlot = isThermocycler
-    ? Object.values(labware).some(({ slot }) => slot === tcSlot)
+    ? Object.values(labware).some(({ stack }) => stack.includes(tcSlot))
     : false
 
   if (isLabwareOnOtherTCSlot) {
@@ -76,7 +78,7 @@ export const getSlotHasLabware = (
   cutoutId: CutoutId
 ): boolean => {
   const slot = cutoutId.split('cutout')[1]
-  return Object.values(labware).some(lw => lw.slot === slot)
+  return Object.values(labware).some(lw => lw.stack.includes(slot))
 }
 
 //  NOTE: used to get the next available module slot for OT-2

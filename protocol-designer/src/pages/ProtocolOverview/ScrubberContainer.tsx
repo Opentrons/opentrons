@@ -3,6 +3,10 @@ import flatMap from 'lodash/flatMap'
 
 import { ProtocolTimelineScrubber } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  COLUMN_4_SLOTS,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import {
   getInitialRobotState,
@@ -17,7 +21,7 @@ import {
   getLiquidEntities,
 } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
-import { uuid } from '../../utils'
+import { getModuleIdFromStack, uuid } from '../../utils'
 
 import type {
   AddressableAreaName,
@@ -46,12 +50,7 @@ export function ScrubberContainer(): JSX.Element | null {
   }
 
   const { pipetteEntities, labwareEntities, moduleEntities } = invariantContext
-  const {
-    pipettes,
-    modules,
-    labware,
-    additionalEquipmentOnDeck,
-  } = initialDeckSetup
+  const { pipettes, modules, labware } = initialDeckSetup
 
   const loadCommands = getLoadCommands(
     initialRobotState,
@@ -117,28 +116,25 @@ export function ScrubberContainer(): JSX.Element | null {
   }))
 
   const loadLabware: LoadedLabware[] = Object.values(labware).map(lw => {
-    let location: LabwareLocation = { slotName: lw.slot }
-    if (lw.slot in modules) {
-      location = { moduleId: lw.slot }
-    } else if (
-      labware[lw.slot] != null &&
-      labware[lw.slot].def.allowedRoles?.includes('adapter')
-    ) {
-      location = { labwareId: lw.slot }
-    } else if (lw.slot === 'offDeck') {
+    let location: LabwareLocation = {
+      slotName: getSlotInLocationStack(lw.stack),
+    }
+    const moduleId = getModuleIdFromStack(lw.stack, modules)
+    if (moduleId != null) {
+      location = { moduleId }
+    } else if (labware[lw.id].def.allowedRoles?.includes('adapter')) {
+      location = { labwareId: lw.id }
+    } else if (getSlotInLocationStack(lw.stack) === 'offDeck') {
       location = 'offDeck'
-    } else if (
-      Object.values(additionalEquipmentOnDeck).find(
-        ae => ae.location === lw.slot
-      )
-    ) {
-      const inWasteChute = Object.values(additionalEquipmentOnDeck).find(
-        ae => ae.location === lw.slot && ae.name === 'wasteChute'
-      )
+    } else if (getSlotInLocationStack(lw.stack) === 'gripperWasteChute') {
       location = {
-        addressableAreaName: inWasteChute
-          ? 'gripperWasteChute'
-          : (lw.slot as AddressableAreaName),
+        addressableAreaName: 'gripperWasteChute',
+      }
+    } else if (COLUMN_4_SLOTS.includes(getSlotInLocationStack(lw.stack))) {
+      location = {
+        addressableAreaName: getSlotInLocationStack(
+          lw.stack
+        ) as AddressableAreaName,
       }
     }
 

@@ -14,7 +14,11 @@ import { getRobotType } from '../../file-data/selectors'
 import { getLabwareEntities } from '../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
-import { getStagingAreaAddressableAreas } from '../../utils'
+import {
+  getFullStackFromLabwares,
+  getSlotInLocationStack,
+  getStagingAreaAddressableAreas,
+} from '../../utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type {
@@ -75,12 +79,21 @@ export const getSlotInformation = (
   const createdModuleForSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
   )
-  const createdLabwareForSlot = Object.values(deckSetupLabware).find(
-    lw => lw.slot === slot || lw.slot === createdModuleForSlot?.id
+  const fullStackFromLabwares = getFullStackFromLabwares(
+    Object.values(deckSetupLabware),
+    slot
   )
-  const createdNestedLabwareForSlot = Object.values(deckSetupLabware).find(
-    lw => lw.slot === createdLabwareForSlot?.id
-  )
+  const labwareIdsFromFullStack =
+    fullStackFromLabwares?.filter(id => deckSetupLabware[id] != null) ?? []
+  const createdLabwareForSlot =
+    deckSetupLabware[
+      labwareIdsFromFullStack[labwareIdsFromFullStack.length - 1]
+    ]
+  //  top most labware
+  const createdNestedLabwareForSlot =
+    labwareIdsFromFullStack.length <= 1
+      ? undefined
+      : deckSetupLabware[fullStackFromLabwares[0]]
   const createdFixtureForSlots = Object.values(
     additionalEquipmentOnDeck
   ).filter(ae => {
@@ -104,7 +117,8 @@ export const getSlotInformation = (
     ] as CutoutId[])
     matchingLabware =
       Object.values(deckSetupLabware).find(
-        lw => lw.slot === stagingAreaAddressableAreaName[0]
+        lw =>
+          getSlotInLocationStack(lw.stack) === stagingAreaAddressableAreaName[0]
       ) ?? null
   }
 
@@ -112,7 +126,6 @@ export const getSlotInformation = (
     createdFixtureForSlots != null && createdFixtureForSlots.length === 2
       ? ('wasteChuteAndStagingArea' as Fixture)
       : (createdFixtureForSlots[0]?.name as Fixture)
-
   return {
     createdModuleForSlot,
     createdLabwareForSlot,
@@ -151,29 +164,20 @@ export const _sortLabwareDropdownOptions = (
 
 function resolveSlotLocation(
   modules: InitialDeckSetup['modules'],
-  labware: InitialDeckSetup['labware'],
-  location: string,
+  locationStack: string[],
   robotType: RobotType
 ): string {
   const TCSlot =
     robotType === FLEX_ROBOT_TYPE
       ? TC_MODULE_LOCATION_OT3
       : TC_MODULE_LOCATION_OT2
-  if (location === 'offDeck') {
-    return 'offDeck'
-  } else if (modules[location] != null) {
-    return modules[location].type === THERMOCYCLER_MODULE_TYPE
-      ? TCSlot
-      : modules[location].slot
-  } else if (labware[location] != null) {
-    const adapter = labware[location]
-    if (modules[adapter.slot] != null) {
-      return modules[adapter.slot].type === THERMOCYCLER_MODULE_TYPE
-        ? TCSlot
-        : modules[adapter.slot].slot
-    } else {
-      return adapter.slot
-    }
+  let location = getSlotInLocationStack(locationStack)
+  const stackHasThermocycler = locationStack.some(
+    item =>
+      modules[item] != null && modules[item].type === THERMOCYCLER_MODULE_TYPE
+  )
+  if (stackHasThermocycler) {
+    return TCSlot
   } else {
     return location
   }
@@ -185,15 +189,13 @@ const getNickname = (
   labwareId: string,
   robotType: RobotType
 ): string => {
-  const { labware, modules } = activeDeckSetup
-  const slot = activeDeckSetup.labware[labwareId].slot
-  const latestSlot = resolveSlotLocation(modules, labware, slot, robotType)
+  const { modules } = activeDeckSetup
+  const stack = activeDeckSetup.labware[labwareId].stack
+  const latestSlot = resolveSlotLocation(modules, stack, robotType)
 
   let nickName: string = nicknamesById[labwareId]
   if (latestSlot != null && latestSlot !== 'offDeck') {
     nickName = `${nicknamesById[labwareId]} in ${latestSlot}`
-  } else if (latestSlot != null && latestSlot === 'offDeck') {
-    nickName = `${nicknamesById[labwareId]} off-deck`
   }
   return nickName
 }
@@ -212,8 +214,10 @@ export const useLabwareDropdownOptions = (
       labwareEntity: LabwareEntity,
       labwareId: string
     ): DropdownOption[] => {
-      const isLabwareInWasteChute =
-        activeDeckSetup.labware[labwareId].slot === 'gripperWasteChute'
+      const deckSlot = getSlotInLocationStack(
+        activeDeckSetup.labware[labwareId].stack
+      )
+      const isLabwareInWasteChute = deckSlot === 'gripperWasteChute'
 
       const isAdapter =
         labwareEntity.def.allowedRoles?.includes('adapter') ?? false
@@ -224,7 +228,7 @@ export const useLabwareDropdownOptions = (
         robotType
       )
       const isTiprack = getIsTiprack(labwareEntity.def)
-      const isOffDeck = activeDeckSetup.labware[labwareId].slot === 'offDeck'
+      const isOffDeck = deckSlot === 'offDeck'
 
       //  filter out moving adapters, and labware in
       //  waste chute for moveLabware, labware off-deck and

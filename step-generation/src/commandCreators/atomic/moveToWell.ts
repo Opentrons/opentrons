@@ -10,6 +10,7 @@ import {
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   getLabwareSlot,
+  getSlotInLocationStack,
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
   pipetteIntoHeaterShakerLatchOpen,
@@ -44,11 +45,7 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
 
-  const slotName = getLabwareSlot(
-    labwareId,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(labwareId, prevRobotState.labware)
 
   if (!pipetteSpec) {
     errors.push(
@@ -65,7 +62,10 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
         labware: labwareId,
       })
     )
-  } else if (prevRobotState.labware[labwareId].slot === 'offDeck') {
+  } else if (
+    getSlotInLocationStack(prevRobotState.labware[labwareId].stack) ===
+    'offDeck'
+  ) {
     errors.push(errorCreators.labwareOffDeck())
   }
 
@@ -74,7 +74,7 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
       errorCreators.pipettingIntoColumn4({ typeOfStep: 'move to well' })
     )
   } else if (labwareState[slotName] != null) {
-    const adapterSlot = labwareState[slotName].slot
+    const adapterSlot = getSlotInLocationStack(labwareState[slotName].stack)
     if (COLUMN_4_SLOTS.includes(adapterSlot)) {
       errors.push(
         errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })

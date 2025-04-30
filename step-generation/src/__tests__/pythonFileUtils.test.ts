@@ -167,15 +167,15 @@ const mockLabwareEntities: LabwareEntities = {
 
 const labwareRobotState: TimelineFrame['labware'] = {
   //  adapter on a module
-  [labwareId1]: { slot: moduleId },
+  [labwareId1]: { stack: [labwareId1, moduleId, 'B1'] },
   //  adapter on a slot
-  [labwareId2]: { slot: 'B2' },
+  [labwareId2]: { stack: [labwareId2, 'B2'] },
   //  labware on an adapter on a slot
-  [labwareId3]: { slot: labwareId2 },
+  [labwareId3]: { stack: [labwareId3, labwareId2, 'B2'] },
   //  labware on a module
-  [labwareId4]: { slot: moduleId3 },
+  [labwareId4]: { stack: [labwareId4, moduleId3, 'A2'] },
   //  labware on a slot
-  [labwareId5]: { slot: 'C2' },
+  [labwareId5]: { stack: [labwareId5, 'C2'] },
 }
 
 const mockLabwareNicknames: Record<string, string> = {
@@ -271,7 +271,7 @@ well_plate_3 = protocol.load_labware_from_definition(
               pythonName: 'well_plate_5',
             },
           },
-          { plateId: { slot: 'offDeck' } },
+          { plateId: { stack: ['plateId', 'offDeck'] } },
           {}
         )
       ).toBe(

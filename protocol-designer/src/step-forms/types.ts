@@ -106,7 +106,7 @@ export type NormalizedLabware = NormalizedLabwareById[keyof NormalizedLabwareByI
 // =========== TEMPORAL ONLY =====
 // Temporal properties (eg location) that are time-variant
 export interface LabwareTemporalProperties {
-  slot: DeckSlot
+  stack: string[] // a stack of ids from top to bottom
 }
 export interface PipetteTemporalProperties {
   mount: Mount
