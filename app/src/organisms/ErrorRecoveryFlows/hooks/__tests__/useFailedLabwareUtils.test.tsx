@@ -399,7 +399,7 @@ describe('getFailedLabwareQuantity', () => {
         failedLocalRetriveCommand,
         errorType
       )
-      expect(result).toEqual('Quantity: 4')
+      expect(result).toEqual(4)
     })
   })
 
@@ -471,7 +471,7 @@ describe('getFailedLabwareQuantity', () => {
         failedLocalRetriveCommand,
         errorType
       )
-      expect(result).toEqual('Quantity: 4')
+      expect(result).toEqual(4)
     })
   })
 
@@ -489,7 +489,7 @@ describe('getFailedLabwareQuantity', () => {
       failedRetriveCommand,
       ERROR_KINDS.STALL_WHILE_STACKING
     )
-    expect(result).toEqual('Quantity: 0')
+    expect(result).toEqual(0)
   })
 
   it('should return null if there is no runCommands', () => {

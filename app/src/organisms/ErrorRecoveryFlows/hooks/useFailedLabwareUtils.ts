@@ -26,6 +26,7 @@ import type {
   DispenseRunTimeCommand,
   Failed,
   FlexStackerRetrieveRunTimeCommand,
+  FlexStackerStoreRunTimeCommand,
   LabwareDefinition2,
   LabwareLocation,
   LiquidProbeRunTimeCommand,
@@ -354,7 +355,11 @@ export function getFailedLabwareQuantity(
     )
 
     const storeOrRetrieveLabwareLast = commandsBeforefailedCmd?.findLast(
-      cmd =>
+      (
+        cmd
+      ): cmd is
+        | FlexStackerRetrieveRunTimeCommand
+        | FlexStackerStoreRunTimeCommand =>
         cmd.commandType === 'flexStacker/retrieve' ||
         cmd.commandType === 'flexStacker/store'
     )
@@ -365,9 +370,10 @@ export function getFailedLabwareQuantity(
     ) {
       quantity =
         storeOrRetrieveLabwareLast.commandType === 'flexStacker/retrieve'
-          ? storeOrRetrieveLabwareLast?.result?.primaryLocationSequence.length
+          ? storeOrRetrieveLabwareLast?.result?.primaryLocationSequence
+              .length ?? 0
           : storeOrRetrieveLabwareLast?.result
-              ?.eventualDestinationLocationSequence.length
+              ?.eventualDestinationLocationSequence?.length ?? 0
     }
     // in case there is no result calculate based on setStoredLabware count
     else {
