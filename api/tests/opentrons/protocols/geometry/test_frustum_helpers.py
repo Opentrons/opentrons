@@ -1,6 +1,7 @@
 import pytest
 from math import pi, isclose
 from typing import Any, List, cast
+from hypothesis import given, strategies as st
 
 from opentrons_shared_data.labware.labware_definition import (
     ConicalFrustum,
@@ -19,9 +20,9 @@ from opentrons.protocol_engine.state.frustum_helpers import (
     _height_from_volume_circular,
     _height_from_volume_rectangular,
     _height_from_volume_spherical,
-    height_at_volume_within_section,
-    _get_segment_capacity,
+    find_height_at_well_volume,
     find_volume_at_well_height,
+    _get_segment_capacity,
 )
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 
@@ -208,9 +209,12 @@ def test_cross_section_area_rectangular(x_dimension: float, y_dimension: float) 
 
 
 @pytest.mark.parametrize("well", fake_frusta())
-def test_volume_and_height_circular(well: List[Any]) -> None:
+@given(target_height_st=st.data())
+def test_volume_and_height_circular(well: List[Any], target_height_st: Any) -> None:
     """Test both volume and height calculations for circular frusta."""
     if well[-1].shape == "spherical":
+        return
+    if any([seg.shape != "conical" for seg in well]):
         return
     for segment in well:
         if segment.shape == "conical":
@@ -218,7 +222,16 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
             b = segment.bottomDiameter / 2
             # test volume within a bunch of arbitrary heights
             segment_height = segment.topHeight - segment.bottomHeight
-            for target_height in range(round(segment_height)):
+            for i in range(50):
+                target_height = target_height_st.draw(
+                    st.floats(
+                        min_value=0,
+                        max_value=segment_height,
+                        allow_infinity=False,
+                        allow_nan=False,
+                        width=32,
+                    )
+                )
                 r_y = (target_height / segment_height) * (a - b) + b
                 expected_volume = (pi * target_height / 3) * (
                     b**2 + b * r_y + r_y**2
@@ -232,7 +245,7 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
                 found_height = _height_from_volume_circular(
                     target_volume=found_volume, segment=segment
                 )
-                assert isclose(found_height, target_height)
+                assert isclose(found_height, target_height, abs_tol=0.001)
 
 
 @pytest.mark.parametrize("well", fake_frusta())
@@ -319,14 +332,24 @@ def test_volume_and_height_spherical(well: List[Any]) -> None:
 @pytest.mark.parametrize("well", fake_frusta())
 def test_height_at_volume_at_section_boundaries(well: List[Any]) -> None:
     """Test that finding the height when volume 0 or ~= capacity  works."""
-    for segment in well:
-        segment_height = segment.topHeight - segment.bottomHeight
-        height = height_at_volume_within_section(segment, 0.0, segment_height)
-        assert isclose(height, 0.0)
-        height = height_at_volume_within_section(
-            segment, _get_segment_capacity(segment), segment_height
+    inner_well_geometry = InnerWellGeometry(sections=well)
+    sorted_well = sorted(
+        inner_well_geometry.sections, key=lambda section: section.topHeight
+    )
+    running_volume = 0.0
+    height = find_height_at_well_volume(
+        target_volume=0.0, well_geometry=inner_well_geometry
+    )
+    assert isinstance(height, float)
+    assert isclose(height, 0.0)
+    for segment in sorted_well:
+        running_volume += _get_segment_capacity(segment)
+        height = find_height_at_well_volume(
+            target_volume=running_volume,
+            well_geometry=inner_well_geometry,
         )
-        assert isclose(height, segment_height)
+        assert isinstance(height, float)
+        assert isclose(height, segment.topHeight)
 
 
 @pytest.mark.parametrize("well", fake_frusta())

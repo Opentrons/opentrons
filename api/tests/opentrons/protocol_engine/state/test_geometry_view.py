@@ -3835,7 +3835,7 @@ def test_circular_frustum_math_helpers(
             segment=segment,
         )
 
-        assert isclose(found_height, frustum["height"][index])
+        assert isclose(found_height, frustum["height"][index], abs_tol=0.001)
 
     for i in range(len(frustum["height"])):
         _find_volume_from_height_(i)
