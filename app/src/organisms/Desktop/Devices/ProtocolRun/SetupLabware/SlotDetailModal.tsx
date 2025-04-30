@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  getWellFillFromLabwareId,
   JUSTIFY_CENTER,
   LabwareRender,
   Modal,
@@ -23,6 +22,7 @@ import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
+import {  getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
 import {
   getDisabledWellGroupForLiquidId,
   getLiquidsByIdForLabware,
@@ -30,11 +30,11 @@ import {
 } from '/app/transformations/analysis'
 import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 
-import type { LabwareByLiquidId } from '@opentrons/components/'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
 import type { LabwareInStack, StackItem } from '/app/transformations/commands'
 
 interface SlotDetailModalProps {

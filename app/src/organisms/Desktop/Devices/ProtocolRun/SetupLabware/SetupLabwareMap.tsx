@@ -5,21 +5,20 @@ import {
   Box,
   DIRECTION_COLUMN,
   Flex,
-  getLabwareInfoByLiquidId,
-  getWellFillFromLabwareId,
   SPACING,
   STACKER_HOPPER_LABWARE_X_OFFSET,
   STACKER_HOPPER_LABWARE_Y_OFFSET,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  FLEX_STACKER_MODULE_V1,
+  FLEX_STACKER_MODULE_TYPE,
   getModuleType,
   getSimplestDeckConfigForProtocol,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import {  getLabwareInfoByLiquidId, getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
 import {
   getLabwareDefinitionsByURIForProtocol,
   getStackedItemsOnStartingDeck,

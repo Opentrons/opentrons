@@ -121,13 +121,10 @@ export function getRequiredLabwareDetailsFromLoadCommands(
       if (command.result.lidLabwareURI != null) {
         defUri = `${defUri}_${command.result.lidLabwareURI}`
       }
-      if (!acc.has(defUri)) {
-        return acc
-      } else {
-        acc.get(defUri).quantity += stackCount
+      if (acc.has(defUri)) {
+        acc.get(defUri)!.quantity += stackCount
       }
       return acc
     }, labwareSetupItems) as ProtocolDetailMap
-  console.log('LABWARE DETAILS', setupItemsWithStackerFillAdded.values())
   return Array.from(setupItemsWithStackerFillAdded.values())
 }

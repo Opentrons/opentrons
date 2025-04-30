@@ -1,4 +1,4 @@
-import { getInitialAndMovedLabwareInSlots } from '@opentrons/components'
+import { getInitialAndMovedLabwareInSlots } from '/app/organisms/ProtocolDeck'
 import {
   FLEX_ROBOT_TYPE,
   getAddressableAreasInProtocol,

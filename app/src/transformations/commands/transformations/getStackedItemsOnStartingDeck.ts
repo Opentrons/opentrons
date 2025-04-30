@@ -16,7 +16,6 @@ import {
 import { getLiquidsByIdForLabware } from '../../analysis'
 import { getLabwareDefinitionsByURIForProtocol } from './getLabwareDefinitionsByURIForProtocol'
 
-import type { LabwareByLiquidId } from '@opentrons/components'
 import type {
   CutoutId,
   LabwareDefinition2,
@@ -31,6 +30,7 @@ import type {
   OnCutoutFixtureLocationSequenceComponent,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
 
 export interface LabwareInStack {
   definitionUri: string
@@ -354,7 +354,7 @@ export function getStackedItemsOnStartingDeck(
           return { ...acc, offDeck: offDeckArray }
         } else {
           // reverse the order of this array so we add the labware in top to bottom
-          const labwareInHopper = command.result.storedLabware
+          const labwareInHopper: StackItem[] = command.result.storedLabware
             ?.toReversed()
             .map(labwareGroup => {
               return {

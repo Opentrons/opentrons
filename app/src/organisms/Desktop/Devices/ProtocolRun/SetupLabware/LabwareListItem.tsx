@@ -40,13 +40,13 @@ import { getLabwareLiquidRenderInfoFromStack } from '/app/transformations/comman
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type { MouseEvent } from 'react'
-import type { LabwareByLiquidId } from '@opentrons/components'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
   LabwareDefinition2,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type {
   LabwareDefinitionsByURI,

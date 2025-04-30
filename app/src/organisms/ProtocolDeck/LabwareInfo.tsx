@@ -1,17 +1,15 @@
 import { css } from 'styled-components'
-
-import { COLORS } from '../../helix-design-system'
-import { Box, Flex, Text } from '../../primitives'
 import {
+  COLORS,
+  Box, Flex, Text,
   ALIGN_FLEX_START,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-} from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { RobotCoordsForeignDiv } from '../Deck'
+  SPACING, TYPOGRAPHY, RobotCoordsForeignDiv
+} from '@opentrons/components'
 
 import type { ReactNode } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

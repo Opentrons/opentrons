@@ -5,11 +5,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  getLabwareInfoByLiquidId,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
+import {  getLabwareInfoByLiquidId } from '/app/organisms/ProtocolDeck'
 import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
 
 import { LabwareListItem } from './LabwareListItem'

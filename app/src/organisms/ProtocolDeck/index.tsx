@@ -1,14 +1,10 @@
+import { BaseDeck } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { BaseDeck } from '../BaseDeck'
-import { getStandardDeckViewLayerBlockList } from './utils'
-import { getLabwareInfoByLiquidId } from './utils/getLabwareInfoByLiquidId'
-import { getTopMostLabwareInSlots } from './utils/getLabwareInSlots'
-import { getModulesInSlots } from './utils/getModulesInSlots'
-import { getWellFillFromLabwareId } from './utils/getWellFillFromLabwareId'
+import { getStandardDeckViewLayerBlockList, getWellFillFromLabwareId, getLabwareInfoByLiquidId, getTopMostLabwareInSlots, getModulesInSlots } from './utils'
 
 import type { ComponentProps } from 'react'
 import type {
@@ -16,7 +12,7 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
-export * from './utils/getStandardDeckViewLayerBlockList'
+export * from './utils'
 export * from './types'
 interface ProtocolDeckProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null

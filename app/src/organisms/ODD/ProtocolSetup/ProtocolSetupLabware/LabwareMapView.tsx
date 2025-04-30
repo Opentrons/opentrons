@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { BaseDeck, Flex, getWellFillFromLabwareId } from '@opentrons/components'
+import { BaseDeck, Flex } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
@@ -8,11 +8,12 @@ import {
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
 import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '@opentrons/components'
-import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
+import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 import type {
