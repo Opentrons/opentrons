@@ -62,6 +62,7 @@
   "labware_missing_detected_when": "Stacker empty errors occur when the robot tries to retrieve labware from an empty stacker",
   "labware_not_retrieved": "Stacker latch jammed",
   "labware_released_from_current_height": "The labware will be released from its current height.",
+  "latch_releasing_labware": "Latch releasing labware",
   "latch_will_release_in_s": "Latch will release labware in {{seconds}} seconds",
   "launch_recovery_mode": "Launch recovery mode",
   "load_labware_into_labware_shuttle": "Load labware into labware shuttle",
