@@ -115,6 +115,12 @@ export function useRecoveryCommands({
   } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
   const { stopRun } = useStopRunMutation()
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
+    const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
+  const { chainRunCommands } = useChainRunCommands(
+    runId,
+    unvalidatedFailedCommand?.id,
+    currentRecoveryPolicy
+  )
   const { makeSuccessToast } = recoveryToastUtils
 
   // TODO(jh, 11-21-24): Some commands return a 200 with an error body. We should catch these and propagate the error.
