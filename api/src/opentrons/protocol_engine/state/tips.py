@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Optional, List, Union
+from typing import Dict, Iterable, Optional, List, Union
 
 from opentrons.types import NozzleMapInterface
 from opentrons.protocol_engine.state import update_types
@@ -14,36 +14,22 @@ from ..actions import Action, ResetTipsAction, get_state_updates
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 
-class TipRackWellState(Enum):
+class _TipRackWellState(Enum):
     """The state of a single tip in a tip rack's well."""
 
     CLEAN = "clean"
     USED = "used"
 
 
-TipRackStateByWellName = Dict[str, TipRackWellState]
-
-
-# todo(mm, 2024-10-10): This info is duplicated between here and PipetteState because
-# TipStore is using it to compute which tips a PickUpTip removes from the tip rack,
-# given the pipette's current nozzle map. We could avoid this duplication by moving the
-# computation to TipView, calling it from PickUpTipImplementation, and passing the
-# precomputed list of wells to TipStore.
-@dataclass
-class _PipetteInfo:
-    channels: int
-    active_channels: int
-    nozzle_map: NozzleMap
+_TipRackStateByWellName = Dict[str, _TipRackWellState]
 
 
 @dataclass
 class TipState:
     """State of all tips."""
 
-    tips_by_labware_id: Dict[str, TipRackStateByWellName]
-    column_by_labware_id: Dict[str, List[List[str]]]
-
-    pipette_info_by_pipette_id: Dict[str, _PipetteInfo]
+    tips_by_labware_id: Dict[str, _TipRackStateByWellName]
+    columns_by_labware_id: Dict[str, List[List[str]]]
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -55,8 +41,7 @@ class TipStore(HasState[TipState], HandlesActions):
         """Initialize a liquid store and its state."""
         self._state = TipState(
             tips_by_labware_id={},
-            column_by_labware_id={},
-            pipette_info_by_pipette_id={},
+            columns_by_labware_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -70,44 +55,25 @@ class TipStore(HasState[TipState], HandlesActions):
             for well_name in self._state.tips_by_labware_id[labware_id].keys():
                 self._state.tips_by_labware_id[labware_id][
                     well_name
-                ] = TipRackWellState.CLEAN
+                ] = _TipRackWellState.CLEAN
 
     def _handle_state_update(self, state_update: update_types.StateUpdate) -> None:
-        if state_update.pipette_config != update_types.NO_CHANGE:
-            self._state.pipette_info_by_pipette_id[
-                state_update.pipette_config.pipette_id
-            ] = _PipetteInfo(
-                channels=state_update.pipette_config.config.channels,
-                active_channels=state_update.pipette_config.config.channels,
-                nozzle_map=state_update.pipette_config.config.nozzle_map,
-            )
-
         if state_update.tips_used != update_types.NO_CHANGE:
             self._set_used_tips(
-                pipette_id=state_update.tips_used.pipette_id,
                 labware_id=state_update.tips_used.labware_id,
-                well_name=state_update.tips_used.well_name,
+                well_names=state_update.tips_used.well_names,
             )
-
-        if state_update.pipette_nozzle_map != update_types.NO_CHANGE:
-            pipette_info = self._state.pipette_info_by_pipette_id[
-                state_update.pipette_nozzle_map.pipette_id
-            ]
-            pipette_info.active_channels = (
-                state_update.pipette_nozzle_map.nozzle_map.tip_count
-            )
-            pipette_info.nozzle_map = state_update.pipette_nozzle_map.nozzle_map
 
         if state_update.loaded_labware != update_types.NO_CHANGE:
             labware_id = state_update.loaded_labware.labware_id
             definition = state_update.loaded_labware.definition
             if definition.parameters.isTiprack:
                 self._state.tips_by_labware_id[labware_id] = {
-                    well_name: TipRackWellState.CLEAN
+                    well_name: _TipRackWellState.CLEAN
                     for column in definition.ordering
                     for well_name in column
                 }
-                self._state.column_by_labware_id[labware_id] = [
+                self._state.columns_by_labware_id[labware_id] = [
                     column for column in definition.ordering
                 ]
         if state_update.batch_loaded_labware != update_types.NO_CHANGE:
@@ -117,20 +83,18 @@ class TipStore(HasState[TipState], HandlesActions):
                 ]
                 if definition.parameters.isTiprack:
                     self._state.tips_by_labware_id[labware_id] = {
-                        well_name: TipRackWellState.CLEAN
+                        well_name: _TipRackWellState.CLEAN
                         for column in definition.ordering
                         for well_name in column
                     }
-                    self._state.column_by_labware_id[labware_id] = [
+                    self._state.columns_by_labware_id[labware_id] = [
                         column for column in definition.ordering
                     ]
 
-    def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
-        columns = self._state.column_by_labware_id.get(labware_id, [])
-        wells = self._state.tips_by_labware_id.get(labware_id, {})
-        nozzle_map = self._state.pipette_info_by_pipette_id[pipette_id].nozzle_map
-        for well in wells_covered_dense(nozzle_map, well_name, columns):
-            wells[well] = TipRackWellState.USED
+    def _set_used_tips(self, labware_id: str, well_names: Iterable[str]) -> None:
+        well_states = self._state.tips_by_labware_id.get(labware_id, {})
+        for well_name in well_names:
+            well_states[well_name] = _TipRackWellState.USED
 
 
 class TipView:
@@ -155,7 +119,7 @@ class TipView:
     ) -> Optional[str]:
         """Get the next available clean tip. Does not support use of a starting tip if the pipette used is in a partial configuration."""
         wells = self._state.tips_by_labware_id.get(labware_id, {})
-        columns = self._state.column_by_labware_id.get(labware_id, [])
+        columns = self._state.columns_by_labware_id.get(labware_id, [])
 
         # TODO(sf): I'm pretty sure this can be replaced with wells_covered_96 but I'm not quite sure how
         def _identify_tip_cluster(
@@ -202,9 +166,9 @@ class TipView:
         def _validate_tip_cluster(
             active_columns: int, active_rows: int, tip_cluster: List[str]
         ) -> Union[str, int, None]:
-            if not any(wells[well] == TipRackWellState.USED for well in tip_cluster):
+            if not any(wells[well] == _TipRackWellState.USED for well in tip_cluster):
                 return tip_cluster[0]
-            elif all(wells[well] == TipRackWellState.USED for well in tip_cluster):
+            elif all(wells[well] == _TipRackWellState.USED for well in tip_cluster):
                 return None
             else:
                 # In the case of an 8ch pipette where a column has mixed state tips we may simply progress to the next column in our search
@@ -224,12 +188,12 @@ class TipView:
                         tip_cluster[(active_rows - 1) + (i * active_rows)]
                     )
                 if all(
-                    wells[well] == TipRackWellState.USED
+                    wells[well] == _TipRackWellState.USED
                     for well in tip_cluster_final_column
                 ):
                     return None
                 elif all(
-                    wells[well] == TipRackWellState.USED
+                    wells[well] == _TipRackWellState.USED
                     for well in tip_cluster_final_row
                 ):
                     return None
@@ -386,7 +350,9 @@ class TipView:
                                 starting_column_index = idx
 
                 for column in columns[starting_column_index:]:
-                    if not any(wells[well] == TipRackWellState.USED for well in column):
+                    if not any(
+                        wells[well] == _TipRackWellState.USED for well in column
+                    ):
                         return column[0]
 
             elif num_tips == len(wells.keys()):  # Get next tips for 96 channel
@@ -394,7 +360,7 @@ class TipView:
                     return None
 
                 if not any(
-                    tip_state == TipRackWellState.USED for tip_state in wells.values()
+                    tip_state == _TipRackWellState.USED for tip_state in wells.values()
                 ):
                     return next(iter(wells))
 
@@ -403,28 +369,9 @@ class TipView:
                     wells = _drop_wells_before_starting_tip(wells, starting_tip_name)
 
                 for well_name, tip_state in wells.items():
-                    if tip_state == TipRackWellState.CLEAN:
+                    if tip_state == _TipRackWellState.CLEAN:
                         return well_name
         return None
-
-    def get_pipette_channels(self, pipette_id: str) -> int:
-        """Return the given pipette's number of channels."""
-        return self._state.pipette_info_by_pipette_id[pipette_id].channels
-
-    def get_pipette_active_channels(self, pipette_id: str) -> int:
-        """Get the number of channels being used in the given pipette's configuration."""
-        return self._state.pipette_info_by_pipette_id[pipette_id].active_channels
-
-    def get_pipette_nozzle_map(self, pipette_id: str) -> NozzleMap:
-        """Get the current nozzle map the given pipette's configuration."""
-        return self._state.pipette_info_by_pipette_id[pipette_id].nozzle_map
-
-    def get_pipette_nozzle_maps(self) -> Dict[str, NozzleMap]:
-        """Get current nozzle maps keyed by pipette id."""
-        return {
-            pipette_id: pipette_info.nozzle_map
-            for pipette_id, pipette_info in self._state.pipette_info_by_pipette_id.items()
-        }
 
     def has_clean_tip(self, labware_id: str, well_name: str) -> bool:
         """Get whether a well in a labware has a clean tip.
@@ -440,15 +387,31 @@ class TipView:
         tip_rack = self._state.tips_by_labware_id.get(labware_id)
         well_state = tip_rack.get(well_name) if tip_rack else None
 
-        return well_state == TipRackWellState.CLEAN
+        return well_state == _TipRackWellState.CLEAN
+
+    def compute_tips_to_mark_as_used(
+        self, labware_id: str, well_name: str, nozzle_map: NozzleMap
+    ) -> list[str]:
+        """Compute which tips a hypothetical tip pickup should mark as "used".
+
+        Params:
+            labware_id: The labware ID of the tip rack.
+            well_name: The single target well of the tip pickup.
+            nozzle_map: The nozzle configuration that the pipette will use for the pickup.
+
+        Returns:
+            The well names of all the tips that the operation will use.
+        """
+        columns = self._state.columns_by_labware_id.get(labware_id, [])
+        return list(wells_covered_dense(nozzle_map, well_name, columns))
 
 
 def _drop_wells_before_starting_tip(
-    wells: TipRackStateByWellName, starting_tip_name: str
-) -> TipRackStateByWellName:
+    wells: _TipRackStateByWellName, starting_tip_name: str
+) -> _TipRackStateByWellName:
     """Drop any wells that come before the starting tip and return the remaining ones after."""
     seen_starting_well = False
-    remaining_wells = {}
+    remaining_wells: dict[str, _TipRackWellState] = {}
     for well_name, tip_state in wells.items():
         if well_name == starting_tip_name:
             seen_starting_well = True

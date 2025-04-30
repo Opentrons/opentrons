@@ -498,9 +498,7 @@ def test_drop_tip_no_location(
         labware_id="labware-id",
         engine_client=mock_engine_client,
     )
-    decoy.when(
-        mock_engine_client.state.tips.get_pipette_channels("abc123")
-    ).then_return(8)
+    decoy.when(mock_engine_client.state.pipettes.get_channels("abc123")).then_return(8)
 
     subject.drop_tip(location=None, well_core=well_core, home_after=True)
 
@@ -552,9 +550,7 @@ def test_drop_tip_with_location(
     ).then_return(
         (WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)), False)
     )
-    decoy.when(
-        mock_engine_client.state.tips.get_pipette_channels("abc123")
-    ).then_return(8)
+    decoy.when(mock_engine_client.state.pipettes.get_channels("abc123")).then_return(8)
     decoy.when(mock_engine_client.state.labware.is_tiprack("labware-id")).then_return(
         True
     )
@@ -634,9 +630,7 @@ def test_drop_tip_in_waste_chute(
     waste_chute = decoy.mock(cls=WasteChute)
 
     decoy.when(waste_chute.offset).then_return(DisposalOffset(x=4, y=5, z=6))
-    decoy.when(
-        mock_engine_client.state.tips.get_pipette_channels("abc123")
-    ).then_return(96)
+    decoy.when(mock_engine_client.state.pipettes.get_channels("abc123")).then_return(96)
 
     subject.drop_tip_in_disposal_location(
         waste_chute, home_after=True, alternate_tip_drop=True
@@ -1341,9 +1335,7 @@ def test_get_channels(
 ) -> None:
     """It should get the pipette's number of channels."""
     decoy.when(
-        mock_engine_client.state.tips.get_pipette_channels(
-            pipette_id=subject.pipette_id
-        )
+        mock_engine_client.state.pipettes.get_channels(pipette_id=subject.pipette_id)
     ).then_return(42)
     assert subject.get_channels() == 42
 
@@ -1674,7 +1666,7 @@ def test_is_tip_tracking_available(
 ) -> None:
     """It should return whether tip tracking is available based on nozzle configuration."""
     decoy.when(
-        mock_engine_client.state.tips.get_pipette_channels(subject.pipette_id)
+        mock_engine_client.state.pipettes.get_channels(subject.pipette_id)
     ).then_return(pipette_channels)
     decoy.when(
         mock_engine_client.state.pipettes.get_nozzle_layout_type(subject.pipette_id)
