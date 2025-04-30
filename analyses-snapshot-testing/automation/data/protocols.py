@@ -12,7 +12,14 @@ class Protocols:
     ##########################################################################################################
     # Begin JSON Protocols ###################################################################################
     ##########################################################################################################
+     # analyses-snapshot-testing/files/protocols/OT2_S_PD_8_4_2_smoketest.json
 
+    OT2_S_PD_8_4_2_smoketest: Protocol = Protocol(
+        file_stem="OT2_S_PD_8_4_2_smoketest",
+        file_extension="json",
+        robot="OT2",
+    )
+    
     OT2_S_v6_P1000S_None_SimpleTransfer: Protocol = Protocol(
         file_stem="OT2_S_v6_P1000S_None_SimpleTransfer",
         file_extension="json",
@@ -1051,13 +1058,3 @@ class Protocols:
         file_extension="json",
         robot="OT2",
     )
-
-    # analyses-snapshot-testing/files/protocols/OT2_S_PD_8_4_2_smoketest.json
-
-    OT2_S_PD_8_4_2_smoketest: Protocol = Protocol(
-        file_stem="OT2_S_PD_8_4_2_smoketest",
-        file_extension="json",
-        robot="OT2",
-    )
-
-    
