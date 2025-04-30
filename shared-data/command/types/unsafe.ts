@@ -12,6 +12,9 @@ export type UnsafeRunTimeCommand =
   | UnsafeEngageAxesRunTimeCommand
   | UnsafeUngripLabwareRunTimeCommand
   | UnsafePlaceLabwareRunTimeCommand
+  | UnsafeFlexStackerCloseLatchRunTimeCommand
+  | UnsafeFlexStackerOpenLatchRunTimeCommand
+  | UnsafeFlexStackerPrepareShuttleRunTimeCommand
 
 export type UnsafeCreateCommand =
   | UnsafeBlowoutInPlaceCreateCommand
