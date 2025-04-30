@@ -140,7 +140,7 @@ export function useFailedLabwareUtils({
   )
   const relevantPickUpTipLabware = useMemo(
     () => getLabwareInfoFrom(relevantPickUpTipCommand, runRecord),
-    [recentRelevantFailedLabwareCmd?.key]
+    [relevantPickUpTipCommand, runRecord]
   )
   const relevantPickUpTipLwLocs = useRelevantFailedLwLocations({
     failedLabware: relevantPickUpTipLabware,
