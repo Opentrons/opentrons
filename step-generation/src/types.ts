@@ -252,6 +252,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   touchTipAfterAspirate: boolean
   /** Optional offset for touch tip after aspirate (if null, use PD default) */
   touchTipAfterAspirateOffsetMmFromTop: number
+  /** Optional offset for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterAspirateMmFromEdge: number | null
   /** Optional speed for touch tip after aspirate (if null, use PD default) */
   touchTipAfterAspirateSpeed: number | null
   /** changeTip is interpreted differently by different Step types */
@@ -290,6 +292,31 @@ export type SharedTransferLikeArgs = CommonArgs & {
   dispenseYOffset: number
   /** will be non-null once introduced to quick transfer */
   pushOut: number | null
+
+  // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
+  liquidClass: string | null
+  aspiratePositionReference: PositionReference
+  aspirateZOffset: number
+  aspirateSubmergeSpeed: number | null
+  aspirateSubmergeXOffset: number
+  aspirateSubmergeYOffset: number
+  aspirateSubmergeZOffset: number
+  aspirateSubmergePositionReference: PositionReference
+  aspirateRetractSpeed: number | null
+  aspirateRetractXOffset: number
+  aspirateRetractYOffset: number
+  aspirateRetractZOffset: number
+  aspirateRetractPositionReference: PositionReference
+  dispenseSubmergeSpeed: number | null
+  dispenseSubmergeXOffset: number
+  dispenseSubmergeYOffset: number
+  dispenseSubmergeZOffset: number
+  dispenseSubmergePositionReference: PositionReference
+  dispenseRetractSpeed: number | null
+  dispenseRetractXOffset: number
+  dispenseRetractYOffset: number
+  dispenseRetractZOffset: number
+  dispenseRetractPositionReference: PositionReference
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {
@@ -665,6 +692,7 @@ export type ErrorType =
   | 'PIPETTING_INTO_COLUMN_4'
   | 'POSSIBLE_PIPETTE_COLLISION'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
+  | 'SUBMERGE_BELOW_ASPIRATE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'

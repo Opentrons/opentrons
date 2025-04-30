@@ -18,6 +18,8 @@ import type { Channels } from '@opentrons/components'
 import type {
   AddressableAreaName,
   CreateCommand,
+  MoveToAddressableAreaCreateCommand,
+  MoveToWellCreateCommand,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
@@ -150,15 +152,58 @@ export const substepTimelineSingleChannel = (
         const prevCommand =
           'commands' in nextFrame ? nextFrame.commands[index - 1] : null
 
+        let previousMoveToCommand:
+          | MoveToWellCreateCommand
+          | MoveToAddressableAreaCreateCommand
+          | null = null
+
+        // find nearest previous command for move to well or addressable area, if it exists
+        for (let i = index - 1; i >= 0; i--) {
+          if (
+            'commands' in nextFrame &&
+            (nextFrame.commands[i].commandType === 'moveToWell' ||
+              nextFrame.commands[i].commandType === 'moveToAddressableArea')
+          ) {
+            previousMoveToCommand = nextFrame.commands[i] as
+              | MoveToWellCreateCommand
+              | MoveToAddressableAreaCreateCommand
+            break
+          }
+        }
+        if (previousMoveToCommand == null) {
+          console.error(
+            `expected to find moveToAddressableArea or moveToWell command assosciated with the ${command.commandType} but could not`
+          )
+        }
+        if (previousMoveToCommand?.commandType === 'moveToWell') {
+          const { labwareId, wellName } = previousMoveToCommand.params
+          return {
+            ...acc,
+            timeline: [
+              ...acc.timeline,
+              _createNextTimelineFrame({
+                volume,
+                index,
+                // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
+                nextFrame,
+                command,
+                wellInfo: {
+                  wells: [previousMoveToCommand.params.wellName],
+                  preIngreds:
+                    acc.prevRobotState.liquidState.labware[labwareId][wellName],
+                  postIngreds:
+                    nextRobotState.liquidState.labware[labwareId][wellName],
+                },
+              }),
+            ],
+            prevRobotState: nextRobotState,
+          }
+        }
         const moveToAddressableAreaCommand =
           prevCommand?.commandType === 'moveToAddressableArea'
             ? prevCommand
             : null
-        if (moveToAddressableAreaCommand == null) {
-          console.error(
-            `expected to find moveToAddressableArea command assosciated with the ${command.commandType} but could not`
-          )
-        }
+
         const trashCutoutFixture =
           moveToAddressableAreaCommand?.params.addressableAreaName ===
           'fixedTrash'

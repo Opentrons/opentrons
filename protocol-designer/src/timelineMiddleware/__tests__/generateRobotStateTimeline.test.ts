@@ -32,6 +32,30 @@ describe('generateRobotStateTimeline', () => {
           pipette: DEFAULT_PIPETTE,
           volume: 5,
           sourceLabware: SOURCE_LABWARE,
+          touchTipAfterAspirateMmFromEdge: null,
+          liquidClass: null,
+          aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateZOffset: 0,
+          aspirateSubmergeSpeed: null,
+          aspirateSubmergeXOffset: 0,
+          aspirateSubmergeYOffset: 0,
+          aspirateSubmergeZOffset: 0,
+          aspirateSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateRetractSpeed: null,
+          aspirateRetractXOffset: 0,
+          aspirateRetractYOffset: 0,
+          aspirateRetractZOffset: 0,
+          aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+          dispenseSubmergeSpeed: null,
+          dispenseSubmergeXOffset: 0,
+          dispenseSubmergeYOffset: 0,
+          dispenseSubmergeZOffset: 0,
+          dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+          dispenseRetractSpeed: null,
+          dispenseRetractXOffset: 0,
+          dispenseRetractYOffset: 0,
+          dispenseRetractZOffset: 0,
+          dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
           destLabware: DEST_LABWARE,
           aspirateFlowRateUlSec: 3.78,
           dispenseFlowRateUlSec: 3.78,
@@ -109,6 +133,30 @@ describe('generateRobotStateTimeline', () => {
           dispenseXOffset: 0,
           dispenseYOffset: 0,
           pushOut: null,
+          touchTipAfterAspirateMmFromEdge: null,
+          liquidClass: null,
+          aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateZOffset: 0,
+          aspirateSubmergeSpeed: null,
+          aspirateSubmergeXOffset: 0,
+          aspirateSubmergeYOffset: 0,
+          aspirateSubmergeZOffset: 0,
+          aspirateSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateRetractSpeed: null,
+          aspirateRetractXOffset: 0,
+          aspirateRetractYOffset: 0,
+          aspirateRetractZOffset: 0,
+          aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+          dispenseSubmergeSpeed: null,
+          dispenseSubmergeXOffset: 0,
+          dispenseSubmergeYOffset: 0,
+          dispenseSubmergeZOffset: 0,
+          dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+          dispenseRetractSpeed: null,
+          dispenseRetractXOffset: 0,
+          dispenseRetractYOffset: 0,
+          dispenseRetractZOffset: 0,
+          dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
         },
       },
       c: {
@@ -163,16 +211,30 @@ describe('generateRobotStateTimeline', () => {
       [
         [
           "pickUpTip",
-          "aspirate",
+          "moveToWell",
+          "liquidProbe",
+          "prepareToAspirate",
+          "moveToWell",
+          "moveToWell",
+          "aspirateInPlace",
           "dispense",
-          "aspirate",
+          "moveToWell",
+          "prepareToAspirate",
+          "moveToWell",
+          "moveToWell",
+          "aspirateInPlace",
           "dispense",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
         ],
         [
           "pickUpTip",
-          "aspirate",
+          "moveToWell",
+          "liquidProbe",
+          "prepareToAspirate",
+          "moveToWell",
+          "moveToWell",
+          "aspirateInPlace",
           "dispense",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
@@ -204,8 +266,16 @@ describe('generateRobotStateTimeline', () => {
       // Step a:
       `
 mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.move_to(mockPythonName["A1"].top(z=2))
+mockPythonName.prepare_to_aspirate()
+mockPythonName.move_to(mockPythonName["A1"].bottom())
+mockPythonName.move_to(mockPythonName["A1"].bottom())
 mockPythonName.aspirate(...)
 mockPythonName.dispense(...)
+mockPythonName.move_to(mockPythonName["A2"].top(z=2))
+mockPythonName.prepare_to_aspirate()
+mockPythonName.move_to(mockPythonName["A2"].bottom())
+mockPythonName.move_to(mockPythonName["A2"].bottom())
 mockPythonName.aspirate(...)
 mockPythonName.dispense(...)
 mockPythonName.drop_tip()
@@ -213,6 +283,10 @@ mockPythonName.drop_tip()
       // Step b:
       `
 mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.move_to(mockPythonName["A1"].top(z=2))
+mockPythonName.prepare_to_aspirate()
+mockPythonName.move_to(mockPythonName["A1"].bottom())
+mockPythonName.move_to(mockPythonName["A1"].bottom())
 mockPythonName.aspirate(...)
 mockPythonName.dispense(...)
 mockPythonName.drop_tip()

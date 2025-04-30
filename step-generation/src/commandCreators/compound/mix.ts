@@ -19,9 +19,11 @@ import {
 } from '../../utils'
 import {
   aspirate,
+  aspirateInPlace,
   configureForVolume,
   delay,
   dispense,
+  dispenseInPlace,
   touchTip,
 } from '../atomic'
 import { replaceTip } from './replaceTip'
@@ -36,6 +38,97 @@ import type {
   InvariantContext,
   MixArgs,
 } from '../../types'
+
+const getDelayCommand = (seconds?: number | null): CurriedCommandCreator[] =>
+  seconds
+    ? [
+        curryWithoutPython(delay, {
+          seconds,
+        }),
+      ]
+    : []
+
+export const mixInPlaceUtil = (args: {
+  pipette: string
+  volume: number
+  times: number
+  aspirateFlowRateUlSec: number
+  dispenseFlowRateUlSec: number
+  aspirateDelaySeconds?: number
+  dispenseDelaySeconds?: number
+  finalPushOut: number | null
+  invariantContext: InvariantContext
+}): CurriedCommandCreator[] => {
+  const {
+    pipette,
+    volume,
+    times,
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
+    aspirateDelaySeconds = 0,
+    dispenseDelaySeconds = 0,
+    finalPushOut,
+    invariantContext,
+  } = args
+  //  If delay is specified to something other than 0,
+  //  emit individual py commands. Otherwise, emit mix()
+
+  const pythonCommandCreator: CurriedCommandCreator = () => {
+    const { pipetteEntities } = invariantContext
+    const pipettePythonName = pipetteEntities[pipette].pythonName
+    const pythonArgs = [
+      `repetitions=${times}`,
+      `volume=${volume}`,
+      ...(aspirateDelaySeconds
+        ? [`aspirate_delay=${aspirateDelaySeconds}`]
+        : []),
+      ...(dispenseDelaySeconds
+        ? [`dispense_delay=${dispenseDelaySeconds}`]
+        : []),
+
+      // TODO (nd, 04/09/2025): uncomment next line once PAPI supports new `final_push_out` arg
+      // `final_push_out=${finalPushOut}`
+    ]
+    return {
+      commands: [],
+      //  Note: we do not support mix in trashBin or wasteChute so location
+      //  will always be a well
+      python:
+        `${pipettePythonName}.flow_rate.aspirate = ${aspirateFlowRateUlSec}\n` +
+        `${pipettePythonName}.flow_rate.dispense = ${dispenseFlowRateUlSec}\n` +
+        `${pipettePythonName}.mix(\n${indentPyLines(
+          pythonArgs.join(',\n')
+        )},\n)`,
+    }
+  }
+
+  const commandCreators = []
+  for (let i = 0; i < times; i++) {
+    commandCreators.push(
+      ...[
+        curryWithoutPython(aspirateInPlace, {
+          pipetteId: pipette,
+          volume,
+          flowRate: aspirateFlowRateUlSec,
+        }),
+        ...getDelayCommand(aspirateDelaySeconds),
+        curryWithoutPython(dispenseInPlace, {
+          pipetteId: pipette,
+          volume,
+          flowRate: dispenseFlowRateUlSec,
+          ...(i < times - 1
+            ? { pushOut: 0 }
+            : finalPushOut == null
+            ? {}
+            : { pushOut: finalPushOut }), // only push out if final repetition
+        }),
+
+        ...getDelayCommand(dispenseDelaySeconds),
+      ]
+    )
+  }
+  return [...commandCreators, pythonCommandCreator]
+}
 
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil(args: {
@@ -76,10 +169,7 @@ export function mixUtil(args: {
   } = args
   //  If delay is specified to something other than 0,
   //  emit individual py commands. Otherwise, emit mix()
-  const hasUnsupportedMixApiArg =
-    (aspirateDelaySeconds != null && aspirateDelaySeconds !== 0) ||
-    (dispenseDelaySeconds != null && dispenseDelaySeconds !== 0) ||
-    finalPushOut != null
+  const hasUnsupportedMixApiArg = finalPushOut != null
 
   const curryCreator = hasUnsupportedMixApiArg
     ? curryCommandCreator
@@ -108,6 +198,12 @@ export function mixUtil(args: {
       `location=${labwarePythonName}[${formatPyStr(
         well
       )}]${formatPyWellLocation(pythonWellLocation)}`,
+      ...(aspirateDelaySeconds
+        ? [`aspirate_delay=${aspirateDelaySeconds}`]
+        : []),
+      ...(dispenseDelaySeconds
+        ? [`dispense_delay=${dispenseDelaySeconds}`]
+        : []),
       // TODO (nd, 04/09/2025): uncomment next line once PAPI supports new `final_push_out` arg
       // `final_push_out=${finalPushOut}`
     ]
