@@ -36,7 +36,23 @@ export function TwoColTextAndImage(
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
-    void proceedNextStep()
+switch (route) {
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
+          void handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
+            void closeLabwareLatch().then(() => {
+              void proceedNextStep()
+            })
+          })
+        } else {
+          void proceedNextStep()
+        }
+        break
+      default:
+        void proceedNextStep()
+        break
+    }
   }
 
   const buildTitle = (): string => {
