@@ -32,7 +32,12 @@ export function TwoColTextAndImage(
     REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
   } = RECOVERY_MAP
   const { route, step } = recoveryMap
-  const { proceedNextStep, goBackPrevStep } = routeUpdateActions
+  const {
+    proceedNextStep,
+    goBackPrevStep,
+    handleMotionRouting,
+  } = routeUpdateActions
+  const { closeLabwareLatch } = recoveryCommands
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
