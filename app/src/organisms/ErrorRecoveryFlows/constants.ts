@@ -1,3 +1,5 @@
+import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -7,7 +9,7 @@ import {
   SPACING,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
-import { css } from 'styled-components'
+
 import type {
   ErrorKind,
   RecoveryRouteStepMetadata,

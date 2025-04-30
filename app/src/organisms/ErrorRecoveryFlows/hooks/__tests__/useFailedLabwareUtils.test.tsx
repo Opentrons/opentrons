@@ -1,7 +1,8 @@
-import type { RunCommandSummary } from '@opentrons/api-client'
-import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+
+import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
+
 import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
 import {
   getFailedLabwareQuantity,
@@ -11,6 +12,8 @@ import {
   useFailedLabwareUtils,
   useRelevantFailedLwLocations,
 } from '../useFailedLabwareUtils'
+
+import type { RunCommandSummary } from '@opentrons/api-client'
 
 vi.mock('@opentrons/shared-data', async () => {
   const actual = await vi.importActual('@opentrons/shared-data')

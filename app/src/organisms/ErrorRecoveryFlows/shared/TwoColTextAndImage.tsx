@@ -1,3 +1,6 @@
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -6,13 +9,14 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { TwoColumn } from '/app/molecules/InterventionModal'
-import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+
 import { RECOVERY_MAP } from '../constants'
-import type { RecoveryContentProps } from '../types'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
+
+import type { RecoveryContentProps } from '../types'
 
 export function TwoColTextAndImage(
   props: RecoveryContentProps

@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next'
+
 import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
+
 import type { ComponentProps } from 'react'
 import type { RecoveryContentProps } from '../types'
-import { useTranslation } from 'react-i18next'
 
 type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   title: string

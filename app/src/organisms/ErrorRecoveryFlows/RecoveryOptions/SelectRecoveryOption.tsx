@@ -1,3 +1,8 @@
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import head from 'lodash/head'
+import { css } from 'styled-components'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -6,17 +11,15 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import type { PipetteWithTip } from '/app/resources/instruments'
-import head from 'lodash/head'
-import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+
 import {
   ERROR_KINDS,
   ODD_SECTION_TITLE_STYLE,
   RECOVERY_MAP,
 } from '../constants'
 import { RecoverySingleColumnContentWrapper } from '../shared'
+
+import type { PipetteWithTip } from '/app/resources/instruments'
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 
 // The "home" route within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough

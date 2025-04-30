@@ -1,10 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import type { ComponentProps } from 'react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { Mock } from 'vitest'
-import { when } from 'vitest-when'
+
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { clickButtonLabeled } from '../../__tests__/util'
 import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
@@ -22,6 +22,9 @@ import {
   TIP_DROP_FAILED_OPTIONS,
   TIP_NOT_DETECTED_OPTIONS,
 } from '../SelectRecoveryOption'
+
+import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 const renderSelectRecoveryOption = (
   props: ComponentProps<typeof SelectRecoveryOption>

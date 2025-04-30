@@ -1,5 +1,7 @@
-import { LegacyStyledText } from '@opentrons/components'
 import { Trans, useTranslation } from 'react-i18next'
+
+import { LegacyStyledText } from '@opentrons/components'
+
 import { RECOVERY_MAP } from '../constants'
 import {
   GripperIsHoldingLabware,
@@ -11,8 +13,9 @@ import {
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
 import { TwoColTextAndImage } from '../shared/TwoColTextAndImage'
-import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
+
+import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 
 export function ManualReplaceLwAndRetry(
   props: RecoveryContentProps
