@@ -38,6 +38,11 @@ export function TwoColTextAndImage(
     handleMotionRouting,
   } = routeUpdateActions
   const { closeLabwareLatch } = recoveryCommands
+    proceedNextStep,
+    goBackPrevStep,
+    handleMotionRouting,
+  } = routeUpdateActions
+  const { closeLabwareLatch } = recoveryCommands
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
