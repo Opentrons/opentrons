@@ -633,7 +633,7 @@ def run(ctx: ProtocolContext) -> None:
         label="dye_reservoir",
     )
     water_reservoir = ctx.load_labware(
-        "nest_1_reservoir_195ml", SLOTS["water_reservoir"], label="water_reservoir"
+        "nest_1_reservoir_290ml", SLOTS["water_reservoir"], label="water_reservoir"
     )
     test_labware = ctx.load_labware(
         ctx.params.test_labware,  # type: ignore[attr-defined]
