@@ -92,8 +92,10 @@ export async function fillLabwareLiquidsSectionAndClickConfirm(): Promise<void> 
 export async function fillRuntimeParametersSectionAndClickConfirm(): Promise<void> {
   // Add a value for runtime parameters to make it show up in the preview
   const textArea = screen.getByRole('textbox')
-  fireEvent.change(textArea, { target: { value: 'Set sample count (1-96, default: 48)' } })
-  
+  fireEvent.change(textArea, {
+    target: { value: 'Set sample count (1-96, default: 48)' },
+  })
+
   const confirmButton = screen.getByText('Confirm')
   await waitFor(() => {
     expect(confirmButton).toBeEnabled()

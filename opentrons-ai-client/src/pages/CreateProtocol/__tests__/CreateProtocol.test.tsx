@@ -209,10 +209,9 @@ describe('CreateProtocol', () => {
     await fillLabwareLiquidsSectionAndClickConfirm()
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Runtime Parameters' })).toHaveAttribute(
-        'aria-expanded',
-        'true'
-      )
+      expect(
+        screen.getByRole('button', { name: 'Runtime Parameters' })
+      ).toHaveAttribute('aria-expanded', 'true')
     })
   })
 
