@@ -159,7 +159,7 @@ export function TwoColTextAndImage(
             <Trans
               t={t}
               i18nKey={buildBody()}
-              components={{ block: <LegacyStyledText as="p" /> }}
+              components={{ block: <StyledText /> }}
             />
           </StyledText>
         </Flex>

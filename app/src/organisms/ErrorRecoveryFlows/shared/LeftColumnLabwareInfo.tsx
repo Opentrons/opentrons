@@ -121,7 +121,7 @@ export function LeftColumnLabwareInfo({
         tagText: buildQuantity()
           ? t('quantity', { quantity: buildQuantity() })
           : null,
-        subText: undefined, // where do we get the lid data from?
+        subText: undefined, // TODO (tz, 5-1-2025): get lid name
         type,
         newLocationProps: buildNewLocation(),
         ...buildInfoNames(),
