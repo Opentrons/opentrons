@@ -35,7 +35,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { getLabwareLiquidRenderInfoFromStack } from '/app/transformations/commands'
+import {
+  getLabwareLiquidRenderInfoFromStack,
+  getModuleFromStack,
+} from '/app/transformations/commands'
 
 import { SecureLabwareModal } from './SecureLabwareModal'
 
@@ -82,9 +85,7 @@ export function LabwareListItem(
     definitionsByURI,
     onClick,
   } = props
-  const moduleInStack = stackedItems.find(
-    (item): item is ModuleInStack => 'moduleModel' in item
-  )
+  const moduleInStack = getModuleFromStack(stackedItems)
   const labwareInStack = stackedItems.filter(
     (lw): lw is LabwareInStack => 'labwareId' in lw
   )

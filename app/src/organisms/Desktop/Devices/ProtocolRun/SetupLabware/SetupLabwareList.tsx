@@ -9,8 +9,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import {  getLabwareInfoByLiquidId } from '/app/organisms/ProtocolDeck'
-import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
+import { getLabwareInfoByLiquidId } from '/app/organisms/ProtocolDeck'
+import {
+  getStackedItemsOnStartingDeck,
+  getStacksWithLabware,
+} from '/app/transformations/commands'
 
 import { LabwareListItem } from './LabwareListItem'
 import { SlotDetailModal } from './SlotDetailModal'
@@ -20,7 +23,7 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
-import type { StackItem, LabwareInStack } from '/app/transformations/commands'
+import type { LabwareInStack, StackItem } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 interface SetupLabwareListProps {
@@ -55,10 +58,11 @@ export function SetupLabwareList(
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     protocolAnalysis?.commands ?? []
   )
-  const sortedStartingDeckEntries = Object.entries(startingDeck)
+  const stacksWithLaware = getStacksWithLabware(startingDeck)
+  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key, value]) => (key !== 'offDeck' && value.some((item): item is LabwareInStack => 'labwareId' in item)))
-  const offDeckItems = Object.keys(startingDeck).includes('offDeck')
+    .filter(([key, value]) => key !== 'offDeck')
+  const offDeckItems = Object.keys(stacksWithLaware).includes('offDeck')
     ? startingDeck.offDeck
     : null
 

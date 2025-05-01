@@ -45,7 +45,9 @@ import {
 } from '/app/transformations/analysis'
 import {
   getLabwareLiquidRenderInfoFromStack,
+  getModuleFromStack,
   getStackedItemsOnStartingDeck,
+  getStacksWithLabware,
 } from '/app/transformations/commands'
 
 import { LabwareMapView } from './LabwareMapView'
@@ -54,17 +56,13 @@ import { SetupLabwareStackView } from './SetupLabwareStackView'
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
-import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data'
+import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
-import type {
-  LabwareInStack,
-  ModuleInStack,
-  StackItem,
-} from '/app/transformations/commands'
+import type { LabwareInStack, StackItem } from '/app/transformations/commands'
 import type { SetupScreens } from '../types'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000
@@ -106,10 +104,11 @@ export function ProtocolSetupLabware({
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     mostRecentAnalysis?.commands ?? []
   )
-  const sortedStartingDeckEntries = Object.entries(startingDeck)
+  const stacksWithLaware = getStacksWithLabware(startingDeck)
+  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key, value]) => (key !== 'offDeck' && value.some((item): item is LabwareInStack => 'labwareId' in item)))
-  const offDeckItems = Object.keys(startingDeck).includes('offDeck')
+    .filter(([key, value]) => key !== 'offDeck')
+  const offDeckItems = Object.keys(stacksWithLaware).includes('offDeck')
     ? startingDeck.offDeck
     : null
 
@@ -416,9 +415,7 @@ function RowLabware({
   onClick,
   labwareByLiquidId,
 }: RowLabwareProps): JSX.Element | null {
-  const moduleInStack = stackedItems.find(
-    (item): item is ModuleInStack => 'moduleModel' in item
-  )
+  const moduleInStack = getModuleFromStack(stackedItems)
   const labwareInStack = stackedItems.filter(
     (lw): lw is LabwareInStack => 'labwareId' in lw
   )
