@@ -1696,7 +1696,7 @@ def test_mix_with_delay_and_final_push_out(
         location=input_location,
         aspirate_delay=3,
         dispense_delay=4,
-        final_push_out=12,
+        final_push_out=2,
     )
     decoy.verify(
         mock_instrument_core.aspirate(
@@ -1737,7 +1737,7 @@ def test_mix_with_delay_and_final_push_out(
             rate=1,
             flow_rate=5.67,
             in_place=True,
-            push_out=12,  # final push out
+            push_out=2,  # final push out
             meniscus_tracking=None,
         ),
         mock_protocol_core.delay(4, msg=None),  # dispense delay
