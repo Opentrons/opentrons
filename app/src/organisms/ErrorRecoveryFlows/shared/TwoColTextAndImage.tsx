@@ -159,7 +159,14 @@ export function TwoColTextAndImage(
             <Trans
               t={t}
               i18nKey={buildBody()}
-              components={{ block: <StyledText /> }}
+              components={{
+                block: (
+                  <StyledText
+                    oddStyle="level4HeaderRegular"
+                    desktopStyle="bodyDefaultRegular"
+                  />
+                ),
+              }}
             />
           </StyledText>
         </Flex>
