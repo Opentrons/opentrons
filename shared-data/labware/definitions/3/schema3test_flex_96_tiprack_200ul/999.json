@@ -27,23 +27,23 @@
     "total": {
       "backLeftBottom": {
         "x": 0,
-        "y": 85.75,
+        "y": 0,
         "z": 0
       },
       "frontRightTop": {
         "x": 127.75,
-        "y": 0,
+        "y": -85.75,
         "z": 99
       }
     },
     "footprint": {
       "backLeft": {
         "x": 0,
-        "y": 85.75
+        "y": 0
       },
       "frontRight": {
         "x": 127.75,
-        "y": 0
+        "y": -85.75
       }
     }
   },
