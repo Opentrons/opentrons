@@ -1672,8 +1672,7 @@ def test_mix_with_delay_and_final_push_out(
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-    """It should delay after the aspirate/dispense and emit the specified push out
-    for the final dispense in a mix."""
+    """It should delay after the aspirate/dispense and emit the specified push out for the final dispense in a mix."""
     mock_well = decoy.mock(cls=Well)
     input_location = Location(point=Point(2, 2, 2), labware=mock_well)
     decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
