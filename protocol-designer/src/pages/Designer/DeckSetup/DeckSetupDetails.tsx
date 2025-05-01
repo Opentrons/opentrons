@@ -480,7 +480,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         )
       })}
 
-      {/* all nested labwares on deck  */}
+      {/* all nested labwares */}
       {allLabware.map(labware => {
         if (
           allModules.some(m => m.id === labware.slot) ||
