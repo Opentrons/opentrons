@@ -953,7 +953,7 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
                                 ),
                                 speed=100,
                                 delay=DelayProperties(
-                                    enable=True, params=DelayParams(duration=0.0)
+                                    enable=True, params=DelayParams(duration=1.1)
                                 ),
                             ),
                             retract=RetractDispense(

@@ -548,7 +548,9 @@ class LiquidClassCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     liquid_class: LiquidClass
     volume: float
     source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]]
-    destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]]
+    destination: Union[
+        Well, Sequence[Well], Sequence[Sequence[Well]], TrashBin, WasteChute
+    ]
 
 
 class TransferWithLiquidClassCommand(TypedDict):

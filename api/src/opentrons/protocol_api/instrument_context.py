@@ -1,7 +1,7 @@
 from __future__ import annotations
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Union, cast
+from typing import Any, List, Optional, Sequence, Union, cast, Tuple
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -32,7 +32,7 @@ from opentrons.protocols.api_support.util import (
     UnsupportedAPIError,
 )
 
-from .core.common import InstrumentCore, ProtocolCore
+from .core.common import InstrumentCore, ProtocolCore, WellCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
@@ -1619,7 +1619,11 @@ class InstrumentContext(publisher.CommandPublisher):
             labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
         ],
         dest: Union[
-            labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
+            labware.Well,
+            Sequence[labware.Well],
+            Sequence[Sequence[labware.Well]],
+            TrashBin,
+            WasteChute,
         ],
         new_tip: TransferTipPolicyV2Type = "once",
         trash_location: Optional[
@@ -1641,7 +1645,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param volume: The amount, in µL, to aspirate from each source and dispense to
                        each destination.
         :param source: A single well or a list of wells to aspirate liquid from.
-        :param dest: A single well or a list of wells to dispense liquid into.
+        :param dest: A single well, list of wells, trash bin, or waste chute to dispense liquid into.
         :param new_tip: When to pick up and drop tips during the command.
             Defaults to ``"once"``.
 
@@ -1680,12 +1684,23 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
-        if len(transfer_args.sources_list) != len(transfer_args.destinations_list):
-            raise ValueError(
-                "Sources and destinations should be of the same length in order to perform a transfer."
-                " To transfer liquid from one source to many destinations, use 'distribute_liquid',"
-                " to transfer liquid onto one destinations from many sources, use 'consolidate_liquid'."
-            )
+
+        verified_dest: Union[
+            List[Tuple[types.Location, WellCore]], TrashBin, WasteChute
+        ]
+        if isinstance(transfer_args.dest, (TrashBin, WasteChute)):
+            verified_dest = transfer_args.dest
+        else:
+            if len(transfer_args.source) != len(transfer_args.dest):
+                raise ValueError(
+                    "Sources and destinations should be of the same length in order to perform a transfer."
+                    " To transfer liquid from one source to many destinations, use 'distribute_liquid',"
+                    " to transfer liquid to one destination from many sources, use 'consolidate_liquid'."
+                )
+            verified_dest = [
+                (types.Location(types.Point(), labware=well), well._core)
+                for well in transfer_args.dest
+            ]
 
         with publisher.publish_context(
             broker=self.broker,
@@ -1702,12 +1717,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume=volume,
                 source=[
                     (types.Location(types.Point(), labware=well), well._core)
-                    for well in transfer_args.sources_list
+                    for well in transfer_args.source
                 ],
-                dest=[
-                    (types.Location(types.Point(), labware=well), well._core)
-                    for well in transfer_args.destinations_list
-                ],
+                dest=verified_dest,
                 new_tip=transfer_args.tip_policy,
                 tip_racks=[
                     (types.Location(types.Point(), labware=rack), rack._core)
@@ -1750,7 +1762,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param volume: The amount, in µL, to aspirate from the source and dispense to
                        each destination.
-        :param source: A single well to aspirate liquid from.
+        :param source: A single well for the pipette to target, or a group of wells to
+                       target in a single aspirate for a multi-channel pipette.
         :param dest: A list of wells to dispense liquid into.
         :param new_tip: When to pick up and drop tips during the command.
             Defaults to ``"once"``.
@@ -1787,10 +1800,15 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
-        if len(transfer_args.sources_list) != 1:
+        if isinstance(transfer_args.dest, (TrashBin, WasteChute)):
+            raise ValueError(
+                "distribute_with_liquid_class() does not support trash bin or waste chute"
+                " as a destination."
+            )
+        if len(transfer_args.source) != 1:
             raise ValueError(
                 f"Source should be a single well (or resolve to a single transfer for multi-channel) "
-                f"but received {transfer_args.sources_list}."
+                f"but received {transfer_args.source}."
             )
         if transfer_args.tip_policy not in [
             TransferTipPolicyV2.ONCE,
@@ -1802,7 +1820,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 f" 'once' and 'never'."
             )
 
-        verified_source = transfer_args.sources_list[0]
+        verified_source = transfer_args.source[0]
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.distribute_with_liquid_class(
@@ -1822,7 +1840,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 ),
                 dest=[
                     (types.Location(types.Point(), labware=well), well._core)
-                    for well in transfer_args.destinations_list
+                    for well in transfer_args.dest
                 ],
                 new_tip=transfer_args.tip_policy,  # type: ignore[arg-type]
                 tip_racks=[
@@ -1845,7 +1863,7 @@ class InstrumentContext(publisher.CommandPublisher):
         source: Union[
             labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
         ],
-        dest: Union[labware.Well, Sequence[labware.Well]],
+        dest: Union[labware.Well, Sequence[labware.Well], TrashBin, WasteChute],
         new_tip: TransferTipPolicyV2Type = "once",
         trash_location: Optional[
             Union[types.Location, labware.Well, TrashBin, WasteChute]
@@ -1867,7 +1885,9 @@ class InstrumentContext(publisher.CommandPublisher):
         :param volume: The amount, in µL, to aspirate from the source and dispense to
                        each destination.
         :param source: A list of wells to aspirate liquid from.
-        :param dest: A single well to dispense liquid into.
+        :param dest: A single well, list of wells, trash bin, or waste chute to dispense liquid into.
+                     Multiple wells can only be given for multi-channel pipette configurations, and
+                     must be able to be dispensed to in a single dispense.
         :param new_tip: When to pick up and drop tips during the command.
             Defaults to ``"once"``.
 
@@ -1903,10 +1923,18 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
-        if len(transfer_args.destinations_list) != 1:
-            raise ValueError(
-                f"Destination should be a single well (or resolve to a single transfer for multi-channel) "
-                f"but received {transfer_args.destinations_list}."
+        verified_dest: Union[Tuple[types.Location, WellCore], TrashBin, WasteChute]
+        if isinstance(transfer_args.dest, (TrashBin, WasteChute)):
+            verified_dest = transfer_args.dest
+        else:
+            if len(transfer_args.dest) != 1:
+                raise ValueError(
+                    f"Destination should be a single well (or resolve to a single transfer for multi-channel) "
+                    f"but received {transfer_args.dest}."
+                )
+            verified_dest = (
+                types.Location(types.Point(), labware=transfer_args.dest[0]),
+                transfer_args.dest[0]._core,
             )
         if transfer_args.tip_policy not in [
             TransferTipPolicyV2.ONCE,
@@ -1918,7 +1946,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 f" 'once' and 'never'."
             )
 
-        verified_dest = transfer_args.destinations_list[0]
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.consolidate_with_liquid_class(
@@ -1934,12 +1961,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume=volume,
                 source=[
                     (types.Location(types.Point(), labware=well), well._core)
-                    for well in transfer_args.sources_list
+                    for well in transfer_args.source
                 ],
-                dest=(
-                    types.Location(types.Point(), labware=verified_dest),
-                    verified_dest._core,
-                ),
+                dest=verified_dest,
                 new_tip=transfer_args.tip_policy,  # type: ignore[arg-type]
                 tip_racks=[
                     (types.Location(types.Point(), labware=rack), rack._core)
