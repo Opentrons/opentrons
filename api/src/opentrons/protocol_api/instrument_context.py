@@ -498,6 +498,7 @@ class InstrumentContext(publisher.CommandPublisher):
         rate: float = 1.0,
         aspirate_delay: Optional[float] = None,
         dispense_delay: Optional[float] = None,
+        final_push_out: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Mix a volume of liquid by repeatedly aspirating and dispensing it in a single location.
@@ -524,6 +525,10 @@ class InstrumentContext(publisher.CommandPublisher):
                      :ref:`new-plunger-flow-rates`.
         :param aspirate_delay: How long to wait after each aspirate in the mix, in seconds.
         :param dispense_delay: How long to wait after each dispense in the mix, in seconds.
+        :param final_push_out: How much to push out after the final mix repetition. The
+                               pipette will not push out after earlier repetitions. If
+                               not specified or ``None``, the pipette will push out the
+                               default non-zero amount. See :ref:`push-out-dispense`.
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
         :returns: This instance.
 
@@ -537,7 +542,7 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.21
             Does not repeatedly check for liquid presence.
         .. versionchanged:: 2.24
-            Adds the ``aspirate_delay`` and ``dispense_delay`` parameters.
+            Adds the ``aspirate_delay``, ``dispense_delay``, and ``final_push_out`` parameters.
         """
         _log.debug(
             "mixing {}uL with {} repetitions in {} at rate={}".format(
@@ -561,6 +566,12 @@ class InstrumentContext(publisher.CommandPublisher):
         if dispense_delay and self.api_version < APIVersion(2, 24):
             raise APIVersionError(
                 api_element="dispense_delay",
+                until_version="2.24",
+                current_version=f"{self._api_version}",
+            )
+        if final_push_out and self.api_version < APIVersion(2, 24):
+            raise APIVersionError(
+                api_element="final_push_out",
                 until_version="2.24",
                 current_version=f"{self._api_version}",
             )
@@ -611,7 +622,10 @@ class InstrumentContext(publisher.CommandPublisher):
                     # aspirate location was set above, do subsequent aspirates in-place:
                     aspirate_with_delay(location=None)
                     repetitions -= 1
-                dispense_with_delay(push_out=None)
+                if final_push_out is not None:
+                    dispense_with_delay(push_out=final_push_out)
+                else:
+                    dispense_with_delay(push_out=None)
         return self
 
     @requires_version(2, 0)
@@ -1713,9 +1727,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
-                starting_tip=self.starting_tip._core
-                if self.starting_tip is not None
-                else None,
+                starting_tip=(
+                    self.starting_tip._core if self.starting_tip is not None else None
+                ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )
@@ -1829,9 +1843,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
-                starting_tip=self.starting_tip._core
-                if self.starting_tip is not None
-                else None,
+                starting_tip=(
+                    self.starting_tip._core if self.starting_tip is not None else None
+                ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )
@@ -1945,9 +1959,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
-                starting_tip=self.starting_tip._core
-                if self.starting_tip is not None
-                else None,
+                starting_tip=(
+                    self.starting_tip._core if self.starting_tip is not None else None
+                ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )
@@ -2121,7 +2135,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=well,
             ),
         ):
-            self._core.resin_tip_unseal(location=well.top(), well_core=well._core)
+            self._core.resin_tip_unseal(location=None, well_core=well._core)
 
         return self
 

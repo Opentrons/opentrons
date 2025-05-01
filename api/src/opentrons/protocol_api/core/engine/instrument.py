@@ -836,7 +836,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         )
 
-    def resin_tip_unseal(self, location: Location, well_core: WellCore) -> None:
+    def resin_tip_unseal(self, location: Location | None, well_core: WellCore) -> None:
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
 
@@ -1190,9 +1190,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             cmd.GetNextTipParams(
                 pipetteId=self._pipette_id,
                 labwareIds=[tip_rack.labware_id for tip_rack in valid_tip_racks],
-                startingTipWell=starting_well.get_name()
-                if starting_well is not None
-                else None,
+                startingTipWell=(
+                    starting_well.get_name() if starting_well is not None else None
+                ),
             )
         )
         next_tip_info = result.nextTipInfo

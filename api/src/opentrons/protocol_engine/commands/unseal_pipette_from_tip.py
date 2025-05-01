@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 from pydantic import Field
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Final
 from typing_extensions import Literal
 
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.types import MotorAxis
-from opentrons.types import MountType
 
 from ..types import DropTipWellLocation
 from .pipetting_common import (
@@ -56,6 +54,8 @@ _ExecuteReturn = (
     SuccessData[UnsealPipetteFromTipResult] | DefinedErrorData[StallOrCollisionError]
 )
 
+CUSTOM_TIP_LENGTH_MARGIN: Final = 10
+
 
 class UnsealPipetteFromTipImplementation(
     AbstractCommandImpl[UnsealPipetteFromTipParams, _ExecuteReturn]
@@ -85,6 +85,10 @@ class UnsealPipetteFromTipImplementation(
 
         well_location = params.wellLocation
 
+        tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
+            pipette_id, labware_id, well_name
+        )
+
         is_partially_configured = self._state_view.pipettes.get_is_partially_configured(
             pipette_id=pipette_id
         )
@@ -93,6 +97,7 @@ class UnsealPipetteFromTipImplementation(
             labware_id=labware_id,
             well_location=well_location,
             partially_configured=is_partially_configured,
+            override_default_offset=-(tip_geometry.length - CUSTOM_TIP_LENGTH_MARGIN),
         )
 
         move_result = await move_to_well(
@@ -105,14 +110,6 @@ class UnsealPipetteFromTipImplementation(
         )
         if isinstance(move_result, DefinedErrorData):
             return move_result
-
-        # Move to an appropriate position
-        mount = self._state_view.pipettes.get_mount(pipette_id)
-
-        mount_axis = MotorAxis.LEFT_Z if mount == MountType.LEFT else MotorAxis.RIGHT_Z
-        await self._gantry_mover.move_axes(
-            axis_map={mount_axis: -14}, speed=10, relative_move=True
-        )
 
         await self._tip_handler.drop_tip(
             pipette_id=pipette_id,
