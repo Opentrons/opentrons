@@ -152,27 +152,20 @@ export const getLabwareIsRecommended = (
       )
 }
 
-const STACKING_LABWARE_LOADNAME_FILTER = [
-  'opentrons_96_wellplate_200ul_pcr_full_skirt',
-]
-
+//  purely for labware<>adapter combos
 export const getLabwareCompatibleWithAdapter = (
   defs: LabwareDefByDefURI,
-  enableStacking: boolean,
   adapterLoadName?: string
 ): string[] => {
-  if (
-    adapterLoadName == null ||
-    (adapterLoadName != null &&
-      !enableStacking &&
-      STACKING_LABWARE_LOADNAME_FILTER.includes(adapterLoadName))
-  ) {
+  if (adapterLoadName == null) {
     return []
   }
   return Object.entries(defs)
     .filter(
-      ([, { stackingOffsetWithLabware }]) =>
-        stackingOffsetWithLabware?.[adapterLoadName] != null
+      ([, { stackingOffsetWithLabware, compatibleParentLabware }]) =>
+        stackingOffsetWithLabware?.[adapterLoadName] != null &&
+        //  stacking labware gets added via the LabwareCard
+        !compatibleParentLabware?.includes(adapterLoadName)
     )
     .map(([labwareDefUri]) => labwareDefUri)
 }

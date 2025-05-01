@@ -66,21 +66,19 @@ export function ListItemCustomize(props: ListItemCustomizeProps): JSX.Element {
         {tag != null ? <Tag {...tag} /> : null}
       </Flex>
       {onClick != null && linkText != null ? (
-        <Link
-          role="button"
-          onClick={onClick}
-          css={css`
-            width: 10%;
-            text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
-            color: ${COLORS.grey60};
-            &:hover {
-              color: ${COLORS.grey40};
-            }
-          `}
-        >
+        <Link role="button" onClick={onClick} css={LINK_STYLE}>
           <StyledText desktopStyle="bodyDefaultRegular">{linkText}</StyledText>
         </Link>
       ) : null}
     </Flex>
   )
 }
+
+const LINK_STYLE = css`
+  width: 10%;
+  text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+  color: ${COLORS.grey60};
+  &:hover {
+    color: ${COLORS.grey40};
+  }
+`

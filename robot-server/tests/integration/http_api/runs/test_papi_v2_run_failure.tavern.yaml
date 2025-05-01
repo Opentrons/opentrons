@@ -92,17 +92,51 @@ stages:
               key: !anystr
               createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
         meta:
-          cursor: 3
+          cursor: 0
           totalLength: 4
         data:
           - id: !anystr
             key: !anystr
+            commandType: home
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            params: !anydict
+            notes: !anylist
+          - id: !re_fullmatch "commands\\.LOAD_LABWARE-\\d+"
+            key: !re_fullmatch "commands\\.LOAD_LABWARE-\\d+"
+            commandType: loadLabware
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            params:
+              location:
+                slotName: "1"
+              loadName: opentrons_96_tiprack_300ul
+              namespace: opentrons
+              version: 1
+            notes: !anylist
+          - id: !re_fullmatch "commands\\.LOAD_PIPETTE-\\d+"
+            key: !re_fullmatch "commands\\.LOAD_PIPETTE-\\d+"
+            commandType: loadPipette
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            params:
+              pipetteName: p300_single
+              mount: right
+            notes: !anylist
+          - id: !re_fullmatch "command\\.ASPIRATE-\\d+"
+            key: !re_fullmatch "command\\.ASPIRATE-\\d+"
             commandType: aspirate
             createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: failed
-            notes: []
+            notes: !anylist
             error:
               id: !anystr
               errorType: LegacyContextCommandError
@@ -119,9 +153,9 @@ stages:
               wellLocation:
                 origin: top
                 offset:
-                  x: 0
-                  y: 0
-                  z: 0
-                volumeOffset: 0
-              flowRate: 150
-              volume: 100
+                  x: !anyfloat
+                  y: !anyfloat
+                  z: !anyfloat
+                volumeOffset: !anyfloat
+              flowRate: !anyfloat
+              volume: !anyfloat

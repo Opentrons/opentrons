@@ -75,6 +75,8 @@ const mapModTypeToStepTypeOt2: Record<OT2ModuleType, StepType> = {
   thermocyclerModuleType: 'thermocycler',
 }
 
+const THERMOCYCLER_SLOTS = ['8', '9', '10', '11']
+
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
   'fixedBase',
@@ -163,8 +165,34 @@ export function Ot2Modules(): JSX.Element {
           COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType]
         ).includes(lw.def.parameters.loadName)
     )?.def.metadata.displayName
+    const incompatibleLabwareSlots = Object.values(labware)
+      .filter(lw => THERMOCYCLER_SLOTS.includes(lw.slot))
+      ?.map(lw => lw.slot)
     if (somethingInSlotModule) {
       makeSnackbar(t('protocol_overview:conflict_on_slot_module') as string)
+    } else if (
+      incompatibleLabwareSlots.length > 0 &&
+      moduleType === THERMOCYCLER_MODULE_TYPE
+    ) {
+      const has1Conflict = incompatibleLabwareSlots.length === 1
+      let slots: string
+      if (incompatibleLabwareSlots.length === 1) {
+        slots = incompatibleLabwareSlots[0]
+      } else {
+        const lastSlot =
+          incompatibleLabwareSlots[incompatibleLabwareSlots.length - 1]
+        const rest = incompatibleLabwareSlots.slice(0, -1)
+        slots = `${rest.join(', ')} and ${lastSlot}`
+      }
+      makeSnackbar(
+        has1Conflict
+          ? (t('protocol_overview:conflict_on_slot_labware_tc', {
+              slots,
+            }) as string)
+          : (t('protocol_overview:conflict_on_slot_labwares_tc', {
+              slots,
+            }) as string)
+      )
     } else if (incompatibleLabwareDisplayNameInSlot != null) {
       makeSnackbar(
         t('protocol_overview:conflict_on_slot_labware', {

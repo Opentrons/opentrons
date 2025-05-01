@@ -221,6 +221,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.STALL_WHILE_STACKING:
     case ERROR_KINDS.SHUTTLE_MISSING:
     case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
+    case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
       return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(

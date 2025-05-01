@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   AlertModal,
+  Divider,
   LegacyStyledText,
   SPACING,
   SpinnerModalPage,
@@ -18,7 +19,6 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { Line } from '/app/atoms/structure'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
 import * as RobotApi from '/app/redux/robot-api'
@@ -327,7 +327,7 @@ export function RobotSettingsCalibration({
           <CalibrationDataDownload
             {...{ robotName, setShowHowCalibrationWorksModal }}
           />
-          <Line marginTop={SPACING.spacing24} />
+          <Divider marginTop={SPACING.spacing24} marginBottom={0} />
           <RobotSettingsPipetteOffsetCalibration
             formattedPipetteOffsetCalibrations={
               formattedPipetteOffsetCalibrations
@@ -335,12 +335,12 @@ export function RobotSettingsCalibration({
             robotName={robotName}
             updateRobotStatus={updateRobotStatus}
           />
-          <Line />
+          <Divider marginY={0} />
           <RobotSettingsGripperCalibration
             gripper={attachedGripper}
             robotName={robotName}
           />
-          <Line />
+          <Divider marginY={0} />
           <RobotSettingsModuleCalibration
             attachedModules={attachedModules}
             updateRobotStatus={updateRobotStatus}
@@ -356,7 +356,7 @@ export function RobotSettingsCalibration({
             {...{ robotName, setShowHowCalibrationWorksModal }}
           />
           <RobotSettingsDeckCalibration robotName={robotName} />
-          <Line />
+          <Divider marginY={0} />
           <RobotSettingsPipetteOffsetCalibration
             formattedPipetteOffsetCalibrations={
               formattedPipetteOffsetCalibrations
@@ -364,7 +364,7 @@ export function RobotSettingsCalibration({
             robotName={robotName}
             updateRobotStatus={updateRobotStatus}
           />
-          <Line />
+          <Divider marginY={0} />
           <RobotSettingsTipLengthCalibration
             formattedPipetteOffsetCalibrations={
               formattedPipetteOffsetCalibrations
@@ -372,14 +372,14 @@ export function RobotSettingsCalibration({
             robotName={robotName}
             updateRobotStatus={updateRobotStatus}
           />
-          <Line />
+          <Divider marginY={0} />
           <CalibrationHealthCheck
             buttonDisabledReason={buttonDisabledReason}
             dispatchRequests={dispatchRequests}
             isPending={isPending}
             robotName={robotName}
           />
-          <Line marginBottom={SPACING.spacing24} />
+          <Divider marginBottom={SPACING.spacing24} />
           <CalibrationDataDownload
             robotName={robotName}
             setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}

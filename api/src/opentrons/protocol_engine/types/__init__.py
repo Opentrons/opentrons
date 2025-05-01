@@ -136,6 +136,7 @@ from .liquid_level_detection import (
     WellInfoSummary,
     WellLiquidInfo,
     LiquidTrackingType,
+    SimulatedProbeResult,
 )
 from .liquid_handling import FlowRates
 from .labware_movement import LabwareMovementStrategy, LabwareMovementOffsetData
@@ -282,6 +283,7 @@ __all__ = [
     "WellInfoSummary",
     "WellLiquidInfo",
     "LiquidTrackingType",
+    "SimulatedProbeResult",
     # Liquid handling
     "FlowRates",
     # Labware movement

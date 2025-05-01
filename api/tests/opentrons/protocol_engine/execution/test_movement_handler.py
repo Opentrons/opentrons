@@ -106,7 +106,7 @@ async def test_move_to_well(
         DeckSlotName.SLOT_1
     )
 
-    decoy.when(state_store.tips.get_pipette_channels("pipette-id")).then_return(1)
+    decoy.when(state_store.pipettes.get_channels("pipette-id")).then_return(1)
     decoy.when(state_store.labware.is_tiprack("labware-id")).then_return(False)
 
     decoy.when(
@@ -221,7 +221,7 @@ async def test_move_to_well_from_starting_location(
         DeckSlotName.SLOT_1
     )
 
-    decoy.when(state_store.tips.get_pipette_channels("pipette-id")).then_return(1)
+    decoy.when(state_store.pipettes.get_channels("pipette-id")).then_return(1)
     decoy.when(state_store.labware.is_tiprack("labware-id")).then_return(False)
 
     decoy.when(
@@ -322,7 +322,7 @@ async def test_move_to_addressable_area(
         state_store.addressable_areas.get_addressable_area_base_slot("area-name")
     ).then_return(DeckSlotName.SLOT_1)
 
-    decoy.when(state_store.tips.get_pipette_channels("pipette-id")).then_return(1)
+    decoy.when(state_store.pipettes.get_channels("pipette-id")).then_return(1)
 
     decoy.when(
         state_store.motion.get_pipette_location(

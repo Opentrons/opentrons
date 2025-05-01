@@ -21,18 +21,47 @@ import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import type { JSX } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function GripperReleaseLabware({
+export function ReleaseLabware({
   routeUpdateActions,
+  recoveryMap,
 }: RecoveryContentProps): JSX.Element {
   const { handleMotionRouting, goBackPrevStep } = routeUpdateActions
+  const { route } = recoveryMap
+  const {
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+  } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const buildPrimaryOnClick = (): void => {
     // Because the actual release command is executed on a delay, the execution behavior is deferred to the
     // motion route.
-    void handleMotionRouting(true, RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE)
+    switch (route) {
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        void handleMotionRouting(
+          true,
+          RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
+        )
+        break
+      default:
+        void handleMotionRouting(
+          true,
+          RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE
+        )
+        break
+    }
   }
 
+  const buildTitle = (): string => {
+    switch (route) {
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        return t('release_labware_from_latch')
+      default:
+        return t('release_labware_from_gripper')
+    }
+  }
   return (
     <RecoverySingleColumnContentWrapper>
       <TwoColumn>
@@ -41,7 +70,7 @@ export function GripperReleaseLabware({
             oddStyle="level4HeaderSemiBold"
             desktopStyle="headingSmallBold"
           >
-            {t('release_labware_from_gripper')}
+            {buildTitle()}
           </StyledText>
           <StyledText
             oddStyle="bodyTextRegular"

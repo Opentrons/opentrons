@@ -7,6 +7,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Divider,
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
@@ -16,14 +17,17 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  useInstrumentsQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   parseAllRequiredModuleModels,
 } from '@opentrons/shared-data'
 
-import { Line } from '/app/atoms/structure'
+import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import { InfoMessage } from '/app/molecules/InfoMessage'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
@@ -182,6 +186,13 @@ export function ProtocolRunSetup({
 
   const isMissingModule = missingModuleIds.length > 0
 
+  const { data: attachedInstruments } = useInstrumentsQuery()
+
+  const incompleteInstrumentCount: number | null =
+    protocolAnalysis != null && attachedInstruments != null
+      ? getIncompleteInstrumentCount(protocolAnalysis, attachedInstruments)
+      : null
+
   const hasModules = protocolAnalysis != null && modules.length > 0
   // need config compatibility (including check for single slot conflicts)
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
@@ -286,6 +297,10 @@ export function ProtocolRunSetup({
             }
           }}
           offsetsConfirmed={offsetsConfirmed}
+          hasMissingModulesForFlex={isMissingModule}
+          hasMissingCalForFlex={
+            incompleteInstrumentCount != null && incompleteInstrumentCount > 0
+          }
           lpcUtils={lpcUtils}
         />
       ),
@@ -399,7 +414,7 @@ export function ProtocolRunSetup({
                     </SetupStep>
                   )}
                   {index !== orderedSteps.length - 1 ? (
-                    <Line marginTop={SPACING.spacing24} />
+                    <Divider marginTop={SPACING.spacing24} marginBottom={0} />
                   ) : null}
                 </Flex>
               )

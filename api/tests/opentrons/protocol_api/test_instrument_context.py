@@ -57,7 +57,13 @@ from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
-from opentrons.types import Location, Mount, Point, NozzleMapInterface
+from opentrons.types import (
+    Location,
+    Mount,
+    Point,
+    NozzleMapInterface,
+    MeniscusTrackingTarget,
+)
 
 from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons_shared_data.errors.exceptions import (
@@ -511,6 +517,47 @@ def test_blow_out_to_well_location(
             location=input_location, well_core=mock_well._core, in_place=False
         ),
         times=1,
+    )
+
+
+def test_blow_out_to_well_meniscus_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should blow out to a well location."""
+    liquid_height = 10.0
+    well_bottom = Point(2, 2, 2)
+    relative_height = 3
+    mock_well = decoy.mock(cls=Well)
+    input_location_absolute = Location(
+        point=well_bottom + Point(0, 0, liquid_height) + Point(0, 0, relative_height),
+        labware=mock_well,
+    )
+    decoy.when(mock_well.current_liquid_height()).then_return(liquid_height)
+    decoy.when(mock_well.bottom(liquid_height + relative_height)).then_return(
+        Location(
+            point=well_bottom + Point(0, 0, liquid_height + relative_height),
+            labware=mock_well,
+        )
+    )
+
+    input_location = Location(
+        point=Point(0, 0, relative_height),
+        labware=mock_well,
+        _meniscus_tracking=MeniscusTrackingTarget.END,
+    )
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    subject.blow_out(location=input_location)
+
+    mock_instrument_core.blow_out(
+        location=input_location_absolute, well_core=mock_well._core, in_place=False
     )
 
 
@@ -1430,8 +1477,15 @@ def test_measure_liquid_height(
         original_error=lnfe,
         message=f"{lnfe.errorType}: {lnfe.detail}",
     )
+    decoy.when(mock_well.current_liquid_height()).then_return(123)
     decoy.when(
-        mock_instrument_core.liquid_probe_without_recovery(
+        mock_instrument_core.liquid_probe_with_recovery(
+            mock_well._core, mock_well.top()
+        )
+    )
+    assert subject.measure_liquid_height(mock_well) == 123
+    decoy.when(
+        mock_instrument_core.liquid_probe_with_recovery(
             mock_well._core, mock_well.top()
         )
     ).then_raise(errorToRaise)
@@ -1612,13 +1666,13 @@ def test_mix_with_lpd(
     )
 
 
-def test_mix_with_delay(
+def test_mix_with_delay_and_final_push_out(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-    """It should delay after the aspirate/dispense in a mix."""
+    """It should delay after the aspirate/dispense and emit the specified push out for the final dispense in a mix."""
     mock_well = decoy.mock(cls=Well)
     input_location = Location(point=Point(2, 2, 2), labware=mock_well)
     decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
@@ -1635,6 +1689,7 @@ def test_mix_with_delay(
         location=input_location,
         aspirate_delay=3,
         dispense_delay=4,
+        final_push_out=2,
     )
     decoy.verify(
         mock_instrument_core.aspirate(
@@ -1675,7 +1730,7 @@ def test_mix_with_delay(
             rate=1,
             flow_rate=5.67,
             in_place=True,
-            push_out=None,
+            push_out=2,  # final push out
             meniscus_tracking=None,
         ),
         mock_protocol_core.delay(4, msg=None),  # dispense delay

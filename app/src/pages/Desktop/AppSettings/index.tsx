@@ -8,13 +8,13 @@ import {
   Box,
   COLORS,
   DIRECTION_ROW,
+  Divider,
   Flex,
   LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Line } from '/app/atoms/structure'
 import { NavTab } from '/app/molecules/NavTab'
 import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
 import * as Config from '/app/redux/config'
@@ -78,7 +78,7 @@ export function AppSettings(): JSX.Element {
             )}
           </Flex>
         </Box>
-        <Line />
+        <Divider marginY="0" />
         {appSettingsContent}
       </Box>
     </Flex>

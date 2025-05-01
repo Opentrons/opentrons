@@ -13,7 +13,8 @@ export function getLabwareInfoByLiquidId(
     commands.length !== 0
       ? commands.filter(
           (command): command is LoadLiquidRunTimeCommand =>
-            command.commandType === 'loadLiquid'
+            command.commandType === 'loadLiquid' &&
+            command.params.liquidId !== 'EMPTY'
         )
       : []
 

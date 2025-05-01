@@ -91,8 +91,8 @@ describe('useLPCDisabledReason', () => {
       () =>
         useLPCDisabledReason({
           runId: RUN_ID_1,
-          hasMissingModulesForOdd: false,
-          hasMissingCalForOdd: false,
+          hasMissingModulesForFlex: false,
+          hasMissingCalForFlex: false,
         }),
       { wrapper }
     )
@@ -103,8 +103,8 @@ describe('useLPCDisabledReason', () => {
       () =>
         useLPCDisabledReason({
           runId: RUN_ID_1,
-          hasMissingModulesForOdd: true,
-          hasMissingCalForOdd: true,
+          hasMissingModulesForFlex: true,
+          hasMissingCalForFlex: true,
         }),
       { wrapper }
     )
@@ -131,8 +131,8 @@ describe('useLPCDisabledReason', () => {
       () =>
         useLPCDisabledReason({
           runId: RUN_ID_1,
-          hasMissingModulesForOdd: false,
-          hasMissingCalForOdd: true,
+          hasMissingModulesForFlex: false,
+          hasMissingCalForFlex: true,
         }),
       { wrapper }
     )
@@ -153,8 +153,8 @@ describe('useLPCDisabledReason', () => {
       () =>
         useLPCDisabledReason({
           runId: RUN_ID_1,
-          hasMissingModulesForOdd: true,
-          hasMissingCalForOdd: false,
+          hasMissingModulesForFlex: true,
+          hasMissingCalForFlex: false,
         }),
       { wrapper }
     )
@@ -190,8 +190,8 @@ describe('useLPCDisabledReason', () => {
       () =>
         useLPCDisabledReason({
           runId: RUN_ID_1,
-          hasMissingModulesForOdd: false,
-          hasMissingCalForOdd: false,
+          hasMissingModulesForFlex: false,
+          hasMissingCalForFlex: false,
         }),
       { wrapper }
     )
@@ -214,8 +214,8 @@ describe('useLPCDisabledReason', () => {
       () =>
         useLPCDisabledReason({
           runId: RUN_ID_1,
-          hasMissingModulesForOdd: false,
-          hasMissingCalForOdd: false,
+          hasMissingModulesForFlex: false,
+          hasMissingCalForFlex: false,
         }),
       { wrapper }
     )
@@ -240,8 +240,8 @@ describe('useLPCDisabledReason', () => {
       () =>
         useLPCDisabledReason({
           runId: RUN_ID_1,
-          hasMissingModulesForOdd: false,
-          hasMissingCalForOdd: false,
+          hasMissingModulesForFlex: false,
+          hasMissingCalForFlex: false,
         }),
       { wrapper }
     )
@@ -269,8 +269,8 @@ describe('useLPCDisabledReason', () => {
       () =>
         useLPCDisabledReason({
           runId: RUN_ID_1,
-          hasMissingModulesForOdd: false,
-          hasMissingCalForOdd: false,
+          hasMissingModulesForFlex: false,
+          hasMissingCalForFlex: false,
         }),
       { wrapper }
     )
@@ -306,8 +306,8 @@ describe('useLPCDisabledReason', () => {
       () =>
         useLPCDisabledReason({
           runId: RUN_ID_1,
-          hasMissingModulesForOdd: false,
-          hasMissingCalForOdd: false,
+          hasMissingModulesForFlex: false,
+          hasMissingCalForFlex: false,
         }),
       { wrapper }
     )

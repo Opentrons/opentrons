@@ -9,15 +9,14 @@ import {
   Box,
   COLORS,
   DIRECTION_COLUMN,
+  Divider,
   Flex,
   LegacyStyledText,
-  SIZE_6,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { Line } from '/app/atoms/structure'
 import { NavTab } from '/app/molecules/NavTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
@@ -100,7 +99,7 @@ export function RobotSettings(): JSX.Element | null {
   )
 
   return (
-    <Box minWidth={SIZE_6} height="max-content" padding={SPACING.spacing16}>
+    <Box minWidth="32rem" height="max-content" padding={SPACING.spacing16}>
       <Flex
         backgroundColor={COLORS.white}
         borderRadius={BORDERS.borderRadius8}
@@ -152,7 +151,7 @@ export function RobotSettings(): JSX.Element | null {
             ) : null}
           </Flex>
         </Box>
-        <Line />
+        <Divider marginY="0" />
         <Box padding={`${SPACING.spacing24} ${SPACING.spacing16}`}>
           <ApiHostProvider
             hostname={robot?.ip ?? null}

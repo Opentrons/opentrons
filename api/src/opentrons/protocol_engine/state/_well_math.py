@@ -63,7 +63,7 @@ def wells_covered_dense(  # noqa: C901
     row_downsample = len(target_wells_by_column[0]) // 8
     if column_downsample < 1 or row_downsample < 1:
         raise InvalidStoredData(
-            "This labware cannot be used wells_covered_dense because it is less dense than an SBS 96 standard"
+            "This labware cannot be used with wells_covered_dense() because it is less dense than an SBS 96 standard"
         )
 
     for nozzle_column in range(len(nozzle_map.columns)):
@@ -126,7 +126,7 @@ def wells_covered_sparse(  # noqa: C901
     row_upsample = 8 // len(target_wells_by_column[0])
     if column_upsample < 1 or row_upsample < 1:
         raise InvalidStoredData(
-            "This labware cannot be used with wells_covered_sparse because it is more dense than an SBS 96 standard."
+            "This labware cannot be used with wells_covered_sparse() because it is more dense than an SBS 96 standard."
         )
     for nozzle_column in range(max(1, len(nozzle_map.columns) // column_upsample)):
         for nozzle_row in range(max(1, len(nozzle_map.rows) // row_upsample)):

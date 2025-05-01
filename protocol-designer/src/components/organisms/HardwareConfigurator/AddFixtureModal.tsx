@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
@@ -31,6 +32,7 @@ import { uuid } from '@opentrons/step-generation'
 import { editDeckConfiguration } from '../../../step-forms/actions'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { useKitchen } from '../Kitchen/hooks'
+import { getMainPagePortalEl } from '../Portal'
 import { getLabwareNotCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 
@@ -321,7 +323,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     )
   })
 
-  return (
+  return createPortal(
     <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         {fixtureOptions}
@@ -345,7 +347,8 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
           </StyledText>
         </Btn>
       ) : null}
-    </Modal>
+    </Modal>,
+    getMainPagePortalEl()
   )
 }
 
