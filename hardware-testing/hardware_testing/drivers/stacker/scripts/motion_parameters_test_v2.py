@@ -51,7 +51,7 @@ TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
         StackerAxis.Z: {
             "SPEED": {"MIN": 50, "MAX": 300, "INC": 50},
             "ACCEL": {"MIN": 500, "MAX": 500, "INC": 10},
-            "CURRENT": {"MIN": 0.7, "MAX": 2.0, "INC": 0.1}
+            "CURRENT": {"MIN": 0.7, "MAX": 1.5, "INC": 0.1}
         },
         StackerAxis.L: {
             "SPEED": {"MIN": 100, "MAX": 100, "INC": 10},
