@@ -98,10 +98,10 @@ export function mixUtil(args: {
       `location=${labwarePythonName}[${formatPyStr(
         well
       )}]${formatPyWellLocation(pythonWellLocation)}`,
-      ...(aspirateDelaySeconds != null
+      ...(aspirateDelaySeconds != null && aspirateDelaySeconds !== 0
         ? [`aspirate_delay=${aspirateDelaySeconds}`]
         : []),
-      ...(dispenseDelaySeconds != null
+      ...(dispenseDelaySeconds != null && dispenseDelaySeconds !== 0
         ? [`dispense_delay=${dispenseDelaySeconds}`]
         : []),
       ...(finalPushOut != null ? [`final_push_out=${finalPushOut}`] : []),
