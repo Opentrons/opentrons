@@ -8,9 +8,7 @@ from typing import Dict
 import numpy as np
 import argparse
 from datetime import datetime
-
 import asyncio
-from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.drivers.flex_stacker.driver import (
