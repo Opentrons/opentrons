@@ -1800,7 +1800,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
-        assert not isinstance(transfer_args.dest, (TrashBin, WasteChute))
+        if isinstance(transfer_args.dest, (TrashBin, WasteChute)):
+            raise ValueError(
+                "distribute_with_liquid_class() does not support trash bin or waste chute"
+                " as a destination."
+            )
         if len(transfer_args.source) != 1:
             raise ValueError(
                 f"Source should be a single well (or resolve to a single transfer for multi-channel) "
