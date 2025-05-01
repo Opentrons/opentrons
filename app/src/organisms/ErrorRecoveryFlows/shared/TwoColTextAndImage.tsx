@@ -4,7 +4,6 @@ import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   StyledText,
