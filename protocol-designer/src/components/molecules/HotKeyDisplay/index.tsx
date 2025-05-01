@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -6,6 +7,7 @@ import {
   SPACING,
   Tag,
 } from '@opentrons/components'
+
 import { getUserOS } from '../../../pages/Designer/ProtocolSteps/Timeline/utils'
 
 interface HotKeyDisplayProps {

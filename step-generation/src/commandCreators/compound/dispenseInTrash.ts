@@ -1,11 +1,12 @@
-import {
-  reduceCommandCreators,
-  indentPyLines,
-  curryWithoutPython,
-} from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
+import {
+  curryWithoutPython,
+  indentPyLines,
+  reduceCommandCreators,
+} from '../../utils'
 import { dispenseInPlace, moveToAddressableArea } from '../atomic'
-import type { CurriedCommandCreator, CommandCreator } from '../../types'
+
+import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface DispenseInTrashParams {
   pipetteId: string

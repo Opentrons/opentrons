@@ -1,15 +1,16 @@
-import { screen } from '@testing-library/react'
-import { vi, describe, it, beforeEach } from 'vitest'
 import { useTranslation } from 'react-i18next'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../../../../testing/utils'
+import { getLabwareDefURI } from '@opentrons/shared-data'
+
 import { i18n } from '../../../../../../i18n'
+import { renderWithProviders } from '../../../../../../testing/utils'
+import { getLabwareDisplayLocation } from '../../getLabwareDisplayLocation'
 import {
   getFlexStackerCommandText,
   KEYS_BY_COMMAND_TYPE,
 } from '../getFlexStackerCommandText'
-import { getLabwareDefURI } from '@opentrons/shared-data'
-import { getLabwareDisplayLocation } from '../../getLabwareDisplayLocation'
 
 vi.mock('@opentrons/shared-data')
 vi.mock('../../getLabwareDisplayLocation')

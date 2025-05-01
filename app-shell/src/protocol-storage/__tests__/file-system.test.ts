@@ -1,22 +1,22 @@
 // tests for labware directory utilities
 
 import path from 'path'
+import Electron from 'electron'
 import fs from 'fs-extra'
 import tempy from 'tempy'
-import Electron from 'electron'
-import { vi, describe, beforeEach, it, afterAll, expect } from 'vitest'
 import uuid from 'uuid/v4'
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { analyzeProtocolSource } from '../../protocol-analysis'
 import {
-  readDirectoriesWithinDirectory,
-  readFilesWithinDirectory,
-  parseProtocolDirs,
   addProtocolFile,
-  removeProtocolByKey,
+  parseProtocolDirs,
   PROTOCOLS_DIRECTORY_NAME,
   PROTOCOLS_DIRECTORY_PATH,
+  readDirectoriesWithinDirectory,
+  readFilesWithinDirectory,
+  removeProtocolByKey,
 } from '../file-system'
-import { analyzeProtocolSource } from '../../protocol-analysis'
 
 vi.mock('uuid/v4')
 vi.mock('electron')

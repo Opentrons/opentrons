@@ -15,6 +15,7 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+
 import type { ModuleModel, ModuleType, RobotType } from '@opentrons/shared-data'
 import type { Gen, PipetteType, PipetteVolumes } from './types'
 
@@ -133,6 +134,6 @@ export const DEFAULT_SLOT_MAP_FLEX: {
 export const DEFAULT_SLOT_MAP_OT2: { [moduleType in ModuleType]?: string } = {
   [THERMOCYCLER_MODULE_TYPE]: '7',
   [HEATERSHAKER_MODULE_TYPE]: '1',
-  [MAGNETIC_MODULE_TYPE]: '9',
+  [MAGNETIC_MODULE_TYPE]: '1',
   [TEMPERATURE_MODULE_TYPE]: '3',
 }

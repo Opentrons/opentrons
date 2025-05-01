@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+
 import { useOnClickOutside } from '@opentrons/components'
+
 import {
   AssignLiquidsModal,
   DefineLiquidsModal,
 } from '../../components/organisms'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 
 export function Liquids(): JSX.Element {
   const navigate = useNavigate()

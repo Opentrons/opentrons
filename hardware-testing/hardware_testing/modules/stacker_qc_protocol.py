@@ -47,7 +47,7 @@ def run(protocol: ProtocolContext) -> None:
         load_name="opentrons_96_wellplate_100ul_pcr_full_skirt",
         count=6,
     )
-    stacker.fill("Fill stacker with pcr plates")
+    stacker.fill(message="Fill stacker with pcr plates")
 
     # ======================= RETRIEVE/STORE PCR PLATES ======================
     plates = []

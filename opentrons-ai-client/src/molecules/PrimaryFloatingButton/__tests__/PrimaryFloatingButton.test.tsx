@@ -1,6 +1,8 @@
-import { describe, it, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { BORDERS, COLORS, TYPOGRAPHY, SPACING } from '@opentrons/components'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { PrimaryFloatingButton } from '../index'
 

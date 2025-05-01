@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react'
+import { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import { createPortal } from 'react-dom'
 
 import {
   ALIGN_CENTER,
@@ -24,11 +24,11 @@ import {
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getModalPortalEl } from '/app/App/portal'
-import { LearnAboutOffsetsLink } from '/app/organisms/Desktop/Devices/ProtocolRun/LearnAboutOffsetsLink'
 import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { LearnAboutOffsetsLink } from '/app/organisms/Desktop/Devices/ProtocolRun/LearnAboutOffsetsLink'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { SetupLabwarePositionCheckProps } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck'
 
 interface LPCOffsetsSnippetsProps extends SetupLabwarePositionCheckProps {

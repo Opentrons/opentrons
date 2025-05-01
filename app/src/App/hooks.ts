@@ -1,23 +1,25 @@
-import { useCallback, useRef, useEffect, useContext } from 'react'
-import difference from 'lodash/difference'
+import { useCallback, useContext, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
+import difference from 'lodash/difference'
 
+import { getProtocol } from '@opentrons/api-client'
 import {
-  useInterval,
   truncateString,
+  useInterval,
   useScrolling,
 } from '@opentrons/components'
 import {
   useAllProtocolIdsQuery,
-  useHost,
   useCreateLiveCommandMutation,
+  useHost,
 } from '@opentrons/react-api-client'
-import { getProtocol } from '@opentrons/api-client'
-import { SharedScrollRefContext } from './ODDProviders/ScrollRefProvider'
-import { checkShellUpdate } from '/app/redux/shell'
+
 import { useToaster } from '/app/organisms/ToasterOven'
+import { checkShellUpdate } from '/app/redux/shell'
+
+import { SharedScrollRefContext } from './ODDProviders/ScrollRefProvider'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '/app/redux/types'

@@ -1,7 +1,11 @@
-import { useRef, useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
+
 import { DeckLabelSet } from '@opentrons/components'
+
+import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { getSelectedTerminalItemId } from '../../ui/steps'
+
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
@@ -33,7 +37,7 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
       text: labelText,
       isSelected: isSelected,
       isLast: isLast,
-      isZoomed: terminalItemId === '__initial_setup__',
+      isZoomed: terminalItemId === START_TERMINAL_ITEM_ID,
     },
     ...nestedLabwareInfo,
   ]

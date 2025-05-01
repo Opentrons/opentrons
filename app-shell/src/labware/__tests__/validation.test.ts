@@ -1,10 +1,11 @@
-import { describe, it, expect } from 'vitest'
-import { validateLabwareFiles, validateNewLabwareFile } from '../validation'
+import { describe, expect, it } from 'vitest'
 
 import {
   fixture96Plate as uncheckedLabwareA,
   fixture12Trough as uncheckedLabwareB,
 } from '@opentrons/shared-data'
+
+import { validateLabwareFiles, validateNewLabwareFile } from '../validation'
 
 import type { CheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

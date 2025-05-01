@@ -1,7 +1,8 @@
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { getLPCUniqValidLabwareLocationInfo } from './getLPCUniqValidLabwareLocationInfo'
 import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
+
+import { getLPCUniqValidLabwareLocationInfo } from './getLPCUniqValidLabwareLocationInfo'
 
 import type {
   CompletedProtocolAnalysis,

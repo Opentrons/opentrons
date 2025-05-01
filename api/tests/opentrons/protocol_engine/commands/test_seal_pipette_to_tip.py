@@ -48,7 +48,7 @@ def evotips_definition() -> LabwareDefinition:
     """A fixturee of the evotips definition."""
     # TODO (chb 2025-01-29): When we migrate all labware to v3 we can clean this up
     return labware_definition_type_adapter.validate_python(
-        load_definition("evotip_flex_96_labware", 1)
+        load_definition("ev_resin_tips_flex_96_labware", 1)
     )
 
 
@@ -134,6 +134,11 @@ async def test_success(
             pipette_aspirated_fluid=update_types.PipetteAspiratedFluidUpdate(
                 pipette_id="pipette-id",
                 fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=1000),
+            ),
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="pipette-id",
+                new_location=update_types.Well(labware_id="labware-id", well_name="A3"),
+                new_deck_point=DeckPoint(x=111, y=222, z=333),
             ),
         ),
     )
@@ -222,6 +227,13 @@ async def test_no_tip_physically_missing_error(
             pipette_aspirated_fluid=update_types.PipetteAspiratedFluidUpdate(
                 pipette_id="pipette-id",
                 fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=1000),
+            ),
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="pipette-id",
+                new_location=update_types.Well(
+                    labware_id="labware-id", well_name="well-name"
+                ),
+                new_deck_point=DeckPoint(x=111, y=222, z=333),
             ),
         ),
     )

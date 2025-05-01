@@ -1,12 +1,12 @@
 import successIcon from '/app/assets/images/icon_success.png'
 
-import type { Meta, StoryObj } from '@storybook/react'
 import { customViewports } from '../../../../.storybook/preview'
-
 import {
-  ModalContentMixed as ModalContentMixedComponent,
   MODAL_CONTENT_MIXED_ICONS,
+  ModalContentMixed as ModalContentMixedComponent,
 } from './ModalContentMixed'
+
+import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof ModalContentMixedComponent> = {
   title: 'App/Molecules/InterventionModal/ModalContentMixed',

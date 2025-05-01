@@ -4,17 +4,17 @@ import styled, { css } from 'styled-components'
 import {
   BORDERS,
   COLORS,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  getModuleDisplayName,
   ABSORBANCE_READER_TYPE,
+  getModuleDisplayName,
 } from '@opentrons/shared-data'
 
-import { formatLastCalibrated } from './utils'
 import { ModuleCalibrationOverflowMenu } from './ModuleCalibrationOverflowMenu'
+import { formatLastCalibrated } from './utils'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { FormattedPipetteOffsetCalibration } from '..'

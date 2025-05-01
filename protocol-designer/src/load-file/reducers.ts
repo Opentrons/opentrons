@@ -1,9 +1,11 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { FileUploadMessage, LoadFileAction } from './types'
 import type { FileUploadMessageAction } from './actions'
+import type { FileUploadMessage, LoadFileAction } from './types'
+
 // Keep track of file upload errors / messages
 type FileUploadMessageState = FileUploadMessage | null | undefined
 
@@ -66,7 +68,6 @@ const unsavedChanges = (
     case 'REPLACE_CUSTOM_LABWARE_DEF':
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
-    case 'EDIT_MODULE':
     case 'TOGGLE_IS_GRIPPER_REQUIRED':
     case 'DELETE_DECK_FIXTURE':
     case 'CREATE_DECK_FIXTURE':

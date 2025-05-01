@@ -1,6 +1,7 @@
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type { AddressableAreaName } from '../../deck'
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 import type { DropTipWellLocation, WellLocation } from './support'
+
 export type PipettingRunTimeCommand =
   | AspirateInPlaceRunTimeCommand
   | AspirateInPlaceRunTimeCommand
@@ -235,9 +236,10 @@ export interface VerifyTipPresenceRunTimeCommand
   result?: any
 }
 
+export type LiquidProbeParams = WellLocationParam & PipetteAccessParams
 export interface LiquidProbeCreateCommand extends CommonCommandCreateInfo {
   commandType: 'liquidProbe'
-  params: WellLocationParam & PipetteAccessParams
+  params: LiquidProbeParams
 }
 export interface LiquidProbeRunTimeCommand
   extends CommonCommandRunTimeInfo,

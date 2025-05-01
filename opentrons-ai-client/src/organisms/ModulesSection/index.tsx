@@ -1,15 +1,18 @@
+import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   Flex,
   InfoScreen,
   SPACING,
 } from '@opentrons/components'
-import { useFormContext } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+
 import { ControlledEmptySelectorButtonGroup } from '../../molecules/ControlledEmptySelectorButtonGroup'
 import { ModuleListItemGroup } from '../../molecules/ModuleListItemGroup'
 import { OPENTRONS_FLEX, ROBOT_FIELD_NAME } from '../InstrumentsSection'
-import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
+
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 export interface DisplayModules {
   type: ModuleType

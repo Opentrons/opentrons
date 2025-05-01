@@ -1,19 +1,20 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   getCommands,
   getInstruments,
   getRunCurrentState,
 } from '@opentrons/api-client'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { useHost } from '@opentrons/react-api-client'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
+
 import { useTipAttachmentStatus } from '../useTipAttachmentStatus'
 
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteData } from '@opentrons/api-client'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getPipetteModelSpecs>()

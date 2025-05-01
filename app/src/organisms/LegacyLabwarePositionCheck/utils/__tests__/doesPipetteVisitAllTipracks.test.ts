@@ -1,6 +1,9 @@
-import { describe, it, expect } from 'vitest'
-import { doesPipetteVisitAllTipracks } from '../doesPipetteVisitAllTipracks'
+import { describe, expect, it } from 'vitest'
+
 import { multiple_tipracks, one_tiprack } from '@opentrons/shared-data'
+
+import { doesPipetteVisitAllTipracks } from '../doesPipetteVisitAllTipracks'
+
 import type {
   LoadedLabware,
   ProtocolAnalysisOutput,

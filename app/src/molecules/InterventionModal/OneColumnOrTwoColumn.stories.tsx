@@ -1,19 +1,19 @@
-import type * as React from 'react'
-
-import { OneColumnOrTwoColumn } from './'
-
-import { StandInContent } from './story-utils/StandIn'
-import { VisibleContainer } from './story-utils/VisibleContainer'
 import { css } from 'styled-components'
+
 import {
-  RESPONSIVENESS,
-  Flex,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_AROUND,
   DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_SPACE_AROUND,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
+import { OneColumnOrTwoColumn } from './'
+import { StandInContent } from './story-utils/StandIn'
+import { VisibleContainer } from './story-utils/VisibleContainer'
+
 import type { Meta, StoryObj } from '@storybook/react'
+import type * as React from 'react'
 
 function Wrapper(props: {}): JSX.Element {
   return (

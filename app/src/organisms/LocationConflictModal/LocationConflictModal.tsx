@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -12,39 +12,41 @@ import {
   Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  Modal,
 } from '@opentrons/components'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   getCutoutDisplayName,
+  getCutoutFixturesForModuleModel,
   getFixtureDisplayName,
+  getFixtureIdByCutoutIdFromModuleSlotName,
   getModuleDisplayName,
+  SINGLE_LEFT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  getCutoutFixturesForModuleModel,
-  getFixtureIdByCutoutIdFromModuleSlotName,
-  SINGLE_LEFT_SLOT_FIXTURE,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
 import { SmallButton } from '/app/atoms/buttons/SmallButton'
+import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+
+import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
 
 import type {
   CutoutConfig,
-  CutoutId,
   CutoutFixtureId,
-  ModuleModel,
+  CutoutId,
   DeckDefinition,
+  ModuleModel,
 } from '@opentrons/shared-data'
-import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
 
 interface LocationConflictModalProps {
   onCloseClick: () => void

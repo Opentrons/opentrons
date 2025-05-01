@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -20,18 +21,24 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useCsvFileQuery } from '@opentrons/react-api-client'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
   getModuleType,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useCsvFileQuery } from '@opentrons/react-api-client'
-import { DownloadCsvFileLink } from './DownloadCsvFileLink'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { useDeckCalibrationData } from './hooks'
+
 import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+
+import { DownloadCsvFileLink } from './DownloadCsvFileLink'
+import { useDeckCalibrationData } from './hooks'
 
 import type { LabwareOffset, RunData } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -46,6 +53,7 @@ export function HistoricalProtocolRunDrawer(
 ): JSX.Element | null {
   const { i18n, t } = useTranslation('run_details')
   const { run, robotName } = props
+  const isFlex = useIsFlex(robotName)
   const allLabwareOffsets: LabwareOffset[] =
     run.labwareOffsets?.sort(
       (a, b) =>
@@ -197,7 +205,7 @@ export function HistoricalProtocolRunDrawer(
               as="p"
               datatest-id="RecentProtocolRun_Drawer_locationTitle"
             >
-              {i18n.format(t('location'), 'capitalize')}
+              {i18n.format(t('labware'), 'capitalize')}
             </LegacyStyledText>
           </Box>
           <Box width="25%" padding={`${SPACING.spacing4} 0`}>
@@ -205,7 +213,7 @@ export function HistoricalProtocolRunDrawer(
               as="p"
               datatest-id="RecentProtocolRun_Drawer_labwareTitle"
             >
-              {i18n.format(t('labware'), 'capitalize')}
+              {i18n.format(t('location'), 'capitalize')}
             </LegacyStyledText>
           </Box>
           <Box width="25%" padding={`${SPACING.spacing4} 0`}>
@@ -230,6 +238,15 @@ export function HistoricalProtocolRunDrawer(
               definition != null
                 ? getLabwareDisplayName(definition)
                 : offset.definitionUri
+            const thermocyclerLocation = isFlex
+              ? TC_MODULE_LOCATION_OT3
+              : TC_MODULE_LOCATION_OT2
+            const slotName =
+              offset.location.moduleModel != null &&
+              getModuleType(offset.location.moduleModel) ===
+                THERMOCYCLER_MODULE_TYPE
+                ? thermocyclerLocation
+                : offset.location.slotName
 
             return (
               <Flex
@@ -251,7 +268,7 @@ export function HistoricalProtocolRunDrawer(
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
                 >
-                  <DeckInfoLabel deckLabel={offset.location.slotName} />
+                  <DeckInfoLabel deckLabel={slotName} />
                   {offset.locationSequence?.some(
                     seq => seq.kind === 'onLabware'
                   ) && (

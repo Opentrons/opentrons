@@ -1,9 +1,10 @@
 import { css } from 'styled-components'
-import { Btn, Flex } from '../../primitives'
-import { SPACING } from '../../ui-style-constants'
+
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
+import { Btn, Flex } from '../../primitives'
 import { FLEX_MAX_CONTENT } from '../../styles'
+import { SPACING } from '../../ui-style-constants'
 
 type LiquidIconSize = 'small' | 'medium'
 

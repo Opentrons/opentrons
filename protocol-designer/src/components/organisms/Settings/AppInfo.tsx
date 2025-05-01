@@ -13,8 +13,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LINK_BUTTON_STYLE } from '../../atoms'
 import { DOC_URL } from '..'
+import { LINK_BUTTON_STYLE } from '../../atoms'
 
 import type { Dispatch, SetStateAction } from 'react'
 

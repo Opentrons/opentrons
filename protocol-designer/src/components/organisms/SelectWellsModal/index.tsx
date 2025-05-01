@@ -1,27 +1,29 @@
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import omit from 'lodash/omit'
+
 import {
-  WELL_LABEL_OPTIONS,
-  Modal,
-  Flex,
-  SPACING,
-  JUSTIFY_CENTER,
-  COLORS,
-  StyledText,
-  SecondaryButton,
-  PrimaryButton,
   ALIGN_CENTER,
+  COLORS,
+  Flex,
+  JUSTIFY_CENTER,
   JUSTIFY_END,
+  Modal,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
+  StyledText,
+  WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
-import { arrayToWellGroup } from '../../../utils'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
+
 import { selectors } from '../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../step-forms'
-import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
+import * as wellContentsSelectors from '../../../top-selectors/well-contents'
+import { arrayToWellGroup } from '../../../utils'
 import { SelectableLabware } from '../Labware/SelectableLabware'
+import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type { StepFieldName } from '../../../form-types'

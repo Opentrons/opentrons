@@ -1,16 +1,19 @@
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
 import { useRunStatus, useRunTimestamps } from '/app/resources/runs'
+
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 
 import type { ComponentProps } from 'react'
-import type { RunStatus, RunData } from '@opentrons/api-client'
+import type { RunData, RunStatus } from '@opentrons/api-client'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('/app/redux/protocol-storage')

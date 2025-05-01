@@ -1,23 +1,24 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import last from 'lodash/last'
+
 import {
-  LOW_VOLUME_PIPETTES,
-  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   ALL,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
+
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { dropTipInTrash } from './dropTipInTrash'
 import {
-  curryCommandCreator,
-  reduceCommandCreators,
+  airGapLocationHelper,
   blowoutLocationHelper,
+  curryCommandCreator,
+  delayLocationHelper,
   getDispenseAirGapLocation,
   getIsSafePipetteMovement,
-  airGapLocationHelper,
-  delayLocationHelper,
+  reduceCommandCreators,
 } from '../../utils'
 import {
   aspirate,
@@ -27,17 +28,20 @@ import {
   dropTip,
   touchTip,
 } from '../atomic'
+import { airGapInWell } from './airGapInWell'
+import { dropTipInTrash } from './dropTipInTrash'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
-import { dropTipInWasteChute } from './dropTipInWasteChute'
+
 import type { CutoutId } from '@opentrons/shared-data'
 import type {
-  DistributeArgs,
   CommandCreator,
-  CurriedCommandCreator,
   CommandCreatorError,
+  CurriedCommandCreator,
+  DistributeArgs,
 } from '../../types'
-import { airGapInWell } from './airGapInWell'
+
 export const distribute: CommandCreator<DistributeArgs> = (
   args,
   invariantContext,

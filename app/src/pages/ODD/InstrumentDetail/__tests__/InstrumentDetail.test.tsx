@@ -1,21 +1,22 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useParams } from 'react-router-dom'
+import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { renderWithProviders } from '/app/__testing-utils__'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { InstrumentDetail } from '..'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
 } from '/app/local-resources/instruments'
-import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
 } from '/app/organisms/DropTipWizardFlows'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
+
+import { InstrumentDetail } from '..'
 
 import type { Instruments } from '@opentrons/api-client'
 import type * as SharedData from '@opentrons/shared-data'

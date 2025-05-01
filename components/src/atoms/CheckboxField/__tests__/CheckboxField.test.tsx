@@ -1,11 +1,13 @@
-import { describe, beforeEach, afterEach, vi, expect, it } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
+import { CheckboxField } from '..'
+import { BORDERS, COLORS } from '../../../helix-design-system'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { renderWithProviders } from '../../../testing/utils'
-import { BORDERS, COLORS } from '../../../helix-design-system'
-import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
-import { CheckboxField } from '..'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 
 import type { ComponentProps } from 'react'
 

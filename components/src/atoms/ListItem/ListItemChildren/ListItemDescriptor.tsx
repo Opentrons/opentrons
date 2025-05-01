@@ -9,9 +9,13 @@ import {
 import { SPACING } from '../../../ui-style-constants'
 
 interface ListItemDescriptorProps {
+  /** ListItemDescriptor size type */
   type: 'default' | 'large'
+  /** ListItemDescriptor description */
   description: JSX.Element
+  /** ListItemDescriptor content */
   content: JSX.Element
+  /** ListItemDescriptor flex direction */
   changeFlexDirection?: boolean
 }
 

@@ -22,18 +22,18 @@ from .move_axes_relative import (
     MoveAxesRelativeCommandType,
 )
 from .open_gripper_jaw import (
-    openGripperJaw,
-    openGripperJawCreate,
-    openGripperJawParams,
-    openGripperJawResult,
-    openGripperJawCommandType,
+    OpenGripperJaw,
+    OpenGripperJawCreate,
+    OpenGripperJawParams,
+    OpenGripperJawResult,
+    OpenGripperJawCommandType,
 )
 from .close_gripper_jaw import (
-    closeGripperJaw,
-    closeGripperJawCreate,
-    closeGripperJawParams,
-    closeGripperJawResult,
-    closeGripperJawCommandType,
+    CloseGripperJaw,
+    CloseGripperJawCreate,
+    CloseGripperJawParams,
+    CloseGripperJawResult,
+    CloseGripperJawCommandType,
 )
 
 __all__ = [
@@ -56,15 +56,15 @@ __all__ = [
     "MoveAxesRelativeResult",
     "MoveAxesRelativeCommandType",
     # robot/openGripperJaw
-    "openGripperJaw",
-    "openGripperJawCreate",
-    "openGripperJawParams",
-    "openGripperJawResult",
-    "openGripperJawCommandType",
+    "OpenGripperJaw",
+    "OpenGripperJawCreate",
+    "OpenGripperJawParams",
+    "OpenGripperJawResult",
+    "OpenGripperJawCommandType",
     # robot/closeGripperJaw
-    "closeGripperJaw",
-    "closeGripperJawCreate",
-    "closeGripperJawParams",
-    "closeGripperJawResult",
-    "closeGripperJawCommandType",
+    "CloseGripperJaw",
+    "CloseGripperJawCreate",
+    "CloseGripperJawParams",
+    "CloseGripperJawResult",
+    "CloseGripperJawCommandType",
 ]

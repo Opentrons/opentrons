@@ -1,21 +1,23 @@
 import Ajv from 'ajv'
 import isEqual from 'lodash/isEqual'
-import values from 'lodash/values'
 import uniqBy from 'lodash/uniqBy'
+import values from 'lodash/values'
+
 import {
-  getLabwareDefURI,
   getIsTiprack,
-  OPENTRONS_LABWARE_NAMESPACE,
+  getLabwareDefURI,
   labwareSchemaV2,
+  OPENTRONS_LABWARE_NAMESPACE,
   validateCustomLabwareHelper,
 } from '@opentrons/shared-data'
+
 import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'
 
 import type { SyntheticEvent } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ThunkAction } from '../types'
 import type { LabwareUploadMessage } from './types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export interface LabwareUploadMessageAction {
   type: 'LABWARE_UPLOAD_MESSAGE'

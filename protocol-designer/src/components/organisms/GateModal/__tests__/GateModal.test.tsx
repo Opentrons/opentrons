@@ -1,12 +1,11 @@
-import { describe, beforeEach, expect, it, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getHasOptedIn } from '../../../../analytics/selectors'
-import { optIn } from '../../../../analytics/actions'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { GateModal } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { optIn } from '../../../../analytics/actions'
+import { getHasOptedIn } from '../../../../analytics/selectors'
+import { i18n } from '../../../../assets/localization'
 
 vi.mock('../../../../analytics/selectors')
 vi.mock('../../../../analytics/actions')

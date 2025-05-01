@@ -1,9 +1,13 @@
 import assert from 'assert'
+
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import * as errorCreators from '../../errorCreators'
+import { uuid } from '../../utils'
+
 import type { HeaterShakerSetAndWaitForShakeSpeedCreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
+
 export const heaterShakerSetTargetShakeSpeed: CommandCreator<
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand['params']
 > = (args, invariantContext, prevRobotState) => {

@@ -1,17 +1,18 @@
-import some from 'lodash/some'
 import { useEffect, useState } from 'react'
+import some from 'lodash/some'
+
 import {
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+  getAreSlotsAdjacent,
+  getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
-  getAreSlotsAdjacent,
-  getModuleType,
 } from '@opentrons/shared-data'
 
 import { getIsAdapter, getStagingAreaAddressableAreas } from '../../../utils'
@@ -48,7 +49,6 @@ import type {
 } from '../../../step-forms'
 import type { Selection } from '../../../ui/steps'
 import type { Fixture } from './constants'
-import type { AdditionalEquipment } from '../utils'
 
 const OT2_TC_SLOTS = ['7', '8', '10', '11']
 const FLEX_TC_SLOTS = ['A1', 'B1']
@@ -152,27 +152,20 @@ export const getLabwareIsRecommended = (
       )
 }
 
-const STACKING_LABWARE_LOADNAME_FILTER = [
-  'opentrons_96_wellplate_200ul_pcr_full_skirt',
-]
-
+//  purely for labware<>adapter combos
 export const getLabwareCompatibleWithAdapter = (
   defs: LabwareDefByDefURI,
-  enableStacking: boolean,
   adapterLoadName?: string
 ): string[] => {
-  if (
-    adapterLoadName == null ||
-    (adapterLoadName != null &&
-      !enableStacking &&
-      STACKING_LABWARE_LOADNAME_FILTER.includes(adapterLoadName))
-  ) {
+  if (adapterLoadName == null) {
     return []
   }
   return Object.entries(defs)
     .filter(
-      ([, { stackingOffsetWithLabware }]) =>
-        stackingOffsetWithLabware?.[adapterLoadName] != null
+      ([, { stackingOffsetWithLabware, compatibleParentLabware }]) =>
+        stackingOffsetWithLabware?.[adapterLoadName] != null &&
+        //  stacking labware gets added via the LabwareCard
+        !compatibleParentLabware?.includes(adapterLoadName)
     )
     .map(([labwareDefUri]) => labwareDefUri)
 }
@@ -615,7 +608,7 @@ export function getHighlightLabwareAndModules(
   return highlightItems
 }
 
-const getIsLabwareInUse = (
+export const getIsLabwareInUse = (
   savedSteps: SavedStepFormState,
   labware?: LabwareOnDeck | null
 ): boolean => {
@@ -635,55 +628,17 @@ const getIsLabwareInUse = (
   )
 }
 
-export function getIsEntityOnSlotInUse(
+export function getIsLabwareOnSlotInUse(
   savedSteps: SavedStepFormState,
-  matchingLabwareFor4thColumn: LabwareOnDeck | null,
-  createdModuleForSlot?: ModuleOnDeck,
   createdLabwareForSlot?: LabwareOnDeck,
-  createdNestedLabwareForSlot?: LabwareOnDeck,
-  createdFixtureForSlots?: AdditionalEquipment[]
+  createdNestedLabwareForSlot?: LabwareOnDeck
 ): boolean {
-  const isCurrentModuleInUse =
-    createdModuleForSlot != null &&
-    Object.values(savedSteps).find(
-      step =>
-        //  module step
-        ('moduleId' in step && step.moduleId === createdModuleForSlot.id) ||
-        //  moving labware to the module
-        ('newLocation' in step &&
-          step.newlocation === createdModuleForSlot.id) ||
-        //  moving a labware from the module location
-        ('labware' in step && step.labware === createdModuleForSlot.id)
-    ) != null
   const isCurrentLabwareInUse = [
     createdLabwareForSlot,
     createdNestedLabwareForSlot,
-    matchingLabwareFor4thColumn,
   ]
     .map(lw => getIsLabwareInUse(savedSteps, lw))
     .includes(true)
 
-  const isCurrentFixtureInUse =
-    createdFixtureForSlots != null &&
-    createdFixtureForSlots.length > 0 &&
-    Object.values(savedSteps).find(
-      step =>
-        //  mix & moveLiquid
-        ('dropTip_location' in step &&
-          createdFixtureForSlots.find(
-            fixture => fixture.id === step.dropTip_location
-          ) != null) ||
-        //  dispensing in trash
-        ('dispense_labware' in step &&
-          createdFixtureForSlots.find(
-            fixture => fixture.id === step.dispense_labware
-          ) != null) ||
-        //  moving to wasteChute or 4th column slot
-        ('newLocation' in step &&
-          createdFixtureForSlots.find(
-            fixture => fixture.location === step.newLocation
-          ) != null)
-    ) != null
-
-  return isCurrentModuleInUse || isCurrentLabwareInUse || isCurrentFixtureInUse
+  return isCurrentLabwareInUse
 }

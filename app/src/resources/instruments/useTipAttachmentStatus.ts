@@ -1,12 +1,12 @@
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import head from 'lodash/head'
 
-import { useHost } from '@opentrons/react-api-client'
 import {
   getCommands,
   getInstruments,
   getRunCurrentState,
 } from '@opentrons/api-client'
+import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import type {

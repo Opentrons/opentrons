@@ -215,6 +215,19 @@ def run(protocol: ProtocolContext) -> None:
             protocol.move_labware(lw, OFF_DECK, use_gripper=False)
     if dvt1abr3:
         protocol.pause("SET UP DVT1ABR3")
+        sample_plate_1 = protocol.load_labware(
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            str(SLOTS["LABWARE"][0]),
+            "Sample Plate 1",
+        )  # Sample Plate
+        pipette.configure_nozzle_layout(style=ALL, tip_racks=[tip_rack])
+        pipette.pick_up_tip()
+        pipette.aspirate(150, src_reservoir["A1"])
+        pipette.dispense(150, sample_plate_1["A1"].top())
+        pipette.return_tip()
+        pipette.reset_tipracks()
+        protocol.move_labware(sample_plate_1, OFF_DECK, use_gripper=False)
+
     if dvt1abr4:
         protocol.pause("SET UP DVT1ABR4")
         reservoir_1 = protocol.load_labware(

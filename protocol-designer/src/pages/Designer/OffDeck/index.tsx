@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -10,25 +11,35 @@ import {
   Flex,
   JUSTIFY_CENTER,
   LabwareRender,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   RobotCoordsForeignDiv,
   RobotWorkSpace,
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+
+import { LiquidButton } from '../../../components/molecules'
 import { getOnlyLatestDefs } from '../../../labware-defs'
+import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getSelectedTerminalItemId } from '../../../ui/steps'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
-import { DeckSetupTools } from '../DeckSetup/DeckSetupTools'
+import { DeckSetupToolbox } from '../DeckSetup/DeckSetupToolbox'
 import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'
 
-const STANDARD_X_WIDTH = '127.76px'
-const STANDARD_Y_HEIGHT = '85.48px'
+import type { Dispatch, SetStateAction } from 'react'
 
-export function OffDeck(): JSX.Element {
+const STANDARD_X_WIDTH = 127.76
+const STANDARD_Y_HEIGHT = 85.48
+const SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL = 0.8
+
+interface OffDeckProps {
+  setOverflowMenu: Dispatch<SetStateAction<boolean>>
+}
+export function OffDeck(props: OffDeckProps): JSX.Element {
+  const { setOverflowMenu } = props
   const { t, i18n } = useTranslation('starting_deck_state')
   const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
   const terminalItemId = useSelector(getSelectedTerminalItemId)
@@ -51,15 +62,17 @@ export function OffDeck(): JSX.Element {
   let labware = (
     <RobotWorkSpace
       key="emptyState"
-      viewBox={`-25 -32 182.5142857143 122.1142857143`}
+      viewBox={`-15 -22 ${
+        STANDARD_X_WIDTH / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
+      } ${STANDARD_Y_HEIGHT / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL}`}
     >
       {() => (
         <RobotCoordsForeignDiv>
           <Box
             backgroundColor={COLORS.grey40}
             borderRadius={BORDERS.borderRadius8}
-            width={STANDARD_X_WIDTH}
-            height={STANDARD_Y_HEIGHT}
+            width={`${STANDARD_X_WIDTH}px`}
+            height={`${STANDARD_Y_HEIGHT}px`}
           />
         </RobotCoordsForeignDiv>
       )}
@@ -69,8 +82,12 @@ export function OffDeck(): JSX.Element {
     labware = (
       <RobotWorkSpace
         key={hoveredLabwareDef.parameters.loadName}
-        viewBox={`-25 -32 ${hoveredLabwareDef.dimensions.xDimension / 0.7} ${
-          hoveredLabwareDef.dimensions.yDimension / 0.7
+        viewBox={`-15 -22 ${
+          hoveredLabwareDef.dimensions.xDimension /
+          SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
+        } ${
+          hoveredLabwareDef.dimensions.yDimension /
+          SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
         }`}
       >
         {() => (
@@ -91,9 +108,9 @@ export function OffDeck(): JSX.Element {
     labware = (
       <RobotWorkSpace
         key={def.parameters.loadName}
-        viewBox={`-25 -32 ${def.dimensions.xDimension / 0.7} ${
-          def.dimensions.yDimension / 0.7
-        }`}
+        viewBox={`-15 -22 ${
+          def.dimensions.xDimension / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
+        } ${def.dimensions.yDimension / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL}`}
       >
         {() => (
           <>
@@ -119,7 +136,19 @@ export function OffDeck(): JSX.Element {
           width="100%"
           padding={SPACING.spacing12}
           gridGap={SPACING.spacing12}
+          position={POSITION_RELATIVE}
         >
+          <Flex
+            position={POSITION_ABSOLUTE}
+            top={SPACING.spacing12}
+            right="24rem"
+          >
+            <LiquidButton
+              showLiquidOverflowMenu={() => {
+                setOverflowMenu(true)
+              }}
+            />
+          </Flex>
           <Flex justifyContent={JUSTIFY_CENTER} width="100%">
             <Flex
               width="39.4275rem"
@@ -145,20 +174,15 @@ export function OffDeck(): JSX.Element {
                     {i18n.format(t('off_deck_labware'), 'upperCase')}
                   </StyledText>
                 </Flex>
-                <Flex
-                  width="510.84px"
-                  height="342px"
-                  alignItems="center"
-                  justifyContent="center"
-                >
+                <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_CENTER}>
                   {labware}
                 </Flex>
               </Flex>
             </Flex>
           </Flex>
-          <DeckSetupTools
+
+          <DeckSetupToolbox
             position={POSITION_RELATIVE}
-            onDeckProps={null}
             setHoveredLabware={setHoveredLabware}
             onCloseClick={() => {
               dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))

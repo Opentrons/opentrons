@@ -1,15 +1,5 @@
 import uuidv1 from 'uuid/v4'
-import {
-  consolidate,
-  transfer,
-  distribute,
-  getWasteChuteAddressableAreaNamePip,
-  pythonImports,
-  pythonMetadata,
-  pythonRequirements,
-} from '@opentrons/step-generation'
-import { generateQuickTransferArgs } from './'
-import { pythonDef } from './pythonDef'
+
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
@@ -17,19 +7,32 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
+import {
+  consolidate,
+  distribute,
+  getWasteChuteAddressableAreaNamePip,
+  pythonImports,
+  pythonMetadata,
+  pythonRequirements,
+  transfer,
+} from '@opentrons/step-generation'
+
+import { generateQuickTransferArgs } from './'
+import { pythonDef } from './pythonDef'
+
 import type {
   AddressableAreaName,
-  DeckConfiguration,
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
   CreateCommand,
   CutoutId,
+  DeckConfiguration,
+  LabwareDefinition2,
   LabwareV2Mixin,
   LiquidV1Mixin,
   LoadLabwareCreateCommand,
   LoadPipetteCreateCommand,
   OT3RobotMixin,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { CommandCreatorResult } from '@opentrons/step-generation'
 import type { QuickTransferSummaryState } from '../types'

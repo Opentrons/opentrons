@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -17,8 +18,9 @@ import {
 } from '@opentrons/shared-data'
 
 import { useToaster } from '/app/organisms/ToasterOven'
-import { CONSOLIDATE, DISTRIBUTE } from './constants'
 import { useFeatureFlag } from '/app/redux/config'
+
+import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
 import type { QuickTransferSummaryState } from './types'
 
@@ -94,7 +96,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
         },
         {
           option: t('liquid_class'),
-          value: 'Dummy liquid class',
+          value: state.liquidClass.displayName,
         },
       ]
     : [

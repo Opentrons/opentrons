@@ -1,13 +1,16 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { LEFT, RIGHT } from '@opentrons/shared-data'
+
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+
+import { FLOWS, SECTIONS } from '../constants'
 import {
   getIsGantryEmpty,
   getPipetteAnimations,
   getPipetteAnimations96,
 } from '../utils'
-import { FLOWS, SECTIONS } from '../constants'
 
 describe('getIsGantryEmpty', () => {
   it('should return true when no pipettes attached', () => {

@@ -3,11 +3,12 @@ import { Controller } from 'react-hook-form'
 
 import { Flex, POSITION_ABSOLUTE } from '@opentrons/components'
 import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
+
 import { rgbaToHex } from './util'
 
 import type { RefObject } from 'react'
-import type { Control, UseFormSetValue } from 'react-hook-form'
 import type { ColorResult } from 'react-color'
+import type { Control, UseFormSetValue } from 'react-hook-form'
 import type { Ingredient } from '@opentrons/step-generation'
 
 interface LiquidColorPickerProps {

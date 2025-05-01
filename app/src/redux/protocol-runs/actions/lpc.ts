@@ -1,57 +1,59 @@
 import {
-  PROCEED_STEP,
-  SET_INITIAL_POSITION,
-  SET_FINAL_POSITION,
-  UPDATE_LPC,
+  APPLIED_OFFSETS_TO_RUN,
+  APPLY_WORKING_OFFSETS,
+  CLEAR_SNACKBAR_STATUS,
+  CLEAR_WORKING_OFFSETS,
   FINISH_LPC,
+  GO_BACK_HANDLE_LW_SUBSTEP,
   GO_BACK_LAST_STEP,
+  PROCEED_HANDLE_LW_SUBSTEP,
+  PROCEED_STEP,
+  RESET_OFFSET_TO_DEFAULT,
+  SET_FINAL_POSITION,
+  SET_INITIAL_POSITION,
   SET_SELECTED_LABWARE,
   SET_SELECTED_LABWARE_URI,
-  APPLY_WORKING_OFFSETS,
-  PROCEED_HANDLE_LW_SUBSTEP,
-  GO_BACK_HANDLE_LW_SUBSTEP,
-  RESET_OFFSET_TO_DEFAULT,
-  CLEAR_WORKING_OFFSETS,
-  APPLIED_OFFSETS_TO_RUN,
-  SOURCE_OFFSETS_FROM_RUN,
   SOURCE_OFFSETS_FROM_DATABASE,
+  SOURCE_OFFSETS_FROM_RUN,
+  TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
   UPDATE_CONFLICT_TIMESTAMP,
+  UPDATE_LPC,
   UPDATE_LPC_DECK,
   UPDATE_LPC_LABWARE,
-  TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
 } from '../constants'
 
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
+  AppliedOffsetsToRunAction,
+  ApplyWorkingOffsetsAction,
+  ClearSelectedLabwareWorkingOffsetsAction,
+  ClearSnackbarStatus,
+  ConflictTimestampInfo,
   FinalPositionAction,
-  InitialPositionAction,
-  UpdateLPCAction,
-  LPCWizardState,
-  PositionParams,
-  ProceedStepAction,
   FinishLPCAction,
+  GoBackHandleLwSubstepAction,
   GoBackStepAction,
+  InitialPositionAction,
+  LocationSpecificOffsetLocationDetails,
+  LPCLabwareInfo,
+  LPCStep,
+  LPCWizardState,
+  OffsetLocationDetails,
+  PositionParams,
+  ProceedHandleLwSubstepAction,
+  ProceedStepAction,
+  ResetLocationSpecificOffsetToDefaultAction,
+  SavedOffsets,
   SelectedLabwareAction,
   SelectedLabwareNameAction,
-  OffsetLocationDetails,
-  ApplyWorkingOffsetsAction,
-  LPCStep,
-  ProceedHandleLwSubstepAction,
-  GoBackHandleLwSubstepAction,
-  LocationSpecificOffsetLocationDetails,
-  ResetLocationSpecificOffsetToDefaultAction,
-  ClearSelectedLabwareWorkingOffsetsAction,
-  AppliedOffsetsToRunAction,
-  SourceOffsetsFromRunAction,
   SourceOffsetsFromDatabaseAction,
-  UpdateConflictTimestampAction,
-  ConflictTimestampInfo,
-  UpdateLPCDeckAction,
-  LPCLabwareInfo,
-  UpdateLPCLabwareAction,
-  SavedOffsets,
+  SourceOffsetsFromRunAction,
   ToggleDefaultOffsetInfoBanner,
+  UpdateConflictTimestampAction,
+  UpdateLPCAction,
+  UpdateLPCDeckAction,
+  UpdateLPCLabwareAction,
 } from '../types'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export const proceedStep = (
   runId: string,
@@ -100,10 +102,11 @@ export const setInitialPosition = (
 
 export const setFinalPosition = (
   runId: string,
+  isOnDevice: boolean,
   params: PositionParams
 ): FinalPositionAction => ({
   type: SET_FINAL_POSITION,
-  payload: { ...params, runId },
+  payload: { ...params, runId, isOnDevice },
 })
 
 export const resetLocationSpecificOffsetToDefault = (
@@ -149,7 +152,7 @@ export const updateLPCDeck = (
 
 export const updateLPCLabware = (
   runId: string,
-  labware: LPCLabwareInfo
+  labware: LPCLabwareInfo['labware']
 ): UpdateLPCLabwareAction => ({
   type: UPDATE_LPC_LABWARE,
   payload: { runId, labware },
@@ -208,5 +211,10 @@ export const toggleDefaultOffsetInfoBanner = (
   runId: string
 ): ToggleDefaultOffsetInfoBanner => ({
   type: TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
+  payload: { runId },
+})
+
+export const clearSnackbarStatus = (runId: string): ClearSnackbarStatus => ({
+  type: CLEAR_SNACKBAR_STATUS,
   payload: { runId },
 })

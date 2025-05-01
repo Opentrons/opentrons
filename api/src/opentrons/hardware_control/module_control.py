@@ -20,7 +20,7 @@ from opentrons.hardware_control.modules.types import ModuleAtPort, ModuleType
 from opentrons.hardware_control.modules import SimulatingModuleAtPort
 
 from opentrons.types import Point
-from .types import AionotifyEvent, BoardRevision, OT3Mount
+from .types import AionotifyEvent, BoardRevision, OT3Mount, StatusBarUpdateEvent
 from . import modules
 
 if TYPE_CHECKING:
@@ -106,6 +106,10 @@ class AttachedModulesControl:
             sim_serial_number=sim_serial_number,
             disconnected_callback=self._disconnected_callback,
         )
+        last_event = StatusBarUpdateEvent(
+            self._api.get_status_bar_state(), self._api.get_status_bar_enabled()
+        )
+        mod.event_listener(last_event)
         self.subscribe_to_api_event(mod)
         return mod
 

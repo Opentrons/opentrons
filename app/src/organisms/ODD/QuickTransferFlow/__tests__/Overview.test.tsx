@@ -1,10 +1,11 @@
-import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
-import { describe, it, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useFeatureFlag } from '/app/redux/config'
+
 import { Overview } from '../Overview'
 
 import type { ComponentProps } from 'react'
@@ -43,6 +44,14 @@ describe('Overview', () => {
         } as any,
         transferType: 'transfer',
         volume: 25,
+        liquidClass: {
+          liquidClassName: 'dummyLiquidClass',
+          displayName: 'Dummy liquid class',
+          description: 'Dummy liquid class description',
+          schemaVersion: 0,
+          namespace: '',
+          byPipette: [],
+        },
       } as any,
     }
     when(vi.mocked(useFeatureFlag))

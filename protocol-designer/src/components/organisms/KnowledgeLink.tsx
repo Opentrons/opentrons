@@ -1,4 +1,7 @@
 import { Link } from '@opentrons/components'
+
+import { LINK_BUTTON_STYLE } from '../atoms'
+
 import type { ReactNode } from 'react'
 
 interface KnowledgeLinkProps {
@@ -14,7 +17,7 @@ export const DOC_URL =
 export function KnowledgeLink(props: KnowledgeLinkProps): JSX.Element {
   const { children } = props
   return (
-    <Link external href={DOC_URL}>
+    <Link external href={DOC_URL} css={LINK_BUTTON_STYLE}>
       {children}
     </Link>
   )

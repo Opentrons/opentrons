@@ -1,19 +1,20 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { aspirateInPlace } from '../commandCreators/atomic'
 import {
-  makeContext,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeContext,
 } from '../fixtures'
-import { aspirateInPlace } from '../commandCreators/atomic'
+
 import type { AspirateInPlaceParams } from '@opentrons/shared-data'
-import type { RobotState, InvariantContext } from '../types'
+import type { InvariantContext, RobotState } from '../types'
 
 describe('aspirateInPlace', () => {
-  let invariantContext: InvariantContext
   let robotStateWithTip: RobotState
-
-  const mockId = 'mockId'
-  const mockFlowRate = 10
+  let invariantContext: InvariantContext
+  const mockId = 'p10SingleId'
+  const mockFlowRate = 20
   const mockVolume = 10
   beforeEach(() => {
     invariantContext = makeContext()
@@ -38,5 +39,12 @@ describe('aspirateInPlace', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mockPythonName.aspirate(
+    volume=10,
+    rate=20 / mockPythonName.flow_rate.aspirate,
+)`.trimStart()
+    )
   })
 })

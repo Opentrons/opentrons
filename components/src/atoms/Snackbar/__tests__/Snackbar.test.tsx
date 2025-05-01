@@ -1,9 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { screen, act } from '@testing-library/react'
-import { renderWithProviders } from '../../../testing/utils'
+
+import { act, screen } from '@testing-library/react'
+
 import { Snackbar } from '..'
 import { COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 

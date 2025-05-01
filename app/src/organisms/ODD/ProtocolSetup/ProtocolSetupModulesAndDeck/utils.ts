@@ -1,10 +1,10 @@
 import {
-  NON_CONNECTING_MODULE_TYPES,
   getModuleType,
+  NON_CONNECTING_MODULE_TYPES,
 } from '@opentrons/shared-data'
 
-import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type { AttachedModule } from '/app/redux/modules/types'
+import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 
 interface UnmatchedModuleResults {
   missingModuleIds: string[]

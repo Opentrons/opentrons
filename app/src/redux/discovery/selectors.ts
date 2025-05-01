@@ -1,38 +1,38 @@
 import isIp from 'is-ip'
 import concat from 'lodash/concat'
+import find from 'lodash/find'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
-import find from 'lodash/find'
 import orderBy from 'lodash/orderBy'
 import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
 import semver from 'semver'
 
 import {
+  CONNECTABLE,
   HEALTH_STATUS_OK,
   HEALTH_STATUS_UNREACHABLE,
-  RE_HOSTNAME_IPV6_LL,
+  OPENTRONS_USB,
   RE_HOSTNAME_IPV4_LL,
+  RE_HOSTNAME_IPV6_LL,
   RE_HOSTNAME_LOCALHOST,
   RE_HOSTNAME_LOOPBACK,
-  CONNECTABLE,
-  REACHABLE,
-  UNREACHABLE,
-  RE_ROBOT_MODEL_OT3,
   RE_ROBOT_MODEL_OT2,
+  RE_ROBOT_MODEL_OT3,
+  REACHABLE,
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
-  OPENTRONS_USB,
+  UNREACHABLE,
 } from './constants'
 
 import type { State } from '../types'
 import type {
   DiscoveredRobot,
   DiscoveryClientRobotAddress,
-  Robot,
   ReachableRobot,
+  Robot,
+  RobotModel,
   UnreachableRobot,
   ViewableRobot,
-  RobotModel,
 } from './types'
 
 type GetConnectableRobots = (state: State) => Robot[]

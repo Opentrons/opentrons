@@ -1,28 +1,29 @@
-import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
-  Box,
-  Flex,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  ALIGN_STRETCH,
   ALIGN_FLEX_END,
-  PrimaryButton,
+  ALIGN_STRETCH,
+  Box,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  PrimaryButton,
+  SPACING,
 } from '@opentrons/components'
-
-import * as Sessions from '/app/redux/sessions'
-import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
-import { JogControls } from '/app/molecules/JogControls'
-import type { CalibrationPanelProps } from './types'
-import { formatJogVector } from './utils'
-
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
-import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 
 import multiDemoAsset from '/app/assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
 import singleDemoAsset from '/app/assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
+import { JogControls } from '/app/molecules/JogControls'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import * as Sessions from '/app/redux/sessions'
+
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+import { formatJogVector } from './utils'
+
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import type { CalibrationPanelProps } from './types'
 
 const ASSET_MAP = {
   multi: multiDemoAsset,

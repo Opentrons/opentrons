@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { _allReducers } from '../reducers'
 
 const { unsavedChanges } = _allReducers
@@ -26,7 +27,6 @@ describe('unsavedChanges', () => {
       'REPLACE_CUSTOM_LABWARE_DEF',
       'CREATE_MODULE',
       'DELETE_MODULE',
-      'EDIT_MODULE',
     ]
     expect.assertions(actionTypes.length)
     actionTypes.forEach(actionType => {

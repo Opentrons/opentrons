@@ -66,6 +66,7 @@ from .module import (
     ModuleOffsetVector,
     ModuleOffsetData,
     StackerFillEmptyStrategy,
+    StackerStoredLabwareGroup,
 )
 from .location import (
     DeckSlotLocation,
@@ -135,6 +136,7 @@ from .liquid_level_detection import (
     WellInfoSummary,
     WellLiquidInfo,
     LiquidTrackingType,
+    SimulatedProbeResult,
 )
 from .liquid_handling import FlowRates
 from .labware_movement import LabwareMovementStrategy, LabwareMovementOffsetData
@@ -205,6 +207,7 @@ __all__ = [
     "ModuleOffsetVector",
     "ModuleOffsetData",
     "StackerFillEmptyStrategy",
+    "StackerStoredLabwareGroup",
     # Locations of things on deck
     "DeckSlotLocation",
     "StagingSlotLocation",
@@ -280,6 +283,7 @@ __all__ = [
     "WellInfoSummary",
     "WellLiquidInfo",
     "LiquidTrackingType",
+    "SimulatedProbeResult",
     # Liquid handling
     "FlowRates",
     # Labware movement

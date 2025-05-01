@@ -1,13 +1,17 @@
 import { Trans, useTranslation } from 'react-i18next'
+
+import { COLORS, LegacyStyledText, SPACING } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
-import { COLORS, SPACING, LegacyStyledText } from '@opentrons/components'
+
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { getPipetteAnimations96 } from './utils'
+
 import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { getPipetteAnimations96 } from './utils'
+
 import type { PipetteWizardStepProps } from './types'
 
 export const MountingPlate = (

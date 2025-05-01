@@ -1,5 +1,6 @@
 import { Fragment, useMemo } from 'react'
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -26,6 +27,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
 import { FixedTrashText } from '../../components/molecules'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnailDetails } from './DeckThumbnailDetails'

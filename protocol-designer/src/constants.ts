@@ -1,4 +1,5 @@
 import mapValues from 'lodash/mapValues'
+
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
@@ -16,6 +17,7 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+
 import type {
   CutoutId,
   DeckSlot as DeckDefSlot,
@@ -198,3 +200,5 @@ export const ABSORBANCE_READER_COLOR_BY_WAVELENGTH: Record<number, string> = {
 export const OFFDECK: 'offDeck' = 'offDeck'
 
 export const PROTOCOL_DESIGNER_SOURCE: 'Protocol Designer' = 'Protocol Designer' // protocolSource for tracking analytics in the app
+
+export const DECK_SETUP_TOOLS_WIDTH_REM = 21.875

@@ -1,6 +1,8 @@
-import type * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
+
 import styles from '../../styles.module.css'
+
+import type * as React from 'react'
 
 interface ExportProps {
   onExportClick: (e: React.MouseEvent) => unknown

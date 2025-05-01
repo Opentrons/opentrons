@@ -7,14 +7,15 @@ import {
   RadioButton,
   SPACING,
 } from '@opentrons/components'
+
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import type { ComponentProps, Dispatch } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
   PathOption,
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
 
 interface SelectPipettePathProps {
