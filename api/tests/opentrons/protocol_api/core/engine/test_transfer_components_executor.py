@@ -1427,7 +1427,7 @@ def test_retract_after_dispense_in_trash_with_blowout_in_source(
     sample_transfer_props: TransferProperties,
     add_final_air_gap: bool,
 ) -> None:
-    """It should execute steps to retract from well after a dispense into a trash."""
+    """It should execute steps to retract after a dispense into a trash."""
     source_location = Location(Point(1, 2, 3), labware=None)
     source_well = decoy.mock(cls=WellCore)
     target_chute = decoy.mock(cls=WasteChute)
@@ -1517,7 +1517,7 @@ def test_retract_after_dispense_in_trash_with_blowout_in_destination(
     sample_transfer_props: TransferProperties,
     add_final_air_gap: bool,
 ) -> None:
-    """It should execute steps to retract from well after a dispense into a trash."""
+    """It should execute steps to retract after a dispense into a trash."""
     source_well = decoy.mock(cls=WellCore)
     target_trash = decoy.mock(cls=TrashBin)
 
@@ -1593,7 +1593,7 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
     sample_transfer_props: TransferProperties,
     add_final_air_gap: bool,
 ) -> None:
-    """It should execute steps to retract from well after a dispense into a trash."""
+    """It should execute steps to retract after a dispense into a trash."""
     source_location = Location(Point(1, 2, 3), labware=None)
     source_well = decoy.mock(cls=WellCore)
     target_trash = decoy.mock(cls=TrashBin)

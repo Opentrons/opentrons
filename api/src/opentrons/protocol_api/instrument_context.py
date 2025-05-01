@@ -1645,7 +1645,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param volume: The amount, in µL, to aspirate from each source and dispense to
                        each destination.
         :param source: A single well or a list of wells to aspirate liquid from.
-        :param dest: A single well, list of wells, or trash bin or waste chute to dispense liquid into.
+        :param dest: A single well, list of wells, trash bin, or waste chute to dispense liquid into.
         :param new_tip: When to pick up and drop tips during the command.
             Defaults to ``"once"``.
 
@@ -1695,7 +1695,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 raise ValueError(
                     "Sources and destinations should be of the same length in order to perform a transfer."
                     " To transfer liquid from one source to many destinations, use 'distribute_liquid',"
-                    " to transfer liquid onto one destinations from many sources, use 'consolidate_liquid'."
+                    " to transfer liquid to one destination from many sources, use 'consolidate_liquid'."
                 )
             verified_dest = [
                 (types.Location(types.Point(), labware=well), well._core)
@@ -1762,8 +1762,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param volume: The amount, in µL, to aspirate from the source and dispense to
                        each destination.
-        :param source: A single well or group of wells for a multi-channel pipette to
-                       aspirate liquid from.
+        :param source: A single well for the pipette to target, or a group of wells to
+                       target in a single aspirate for a multi-channel pipette.
         :param dest: A list of wells to dispense liquid into.
         :param new_tip: When to pick up and drop tips during the command.
             Defaults to ``"once"``.
@@ -1881,8 +1881,9 @@ class InstrumentContext(publisher.CommandPublisher):
         :param volume: The amount, in µL, to aspirate from the source and dispense to
                        each destination.
         :param source: A list of wells to aspirate liquid from.
-        :param dest: A single well, group of wells for a multi-channel pipette, or
-                     trash bin or waste chute to dispense liquid into.
+        :param dest: A single well, list of wells, trash bin, or waste chute to dispense liquid into.
+                     Multiple wells can only be given for multi-channel pipette configurations, and
+                     must be able to be dispensed to in a single dispense.
         :param new_tip: When to pick up and drop tips during the command.
             Defaults to ``"once"``.
 
