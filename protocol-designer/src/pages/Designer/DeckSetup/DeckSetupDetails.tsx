@@ -29,9 +29,8 @@ import { getStagingAreaAddressableAreas } from '../../../utils'
 import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
-import { HoveredItem } from './HoveredItem'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
-import { SelectedHoveredItems } from './SelectedHoveredItems'
+import { SelectedItems } from './Selectedtems'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
 import { SlotWarning } from './SlotWarning'
 import {
@@ -64,7 +63,6 @@ interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   addEquipment: (slotId: string) => void
   deckDef: DeckDefinition
   hover: string | null
-  hoveredLabware: string | null
   setHover: Dispatch<SetStateAction<string | null>>
   showGen1MultichannelCollisionWarnings: boolean
   stagingAreaCutoutIds: CutoutId[]
@@ -77,7 +75,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     addEquipment,
     deckDef,
     hover,
-    hoveredLabware: hoveredLabwareFromProp,
     selectedZoomInSlot,
     terminalItemId,
     setHover,
@@ -554,17 +551,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       <HighlightItems robotType={robotType} deckDef={deckDef} />
 
       {/* selected hardware + labware */}
-      <SelectedHoveredItems
+      <SelectedItems
         deckDef={deckDef}
         robotType={robotType}
-        hoveredLabware={hoveredLabwareFromProp}
         slotPosition={slotPosition}
-      />
-
-      {/* hovered  labware */}
-      <HoveredItem
-        hoveredSlotPosition={slotPosition}
-        hoveredLabware={hoveredLabwareFromProp}
       />
 
       {/* slot overflow menu */}

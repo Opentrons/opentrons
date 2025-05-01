@@ -140,8 +140,6 @@ export function DeckSetupContainer(
     return i < viewBoxNumerical.length - 1 ? acc + `${num} ` : acc + `${num}`
   }, '')
 
-  const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
-
   const addEquipment = (slotId: string): void => {
     const cutoutId =
       getCutoutIdForAddressableArea(
@@ -342,7 +340,6 @@ export function DeckSetupContainer(
                   )}
                   <DeckSetupDetails
                     selectedZoomInSlot={zoomIn.slot ?? undefined}
-                    hoveredLabware={hoveredLabware}
                     hover={hoverSlot}
                     terminalItemId={terminalItemId}
                     setHover={setHoverSlot}
@@ -375,7 +372,6 @@ export function DeckSetupContainer(
                 setViewBox,
               })
             }}
-            setHoveredLabware={setHoveredLabware}
           />
         ) : null}
       </Flex>

@@ -64,6 +64,7 @@ import {
   ADAPTER_96_CHANNEL,
   getLabwareCompatibleWithModule,
 } from '../../../utils/labwareModuleCompatibility'
+import { useKitchen } from '../Kitchen/hooks'
 import { getMainPagePortalEl } from '../Portal'
 
 import type { ChangeEvent } from 'react'
@@ -78,7 +79,6 @@ const PLATE_READER_LOADNAME =
   'opentrons_flex_lid_absorbance_plate_reader_module'
 interface SelectLabwareModalProps {
   slot: DeckSlotId
-  setHoveredLabware: (defUri: string | null) => void
   onClose: () => void
   onConfirm: () => void
 }
@@ -91,9 +91,11 @@ interface LabwareInfo {
 export function SelectLabwareModal(
   props: SelectLabwareModalProps
 ): JSX.Element {
-  const { slot, setHoveredLabware, onClose, onConfirm } = props
+  const { slot, onClose, onConfirm } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)
+  const { makeSnackbar } = useKitchen()
+
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const permittedTipracks = useSelector(stepFormSelectors.getPermittedTipracks)
   const pipetteEntities = useSelector(getPipetteEntities)
@@ -108,6 +110,7 @@ export function SelectLabwareModal(
     selectedNestedLabwareDefUri,
   } = zoomedInSlotInfo
 
+  const hasNoLabware = selectedLabwareDefUri == null
   const setAllCategories = (state: boolean): Record<string, boolean> =>
     ALL_ORDERED_CATEGORIES.reduce<Record<string, boolean>>(
       (acc, category) => ({ ...acc, [category]: state }),
@@ -284,7 +287,7 @@ export function SelectLabwareModal(
       footer={
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          padding={SPACING.spacing24}
+          padding={`0 ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing24}`}
           gridGap="36px"
         >
           <Flex
@@ -317,8 +320,12 @@ export function SelectLabwareModal(
             </SecondaryButton>
             <PrimaryButton
               onClick={() => {
-                onConfirm()
-                handleResetLabwareTools()
+                if (hasNoLabware) {
+                  makeSnackbar('select labware before proceeding')
+                } else {
+                  onConfirm()
+                  handleResetLabwareTools()
+                }
               }}
             >
               Add labware
@@ -389,12 +396,6 @@ export function SelectLabwareModal(
                         key={`${index}_${uri}`}
                         id={`${index}_${uri}`}
                         buttonText={customLabwareDefs[uri].metadata.displayName}
-                        setNoHover={() => {
-                          setHoveredLabware(null)
-                        }}
-                        setHovered={() => {
-                          setHoveredLabware(uri)
-                        }}
                         buttonValue={uri}
                         onChange={e => {
                           e.stopPropagation()
@@ -431,12 +432,6 @@ export function SelectLabwareModal(
                             !getIsLabwareFiltered(def) ? (
                             <Fragment key={`${index}_${category}_${loadName}`}>
                               <ListButtonRadioButton
-                                setNoHover={() => {
-                                  setHoveredLabware(null)
-                                }}
-                                setHovered={() => {
-                                  setHoveredLabware(uri)
-                                }}
                                 id={`${index}_${category}_${loadName}`}
                                 buttonText={def.metadata.displayName}
                                 buttonValue={uri}
@@ -480,14 +475,6 @@ export function SelectLabwareModal(
                                                 defs[tiprackDefUri]
                                               return (
                                                 <ListButtonRadioButton
-                                                  setNoHover={() => {
-                                                    setHoveredLabware(null)
-                                                  }}
-                                                  setHovered={() => {
-                                                    setHoveredLabware(
-                                                      tiprackDefUri
-                                                    )
-                                                  }}
                                                   key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                   id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                   buttonText={
@@ -521,14 +508,6 @@ export function SelectLabwareModal(
 
                                             return (
                                               <ListButtonRadioButton
-                                                setNoHover={() => {
-                                                  setHoveredLabware(null)
-                                                }}
-                                                setHovered={() => {
-                                                  setHoveredLabware(
-                                                    nestedDefUri
-                                                  )
-                                                }}
                                                 key={`${index}_${category}_${loadName}_${nestedDefUri}`}
                                                 id={`${index}_${category}_${loadName}_${nestedDefUri}`}
                                                 buttonText={

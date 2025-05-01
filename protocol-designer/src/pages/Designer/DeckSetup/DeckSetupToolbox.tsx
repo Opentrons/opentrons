@@ -5,10 +5,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   Btn,
+  COLORS,
   DeckInfoLabel,
+  DIRECTION_COLUMN,
   EmptySelectorButton,
   Flex,
   Icon,
+  InfoScreen,
   POSITION_FIXED,
   SPACING,
   StyledText,
@@ -20,10 +23,12 @@ import {
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '../../../components/atoms'
+import { LabwareCard } from '../../../components/molecules'
 import {
   ConfirmDeleteEntityInUseModal,
   SelectLabwareModal,
 } from '../../../components/organisms'
+import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import {
   createContainer,
@@ -42,7 +47,6 @@ import type { ThunkDispatch } from '../../../types'
 
 interface DeckSetupToolsProps {
   onCloseClick: () => void
-  setHoveredLabware: (defUri: string | null) => void
   position?: string
 }
 
@@ -51,7 +55,8 @@ export type CategoryExpand = Record<string, boolean>
 export function DeckSetupToolbox(
   props: DeckSetupToolsProps
 ): JSX.Element | null {
-  const { onCloseClick, setHoveredLabware, position = POSITION_FIXED } = props
+  const { onCloseClick, position = POSITION_FIXED } = props
+  const { makeSnackbar } = useKitchen()
   const { t, i18n } = useTranslation(['starting_deck_state', 'shared'])
   const [
     showDeleteEntityInUseModal,
@@ -100,6 +105,14 @@ export function DeckSetupToolbox(
     )
   }
 
+  const slotFull =
+    (createdLabwareForSlot != null &&
+      !createdLabwareForSlot.def.allowedRoles?.includes('adapter')) ||
+    (createdLabwareForSlot != null && createdNestedLabwareForSlot != null)
+
+  const hasNoLabware =
+    createdLabwareForSlot == null && createdNestedLabwareForSlot == null
+
   const handleClear = (keepExistingLabware = false): void => {
     if (slot !== 'offDeck') {
       //  clear labware from slot
@@ -128,6 +141,7 @@ export function DeckSetupToolbox(
     handleResetToolbox()
   }
   const handleConfirm = (): void => {
+    handleClear()
     if (
       (slot === 'offDeck' && selectedLabwareDefUri != null) ||
       (selectedModuleModel == null &&
@@ -212,7 +226,6 @@ export function DeckSetupToolbox(
       {showSelectLabwareModal ? (
         <SelectLabwareModal
           slot={slot}
-          setHoveredLabware={setHoveredLabware}
           onClose={() => {
             setShowSelectLabwareModal(false)
           }}
@@ -262,15 +275,48 @@ export function DeckSetupToolbox(
         onConfirmClick={handleClose}
         confirmButtonText={t('done')}
       >
-        <Flex width="max-content">
-          <EmptySelectorButton
-            textAlignment="left"
-            text={'Add labware'}
-            iconName="plus"
-            onClick={() => {
-              setShowSelectLabwareModal(true)
-            }}
-          />
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <Flex width="max-content">
+            <EmptySelectorButton
+              textAlignment="left"
+              text={'Add labware'}
+              iconName="plus"
+              onClick={() => {
+                if (slotFull) {
+                  makeSnackbar('no space on slot')
+                } else {
+                  setShowSelectLabwareModal(true)
+                }
+              }}
+            />
+          </Flex>
+          {hasNoLabware ? (
+            <InfoScreen
+              content="no labware added"
+              subContent="Select labware to add to slot"
+            />
+          ) : (
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                color={COLORS.grey60}
+              >
+                Top of slot
+              </StyledText>
+              {createdNestedLabwareForSlot != null ? (
+                <LabwareCard labware={createdNestedLabwareForSlot} />
+              ) : null}
+              {createdLabwareForSlot != null ? (
+                <LabwareCard labware={createdLabwareForSlot} />
+              ) : null}
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                color={COLORS.grey60}
+              >
+                Bottom of slot
+              </StyledText>
+            </Flex>
+          )}
         </Flex>
       </Toolbox>
     </>
