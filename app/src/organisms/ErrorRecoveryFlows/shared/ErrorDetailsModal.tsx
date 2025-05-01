@@ -129,7 +129,7 @@ export function ErrorDetailsModalDesktop(
   props: ErrorDetailsModalType
 ): JSX.Element {
   const { children, modalHeader, toggleModal, desktopType } = props
-  const { t } = useTranslation('error_recovery')
+  const { t } = useTranslation(['error_recovery', 'branded'])
 
   const buildIcon = (): IconProps => {
     return {
@@ -318,7 +318,7 @@ export function LabwareMissingOnShuttleErrorBanner(): JSX.Element {
     <InlineNotification
       type="alert"
       heading={t('stacker_latch_jammed_errors_occur_when')}
-      message={t('if_issue_persists_call_support')}
+      message={t('branded:if_issue_persists_call_support')}
     />
   )
 }
