@@ -220,7 +220,7 @@ export const transfer: CommandCreator<TransferArgs> = (
       .concat(splitLastVol)
   }
 
-  const aspirateSubmergePosition: WellLocation = {
+  const aspirateSubmergeLocation: WellLocation = {
     origin:
       POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN[
         aspirateSubmergePositionReference
@@ -361,14 +361,14 @@ export const transfer: CommandCreator<TransferArgs> = (
               pipetteId: args.pipette,
               labwareId: args.sourceLabware,
               wellName: sourceWell,
-              wellLocation: aspirateSubmergePosition,
+              wellLocation: aspirateSubmergeLocation,
             }),
             curryCommandCreator(moveToWell, {
               pipetteId: args.pipette,
               labwareId: args.sourceLabware,
               ...(args.aspirateSubmergeSpeed != null
                 ? { speed: args.aspirateSubmergeSpeed }
-                : 0),
+                : {}),
               wellName: sourceWell,
               wellLocation: {
                 origin:
