@@ -392,12 +392,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     )
                 )
 
-        if isinstance(location, (TrashBin, WasteChute)):
-            self._protocol_core.set_last_location(location=None, mount=self.get_mount())
-        else:
-            self._protocol_core.set_last_location(
-                location=location, mount=self.get_mount()
-            )
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def blow_out(
         self,
@@ -473,12 +468,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 )
             )
 
-        if isinstance(location, (TrashBin, WasteChute)):
-            self._protocol_core.set_last_location(location=None, mount=self.get_mount())
-        else:
-            self._protocol_core.set_last_location(
-                location=location, mount=self.get_mount()
-            )
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def touch_tip(
         self,
@@ -806,12 +796,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         speed=speed,
                     )
                 )
-        if isinstance(location, (TrashBin, WasteChute)):
-            self._protocol_core.set_last_location(location=None, mount=self.get_mount())
-        else:
-            self._protocol_core.set_last_location(
-                location=location, mount=self.get_mount()
-            )
+
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def resin_tip_seal(
         self, location: Location, well_core: WellCore, in_place: Optional[bool] = False

@@ -558,7 +558,7 @@ ValidTarget = Union[WellTarget, PointTarget, TrashBin, WasteChute]
 
 def validate_location(
     location: Union[Location, Well, TrashBin, WasteChute, None],
-    last_location: Optional[Location],
+    last_location: Optional[Union[Location, TrashBin, WasteChute]],
 ) -> ValidTarget:
     """Validate a given location for a liquid handling command.
 

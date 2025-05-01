@@ -792,8 +792,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
         # If location is a valid well, move to the well first
         if location is None:
+            # TODO make this by api version as well too???
             last_location = self._protocol_core.get_last_location()
-            if not last_location:
+            if last_location is None or isinstance(
+                last_location, (TrashBin, WasteChute)
+            ):
                 raise RuntimeError("No valid current location cache present")
             parent_labware, well = last_location.labware.get_parent_labware_and_well()
             if not well or not parent_labware:
@@ -888,10 +891,21 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if height is None:
             height = 5
-        loc = self._protocol_core.get_last_location()
-        if not loc or not loc.labware.is_well:
-            raise RuntimeError("No previous Well cached to perform air gap")
-        target = loc.labware.as_well().top(height)
+        last_location = self._protocol_core.get_last_location()
+        if self.api_version < APIVersion(2, 24) and isinstance(
+            last_location, (TrashBin, WasteChute)
+        ):
+            last_location = None
+        if last_location is None or (
+            isinstance(last_location, types.Location)
+            and not last_location.labware.is_well
+        ):
+            raise RuntimeError("No previous valid location cached to perform air gap")
+        target: Union[types.Location, TrashBin, WasteChute]
+        if isinstance(last_location, types.Location):
+            target = last_location.labware.as_well().top(height)
+        else:
+            target = last_location
         self.move_to(target, publish=False)
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
             self._core.prepare_to_aspirate()
@@ -2542,14 +2556,22 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._well_bottom_clearances
 
-    def _get_last_location_by_api_version(self) -> Optional[types.Location]:
+    def _get_last_location_by_api_version(
+        self,
+    ) -> Optional[Union[types.Location, TrashBin, WasteChute]]:
         """Get the last location accessed by this pipette, if any.
 
         In pre-engine Protocol API versions, this call omits the pipette mount.
+        Between 2.14 (first engine PAPI version) and 2.23 this only returns None or a Location object.
         This is to preserve pre-existing, potentially buggy behavior.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
+        if self._api_version >= APIVersion(2, 24):
             return self._protocol_core.get_last_location(mount=self._core.get_mount())
+        elif self._api_version >= ENGINE_CORE_API_VERSION:
+            last_location = self._protocol_core.get_last_location(
+                mount=self._core.get_mount()
+            )
+            return last_location if isinstance(last_location, types.Location) else None
         else:
             return self._protocol_core.get_last_location()
 
@@ -2605,7 +2627,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 actual_value=str(volume),
             )
         last_location = self._get_last_location_by_api_version()
-        if last_location and isinstance(last_location.labware, labware.Well):
+        if (
+            last_location
+            and isinstance(last_location, types.Location)
+            and isinstance(last_location.labware, labware.Well)
+        ):
             self.move_to(last_location.labware.top())
         self._core.configure_for_volume(volume)
 
