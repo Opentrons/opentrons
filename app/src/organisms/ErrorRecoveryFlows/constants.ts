@@ -205,6 +205,7 @@ export const RECOVERY_MAP = {
     STEPS: {
       PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
       CLOSE_DOOR_AND_HOME: 'close-door-and-home',
+      CLEAR_TRACK_OF_OBSTRUCTIONS: 'clear-track-of-obstructions',
       CONFIRM_RETRY: 'confirm-retry',
       RETRY: 'retry',
     },
@@ -214,6 +215,7 @@ export const RECOVERY_MAP = {
     STEPS: {
       PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
       CLOSE_DOOR_AND_HOME: 'close-door-and-home',
+      CLEAR_TRACK_OF_OBSTRUCTIONS: 'clear-track-of-obstructions',
       MANUAL_REPLACE: 'manual-replace',
       CONFIRM_RETRY: 'confirm-retry',
       SKIP: 'skip',
@@ -235,7 +237,7 @@ export const RECOVERY_MAP = {
     },
   },
   REPLACE_LABWARE_IN_HOPPER_AND_RETRY: {
-    ROUTE: 'replace-labware-in-stacker-and-retry',
+    ROUTE: 'replace-labware-in-hopper-and-retry',
     STEPS: {
       EMPTY_STACKER: 'empty-stacker',
       PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
@@ -268,7 +270,6 @@ export const RECOVERY_MAP = {
       RETRY: 'retry',
     },
   },
-  REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
   RETRY_STEP: {
     ROUTE: 'retry-step',
     STEPS: { CONFIRM_RETRY: 'confirm-retry' },
@@ -319,7 +320,6 @@ const {
   ROBOT_DOOR_OPEN,
   ROBOT_DOOR_OPEN_SPECIAL,
   DROP_TIP_FLOWS,
-  REFILL_AND_RESUME,
   IGNORE_AND_SKIP,
   CANCEL_RUN,
   RETRY_NEW_TIPS,
@@ -379,7 +379,6 @@ export const STEP_ORDER: StepOrder = {
     DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT,
     DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP,
   ],
-  [REFILL_AND_RESUME.ROUTE]: [],
   [IGNORE_AND_SKIP.ROUTE]: [
     IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND,
     IGNORE_AND_SKIP.STEPS.SKIP_STEP,
@@ -414,12 +413,14 @@ export const STEP_ORDER: StepOrder = {
   [MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE]: [
     MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING,
     MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME,
+    MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS,
     MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY,
     MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.RETRY,
   ],
   [MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE]: [
     MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING,
     MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CLOSE_DOOR_AND_HOME,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS,
     MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE,
     MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.SKIP,
@@ -619,6 +620,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     [MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME]: {
       allowDoorOpen: true,
     },
+    [MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS]: {
+      allowDoorOpen: true,
+    },
     [MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY]: {
       allowDoorOpen: false,
     },
@@ -629,6 +633,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
       allowDoorOpen: true,
     },
     [MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CLOSE_DOOR_AND_HOME]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS]: {
       allowDoorOpen: true,
     },
     [MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE]: {
@@ -717,7 +724,6 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
       allowDoorOpen: false,
     },
   },
-  [REFILL_AND_RESUME.ROUTE]: {},
   [RETRY_STEP.ROUTE]: {
     [RETRY_STEP.STEPS.CONFIRM_RETRY]: {
       allowDoorOpen: false,

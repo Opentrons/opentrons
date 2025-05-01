@@ -385,7 +385,7 @@ export function pythonDefRun(
       .filter(section => section) // skip empty sections
       .join('\n\n') || 'pass'
   return (
-    `def run(${PROTOCOL_CONTEXT_NAME}: protocol_api.ProtocolContext):\n` +
+    `def run(${PROTOCOL_CONTEXT_NAME}: protocol_api.ProtocolContext) -> None:\n` +
     `${indentPyLines(functionBody)}`
   )
 }

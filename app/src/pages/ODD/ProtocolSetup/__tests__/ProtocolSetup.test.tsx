@@ -21,6 +21,7 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
+import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import {
   NOT_CONFIGURED,
@@ -29,7 +30,6 @@ import {
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
-  getIncompleteInstrumentCount,
   getUnmatchedModulesForProtocol,
   ProtocolSetupLabware,
   ProtocolSetupModulesAndDeck,
@@ -129,6 +129,7 @@ vi.mock('/app/local-resources/dom-utils')
 vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('/app/resources/maintenance_runs')
+vi.mock('/app/local-resources/instruments')
 vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
 
 const render = (path = '/') => {

@@ -23,8 +23,8 @@ import { useUnmatchedModulesForProtocol } from './useUnmatchedModulesForProtocol
 interface LPCDisabledReasonProps {
   runId: string
   robotName?: string
-  hasMissingModulesForOdd?: boolean
-  hasMissingCalForOdd?: boolean
+  hasMissingModulesForFlex?: boolean
+  hasMissingCalForFlex?: boolean
 }
 export function useLPCDisabledReason(
   props: LPCDisabledReasonProps
@@ -32,8 +32,8 @@ export function useLPCDisabledReason(
   const {
     runId,
     robotName,
-    hasMissingModulesForOdd,
-    hasMissingCalForOdd,
+    hasMissingModulesForFlex,
+    hasMissingCalForFlex,
   } = props
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const runHasStarted = useRunHasStarted(runId)
@@ -44,7 +44,7 @@ export function useLPCDisabledReason(
   )
 
   const isCalibrationComplete =
-    robotName != null ? complete : !hasMissingCalForOdd
+    robotName != null ? complete : !hasMissingCalForFlex
   const { missingModuleIds } = unmatchedModuleResults
   const isFlex = useIsFlex(robotName ?? '')
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -56,7 +56,7 @@ export function useLPCDisabledReason(
   )
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
   const hasMissingModules =
-    hasMissingModulesForOdd ?? missingModuleIds.length > 0
+    hasMissingModulesForFlex ?? missingModuleIds.length > 0
   const calibrationIncomplete = !hasMissingModules && !isCalibrationComplete
   const moduleSetupIncomplete =
     (hasMissingModules || isFixtureMismatch) && isCalibrationComplete
