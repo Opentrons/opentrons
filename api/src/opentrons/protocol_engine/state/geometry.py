@@ -495,7 +495,7 @@ class GeometryView:
             )
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
-        """Get the calibrated position of the labware's parent slot (deck or module)."""
+        """Get the calibrated position of the labware's parent slot (deck slot, module, or another labware)."""
         parent_pos = self.get_labware_parent_nominal_position(labware_id)
         labware_data = self._labware.get(labware_id)
         cal_offset = self._get_calibrated_module_offset(labware_data.location)
