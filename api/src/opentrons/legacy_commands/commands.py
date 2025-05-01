@@ -328,12 +328,18 @@ def transfer_with_liquid_class(
     liquid_class: LiquidClass,
     volume: float,
     source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
-    destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+    destination: Union[
+        Well, Sequence[Well], Sequence[Sequence[Well]], TrashBin, WasteChute
+    ],
 ) -> command_types.TransferWithLiquidClassCommand:
+    if isinstance(destination, (TrashBin, WasteChute)):
+        destination_text = stringify_disposal_location(destination)
+    else:
+        destination_text = stringify_well_list(destination)
     text = (
         "Transferring "
         + f"{volume} uL of {liquid_class.display_name} liquid class from "
-        + f"{stringify_well_list(source)} to {stringify_well_list(destination)}"
+        + f"{stringify_well_list(source)} to {destination_text}"
     )
     return {
         "name": command_types.TRANSFER_WITH_LIQUID_CLASS,
@@ -378,12 +384,18 @@ def consolidate_with_liquid_class(
     liquid_class: LiquidClass,
     volume: float,
     source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
-    destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+    destination: Union[
+        Well, Sequence[Well], Sequence[Sequence[Well]], TrashBin, WasteChute
+    ],
 ) -> command_types.ConsolidateWithLiquidClassCommand:
+    if isinstance(destination, (TrashBin, WasteChute)):
+        destination_text = stringify_disposal_location(destination)
+    else:
+        destination_text = stringify_well_list(destination)
     text = (
         "Consolidating "
         + f"{volume} uL of {liquid_class.display_name} liquid class from "
-        + f"{stringify_well_list(source)} to {stringify_well_list(destination)}"
+        + f"{stringify_well_list(source)} to {destination_text}"
     )
     return {
         "name": command_types.CONSOLIDATE_WITH_LIQUID_CLASS,
