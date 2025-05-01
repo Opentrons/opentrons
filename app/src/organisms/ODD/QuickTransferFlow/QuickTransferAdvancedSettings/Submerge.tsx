@@ -90,14 +90,14 @@ export function Submerge({
   const setSaveOrContinueButtonText =
     currentStep === 1 ? t('shared:continue') : t('shared:save')
 
-   let buttonIsDisabled = false
-   if (speed == null && currentStep ===1) {
+  let buttonIsDisabled = false
+  if (speed == null && currentStep === 1) {
     buttonIsDisabled = true
-   }
-   if (position == null && currentStep === 2) {
+  }
+  if (position == null && currentStep === 2) {
     buttonIsDisabled = true
-   }
-   
+  }
+
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
