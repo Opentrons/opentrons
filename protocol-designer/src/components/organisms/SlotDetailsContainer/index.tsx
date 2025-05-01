@@ -8,7 +8,7 @@ import { getLiquidEntities } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import { getFullStackFromLabwares } from '../../../utils'
+import { getFullStackFromLabwaresOnDeck } from '../../../utils'
 import { SlotInformation } from '../SlotInformation'
 
 import type { DeckSlotId, RobotType } from '@opentrons/shared-data'
@@ -48,13 +48,7 @@ export function SlotDetailsContainer(
   const moduleOnSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
   )
-  // const labwareOnSlot = Object.values(deckSetupLabwares).find(
-  //   lw => lw.slot === slot || lw.slot === moduleOnSlot?.id
-  // )
-  // const nestedLabwareOnSlot = Object.values(deckSetupLabwares).find(
-  //   lw => lw.slot === labwareOnSlot?.id
-  // )
-  const fullStackFromLabwares = getFullStackFromLabwares(
+  const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabwares),
     slot
   )

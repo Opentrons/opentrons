@@ -398,14 +398,6 @@ export function getLocationStackTopToBottom(
   return stack
 }
 
-export function getSlotInLocationStack(stack: string[]): string {
-  return stack[stack.length - 1]
-}
-
-export function getTopLocationInStack(stack: string[]): string {
-  return stack[0]
-}
-
 export function getTopmostLabwareOnModuleFromStack(
   moduleId: string,
   labware: LabwareOnDeck[]
@@ -415,7 +407,7 @@ export function getTopmostLabwareOnModuleFromStack(
     .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
 }
 
-export function getFullStackFromLabwares(
+export function getFullStackFromLabwaresOnDeck(
   labwareOnDeck: LabwareOnDeck[],
   slot: DeckSlotId
 ): string[] {

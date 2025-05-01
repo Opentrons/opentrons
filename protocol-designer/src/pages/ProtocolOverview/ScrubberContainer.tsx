@@ -21,7 +21,7 @@ import {
   getLiquidEntities,
 } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
-import { getModuleIdFromStack, uuid } from '../../utils'
+import { uuid } from '../../utils'
 
 import type {
   AddressableAreaName,

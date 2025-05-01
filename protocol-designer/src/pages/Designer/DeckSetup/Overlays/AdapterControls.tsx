@@ -13,7 +13,6 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { DND_TYPES } from '../../../../constants'
 import { selectors as labwareDefSelectors } from '../../../../labware-defs'
@@ -96,10 +95,9 @@ export const AdapterControls = (
       drop: (item: DroppedItem) => {
         const droppedLabware = item
         if (droppedLabware.labwareOnDeck != null) {
-          const droppedSlot = getSlotInLocationStack(
-            droppedLabware.labwareOnDeck.stack
+          dispatch(
+            moveDeckItem(droppedLabware.labwareOnDeck.stack[1], labwareId)
           )
-          dispatch(moveDeckItem(droppedSlot, labwareId))
         }
       },
       hover: () => {

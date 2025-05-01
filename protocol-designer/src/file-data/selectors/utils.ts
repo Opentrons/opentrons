@@ -9,7 +9,6 @@ import {
 } from '@opentrons/step-generation'
 
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
-import { getModuleIdFromStack } from '../../utils'
 
 import type {
   AddressableAreaName,

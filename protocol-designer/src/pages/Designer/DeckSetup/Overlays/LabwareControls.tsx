@@ -15,10 +15,7 @@ import {
   TYPOGRAPHY,
   WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
-import {
-  getSlotInLocationStack,
-  getTopLocationInStack,
-} from '@opentrons/step-generation'
+import { getTopLocationInStack } from '@opentrons/step-generation'
 
 import { DND_TYPES } from '../../../../constants'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
@@ -86,10 +83,7 @@ export const LabwareControls = (
         const draggedLabware = item?.labwareOnDeck
         if (draggedLabware != null) {
           dispatch(
-            moveDeckItem(
-              getSlotInLocationStack(draggedLabware.stack),
-              getSlotInLocationStack(labwareOnDeck.stack)
-            )
+            moveDeckItem(draggedLabware.stack[1], labwareOnDeck.stack[1])
           )
         }
       },

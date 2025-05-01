@@ -9,14 +9,14 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getRobotType } from '../../file-data/selectors'
 import { getLabwareEntities } from '../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import {
-  getFullStackFromLabwares,
-  getSlotInLocationStack,
+  getFullStackFromLabwaresOnDeck,
   getStagingAreaAddressableAreas,
 } from '../../utils'
 
@@ -79,7 +79,7 @@ export const getSlotInformation = (
   const createdModuleForSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
   )
-  const fullStackFromLabwares = getFullStackFromLabwares(
+  const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabware),
     slot
   )

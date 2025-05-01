@@ -16,7 +16,10 @@ import {
   WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
+import {
+  COLUMN_4_SLOTS,
+  getTopLocationInStack,
+} from '@opentrons/step-generation'
 
 import { selectors as fileDataSelectors } from '../../file-data'
 import { getRobotType } from '../../file-data/selectors'
@@ -36,7 +39,7 @@ import {
 import { getActiveItem, getSelectedStepId } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { getSelectedTerminalItemId } from '../../ui/steps/selectors'
-import { getIsAdapter, getTopLocationInStack } from '../../utils'
+import { getIsAdapter } from '../../utils'
 
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
 import type { RobotState } from '@opentrons/step-generation'

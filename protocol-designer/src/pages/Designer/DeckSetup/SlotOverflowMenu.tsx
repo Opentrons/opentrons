@@ -127,8 +127,10 @@ export function SlotOverflowMenu(
   const fullStackOnSlot = getFullStackFromLabwares(deckSetupLabware, location)
   const labwareStackOnSlot =
     fullStackOnSlot?.filter(id => deckSetupLabware[id] != null) ?? []
-  const topLabwareOnStackId = getTopLocationInStack(fullStackOnSlot)
-  const topLabwareOnSlot = deckSetupLabware[topLabwareOnStackId]
+  const topLabwareOnStackId =
+    fullStackOnSlot != null ? getTopLocationInStack(fullStackOnSlot) : null
+  const topLabwareOnSlot =
+    topLabwareOnStackId != null ? deckSetupLabware[topLabwareOnStackId] : null
 
   const isSpace =
     getNextAvailableDeckSlot(deckSetup, robotType, topLabwareOnSlot?.def) !=
@@ -166,11 +168,10 @@ export function SlotOverflowMenu(
     setShowMenuList(false)
   }
 
-  const isLabwareOnSlotInUse = getIsLabwareOnSlotInUse(
-    savedSteps,
-    topLabwareOnSlot,
-    adapterOnSlot
-  )
+  const isLabwareOnSlotInUse =
+    topLabwareOnSlot != null
+      ? getIsLabwareOnSlotInUse(savedSteps, topLabwareOnSlot, adapterOnSlot)
+      : false
 
   const handleClear = (): void => {
     labwareStackOnSlot.forEach(labware => {
