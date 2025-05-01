@@ -118,7 +118,9 @@ export function LeftColumnLabwareInfo({
       headline={title}
       infoProps={{
         layout: layout,
-        tagText: t('quantity', { quantity: buildQuantity() }),
+        tagText: buildQuantity()
+          ? t('quantity', { quantity: buildQuantity() })
+          : null,
         subText: undefined, // where do we get the lid data from?
         type,
         newLocationProps: buildNewLocation(),

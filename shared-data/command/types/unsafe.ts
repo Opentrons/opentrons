@@ -23,7 +23,7 @@ export type UnsafeCreateCommand =
   | UnsafeEngageAxesCreateCommand
   | UnsafeUngripLabwareCreateCommand
   | UnsafePlaceLabwareCreateCommand
-  | UnsafeManualRetrieveCreateCommand
+  | UnsafeFlexStackerManualRetrieveCreateCommand
   | UnsafeFlexStackerCloseLatchCreateCommand
   | UnsafeFlexStackerOpenLatchCreateCommand
   | UnsafeFlexStackerPrepareShuttleCreateCommand
