@@ -60,8 +60,8 @@ export function useAspirateSettingsConfig({
       value:
         state.submergeAspirate !== undefined
           ? t('submerge_value', {
-              speed: state.submergeAspirate?.speed,
-              position: state.submergeAspirate?.positionFromBottom,
+              speed: state.submergeAspirate.speed,
+              position: state.submergeAspirate.positionFromBottom,
             })
           : '',
       enabled: true,

@@ -73,8 +73,8 @@ export function useDispenseSettingsConfig({
       value:
         state.submergeDispense !== undefined
           ? t('submerge_value', {
-              speed: state.submergeDispense?.speed,
-              position: state.submergeDispense?.positionFromBottom,
+              speed: state.submergeDispense.speed,
+              position: state.submergeDispense.positionFromBottom,
             })
           : '',
       enabled: true,
