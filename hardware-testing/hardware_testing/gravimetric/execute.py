@@ -437,21 +437,6 @@ def _run_trial(
     ) -> Tuple[Callable, Callable]:
         _attr_name = "aspirate" if is_aspirate else "dispense"
         _asp_or_disp = getattr(transfer_properties, _attr_name)
-        _retract_mm = max(
-            0.0, _asp_or_disp.submerge.offset.z, _asp_or_disp.retract.offset.z
-        )
-        approach, submerge, retract = _get_approach_submerge_retract_heights(
-            trial.well,
-            trial.liquid_tracker,
-            submerge_mm=-1.5,  # NOTE: this will continue to be set here in script until LLD is available
-            retract_mm=_retract_mm,  # FIXME: use value from liquid-class definition
-            mix=None,
-            aspirate=trial.volume if is_aspirate else None,
-            dispense=trial.volume if not is_aspirate else None,
-            blank=trial.blank,
-            channel_count=trial.channel_count,
-        )
-
         _original_submerge_position_reference = _asp_or_disp.submerge.position_reference
         _original_position_reference = _asp_or_disp.position_reference
         _original_retract_position_reference = _asp_or_disp.retract.position_reference
@@ -459,14 +444,24 @@ def _run_trial(
         _original_offset_z = _asp_or_disp.offset.z
         _original_retract_offset_z = _asp_or_disp.retract.offset.z
 
-        # NOTE: setting all position references to BOTTOM
-        _asp_or_disp.submerge.position_reference = PositionReference.WELL_BOTTOM
-        _asp_or_disp.position_reference = PositionReference.WELL_BOTTOM
-        _asp_or_disp.retract.position_reference = PositionReference.WELL_BOTTOM
-        # update liquid-class offsets based on CALCULATED meniscus height
-        _asp_or_disp.submerge.offset.z = approach
-        _asp_or_disp.offset.z = submerge
-        _asp_or_disp.retract.offset.z = retract
+        assert _original_position_reference == PositionReference.LIQUID_MENISCUS, \
+            f"position reference must be liquid-meniscus, not {_original_position_reference.value}"
+
+        _retract_mm = max(
+            0.0, _asp_or_disp.submerge.offset.z, _asp_or_disp.retract.offset.z
+        )
+        _submerge_mm = _original_offset_z
+        approach, submerge, retract = _get_approach_submerge_retract_heights(
+            trial.well,
+            trial.liquid_tracker,
+            submerge_mm=_original_offset_z,
+            retract_mm=_retract_mm,
+            mix=None,
+            aspirate=trial.volume if is_aspirate else None,
+            dispense=trial.volume if not is_aspirate else None,
+            blank=trial.blank,
+            channel_count=trial.channel_count,
+        )
 
         def _enable() -> None:
             # NOTE: setting all position references to BOTTOM
