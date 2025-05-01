@@ -235,7 +235,7 @@ export const RECOVERY_MAP = {
     },
   },
   REPLACE_LABWARE_IN_HOPPER_AND_RETRY: {
-    ROUTE: 'replace-labware-in-stacker-and-retry',
+    ROUTE: 'replace-labware-in-hopper-and-retry',
     STEPS: {
       EMPTY_STACKER: 'empty-stacker',
       PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
@@ -268,7 +268,6 @@ export const RECOVERY_MAP = {
       RETRY: 'retry',
     },
   },
-  REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
   RETRY_STEP: {
     ROUTE: 'retry-step',
     STEPS: { CONFIRM_RETRY: 'confirm-retry' },
@@ -319,7 +318,6 @@ const {
   ROBOT_DOOR_OPEN,
   ROBOT_DOOR_OPEN_SPECIAL,
   DROP_TIP_FLOWS,
-  REFILL_AND_RESUME,
   IGNORE_AND_SKIP,
   CANCEL_RUN,
   RETRY_NEW_TIPS,
@@ -379,7 +377,6 @@ export const STEP_ORDER: StepOrder = {
     DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT,
     DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP,
   ],
-  [REFILL_AND_RESUME.ROUTE]: [],
   [IGNORE_AND_SKIP.ROUTE]: [
     IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND,
     IGNORE_AND_SKIP.STEPS.SKIP_STEP,
@@ -717,7 +714,6 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
       allowDoorOpen: false,
     },
   },
-  [REFILL_AND_RESUME.ROUTE]: {},
   [RETRY_STEP.ROUTE]: {
     [RETRY_STEP.STEPS.CONFIRM_RETRY]: {
       allowDoorOpen: false,

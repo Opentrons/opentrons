@@ -34,6 +34,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { useScrollPosition } from '/app/local-resources/dom-utils'
+import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import {
   NOT_CONFIGURED,
   useIsDoorOpen,
@@ -43,7 +44,6 @@ import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   AnalysisFailedModal,
-  getIncompleteInstrumentCount,
   getUnmatchedModulesForProtocol,
   ProtocolSetupDeckConfiguration,
   ProtocolSetupInstruments,
@@ -767,8 +767,9 @@ export function ProtocolSetup(): JSX.Element {
       : null
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
-    hasMissingModulesForOdd: isMissingModules,
-    hasMissingCalForOdd:
+    robotName,
+    hasMissingModulesForFlex: isMissingModules,
+    hasMissingCalForFlex:
       incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
   })
   const protocolName =

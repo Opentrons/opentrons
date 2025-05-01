@@ -326,7 +326,7 @@ class HardwarePipettingHandler(PipettingHandler):
         well_name: str,
         well_location: WellLocation,
     ) -> LiquidTrackingType:
-        """Detect liquid level."""
+        """Return liquid level relative to the bottom of the well."""
         hw_pipette = self._state_view.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
             attached_pipettes=self._hardware_api.attached_instruments,
