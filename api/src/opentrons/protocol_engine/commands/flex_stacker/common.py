@@ -879,7 +879,9 @@ def build_retrieve_labware_move_updates(
             [OnLabwareOffsetLocationSequenceComponent(labwareUri=primary_uri)],
             primary_offset_location,
         )
-        locations_for_ids[group.lidLabwareId] = OnLabwareLocation(labwareId=group.primaryLabwareId)
+        locations_for_ids[group.lidLabwareId] = OnLabwareLocation(
+            labwareId=group.primaryLabwareId
+        )
         offset_ids_by_id[group.lidLabwareId] = _find_offset_id(
             state_view.labware.get_uri_from_definition(stacker.pool_lid_definition),
             lid_offset_location,
