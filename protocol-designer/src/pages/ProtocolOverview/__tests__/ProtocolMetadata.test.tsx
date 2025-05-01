@@ -1,10 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-
-import { i18n } from '../../../assets/localization'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
 import { ProtocolMetadata } from '../ProtocolMetadata'
-
 import type { ComponentProps } from 'react'
 
 const mockSetShowEditMetadataModal = vi.fn()
@@ -45,7 +43,7 @@ describe('ProtocolMetadata', () => {
     screen.getByText('Protocol Metadata')
     screen.getByText('Edit')
     screen.getByText('Required app version')
-    screen.getByText('8.3.0 or higher')
+    screen.getByText('8.3.2 or higher')
   })
 
   it('should render protocol metadata', () => {
