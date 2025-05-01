@@ -399,6 +399,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.17
             Behavior of the ``volume`` parameter.
+
+        .. versionchanged:: 2.24
+            Can dispense over trash bin or waste chute implicitly.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
@@ -656,6 +659,9 @@ class InstrumentContext(publisher.CommandPublisher):
                               without first calling a method that takes a location, like
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
         :returns: This instance.
+
+        .. versionchanged:: 2.24
+            Can blow out over trash bin or waste chute implicitly.
         """
         well: Optional[labware.Well] = None
         move_to_location: types.Location
@@ -885,6 +891,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.22
             No longer implemented as an aspirate.
+        .. versionchanged:: 2.24
+            Can air gap over a trash bin or waste chute.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
