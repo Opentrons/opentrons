@@ -348,6 +348,7 @@ describe('mix: advanced options', () => {
         changeTip: 'always',
         wells: ['A1', 'B1', 'C1'],
         yOffset: 1,
+        finalPushOut: 2,
       } as MixArgs
       const mockWellLocationCustomXY: Partial<AspDispAirgapParams> = {
         wellLocation: {
@@ -371,7 +372,10 @@ describe('mix: advanced options', () => {
           delayCommand(12),
           aspirateHelper(well, volume, mockWellLocationCustomXY),
           delayCommand(10),
-          dispenseHelper(well, volume, mockWellLocationCustomXY),
+          dispenseHelper(well, volume, {
+            ...mockWellLocationCustomXY,
+            pushOut: 2,
+          }),
           delayCommand(12),
           blowoutHelper(blowoutLabwareId, {
             wellLocation: {
@@ -396,6 +400,7 @@ mockPythonName.mix(
     location=mockPythonName["A1"].bottom(z=3.2).move(types.Point(y=1)),
     aspirate_delay=10,
     dispense_delay=12,
+    final_push_out=2,
 )
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
@@ -410,6 +415,7 @@ mockPythonName.mix(
     location=mockPythonName["B1"].bottom(z=3.2).move(types.Point(y=1)),
     aspirate_delay=10,
     dispense_delay=12,
+    final_push_out=2,
 )
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
@@ -424,6 +430,7 @@ mockPythonName.mix(
     location=mockPythonName["C1"].bottom(z=3.2).move(types.Point(y=1)),
     aspirate_delay=10,
     dispense_delay=12,
+    final_push_out=2,
 )
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
