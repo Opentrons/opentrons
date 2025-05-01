@@ -65,9 +65,8 @@ TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description="FlexStacker Motion Parameter Test Script")
     arg_parser.add_argument("-c", "--cycles", default = 10, help = "number of cycles to execute")
-    arg_parser.add_argument("-a", "--axis", default = StackerAxis.Z, help = "Choose a Axis")
-    arg_parser.add_argument("-g", "--gauge", default = True, type=bool,  help = "gauge")
-    # arg_parser.add_argument("-")
+    arg_parser.add_argument("-a", "--axis", default = 'X', help = "Choose a Axis to test: X, Y, or L")
+    arg_parser.add_argument("-g", "--gauge", default = True, type=bool,  help = "if a dial gauge is connected")
     return arg_parser
 
 def parameter_range(test_axis: str, p_type: str) -> np.ndarray:
@@ -438,7 +437,14 @@ if __name__ == '__main__':
         print(f'home reading: {home_reading}')
     else:
         gauge = None
-    test_axis = args.axis
+    if args.axis == 'X':
+        test_axis = StackerAxis.X
+    elif args.axis == 'Z':
+        test_axis = StackerAxis.Z
+    elif args.axis == 'L':
+        test_axis = StackerAxis.L
+    else:
+        raise("NO AXIS CHOSEN!!, PLEASE CHOOSE X, Y, or L")
     list_1 = make_test_list(test_axis)
     # Can't remember if this is needed
     # s.close_latch()
