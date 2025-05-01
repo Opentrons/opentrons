@@ -14,8 +14,6 @@ import {
 } from '@opentrons/shared-data'
 import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
 
-import { InitialDeckSetup, LabwareOnDeck, ModuleEntities } from '../step-forms'
-
 import type { WellGroup } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -35,6 +33,11 @@ import type {
   PipetteEntity,
 } from '@opentrons/step-generation'
 import type { BoundingRect, GenericRect } from '../collision-types'
+import type {
+  InitialDeckSetup,
+  LabwareOnDeck,
+  ModuleEntities,
+} from '../step-forms'
 
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware

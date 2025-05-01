@@ -29,7 +29,6 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getRobotType } from '../../../file-data/selectors'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
 
@@ -59,8 +58,6 @@ export function MaterialsListModal({
 }: MaterialsListModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const robotType = useSelector(getRobotType)
-  const deckSetup = useSelector(getInitialDeckSetup)
-  const { modules: modulesOnDeck, labware: labwareOnDeck } = deckSetup
   const allLabwareWellContents = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId
   )

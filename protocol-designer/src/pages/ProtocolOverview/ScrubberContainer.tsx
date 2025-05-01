@@ -119,11 +119,11 @@ export function ScrubberContainer(): JSX.Element | null {
     let location: LabwareLocation = {
       slotName: getSlotInLocationStack(lw.stack),
     }
-    const moduleId = getModuleIdFromStack(lw.stack, modules)
-    if (moduleId != null) {
-      location = { moduleId }
-    } else if (labware[lw.id].def.allowedRoles?.includes('adapter')) {
-      location = { labwareId: lw.id }
+    const locationUnderLabware = lw.stack[1]
+    if (moduleEntities[locationUnderLabware] != null) {
+      location = { moduleId: moduleEntities[locationUnderLabware].id }
+    } else if (labwareEntities[locationUnderLabware] != null) {
+      location = { labwareId: labwareEntities[locationUnderLabware].id }
     } else if (getSlotInLocationStack(lw.stack) === 'offDeck') {
       location = 'offDeck'
     } else if (getSlotInLocationStack(lw.stack) === 'gripperWasteChute') {
