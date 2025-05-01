@@ -1,4 +1,5 @@
 import {
+  FLEX_ROBOT_TYPE,
   getAreSlotsVerticallyAdjacent,
   getModuleType,
   THERMOCYCLER_MODULE_TYPE,
@@ -16,6 +17,7 @@ import type {
   DeckDefinition,
   ModuleModel,
   ModuleType,
+  RobotType,
 } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
@@ -103,4 +105,59 @@ export const getNextAvailableModuleSlot = (
   } else {
     return null
   }
+}
+
+export const getSlotForLabware = (
+  targetLabwareId: string,
+  initialDeckSetup: AllTemporalPropertiesForTimelineFrame,
+  robotType: RobotType,
+  visitedIds: Set<string> = new Set()
+): string | null => {
+  const flexPattern = /^[A-D][1-4]$/
+  const ot2Pattern = /^[1-9]|1[0-2]$/
+
+  if (visitedIds.has(targetLabwareId)) {
+    console.error(
+      `Circular reference detected while finding physical slot for labware: ${targetLabwareId}`
+    )
+    return null
+  }
+  visitedIds.add(targetLabwareId)
+
+  const { labware, modules } = initialDeckSetup
+
+  const labwareInfo = labware[targetLabwareId]
+  if (labwareInfo == null) {
+    return null
+  }
+  const location = labwareInfo.slot
+
+  const deckSlotPattern =
+    robotType === FLEX_ROBOT_TYPE ? flexPattern : ot2Pattern
+  const isSlot = typeof location === 'string' && deckSlotPattern.test(location)
+
+  if (isSlot) {
+    return location
+  }
+
+  if (typeof location === 'string' && modules[location] != null) {
+    const moduleInfo = modules[location]
+    const modulePhysicalSlot = moduleInfo.slot
+    const isModulePhysicalSlot =
+      typeof modulePhysicalSlot === 'string' &&
+      deckSlotPattern.test(modulePhysicalSlot)
+    if (isModulePhysicalSlot) {
+      return modulePhysicalSlot
+    } else {
+      console.warn(
+        `Module ${location} is not placed in a valid physical deck slot: ${modulePhysicalSlot}`
+      )
+      return null
+    }
+  }
+
+  if (typeof location === 'string' && labware[location] != null) {
+    return getSlotForLabware(location, initialDeckSetup, robotType, visitedIds)
+  }
+  return null
 }
