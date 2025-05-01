@@ -74,21 +74,11 @@ export function mixUtil(args: {
     invariantContext,
     finalPushOut,
   } = args
-  //  If delay is specified to something other than 0,
-  //  emit individual py commands. Otherwise, emit mix()
-  const hasUnsupportedMixApiArg =
-    (aspirateDelaySeconds != null && aspirateDelaySeconds !== 0) ||
-    (dispenseDelaySeconds != null && dispenseDelaySeconds !== 0) ||
-    finalPushOut != null
-
-  const curryCreator = hasUnsupportedMixApiArg
-    ? curryCommandCreator
-    : curryWithoutPython
 
   const getDelayCommand = (seconds?: number | null): CurriedCommandCreator[] =>
     seconds
       ? [
-          curryCreator(delay, {
+          curryWithoutPython(delay, {
             seconds,
           }),
         ]
@@ -108,8 +98,13 @@ export function mixUtil(args: {
       `location=${labwarePythonName}[${formatPyStr(
         well
       )}]${formatPyWellLocation(pythonWellLocation)}`,
-      // TODO (nd, 04/09/2025): uncomment next line once PAPI supports new `final_push_out` arg
-      // `final_push_out=${finalPushOut}`
+      ...(aspirateDelaySeconds != null && aspirateDelaySeconds !== 0
+        ? [`aspirate_delay=${aspirateDelaySeconds}`]
+        : []),
+      ...(dispenseDelaySeconds != null && dispenseDelaySeconds !== 0
+        ? [`dispense_delay=${dispenseDelaySeconds}`]
+        : []),
+      ...(finalPushOut != null ? [`final_push_out=${finalPushOut}`] : []),
     ]
     return {
       commands: [],
@@ -128,7 +123,7 @@ export function mixUtil(args: {
   for (let i = 0; i < times; i++) {
     commandCreators.push(
       ...[
-        curryCreator(aspirate, {
+        curryWithoutPython(aspirate, {
           pipetteId: pipette,
           volume,
           labwareId: labware,
@@ -146,7 +141,7 @@ export function mixUtil(args: {
           nozzles: null,
         }),
         ...getDelayCommand(aspirateDelaySeconds),
-        curryCreator(dispense, {
+        curryWithoutPython(dispense, {
           pipetteId: pipette,
           volume,
           labwareId: labware,
@@ -172,10 +167,7 @@ export function mixUtil(args: {
       ]
     )
   }
-  return [
-    ...commandCreators,
-    ...(hasUnsupportedMixApiArg ? [] : [pythonCommandCreator]),
-  ]
+  return [...commandCreators, pythonCommandCreator]
 }
 export const mix: CommandCreator<MixArgs> = (
   data,
