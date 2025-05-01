@@ -376,71 +376,71 @@ export function Toast(props: ToastProps): JSX.Element {
       </Flex>
 
       <Flex alignItems={ALIGN_CENTER}>
-      {linkText ? (
-        <Link
-          role="button"
-          onClick={() => {
-            console.log("link")
-            onLinkClick()
-            onCloseHandler()
-          }}
-          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-        >
-          <LegacyStyledText
-            color={COLORS.black90}
-            fontSize={
-              showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
-            }
-            fontWeight={
-              showODDStyle
-                ? TYPOGRAPHY.fontWeightSemiBold
-                : TYPOGRAPHY.fontWeightRegular
-            }
-            lineHeight={
-              showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
-            }
-            textDecoration={
-              showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
-            }
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            whiteSpace={NO_WRAP}
+        {linkText ? (
+          <Link
+            role="button"
+            onClick={() => {
+              console.log('link')
+              onLinkClick()
+              onCloseHandler()
+            }}
+            marginLeft={SPACING.spacing4}
+            marginRight={SPACING.spacing8}
           >
-            {linkText}
-          </LegacyStyledText>
-        </Link>
-      ) : null}
-      {closeText ? (
-        <Link
-          role="button"
-          onClick={() => {
-            onCloseHandler()
-          }}
-          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-        >
-          <LegacyStyledText
-            color={COLORS.black90}
-            fontSize={
-              showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
-            }
-            fontWeight={
-              showODDStyle
-                ? TYPOGRAPHY.fontWeightSemiBold
-                : TYPOGRAPHY.fontWeightRegular
-            }
-            lineHeight={
-              showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
-            }
-            textDecoration={
-              showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
-            }
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            whiteSpace={NO_WRAP}
+            <LegacyStyledText
+              color={COLORS.black90}
+              fontSize={
+                showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
+              }
+              fontWeight={
+                showODDStyle
+                  ? TYPOGRAPHY.fontWeightSemiBold
+                  : TYPOGRAPHY.fontWeightRegular
+              }
+              lineHeight={
+                showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+              }
+              textDecoration={
+                showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
+              }
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              whiteSpace={NO_WRAP}
+            >
+              {linkText}
+            </LegacyStyledText>
+          </Link>
+        ) : null}
+        {closeText ? (
+          <Link
+            role="button"
+            onClick={() => {
+              onCloseHandler()
+            }}
+            padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
-            {closeText}
-          </LegacyStyledText>
-        </Link>
-      ) : null}
-
+            <LegacyStyledText
+              color={COLORS.black90}
+              fontSize={
+                showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
+              }
+              fontWeight={
+                showODDStyle
+                  ? TYPOGRAPHY.fontWeightSemiBold
+                  : TYPOGRAPHY.fontWeightRegular
+              }
+              lineHeight={
+                showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+              }
+              textDecoration={
+                showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
+              }
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              whiteSpace={NO_WRAP}
+            >
+              {closeText}
+            </LegacyStyledText>
+          </Link>
+        ) : null}
       </Flex>
       {!closeText && closeButton ? (
         <Btn
