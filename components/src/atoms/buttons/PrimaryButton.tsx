@@ -23,7 +23,8 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.yellow50};
+    outline: 2px solid ${COLORS.blue50};
+    outline-offset: 0.25rem;
   }
 
   &:active {
