@@ -83,6 +83,8 @@ export interface UseRecoveryCommandsResult {
   homeAll: () => Promise<CommandData[]>
   /* A non-terminal recovery-command */
   homeShuttle: () => Promise<CommandData[]>
+  /* A non-terminal recovery-command */
+  manualRetrieve: () => Promise<CommandData[]>
 }
 
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
@@ -114,7 +116,6 @@ export function useRecoveryCommands({
     unvalidatedFailedCommand?.id,
     currentRecoveryPolicy
   )
-
   const { makeSuccessToast } = recoveryToastUtils
 
   const reportAndRouteFailedCmd = (e: Error): Promise<never> => {
@@ -124,7 +125,6 @@ export function useRecoveryCommands({
 
     return Promise.reject(new Error(`Could not execute command: ${e}`))
   }
-
   // TODO(jh, 11-21-24): Some commands return a 200 with an error body. We should catch these and propagate the error.
   const chainRunRecoveryCommands = useCallback(
     (
@@ -189,6 +189,46 @@ export function useRecoveryCommands({
           },
         }
       : null
+  }
+
+  const buildOpenLatch = (
+    failedCommand: FailedCommand | null
+  ): CreateCommand | null => {
+    if (failedCommand == null) {
+      return null
+    }
+    const storeOrRetriveFailedCommandParams = failedCommand.params
+    const moduleId =
+      'moduleId' in storeOrRetriveFailedCommandParams
+        ? storeOrRetriveFailedCommandParams.moduleId
+        : ''
+    return {
+      commandType: 'flexStacker/openLatch',
+      params: {
+        moduleId: moduleId,
+      },
+      intent: 'fixit',
+    }
+  }
+
+  const buildCloseLatch = (
+    failedCommand: FailedCommand | null
+  ): CreateCommand | null => {
+    if (failedCommand == null) {
+      return null
+    }
+    const storeOrRetriveFailedCommandParams = failedCommand.params
+    const moduleId =
+      'moduleId' in storeOrRetriveFailedCommandParams
+        ? storeOrRetriveFailedCommandParams.moduleId
+        : ''
+    return {
+      commandType: 'flexStacker/closeLatch',
+      params: {
+        moduleId: moduleId,
+      },
+      intent: 'fixit',
+    }
   }
 
   const retryFailedCommand = useCallback((): Promise<CommandData[]> => {
@@ -329,8 +369,8 @@ export function useRecoveryCommands({
   const releaseLabwareLatch = useCallback((): Promise<CommandData[]> => {
     const buildOpenLatchCommand = buildOpenLatch(unvalidatedFailedCommand)
     if (buildOpenLatchCommand == null) {
-      return Promise.reject(
-        new Error('Invalid use of open labware latch command')
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of open latch command')
       )
     } else {
       return chainRunRecoveryCommands([buildOpenLatchCommand])
@@ -340,8 +380,8 @@ export function useRecoveryCommands({
   const closeLabwareLatch = useCallback((): Promise<CommandData[]> => {
     const buildCloseLatchCommand = buildCloseLatch(unvalidatedFailedCommand)
     if (buildCloseLatchCommand == null) {
-      return Promise.reject(
-        new Error('Invalid use of close labware latch command')
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of close latch command')
       )
     } else {
       return chainRunRecoveryCommands([buildCloseLatchCommand])
@@ -365,6 +405,17 @@ export function useRecoveryCommands({
     }
   }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
+  const manualRetrieve = useCallback((): Promise<CommandData[]> => {
+    const manualRetrieveCommand = buildManualRetrieve(unvalidatedFailedCommand)
+    if (manualRetrieveCommand == null) {
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of manual retrieve command')
+      )
+    } else {
+      return chainRunRecoveryCommands([manualRetrieveCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+
   const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
     const moveLabwareCmd = buildMoveLabwareWithoutPause(
       unvalidatedFailedCommand
@@ -385,14 +436,15 @@ export function useRecoveryCommands({
     homePipetteZAxes,
     pickUpTips,
     releaseGripperJaws,
-    releaseLabwareLatch,
-    closeLabwareLatch,
     homeExceptPlungers,
     moveLabwareWithoutPause,
     skipFailedCommand,
     ignoreErrorKindThisRun,
     homeAll,
     homeShuttle,
+    manualRetrieve,
+    closeLabwareLatch,
+    releaseLabwareLatch,
   }
 }
 
@@ -463,7 +515,7 @@ const buildHomeShuttle = (
   }
 }
 
-const buildOpenLatch = (
+const buildManualRetrieve = (
   failedCommand: FailedCommand | null
 ): CreateCommand | null => {
   if (failedCommand == null) {
@@ -475,27 +527,7 @@ const buildOpenLatch = (
       ? storeOrRetriveFailedCommandParams.moduleId
       : ''
   return {
-    commandType: 'flexStacker/openLatch',
-    params: {
-      moduleId: moduleId,
-    },
-    intent: 'fixit',
-  }
-}
-
-const buildCloseLatch = (
-  failedCommand: FailedCommand | null
-): CreateCommand | null => {
-  if (failedCommand == null) {
-    return null
-  }
-  const storeOrRetriveFailedCommandParams = failedCommand.params
-  const moduleId =
-    'moduleId' in storeOrRetriveFailedCommandParams
-      ? storeOrRetriveFailedCommandParams.moduleId
-      : ''
-  return {
-    commandType: 'flexStacker/closeLatch',
+    commandType: 'unsafe/flexStacker/manualRetrieve',
     params: {
       moduleId: moduleId,
     },
