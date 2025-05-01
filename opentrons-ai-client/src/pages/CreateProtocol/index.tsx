@@ -53,6 +53,7 @@ export interface CreateProtocolFormData {
   modules: DisplayModules[]
   labwares: DisplayLabware[]
   liquids: string[]
+  runtime_parameters?: string
   steps: string[] | string
 }
 

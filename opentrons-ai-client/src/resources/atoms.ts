@@ -28,6 +28,7 @@ export const createProtocolChatAtom = atom<CreatePrompt>({
   modules: [],
   labware: [],
   liquids: [],
+  runtime_parameters: '',
   steps: [],
   fake: true,
 })

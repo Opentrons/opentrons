@@ -33,6 +33,7 @@ export interface CreatePrompt {
   modules: string[]
   labware: string[]
   liquids: string[]
+  runtime_parameters?: string
   steps: string[]
   fake?: boolean
   fake_key?: string

@@ -17,6 +17,7 @@ export interface PromptPreviewSectionProps {
   items: string[]
   itemMaxWidth?: string
   oneItemPerRow?: boolean
+  isStepsSection?: boolean
 }
 
 const PromptPreviewSectionContainer = styled(Flex)`
@@ -33,10 +34,11 @@ const TagsContainer = styled.div<{
 }>`
   display: flex;
   grid-gap: ${SPACING.spacing4};
-  flex-wrap: ${WRAP};
+  /* When oneItemPerRow is true, disable wrapping to keep a single column layout */
+  flex-wrap: ${props => (props.oneItemPerRow ? 'nowrap' : WRAP)};
   justify-content: flex-start;
   width: 100%;
-  flex-direction: ${props => (Boolean(props.oneItemPerRow) ? 'column' : 'row')};
+  flex-direction: ${props => (props.oneItemPerRow ? 'column' : 'row')};
 `
 
 const TagItemWrapper = styled.div<{
@@ -97,32 +99,53 @@ export function PromptPreviewSection({
   items,
   itemMaxWidth = '35%',
   oneItemPerRow = false,
+  isStepsSection = false,
 }: PromptPreviewSectionProps): JSX.Element {
+  // If this is the Steps section, render each step in its own row
+  if (isStepsSection) {
+    return (
+      <PromptPreviewSectionContainer>
+        <SectionHeading desktopStyle="bodyLargeSemiBold">
+          {title}
+        </SectionHeading>
+        <Flex flexDirection="column" gridGap={SPACING.spacing4} width="100%">
+          {items.map((item: string, index: number) => (
+            <StepTagContent key={`step-${index}`} text={item} />
+          ))}
+        </Flex>
+      </PromptPreviewSectionContainer>
+    )
+  }
+
+  const stackItems = oneItemPerRow || isStepsSection
   return (
     <PromptPreviewSectionContainer>
       <SectionHeading desktopStyle="bodyLargeSemiBold">{title}</SectionHeading>
-      <TagsContainer oneItemPerRow={oneItemPerRow}>
+      <TagsContainer oneItemPerRow={stackItems}>
         {items.map((item: string, index: number) => {
           // Handle the special line break item that separates labware from liquids
           if (item === '__LINE_BREAK__') {
             return <LineBreakWrapper key={`line-break-${index}`} />
           }
 
-          // Render regular items
+          // Skip empty strings
+          if (item.trim() === '') return null
+
+          // Render each tag, forcing a break for stacked layouts
           return (
-            item.trim() !== '' && (
+            <React.Fragment key={`item-row-${index}`}>
               <TagItemWrapper
                 data-testid={`item-tag-wrapper-${index}`}
-                key={`item-tag-${index}`}
                 itemMaxWidth={itemMaxWidth}
               >
-                {title === 'Steps' ? (
+                {isStepsSection ? (
                   <StepTagContent text={item} />
                 ) : (
                   <Tag text={item} type="default" />
                 )}
               </TagItemWrapper>
-            )
+              {stackItems && <LineBreakWrapper />}
+            </React.Fragment>
           )
         })}
       </TagsContainer>
