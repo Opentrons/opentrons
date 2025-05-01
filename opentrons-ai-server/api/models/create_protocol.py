@@ -2,6 +2,8 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
+from api.models.protocol_format import ProtocolFormat
+
 
 class CreateProtocol(BaseModel):
     prompt: str = Field(..., description="Prompt")
@@ -17,3 +19,4 @@ class CreateProtocol(BaseModel):
     steps: List[str] = Field(..., description="The steps of the protocol")
     fake: Optional[bool] = Field(False, description="Fake response?")
     fake_key: Optional[str] = None
+    protocol_format: ProtocolFormat = ProtocolFormat.PYTHON
