@@ -523,13 +523,13 @@ class GeometryView:
             return slot_front_left + slot_front_left_to_labware_front_left
         else:
             assert_type(definition, LabwareDefinition3)
-            # todo(mm, 2025-03-03): This needs more work to correctly handle labware schema 3.
-            # This is currently assuming the labware's wells are in quadrant I and the
-            # labware sits as far in the -x, -y direction as the slot allows. We instead
-            # need to have the labware sit in the -x, +y direction (depending on the slot
-            # and labware's locating features) and allow for the labware's wells to be
-            # in quadrant IV.
-            return slot_front_left
+
+            slot_front_left_to_labware_back_left = Point(
+                definition.extents.total.backLeftBottom.x,
+                definition.extents.total.backLeftBottom.y,
+                definition.extents.total.backLeftBottom.z,
+            )
+            return slot_front_left + slot_front_left_to_labware_back_left
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
