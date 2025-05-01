@@ -309,6 +309,7 @@ async def test_manual_retrieve_primary_and_lid(
             batch_labware_location=BatchLabwareLocationUpdate(
                 new_locations_by_id={
                     "primary-id-1": ModuleLocation(moduleId=stacker_id),
+                    "lid-id-1": OnLabwareLocation(labwareId="primary-id-1"),
                 },
                 new_offset_ids_by_id={"primary-id-1": None, "lid-id-1": None},
             ),
@@ -410,6 +411,7 @@ async def test_manual_retrieve_primary_and_adapter(
             batch_labware_location=BatchLabwareLocationUpdate(
                 new_locations_by_id={
                     "adapter-id-1": ModuleLocation(moduleId=stacker_id),
+                    "primary-id-1": OnLabwareLocation(labwareId="adapter-id-1"),
                 },
                 new_offset_ids_by_id={"primary-id-1": None, "adapter-id-1": None},
             ),
@@ -562,6 +564,8 @@ async def test_manual_retrieve_primary_adapter_and_lid(
             batch_labware_location=BatchLabwareLocationUpdate(
                 new_locations_by_id={
                     "adapter-id-1": ModuleLocation(moduleId=stacker_id),
+                    "primary-id-1": OnLabwareLocation(labwareId="adapter-id-1"),
+                    "lid-id-1": OnLabwareLocation(labwareId="primary-id-1"),
                 },
                 new_offset_ids_by_id={
                     "primary-id-1": None,
