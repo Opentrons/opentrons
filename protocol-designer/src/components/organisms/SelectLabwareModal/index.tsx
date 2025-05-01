@@ -1,0 +1,582 @@
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import reduce from 'lodash/reduce'
+import styled from 'styled-components'
+
+import {
+  ALIGN_CENTER,
+  CheckboxField,
+  CURSOR_POINTER,
+  DIRECTION_COLUMN,
+  DISPLAY_INLINE_BLOCK,
+  Flex,
+  InputField,
+  JUSTIFY_CENTER,
+  ListButton,
+  ListButtonAccordion,
+  ListButtonAccordionContainer,
+  ListButtonRadioButton,
+  Modal,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import {
+  ABSORBANCE_READER_TYPE,
+  getAreSlotsHorizontallyAdjacent,
+  getIsLabwareAboveHeight,
+  getLabwareDefIsStandard,
+  getLabwareDefURI,
+  getModuleType,
+  HEATERSHAKER_MODULE_TYPE,
+  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
+
+import { LINK_BUTTON_STYLE } from '../../../components/atoms'
+import { getRobotType } from '../../../file-data/selectors'
+import { getOnlyLatestDefs } from '../../../labware-defs'
+import { createCustomLabwareDef } from '../../../labware-defs/actions'
+import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import {
+  selectLabware,
+  selectNestedLabware,
+} from '../../../labware-ingred/actions'
+import { selectors } from '../../../labware-ingred/selectors'
+import {
+  ALL_ORDERED_CATEGORIES,
+  CUSTOM_CATEGORY,
+  ORDERED_CATEGORIES,
+} from '../../../pages/Designer/DeckSetup/constants'
+import { CategoryExpand } from '../../../pages/Designer/DeckSetup/DeckSetupToolbox'
+import {
+  getLabwareCompatibleWithAdapter,
+  getLabwareIsRecommended,
+} from '../../../pages/Designer/DeckSetup/utils'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import { getPipetteEntities } from '../../../step-forms/selectors'
+import { getHas96Channel } from '../../../utils'
+import {
+  ADAPTER_96_CHANNEL,
+  getLabwareCompatibleWithModule,
+} from '../../../utils/labwareModuleCompatibility'
+import { getMainPagePortalEl } from '../Portal'
+
+import type { ChangeEvent } from 'react'
+import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefByDefURI } from '../../../labware-defs'
+import type { ModuleOnDeck } from '../../../step-forms'
+import type { ThunkDispatch } from '../../../types'
+
+const STANDARD_X_DIMENSION = 127.75
+const STANDARD_Y_DIMENSION = 85.48
+const PLATE_READER_LOADNAME =
+  'opentrons_flex_lid_absorbance_plate_reader_module'
+interface SelectLabwareModalProps {
+  slot: DeckSlotId
+  setHoveredLabware: (defUri: string | null) => void
+  onClose: () => void
+  onConfirm: () => void
+}
+
+interface LabwareInfo {
+  uri: string
+  def: LabwareDefinition2
+}
+
+export function SelectLabwareModal(
+  props: SelectLabwareModalProps
+): JSX.Element {
+  const { slot, setHoveredLabware, onClose, onConfirm } = props
+  const { t } = useTranslation(['starting_deck_state', 'shared'])
+  const robotType = useSelector(getRobotType)
+  const dispatch = useDispatch<ThunkDispatch<any>>()
+  const permittedTipracks = useSelector(stepFormSelectors.getPermittedTipracks)
+  const pipetteEntities = useSelector(getPipetteEntities)
+  const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
+  const has96Channel = getHas96Channel(pipetteEntities)
+  const defs = getOnlyLatestDefs()
+  const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
+  const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
+  const {
+    selectedLabwareDefUri,
+    selectedModuleModel,
+    selectedNestedLabwareDefUri,
+  } = zoomedInSlotInfo
+
+  const setAllCategories = (state: boolean): Record<string, boolean> =>
+    ALL_ORDERED_CATEGORIES.reduce<Record<string, boolean>>(
+      (acc, category) => ({ ...acc, [category]: state }),
+      {}
+    )
+
+  const allCategoriesExpanded = setAllCategories(true)
+  const allCategoriesCollapsed = setAllCategories(false)
+  const [
+    areCategoriesExpanded,
+    setAreCategoriesExpanded,
+  ] = useState<CategoryExpand>(allCategoriesCollapsed)
+  const [searchTerm, setSearchTerm] = useState<string>('')
+
+  useEffect(() => {
+    if (searchTerm !== '') {
+      setAreCategoriesExpanded(allCategoriesExpanded)
+    } else {
+      setAreCategoriesExpanded(allCategoriesCollapsed)
+    }
+  }, [searchTerm])
+
+  const handleResetLabwareTools = (): void => {
+    setAreCategoriesExpanded(allCategoriesCollapsed)
+    setSearchTerm('')
+  }
+
+  const searchFilter = (termToCheck: string): boolean =>
+    termToCheck.toLowerCase().includes(searchTerm.toLowerCase())
+
+  const modulesById = deckSetup.modules
+  const moduleType =
+    selectedModuleModel != null ? getModuleType(selectedModuleModel) : null
+  const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
+    moduleId => modulesById[moduleId]
+  )
+  const [filterRecommended, setFilterRecommended] = useState<boolean>(
+    moduleType != null
+  )
+  //    for OT-2 usage only due to H-S collisions
+  const isNextToHeaterShaker = initialModules.some(
+    hardwareModule =>
+      hardwareModule.type === HEATERSHAKER_MODULE_TYPE &&
+      getAreSlotsHorizontallyAdjacent(hardwareModule.slot, slot)
+  )
+  const [filterHeight, setFilterHeight] = useState<boolean>(
+    robotType === OT2_ROBOT_TYPE ? isNextToHeaterShaker : false
+  )
+
+  const getLabwareCompatible = useCallback(
+    (def: LabwareDefinition2) => {
+      // assume that custom (non-standard) labware is (potentially) compatible
+      if (moduleType == null || !getLabwareDefIsStandard(def)) {
+        return true
+      }
+      return getLabwareCompatibleWithModule(def, moduleType)
+    },
+    [moduleType]
+  )
+
+  const getIsLabwareFiltered = useCallback(
+    (labwareDef: LabwareDefinition2) => {
+      const { dimensions, parameters } = labwareDef
+      const { xDimension, yDimension } = dimensions
+
+      const isSmallXDimension = xDimension < STANDARD_X_DIMENSION
+      const isSmallYDimension = yDimension < STANDARD_Y_DIMENSION
+      const isIrregularSize = isSmallXDimension && isSmallYDimension
+      const isAdapter = labwareDef.allowedRoles?.includes('adapter')
+      const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
+      return (
+        (filterRecommended &&
+          !getLabwareIsRecommended(labwareDef, selectedModuleModel)) ||
+        (filterHeight &&
+          getIsLabwareAboveHeight(
+            labwareDef,
+            MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
+          )) ||
+        !getLabwareCompatible(labwareDef) ||
+        (isAdapter &&
+          isIrregularSize &&
+          moduleType !== HEATERSHAKER_MODULE_TYPE) ||
+        (isAdapter96Channel && !has96Channel) ||
+        (slot === 'offDeck' && isAdapter) ||
+        (PLATE_READER_LOADNAME === parameters.loadName &&
+          moduleType !== ABSORBANCE_READER_TYPE)
+      )
+    },
+    [filterRecommended, filterHeight, getLabwareCompatible, moduleType, slot]
+  )
+
+  const labwareByCategory = useMemo(() => {
+    return reduce<
+      LabwareDefByDefURI,
+      { [category: string]: LabwareDefinition2[] }
+    >(
+      defs,
+      (acc, def: typeof defs[keyof typeof defs]) => {
+        const category: string = def.metadata.displayCategory
+        //  filter out non-permitted tipracks
+        if (
+          category === 'tipRack' &&
+          !permittedTipracks.includes(getLabwareDefURI(def))
+        ) {
+          return acc
+        }
+
+        return {
+          ...acc,
+          [category]: [...(acc[category] || []), def],
+        }
+      },
+      {}
+    )
+  }, [permittedTipracks])
+
+  const filteredLabwareByCategory: Record<string, LabwareInfo[]> = useMemo(
+    () =>
+      ALL_ORDERED_CATEGORIES.reduce((acc, category) => {
+        if (category === 'custom') {
+          return {
+            ...acc,
+            [category]: filterRecommended
+              ? []
+              : Object.entries(customLabwareDefs).reduce<LabwareInfo[]>(
+                  (accInner, [uri, def]) => {
+                    return searchFilter(def.metadata.displayName)
+                      ? [...accInner, { uri, def }]
+                      : accInner
+                  },
+                  []
+                ),
+          }
+        }
+        const isDeckLocationCategory =
+          slot === 'offDeck' ? category !== 'adapter' : true
+        if (!(category in labwareByCategory) || !isDeckLocationCategory) {
+          return { ...acc, [category]: [] }
+        }
+        return {
+          ...acc,
+          [category]: labwareByCategory[category].reduce<LabwareInfo[]>(
+            (accInner, def) => {
+              return searchFilter(def.metadata.displayName) &&
+                !getIsLabwareFiltered(def)
+                ? [...accInner, { def, uri: getLabwareDefURI(def) }]
+                : accInner
+            },
+            []
+          ),
+        }
+      }, {}),
+    [labwareByCategory, getIsLabwareFiltered, searchTerm]
+  )
+
+  const handleCategoryClick = (category: string, expand?: boolean): void => {
+    const updatedExpandState = {
+      ...areCategoriesExpanded,
+      [category]: expand ?? !areCategoriesExpanded[category],
+    }
+    setAreCategoriesExpanded(updatedExpandState)
+  }
+
+  return createPortal(
+    <Modal
+      marginLeft="0"
+      title={t('add_labware')}
+      type="info"
+      width="594px"
+      onClose={() => {
+        onClose()
+        handleResetLabwareTools()
+      }}
+      footer={
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          padding={SPACING.spacing24}
+          gridGap="36px"
+        >
+          <Flex
+            padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_CENTER}
+          >
+            <StyledLabel css={LINK_BUTTON_STYLE}>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('upload_custom_labware')}
+              </StyledText>
+              <input
+                data-testid="customLabwareInput"
+                type="file"
+                onChange={e => {
+                  dispatch(createCustomLabwareDef(e))
+                  handleCategoryClick(CUSTOM_CATEGORY, true)
+                }}
+              />
+            </StyledLabel>
+          </Flex>
+          <Flex justifyContent="end" gridGap={SPACING.spacing8}>
+            <SecondaryButton
+              onClick={() => {
+                onClose()
+                handleResetLabwareTools()
+              }}
+            >
+              Cancel
+            </SecondaryButton>
+            <PrimaryButton
+              onClick={() => {
+                onConfirm()
+                handleResetLabwareTools()
+              }}
+            >
+              Add labware
+            </PrimaryButton>
+          </Flex>
+        </Flex>
+      }
+    >
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          <InputField
+            value={searchTerm}
+            onChange={e => {
+              setSearchTerm(e.target.value)
+            }}
+            placeholder="Search for labware..."
+            size="medium"
+            leftIcon="search"
+            showDeleteIcon
+            onDelete={() => {
+              setSearchTerm('')
+            }}
+          />
+          {moduleType != null ||
+          (isNextToHeaterShaker && robotType === OT2_ROBOT_TYPE) ? (
+            <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+              <CheckboxField
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  isNextToHeaterShaker
+                    ? setFilterHeight(e.currentTarget.checked)
+                    : setFilterRecommended(e.currentTarget.checked)
+                }}
+                value={
+                  isNextToHeaterShaker && robotType === OT2_ROBOT_TYPE
+                    ? filterHeight
+                    : filterRecommended
+                }
+              />
+              <StyledText desktopStyle="captionRegular">
+                {t('only_display_rec')}
+              </StyledText>
+            </Flex>
+          ) : null}
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing4}
+          overflowY="auto"
+          height="284px"
+          paddingTop={SPACING.spacing8}
+        >
+          {filteredLabwareByCategory[CUSTOM_CATEGORY].length > 0 ? (
+            <ListButton
+              key={`ListButton_${CUSTOM_CATEGORY}`}
+              type="noActive"
+              onClick={() => {
+                handleCategoryClick(CUSTOM_CATEGORY)
+              }}
+            >
+              <ListButtonAccordionContainer id={`${CUSTOM_CATEGORY}_${slot}`}>
+                <ListButtonAccordion
+                  mainHeadline={t(`${CUSTOM_CATEGORY}`)}
+                  isExpanded={areCategoriesExpanded[CUSTOM_CATEGORY]}
+                >
+                  {filteredLabwareByCategory[CUSTOM_CATEGORY].map(
+                    ({ uri }, index) => (
+                      <ListButtonRadioButton
+                        key={`${index}_${uri}`}
+                        id={`${index}_${uri}`}
+                        buttonText={customLabwareDefs[uri].metadata.displayName}
+                        setNoHover={() => {
+                          setHoveredLabware(null)
+                        }}
+                        setHovered={() => {
+                          setHoveredLabware(uri)
+                        }}
+                        buttonValue={uri}
+                        onChange={e => {
+                          e.stopPropagation()
+                          dispatch(selectLabware({ labwareDefUri: uri }))
+                        }}
+                        isSelected={uri === selectedLabwareDefUri}
+                      />
+                    )
+                  )}
+                </ListButtonAccordion>
+              </ListButtonAccordionContainer>
+            </ListButton>
+          ) : null}
+          {ORDERED_CATEGORIES.map(category => {
+            if (filteredLabwareByCategory[category].length > 0) {
+              return (
+                <ListButton
+                  key={`ListButton_${category}`}
+                  type="noActive"
+                  onClick={() => {
+                    handleCategoryClick(category)
+                  }}
+                >
+                  <ListButtonAccordionContainer id={`${category}_${slot}`}>
+                    <ListButtonAccordion
+                      mainHeadline={t(`${category}`)}
+                      isExpanded={areCategoriesExpanded[category]}
+                    >
+                      {filteredLabwareByCategory[category]?.map(
+                        ({ def, uri }, index) => {
+                          const loadName = def.parameters.loadName
+
+                          return searchFilter(def.metadata.displayName) &&
+                            !getIsLabwareFiltered(def) ? (
+                            <Fragment key={`${index}_${category}_${loadName}`}>
+                              <ListButtonRadioButton
+                                setNoHover={() => {
+                                  setHoveredLabware(null)
+                                }}
+                                setHovered={() => {
+                                  setHoveredLabware(uri)
+                                }}
+                                id={`${index}_${category}_${loadName}`}
+                                buttonText={def.metadata.displayName}
+                                buttonValue={uri}
+                                onChange={e => {
+                                  e.stopPropagation()
+                                  dispatch(
+                                    selectLabware({
+                                      labwareDefUri:
+                                        uri === selectedLabwareDefUri
+                                          ? null
+                                          : uri,
+                                    })
+                                  )
+                                  // reset the nested labware def uri in case it is not compatible
+                                  dispatch(
+                                    selectNestedLabware({
+                                      nestedLabwareDefUri: null,
+                                    })
+                                  )
+                                }}
+                                isSelected={uri === selectedLabwareDefUri}
+                              />
+
+                              {uri === selectedLabwareDefUri &&
+                                getLabwareCompatibleWithAdapter(defs, loadName)
+                                  ?.length > 0 && (
+                                  <ListButtonAccordionContainer
+                                    id={`nestedAccordionContainer_${loadName}`}
+                                  >
+                                    <ListButtonAccordion
+                                      key={`${index}_${category}_${loadName}_accordion`}
+                                      isNested
+                                      mainHeadline={t('adapter_compatible_lab')}
+                                      isExpanded={uri === selectedLabwareDefUri}
+                                    >
+                                      {has96Channel &&
+                                      loadName === ADAPTER_96_CHANNEL
+                                        ? permittedTipracks.map(
+                                            (tiprackDefUri, index) => {
+                                              const nestedDef =
+                                                defs[tiprackDefUri]
+                                              return (
+                                                <ListButtonRadioButton
+                                                  setNoHover={() => {
+                                                    setHoveredLabware(null)
+                                                  }}
+                                                  setHovered={() => {
+                                                    setHoveredLabware(
+                                                      tiprackDefUri
+                                                    )
+                                                  }}
+                                                  key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
+                                                  id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
+                                                  buttonText={
+                                                    nestedDef?.metadata
+                                                      .displayName ?? ''
+                                                  }
+                                                  buttonValue={tiprackDefUri}
+                                                  onChange={e => {
+                                                    e.stopPropagation()
+                                                    dispatch(
+                                                      selectNestedLabware({
+                                                        nestedLabwareDefUri: tiprackDefUri,
+                                                      })
+                                                    )
+                                                  }}
+                                                  isSelected={
+                                                    tiprackDefUri ===
+                                                    selectedNestedLabwareDefUri
+                                                  }
+                                                />
+                                              )
+                                            }
+                                          )
+                                        : getLabwareCompatibleWithAdapter(
+                                            { ...defs, ...customLabwareDefs },
+                                            loadName
+                                          ).map(nestedDefUri => {
+                                            const nestedDef =
+                                              defs[nestedDefUri] ??
+                                              customLabwareDefs[nestedDefUri]
+
+                                            return (
+                                              <ListButtonRadioButton
+                                                setNoHover={() => {
+                                                  setHoveredLabware(null)
+                                                }}
+                                                setHovered={() => {
+                                                  setHoveredLabware(
+                                                    nestedDefUri
+                                                  )
+                                                }}
+                                                key={`${index}_${category}_${loadName}_${nestedDefUri}`}
+                                                id={`${index}_${category}_${loadName}_${nestedDefUri}`}
+                                                buttonText={
+                                                  nestedDef?.metadata
+                                                    .displayName ?? ''
+                                                }
+                                                buttonValue={nestedDefUri}
+                                                onChange={e => {
+                                                  e.stopPropagation()
+                                                  dispatch(
+                                                    selectNestedLabware({
+                                                      nestedLabwareDefUri: nestedDefUri,
+                                                    })
+                                                  )
+                                                }}
+                                                isSelected={
+                                                  nestedDefUri ===
+                                                  selectedNestedLabwareDefUri
+                                                }
+                                              />
+                                            )
+                                          })}
+                                    </ListButtonAccordion>
+                                  </ListButtonAccordionContainer>
+                                )}
+                            </Fragment>
+                          ) : null
+                        }
+                      )}
+                    </ListButtonAccordion>
+                  </ListButtonAccordionContainer>
+                </ListButton>
+              )
+            }
+          })}
+        </Flex>
+      </Flex>
+    </Modal>,
+    getMainPagePortalEl()
+  )
+}
+
+const StyledLabel = styled.label`
+  text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+  text-align: ${TYPOGRAPHY.textAlignCenter};
+  display: ${DISPLAY_INLINE_BLOCK};
+  cursor: ${CURSOR_POINTER};
+  input[type='file'] {
+    display: none;
+  }
+`

@@ -307,7 +307,6 @@ export function Ot2Modules(): JSX.Element {
     <>
       {entityToDelete != null ? (
         <ConfirmDeleteEntityInUseModal
-          type="clear"
           onClose={() => {
             setDeleteEntityInUseModal(null)
           }}

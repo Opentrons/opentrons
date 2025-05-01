@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   Btn,
   DeckInfoLabel,
+  EmptySelectorButton,
   Flex,
   Icon,
   POSITION_FIXED,
@@ -19,7 +20,10 @@ import {
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '../../../components/atoms'
-import { ConfirmDeleteEntityInUseModal } from '../../../components/organisms'
+import {
+  ConfirmDeleteEntityInUseModal,
+  SelectLabwareModal,
+} from '../../../components/organisms'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import {
   createContainer,
@@ -32,8 +36,6 @@ import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getSlotInformation } from '../utils'
-import { ALL_ORDERED_CATEGORIES } from './constants'
-import { LabwareTools } from './LabwareTools'
 import { getIsLabwareOnSlotInUse } from './utils'
 
 import type { ThunkDispatch } from '../../../types'
@@ -51,9 +53,10 @@ export function DeckSetupToolbox(
 ): JSX.Element | null {
   const { onCloseClick, setHoveredLabware, position = POSITION_FIXED } = props
   const { t, i18n } = useTranslation(['starting_deck_state', 'shared'])
-  const [showDeleteEntityInUseModal, setShowDeleteEntityInUseModal] = useState<
-    'clear' | 'confirm' | null
-  >(null)
+  const [
+    showDeleteEntityInUseModal,
+    setShowDeleteEntityInUseModal,
+  ] = useState<boolean>(false)
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const savedSteps = useSelector(getSavedStepForms)
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -65,34 +68,9 @@ export function DeckSetupToolbox(
     selectedNestedLabwareDefUri,
   } = selectedSlotInfo
   const { slot } = selectedSlot
-
-  const setAllCategories = (state: boolean): Record<string, boolean> =>
-    ALL_ORDERED_CATEGORIES.reduce<Record<string, boolean>>(
-      (acc, category) => ({ ...acc, [category]: state }),
-      {}
-    )
-  const allCategoriesExpanded = setAllCategories(true)
-  const allCategoriesCollapsed = setAllCategories(false)
-  const [
-    areCategoriesExpanded,
-    setAreCategoriesExpanded,
-  ] = useState<CategoryExpand>(allCategoriesCollapsed)
-  const [searchTerm, setSearchTerm] = useState<string>('')
-
-  useEffect(() => {
-    if (searchTerm !== '') {
-      setAreCategoriesExpanded(allCategoriesExpanded)
-    } else {
-      setAreCategoriesExpanded(allCategoriesCollapsed)
-    }
-  }, [searchTerm])
-
-  const handleCollapseAllCategories = (): void => {
-    setAreCategoriesExpanded(allCategoriesCollapsed)
-  }
-  const handleResetSearchTerm = (): void => {
-    setSearchTerm('')
-  }
+  const [showSelectLabwareModal, setShowSelectLabwareModal] = useState<boolean>(
+    false
+  )
 
   if (slot == null) {
     return null
@@ -122,11 +100,6 @@ export function DeckSetupToolbox(
     )
   }
 
-  const handleResetLabwareTools = (): void => {
-    handleCollapseAllCategories()
-    handleResetSearchTerm()
-  }
-
   const handleClear = (keepExistingLabware = false): void => {
     if (slot !== 'offDeck') {
       //  clear labware from slot
@@ -153,11 +126,8 @@ export function DeckSetupToolbox(
       }
     }
     handleResetToolbox()
-    handleResetLabwareTools()
   }
   const handleConfirm = (): void => {
-    //  clear labware first before recreating them
-    handleClear(true)
     if (
       (slot === 'offDeck' && selectedLabwareDefUri != null) ||
       (selectedModuleModel == null &&
@@ -199,9 +169,7 @@ export function DeckSetupToolbox(
         })
       )
     }
-    handleResetToolbox()
-    dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
-    onCloseClick()
+    setShowSelectLabwareModal(false)
   }
 
   const isLabwareOnSlotInUse = getIsLabwareOnSlotInUse(
@@ -219,13 +187,9 @@ export function DeckSetupToolbox(
       : {}
 
   const handleConfirmDeleteEntityInUseModal = (): void => {
-    if (showDeleteEntityInUseModal === 'confirm') {
-      handleConfirm()
-    } else {
-      handleClear()
-      handleResetToolbox()
-    }
-    setShowDeleteEntityInUseModal(null)
+    handleClear()
+    handleResetToolbox()
+    setShowDeleteEntityInUseModal(false)
   }
   const handleClose = (): void => {
     onCloseClick()
@@ -233,32 +197,34 @@ export function DeckSetupToolbox(
     handleResetToolbox()
   }
   const handleConfirmSelection = (): void => {
-    if (isLabwareOnSlotInUse) {
-      setShowDeleteEntityInUseModal('confirm')
-    } else {
-      handleConfirm()
-    }
+    handleConfirm()
   }
   const handleClearSelection = (): void => {
     if (isLabwareOnSlotInUse) {
-      setShowDeleteEntityInUseModal('clear')
+      setShowDeleteEntityInUseModal(true)
     } else {
       handleClear()
-      handleResetToolbox()
     }
   }
 
   return (
     <>
-      {isLabwareOnSlotInUse && showDeleteEntityInUseModal != null ? (
+      {showSelectLabwareModal ? (
+        <SelectLabwareModal
+          slot={slot}
+          setHoveredLabware={setHoveredLabware}
+          onClose={() => {
+            setShowSelectLabwareModal(false)
+          }}
+          onConfirm={handleConfirmSelection}
+        />
+      ) : null}
+      {isLabwareOnSlotInUse && showDeleteEntityInUseModal ? (
         <ConfirmDeleteEntityInUseModal
           onConfirm={handleConfirmDeleteEntityInUseModal}
           onClose={() => {
-            setShowDeleteEntityInUseModal(null)
+            setShowDeleteEntityInUseModal(false)
           }}
-          type={
-            showDeleteEntityInUseModal === 'confirm' ? 'reconfigure' : 'clear'
-          }
         />
       ) : null}
       <Toolbox
@@ -293,18 +259,19 @@ export function DeckSetupToolbox(
         }
         closeButton={<Icon size="2rem" name="close" />}
         onCloseClick={handleClose}
-        onConfirmClick={handleConfirmSelection}
+        onConfirmClick={handleClose}
         confirmButtonText={t('done')}
       >
-        <LabwareTools
-          setHoveredLabware={setHoveredLabware}
-          slot={slot}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          areCategoriesExpanded={areCategoriesExpanded}
-          setAreCategoriesExpanded={setAreCategoriesExpanded}
-          handleReset={handleResetLabwareTools}
-        />
+        <Flex width="max-content">
+          <EmptySelectorButton
+            textAlignment="left"
+            text={'Add labware'}
+            iconName="plus"
+            onClick={() => {
+              setShowSelectLabwareModal(true)
+            }}
+          />
+        </Flex>
       </Toolbox>
     </>
   )
