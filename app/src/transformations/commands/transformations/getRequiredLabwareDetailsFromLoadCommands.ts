@@ -112,7 +112,7 @@ export function getRequiredLabwareDetailsFromLoadCommands(
   const setupItemsWithStackerFillAdded = commands
     .filter(
       (command): command is FlexStackerFillRunTimeCommand =>
-        'flexStacker/fill' === command.commandType
+        command.commandType === 'flexStacker/fill'
     )
     .reduce((acc, command) => {
       if (command.result == null) return acc
@@ -122,7 +122,8 @@ export function getRequiredLabwareDetailsFromLoadCommands(
         defUri = `${defUri}_${command.result.lidLabwareURI}`
       }
       if (acc.has(defUri)) {
-        acc.get(defUri)!.quantity += stackCount
+        // @ts-expect-error acc.has not accepted as TS type narrower
+        acc.get(defUri).quantity += stackCount
       }
       return acc
     }, labwareSetupItems) as ProtocolDetailMap

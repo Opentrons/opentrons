@@ -1,16 +1,30 @@
+import { useMemo } from 'react'
 import { BaseDeck } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
-
-import { getStandardDeckViewLayerBlockList, getWellFillFromLabwareId, getLabwareInfoByLiquidId, getTopMostLabwareInSlots, getModulesInSlots } from './utils'
+import {
+  getLabwareDefinitionsByURIForProtocol,
+  getStackedItemsOnStartingDeck,
+} from '/app/transformations/commands'
+import { 
+  getLabwareInfoByLiquidId, 
+  getStandardDeckViewLayerBlockList, 
+  getWellFillFromLabwareId, 
+} from './utils'
 
 import type { ComponentProps } from 'react'
+import type { LabwareOnDeck } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
+  ModuleModel,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import type {
+  ModuleInStack,
+  LabwareInStack,
+} from '/app/transformations/commands'
 
 export * from './utils'
 export * from './types'
@@ -22,7 +36,20 @@ interface ProtocolDeckProps {
 
 export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
   const { protocolAnalysis, baseDeckProps } = props
-
+  const startingDeck = useMemo(
+    () =>
+      getStackedItemsOnStartingDeck(
+        protocolAnalysis?.commands ?? [],
+        protocolAnalysis?.labware ?? [],
+        protocolAnalysis?.modules ?? []
+      ),
+    [protocolAnalysis]
+  )
+  const labwareDefinitionsByURI = useMemo(
+    () =>
+      getLabwareDefinitionsByURIForProtocol(protocolAnalysis?.commands ?? []),
+    [protocolAnalysis]
+  )
   if (protocolAnalysis == null || (protocolAnalysis?.errors ?? []).length > 0)
     return null
 
@@ -30,15 +57,36 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
   const labwareByLiquidId = getLabwareInfoByLiquidId(protocolAnalysis.commands)
 
-  const modulesInSlots = getModulesInSlots(protocolAnalysis)
-  const modulesOnDeck = modulesInSlots.map(
-    ({ moduleModel, moduleLocation, nestedLabwareId, nestedLabwareDef }) => {
-      return {
-        moduleModel,
-        moduleLocation,
-        nestedLabwareDef,
+  const modulesOnDeck = Object.entries(startingDeck)
+  .filter(([key, value]) =>
+    value.some(
+      (stackItem): stackItem is ModuleInStack => 'moduleId' in stackItem
+    )
+  )
+  .map(([slotName, stackedItems]) => {
+    const stackOnModule = stackedItems.filter(
+      (stackedItem): stackedItem is LabwareInStack =>
+        'labwareId' in stackedItem
+    )
+    const module = stackedItems.find(
+      (item): item is ModuleInStack => 'moduleId' in item
+    )
+    const topLabwareInfo = stackOnModule != null ? stackOnModule[0] : null
+    const topLabwareDefinition =
+      topLabwareInfo != null && 'labwareId' in topLabwareInfo
+        ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
+        : null
+    const topLabwareId =
+      topLabwareInfo != null && 'labwareId' in topLabwareInfo
+        ? topLabwareInfo.labwareId
+        : ''
+
+    return {
+        moduleModel: module?.moduleModel ?? ('' as ModuleModel),
+        moduleLocation: { slotName: module?.moduleSlotName ?? slotName },
+        nestedLabwareDef: topLabwareDefinition,
         nestedLabwareWellFill: getWellFillFromLabwareId(
-          nestedLabwareId ?? '',
+          topLabwareId ?? '',
           protocolAnalysis.liquids,
           labwareByLiquidId
         ),
@@ -46,20 +94,39 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
     }
   )
 
-  // this function gets the top most labware
-  const topMostLabwareInSlots = getTopMostLabwareInSlots(protocolAnalysis)
-  const labwareOnDeck = topMostLabwareInSlots.map(
-    ({ labwareId, labwareDef, location }) => {
-      return {
-        definition: labwareDef,
-        labwareLocation: location,
+  const labwareOnDeck: Array<LabwareOnDeck | null> = Object.entries(
+    startingDeck
+  )
+    .filter(
+      ([key, value]) =>
+        key !== 'offDeck' &&
+        !value.some(
+          (stackItem): stackItem is ModuleInStack => 'moduleId' in stackItem
+        )
+    )
+    .map(([slotName, stackedItems]) => {
+      const topLabwareInfo = stackedItems[0]
+      const topLabwareDefinition =
+        topLabwareInfo != null && 'labwareId' in topLabwareInfo
+          ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
+          : null
+      const topLabwareId =
+        topLabwareInfo != null && 'labwareId' in topLabwareInfo
+          ? topLabwareInfo.labwareId
+          : ''
+      return topLabwareDefinition != null ? {
+        definition: topLabwareDefinition,
+        labwareLocation: { slotName },
         wellFill: getWellFillFromLabwareId(
-          labwareId,
+          topLabwareId,
           protocolAnalysis.liquids,
           labwareByLiquidId
         ),
-      }
+      } : null
     }
+  )
+  const labwareOnDeckFiltered: LabwareOnDeck[] = labwareOnDeck.filter(
+    (labware): labware is LabwareOnDeck => labware != null
   )
 
   return (
@@ -67,7 +134,7 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
       deckConfig={deckConfig}
       deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
       robotType={robotType}
-      labwareOnDeck={labwareOnDeck}
+      labwareOnDeck={labwareOnDeckFiltered}
       modulesOnDeck={modulesOnDeck}
       {...{
         svgProps: {

@@ -14,16 +14,15 @@ import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/comm
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '@opentrons/components'
 import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
+import type { CompletedProtocolAnalysis, ModuleModel } from '@opentrons/shared-data'
 import type {
+  LabwareInStack,
   ModuleInStack,
   StackedItemsOnDeck,
   StackItem,
 } from '/app/transformations/commands'
 
 interface LabwareMapViewProps {
-  attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]
   handleLabwareClick: Dispatch<SetStateAction<[string, StackItem[]] | null>>
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   startingDeck: StackedItemsOnDeck
@@ -33,7 +32,6 @@ interface LabwareMapViewProps {
 export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
   const {
     handleLabwareClick,
-    attachedProtocolModuleMatches,
     mostRecentAnalysis,
     startingDeck,
     labwareByLiquidId,
@@ -44,18 +42,20 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       getLabwareDefinitionsByURIForProtocol(mostRecentAnalysis?.commands ?? []),
     [mostRecentAnalysis]
   )
-  const modulesOnDeck = attachedProtocolModuleMatches.map(module => {
-    const { moduleDef, slotName } = module
-    const slotAndStackOnModule = Object.entries(
-      startingDeck
-    ).find(([key, value]) =>
+  const modulesOnDeck = Object.entries(startingDeck)
+    .filter(([key, value]) =>
       value.some(
-        (stackItem): stackItem is ModuleInStack =>
-          'moduleId' in stackItem && stackItem.moduleId === module.moduleId
+        (stackItem): stackItem is ModuleInStack => 'moduleId' in stackItem
       )
     )
-    const slotDisplayName = slotAndStackOnModule?.[0]
-    const stackOnModule = slotAndStackOnModule?.[1]
+    .map(([slotName, stackedItems]) => {
+      const stackOnModule = stackedItems.filter(
+        (stackedItem): stackedItem is LabwareInStack =>
+          'labwareId' in stackedItem
+      )
+      const module = stackedItems.find(
+        (item): item is ModuleInStack => 'moduleId' in item
+      )
 
     const topLabwareInfo = stackOnModule != null ? stackOnModule[0] : null
     const topLabwareDefinition =
@@ -73,16 +73,16 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       labwareByLiquidId
     )
     return {
-      moduleModel: moduleDef.model,
-      moduleLocation: { slotName },
+      moduleModel: module?.moduleModel ?? ('' as ModuleModel),
+      moduleLocation: { slotName: module?.moduleSlotName ?? slotName },
       innerProps:
-        moduleDef.model === THERMOCYCLER_MODULE_V1
+        module?.moduleModel === THERMOCYCLER_MODULE_V1
           ? { lidMotorState: 'open' }
           : {},
       nestedLabwareDef: topLabwareDefinition,
       nestedLabwareWellFill: wellFill,
       onLabwareClick: () => {
-        handleLabwareClick([slotDisplayName ?? slotName, stackOnModule ?? []])
+        stackOnModule.length > 0 ? handleLabwareClick([slotName, stackOnModule]) : null
       },
       highlightLabware: true,
       moduleChildren: null,

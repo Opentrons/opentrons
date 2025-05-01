@@ -178,7 +178,6 @@ export function ProtocolSetupLabware({
             {showMapView ? (
               <LabwareMapView
                 mostRecentAnalysis={mostRecentAnalysis}
-                attachedProtocolModuleMatches={attachedProtocolModuleMatches}
                 startingDeck={startingDeck}
                 labwareByLiquidId={labwareByLiquidId}
                 handleLabwareClick={setSelectedLabwareStack}

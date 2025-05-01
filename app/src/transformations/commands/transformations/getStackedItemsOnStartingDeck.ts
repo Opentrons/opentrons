@@ -1,7 +1,5 @@
 import {
   FLEX_STACKER_MODULE_TYPE,
-  FlexStackerFillRunTimeCommand,
-  FlexStackerSetStoredLabwareRunTimeCommand,
   getCutoutDisplayName,
   getLabwareDefURI,
   getModuleType,
@@ -18,6 +16,8 @@ import { getLabwareDefinitionsByURIForProtocol } from './getLabwareDefinitionsBy
 
 import type {
   CutoutId,
+  FlexStackerFillRunTimeCommand,
+  FlexStackerSetStoredLabwareRunTimeCommand,
   LabwareDefinition2,
   LoadedLabware,
   LoadedModule,
@@ -318,7 +318,7 @@ export function getStackedItemsOnStartingDeck(
     )
     .reduce<StackedItemsOnDeck>((acc, command) => {
       if (command.result == null) return acc
-      let stackFromCommand: StackItem[] = []
+      const stackFromCommand: StackItem[] = []
       let location = ''
       const offDeckArray = Object.keys(acc).includes('offDeck')
         ? acc.offDeck
