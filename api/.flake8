@@ -63,3 +63,4 @@ per-file-ignores =
     tests/opentrons/util/test_async_helpers.py:ANN,D
     tests/opentrons/util/test_linal.py:ANN,D
     tests/opentrons/util/test_entrypoint_util.py:ANN,D
+    tests/interop/__pd_protocols__/*:D,F
