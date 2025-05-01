@@ -265,6 +265,9 @@ async def test_aspirate_implementation_with_prep(
                 pipette_id=pipette_id,
                 fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=50),
             ),
+            ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                pipette_id=pipette_id, ready_to_aspirate=True
+            ),
         ),
     )
 
