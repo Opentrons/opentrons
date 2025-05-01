@@ -107,6 +107,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     aspirateSubmergeYOffset,
     aspirateSubmergeZOffset,
     aspirateSubmergePositionReference,
+    aspirateSubmergeDelay,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
@@ -312,7 +313,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             errors.push(errorCreators.submergeBelowAspirate())
           }
 
-          const initialMoveToSourceWellCommand = [
+          const moveToSourceWellTopCommand = [
             curryCommandCreator(moveToWell, {
               pipetteId: args.pipette,
               labwareId: args.sourceLabware,
@@ -350,7 +351,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                 ]
               : []
           const preAspirateSubmergeCommands = [
-            ...initialMoveToSourceWellCommand,
+            ...moveToSourceWellTopCommand,
             ...voidDispenseAirGapCommand,
             ...liquidProbeCommand,
             ...configureForVolumeCommand,
@@ -363,6 +364,14 @@ export const transfer: CommandCreator<TransferArgs> = (
               wellName: sourceWell,
               wellLocation: aspirateSubmergeLocation,
             }),
+            ...(aspirateSubmergeDelay != null &&
+            aspirateSubmergeDelay.seconds > 0
+              ? [
+                  curryCommandCreator(delay, {
+                    seconds: aspirateSubmergeDelay.seconds,
+                  }),
+                ]
+              : []),
             curryCommandCreator(moveToWell, {
               pipetteId: args.pipette,
               labwareId: args.sourceLabware,
