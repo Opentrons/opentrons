@@ -98,6 +98,7 @@ export const featureFlagsAtom = atom(
     // reset all feature flags to false if turning off prerelease mode
     if (update.enablePrereleaseMode === false) {
       set(rawFeatureFlagsAtom, { ...DEFAULT_FEATURE_FLAG_STATE })
+      set(displayFeatureFlagsModalAtom, false)
     } else {
       set(rawFeatureFlagsAtom, {
         ...get(rawFeatureFlagsAtom),
