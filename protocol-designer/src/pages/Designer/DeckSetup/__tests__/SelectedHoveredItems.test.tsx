@@ -1,23 +1,22 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
+import { Module } from '@opentrons/components'
+import {
+  fixture24Tuberack,
+  FLEX_ROBOT_TYPE,
+  getAllDefinitions,
+  getDeckDefFromRobotType,
+  HEATERSHAKER_MODULE_V1,
+} from '@opentrons/shared-data'
 import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import {
-  FLEX_ROBOT_TYPE,
-  HEATERSHAKER_MODULE_V1,
-  fixture24Tuberack,
-  getDeckDefFromRobotType,
-  getAllLabwareDefs,
-} from '@opentrons/shared-data'
-import { Module } from '@opentrons/components'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { getDesignerTab } from '../../../../file-data/selectors'
+import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
+import { selectors } from '../../../../labware-ingred/selectors'
 import { LabwareOnDeck } from '../../../../organisms'
+import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { FixtureRender } from '../FixtureRender'
 import { SelectedHoveredItems } from '../SelectedHoveredItems'
-
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
@@ -35,10 +34,10 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof getAllLabwareDefs>()
+  const actual = await importOriginal<typeof getAllDefinitions>()
   return {
     ...actual,
-    getAllLabwareDefs: vi.fn(),
+    getAllDefinitions: vi.fn(),
   }
 })
 
@@ -59,7 +58,7 @@ describe('SelectedHoveredItems', () => {
       hoveredFixture: null,
       slotPosition: [0, 0, 0],
     }
-    vi.mocked(getAllLabwareDefs).mockReturnValue({
+    vi.mocked(getAllDefinitions).mockReturnValue({
       [mockAdapterURI]: {
         ...fixture24Tuberack,
         metadata: {
