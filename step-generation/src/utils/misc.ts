@@ -53,7 +53,6 @@ import type {
   LabwareEntity,
   LabwareTemporalProperties,
   LocationLiquidState,
-  ModuleTemporalProperties,
   PipetteEntity,
   RobotState,
   SourceAndDest,

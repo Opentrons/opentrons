@@ -137,7 +137,6 @@ export const DeckThumbnailDetails = (
           console.warn(`no slot ${slot} for labware ${labware.id}!`)
           return null
         }
-        console.log('hello', labware)
         return (
           <Fragment key={labware.id}>
             <LabwareOnDeck

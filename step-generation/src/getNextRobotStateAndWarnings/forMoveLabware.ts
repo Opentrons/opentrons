@@ -10,7 +10,7 @@ export function forMoveLabware(
   const { robotState } = robotStateAndWarnings
   const { modules, labware } = robotState
 
-  let newLocationStack = [labwareId]
+  const newLocationStack = [labwareId]
   if (newLocation === 'offDeck' || newLocation === 'systemLocation') {
     newLocationStack.push(newLocation)
   } else if ('moduleId' in newLocation) {

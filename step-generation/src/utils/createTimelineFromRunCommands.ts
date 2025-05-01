@@ -57,7 +57,7 @@ export function getResultingTimelineFrameFromRunCommands(
   const labwareLocations = commands.reduce<RobotState['labware']>(
     (acc, command) => {
       if (command.commandType === 'loadLabware' && command.result != null) {
-        let stack = [command.result.labwareId]
+        const stack = [command.result.labwareId]
         if (
           command.params.location === 'offDeck' ||
           command.params.location === 'systemLocation'
