@@ -14,7 +14,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { COLUMN_4_SLOTS } from './constants'
-import { getSlotInLocationStack, getTopLocationInStack } from './utils'
+import { getSlotInLocationStack } from './utils'
 
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
@@ -137,9 +137,8 @@ export function getNextTiprack(
   const is96Channel = pipetteEntity.spec.channels === 96
   const filteredSortedTipRackIdsFor96Channel = sortedTipracksIds.filter(
     tiprackId => {
-      const tipRackLocation = getTopLocationInStack(
-        robotState.labware[tiprackId].stack
-      )
+      const tipRackLocation = robotState.labware[tiprackId].stack[1]
+
       const adapterEntity = invariantContext.labwareEntities[tipRackLocation]
       const has96TiprackAdapterId =
         adapterEntity?.def.parameters.loadName ===
