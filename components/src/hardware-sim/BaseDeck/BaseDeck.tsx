@@ -1,5 +1,5 @@
-import partition from 'lodash/partition'
 import { Fragment } from 'react'
+import partition from 'lodash/partition'
 
 import {
   FLEX_STACKER_MODULE_TYPE,
@@ -91,7 +91,7 @@ export interface HopperLabwareProps {
 export const STACKER_MODULE_Y_OFFSET = -6
 export const STACKER_HOPPER_LABWARE_X_OFFSET = 178.5
 export const STACKER_HOPPER_LABWARE_Y_OFFSET = 7
-
+export const STACKER_DECK_VIEW_BOX_EXPANSION = 220
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
   robotType: RobotType
@@ -178,7 +178,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         deckDef.cornerOffsetFromOrigin[1]
       } ${
         stackerModules.length > 0
-          ? deckDef.dimensions[0] + 220
+          ? deckDef.dimensions[0] + STACKER_DECK_VIEW_BOX_EXPANSION
           : deckDef.dimensions[0]
       } ${deckDef.dimensions[1]}`}
       animated={animatedSVG}

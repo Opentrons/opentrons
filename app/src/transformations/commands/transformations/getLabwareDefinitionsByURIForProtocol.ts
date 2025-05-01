@@ -13,6 +13,11 @@ export interface LabwareDefinitionsByURI {
   [labwareDefURI: string]: LabwareDefinition2
 }
 
+const defPair = (
+  maybeDef?: LabwareDefinition2
+): Record<string, LabwareDefinition2> =>
+  maybeDef == null ? {} : { [getLabwareDefURI(maybeDef)]: maybeDef }
+
 export function getLabwareDefinitionsByURIForProtocol(
   commands: RunTimeCommand[]
 ): LabwareDefinitionsByURI {
@@ -22,39 +27,11 @@ export function getLabwareDefinitionsByURIForProtocol(
         command.commandType === 'flexStacker/setStoredLabware'
     )
     .reduce<LabwareDefinitionsByURI>((acc, command) => {
-      let labwareDefMap: LabwareDefinitionsByURI = {}
-      const primaryLabwareDefinition = command.result?.primaryLabwareDefinition
-      const lidLabwareDefinition = command.result?.lidLabwareDefinition
-      const adapterLabwareDefinition = command.result?.adapterLabwareDefinition
-      if (primaryLabwareDefinition == null) return acc
-      const primaryDefUri = getLabwareDefURI(primaryLabwareDefinition)
-      if (!Object.keys(acc).includes(primaryDefUri)) {
-        labwareDefMap = {
-          ...labwareDefMap,
-          [primaryDefUri]: primaryLabwareDefinition,
-        }
-      }
-      if (lidLabwareDefinition != null) {
-        const lidDefUri = getLabwareDefURI(lidLabwareDefinition)
-        if (!Object.keys(acc).includes(lidDefUri)) {
-          labwareDefMap = {
-            ...labwareDefMap,
-            [lidDefUri]: lidLabwareDefinition,
-          }
-        }
-      }
-      if (adapterLabwareDefinition != null) {
-        const adapterDefUri = getLabwareDefURI(adapterLabwareDefinition)
-        if (!Object.keys(acc).includes(adapterDefUri)) {
-          labwareDefMap = {
-            ...labwareDefMap,
-            [adapterDefUri]: adapterLabwareDefinition,
-          }
-        }
-      }
       return {
         ...acc,
-        ...labwareDefMap,
+        ...defPair(command.result?.primaryLabwareDefinition),
+        ...defPair(command.result?.lidLabwareDefinition ?? undefined),
+        ...defPair(command.result?.adapterLabwareDefinition ?? undefined),
       }
     }, {})
   return commands
