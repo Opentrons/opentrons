@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
-import { Flex, useOnClickOutside } from '@opentrons/components'
+import { useOnClickOutside } from '@opentrons/components'
 
 import {
   AssignLiquidsModal,
