@@ -265,7 +265,8 @@ export function generateChatPrompt(
   t: any,
   setCreateProtocolChatAtom: (
     args_0: CreatePrompt | ((prev: CreatePrompt) => CreatePrompt)
-  ) => void
+  ) => void,
+  isPdProtocolGenerationEnabled: boolean = false
 ): string {
   const protocolFormat = `- ${startCase(values.protocol_format)}`
 
@@ -394,8 +395,14 @@ export function generateChatPrompt(
     ),
     liquids: values.liquids,
     steps: Array.isArray(values.steps) ? values.steps : [values.steps],
-    fake: false,
-    fake_key: undefined,
+    fake:
+      !isPdProtocolGenerationEnabled &&
+      values.protocol_format === 'Protocol Designer',
+    fake_key:
+      !isPdProtocolGenerationEnabled &&
+      values.protocol_format === 'Protocol Designer'
+        ? 'pd serial diliution'
+        : undefined,
   })
 
   return prompt
