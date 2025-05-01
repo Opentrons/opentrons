@@ -371,24 +371,44 @@ export function Toast(props: ToastProps): JSX.Element {
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
             <LegacyStyledText css={TEXT_STYLE}>{message}</LegacyStyledText>
-            {linkText != null ? (
-              <Link
-                role="button"
-                onClick={() => {
-                  onLinkClick()
-                  onCloseHandler()
-                }}
-                css={TEXT_STYLE}
-                marginLeft={SPACING.spacing4}
-                marginRight={SPACING.spacing8}
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-              >
-                {linkText}
-              </Link>
-            ) : null}
           </Flex>
         </Flex>
       </Flex>
+
+      <Flex alignItems={ALIGN_CENTER}>
+      {linkText ? (
+        <Link
+          role="button"
+          onClick={() => {
+            console.log("link")
+            onLinkClick()
+            onCloseHandler()
+          }}
+          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+        >
+          <LegacyStyledText
+            color={COLORS.black90}
+            fontSize={
+              showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
+            }
+            fontWeight={
+              showODDStyle
+                ? TYPOGRAPHY.fontWeightSemiBold
+                : TYPOGRAPHY.fontWeightRegular
+            }
+            lineHeight={
+              showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+            }
+            textDecoration={
+              showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
+            }
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            whiteSpace={NO_WRAP}
+          >
+            {linkText}
+          </LegacyStyledText>
+        </Link>
+      ) : null}
       {closeText ? (
         <Link
           role="button"
@@ -420,6 +440,8 @@ export function Toast(props: ToastProps): JSX.Element {
           </LegacyStyledText>
         </Link>
       ) : null}
+
+      </Flex>
       {!closeText && closeButton ? (
         <Btn
           onClick={() => {
