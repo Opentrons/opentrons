@@ -2,24 +2,17 @@ import { ComponentProps } from 'react'
 import { css } from 'styled-components'
 
 import {
-  ALIGN_CENTER,
   BORDERS,
   Box,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
-  DISPLAY_NONE,
   Flex,
   LegacyStyledText,
-  RESPONSIVENESS,
   SPACING,
-  TEXT_TRANSFORM_UPPERCASE,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useRunCurrentState } from '@opentrons/react-api-client'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
-import { Divider } from '/app/atoms/structure'
 import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
 
 import { InterventionCommandMessage } from './InterventionCommandMessage'
@@ -56,7 +49,7 @@ export function StackerFillInterventionContent({
 }: StackerFillInterventionProps): JSX.Element | null {
   const { data: runCurrentState } = useRunCurrentState(run.id)
   const flexStacker =
-    runCurrentState?.data.flexStackerStates[command.params.moduleId] ?? null
+    runCurrentState?.data.flexStackerStates?.[command.params.moduleId] ?? null
 
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
@@ -78,11 +71,12 @@ export function StackerFillInterventionContent({
   if (
     moduleLocation?.slotName == null ||
     labwareName == null ||
-    flexStacker == null
+    flexStacker == null ||
+    labwareCount == null
   )
     return null
 
-  let infoProps: ComponentProps<typeof InterventionInfo> = {
+  const infoProps: ComponentProps<typeof InterventionInfo> = {
     layout: 'default',
     type: 'location-quantity',
     labwareName: labwareName ?? '',
@@ -108,7 +102,7 @@ export function StackerFillInterventionContent({
         </Flex>
         <Flex width="50%" css={STACKER_IMAGE_STYLE}>
           <Box margin="0 auto" width="100%">
-            {/* TODO (chb, 04-30-2025): Replace this with proper fill content*/}
+            {/* TODO (chb, 04-30-2025): Replace this with proper fill content */}
             <LegacyStyledText as="p">
               {'Replace me with a Stacker Fill image/animation'}
             </LegacyStyledText>

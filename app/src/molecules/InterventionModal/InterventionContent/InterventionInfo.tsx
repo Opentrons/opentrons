@@ -20,8 +20,6 @@ import {
 
 import { Divider } from '/app/atoms/structure/Divider'
 
-import { LegacyStyledText } from '../../../../../components/src'
-
 import type { DeckInfoLabelProps } from '@opentrons/components'
 
 export interface BaseInterventionInfo {
@@ -186,7 +184,7 @@ const buildLocColonLoc = (props: InterventionInfoProps): JSX.Element => {
 
 const buildLocQuantity = (props: InterventionInfoProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
-  let { currentLocationProps, quantity, type } = props
+  const { currentLocationProps, quantity, type } = props
   if (quantity != null) {
     return (
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>

@@ -2,18 +2,13 @@ import { ComponentProps } from 'react'
 import { css } from 'styled-components'
 
 import {
-  ALIGN_CENTER,
   BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
-  DISPLAY_NONE,
   Flex,
   LegacyStyledText,
-  RESPONSIVENESS,
   SPACING,
-  TEXT_TRANSFORM_UPPERCASE,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useRunCurrentState } from '@opentrons/react-api-client'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
@@ -54,7 +49,7 @@ export function StackerEmptyInterventionContent({
 }: StackerEmptyInterventionProps): JSX.Element | null {
   const { data: runCurrentState } = useRunCurrentState(run.id)
   const flexStacker =
-    runCurrentState?.data.flexStackerStates[command.params.moduleId] ?? null
+    runCurrentState?.data.flexStackerStates?.[command.params.moduleId] ?? null
 
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
@@ -76,7 +71,7 @@ export function StackerEmptyInterventionContent({
   )
     return null
 
-  let infoProps: ComponentProps<typeof InterventionInfo> = {
+  const infoProps: ComponentProps<typeof InterventionInfo> = {
     layout: 'default',
     type: 'location',
     labwareName: labwareName ?? '',
@@ -101,7 +96,7 @@ export function StackerEmptyInterventionContent({
         </Flex>
         <Flex width="50%" css={STACKER_IMAGE_STYLE}>
           <Box margin="0 auto" width="100%">
-            {/* TODO (chb, 04-30-2025): Replace this with proper empty content*/}
+            {/* TODO (chb, 04-30-2025): Replace this with proper empty content */}
             <LegacyStyledText as="p">
               {'Replace me with a Stacker Empty image/animation'}
             </LegacyStyledText>
