@@ -332,7 +332,7 @@ export const getDefaultPushOutVolume = (
   const tipVolume = Object.values(tiprackDefinition.wells)[0].totalLiquidVolume
   const lookupKey =
     transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
-      ? 'lowVolumeDefalt'
+      ? 'lowVolumeDefault'
       : 'default'
   const tipVolumeKey = `t${tipVolume}`
   return (
