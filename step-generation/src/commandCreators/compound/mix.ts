@@ -79,10 +79,10 @@ export const mixInPlaceUtil = (args: {
     const pythonArgs = [
       `repetitions=${times}`,
       `volume=${volume}`,
-      ...(aspirateDelaySeconds
+      ...(aspirateDelaySeconds != null && aspirateDelaySeconds > 0
         ? [`aspirate_delay=${aspirateDelaySeconds}`]
         : []),
-      ...(dispenseDelaySeconds
+      ...(dispenseDelaySeconds != null && dispenseDelaySeconds > 0
         ? [`dispense_delay=${dispenseDelaySeconds}`]
         : []),
 
