@@ -398,37 +398,37 @@ export function getLocationStackTopToBottom(
   return stack
 }
 
-export function getTopmostLabwareOnModuleFromStack(
+export const getTopmostLabwareOnModuleFromStack = (
   moduleId: string,
   labware: LabwareOnDeck[]
-): string {
+): string => {
   return labware
     .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
     .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
 }
 
-export function getFullStackFromLabwaresOnDeck(
+export const getFullStackFromLabwaresOnDeck = (
   labwareOnDeck: LabwareOnDeck[],
   slot: DeckSlotId
-): string[] {
+): string[] => {
   return labwareOnDeck
     .filter(lw => lw.stack.includes(slot))
     .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
 }
 
-export function getModuleIdFromStack(
+export const getModuleIdFromStack = (
   stack: string[],
   modulesById: InitialDeckSetup['modules'] | ModuleEntities
-): string | null {
+): string | null => {
   return stack.find(id => modulesById[id] != null) ?? null
 }
 
-export function getLabwareIdAfterModuleIdInStack(
+export const getLabwareIdAfterModuleIdInStack = (
   moduleId: string,
   labware: {
     [labwareId: string]: LabwareOnDeck
   }
-): string | null {
+): string | null => {
   const matchingLabware = Object.values(labware).find(lw =>
     lw.stack.includes(moduleId)
   )
