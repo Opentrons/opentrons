@@ -1845,6 +1845,29 @@ def test_air_gap_uses_air_gap(
     decoy.verify(mock_instrument_core.air_gap_in_place(10, 11))
 
 
+def test_air_gap_in_place(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """It should air gap in place when in_place=True."""
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate()).then_return(11)
+    monkeypatch.setattr(subject, "move_to", None)  # pipette should not move
+
+    subject.air_gap(volume=10, in_place=True)
+
+    decoy.verify(mock_instrument_core.air_gap_in_place(10, 11))
+
+    # Should not allow height if in_place=True is specified.
+    with pytest.raises(ValueError):
+        subject.air_gap(volume=10, height=2, in_place=True)
+    # height=0 is also not allowed when in_place=True.
+    with pytest.raises(ValueError):
+        subject.air_gap(volume=10, height=0, in_place=True)
+
+
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 def test_transfer_liquid_raises_for_invalid_locations(
     decoy: Decoy,

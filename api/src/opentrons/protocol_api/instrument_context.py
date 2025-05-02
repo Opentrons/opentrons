@@ -844,7 +844,10 @@ class InstrumentContext(publisher.CommandPublisher):
     @publisher.publish(command=cmds.air_gap)
     @requires_version(2, 0)
     def air_gap(
-        self, volume: Optional[float] = None, height: Optional[float] = None
+        self,
+        volume: Optional[float] = None,
+        height: Optional[float] = None,
+        in_place: Optional[bool] = None,
     ) -> InstrumentContext:
         """
         Draw air into the pipette's tip at the current well.
@@ -858,6 +861,11 @@ class InstrumentContext(publisher.CommandPublisher):
         :param height: The height, in mm, to move above the current well before creating
                        the air gap. The default is 5 mm above the current well.
         :type height: float
+
+        :param in_place: Air gap at the pipette's current position, without moving to
+                         some height above the well. If ``in_place`` is specified,
+                         ``height`` must be unset.
+        :type in_place: bool
 
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
 
@@ -882,17 +890,29 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.22
             No longer implemented as an aspirate.
+        .. versionchanged:: 2.24
+            Added the ``in_place`` option.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
+        if in_place:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="in_place",
+                    until_version="2.24",
+                    current_version=f"{self._api_version}",
+                )
+            if height is not None:
+                raise ValueError("height must be unset if air gapping in_place")
+        else:
+            if height is None:
+                height = 5
+            loc = self._protocol_core.get_last_location()
+            if not loc or not loc.labware.is_well:
+                raise RuntimeError("No previous Well cached to perform air gap")
+            target = loc.labware.as_well().top(height)
+            self.move_to(target, publish=False)
 
-        if height is None:
-            height = 5
-        loc = self._protocol_core.get_last_location()
-        if not loc or not loc.labware.is_well:
-            raise RuntimeError("No previous Well cached to perform air gap")
-        target = loc.labware.as_well().top(height)
-        self.move_to(target, publish=False)
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
             self._core.prepare_to_aspirate()
             c_vol = self._core.get_available_volume() if volume is None else volume
