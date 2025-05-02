@@ -414,9 +414,13 @@ def run(ctx: ProtocolContext) -> None:
         dest = dest_wells_by_volume[ul]
         if test_class:
             if len(dest) > len(source):
-                test_pipette.distribute_with_liquid_class(
-                    test_class, ul, source, dest, new_tip="always"
-                )
+                num_dispense_per_aspirate = ceil(len(dest) / len(source))
+                split_ul = ul / num_dispense_per_aspirate
+                for src_well in source:
+                    dest_wells = [dest.pop(0) for _ in range(num_dispense_per_aspirate)]
+                    test_pipette.distribute_with_liquid_class(
+                        test_class, split_ul, src_well, dest_wells, new_tip="once"
+                    )
             else:
                 test_pipette.transfer_with_liquid_class(
                     test_class, ul, source, dest, new_tip="always"
