@@ -2,6 +2,7 @@ site_name: Opentrons Python Protocol API
 nav:
   - Welcome: index.md
   - Tutorial: tutorial.md
+  - Versioning: versioning.md
   - API Reference: api-reference.md
 theme: material
 
