@@ -2,6 +2,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type {
@@ -14,8 +15,10 @@ import type {
   TCDeactivateLidCreateCommand,
   TCOpenLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
+  UnsafeFlexStackerCloseLatchCreateCommand,
+  UnsafeFlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule, FlexStackerModule } from '/app/redux/modules/types'
 
 export type ModulePrepCommandsType =
   | TemperatureModuleDeactivateCreateCommand
@@ -27,6 +30,8 @@ export type ModulePrepCommandsType =
   | HeaterShakerCloseLatchCreateCommand
   | TCOpenLidCreateCommand
   | TCCloseLidCreateCommand
+  | UnsafeFlexStackerCloseLatchCreateCommand
+  | UnsafeFlexStackerPrepareShuttleCreateCommand
 
 //  todo(jr, 9/15/23): refactor this to be more readable
 export function getModulePrepCommands(
@@ -83,4 +88,19 @@ export function getModulePrepCommands(
   }
 
   return modulePrepCommands
+}
+
+export function getFlexStackerPrepCommands(
+  module: FlexStackerModule
+): ModulePrepCommandsType[] {
+  return [
+    {
+      commandType: 'unsafe/flexStacker/closeLatch',
+      params: { moduleId: module.id },
+    },
+    {
+      commandType: 'unsafe/flexStacker/prepareShuttle',
+      params: { moduleId: module.id },
+    },
+  ]
 }

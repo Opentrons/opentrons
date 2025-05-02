@@ -28,7 +28,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { getModulePrepCommands } from '/app/local-resources/modules'
+import { getModulePrepCommands, getFlexStackerPrepCommands } from '/app/local-resources/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -68,15 +68,16 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
     refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
   })
   const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name != null ? localRobot.name : ''
+  const robotName: string = localRobot?.name ?? ''
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
 
   return (
     <>
-      {attachedProtocolModuleMatches.map(module => {
-        // filter out the magnetic block here, because it is handled by the SetupFixturesList
-        if (module.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE) return null
+      {attachedProtocolModuleMatches
+      // filter out the magnetic block here, because it is handled by the SetupFixturesList
+      .filter(module => module.moduleDef.moduleType !== MAGNETIC_BLOCK_TYPE)
+      .map(module => {
         const moduleFixtures = getCutoutFixturesForModuleModel(
           module.moduleDef.model,
           deckDef
@@ -159,6 +160,17 @@ function ModuleTableItem({
       makeSnackbar(t('attach_module') as string)
     }
   }
+  
+  const homeStacker = () : void => {
+    if (module.attachedModuleMatch != null && module.attachedModuleMatch.moduleType === FLEX_STACKER_MODULE_TYPE) {
+      chainLiveCommands(
+        getFlexStackerPrepCommands(module.attachedModuleMatch),
+        true
+      ).catch((e: Error) => {
+        setPrepCommandErrorMessage(e.message)
+      })
+    }
+  }
 
   const isNonConnectingModule = NON_CONNECTING_MODULE_TYPES.includes(
     module.moduleDef.moduleType
@@ -224,8 +236,9 @@ function ModuleTableItem({
         <SmallButton
           buttonCategory="rounded"
           buttonText={t('home_stacker')}
-          onClick={() => {}}
-        />)
+          onClick={homeStacker}
+        />
+      )
      } else {
         moduleStatus = (
           <Chip
