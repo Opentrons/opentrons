@@ -48,7 +48,7 @@ LabwareCardField.args = {
     labwareDefURI: `${fixture96Plate.namespace}/${fixture96Plate.parameters.loadName}/${fixture96Plate.version}`,
     def: fixture96Plate as LabwareDefinition2,
     pythonName: 'mockPythonName',
-    slot: 'A1',
+    stack: ['mockId', 'A1'],
   },
   lidDisplayName: 'Opentrons Flex Tip Rack Lid',
 }

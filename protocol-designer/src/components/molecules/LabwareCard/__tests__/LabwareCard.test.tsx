@@ -37,7 +37,7 @@ describe('LabwareCard', () => {
       labware: {
         id: 'labwareId',
         pythonName: 'mockPythonName',
-        slot: 'A1',
+        stack: ['labwareId', 'A1'],
         labwareDefURI: 'mockuri',
         def: fixture96Plate as LabwareDefinition2,
       },
