@@ -197,7 +197,7 @@ class GeometryView:
             (
                 self._get_highest_z_from_labware_data(lw_data)
                 for lw_data in self._labware.get_all()
-                if lw_data.location != OFF_DECK_LOCATION
+                if lw_data.location not in [OFF_DECK_LOCATION, SYSTEM_LOCATION]
                 and not self._labware.get_labware_by_lid_id(lw_data.id)
             ),
             default=0.0,
@@ -875,6 +875,13 @@ class GeometryView:
             raise errors.LabwareNotOnDeckError(
                 f"Labware {labware_id} does not have a slot associated with it"
                 f" since it is no longer on the deck."
+            )
+        else:
+            _LOG.error(
+                f"Unhandled location type in get_ancestor_slot_name: {labware.location}"
+            )
+            raise errors.InvalidLabwarePositionError(
+                f"Cannot get ancestor slot of {self._labware.get_display_name(labware_id)} with location {labware.location}"
             )
 
         return slot_name
