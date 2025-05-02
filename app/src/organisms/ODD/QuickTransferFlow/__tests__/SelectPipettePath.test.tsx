@@ -53,7 +53,7 @@ describe('SelectPipettePath', () => {
     screen.getByText('Single transfers')
   })
 
-  it('should render sinle transfer when transfer is 1:n', () => {
+  it('should render single transfer when transfer is 1:n', () => {
     props.state.sourceWells = ['A1']
     props.state.destinationWells = ['A1', 'A2']
     render(props)
@@ -61,7 +61,7 @@ describe('SelectPipettePath', () => {
     screen.getByText('Multi-dispense')
   })
 
-  it('should render sinle transfer when transfer is n:1', () => {
+  it('should render single transfer when transfer is n:1', () => {
     props.state.sourceWells = ['A1', 'A2']
     props.state.destinationWells = ['A1']
     render(props)
@@ -69,7 +69,7 @@ describe('SelectPipettePath', () => {
     screen.getByText('Multi-aspirate')
   })
 
-  it('should call mock function when tappin exit button', () => {
+  it('should call mock function when tapping exit button', () => {
     render(props)
     fireEvent.click(screen.getByText('Exit'))
     expect(props.exitButtonProps.onClick).toHaveBeenCalled()

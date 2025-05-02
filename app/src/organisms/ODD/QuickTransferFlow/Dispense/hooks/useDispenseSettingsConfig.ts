@@ -7,6 +7,8 @@ import {
 
 import { useToaster } from '/app/organisms/ToasterOven'
 
+import { DISPENSE_SETTING_OPTIONS as SETTING_OPTIONS } from '../../constants'
+
 import type {
   DispenseSettingOption,
   QuickTransferSummaryState,
@@ -65,15 +67,19 @@ export function useDispenseSettingsConfig({
         setSelectedSetting('dispense_tip_position')
       },
     },
-    // ToDo replace dummy configs for submerge
     {
       option: 'dispense_submerge',
       copy: t('submerge'),
-      value: 'dummy Submerge',
-      enabled: false,
+      value:
+        state.submergeDispense !== undefined
+          ? t('submerge_value', {
+              speed: state.submergeDispense.speed,
+              position: state.submergeDispense.positionFromBottom,
+            })
+          : '',
+      enabled: true,
       onClick: () => {
-        // (kk: 04/07/2025)ToDo add submerge setting
-        // setSelectedSetting('submerge')
+        setSelectedSetting(SETTING_OPTIONS.DISPENSE_SUBMERGE)
       },
     },
     {
