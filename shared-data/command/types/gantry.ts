@@ -129,6 +129,7 @@ export interface MoveToWellParams {
   wellLocation?: WellLocation
   minimumZHeight?: number
   forceDirect?: boolean
+  speed?: number
 }
 
 interface MoveToCoordinatesParams {
