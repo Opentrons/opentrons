@@ -59,6 +59,7 @@ export enum SetupContent {
   AddStep = 'Add Step',
   NestDeepWell = 'NEST 96 Deep Well Plate 2mL',
   Save = 'Save',
+  SaveLiquid = 'Save liquid',
 }
 
 export enum SetupLocators {
@@ -562,7 +563,7 @@ export const SetupSteps = {
     call: () => {
       cy.get('input[name="volume"]').type(volume, { force: true })
       cy.contains('button', SetupContent.Save).click()
-      cy.contains('button', 'Save liquid').click({ force: true })
+      cy.contains('button', SetupContent.SaveLiquid).click({ force: true })
     },
   }),
 
