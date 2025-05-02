@@ -562,7 +562,7 @@ export const SetupSteps = {
     call: () => {
       cy.get('input[name="volume"]').type(volume, { force: true })
       cy.contains('button', SetupContent.Save).click()
-      cy.contains('button', 'Done').click({ force: true })
+      cy.contains('button', 'Save liquid').click({ force: true })
     },
   }),
 

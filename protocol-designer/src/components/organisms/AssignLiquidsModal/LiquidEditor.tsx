@@ -65,7 +65,7 @@ interface LiquidContainerProps {
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
 }
 
-export function LiquidContainer({
+export function LiquidEditor({
   showBadFormState,
   setShowBadFormState,
 }: LiquidContainerProps): JSX.Element {

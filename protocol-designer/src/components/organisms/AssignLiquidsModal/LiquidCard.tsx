@@ -27,7 +27,7 @@ import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 
 import type { SelectedContainerId } from '../../../labware-ingred/reducers'
-import type { LiquidInfo } from './LiquidContainer'
+import type { LiquidInfo } from './LiquidEditor'
 
 interface LiquidCardProps {
   info: LiquidInfo

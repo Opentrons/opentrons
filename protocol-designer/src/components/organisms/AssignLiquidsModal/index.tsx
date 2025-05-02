@@ -36,7 +36,7 @@ import { LiquidButton } from '../../molecules'
 import { getSlotForLabware } from '../../organisms/utils'
 import { SelectableLabware } from '../Labware/SelectableLabware'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
-import { LiquidContainer } from './LiquidContainer'
+import { LiquidEditor } from './LiquidEditor'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
@@ -173,7 +173,7 @@ export function AssignLiquidsModal(
             />
           </Box>
           <Flex width="100%">
-            <LiquidContainer
+            <LiquidEditor
               showBadFormState={showBadFormState}
               setShowBadFormState={setShowBadFormState}
             />
