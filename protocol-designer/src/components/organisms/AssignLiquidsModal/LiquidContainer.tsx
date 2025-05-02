@@ -53,7 +53,7 @@ interface ValidFormValues {
   volume: string
 }
 
-interface ToolboxFormValues {
+interface LiquidFormValues {
   selectedLiquidId?: string | null
   volume?: string | null
 }
@@ -120,7 +120,7 @@ export function LiquidContainer({
     setValue,
     reset,
     formState,
-  } = useForm<ToolboxFormValues>({
+  } = useForm<LiquidFormValues>({
     defaultValues: getInitialValues(),
   })
 
@@ -161,7 +161,7 @@ export function LiquidContainer({
     setValue('volume', masked)
   }
 
-  const handleSaveForm = (values: ToolboxFormValues): void => {
+  const handleSaveForm = (values: LiquidFormValues): void => {
     const volume = Number(values.volume)
     const { selectedLiquidId } = values
     console.assert(
@@ -198,7 +198,7 @@ export function LiquidContainer({
     setShowBadFormState(false)
   }
 
-  const handleSaveSubmit: (values: ToolboxFormValues) => void = values => {
+  const handleSaveSubmit: (values: LiquidFormValues) => void = values => {
     handleSaveForm(values)
     reset()
   }
