@@ -169,7 +169,7 @@ def load_tip_racks(
             if "4" not in s
         ]
         ctx.load_adapter(rack_ln, SLOTS["tips_diluent"]).load_labware(
-            "opentrons_flex_96_filtertiprack_200ul"
+            "opentrons_flex_96_filtertiprack_1000ul"
         )
     else:
         pipette.tip_racks = [
@@ -179,7 +179,7 @@ def load_tip_racks(
         assert diluent_pipette is not None, "diluent_pipette exists when it should not"
         diluent_pipette.tip_racks = [
             ctx.load_labware(
-                "opentrons_flex_96_filtertiprack_200ul", SLOTS["tips_diluent"]
+                "opentrons_flex_96_filtertiprack_1000ul", SLOTS["tips_diluent"]
             )
         ]
     inaccessible_racks = [
