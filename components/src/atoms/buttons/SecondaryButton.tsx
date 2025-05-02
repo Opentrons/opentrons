@@ -32,7 +32,9 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   background-color: ${COLORS.transparent};
-  ${TYPOGRAPHY.pSemiBold}
+  font-size: ${TYPOGRAPHY.fontSizeH3};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  line-height: ${TYPOGRAPHY.lineHeight20};
 
   &:hover,
   &:focus {
