@@ -14,7 +14,6 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_END,
-  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
   StyledText,
