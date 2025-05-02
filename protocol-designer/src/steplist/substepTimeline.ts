@@ -216,7 +216,6 @@ export const substepTimelineSingleChannel = (
           ? 'wasteChuteRightAdapterNoCover'
           : trashCutoutFixture
 
-        console.log(moveToAddressableAreaCommand)
         const cutoutId = getCutoutIdByAddressableArea(
           moveToAddressableAreaCommand?.params
             .addressableAreaName as AddressableAreaName,
