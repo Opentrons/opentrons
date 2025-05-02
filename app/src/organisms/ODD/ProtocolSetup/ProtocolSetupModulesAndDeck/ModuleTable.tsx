@@ -46,6 +46,7 @@ import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
+import { el } from 'date-fns/locale'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
@@ -205,10 +206,40 @@ function ModuleTableItem({
       </LegacyStyledText>
     )
   } else if (
+    isModuleReady && module.attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE) {
+     if (module.attachedModuleMatch.data.platformState === 'missing') {
+        moduleStatus = (
+          <Chip
+            text={t('missing_shuttle')}
+            type="warning"
+            background={false}
+            iconName='ot-alert'
+          />
+        )
+     } else if (
+        module.attachedModuleMatch.data.platformState !== 'extended' ||
+        module.attachedModuleMatch.data.latchState !== 'closed'
+     ) {
+      moduleStatus = (
+        <SmallButton
+          buttonCategory="rounded"
+          buttonText={t('home_stacker')}
+          onClick={() => {}}
+        />)
+     } else {
+        moduleStatus = (
+          <Chip
+            text={t('module_connected')}
+            type="success"
+            background={false}
+            iconName="connection-status"
+          />
+        )
+      }
+  } else if (
     isModuleReady &&
     (module.attachedModuleMatch?.moduleOffset?.last_modified != null ||
-      module.attachedModuleMatch?.moduleType === ABSORBANCE_READER_TYPE ||
-      module.attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE)
+      module.attachedModuleMatch?.moduleType === ABSORBANCE_READER_TYPE)
   ) {
     moduleStatus = (
       <Chip
