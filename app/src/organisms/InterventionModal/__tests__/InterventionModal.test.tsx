@@ -11,13 +11,13 @@ import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 
 import { InterventionModal, useInterventionModal } from '..'
 import {
+  mockEmptyStackerCommand,
+  mockFillStackerCommand,
   mockMoveLabwareCommandFromModule,
   mockMoveLabwareCommandFromSlot,
   mockPauseCommandWithoutStartTime,
   mockPauseCommandWithStartTime,
   truncatedCommandMessage,
-  mockEmptyStackerCommand,
-  mockFillStackerCommand,
 } from '../__fixtures__'
 
 import type { ComponentProps } from 'react'

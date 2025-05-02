@@ -36,8 +36,9 @@ import { useRobotType } from '/app/redux-resources/robots'
 import { getIsOnDevice } from '/app/redux/config'
 
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
-import { StackerEmptyInterventionContent } from './StackerEmptyInterventionContent'
 import { PauseInterventionContent } from './PauseInterventionContent'
+import { StackerEmptyInterventionContent } from './StackerEmptyInterventionContent'
+import { StackerFillInterventionContent } from './StackerFillInterventionContent'
 import { isInterventionCommand } from './utils'
 
 import type { ReactNode } from 'react'
@@ -46,7 +47,6 @@ import type {
   RunData,
   RunStatus,
 } from '@opentrons/api-client'
-import { StackerFillInterventionContent } from './StackerFillInterventionContent'
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 

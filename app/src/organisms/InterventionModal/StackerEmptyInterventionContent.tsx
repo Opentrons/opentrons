@@ -1,4 +1,6 @@
-import type { RunData } from '@opentrons/api-client'
+import { ComponentProps } from 'react'
+import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -15,15 +17,17 @@ import {
 } from '@opentrons/components'
 import { useRunCurrentState } from '@opentrons/react-api-client'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+
+import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
+
+import { InterventionCommandMessage } from './InterventionCommandMessage'
+
+import type { RunData } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   FlexStackerEmptyRunTimeCommand,
   ModuleLocation,
 } from '@opentrons/shared-data'
-import { css } from 'styled-components'
-import { InterventionCommandMessage } from './InterventionCommandMessage'
-import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
-import { ComponentProps } from 'react'
 
 const STACKER_IMAGE_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -65,8 +69,6 @@ export function StackerEmptyInterventionContent({
   const moduleLocation =
     run?.modules.find(m => m.id === command.params.moduleId)?.location ?? null
 
-
-
   if (
     moduleLocation?.slotName == null ||
     labwareName == null ||
@@ -74,11 +76,11 @@ export function StackerEmptyInterventionContent({
   )
     return null
 
-  let infoProps : ComponentProps<typeof InterventionInfo> = {
-    layout:"default", 
-    type:"location", 
-    labwareName:labwareName ?? "",
-    currentLocationProps:{deckLabel:stackerNameFormat(moduleLocation)}
+  let infoProps: ComponentProps<typeof InterventionInfo> = {
+    layout: 'default',
+    type: 'location',
+    labwareName: labwareName ?? '',
+    currentLocationProps: { deckLabel: stackerNameFormat(moduleLocation) },
   }
   return (
     <Flex
@@ -92,7 +94,7 @@ export function StackerEmptyInterventionContent({
           gridGap={SPACING.spacing12}
           width="50%"
         >
-          <InterventionInfo {...infoProps}/>
+          <InterventionInfo {...infoProps} />
           <InterventionCommandMessage
             commandMessage={command.params.message ?? null}
           />

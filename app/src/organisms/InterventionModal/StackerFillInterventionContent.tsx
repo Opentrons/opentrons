@@ -1,4 +1,6 @@
-import type { RunData } from '@opentrons/api-client'
+import { ComponentProps } from 'react'
+import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -16,16 +18,18 @@ import {
 } from '@opentrons/components'
 import { useRunCurrentState } from '@opentrons/react-api-client'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+
+import { Divider } from '/app/atoms/structure'
+import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
+
+import { InterventionCommandMessage } from './InterventionCommandMessage'
+
+import type { RunData } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   FlexStackerFillRunTimeCommand,
   ModuleLocation,
 } from '@opentrons/shared-data'
-import { Divider } from '/app/atoms/structure'
-import { css } from 'styled-components'
-import { InterventionCommandMessage } from './InterventionCommandMessage'
-import { ComponentProps } from 'react'
-import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
 
 const STACKER_IMAGE_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -78,13 +82,13 @@ export function StackerFillInterventionContent({
   )
     return null
 
-  let infoProps : ComponentProps<typeof InterventionInfo> = {
-      layout:"default", 
-      type:"location-quantity", 
-      labwareName:labwareName ?? "",
-      currentLocationProps:{deckLabel:stackerNameFormat(moduleLocation)},
-      quantity:labwareCount
-    }
+  let infoProps: ComponentProps<typeof InterventionInfo> = {
+    layout: 'default',
+    type: 'location-quantity',
+    labwareName: labwareName ?? '',
+    currentLocationProps: { deckLabel: stackerNameFormat(moduleLocation) },
+    quantity: labwareCount,
+  }
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
