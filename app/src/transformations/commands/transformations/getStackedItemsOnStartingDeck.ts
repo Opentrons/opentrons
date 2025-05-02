@@ -11,7 +11,8 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { getLiquidsByIdForLabware } from '../../analysis'
+import { getLiquidsByIdForLabware } from '/app/transformations/analysis'
+
 import { getLabwareDefinitionsByURIForProtocol } from './getLabwareDefinitionsByURIForProtocol'
 
 import type {
@@ -30,7 +31,7 @@ import type {
   OnCutoutFixtureLocationSequenceComponent,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
+import type { LabwareByLiquidId } from './getLabwareInfoByLiquidId'
 
 export interface LabwareInStack {
   definitionUri: string
@@ -463,9 +464,9 @@ export function getLabwareOnDeck(
   [slotName: string]: LabwareInStack[]
 } {
   // @ts-expect-error this filter should act as a type narrower
-  const labwareOnDeckEntries: [string, LabwareInStack[]][] = Object.entries(
-    itemsOnDeck
-  ).filter(
+  const labwareOnDeckEntries: Array<
+    [string, LabwareInStack[]]
+  > = Object.entries(itemsOnDeck).filter(
     ([key, value]) =>
       key !== 'offDeck' &&
       value.every(

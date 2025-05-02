@@ -35,7 +35,6 @@ import {
 
 import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
-import { getLabwareInfoByLiquidId } from '/app/organisms/ProtocolDeck'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -44,6 +43,7 @@ import {
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
 import {
+  getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
   getModuleFromStack,
   getStackedItemsOnStartingDeck,
@@ -60,9 +60,12 @@ import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
-import type { LabwareInStack, StackItem } from '/app/transformations/commands'
+import type {
+  LabwareByLiquidId,
+  LabwareInStack,
+  StackItem,
+} from '/app/transformations/commands'
 import type { SetupScreens } from '../types'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000

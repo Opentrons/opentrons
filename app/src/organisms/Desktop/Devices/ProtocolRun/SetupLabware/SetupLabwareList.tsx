@@ -9,8 +9,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { getLabwareInfoByLiquidId } from '/app/organisms/ProtocolDeck'
 import {
+  getLabwareInfoByLiquidId,
   getStackedItemsOnStartingDeck,
   getStacksWithLabware,
 } from '/app/transformations/commands'
@@ -23,7 +23,7 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
-import type { LabwareInStack, StackItem } from '/app/transformations/commands'
+import type { StackItem } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 interface SetupLabwareListProps {

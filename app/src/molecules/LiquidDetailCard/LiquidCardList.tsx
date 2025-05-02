@@ -10,7 +10,7 @@ import { LiquidDetailCard } from './LiquidDetailCard'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareDefinition2, ParsedLiquid } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
+import type { LabwareByLiquidId } from '/app/transformations/commands'
 
 interface LiquidCardListProps {
   selectedLabwareDefinition: LabwareDefinition2

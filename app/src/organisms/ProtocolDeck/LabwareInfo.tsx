@@ -1,14 +1,19 @@
 import { css } from 'styled-components'
+
 import {
-  COLORS,
-  Box, Flex, Text,
   ALIGN_FLEX_START,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING, TYPOGRAPHY, RobotCoordsForeignDiv
+  RobotCoordsForeignDiv,
+  SPACING,
+  Text,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'

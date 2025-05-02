@@ -23,8 +23,8 @@ import type {
   CompletedProtocolAnalysis,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
 import type {
+  LabwareByLiquidId,
   StackedItemsOnDeck,
   StackItem,
 } from '/app/transformations/commands'
@@ -75,11 +75,12 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
             : {},
         nestedLabwareDef: topLabwareDefinition,
         nestedLabwareWellFill: wellFill,
-        onLabwareClick: () => {
+        onLabwareClick:
           topLabwareInfo != null
-            ? handleLabwareClick([slotName, stackedItems])
-            : null
-        },
+            ? () => {
+                handleLabwareClick([slotName, stackedItems])
+              }
+            : undefined,
         highlightLabware: true,
         stacked: isLabwareStacked,
       }

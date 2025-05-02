@@ -49,12 +49,11 @@ import type {
   LabwareDefinition2,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type {
+  LabwareByLiquidId,
   LabwareDefinitionsByURI,
   LabwareInStack,
-  ModuleInStack,
   StackItem,
 } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'

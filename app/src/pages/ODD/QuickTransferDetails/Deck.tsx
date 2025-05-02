@@ -5,7 +5,8 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import {ProtocolDeck} from '/app/organisms/ProtocolDeck' 
+
+import { ProtocolDeck } from '/app/organisms/ProtocolDeck'
 
 export const Deck = (props: { transferId: string }): JSX.Element => {
   const { data: transferData } = useProtocolQuery(props.transferId)

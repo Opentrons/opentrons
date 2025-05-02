@@ -8,6 +8,7 @@ import {
 
 import {
   getLabwareDefinitionsByURIForProtocol,
+  getLabwareInfoByLiquidId,
   getLabwareOnDeck,
   getModuleFromStack,
   getStackedItemsOnStartingDeck,
@@ -16,7 +17,6 @@ import {
 } from '/app/transformations/commands'
 
 import {
-  getLabwareInfoByLiquidId,
   getStandardDeckViewLayerBlockList,
   getWellFillFromLabwareId,
 } from './utils'
@@ -30,7 +30,6 @@ import type {
 } from '@opentrons/shared-data'
 
 export * from './utils'
-export * from './types'
 interface ProtocolDeckProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
   /** extra props to pass through to BaseDeck component */

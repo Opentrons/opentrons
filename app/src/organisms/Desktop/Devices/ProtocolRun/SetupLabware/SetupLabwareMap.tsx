@@ -18,12 +18,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import {
-  getLabwareInfoByLiquidId,
-  getWellFillFromLabwareId,
-} from '/app/organisms/ProtocolDeck'
+import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
 import {
   getLabwareDefinitionsByURIForProtocol,
+  getLabwareInfoByLiquidId,
   getLabwareOnDeck,
   getModuleFromStack,
   getStackedItemsOnStartingDeck,

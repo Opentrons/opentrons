@@ -1,6 +1,2 @@
-export * from './getInitiallyLoadedLabwareByAdapter'
-export * from './getModulesInSlots'
-export * from './getLabwareInSlots'
 export * from './getStandardDeckViewLayerBlockList'
-export * from './getLabwareInfoByLiquidId'
 export * from './getWellFillFromLabwareId'

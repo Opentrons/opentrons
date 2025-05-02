@@ -16,10 +16,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getModuleDef2,
   getModuleDisplayName,
   MAGNETIC_BLOCK_V1,
-  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { useRunHasStarted } from '/app/resources/runs'

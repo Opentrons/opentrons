@@ -27,8 +27,11 @@ import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/comm
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { LabwareInStack, StackItem } from '/app/transformations/commands'
-import type { LabwareByLiquidId } from '/app/organisms/ProtocolDeck'
+import type {
+  LabwareByLiquidId,
+  LabwareInStack,
+  StackItem,
+} from '/app/transformations/commands'
 
 const LabwareThumbnail = styled.svg`
   transform: scale(1, -1);
