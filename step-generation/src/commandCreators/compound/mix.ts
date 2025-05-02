@@ -14,6 +14,7 @@ import {
   formatPyStr,
   formatPyWellLocation,
   getIsSafePipetteMovement,
+  getSlotInLocationStack,
   indentPyLines,
   reduceCommandCreators,
 } from '../../utils'
@@ -361,7 +362,9 @@ export const mix: CommandCreator<MixArgs> = (
     }
   }
 
-  const initialLabwareSlot = prevRobotState.labware[labware]?.slot
+  const initialLabwareSlot = getSlotInLocationStack(
+    prevRobotState.labware[labware]?.stack
+  )
   const hasWasteChute =
     Object.keys(invariantContext.wasteChuteEntities).length > 0
 

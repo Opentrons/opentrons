@@ -11,7 +11,7 @@ describe('labwareModuleCompatibility', () => {
     const labwareOnDeck = {
       labwareDefURI: 'fixture/fixture_96_plate',
       id: 'abcef123',
-      slot: '3',
+      stack: ['abcef123', '3'],
       def: fixture_96_plate as LabwareDefinition2,
       pythonName: 'mockPythonName',
     }

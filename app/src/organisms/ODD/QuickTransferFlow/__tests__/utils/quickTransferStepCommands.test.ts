@@ -71,13 +71,13 @@ const mockRobotState: TimelineFrame = {
   },
   labware: {
     mockSourceLabware: {
-      slot: 'A1',
+      stack: ['mockSourceLabware', 'A1'],
     },
     mockDestLabware: {
-      slot: 'C2',
+      stack: ['mockDestLabware', 'C2'],
     },
     mockTiprack: {
-      slot: 'B1',
+      stack: ['mockTiprack', 'B1'],
     },
   },
   modules: {},

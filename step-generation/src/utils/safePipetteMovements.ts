@@ -8,6 +8,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
+
 import type {
   AddressableArea,
   CoordinateTuple,
@@ -152,51 +154,28 @@ const getHighestZInSlot = (
   const { moduleEntities, labwareEntities } = invariantContext
 
   let totalHeight: number = 0
+  const largestLabwareStack = getFullStackFromLabwares(labware, slotId)
   const moduleInSlot = Object.keys(modules).find(
     moduleId => modules[moduleId].slot === slotId
   )
-  // module in slot
-  if (moduleInSlot != null) {
+
+  //  if slot has labware, includes labware, adapters, and module
+  if (largestLabwareStack != null) {
+    largestLabwareStack.forEach(item => {
+      if (modules[item] != null) {
+        totalHeight += getModuleHeightFromDeckDefinition(
+          moduleEntities[item].model
+        )
+      }
+      if (labware[item] != null) {
+        totalHeight += labwareEntities[item].def.dimensions.zDimension
+      }
+    })
+    // if slot only has module
+  } else if (moduleInSlot != null) {
     totalHeight += getModuleHeightFromDeckDefinition(
       moduleEntities[moduleInSlot].model
     )
-    const moduleDirectChildId = Object.keys(labware).find(
-      lwId => labware[lwId].slot === moduleInSlot
-    )
-    if (moduleDirectChildId != null) {
-      const moduleChildHeight =
-        labwareEntities[moduleDirectChildId].def.dimensions.zDimension
-      totalHeight += moduleChildHeight
-
-      // check if adapter is on module and has child
-      const moduleGrandchildId = Object.keys(labware).find(
-        lwId => labware[lwId].slot === moduleDirectChildId
-      )
-      if (moduleGrandchildId != null) {
-        const moduleGrandchildHeight =
-          labwareEntities[moduleGrandchildId].def.dimensions.zDimension
-        totalHeight += moduleGrandchildHeight
-      }
-    }
-  } else {
-    const labwareInSlotId = Object.keys(labware).find(
-      lwId => labware[lwId].slot === slotId
-    )
-    if (labwareInSlotId != null) {
-      const slotDirectChild = labwareEntities[labwareInSlotId]
-      const slotDirectChildHeight = slotDirectChild.def.dimensions.zDimension
-      totalHeight += slotDirectChildHeight
-
-      // check if adapter and has child
-      const slotGrandchildId = Object.keys(labware).find(
-        lwId => labware[lwId].slot === labwareInSlotId
-      )
-      if (slotGrandchildId != null) {
-        const slotGrandchildHeight =
-          labwareEntities[slotGrandchildId].def.dimensions.zDimension
-        totalHeight += slotGrandchildHeight
-      }
-    }
   }
   return totalHeight
 }
@@ -335,7 +314,7 @@ export const getIsSafePipetteMovement = (
   const pipetteHasTip = tipState.pipettes[pipetteId]
   // account for tip length if picking up tip
   const tipLength = pipetteHasTip ? tiprackTipLength ?? 0 : 0
-  const labwareSlot = labwareState[labwareId].slot
+  const labwareSlot = getSlotInLocationStack(labwareState[labwareId].stack)
   const addressableAreaOffset = getPositionFromSlotId(
     labwareSlot,
     deckDefinition

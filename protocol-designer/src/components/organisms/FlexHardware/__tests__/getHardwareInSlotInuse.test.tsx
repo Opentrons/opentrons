@@ -31,7 +31,7 @@ const mockSavedSteps: SavedStepFormState = {
   },
 }
 let mockLabware: LabwareOnDeck = {
-  slot: 'A3',
+  stack: ['mockLabwareId', 'A3'],
   id: 'mockLabwareId',
   pythonName: 'mockPythonName',
   labwareDefURI: 'mockURI',
@@ -66,7 +66,7 @@ describe('getHardwareInSlotInUse', () => {
   it('returns true when there is a matchingLabwareFor4thColumn in use', () => {
     mockLabware = {
       ...mockLabware,
-      slot: 'A4',
+      stack: ['mockLabwareId', 'A4'],
     }
     expect(getHardwareInSlotInUse(mockSavedSteps, mockLabware)).toStrictEqual({
       moduleId: null,

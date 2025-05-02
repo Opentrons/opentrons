@@ -113,8 +113,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
       drop: (item: DroppedItem) => {
         const droppedLabware = item
         if (droppedLabware.labwareOnDeck != null) {
-          const droppedSlot = droppedLabware.labwareOnDeck.slot
-          dispatch(moveDeckItem(droppedSlot, slotId))
+          dispatch(moveDeckItem(droppedLabware.labwareOnDeck.stack[1], slotId))
         }
       },
       hover: () => {

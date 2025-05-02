@@ -10,6 +10,7 @@ import {
 import {
   consolidate,
   distribute,
+  getSlotInLocationStack,
   getWasteChuteAddressableAreaNamePip,
   pythonImports,
   pythonMetadata,
@@ -76,7 +77,9 @@ export function createQuickTransferFile(
         loadName: def.parameters.loadName,
         namespace: def.namespace,
         version: def.version,
-        location: { slotName: initialRobotState.labware[id].slot },
+        location: {
+          slotName: getSlotInLocationStack(initialRobotState.labware[id].stack),
+        },
       },
     })
     return acc
@@ -88,7 +91,7 @@ export function createQuickTransferFile(
     const { def, id } = entity
     const isAdapter = def.allowedRoles?.includes('adapter')
     if (isAdapter) return acc
-    const location = initialRobotState.labware[id].slot
+    const location = initialRobotState.labware[id].stack[1]
     const isOnAdapter =
       loadAdapterCommands.find(
         command => command.params.labwareId === location

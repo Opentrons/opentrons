@@ -15,6 +15,7 @@ import {
   TYPOGRAPHY,
   WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
+import { getTopLocationInStack } from '@opentrons/step-generation'
 
 import { DND_TYPES } from '../../../../constants'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
@@ -73,13 +74,17 @@ export const LabwareControls = (
       canDrop: (item: DroppedItem) => {
         const draggedLabware = item?.labwareOnDeck
         const isDifferentSlot =
-          draggedLabware && draggedLabware.slot !== labwareOnDeck.slot
+          draggedLabware &&
+          getTopLocationInStack(draggedLabware.stack) !==
+            getTopLocationInStack(labwareOnDeck.stack)
         return isDifferentSlot && !swapBlocked
       },
       drop: (item: DroppedItem) => {
         const draggedLabware = item?.labwareOnDeck
         if (draggedLabware != null) {
-          dispatch(moveDeckItem(draggedLabware.slot, labwareOnDeck.slot))
+          dispatch(
+            moveDeckItem(draggedLabware.stack[1], labwareOnDeck.stack[1])
+          )
         }
       },
       hover: () => {
@@ -108,7 +113,9 @@ export const LabwareControls = (
   }, [draggedLabware])
 
   const isBeingDragged =
-    draggedLabware?.labwareOnDeck?.slot === labwareOnDeck.slot
+    draggedLabware?.labwareOnDeck?.stack != null &&
+    getTopLocationInStack(draggedLabware?.labwareOnDeck?.stack) ===
+      getTopLocationInStack(labwareOnDeck.stack)
 
   drag(drop(ref))
 
@@ -120,7 +127,9 @@ export const LabwareControls = (
     return null
   }
   const isLabwareSwapping =
-    draggedLabware?.labwareOnDeck?.slot !== labwareOnDeck.slot
+    draggedLabware?.labwareOnDeck?.stack != null &&
+    getTopLocationInStack(draggedLabware?.labwareOnDeck?.stack) !==
+      getTopLocationInStack(labwareOnDeck.stack)
   const [x, y] = slotPosition
   const width = labwareOnDeck.def.dimensions.xDimension
   const height = labwareOnDeck.def.dimensions.yDimension

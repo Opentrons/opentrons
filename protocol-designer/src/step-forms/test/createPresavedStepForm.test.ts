@@ -67,12 +67,12 @@ beforeEach(() => {
       labware: {
         labwareOnMagModule: {
           ...labwareOnMagModule,
-          slot: 'someMagneticModuleId',
+          stack: ['labwareOnMagModule', 'someMagneticModuleId', '1'],
         },
       },
       tipRack: {
         ...tipRack,
-        slot: '6',
+        stack: ['tipRack', '6'],
       },
       modules: {
         someMagneticModuleId: {
@@ -289,7 +289,7 @@ describe('createPresavedStepForm', () => {
       id: stepId,
       stepType: 'magnet',
       moduleId: 'someMagneticModuleId',
-      engageHeight: EXAMPLE_ENGAGE_HEIGHT,
+      engageHeight: null,
       magnetAction: 'engage',
       // Default values
       stepName: 'magnet',

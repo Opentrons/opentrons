@@ -19,6 +19,7 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getSlotInLocationStack,
   pipetteAdjacentHeaterShakerWhileShaking,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
@@ -146,7 +147,7 @@ mockPythonName.dispense(
       robotStateWithTip = {
         ...robotStateWithTip,
         labware: {
-          [SOURCE_LABWARE]: { slot: 'A4' },
+          [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'A4'] },
         },
       }
       const result = dispense(params, invariantContext, robotStateWithTip)
@@ -291,7 +292,9 @@ mockPythonName.dispense(
       when(getIsHeaterShakerEastWestWithLatchOpen)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          )
         )
         .thenReturn(true)
 
@@ -305,7 +308,9 @@ mockPythonName.dispense(
       when(getIsHeaterShakerEastWestMultiChannelPipette)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           expect.anything()
         )
         .thenReturn(true)
@@ -320,7 +325,9 @@ mockPythonName.dispense(
       when(pipetteAdjacentHeaterShakerWhileShaking)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           OT2_ROBOT_TYPE
         )
         .thenReturn(true)
@@ -335,7 +342,9 @@ mockPythonName.dispense(
       when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           expect.anything(),
           expect.anything()
         )

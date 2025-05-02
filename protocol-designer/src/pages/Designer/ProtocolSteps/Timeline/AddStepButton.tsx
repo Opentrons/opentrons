@@ -33,6 +33,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import {
   CLOSE_UNSAVED_STEP_FORM,
@@ -101,11 +102,11 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
   const labwareAtLastState = lastTimelineFrame?.labware ?? {}
   const isLabwarePresentForLiquidHandling = Object.entries(
     labwareAtLastState
-  ).some(([labwareId, { slot }]) => {
+  ).some(([labwareId, { stack }]) => {
     const labwareDef = labwareEntities[labwareId]?.def
     return (
       labwareDef != null &&
-      slot !== OFFDECK &&
+      getSlotInLocationStack(stack) !== OFFDECK &&
       !getIsTiprack(labwareDef) &&
       !getIsAdapterFromDef(labwareDef)
     )

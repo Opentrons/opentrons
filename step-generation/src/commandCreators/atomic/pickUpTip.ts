@@ -5,7 +5,11 @@ import {
   pipettingIntoColumn4,
   possiblePipetteCollision,
 } from '../../errorCreators'
-import { getIsSafePipetteMovement, uuid } from '../../utils'
+import {
+  getIsSafePipetteMovement,
+  getSlotInLocationStack,
+  uuid,
+} from '../../utils'
 
 import type {
   NozzleConfigurationStyle,
@@ -46,11 +50,15 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
     errors.push(possiblePipetteCollision())
   }
 
-  const tiprackSlot = prevRobotState.labware[labwareId].slot
+  const tiprackSlot = getSlotInLocationStack(
+    prevRobotState.labware[labwareId].stack
+  )
   if (COLUMN_4_SLOTS.includes(tiprackSlot)) {
     errors.push(pipettingIntoColumn4({ typeOfStep: 'pick up tip' }))
   } else if (prevRobotState.labware[tiprackSlot] != null) {
-    const adapterSlot = prevRobotState.labware[tiprackSlot].slot
+    const adapterSlot = getSlotInLocationStack(
+      prevRobotState.labware[tiprackSlot].stack
+    )
     if (COLUMN_4_SLOTS.includes(adapterSlot)) {
       errors.push(pipettingIntoColumn4({ typeOfStep: 'pick up tip' }))
     }
