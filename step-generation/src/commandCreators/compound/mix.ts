@@ -85,9 +85,6 @@ export const mixInPlaceUtil = (args: {
       ...(dispenseDelaySeconds != null && dispenseDelaySeconds > 0
         ? [`dispense_delay=${dispenseDelaySeconds}`]
         : []),
-
-      // TODO (nd, 04/09/2025): uncomment next line once PAPI supports new `final_push_out` arg
-      // `final_push_out=${finalPushOut}`
     ]
     return {
       commands: [],
