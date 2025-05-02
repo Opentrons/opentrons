@@ -11,11 +11,16 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
+import { SelectLabwareModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { getRobotType } from '../../../../file-data/selectors'
 import { createCustomLabwareDef } from '../../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
+import {
+  selectLabware,
+  selectNestedLabware,
+} from '../../../../labware-ingred/actions'
 import { selectors } from '../../../../labware-ingred/selectors'
 import {
   getInitialDeckSetup,
@@ -23,38 +28,31 @@ import {
   getPipetteEntities,
 } from '../../../../step-forms/selectors'
 import { getHas96Channel } from '../../../../utils'
-import { LabwareTools } from '../LabwareTools'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 
-vi.mock('../../../../utils')
 vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../feature-flags/selectors')
-vi.mock('../../../../file-data/selectors')
+vi.mock('../../../../utils')
+vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../labware-defs/selectors')
 vi.mock('../../../../labware-defs/actions')
-vi.mock('../../../../labware-ingred/selectors')
+vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../labware-ingred/actions')
-
-const render = (props: ComponentProps<typeof LabwareTools>) => {
-  return renderWithProviders(<LabwareTools {...props} />, {
+const render = (props: ComponentProps<typeof SelectLabwareModal>) => {
+  return renderWithProviders(<SelectLabwareModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('LabwareTools', () => {
-  let props: ComponentProps<typeof LabwareTools>
+describe('SelectLabwareModal', () => {
+  let props: ComponentProps<typeof SelectLabwareModal>
 
   beforeEach(() => {
     props = {
       slot: 'D3',
-      setHoveredLabware: vi.fn(),
-      searchTerm: '',
-      setSearchTerm: vi.fn(),
-      areCategoriesExpanded: {},
-      setAreCategoriesExpanded: vi.fn(),
-      handleReset: vi.fn(),
+      onClose: vi.fn(),
+      onConfirm: vi.fn(),
     }
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
@@ -87,15 +85,18 @@ describe('LabwareTools', () => {
 
   it('renders an empty slot with all the labware options', () => {
     render(props)
-    screen.getByText('Add labware')
+    screen.getAllByText('Add labware')
     screen.getByText('Tube racks')
     screen.getByText('Well plates')
     screen.getByText('Reservoirs')
     screen.getByText('Aluminum blocks')
     screen.getByText('Adapters')
-    //  click and expand well plate accordion
-    fireEvent.click(screen.getAllByTestId('ListButton_noActive')[1])
-    expect(props.setAreCategoriesExpanded).toBeCalled()
+    //  click and expand reservoirs accordion
+    fireEvent.click(screen.getAllByTestId('ListButton_noActive')[3])
+    fireEvent.click(
+      screen.getByText('Opentrons Calibration Block - Short Side: Left')
+    )
+    expect(vi.mocked(selectLabware)).toHaveBeenCalled()
   })
   it('renders deck slot and selects an adapter and labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
@@ -109,7 +110,11 @@ describe('LabwareTools', () => {
     screen.getByText('Adapters')
     fireEvent.click(screen.getAllByTestId('ListButton_noActive')[4])
     //   set adapter
-    expect(props.setAreCategoriesExpanded).toBeCalled()
+    screen.getByText('Adapter compatible labware')
+    fireEvent.click(
+      screen.getByText('Fixture Corning 96 Well Plate 360 µL Flat')
+    )
+    expect(vi.mocked(selectNestedLabware)).toHaveBeenCalled()
   })
 
   it('renders the custom labware flow', () => {

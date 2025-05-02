@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import round from 'lodash/round'
 
@@ -169,6 +169,25 @@ export function DeckSetupContainer(
       })
     }
   }
+
+  //  zoom in already if you are exiting from adding liquids
+  useEffect(() => {
+    if (zoomIn.slot != null && zoomIn.slot !== 'offDeck') {
+      const zoomInSlotPosition = getPositionFromSlotId(
+        zoomIn.slot ?? '',
+        deckDef
+      )
+      if (zoomInSlotPosition != null) {
+        const zoomedInViewBox = zoomInOnCoordinate({
+          x: zoomInSlotPosition[0],
+          y: zoomInSlotPosition[1],
+
+          deckDef,
+        })
+        setViewBox(zoomedInViewBox)
+      }
+    }
+  }, [zoomIn])
 
   const _hasGen1MultichannelPipette = useMemo(
     () => getHasGen1MultiChannelPipette(activeDeckSetup.pipettes),

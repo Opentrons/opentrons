@@ -10,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   EmptySelectorButton,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
   InfoScreen,
   POSITION_FIXED,
@@ -87,7 +88,6 @@ export function DeckSetupToolbox(
     createdModuleForSlot,
     createdFixtureForSlots,
   } = getSlotInformation({ deckSetup, slot })
-
   const handleResetToolbox = (): void => {
     dispatch(
       editSlotInfo({
@@ -141,7 +141,7 @@ export function DeckSetupToolbox(
     handleResetToolbox()
   }
   const handleConfirm = (): void => {
-    handleClear()
+    handleClear(true)
     if (
       (slot === 'offDeck' && selectedLabwareDefUri != null) ||
       (selectedModuleModel == null &&
@@ -276,14 +276,14 @@ export function DeckSetupToolbox(
         confirmButtonText={t('done')}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          <Flex width="max-content">
+          <Flex width={FLEX_MAX_CONTENT}>
             <EmptySelectorButton
               textAlignment="left"
-              text={'Add labware'}
+              text={t('add_labware')}
               iconName="plus"
               onClick={() => {
                 if (slotFull) {
-                  makeSnackbar('no space on slot')
+                  makeSnackbar(t('no_space') as string)
                 } else {
                   setShowSelectLabwareModal(true)
                 }
@@ -292,29 +292,38 @@ export function DeckSetupToolbox(
           </Flex>
           {hasNoLabware ? (
             <InfoScreen
-              content="no labware added"
-              subContent="Select labware to add to slot"
+              content={t('no_labware_added')}
+              subContent={t('select_labware_to_add')}
             />
           ) : (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                color={COLORS.grey60}
-              >
-                Top of slot
-              </StyledText>
+              {createdNestedLabwareForSlot != null &&
+              createdLabwareForSlot != null ? (
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                >
+                  {t('top_slot')}
+                </StyledText>
+              ) : null}
               {createdNestedLabwareForSlot != null ? (
-                <LabwareCard labware={createdNestedLabwareForSlot} />
+                <LabwareCard
+                  labware={createdNestedLabwareForSlot}
+                  //  TODO: add logic for the lid display name
+                />
               ) : null}
               {createdLabwareForSlot != null ? (
                 <LabwareCard labware={createdLabwareForSlot} />
               ) : null}
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                color={COLORS.grey60}
-              >
-                Bottom of slot
-              </StyledText>
+              {createdNestedLabwareForSlot != null &&
+              createdLabwareForSlot != null ? (
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                >
+                  {t('bottom_slot')}
+                </StyledText>
+              ) : null}
             </Flex>
           )}
         </Flex>

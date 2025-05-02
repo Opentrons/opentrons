@@ -14,6 +14,7 @@ import {
   Flex,
   InputField,
   JUSTIFY_CENTER,
+  JUSTIFY_END,
   ListButton,
   ListButtonAccordion,
   ListButtonAccordionContainer,
@@ -52,7 +53,6 @@ import {
   CUSTOM_CATEGORY,
   ORDERED_CATEGORIES,
 } from '../../../pages/Designer/DeckSetup/constants'
-import { CategoryExpand } from '../../../pages/Designer/DeckSetup/DeckSetupToolbox'
 import {
   getLabwareCompatibleWithAdapter,
   getLabwareIsRecommended,
@@ -70,6 +70,7 @@ import { getMainPagePortalEl } from '../Portal'
 import type { ChangeEvent } from 'react'
 import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
+import type { CategoryExpand } from '../../../pages/Designer/DeckSetup/DeckSetupToolbox'
 import type { ModuleOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 
@@ -309,26 +310,27 @@ export function SelectLabwareModal(
               />
             </StyledLabel>
           </Flex>
-          <Flex justifyContent="end" gridGap={SPACING.spacing8}>
+          <Flex justifyContent={JUSTIFY_END} gridGap={SPACING.spacing8}>
             <SecondaryButton
               onClick={() => {
                 onClose()
                 handleResetLabwareTools()
               }}
             >
-              Cancel
+              {t('shared:cancel')}
             </SecondaryButton>
             <PrimaryButton
+              data-testid="SelectLabwareModal_confirm"
               onClick={() => {
                 if (hasNoLabware) {
-                  makeSnackbar('select labware before proceeding')
+                  makeSnackbar(t('select_before_proceeding') as string)
                 } else {
                   onConfirm()
                   handleResetLabwareTools()
                 }
               }}
             >
-              Add labware
+              {t('add_labware')}
             </PrimaryButton>
           </Flex>
         </Flex>
@@ -341,7 +343,7 @@ export function SelectLabwareModal(
             onChange={e => {
               setSearchTerm(e.target.value)
             }}
-            placeholder="Search for labware..."
+            placeholder={t('search_labware')}
             size="medium"
             leftIcon="search"
             showDeleteIcon
@@ -374,7 +376,7 @@ export function SelectLabwareModal(
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
           overflowY="auto"
-          height="284px"
+          maxHeight="15.5rem"
           paddingTop={SPACING.spacing8}
         >
           {filteredLabwareByCategory[CUSTOM_CATEGORY].length > 0 ? (

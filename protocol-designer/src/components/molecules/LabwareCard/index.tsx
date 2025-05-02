@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -16,21 +17,26 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { openIngredientSelector } from '../../../labware-ingred/actions'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 
 import type { LabwareOnDeck } from '../../../step-forms'
+import type { ThunkDispatch } from '../../../types'
 
 interface LabwareCardProps {
   labware: LabwareOnDeck
+  lidDisplayName?: string
 }
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
-  const { labware } = props
+  const { labware, lidDisplayName } = props
   const navigate = useNavigate()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
   const { def } = labware
   const displayName = def.metadata.displayName
   const isAdapter = def.allowedRoles?.includes('adapter')
+
   return (
     <ListItem type="default" backgroundColor={COLORS.grey30}>
       <Flex
@@ -49,18 +55,30 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           <OverflowBtn
             data-testid="LabwareCard_overflowBtn"
             onClick={() => {
-              console.log('wire up')
+              console.log('TODO: wire up')
             }}
           />
         </Flex>
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {displayName}
-        </StyledText>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing4}
+          maxWidth="95%"
+        >
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {displayName}
+          </StyledText>
+          {lidDisplayName != null ? (
+            <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+              {lidDisplayName}
+            </StyledText>
+          ) : null}
+        </Flex>
         {!isAdapter ? (
           <Btn
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
             css={LINK_BUTTON_STYLE}
             onClick={() => {
+              dispatch(openIngredientSelector(labware.id))
               navigate('/liquids')
             }}
           >
