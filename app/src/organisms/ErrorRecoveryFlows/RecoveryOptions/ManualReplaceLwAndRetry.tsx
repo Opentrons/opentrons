@@ -20,7 +20,7 @@ import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 export function ManualReplaceLwAndRetry(
   props: RecoveryContentProps
 ): JSX.Element {
-  const { recoveryMap, doorStatusUtils } = props
+  const { recoveryMap } = props
   const { step, route } = recoveryMap
   const {
     MANUAL_REPLACE_AND_RETRY,
