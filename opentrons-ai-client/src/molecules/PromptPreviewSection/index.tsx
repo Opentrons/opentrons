@@ -77,6 +77,7 @@ const StepTag = styled.div`
   border-radius: ${BORDERS.borderRadius4};
   padding: ${SPACING.spacing2} ${SPACING.spacing8};
   width: 100%;
+  font-size: 0.87rem;
 `
 
 // Component to handle multiline steps
