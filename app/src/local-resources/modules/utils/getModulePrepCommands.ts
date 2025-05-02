@@ -2,7 +2,6 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type {
@@ -18,7 +17,10 @@ import type {
   UnsafeFlexStackerCloseLatchCreateCommand,
   UnsafeFlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
-import type { AttachedModule, FlexStackerModule } from '/app/redux/modules/types'
+import type {
+  AttachedModule,
+  FlexStackerModule,
+} from '/app/redux/modules/types'
 
 export type ModulePrepCommandsType =
   | TemperatureModuleDeactivateCreateCommand

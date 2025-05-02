@@ -27,7 +27,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { getModulePrepCommands, getFlexStackerPrepCommands } from '/app/local-resources/modules'
+import {
+  getFlexStackerPrepCommands,
+  getModulePrepCommands,
+} from '/app/local-resources/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -73,41 +76,41 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
   return (
     <>
       {attachedProtocolModuleMatches
-      // filter out the magnetic block here, because it is a non-connected module
-      // and is handled by the fixture table
-      .filter(module => module.moduleDef.moduleType !== MAGNETIC_BLOCK_TYPE)
-      .map(module => {
-        const moduleFixtures = getCutoutFixturesForModuleModel(
-          module.moduleDef.model,
-          deckDef
-        )
-        const moduleCutoutIds = getCutoutIdsFromModuleSlotName(
-          module.slotName,
-          moduleFixtures,
-          deckDef
-        )
-        const conflictedFixture =
-          deckConfig?.find(
-            ({ cutoutId, cutoutFixtureId }) =>
-              moduleCutoutIds.includes(cutoutId) &&
-              !moduleFixtures.some(({ id }) => cutoutFixtureId === id) &&
-              module.attachedModuleMatch == null
-          ) ?? null
-        return (
-          <ModuleTableItem
-            key={module.moduleId}
-            module={module}
-            calibrationStatus={calibrationStatus}
-            chainLiveCommands={chainLiveCommands}
-            isLoading={isCommandMutationLoading}
-            prepCommandErrorMessage={prepCommandErrorMessage}
-            setPrepCommandErrorMessage={setPrepCommandErrorMessage}
-            conflictedFixture={conflictedFixture}
-            deckDef={deckDef}
-            robotName={robotName}
-          />
-        )
-      })}
+        // filter out the magnetic block here, because it is a non-connected module
+        // and is handled by the fixture table
+        .filter(module => module.moduleDef.moduleType !== MAGNETIC_BLOCK_TYPE)
+        .map(module => {
+          const moduleFixtures = getCutoutFixturesForModuleModel(
+            module.moduleDef.model,
+            deckDef
+          )
+          const moduleCutoutIds = getCutoutIdsFromModuleSlotName(
+            module.slotName,
+            moduleFixtures,
+            deckDef
+          )
+          const conflictedFixture =
+            deckConfig?.find(
+              ({ cutoutId, cutoutFixtureId }) =>
+                moduleCutoutIds.includes(cutoutId) &&
+                !moduleFixtures.some(({ id }) => cutoutFixtureId === id) &&
+                module.attachedModuleMatch == null
+            ) ?? null
+          return (
+            <ModuleTableItem
+              key={module.moduleId}
+              module={module}
+              calibrationStatus={calibrationStatus}
+              chainLiveCommands={chainLiveCommands}
+              isLoading={isCommandMutationLoading}
+              prepCommandErrorMessage={prepCommandErrorMessage}
+              setPrepCommandErrorMessage={setPrepCommandErrorMessage}
+              conflictedFixture={conflictedFixture}
+              deckDef={deckDef}
+              robotName={robotName}
+            />
+          )
+        })}
     </>
   )
 }
@@ -124,45 +127,46 @@ type ModuleStatusType =
 const getModuleDisplayStatus = (
   attachedModule: AttachedModule | null,
   conflictedFixture: CutoutConfig | null,
-  calibrationStatus: ProtocolCalibrationStatus,
+  calibrationStatus: ProtocolCalibrationStatus
 ): ModuleStatusType => {
   // deck location conflict
   if (conflictedFixture !== null) {
     return 'locationConflict'
   }
   // module is not connected
-  if (attachedModule === null) {
+  if (!!!attachedModule) {
     return 'disconnected'
-  }
-  // flex stacker module does not require calibration
-  // but needs to check for missing shuttle or home
-  if (attachedModule.moduleType === FLEX_STACKER_MODULE_TYPE) {
-    if (attachedModule.data.platformState === 'missing') {
-      return 'shuttleMissing'
+  } else {
+    // flex stacker module does not require calibration
+    // but needs to check for missing shuttle or home
+    if (attachedModule.moduleType === FLEX_STACKER_MODULE_TYPE) {
+      if (attachedModule.data.platformState === 'missing') {
+        return 'shuttleMissing'
+      }
+      if (
+        attachedModule.data.platformState !== 'extended' ||
+        attachedModule.data.latchState !== 'closed'
+      ) {
+        return 'needsHome'
+      }
+      return 'connected'
     }
+
+    // module is connected but instrument not calibrated
+    if (!calibrationStatus.complete) {
+      return 'calibrationBlocked'
+    }
+
+    // Absorbance reader module does not require calibration
     if (
-      attachedModule.data.platformState !== 'extended' ||
-      attachedModule.data.latchState !== 'closed'
+      !!!attachedModule.moduleOffset?.last_modified &&
+      attachedModule.moduleType !== ABSORBANCE_READER_TYPE
     ) {
-      return 'needsHome'
+      return 'needsCalibration'
     }
     return 'connected'
   }
-  
-  // module is connected but instrument not calibrated
-  if (!calibrationStatus.complete) {
-    console.log('calibrationStatus', calibrationStatus)
-    return 'calibrationBlocked'
-  }
-
-  // Absorbance reader module does not require calibration
-  if (attachedModule.moduleOffset?.last_modified === null && attachedModule.moduleType !== ABSORBANCE_READER_TYPE
-  ) {
-    return 'needsCalibration'
-  }
-  return 'connected'
 }
-
 
 interface ModuleTableItemProps {
   calibrationStatus: ProtocolCalibrationStatus
@@ -195,7 +199,7 @@ function ModuleTableItem({
   const { makeSnackbar } = useToaster()
 
   const handleCalibrate = (): void => {
-    if (module.attachedModuleMatch != null) {
+    if (module.attachedModuleMatch !== null) {
       if (getModuleTooHot(module.attachedModuleMatch)) {
         makeSnackbar(t('module_wizard_flows:module_too_hot') as string)
       } else {
@@ -211,9 +215,12 @@ function ModuleTableItem({
       makeSnackbar(t('attach_module') as string)
     }
   }
-  
-  const homeStacker = () : void => {
-    if (module.attachedModuleMatch != null && module.attachedModuleMatch.moduleType === FLEX_STACKER_MODULE_TYPE) {
+
+  const homeStacker = (): void => {
+    if (
+      module.attachedModuleMatch !== null &&
+      module.attachedModuleMatch.moduleType === FLEX_STACKER_MODULE_TYPE
+    ) {
       chainLiveCommands(
         getFlexStackerPrepCommands(module.attachedModuleMatch),
         // if the close latch command fails, we still want to home the shuttle
@@ -240,12 +247,21 @@ function ModuleTableItem({
     switch (displayStatus) {
       case 'locationConflict':
         return (
-          <Chip
-            text={t('location_conflict')}
-            type="warning"
-            background={false}
-            iconName="connection-status"
-          />
+          <>
+            <Chip
+              text={t('location_conflict')}
+              type="warning"
+              background={false}
+              iconName="connection-status"
+            />
+            <SmallButton
+              buttonCategory="rounded"
+              buttonText={t('resolve')}
+              onClick={() => {
+                setShowLocationConflictModal(true)
+              }}
+            />
+          </>
         )
       case 'connected':
         return (
@@ -291,20 +307,20 @@ function ModuleTableItem({
         )
       case 'disconnected':
       default:
-          return (
-            <Chip
-              text={t('module_disconnected')}
-              type="warning"
-              background={false}
-              iconName="connection-status"
-            />
-          )
+        return (
+          <Chip
+            text={t('module_disconnected')}
+            type="warning"
+            background={false}
+            iconName="connection-status"
+          />
+        )
     }
   }
 
   return (
     <>
-      {showModuleWizard && module.attachedModuleMatch != null ? (
+      {showModuleWizard && module.attachedModuleMatch !== null ? (
         <ModuleWizardFlows
           attachedModule={module.attachedModuleMatch}
           closeFlow={() => {
@@ -316,7 +332,7 @@ function ModuleTableItem({
           }
         />
       ) : null}
-      {showLocationConflictModal && conflictedFixture != null ? (
+      {showLocationConflictModal && conflictedFixture !== null ? (
         <LocationConflictModal
           onCloseClick={() => {
             setShowLocationConflictModal(false)
@@ -330,7 +346,9 @@ function ModuleTableItem({
       ) : null}
       <Flex
         alignItems={ALIGN_CENTER}
-        backgroundColor={displayStatus === 'connected' ? COLORS.green35 : COLORS.yellow35}
+        backgroundColor={
+          displayStatus === 'connected' ? COLORS.green35 : COLORS.yellow35
+        }
         borderRadius={BORDERS.borderRadius8}
         cursor="inherit"
         gridGap={SPACING.spacing24}
