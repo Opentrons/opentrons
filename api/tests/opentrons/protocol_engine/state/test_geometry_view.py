@@ -49,6 +49,7 @@ from opentrons_shared_data.labware import load_definition as load_labware_defini
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
+    SYSTEM_LOCATION,
     LabwareOffsetVector,
     DeckSlotLocation,
     ModuleLocation,
@@ -790,6 +791,7 @@ def test_get_all_obstacle_highest_z(
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
     falcon_tuberack_def: LabwareDefinition,
+    lid_stack_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
@@ -817,7 +819,13 @@ def test_get_all_obstacle_highest_z(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         offsetId="reservoir-offset-id",
     )
-
+    lid_stack_system = LoadedLabware(
+        id="lid-stack-id",
+        loadName="protocol_engine_lid_stack_object",
+        definitionUri="lid-stack-1",
+        location=SYSTEM_LOCATION,
+        offsetId=None,
+    )
     plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     off_deck_lw_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
@@ -829,6 +837,7 @@ def test_get_all_obstacle_highest_z(
     decoy.when(mock_labware_view.get("plate-id")).then_return(plate)
     decoy.when(mock_labware_view.get("off-deck-plate-id")).then_return(off_deck_lw)
     decoy.when(mock_labware_view.get("reservoir-id")).then_return(reservoir)
+    decoy.when(mock_labware_view.get("lid-stack-id")).then_return(lid_stack_system)
 
     decoy.when(mock_labware_view.get_definition("plate-id")).then_return(well_plate_def)
     decoy.when(mock_labware_view.get_definition("off-deck-plate-id")).then_return(
@@ -836,6 +845,9 @@ def test_get_all_obstacle_highest_z(
     )
     decoy.when(mock_labware_view.get_definition("reservoir-id")).then_return(
         reservoir_def
+    )
+    decoy.when(mock_labware_view.get_definition("lid-stack-id")).then_return(
+        lid_stack_def
     )
 
     decoy.when(mock_labware_view.get_labware_offset_vector("plate-id")).then_return(
