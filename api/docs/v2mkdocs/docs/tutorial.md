@@ -1,4 +1,7 @@
-:og:description: A guide to creating your first Python protocol and running it on an Opentrons robot.
+---
+title: Tutorial
+description: A guide to creating your first Python protocol and running it on an Opentrons robot.
+---
 
 # Tutorial
 
@@ -82,12 +85,12 @@ The `requirements` code block can appear before *or* after the `metadata` code b
 Whether you need a `requirements` block depends on your robot model and API version.
 
 - **Flex:** The `requirements` block is always required. And, the API version does not go in the `metadata` section. The API version belongs in the `requirements`. For example:
-
-      requirements = {"robotType": "Flex", "apiLevel": "2.16"}
-
+  ``` python
+  requirements = {"robotType": "Flex", "apiLevel": "2.16"}
+  ```
 - **OT-2:** The `requirements` block is optional, but including it is a recommended best practice, particularly if you’re using API version 2.15 or greater. If you do use it, remember to remove the API version from the `metadata`. For example:
   ``` python
-      requirements = {"robotType": "OT-2", "apiLevel": "2.16"}
+  requirements = {"robotType": "OT-2", "apiLevel": "2.16"}
   ```
 With the metadata and requirements defined, you can move on to creating the `run()` function for your protocol.
 
@@ -103,55 +106,43 @@ With the protocol context argument named and typed, you can start calling method
 
 #### Labware
 
-For serial dilution, you need to load a tip rack, reservoir, and 96-well plate on the deck of your Flex or OT-2. Loading labware is done with the `~.ProtocolContext.load_labware` method of the protocol context, which takes two arguments: the standard labware name as defined in the [Opentrons Labware Library](https://labware.opentrons.com/), and the position where you'll place the labware on the robot's deck.
+For serial dilution, you need to load a tip rack, reservoir, and 96-well plate on the deck of your Flex or OT-2. Loading labware is done with the [`load_labware`][opentrons.protocol_api.ProtocolContext.load_labware] method of the protocol context, which takes two arguments: the standard labware name as defined in the [Opentrons Labware Library](https://labware.opentrons.com/), and the position where you'll place the labware on the robot's deck.
 
-<div class="tabs">
+=== "Flex"
 
-<div class="tab">
+    Here’s how to load the labware on a Flex in slots D1, D2, and D3 (repeating the `def` statement from above to show proper indenting):
+    
+    ``` python
+    def run(protocol: protocol_api.ProtocolContext):
+        tips = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
+        reservoir = protocol.load_labware("nest_12_reservoir_15ml", "D2")
+        plate = protocol.load_labware("nest_96_wellplate_200ul_flat", "D3")
+    ```
+    
+    If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
+    
+    Now the robot will expect to find labware in a configuration that looks like this:
+    
+    ![Flex deck map with a tip rack in slot D1, reservoir in slot D2, and well plate in slot D3.](img/tutorial/initial-deck-map-flex.png)
 
-Flex
+=== "OT-2"
 
-Here’s how to load the labware on a Flex in slots D1, D2, and D3 (repeating the `def` statement from above to show proper indenting):
+    Here’s how to load the labware on an OT-2 in slots 1, 2, and 3 (repeating the `def` statement from above to show proper indenting):
+    
+    ``` python
+    def run(protocol: protocol_api.ProtocolContext):
+        tips = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+        reservoir = protocol.load_labware("nest_12_reservoir_15ml", 2)
+        plate = protocol.load_labware("nest_96_wellplate_200ul_flat", 3)
+    ```
+    
+    If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
+    
+    Now the robot will expect to find labware in a configuration that looks like this:
+    
+    ![OT-2 deck map with a tip rack in slot 1, reservoir in slot 2, and well plate in slot 3.](img/tutorial/initial-deck-map.png)
 
-``` python
-def run(protocol: protocol_api.ProtocolContext):
-    tips = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
-    reservoir = protocol.load_labware("nest_12_reservoir_15ml", "D2")
-    plate = protocol.load_labware("nest_96_wellplate_200ul_flat", "D3")
-```
-
-If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
-
-Now the robot will expect to find labware in a configuration that looks like this:
-
-<img src="../img/tutorial/initial-deck-map-flex.png" id="Initial Deck State – Flex" class="align-center" alt="Flex deck map with a tip rack in slot D1, reservoir in slot D2, and well plate in slot D3." />
-
-</div>
-
-<div class="tab">
-
-OT-2
-
-Here’s how to load the labware on an OT-2 in slots 1, 2, and 3 (repeating the `def` statement from above to show proper indenting):
-
-``` python
-def run(protocol: protocol_api.ProtocolContext):
-    tips = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
-    reservoir = protocol.load_labware("nest_12_reservoir_15ml", 2)
-    plate = protocol.load_labware("nest_96_wellplate_200ul_flat", 3)
-```
-
-If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
-
-Now the robot will expect to find labware in a configuration that looks like this:
-
-<img src="../img/tutorial/initial-deck-map.png" id="Initial Deck State – OT-2" class="align-center" alt="OT-2 deck map with a tip rack in slot 1, reservoir in slot 2, and well plate in slot 3." />
-
-</div>
-
-</div>
-
-You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in [Protocol Designer](https://designer.opentrons.com/). If you want to identify liquids, see [Labeling Liquids in Wells](https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-wells). (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
+You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in [Protocol Designer](https://designer.opentrons.com/). If you want to identify liquids, see [Labeling liquids in wells](labware.md#labeling-liquids-in-wells). (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
 
 #### Trash Bin
 
@@ -159,13 +150,13 @@ Flex and OT-2 both come with a trash bin for disposing used tips.
 
 The OT-2 trash bin is fixed in slot 12. Since it can't go anywhere else on the deck, you don't need to write any code to tell the API where it is. Skip ahead to the Pipettes section below.
 
-Flex lets you put a `trash bin <configure-trash-bin>` in multiple locations on the deck. You can even have more than one trash bin, or none at all (if you use the `waste chute <configure-waste-chute>` instead, or if your protocol never trashes any tips). For serial dilution, you'll need to dispose used tips, so you also need to tell the API where the trash container is located on your robot. Loading a trash bin on Flex is done with the `.load_trash_bin` method, which takes one argument: its location. Here's how to load the trash in slot A3:
+Flex lets you put a [trash bin](deck-slots.md#trash-bin) in multiple locations on the deck. You can even have more than one trash bin, or none at all (if you use the [waste chute](deck-slots.md#waste-chute) instead, or if your protocol never trashes any tips). For serial dilution, you'll need to dispose used tips, so you also need to tell the API where the trash container is located on your robot. Loading a trash bin on Flex is done with the `.load_trash_bin` method, which takes one argument: its location. Here's how to load the trash in slot A3:
 
     trash = protocol.load_trash_bin("A3")
 
 #### Pipettes
 
-Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the `.load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its `standard pipette name <new-pipette-models>`. Here’s how to load the pipette in the left mount and instantiate it as a variable named `left_pipette`:
+Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the `load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its `standard pipette name <new-pipette-models>`. Here’s how to load the pipette in the left mount and instantiate it as a variable named `left_pipette`:
 
 ``` python
 # Flex

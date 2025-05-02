@@ -24,6 +24,7 @@ plugins:
               - "public"
               - "!^__"
             heading_level: 3
+            autolink: true
   - autorefs
   - macros
 
@@ -31,6 +32,8 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+  - toc:
+      permalink: true
       
 extra:
   apiLevel: 2.23
