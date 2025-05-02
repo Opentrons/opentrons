@@ -2038,11 +2038,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -2122,7 +2122,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -2202,7 +2202,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
