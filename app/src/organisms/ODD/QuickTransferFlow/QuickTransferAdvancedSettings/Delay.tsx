@@ -95,7 +95,7 @@ export function Delay(props: DelayProps): JSX.Element {
         trackEventWithRobotSerial({
           name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
           properties: {
-            settting: `Delay_${kind}`,
+            setting: `Delay_${kind}`,
           },
         })
         onBack()
@@ -116,7 +116,7 @@ export function Delay(props: DelayProps): JSX.Element {
         trackEventWithRobotSerial({
           name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
           properties: {
-            settting: `Delay_${kind}`,
+            setting: `Delay_${kind}`,
           },
         })
       }
