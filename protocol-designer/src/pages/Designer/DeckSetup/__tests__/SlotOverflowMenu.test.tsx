@@ -127,8 +127,6 @@ describe('SlotOverflowMenu', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Edit labware' }))
     expect(props.addEquipment).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Rename labware' }))
-    screen.getByText('mock EditNickNameModal')
     fireEvent.click(screen.getByRole('button', { name: 'Add liquid' }))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()

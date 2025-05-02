@@ -294,19 +294,6 @@ export function SlotOverflowMenu(
             {hasNoItem ? t('add_labware') : t('edit_labware')}
           </StyledText>
         </MenuItem>
-        {canRenameLabwareAndEditLiquids ? (
-          <MenuItem
-            onClick={(e: MouseEvent) => {
-              setShowNickNameModal(true)
-              e.preventDefault()
-              e.stopPropagation()
-            }}
-          >
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('rename_lab')}
-            </StyledText>
-          </MenuItem>
-        ) : null}
         <MenuItem
           onClick={() => {
             if (nestedLabwareOnSlot != null) {
