@@ -302,6 +302,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   aspirateSubmergeYOffset: number
   aspirateSubmergeZOffset: number
   aspirateSubmergePositionReference: PositionReference
+  aspirateSubmergeDelay: InnerDelayArgs | null
   aspirateRetractSpeed: number | null
   aspirateRetractXOffset: number
   aspirateRetractYOffset: number

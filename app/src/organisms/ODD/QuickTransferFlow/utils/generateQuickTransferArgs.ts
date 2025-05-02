@@ -429,6 +429,7 @@ export function generateQuickTransferArgs(
     aspirateSubmergeYOffset: 0,
     aspirateSubmergeZOffset: 0,
     aspirateSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+    aspirateSubmergeDelay: null,
     aspirateRetractSpeed: null,
     aspirateRetractXOffset: 0,
     aspirateRetractYOffset: 0,
