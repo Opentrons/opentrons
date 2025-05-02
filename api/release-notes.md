@@ -25,6 +25,10 @@ Welcome to the v8.4.0 release of the Opentrons robot software! This release incl
 
 - The API raises an error if the Absorbance Plate Reader fails to initialize before reading a plate inside the module. 
 
+### Known Issues
+
+-When you use ``load_liquid()`` and subsequent liquid detection, protocol analysis won't raise an error if there's not enough liquid to complete your transfers. To avoid protocol failure, remove ``measure_liquid_height()`` commands for a correct analysis. 
+
 ## Opentrons Robot Software Changes in 8.3.1
 
 The 8.3.1 hotfix release contains two bug fixes:    
