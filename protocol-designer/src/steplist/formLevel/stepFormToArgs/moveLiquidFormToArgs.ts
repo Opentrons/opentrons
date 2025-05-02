@@ -281,7 +281,7 @@ export const moveLiquidFormToArgs = (
     aspirateRetractYOffset: hydratedFormData.aspirate_retract_y_position ?? 0,
     aspirateRetractZOffset: hydratedFormData.aspirate_retract_mmFromBottom ?? 0,
     aspirateRetractPositionReference:
-      hydratedFormData.aspirate_position_reference,
+      hydratedFormData.aspirate_retract_position_reference,
     dispenseSubmergeSpeed: hydratedFormData.dispense_submerge_speed ?? null,
     dispenseSubmergeXOffset: hydratedFormData.dispense_submerge_x_position ?? 0,
     dispenseSubmergeYOffset: hydratedFormData.dispense_submerge_y_position ?? 0,

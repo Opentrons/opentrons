@@ -47,6 +47,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateRetractYOffset: 0,
           aspirateRetractZOffset: 0,
           aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateRetractDelay: null,
           dispenseSubmergeSpeed: null,
           dispenseSubmergeXOffset: 0,
           dispenseSubmergeYOffset: 0,
@@ -149,6 +150,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateRetractYOffset: 0,
           aspirateRetractZOffset: 0,
           aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateRetractDelay: null,
           dispenseSubmergeSpeed: null,
           dispenseSubmergeXOffset: 0,
           dispenseSubmergeYOffset: 0,
@@ -219,12 +221,14 @@ describe('generateRobotStateTimeline', () => {
           "moveToWell",
           "moveToWell",
           "aspirateInPlace",
+          "moveToWell",
           "dispense",
           "moveToWell",
           "prepareToAspirate",
           "moveToWell",
           "moveToWell",
           "aspirateInPlace",
+          "moveToWell",
           "dispense",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
@@ -237,6 +241,7 @@ describe('generateRobotStateTimeline', () => {
           "moveToWell",
           "moveToWell",
           "aspirateInPlace",
+          "moveToWell",
           "dispense",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
@@ -273,12 +278,14 @@ mockPythonName.prepare_to_aspirate()
 mockPythonName.move_to(mockPythonName["A1"].bottom())
 mockPythonName.move_to(mockPythonName["A1"].bottom())
 mockPythonName.aspirate(...)
+mockPythonName.move_to(mockPythonName["A1"].bottom())
 mockPythonName.dispense(...)
 mockPythonName.move_to(mockPythonName["A2"].top(z=2))
 mockPythonName.prepare_to_aspirate()
 mockPythonName.move_to(mockPythonName["A2"].bottom())
 mockPythonName.move_to(mockPythonName["A2"].bottom())
 mockPythonName.aspirate(...)
+mockPythonName.move_to(mockPythonName["A2"].bottom())
 mockPythonName.dispense(...)
 mockPythonName.drop_tip()
 `.trim(),
@@ -290,6 +297,7 @@ mockPythonName.prepare_to_aspirate()
 mockPythonName.move_to(mockPythonName["A1"].bottom())
 mockPythonName.move_to(mockPythonName["A1"].bottom())
 mockPythonName.aspirate(...)
+mockPythonName.move_to(mockPythonName["A1"].bottom())
 mockPythonName.dispense(...)
 mockPythonName.drop_tip()
 `.trim(),
