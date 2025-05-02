@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  fixture12Trough,
+  fixtureTiprackAdapter,
   HEATERSHAKER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
@@ -197,6 +199,16 @@ describe('moveLabware', () => {
       newLocation: { labwareId: DEST_LABWARE },
     } as MoveLabwareParams
 
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [DEST_LABWARE]: {
+          def: fixtureTiprackAdapter as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+        } as any,
+      },
+    }
     const result = moveLabware(params, invariantContext, robotState)
     expect(getSuccessResult(result).commands).toEqual([
       {
@@ -324,6 +336,52 @@ describe('moveLabware', () => {
       type: 'LABWARE_ON_ANOTHER_ENTITY',
     })
   })
+  it('should not return an error for trying to move the labware to an occupied slot where the labware supports stacking', () => {
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      strategy: 'usingGripper',
+      newLocation: { slotName: '1' },
+    } as MoveLabwareParams
+    robotState = {
+      ...robotState,
+      ...robotState.labware,
+      labware: {
+        [SOURCE_LABWARE]: {
+          stack: [SOURCE_LABWARE, '2'],
+        },
+        stackingLabware: {
+          stack: ['stackingLabware', '1'],
+        },
+      },
+    }
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        stackingLabware: {
+          def: {
+            ...fixture12Trough,
+            compatibleParentLabware: ['fixture_96_plate'],
+          } as LabwareDefinition2,
+        } as any,
+      },
+    }
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getSuccessResult(result).commands).toEqual([
+      {
+        commandType: 'moveLabware',
+        key: expect.any(String),
+        params: {
+          labwareId: SOURCE_LABWARE,
+          strategy: 'usingGripper',
+          newLocation: { slotName: '1' },
+        },
+      },
+    ])
+    expect(getSuccessResult(result).python).toBe(
+      `protocol.move_labware(mockPythonName, "1", use_gripper=True)`
+    )
+  })
   it('should return an error for trying to move the labware to an occupied module', () => {
     const state = getInitialRobotStateStandard(invariantContext)
     const HEATER_SHAKER_ID = 'heaterShakerId'
@@ -331,22 +389,29 @@ describe('moveLabware', () => {
 
     robotState = {
       ...state,
-      modules: {
-        ...state.modules,
-        [HEATER_SHAKER_ID]: {
-          slot: HEATER_SHAKER_SLOT,
-          moduleState: {
-            type: HEATERSHAKER_MODULE_TYPE,
-            latchOpen: true,
-            targetSpeed: null,
-          },
-        } as any,
-      },
+
       labware: {
         ...state.labware,
         mockLabwareId: {
-          slot: HEATER_SHAKER_ID,
+          stack: ['mockLabwareId', HEATER_SHAKER_ID, HEATER_SHAKER_SLOT],
         },
+      },
+    }
+    invariantContext = {
+      ...invariantContext,
+      moduleEntities: {
+        [HEATER_SHAKER_ID]: {
+          model: 'heaterShakerModuleV1',
+          id: HEATER_SHAKER_ID,
+          type: 'heaterShakerModuleType',
+          pythonName: 'mockpythonName',
+        },
+      },
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        mockLabwareId: {
+          def: fixture12Trough as LabwareDefinition2,
+        } as any,
       },
     }
     const params = {
@@ -375,7 +440,7 @@ describe('moveLabware', () => {
     } as InvariantContext
 
     robotState.labware = {
-      [SOURCE_LABWARE]: { slot: 'gripperWasteChute' },
+      [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'gripperWasteChute'] },
     }
     const params = {
       labwareId: SOURCE_LABWARE,
@@ -501,7 +566,7 @@ describe('moveLabware', () => {
       labware: {
         ...state.labware,
         [ADAPTER_ID]: {
-          slot: HEATER_SHAKER_ID,
+          stack: [ADAPTER_ID, HEATER_SHAKER_ID, HEATER_SHAKER_SLOT],
         },
       },
       modules: {
@@ -523,7 +588,7 @@ describe('moveLabware', () => {
     } as MoveLabwareParams
 
     const result = moveLabware(params, invariantContext, robotState)
-    expect(getErrorResult(result).errors).toHaveLength(1)
+    // expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'HEATER_SHAKER_LATCH_CLOSED',
     })

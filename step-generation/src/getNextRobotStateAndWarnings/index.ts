@@ -129,6 +129,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'comment':
     case 'airGapInPlace':
     case 'prepareToAspirate':
+    case 'liquidProbe':
       break
 
     case 'loadLiquid':

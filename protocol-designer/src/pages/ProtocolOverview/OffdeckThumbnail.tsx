@@ -18,6 +18,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { wellFillFromWellContents } from '../../components/organisms/LabwareOnDeck/utils'
 import { getRobotType } from '../../file-data/selectors'
@@ -39,7 +40,7 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
   const robotType = useSelector(getRobotType)
   const deckSetup = useSelector(getInitialDeckSetup)
   const offDeckLabware = Object.values(deckSetup.labware).filter(
-    lw => lw.slot === 'offDeck'
+    lw => getSlotInLocationStack(lw.stack) === 'offDeck'
   )
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   const allWellContentsForActiveItem = useSelector(

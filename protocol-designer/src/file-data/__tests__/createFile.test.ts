@@ -158,7 +158,7 @@ requirements = {
     "apiLevel": "2.24",
 }
 
-def run(protocol: protocol_api.ProtocolContext):
+def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Labware:
     mock_python_name_1 = protocol.load_labware_from_definition(
         CUSTOM_LABWARE["fixture/fixture_trash/1"],

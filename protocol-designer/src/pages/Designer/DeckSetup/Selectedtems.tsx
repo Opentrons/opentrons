@@ -6,6 +6,7 @@ import {
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
@@ -42,13 +43,9 @@ export const SelectedItems = (
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getAllLabwareDefs()
   const deckSetup = useSelector(getInitialDeckSetup)
-  const { labware, modules } = deckSetup
+  const { labware } = deckSetup
   const matchingSelectedLabwareOnDeck = Object.values(labware).find(labware => {
-    const moduleUnderLabware = Object.values(modules).find(
-      mod => mod.id === labware.slot
-    )
-    const matchingSlot =
-      moduleUnderLabware != null ? moduleUnderLabware.slot : labware.slot
+    const matchingSlot = getSlotInLocationStack(labware.stack)
     return (
       matchingSlot === selectedSlot.slot &&
       labware.labwareDefURI === selectedLabwareDefUri
@@ -56,19 +53,7 @@ export const SelectedItems = (
   })
   const matchingSelectedNestedLabwareOnDeck = Object.values(labware).find(
     lw => {
-      const adapterUnderLabware = Object.values(labware).find(
-        lab => lab.id === lw.slot
-      )
-      if (adapterUnderLabware == null) {
-        return
-      }
-      const moduleUnderLabware = Object.values(modules).find(
-        mod => mod.id === adapterUnderLabware.slot
-      )
-      const matchingSlot =
-        moduleUnderLabware != null
-          ? moduleUnderLabware.slot
-          : adapterUnderLabware.slot
+      const matchingSlot = getSlotInLocationStack(lw.stack)
       return (
         lw.labwareDefURI === selectedNestedLabwareDefUri &&
         matchingSlot === selectedSlot.slot

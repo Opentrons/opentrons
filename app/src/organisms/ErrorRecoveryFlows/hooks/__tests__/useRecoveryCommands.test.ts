@@ -295,7 +295,6 @@ describe('useRecoveryCommands', () => {
       false
     )
   })
-
   it('should reject with error and call proceedToRouteAndStep when pickUpTips has invalid input', async () => {
     const testProps = {
       ...props,
@@ -322,7 +321,6 @@ describe('useRecoveryCommands', () => {
       'failed'
     )
   })
-
   it('should call releaseGripperJaws and resolve the promise', async () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 

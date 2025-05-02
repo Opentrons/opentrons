@@ -6,10 +6,14 @@ import {
   getLabwareDefURI,
   getTipTypeFromTipRackDefinition,
   orderWells,
+  POSITION_REFERENCE_BOTTOM,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
-import { makeInitialRobotState } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  makeInitialRobotState,
+} from '@opentrons/step-generation'
 
 import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
@@ -104,7 +108,7 @@ function getInvariantContextAndRobotState(
     }
     labwareLocations = {
       [adapterId]: {
-        slot: 'B2',
+        stack: [adapterId, 'B2'],
       },
     }
   }
@@ -135,10 +139,11 @@ function getInvariantContextAndRobotState(
   labwareLocations = {
     ...labwareLocations,
     [tipRackId]: {
-      slot: adapterId ?? 'B2',
+      stack:
+        adapterId != null ? [tipRackId, adapterId, 'B2'] : [tipRackId, 'B2'],
     },
     [sourceLabwareId]: {
-      slot: 'C2',
+      stack: [sourceLabwareId, 'C2'],
     },
   }
 
@@ -159,7 +164,7 @@ function getInvariantContextAndRobotState(
     labwareLocations = {
       ...labwareLocations,
       [destLabwareId]: {
-        slot: 'D2',
+        stack: [destLabwareId, 'D2'],
       },
     }
   }
@@ -343,7 +348,8 @@ export function generateQuickTransferArgs(
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
 
   const sourceLabwareId = Object.keys(robotState.labware).find(
-    labwareId => robotState.labware[labwareId].slot === 'C2'
+    labwareId =>
+      getSlotInLocationStack(robotState.labware[labwareId].stack) === 'C2'
   )
   const sourceLabwareEntity =
     sourceLabwareId != null
@@ -352,7 +358,8 @@ export function generateQuickTransferArgs(
   let destLabwareEntity = sourceLabwareEntity
   if (quickTransferState.destination !== 'source') {
     const destinationLabwareId = Object.keys(robotState.labware).find(
-      labwareId => robotState.labware[labwareId].slot === 'D2'
+      labwareId =>
+        getSlotInLocationStack(robotState.labware[labwareId].stack) === 'D2'
     )
     destLabwareEntity =
       destinationLabwareId != null
@@ -419,6 +426,32 @@ export function generateQuickTransferArgs(
     description: null,
     nozzles,
     pushOut: null,
+    /** TODO: update all values below once quick transfer state is updated */
+    liquidClass: null,
+    aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
+    aspirateZOffset: 0,
+    aspirateSubmergeSpeed: null,
+    aspirateSubmergeXOffset: 0,
+    aspirateSubmergeYOffset: 0,
+    aspirateSubmergeZOffset: 0,
+    aspirateSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+    aspirateSubmergeDelay: null,
+    aspirateRetractSpeed: null,
+    aspirateRetractXOffset: 0,
+    aspirateRetractYOffset: 0,
+    aspirateRetractZOffset: 0,
+    aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseSubmergeSpeed: null,
+    dispenseSubmergeXOffset: 0,
+    dispenseSubmergeYOffset: 0,
+    dispenseSubmergeZOffset: 0,
+    dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseRetractSpeed: null,
+    dispenseRetractXOffset: 0,
+    dispenseRetractYOffset: 0,
+    dispenseRetractZOffset: 0,
+    dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+    touchTipAfterAspirateMmFromEdge: null,
   }
 
   switch (quickTransferState.path) {

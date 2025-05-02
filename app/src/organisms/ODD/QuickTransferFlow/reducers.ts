@@ -174,6 +174,12 @@ export function quickTransferSummaryReducer(
         delayAspirate: action.delaySettings,
       }
     }
+    case 'SET_SUBMERGE_ASPIRATE': {
+      return {
+        ...state,
+        submergeAspirate: action.submergeSettings,
+      }
+    }
     case 'SET_TOUCH_TIP_ASPIRATE': {
       return {
         ...state,
@@ -202,6 +208,12 @@ export function quickTransferSummaryReducer(
       return {
         ...state,
         delayDispense: action.delaySettings,
+      }
+    }
+    case 'SET_SUBMERGE_DISPENSE': {
+      return {
+        ...state,
+        submergeDispense: action.submergeSettings,
       }
     }
     case 'SET_TOUCH_TIP_DISPENSE': {

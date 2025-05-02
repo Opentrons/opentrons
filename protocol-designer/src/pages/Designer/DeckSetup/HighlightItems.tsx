@@ -11,6 +11,7 @@ import {
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import {
@@ -107,18 +108,10 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
       )
       return acc
     }
-    let labwareSlot = labwareOnDeck.slot
+    const labwareSlot = getSlotInLocationStack(labwareOnDeck.stack)
     const tcModel = Object.values(modules).find(
       module => module.type === THERMOCYCLER_MODULE_TYPE
     )?.model
-
-    if (modules[labwareSlot]) {
-      labwareSlot = modules[labwareSlot].slot
-    } else if (labware[labwareSlot]) {
-      const adapter = labware[labwareSlot]
-      labwareSlot = modules[adapter.slot]?.slot ?? adapter.slot
-    }
-
     const position = getPositionFromSlotId(labwareSlot, deckDef)
     if (position != null) {
       let tcPosition: CoordinateTuple = FLEX_TC_POSITION

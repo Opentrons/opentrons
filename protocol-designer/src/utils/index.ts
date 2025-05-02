@@ -18,6 +18,7 @@ import type { WellGroup } from '@opentrons/components'
 import type {
   AddressableAreaName,
   CutoutId,
+  DeckSlotId,
   LabwareDefinition2,
   LabwareDisplayCategory,
   ModuleType,
@@ -32,6 +33,11 @@ import type {
   PipetteEntity,
 } from '@opentrons/step-generation'
 import type { BoundingRect, GenericRect } from '../collision-types'
+import type {
+  InitialDeckSetup,
+  LabwareOnDeck,
+  ModuleEntities,
+} from '../step-forms'
 
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware
@@ -332,7 +338,7 @@ export const getDefaultPushOutVolume = (
   const tipVolume = Object.values(tiprackDefinition.wells)[0].totalLiquidVolume
   const lookupKey =
     transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
-      ? 'lowVolumeDefalt'
+      ? 'lowVolumeDefault'
       : 'default'
   const tipVolumeKey = `t${tipVolume}`
   return (
@@ -369,4 +375,69 @@ export const getMaxConditioningVolume = (args: {
     ...(tipMaxVolume != null ? [tipMaxVolume] : [])
   )
   return maxWorkingVolume - disposalVolume - transferVolume
+}
+
+// for stacking
+export function getLocationStackTopToBottom(
+  labwareId: string,
+  labwareLocationUpdate: Record<string, string>,
+  moduleLocationUpdate: Record<string, string>
+): string[] {
+  const stack = []
+  let current = labwareId
+
+  //  while parent still exists
+  while (true) {
+    stack.push(current)
+    const parent =
+      labwareLocationUpdate[current] || moduleLocationUpdate[current]
+    if (!parent) break
+    current = parent
+  }
+
+  return stack
+}
+
+export const getTopmostLabwareOnModuleFromStack = (
+  moduleId: string,
+  labware: LabwareOnDeck[]
+): string => {
+  return labware
+    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
+}
+
+export const getFullStackFromLabwaresOnDeck = (
+  labwareOnDeck: LabwareOnDeck[],
+  slot: DeckSlotId
+): string[] => {
+  return labwareOnDeck
+    .filter(lw => lw.stack.includes(slot))
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+}
+
+export const getModuleIdFromStack = (
+  stack: string[],
+  modulesById: InitialDeckSetup['modules'] | ModuleEntities
+): string | null => {
+  return stack.find(id => modulesById[id] != null) ?? null
+}
+
+export const getLabwareIdAfterModuleIdInStack = (
+  moduleId: string,
+  labware: {
+    [labwareId: string]: LabwareOnDeck
+  }
+): string | null => {
+  const matchingLabware = Object.values(labware).find(lw =>
+    lw.stack.includes(moduleId)
+  )
+  if (!matchingLabware) {
+    return null
+  }
+
+  const index = matchingLabware.stack.indexOf(moduleId)
+  const indexAfter = index + 1
+
+  return matchingLabware.stack[indexAfter] ?? null
 }

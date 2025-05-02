@@ -5827,6 +5827,67 @@
       "title": "UnsafeFlexStackerCloseLatchParams",
       "type": "object"
     },
+    "UnsafeFlexStackerManualRetrieveCreate": {
+      "description": "A request to execute a Flex Stacker manual retrieve command.",
+      "properties": {
+        "commandType": {
+          "const": "unsafe/flexStacker/manualRetrieve",
+          "default": "unsafe/flexStacker/manualRetrieve",
+          "enum": ["unsafe/flexStacker/manualRetrieve"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/UnsafeFlexStackerManualRetrieveParams"
+        }
+      },
+      "required": ["params"],
+      "title": "UnsafeFlexStackerManualRetrieveCreate",
+      "type": "object"
+    },
+    "UnsafeFlexStackerManualRetrieveParams": {
+      "description": "Input parameters for a labware retrieval command.",
+      "properties": {
+        "adapterId": {
+          "description": "Do not use. Present for internal backward compatibility.",
+          "title": "Adapterid",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Do not use. Present for internal backward compatibility.",
+          "title": "Displayname",
+          "type": "string"
+        },
+        "labwareId": {
+          "description": "Do not use. Present for internal backward compatibility.",
+          "title": "Labwareid",
+          "type": "string"
+        },
+        "lidId": {
+          "description": "Do not use. Present for internal backward compatibility.",
+          "title": "Lidid",
+          "type": "string"
+        },
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker.",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "UnsafeFlexStackerManualRetrieveParams",
+      "type": "object"
+    },
     "UnsafeFlexStackerOpenLatchCreate": {
       "description": "A request to execute a Flex Stacker UnsafeFlexStackerOpenLatch command.",
       "properties": {
@@ -5913,67 +5974,6 @@
       },
       "required": ["moduleId"],
       "title": "UnsafeFlexStackerPrepareShuttleParams",
-      "type": "object"
-    },
-    "UnsafeManualRetrieveCreate": {
-      "description": "A request to execute a Flex Stacker manual retrieve command.",
-      "properties": {
-        "commandType": {
-          "const": "unsafe/manualRetrieve",
-          "default": "unsafe/manualRetrieve",
-          "enum": ["unsafe/manualRetrieve"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/UnsafeManualRetrieveParams"
-        }
-      },
-      "required": ["params"],
-      "title": "UnsafeManualRetrieveCreate",
-      "type": "object"
-    },
-    "UnsafeManualRetrieveParams": {
-      "description": "Input parameters for a labware retrieval command.",
-      "properties": {
-        "adapterId": {
-          "description": "Do not use. Present for internal backward compatibility.",
-          "title": "Adapterid",
-          "type": "string"
-        },
-        "displayName": {
-          "description": "Do not use. Present for internal backward compatibility.",
-          "title": "Displayname",
-          "type": "string"
-        },
-        "labwareId": {
-          "description": "Do not use. Present for internal backward compatibility.",
-          "title": "Labwareid",
-          "type": "string"
-        },
-        "lidId": {
-          "description": "Do not use. Present for internal backward compatibility.",
-          "title": "Lidid",
-          "type": "string"
-        },
-        "moduleId": {
-          "description": "Unique ID of the Flex Stacker.",
-          "title": "Moduleid",
-          "type": "string"
-        }
-      },
-      "required": ["moduleId"],
-      "title": "UnsafeManualRetrieveParams",
       "type": "object"
     },
     "UnsafePlaceLabwareCreate": {
@@ -6895,9 +6895,9 @@
       "unsafe/dropTipInPlace": "#/$defs/UnsafeDropTipInPlaceCreate",
       "unsafe/engageAxes": "#/$defs/UnsafeEngageAxesCreate",
       "unsafe/flexStacker/closeLatch": "#/$defs/UnsafeFlexStackerCloseLatchCreate",
+      "unsafe/flexStacker/manualRetrieve": "#/$defs/UnsafeFlexStackerManualRetrieveCreate",
       "unsafe/flexStacker/openLatch": "#/$defs/UnsafeFlexStackerOpenLatchCreate",
       "unsafe/flexStacker/prepareShuttle": "#/$defs/UnsafeFlexStackerPrepareShuttleCreate",
-      "unsafe/manualRetrieve": "#/$defs/UnsafeManualRetrieveCreate",
       "unsafe/placeLabware": "#/$defs/UnsafePlaceLabwareCreate",
       "unsafe/ungripLabware": "#/$defs/UnsafeUngripLabwareCreate",
       "unsafe/updatePositionEstimators": "#/$defs/UpdatePositionEstimatorsCreate",
@@ -7177,7 +7177,7 @@
       "$ref": "#/$defs/UnsafePlaceLabwareCreate"
     },
     {
-      "$ref": "#/$defs/UnsafeManualRetrieveCreate"
+      "$ref": "#/$defs/UnsafeFlexStackerManualRetrieveCreate"
     },
     {
       "$ref": "#/$defs/UnsafeFlexStackerCloseLatchCreate"

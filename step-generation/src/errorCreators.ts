@@ -299,3 +299,10 @@ export const labwareDiscarded = (): CommandCreatorError => {
     message: 'The labware was discarded in waste chute in a previous step.',
   }
 }
+
+export const submergeBelowAspirate = (): CommandCreatorError => {
+  return {
+    type: 'SUBMERGE_BELOW_ASPIRATE',
+    message: 'The submerge position must be above the aspirate position',
+  }
+}
