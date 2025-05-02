@@ -16,9 +16,10 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 
 metadata = {"protocolName": "Opentrons Flex Pipette IQ/OQ"}
-requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
-assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"]
+assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"], \
+    f"api level: {requirements['apiLevel']}"
 
 # TODO: (sigler) test using Buonoy at low volumes
 DYE_READER_IDEAL_UL = 200.0
@@ -175,7 +176,7 @@ def load_tip_racks(
             ctx.load_labware(ctx.params.tips, s)  # type: ignore[attr-defined]
             for s in accessible_rack_slot_names
         ]
-        assert diluent_pipette is not None
+        assert diluent_pipette is not None, "diluent_pipette exists when it should not"
         diluent_pipette.tip_racks = [
             ctx.load_labware(
                 "opentrons_flex_96_filtertiprack_200ul", SLOTS["tips_diluent"]
@@ -308,7 +309,8 @@ def load_liquid_dye(
 
         def _load_liquid_and_pop_to_next_well() -> None:
             nonlocal total_ul_aspirated_per_test_ul, current_src_well
-            assert total_ul_aspirated_per_test_ul > 0
+            assert total_ul_aspirated_per_test_ul > 0, \
+                f"total_ul_aspirated_per_test_ul={total_ul_aspirated_per_test_ul}"
             ul_in_well = critical_ul["dead"] + total_ul_aspirated_per_test_ul
             current_src_well.load_liquid(liquid, ul_in_well)
             total_ul_aspirated_per_test_ul = 0.0
