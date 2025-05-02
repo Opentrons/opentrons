@@ -13,7 +13,7 @@ import {
 } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { truncateString } from '../../utils'
-import { LegacyStyledText } from '../StyledText'
+import { StyledText } from '../StyledText'
 
 import type {
   DefaultTheme,
@@ -347,8 +347,7 @@ export function Toast(props: ToastProps): JSX.Element {
           width={showODDStyle ? 'auto' : '100%'}
         >
           {headingText.length > 0 ? (
-            <LegacyStyledText
-              color={COLORS.black90}
+            <StyledText
               fontSize={
                 showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
               }
@@ -367,10 +366,10 @@ export function Toast(props: ToastProps): JSX.Element {
               whiteSpace={NO_WRAP}
             >
               {headingText}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
-            <LegacyStyledText css={TEXT_STYLE}>{message}</LegacyStyledText>
+            <StyledText css={TEXT_STYLE}>{message}</StyledText>
           </Flex>
         </Flex>
       </Flex>
@@ -380,15 +379,13 @@ export function Toast(props: ToastProps): JSX.Element {
           <Link
             role="button"
             onClick={() => {
-              console.log('link')
               onLinkClick()
               onCloseHandler()
             }}
             marginLeft={SPACING.spacing4}
             marginRight={SPACING.spacing8}
           >
-            <LegacyStyledText
-              color={COLORS.black90}
+            <StyledText
               fontSize={
                 showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
               }
@@ -407,7 +404,7 @@ export function Toast(props: ToastProps): JSX.Element {
               whiteSpace={NO_WRAP}
             >
               {linkText}
-            </LegacyStyledText>
+            </StyledText>
           </Link>
         ) : null}
         {closeText ? (
@@ -418,8 +415,7 @@ export function Toast(props: ToastProps): JSX.Element {
             }}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
-            <LegacyStyledText
-              color={COLORS.black90}
+            <StyledText
               fontSize={
                 showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
               }
@@ -438,7 +434,7 @@ export function Toast(props: ToastProps): JSX.Element {
               whiteSpace={NO_WRAP}
             >
               {closeText}
-            </LegacyStyledText>
+            </StyledText>
           </Link>
         ) : null}
       </Flex>
