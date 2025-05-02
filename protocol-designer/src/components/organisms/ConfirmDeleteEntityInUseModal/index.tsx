@@ -21,7 +21,7 @@ interface ConfirmDeleteEntityInUseModalProps {
 export function ConfirmDeleteEntityInUseModal(
   props: ConfirmDeleteEntityInUseModalProps
 ): JSX.Element {
-  const { onClose, onConfirm,} = props
+  const { onClose, onConfirm } = props
   const { t } = useTranslation(['onboarding', 'shared'])
 
   return createPortal(

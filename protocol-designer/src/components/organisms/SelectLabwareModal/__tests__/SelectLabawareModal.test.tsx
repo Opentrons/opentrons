@@ -11,7 +11,6 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { SelectLabwareModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { getRobotType } from '../../../../file-data/selectors'
@@ -28,6 +27,7 @@ import {
   getPipetteEntities,
 } from '../../../../step-forms/selectors'
 import { getHas96Channel } from '../../../../utils'
+import { SelectLabwareModal } from '../index'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
