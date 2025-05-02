@@ -4,7 +4,6 @@ import {
   BORDERS,
   Box,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DISPLAY_NONE,
   Flex,
@@ -21,44 +20,10 @@ import type {
   FlexStackerEmptyRunTimeCommand,
   ModuleLocation,
 } from '@opentrons/shared-data'
-import { Divider } from '/app/atoms/structure'
 import { css } from 'styled-components'
 import { InterventionCommandMessage } from './InterventionCommandMessage'
-
-const LABWARE_DESCRIPTION_STYLE = css`
-  flex-direction: ${DIRECTION_COLUMN};
-  grid-gap: ${SPACING.spacing8};
-  padding: ${SPACING.spacing16};
-  background-color: ${COLORS.grey20};
-  border-radius: ${BORDERS.borderRadius4};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.grey35};
-    border-radius: ${BORDERS.borderRadius8};
-  }
-`
-
-const LABWARE_NAME_STYLE = css`
-  color: ${COLORS.grey60};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${TYPOGRAPHY.bodyTextBold}
-    color: ${COLORS.black90};
-  }
-`
-
-const DIVIDER_STYLE = css`
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    display: ${DISPLAY_NONE};
-  }
-`
-
-const LABWARE_DIRECTION_STYLE = css`
-  align-items: ${ALIGN_CENTER};
-  grid-gap: ${SPACING.spacing4};
-  text-transform: ${TEXT_TRANSFORM_UPPERCASE};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    grid-gap: ${SPACING.spacing8};
-  }
-`
+import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
+import { ComponentProps } from 'react'
 
 const STACKER_IMAGE_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -100,12 +65,21 @@ export function StackerEmptyInterventionContent({
   const moduleLocation =
     run?.modules.find(m => m.id === command.params.moduleId)?.location ?? null
 
+
+
   if (
     moduleLocation?.slotName == null ||
     labwareName == null ||
     flexStacker == null
   )
     return null
+
+  let infoProps : ComponentProps<typeof InterventionInfo> = {
+    layout:"default", 
+    type:"location", 
+    labwareName:labwareName ?? "",
+    currentLocationProps:{deckLabel:stackerNameFormat(moduleLocation)}
+  }
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -118,23 +92,14 @@ export function StackerEmptyInterventionContent({
           gridGap={SPACING.spacing12}
           width="50%"
         >
-          <Flex css={LABWARE_DESCRIPTION_STYLE}>
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText as="h2" css={LABWARE_NAME_STYLE}>
-                {labwareName}
-              </LegacyStyledText>
-            </Flex>
-            <Divider css={DIVIDER_STYLE} />
-            <Flex css={LABWARE_DIRECTION_STYLE}>
-              <DeckInfoLabel deckLabel={stackerNameFormat(moduleLocation)} />
-            </Flex>
-          </Flex>
+          <InterventionInfo {...infoProps}/>
           <InterventionCommandMessage
             commandMessage={command.params.message ?? null}
           />
         </Flex>
         <Flex width="50%" css={STACKER_IMAGE_STYLE}>
           <Box margin="0 auto" width="100%">
+            {/* TODO (chb, 04-30-2025): Replace this with proper empty content*/}
             <LegacyStyledText as="p">
               {'Replace me with a Stacker Empty image/animation'}
             </LegacyStyledText>

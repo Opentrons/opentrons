@@ -385,7 +385,7 @@ class RunCurrentState(BaseModel):
     activeNozzleLayouts: Dict[str, ActiveNozzleLayout]
     tipStates: Dict[str, TipState]
     placeLabwareState: Optional[PlaceLabwareState]
-    flexStackerStates: Dict[str, FlexStackerState]
+    flexStackerStates: Optional[Dict[str, FlexStackerState]]
 
 
 class CommandLinkNoMeta(BaseModel):

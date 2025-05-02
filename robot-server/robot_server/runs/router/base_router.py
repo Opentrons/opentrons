@@ -626,7 +626,7 @@ async def get_current_state(  # noqa: C901
                     break
 
     flex_stacker_substates = run_data_manager.get_flex_stacker_substate(run_id=runId)
-    flex_stacker_states: Dict[str, FlexStackerState] = {}
+    flex_stacker_states: Dict[str, FlexStackerState] | None = {}
     for module_id in flex_stacker_substates:
         primary_uri: str | None = None
         adapter_uri: str | None = None
@@ -668,6 +668,8 @@ async def get_current_state(  # noqa: C901
             if flex_stacker_substates[module_id].get_max_pool_count() is not None
             else 0,
         )
+    if len(flex_stacker_states) == 0:
+        flex_stacker_states = None
 
     last_completed_command = run_data_manager.get_last_completed_command(run_id=runId)
     links = CurrentStateLinks.model_construct(

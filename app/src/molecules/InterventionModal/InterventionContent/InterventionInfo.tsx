@@ -20,14 +20,17 @@ import {
 import { Divider } from '/app/atoms/structure/Divider'
 
 import type { DeckInfoLabelProps } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { LegacyStyledText } from '../../../../../components/src'
 
 export interface BaseInterventionInfo {
   layout: 'default' | 'stacked'
-  type: 'location-arrow-location' | 'location-colon-location' | 'location'
+  type: 'location-arrow-location' | 'location-colon-location' | 'location' | 'location-quantity'
   labwareName: string
   labwareNickname?: string
   currentLocationProps: DeckInfoLabelProps
   newLocationProps?: DeckInfoLabelProps
+  quantity?: number
 }
 
 export interface InterventionInfoDefaultProps extends BaseInterventionInfo {
@@ -107,6 +110,8 @@ const buildContent = (props: InterventionInfoProps): JSX.Element => {
       return buildLocColonLoc(props)
     case 'location':
       return buildLoc(props)
+    case 'location-quantity':
+      return buildLocQuantity(props)
   }
 }
 
@@ -174,6 +179,28 @@ const buildLocColonLoc = (props: InterventionInfoProps): JSX.Element => {
   }
 }
 
+const buildLocQuantity = (props: InterventionInfoProps): JSX.Element => {
+  const { t } = useTranslation('protocol_setup')
+  let { currentLocationProps, quantity, type } = props
+  if (quantity != null) {
+    return (
+      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+        <Flex>
+          <StyledText as="p" css={QUANTITY_STYLE}>
+            {t('labware_quantity', {quantity})}
+          </StyledText>
+        </Flex>
+        <DeckInfoLabel {...currentLocationProps} />
+      </Flex>
+    )
+  } else {
+    console.error(
+      `InterventionInfo type is ${type}, but no quantity was specified.`
+    )
+    return buildLoc(props)
+  }
+}
+
 const ICON_STYLE = css`
   width: ${SPACING.spacing24};
   height: ${SPACING.spacing24};
@@ -200,4 +227,14 @@ const LINE_CLAMP_STYLE = css`
   text-overflow: ellipsis;
   word-wrap: break-word;
   -webkit-line-clamp: 2;
+`
+
+
+const QUANTITY_STYLE = css`
+  background-color: ${COLORS.grey40};
+  padding: ${SPACING.spacing4};
+  border-radius: ${BORDERS.borderRadius4};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.bodyTextBold}
+}
 `
