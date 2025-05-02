@@ -111,8 +111,6 @@ export function LiquidEditor({
     }
   }
 
-  //   global.confirm(t('application:are_you_sure') as string)
-
   const {
     handleSubmit,
     watch,

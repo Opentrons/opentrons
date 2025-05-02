@@ -79,10 +79,7 @@ export function AssignLiquidsModal(
   const wellContents = allWellContents[labwareId]
 
   const handleSave = (): void => {
-    console.log('save_function')
-
     if (Object.keys(selectedWells).length > 0) {
-      console.log('selectedWells', selectedWells)
       setShowBadFormState(true)
     } else {
       dispatch(deselectAllWells())
