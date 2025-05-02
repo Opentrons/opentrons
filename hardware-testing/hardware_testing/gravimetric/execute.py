@@ -450,7 +450,6 @@ def _run_trial(
         _retract_mm = max(
             0.0, _asp_or_disp.submerge.offset.z, _asp_or_disp.retract.offset.z
         )
-        _submerge_mm = _original_offset_z
         approach, submerge, retract = _get_approach_submerge_retract_heights(
             trial.well,
             trial.liquid_tracker,
@@ -465,13 +464,13 @@ def _run_trial(
 
         def _enable() -> None:
             # NOTE: setting all position references to BOTTOM
-            _asp_or_disp.submerge.position_reference = PositionReference.WELL_BOTTOM
+            _asp_or_disp.submerge.position_reference = PositionReference.WELL_TOP
+            _asp_or_disp.retract.position_reference = PositionReference.WELL_TOP
             _asp_or_disp.position_reference = PositionReference.WELL_BOTTOM
-            _asp_or_disp.retract.position_reference = PositionReference.WELL_BOTTOM
             # update liquid-class offsets based on CALCULATED meniscus height
-            _asp_or_disp.submerge.offset.z = approach
+            _asp_or_disp.submerge.offset.z = 0.0
+            _asp_or_disp.retract.offset.z = 0.0
             _asp_or_disp.offset.z = submerge
-            _asp_or_disp.retract.offset.z = retract
 
         def _disable() -> None:
             _asp_or_disp.submerge.position_reference = (
