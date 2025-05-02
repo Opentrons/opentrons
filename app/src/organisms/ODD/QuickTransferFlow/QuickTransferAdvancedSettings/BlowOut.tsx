@@ -144,7 +144,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
         trackEventWithRobotSerial({
           name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
           properties: {
-            settting: `BlowOut`,
+            setting: `BlowOut`,
           },
         })
         onBack()
@@ -159,7 +159,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
         properties: {
-          settting: `BlowOut`,
+          setting: `BlowOut`,
         },
       })
       onBack()

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
@@ -36,6 +38,7 @@ export function LeftColumnLabwareInfo({
     HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
     MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
+  const { t } = useTranslation('error_recovery')
 
   const buildNewLocation = (): ComponentProps<
     typeof InterventionContent
@@ -95,7 +98,7 @@ export function LeftColumnLabwareInfo({
     }
   }
 
-  const buildQuantity = (): string | null => {
+  const buildQuantity = (): number | null => {
     switch (step) {
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
@@ -115,8 +118,10 @@ export function LeftColumnLabwareInfo({
       headline={title}
       infoProps={{
         layout: layout,
-        tagText: buildQuantity(),
-        subText: undefined, // where do we get the lid data from?
+        tagText: buildQuantity()
+          ? t('quantity', { quantity: buildQuantity() })
+          : null,
+        subText: undefined, // TODO (tz, 5-1-2025): get lid name
         type,
         newLocationProps: buildNewLocation(),
         ...buildInfoNames(),

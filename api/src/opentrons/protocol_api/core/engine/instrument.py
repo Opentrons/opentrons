@@ -10,6 +10,7 @@ from typing import (
     cast,
     Union,
     List,
+    Sequence,
     Tuple,
     NamedTuple,
     Generator,
@@ -836,7 +837,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         )
 
-    def resin_tip_unseal(self, location: Location, well_core: WellCore) -> None:
+    def resin_tip_unseal(self, location: Location | None, well_core: WellCore) -> None:
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
 
@@ -1190,9 +1191,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             cmd.GetNextTipParams(
                 pipetteId=self._pipette_id,
                 labwareIds=[tip_rack.labware_id for tip_rack in valid_tip_racks],
-                startingTipWell=starting_well.get_name()
-                if starting_well is not None
-                else None,
+                startingTipWell=(
+                    starting_well.get_name() if starting_well is not None else None
+                ),
             )
         )
         next_tip_info = result.nextTipInfo
@@ -1212,7 +1213,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[Location, WellCore]],
-        dest: List[Tuple[Location, WellCore]],
+        dest: Union[List[Tuple[Location, WellCore]], TrashBin, WasteChute],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[Location, LabwareCore]],
         starting_tip: Optional[WellCore],
@@ -1258,10 +1259,17 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             tiprack_uri=tiprack_uri_for_transfer_props,
         )
 
+        target_destinations: Sequence[
+            Union[Tuple[Location, WellCore], TrashBin, WasteChute]
+        ]
+        if isinstance(dest, (TrashBin, WasteChute)):
+            target_destinations = [dest] * len(source)
+        else:
+            target_destinations = dest
         source_dest_per_volume_step = (
             tx_commons.expand_for_volume_constraints_for_liquid_classes(
                 volumes=[volume for _ in range(len(source))],
-                targets=zip(source, dest),
+                targets=zip(source, target_destinations),
                 max_volume=min(
                     self.get_max_volume(),
                     self._engine_client.state.geometry.get_nominal_tip_geometry(
@@ -1728,7 +1736,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[Location, WellCore]],
-        dest: Tuple[Location, WellCore],
+        dest: Union[Tuple[Location, WellCore], TrashBin, WasteChute],
         new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[Location, LabwareCore]],
         starting_tip: Optional[WellCore],
@@ -2059,7 +2067,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         self,
         last_air_gap: float,
         dispense_props: SingleDispenseProperties,
-        location: Location,
+        location: Union[Location, TrashBin, WasteChute],
     ) -> None:
         """Remove an air gap that was previously added during a transfer."""
         if last_air_gap == 0:
@@ -2090,7 +2098,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     def dispense_liquid_class(
         self,
         volume: float,
-        dest: Tuple[Location, WellCore],
+        dest: Union[Tuple[Location, WellCore], TrashBin, WasteChute],
         source: Optional[Tuple[Location, WellCore]],
         transfer_properties: TransferProperties,
         transfer_type: tx_comps_executor.TransferType,
@@ -2129,17 +2137,21 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             List of liquid and air gap pairs in tip.
         """
         dispense_props = transfer_properties.dispense
-        dest_loc, dest_well = dest
-        dispense_point = (
-            tx_comps_executor.absolute_point_from_position_reference_and_offset(
+        dispense_location: Union[Location, TrashBin, WasteChute]
+        if isinstance(dest, tuple):
+            dest_loc, dest_well = dest
+            dispense_point = tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=dest_well,
                 well_volume_difference=volume,
                 position_reference=dispense_props.dispense_position.position_reference,
                 offset=dispense_props.dispense_position.offset,
                 mount=self.get_mount(),
             )
-        )
-        dispense_location = Location(dispense_point, labware=dest_loc.labware)
+            dispense_location = Location(dispense_point, labware=dest_loc.labware)
+        else:
+            dispense_location = dest
+            dest_well = None
+
         last_liquid_and_airgap_in_tip = (
             tip_contents[-1]
             if tip_contents

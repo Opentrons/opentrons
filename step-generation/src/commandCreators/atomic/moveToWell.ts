@@ -35,6 +35,7 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
     wellLocation,
     minimumZHeight,
     forceDirect,
+    speed,
   } = args
   const actionName = 'moveToWell'
   const errors: CommandCreatorError[] = []
@@ -189,8 +190,9 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
         labwareId,
         wellName,
         wellLocation,
-        forceDirect,
-        minimumZHeight,
+        ...(forceDirect != null ? { forceDirect } : {}),
+        ...(minimumZHeight != null ? { minimumZHeight } : {}),
+        ...(speed != null ? { speed } : null),
       },
     },
   ]

@@ -197,7 +197,7 @@ export const updateInitialDeckState = (
               value.cutoutId,
               'A1'
             )
-          : { isCompatible: true, slot: '' }
+          : null
       //  if deleting staging area where labware is in 4th column slot
       if (
         matchingStagingArea != null &&
