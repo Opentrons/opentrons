@@ -267,44 +267,44 @@ describe('generateRobotStateTimeline', () => {
     expect(pythonCommandsOverview).toEqual([
       // Step a:
       `
-mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.move_to(mockPythonName["A1"].top(z=2))
-mockPythonName.prepare_to_aspirate()
-mockPythonName.move_to(mockPythonName["A1"].bottom())
-mockPythonName.move_to(mockPythonName["A1"].bottom())
-mockPythonName.aspirate(...)
-mockPythonName.dispense(...)
-mockPythonName.move_to(mockPythonName["A2"].top(z=2))
-mockPythonName.prepare_to_aspirate()
-mockPythonName.move_to(mockPythonName["A2"].bottom())
-mockPythonName.move_to(mockPythonName["A2"].bottom())
-mockPythonName.aspirate(...)
-mockPythonName.dispense(...)
-mockPythonName.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.move_to(mock_source_plate["A1"].top(z=2))
+mock_pipette.prepare_to_aspirate()
+mock_pipette.move_to(mock_source_plate["A1"].bottom())
+mock_pipette.move_to(mock_source_plate["A1"].bottom())
+mock_pipette.aspirate(...)
+mock_pipette.dispense(...)
+mock_pipette.move_to(mock_source_plate["A2"].top(z=2))
+mock_pipette.prepare_to_aspirate()
+mock_pipette.move_to(mock_source_plate["A2"].bottom())
+mock_pipette.move_to(mock_source_plate["A2"].bottom())
+mock_pipette.aspirate(...)
+mock_pipette.dispense(...)
+mock_pipette.drop_tip()
 `.trim(),
       // Step b:
       `
-mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.move_to(mockPythonName["A1"].top(z=2))
-mockPythonName.prepare_to_aspirate()
-mockPythonName.move_to(mockPythonName["A1"].bottom())
-mockPythonName.move_to(mockPythonName["A1"].bottom())
-mockPythonName.aspirate(...)
-mockPythonName.dispense(...)
-mockPythonName.drop_tip()
+pipette_p300_multi.pick_up_tip(location=mock_tip_rack_1)
+pipette_p300_multi.move_to(mock_source_plate["A1"].top(z=2))
+pipette_p300_multi.prepare_to_aspirate()
+pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
+pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
+pipette_p300_multi.aspirate(...)
+pipette_p300_multi.dispense(...)
+pipette_p300_multi.drop_tip()
 `.trim(),
       // Step c:
       `
-mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.flow_rate.aspirate = 3.78
-mockPythonName.flow_rate.dispense = 3.78
-mockPythonName.mix(...)
-mockPythonName.drop_tip()
-mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.flow_rate.aspirate = 3.78
-mockPythonName.flow_rate.dispense = 3.78
-mockPythonName.mix(...)
-mockPythonName.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.flow_rate.aspirate = 3.78
+mock_pipette.flow_rate.dispense = 3.78
+mock_pipette.mix(...)
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.flow_rate.aspirate = 3.78
+mock_pipette.flow_rate.dispense = 3.78
+mock_pipette.mix(...)
+mock_pipette.drop_tip()
 `.trim(),
     ])
   })

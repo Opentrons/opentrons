@@ -53,7 +53,7 @@ describe('moveToAddressableArea', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      'mockPythonName.move_to(mock_trash_bin_1)'
+      'mock_pipette.move_to(mock_trash_bin_1)'
     )
   })
   it('should call moveToAddressableArea with correct params for waste chute', () => {
@@ -90,7 +90,7 @@ describe('moveToAddressableArea', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      'mockPythonName.move_to(mock_waste_chute_1)'
+      'mock_pipette.move_to(mock_waste_chute_1)'
     )
   })
 })
