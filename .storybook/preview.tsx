@@ -1,6 +1,7 @@
 import { I18nextProvider } from 'react-i18next'
+import { Global } from '@emotion/react'
 
-import { GlobalStyle } from '../app/src/atoms/GlobalStyle'
+import { globalStyles } from '../app/src/atoms/GlobalStyle'
 import { i18n } from '../app/src/i18n'
 
 global.APP_SHELL_REMOTE = {
@@ -85,7 +86,7 @@ export const parameters = {
 export const decorators = [
   Story => (
     <I18nextProvider i18n={i18n}>
-      <GlobalStyle />
+      <Global styles={globalStyles} />
       <Story />
     </I18nextProvider>
   ),

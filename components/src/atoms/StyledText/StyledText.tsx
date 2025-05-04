@@ -1,10 +1,12 @@
-import styled, { css } from 'styled-components'
+import { css } from '@emotion/react'
+import styled from '@emotion/styled'
 
 import { TYPOGRAPHY as HELIX_TYPOGRAPHY } from '../../helix-design-system/product'
 import { Text } from '../../primitives'
 import { RESPONSIVENESS, TYPOGRAPHY } from '../../ui-style-constants'
 
-import type { FlattenSimpleInterpolation } from 'styled-components'
+// import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { SerializedStyles } from '@emotion/react'
 import type { ComponentProps, ReactNode } from 'react'
 
 const helixProductStyleMap = {
@@ -310,17 +312,15 @@ export const HELIX_STYLES = Object.keys(helixProductStyleMap)
 export type HelixStyles = keyof typeof helixProductStyleMap
 export type ODDStyles = keyof typeof ODDStyleMap
 
-function styleForDesktopName(name?: HelixStyles): FlattenSimpleInterpolation {
+function styleForDesktopName(name?: HelixStyles): SerializedStyles {
   return name ? helixProductStyleMap[name].style : css``
 }
 
-function styleForODDName(name?: ODDStyles): FlattenSimpleInterpolation {
+function styleForODDName(name?: ODDStyles): SerializedStyles {
   return name ? ODDStyleMap[name].style : css``
 }
 
-const DesktopStyledText: (props: Props) => JSX.Element = styled(
-  Text
-).withConfig({
+const DesktopStyledText: (props: Props) => JSX.Element = styled(Text, {
   shouldForwardProp: p => p !== 'oddStyle' && p !== 'desktopStyle',
 })`
   ${(props: Props) => styleForDesktopName(props.desktopStyle)}

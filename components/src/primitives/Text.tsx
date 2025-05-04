@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import { isntStyleProp, styleProps } from './style-props'
 
@@ -9,7 +9,7 @@ import type { PrimitiveComponent } from './types'
  *
  * @component
  */
-export const Text: PrimitiveComponent<'p'> = styled.p.withConfig({
+export const Text: PrimitiveComponent<'p'> = styled('p', {
   shouldForwardProp: isntStyleProp,
 })`
   margin-top: 0;

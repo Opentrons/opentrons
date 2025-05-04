@@ -1,18 +1,22 @@
-import styled, { css } from 'styled-components'
+import { css } from '@emotion/react' // Import css from @emotion/react
+import styled from '@emotion/styled' // Import styled from @emotion/styled
 
 import { Text } from '../../primitives'
 import { RESPONSIVENESS, TYPOGRAPHY } from '../../ui-style-constants'
 
-import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { ComponentProps, ReactNode } from 'react'
+import type { SerializedStyles } from '@emotion/react' // Import SerializedStyles from @emotion/react
+import type { ComponentProps, FC, ReactNode } from 'react'
 
-export interface LegacyProps extends ComponentProps<typeof Text> {
-  children?: ReactNode
-}
+// export interface LegacyProps extends ComponentProps<typeof Text> {
+//   children?: ReactNode
+// }
 
-const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
+// const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
+const styleMap: { [tag: string]: SerializedStyles } = {
+  // Update type to SerializedStyles
   h1: css`
-    ${TYPOGRAPHY.h1Default};
+    // css usage remains the same
+    ${TYPOGRAPHY.h1Default}
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       ${TYPOGRAPHY.level1Header};
     }
@@ -80,17 +84,64 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
   pBold: TYPOGRAPHY.bodyTextBold,
   labelBold: TYPOGRAPHY.smallBodyTextBold,
 }
+// export const LegacyStyledText: (props: LegacyProps) => JSX.Element = styled(
+// export const LegacyStyledText: FC<LegacyProps> = styled(
+//   // styled(Component) syntax is the same
+//   Text
+// )<LegacyProps>`
+//   ${props => {
+//     let fontWeight = ''
+//     if (props.fontWeight === TYPOGRAPHY.fontWeightSemiBold) {
+//       fontWeight = 'SemiBold'
+//     } else if (props.fontWeight === TYPOGRAPHY.fontWeightBold) {
+//       fontWeight = 'Bold'
+//     }
+//     return styleMap[`${props.as}${fontWeight}`]
+//   }}
+// `
 
-export const LegacyStyledText: (props: LegacyProps) => JSX.Element = styled(
-  Text
+// Define the specific 'as' values and font weights used in the styleMap keys/logic
+type AsValues = 'h1' | 'h2' | 'h3' | 'h4' | 'h6' | 'p' | 'label'
+type FontWeightValues =
+  | typeof TYPOGRAPHY.fontWeightRegular
+  | typeof TYPOGRAPHY.fontWeightSemiBold
+  | typeof TYPOGRAPHY.fontWeightBold
+
+// Define LegacyProps explicitly for this component's needs.
+// Include other props from the base 'Text' if they should be passable.
+// Use Omit to prevent conflicts if necessary, otherwise just list needed props.
+export interface LegacyProps {
+  as: AsValues // REQUIRED: Determines the base style and tag lookup
+  fontWeight?: FontWeightValues // OPTIONAL: Modifies the style lookup
+  children?: ReactNode
+  className?: string // Allow className to be passed
+  // Add any other props from the original Text component that should be supported, e.g.:
+  // id?: string;
+  // onClick?: React.MouseEventHandler<HTMLElement>;
+}
+
+// Use React.FC for the component type signature (Fix for Error 1)
+export const LegacyStyledText: FC<LegacyProps> = styled(
+  Text // Base component is Emotion's styled(Text)
 )<LegacyProps>`
-  ${props => {
-    let fontWeight = ''
-    if (props.fontWeight === TYPOGRAPHY.fontWeightSemiBold) {
-      fontWeight = 'SemiBold'
-    } else if (props.fontWeight === TYPOGRAPHY.fontWeightBold) {
-      fontWeight = 'Bold'
+  // Specify props for the styled wrapper
+  // Dynamic styling function
+  ${(props: LegacyProps) => {
+    // Type props explicitly here (Fix for Error 2)
+    let fontWeightSuffix = ''
+    // Default to regular weight if fontWeight prop is omitted
+    const currentWeight = props.fontWeight ?? TYPOGRAPHY.fontWeightRegular
+
+    if (currentWeight === TYPOGRAPHY.fontWeightSemiBold) {
+      fontWeightSuffix = 'SemiBold'
+    } else if (currentWeight === TYPOGRAPHY.fontWeightBold) {
+      fontWeightSuffix = 'Bold'
     }
-    return styleMap[`${props.as}${fontWeight}`]
+
+    // Construct the key from explicitly defined props
+    const styleKey = `${props.as}${fontWeightSuffix}` as keyof typeof styleMap
+
+    // Return the SerializedStyles, add a fallback just in case
+    return styleMap[styleKey] ?? css``
   }}
 `

@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import { isntStyleProp, styleProps } from './style-props'
 
@@ -9,7 +9,7 @@ import type { PrimitiveComponent } from './types'
  *
  * @component
  */
-export const Flex: PrimitiveComponent<'div'> = styled.div.withConfig({
+export const Flex: PrimitiveComponent<'div'> = styled('div', {
   shouldForwardProp: isntStyleProp,
 })`
   display: flex;

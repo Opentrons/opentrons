@@ -1,8 +1,9 @@
 import { useSelector } from 'react-redux'
+import { Global } from '@emotion/react'
 
 import { DIRECTION_ROW, Flex, POSITION_FIXED } from '@opentrons/components'
 
-import { GlobalStyle } from '/app/atoms/GlobalStyle'
+import { globalStyles } from '/app/atoms/GlobalStyle'
 import { getConfig, getIsOnDevice } from '/app/redux/config'
 
 import { DesktopApp } from './DesktopApp'
@@ -22,7 +23,7 @@ export const App = (): JSX.Element | null => {
   // render null until getIsOnDevice returns the isOnDevice value from config
   return hasConfigLoaded ? (
     <>
-      <GlobalStyle />
+      <Global styles={globalStyles} />
       <Flex
         position={POSITION_FIXED}
         flexDirection={DIRECTION_ROW}

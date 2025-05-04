@@ -1,10 +1,11 @@
-import styled from 'styled-components'
+// import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { NewPrimaryBtn, styleProps } from '../../primitives'
+import { Btn, styleProps } from '../../primitives'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-export const PrimaryButton = styled(NewPrimaryBtn)`
+export const PrimaryButton = styled(Btn)`
   background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.borderRadius8};
   box-shadow: none;
@@ -12,7 +13,9 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   padding-right: ${SPACING.spacing16};
   line-height: ${TYPOGRAPHY.lineHeight20};
   text-transform: ${TYPOGRAPHY.textTransformNone};
-  ${TYPOGRAPHY.pSemiBold}
+  font-size: ${TYPOGRAPHY.fontSizeH3};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  line-height: ${TYPOGRAPHY.lineHeight20};
 
   ${styleProps}
 

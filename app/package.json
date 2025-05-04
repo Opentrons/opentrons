@@ -20,6 +20,8 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "dependencies": {
     "@ebay/nice-modal-react": "1.2.13",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@fontsource/dejavu-sans": "5.0.3",
     "@fontsource/public-sans": "5.0.3",
     "@opentrons/api-client": "link:../api-client",

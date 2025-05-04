@@ -24,6 +24,8 @@
   "dependencies": {
     "@opentrons/shared-data": "link:../shared-data",
     "@opentrons/step-generation": "link:../step-generation",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@popperjs/core": "2.1.1",
     "@react-spring/types": "9.6.1",
     "@react-spring/web": "9.6.1",

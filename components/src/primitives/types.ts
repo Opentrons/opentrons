@@ -1,6 +1,6 @@
 // known style types
-import type { CSSProperties, StyledComponent } from 'styled-components'
-import type { ComponentType } from 'react'
+import type { StyledComponent } from '@emotion/styled'
+import type { ComponentProps, CSSProperties, ElementType } from 'react'
 
 export interface ColorProps {
   color?: string
@@ -55,6 +55,12 @@ export interface FlexboxProps {
   flexDirection?: string
   flexWrap?: string
   whiteSpace?: string
+  flexFlow?: string
+  flexBasis?: string
+  alignContent?: string
+  gap?: string | number
+  rowGap?: string | number
+  columnGap?: string | number
 }
 
 export interface GridProps {
@@ -115,6 +121,6 @@ export interface StyleProps
 }
 
 export type PrimitiveComponent<
-  Instance extends keyof JSX.IntrinsicElements | ComponentType<any>,
+  Instance extends ElementType,
   Props extends StyleProps = StyleProps
-> = StyledComponent<Instance, any, Props, any>
+> = StyledComponent<Props, ComponentProps<Instance>, {}> // use {} because at this moment we don't have theme

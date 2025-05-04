@@ -1,4 +1,5 @@
-import { css } from 'styled-components'
+// import { css } from 'styled-components'
+import { css } from '@emotion/react'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
@@ -7,7 +8,9 @@ import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 
-import type { FlattenSimpleInterpolation } from 'styled-components'
+// import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { SerializedStyles } from '@emotion/react' // Changed type import
+
 import type { IconName } from '../../icons'
 
 export type TagType = 'default' | 'interactive' | 'branded' | 'onColor'
@@ -88,7 +91,7 @@ export function Tag(props: TagProps): JSX.Element {
 
 const DEFAULT_CONTAINER_STYLE = (
   shrinkToContent: boolean
-): FlattenSimpleInterpolation => css`
+): SerializedStyles => css`
   padding: ${SPACING.spacing2} ${SPACING.spacing8};
   border-radius: ${BORDERS.borderRadius4};
   width: ${shrinkToContent ? FLEX_MAX_CONTENT : 'inherit'};
@@ -100,7 +103,7 @@ const DEFAULT_CONTAINER_STYLE = (
 
 const INTERACTIVE_CONTAINER_STYLE = (
   shrinkToContent: boolean
-): FlattenSimpleInterpolation => css`
+): SerializedStyles => css`
   ${DEFAULT_CONTAINER_STYLE(shrinkToContent)}
   &:hover {
     background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
