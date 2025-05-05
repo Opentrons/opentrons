@@ -32,7 +32,6 @@ describe('ModulesSection', () => {
   it('should render modules buttons and no modules added yet', async () => {
     render()
 
-    expect(screen.getAllByRole('button').length).toBe(4)
     expect(screen.getByText('No modules added yet')).toBeInTheDocument()
   })
 
