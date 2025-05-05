@@ -41,7 +41,7 @@ class ThermocyclerMovementFlagger:
         self._hardware_api = hardware_api
         self._equipment = equipment
 
-    async def verify_tc_lid_status(self, module_id: str) -> None:
+    async def _verify_tc_lid_status(self, module_id: str) -> None:
         """Ensure the thermocycler's lid state is correct or raise an error."""
         try:
             hw_tc_lid_status = await self._get_hardware_thermocycler_lid_status(
@@ -57,14 +57,20 @@ class ThermocyclerMovementFlagger:
             hw_tc_lid_status == ThermocyclerLidStatus.IN_BETWEEN
             or hw_tc_lid_status == ThermocyclerLidStatus.UNKNOWN
         ):
-            await self.open_tc_lid(module_id=module_id)
+            # NOTE(cm): due to a potential hardware bug, the thermocycler might lose its position
+            # status when idling in an open position and default to UNKNOWN or IN_BETWEEN.
+            # This tries to recover only from an unexpected known position.
+            await self._open_tc_lid(module_id=module_id)
+            hw_tc_lid_status = await self._get_hardware_thermocycler_lid_status(
+                module_id=module_id
+            )
         if hw_tc_lid_status != ThermocyclerLidStatus.OPEN:
             raise ThermocyclerNotOpenError(
                 f"Thermocycler must be open when moving to labware inside it,"
                 f' but Thermocycler is currently "{hw_tc_lid_status}".'
             )
 
-    async def open_tc_lid(self, module_id: str) -> None:
+    async def _open_tc_lid(self, module_id: str) -> None:
         """Try to open the thermocycler lid."""
         tc_hardware = self._equipment.get_module_hardware_api(
             ThermocyclerModuleId(module_id)
@@ -122,7 +128,7 @@ class ThermocyclerMovementFlagger:
         # There is a chance that the engine might not have the latest lid status;
         # do a hardware state check just to be sure that the lid is truly open.
         if not self._state_store.config.use_virtual_modules:
-            await self.verify_tc_lid_status(module_id=module_id)
+            await self._verify_tc_lid_status(module_id=module_id)
 
     async def _get_hardware_thermocycler_lid_status(
         self,

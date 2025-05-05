@@ -47,8 +47,6 @@ class MovementHandler:
         equipment: Optional[EquipmentHandler] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
-        if thermocycler_movement_flagger:
-            assert equipment is not None, "no module handler received."
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
         self._tc_movement_flagger = (
