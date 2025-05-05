@@ -1330,6 +1330,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             last_tip_picked_up_from = _pick_up_tip()
 
         prev_src: Optional[Tuple[Location, WellCore]] = None
+        prev_dest: Optional[Tuple[Location, WellCore]] = None
         post_disp_tip_contents = [
             tx_comps_executor.LiquidAndAirGapPair(
                 liquid=0,
@@ -1349,10 +1350,18 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             except StopIteration:
                 is_last_step = True
 
-            if new_tip == TransferTipPolicyV2.ALWAYS or (
-                new_tip == TransferTipPolicyV2.PER_SOURCE and step_source != prev_src
+            if (
+                new_tip == TransferTipPolicyV2.ALWAYS
+                or (
+                    new_tip == TransferTipPolicyV2.PER_SOURCE
+                    and step_source != prev_src
+                )
+                or (
+                    new_tip == TransferTipPolicyV2.PER_DESTINATION
+                    and step_destination != prev_dest
+                )
             ):
-                if prev_src is not None:
+                if prev_src is not None and prev_dest is not None:
                     _drop_tip()
                 last_tip_picked_up_from = _pick_up_tip()
                 post_disp_tip_contents = [
@@ -1401,6 +1410,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     trash_location=trash_location,
                 )
             prev_src = step_source
+            prev_dest = step_destination
         if new_tip != TransferTipPolicyV2.NEVER:
             _drop_tip()
 
