@@ -47,6 +47,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateRetractYOffset: 0,
           aspirateRetractZOffset: 0,
           aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateRetractDelay: null,
           dispenseSubmergeSpeed: null,
           dispenseSubmergeXOffset: 0,
           dispenseSubmergeYOffset: 0,
@@ -149,6 +150,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateRetractYOffset: 0,
           aspirateRetractZOffset: 0,
           aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateRetractDelay: null,
           dispenseSubmergeSpeed: null,
           dispenseSubmergeXOffset: 0,
           dispenseSubmergeYOffset: 0,
@@ -219,12 +221,14 @@ describe('generateRobotStateTimeline', () => {
           "moveToWell",
           "moveToWell",
           "aspirateInPlace",
+          "moveToWell",
           "dispense",
           "moveToWell",
           "prepareToAspirate",
           "moveToWell",
           "moveToWell",
           "aspirateInPlace",
+          "moveToWell",
           "dispense",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
@@ -237,6 +241,7 @@ describe('generateRobotStateTimeline', () => {
           "moveToWell",
           "moveToWell",
           "aspirateInPlace",
+          "moveToWell",
           "dispense",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
@@ -273,12 +278,14 @@ mock_pipette.prepare_to_aspirate()
 mock_pipette.move_to(mock_source_plate["A1"].bottom())
 mock_pipette.move_to(mock_source_plate["A1"].bottom())
 mock_pipette.aspirate(...)
+mock_pipette.move_to(mock_source_plate["A1"].bottom())
 mock_pipette.dispense(...)
 mock_pipette.move_to(mock_source_plate["A2"].top(z=2))
 mock_pipette.prepare_to_aspirate()
 mock_pipette.move_to(mock_source_plate["A2"].bottom())
 mock_pipette.move_to(mock_source_plate["A2"].bottom())
 mock_pipette.aspirate(...)
+mock_pipette.move_to(mock_source_plate["A2"].bottom())
 mock_pipette.dispense(...)
 mock_pipette.drop_tip()
 `.trim(),
@@ -290,6 +297,7 @@ pipette_p300_multi.prepare_to_aspirate()
 pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
 pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
 pipette_p300_multi.aspirate(...)
+pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
 pipette_p300_multi.dispense(...)
 pipette_p300_multi.drop_tip()
 `.trim(),
