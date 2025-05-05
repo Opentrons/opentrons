@@ -160,8 +160,8 @@ export const getModuleDisplayStatus = (
     // Absorbance reader module does not require calibration
     if (
       attachedModule.moduleType !== ABSORBANCE_READER_TYPE &&
-      (
-        !!!attachedModule.moduleOffset || attachedModule.moduleOffset?.last_modified === null)
+      (!!!attachedModule.moduleOffset ||
+        !!!attachedModule.moduleOffset?.last_modified)
     ) {
       return 'needsCalibration'
     }
