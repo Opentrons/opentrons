@@ -1338,7 +1338,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             last_tip_picked_up_from = _pick_up_tip()
 
         prev_src: Optional[Tuple[Location, WellCore]] = None
-        prev_dest: Optional[Tuple[Location, WellCore]] = None
+        prev_dest: Optional[
+            Union[Tuple[Location, WellCore], TrashBin, WasteChute]
+        ] = None
         post_disp_tip_contents = [
             tx_comps_executor.LiquidAndAirGapPair(
                 liquid=0,

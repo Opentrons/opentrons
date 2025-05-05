@@ -244,7 +244,6 @@ def test_order_of_water_transfer_steps_with_new_tip_per_destination(
     simulated_protocol_context: ProtocolContext,
 ) -> None:
     """It should run the transfer steps while picking up a new tip only for a new destination."""
-
     trash = simulated_protocol_context.load_trash_bin("A3")
     tiprack = simulated_protocol_context.load_labware(
         "opentrons_flex_96_tiprack_50ul", "D1"
