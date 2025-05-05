@@ -24,16 +24,11 @@ import type { DeckInfoLabelProps } from '@opentrons/components'
 
 export interface BaseInterventionInfo {
   layout: 'default' | 'stacked'
-  type:
-    | 'location-arrow-location'
-    | 'location-colon-location'
-    | 'location'
-    | 'location-quantity'
+  type: 'location-arrow-location' | 'location-colon-location' | 'location'
   labwareName: string
   labwareNickname?: string
   currentLocationProps: DeckInfoLabelProps
   newLocationProps?: DeckInfoLabelProps
-  quantity?: number
 }
 
 export interface InterventionInfoDefaultProps extends BaseInterventionInfo {
@@ -113,8 +108,6 @@ const buildContent = (props: InterventionInfoProps): JSX.Element => {
       return buildLocColonLoc(props)
     case 'location':
       return buildLoc(props)
-    case 'location-quantity':
-      return buildLocQuantity(props)
   }
 }
 
@@ -177,28 +170,6 @@ const buildLocColonLoc = (props: InterventionInfoProps): JSX.Element => {
   } else {
     console.error(
       `InterventionInfo type is ${type}, but no newLocation was specified.`
-    )
-    return buildLoc(props)
-  }
-}
-
-const buildLocQuantity = (props: InterventionInfoProps): JSX.Element => {
-  const { t } = useTranslation('protocol_setup')
-  const { currentLocationProps, quantity, type } = props
-  if (quantity != null) {
-    return (
-      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-        <Flex>
-          <StyledText as="p" css={QUANTITY_STYLE}>
-            {t('labware_quantity', { quantity })}
-          </StyledText>
-        </Flex>
-        <DeckInfoLabel {...currentLocationProps} />
-      </Flex>
-    )
-  } else {
-    console.error(
-      `InterventionInfo type is ${type}, but no quantity was specified.`
     )
     return buildLoc(props)
   }

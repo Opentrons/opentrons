@@ -1,4 +1,5 @@
 import { ComponentProps } from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
@@ -44,6 +45,7 @@ export function StackerFillInterventionContent({
   analysis,
   run,
 }: StackerFillInterventionProps): JSX.Element | null {
+  const { t } = useTranslation('protocol_setup')
   const { data: runCurrentState } = useRunCurrentState(run.id)
   const flexStacker =
     runCurrentState?.data.flexStackerStates?.[command.params.moduleId] ?? null
@@ -53,12 +55,12 @@ export function StackerFillInterventionContent({
 
   // Get the name of the labware to be removed from the stacker
   let labwareName: string | null = null
-  let labwareCount = command.params.count ?? null
+  let quantity = command.params.count ?? null
   if (flexStacker) {
     const labwareDef = labwareDefsByUri?.[flexStacker.primaryLabwareURI] ?? null
     labwareName = labwareDef?.metadata.displayName ?? null
-    if (labwareCount == null) {
-      labwareCount = flexStacker.maxCount
+    if (quantity == null) {
+      quantity = flexStacker.maxCount
     }
   }
 
@@ -69,18 +71,18 @@ export function StackerFillInterventionContent({
     moduleLocation?.slotName == null ||
     labwareName == null ||
     flexStacker == null ||
-    labwareCount == null
+    quantity == null
   )
     return null
 
   const infoProps: ComponentProps<typeof InterventionInfo> = {
-    layout: 'default',
-    type: 'location-quantity',
+    layout: 'stacked',
+    type: 'location',
     labwareName: labwareName ?? '',
+    tagText: t('labware_quantity', { quantity }),
     currentLocationProps: {
       deckLabel: getStackerLocationFromSlotName(moduleLocation.slotName),
     },
-    quantity: labwareCount,
   }
   return (
     <Flex
