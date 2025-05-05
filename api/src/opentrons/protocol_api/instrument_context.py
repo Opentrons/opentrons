@@ -913,7 +913,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if isinstance(last_location, types.Location):
             target = last_location.labware.as_well().top(height)
         else:
-            target = last_location
+            target = last_location.top(height)
         self.move_to(target, publish=False)
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
             self._core.prepare_to_aspirate()

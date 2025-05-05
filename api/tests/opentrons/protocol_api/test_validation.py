@@ -581,6 +581,34 @@ def test_validate_last_location_with_labware(decoy: Decoy) -> None:
     assert result == subject.PointTarget(location=input_last_location, in_place=True)
 
 
+def test_validate_location_with_trash_bin(decoy: Decoy) -> None:
+    """Should return a Trash Bin object."""
+    mock_trash = decoy.mock(cls=TrashBin)
+
+    result = subject.validate_location(location=None, last_location=mock_trash)
+    assert result is mock_trash
+
+    result = subject.validate_location(location=mock_trash, last_location=None)
+    assert result is mock_trash
+
+    result = subject.validate_location(location=mock_trash, last_location=mock_trash)
+    assert result is mock_trash
+
+
+def test_validate_location_with_waste_chute(decoy: Decoy) -> None:
+    """Should return a waste chute object."""
+    mock_chute = decoy.mock(cls=WasteChute)
+
+    result = subject.validate_location(location=None, last_location=mock_chute)
+    assert result is mock_chute
+
+    result = subject.validate_location(location=mock_chute, last_location=None)
+    assert result is mock_chute
+
+    result = subject.validate_location(location=mock_chute, last_location=mock_chute)
+    assert result is mock_chute
+
+
 def test_ensure_boolean() -> None:
     """It should return a boolean value."""
     assert subject.ensure_boolean(False) is False

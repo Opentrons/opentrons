@@ -557,7 +557,7 @@ ValidTarget = Union[WellTarget, PointTarget, TrashBin, WasteChute]
 
 
 def validate_location(
-    location: Union[Location, Well, TrashBin, WasteChute, None],
+    location: Optional[Union[Location, Well, TrashBin, WasteChute]],
     last_location: Optional[Union[Location, TrashBin, WasteChute]],
 ) -> ValidTarget:
     """Validate a given location for a liquid handling command.
@@ -569,9 +569,11 @@ def validate_location(
     Returns:
         A `WellTarget` if the input location represents a well.
         A `PointTarget` if the input location is an x, y, z coordinate.
+        A `TrashBin` if the input location is a trash bin
+        A `WasteChute` if the input location is a waste chute
 
     Raises:
-        NoLocationError: The is no input location and no cached loaction.
+        NoLocationError: The is no input location and no cached location.
         LocationTypeError: The location supplied is of unexpected type.
     """
     from .labware import Well
