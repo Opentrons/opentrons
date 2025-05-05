@@ -1863,14 +1863,15 @@ def test_air_gap_has_rate(
     decoy.when(mock_instrument_core.has_tip()).then_return(True)
     decoy.when(mock_protocol_core.get_last_location()).then_return(last_location)
     decoy.when(mock_well.top(z=5.0)).then_return(top_location)
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate()).then_return(100)
 
-    subject.air_gap(volume=10, height=5, rate=12)
+    subject.air_gap(volume=10, height=5, rate=1.2)
 
     decoy.verify(mock_move_to(top_location, publish=False))
     decoy.verify(mock_instrument_core.prepare_to_aspirate())
     decoy.verify(
-        mock_instrument_core.air_gap_in_place(10, 12)
-    )  # 12 is from the rate param
+        mock_instrument_core.air_gap_in_place(10, 120)
+    )  # 120 is from the flow_rate calculated from the rate * aspirate_flow_rate param
 
 
 @pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 24)))
@@ -1891,15 +1892,14 @@ def test_air_gap_has_flow_rate(
     decoy.when(mock_instrument_core.has_tip()).then_return(True)
     decoy.when(mock_protocol_core.get_last_location()).then_return(last_location)
     decoy.when(mock_well.top(z=5.0)).then_return(top_location)
-    decoy.when(mock_instrument_core.get_aspirate_flow_rate()).then_return(12)
 
-    subject.air_gap(volume=10, height=5, flow_rate=144)
+    subject.air_gap(volume=10, height=5, flow_rate=100)
 
     decoy.verify(mock_move_to(top_location, publish=False))
     decoy.verify(mock_instrument_core.prepare_to_aspirate())
     decoy.verify(
-        mock_instrument_core.air_gap_in_place(10, 12)
-    )  # 12 is the rate calculated from the flow_rate param
+        mock_instrument_core.air_gap_in_place(10, 100)
+    )  # 100 is the flow_rate param
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])

@@ -843,7 +843,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @publisher.publish(command=cmds.air_gap)
     @requires_version(2, 0)
-    def air_gap(
+    def air_gap(  # noqa: C901
         self,
         volume: Optional[float] = None,
         height: Optional[float] = None,
@@ -897,7 +897,7 @@ class InstrumentContext(publisher.CommandPublisher):
             No longer implemented as an aspirate.
 
         .. versionchanged:: 2.24
-            Adds the ``rate`` and ``flow_rate`` parameter. You only need to define one or the other.
+            Adds the ``rate`` and ``flow_rate`` parameter. You can only define one or the other.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
@@ -916,6 +916,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 current_version=f"{self._api_version}",
             )
 
+        if flow_rate and rate:
+            raise UnsupportedAPIError(message="Cannot define both flow_rate and rate.")
+
         if height is None:
             height = 5
         loc = self._protocol_core.get_last_location()
@@ -926,14 +929,13 @@ class InstrumentContext(publisher.CommandPublisher):
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
             self._core.prepare_to_aspirate()
             c_vol = self._core.get_available_volume() if volume is None else volume
+            if flow_rate is not None:
+                calculated_rate = flow_rate
+            elif rate is not None:
+                calculated_rate = rate * self._core.get_aspirate_flow_rate()
+            else:
+                calculated_rate = self._core.get_aspirate_flow_rate()
 
-            calculated_rate = (
-                flow_rate / self._core.get_aspirate_flow_rate()
-                if flow_rate is not None
-                else rate
-                if rate is not None
-                else self._core.get_aspirate_flow_rate()
-            )
             self._core.air_gap_in_place(c_vol, calculated_rate)
         else:
             self.aspirate(volume)
