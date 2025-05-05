@@ -61,8 +61,9 @@ describe('blowOutInWasteChute', () => {
     ])
     expect(getSuccessResult(result).python).toBe(
       `
-mockPythonName.flow_rate.blow_out = 10
-mockPythonName.blow_out(mock_waste_chute_1)`.trim()
+mock_pipette.flow_rate.blow_out = 10
+mock_pipette.blow_out(mock_waste_chute_1)
+`.trim()
     )
   })
 })

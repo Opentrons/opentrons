@@ -64,10 +64,10 @@ describe('dispenseInTrash', () => {
     ])
     expect(getSuccessResult(result).python).toBe(
       `
-mockPythonName.dispense(
+mock_pipette.dispense(
     volume=10,
     location=mock_trash_bin_1,
-    rate=10 / mockPythonName.flow_rate.dispense,
+    rate=10 / mock_pipette.flow_rate.dispense,
 )`.trimStart()
     )
   })
@@ -115,10 +115,10 @@ mockPythonName.dispense(
     ])
     expect(getSuccessResult(result).python).toBe(
       `
-mockPythonName.dispense(
+mock_pipette.dispense(
     volume=10,
     location=protocol.fixed_trash,
-    rate=10 / mockPythonName.flow_rate.dispense,
+    rate=10 / mock_pipette.flow_rate.dispense,
 )`.trimStart()
     )
   })

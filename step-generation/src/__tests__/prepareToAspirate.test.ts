@@ -38,6 +38,6 @@ describe('prepareToAspirate', () => {
         },
       },
     ])
-    expect(res.python).toBe('mockPythonName.prepare_to_aspirate()')
+    expect(res.python).toBe('mock_pipette.prepare_to_aspirate()')
   })
 })
