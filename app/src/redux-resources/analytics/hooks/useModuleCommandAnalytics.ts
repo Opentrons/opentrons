@@ -172,8 +172,7 @@ function isModuleOnlyParams(params: unknown): params is ModuleOnlyParams {
 type AllTemperatureParams = 
   TemperatureModuleAwaitTemperatureParams |
   TemperatureParams |
-  ThermocyclerSetTargetBlockTemperatureParams |
-  TCSetTargetLidTemperatureRunTimeCommand 
+  ThermocyclerSetTargetBlockTemperatureParams 
 
 function isTemperatureParams(params: unknown): params is AllTemperatureParams{
   return typeof params === 'object' && params !== null && 'celsius' in params
