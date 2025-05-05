@@ -14,6 +14,7 @@ import { useRunCurrentState } from '@opentrons/react-api-client'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
 import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
+import { getStackerLocationFromSlotName } from '/app/transformations/commands'
 
 import { InterventionCommandMessage } from './InterventionCommandMessage'
 
@@ -31,10 +32,6 @@ const STACKER_IMAGE_STYLE = css`
   background-color: ${COLORS.grey35};
   border-radius: ${BORDERS.lineBorder};
 `
-
-function stackerNameFormat(moduleLocation: ModuleLocation): string {
-  return 'Stacker ' + moduleLocation.slotName.charAt(0)
-}
 
 export interface StackerFillInterventionProps {
   command: FlexStackerFillRunTimeCommand
@@ -80,7 +77,9 @@ export function StackerFillInterventionContent({
     layout: 'default',
     type: 'location-quantity',
     labwareName: labwareName ?? '',
-    currentLocationProps: { deckLabel: stackerNameFormat(moduleLocation) },
+    currentLocationProps: {
+      deckLabel: getStackerLocationFromSlotName(moduleLocation.slotName),
+    },
     quantity: labwareCount,
   }
   return (

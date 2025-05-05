@@ -82,7 +82,10 @@ from opentrons.protocol_engine.resources.file_provider import (
     FileProvider,
 )
 from robot_server.file_provider.provider import FileProviderWrapper
-from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerSubState,
+    FlexStackerId,
+)
 from opentrons.protocol_engine.types.module import StackerStoredLabwareGroup
 
 
@@ -873,12 +876,14 @@ async def test_get_current_state_success(
 
     stacker_substates = {
         "mock-stacker-id": FlexStackerSubState(
-            module_id="mock-stacker-id",
+            module_id=FlexStackerId("mock-stacker-id"),
             pool_primary_definition=labware_definition,
             pool_adapter_definition=None,
             pool_lid_definition=None,
             max_pool_count=6,
-            contained_labware_bottom_first=[StackerStoredLabwareGroup],
+            contained_labware_bottom_first=[
+                StackerStoredLabwareGroup(primaryLabwareId="heeheehoohoo")
+            ],
             pool_overlap=0,
         ),
     }
