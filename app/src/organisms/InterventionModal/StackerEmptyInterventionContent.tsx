@@ -1,4 +1,3 @@
-import { ComponentProps } from 'react'
 import { css } from 'styled-components'
 
 import {
@@ -22,8 +21,8 @@ import type { RunData } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   FlexStackerEmptyRunTimeCommand,
-  ModuleLocation,
 } from '@opentrons/shared-data'
+import type { ComponentProps } from 'react'
 
 const STACKER_IMAGE_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
