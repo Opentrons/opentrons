@@ -25,8 +25,8 @@ async def test_get_next_tip_implementation(
     )
     mock_nozzle_map = decoy.mock(cls=NozzleMap)
 
-    decoy.when(state_view.tips.get_pipette_active_channels("abc")).then_return(42)
-    decoy.when(state_view.tips.get_pipette_nozzle_map("abc")).then_return(
+    decoy.when(state_view.pipettes.get_active_channels("abc")).then_return(42)
+    decoy.when(state_view.pipettes.get_nozzle_configuration("abc")).then_return(
         mock_nozzle_map
     )
     decoy.when(mock_nozzle_map.configuration).then_return(NozzleConfigurationType.FULL)
@@ -60,8 +60,8 @@ async def test_get_next_tip_implementation_multiple_tip_racks(
     )
     mock_nozzle_map = decoy.mock(cls=NozzleMap)
 
-    decoy.when(state_view.tips.get_pipette_active_channels("abc")).then_return(42)
-    decoy.when(state_view.tips.get_pipette_nozzle_map("abc")).then_return(
+    decoy.when(state_view.pipettes.get_active_channels("abc")).then_return(42)
+    decoy.when(state_view.pipettes.get_nozzle_configuration("abc")).then_return(
         mock_nozzle_map
     )
     decoy.when(mock_nozzle_map.configuration).then_return(NozzleConfigurationType.FULL)
@@ -95,8 +95,8 @@ async def test_get_next_tip_implementation_no_tips(
     )
     mock_nozzle_map = decoy.mock(cls=NozzleMap)
 
-    decoy.when(state_view.tips.get_pipette_active_channels("abc")).then_return(42)
-    decoy.when(state_view.tips.get_pipette_nozzle_map("abc")).then_return(
+    decoy.when(state_view.pipettes.get_active_channels("abc")).then_return(42)
+    decoy.when(state_view.pipettes.get_nozzle_configuration("abc")).then_return(
         mock_nozzle_map
     )
     decoy.when(mock_nozzle_map.configuration).then_return(NozzleConfigurationType.FULL)
@@ -124,8 +124,8 @@ async def test_get_next_tip_implementation_partial_with_starting_tip(
     )
     mock_nozzle_map = decoy.mock(cls=NozzleMap)
 
-    decoy.when(state_view.tips.get_pipette_active_channels("abc")).then_return(42)
-    decoy.when(state_view.tips.get_pipette_nozzle_map("abc")).then_return(
+    decoy.when(state_view.pipettes.get_active_channels("abc")).then_return(42)
+    decoy.when(state_view.pipettes.get_nozzle_configuration("abc")).then_return(
         mock_nozzle_map
     )
     decoy.when(mock_nozzle_map.configuration).then_return(NozzleConfigurationType.ROW)

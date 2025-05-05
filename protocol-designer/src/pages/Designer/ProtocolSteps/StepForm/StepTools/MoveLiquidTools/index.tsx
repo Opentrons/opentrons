@@ -27,26 +27,41 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     propsForFields.liquidClass.updateValue
   )
 
-  // Object mapping step numbers to functions returning the correct JSX
-  const stepComponents: Record<number, () => JSX.Element> = {
-    0: () => (
-      <FirstStepMoveLiquidTools
-        propsForFields={propsForFields}
-        formData={formData}
-        visibleFormErrors={visibleFormErrors}
-      />
-    ),
-    1: () => (
-      <>
-        {enableLiquidClasses ? (
-          <LiquidClassesStepTools
+  const renderStepComponent = (): JSX.Element => {
+    switch (toolboxStep) {
+      case 0:
+        return (
+          <FirstStepMoveLiquidTools
             propsForFields={propsForFields}
             formData={formData}
-            setShowFormErrors={setShowFormErrors}
-            type="transfer"
-            orderedLiquidClassOptions={orderedLiquidClassOptions}
+            visibleFormErrors={visibleFormErrors}
           />
-        ) : (
+        )
+      case 1:
+        return (
+          <>
+            {enableLiquidClasses ? (
+              <LiquidClassesStepTools
+                propsForFields={propsForFields}
+                formData={formData}
+                setShowFormErrors={setShowFormErrors}
+                type="transfer"
+                orderedLiquidClassOptions={orderedLiquidClassOptions}
+              />
+            ) : (
+              <SecondStepsMoveLiquidTools
+                propsForFields={propsForFields}
+                formData={formData}
+                tab={tab}
+                setTab={setTab}
+                setShowFormErrors={setShowFormErrors}
+                visibleFormErrors={visibleFormErrors}
+              />
+            )}
+          </>
+        )
+      case 2:
+        return (
           <SecondStepsMoveLiquidTools
             propsForFields={propsForFields}
             formData={formData}
@@ -55,21 +70,20 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
             setShowFormErrors={setShowFormErrors}
             visibleFormErrors={visibleFormErrors}
           />
-        )}
-      </>
-    ),
-    2: () => (
-      <SecondStepsMoveLiquidTools
-        propsForFields={propsForFields}
-        formData={formData}
-        tab={tab}
-        setTab={setTab}
-        setShowFormErrors={setShowFormErrors}
-        visibleFormErrors={visibleFormErrors}
-      />
-    ),
+        )
+      default:
+        console.warn(
+          `Unexpected toolboxStep value: ${toolboxStep}, defaulting to the first step.`
+        )
+        return (
+          <FirstStepMoveLiquidTools
+            propsForFields={propsForFields}
+            formData={formData}
+            visibleFormErrors={visibleFormErrors}
+          />
+        )
+    }
   }
 
-  const StepComponent = stepComponents[toolboxStep] ?? stepComponents[0]
-  return StepComponent()
+  return renderStepComponent()
 }

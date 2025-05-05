@@ -298,7 +298,7 @@ class LegacyInstrumentCoreSimulator(
 
     def resin_tip_unseal(
         self,
-        location: types.Location,
+        location: types.Location | None,
         well_core: WellCore,
     ) -> None:
         raise APIVersionError(api_element="Unsealing resin tips.")
@@ -519,7 +519,7 @@ class LegacyInstrumentCoreSimulator(
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[types.Location, LegacyWellCore]],
-        dest: List[Tuple[types.Location, LegacyWellCore]],
+        dest: Union[List[Tuple[types.Location, LegacyWellCore]], TrashBin, WasteChute],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         starting_tip: Optional[LegacyWellCore],
@@ -549,7 +549,7 @@ class LegacyInstrumentCoreSimulator(
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[types.Location, LegacyWellCore]],
-        dest: Tuple[types.Location, LegacyWellCore],
+        dest: Union[Tuple[types.Location, LegacyWellCore], TrashBin, WasteChute],
         new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         starting_tip: Optional[LegacyWellCore],

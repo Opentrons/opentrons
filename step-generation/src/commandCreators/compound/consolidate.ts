@@ -16,6 +16,7 @@ import {
   delayLocationHelper,
   dispenseLocationHelper,
   getIsSafePipetteMovement,
+  getSlotInLocationStack,
   reduceCommandCreators,
 } from '../../utils'
 import {
@@ -108,8 +109,12 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     return { errors: [errorCreators.equipmentDoesNotExist()] }
   }
 
-  const initialDestLabwareSlot = prevRobotState.labware[destLabware]?.slot
-  const initialSourceLabwareSlot = prevRobotState.labware[sourceLabware]?.slot
+  const initialDestLabwareSlot = getSlotInLocationStack(
+    prevRobotState.labware[destLabware]?.stack
+  )
+  const initialSourceLabwareSlot = getSlotInLocationStack(
+    prevRobotState.labware[sourceLabware]?.stack
+  )
   const hasWasteChute =
     Object.keys(invariantContext.wasteChuteEntities).length > 0
 

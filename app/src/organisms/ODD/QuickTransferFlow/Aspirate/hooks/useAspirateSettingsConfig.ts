@@ -54,13 +54,20 @@ export function useAspirateSettingsConfig({
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_TIP_POSITION)
       },
     },
-    // ToDo replace dummy configs for submerge
     {
       option: SETTING_OPTIONS.ASPIRATE_SUBMERGE,
       copy: t('submerge'),
-      value: '', // t('submerge_value', { volume: 'dummy' }),
-      enabled: false,
-      onClick: () => {},
+      value:
+        state.submergeAspirate !== undefined
+          ? t('submerge_value', {
+              speed: state.submergeAspirate.speed,
+              position: state.submergeAspirate.positionFromBottom,
+            })
+          : '',
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_SUBMERGE)
+      },
     },
     {
       option: SETTING_OPTIONS.PRE_WET_TIP,

@@ -5,6 +5,7 @@ import logging
 from typing import Any, Awaitable, Callable, Dict, Optional, Mapping
 
 from opentrons.drivers.flex_stacker.types import (
+    AxisParams,
     Direction,
     LEDColor,
     LEDPattern,
@@ -292,10 +293,18 @@ class FlexStacker(mod_abc.AbstractModule):
     ) -> bool:
         """Move the axis in a direction by the given distance in mm."""
         default = STACKER_MOTION_CONFIG[axis]["move"]
-        await self._driver.set_run_current(
-            axis, current if current is not None else default.run_current
-        )
-        await self._driver.set_ihold_current(axis, default.hold_current)
+        old_run_current = self._reader.motion_params[axis].run_current
+        new_run_current = current if current is not None else default.run_current
+        if new_run_current != old_run_current:
+            await self._driver.set_run_current(axis, new_run_current)
+            self._reader.motion_params[axis].run_current = new_run_current
+
+        old_hold_current = self._reader.motion_params[axis].hold_current
+        new_hold_current = default.hold_current
+        if new_hold_current != old_hold_current:
+            await self._driver.set_ihold_current(axis, new_hold_current)
+            self._reader.motion_params[axis].hold_current = new_hold_current
+
         motion_params = default.move_params.update(
             max_speed=speed, acceleration=acceleration
         )
@@ -315,10 +324,18 @@ class FlexStacker(mod_abc.AbstractModule):
         current: Optional[float] = None,
     ) -> bool:
         default = STACKER_MOTION_CONFIG[axis]["home"]
-        await self._driver.set_run_current(
-            axis, current if current is not None else default.run_current
-        )
-        await self._driver.set_ihold_current(axis, default.hold_current)
+        old_run_current = self._reader.motion_params[axis].run_current
+        new_run_current = current if current is not None else default.run_current
+        if new_run_current != old_run_current:
+            await self._driver.set_run_current(axis, new_run_current)
+            self._reader.motion_params[axis].run_current = new_run_current
+
+        old_hold_current = self._reader.motion_params[axis].hold_current
+        new_hold_current = default.hold_current
+        if new_hold_current != old_hold_current:
+            await self._driver.set_ihold_current(axis, new_hold_current)
+            self._reader.motion_params[axis].hold_current = new_hold_current
+
         motion_params = default.move_params.update(
             max_speed=speed, acceleration=acceleration
         )
@@ -610,8 +627,8 @@ class FlexStackerReader(Reader):
             )
             for s in TOFSensor
         }
-        self.motion_params: Dict[StackerAxis, Optional[MoveParams]] = {
-            axis: None for axis in StackerAxis
+        self.motion_params: Dict[StackerAxis, AxisParams] = {
+            axis: AxisParams(0, 0, MoveParams(0, 0, 0)) for axis in StackerAxis
         }
         self.platform_state = PlatformState.UNKNOWN
         self.hopper_door_closed = False
@@ -652,9 +669,10 @@ class FlexStackerReader(Reader):
 
     async def get_motion_parameters(self) -> None:
         """Get the motion parameters used by the axis motors."""
-        self.motion_params = {
-            axis: await self._driver.get_motion_params(axis) for axis in StackerAxis
-        }
+        for axis in StackerAxis:
+            self.motion_params[axis].move_params = await self._driver.get_motion_params(
+                axis
+            )
 
     async def get_platform_sensor_state(self) -> None:
         """Get the platform state."""
