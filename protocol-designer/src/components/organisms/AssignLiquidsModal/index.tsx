@@ -19,8 +19,8 @@ import {
   StyledText,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { getRobotType } from '../../../file-data/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
@@ -33,7 +33,6 @@ import {
 } from '../../../well-selection/actions'
 import { getSelectedWells } from '../../../well-selection/selectors'
 import { LiquidButton } from '../../molecules'
-import { getSlotForLabware } from '../../organisms/utils'
 import { SelectableLabware } from '../Labware/SelectableLabware'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { LiquidEditor } from './LiquidEditor'
@@ -63,8 +62,7 @@ export function AssignLiquidsModal(
   )
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
-  const deckSetup = useSelector(getInitialDeckSetup)
-  const robotType = useSelector(getRobotType)
+  const { labware } = useSelector(getInitialDeckSetup)
   const [showBadFormState, setShowBadFormState] = useState(false)
 
   if (labwareId == null) {
@@ -111,7 +109,7 @@ export function AssignLiquidsModal(
         gap={SPACING.spacing8}
       >
         <DeckInfoLabel
-          deckLabel={getSlotForLabware(labwareId, deckSetup, robotType) ?? ''}
+          deckLabel={getSlotInLocationStack(labware[labwareId].stack) ?? ''}
         />
         <StyledText desktopStyle="headingLargeBold">
           {t('add_liquids_to_labware', { labwareName: nickNames[labwareId] })}
