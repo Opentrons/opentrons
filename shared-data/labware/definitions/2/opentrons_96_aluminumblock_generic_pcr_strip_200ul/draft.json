@@ -42,7 +42,8 @@
       "totalLiquidVolume": 200,
       "x": 14.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G1": {
       "shape": "circular",
@@ -51,7 +52,8 @@
       "totalLiquidVolume": 200,
       "x": 14.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F1": {
       "shape": "circular",
@@ -60,7 +62,8 @@
       "totalLiquidVolume": 200,
       "x": 14.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E1": {
       "shape": "circular",
@@ -69,7 +72,8 @@
       "totalLiquidVolume": 200,
       "x": 14.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D1": {
       "shape": "circular",
@@ -78,7 +82,8 @@
       "totalLiquidVolume": 200,
       "x": 14.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C1": {
       "shape": "circular",
@@ -87,7 +92,8 @@
       "totalLiquidVolume": 200,
       "x": 14.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B1": {
       "shape": "circular",
@@ -96,7 +102,8 @@
       "totalLiquidVolume": 200,
       "x": 14.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A1": {
       "shape": "circular",
@@ -105,7 +112,8 @@
       "totalLiquidVolume": 200,
       "x": 14.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "H2": {
       "shape": "circular",
@@ -114,7 +122,8 @@
       "totalLiquidVolume": 200,
       "x": 23.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G2": {
       "shape": "circular",
@@ -123,7 +132,8 @@
       "totalLiquidVolume": 200,
       "x": 23.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F2": {
       "shape": "circular",
@@ -132,7 +142,8 @@
       "totalLiquidVolume": 200,
       "x": 23.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E2": {
       "shape": "circular",
@@ -141,7 +152,8 @@
       "totalLiquidVolume": 200,
       "x": 23.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D2": {
       "shape": "circular",
@@ -150,7 +162,8 @@
       "totalLiquidVolume": 200,
       "x": 23.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C2": {
       "shape": "circular",
@@ -159,7 +172,8 @@
       "totalLiquidVolume": 200,
       "x": 23.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B2": {
       "shape": "circular",
@@ -168,7 +182,8 @@
       "totalLiquidVolume": 200,
       "x": 23.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A2": {
       "shape": "circular",
@@ -177,7 +192,8 @@
       "totalLiquidVolume": 200,
       "x": 23.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "H3": {
       "shape": "circular",
@@ -186,7 +202,8 @@
       "totalLiquidVolume": 200,
       "x": 32.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G3": {
       "shape": "circular",
@@ -195,7 +212,8 @@
       "totalLiquidVolume": 200,
       "x": 32.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F3": {
       "shape": "circular",
@@ -204,7 +222,8 @@
       "totalLiquidVolume": 200,
       "x": 32.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E3": {
       "shape": "circular",
@@ -213,7 +232,8 @@
       "totalLiquidVolume": 200,
       "x": 32.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D3": {
       "shape": "circular",
@@ -222,7 +242,8 @@
       "totalLiquidVolume": 200,
       "x": 32.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C3": {
       "shape": "circular",
@@ -231,7 +252,8 @@
       "totalLiquidVolume": 200,
       "x": 32.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B3": {
       "shape": "circular",
@@ -240,7 +262,8 @@
       "totalLiquidVolume": 200,
       "x": 32.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A3": {
       "shape": "circular",
@@ -249,7 +272,8 @@
       "totalLiquidVolume": 200,
       "x": 32.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "H4": {
       "shape": "circular",
@@ -258,7 +282,8 @@
       "totalLiquidVolume": 200,
       "x": 41.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G4": {
       "shape": "circular",
@@ -267,7 +292,8 @@
       "totalLiquidVolume": 200,
       "x": 41.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F4": {
       "shape": "circular",
@@ -276,7 +302,8 @@
       "totalLiquidVolume": 200,
       "x": 41.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E4": {
       "shape": "circular",
@@ -285,7 +312,8 @@
       "totalLiquidVolume": 200,
       "x": 41.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D4": {
       "shape": "circular",
@@ -294,7 +322,8 @@
       "totalLiquidVolume": 200,
       "x": 41.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C4": {
       "shape": "circular",
@@ -303,7 +332,8 @@
       "totalLiquidVolume": 200,
       "x": 41.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B4": {
       "shape": "circular",
@@ -312,7 +342,8 @@
       "totalLiquidVolume": 200,
       "x": 41.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A4": {
       "shape": "circular",
@@ -321,7 +352,8 @@
       "totalLiquidVolume": 200,
       "x": 41.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "H5": {
       "shape": "circular",
@@ -330,7 +362,8 @@
       "totalLiquidVolume": 200,
       "x": 50.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G5": {
       "shape": "circular",
@@ -339,7 +372,8 @@
       "totalLiquidVolume": 200,
       "x": 50.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F5": {
       "shape": "circular",
@@ -348,7 +382,8 @@
       "totalLiquidVolume": 200,
       "x": 50.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E5": {
       "shape": "circular",
@@ -357,7 +392,8 @@
       "totalLiquidVolume": 200,
       "x": 50.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D5": {
       "shape": "circular",
@@ -366,7 +402,8 @@
       "totalLiquidVolume": 200,
       "x": 50.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C5": {
       "shape": "circular",
@@ -375,7 +412,8 @@
       "totalLiquidVolume": 200,
       "x": 50.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B5": {
       "shape": "circular",
@@ -384,7 +422,8 @@
       "totalLiquidVolume": 200,
       "x": 50.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A5": {
       "shape": "circular",
@@ -393,7 +432,8 @@
       "totalLiquidVolume": 200,
       "x": 50.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "H6": {
       "shape": "circular",
@@ -402,7 +442,8 @@
       "totalLiquidVolume": 200,
       "x": 59.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G6": {
       "shape": "circular",
@@ -411,7 +452,8 @@
       "totalLiquidVolume": 200,
       "x": 59.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F6": {
       "shape": "circular",
@@ -420,7 +462,8 @@
       "totalLiquidVolume": 200,
       "x": 59.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E6": {
       "shape": "circular",
@@ -429,7 +472,8 @@
       "totalLiquidVolume": 200,
       "x": 59.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D6": {
       "shape": "circular",
@@ -438,7 +482,8 @@
       "totalLiquidVolume": 200,
       "x": 59.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C6": {
       "shape": "circular",
@@ -447,7 +492,8 @@
       "totalLiquidVolume": 200,
       "x": 59.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B6": {
       "shape": "circular",
@@ -456,7 +502,8 @@
       "totalLiquidVolume": 200,
       "x": 59.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A6": {
       "shape": "circular",
@@ -465,7 +512,8 @@
       "totalLiquidVolume": 200,
       "x": 59.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "H7": {
       "shape": "circular",
@@ -474,7 +522,8 @@
       "totalLiquidVolume": 200,
       "x": 68.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G7": {
       "shape": "circular",
@@ -483,7 +532,8 @@
       "totalLiquidVolume": 200,
       "x": 68.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F7": {
       "shape": "circular",
@@ -492,7 +542,8 @@
       "totalLiquidVolume": 200,
       "x": 68.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E7": {
       "shape": "circular",
@@ -501,7 +552,8 @@
       "totalLiquidVolume": 200,
       "x": 68.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D7": {
       "shape": "circular",
@@ -510,7 +562,8 @@
       "totalLiquidVolume": 200,
       "x": 68.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C7": {
       "shape": "circular",
@@ -519,7 +572,8 @@
       "totalLiquidVolume": 200,
       "x": 68.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B7": {
       "shape": "circular",
@@ -528,7 +582,8 @@
       "totalLiquidVolume": 200,
       "x": 68.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A7": {
       "shape": "circular",
@@ -537,7 +592,8 @@
       "totalLiquidVolume": 200,
       "x": 68.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "H8": {
       "shape": "circular",
@@ -546,7 +602,8 @@
       "totalLiquidVolume": 200,
       "x": 77.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G8": {
       "shape": "circular",
@@ -555,7 +612,8 @@
       "totalLiquidVolume": 200,
       "x": 77.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F8": {
       "shape": "circular",
@@ -564,7 +622,8 @@
       "totalLiquidVolume": 200,
       "x": 77.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E8": {
       "shape": "circular",
@@ -573,7 +632,8 @@
       "totalLiquidVolume": 200,
       "x": 77.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D8": {
       "shape": "circular",
@@ -582,7 +642,8 @@
       "totalLiquidVolume": 200,
       "x": 77.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C8": {
       "shape": "circular",
@@ -591,7 +652,8 @@
       "totalLiquidVolume": 200,
       "x": 77.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B8": {
       "shape": "circular",
@@ -600,7 +662,8 @@
       "totalLiquidVolume": 200,
       "x": 77.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A8": {
       "shape": "circular",
@@ -609,7 +672,8 @@
       "totalLiquidVolume": 200,
       "x": 77.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "H9": {
       "shape": "circular",
@@ -618,7 +682,8 @@
       "totalLiquidVolume": 200,
       "x": 86.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G9": {
       "shape": "circular",
@@ -627,7 +692,8 @@
       "totalLiquidVolume": 200,
       "x": 86.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F9": {
       "shape": "circular",
@@ -636,7 +702,8 @@
       "totalLiquidVolume": 200,
       "x": 86.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E9": {
       "shape": "circular",
@@ -645,7 +712,8 @@
       "totalLiquidVolume": 200,
       "x": 86.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D9": {
       "shape": "circular",
@@ -654,7 +722,8 @@
       "totalLiquidVolume": 200,
       "x": 86.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C9": {
       "shape": "circular",
@@ -663,7 +732,8 @@
       "totalLiquidVolume": 200,
       "x": 86.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B9": {
       "shape": "circular",
@@ -672,7 +742,8 @@
       "totalLiquidVolume": 200,
       "x": 86.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A9": {
       "shape": "circular",
@@ -681,7 +752,8 @@
       "totalLiquidVolume": 200,
       "x": 86.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "H10": {
       "shape": "circular",
@@ -690,7 +762,8 @@
       "totalLiquidVolume": 200,
       "x": 95.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G10": {
       "shape": "circular",
@@ -699,7 +772,8 @@
       "totalLiquidVolume": 200,
       "x": 95.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F10": {
       "shape": "circular",
@@ -708,7 +782,8 @@
       "totalLiquidVolume": 200,
       "x": 95.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E10": {
       "shape": "circular",
@@ -717,7 +792,8 @@
       "totalLiquidVolume": 200,
       "x": 95.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D10": {
       "shape": "circular",
@@ -726,7 +802,8 @@
       "totalLiquidVolume": 200,
       "x": 95.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C10": {
       "shape": "circular",
@@ -735,7 +812,8 @@
       "totalLiquidVolume": 200,
       "x": 95.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B10": {
       "shape": "circular",
@@ -744,7 +822,8 @@
       "totalLiquidVolume": 200,
       "x": 95.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A10": {
       "shape": "circular",
@@ -753,7 +832,8 @@
       "totalLiquidVolume": 200,
       "x": 95.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "H11": {
       "shape": "circular",
@@ -762,7 +842,8 @@
       "totalLiquidVolume": 200,
       "x": 104.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G11": {
       "shape": "circular",
@@ -771,7 +852,8 @@
       "totalLiquidVolume": 200,
       "x": 104.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F11": {
       "shape": "circular",
@@ -780,7 +862,8 @@
       "totalLiquidVolume": 200,
       "x": 104.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E11": {
       "shape": "circular",
@@ -789,7 +872,8 @@
       "totalLiquidVolume": 200,
       "x": 104.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D11": {
       "shape": "circular",
@@ -798,7 +882,8 @@
       "totalLiquidVolume": 200,
       "x": 104.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C11": {
       "shape": "circular",
@@ -807,7 +892,8 @@
       "totalLiquidVolume": 200,
       "x": 104.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B11": {
       "shape": "circular",
@@ -816,7 +902,8 @@
       "totalLiquidVolume": 200,
       "x": 104.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A11": {
       "shape": "circular",
@@ -825,7 +912,8 @@
       "totalLiquidVolume": 200,
       "x": 104.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "H12": {
       "shape": "circular",
@@ -834,7 +922,8 @@
       "totalLiquidVolume": 200,
       "x": 113.38,
       "y": 11.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "G12": {
       "shape": "circular",
@@ -843,7 +932,8 @@
       "totalLiquidVolume": 200,
       "x": 113.38,
       "y": 20.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "F12": {
       "shape": "circular",
@@ -852,7 +942,8 @@
       "totalLiquidVolume": 200,
       "x": 113.38,
       "y": 29.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "E12": {
       "shape": "circular",
@@ -861,7 +952,8 @@
       "totalLiquidVolume": 200,
       "x": 113.38,
       "y": 38.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "D12": {
       "shape": "circular",
@@ -870,7 +962,8 @@
       "totalLiquidVolume": 200,
       "x": 113.38,
       "y": 47.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "C12": {
       "shape": "circular",
@@ -879,7 +972,8 @@
       "totalLiquidVolume": 200,
       "x": 113.38,
       "y": 56.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "B12": {
       "shape": "circular",
@@ -888,7 +982,8 @@
       "totalLiquidVolume": 200,
       "x": 113.38,
       "y": 65.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     },
     "A12": {
       "shape": "circular",
@@ -897,7 +992,8 @@
       "totalLiquidVolume": 200,
       "x": 113.38,
       "y": 74.25,
-      "z": 5.31
+      "z": 5.31,
+      "geometryDefinitionId": "pcrWell"
     }
   },
   "brand": {
@@ -1023,5 +1119,31 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "innerLabwareGeometry": {
+    "pcrWell": {
+      "sections": [
+        {
+          "shape": "conical",
+          "bottomDiameter": 5.3,
+          "topDiameter": 5.46,
+          "topHeight": 20.3,
+          "bottomHeight": 11.35
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 2.33,
+          "topDiameter": 5.3,
+          "topHeight": 11.35,
+          "bottomHeight": 0.8
+        },
+        {
+          "shape": "spherical",
+          "radiusOfCurvature": 1.25,
+          "topHeight": 0.8,
+          "bottomHeight": 0.0
+        }
+      ]
+    }
   }
 }

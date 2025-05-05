@@ -348,13 +348,13 @@
         {
           "shape": "conical",
           "topDiameter": 5.8,
-          "bottomDiameter": 3,
+          "bottomDiameter": 2.8,
           "topHeight": 10.2,
           "bottomHeight": 0.95
         },
         {
           "shape": "conical",
-          "topDiameter": 3,
+          "topDiameter": 2.8,
           "bottomDiameter": 2,
           "topHeight": 0.95,
           "bottomHeight": 0.14

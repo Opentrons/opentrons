@@ -5103,8 +5103,8 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "topXDimension": 3.6322,
-          "topYDimension": 3.6322,
+          "topXDimension": 3.632,
+          "topYDimension": 3.632,
           "bottomXDimension": 2.667,
           "bottomYDimension": 2.667,
           "topHeight": 11.43,

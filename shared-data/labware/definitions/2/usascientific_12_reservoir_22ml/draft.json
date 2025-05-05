@@ -206,9 +206,9 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "topXDimension": 8.34,
-          "topYDimension": 71.85,
-          "bottomXDimension": 7.9,
+          "topXDimension": 8.317,
+          "topYDimension": 71.88,
+          "bottomXDimension": 8.139,
           "bottomYDimension": 71.75,
           "topHeight": 41.75,
           "bottomHeight": 4.0
@@ -216,9 +216,9 @@
         {
           "shape": "squaredcone",
           "bottomCrossSection": "circular",
-          "circleDiameter": 1.68,
-          "rectangleXDimension": 7.9,
-          "rectangleYDimension": 7.9,
+          "circleDiameter": 1.06,
+          "rectangleXDimension": 8.1,
+          "rectangleYDimension": 8.75,
           "topHeight": 4.0,
           "bottomHeight": 0.25,
           "xCount": 1,
@@ -226,7 +226,7 @@
         },
         {
           "shape": "spherical",
-          "radiusOfCurvature": 1.5362,
+          "radiusOfCurvature": 0.687,
           "topHeight": 0.25,
           "bottomHeight": 0.0,
           "yCount": 8
