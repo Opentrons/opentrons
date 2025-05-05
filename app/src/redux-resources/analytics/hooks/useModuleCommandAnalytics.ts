@@ -22,13 +22,11 @@ import type {
   TemperatureParams,
   TemperatureModuleAwaitTemperatureParams,
   ThermocyclerSetTargetBlockTemperatureParams,
-  TCSetTargetLidTemperatureRunTimeCommand,
   RunTimeCommand,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
-import { Temperature } from '@opentrons/components/src/hardware-sim/Module/Temperature'
-import { Thermocycler } from '@opentrons/components'
+
 
 const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
   'thermocycler/closeLid',
@@ -169,25 +167,26 @@ export function useModuleCommandAnalytics(): UseModuleCommandAnalyticsResult {
 function isModuleOnlyParams(params: unknown): params is ModuleOnlyParams {
   return typeof params === 'object' && params !== null && 'moduleId' in params
 }
-type AllTemperatureParams = 
+
+type AllTemperatureParams =
   TemperatureModuleAwaitTemperatureParams |
   TemperatureParams |
-  ThermocyclerSetTargetBlockTemperatureParams 
+  ThermocyclerSetTargetBlockTemperatureParams
 
-function isTemperatureParams(params: unknown): params is AllTemperatureParams{
+function isTemperatureParams(params: unknown): params is AllTemperatureParams {
   return typeof params === 'object' && params !== null && 'celsius' in params
 }
 
 /* Checks param type and returns variables found */
 function isParamType(params: unknown): { moduleId: string; celsius: string } {
-  if (isModuleOnlyParams(params)) {
-    return { moduleId: String(params.moduleId), celsius: '' }
-  }
   if (isTemperatureParams(params)) {
     return {
       moduleId: String(params.moduleId),
       celsius: String(params.celsius),
     }
+  }
+  if (isModuleOnlyParams(params)) {
+    return { moduleId: String(params.moduleId), celsius: '' }
   }
   return { moduleId: '', celsius: '' }
 }
