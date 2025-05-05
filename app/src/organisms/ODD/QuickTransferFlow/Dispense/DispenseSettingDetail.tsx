@@ -4,6 +4,7 @@ import { BlowOut } from '../QuickTransferAdvancedSettings/BlowOut'
 import { Delay } from '../QuickTransferAdvancedSettings/Delay'
 import { FlowRateEntry } from '../QuickTransferAdvancedSettings/FlowRate'
 import { Mix } from '../QuickTransferAdvancedSettings/Mix'
+import { Submerge } from '../QuickTransferAdvancedSettings/Submerge'
 import { TipPositionEntry } from '../QuickTransferAdvancedSettings/TipPosition'
 import { TouchTip } from '../QuickTransferAdvancedSettings/TouchTip'
 
@@ -31,6 +32,7 @@ const SettingComponentMap: Partial<
   [SETTING_OPTIONS.DISPENSE_TOUCH_TIP]: TouchTip,
   [SETTING_OPTIONS.DISPENSE_AIR_GAP]: AirGap,
   [SETTING_OPTIONS.DISPENSE_BLOW_OUT]: BlowOut,
+  [SETTING_OPTIONS.DISPENSE_SUBMERGE]: Submerge,
 }
 
 interface DispenseSettingDetailProps extends Omit<CommonSettingProps, 'kind'> {

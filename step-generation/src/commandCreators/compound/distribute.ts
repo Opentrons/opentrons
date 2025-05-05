@@ -18,6 +18,7 @@ import {
   delayLocationHelper,
   getDispenseAirGapLocation,
   getIsSafePipetteMovement,
+  getSlotInLocationStack,
   reduceCommandCreators,
 } from '../../utils'
 import {
@@ -107,9 +108,12 @@ export const distribute: CommandCreator<DistributeArgs> = (
     )
   }
 
-  const initialDestLabwareSlot = prevRobotState.labware[args.destLabware]?.slot
-  const initialSourceLabwareSlot =
-    prevRobotState.labware[args.sourceLabware]?.slot
+  const initialDestLabwareSlot = getSlotInLocationStack(
+    prevRobotState.labware[args.destLabware]?.stack
+  )
+  const initialSourceLabwareSlot = getSlotInLocationStack(
+    prevRobotState.labware[args.sourceLabware]?.stack
+  )
   const hasWasteChute =
     Object.keys(invariantContext.wasteChuteEntities).length > 0
 

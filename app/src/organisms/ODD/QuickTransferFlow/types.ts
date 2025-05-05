@@ -68,6 +68,10 @@ export interface QuickTransferSummaryState {
     mixVolume: number
     repititions: number
   }
+  submergeAspirate?: {
+    speed: number
+    positionFromBottom: number
+  }
   delayAspirate?: {
     delayDuration: number
     positionFromBottom: number
@@ -79,6 +83,10 @@ export interface QuickTransferSummaryState {
   mixOnDispense?: {
     mixVolume: number
     repititions: number
+  }
+  submergeDispense?: {
+    speed: number
+    positionFromBottom: number
   }
   delayDispense?: {
     delayDuration: number
@@ -122,12 +130,14 @@ export type QuickTransferSummaryAction =
   | SetDelayAspirate
   | SetTouchTipAspirate
   | SetAirGapAspirate
+  | SetSubmergeAspirate
   | SetDispenseTipPosition
   | SetMixOnDispense
   | SetDelayDispense
   | SetTouchTipDispense
   | SetBlowOut
   | SetAirGapDispense
+  | SetSubmergeDispense
   | SetChangeTip
   | SetDropTipLocation
 
@@ -172,6 +182,13 @@ interface SetAirGapAspirate {
   type: typeof ACTIONS.SET_AIR_GAP_ASPIRATE
   volume?: number
 }
+interface SetSubmergeAspirate {
+  type: typeof ACTIONS.SET_SUBMERGE_ASPIRATE
+  submergeSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
+}
 interface SetDispenseTipPosition {
   type: typeof ACTIONS.SET_DISPENSE_TIP_POSITION
   position: number
@@ -198,6 +215,13 @@ interface SetBlowOut {
 interface SetAirGapDispense {
   type: typeof ACTIONS.SET_AIR_GAP_DISPENSE
   volume?: number
+}
+interface SetSubmergeDispense {
+  type: typeof ACTIONS.SET_SUBMERGE_DISPENSE
+  submergeSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
 }
 interface SetChangeTip {
   type: typeof ACTIONS.SET_CHANGE_TIP

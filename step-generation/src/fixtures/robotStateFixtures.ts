@@ -243,28 +243,28 @@ export const makeStateArgsStandard = (): StandardMakeStateArgs => ({
   },
   labwareLocations: {
     tiprack1Id: {
-      slot: '1',
+      stack: ['tiprack1Id', '1'],
     },
     tiprack2Id: {
-      slot: '5',
+      stack: ['tiprack2Id', '5'],
     },
     tiprack4AdapterId: {
-      slot: '7',
+      stack: ['tiprack4AdapterId', '7'],
     },
     tiprack5AdapterId: {
-      slot: '8',
+      stack: ['tiprack5AdapterId', '8'],
     },
     tiprack4Id: {
-      slot: 'tiprack4AdapterId',
+      stack: ['tiprack4Id', 'tiprack4AdapterId', '7'],
     },
     tiprack5Id: {
-      slot: 'tiprack5AdapterId',
+      stack: ['tiprack5Id', 'tiprack5AdapterId', '8'],
     },
     sourcePlateId: {
-      slot: '2',
+      stack: ['sourcePlateId', '2'],
     },
     destPlateId: {
-      slot: '3',
+      stack: ['destPlateId', '3'],
     },
   },
   moduleLocations: {},
@@ -280,16 +280,16 @@ export const makeStateArgsLabwareOffDeck = (): StandardMakeStateArgs => ({
   },
   labwareLocations: {
     tiprack1Id: {
-      slot: 'B1',
+      stack: ['tiprack1Id', 'B1'],
     },
     tiprack2Id: {
-      slot: 'A2',
+      stack: ['tiprack2Id', 'A2'],
     },
     sourcePlateId: {
-      slot: 'offDeck',
+      stack: ['sourcePlateId', 'offDeck'],
     },
     destPlateId: {
-      slot: 'C2',
+      stack: ['destPlateId', 'C2'],
     },
   },
   moduleLocations: {},

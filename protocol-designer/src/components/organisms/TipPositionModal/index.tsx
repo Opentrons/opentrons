@@ -19,6 +19,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getMmFromBottom,
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
@@ -378,11 +379,8 @@ export function TipPositionModal(
               <TipPositionSideView
                 mmFromBottom={
                   zValue !== null
-                    ? utils.getMmFromBottom(
-                        Number(zValue),
-                        reference,
-                        wellDepthMm
-                      )
+                    ? getMmFromBottom(Number(zValue), reference, wellDepthMm) ??
+                      defaultMmFromBottom
                     : defaultMmFromBottom
                 }
                 wellDepthMm={wellDepthMm}

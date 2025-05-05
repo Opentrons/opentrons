@@ -164,7 +164,7 @@ const mockSavedSteps: SavedStepFormState = {
   },
 }
 const mockLabware: LabwareOnDeck = {
-  slot: 'A3',
+  stack: ['mockLabwareId', 'A3'],
   id: 'mockLabwareId',
   pythonName: 'mockPythonName',
   labwareDefURI: 'mockURI',

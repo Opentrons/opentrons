@@ -15,7 +15,7 @@ export function useAbsorbanceReaderCommandType(
   const robotState = useSelector(getRobotStateAtActiveItem)
   const { labware = {}, modules = {} } = robotState ?? {}
   const isLabwareOnAbsorbanceReader = useMemo(
-    () => Object.values(labware).some(lw => lw.slot === moduleId),
+    () => Object.values(labware).some(lw => lw.stack.includes(moduleId ?? '')),
     [moduleId, labware]
   )
   if (moduleId == null) {

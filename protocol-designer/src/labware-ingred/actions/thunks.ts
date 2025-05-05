@@ -1,4 +1,5 @@
 import { getIsTiprack } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getRobotType } from '../../file-data/selectors'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
@@ -150,7 +151,9 @@ export const duplicateLabware: (
   )
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const templateLabwareIdIsOffDeck =
-    initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
+    getSlotInLocationStack(
+      initialDeckSetup.labware[templateLabwareId].stack
+    ) === 'offDeck'
   const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
     templateLabwareDefURI
   ]

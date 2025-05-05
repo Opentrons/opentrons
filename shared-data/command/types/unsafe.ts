@@ -23,6 +23,7 @@ export type UnsafeCreateCommand =
   | UnsafeEngageAxesCreateCommand
   | UnsafeUngripLabwareCreateCommand
   | UnsafePlaceLabwareCreateCommand
+  | UnsafeFlexStackerManualRetrieveCreateCommand
   | UnsafeFlexStackerCloseLatchCreateCommand
   | UnsafeFlexStackerOpenLatchCreateCommand
   | UnsafeFlexStackerPrepareShuttleCreateCommand
@@ -111,7 +112,19 @@ export interface UnsafePlaceLabwareRunTimeCommand
     UnsafePlaceLabwareCreateCommand {
   result?: any
 }
-
+export interface UnsafeFlexStackerManualRetrieveParams {
+  moduleId: string
+}
+export interface UnsafeFlexStackerManualRetrieveCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'unsafe/flexStacker/manualRetrieve'
+  params: UnsafeFlexStackerManualRetrieveParams
+}
+export interface UnsafeFlexStackerManualRetrieveLatchRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    UnsafeFlexStackerManualRetrieveCreateCommand {
+  result?: any
+}
 export interface UnsafeFlexStackerCloseLatchParams {
   moduleId: string
 }

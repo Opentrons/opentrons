@@ -100,6 +100,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'thermocyclerModuleId',
           moduleModel: 'thermocyclerModuleV1' as ModuleModel,
+          moduleSlotName: '7',
         },
       ],
       extraAttentionModules: ['thermocyclerModuleType'],
@@ -135,6 +136,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'thermocyclerModuleId',
           moduleModel: 'thermocyclerModuleV1' as ModuleModel,
+          moduleSlotName: 'B1',
         },
       ],
       extraAttentionModules: ['thermocyclerModuleType'],
@@ -166,6 +168,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'magneticModuleId',
           moduleModel: 'magneticModuleV1' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: mockModuleSlot.slotName,
@@ -206,6 +209,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'temperatureModuleId',
           moduleModel: 'temperatureModuleV1' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: mockModuleSlot.slotName,
@@ -247,6 +251,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'temperatureModuleId',
           moduleModel: 'temperatureModuleV2' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: '7',
@@ -311,6 +316,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: mockModuleId,
           moduleModel: 'heaterShakerModuleV1' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: mockModuleSlot.slotName,

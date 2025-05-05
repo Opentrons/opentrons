@@ -15,12 +15,12 @@ import {
 import { TwoColTextAndImage } from '../shared/TwoColTextAndImage'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
-import type { RecoveryContentProps, RouteStep } from '../types'
+import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 
 export function ManualReplaceLwAndRetry(
   props: RecoveryContentProps
 ): JSX.Element {
-  const { recoveryMap, doorStatusUtils } = props
+  const { recoveryMap } = props
   const { step, route } = recoveryMap
   const {
     MANUAL_REPLACE_AND_RETRY,
@@ -39,15 +39,24 @@ export function ManualReplaceLwAndRetry(
   const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
   const { homeShuttle } = recoveryCommands
 
+  const homeShuttleRoutes: RecoveryRoute[] = [
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
+    MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+  ]
+
   const primaryBtnOnClick = (): Promise<void> => {
     return handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
       switch (route) {
         case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
         case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-          void homeShuttle().then(() => {
+          if (homeShuttleRoutes.includes(route)) {
+            void homeShuttle().then(() => {
+              proceedToRouteAndStep(route, buildNextStep())
+            })
+          } else {
             proceedToRouteAndStep(route, buildNextStep())
-          })
+          }
           break
         default:
           proceedToRouteAndStep(route, buildNextStep())
@@ -57,31 +66,24 @@ export function ManualReplaceLwAndRetry(
   }
 
   const buildNextStep = (): RouteStep => {
-    if (doorStatusUtils.isDoorOpen) {
-      switch (route) {
-        case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-          return RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS
-            .CLOSE_DOOR_AND_HOME
-        default:
-          return MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CLOSE_DOOR_AND_HOME
-      }
-    } else {
-      switch (route) {
-        case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-          return RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS
-            .CONFIRM_RETRY
-        case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
-          return RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS
-            .MANUAL_REPLACE
-        case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-          return REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS
-            .CONFIRM_LABWARE_IN_LATCH
-        case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-          return MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_LABWARE_IN_LATCH
-        default:
-          return MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
-      }
+    switch (route) {
+      case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+        return RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS
+          .CLEAR_TRACK_OF_OBSTRUCTIONS
+      case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+        return RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+        return REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS
+          .CONFIRM_LABWARE_IN_LATCH
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        return MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_LABWARE_IN_LATCH
+      default:
+        return MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS
     }
+  }
+
+  const buildTitle = (): string => {
+    return t('prepare_track_for_homing')
   }
 
   const buildBodyText = (): JSX.Element => (
@@ -112,6 +114,7 @@ export function ManualReplaceLwAndRetry(
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY:
         return <TwoColLwInfoAndDeck {...props} />
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE:
+      case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
       case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.EMPTY_STACKER:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.EMPTY_STACKER:
       case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.REENGAGE_LATCH:
@@ -124,9 +127,9 @@ export function ManualReplaceLwAndRetry(
         return (
           <TwoColTextAndFailedStepNextStep
             {...props}
-            leftColTitle={t('prepare_track_for_homing')}
+            leftColTitle={buildTitle()}
             leftColBodyText={buildBodyText()}
-            primaryBtnCopy={t('continue')}
+            primaryBtnCopy={t('home_now')}
             primaryBtnOnClick={primaryBtnOnClick}
           />
         )

@@ -28,8 +28,8 @@ beforeEach(() => {
     pythonName: 'mockPythonName',
   }
   robotState = getInitialRobotStateStandard(invariantContext)
-  robotState.labware.destPlateId.slot = '4'
-  robotState.labware.tiprack1Id.slot = '10'
+  robotState.labware.destPlateId.stack = ['destPlateId', '4']
+  robotState.labware.tiprack1Id.stack = ['tiprack1Id', '10']
   robotState.modules.magDeckId = {
     slot: '1',
     moduleState: {

@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { MoveLabwareOnDeck } from '@opentrons/components'
@@ -26,6 +26,7 @@ vi.mock('../LeftColumnLabwareInfo')
 vi.mock('../../hooks/useDeckMapUtils')
 
 let mockProceedNextStep: Mock
+let mockManualRetrieve: Mock
 
 const render = (props: ComponentProps<typeof TwoColLwInfoAndDeck>) => {
   return renderWithProviders(<TwoColLwInfoAndDeck {...props} />, {
@@ -38,7 +39,7 @@ describe('TwoColLwInfoAndDeck', () => {
 
   beforeEach(() => {
     mockProceedNextStep = vi.fn()
-
+    mockManualRetrieve = vi.fn().mockResolvedValue(undefined)
     props = {
       routeUpdateActions: {
         proceedNextStep: mockProceedNextStep,
@@ -75,6 +76,9 @@ describe('TwoColLwInfoAndDeck', () => {
         step:
           RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE,
       },
+      recoveryCommands: {
+        manualRetrieve: mockManualRetrieve,
+      },
     } as any
 
     vi.mocked(LeftColumnLabwareInfo).mockReturnValue(
@@ -87,6 +91,19 @@ describe('TwoColLwInfoAndDeck', () => {
     render(props)
     clickButtonLabeled('Continue')
     expect(mockProceedNextStep).toHaveBeenCalled()
+  })
+
+  it('calls manualRetrieve and then proceedNextStep when primary button is clicked for flex stacker retrieve options', async () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOPPER_MANUAL_REPLACE
+    render(props)
+    clickButtonLabeled('Continue')
+    await waitFor(() => {
+      expect(mockManualRetrieve).toHaveBeenCalled()
+    })
+    await waitFor(() => {
+      expect(mockProceedNextStep).toHaveBeenCalled()
+    })
   })
 
   it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE}`, () => {

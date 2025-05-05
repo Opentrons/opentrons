@@ -71,6 +71,8 @@ describe('LeftColumnLabwareInfo', () => {
           labwareNickname: 'MOCK_LW_NICKNAME',
           currentLocationProps: { deckLabel: 'SLOT A1' },
           newLocationProps: { deckLabel: 'SLOT B2' },
+          subText: undefined,
+          tagText: null,
         },
         notificationProps: {
           type: 'alert',

@@ -1,9 +1,12 @@
 import asyncio
+import json
 import os
+import re
 import time
-from typing import Annotated, Any, Awaitable, Callable, List, Literal, Optional, Union
+from typing import Annotated, Any, Awaitable, Callable, List, Literal, Optional, Union, cast
 
 import structlog
+from anthropic.types import MessageParam
 from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.context import correlation_id
 from ddtrace import tracer
@@ -31,6 +34,7 @@ from api.models.error_response import ErrorResponse
 from api.models.feedback_request import FeedbackRequest
 from api.models.feedback_response import FeedbackResponse
 from api.models.internal_server_error import InternalServerError
+from api.models.protocol_format import ProtocolFormat
 from api.models.update_protocol import UpdateProtocol
 from api.models.user import User
 from api.settings import Settings
@@ -169,6 +173,83 @@ class CorsHeadersResponse(BaseModel):
     Access_Control_Max_Age: str = Field(alias="Access-Control-Max-Age")
 
 
+def _validate_request(data: Any, field_name: str) -> None:
+    """Generic request validation for empty fields."""
+    value = getattr(data, field_name, None)
+    if not value:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=EmptyRequestError(message=f"{field_name} is empty").model_dump()
+        )
+
+
+def _handle_fake_response(fake: bool, fake_key: Optional[str] = None) -> Optional[ChatResponse]:
+    """Handle fake responses with optional fake_key."""
+    if fake_key is not None:
+        fake_response: FakeResponse = get_fake_response(fake_key)
+        return ChatResponse(
+            reply=fake_response.chat_response.reply,
+            fake=fake_response.chat_response.fake,
+            protocol_content=fake_response.chat_response.protocol_content,
+        )
+
+    if fake:
+        return ChatResponse(reply="Default fake response", fake=True)
+
+    return None
+
+
+def _generate_llm_response(
+    model_type: str,
+    user_id: str,
+    prompt: str,
+    history: Optional[List[Any]] = None,
+    protocol_format: Optional[ProtocolFormat] = None,
+    protocol_action: Optional[str] = None,
+) -> Optional[str]:
+    """Generate a response from the appropriate LLM based on context."""
+    if "openai" in model_type.lower():
+        return openai.predict(prompt=prompt, chat_completion_message_params=history)
+
+    # Claude models
+    if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
+        return claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+
+    if protocol_action == "create":
+        return claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+
+    # Default to update for chat completion and update_protocol
+    return claude.update(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+
+
+def _format_response(response: Optional[str], protocol_format: Optional[ProtocolFormat], is_fake: bool) -> ChatResponse:
+    """Format the LLM response according to the protocol format."""
+    if response is None or response == "":
+        return ChatResponse(reply="No response was generated, please try again.", fake=bool(is_fake))
+
+    if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
+        logger.debug("Formatting response for Protocol Designer")
+        try:
+            tag = "LIMITATION_REPLY"
+            if f"<{tag}>" in response:
+                pattern = rf"<{tag}>\s*(.*?)\s*</{tag}>"
+                match = re.search(pattern, response, flags=re.DOTALL | re.IGNORECASE)
+                if match is not None:
+                    return ChatResponse(reply=match.group(1).strip(), fake=bool(is_fake))
+                # Fallback if pattern unexpectedly not found
+                return ChatResponse(
+                    reply=f"LLM limitation reply detected but could not parse message. {response[:200]}", fake=bool(is_fake)
+                )
+            else:
+                pd_content = claude.fillup_pd(response)
+                pd_json = json.loads(pd_content)
+                return ChatResponse(reply="Here is your Protocol Designer protocol", fake=bool(is_fake), protocol_content=pd_json)
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON parsing error: {str(e)}", extra={"response": response[:100]})
+            return ChatResponse(reply=f"Failed to parse Protocol Designer JSON: {str(e)}", fake=bool(is_fake))
+
+    return ChatResponse(reply=response, fake=bool(is_fake))
+
+
 @tracer.wrap()
 @app.post(
     "/api/chat/completion",
@@ -187,44 +268,46 @@ async def create_chat_completion(
     """
     logger.info("POST /api/chat/completion", extra={"body": body.model_dump(), "user": user})
     try:
-        if not body.message or body.message == "":
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail=EmptyRequestError(message="Request body is empty").model_dump()
-            )
+        _validate_request(body, "message")
 
-        if body.fake:
-            if body.fake_key is not None:
-                fake: FakeResponse = get_fake_response(body.fake_key)
-                return ChatResponse(
-                    reply=fake.chat_response.reply, fake=fake.chat_response.fake, protocol_content=fake.chat_response.protocol_content
-                )
-            return ChatResponse(reply="Default fake response.  ", fake=body.fake)
+        fake_response = _handle_fake_response(body.fake, getattr(body, "fake_key", None))
+        if fake_response:
+            return fake_response
 
-        response: Optional[str] = None
+        protocol_format = getattr(body, "protocol_format", ProtocolFormat.PYTHON)
+        protocol_action = _determine_protocol_action(body)
 
-        if body.history and body.history[0].get("content") and "Write a protocol using" in body.history[0]["content"]:  # type: ignore
-            protocol_option = "create"
-        else:
-            protocol_option = "update"
-
-        if "openai" in settings.model.lower():
-            response = openai.predict(prompt=body.message, chat_completion_message_params=body.history)
-        else:
-            if protocol_option == "create":
-                response = claude.create(user_id=str(user.sub), prompt=body.message, history=body.history)  # type: ignore
-            else:
-                response = claude.update(user_id=str(user.sub), prompt=body.message, history=body.history)  # type: ignore
-
-        if response is None or response == "":
-            return ChatResponse(reply="No response was generated", fake=bool(body.fake))
-
-        return ChatResponse(reply=response, fake=bool(body.fake))
+        response = _generate_llm_response(
+            model_type=settings.model,
+            user_id=str(user.sub),
+            prompt=body.message,
+            history=body.history,
+            protocol_format=protocol_format,
+            protocol_action=protocol_action,
+        )
+        return _format_response(response, protocol_format, bool(body.fake))
 
     except Exception as e:
         logger.exception("Error processing chat completion")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
         ) from e
+
+
+def _determine_protocol_action(body: ChatRequest) -> str:
+    """Determine protocol action based on message content."""
+    # Default action is update
+    protocol_action = "update"
+
+    # Check if first history message indicates a create action
+    if body.history:
+        message = body.history[0]
+        if isinstance(message, dict) and message.get("content") is not None:
+            first_message_content = str(message["content"])
+            if "Write a protocol using" in first_message_content:
+                protocol_action = "create"
+
+    return protocol_action
 
 
 @tracer.wrap()
@@ -245,31 +328,33 @@ async def create_protocol(
     """
     logger.info("POST /api/chat/createProtocol", extra={"body": body.model_dump(), "user": user})
     try:
+        _validate_request(body, "prompt")
 
-        if not body.prompt or body.prompt == "":
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail=EmptyRequestError(message="Request body is empty").model_dump()
-            )
+        # Special handling for fake_key with delay in createProtocol
         if body.fake_key is not None:
             await asyncio.sleep(6)  # Wait 6 seconds before returning to simulate actual behavior
-            fake: FakeResponse = get_fake_response(body.fake_key)
-            return ChatResponse(
-                reply=fake.chat_response.reply, fake=fake.chat_response.fake, protocol_content=fake.chat_response.protocol_content
+            fake_response = _handle_fake_response(True, body.fake_key)
+            return fake_response if fake_response else ChatResponse(reply="Fake response", fake=True)
+
+        fake_response = _handle_fake_response(bool(body.fake))
+        if fake_response:
+            return fake_response
+
+        protocol_format = body.protocol_format
+        logger.debug(f"Received protocol_format: {protocol_format.value}")
+
+        response = _generate_llm_response(
+            model_type=settings.model, user_id=str(user.sub), prompt=body.prompt, protocol_format=protocol_format, protocol_action="create"
+        )
+
+        # Special handling for Protocol Designer with null response
+        if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER and response is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=InternalServerError(exception_object=Exception("No response received from LLM")).model_dump(),
             )
 
-        if body.fake:
-            return ChatResponse(reply="Fake response", fake=body.fake)
-
-        response: Optional[str] = None
-        if "openai" in settings.model.lower():
-            response = openai.predict(prompt=str(body.model_dump()), chat_completion_message_params=None)
-        else:
-            response = claude.create(user_id=str(user.sub), prompt=body.prompt, history=None)
-
-        if response is None or response == "":
-            return ChatResponse(reply="No response was generated", fake=bool(body.fake))
-
-        return ChatResponse(reply=response, fake=bool(body.fake))
+        return _format_response(response, protocol_format, bool(body.fake))
 
     except Exception as e:
         logger.exception("Error processing protocol creation")
@@ -296,20 +381,15 @@ async def update_protocol(
     """
     logger.info("POST /api/chat/updateProtocol", extra={"body": body.model_dump(), "user": user})
     try:
-        if not body.protocol_text or body.protocol_text == "":
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail=EmptyRequestError(message="Request body is empty").model_dump()
-            )
+        _validate_request(body, "protocol_text")
 
-        if body.fake:
-            return ChatResponse(reply="Fake response", fake=bool(body.fake))
+        fake_response = _handle_fake_response(bool(body.fake))
+        if fake_response:
+            return fake_response
 
-        response: Optional[str] = None
-        if "openai" in settings.model.lower():
-            response = openai.predict(prompt=body.prompt, chat_completion_message_params=None)
-        else:
-            response = claude.update(user_id=str(user.sub), prompt=body.prompt, history=None)
+        response = _generate_llm_response(model_type=settings.model, user_id=str(user.sub), prompt=body.prompt, protocol_action="update")
 
+        # Handle empty response specifically for update protocol
         if response is None or response == "":
             return ChatResponse(reply="No response was generated", fake=bool(body.fake))
 

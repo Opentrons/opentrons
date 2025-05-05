@@ -39,6 +39,7 @@ import {
 import { useApiCall } from '../../resources/hooks'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import { calcTextAreaHeight } from '../../resources/utils'
+import { detectProtocolFormat } from '../../resources/utils/protocolFormat'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'
@@ -47,6 +48,25 @@ import type {
   CreatePrompt,
   UpdatePrompt,
 } from '../../resources/types'
+
+// Helper to safely parse the `protocol_content` field that may be a JSON string or an object.
+const parseProtocolContent = (content: unknown): Record<string, unknown> => {
+  let parsed: unknown
+  if (typeof content === 'string') {
+    try {
+      parsed = JSON.parse(content)
+    } catch {
+      parsed = {}
+    }
+  } else {
+    parsed = content
+  }
+
+  // Ensure result is a non-null object; otherwise fall back to {}
+  return parsed != null && typeof parsed === 'object'
+    ? (parsed as Record<string, unknown>)
+    : {}
+}
 
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -67,7 +87,7 @@ export function InputPrompt(): JSX.Element {
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
   const [token] = useAtom(tokenAtom)
   const [submitted, setSubmitted] = useState<boolean>(false)
-  const watchUserPrompt = watch('userPrompt') ?? ''
+  const watchUserPrompt = (watch('userPrompt') ?? '') as string
 
   const { data, isLoading, callApi } = useApiCall()
 
@@ -112,10 +132,15 @@ export function InputPrompt(): JSX.Element {
   ): Promise<void> => {
     const newRequestId = uuidv4() + getPreFixText(isUpdateOrCreateRequest)
     setRequestId(newRequestId)
+    const currentProtocolFormat = detectProtocolFormat(
+      watchUserPrompt,
+      chatHistory
+    )
     const userInput: ChatData = {
       requestId: newRequestId,
       role: 'user',
       reply: watchUserPrompt,
+      protocol_format: currentProtocolFormat,
     }
     reset()
     setChatData(chatData => [...chatData, userInput])
@@ -132,6 +157,35 @@ export function InputPrompt(): JSX.Element {
 
       const promptData = getUpdateOrCreatePrompt(isRegenerateRequest)
 
+      // Build a history array that conforms to the server schema (role + content).
+      // If this chat is dealing with a Protocol Designer conversation and a history
+      // item contains a `protocol_content`, strip out `labwareDefinitions` and
+      // append the remaining JSON to its content.
+      const sanitizedHistory =
+        currentProtocolFormat !== 'Protocol Designer'
+          ? chatHistory
+          : chatHistory.map(msg => {
+              if (msg.protocol_content != null) {
+                // Use helper to parse the protocol content into a plain object
+                const rawPdJson = parseProtocolContent(msg.protocol_content)
+
+                // Remove labwareDefinitions without using the `delete` operator
+                const {
+                  labwareDefinitions: _omit,
+                  ...pdWithoutLabwareDefs
+                } = rawPdJson
+
+                return {
+                  role: msg.role,
+                  content: `${msg.content}\n\n${JSON.stringify(
+                    pdWithoutLabwareDefs
+                  )}`,
+                }
+              }
+
+              return { role: msg.role, content: msg.content }
+            })
+
       const config = {
         url,
         method: 'POST',
@@ -140,10 +194,11 @@ export function InputPrompt(): JSX.Element {
           ? promptData
           : {
               message: watchUserPrompt,
-              history: chatHistory,
+              history: sanitizedHistory,
               fake: false,
               chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
               pd_protocol_content: pdProtocolContent,
+              protocol_format: currentProtocolFormat,
             },
       }
 
@@ -156,6 +211,7 @@ export function InputPrompt(): JSX.Element {
         name: 'chat-submitted',
         properties: {
           chat: watchUserPrompt,
+          protocol_format: currentProtocolFormat,
         },
       })
       setSubmitted(true)
@@ -170,6 +226,14 @@ export function InputPrompt(): JSX.Element {
   ): CreatePrompt | UpdatePrompt => {
     createProtocol.regenerate = isRegenerateRequest
     updateProtocol.regenerate = isRegenerateRequest
+
+    // If it's a new protocol, set the protocol_format property
+    if (isNewProtocol) {
+      createProtocol.protocol_format = detectProtocolFormat(
+        createProtocol.prompt
+      )
+    }
+
     return isNewProtocol ? createProtocol : updateProtocol
   }
 
@@ -203,7 +267,9 @@ export function InputPrompt(): JSX.Element {
         {
           role: 'assistant',
           content: reply,
-          protocol_content,
+          protocol_content: (JSON.stringify(
+            protocol_content
+          ) as unknown) as string,
         },
       ])
       setChatData(chatData => [...chatData, assistantResponse])
@@ -222,7 +288,7 @@ export function InputPrompt(): JSX.Element {
     <StyledForm id="User_Prompt">
       <Flex css={CONTAINER_STYLE}>
         <LegacyStyledTextarea
-          rows={calcTextAreaHeight(watchUserPrompt as string)}
+          rows={calcTextAreaHeight(watchUserPrompt)}
           placeholder={t('type_your_prompt')}
           {...register('userPrompt')}
         />

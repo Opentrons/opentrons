@@ -57,13 +57,13 @@ const MOCK_TIPRACK_ENTITY = {
   } as LabwareDefinition2,
 } as LabwareEntity
 const MOCK_TIPRACK_LABWARE = {
-  slot: 'C2',
+  stack: [MOCK_TIPRACK_ID, 'C2'],
 }
 const MOCK_TUBERACK_LABWARE_ONDECK = {
-  slot: 'C2',
+  stack: [MOCK_TUBERACK_ID, 'C2'],
 }
 const MOCK_TUBERACK_LABWARE_OFFDECK = {
-  slot: OFFDECK,
+  stack: [MOCK_TUBERACK_ID, OFFDECK],
 }
 
 const MOCK_INITIAL_ROBOT_STATE = {
