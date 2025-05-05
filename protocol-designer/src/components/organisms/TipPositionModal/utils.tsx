@@ -2,7 +2,6 @@ import floor from 'lodash/floor'
 import round from 'lodash/round'
 
 import {
-  POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
@@ -119,23 +118,6 @@ export const getMinMaxWidth = (width: number): MinMaxValues => {
   return {
     minValue: -width * 0.5,
     maxValue: width * 0.5,
-  }
-}
-
-export const getMmFromBottom = (
-  zValue: number,
-  reference: PositionReference,
-  wellDepth: number
-): number => {
-  switch (reference) {
-    case POSITION_REFERENCE_BOTTOM:
-      return zValue
-    case POSITION_REFERENCE_CENTER:
-      return wellDepth / 2 + zValue
-    case POSITION_REFERENCE_TOP:
-      return wellDepth + zValue
-    default:
-      return zValue
   }
 }
 

@@ -94,7 +94,7 @@ export function useAssignLiquidClass(
         const well = allWellsAdjustedForPipette[i]
         const uniqueLiquidClassesInWell = new Set(
           aspirateLabwareLiquids[well].groupIds.reduce<string[]>((acc, id) => {
-            const liquidClass = liquidEntities[id].liquidClass
+            const liquidClass = liquidEntities[id]?.liquidClass
             return liquidClass != null ? [...acc, liquidClass] : acc
           }, [])
         )

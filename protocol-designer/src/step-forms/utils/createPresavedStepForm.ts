@@ -351,8 +351,8 @@ const _patchAbsorbanceReaderModuleId = (args: {
       return null
     }
 
-    const isLabwareOnAbsorbanceReader = Object.values(labware).some(
-      lw => lw.slot === moduleId
+    const isLabwareOnAbsorbanceReader = Object.values(labware).some(lw =>
+      lw.stack.includes(moduleId)
     )
     const absorbanceReaderState = modules[moduleId]
       ?.moduleState as AbsorbanceReaderState | null

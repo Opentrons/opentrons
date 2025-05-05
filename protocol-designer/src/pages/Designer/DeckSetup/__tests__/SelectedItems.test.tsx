@@ -21,7 +21,7 @@ import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { FixtureRender } from '../FixtureRender'
-import { SelectedHoveredItems } from '../SelectedHoveredItems'
+import { SelectedItems } from '../Selectedtems'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -48,19 +48,18 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 
-const render = (props: ComponentProps<typeof SelectedHoveredItems>) => {
-  return renderWithProviders(<SelectedHoveredItems {...props} />)[0]
+const render = (props: ComponentProps<typeof SelectedItems>) => {
+  return renderWithProviders(<SelectedItems {...props} />)[0]
 }
 
 const mockAdapterURI = 'fixture/fixture_universal_flat_bottom_adapter/1'
-describe('SelectedHoveredItems', () => {
-  let props: ComponentProps<typeof SelectedHoveredItems>
+describe('SelectedItems', () => {
+  let props: ComponentProps<typeof SelectedItems>
 
   beforeEach(() => {
     props = {
       deckDef: getDeckDefFromRobotType(FLEX_ROBOT_TYPE),
       robotType: FLEX_ROBOT_TYPE,
-      hoveredLabware: null,
       slotPosition: [0, 0, 0],
     }
     vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
@@ -81,7 +80,7 @@ describe('SelectedHoveredItems', () => {
           id: 'mockId',
           def: fixture24Tuberack as LabwareDefinition2,
           labwareDefURI: mockAdapterURI,
-          slot: 'D3',
+          stack: ['mockId', 'D3'],
           pythonName: 'mockPythonName',
         },
       },
@@ -154,14 +153,14 @@ describe('SelectedHoveredItems', () => {
           id: 'mockId',
           def: fixture24Tuberack as LabwareDefinition2,
           labwareDefURI: mockAdapterURI,
-          slot: 'D3',
+          stack: ['mockId', 'D3'],
           pythonName: 'mockPythonName',
         },
         labware2: {
           id: 'mockId2',
           def: fixture24Tuberack as LabwareDefinition2,
           labwareDefURI: mockAdapterURI,
-          slot: 'mockId',
+          stack: ['mockId2', 'mockId', 'D3'],
           pythonName: 'mockPythonName',
         },
       },

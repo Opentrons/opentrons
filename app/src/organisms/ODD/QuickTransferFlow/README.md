@@ -99,6 +99,11 @@ export interface QuickTransferSummaryState {
     mixVolume: number
     repititions: number
   }
+  submergeAspirate?: {
+    // this has been added
+    speed: number
+    positionFromBottom: number
+  }
   delayAspirate?: {
     delayDuration: number
     positionFromBottom: number
@@ -110,6 +115,11 @@ export interface QuickTransferSummaryState {
   mixOnDispense?: {
     mixVolume: number
     repititions: number
+  }
+  submergeDispense?: {
+    // this has been added
+    speed: number
+    positionFromBottom: number
   }
   delayDispense?: {
     delayDuration: number

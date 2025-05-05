@@ -33,7 +33,7 @@ const MOCK_MODULE_STATE = {
 }
 const MOCK_LABWARE = {
   [MOCK_LABWARE_ID]: {
-    slot: MOCK_MODULE_ID,
+    stack: [MOCK_LABWARE_ID, MOCK_MODULE_ID, 'D3'],
   },
 }
 

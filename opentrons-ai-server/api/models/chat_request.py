@@ -3,6 +3,8 @@ from typing import Annotated, Any, Dict, List, Literal, Optional
 from openai.types.chat import ChatCompletionMessageParam
 from pydantic import BaseModel, Field
 
+from api.models.protocol_format import ProtocolFormat
+
 
 class Chat(BaseModel):
     role: str
@@ -35,3 +37,4 @@ class ChatRequest(BaseModel):
     fake_key: FakeKeyType
     chat_options: ChatOptionType
     pd_protocol_content: Optional[Dict[str, Any]] = Field(None, description="PD protocol that was previously generated")
+    protocol_format: ProtocolFormat = ProtocolFormat.PYTHON

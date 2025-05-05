@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
@@ -23,9 +23,11 @@ export function TwoColTextAndImage(
   const { routeUpdateActions, recoveryMap, recoveryCommands } = props
   const {
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
-    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
+    MANUAL_REPLACE_STACKER_AND_RETRY,
     ROBOT_IN_MOTION,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP,
     MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
   } = RECOVERY_MAP
   const { route, step } = recoveryMap
   const {
@@ -67,6 +69,9 @@ export function TwoColTextAndImage(
         } else {
           return t('empty_stacker_of_labware_above_latch')
         }
+      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+        return t('clear_track_of_obstructions')
       default:
         console.error(
           `TwoColTextAndImage: Unexpected recovery option: ${route}. Handle retry step copy explicitly.`
@@ -79,6 +84,9 @@ export function TwoColTextAndImage(
     switch (route) {
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('take_any_necessary_precautions_before_loading_shuttle')
+      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+        return t('clear_track_of_obstructions_and_close_door')
       case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         if (REENGAGE_LATCH_ROUTES.includes(step)) {
@@ -147,15 +155,26 @@ export function TwoColTextAndImage(
             oddStyle="level4HeaderRegular"
             desktopStyle="bodyDefaultRegular"
           >
-            {buildBody()}
+            <Trans
+              t={t}
+              i18nKey={buildBody()}
+              components={{
+                block: (
+                  <StyledText
+                    oddStyle="level4HeaderRegular"
+                    desktopStyle="bodyDefaultRegular"
+                  />
+                ),
+              }}
+            />
           </StyledText>
         </Flex>
         <Flex>{buildImage()}</Flex>
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={primaryOnClick}
-        primaryBtnTextOverride={buildButtonText()}
         secondaryBtnOnClick={goBackPrevStep}
+        primaryBtnTextOverride={buildButtonText()}
       ></RecoveryFooterButtons>
     </RecoverySingleColumnContentWrapper>
   )

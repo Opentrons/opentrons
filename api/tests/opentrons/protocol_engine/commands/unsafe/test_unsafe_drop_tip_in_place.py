@@ -49,9 +49,9 @@ async def test_drop_tip_implementation(
     decoy.when(state_view.motion.get_pipette_location(pipette_id="abc")).then_return(
         PipetteLocationData(mount=MountType.LEFT, critical_point=None)
     )
-    decoy.when(
-        state_view.tips.get_pipette_active_channels(params.pipetteId)
-    ).then_return(channels)
+    decoy.when(state_view.pipettes.get_active_channels(params.pipetteId)).then_return(
+        channels
+    )
 
     result = await subject.execute(params)
 

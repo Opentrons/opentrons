@@ -35,6 +35,7 @@ from opentrons.protocol_engine.commands.flex_stacker.retrieve import RetrieveImp
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     ModuleModel,
     LoadedModule,
     OnModuleLocationSequenceComponent,
@@ -334,6 +335,7 @@ async def test_retrieve_primary_and_lid(
             batch_labware_location=BatchLabwareLocationUpdate(
                 new_locations_by_id={
                     "primary-id-1": ModuleLocation(moduleId=stacker_id),
+                    "lid-id-1": OnLabwareLocation(labwareId="primary-id-1"),
                 },
                 new_offset_ids_by_id={"primary-id-1": "offset-id-1", "lid-id-1": None},
             ),
@@ -454,6 +456,7 @@ async def test_retrieve_primary_and_adapter(
             batch_labware_location=BatchLabwareLocationUpdate(
                 new_locations_by_id={
                     "adapter-id-1": ModuleLocation(moduleId=stacker_id),
+                    "primary-id-1": OnLabwareLocation(labwareId="adapter-id-1"),
                 },
                 new_offset_ids_by_id={
                     "primary-id-1": "offset-id-2",
@@ -623,6 +626,8 @@ async def test_retrieve_primary_adapter_and_lid(
             batch_labware_location=BatchLabwareLocationUpdate(
                 new_locations_by_id={
                     "adapter-id-1": ModuleLocation(moduleId=stacker_id),
+                    "primary-id-1": OnLabwareLocation(labwareId="adapter-id-1"),
+                    "lid-id-1": OnLabwareLocation(labwareId="primary-id-1"),
                 },
                 new_offset_ids_by_id={
                     "primary-id-1": "offset-id-2",

@@ -2079,6 +2079,7 @@ def test_build_ids_to_fill_builds_specified_components(
             ),
             {
                 "adapter-id": ModuleLocation(moduleId="stacker-id"),
+                "primary-id": OnLabwareLocation(labwareId="adapter-id"),
             },
             {
                 "primary-id": "primary-on-adapter-base-id",
@@ -2094,6 +2095,7 @@ def test_build_ids_to_fill_builds_specified_components(
             ),
             {
                 "primary-id": ModuleLocation(moduleId="stacker-id"),
+                "lid-id": OnLabwareLocation(labwareId="primary-id"),
             },
             {"primary-id": "primary-base-id", "lid-id": "lid-primary-base-id"},
             id="primary-and-lid",
@@ -2106,6 +2108,8 @@ def test_build_ids_to_fill_builds_specified_components(
             ),
             {
                 "adapter-id": ModuleLocation(moduleId="stacker-id"),
+                "primary-id": OnLabwareLocation(labwareId="adapter-id"),
+                "lid-id": OnLabwareLocation(labwareId="primary-id"),
             },
             {
                 "primary-id": "primary-on-adapter-base-id",

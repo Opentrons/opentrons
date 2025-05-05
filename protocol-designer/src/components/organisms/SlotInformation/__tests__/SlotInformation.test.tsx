@@ -40,7 +40,6 @@ describe('SlotInformation', () => {
       location: 'A1',
       liquids: [],
       labwares: [],
-      adapters: [],
       modules: [],
       fixtures: [],
     }
@@ -65,8 +64,7 @@ describe('SlotInformation', () => {
     props = {
       ...props,
       liquids: mockLiquids,
-      labwares: mockLabwares,
-      adapters: mockAdapters,
+      labwares: [...mockLabwares, ...mockAdapters],
       modules: mockModules,
     }
     render(props)

@@ -22,6 +22,7 @@ import {
   chatHistoryAtom,
   createProtocolAtom,
   createProtocolChatAtom,
+  featureFlagsAtom,
   headerWithMeterAtom,
   updateProtocolChatAtom,
 } from '../../resources/atoms'
@@ -77,6 +78,8 @@ export function CreateProtocol(): JSX.Element | null {
   const [isResizing, setIsResizing] = useState(false)
   const [initialMouseX, setInitialMouseX] = useState(0)
   const [initialLeftWidth, setInitialLeftWidth] = useState(50)
+  const [featureFlags] = useAtom(featureFlagsAtom)
+  const isPdProtocolGenerationEnabled = featureFlags.enablePDProtocolGeneration
 
   const parentRef = useRef<HTMLDivElement>(null)
 
@@ -209,7 +212,8 @@ export function CreateProtocol(): JSX.Element | null {
     const chatPromptData = generateChatPrompt(
       methods.getValues(),
       t,
-      setCreateProtocolChatAtom
+      setCreateProtocolChatAtom,
+      isPdProtocolGenerationEnabled
     )
 
     trackEvent({

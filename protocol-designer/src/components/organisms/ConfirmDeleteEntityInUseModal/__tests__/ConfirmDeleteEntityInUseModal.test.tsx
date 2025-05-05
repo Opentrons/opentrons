@@ -21,26 +21,9 @@ describe('ConfirmDeleteEntityInUseModal', () => {
     props = {
       onClose: vi.fn(),
       onConfirm: vi.fn(),
-      type: 'clear',
     }
     render(props)
     screen.getByText('Are you sure you want to clear slot?')
-    screen.getByText(
-      'This slot contains hardware or labware used in a protocol step, and clearing it may cause errors in your protocol.'
-    )
-    fireEvent.click(screen.getByText('Cancel'))
-    expect(props.onClose).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Clear slot'))
-    expect(props.onConfirm).toHaveBeenCalled()
-  })
-  it('renders the text and buttons work as expected for reconfigure', () => {
-    props = {
-      onClose: vi.fn(),
-      onConfirm: vi.fn(),
-      type: 'reconfigure',
-    }
-    render(props)
-    screen.getByText('Are you sure you want to reconfigure the slot?')
     screen.getByText(
       'This slot contains hardware or labware used in a protocol step, and clearing it may cause errors in your protocol.'
     )

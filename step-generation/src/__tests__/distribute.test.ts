@@ -1950,7 +1950,7 @@ it('should return an error for the labware already being discarded in previous s
   } as InvariantContext
 
   robotStateWithTip.labware = {
-    [SOURCE_LABWARE]: { slot: 'gripperWasteChute' },
+    [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'gripperWasteChute'] },
   }
 
   const distributeArgs = {

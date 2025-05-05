@@ -127,6 +127,7 @@ Follow these instructions to handle the user's prompt:
 
       def add_parameters(parameters): # this required only if users want runtime parameters in the protocol
          [...]
+         # note that `description` parameter: description must be less than 90 characters
 
       def run(protocol: protocol_api.ProtocolContext):
          # accessing runtime values
