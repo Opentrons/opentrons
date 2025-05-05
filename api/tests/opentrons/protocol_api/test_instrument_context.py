@@ -1844,6 +1844,7 @@ def test_air_gap_uses_air_gap(
     decoy.verify(mock_instrument_core.prepare_to_aspirate())
     decoy.verify(mock_instrument_core.air_gap_in_place(10, 11))
 
+
 @pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 24)))
 def test_air_gap_has_rate(
     decoy: Decoy,
@@ -1852,7 +1853,7 @@ def test_air_gap_has_rate(
     subject: InstrumentContext,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """It should use its own rate param"""
+    """It should use its own rate param."""
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(9, 9, 14), labware=mock_well)
     last_location = Location(point=Point(9, 9, 9), labware=mock_well)
@@ -1867,7 +1868,9 @@ def test_air_gap_has_rate(
 
     decoy.verify(mock_move_to(top_location, publish=False))
     decoy.verify(mock_instrument_core.prepare_to_aspirate())
-    decoy.verify(mock_instrument_core.air_gap_in_place(10, 12)) # 12 is from the rate param
+    decoy.verify(
+        mock_instrument_core.air_gap_in_place(10, 12)
+    )  # 12 is from the rate param
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
