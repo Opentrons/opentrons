@@ -603,7 +603,7 @@ def test_blow_out_with_trash_last_location(
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=mock_chute, well_core=None, in_place=False
+            location=mock_chute, well_core=None, in_place=True
         ),
         times=1,
     )
@@ -1503,7 +1503,7 @@ def test_dispense_with_trash_last_location(
         mock_instrument_core.dispense(
             location=mock_trash,
             well_core=None,
-            in_place=False,
+            in_place=True,
             volume=12.3,
             rate=4.5,
             flow_rate=6.7,

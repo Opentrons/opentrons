@@ -258,7 +258,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             ) from e
 
-        if isinstance(target, (TrashBin, WasteChute)):
+        if isinstance(target, validation.DisposalTarget):
             raise ValueError(
                 "Trash Bin and Waste Chute are not acceptable location parameters for Aspirate commands."
             )
@@ -435,13 +435,13 @@ class InstrumentContext(publisher.CommandPublisher):
 
         flow_rate = self._core.get_dispense_flow_rate(rate)
 
-        if isinstance(target, (TrashBin, WasteChute)):
+        if isinstance(target, validation.DisposalTarget):
             with publisher.publish_context(
                 broker=self.broker,
                 command=cmds.dispense_in_disposal_location(
                     instrument=self,
                     volume=c_vol,
-                    location=target,
+                    location=target.location,
                     rate=rate,
                     flow_rate=flow_rate,
                 ),
@@ -449,10 +449,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 self._core.dispense(
                     volume=c_vol,
                     rate=rate,
-                    location=target,
+                    location=target.location,
                     well_core=None,
                     flow_rate=flow_rate,
-                    in_place=False,
+                    in_place=target.in_place,
                     push_out=push_out,
                     meniscus_tracking=None,
                 )
@@ -702,17 +702,17 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
-        elif isinstance(target, (TrashBin, WasteChute)):
+        elif isinstance(target, validation.DisposalTarget):
             with publisher.publish_context(
                 broker=self.broker,
                 command=cmds.blow_out_in_disposal_location(
-                    instrument=self, location=target
+                    instrument=self, location=target.location
                 ),
             ):
                 self._core.blow_out(
-                    location=target,
+                    location=target.location,
                     well_core=None,
-                    in_place=False,
+                    in_place=target.in_place,
                 )
             return self
 

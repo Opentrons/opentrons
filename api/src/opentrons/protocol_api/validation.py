@@ -545,6 +545,11 @@ class PointTarget(NamedTuple):
     in_place: bool
 
 
+class DisposalTarget(NamedTuple):
+    location: Union[TrashBin, WasteChute]
+    in_place: bool
+
+
 class NoLocationError(ValueError):
     """Error representing that no location was supplied."""
 
@@ -553,7 +558,7 @@ class LocationTypeError(TypeError):
     """Error representing that the location supplied is of different expected type."""
 
 
-ValidTarget = Union[WellTarget, PointTarget, TrashBin, WasteChute]
+ValidTarget = Union[WellTarget, PointTarget, DisposalTarget]
 
 
 def validate_location(
@@ -588,10 +593,10 @@ def validate_location(
             f"location should be a Well, Location, TrashBin or WasteChute, but it is {location}"
         )
 
-    if isinstance(target_location, (TrashBin, WasteChute)):
-        return target_location
-
     in_place = target_location == last_location
+
+    if isinstance(target_location, (TrashBin, WasteChute)):
+        return DisposalTarget(location=target_location, in_place=in_place)
 
     if isinstance(target_location, Well):
         return WellTarget(well=target_location, location=None, in_place=in_place)
