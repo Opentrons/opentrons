@@ -206,10 +206,11 @@ class EmptyImpl(AbstractCommandImpl[EmptyParams, SuccessData[EmptyResult]]):
             module_id=stacker_state.module_id
         )
         if stacker_hw:
-            await stacker_hw.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
+            stacker_hw.set_door_intervention(True)
 
         if params.strategy == StackerFillEmptyStrategy.MANUAL_WITH_PAUSE:
             await self._run_control.wait_for_resume()
+        stacker_hw.set_door_intervention(False)
 
         if stacker_state.pool_primary_definition is None:
             raise FlexStackerLabwarePoolNotYetDefinedError(
