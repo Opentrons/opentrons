@@ -100,6 +100,19 @@ export function generatePromptPreviewModulesItems(
   return items.filter(Boolean)
 }
 
+export function generatePromptPreviewFixtureItems(
+  watch: UseFormWatch<CreateProtocolFormData>,
+  t: any
+): string[] {
+  const { fixtures } = watch()
+
+  if (fixtures === undefined || fixtures?.length === 0) return []
+
+  const items = fixtures?.map(fixture => fixture.name)
+
+  return items.filter(Boolean)
+}
+
 export function generatePromptPreviewLabwareLiquidsItems(
   watch: UseFormWatch<CreateProtocolFormData>,
   t: any
@@ -249,6 +262,10 @@ export function generatePromptPreviewData(
     {
       title: t('modules_title'),
       items: generatePromptPreviewModulesItems(watch, t),
+    },
+    {
+      title: t('fixtures_title'),
+      items: generatePromptPreviewFixtureItems(watch, t),
     },
     {
       title: t('labware_liquids_title'),
