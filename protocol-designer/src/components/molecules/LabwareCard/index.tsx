@@ -28,6 +28,8 @@ interface LabwareCardProps {
   lidDisplayName?: string
 }
 
+//  TODO: add stacking capabilities for Flex Stacker work, currently not
+//  ready Design-wise.
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { labware, lidDisplayName } = props
   const navigate = useNavigate()
