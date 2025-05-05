@@ -44,9 +44,7 @@ class MovementHandler:
         model_utils: Optional[ModelUtils] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
         heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
-        equipment: Optional[
-            EquipmentHandler
-        ] = None,
+        equipment: Optional[EquipmentHandler] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         if thermocycler_movement_flagger:

@@ -64,6 +64,7 @@ def mock_gantry_mover(decoy: Decoy) -> GantryMover:
     """Get a mock in the shape of a GantryMover."""
     return decoy.mock(cls=GantryMover)
 
+
 @pytest.fixture
 def mock_equipment_handler(decoy: Decoy) -> EquipmentHandler:
     """Get a mock in the shape of an EquipmentHandler."""

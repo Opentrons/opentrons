@@ -55,7 +55,10 @@ class ThermocyclerMovementFlagger:
                 " but can't confirm Thermocycler's current status."
             ) from e
 
-        if hw_tc_lid_status == ThermocyclerLidStatus.IN_BETWEEN:
+        if (
+            hw_tc_lid_status == ThermocyclerLidStatus.IN_BETWEEN
+            or hw_tc_lid_status == ThermocyclerLidStatus.UNKNOWN
+        ):
             await self.open_tc_lid(module_id=module_id)
         if hw_tc_lid_status != ThermocyclerLidStatus.OPEN:
             raise ThermocyclerNotOpenError(
