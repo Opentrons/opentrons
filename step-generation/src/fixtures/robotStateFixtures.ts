@@ -149,7 +149,7 @@ export function makeContext(): InvariantContext {
     p10SingleId: {
       name: 'p10_single',
       id: 'p10SingleId',
-      pythonName: 'pipette_p10',
+      pythonName: 'mock_pipette_p10',
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
       tiprackLabwareDef: [fixtureTiprack10ul],
       spec: fixtureP10SingleV2Specs,
@@ -160,7 +160,7 @@ export function makeContext(): InvariantContext {
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
       tiprackLabwareDef: [fixtureTiprack10ul],
       spec: fixtureP10MultiV2Specs,
-      pythonName: 'pipette_p10_multi',
+      pythonName: 'mock_pipette_p10_multi',
     },
     [DEFAULT_PIPETTE]: {
       name: 'p300_single',
@@ -176,7 +176,7 @@ export function makeContext(): InvariantContext {
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
       tiprackLabwareDef: [fixtureTiprack300ul],
       spec: fixtureP300MultiV2Specs,
-      pythonName: 'pipette_p300_multi',
+      pythonName: 'mock_pipette_p300_multi',
     },
     [PIPETTE_96]: {
       name: 'p1000_96',
@@ -184,7 +184,7 @@ export function makeContext(): InvariantContext {
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack1000ul)],
       tiprackLabwareDef: [fixtureTiprack1000ul],
       spec: fixtureP100096V2Specs,
-      pythonName: 'pipette_p1000_96',
+      pythonName: 'mock_pipette_p1000_96',
     },
   }
 

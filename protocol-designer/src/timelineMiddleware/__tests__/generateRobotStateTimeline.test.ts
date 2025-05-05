@@ -291,15 +291,15 @@ mock_pipette.drop_tip()
 `.trim(),
       // Step b:
       `
-pipette_p300_multi.pick_up_tip(location=mock_tip_rack_1)
-pipette_p300_multi.move_to(mock_source_plate["A1"].top(z=2))
-pipette_p300_multi.prepare_to_aspirate()
-pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
-pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
-pipette_p300_multi.aspirate(...)
-pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
-pipette_p300_multi.dispense(...)
-pipette_p300_multi.drop_tip()
+mock_pipette_p300_multi.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette_p300_multi.move_to(mock_source_plate["A1"].top(z=2))
+mock_pipette_p300_multi.prepare_to_aspirate()
+mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
+mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
+mock_pipette_p300_multi.aspirate(...)
+mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
+mock_pipette_p300_multi.dispense(...)
+mock_pipette_p300_multi.drop_tip()
 `.trim(),
       // Step c:
       `

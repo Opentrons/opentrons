@@ -68,7 +68,7 @@ describe('airGapInWell', () => {
         },
       },
     ])
-    expect(res.python).toBe('pipette_p10.air_gap(volume=10, height=1)')
+    expect(res.python).toBe('mock_pipette_p10.air_gap(volume=10, height=1)')
   })
   it('air gap for multi wells for consolidate dispense', () => {
     const args = {
@@ -117,7 +117,7 @@ describe('airGapInWell', () => {
         },
       },
     ])
-    expect(res.python).toBe('pipette_p10.air_gap(volume=10, height=1)')
+    expect(res.python).toBe('mock_pipette_p10.air_gap(volume=10, height=1)')
   })
   it('air gap after aspirate', () => {
     const args = {
@@ -159,6 +159,6 @@ describe('airGapInWell', () => {
         },
       },
     ])
-    expect(res.python).toBe('pipette_p10.air_gap(volume=10, height=1)')
+    expect(res.python).toBe('mock_pipette_p10.air_gap(volume=10, height=1)')
   })
 })

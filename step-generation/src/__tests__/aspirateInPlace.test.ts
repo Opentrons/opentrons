@@ -41,9 +41,9 @@ describe('aspirateInPlace', () => {
     ])
     expect(getSuccessResult(result).python).toBe(
       `
-pipette_p10.aspirate(
+mock_pipette_p10.aspirate(
     volume=10,
-    rate=20 / pipette_p10.flow_rate.aspirate,
+    rate=20 / mock_pipette_p10.flow_rate.aspirate,
 )`.trimStart()
     )
   })
