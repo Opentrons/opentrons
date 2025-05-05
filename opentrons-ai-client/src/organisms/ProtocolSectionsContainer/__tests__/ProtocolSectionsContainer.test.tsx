@@ -31,7 +31,7 @@ describe('ProtocolSectionsContainer', () => {
     expect(screen.getByText('Protocol Format')).toBeInTheDocument()
     expect(screen.getByText('Application')).toBeInTheDocument()
     expect(screen.getByText('Instruments')).toBeInTheDocument()
-    expect(screen.getByText('Modules & Fixtures')).toBeInTheDocument()
+    expect(screen.getByText('Modules')).toBeInTheDocument()
     expect(screen.getByText('Labware & Liquids')).toBeInTheDocument()
     expect(screen.getByText('Steps')).toBeInTheDocument()
   })
@@ -52,7 +52,7 @@ describe('ProtocolSectionsContainer', () => {
       'false'
     )
     expect(
-      screen.getByRole('button', { name: 'Modules & Fixtures' })
+      screen.getByRole('button', { name: 'Modules' })
     ).toHaveAttribute('aria-expanded', 'false')
     expect(
       screen.getByRole('button', { name: 'Labware & Liquids' })

@@ -17,6 +17,7 @@ import { COLUMN } from '@opentrons/shared-data'
 import { Accordion } from '../../molecules/Accordion'
 import { ApplicationSection } from '../../organisms/ApplicationSection'
 import { createProtocolAtom } from '../../resources/atoms'
+import { PROTOCOL_FORMAT, PYTHON } from '../../resources/constants'
 import { InstrumentsSection } from '../InstrumentsSection'
 import { LabwareLiquidsSection } from '../LabwareLiquidsSection'
 import { ModulesAndFixturesSection } from '../ModulesAndFixturesSection'
@@ -29,49 +30,54 @@ export const INSTRUMENTS_STEP = 2
 export const MODULES_STEP = 3
 export const LABWARE_LIQUIDS_STEP = 4
 export const STEPS_STEP = 5
-
-export const sections = [
-  {
-    sectionNumber: PROTOCOL_FORMAT_STEP,
-    title: 'protocol_format_title',
-    Component: ProtocolFormatSection,
-  },
-  {
-    sectionNumber: APPLICATION_STEP,
-    title: 'application_title',
-    Component: ApplicationSection,
-  },
-  {
-    sectionNumber: INSTRUMENTS_STEP,
-    title: 'instruments_title',
-    Component: InstrumentsSection,
-  },
-  {
-    sectionNumber: MODULES_STEP,
-    title: 'modules_fixtures_title',
-    Component: ModulesAndFixturesSection,
-  },
-  {
-    sectionNumber: LABWARE_LIQUIDS_STEP,
-    title: 'labware_liquids_title',
-    Component: LabwareLiquidsSection,
-  },
-  {
-    sectionNumber: STEPS_STEP,
-    title: 'steps_title',
-    Component: StepsSection,
-  },
-]
+export const TOTAL_STEPS = 6
 
 export function ProtocolSectionsContainer(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const {
     formState: { isValid },
     trigger,
+    watch,
   } = useFormContext()
   const [{ currentSection, focusSection }, setCreateProtocolAtom] = useAtom(
     createProtocolAtom
   )
+
+  const protocolFormat: string = watch(PROTOCOL_FORMAT)
+
+  const sections = [
+    {
+      sectionNumber: PROTOCOL_FORMAT_STEP,
+      title: 'protocol_format_title',
+      Component: ProtocolFormatSection,
+    },
+    {
+      sectionNumber: APPLICATION_STEP,
+      title: 'application_title',
+      Component: ApplicationSection,
+    },
+    {
+      sectionNumber: INSTRUMENTS_STEP,
+      title: 'instruments_title',
+      Component: InstrumentsSection,
+    },
+    {
+      sectionNumber: MODULES_STEP,
+      title:
+        protocolFormat === PYTHON ? 'modules_fixtures_title' : 'modules_title',
+      Component: ModulesAndFixturesSection,
+    },
+    {
+      sectionNumber: LABWARE_LIQUIDS_STEP,
+      title: 'labware_liquids_title',
+      Component: LabwareLiquidsSection,
+    },
+    {
+      sectionNumber: STEPS_STEP,
+      title: 'steps_title',
+      Component: StepsSection,
+    },
+  ]
 
   useEffect(() => {
     trigger()

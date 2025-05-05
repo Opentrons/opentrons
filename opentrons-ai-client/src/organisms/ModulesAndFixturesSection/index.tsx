@@ -15,6 +15,7 @@ import { FixtureListItemGroup } from '../../molecules/FixtureListItemGroup'
 import { FixturesButtonGroup } from '../../molecules/FixturesButtonGroup'
 import { ModuleListItemGroup } from '../../molecules/ModuleListItemGroup'
 import { ModulesButtonGroup } from '../../molecules/ModulesButtonGroup'
+import { PROTOCOL_FORMAT, PYTHON } from '../../resources/constants'
 import { OPENTRONS_FLEX, ROBOT_FIELD_NAME } from '../InstrumentsSection'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
@@ -104,6 +105,7 @@ export function ModulesAndFixturesSection(): JSX.Element | null {
 
   const modulesWatch: DisplayModule[] = watch(MODULES_FIELD_NAME) ?? []
   const fixturesWatch: DisplayFixture[] = watch(FIXTURES_FIELD_NAME) ?? []
+  const protocolFormat: string = watch(PROTOCOL_FORMAT)
 
   return (
     <Flex
@@ -128,15 +130,19 @@ export function ModulesAndFixturesSection(): JSX.Element | null {
         <InfoScreen content={t('no_modules_added_yet')} />
       )}
       <ModuleListItemGroup />
-      <Divider />
-      <StyledText desktopStyle="headingSmallRegular">
-        {t('fixtures_title')}
-      </StyledText>
-      <FixturesButtonGroup fixtures={allFixtures} />
-      {fixturesWatch.length === 0 && (
-        <InfoScreen content={t('no_fixtures_added_yet')} />
+      {protocolFormat === PYTHON && (
+        <>
+          <Divider />
+          <StyledText desktopStyle="headingSmallRegular">
+            {t('fixtures_title')}
+          </StyledText>
+          <FixturesButtonGroup fixtures={allFixtures} />
+          {fixturesWatch.length === 0 && (
+            <InfoScreen content={t('no_fixtures_added_yet')} />
+          )}
+          <FixtureListItemGroup />
+        </>
       )}
-      <FixtureListItemGroup />
     </Flex>
   )
 }

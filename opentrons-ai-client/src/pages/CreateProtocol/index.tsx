@@ -15,7 +15,7 @@ import { ResizeBar } from '../../atoms/ResizeBar'
 import { PromptPreview } from '../../molecules/PromptPreview'
 import {
   ProtocolSectionsContainer,
-  sections,
+  TOTAL_STEPS,
 } from '../../organisms/ProtocolSectionsContainer'
 import {
   chatDataAtom,
@@ -59,8 +59,6 @@ export interface CreateProtocolFormData {
   liquids: string[]
   steps: string[] | string
 }
-
-const TOTAL_STEPS = sections.length
 
 export function CreateProtocol(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
