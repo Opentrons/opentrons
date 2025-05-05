@@ -1,19 +1,10 @@
 import { useModulesQuery } from '@opentrons/react-api-client'
-import {
-  FLEX_ROBOT_TYPE,
-  getDeckDefFromRobotType,
-} from '@opentrons/shared-data'
 
 import {
   useTrackEvent,
   ANALYTICS_MODULE_COMMAND_ERROR,
   ANALYTICS_MODULE_COMMAND_COMPLETED,
 } from '/app/redux/analytics'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import {
-  getAttachedProtocolModuleMatches,
-  getProtocolModulesInfo,
-} from '/app/transformations/analysis'
 
 import type {
   CommandStatus,
@@ -26,7 +17,6 @@ import type {
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
-
 
 const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
   'thermocycler/closeLid',
@@ -103,7 +93,7 @@ export function useModuleCommandAnalytics(): UseModuleCommandAnalyticsResult {
       moduleId: module.id,
       serialNumber: module.serialNumber,
       firmwareVersion: module.firmwareVersion,
-    }));
+    }))
 
     const { moduleId, celsius } = isParamType(
       'params' in rest ? rest.params : null
@@ -157,9 +147,9 @@ function isModuleOnlyParams(params: unknown): params is ModuleOnlyParams {
 }
 
 type AllTemperatureParams =
-  TemperatureModuleAwaitTemperatureParams |
-  TemperatureParams |
-  ThermocyclerSetTargetBlockTemperatureParams
+  | TemperatureModuleAwaitTemperatureParams
+  | TemperatureParams
+  | ThermocyclerSetTargetBlockTemperatureParams
 
 function isTemperatureParams(params: unknown): params is AllTemperatureParams {
   return typeof params === 'object' && params !== null && 'celsius' in params
