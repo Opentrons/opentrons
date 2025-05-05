@@ -844,7 +844,10 @@ class InstrumentContext(publisher.CommandPublisher):
     @publisher.publish(command=cmds.air_gap)
     @requires_version(2, 0)
     def air_gap(
-        self, volume: Optional[float] = None, height: Optional[float] = None
+        self,
+        volume: Optional[float] = None,
+        height: Optional[float] = None,
+        rate: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Draw air into the pipette's tip at the current well.
@@ -858,6 +861,12 @@ class InstrumentContext(publisher.CommandPublisher):
         :param height: The height, in mm, to move above the current well before creating
                        the air gap. The default is 5 mm above the current well.
         :type height: float
+
+        :param rate: A multiplier for the default flow rate of the pipette. Calculated
+                     as ``rate`` multiplied by :py:attr:`flow_rate.aspirate
+                     <flow_rate>`. If not specified, defaults to 1.0. See
+                     :ref:`new-plunger-flow-rates`.
+        :type rate: float
 
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
 
@@ -882,9 +891,19 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.22
             No longer implemented as an aspirate.
+
+        .. versionchanged:: 2.24
+            Adds the ``rate`` parameter.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
+
+        if rate and self.api_version < APIVersion(2, 24):
+            raise APIVersionError(
+                api_element="rate",
+                until_version="2.24",
+                current_version=f"{self._api_version}",
+            )
 
         if height is None:
             height = 5
@@ -896,7 +915,9 @@ class InstrumentContext(publisher.CommandPublisher):
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
             self._core.prepare_to_aspirate()
             c_vol = self._core.get_available_volume() if volume is None else volume
-            flow_rate = self._core.get_aspirate_flow_rate()
+            flow_rate = (
+                rate if rate is not None else self._core.get_aspirate_flow_rate()
+            )
             self._core.air_gap_in_place(c_vol, flow_rate)
         else:
             self.aspirate(volume)
