@@ -9,10 +9,10 @@ import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getLabwarePythonName, uuid } from '../../utils'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 import {
+  selectAdapter,
   selectFixture,
-  selectLabware,
   selectModule,
-  selectNestedLabware,
+  selectTopLabware,
 } from './actions'
 
 import type { LabwareEntities } from '@opentrons/step-generation'
@@ -29,10 +29,10 @@ import type {
   CreateContainerArgs,
   DeleteContainerAction,
   DuplicateLabwareAction,
+  SelectAdapterAction,
   SelectFixtureAction,
-  SelectLabwareAction,
   SelectModuleAction,
-  SelectNestedLabwareAction,
+  SelectTopLabwareAction,
 } from './actions'
 
 export interface RenameLabwareAction {
@@ -203,8 +203,8 @@ export const duplicateLabware: (
 }
 
 interface EditSlotInfo {
-  createdLabwareForSlot?: LabwareOnDeck | null
-  createdNestedLabwareForSlot?: LabwareOnDeck | null
+  createdTopLabwareForSlot?: LabwareOnDeck | null
+  createdAdapterForSlot?: LabwareOnDeck | null
   createdModuleForSlot?: ModuleOnDeck | null
   preSelectedFixture?: Fixture | null
 }
@@ -212,26 +212,26 @@ interface EditSlotInfo {
 export const editSlotInfo: (
   args: EditSlotInfo
 ) => ThunkAction<
-  | SelectNestedLabwareAction
-  | SelectLabwareAction
+  | SelectTopLabwareAction
+  | SelectAdapterAction
   | SelectModuleAction
   | SelectFixtureAction
 > = args => dispatch => {
   const {
     createdModuleForSlot,
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
     preSelectedFixture,
   } = args
 
   dispatch(
-    selectNestedLabware({
-      nestedLabwareDefUri: createdNestedLabwareForSlot?.labwareDefURI ?? null,
+    selectTopLabware({
+      labwareDefUri: createdTopLabwareForSlot?.labwareDefURI ?? null,
     })
   )
   dispatch(
-    selectLabware({
-      labwareDefUri: createdLabwareForSlot?.labwareDefURI ?? null,
+    selectAdapter({
+      adapterDefUri: createdAdapterForSlot?.labwareDefURI ?? null,
     })
   )
   dispatch(selectModule({ moduleModel: createdModuleForSlot?.model ?? null }))

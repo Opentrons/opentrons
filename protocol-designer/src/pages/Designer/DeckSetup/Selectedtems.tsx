@@ -36,9 +36,9 @@ export const SelectedItems = (
   const {
     selectedSlot,
     selectedFixture,
-    selectedLabwareDefUri,
+    selectedTopLabwareDefUri,
     selectedModuleModel,
-    selectedNestedLabwareDefUri,
+    selectedAdapterDefUri,
   } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getAllLabwareDefs()
@@ -48,26 +48,26 @@ export const SelectedItems = (
     const matchingSlot = getSlotInLocationStack(labware.stack)
     return (
       matchingSlot === selectedSlot.slot &&
-      labware.labwareDefURI === selectedLabwareDefUri
+      labware.labwareDefURI === selectedAdapterDefUri
     )
   })
   const matchingSelectedNestedLabwareOnDeck = Object.values(labware).find(
     lw => {
       const matchingSlot = getSlotInLocationStack(lw.stack)
       return (
-        lw.labwareDefURI === selectedNestedLabwareDefUri &&
+        lw.labwareDefURI === selectedTopLabwareDefUri &&
         matchingSlot === selectedSlot.slot
       )
     }
   )
   const selectedLabwareDef =
-    selectedLabwareDefUri != null
-      ? defs[selectedLabwareDefUri] ?? customLabwareDefs[selectedLabwareDefUri]
+    selectedAdapterDefUri != null
+      ? defs[selectedAdapterDefUri] ?? customLabwareDefs[selectedAdapterDefUri]
       : null
   const selectedNestedLabwareDef =
-    selectedNestedLabwareDefUri != null
-      ? defs[selectedNestedLabwareDefUri] ??
-        customLabwareDefs[selectedNestedLabwareDefUri]
+    selectedTopLabwareDefUri != null
+      ? defs[selectedTopLabwareDefUri] ??
+        customLabwareDefs[selectedTopLabwareDefUri]
       : null
 
   const orientation =
@@ -86,13 +86,13 @@ export const SelectedItems = (
     }
     labwareInfos.push(selectedNestedLabwareLabel)
   }
-  if (selectedLabwareDefUri != null) {
+  if (selectedAdapterDefUri != null) {
     const def =
-      defs[selectedLabwareDefUri] ?? customLabwareDefs[selectedLabwareDefUri]
+      defs[selectedAdapterDefUri] ?? customLabwareDefs[selectedAdapterDefUri]
     const selectedLabwareLabel = {
       text: def.metadata.displayName,
       isSelected: true,
-      isLast: selectedNestedLabwareDefUri == null,
+      isLast: selectedTopLabwareDefUri == null,
       isZoomed: true,
     }
     labwareInfos.push(selectedLabwareLabel)
@@ -130,7 +130,7 @@ export const SelectedItems = (
           </Module>
           {selectedModuleModel != null ? (
             <ModuleLabel
-              isLast={selectedLabwareDefUri == null}
+              isLast={selectedAdapterDefUri == null}
               moduleModel={selectedModuleModel}
               position={slotPosition}
               orientation={orientation}

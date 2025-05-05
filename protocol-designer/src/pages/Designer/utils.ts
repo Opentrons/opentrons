@@ -50,8 +50,8 @@ interface SlotInformation {
   matchingLabwareFor4thColumn: LabwareOnDeck | null
   slotPosition: CoordinateTuple | null
   createdModuleForSlot?: ModuleOnDeck
-  createdLabwareForSlot?: LabwareOnDeck
-  createdNestedLabwareForSlot?: LabwareOnDeck
+  createdTopLabwareForSlot?: LabwareOnDeck
+  createdAdapterForSlot?: LabwareOnDeck
   createdFixtureForSlots?: AdditionalEquipment[]
   preSelectedFixture?: Fixture
 }
@@ -85,15 +85,23 @@ export const getSlotInformation = (
   )
   const labwareIdsFromFullStack =
     fullStackFromLabwares?.filter(id => deckSetupLabware[id] != null) ?? []
-  const createdLabwareForSlot =
+  const bottomMostLabware =
     deckSetupLabware[
       labwareIdsFromFullStack[labwareIdsFromFullStack.length - 1]
     ]
+  const createdAdapterForSlot =
+    bottomMostLabware != null &&
+    bottomMostLabware.def.allowedRoles?.includes('adapter')
+      ? bottomMostLabware
+      : undefined
+
   //  top most labware
-  const createdNestedLabwareForSlot =
-    labwareIdsFromFullStack.length <= 1
+  const createdTopLabwareForSlot =
+    labwareIdsFromFullStack.length < 1
       ? undefined
-      : deckSetupLabware[fullStackFromLabwares[0]]
+      : deckSetupLabware[labwareIdsFromFullStack[0]]
+
+      console.log(labwareIdsFromFullStack)
   const createdFixtureForSlots = Object.values(
     additionalEquipmentOnDeck
   ).filter(ae => {
@@ -128,8 +136,8 @@ export const getSlotInformation = (
       : (createdFixtureForSlots[0]?.name as Fixture)
   return {
     createdModuleForSlot,
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdTopLabwareForSlot,
+    createdAdapterForSlot,
     createdFixtureForSlots,
     preSelectedFixture,
     slotPosition: slotPosition,

@@ -44,12 +44,14 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
   const dispatch = useDispatch()
 
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
-  const { selectedLabwareDefUri, selectedSlot } = selectedSlotInfo
+  const { selectedTopLabwareDefUri, selectedSlot } = selectedSlotInfo
 
   const defs = getOnlyLatestDefs()
 
   const offDeckLabware =
-    selectedLabwareDefUri != null ? defs[selectedLabwareDefUri] ?? null : null
+    selectedTopLabwareDefUri != null
+      ? defs[selectedTopLabwareDefUri] ?? null
+      : null
 
   let labware = (
     <RobotWorkSpace

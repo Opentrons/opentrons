@@ -68,10 +68,10 @@ export function DeckSetupToolbox(
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const {
-    selectedLabwareDefUri,
+    selectedTopLabwareDefUri,
     selectedModuleModel,
     selectedSlot,
-    selectedNestedLabwareDefUri,
+    selectedAdapterDefUri,
   } = selectedSlotInfo
   const { slot } = selectedSlot
   const [showSelectLabwareModal, setShowSelectLabwareModal] = useState<boolean>(
@@ -83,16 +83,16 @@ export function DeckSetupToolbox(
   }
 
   const {
-    createdNestedLabwareForSlot,
-    createdLabwareForSlot,
+    createdTopLabwareForSlot,
+    createdAdapterForSlot,
     createdModuleForSlot,
     createdFixtureForSlots,
   } = getSlotInformation({ deckSetup, slot })
   const handleResetToolbox = (): void => {
     dispatch(
       editSlotInfo({
-        createdLabwareForSlot: null,
-        createdNestedLabwareForSlot: null,
+        createdTopLabwareForSlot: null,
+        createdAdapterForSlot: null,
         createdModuleForSlot,
         preSelectedFixture:
           createdFixtureForSlots != null &&
@@ -106,36 +106,33 @@ export function DeckSetupToolbox(
   }
 
   const slotFull =
-    (createdLabwareForSlot != null &&
-      !createdLabwareForSlot.def.allowedRoles?.includes('adapter')) ||
-    (createdLabwareForSlot != null && createdNestedLabwareForSlot != null)
+    createdAdapterForSlot != null && createdTopLabwareForSlot != null
 
   const hasNoLabware =
-    createdLabwareForSlot == null && createdNestedLabwareForSlot == null
+    createdAdapterForSlot == null && createdTopLabwareForSlot == null
 
   const handleClear = (keepExistingLabware = false): void => {
     if (slot !== 'offDeck') {
-      //  clear labware from slot
+      //  clear adapter from slot
       if (
-        createdLabwareForSlot != null &&
+        createdAdapterForSlot != null &&
         (!keepExistingLabware ||
-          createdLabwareForSlot.labwareDefURI !== selectedLabwareDefUri ||
-          //  if nested labware changes but labware doesn't, still delete both
-          (createdLabwareForSlot.labwareDefURI === selectedLabwareDefUri &&
-            selectedNestedLabwareDefUri != null &&
-            createdNestedLabwareForSlot?.labwareDefURI !==
-              selectedNestedLabwareDefUri))
+          createdAdapterForSlot.labwareDefURI !== selectedAdapterDefUri ||
+          //  if top labware changes but adapter doesn't, still delete both
+          (createdTopLabwareForSlot?.labwareDefURI === selectedAdapterDefUri &&
+            selectedTopLabwareDefUri != null &&
+            createdTopLabwareForSlot?.labwareDefURI !==
+              selectedTopLabwareDefUri))
       ) {
-        dispatch(deleteContainer({ labwareId: createdLabwareForSlot.id }))
+        dispatch(deleteContainer({ labwareId: createdAdapterForSlot.id }))
       }
-      //  clear nested labware from slot
+      //  clear top labware from slot
       if (
-        createdNestedLabwareForSlot != null &&
+        createdTopLabwareForSlot != null &&
         (!keepExistingLabware ||
-          createdNestedLabwareForSlot.labwareDefURI !==
-            selectedNestedLabwareDefUri)
+          createdTopLabwareForSlot.labwareDefURI !== selectedTopLabwareDefUri)
       ) {
-        dispatch(deleteContainer({ labwareId: createdNestedLabwareForSlot.id }))
+        dispatch(deleteContainer({ labwareId: createdTopLabwareForSlot.id }))
       }
     }
     handleResetToolbox()
@@ -143,43 +140,39 @@ export function DeckSetupToolbox(
   const handleConfirm = (): void => {
     handleClear(true)
     if (
-      (slot === 'offDeck' && selectedLabwareDefUri != null) ||
-      (selectedModuleModel == null &&
-        selectedLabwareDefUri != null &&
-        (createdLabwareForSlot?.labwareDefURI !== selectedLabwareDefUri ||
-          (selectedNestedLabwareDefUri != null &&
-            selectedNestedLabwareDefUri !==
-              createdNestedLabwareForSlot?.labwareDefURI)))
+      (slot === 'offDeck' && selectedTopLabwareDefUri != null) ||
+      (selectedModuleModel == null && selectedTopLabwareDefUri != null)
+      // (createdTopLabwareForSlot?.labwareDefURI !== selectedAdapterDefUri ||
+      //   (selectedTopLabwareDefUri != null &&
+      //     selectedTopLabwareDefUri !==
+      //       createdTopLabwareForSlot?.labwareDefURI)))
     ) {
       //  create adapter + labware on deck
       dispatch(
         createContainer({
           slot,
-          labwareDefURI: selectedNestedLabwareDefUri ?? selectedLabwareDefUri,
-          adapterUnderLabwareDefURI:
-            selectedNestedLabwareDefUri == null
-              ? undefined
-              : selectedLabwareDefUri,
+          labwareDefURI: selectedTopLabwareDefUri,
+          adapterUnderLabwareDefURI: selectedAdapterDefUri ?? undefined,
         })
       )
     }
     if (
       selectedModuleModel != null &&
-      selectedLabwareDefUri != null &&
-      (createdLabwareForSlot?.labwareDefURI !== selectedLabwareDefUri ||
-        //  if nested labware changes but labware doesn't, still create both
-        (createdLabwareForSlot.labwareDefURI === selectedLabwareDefUri &&
-          createdNestedLabwareForSlot?.labwareDefURI !==
-            selectedNestedLabwareDefUri &&
-          (createdNestedLabwareForSlot?.labwareDefURI != null ||
-            selectedNestedLabwareDefUri != null)))
+      selectedTopLabwareDefUri != null
+      // (createdAdapterForSlot?.labwareDefURI !== selectedAdapterDefUri ||
+      //   //  if nested labware changes but labware doesn't, still create both
+      //   (createdAdapterForSlot.labwareDefURI === selectedAdapterDefUri &&
+      //     createdTopLabwareForSlot?.labwareDefURI !==
+      //       selectedTopLabwareDefUri &&
+      //     (createdTopLabwareForSlot?.labwareDefURI != null ||
+      //       selectedTopLabwareDefUri != null)))
     ) {
       //   create adapter + labware on module
       dispatch(
         createContainerAboveModule({
           slot,
-          labwareDefURI: selectedLabwareDefUri,
-          nestedLabwareDefURI: selectedNestedLabwareDefUri ?? undefined,
+          labwareDefURI: selectedTopLabwareDefUri,
+          adapterDefURI: selectedAdapterDefUri ?? undefined,
         })
       )
     }
@@ -188,8 +181,8 @@ export function DeckSetupToolbox(
 
   const isLabwareOnSlotInUse = getIsLabwareOnSlotInUse(
     savedSteps,
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot
+    createdAdapterForSlot,
+    createdTopLabwareForSlot
   )
 
   const positionStyles =
@@ -297,8 +290,7 @@ export function DeckSetupToolbox(
             />
           ) : (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              {createdNestedLabwareForSlot != null &&
-              createdLabwareForSlot != null ? (
+              {slotFull ? (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}
@@ -306,17 +298,16 @@ export function DeckSetupToolbox(
                   {t('top_slot')}
                 </StyledText>
               ) : null}
-              {createdNestedLabwareForSlot != null ? (
+              {createdTopLabwareForSlot != null ? (
                 <LabwareCard
-                  labware={createdNestedLabwareForSlot}
+                  labware={createdTopLabwareForSlot}
                   //  TODO: add logic for the lid display name
                 />
               ) : null}
-              {createdLabwareForSlot != null ? (
-                <LabwareCard labware={createdLabwareForSlot} />
+              {createdAdapterForSlot != null ? (
+                <LabwareCard labware={createdAdapterForSlot} />
               ) : null}
-              {createdNestedLabwareForSlot != null &&
-              createdLabwareForSlot != null ? (
+              {slotFull ? (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}

@@ -20,7 +20,7 @@ import type { CreateModuleAction } from './modules'
 export interface CreateContainerAboveModuleArgs {
   slot: DeckSlotId
   labwareDefURI: string
-  nestedLabwareDefURI?: string
+  adapterDefURI?: string
 }
 
 export const createContainerAboveModule: (
@@ -29,7 +29,7 @@ export const createContainerAboveModule: (
   dispatch,
   getState
 ) => {
-  const { slot, labwareDefURI, nestedLabwareDefURI } = args
+  const { slot, labwareDefURI, adapterDefURI } = args
   const state = getState()
   const deckSetup = getDeckSetupForActiveItem(state)
   const modules = deckSetup.modules
@@ -39,10 +39,8 @@ export const createContainerAboveModule: (
   dispatch(
     createContainer({
       slot: moduleId,
-      labwareDefURI:
-        nestedLabwareDefURI == null ? labwareDefURI : nestedLabwareDefURI,
-      adapterUnderLabwareDefURI:
-        nestedLabwareDefURI == null ? undefined : labwareDefURI,
+      labwareDefURI,
+      adapterUnderLabwareDefURI: adapterDefURI,
     })
   )
 }

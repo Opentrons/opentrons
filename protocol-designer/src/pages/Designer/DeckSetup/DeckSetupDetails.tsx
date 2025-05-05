@@ -126,8 +126,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   }, [])
 
   const {
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
     createdModuleForSlot,
     preSelectedFixture,
     slotPosition,
@@ -140,15 +140,15 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   useEffect(() => {
     dispatch(
       editSlotInfo({
-        createdNestedLabwareForSlot,
-        createdLabwareForSlot,
+        createdAdapterForSlot,
+        createdTopLabwareForSlot,
         createdModuleForSlot,
         preSelectedFixture,
       })
     )
   }, [
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
     createdModuleForSlot,
     preSelectedFixture,
   ])
