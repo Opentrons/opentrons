@@ -124,7 +124,6 @@ async def test_raises_depending_on_thermocycler_hardware_lid_status(
     subject: ThermocyclerMovementFlagger,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    # equipment_handler: EquipmentHandler,
     decoy: Decoy,
 ) -> None:
     """When on a Thermocycler, it should raise if the lid isn't open."""

@@ -11,8 +11,6 @@ from ..types import ModuleLocation, LabwareLocation
 from ..state.state import StateStore
 from ..errors import ThermocyclerNotOpenError, WrongModuleTypeError
 
-# if TYPE_CHECKING:
-#     from opentrons.protocol_engine.execution import EquipmentHandler
 from .equipment import EquipmentHandler
 
 
