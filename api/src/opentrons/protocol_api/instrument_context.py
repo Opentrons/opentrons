@@ -798,7 +798,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         # If location is a valid well, move to the well first
         if location is None:
-            # TODO make this by api version as well too???
             last_location = self._protocol_core.get_last_location()
             if last_location is None or isinstance(
                 last_location, (TrashBin, WasteChute)

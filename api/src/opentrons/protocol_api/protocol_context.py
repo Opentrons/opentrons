@@ -1190,12 +1190,15 @@ class ProtocolContext(CommandPublisher):
         self._core.home()
 
     @property
-    def location_cache(self) -> Optional[Location]:
-        """The cache used by the robot to determine where it last was."""
-        last_location = self._core.get_last_location()
-        if isinstance(last_location, Location):
-            return last_location
-        # TODO should we update this to return trash bin or waste chute for future API versions?
+    def location_cache(self) -> Optional[Union[Location, TrashBin, WasteChute]]:
+        """The cache used by the robot to determine where it last was.
+
+        .. versionchanged:: 2.24
+           Can return a ``TrashBin`` or ``WasteChute`` object.
+        """
+        last_loc = self._core.get_last_location()
+        if isinstance(last_loc, Location) or self._api_version >= APIVersion(2, 24):
+            return last_loc
         return None
 
     @location_cache.setter
