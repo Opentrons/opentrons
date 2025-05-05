@@ -332,7 +332,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
 
     def resin_tip_unseal(
         self,
-        location: types.Location,
+        location: types.Location | None,
         well_core: WellCore,
     ) -> None:
         raise APIVersionError(api_element="Unsealing resin tips.")

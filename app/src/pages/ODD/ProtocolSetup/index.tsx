@@ -53,7 +53,6 @@ import {
   ProtocolSetupStepSkeleton,
   ProtocolSetupTitleSkeleton,
   getUnmatchedModulesForProtocol,
-  getIncompleteInstrumentCount,
   ViewOnlyParameters,
 } from '/app/organisms/ODD/ProtocolSetup'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
@@ -97,6 +96,7 @@ import {
 } from '/app/redux/protocol-runs'
 import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
@@ -753,8 +753,9 @@ export function ProtocolSetup(): JSX.Element {
       : null
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
-    hasMissingModulesForOdd: isMissingModules,
-    hasMissingCalForOdd:
+    robotName,
+    hasMissingModulesForFlex: isMissingModules,
+    hasMissingCalForFlex:
       incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
   })
   const protocolName =

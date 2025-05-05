@@ -49,6 +49,7 @@ from opentrons_shared_data.labware import load_definition as load_labware_defini
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
+    SYSTEM_LOCATION,
     LabwareOffsetVector,
     DeckSlotLocation,
     ModuleLocation,
@@ -790,6 +791,7 @@ def test_get_all_obstacle_highest_z(
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
     falcon_tuberack_def: LabwareDefinition,
+    lid_stack_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
@@ -817,7 +819,13 @@ def test_get_all_obstacle_highest_z(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         offsetId="reservoir-offset-id",
     )
-
+    lid_stack_system = LoadedLabware(
+        id="lid-stack-id",
+        loadName="protocol_engine_lid_stack_object",
+        definitionUri="lid-stack-1",
+        location=SYSTEM_LOCATION,
+        offsetId=None,
+    )
     plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     off_deck_lw_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
@@ -829,6 +837,7 @@ def test_get_all_obstacle_highest_z(
     decoy.when(mock_labware_view.get("plate-id")).then_return(plate)
     decoy.when(mock_labware_view.get("off-deck-plate-id")).then_return(off_deck_lw)
     decoy.when(mock_labware_view.get("reservoir-id")).then_return(reservoir)
+    decoy.when(mock_labware_view.get("lid-stack-id")).then_return(lid_stack_system)
 
     decoy.when(mock_labware_view.get_definition("plate-id")).then_return(well_plate_def)
     decoy.when(mock_labware_view.get_definition("off-deck-plate-id")).then_return(
@@ -836,6 +845,9 @@ def test_get_all_obstacle_highest_z(
     )
     decoy.when(mock_labware_view.get_definition("reservoir-id")).then_return(
         reservoir_def
+    )
+    decoy.when(mock_labware_view.get_definition("lid-stack-id")).then_return(
+        lid_stack_def
     )
 
     decoy.when(mock_labware_view.get_labware_offset_vector("plate-id")).then_return(
@@ -2436,6 +2448,99 @@ def test_get_ancestor_slot_for_labware_stack_in_staging_area_slot(
     assert subject.get_ancestor_slot_name("labware-2") == StagingSlotName.SLOT_D4
 
 
+def test_get_ancestor_addressable_area_name(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    mock_module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should get name of ancestor AA of labware."""
+    decoy.when(mock_labware_view.get("labware-1")).then_return(
+        LoadedLabware(
+            id="labware-1",
+            loadName="load-name",
+            definitionUri="1234",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        )
+    )
+    assert subject.get_ancestor_addressable_area_name("labware-1") == "4"
+
+    decoy.when(mock_labware_view.get("labware-2")).then_return(
+        LoadedLabware(
+            id="labware-2",
+            loadName="load-name",
+            definitionUri="4567",
+            location=ModuleLocation(moduleId="4321"),
+        )
+    )
+    decoy.when(mock_module_view.get_provided_addressable_area("4321")).then_return(
+        "someModuleAddressableArea"
+    )
+    assert (
+        subject.get_ancestor_addressable_area_name("labware-2")
+        == "someModuleAddressableArea"
+    )
+
+
+def test_get_ancestor_addressable_area_for_labware_stack_in_staging_area_slot(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should get name of ancestor AA of a stack of labware in a staging area slot."""
+    decoy.when(mock_labware_view.get("labware-1")).then_return(
+        LoadedLabware(
+            id="labware-1",
+            loadName="load-name",
+            definitionUri="1234",
+            location=AddressableAreaLocation(
+                addressableAreaName=StagingSlotName.SLOT_D4.id
+            ),
+        )
+    )
+    decoy.when(mock_labware_view.get("labware-2")).then_return(
+        LoadedLabware(
+            id="labware-2",
+            loadName="load-name",
+            definitionUri="1234",
+            location=OnLabwareLocation(labwareId="labware-1"),
+        )
+    )
+    assert subject.get_ancestor_addressable_area_name("labware-2") == "D4"
+
+
+def test_get_ancestor_addressable_area_handles_cycles(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """It should raise and not lock up if there is a location cycle."""
+    decoy.when(mock_labware_view.get("labware-1")).then_return(
+        LoadedLabware(
+            id="labware-1",
+            loadName="load-name",
+            definitionUri="1234",
+            location=OnLabwareLocation(labwareId="labware-2"),
+        )
+    )
+    decoy.when(mock_labware_view.get("labware-2")).then_return(
+        LoadedLabware(
+            id="labware-2",
+            loadName="load-name",
+            definitionUri="1234",
+            location=OnLabwareLocation(labwareId="labware-3"),
+        )
+    )
+    decoy.when(mock_labware_view.get("labware-3")).then_return(
+        LoadedLabware(
+            id="labware-3",
+            loadName="load-name",
+            definitionUri="1234",
+            location=OnLabwareLocation(labwareId="labware-1"),
+        )
+    )
+    with pytest.raises(errors.InvalidLabwarePositionError):
+        subject.get_ancestor_addressable_area_name("labware-1")
+
+
 def test_ensure_location_not_occupied_raises(
     decoy: Decoy,
     mock_labware_view: LabwareView,
@@ -2591,11 +2696,10 @@ def test_get_labware_grip_point_for_labware_on_module(
         ot3_standard_deck_def
     )
     decoy.when(
-        mock_module_view.get_nominal_offset_to_child(
+        mock_module_view.get_nominal_offset_to_child_from_addressable_area(
             module_id="module-id",
-            addressable_areas=addressable_area_view,
         )
-    ).then_return(LabwareOffsetVector(x=-291, y=52, z=303))
+    ).then_return(LabwareOffsetVector(x=-291, y=52, z=265))
     decoy.when(mock_module_view.get_connected_model("module-id")).then_return(
         ModuleModel.MAGNETIC_BLOCK_V1
     )
@@ -2617,6 +2721,124 @@ def test_get_labware_grip_point_for_labware_on_module(
         location=ModuleLocation(moduleId="module-id"),
     )
     assert result_grip_point == Point(x=191, y=382, z=1073)
+
+
+def test_get_labware_grip_point_for_labware_stack_on_module(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    mock_module_view: ModuleView,
+    ot3_standard_deck_def: DeckDefinitionV5,
+    subject: GeometryView,
+) -> None:
+    """It should return the grip point for labware directly on a module."""
+    addressable_area_view = AddressableAreaView(
+        state=AddressableAreaState(
+            loaded_addressable_areas_by_name={},
+            potential_cutout_fixtures_by_cutout_id={
+                "cutoutC3": {
+                    PotentialCutoutFixture(
+                        "cutoutC3", "magneticBlockV1", frozenset({"magneticBlockV1C3"})
+                    )
+                }
+            },
+            deck_definition=ot3_standard_deck_def,
+            deck_configuration=None,
+            robot_type=subject._config.robot_type,
+            use_simulated_deck_config=True,
+            robot_definition=RobotDefinition(
+                displayName="cool_guy",
+                robotType="OT-3 Standard",
+                models=[],
+                extents=[5000, 5000, 5000],
+                paddingOffsets=paddingOffset(rear=0, front=0, leftSide=0, rightSide=0),
+                mountOffsets=mountOffset(left=[0], right=[0], gripper=[0]),
+            ),
+        )
+    )
+    subject = GeometryView(
+        config=subject._config,
+        labware_view=subject._labware,
+        well_view=subject._wells,
+        module_view=subject._modules,
+        pipette_view=subject._pipettes,
+        addressable_area_view=addressable_area_view,
+    )
+    decoy.when(
+        mock_labware_view.get_grip_height_from_labware_bottom(
+            sentinel.labware_definition
+        )
+    ).then_return(500)
+    decoy.when(mock_labware_view.get(labware_id="below-id-0")).then_return(
+        LoadedLabware(
+            id="below-id-0",
+            loadName="below-name",
+            definitionUri="1234",
+            location=ModuleLocation(moduleId="module-id"),
+        )
+    )
+    decoy.when(mock_labware_view.get_dimensions(labware_id="below-id-0")).then_return(
+        Dimensions(x=1000, y=1001, z=11)
+    )
+    decoy.when(
+        mock_labware_view.get_labware_overlap_offsets(
+            sentinel.labware_definition, "below-name"
+        )
+    ).then_return(OverlapOffset(x=0, y=1, z=6))
+    decoy.when(mock_labware_view.get_definition("below-id-0")).then_return(
+        sentinel.labware_definition
+    )
+    for idx in range(9):
+        decoy.when(mock_labware_view.get(labware_id=f"below-id-{idx+1}")).then_return(
+            LoadedLabware(
+                id=f"below-id-{idx+1}",
+                loadName="below-name",
+                definitionUri="1234",
+                location=OnLabwareLocation(labwareId=f"below-id-{idx}"),
+            )
+        )
+        decoy.when(
+            mock_labware_view.get_dimensions(labware_id=f"below-id-{idx+1}")
+        ).then_return(Dimensions(x=1000, y=1001, z=11))
+        decoy.when(mock_labware_view.get_definition(f"below-id-{idx+1}")).then_return(
+            sentinel.labware_definition
+        )
+    decoy.when(mock_module_view.get_provided_addressable_area("module-id")).then_return(
+        "magneticBlockV1C3"
+    )
+    decoy.when(mock_module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_C3)
+    )
+    decoy.when(mock_labware_view.get_deck_definition()).then_return(
+        ot3_standard_deck_def
+    )
+    decoy.when(
+        mock_module_view.get_nominal_offset_to_child_from_addressable_area(
+            module_id="module-id",
+        )
+    ).then_return(LabwareOffsetVector(x=-291, y=52, z=265))
+    decoy.when(mock_module_view.get_connected_model("module-id")).then_return(
+        ModuleModel.MAGNETIC_BLOCK_V1
+    )
+    decoy.when(
+        mock_labware_view.get_module_overlap_offsets(
+            sentinel.labware_definition, ModuleModel.MAGNETIC_BLOCK_V1
+        )
+    ).then_return(OverlapOffset(x=10, y=20, z=30))
+
+    decoy.when(mock_module_view.get_module_calibration_offset("module-id")).then_return(
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=100, y=200, z=300),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C3),
+        )
+    )
+
+    result_grip_point = subject.get_labware_grip_point(
+        labware_definition=sentinel.labware_definition,
+        location=OnLabwareLocation(labwareId="below-id-9"),
+    )
+    # we do not take into account labware stack offsets for some reason
+    # so all those 1000s go away
+    assert result_grip_point == Point(x=191, y=392, z=1073 + 50)
 
 
 @pytest.mark.parametrize(
@@ -3226,22 +3448,13 @@ def test_check_gripper_labware_tip_collision(
     decoy.when(subject._get_highest_z_from_labware_data(labware_data)).then_return(1000)
 
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(subject.get_labware_highest_z("labware-id")).then_return(100.0)
     decoy.when(
-        mock_addressable_area_view.get_addressable_area_center(
-            addressable_area_name=DeckSlotName.SLOT_1.id
-        )
-    ).then_return(Point(x=11, y=22, z=33))
+        mock_labware_view.get_dimensions(labware_definition=definition)
+    ).then_return(Dimensions(x=1, y=2, z=67))
     decoy.when(
         mock_labware_view.get_grip_height_from_labware_bottom(definition)
     ).then_return(1.0)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(
-        subject.get_labware_grip_point(
-            labware_definition=definition,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        )
-    ).then_return(Point(x=100.0, y=100.0, z=0.0))
 
     with pytest.raises(errors.LabwareMovementNotAllowedError):
         subject.check_gripper_labware_tip_collision(

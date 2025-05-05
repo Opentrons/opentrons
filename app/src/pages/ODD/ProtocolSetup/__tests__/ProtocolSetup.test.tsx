@@ -38,7 +38,6 @@ import {
   ProtocolSetupTitleSkeleton,
   ProtocolSetupStepSkeleton,
   getUnmatchedModulesForProtocol,
-  getIncompleteInstrumentCount,
 } from '/app/organisms/ODD/ProtocolSetup'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupInstruments/__fixtures__'
@@ -72,6 +71,7 @@ import {
   selectOffsetSource,
 } from '/app/redux/protocol-runs'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -125,6 +125,7 @@ vi.mock('/app/local-resources/dom-utils')
 vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('/app/resources/maintenance_runs')
+vi.mock('/app/local-resources/instruments')
 
 const render = (path = '/') => {
   return renderWithProviders(
