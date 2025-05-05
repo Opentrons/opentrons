@@ -33,7 +33,7 @@ export function EmptySelectorButton(
     <StyledButton
       onClick={onClick}
       disabled={disabled}
-      data-testid="EmptySelectoButton_click"
+      data-testid="EmptySelectorButton_click"
     >
       <Flex
         gridGap={SPACING.spacing4}

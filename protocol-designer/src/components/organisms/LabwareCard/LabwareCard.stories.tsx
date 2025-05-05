@@ -16,7 +16,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const store = configureStore()
 
 const meta: Meta<typeof LabwareCardComponent> = {
-  title: 'Protocol-Designer/Molecules/LabwareCard',
+  title: 'Protocol-Designer/Organisms/LabwareCard',
   component: LabwareCardComponent,
   parameters: VIEWPORT.touchScreenViewport,
   decorators: [

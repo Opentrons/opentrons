@@ -24,9 +24,9 @@ import {
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '../../../components/atoms'
-import { LabwareCard } from '../../../components/molecules'
 import {
   ConfirmDeleteEntityInUseModal,
+  LabwareCard,
   SelectLabwareModal,
 } from '../../../components/organisms'
 import { useKitchen } from '../../../components/organisms/Kitchen/hooks'

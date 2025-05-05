@@ -119,7 +119,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                   id={lw.id}
                   flexDirection={DIRECTION_COLUMN}
                   key={lw.id}
-                  paddingBottom="0px"
+                  paddingBottom="0"
                 >
                   <RobotWorkSpace
                     key={lw.id}

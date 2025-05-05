@@ -112,27 +112,24 @@ export function SelectLabwareModal(
   } = zoomedInSlotInfo
 
   const hasNoLabware = selectedLabwareDefUri == null
-  const setAllCategories = (state: boolean): Record<string, boolean> =>
-    ALL_ORDERED_CATEGORIES.reduce<Record<string, boolean>>(
-      (acc, category) => ({ ...acc, [category]: state }),
-      {}
-    )
+  const createCategoryState = (state: boolean): Record<string, boolean> =>
+    Object.fromEntries(ALL_ORDERED_CATEGORIES.map(cat => [cat, state]))
 
-  const allCategoriesExpanded = setAllCategories(true)
-  const allCategoriesCollapsed = setAllCategories(false)
+  const allCategoriesExpanded = useMemo(() => createCategoryState(true), [])
+  const allCategoriesCollapsed = useMemo(() => createCategoryState(false), [])
+
   const [
     areCategoriesExpanded,
     setAreCategoriesExpanded,
   ] = useState<CategoryExpand>(allCategoriesCollapsed)
+
   const [searchTerm, setSearchTerm] = useState<string>('')
 
   useEffect(() => {
-    if (searchTerm !== '') {
-      setAreCategoriesExpanded(allCategoriesExpanded)
-    } else {
-      setAreCategoriesExpanded(allCategoriesCollapsed)
-    }
-  }, [searchTerm])
+    setAreCategoriesExpanded(
+      searchTerm ? allCategoriesExpanded : allCategoriesCollapsed
+    )
+  }, [searchTerm, allCategoriesExpanded, allCategoriesCollapsed])
 
   const handleResetLabwareTools = (): void => {
     setAreCategoriesExpanded(allCategoriesCollapsed)
@@ -161,7 +158,7 @@ export function SelectLabwareModal(
     robotType === OT2_ROBOT_TYPE ? isNextToHeaterShaker : false
   )
 
-  const getLabwareCompatible = useCallback(
+  const getIsLabwareCompatible = useCallback(
     (def: LabwareDefinition2) => {
       // assume that custom (non-standard) labware is (potentially) compatible
       if (moduleType == null || !getLabwareDefIsStandard(def)) {
@@ -190,7 +187,7 @@ export function SelectLabwareModal(
             labwareDef,
             MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
           )) ||
-        !getLabwareCompatible(labwareDef) ||
+        !getIsLabwareCompatible(labwareDef) ||
         (isAdapter &&
           isIrregularSize &&
           moduleType !== HEATERSHAKER_MODULE_TYPE) ||
@@ -200,7 +197,7 @@ export function SelectLabwareModal(
           moduleType !== ABSORBANCE_READER_TYPE)
       )
     },
-    [filterRecommended, filterHeight, getLabwareCompatible, moduleType, slot]
+    [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
   )
 
   const labwareByCategory = useMemo(() => {
@@ -280,7 +277,7 @@ export function SelectLabwareModal(
       marginLeft="0"
       title={t('add_labware')}
       type="info"
-      width="594px"
+      width="37.125rem"
       onClose={() => {
         onClose()
         handleResetLabwareTools()
@@ -291,11 +288,7 @@ export function SelectLabwareModal(
           padding={`0 ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing24}`}
           gridGap="36px"
         >
-          <Flex
-            padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_CENTER}
-          >
+          <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_CENTER}>
             <StyledLabel css={LINK_BUTTON_STYLE}>
               <StyledText desktopStyle="bodyDefaultRegular">
                 {t('upload_custom_labware')}
@@ -336,7 +329,11 @@ export function SelectLabwareModal(
         </Flex>
       }
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      <Flex
+        paddingTop={SPACING.spacing8}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing8}
+      >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <InputField
             value={searchTerm}

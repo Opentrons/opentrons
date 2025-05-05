@@ -437,7 +437,7 @@ export const SetupSteps = {
    */
   OpenSelectLabwareModal: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="EmptySelectoButton_click"]').click()
+      cy.get('button[data-testid="EmptySelectorButton_click"]').click()
     },
   }),
 
