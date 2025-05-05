@@ -50,7 +50,7 @@ export function AssignLiquidsModal(
   props: AssignLiquidsModalProps
 ): JSX.Element | null {
   const { showLiquidOverflowMenu } = props
-  const { t } = useTranslation('liquids')
+  const { t } = useTranslation(['liquids', 'shared'])
   const [highlightedWells, setHighlightedWells] = useState<WellGroup | {}>({})
   const navigate = useNavigate()
   const nickNames = useSelector(getLabwareNicknamesById)
@@ -102,7 +102,7 @@ export function AssignLiquidsModal(
         gap={SPACING.spacing8}
       >
         <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
-        <PrimaryButton onClick={handleSave}>{t('save_liquid')}</PrimaryButton>
+        <PrimaryButton onClick={handleSave}>{t('shared:done')}</PrimaryButton>
       </Flex>
       <Flex
         width="100%"
