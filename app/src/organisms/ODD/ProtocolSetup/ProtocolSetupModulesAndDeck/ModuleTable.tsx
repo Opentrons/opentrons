@@ -124,7 +124,7 @@ type ModuleStatusType =
   | 'needsHome'
   | 'connected' // when the module is connected and ready
 
-const getModuleDisplayStatus = (
+export const getModuleDisplayStatus = (
   attachedModule: AttachedModule | null,
   conflictedFixture: CutoutConfig | null,
   calibrationStatus: ProtocolCalibrationStatus
@@ -134,7 +134,7 @@ const getModuleDisplayStatus = (
     return 'locationConflict'
   }
   // module is not connected
-  if (attachedModule === null) {
+  if (!!!attachedModule) {
     return 'disconnected'
   } else {
     // flex stacker module does not require calibration
@@ -159,8 +159,9 @@ const getModuleDisplayStatus = (
 
     // Absorbance reader module does not require calibration
     if (
-      attachedModule.moduleOffset?.last_modified === null &&
-      attachedModule.moduleType !== ABSORBANCE_READER_TYPE
+      attachedModule.moduleType !== ABSORBANCE_READER_TYPE &&
+      (
+        !!!attachedModule.moduleOffset || attachedModule.moduleOffset?.last_modified === null)
     ) {
       return 'needsCalibration'
     }
