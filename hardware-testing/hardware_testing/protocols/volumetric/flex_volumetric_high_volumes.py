@@ -335,8 +335,9 @@ def calibrate_tip_overlap(ctx: ProtocolContext, pipette: InstrumentContext) -> N
         return
     api: SyncHardwareAPI = ctx._core.get_hardware()
     pip_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-    empty_slot_row_idx = "DCBA".index(SLOTS["empty"][0])
-    empty_slot_as_int = (empty_slot_row_idx * 3) + int(SLOTS["empty"][1:])
+    slot_name = SLOTS["empty_0"]
+    empty_slot_row_idx = "DCBA".index(slot_name[0])
+    empty_slot_as_int = (empty_slot_row_idx * 3) + int(slot_name[1:])
     expected_probe_position = Point(
         *get_calibration_square_position_in_slot(slot=empty_slot_as_int)
     )
