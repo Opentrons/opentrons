@@ -231,7 +231,6 @@ export function SlotOverflowMenu(
           onClose={() => {
             setShowDeleteEntityInUseModal(false)
           }}
-          type="clear"
         />
       ) : null}
       {showNickNameModal && nickNameId != null ? (

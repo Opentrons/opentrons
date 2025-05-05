@@ -29,10 +29,6 @@ import { selectors } from '../../../labware-ingred/selectors'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import {
-  getHoveredDropdownItem,
-  getSelectedDropdownItem,
-} from '../../../ui/steps/selectors'
 import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
 import { HighlightOffdeckSlot } from './HighlightOffdeckSlot'
 import { OffDeckControls } from './OffDeckControls'
@@ -53,8 +49,6 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
   const [menuListId, setShowMenuListForId] = useState<DeckSlotId | null>(null)
   const robotType = useSelector(getRobotType)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
-  const hoveredDropdownItem = useSelector(getHoveredDropdownItem)
-  const selectedDropdownSelection = useSelector(getSelectedDropdownItem)
   const offDeckLabware = Object.values(deckSetup.labware).filter(
     lw => getSlotInLocationStack(lw.stack) === 'offDeck'
   )
@@ -120,18 +114,12 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                 yDimension: dimensions.yDimension ?? 0,
                 zDimension: dimensions.zDimension ?? 0,
               }
-              const isLabwareSelectionSelected = selectedDropdownSelection.some(
-                selected => selected.id === lw.id
-              )
-              const highlighted = hoveredDropdownItem.id === lw.id
               return (
                 <Flex
                   id={lw.id}
                   flexDirection={DIRECTION_COLUMN}
                   key={lw.id}
-                  paddingBottom={
-                    isLabwareSelectionSelected || highlighted ? '0px' : '0px'
-                  }
+                  paddingBottom="0"
                 >
                   <RobotWorkSpace
                     key={lw.id}

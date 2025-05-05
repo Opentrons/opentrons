@@ -45,6 +45,7 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.EditProtocolA())
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('C3'))
     steps.add(SetupSteps.AddHardwareLabware())
+    steps.add(SetupSteps.OpenSelectLabwareModal())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('C3'))
@@ -62,6 +63,7 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('D2'))
 
     steps.add(SetupSteps.AddHardwareLabware())
+    steps.add(SetupSteps.OpenSelectLabwareModal())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Armadillo 96 Well Plate'))
     steps.add(SetupSteps.AddStep())
