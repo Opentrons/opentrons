@@ -159,7 +159,7 @@ describe('IgnoreErrorStepHome', () => {
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
         RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
-        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.SKIP
       )
     })
   })
