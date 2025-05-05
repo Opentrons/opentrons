@@ -32,10 +32,11 @@ from .common import (
     lid_location_sequences_with_default,
 )
 
+from opentrons.drivers.flex_stacker.types import LEDColor, LEDPattern
 
 if TYPE_CHECKING:
     from ...state.state import StateView
-    from ...execution import RunControlHandler
+    from ...execution import RunControlHandler, EquipmentHandler
 
 EmptyCommandType = Literal["flexStacker/empty"]
 
@@ -138,10 +139,15 @@ class EmptyImpl(AbstractCommandImpl[EmptyParams, SuccessData[EmptyResult]]):
     """Implementation of a stacker empty command."""
 
     def __init__(
-        self, state_view: StateView, run_control: RunControlHandler, **kwargs: object
+        self,
+        state_view: StateView,
+        run_control: RunControlHandler,
+        equipment: EquipmentHandler,
+        **kwargs: object,
     ) -> None:
         self._state_view = state_view
         self._run_control = run_control
+        self._equipment = equipment
 
     async def execute(self, params: EmptyParams) -> SuccessData[EmptyResult]:
         """Execute the stacker empty command."""
@@ -195,6 +201,12 @@ class EmptyImpl(AbstractCommandImpl[EmptyParams, SuccessData[EmptyResult]]):
                 new_offset_ids_by_id=new_offset_ids_by_id,
             )
         )
+
+        stacker_hw = self._equipment.get_module_hardware_api(
+            module_id=stacker_state.module_id
+        )
+        if stacker_hw:
+            await stacker_hw.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
 
         if params.strategy == StackerFillEmptyStrategy.MANUAL_WITH_PAUSE:
             await self._run_control.wait_for_resume()
