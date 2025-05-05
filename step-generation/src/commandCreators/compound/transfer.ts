@@ -24,6 +24,7 @@ import {
   reduceCommandCreators,
 } from '../../utils'
 import {
+  airGapInPlace,
   aspirateInPlace,
   configureForVolume,
   delay,
@@ -35,7 +36,6 @@ import {
   prepareToAspirate,
   touchTip,
 } from '../atomic'
-import { airGapInWell } from './airGapInWell'
 import { dropTipInTrash } from './dropTipInTrash'
 import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { mixInPlaceUtil, mixUtil } from './mix'
@@ -109,6 +109,11 @@ export const transfer: CommandCreator<TransferArgs> = (
     aspirateSubmergeZOffset,
     aspirateSubmergePositionReference,
     aspirateSubmergeDelay,
+    aspirateRetractXOffset,
+    aspirateRetractYOffset,
+    aspirateRetractZOffset,
+    aspirateRetractPositionReference,
+    aspirateRetractDelay,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
@@ -237,6 +242,17 @@ export const transfer: CommandCreator<TransferArgs> = (
       z: aspirateSubmergeZOffset,
     },
   }
+  const aspirateRetractLocation: WellLocation = {
+    origin:
+      POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN[
+        aspirateRetractPositionReference
+      ],
+    offset: {
+      x: aspirateRetractXOffset,
+      y: aspirateRetractYOffset,
+      z: aspirateRetractZOffset,
+    },
+  }
   // @ts-expect-error(SA, 2021-05-05): zip can return undefined so this really should be Array<[string | undefined, string | undefined]>
   const sourceDestPairs: Array<[string, string | null]> = zip(
     args.sourceWells,
@@ -310,12 +326,24 @@ export const transfer: CommandCreator<TransferArgs> = (
             aspirateSubmergePositionReference,
             wellDepth
           )
+          const aspirateRetractMmFromBottom = getMmFromBottom(
+            aspirateRetractZOffset,
+            aspirateRetractPositionReference,
+            wellDepth
+          )
           if (
             aspirateMmFromBottom != null &&
             aspirateSubmergeMmFromBottom != null &&
             aspirateMmFromBottom >= aspirateSubmergeMmFromBottom
           ) {
             errors.push(errorCreators.submergeBelowAspirate())
+          }
+          if (
+            aspirateMmFromBottom != null &&
+            aspirateRetractMmFromBottom != null &&
+            aspirateMmFromBottom >= aspirateRetractMmFromBottom
+          ) {
+            errors.push(errorCreators.retractBelowAspirate())
           }
 
           const moveToSourceWellTopCommand = [
@@ -397,20 +425,20 @@ export const transfer: CommandCreator<TransferArgs> = (
               },
             }),
           ]
-          const preWetTipCommands =
-            args.preWetTip && chunkIdx === 0
-              ? mixInPlaceUtil({
-                  pipette: args.pipette,
-                  volume: subTransferVol,
-                  times: 1,
-                  aspirateFlowRateUlSec,
-                  dispenseFlowRateUlSec,
-                  aspirateDelaySeconds: aspirateDelay?.seconds ?? 0,
-                  dispenseDelaySeconds: dispenseDelay?.seconds ?? 0,
-                  finalPushOut: 0, // according to transfer_components_executor, don't push out here
-                  invariantContext,
-                })
-              : []
+          // prewet before each aspirate if enabled
+          const preWetTipCommands = args.preWetTip
+            ? mixInPlaceUtil({
+                pipette: args.pipette,
+                volume: subTransferVol,
+                times: 1,
+                aspirateFlowRateUlSec,
+                dispenseFlowRateUlSec,
+                aspirateDelaySeconds: aspirateDelay?.seconds ?? 0,
+                dispenseDelaySeconds: dispenseDelay?.seconds ?? 0,
+                finalPushOut: 0, // according to transfer_components_executor, don't push out here
+                invariantContext,
+              })
+            : []
           const mixBeforeAspirateCommands =
             args.mixBeforeAspirate != null
               ? mixInPlaceUtil({
@@ -433,7 +461,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   }),
                 ]
               : []
-          const touchTipAfterAspirateCommands = args.touchTipAfterAspirate
+          const touchTipAfterRetractCommands = args.touchTipAfterAspirate
             ? [
                 curryCommandCreator(touchTip, {
                   pipetteId: args.pipette,
@@ -447,8 +475,30 @@ export const transfer: CommandCreator<TransferArgs> = (
                     ? { speed: args.touchTipAfterAspirateSpeed }
                     : {}),
                 }),
+                // move back to retract position after touch tip if air gap needed
+                ...(aspirateAirGapVolume > 0
+                  ? [
+                      curryCommandCreator(moveToWell, {
+                        pipetteId: args.pipette,
+                        labwareId: args.sourceLabware,
+                        wellName: sourceWell,
+                        wellLocation: aspirateRetractLocation,
+                      }),
+                    ]
+                  : []),
               ]
             : []
+          const airGapAfterRetractCommands =
+            aspirateAirGapVolume > 0
+              ? [
+                  curryCommandCreator(airGapInPlace, {
+                    pipetteId: args.pipette,
+                    volume: aspirateAirGapVolume,
+                    flowRate: aspirateFlowRateUlSec,
+                  }),
+                  ...(aspirateDelay != null ? delayAfterAspirateCommands : []),
+                ]
+              : []
           //  can not touch tip in a waste chute
           const touchTipAfterDispenseCommands =
             args.touchTipAfterDispense && destinationWell != null
@@ -487,24 +537,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                 })
               : []
 
-          const airGapAfterAspirateCommands =
+          const dispenseAspirateAirGapCommands =
             aspirateAirGapVolume && destinationWell != null
               ? [
-                  curryCommandCreator(airGapInWell, {
-                    pipetteId: args.pipette,
-                    labwareId: args.sourceLabware,
-                    wellName: sourceWell,
-                    volume: aspirateAirGapVolume,
-                    flowRate: aspirateFlowRateUlSec,
-                    type: 'aspirate',
-                  }),
-                  ...(aspirateDelay != null
-                    ? [
-                        curryCommandCreator(delay, {
-                          seconds: aspirateDelay.seconds,
-                        }),
-                      ]
-                    : []),
                   curryCommandCreator(dispense, {
                     pipetteId: args.pipette,
                     volume: aspirateAirGapVolume,
@@ -550,12 +585,32 @@ export const transfer: CommandCreator<TransferArgs> = (
             willReuseTip = nextDestWell === destinationWell
           }
 
-          const aspirateCommand = [
+          const aspirateCommands = [
             curryCommandCreator(aspirateInPlace, {
               pipetteId: args.pipette,
               volume: subTransferVol,
               flowRate: aspirateFlowRateUlSec,
             }),
+            ...delayAfterAspirateCommands,
+          ]
+          const postAspirateRetractCommands = [
+            curryCommandCreator(moveToWell, {
+              pipetteId: args.pipette,
+              labwareId: args.sourceLabware,
+              ...(args.aspirateRetractSpeed != null
+                ? { speed: args.aspirateRetractSpeed }
+                : {}),
+              wellName: sourceWell,
+              wellLocation: aspirateRetractLocation,
+            }),
+            ...(aspirateRetractDelay != null &&
+            aspirateRetractDelay?.seconds > 0
+              ? [
+                  curryCommandCreator(delay, {
+                    seconds: aspirateRetractDelay.seconds,
+                  }),
+                ]
+              : []),
           ]
           const dispenseCommand = [
             curryCommandCreator(dispenseLocationHelper, {
@@ -659,10 +714,11 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...aspirateSubmergeCommands,
             ...mixBeforeAspirateCommands,
             ...preWetTipCommands,
-            ...aspirateCommand,
-            ...delayAfterAspirateCommands,
-            ...touchTipAfterAspirateCommands,
-            ...airGapAfterAspirateCommands,
+            ...aspirateCommands,
+            ...postAspirateRetractCommands,
+            ...touchTipAfterRetractCommands,
+            ...airGapAfterRetractCommands,
+            ...dispenseAspirateAirGapCommands,
             ...dispenseCommand,
             ...delayAfterDispenseCommands,
             ...mixInDestinationCommands,

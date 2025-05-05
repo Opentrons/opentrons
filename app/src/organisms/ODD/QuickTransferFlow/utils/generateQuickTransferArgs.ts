@@ -441,6 +441,7 @@ export function generateQuickTransferArgs(
     aspirateRetractYOffset: 0,
     aspirateRetractZOffset: 0,
     aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+    aspirateRetractDelay: null,
     dispenseSubmergeSpeed: null,
     dispenseSubmergeXOffset: 0,
     dispenseSubmergeYOffset: 0,

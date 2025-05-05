@@ -135,6 +135,7 @@ describe('quickTransferStepCommands', () => {
       aspirateRetractYOffset: 0,
       aspirateRetractZOffset: 0,
       aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateRetractDelay: null,
       dispenseSubmergeSpeed: null,
       dispenseSubmergeXOffset: 0,
       dispenseSubmergeYOffset: 0,
@@ -199,6 +200,7 @@ pipette.aspirate(
     volume=10,
     rate=56 / pipette.flow_rate.aspirate,
 )
+pipette.move_to(mock_labware_1["A1"].bottom())
 pipette.dispense(
     volume=10,
     location=mock_labware_2["B1"].bottom(z=-1),
@@ -229,6 +231,7 @@ pipette.drop_tip()`.trimStart()
       aspirateRetractYOffset: 0,
       aspirateRetractZOffset: 0,
       aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateRetractDelay: null,
       dispenseSubmergeSpeed: null,
       dispenseSubmergeXOffset: 0,
       dispenseSubmergeYOffset: 0,
@@ -327,6 +330,7 @@ pipette.drop_tip()`.trimStart()
       aspirateRetractYOffset: 0,
       aspirateRetractZOffset: 0,
       aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateRetractDelay: null,
       dispenseSubmergeSpeed: null,
       dispenseSubmergeXOffset: 0,
       dispenseSubmergeYOffset: 0,

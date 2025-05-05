@@ -144,36 +144,54 @@ export const submergeWithAspirateHelper = (submergeParams: {
   labwareId: string
   wellName: string
   volume: number
-  speed: number
+  submergeSpeed: number
+  retractSpeed: number
   aspirateFlowRate: number
   submergeLocation: WellLocation
   aspirateLocation: WellLocation
+  retractLocation: WellLocation
+  aspirateAirGap?: number
   dispenseAirGap?: number
   dispenseFlowRate?: number
   shouldProbe?: boolean
-  preWet?: boolean
+  shouldPreWet?: boolean
+  shouldTouchTip?: boolean
+  submergeDelay?: number
   aspirateDelay?: number
+  retractDelay?: number
   dispenseDelay?: number
   mixTimes?: number
   mixVolume?: number
+  touchTipMmFromTop?: number
+  touchTipMmFromEdge?: number
+  touchTipSpeed?: number
 }) => {
   const {
     volume,
     aspirateFlowRate,
     dispenseFlowRate,
-    speed,
+    submergeSpeed,
+    retractSpeed,
     pipetteId,
     labwareId,
     wellName,
     submergeLocation,
     aspirateLocation,
+    retractLocation,
     shouldProbe = true,
-    preWet = false,
+    shouldPreWet = false,
+    shouldTouchTip = false,
+    submergeDelay = 0,
     aspirateDelay = 0,
+    retractDelay = 0,
     dispenseDelay = 0,
     mixTimes = 0,
     mixVolume = 0,
+    aspirateAirGap = 0,
     dispenseAirGap = 0,
+    touchTipMmFromTop,
+    touchTipMmFromEdge,
+    touchTipSpeed,
   } = submergeParams
   const mixCommands = []
   for (let i = 0; i < mixTimes; i++) {
@@ -294,13 +312,23 @@ export const submergeWithAspirateHelper = (submergeParams: {
       params: {
         pipetteId: 'p300SingleId',
         labwareId: SOURCE_LABWARE,
-        speed,
+        speed: submergeSpeed,
         wellName,
         wellLocation: aspirateLocation,
       },
     },
+    ...(submergeDelay > 0
+      ? [
+          {
+            commandType: 'waitForDuration',
+            key: expect.any(String),
+            params: { seconds: submergeDelay },
+          },
+        ]
+      : []),
+
     ...(mixTimes > 0 ? mixCommands : []),
-    ...(preWet
+    ...(shouldPreWet
       ? [
           {
             commandType: 'aspirateInPlace',
@@ -357,6 +385,80 @@ export const submergeWithAspirateHelper = (submergeParams: {
             key: expect.any(String),
             params: { seconds: aspirateDelay },
           },
+        ]
+      : []),
+
+    {
+      commandType: 'moveToWell',
+      key: expect.any(String),
+      params: {
+        pipetteId: 'p300SingleId',
+        labwareId: SOURCE_LABWARE,
+        speed: retractSpeed,
+        wellName,
+        wellLocation: retractLocation,
+      },
+    },
+    ...(retractDelay > 0
+      ? [
+          {
+            commandType: 'waitForDuration',
+            key: expect.any(String),
+            params: { seconds: retractDelay },
+          },
+        ]
+      : []),
+    ...(shouldTouchTip
+      ? [
+          {
+            commandType: 'touchTip',
+            key: expect.any(String),
+            params: {
+              pipetteId: 'p300SingleId',
+              labwareId: SOURCE_LABWARE,
+              wellName,
+              wellLocation: {
+                origin: WELL_ORIGIN_TOP,
+                offset: {
+                  z: touchTipMmFromTop,
+                },
+              },
+              mmFromEdge: touchTipMmFromEdge,
+              speed: touchTipSpeed,
+            },
+          },
+          {
+            commandType: 'moveToWell',
+            key: expect.any(String),
+            params: {
+              pipetteId: 'p300SingleId',
+              labwareId: SOURCE_LABWARE,
+              wellName,
+              wellLocation: retractLocation,
+            },
+          },
+        ]
+      : []),
+    ...(aspirateAirGap > 0
+      ? [
+          {
+            commandType: 'airGapInPlace',
+            key: expect.any(String),
+            params: {
+              pipetteId,
+              volume: aspirateAirGap,
+              flowRate: aspirateFlowRate,
+            },
+          },
+          ...(aspirateDelay > 0
+            ? [
+                {
+                  commandType: 'waitForDuration',
+                  key: expect.any(String),
+                  params: { seconds: aspirateDelay },
+                },
+              ]
+            : []),
         ]
       : []),
   ]

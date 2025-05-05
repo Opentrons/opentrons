@@ -306,3 +306,10 @@ export const submergeBelowAspirate = (): CommandCreatorError => {
     message: 'The submerge position must be above the aspirate position',
   }
 }
+
+export const retractBelowAspirate = (): CommandCreatorError => {
+  return {
+    type: 'RETRACT_BELOW_ASPIRATE',
+    message: 'The retract position must be above the aspirate position',
+  }
+}
