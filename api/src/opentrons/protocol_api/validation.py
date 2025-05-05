@@ -662,7 +662,7 @@ def ensure_new_tip_policy(value: str) -> TransferTipPolicyV2:
     except ValueError:
         raise ValueError(
             f"'{value}' is invalid value for 'new_tip'."
-            f" Acceptable value is either 'never', 'once', 'always' or 'per source'."
+            f" Acceptable value is either 'never', 'once', 'always', 'per source' or 'per destination'."
         )
 
 
