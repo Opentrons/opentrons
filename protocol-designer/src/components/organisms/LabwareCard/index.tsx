@@ -37,7 +37,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { t } = useTranslation('starting_deck_state')
   const { def } = labware
   const displayName = def.metadata.displayName
-  const isAdapter = def.allowedRoles?.includes('adapter')
+  const noLiquidAllowed =
+    def.allowedRoles?.includes('adapter') || def.parameters.isTiprack
 
   return (
     <ListItem type="default" backgroundColor={COLORS.grey30}>
@@ -75,7 +76,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             </StyledText>
           ) : null}
         </Flex>
-        {!isAdapter ? (
+        {noLiquidAllowed ? (
           <Btn
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
             css={LINK_BUTTON_STYLE}
