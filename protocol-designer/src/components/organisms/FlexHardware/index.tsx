@@ -179,7 +179,6 @@ export function FlexHardware(): JSX.Element {
     <>
       {modalInfo != null ? (
         <ConfirmDeleteEntityInUseModal
-          type="clear"
           onClose={() => {
             setShowDeleteEntityModal(null)
           }}
