@@ -20,10 +20,15 @@ import type {
   ModuleOnlyParams,
   ModuleType,
   TemperatureParams,
+  TemperatureModuleAwaitTemperatureParams,
+  ThermocyclerSetTargetBlockTemperatureParams,
+  TCSetTargetLidTemperatureRunTimeCommand,
   RunTimeCommand,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
+import { Temperature } from '@opentrons/components/src/hardware-sim/Module/Temperature'
+import { Thermocycler } from '@opentrons/components'
 
 const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
   'thermocycler/closeLid',
@@ -164,8 +169,13 @@ export function useModuleCommandAnalytics(): UseModuleCommandAnalyticsResult {
 function isModuleOnlyParams(params: unknown): params is ModuleOnlyParams {
   return typeof params === 'object' && params !== null && 'moduleId' in params
 }
+type AllTemperatureParams = 
+  TemperatureModuleAwaitTemperatureParams |
+  TemperatureParams |
+  ThermocyclerSetTargetBlockTemperatureParams |
+  TCSetTargetLidTemperatureRunTimeCommand 
 
-function isTemperatureParams(params: unknown): params is TemperatureParams {
+function isTemperatureParams(params: unknown): params is AllTemperatureParams{
   return typeof params === 'object' && params !== null && 'celsius' in params
 }
 
