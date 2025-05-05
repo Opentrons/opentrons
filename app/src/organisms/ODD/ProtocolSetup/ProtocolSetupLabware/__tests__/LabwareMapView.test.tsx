@@ -107,11 +107,6 @@ describe('LabwareMapView', () => {
       },
     })
     render({
-      attachedProtocolModuleMatches: [
-        {
-          ...mockProtocolModuleInfo[0],
-        },
-      ],
       handleLabwareClick: vi.fn(),
       mostRecentAnalysis: ({} as unknown) as CompletedProtocolAnalysis,
       startingDeck: {

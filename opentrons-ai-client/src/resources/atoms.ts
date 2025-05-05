@@ -82,20 +82,28 @@ export const displayFeatureFlagsModalAtom = atom<boolean>(false)
 // feature flag atoms are a bit more fancy
 // they leverage local storage to persist settings across browser refreshes
 
+const DEFAULT_FEATURE_FLAG_STATE = {
+  enablePrereleaseMode: false,
+  enablePDProtocolGeneration: false,
+}
+
 const rawFeatureFlagsAtom = atomWithStorage<FeatureFlags>(
   'opentrons_ai_feature_flags',
-  {
-    enablePrereleaseMode: false,
-    enablePDProtocolGeneration: false,
-  }
+  { ...DEFAULT_FEATURE_FLAG_STATE }
 )
 
 export const featureFlagsAtom = atom(
   get => get(rawFeatureFlagsAtom),
   (get, set, update: Partial<FeatureFlags>) => {
-    set(rawFeatureFlagsAtom, {
-      ...get(rawFeatureFlagsAtom),
-      ...update,
-    })
+    // reset all feature flags to false if turning off prerelease mode
+    if (update.enablePrereleaseMode === false) {
+      set(rawFeatureFlagsAtom, { ...DEFAULT_FEATURE_FLAG_STATE })
+      set(displayFeatureFlagsModalAtom, false)
+    } else {
+      set(rawFeatureFlagsAtom, {
+        ...get(rawFeatureFlagsAtom),
+        ...update,
+      })
+    }
   }
 )

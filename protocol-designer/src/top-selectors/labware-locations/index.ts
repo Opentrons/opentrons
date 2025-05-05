@@ -16,7 +16,10 @@ import {
   WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
+import {
+  COLUMN_4_SLOTS,
+  getTopLocationInStack,
+} from '@opentrons/step-generation'
 
 import { selectors as fileDataSelectors } from '../../file-data'
 import { getRobotType } from '../../file-data/selectors'
@@ -183,11 +186,12 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
     const unoccupiedAdapterOptions = Object.entries(labware).reduce<Option[]>(
       (acc, [labwareId, labwareOnDeck]) => {
         const labwareOnAdapter = Object.values(labware).find(
-          temporalProperties => temporalProperties.slot === labwareId
+          temporalProperties =>
+            getTopLocationInStack(temporalProperties.stack) === labwareId
         )
-        const adapterSlot = labwareOnDeck.slot
-        const modIdWithAdapter = Object.keys(modules).find(
-          modId => modId === labwareOnDeck.slot
+        const adapterSlot = getTopLocationInStack(labwareOnDeck.stack)
+        const modIdWithAdapter = Object.keys(modules).find(modId =>
+          labwareOnDeck.stack.includes(modId)
         )
         const adapterDisplayName =
           labwareEntities[labwareId].def.metadata.displayName
@@ -219,7 +223,7 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
     const unoccupiedModuleOptions = Object.entries(modules).reduce<Option[]>(
       (acc, [modId, modOnDeck]) => {
         const moduleHasLabware = Object.entries(labware).some(
-          ([lwId, lwOnDeck]) => lwOnDeck.slot === modId
+          ([_, lwOnDeck]) => lwOnDeck.stack[0] === modId
         )
         const type = moduleEntities[modId].type
         const slot = modOnDeck.slot
@@ -267,9 +271,7 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
             : ['fixedTrash', '12'].includes(slotId)
         return (
           !slotIdsOccupiedByModules.includes(slotId) &&
-          !Object.values(labware)
-            .map(lw => lw.slot)
-            .includes(slotId) &&
+          !Object.values(labware).some(lw => lw.stack.includes(slotId)) &&
           !isTrashSlot &&
           !trashCutouts.some(cutout => cutout.includes(slotId)) &&
           !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&

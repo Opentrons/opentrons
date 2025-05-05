@@ -20,6 +20,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { SlotDetailsContainer } from '../../../components/organisms'
 import { wellFillFromWellContents } from '../../../components/organisms/LabwareOnDeck/utils'
@@ -55,7 +56,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
   const hoveredDropdownItem = useSelector(getHoveredDropdownItem)
   const selectedDropdownSelection = useSelector(getSelectedDropdownItem)
   const offDeckLabware = Object.values(deckSetup.labware).filter(
-    lw => lw.slot === 'offDeck'
+    lw => getSlotInLocationStack(lw.stack) === 'offDeck'
   )
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   const allWellContentsForActiveItem = useSelector(

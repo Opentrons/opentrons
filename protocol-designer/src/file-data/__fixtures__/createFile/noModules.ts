@@ -6,13 +6,13 @@ import type { ModuleEntities, SavedStepFormState } from '../../../step-forms'
 export const initialRobotState: RobotState = {
   labware: {
     fixedTrash: {
-      slot: '12',
+      stack: ['fixedTrash', '12'],
     },
     tiprackId: {
-      slot: '2',
+      stack: ['tiprackId', '2'],
     },
     plateId: {
-      slot: '1',
+      stack: ['plateId', '1'],
     },
   },
   modules: {},

@@ -3,6 +3,7 @@ import { AirGap } from '../QuickTransferAdvancedSettings/AirGap'
 import { Delay } from '../QuickTransferAdvancedSettings/Delay'
 import { FlowRateEntry } from '../QuickTransferAdvancedSettings/FlowRate'
 import { Mix } from '../QuickTransferAdvancedSettings/Mix'
+import { Submerge } from '../QuickTransferAdvancedSettings/Submerge'
 import { TipPositionEntry } from '../QuickTransferAdvancedSettings/TipPosition'
 import { TouchTip } from '../QuickTransferAdvancedSettings/TouchTip'
 
@@ -29,6 +30,7 @@ const SettingComponentMap: Partial<
   [SETTING_OPTIONS.ASPIRATE_DELAY]: Delay,
   [SETTING_OPTIONS.ASPIRATE_TOUCH_TIP]: TouchTip,
   [SETTING_OPTIONS.ASPIRATE_AIR_GAP]: AirGap,
+  [SETTING_OPTIONS.ASPIRATE_SUBMERGE]: Submerge,
   // ToDo(kk:04/03/2025) add pre-wet tip
   // [SETTING_OPTIONS.PRE_WET_TIP]: PreWetTip,
 }

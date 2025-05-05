@@ -1,4 +1,4 @@
-import { getInitialLoadedLabwareByAdapter } from './getInitiallyLoadedLabwareByAdapter'
+import { getInitialLoadedLabwareByAdapter } from '/app/transformations/commands'
 
 import type {
   CompletedProtocolAnalysis,

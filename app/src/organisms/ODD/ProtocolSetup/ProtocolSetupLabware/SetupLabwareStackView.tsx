@@ -9,7 +9,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  getWellFillFromLabwareId,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
@@ -22,13 +21,17 @@ import {
 
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
 import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
 
-import type { LabwareByLiquidId } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { LabwareInStack, StackItem } from '/app/transformations/commands'
+import type {
+  LabwareByLiquidId,
+  LabwareInStack,
+  StackItem,
+} from '/app/transformations/commands'
 
 const LabwareThumbnail = styled.svg`
   transform: scale(1, -1);

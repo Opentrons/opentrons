@@ -15,6 +15,7 @@ import {
   OPENTRONS_OT2,
   TWO_PIPETTES,
 } from '../../organisms/InstrumentsSection'
+import { PYTHON } from '../constants'
 import { getOnlyLatestDefs } from './labware'
 
 import type { UseFormWatch } from 'react-hook-form'
@@ -112,9 +113,7 @@ export function generatePromptPreviewLabwareLiquidsItems(
   // Add all labware items
   labwares?.forEach(labware => {
     items.push(
-      `${labware.count} x ${
-        getLabwareDisplayName(defs[labware.labwareURI]) as string
-      }`
+      `${labware.count} x ${getLabwareDisplayName(defs[labware.labwareURI])}`
     )
   })
 
@@ -266,7 +265,8 @@ export function generateChatPrompt(
   t: any,
   setCreateProtocolChatAtom: (
     args_0: CreatePrompt | ((prev: CreatePrompt) => CreatePrompt)
-  ) => void
+  ) => void,
+  isPdProtocolGenerationEnabled: boolean = false
 ): string {
   const protocolFormat = `- ${startCase(values.protocol_format)}`
 
@@ -357,9 +357,11 @@ export function generateChatPrompt(
     ? values.steps.map(step => `- ${step}`).join('\n')
     : values.steps
 
-  const prompt = `${t('create_protocol_prompt_robot', { robotType })}\n${t(
-    'protocol_format'
-  )}:\n${protocolFormat}\n\n${t(
+  const prompt = `${
+    values.protocol_format === PYTHON
+      ? t('create_protocol_prompt_robot', { robotType }) + '\n'
+      : ''
+  }\n${t('protocol_format_title')}:\n${protocolFormat}\n\n${t(
     'application_title'
   )}:\n${scientificApplication}\n\n${t('description')}:\n${description}\n\n${t(
     'pipette_mounts'
@@ -393,8 +395,11 @@ export function generateChatPrompt(
     ),
     liquids: values.liquids,
     steps: Array.isArray(values.steps) ? values.steps : [values.steps],
-    fake: values.protocol_format === 'Protocol Designer',
+    fake:
+      !isPdProtocolGenerationEnabled &&
+      values.protocol_format === 'Protocol Designer',
     fake_key:
+      !isPdProtocolGenerationEnabled &&
       values.protocol_format === 'Protocol Designer'
         ? 'pd serial diliution'
         : undefined,

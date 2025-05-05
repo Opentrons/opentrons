@@ -78,8 +78,8 @@ describe('getIsSafePipetteMovement', () => {
     mockRobotState = {
       pipettes: { pip: { mount: 'left' } },
       labware: {
-        [mockLabwareId]: { slot: 'D2' },
-        [mockTiprackId]: { slot: 'A2' },
+        [mockLabwareId]: { stack: ['mockLabwareId', 'D2'] },
+        [mockTiprackId]: { stack: ['mockTiprackId', 'A2'] },
       },
       modules: {},
       tipState: { tipracks: {}, pipettes: {} },
@@ -167,7 +167,7 @@ describe('getIsSafePipetteMovement', () => {
     mockRobotState.tipState.tipracks = { mockTiprackId: { A1: true } }
     mockRobotState.labware = {
       ...mockRobotState.labware,
-      [mockAdapter]: { slot: 'D1' },
+      [mockAdapter]: { stack: [mockAdapter, 'D1'] },
     }
     const result = getIsSafePipetteMovement(
       COLUMN,
@@ -186,12 +186,12 @@ describe('getIsSafePipetteMovement', () => {
       [mockModule]: { slot: 'D1', moduleState: {} as any },
     }
     mockRobotState.labware = {
-      [mockLabwareId]: { slot: 'D2' },
+      [mockLabwareId]: { stack: [mockLabwareId, 'D2'] },
       [mockAdapter]: {
-        slot: mockModule,
+        stack: [mockAdapter, mockModule, 'D1'],
       },
       [mockLabware2]: {
-        slot: mockAdapter,
+        stack: [mockLabware2, mockAdapter, mockModule, 'D1'],
       },
     }
     mockInvariantProperties.moduleEntities = {

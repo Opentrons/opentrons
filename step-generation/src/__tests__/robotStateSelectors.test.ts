@@ -38,16 +38,16 @@ describe('sortLabwareBySlot', () => {
   it('sorts all labware by slot', () => {
     const labwareState = {
       six: {
-        slot: '6',
+        stack: ['six', '6'],
       },
       one: {
-        slot: '1',
+        stack: ['one', '1'],
       },
       eleven: {
-        slot: '11',
+        stack: ['eleven', '11'],
       },
       two: {
-        slot: '2',
+        stack: ['two', '2'],
       },
     }
     expect(sortLabwareBySlot(labwareState)).toEqual([
@@ -80,7 +80,7 @@ describe('_getNextTip', () => {
     }
     const robotState = makeState({
       invariantContext: _invariantContext,
-      labwareLocations: { [tiprackId]: { slot: '8' } },
+      labwareLocations: { [tiprackId]: { stack: [tiprackId, '8'] } },
       pipetteLocations: {
         p300SingleId: { mount: 'left' },
         p300MultiId: { mount: 'right' },
@@ -149,8 +149,8 @@ describe('getNextTiprack - single-channel', () => {
     const robotState = makeState({
       invariantContext,
       labwareLocations: {
-        tiprack1Id: { slot: '1' },
-        sourcePlateId: { slot: '2' },
+        tiprack1Id: { stack: ['tiprack1Id', '1'] },
+        sourcePlateId: { stack: ['sourcePlateId', '2'] },
       },
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       tiprackSetting: { tiprack1Id: true },
@@ -173,7 +173,7 @@ describe('getNextTiprack - single-channel', () => {
     const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
-      labwareLocations: { tiprack1Id: { slot: '1' } },
+      labwareLocations: { tiprack1Id: { stack: ['tiprack1Id', '1'] } },
       tiprackSetting: { tiprack1Id: false },
     })
 
@@ -191,8 +191,8 @@ describe('getNextTiprack - single-channel', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '1' },
-        tiprack2Id: { slot: '11' },
+        tiprack1Id: { stack: ['tiprack1Id', '1'] },
+        tiprack2Id: { stack: ['tiprack2Id', '11'] },
       },
       tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
     })
@@ -212,8 +212,8 @@ describe('getNextTiprack - single-channel', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '2' },
-        tiprack2Id: { slot: '11' },
+        tiprack1Id: { stack: ['tiprack1Id', '2'] },
+        tiprack2Id: { stack: ['tiprack2Id', '11'] },
       },
       tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
     })
@@ -236,8 +236,8 @@ describe('getNextTiprack - single-channel', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '2' },
-        tiprack2Id: { slot: '11' },
+        tiprack1Id: { stack: ['tiprack1Id', '2'] },
+        tiprack2Id: { stack: ['tiprack2Id', '11'] },
       },
       tiprackSetting: { tiprack1Id: false, tiprack2Id: false },
     })
@@ -258,7 +258,7 @@ describe('getNextTiprack - 8-channel', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '1' },
+        tiprack1Id: { stack: ['tiprack1Id', '1'] },
       },
       tiprackSetting: { tiprack1Id: true },
     })
@@ -279,7 +279,7 @@ describe('getNextTiprack - 8-channel', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '2' },
+        tiprack1Id: { stack: ['tiprack1Id', '2'] },
       },
       tiprackSetting: { tiprack1Id: true },
     })
@@ -305,7 +305,7 @@ describe('getNextTiprack - 8-channel', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '2' },
+        tiprack1Id: { stack: ['tiprack1Id', '2'] },
       },
       tiprackSetting: { tiprack1Id: false },
     })
@@ -324,7 +324,7 @@ describe('getNextTiprack - 8-channel', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '2' },
+        tiprack1Id: { stack: ['tiprack1Id', '2'] },
       },
       tiprackSetting: { tiprack1Id: true },
     })
@@ -359,9 +359,9 @@ describe('getNextTiprack - 8-channel', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '2' },
-        tiprack2Id: { slot: '3' },
-        tiprack3Id: { slot: '10' },
+        tiprack1Id: { stack: ['tiprack1Id', '2'] },
+        tiprack2Id: { stack: ['tiprack2Id', '3'] },
+        tiprack3Id: { stack: ['tiprack3Id', '10'] },
       },
       tiprackSetting: { tiprack1Id: true, tiprack2Id: true, tiprack3Id: true },
     })
@@ -381,9 +381,9 @@ describe('getNextTiprack - 8-channel', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '1' },
-        tiprack2Id: { slot: '2' },
-        tiprack3Id: { slot: '3' },
+        tiprack1Id: { stack: ['tiprack1Id', '1'] },
+        tiprack2Id: { stack: ['tiprack2Id', '2'] },
+        tiprack3Id: { stack: ['tiprack3Id', '3'] },
       },
       tiprackSetting: { tiprack1Id: true, tiprack2Id: true, tiprack3Id: true },
     })
@@ -441,9 +441,9 @@ describe('getNextTiprack - 8-channel', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '1' },
-        tiprack2Id: { slot: '2' },
-        tiprack3Id: { slot: '3' },
+        tiprack1Id: { stack: ['tiprack1Id', '1'] },
+        tiprack2Id: { stack: ['tiprack2Id', '2'] },
+        tiprack3Id: { stack: ['tiprack3Id', '3'] },
       },
       tiprackSetting: {
         tiprack1Id: false,
@@ -472,7 +472,7 @@ describe('getModuleState', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '2' },
+        tiprack1Id: { stack: ['tiprack1Id', '2'] },
       },
       tiprackSetting: { tiprack1Id: false },
       moduleLocations: {

@@ -842,6 +842,9 @@ def build_retrieve_labware_move_updates(
         locations_for_ids[group.adapterLabwareId] = ModuleLocation(
             moduleId=stacker.module_id
         )
+        locations_for_ids[group.primaryLabwareId] = OnLabwareLocation(
+            labwareId=group.adapterLabwareId
+        )
         assert (
             stacker.pool_adapter_definition
         ), "Mismatched pool and labware definitions"
@@ -875,6 +878,9 @@ def build_retrieve_labware_move_updates(
         lid_offset_location = _prepend_loc(
             [OnLabwareOffsetLocationSequenceComponent(labwareUri=primary_uri)],
             primary_offset_location,
+        )
+        locations_for_ids[group.lidLabwareId] = OnLabwareLocation(
+            labwareId=group.primaryLabwareId
         )
         offset_ids_by_id[group.lidLabwareId] = _find_offset_id(
             state_view.labware.get_uri_from_definition(stacker.pool_lid_definition),

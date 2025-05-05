@@ -36,6 +36,7 @@ export function RecoveryDoorOpen({
   routeUpdateActions,
   recoveryMap,
   recoveryCommands,
+  currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element {
   const {
     resumeRecovery,
@@ -46,6 +47,7 @@ export function RecoveryDoorOpen({
     proceedToRouteAndStep,
     handleMotionRouting,
   } = routeUpdateActions
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { t } = useTranslation('error_recovery')
 
   const handleHomeAllAndRoute = (
@@ -77,8 +79,15 @@ export function RecoveryDoorOpen({
   }
 
   const buildSubtext = (): string => {
-    switch (recoveryMap.route) {
+    switch (selectedRecoveryOption) {
+      case RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
       case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
         return t('stacker_door_open_robot_home')
       default:
         return t('close_the_robot_door')
@@ -86,8 +95,15 @@ export function RecoveryDoorOpen({
   }
 
   const buildTitleText = (): string => {
-    switch (recoveryMap.route) {
+    switch (selectedRecoveryOption) {
+      case RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
       case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
         return t('close_robot_and_stacker_door')
       default:
         return t('robot_door_is_open')
@@ -97,6 +113,13 @@ export function RecoveryDoorOpen({
   const buildPrimaryButtonText = (): string => {
     switch (recoveryMap.route) {
       case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
         return t('continue')
       default:
         return t('resume')
