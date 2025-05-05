@@ -127,7 +127,10 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
         boxShadow="none"
         display={DISPLAY_FLEX}
         padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
-        disabled={isDisabled && !validRunAgainButRequiresSetup}
+        // TODO(jh, 05-05-25): These boolean checks should live in useActionBtnDisabledUtils as a part of the singular disabled check.
+        disabled={
+          isDisabled && (!validRunAgainButRequiresSetup || isClosingCurrentRun)
+        }
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
         {...targetProps}
