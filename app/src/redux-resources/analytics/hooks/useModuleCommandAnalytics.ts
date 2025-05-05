@@ -84,7 +84,6 @@ export interface UseModuleCommandAnalyticsResult {
 
 export function useModuleCommandAnalytics(): UseModuleCommandAnalyticsResult {
   const doTrackEvent = useTrackEvent()
-  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
   const moduleQuery = useModulesQuery()
 
   const reportModuleCommand = ({
@@ -99,23 +98,12 @@ export function useModuleCommandAnalytics(): UseModuleCommandAnalyticsResult {
 
     const attachedModules = moduleQuery?.data?.data ?? []
 
-    const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-
-    const protocolModulesInfo =
-      analysis != null ? getProtocolModulesInfo(analysis, deckDef) : []
-
-    const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-      attachedModules,
-      protocolModulesInfo,
-      deckConfig
-    )
-
-    const matchedModules = attachedProtocolModuleMatches.map(module => ({
-      moduleType: module.attachedModuleMatch?.moduleType,
-      moduleId: module.attachedModuleMatch?.id,
-      serialNumber: module.attachedModuleMatch?.serialNumber,
-      firmwareVersion: module.attachedModuleMatch?.firmwareVersion,
-    }))
+    const matchedModules = attachedModules.map(module => ({
+      moduleType: module.moduleType,
+      moduleId: module.id,
+      serialNumber: module.serialNumber,
+      firmwareVersion: module.firmwareVersion,
+    }));
 
     const { moduleId, celsius } = isParamType(
       'params' in rest ? rest.params : null
