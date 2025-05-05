@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { ModuleListItemGroup } from '../index'
+import { FixtureListItemGroup } from '../index'
 
 import type { DisplayModule } from '../../../organisms/ModulesAndFixturesSection'
 
@@ -30,7 +30,7 @@ const TestFormProviderComponent = () => {
 
   return (
     <FormProvider {...methods}>
-      <ModuleListItemGroup />
+      <FixtureListItemGroup />
     </FormProvider>
   )
 }

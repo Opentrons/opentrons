@@ -19,7 +19,7 @@ import { ApplicationSection } from '../../organisms/ApplicationSection'
 import { createProtocolAtom } from '../../resources/atoms'
 import { InstrumentsSection } from '../InstrumentsSection'
 import { LabwareLiquidsSection } from '../LabwareLiquidsSection'
-import { ModulesSection } from '../ModulesSection'
+import { ModulesAndFixturesSection } from '../ModulesAndFixturesSection'
 import { ProtocolFormatSection } from '../ProtocolFormatSection'
 import { StepsSection } from '../StepsSection'
 
@@ -48,8 +48,8 @@ export const sections = [
   },
   {
     sectionNumber: MODULES_STEP,
-    title: 'modules_title',
-    Component: ModulesSection,
+    title: 'modules_fixtures_title',
+    Component: ModulesAndFixturesSection,
   },
   {
     sectionNumber: LABWARE_LIQUIDS_STEP,

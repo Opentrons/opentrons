@@ -344,6 +344,10 @@ export function generateChatPrompt(
         }`
     )
     .join('\n')
+
+  const fixtures = values.fixtures
+    .map(fixture => `- ${fixture.name}`)
+    .join('\n')
   const labwares = values.labwares
     .map(
       labware =>
@@ -365,9 +369,11 @@ export function generateChatPrompt(
     'pipette_mounts'
   )}:\n\n${pipetteMounts}${flexGripper}\n\n${t(
     'modules_title'
-  )}:\n${modules}\n\n${t('labware_section_title')}:\n${labwares}\n\n${t(
-    'liquid_section_title'
-  )}:\n${liquids}\n\n${t('steps_section_title')}:\n${steps}\n`
+  )}:\n${modules}\n\n${t('fixtures_title')}:\n${fixtures}\n\n${t(
+    'labware_section_title'
+  )}:\n${labwares}\n\n${t('liquid_section_title')}:\n${liquids}\n\n${t(
+    'steps_section_title'
+  )}:\n${steps}\n`
 
   setCreateProtocolChatAtom({
     prompt,
@@ -388,6 +394,7 @@ export function generateChatPrompt(
             : ''
         }`
     ),
+    fixtures: values.fixtures.map(fixture => fixture.name),
     labware: values.labwares.map(
       labware => `${labware.labwareURI}, quantity: ${labware.count}`
     ),

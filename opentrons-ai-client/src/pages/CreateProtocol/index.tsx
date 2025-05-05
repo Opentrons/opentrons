@@ -33,7 +33,10 @@ import {
 
 import type { MouseEvent } from 'react'
 import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
-import type { DisplayModules } from '../../organisms/ModulesSection'
+import type {
+  DisplayFixture,
+  DisplayModule,
+} from '../../organisms/ModulesAndFixturesSection'
 
 export interface CreateProtocolFormData {
   protocol_format: 'Protocol Designer' | 'Python'
@@ -49,7 +52,8 @@ export interface CreateProtocolFormData {
     rightPipette: string
     flexGripper: string
   }
-  modules: DisplayModules[]
+  modules: DisplayModule[]
+  fixtures: DisplayFixture[]
   labwares: DisplayLabware[]
   liquids: string[]
   steps: string[] | string
