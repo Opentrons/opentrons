@@ -3,6 +3,7 @@ import mapValues from 'lodash/mapValues'
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
+  FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
@@ -10,6 +11,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
@@ -24,6 +26,7 @@ import type {
   LabwareDefinition2,
   ModuleModel,
   ModuleType,
+  RobotType,
 } from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
 
@@ -202,3 +205,44 @@ export const OFFDECK: 'offDeck' = 'offDeck'
 export const PROTOCOL_DESIGNER_SOURCE: 'Protocol Designer' = 'Protocol Designer' // protocolSource for tracking analytics in the app
 
 export const DECK_SETUP_TOOLS_WIDTH_REM = 21.875
+
+// Copied from opentrons/api/src/opentrons/config/defaults_ot[2/3].py
+export const CHANNELS_MAPPED_TO_MAX_SPEED: Record<
+  RobotType,
+  Record<number, { plunger: number; x: number; y: number; z: number }>
+> = {
+  [FLEX_ROBOT_TYPE]: {
+    1: {
+      plunger: 70,
+      x: 300,
+      y: 300,
+      z: 100,
+    },
+    8: {
+      plunger: 70,
+      x: 300,
+      y: 300,
+      z: 100,
+    },
+    96: {
+      plunger: 15,
+      x: 300,
+      y: 300,
+      z: 35,
+    },
+  },
+  [OT2_ROBOT_TYPE]: {
+    1: {
+      plunger: 40,
+      x: 600,
+      y: 400,
+      z: 125,
+    },
+    8: {
+      plunger: 40,
+      x: 600,
+      y: 400,
+      z: 125,
+    },
+  },
+}

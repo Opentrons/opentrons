@@ -7,12 +7,7 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
-import {
-  getMaxUiFlowRate,
-  MAX_PLUNGER_SPEED_FLEX_HIGH_THROUGHPUT_MM_PER_S,
-  MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S,
-  MAX_PLUNGER_SPEED_OT2,
-} from '../PipetteFields/utils'
+import { getMaxUiFlowRate } from '../PipetteFields/utils'
 import {
   capitalizeFirstLetter,
   getBlowoutLocationOptionsForForm,
@@ -184,9 +179,7 @@ describe('getMaxUiFlowRate', () => {
     } as any
     const expectedAccuracy = 0.05 * 50 + 1
     const expectedTravelMm = 50 / expectedAccuracy
-    const expectedMaxFlowRate = round(
-      50 / (expectedTravelMm / MAX_PLUNGER_SPEED_OT2)
-    )
+    const expectedMaxFlowRate = round(50 / (expectedTravelMm / 40))
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
 
@@ -201,9 +194,7 @@ describe('getMaxUiFlowRate', () => {
     } as any
     const expectedAccuracy = 0.06 * 20 + 1.2
     const expectedTravelMm = 20 / expectedAccuracy
-    const expectedMaxFlowRate = round(
-      20 / (expectedTravelMm / MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S)
-    )
+    const expectedMaxFlowRate = round(20 / (expectedTravelMm / 70))
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
 
@@ -218,9 +209,7 @@ describe('getMaxUiFlowRate', () => {
     } as any
     const expectedAccuracy = 0.06 * 80 + 1.2
     const expectedTravelMm = 80 / expectedAccuracy
-    const expectedMaxFlowRate = round(
-      80 / (expectedTravelMm / MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S)
-    )
+    const expectedMaxFlowRate = round(80 / (expectedTravelMm / 70))
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
 
@@ -235,9 +224,7 @@ describe('getMaxUiFlowRate', () => {
     } as any
     const expectedAccuracy = 0.1 * 5 + 0.5
     const expectedTravelMm = 5 / expectedAccuracy
-    const expectedMaxFlowRate = round(
-      5 / (expectedTravelMm / MAX_PLUNGER_SPEED_FLEX_HIGH_THROUGHPUT_MM_PER_S)
-    )
+    const expectedMaxFlowRate = round(5 / (expectedTravelMm / 15))
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
 
@@ -254,9 +241,7 @@ describe('getMaxUiFlowRate', () => {
     const expectedTravelMm = 50 / expectedAccuracy
     const correctionMultiplier = 1 + 10 / 50
     const expectedTravelMmCorrected = expectedTravelMm * correctionMultiplier
-    const expectedMaxFlowRate = round(
-      50 / (expectedTravelMmCorrected / MAX_PLUNGER_SPEED_OT2)
-    )
+    const expectedMaxFlowRate = round(50 / (expectedTravelMmCorrected / 40))
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
 
@@ -271,8 +256,7 @@ describe('getMaxUiFlowRate', () => {
     } as any
     const expectedAccuracy = 0.05 * 150 + 1 // Using the last entry [100, 0.05, 1]
     const expectedTravelMm = 150 / expectedAccuracy
-    const expectedMaxFlowRate =
-      150 / (expectedTravelMm / MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S)
+    const expectedMaxFlowRate = 150 / (expectedTravelMm / 70)
     expect(getMaxUiFlowRate(largeVolumeArgs)).toEqual(expectedMaxFlowRate)
   })
 })
