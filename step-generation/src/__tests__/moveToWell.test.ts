@@ -19,6 +19,7 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getSlotInLocationStack,
   pipetteAdjacentHeaterShakerWhileShaking,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
@@ -74,7 +75,7 @@ describe('moveToWell', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      'mockPythonName.move_to(mockPythonName["A1"].bottom(z=1))'
+      'mock_pipette.move_to(mock_source_plate["A1"].bottom(z=1))'
     )
   })
   it('should apply the optional params to the command', () => {
@@ -165,7 +166,7 @@ describe('moveToWell', () => {
     robotStateWithTip = {
       ...robotStateWithTip,
       labware: {
-        [SOURCE_LABWARE]: { slot: 'A4' },
+        [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'A4'] },
       },
     }
     const result = moveToWell(
@@ -476,7 +477,7 @@ describe('moveToWell', () => {
     when(getIsHeaterShakerEastWestWithLatchOpen)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack)
       )
       .thenReturn(true)
 
@@ -498,7 +499,7 @@ describe('moveToWell', () => {
     when(getIsHeaterShakerEastWestMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything()
       )
       .thenReturn(true)
@@ -521,7 +522,7 @@ describe('moveToWell', () => {
     when(pipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         OT2_ROBOT_TYPE
       )
       .thenReturn(true)
@@ -544,7 +545,7 @@ describe('moveToWell', () => {
     when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything(),
         expect.anything()
       )

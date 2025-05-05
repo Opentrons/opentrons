@@ -4,7 +4,13 @@ import type {
   LoadLiquidRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '../types'
+
+export interface LabwareByLiquidId {
+  [liquidId: string]: Array<{
+    labwareId: string
+    volumeByWell: { [well: string]: number }
+  }>
+}
 
 export function getLabwareInfoByLiquidId(
   commands: RunTimeCommand[]

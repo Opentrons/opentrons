@@ -67,7 +67,7 @@ export const getInitialRobotState: (
     const labware: Record<string, LabwareTemporalProperties> = mapValues(
       initialDeckSetup.labware,
       (l: LabwareOnDeck): LabwareTemporalProperties => ({
-        slot: l.slot,
+        stack: l.stack,
       })
     )
     const modules: Record<string, ModuleTemporalProperties> = mapValues(

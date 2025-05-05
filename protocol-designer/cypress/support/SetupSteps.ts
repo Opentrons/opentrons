@@ -188,7 +188,7 @@ export const SetupSteps = {
   SelectLabwareByDisplayName: (displayName: string): StepThunk => ({
     call: () => {
       selectLabwareByDisplayName(displayName)
-
+      cy.get('button[data-testid="SelectLabwareModal_confirm"]').click()
       cy.get(SetupLocators.DoneButtonLabwareSelection).click({ force: true })
     },
   }),
@@ -430,6 +430,15 @@ export const SetupSteps = {
   ClickWellPlatesSection: (): StepThunk => ({
     call: () => {
       cy.contains(SetupContent.WellPlatesCat).click()
+    },
+  }),
+
+  /**
+   * Open SelectLabwareModal to a deck slot.
+   */
+  OpenSelectLabwareModal: (): StepThunk => ({
+    call: () => {
+      cy.get('button[data-testid="EmptySelectorButton_click"]').click()
     },
   }),
 
@@ -1175,6 +1184,7 @@ export const CompositeSetupSteps = {
       )
       SetupSteps.ChoseDeckSlotWithLabware(slotToUse).call()
       SetupSteps.AddHardwareLabware().call()
+      SetupSteps.OpenSelectLabwareModal().call()
       SetupSteps.ClickWellPlatesSection().call()
       SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()
     },

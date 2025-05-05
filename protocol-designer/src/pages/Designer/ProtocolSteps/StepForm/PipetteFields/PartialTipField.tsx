@@ -33,7 +33,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
     labware => labware.def.parameters.isTiprack
   )
   const tipracksNotOnAdapter = tipracks.filter(
-    tiprack => deckSetup.labware[tiprack.slot] == null
+    tiprack => tiprack.stack.length === 2
   )
   const noTipracksOnAdapter = tipracksNotOnAdapter.length === 0
 

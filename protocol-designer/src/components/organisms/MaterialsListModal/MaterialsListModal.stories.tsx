@@ -44,7 +44,7 @@ const mockLabware = [
     },
     id: 'mockLabware',
     labwareDefURI: 'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
-    slot: 'D3',
+    stack: ['mockLabware', 'D3'],
   },
 ] as LabwareOnDeck[]
 

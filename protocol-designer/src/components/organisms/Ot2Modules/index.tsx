@@ -34,6 +34,7 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import {
   getDisableModuleRestrictions,
@@ -160,14 +161,17 @@ export function Ot2Modules(): JSX.Element {
       (moduleSlot === '10' && hasThermocycler)
     const incompatibleLabwareDisplayNameInSlot = Object.values(labware).find(
       lw =>
-        lw.slot === moduleSlot &&
+        moduleSlot != null &&
+        lw.stack.includes(moduleSlot) &&
         !Object.values(
           COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType]
         ).includes(lw.def.parameters.loadName)
     )?.def.metadata.displayName
     const incompatibleLabwareSlots = Object.values(labware)
-      .filter(lw => THERMOCYCLER_SLOTS.includes(lw.slot))
-      ?.map(lw => lw.slot)
+      .filter(lw =>
+        THERMOCYCLER_SLOTS.includes(getSlotInLocationStack(lw.stack))
+      )
+      ?.map(lw => getSlotInLocationStack(lw.stack))
     if (somethingInSlotModule) {
       makeSnackbar(t('protocol_overview:conflict_on_slot_module') as string)
     } else if (
@@ -307,7 +311,6 @@ export function Ot2Modules(): JSX.Element {
     <>
       {entityToDelete != null ? (
         <ConfirmDeleteEntityInUseModal
-          type="clear"
           onClose={() => {
             setDeleteEntityInUseModal(null)
           }}

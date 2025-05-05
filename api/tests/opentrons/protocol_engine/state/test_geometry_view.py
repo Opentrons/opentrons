@@ -1470,10 +1470,12 @@ def test_get_well_position(
 
     result = subject.get_well_position("labware-id", "B2")
 
-    assert result == Point(
-        x=slot_pos[0] + 1 + well_def.x,
-        y=slot_pos[1] - 2 + well_def.y,
-        z=slot_pos[2] + 3 + well_def.z + well_def.depth,
+    assert result.elementwise_isclose(
+        Point(
+            x=slot_pos[0] + 1 + well_def.x,
+            y=slot_pos[1] - 2 + well_def.y,
+            z=slot_pos[2] + 3 + well_def.z + well_def.depth,
+        )
     )
 
 
@@ -1597,10 +1599,12 @@ def test_get_module_labware_well_position(
     ).then_return(OverlapOffset(x=0, y=0, z=0))
 
     result = subject.get_well_position("labware-id", "B2")
-    assert result == Point(
-        x=slot_pos[0] + 1 + well_def.x + 4,
-        y=slot_pos[1] - 2 + well_def.y + 5,
-        z=slot_pos[2] + 3 + well_def.z + well_def.depth + 6,
+    assert result.elementwise_isclose(
+        Point(
+            x=slot_pos[0] + 1 + well_def.x + 4,
+            y=slot_pos[1] - 2 + well_def.y + 5,
+            z=slot_pos[2] + 3 + well_def.z + well_def.depth + 6,
+        )
     )
 
 
@@ -1646,10 +1650,12 @@ def test_get_well_position_with_top_offset(
         ),
     )
 
-    assert result == Point(
-        x=slot_pos[0] + 1 + well_def.x + 1,
-        y=slot_pos[1] - 2 + well_def.y + 2,
-        z=slot_pos[2] + 3 + well_def.z + well_def.depth + 3,
+    assert result.elementwise_isclose(
+        Point(
+            x=slot_pos[0] + 1 + well_def.x + 1,
+            y=slot_pos[1] - 2 + well_def.y + 2,
+            z=slot_pos[2] + 3 + well_def.z + well_def.depth + 3,
+        )
     )
 
 
