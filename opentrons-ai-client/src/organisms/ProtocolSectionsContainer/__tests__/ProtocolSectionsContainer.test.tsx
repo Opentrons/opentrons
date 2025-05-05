@@ -51,9 +51,10 @@ describe('ProtocolSectionsContainer', () => {
       'aria-expanded',
       'false'
     )
-    expect(
-      screen.getByRole('button', { name: 'Modules' })
-    ).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByRole('button', { name: 'Modules' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    )
     expect(
       screen.getByRole('button', { name: 'Labware & Liquids' })
     ).toHaveAttribute('aria-expanded', 'false')
