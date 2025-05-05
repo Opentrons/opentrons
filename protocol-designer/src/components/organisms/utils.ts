@@ -1,5 +1,4 @@
 import {
-  FLEX_ROBOT_TYPE,
   getAreSlotsVerticallyAdjacent,
   getModuleType,
   THERMOCYCLER_MODULE_TYPE,
@@ -17,7 +16,6 @@ import type {
   DeckDefinition,
   ModuleModel,
   ModuleType,
-  RobotType,
 } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
