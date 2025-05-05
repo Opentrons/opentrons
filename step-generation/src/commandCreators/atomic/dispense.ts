@@ -11,6 +11,7 @@ import {
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   getIsSafePipetteMovement,
   getLabwareSlot,
+  getSlotInLocationStack,
   indentPyLines,
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
@@ -58,11 +59,7 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
-  const slotName = getLabwareSlot(
-    labwareId,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(labwareId, prevRobotState.labware)
 
   if (!pipetteSpec) {
     errors.push(
@@ -101,14 +98,17 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
         labware: labwareId,
       })
     )
-  } else if (prevRobotState.labware[labwareId]?.slot === 'offDeck') {
+  } else if (
+    getSlotInLocationStack(prevRobotState.labware[labwareId].stack) ===
+    'offDeck'
+  ) {
     errors.push(errorCreators.labwareOffDeck())
   }
 
   if (COLUMN_4_SLOTS.includes(slotName)) {
     errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
   } else if (labwareState[slotName] != null) {
-    const adapterSlot = labwareState[slotName].slot
+    const adapterSlot = getSlotInLocationStack(labwareState[slotName].stack)
     if (COLUMN_4_SLOTS.includes(adapterSlot)) {
       errors.push(
         errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })

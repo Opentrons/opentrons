@@ -54,7 +54,7 @@ describe('OffDeckThumbnail', () => {
           id: 'mockId',
           def: fixture12Trough as LabwareDefinition2,
           labwareDefURI: 'mockDefUri',
-          slot: 'offDeck',
+          stack: ['mockId', 'offDeck'],
           pythonName: 'mockPythonName',
         },
       },

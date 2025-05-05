@@ -206,7 +206,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
     @abstractmethod
     def resin_tip_unseal(
         self,
-        location: types.Location,
+        location: types.Location | None,
         well_core: WellCoreType,
     ) -> None:
         ...
@@ -365,7 +365,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[types.Location, WellCoreType]],
-        dest: List[Tuple[types.Location, WellCoreType]],
+        dest: Union[List[Tuple[types.Location, WellCoreType]], TrashBin, WasteChute],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LabwareCoreType]],
         starting_tip: Optional[WellCoreType],
@@ -400,7 +400,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[types.Location, WellCoreType]],
-        dest: Tuple[types.Location, WellCoreType],
+        dest: Union[Tuple[types.Location, WellCoreType], TrashBin, WasteChute],
         new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[types.Location, LabwareCoreType]],
         starting_tip: Optional[WellCoreType],

@@ -14,6 +14,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { COLUMN_4_SLOTS } from './constants'
+import { getSlotInLocationStack } from './utils'
 
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
@@ -29,21 +30,23 @@ export function sortLabwareBySlot(
 ): string[] {
   const sortedLabware = Object.keys(labwareState).sort(
     (idA: string, idB: string) => {
-      const slotA = parseInt(labwareState[idA].slot)
-      const slotB = parseInt(labwareState[idB].slot)
+      const slotAStr = getSlotInLocationStack(labwareState[idA].stack)
+      const slotBStr = getSlotInLocationStack(labwareState[idB].stack)
+      const slotANum = parseInt(slotAStr)
+      const slotBNum = parseInt(slotBStr)
       if (
-        COLUMN_4_SLOTS.includes(labwareState[idA].slot) &&
-        COLUMN_4_SLOTS.includes(labwareState[idB].slot)
+        COLUMN_4_SLOTS.includes(slotAStr) &&
+        COLUMN_4_SLOTS.includes(slotBStr)
       ) {
         return idA.localeCompare(idB)
       }
-      if (COLUMN_4_SLOTS.includes(labwareState[idA].slot)) {
+      if (COLUMN_4_SLOTS.includes(slotAStr)) {
         return 1
       }
-      if (COLUMN_4_SLOTS.includes(labwareState[idB].slot)) {
+      if (COLUMN_4_SLOTS.includes(slotBStr)) {
         return -1
       }
-      return slotA - slotB
+      return slotANum - slotBNum
     }
   )
 
@@ -123,7 +126,9 @@ export function getNextTiprack(
         invariantContext.labwareEntities[labwareId]?.labwareDefURI,
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
-      const isOnDeck = robotState.labware[labwareId].slot != null
+      const isOnDeck =
+        getSlotInLocationStack(robotState.labware[labwareId].stack) !==
+        'offDeck'
       const labwareIdDefUri =
         invariantContext.labwareEntities[labwareId].labwareDefURI
       return isOnDeck && labwareIdDefUri === tipRackUri
@@ -132,7 +137,8 @@ export function getNextTiprack(
   const is96Channel = pipetteEntity.spec.channels === 96
   const filteredSortedTipRackIdsFor96Channel = sortedTipracksIds.filter(
     tiprackId => {
-      const tipRackLocation = robotState.labware[tiprackId].slot
+      const tipRackLocation = robotState.labware[tiprackId].stack[1]
+
       const adapterEntity = invariantContext.labwareEntities[tipRackLocation]
       const has96TiprackAdapterId =
         adapterEntity?.def.parameters.loadName ===

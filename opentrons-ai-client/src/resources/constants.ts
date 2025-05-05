@@ -40,3 +40,7 @@ export const LOCAL_FEEDBACK_END_POINT =
   'http://localhost:8000/api/chat/feedback'
 
 export const CLIENT_MAX_WIDTH = '1440px'
+
+export const PD = 'Protocol Designer'
+export const PYTHON = 'Python'
+export const PROTOCOL_FORMAT = 'protocol_format'
