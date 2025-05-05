@@ -338,12 +338,13 @@ def calibrate_tip_overlap(ctx: ProtocolContext, pipette: InstrumentContext) -> N
     slot_name = SLOTS["empty_0"]
     empty_slot_row_idx = "DCBA".index(slot_name[0])
     empty_slot_as_int = (empty_slot_row_idx * 3) + int(slot_name[1:])
-    expected_probe_position = Point(
+    empty_slot_point = Point(
         *get_calibration_square_position_in_slot(slot=empty_slot_as_int)
     )
-    expected_probe_position += expected_probe_position + Point(
+    probe_distance_from_slot_point = Point(
         x=Z_PREP_OFFSET.x, y=Z_PREP_OFFSET.y, z=Z_PREP_OFFSET.z
     )
+    expected_probe_position = empty_slot_point + probe_distance_from_slot_point
 
     # RETRACT and move to above the deck slot
     api.retract(pip_mount)
