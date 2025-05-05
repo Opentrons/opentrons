@@ -29,7 +29,6 @@ import {
   NO_WRAP,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
-  ProtocolDeck,
   SecondaryButton,
   SPACING,
   Tooltip,
@@ -53,6 +52,7 @@ import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/h
 import { getAnalysisStatus } from '/app/organisms/Desktop/ProtocolsLanding/utils'
 import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { ProtocolDeck } from '/app/organisms/ProtocolDeck'
 import { useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocols } from '/app/redux/protocol-storage'

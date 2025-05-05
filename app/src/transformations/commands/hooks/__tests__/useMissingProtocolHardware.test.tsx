@@ -15,7 +15,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { useMissingProtocolHardware } from '../useMissingProtocolHardware'
 

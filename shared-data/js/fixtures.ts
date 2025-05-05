@@ -27,6 +27,7 @@ import {
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_V1_FIXTURE,
+  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   HEATERSHAKER_MODULE_V1,
@@ -316,6 +317,12 @@ export function getFixtureDisplayName(
             FLEX_STACKER_MODULE_V1
           )} in USB-${usbPortNumber} and waste chute`
         : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and waste chute`
+    case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
+      return usbPortNumber != null
+        ? `${getModuleDisplayName(
+            FLEX_STACKER_MODULE_V1
+          )} in USB-${usbPortNumber} and magnetic block`
+        : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and magnetic block`
     default:
       return 'Slot'
   }
