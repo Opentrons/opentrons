@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
@@ -201,13 +200,4 @@ const LINE_CLAMP_STYLE = css`
   text-overflow: ellipsis;
   word-wrap: break-word;
   -webkit-line-clamp: 2;
-`
-
-const QUANTITY_STYLE = css`
-  background-color: ${COLORS.grey40};
-  padding: ${SPACING.spacing4};
-  border-radius: ${BORDERS.borderRadius4};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${TYPOGRAPHY.bodyTextBold}
-  }
 `
