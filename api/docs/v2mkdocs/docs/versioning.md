@@ -48,11 +48,9 @@ The version you specify determines the features and behaviors available to your 
 
 When choosing an API level, consider what features you need and how widely you plan to share your protocol. Throughout the Python Protocol API documentation, there are version statements indicating when elements (features, function calls, available properties, etc.) were introduced. Keep these in mind when specifying your protocol's API version. Version statements look like this:
 
-<div class="versionadded">
+:material-plus-circle-outline: *Added in version 2.0*
 
-2.0
-
-</div>
+:material-update: *Changed in version 2.15: now supports foo and bar.*
 
 On the one hand, using the highest available version will give your protocol access to all the latest `features and fixes <version-notes>`. On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.
 
@@ -287,8 +285,8 @@ If you specify an API version of `2.13` or lower, your protocols will continue t
 
 - Added `InstrumentContext.pair_with()`, an experimental feature for moving both pipettes simultaneously.
 
-  > [!NOTE]
-  > This feature has been removed from the Python Protocol API.
+!!! note
+    This feature has been removed from the Python Protocol API.
 
 - Calling `.InstrumentContext.has_tip` will return whether a particular instrument
   has a tip attached or not.
