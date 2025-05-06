@@ -25,15 +25,18 @@ import {
 import { LabwareLiquidsSection } from '../LabwareLiquidsSection'
 import { ModulesAndFixturesSection } from '../ModulesAndFixturesSection'
 import { ProtocolFormatSection } from '../ProtocolFormatSection'
+import { RuntimeParametersSection } from '../RuntimeParametersSection'
 import { StepsSection } from '../StepsSection'
 
-export const PROTOCOL_FORMAT_STEP = 0
-export const APPLICATION_STEP = 1
-export const INSTRUMENTS_STEP = 2
-export const MODULES_STEP = 3
-export const LABWARE_LIQUIDS_STEP = 4
-export const STEPS_STEP = 5
-export const TOTAL_STEPS = 6
+const PROTOCOL_FORMAT_SECTION = 0
+const APPLICATION_SECTION = 1
+const INSTRUMENTS_SECTION = 2
+const MODULES_SECTION = 3
+const LABWARE_LIQUIDS_SECTION = 4
+const RUNTIME_PARAMETERS_SECTION = 5
+const STEPS_SECTION = 6
+
+export const TOTAL_STEPS = 7
 
 export function ProtocolSectionsContainer(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
@@ -50,22 +53,22 @@ export function ProtocolSectionsContainer(): JSX.Element | null {
 
   const sections = [
     {
-      sectionNumber: PROTOCOL_FORMAT_STEP,
+      sectionNumber: PROTOCOL_FORMAT_SECTION,
       title: 'protocol_format_title',
       Component: ProtocolFormatSection,
     },
     {
-      sectionNumber: APPLICATION_STEP,
+      sectionNumber: APPLICATION_SECTION,
       title: 'application_title',
       Component: ApplicationSection,
     },
     {
-      sectionNumber: INSTRUMENTS_STEP,
+      sectionNumber: INSTRUMENTS_SECTION,
       title: 'instruments_title',
       Component: InstrumentsSection,
     },
     {
-      sectionNumber: MODULES_STEP,
+      sectionNumber: MODULES_SECTION,
       title:
         robotType === OPENTRONS_FLEX
           ? 'modules_fixtures_title'
@@ -73,12 +76,17 @@ export function ProtocolSectionsContainer(): JSX.Element | null {
       Component: ModulesAndFixturesSection,
     },
     {
-      sectionNumber: LABWARE_LIQUIDS_STEP,
+      sectionNumber: LABWARE_LIQUIDS_SECTION,
       title: 'labware_liquids_title',
       Component: LabwareLiquidsSection,
     },
     {
-      sectionNumber: STEPS_STEP,
+      sectionNumber: RUNTIME_PARAMETERS_SECTION,
+      title: 'runtime_parameters_title',
+      Component: RuntimeParametersSection,
+    },
+    {
+      sectionNumber: STEPS_SECTION,
       title: 'steps_title',
       Component: StepsSection,
     },

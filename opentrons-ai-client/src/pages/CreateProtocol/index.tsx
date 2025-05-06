@@ -57,6 +57,7 @@ export interface CreateProtocolFormData {
   fixtures: DisplayFixture[]
   labwares: DisplayLabware[]
   liquids: string[]
+  runtime_parameters?: string
   steps: string[] | string
 }
 

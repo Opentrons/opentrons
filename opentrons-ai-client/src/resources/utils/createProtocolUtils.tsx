@@ -13,9 +13,10 @@ import {
   NO_PIPETTES,
   OPENTRONS_FLEX,
   OPENTRONS_OT2,
+  ROBOT_FIELD_NAME,
   TWO_PIPETTES,
 } from '../../organisms/InstrumentsSection'
-import { PYTHON } from '../constants'
+import { PROTOCOL_FORMAT, PYTHON } from '../constants'
 import { getOnlyLatestDefs } from './labware'
 
 import type { UseFormWatch } from 'react-hook-form'
@@ -238,6 +239,26 @@ export function generatePromptPreviewStepsItems(
   return steps.filter(Boolean)
 }
 
+export function generatePromptPreviewRuntimeParametersItems(
+  watch: UseFormWatch<CreateProtocolFormData>,
+  t: any
+): string[] {
+  const { runtime_parameters } = watch()
+  const protocolFormat = watch(PROTOCOL_FORMAT)
+  const robotType = watch(ROBOT_FIELD_NAME)
+
+  // Only show in preview if Protocol is Python and robot is Flex
+  if (
+    protocolFormat !== PYTHON ||
+    robotType !== OPENTRONS_FLEX ||
+    !runtime_parameters
+  ) {
+    return []
+  }
+
+  return [runtime_parameters].filter(Boolean)
+}
+
 export function generatePromptPreviewData(
   watch: UseFormWatch<CreateProtocolFormData>,
   t: any
@@ -269,6 +290,10 @@ export function generatePromptPreviewData(
     {
       title: t('labware_liquids_title'),
       items: generatePromptPreviewLabwareLiquidsItems(watch, t),
+    },
+    {
+      title: t('runtime_parameters_title'),
+      items: generatePromptPreviewRuntimeParametersItems(watch, t),
     },
     {
       title: t('steps_title'),
@@ -388,6 +413,15 @@ export function generateChatPrompt(
   const fixtureSection =
     values.fixtures.length > 0 ? `\n\n${t('fixtures_title')}:\n${fixtures}` : ''
 
+  const runtimeParametersSection =
+    values.protocol_format === PYTHON &&
+    values.instruments.robot === OPENTRONS_FLEX &&
+    values.runtime_parameters
+      ? `\n\n${t(
+          'runtime_parameters_title'
+        )}:\n- ${values.runtime_parameters.replace(/\n/g, '\n- ')}`
+      : ''
+
   const prompt = `${
     values.protocol_format === PYTHON
       ? t('create_protocol_prompt_robot', { robotType }) + '\n'
@@ -406,7 +440,7 @@ ${t(
 
 \n${t('labware_section_title')}:\n${labwares}
 
-\n${t('liquid_section_title')}:\n${liquids}
+\n${t('liquid_section_title')}:\n${liquids}${runtimeParametersSection}
 
 \n${t('steps_section_title')}:\n${steps}
 `
@@ -435,6 +469,7 @@ ${t(
       labware => `${labware.labwareURI}, quantity: ${labware.count}`
     ),
     liquids: values.liquids,
+    runtime_parameters: values.runtime_parameters,
     steps: Array.isArray(values.steps) ? values.steps : [values.steps],
     fake:
       !isPdProtocolGenerationEnabled &&
