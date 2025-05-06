@@ -7,12 +7,6 @@ import { MODULES_FIELD_NAME } from '../../organisms/ModulesSection'
 
 import type { DisplayModules } from '../../organisms/ModulesSection'
 
-const ButtonWrapper = styled.div`
-  display: inline-block;
-  flex-grow: 0;
-  flex-shrink: 1;
-`
-
 export function ControlledEmptySelectorButtonGroup({
   modules,
 }: {
@@ -54,3 +48,9 @@ export function ControlledEmptySelectorButtonGroup({
     />
   )
 }
+
+const ButtonWrapper = styled.div`
+  display: inline-block;
+  flex-grow: 0;
+  flex-shrink: 1;
+`
