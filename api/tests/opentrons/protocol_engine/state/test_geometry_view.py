@@ -44,6 +44,11 @@ from opentrons_shared_data.labware.labware_definition import (
     ConicalFrustum,
     labware_definition_type_adapter,
     LabwareDefinition3,
+    Extents,
+    AxisAlignedBoundingBox3D,
+    AxisAlignedBoundingBox2D,
+    Vector3D,
+    Vector2D,
 )
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons_shared_data.labware import load_definition as load_labware_definition
@@ -363,34 +368,17 @@ def nice_adapter_definition() -> LabwareDefinition:
 @pytest.fixture
 def mock_labware_definition3() -> LabwareDefinition3:
     """Get a mock LabwareDefinition3."""
-
-    class BackLeftBottom:
-        """Mocked 'total' backLeftBottom extents."""
-
-        x = 0
-        y = 0
-        z = 0
-
-    class FrontRightTop:
-        """Mocked 'total' frontRightTop extents."""
-
-        x = 127.76
-        y = -85.48
-        z = 18.16
-
-    class BoundingBox:
-        """Mocked intermediate. Doesn't actually exist in labware schema v3."""
-
-        backLeftBottom = BackLeftBottom()
-        frontRightTop = FrontRightTop()
-
-    class Extents:
-        """Mocked labware schemav3 extents."""
-
-        total = BoundingBox()
-
     mock_def = cast(LabwareDefinition3, sentinel.labware_definition)
-    mock_def.extents = Extents()
+    extents_bounding_box = AxisAlignedBoundingBox3D(
+        backLeftBottom=Vector3D(x=0, y=0, z=0),
+        frontRightTop=Vector3D(x=127.76, y=-85.48, z=18.16),
+    )
+    footprint_bounding_box = AxisAlignedBoundingBox2D(
+        backLeft=Vector2D(x=0, y=0), frontRight=Vector2D(x=127.76, y=-85.48)
+    )
+    mock_def.extents = Extents(
+        total=extents_bounding_box, footprint=footprint_bounding_box
+    )
     mock_def.schemaVersion = 3
     return mock_def
 
