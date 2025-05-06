@@ -9,7 +9,6 @@ import {
   DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
-  InfoScreen,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SPACING,
@@ -29,6 +28,7 @@ import {
   getFlexStackerPrepCommands,
   getModulePrepCommands,
 } from '/app/local-resources/modules'
+import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { OddModal } from '/app/molecules/OddModal'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
@@ -186,10 +186,12 @@ export function ModuleTableItem({
           gridGap={SPACING.spacing32}
           width="100%"
         >
-          <InfoScreen
-            content={t('home_stacker_warning_title')}
-            subContent={t('home_stacker_warning_description')}
-            backgroundColor={COLORS.yellow35}
+          <OddInfoScreen
+            type="warning"
+            header={t('home_stacker_warning_title')}
+            subText={t('home_stacker_warning_description')}
+            padding={SPACING.spacing24}
+            gridGap={SPACING.spacing16}
           />
           <Flex gridGap={SPACING.spacing8} width="100%">
             <SmallButton
