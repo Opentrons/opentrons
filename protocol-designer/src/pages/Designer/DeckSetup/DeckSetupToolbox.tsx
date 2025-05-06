@@ -230,6 +230,7 @@ export function DeckSetupToolbox(
             setShowSelectLabwareModal(false)
           }}
           onConfirm={handleConfirmSelection}
+          slotFull={slotFull}
         />
       ) : null}
       {isLabwareOnSlotInUse && showDeleteEntityInUseModal ? (
@@ -282,11 +283,11 @@ export function DeckSetupToolbox(
               text={t('add_labware')}
               iconName="plus"
               onClick={() => {
-                if (slotFull) {
-                  makeSnackbar(t('no_space') as string)
-                } else {
-                  setShowSelectLabwareModal(true)
-                }
+                // if (slotFull) {
+                //   makeSnackbar(t('no_space') as string)
+                // } else {
+                setShowSelectLabwareModal(true)
+                // }
               }}
             />
           </Flex>
