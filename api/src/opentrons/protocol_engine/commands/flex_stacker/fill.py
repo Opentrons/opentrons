@@ -31,8 +31,6 @@ from .common import (
     lid_location_sequences_with_default,
 )
 
-from opentrons.drivers.flex_stacker.types import LEDColor, LEDPattern
-
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler, RunControlHandler
@@ -223,7 +221,8 @@ class FillImpl(AbstractCommandImpl[FillParams, SuccessData[FillResult]]):
 
         if params.strategy == StackerFillEmptyStrategy.MANUAL_WITH_PAUSE:
             await self._run_control.wait_for_resume()
-        stacker_hw.set_door_intervention(False)
+        if stacker_hw:
+            stacker_hw.set_door_intervention(False)
 
         return SuccessData(
             public=FillResult.model_construct(
