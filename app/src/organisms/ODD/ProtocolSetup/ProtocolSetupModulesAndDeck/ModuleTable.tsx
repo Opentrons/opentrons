@@ -14,9 +14,10 @@ import {
   useRunCalibrationStatus,
 } from '/app/resources/runs'
 
+import { ModuleTableItem } from './ModuleTableItem'
+
 import type { DeckDefinition } from '@opentrons/shared-data'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
-import { ModuleTableItem } from './ModuleTableItem'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
