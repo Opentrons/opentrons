@@ -9,7 +9,6 @@ import { fixture96Plate, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { SelectLabwareModal } from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import { getRobotType } from '../../../../file-data/selectors'
 import {
   deleteContainer,
@@ -52,8 +51,6 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
-const mockMakeSnackbar = vi.fn()
-
 describe('DeckSetupToolbox', () => {
   let props: ComponentProps<typeof DeckSetupToolbox>
 
@@ -81,11 +78,6 @@ describe('DeckSetupToolbox', () => {
     vi.mocked(getSavedStepForms).mockReturnValue({})
     vi.mocked(getDismissedHints).mockReturnValue([])
     vi.mocked(getAdditionalEquipment).mockReturnValue({})
-    vi.mocked(useKitchen).mockReturnValue({
-      makeSnackbar: mockMakeSnackbar,
-      bakeToast: vi.fn(),
-      eatToast: vi.fn(),
-    })
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -153,7 +145,7 @@ describe('DeckSetupToolbox', () => {
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
     // add labware when there is no space
     fireEvent.click(screen.getAllByText('Add labware')[0])
-    expect(mockMakeSnackbar).toHaveBeenCalledWith('No space on slot')
+    screen.getByText('mock SelectLabwareModal')
     // click done
     fireEvent.click(screen.getByText('Done'))
     expect(props.onCloseClick).toHaveBeenCalled()
