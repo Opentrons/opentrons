@@ -206,43 +206,53 @@ export const PROTOCOL_DESIGNER_SOURCE: 'Protocol Designer' = 'Protocol Designer'
 
 export const DECK_SETUP_TOOLS_WIDTH_REM = 21.875
 
-// Copied from opentrons/api/src/opentrons/config/defaults_ot[2/3].py
+// Below values copied from opentrons/api/src/opentrons/config/defaults_ot[2/3].py
+export const FLEX_X_Y_MAX_SPEED = 300
+export const FLEX_LOW_THROUGHPUT_Z_MAX_SPEED = 100
+export const FLEX_HIGH_THROUGHPUT_Z_MAX_SPEED = 35
+export const FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED = 70
+export const FLEX_HIGH_THROUGHPUT_PLUNGER_MAX_SPEED = 15
+export const OT2_X_MAX_SPEED = 600
+export const OT2_Y_MAX_SPEED = 400
+export const OT2_Z_MAX_SPEED = 125
+export const OT2_PLUNGER_MAX_SPEED = 40
+
 export const CHANNELS_MAPPED_TO_MAX_SPEED: Record<
   RobotType,
   Record<number, { plunger: number; x: number; y: number; z: number }>
 > = {
   [FLEX_ROBOT_TYPE]: {
     1: {
-      plunger: 70,
-      x: 300,
-      y: 300,
-      z: 100,
+      plunger: FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED,
+      x: FLEX_X_Y_MAX_SPEED,
+      y: FLEX_X_Y_MAX_SPEED,
+      z: FLEX_LOW_THROUGHPUT_Z_MAX_SPEED,
     },
     8: {
-      plunger: 70,
-      x: 300,
-      y: 300,
-      z: 100,
+      plunger: FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED,
+      x: FLEX_X_Y_MAX_SPEED,
+      y: FLEX_X_Y_MAX_SPEED,
+      z: FLEX_LOW_THROUGHPUT_Z_MAX_SPEED,
     },
     96: {
-      plunger: 15,
-      x: 300,
-      y: 300,
-      z: 35,
+      plunger: FLEX_HIGH_THROUGHPUT_PLUNGER_MAX_SPEED,
+      x: FLEX_X_Y_MAX_SPEED,
+      y: FLEX_X_Y_MAX_SPEED,
+      z: FLEX_HIGH_THROUGHPUT_Z_MAX_SPEED,
     },
   },
   [OT2_ROBOT_TYPE]: {
     1: {
-      plunger: 40,
-      x: 600,
-      y: 400,
-      z: 125,
+      plunger: OT2_PLUNGER_MAX_SPEED,
+      x: OT2_X_MAX_SPEED,
+      y: OT2_Y_MAX_SPEED,
+      z: OT2_Z_MAX_SPEED,
     },
     8: {
-      plunger: 40,
-      x: 600,
-      y: 400,
-      z: 125,
+      plunger: OT2_PLUNGER_MAX_SPEED,
+      x: OT2_X_MAX_SPEED,
+      y: OT2_Y_MAX_SPEED,
+      z: OT2_Z_MAX_SPEED,
     },
   },
 }
