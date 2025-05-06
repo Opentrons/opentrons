@@ -917,7 +917,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
         if flow_rate and rate:
-            raise UnsupportedAPIError(message="Cannot define both flow_rate and rate.")
+            raise ValueError("Cannot define both flow_rate and rate.")
 
         if height is None:
             height = 5
