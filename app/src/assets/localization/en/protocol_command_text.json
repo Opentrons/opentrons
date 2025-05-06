@@ -70,6 +70,8 @@
   "partial_layout": "partial layout",
   "pause": "Pause",
   "pause_on": "Pause on {{robot_name}}",
+  "empty_stacker": "Empty Stacker",
+  "fill_stacker": "Refill Stacker",
   "pickup_tip": "Picking up tip(s) from {{well_range}} of {{labware}} in {{labware_location}}",
   "prepare_to_aspirate": "Preparing {{pipette}} to aspirate",
   "pressurizing_to_dispense": "Pressurize pipette to dispense {{volume}} µL from resin tip at {{flow_rate}} µL/sec",
