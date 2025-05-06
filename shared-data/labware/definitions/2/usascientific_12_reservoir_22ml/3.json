@@ -25,7 +25,7 @@
   "dimensions": {
     "xDimension": 127.76,
     "yDimension": 85.8,
-    "zDimension": 44.45
+    "zDimension": 44.2
   },
   "parameters": {
     "format": "trough",
@@ -43,7 +43,7 @@
       "totalLiquidVolume": 22000,
       "x": 13.94,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     },
     "A2": {
@@ -54,7 +54,7 @@
       "totalLiquidVolume": 22000,
       "x": 23.03,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     },
     "A3": {
@@ -65,7 +65,7 @@
       "totalLiquidVolume": 22000,
       "x": 32.12,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     },
     "A4": {
@@ -76,7 +76,7 @@
       "totalLiquidVolume": 22000,
       "x": 41.21,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     },
     "A5": {
@@ -87,7 +87,7 @@
       "totalLiquidVolume": 22000,
       "x": 50.3,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     },
     "A6": {
@@ -98,7 +98,7 @@
       "totalLiquidVolume": 22000,
       "x": 59.39,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     },
     "A7": {
@@ -109,7 +109,7 @@
       "totalLiquidVolume": 22000,
       "x": 68.48,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     },
     "A8": {
@@ -120,7 +120,7 @@
       "totalLiquidVolume": 22000,
       "x": 77.57,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     },
     "A9": {
@@ -131,7 +131,7 @@
       "totalLiquidVolume": 22000,
       "x": 86.66,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     },
     "A10": {
@@ -142,7 +142,7 @@
       "totalLiquidVolume": 22000,
       "x": 95.75,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     },
     "A11": {
@@ -153,7 +153,7 @@
       "totalLiquidVolume": 22000,
       "x": 104.84,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     },
     "A12": {
@@ -164,7 +164,7 @@
       "totalLiquidVolume": 22000,
       "x": 113.93,
       "y": 42.9,
-      "z": 2.29,
+      "z": 2.45,
       "geometryDefinitionId": "cuboidalWell"
     }
   },
