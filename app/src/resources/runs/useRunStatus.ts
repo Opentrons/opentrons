@@ -9,6 +9,10 @@ import { DEFAULT_STATUS_REFETCH_INTERVAL } from './constants'
 import type { UseQueryOptions } from 'react-query'
 import type { RunStatus, RunAction, Run } from '@opentrons/api-client'
 
+/**
+ * @deprecated TODO(jh, 05-05-24): Confirming MM's observation, this hook is no longer necessary
+ *  and appears bug-prone. Let's remove it and replace with useNotifyRunQuery.
+ */
 export function useRunStatus(
   runId: string | null,
   options?: UseQueryOptions<Run>
