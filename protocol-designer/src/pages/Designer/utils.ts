@@ -60,6 +60,7 @@ interface SlotInformationProps {
   deckSetup: AllTemporalPropertiesForTimelineFrame
   slot: DeckSlot
   deckDef?: DeckDefinition
+  offDeckUri?: string
 }
 
 const FOURTH_COLUMN_SLOTS = ['A4', 'B4', 'C4', 'D4']
@@ -68,7 +69,7 @@ const FOURTH_COLUMN_CONVERSION = { A4: 'A3', B4: 'B3', C4: 'C3', D4: 'D3' }
 export const getSlotInformation = (
   props: SlotInformationProps
 ): SlotInformation => {
-  const { slot, deckSetup, deckDef } = props
+  const { slot, deckSetup, deckDef, offDeckUri } = props
   const slotPosition =
     deckDef != null ? getPositionFromSlotId(slot, deckDef) ?? null : null
   const {
@@ -79,12 +80,14 @@ export const getSlotInformation = (
   const createdModuleForSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
   )
+  console.log('slot', slot)
   const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabware),
     slot
   )
   const labwareIdsFromFullStack =
     fullStackFromLabwares?.filter(id => deckSetupLabware[id] != null) ?? []
+  console.log('offDeckId', offDeckUri)
   const bottomMostLabware =
     deckSetupLabware[
       labwareIdsFromFullStack[labwareIdsFromFullStack.length - 1]
@@ -97,11 +100,13 @@ export const getSlotInformation = (
 
   //  top most labware
   const createdTopLabwareForSlot =
-    labwareIdsFromFullStack.length < 1
-      ? undefined
-      : deckSetupLabware[labwareIdsFromFullStack[0]]
+    labwareIdsFromFullStack.length >= 1 &&
+    !deckSetupLabware[labwareIdsFromFullStack[0]].def.allowedRoles?.includes(
+      'adapter'
+    )
+      ? deckSetupLabware[labwareIdsFromFullStack[0]]
+      : undefined
 
-      console.log(labwareIdsFromFullStack)
   const createdFixtureForSlots = Object.values(
     additionalEquipmentOnDeck
   ).filter(ae => {
@@ -134,9 +139,18 @@ export const getSlotInformation = (
     createdFixtureForSlots != null && createdFixtureForSlots.length === 2
       ? ('wasteChuteAndStagingArea' as Fixture)
       : (createdFixtureForSlots[0]?.name as Fixture)
+
+  const offDeckLabware =
+    offDeckUri != null && slot === 'offDeck'
+      ? Object.values(deckSetupLabware).find(
+          lw => lw.labwareDefURI === offDeckUri
+        )
+      : null
   return {
     createdModuleForSlot,
-    createdTopLabwareForSlot,
+    createdTopLabwareForSlot: offDeckLabware
+      ? offDeckLabware
+      : createdTopLabwareForSlot,
     createdAdapterForSlot,
     createdFixtureForSlots,
     preSelectedFixture,

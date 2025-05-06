@@ -77,7 +77,6 @@ export function DeckSetupToolbox(
   const [showSelectLabwareModal, setShowSelectLabwareModal] = useState<boolean>(
     false
   )
-
   if (slot == null) {
     return null
   }
@@ -87,7 +86,13 @@ export function DeckSetupToolbox(
     createdAdapterForSlot,
     createdModuleForSlot,
     createdFixtureForSlots,
-  } = getSlotInformation({ deckSetup, slot })
+  } = getSlotInformation({
+    deckSetup,
+    slot,
+    deckDef: undefined,
+    offDeckUri: selectedTopLabwareDefUri ?? undefined,
+  })
+  console.log('createdTopLabwareForSlot', createdTopLabwareForSlot)
   const handleResetToolbox = (): void => {
     dispatch(
       editSlotInfo({
@@ -111,68 +116,97 @@ export function DeckSetupToolbox(
   const hasNoLabware =
     createdAdapterForSlot == null && createdTopLabwareForSlot == null
 
-  const handleClear = (keepExistingLabware = false): void => {
+  const handleClear = (): void => {
     if (slot !== 'offDeck') {
-      //  clear adapter from slot
-      if (
-        createdAdapterForSlot != null &&
-        (!keepExistingLabware ||
-          createdAdapterForSlot.labwareDefURI !== selectedAdapterDefUri ||
-          //  if top labware changes but adapter doesn't, still delete both
-          (createdTopLabwareForSlot?.labwareDefURI === selectedAdapterDefUri &&
-            selectedTopLabwareDefUri != null &&
-            createdTopLabwareForSlot?.labwareDefURI !==
-              selectedTopLabwareDefUri))
-      ) {
+      if (createdAdapterForSlot != null) {
         dispatch(deleteContainer({ labwareId: createdAdapterForSlot.id }))
       }
-      //  clear top labware from slot
-      if (
-        createdTopLabwareForSlot != null &&
-        (!keepExistingLabware ||
-          createdTopLabwareForSlot.labwareDefURI !== selectedTopLabwareDefUri)
-      ) {
+      if (createdTopLabwareForSlot != null) {
+        dispatch(deleteContainer({ labwareId: createdTopLabwareForSlot.id }))
+      }
+    } else {
+      if (createdTopLabwareForSlot != null) {
         dispatch(deleteContainer({ labwareId: createdTopLabwareForSlot.id }))
       }
     }
     handleResetToolbox()
   }
   const handleConfirm = (): void => {
-    handleClear(true)
-    if (
-      (slot === 'offDeck' && selectedTopLabwareDefUri != null) ||
-      (selectedModuleModel == null && selectedTopLabwareDefUri != null)
-      // (createdTopLabwareForSlot?.labwareDefURI !== selectedAdapterDefUri ||
-      //   (selectedTopLabwareDefUri != null &&
-      //     selectedTopLabwareDefUri !==
-      //       createdTopLabwareForSlot?.labwareDefURI)))
-    ) {
-      //  create adapter + labware on deck
+    handleClear()
+
+    if (slot === 'offDeck' && selectedTopLabwareDefUri != null) {
       dispatch(
         createContainer({
           slot,
           labwareDefURI: selectedTopLabwareDefUri,
-          adapterUnderLabwareDefURI: selectedAdapterDefUri ?? undefined,
         })
       )
-    }
-    if (
-      selectedModuleModel != null &&
-      selectedTopLabwareDefUri != null
-      // (createdAdapterForSlot?.labwareDefURI !== selectedAdapterDefUri ||
-      //   //  if nested labware changes but labware doesn't, still create both
-      //   (createdAdapterForSlot.labwareDefURI === selectedAdapterDefUri &&
-      //     createdTopLabwareForSlot?.labwareDefURI !==
-      //       selectedTopLabwareDefUri &&
-      //     (createdTopLabwareForSlot?.labwareDefURI != null ||
-      //       selectedTopLabwareDefUri != null)))
+    } else if (
+      selectedModuleModel == null &&
+      selectedTopLabwareDefUri != null &&
+      selectedAdapterDefUri != null
     ) {
-      //   create adapter + labware on module
+      dispatch(
+        createContainer({
+          slot,
+          labwareDefURI: selectedTopLabwareDefUri,
+          adapterUnderLabwareDefURI: selectedAdapterDefUri,
+        })
+      )
+    } else if (
+      selectedModuleModel == null &&
+      selectedTopLabwareDefUri != null &&
+      selectedAdapterDefUri == null
+    ) {
+      dispatch(
+        createContainer({
+          slot,
+          labwareDefURI: selectedTopLabwareDefUri,
+        })
+      )
+    } else if (
+      selectedModuleModel == null &&
+      selectedTopLabwareDefUri == null &&
+      selectedAdapterDefUri != null
+    ) {
+      dispatch(
+        createContainer({
+          slot,
+          labwareDefURI: selectedAdapterDefUri,
+        })
+      )
+    } else if (
+      selectedModuleModel != null &&
+      selectedTopLabwareDefUri != null &&
+      selectedAdapterDefUri != null
+    ) {
       dispatch(
         createContainerAboveModule({
           slot,
           labwareDefURI: selectedTopLabwareDefUri,
-          adapterDefURI: selectedAdapterDefUri ?? undefined,
+          adapterDefURI: selectedAdapterDefUri,
+        })
+      )
+    } else if (
+      selectedModuleModel != null &&
+      selectedTopLabwareDefUri != null &&
+      selectedAdapterDefUri == null
+    ) {
+      dispatch(
+        createContainerAboveModule({
+          slot,
+          labwareDefURI: selectedTopLabwareDefUri,
+        })
+      )
+    } else if (
+      selectedModuleModel != null &&
+      selectedTopLabwareDefUri == null &&
+      selectedAdapterDefUri != null
+    ) {
+      dispatch(
+        createContainerAboveModule({
+          slot,
+          labwareDefURI: selectedAdapterDefUri,
         })
       )
     }

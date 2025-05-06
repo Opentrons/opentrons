@@ -29,7 +29,6 @@ export function SelectedLabwareRender(
     nestedLabwareInfo,
     showLabel = true,
   } = props
-
   return (labwareOnDeck != null || labwareDef != null) &&
     slotPosition != null &&
     moduleModel == null ? (

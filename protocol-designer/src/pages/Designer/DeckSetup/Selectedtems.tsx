@@ -44,27 +44,18 @@ export const SelectedItems = (
   const defs = getAllLabwareDefs()
   const deckSetup = useSelector(getInitialDeckSetup)
   const { labware } = deckSetup
-  const matchingSelectedLabwareOnDeck = Object.values(labware).find(labware => {
-    const matchingSlot = getSlotInLocationStack(labware.stack)
+  const matchingSelectedTopLabwareOnDeck = Object.values(labware).find(lw => {
+    const matchingSlot = getSlotInLocationStack(lw.stack)
     return (
-      matchingSlot === selectedSlot.slot &&
-      labware.labwareDefURI === selectedAdapterDefUri
+      lw.labwareDefURI === selectedTopLabwareDefUri &&
+      matchingSlot === selectedSlot.slot
     )
   })
-  const matchingSelectedNestedLabwareOnDeck = Object.values(labware).find(
-    lw => {
-      const matchingSlot = getSlotInLocationStack(lw.stack)
-      return (
-        lw.labwareDefURI === selectedTopLabwareDefUri &&
-        matchingSlot === selectedSlot.slot
-      )
-    }
-  )
-  const selectedLabwareDef =
+  const selectedAdapterDef =
     selectedAdapterDefUri != null
       ? defs[selectedAdapterDefUri] ?? customLabwareDefs[selectedAdapterDefUri]
       : null
-  const selectedNestedLabwareDef =
+  const selectedTopLabwareDef =
     selectedTopLabwareDefUri != null
       ? defs[selectedTopLabwareDefUri] ??
         customLabwareDefs[selectedTopLabwareDefUri]
@@ -77,25 +68,25 @@ export const SelectedItems = (
 
   const labwareInfos: DeckLabelProps[] = []
 
-  if (selectedNestedLabwareDef != null) {
-    const selectedNestedLabwareLabel = {
-      text: selectedNestedLabwareDef.metadata.displayName,
+  if (selectedTopLabwareDef != null) {
+    const selectedTopLabwareLabel = {
+      text: selectedTopLabwareDef.metadata.displayName,
       isSelected: true,
       isLast: true,
       isZoomed: true,
     }
-    labwareInfos.push(selectedNestedLabwareLabel)
+    labwareInfos.push(selectedTopLabwareLabel)
   }
   if (selectedAdapterDefUri != null) {
     const def =
       defs[selectedAdapterDefUri] ?? customLabwareDefs[selectedAdapterDefUri]
-    const selectedLabwareLabel = {
+    const selectedAdapterLabel = {
       text: def.metadata.displayName,
       isSelected: true,
       isLast: selectedTopLabwareDefUri == null,
       isZoomed: true,
     }
-    labwareInfos.push(selectedLabwareLabel)
+    labwareInfos.push(selectedAdapterLabel)
   }
 
   return (
@@ -121,9 +112,8 @@ export const SelectedItems = (
           >
             <>
               <SelectedModuleLabwareRender
-                nestedLabwareDef={selectedNestedLabwareDef}
-                labwareOnDeck={matchingSelectedLabwareOnDeck}
-                labwareDef={selectedLabwareDef}
+                topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
+                adapterDef={selectedAdapterDef}
                 moduleModel={selectedModuleModel}
               />
             </>
@@ -142,25 +132,22 @@ export const SelectedItems = (
         </>
       ) : null}
       <SelectedLabwareRender
-        labwareOnDeck={matchingSelectedLabwareOnDeck}
-        labwareDef={selectedLabwareDef}
+        labwareOnDeck={matchingSelectedTopLabwareOnDeck}
+        labwareDef={selectedTopLabwareDef ?? selectedAdapterDef}
         slotPosition={slotPosition}
         moduleModel={selectedModuleModel}
-        showLabel={selectedNestedLabwareDef == null}
-      />
-      <SelectedLabwareRender
-        labwareOnDeck={matchingSelectedNestedLabwareOnDeck}
-        labwareDef={selectedNestedLabwareDef}
-        slotPosition={slotPosition}
-        moduleModel={selectedModuleModel}
-        nestedLabwareInfo={[
-          {
-            text: selectedLabwareDef?.metadata.displayName ?? 'unknown name',
-            isSelected: true,
-            isLast: true,
-            isZoomed: true,
-          },
-        ]}
+        nestedLabwareInfo={
+          selectedAdapterDef != null && selectedTopLabwareDef != null
+            ? [
+                {
+                  text: selectedAdapterDef?.metadata.displayName,
+                  isSelected: true,
+                  isLast: true,
+                  isZoomed: true,
+                },
+              ]
+            : undefined
+        }
       />
     </>
   )

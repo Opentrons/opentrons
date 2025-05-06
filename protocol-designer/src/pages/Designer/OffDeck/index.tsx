@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -20,8 +21,12 @@ import {
 
 import { LiquidButton } from '../../../components/molecules'
 import { getOnlyLatestDefs } from '../../../labware-defs'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
+import {
+  editSlotInfo,
+  selectZoomedIntoSlot,
+} from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getSelectedTerminalItemId } from '../../../ui/steps'
 import { DeckSetupToolbox } from '../DeckSetup/DeckSetupToolbox'
 import { LabwareLabel } from '../LabwareLabel'
@@ -40,18 +45,44 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
   const { setOverflowMenu } = props
   const { t, i18n } = useTranslation('starting_deck_state')
   const terminalItemId = useSelector(getSelectedTerminalItemId)
+  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<any>()
 
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedTopLabwareDefUri, selectedSlot } = selectedSlotInfo
-
+  console.log('selectedTopLabwareDefUri', selectedTopLabwareDefUri)
   const defs = getOnlyLatestDefs()
 
   const offDeckLabware =
     selectedTopLabwareDefUri != null
       ? defs[selectedTopLabwareDefUri] ?? null
       : null
+
+  // const {
+  //   createdAdapterForSlot,
+  //   createdTopLabwareForSlot,
+  //   createdModuleForSlot,
+  //   preSelectedFixture,
+  //   slotPosition,
+  // } = getSlotInformation({
+  //   deckSetup: activeDeckSetup,
+  //   slot: 'offDeck',
+  //   deckDef,
+  // })
+  // //  initiate the slot's info
+  // useEffect(() => {
+  //   dispatch(
+  //     editSlotInfo({
+  //       createdTopLabwareForSlot: null,
+  //     })
+  //   )
+  // }, [
+  //   createdAdapterForSlot,
+  //   createdTopLabwareForSlot,
+  //   createdModuleForSlot,
+  //   preSelectedFixture,
+  // ])
 
   let labware = (
     <RobotWorkSpace
@@ -160,8 +191,15 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
       ) : (
         <OffDeckDetails
           terminalItemId={terminalItemId}
-          addLabware={() => {
+          addLabware={id => {
+            console.log('id', id)
             dispatch(selectZoomedIntoSlot({ slot: 'offDeck', cutout: null }))
+            dispatch(
+              editSlotInfo({
+                createdTopLabwareForSlot:
+                  id != null ? activeDeckSetup.labware[id] : null,
+              })
+            )
           }}
         />
       )}
