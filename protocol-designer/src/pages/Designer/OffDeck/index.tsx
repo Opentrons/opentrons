@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -51,38 +50,16 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
 
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedTopLabwareDefUri, selectedSlot } = selectedSlotInfo
-  console.log('selectedTopLabwareDefUri', selectedTopLabwareDefUri)
+  const isZoomedIntoLabware =
+    selectedSlot?.slot != null &&
+    activeDeckSetup.labware[selectedSlot.slot] != null
+
   const defs = getOnlyLatestDefs()
 
   const offDeckLabware =
     selectedTopLabwareDefUri != null
       ? defs[selectedTopLabwareDefUri] ?? null
       : null
-
-  // const {
-  //   createdAdapterForSlot,
-  //   createdTopLabwareForSlot,
-  //   createdModuleForSlot,
-  //   preSelectedFixture,
-  //   slotPosition,
-  // } = getSlotInformation({
-  //   deckSetup: activeDeckSetup,
-  //   slot: 'offDeck',
-  //   deckDef,
-  // })
-  // //  initiate the slot's info
-  // useEffect(() => {
-  //   dispatch(
-  //     editSlotInfo({
-  //       createdTopLabwareForSlot: null,
-  //     })
-  //   )
-  // }, [
-  //   createdAdapterForSlot,
-  //   createdTopLabwareForSlot,
-  //   createdModuleForSlot,
-  //   preSelectedFixture,
-  // ])
 
   let labware = (
     <RobotWorkSpace
@@ -130,7 +107,7 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
 
   return (
     <Flex width="100%" height="100%">
-      {selectedSlot.slot === 'offDeck' ? (
+      {isZoomedIntoLabware || selectedSlot.slot === 'offDeck' ? (
         <Flex
           alignItems={ALIGN_CENTER}
           width="100%"
@@ -192,8 +169,10 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
         <OffDeckDetails
           terminalItemId={terminalItemId}
           addLabware={id => {
-            console.log('id', id)
-            dispatch(selectZoomedIntoSlot({ slot: 'offDeck', cutout: null }))
+            //  if id is null then you are creating a new labware on an empty off-deck slot
+            dispatch(
+              selectZoomedIntoSlot({ slot: id ?? 'offDeck', cutout: null })
+            )
             dispatch(
               editSlotInfo({
                 createdTopLabwareForSlot:

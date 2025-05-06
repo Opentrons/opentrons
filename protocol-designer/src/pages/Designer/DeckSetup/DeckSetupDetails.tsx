@@ -136,9 +136,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     slot: selectedZoomInSlot ?? '',
     deckDef,
   })
-  console.log('createdTopLabwareForSlot deck setup details', createdTopLabwareForSlot)
   //  initiate the slot's info
   useEffect(() => {
+    console.log('initializing slot info')
     dispatch(
       editSlotInfo({
         createdAdapterForSlot,

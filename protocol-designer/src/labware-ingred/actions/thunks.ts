@@ -13,6 +13,7 @@ import {
   selectFixture,
   selectModule,
   selectTopLabware,
+  selectZoomedIntoSlot,
 } from './actions'
 
 import type { LabwareEntities } from '@opentrons/step-generation'
@@ -33,6 +34,7 @@ import type {
   SelectFixtureAction,
   SelectModuleAction,
   SelectTopLabwareAction,
+  ZoomedIntoSlotAction,
 } from './actions'
 
 export interface RenameLabwareAction {
@@ -44,10 +46,9 @@ export interface RenameLabwareAction {
 }
 export const renameLabware: (
   args: RenameLabwareAction['payload']
-) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
-  dispatch,
-  getState
-) => {
+) => ThunkAction<
+  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+> = args => (dispatch, getState) => {
   const { labwareId } = args
   const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(
     getState()
@@ -70,10 +71,9 @@ export const renameLabware: (
 }
 export const createContainer: (
   args: CreateContainerArgs
-) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
-  dispatch,
-  getState
-) => {
+) => ThunkAction<
+  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+> = args => (dispatch, getState) => {
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
@@ -128,6 +128,12 @@ export const createContainer: (
       renameLabware({
         labwareId: id,
       })(dispatch, getState)
+    }
+    if (slot === 'offDeck') {
+      dispatch({
+        type: 'ZOOMED_INTO_SLOT',
+        payload: { slot: id, cutout: null },
+      })
     }
   } else {
     console.warn('no slots available, cannot create labware')

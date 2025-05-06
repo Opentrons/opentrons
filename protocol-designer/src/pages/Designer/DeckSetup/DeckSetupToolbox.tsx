@@ -38,7 +38,10 @@ import {
   selectZoomedIntoSlot,
 } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
-import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
+import {
+  createContainerAboveModule,
+  CreateContainerAboveModuleArgs,
+} from '../../../step-forms/actions/thunks'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getSlotInformation } from '../utils'
@@ -90,9 +93,8 @@ export function DeckSetupToolbox(
     deckSetup,
     slot,
     deckDef: undefined,
-    offDeckUri: selectedTopLabwareDefUri ?? undefined,
   })
-  console.log('createdTopLabwareForSlot', createdTopLabwareForSlot)
+  const offDeckLabware = deckSetup.labware[slot]
   const handleResetToolbox = (): void => {
     dispatch(
       editSlotInfo({
@@ -111,13 +113,14 @@ export function DeckSetupToolbox(
   }
 
   const slotFull =
-    createdAdapterForSlot != null && createdTopLabwareForSlot != null
+    (createdAdapterForSlot != null && createdTopLabwareForSlot != null) ||
+    (createdTopLabwareForSlot != null && deckSetup.labware[slot] != null)
 
   const hasNoLabware =
     createdAdapterForSlot == null && createdTopLabwareForSlot == null
 
   const handleClear = (): void => {
-    if (slot !== 'offDeck') {
+    if (slot !== 'offDeck' && offDeckLabware == null) {
       if (createdAdapterForSlot != null) {
         dispatch(deleteContainer({ labwareId: createdAdapterForSlot.id }))
       }
@@ -128,88 +131,60 @@ export function DeckSetupToolbox(
       if (createdTopLabwareForSlot != null) {
         dispatch(deleteContainer({ labwareId: createdTopLabwareForSlot.id }))
       }
+      dispatch(selectZoomedIntoSlot({ slot: 'offDeck', cutout: null }))
     }
     handleResetToolbox()
   }
-  const handleConfirm = (): void => {
-    handleClear()
 
-    if (slot === 'offDeck' && selectedTopLabwareDefUri != null) {
-      dispatch(
-        createContainer({
-          slot,
-          labwareDefURI: selectedTopLabwareDefUri,
-        })
-      )
-    } else if (
-      selectedModuleModel == null &&
-      selectedTopLabwareDefUri != null &&
-      selectedAdapterDefUri != null
-    ) {
-      dispatch(
-        createContainer({
-          slot,
-          labwareDefURI: selectedTopLabwareDefUri,
-          adapterUnderLabwareDefURI: selectedAdapterDefUri,
-        })
-      )
-    } else if (
-      selectedModuleModel == null &&
-      selectedTopLabwareDefUri != null &&
-      selectedAdapterDefUri == null
-    ) {
-      dispatch(
-        createContainer({
-          slot,
-          labwareDefURI: selectedTopLabwareDefUri,
-        })
-      )
-    } else if (
-      selectedModuleModel == null &&
-      selectedTopLabwareDefUri == null &&
-      selectedAdapterDefUri != null
-    ) {
-      dispatch(
-        createContainer({
-          slot,
-          labwareDefURI: selectedAdapterDefUri,
-        })
-      )
-    } else if (
-      selectedModuleModel != null &&
-      selectedTopLabwareDefUri != null &&
-      selectedAdapterDefUri != null
-    ) {
-      dispatch(
-        createContainerAboveModule({
-          slot,
-          labwareDefURI: selectedTopLabwareDefUri,
-          adapterDefURI: selectedAdapterDefUri,
-        })
-      )
-    } else if (
-      selectedModuleModel != null &&
-      selectedTopLabwareDefUri != null &&
-      selectedAdapterDefUri == null
-    ) {
-      dispatch(
-        createContainerAboveModule({
-          slot,
-          labwareDefURI: selectedTopLabwareDefUri,
-        })
-      )
-    } else if (
-      selectedModuleModel != null &&
-      selectedTopLabwareDefUri == null &&
-      selectedAdapterDefUri != null
-    ) {
-      dispatch(
-        createContainerAboveModule({
-          slot,
-          labwareDefURI: selectedAdapterDefUri,
-        })
-      )
+  const handleConfirm = (): void => {
+    const isOffDeck = slot === 'offDeck'
+    const hasModule = selectedModuleModel != null
+    const hasTopLabware = selectedTopLabwareDefUri != null
+    const hasAdapter = selectedAdapterDefUri != null
+
+    //  handle clear for if you are changing the adpater/labware combo
+    if (!isOffDeck) {
+      handleClear()
     }
+
+    if (hasModule) {
+      const payload: CreateContainerAboveModuleArgs = {
+        slot,
+        //  @ts-expect-error: one or the other is always defined
+        labwareDefURI: hasTopLabware
+          ? selectedTopLabwareDefUri
+          : selectedAdapterDefUri,
+      }
+      if (hasTopLabware && hasAdapter) {
+        payload.adapterDefURI = selectedAdapterDefUri
+      }
+      dispatch(createContainerAboveModule(payload))
+    } else {
+      if (hasTopLabware && hasAdapter) {
+        dispatch(
+          createContainer({
+            slot,
+            labwareDefURI: selectedTopLabwareDefUri,
+            adapterUnderLabwareDefURI: selectedAdapterDefUri,
+          })
+        )
+      } else if (hasTopLabware) {
+        dispatch(
+          createContainer({
+            slot,
+            labwareDefURI: selectedTopLabwareDefUri,
+          })
+        )
+      } else if (hasAdapter) {
+        dispatch(
+          createContainer({
+            slot,
+            labwareDefURI: selectedAdapterDefUri,
+          })
+        )
+      }
+    }
+
     setShowSelectLabwareModal(false)
   }
 
@@ -276,7 +251,7 @@ export function DeckSetupToolbox(
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <DeckInfoLabel
               deckLabel={
-                slot === 'offDeck'
+                slot === 'offDeck' || deckSetup.labware[slot] != null
                   ? i18n.format(t('off_deck_title'), 'upperCase')
                   : slot
               }
