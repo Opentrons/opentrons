@@ -283,7 +283,4 @@ describe('getModuleDisplayStatus', () => {
     )
     expect(status).toBe('connected')
   })
-
-  // Note: Magnetic Block is filtered out before calling getModuleDisplayStatus,
-  // so no specific test case is needed here unless the filtering logic changes.
 })

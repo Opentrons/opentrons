@@ -177,7 +177,7 @@ export function ModuleTableItem({
         setShowLocationConflictModal,
     ] = useState<boolean>(false)
 
-    const homeStackerWarning = (): JSX.Element => {
+    const homeStackerWarningModal = (): JSX.Element => {
         return (
             <OddModal header={{ title: t('home_stacker') }}>
                 <Flex
@@ -252,7 +252,7 @@ export function ModuleTableItem({
             case 'needsHome':
                 return (
                     <>
-                        {showHomeStackerWarning && homeStackerWarning()}
+                        {showHomeStackerWarning && homeStackerWarningModal()}
                         <SmallButton
                             buttonCategory="rounded"
                             buttonText={t('home_stacker')}

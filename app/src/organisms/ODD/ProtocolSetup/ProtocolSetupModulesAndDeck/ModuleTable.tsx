@@ -1,57 +1,21 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  ALIGN_CENTER,
-  BORDERS,
-  Chip,
-  COLORS,
-  DeckInfoLabel,
-  Flex,
-  InfoScreen,
-  JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import {
-  ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
-  getModuleDisplayName,
-  getModuleType,
   MAGNETIC_BLOCK_TYPE,
-  TC_MODULE_LOCATION_OT3,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
-import {
-  getFlexStackerPrepCommands,
-  getModulePrepCommands,
-} from '/app/local-resources/modules'
-import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   useChainLiveCommands,
   useRunCalibrationStatus,
 } from '/app/resources/runs'
-import { getModuleTooHot } from '/app/transformations/modules'
 
-import type { Dispatch, SetStateAction } from 'react'
-import type { AttachedModule, CommandData } from '@opentrons/api-client'
-import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
-import type { ModulePrepCommandsType } from '/app/local-resources/modules'
-import type { ProtocolCalibrationStatus } from '/app/resources/runs'
+import type { DeckDefinition } from '@opentrons/shared-data'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
-import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { ModuleTableItem } from './ModuleTableItem'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
