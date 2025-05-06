@@ -17,7 +17,6 @@ import { COLUMN } from '@opentrons/shared-data'
 import { Accordion } from '../../molecules/Accordion'
 import { ApplicationSection } from '../../organisms/ApplicationSection'
 import { createProtocolAtom } from '../../resources/atoms'
-import { PROTOCOL_FORMAT, PYTHON } from '../../resources/constants'
 import {
   InstrumentsSection,
   OPENTRONS_FLEX,

@@ -353,6 +353,7 @@ export function generateChatPrompt(
     values.instruments.robot === OPENTRONS_FLEX
       ? `\n- ${t('with_flex_gripper')}`
       : ''
+
   const modules = values.modules
     .map(
       module =>
@@ -365,6 +366,7 @@ export function generateChatPrompt(
   const fixtures = values.fixtures
     .map(fixture => `- ${fixture.name}`)
     .join('\n')
+
   const labwares = values.labwares
     .map(
       labware =>
@@ -373,26 +375,41 @@ export function generateChatPrompt(
         }`
     )
     .join('\n')
+
   const liquids = values.liquids.map(liquid => `- ${liquid}`).join('\n')
+
   const steps = Array.isArray(values.steps)
     ? values.steps.map(step => `- ${step}`).join('\n')
     : values.steps
+
+  const moduleSection =
+    values.modules.length > 0 ? `\n\n${t('modules_title')}:\n${modules}` : ''
+
+  const fixtureSection =
+    values.fixtures.length > 0 ? `\n\n${t('fixtures_title')}:\n${fixtures}` : ''
 
   const prompt = `${
     values.protocol_format === PYTHON
       ? t('create_protocol_prompt_robot', { robotType }) + '\n'
       : ''
-  }\n${t('protocol_format_title')}:\n${protocolFormat}\n\n${t(
-    'application_title'
-  )}:\n${scientificApplication}\n\n${t('description')}:\n${description}\n\n${t(
-    'pipette_mounts'
-  )}:\n\n${pipetteMounts}${flexGripper}\n\n${t(
-    'modules_title'
-  )}:\n${modules}\n\n${t('fixtures_title')}:\n${fixtures}\n\n${t(
-    'labware_section_title'
-  )}:\n${labwares}\n\n${t('liquid_section_title')}:\n${liquids}\n\n${t(
-    'steps_section_title'
-  )}:\n${steps}\n`
+  }
+
+${t('protocol_format_title')}:\n${protocolFormat}
+
+${t('application_title')}:\n${scientificApplication}
+
+${t('description')}:\n${description}
+
+${t(
+  'pipette_mounts'
+)}:\n\n${pipetteMounts}${flexGripper}${moduleSection}${fixtureSection}
+
+\n${t('labware_section_title')}:\n${labwares}
+
+\n${t('liquid_section_title')}:\n${liquids}
+
+\n${t('steps_section_title')}:\n${steps}
+`
 
   setCreateProtocolChatAtom({
     prompt,

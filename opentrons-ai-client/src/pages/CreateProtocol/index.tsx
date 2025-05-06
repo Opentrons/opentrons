@@ -90,6 +90,7 @@ export function CreateProtocol(): JSX.Element | null {
       },
       instruments: {},
       modules: [],
+      fixtures: [],
       labwares: [],
       liquids: [''],
       steps: [''],
