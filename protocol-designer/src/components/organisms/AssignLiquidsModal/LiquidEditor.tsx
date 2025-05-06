@@ -14,6 +14,7 @@ import {
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
+  OVERFLOW_AUTO,
   SPACING,
   StyledText,
   TertiaryButton,
@@ -427,6 +428,8 @@ export function LiquidEditor({
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing8}
               width={LIQUID_CONTAINER_WIDTH}
+              maxHeight="36.375rem"
+              overflowY={OVERFLOW_AUTO}
             >
               {liquidInfo.length > 0 ? (
                 <StyledText desktopStyle="bodyDefaultSemiBold">
