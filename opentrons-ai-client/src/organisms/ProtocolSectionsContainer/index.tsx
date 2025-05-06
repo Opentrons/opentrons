@@ -18,7 +18,11 @@ import { Accordion } from '../../molecules/Accordion'
 import { ApplicationSection } from '../../organisms/ApplicationSection'
 import { createProtocolAtom } from '../../resources/atoms'
 import { PROTOCOL_FORMAT, PYTHON } from '../../resources/constants'
-import { InstrumentsSection } from '../InstrumentsSection'
+import {
+  InstrumentsSection,
+  OPENTRONS_FLEX,
+  ROBOT_FIELD_NAME,
+} from '../InstrumentsSection'
 import { LabwareLiquidsSection } from '../LabwareLiquidsSection'
 import { ModulesAndFixturesSection } from '../ModulesAndFixturesSection'
 import { ProtocolFormatSection } from '../ProtocolFormatSection'
@@ -43,7 +47,7 @@ export function ProtocolSectionsContainer(): JSX.Element | null {
     createProtocolAtom
   )
 
-  const protocolFormat: string = watch(PROTOCOL_FORMAT)
+  const robotType: string = watch(ROBOT_FIELD_NAME)
 
   const sections = [
     {
@@ -64,7 +68,9 @@ export function ProtocolSectionsContainer(): JSX.Element | null {
     {
       sectionNumber: MODULES_STEP,
       title:
-        protocolFormat === PYTHON ? 'modules_fixtures_title' : 'modules_title',
+        robotType === OPENTRONS_FLEX
+          ? 'modules_fixtures_title'
+          : 'modules_title',
       Component: ModulesAndFixturesSection,
     },
     {
