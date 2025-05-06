@@ -1,5 +1,5 @@
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux'
-import thunk from 'redux-thunk'
+import { thunk } from 'redux-thunk'
 
 import { rootReducer as analyticsReducer } from './analytics'
 import { trackEventMiddleware } from './analytics/middleware'

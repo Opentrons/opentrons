@@ -1,6 +1,6 @@
 import { applyMiddleware, compose, legacy_createStore } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
-import thunk from 'redux-thunk'
+import { thunk } from 'redux-thunk'
 
 import { rootEpic } from './epic'
 import { rootReducer } from './reducer'
