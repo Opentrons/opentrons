@@ -21,43 +21,50 @@ import { InstrumentsSection } from '../InstrumentsSection'
 import { LabwareLiquidsSection } from '../LabwareLiquidsSection'
 import { ModulesSection } from '../ModulesSection'
 import { ProtocolFormatSection } from '../ProtocolFormatSection'
+import { RuntimeParametersSection } from '../RuntimeParametersSection'
 import { StepsSection } from '../StepsSection'
 
-export const PROTOCOL_FORMAT_STEP = 0
-export const APPLICATION_STEP = 1
-export const INSTRUMENTS_STEP = 2
-export const MODULES_STEP = 3
-export const LABWARE_LIQUIDS_STEP = 4
-export const STEPS_STEP = 5
+export const PROTOCOL_FORMAT_SECTION = 0
+export const APPLICATION_SECTION = 1
+export const INSTRUMENTS_SECTION = 2
+export const MODULES_SECTION = 3
+export const LABWARE_LIQUIDS_SECTION = 4
+export const RUNTIME_PARAMETERS_SECTION = 5
+export const STEPS_SECTION = 6
 
 export const sections = [
   {
-    sectionNumber: PROTOCOL_FORMAT_STEP,
+    sectionNumber: PROTOCOL_FORMAT_SECTION,
     title: 'protocol_format_title',
     Component: ProtocolFormatSection,
   },
   {
-    sectionNumber: APPLICATION_STEP,
+    sectionNumber: APPLICATION_SECTION,
     title: 'application_title',
     Component: ApplicationSection,
   },
   {
-    sectionNumber: INSTRUMENTS_STEP,
+    sectionNumber: INSTRUMENTS_SECTION,
     title: 'instruments_title',
     Component: InstrumentsSection,
   },
   {
-    sectionNumber: MODULES_STEP,
+    sectionNumber: MODULES_SECTION,
     title: 'modules_title',
     Component: ModulesSection,
   },
   {
-    sectionNumber: LABWARE_LIQUIDS_STEP,
+    sectionNumber: LABWARE_LIQUIDS_SECTION,
     title: 'labware_liquids_title',
     Component: LabwareLiquidsSection,
   },
   {
-    sectionNumber: STEPS_STEP,
+    sectionNumber: RUNTIME_PARAMETERS_SECTION,
+    title: 'runtime_parameters_title',
+    Component: RuntimeParametersSection,
+  },
+  {
+    sectionNumber: STEPS_SECTION,
     title: 'steps_title',
     Component: StepsSection,
   },
