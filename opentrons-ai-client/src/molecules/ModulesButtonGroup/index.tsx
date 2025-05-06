@@ -1,4 +1,5 @@
 import { Controller, useFormContext } from 'react-hook-form'
+import styled from 'styled-components'
 
 import { EmptySelectorButton, Flex, SPACING, WRAP } from '@opentrons/components'
 
@@ -20,20 +21,26 @@ export function ModulesButtonGroup({
       name={MODULES_FIELD_NAME}
       render={({ field }) => {
         return (
-          <Flex flexWrap={WRAP} gap={SPACING.spacing8}>
+          <Flex
+            flexWrap={WRAP}
+            gap={SPACING.spacing8}
+            justifyContent="flex-start"
+          >
             {modules.map(module => (
-              <EmptySelectorButton
-                key={module.type}
-                iconName="plus"
-                onClick={() => {
-                  if (modulesWatch.some(m => m.type === module.type)) {
-                    return
-                  }
-                  field.onChange([...modulesWatch, module])
-                }}
-                text={module.name}
-                textAlignment="left"
-              />
+              <ButtonWrapper key={module.type}>
+                <EmptySelectorButton
+                  key={module.type}
+                  iconName="plus"
+                  onClick={() => {
+                    if (modulesWatch.some(m => m.type === module.type)) {
+                      return
+                    }
+                    field.onChange([...modulesWatch, module])
+                  }}
+                  text={module.name}
+                  textAlignment="left"
+                />
+              </ButtonWrapper>
             ))}
           </Flex>
         )
@@ -41,3 +48,9 @@ export function ModulesButtonGroup({
     />
   )
 }
+
+const ButtonWrapper = styled.div`
+  display: inline-block;
+  flex-grow: 0;
+  flex-shrink: 1;
+`

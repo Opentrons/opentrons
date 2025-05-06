@@ -51,7 +51,7 @@ describe('dropTipInWasteChute', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      'mockPythonName.drop_tip(mock_waste_chute_1)'
+      'mock_pipette.drop_tip(mock_waste_chute_1)'
     )
   })
 })

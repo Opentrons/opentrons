@@ -90,10 +90,10 @@ describe('dispense', () => {
       ])
       expect(getSuccessResult(result).python).toBe(
         `
-mockPythonName.dispense(
+mock_pipette.dispense(
     volume=50,
-    location=mockPythonName["A1"].bottom(z=5),
-    rate=6 / mockPythonName.flow_rate.dispense,
+    location=mock_source_plate["A1"].bottom(z=5),
+    rate=6 / mock_pipette.flow_rate.dispense,
 )`.trimStart()
       )
     })

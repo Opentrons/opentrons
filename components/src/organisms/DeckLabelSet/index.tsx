@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { RobotCoordsForeignDiv } from '../../hardware-sim'
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { DeckInfoLabel } from '../../molecules'
 import { DeckLabel } from '../../molecules/DeckLabel'
 import { Box } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
@@ -17,13 +18,22 @@ interface DeckLabelSetProps {
   width: number
   height: number
   invert?: boolean
+  showModuleIcon?: boolean
 }
 
 const DeckLabelSetComponent = (
   props: DeckLabelSetProps,
   ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element => {
-  const { deckLabels, x, y, width, height, invert = false } = props
+  const {
+    deckLabels,
+    x,
+    y,
+    width,
+    height,
+    invert = false,
+    showModuleIcon = false,
+  } = props
 
   return (
     <RobotCoordsForeignDiv
@@ -35,24 +45,31 @@ const DeckLabelSetComponent = (
         },
       }}
     >
-      <StyledBox
-        width={width}
-        height={height}
-        data-testid="DeckLabeSet"
-        isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
-      />
-      <LabelContainer ref={ref}>
-        {deckLabels.length > 0
-          ? deckLabels.map((deckLabel, index) => (
-              <DeckLabel
-                key={`DeckLabel_${index}`}
-                maxWidth={`calc(${width}px - 8px)`}
-                {...deckLabel}
-                isLast={deckLabels.length - 1 === index}
-              />
-            ))
-          : null}
-      </LabelContainer>
+      <BoxAndIconContainer width={width} height={height}>
+        <StyledBox
+          width="100%"
+          height="100%"
+          isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
+          data-testid="DeckLabeSet"
+        />
+        {showModuleIcon && (
+          <IconWrapper>
+            <DeckInfoLabel iconName="stacked" highlight />
+          </IconWrapper>
+        )}
+        <LabelContainer ref={ref}>
+          {deckLabels.length > 0
+            ? deckLabels.map((deckLabel, index) => (
+                <DeckLabel
+                  key={`DeckLabel_${index}`}
+                  maxWidth={`calc(${width}px - 8px)`}
+                  {...deckLabel}
+                  isLast={deckLabels.length - 1 === index}
+                />
+              ))
+            : null}
+        </LabelContainer>
+      </BoxAndIconContainer>
     </RobotCoordsForeignDiv>
   )
 }
@@ -90,4 +107,17 @@ const LabelContainer = styled.div`
   & > *:last-child {
     border-bottom-left-radius: ${BORDERS.borderRadius4};
   }
+`
+
+const IconWrapper = styled(Box)<StyledBoxProps>`
+  position: absolute;
+  top: -${SPACING.spacing8};
+  right: -${SPACING.spacing8};
+  z-index: 1;
+`
+
+const BoxAndIconContainer = styled(Box)<StyledBoxProps>`
+  position: relative;
+  width: ${(props: { width: number }) => props.width}px;
+  height: ${(props: { height: number }) => props.height}px;
 `
