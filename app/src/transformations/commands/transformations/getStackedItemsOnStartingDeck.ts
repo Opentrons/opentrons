@@ -66,7 +66,7 @@ export interface LabwareLiquidRenderInfo extends LabwareInStack {
   liquids: number
 }
 
-function getStackerLocationFromSlotName(slotName: string): string {
+export function getStackerLocationFromSlotName(slotName: string): string {
   return `STACKER ${slotName.charAt(0)}`
 }
 

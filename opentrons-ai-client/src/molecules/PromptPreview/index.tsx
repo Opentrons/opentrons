@@ -18,6 +18,7 @@ import { PromptPreviewSection } from '../PromptPreviewSection'
 
 import type { PromptPreviewSectionProps } from '../PromptPreviewSection'
 
+const LABWARE_LIQUIDS_SECTION_INDEX = 4
 interface PromptPreviewProps {
   isSubmitButtonEnabled?: boolean
   handleSubmit: () => void
@@ -53,6 +54,9 @@ export function PromptPreview({
 }: PromptPreviewProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
 
+  // Compute the index of the steps section (always last)
+  const lastSectionIndex = promptPreviewData.length - 1
+
   const areAllSectionsEmpty = (): boolean => {
     return promptPreviewData.every(section => section.items.length === 0)
   }
@@ -74,18 +78,22 @@ export function PromptPreview({
         </PromptPreviewPlaceholderMessage>
       )}
 
-      {Object.values(promptPreviewData).map(
-        (section, index) =>
+      {Object.values(promptPreviewData).map((section, index) => {
+        const isLabwareLiquidsSection = index === LABWARE_LIQUIDS_SECTION_INDEX
+        const isStepsSection = index === lastSectionIndex
+        return (
           section.items.length > 0 && (
             <PromptPreviewSection
               key={`section-${index}`}
               title={section.title}
               items={section.items}
               itemMaxWidth={index === 1 ? '50%' : '100%'}
-              oneItemPerRow={index === 4}
+              oneItemPerRow={isLabwareLiquidsSection}
+              isStepsSection={isStepsSection}
             />
           )
-      )}
+        )
+      })}
     </PromptPreviewContainer>
   )
 }

@@ -13,9 +13,10 @@ import {
   NO_PIPETTES,
   OPENTRONS_FLEX,
   OPENTRONS_OT2,
+  ROBOT_FIELD_NAME,
   TWO_PIPETTES,
 } from '../../organisms/InstrumentsSection'
-import { PYTHON } from '../constants'
+import { PROTOCOL_FORMAT, PYTHON } from '../constants'
 import { getOnlyLatestDefs } from './labware'
 
 import type { UseFormWatch } from 'react-hook-form'
@@ -225,6 +226,26 @@ export function generatePromptPreviewStepsItems(
   return steps.filter(Boolean)
 }
 
+export function generatePromptPreviewRuntimeParametersItems(
+  watch: UseFormWatch<CreateProtocolFormData>,
+  t: any
+): string[] {
+  const { runtime_parameters } = watch()
+  const protocolFormat = watch(PROTOCOL_FORMAT)
+  const robotType = watch(ROBOT_FIELD_NAME)
+
+  // Only show in preview if Protocol is Python and robot is Flex
+  if (
+    protocolFormat !== PYTHON ||
+    robotType !== OPENTRONS_FLEX ||
+    !runtime_parameters
+  ) {
+    return []
+  }
+
+  return [runtime_parameters].filter(Boolean)
+}
+
 export function generatePromptPreviewData(
   watch: UseFormWatch<CreateProtocolFormData>,
   t: any
@@ -252,6 +273,10 @@ export function generatePromptPreviewData(
     {
       title: t('labware_liquids_title'),
       items: generatePromptPreviewLabwareLiquidsItems(watch, t),
+    },
+    {
+      title: t('runtime_parameters_title'),
+      items: generatePromptPreviewRuntimeParametersItems(watch, t),
     },
     {
       title: t('steps_title'),
@@ -357,6 +382,20 @@ export function generateChatPrompt(
     ? values.steps.map(step => `- ${step}`).join('\n')
     : values.steps
 
+  // Add runtime parameters to the prompt if it exists and conditions are met
+  const runtimeParameters =
+    values.protocol_format === PYTHON &&
+    values.instruments.robot === OPENTRONS_FLEX &&
+    values.runtime_parameters
+      ? `\n\n${t(
+          'runtime_parameters_title'
+        )}:\n- ${values.runtime_parameters.replace(/\n/g, '\n- ')}`
+      : ''
+
+  // Only include modules section if modules are selected
+  const modulesSection =
+    values.modules.length > 0 ? `\n\n${t('modules_title')}:\n${modules}` : ''
+
   const prompt = `${
     values.protocol_format === PYTHON
       ? t('create_protocol_prompt_robot', { robotType }) + '\n'
@@ -365,11 +404,13 @@ export function generateChatPrompt(
     'application_title'
   )}:\n${scientificApplication}\n\n${t('description')}:\n${description}\n\n${t(
     'pipette_mounts'
-  )}:\n\n${pipetteMounts}${flexGripper}\n\n${t(
-    'modules_title'
-  )}:\n${modules}\n\n${t('labware_section_title')}:\n${labwares}\n\n${t(
+  )}:\n\n${pipetteMounts}${flexGripper}${modulesSection}\n\n${t(
+    'labware_section_title'
+  )}:\n${labwares}\n\n${t(
     'liquid_section_title'
-  )}:\n${liquids}\n\n${t('steps_section_title')}:\n${steps}\n`
+  )}:\n${liquids}${runtimeParameters}\n\n${t(
+    'steps_section_title'
+  )}:\n${steps}\n`
 
   setCreateProtocolChatAtom({
     prompt,
@@ -394,6 +435,7 @@ export function generateChatPrompt(
       labware => `${labware.labwareURI}, quantity: ${labware.count}`
     ),
     liquids: values.liquids,
+    runtime_parameters: values.runtime_parameters,
     steps: Array.isArray(values.steps) ? values.steps : [values.steps],
     fake:
       !isPdProtocolGenerationEnabled &&
