@@ -309,7 +309,7 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
 
       const labwareWithWellDepthMismatches = [
         // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
-        'agilent_1_reservoir_290ml/2',
+        'agilent_1_reservoir_290ml/2', // Fixed in v3 of this labware.
         'corning_24_wellplate_3.4ml_flat/3',
         'corning_6_wellplate_16.8ml_flat/3',
         'corning_96_wellplate_360ul_flat/3',
