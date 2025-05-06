@@ -95,7 +95,6 @@ export function SlotOverflowMenu(
   const [showDeleteLabwareModal, setShowDeleteLabwareModal] = useState<boolean>(
     false
   )
-  console.log('location', location)
   const [
     showDeleteEntityInUseModal,
     setShowDeleteEntityInUseModal,

@@ -138,7 +138,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   })
   //  initiate the slot's info
   useEffect(() => {
-    console.log('initializing slot info')
     dispatch(
       editSlotInfo({
         createdAdapterForSlot,
