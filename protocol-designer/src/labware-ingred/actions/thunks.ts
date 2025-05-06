@@ -13,7 +13,6 @@ import {
   selectFixture,
   selectModule,
   selectTopLabware,
-  selectZoomedIntoSlot,
 } from './actions'
 
 import type { LabwareEntities } from '@opentrons/step-generation'

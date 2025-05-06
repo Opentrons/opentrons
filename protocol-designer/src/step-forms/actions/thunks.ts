@@ -12,6 +12,7 @@ import type { FormData } from '../../form-types'
 import type {
   CreateContainerAction,
   RenameLabwareAction,
+  ZoomedIntoSlotAction,
 } from '../../labware-ingred/actions'
 import type { ChangeSavedStepFormAction } from '../../steplist/actions'
 import type { ThunkAction } from '../../types'
@@ -25,10 +26,9 @@ export interface CreateContainerAboveModuleArgs {
 
 export const createContainerAboveModule: (
   args: CreateContainerAboveModuleArgs
-) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
-  dispatch,
-  getState
-) => {
+) => ThunkAction<
+  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+> = args => (dispatch, getState) => {
   const { slot, labwareDefURI, adapterDefURI } = args
   const state = getState()
   const deckSetup = getDeckSetupForActiveItem(state)

@@ -35,11 +35,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
   const missingTips = missingTipsByLabwareId
     ? missingTipsByLabwareId[labwareOnDeck.id]
     : null
-  console.log(
-    'labware on deck component',
-    labwareOnDeck,
-    allWellContentsForActiveItem
-  )
+
   return (
     <g transform={`translate(${x}, ${y})`}>
       <LabwareRender

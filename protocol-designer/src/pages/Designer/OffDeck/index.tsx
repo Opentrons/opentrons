@@ -9,7 +9,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LabwareRender,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   RobotCoordsForeignDiv,
@@ -19,7 +18,7 @@ import {
 } from '@opentrons/components'
 
 import { LiquidButton } from '../../../components/molecules'
-import { getOnlyLatestDefs } from '../../../labware-defs'
+import { LabwareOnDeck } from '../../../components/organisms'
 import {
   editSlotInfo,
   selectZoomedIntoSlot,
@@ -49,16 +48,10 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
   const dispatch = useDispatch<any>()
 
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
-  const { selectedTopLabwareDefUri, selectedSlot } = selectedSlotInfo
-  const isZoomedIntoLabware =
-    selectedSlot?.slot != null &&
-    activeDeckSetup.labware[selectedSlot.slot] != null
-
-  const defs = getOnlyLatestDefs()
-
-  const offDeckLabware =
-    selectedTopLabwareDefUri != null
-      ? defs[selectedTopLabwareDefUri] ?? null
+  const { selectedSlot } = selectedSlotInfo
+  const zoomedInLabwareOnDeck =
+    selectedSlot?.slot != null
+      ? activeDeckSetup.labware[selectedSlot.slot]
       : null
 
   let labware = (
@@ -80,23 +73,25 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
       )}
     </RobotWorkSpace>
   )
-  if (offDeckLabware != null) {
-    const def = offDeckLabware
+  if (zoomedInLabwareOnDeck != null) {
     labware = (
       <RobotWorkSpace
-        key={def.parameters.loadName}
+        key={zoomedInLabwareOnDeck.def.parameters.loadName}
         viewBox={`-15 -22 ${
-          def.dimensions.xDimension / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
-        } ${def.dimensions.yDimension / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL}`}
+          zoomedInLabwareOnDeck.def.dimensions.xDimension /
+          SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
+        } ${
+          zoomedInLabwareOnDeck.def.dimensions.yDimension /
+          SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
+        }`}
       >
         {() => (
           <>
-            <LabwareRender definition={def} />
-
+            <LabwareOnDeck labwareOnDeck={zoomedInLabwareOnDeck} x={0} y={0} />
             <LabwareLabel
               isLast={true}
               isSelected={true}
-              labwareDef={def}
+              labwareDef={zoomedInLabwareOnDeck.def}
               position={[0, 0, 0]}
             />
           </>
@@ -107,7 +102,7 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
 
   return (
     <Flex width="100%" height="100%">
-      {isZoomedIntoLabware || selectedSlot.slot === 'offDeck' ? (
+      {zoomedInLabwareOnDeck != null || selectedSlot.slot === 'offDeck' ? (
         <Flex
           alignItems={ALIGN_CENTER}
           width="100%"

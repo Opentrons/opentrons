@@ -33,7 +33,7 @@ import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
-import { SelectedItems } from './Selectedtems'
+import { SelectedItems } from './SelectedItems'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
 import { SlotWarning } from './SlotWarning'
 import {

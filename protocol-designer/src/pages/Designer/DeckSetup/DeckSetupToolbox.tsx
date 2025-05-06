@@ -38,15 +38,13 @@ import {
   selectZoomedIntoSlot,
 } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
-import {
-  createContainerAboveModule,
-  CreateContainerAboveModuleArgs,
-} from '../../../step-forms/actions/thunks'
+import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getSlotInformation } from '../utils'
 import { getIsLabwareOnSlotInUse } from './utils'
 
+import type { CreateContainerAboveModuleArgs } from '../../../step-forms/actions/thunks'
 import type { ThunkDispatch } from '../../../types'
 
 interface DeckSetupToolsProps {

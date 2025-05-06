@@ -17,8 +17,7 @@ import { getRobotType } from '../../../../file-data/selectors'
 import { createCustomLabwareDef } from '../../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import {
-  selectLabware,
-  selectNestedLabware,
+  selectTopLabware,
 } from '../../../../labware-ingred/actions'
 import { selectors } from '../../../../labware-ingred/selectors'
 import {
@@ -68,8 +67,8 @@ describe('SelectLabwareModal', () => {
       },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: null,
-      selectedNestedLabwareDefUri: null,
+      selectedTopLabwareDefUri: null,
+      selectedAdapterDefUri: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -96,12 +95,12 @@ describe('SelectLabwareModal', () => {
     fireEvent.click(
       screen.getByText('Opentrons Calibration Block - Short Side: Left')
     )
-    expect(vi.mocked(selectLabware)).toHaveBeenCalled()
+    expect(vi.mocked(selectTopLabware)).toHaveBeenCalled()
   })
   it('renders deck slot and selects an adapter and labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: 'fixture/fixture_universal_flat_bottom_adapter/1',
-      selectedNestedLabwareDefUri: null,
+      selectedAdapterDefUri: 'fixture/fixture_universal_flat_bottom_adapter/1',
+      selectedTopLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -114,7 +113,7 @@ describe('SelectLabwareModal', () => {
     fireEvent.click(
       screen.getByText('Fixture Corning 96 Well Plate 360 µL Flat')
     )
-    expect(vi.mocked(selectNestedLabware)).toHaveBeenCalled()
+    expect(vi.mocked(selectTopLabware)).toHaveBeenCalled()
   })
 
   it('renders the custom labware flow', () => {
@@ -126,8 +125,8 @@ describe('SelectLabwareModal', () => {
 
   it('renders the filter checkbox if there is a module on the slot and is checked by default', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: null,
-      selectedNestedLabwareDefUri: null,
+      selectedAdapterDefUri: null,
+      selectedTopLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: THERMOCYCLER_MODULE_V1,
       selectedSlot: { slot: 'B1', cutout: 'cutoutB1' },

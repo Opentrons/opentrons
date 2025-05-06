@@ -89,7 +89,6 @@ export const getSlotInformation = (
   )
   const labwareIdsFromFullStack =
     fullStackFromLabwares?.filter(id => deckSetupLabware[id] != null) ?? []
-
   const bottomMostLabware =
     deckSetupLabware[
       labwareIdsFromFullStack[labwareIdsFromFullStack.length - 1]

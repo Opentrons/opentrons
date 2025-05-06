@@ -23,14 +23,12 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 
-interface SelectedHoveredItemsProps {
+interface SelectedItemsProps {
   deckDef: DeckDefinition
   robotType: RobotType
   slotPosition: CoordinateTuple | null
 }
-export const SelectedItems = (
-  props: SelectedHoveredItemsProps
-): JSX.Element => {
+export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
   const { deckDef, robotType, slotPosition } = props
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {

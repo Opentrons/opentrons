@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Fragment, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import round from 'lodash/round'
 
