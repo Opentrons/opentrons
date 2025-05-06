@@ -5,6 +5,7 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   SPACING,
   StyledText,
@@ -35,10 +36,11 @@ const TagsContainer = styled.div<{
   display: flex;
   grid-gap: ${SPACING.spacing4};
   /* When oneItemPerRow is true, disable wrapping to keep a single column layout */
-  flex-wrap: ${props => (props.oneItemPerRow ? 'NOWRAP' : WRAP)};
+  flex-wrap: ${props => (props.oneItemPerRow ? 'NO_WRAP' : WRAP)};
   justify-content: flex-start;
   width: 100%;
-  flex-direction: ${props => (props.oneItemPerRow ? 'column' : 'row')};
+  flex-direction: ${props =>
+    props.oneItemPerRow ? DIRECTION_COLUMN : DIRECTION_ROW};
 `
 
 const TagItemWrapper = styled.div<{
@@ -145,7 +147,7 @@ export function PromptPreviewSection({
                   <Tag text={item} type="default" />
                 )}
               </TagItemWrapper>
-              {stackItems && <LineBreakWrapper />}
+              {stackItems ? <LineBreakWrapper /> : null}
             </Fragment>
           )
         })}
