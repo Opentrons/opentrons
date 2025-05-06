@@ -1,15 +1,16 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
-import { thermocyclerStateDiff as actualThermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import { getStateAndContextTempTCModules, getSuccessResult } from '../fixtures'
+import { thermocyclerStateDiff as actualThermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 
-import type { Diff } from '../utils/thermocyclerStateDiff'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
   ThermocyclerStateStepArgs,
 } from '../types'
+import type { Diff } from '../utils/thermocyclerStateDiff'
 
 vi.mock('../utils/thermocyclerStateDiff')
 
@@ -35,6 +36,7 @@ describe('thermocyclerStateStep', () => {
     testMsg: string
     thermocyclerStateArgs: ThermocyclerStateStepArgs
     thermocyclerStateDiff: Diff
+    expectedPython: string
   }> = [
     {
       testMsg: 'should open the lid when diff includes lidOpen',
@@ -59,6 +61,7 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.open_lid()',
     },
     {
       testMsg: 'should close the lid when diff includes lidClosed',
@@ -83,6 +86,7 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.close_lid()',
     },
     {
       testMsg:
@@ -116,6 +120,7 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.set_block_temperature(10)',
     },
     {
       testMsg:
@@ -144,6 +149,7 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.deactivate_block()',
     },
     {
       testMsg:
@@ -177,6 +183,7 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.set_lid_temperature(10)',
     },
     {
       testMsg:
@@ -205,6 +212,7 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.deactivate_block()',
     },
     {
       testMsg:
@@ -238,6 +246,7 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.set_lid_temperature(10)',
     },
     {
       testMsg:
@@ -266,6 +275,7 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.deactivate_lid()',
     },
     {
       testMsg: 'should issue commands in the correct order',
@@ -348,6 +358,13 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: `
+mock_thermocycler.open_lid()
+mock_thermocycler.close_lid()
+mock_thermocycler.deactivate_block()
+mock_thermocycler.set_block_temperature(10)
+mock_thermocycler.deactivate_lid()
+mock_thermocycler.set_lid_temperature(20)`.trimStart(),
     },
   ]
   testCases.forEach(
@@ -358,6 +375,7 @@ describe('thermocyclerStateStep', () => {
       invariantContext,
       thermocyclerStateDiff,
       expected,
+      expectedPython,
     }) => {
       it(testMsg, () => {
         vi.mocked(actualThermocyclerStateDiff).mockImplementationOnce(
@@ -374,8 +392,9 @@ describe('thermocyclerStateStep', () => {
           invariantContext,
           robotState
         )
-        const { commands } = getSuccessResult(result)
+        const { commands, python } = getSuccessResult(result)
         expect(commands).toEqual(expected)
+        expect(python).toEqual(expectedPython)
       })
     }
   )

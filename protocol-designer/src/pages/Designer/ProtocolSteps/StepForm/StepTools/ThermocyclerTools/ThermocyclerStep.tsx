@@ -1,6 +1,7 @@
-import { css } from 'styled-components'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -18,17 +19,18 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../../../../../../atoms'
+
+import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
-  temperatureRangeFieldValue,
   isTimeFormatMinutesSeconds,
+  temperatureRangeFieldValue,
 } from '../../../../../../steplist/fieldLevel/errors'
 import {
   maskToFloat,
   maskToTime,
 } from '../../../../../../steplist/fieldLevel/processing'
 import { uuid } from '../../../../../../utils'
-import { getTimeFromString, getStepIndex } from './utils'
+import { getStepIndex, getTimeFromString } from './utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerStepTypeGeneral } from './ThermocyclerProfileModal'
@@ -333,6 +335,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadius4}
+      data-testid="thermocyclerStep"
     >
       {header}
       {showEdit ? editContent : null}

@@ -1,16 +1,16 @@
-import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
-import { UniversalSteps } from '../support/UniversalSteps'
 import { ModuleSteps, ModuleVerifications } from '../support/ModuleSteps'
+import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
+import { UniversalSteps } from '../support/UniversalSteps'
 
-describe('Modules happy path - will load modules to this over time', () => {
+describe('The Redesigned Create Protocol Landing Page', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.verifyHomePage()
     cy.closeAnalyticsModal()
   })
 
-  it('Selects modules on the onboarding flow and then uses Temperatuer Module', () => {
+  it('content and step 1 flow works', () => {
     cy.clickCreateNew()
     cy.verifyCreateNewHeader()
 
@@ -24,38 +24,32 @@ describe('Modules happy path - will load modules to this over time', () => {
     steps.add(SetupSteps.SelectFlex())
     steps.add(SetupVerifications.FlexSelected())
     steps.add(UniversalSteps.Snapshot())
-    steps.add(SetupSteps.Confirm())
     steps.add(SetupVerifications.OnStep2())
     steps.add(SetupSteps.SingleChannelPipette50())
     steps.add(SetupVerifications.StepTwo50uL())
     steps.add(UniversalSteps.Snapshot())
-    steps.add(SetupSteps.Confirm())
+    steps.add(SetupSteps.Save())
     steps.add(SetupVerifications.StepTwoPart3())
     steps.add(UniversalSteps.Snapshot())
-    steps.add(SetupSteps.Confirm())
     steps.add(SetupVerifications.OnStep3())
     steps.add(SetupSteps.YesGripper())
+    steps.add(SetupSteps.NoThermocycler())
+    steps.add(SetupSteps.NoWasteChute())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupVerifications.Step4Verification())
     steps.add(SetupSteps.AddThermocycler())
-    steps.add(SetupVerifications.ThermocyclerImg())
     steps.add(SetupSteps.AddHeaterShaker())
-    steps.add(SetupVerifications.HeaterShakerImg())
     steps.add(SetupSteps.AddMagBlock())
-    steps.add(SetupVerifications.MagBlockImg())
     steps.add(SetupSteps.AddTempdeck2())
-    steps.add(SetupVerifications.Tempdeck2Img())
-    steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.EditProtocolA())
-    steps.add(SetupSteps.ChoseDeckSlotWithLabware('C2'))
+    steps.add(SetupSteps.ChoseDeckSlot('C2'))
     steps.add(SetupSteps.AddHardwareLabware())
-    steps.add(SetupSteps.ClickLabwareHeader())
+    steps.add(SetupSteps.OpenSelectLabwareModal())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
-    // steps.add(SetupSteps.ChoseDeckSlotLabware('C2'))
-    steps.add(SetupSteps.ChoseDeckSlotWithLabware('C2'))
+    steps.add(SetupSteps.ChoseDeckSlotC2Labware())
     steps.add(SetupSteps.AddLiquid())
     steps.add(SetupSteps.ClickLiquidButton())
     steps.add(SetupSteps.DefineLiquid())
@@ -66,14 +60,13 @@ describe('Modules happy path - will load modules to this over time', () => {
     steps.add(UniversalSteps.Snapshot())
     steps.add(SetupSteps.SelectLiquidWells())
     steps.add(SetupSteps.SetVolumeAndSaveForWells('150'))
-    steps.add(SetupSteps.ChoseDeckSlotWithLabware('C1'))
+    steps.add(SetupSteps.ChoseDeckSlot('C1'))
     steps.add(SetupSteps.EditHardwareLabwareOnDeck())
-    steps.add(SetupSteps.ClickLabwareHeader())
+    steps.add(SetupSteps.OpenSelectLabwareModal())
     steps.add(SetupSteps.AddAdapters())
     steps.add(SetupSteps.DeepWellTempModAdapter())
     steps.add(SetupSteps.AddNest96DeepWellPlate())
     steps.add(SetupSteps.SelectDone())
-    steps.add(SetupSteps.ProtocolStepsH())
     steps.add(SetupSteps.AddStep())
     steps.add(ModuleSteps.AddTemperatureStep())
     steps.add(ModuleVerifications.TempeDeckInitialForm())

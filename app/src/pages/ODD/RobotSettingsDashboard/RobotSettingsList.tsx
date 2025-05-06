@@ -1,5 +1,5 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
@@ -15,39 +15,36 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LANGUAGES } from '/app/i18n'
-import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
-import { getRobotUpdateAvailable } from '/app/redux/robot-update'
-import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
+import { InlineNotification } from '/app/atoms/InlineNotification'
+import { LANGUAGES, US_ENGLISH_DISPLAY_NAME } from '/app/i18n'
+import { Navigation } from '/app/organisms/ODD/Navigation'
+import {
+  OnOffToggle,
+  RobotSettingButton,
+} from '/app/organisms/ODD/RobotSettingsDashboard'
 import {
   DEV_INTERNAL_FLAGS,
   getAppLanguage,
-  getApplyHistoricOffsets,
   getDevtoolsEnabled,
   getFeatureFlags,
   toggleDevInternalFlag,
   toggleDevtools,
-  toggleHistoricOffsets,
-  useFeatureFlag,
 } from '/app/redux/config'
-import { InlineNotification } from '/app/atoms/InlineNotification'
-import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
+import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
-import { Navigation } from '/app/organisms/ODD/Navigation'
-import { useLEDLights } from '/app/resources/robot-settings'
+import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
+import { getRobotUpdateAvailable } from '/app/redux/robot-update'
+import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
-import {
-  RobotSettingButton,
-  OnOffToggle,
-} from '/app/organisms/ODD/RobotSettingsDashboard'
+import { useLEDLights } from '/app/resources/robot-settings'
 
-import type { Dispatch, State } from '/app/redux/types'
 import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
+import type { Dispatch, State } from '/app/redux/types'
 
 const HOME_GANTRY_SETTING_ID = 'disableHomeOnBoot'
 interface RobotSettingsListProps {
@@ -61,7 +58,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
     'app_settings',
     'branded',
   ])
-  const isNewLPC = useFeatureFlag('lpcRedesign')
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -85,7 +81,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
   const devToolsOn = useSelector(getDevtoolsEnabled)
-  const historicOffsetsOn = useSelector(getApplyHistoricOffsets)
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
   const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
 
@@ -146,7 +141,9 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         <RobotSettingButton
           settingName={t('app_settings:language')}
           settingInfo={
-            currentLanguageOption != null ? currentLanguageOption.name : ''
+            currentLanguageOption != null
+              ? currentLanguageOption.name
+              : US_ENGLISH_DISPLAY_NAME
           }
           onClick={() => {
             setCurrentOption('LanguageSetting')
@@ -186,16 +183,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="privacy"
         />
-        {!isNewLPC && (
-          <RobotSettingButton
-            settingName={t('apply_historic_offsets')}
-            dataTestId="RobotSettingButton_apply_historic_offsets"
-            settingInfo={t('historic_offsets_description')}
-            iconName="reticle"
-            rightElement={<OnOffToggle isOn={historicOffsetsOn} />}
-            onClick={() => dispatch(toggleHistoricOffsets())}
-          />
-        )}
         <RobotSettingButton
           settingName={t('app_settings:error_recovery_mode')}
           dataTestId="RobotSettingButton_error_recovery_mode"

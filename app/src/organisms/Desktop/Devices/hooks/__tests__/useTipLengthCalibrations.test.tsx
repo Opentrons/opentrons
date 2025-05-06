@@ -1,13 +1,16 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
+
 import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
 } from '/app/redux/calibration/tip-length/__fixtures__'
+
 import { useTipLengthCalibrations } from '..'
 
 import type { FunctionComponent, ReactNode } from 'react'

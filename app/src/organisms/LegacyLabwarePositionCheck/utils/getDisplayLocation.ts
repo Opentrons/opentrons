@@ -1,15 +1,16 @@
 import {
+  getLabwareDefURI,
   getModuleDisplayName,
   getModuleType,
   THERMOCYCLER_MODULE_TYPE,
-  getLabwareDefURI,
 } from '@opentrons/shared-data'
+
 import type { i18n, TFunction } from 'i18next'
+import type { LegacyLabwareOffsetLocation } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareOffsetLocation } from '@opentrons/api-client'
 
 export function getDisplayLocation(
-  location: LabwareOffsetLocation,
+  location: LegacyLabwareOffsetLocation,
   labwareDefinitions: LabwareDefinition2[],
   t: TFunction,
   i18n: i18n,

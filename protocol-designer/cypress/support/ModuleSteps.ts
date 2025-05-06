@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { StepThunk } from './StepBuilder'
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -28,7 +29,6 @@ export enum ModContent {
  * Each function returns a StepThunk
  * Add a comment to all records
  */
-
 export const ModuleSteps = {
   /**
    * Select "Done" on a step form.

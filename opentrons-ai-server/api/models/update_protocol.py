@@ -10,4 +10,4 @@ class UpdateProtocol(BaseModel):
     update_type: Literal["adapt_python_protocol", "change_labware", "change_pipettes", "other"] = Field(..., description="Type of update")
     update_details: str = Field(..., description="Details of the update")
     fake: Optional[bool] = Field(False, description="Fake response?")
-    fake_id: Optional[int] = Field(..., description="type of response")
+    fake_key: Optional[int] = Field(None, description="type of response")

@@ -1,11 +1,13 @@
 import { useRef } from 'react'
+
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { Svg } from '../../primitives'
 import { DeckFromLayers } from './DeckFromLayers'
 
 import type { ReactNode } from 'react'
-import type { StyleProps } from '../../primitives'
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
+import type { StyleProps } from '../../primitives'
 
 export interface RobotWorkSpaceRenderProps {
   deckSlotsById: { [slotId: string]: DeckSlot }
@@ -69,22 +71,30 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
     )
     wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
   }
+
+  const activeViewBox = viewBox ?? wholeDeckViewBox
+
   return (
-    <Svg
-      viewBox={viewBox || wholeDeckViewBox}
-      ref={wrapperRef}
-      id={id}
-      /* reflect horizontally about the center of the DOM elem */
-      transform="scale(1, -1)"
-      {...styleProps}
-    >
-      {showDeckLayers ? (
-        <DeckFromLayers
-          layerBlocklist={deckLayerBlocklist}
-          robotType={OT2_ROBOT_TYPE}
-        />
-      ) : null}
-      {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
+    <Svg viewBox={activeViewBox} ref={wrapperRef} id={id} {...styleProps}>
+      <g
+        transform={
+          activeViewBox
+            ? `scale(1, -1) translate(0, ${
+                -1 *
+                (Number(activeViewBox?.split(' ')[3]) +
+                  2 * Number(activeViewBox?.split(' ')[1]))
+              })`
+            : undefined
+        }
+      >
+        {showDeckLayers ? (
+          <DeckFromLayers
+            layerBlocklist={deckLayerBlocklist}
+            robotType={OT2_ROBOT_TYPE}
+          />
+        ) : null}
+        {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
+      </g>
     </Svg>
   )
 }

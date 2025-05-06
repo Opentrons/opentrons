@@ -1,13 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { getFieldErrors } from '../../steplist/fieldLevel'
 import {
   _hasFieldLevelErrors,
-  getEquippedPipetteOptions,
   getBatchEditFormHasUnsavedChanges,
+  getEquippedPipetteOptions,
   getUnsavedFormIsPristineHeaterShakerForm,
   getUnsavedFormIsPristineSetTempForm,
 } from '../selectors'
-import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
+
 import type {
   FormData,
   HydratedPauseFormData,

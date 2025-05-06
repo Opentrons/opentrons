@@ -1,12 +1,12 @@
 import type { CreateCommand } from '../../../command/types'
+import type { CommandAnnotation } from '../../../commandAnnotation/types'
 import type {
-  LoadedPipette,
+  Liquid,
   LoadedLabware,
   LoadedModule,
-  Liquid,
+  LoadedPipette,
   RunTimeParameter,
 } from '../../../js'
-import type { CommandAnnotation } from '../../../commandAnnotation/types'
 import type { LabwareDefinition2, RobotType } from '../../../js/types'
 import type { RunTimeCommand } from '../schemaV8'
 
@@ -105,6 +105,7 @@ export interface ProtocolBase<DesignerApplicationData> {
     category?: string | null | undefined
     subcategory?: string | null | undefined
     tags?: string[]
+    source?: string | null
   }
   designerApplication?: {
     name?: string

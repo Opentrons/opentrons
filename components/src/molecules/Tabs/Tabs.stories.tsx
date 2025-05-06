@@ -1,10 +1,12 @@
 import { useArgs } from '@storybook/preview-api'
-import { VIEWPORT } from '../../ui-style-constants'
+
 import { Tabs as TabsComponent } from '.'
+import { VIEWPORT } from '../../ui-style-constants'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof TabsComponent> = {
-  title: 'Library/Molecules/Tabs',
+  title: 'Helix/Molecules/Tabs',
   component: TabsComponent,
   parameters: VIEWPORT.touchScreenViewport,
   argTypes: {

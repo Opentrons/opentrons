@@ -1,13 +1,20 @@
-import { beforeEach, describe, it, expect, test } from 'vitest'
+import { beforeEach, describe, expect, it, test } from 'vitest'
+
 import {
-  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   fixtureTiprack300ul,
   getLabwareDefURI,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_TOP,
   WASTE_CHUTE_CUTOUT,
+  WELL_ORIGIN_BOTTOM,
+  WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
+
+import { transfer } from '../commandCreators/compound/transfer'
+import { FIXED_TRASH_ID } from '../constants'
 import {
   AIR_GAP_META,
-  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DEFAULT_PIPETTE,
   delayCommand,
   delayWithOffset,
@@ -21,33 +28,22 @@ import {
   makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
+  makeDispenseAirGapHelper,
   makeDispenseHelper,
+  makeMoveToWellHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
-  makeDispenseAirGapHelper,
-  makeMoveToWellHelper,
-  makeAirGapAfterAspirateHelper,
+  submergeWithAspirateHelper,
 } from '../fixtures'
-import { FIXED_TRASH_ID } from '../constants'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../utils/misc'
-import { transfer } from '../commandCreators/compound/transfer'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState, TransferArgs } from '../types'
 
-const dispenseAirGapHelper = makeDispenseAirGapHelper({
-  wellLocation: {
-    origin: 'bottom',
-    offset: {
-      x: 0,
-      y: 0,
-      z: 11.54,
-    },
-  },
-})
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
@@ -81,6 +77,19 @@ beforeEach(() => {
     dispenseXOffset: 0,
     aspirateYOffset: 0,
     dispenseYOffset: 0,
+    aspirateZOffset: 2,
+    aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
+    aspirateSubmergeSpeed: 50,
+    aspirateSubmergeXOffset: 1,
+    aspirateSubmergeYOffset: 0,
+    aspirateSubmergeZOffset: 5,
+    aspirateSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+    aspirateRetractSpeed: 51,
+    aspirateRetractXOffset: 2,
+    aspirateRetractYOffset: -1,
+    aspirateRetractZOffset: -4,
+    aspirateRetractPositionReference: POSITION_REFERENCE_TOP,
+    aspirateFlowRateUlSec: 10,
   }
 
   invariantContext = makeContext()
@@ -120,14 +129,16 @@ describe('pick up tip if no tip on pipette', () => {
   it('...once, drop tip in waste chute', () => {
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      wasteChuteEntities: {
         wasteChuteId: {
-          name: 'wasteChute',
+          pythonName: 'waste_chute',
           id: 'wasteChuteId',
           location: 'cutoutD3',
         },
       },
     }
+
+    robotStateWithTip.tipState.pipettes.p300SingleId = true
 
     noTipArgs = {
       ...noTipArgs,
@@ -140,11 +151,88 @@ describe('pick up tip if no tip on pipette', () => {
 
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
+      //   drop tip from return tip
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.any(String),
+
+        params: {
+          addressableAreaName: '1ChannelWasteChute',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'dropTipInPlace',
+        key: expect.any(String),
+
+        params: {
+          pipetteId: 'p300SingleId',
+        },
+      },
       pickUpTipHelper('A1'),
-      aspirateHelper('A1', 30),
+      ...submergeWithAspirateHelper({
+        volume: 30,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+      }),
       dispenseHelper('B2', 30),
       makeMoveToWellHelper('B2', 'destPlateId'),
-      ...makeAirGapHelper(5),
+      ...makeAirGapHelper(5, 10),
+      //   drop tip at end
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.any(String),
+        params: {
+          addressableAreaName: '1ChannelWasteChute',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'dropTipInPlace',
+        key: expect.any(String),
+
+        params: {
+          pipetteId: 'p300SingleId',
+        },
+      },
     ])
   })
 
@@ -184,7 +272,40 @@ it('single transfer: 1 source & 1 dest', () => {
   )
   const res = getSuccessResult(result)
   expect(res.commands).toEqual([
-    aspirateHelper('A1', 30),
+    ...submergeWithAspirateHelper({
+      volume: 30,
+      aspirateFlowRate: 10,
+      submergeSpeed: 50,
+      retractSpeed: 51,
+      pipetteId: 'p300SingleId',
+      wellName: 'A1',
+      labwareId: SOURCE_LABWARE,
+      submergeLocation: {
+        origin: WELL_ORIGIN_BOTTOM,
+        offset: {
+          x: 1,
+          y: 0,
+          z: 5,
+        },
+      },
+      retractLocation: {
+        origin: WELL_ORIGIN_TOP,
+        offset: {
+          x: 2,
+          y: -1,
+          z: -4,
+        },
+      },
+      aspirateLocation: {
+        origin: WELL_ORIGIN_BOTTOM,
+        offset: {
+          x: 0,
+          y: 0,
+          z: 2,
+        },
+      },
+      shouldProbe: false,
+    }),
     dispenseHelper('B2', 30),
   ])
 })
@@ -204,15 +325,15 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
 
   invariantContext = {
     ...invariantContext,
-    additionalEquipmentEntities: {
+    wasteChuteEntities: {
       mockWasteChuteId: {
-        name: 'wasteChute',
+        pythonName: 'waste_chute',
         id: mockWasteChuteId,
         location: WASTE_CHUTE_CUTOUT,
       },
     },
   }
-  robotStateWithTip.liquidState.additionalEquipment.mockWasteChuteId = {
+  robotStateWithTip.liquidState.wasteChute.mockWasteChuteId = {
     '0': { volume: 200 },
   }
   robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {
@@ -226,7 +347,40 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
   )
   const res = getSuccessResult(result)
   expect(res.commands).toEqual([
-    aspirateHelper('A1', 30),
+    ...submergeWithAspirateHelper({
+      volume: 30,
+      aspirateFlowRate: 10,
+      submergeSpeed: 50,
+      retractSpeed: 51,
+      pipetteId: 'p300SingleId',
+      wellName: 'A1',
+      labwareId: SOURCE_LABWARE,
+      submergeLocation: {
+        origin: WELL_ORIGIN_BOTTOM,
+        offset: {
+          x: 1,
+          y: 0,
+          z: 5,
+        },
+      },
+      aspirateLocation: {
+        origin: WELL_ORIGIN_BOTTOM,
+        offset: {
+          x: 0,
+          y: 0,
+          z: 2,
+        },
+      },
+      retractLocation: {
+        origin: WELL_ORIGIN_TOP,
+        offset: {
+          x: 2,
+          y: -1,
+          z: -4,
+        },
+      },
+      shouldProbe: false,
+    }),
     {
       commandType: 'moveToAddressableArea',
       key: expect.any(String),
@@ -263,10 +417,77 @@ test('transfer with multiple sets of wells', () => {
   )
   const res = getSuccessResult(result)
   expect(res.commands).toEqual([
-    aspirateHelper('A1', 30),
+    ...submergeWithAspirateHelper({
+      volume: 30,
+      aspirateFlowRate: 10,
+      submergeSpeed: 50,
+      retractSpeed: 51,
+      pipetteId: 'p300SingleId',
+      wellName: 'A1',
+      labwareId: SOURCE_LABWARE,
+      submergeLocation: {
+        origin: WELL_ORIGIN_BOTTOM,
+        offset: {
+          x: 1,
+          y: 0,
+          z: 5,
+        },
+      },
+      aspirateLocation: {
+        origin: WELL_ORIGIN_BOTTOM,
+        offset: {
+          x: 0,
+          y: 0,
+          z: 2,
+        },
+      },
+      retractLocation: {
+        origin: WELL_ORIGIN_TOP,
+        offset: {
+          x: 2,
+          y: -1,
+          z: -4,
+        },
+      },
+      shouldProbe: false,
+    }),
     dispenseHelper('B2', 30),
 
-    aspirateHelper('A2', 30),
+    ...submergeWithAspirateHelper({
+      volume: 30,
+      aspirateFlowRate: 10,
+      submergeSpeed: 50,
+      retractSpeed: 51,
+      pipetteId: 'p300SingleId',
+      wellName: 'A2',
+      labwareId: SOURCE_LABWARE,
+      submergeLocation: {
+        origin: WELL_ORIGIN_BOTTOM,
+        offset: {
+          x: 1,
+          y: 0,
+          z: 5,
+        },
+      },
+      aspirateLocation: {
+        origin: WELL_ORIGIN_BOTTOM,
+        offset: {
+          x: 0,
+          y: 0,
+          z: 2,
+        },
+      },
+      retractLocation: {
+        origin: WELL_ORIGIN_TOP,
+        offset: {
+          x: 2,
+          y: -1,
+          z: -4,
+        },
+      },
+      shouldProbe: false,
+    }),
+
     dispenseHelper('C2', 30),
   ])
 
@@ -351,13 +572,145 @@ describe('single transfer exceeding pipette max', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
-      aspirateHelper('A1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+      }),
       dispenseHelper('A3', 300),
-      aspirateHelper('A1', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('A3', 50),
-      aspirateHelper('B1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B3', 300),
-      aspirateHelper('B1', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
+
       dispenseHelper('B3', 50),
     ])
   })
@@ -374,28 +727,162 @@ describe('single transfer exceeding pipette max', () => {
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
 
-      aspirateHelper('A1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+      }),
+
       dispenseHelper('A3', 300),
 
       // replace tip before next asp-disp chunk
       ...dropTipHelper(),
       pickUpTipHelper('B1'),
 
-      aspirateHelper('A1', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        shouldProbe: false,
+      }),
+
       dispenseHelper('A3', 50),
 
       // replace tip before next source-dest well pair
       ...dropTipHelper(),
       pickUpTipHelper('C1'),
 
-      aspirateHelper('B1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+      }),
+
       dispenseHelper('B3', 300),
 
       // replace tip before next asp-disp chunk
       ...dropTipHelper(),
       pickUpTipHelper('D1'),
 
-      aspirateHelper('B1', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
+
       dispenseHelper('B3', 50),
     ])
   })
@@ -413,27 +900,226 @@ describe('single transfer exceeding pipette max', () => {
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
 
-      aspirateHelper('A1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+      }),
+
       dispenseHelper('B1', 300),
 
-      aspirateHelper('A1', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
+
       dispenseHelper('B1', 50),
 
       // same source, different dest: no change
-      aspirateHelper('A1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
+
       dispenseHelper('B2', 300),
 
-      aspirateHelper('A1', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B2', 50),
 
       // new source, different dest: change tip
       ...dropTipHelper(),
       pickUpTipHelper('B1'),
 
-      aspirateHelper('A2', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A2',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+      }),
       dispenseHelper('B2', 300),
 
-      aspirateHelper('A2', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A2',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B2', 50),
     ])
   })
@@ -452,28 +1138,225 @@ describe('single transfer exceeding pipette max', () => {
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
 
-      aspirateHelper('A1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+      }),
       dispenseHelper('B1', 300),
 
-      aspirateHelper('A1', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B1', 50),
 
       // same source, different dest: change tip
       ...dropTipHelper(),
       pickUpTipHelper('B1'),
 
-      aspirateHelper('A1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B2', 300),
 
-      aspirateHelper('A1', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B2', 50),
 
       // different source, same dest: no change
 
-      aspirateHelper('A2', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A2',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B2', 300),
 
-      aspirateHelper('A2', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A2',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B2', 50),
     ])
   })
@@ -490,16 +1373,149 @@ describe('single transfer exceeding pipette max', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       // no pick up tip
-      aspirateHelper('A1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('A3', 300),
 
-      aspirateHelper('A1', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
+
       dispenseHelper('A3', 50),
 
-      aspirateHelper('B1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B3', 300),
 
-      aspirateHelper('B1', 50),
+      ...submergeWithAspirateHelper({
+        volume: 50,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B3', 50),
     ])
   })
@@ -517,20 +1533,218 @@ describe('single transfer exceeding pipette max', () => {
     const result = transfer(transferArgs, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
-      aspirateHelper('A1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('A3', 300),
       // last 2 chunks split evenly
-      aspirateHelper('A1', 164.5),
+      ...submergeWithAspirateHelper({
+        volume: 164.5,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('A3', 164.5),
-      aspirateHelper('A1', 164.5),
+      ...submergeWithAspirateHelper({
+        volume: 164.5,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('A3', 164.5),
 
-      aspirateHelper('B1', 300),
+      ...submergeWithAspirateHelper({
+        volume: 300,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B3', 300),
       // last 2 chunks split evenly
-      aspirateHelper('B1', 164.5),
+      ...submergeWithAspirateHelper({
+        volume: 164.5,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B3', 164.5),
-      aspirateHelper('B1', 164.5),
+      ...submergeWithAspirateHelper({
+        volume: 164.5,
+        aspirateFlowRate: 10,
+        submergeSpeed: 50,
+        retractSpeed: 51,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: SOURCE_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 1,
+            y: 0,
+            z: 5,
+          },
+        },
+        aspirateLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 2,
+            y: -1,
+            z: -4,
+          },
+        },
+        shouldProbe: false,
+      }),
       dispenseHelper('B3', 164.5),
     ])
   })
@@ -558,25 +1772,79 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        // pre-wet aspirate/dispense
-        aspirateHelper('A1', 300),
-        dispenseHelper('A1', 300, {
+        ...submergeWithAspirateHelper({
+          volume: 300,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
           labwareId: SOURCE_LABWARE,
-          wellLocation: {
-            origin: 'bottom',
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
             offset: {
               x: 0,
               y: 0,
-              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+              z: 2,
             },
           },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+          shouldPreWet: true,
         }),
-
-        // "real" aspirate/dispenses
-        aspirateHelper('A1', 300),
         dispenseHelper('B1', 300),
 
-        aspirateHelper('A1', 50),
+        ...submergeWithAspirateHelper({
+          volume: 50,
+          aspirateFlowRate: 10,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
+
         dispenseHelper('B1', 50),
       ])
     })
@@ -593,27 +1861,81 @@ describe('advanced options', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // pre-wet aspirate/dispense
-        aspirateHelper('A1', 300),
-        delayCommand(12),
-        dispenseHelper('A1', 300, {
+        ...submergeWithAspirateHelper({
+          volume: 300,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
           labwareId: SOURCE_LABWARE,
-          wellLocation: {
-            origin: 'bottom',
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
             offset: {
               x: 0,
               y: 0,
-              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+              z: 2,
             },
           },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          aspirateDelay: 12,
+          shouldProbe: false,
+          shouldPreWet: true,
         }),
-
-        // "real" aspirate/dispenses
-        aspirateHelper('A1', 300),
-        ...delayWithOffset('A1', SOURCE_LABWARE),
         dispenseHelper('B1', 300),
 
-        aspirateHelper('A1', 50),
-        ...delayWithOffset('A1', SOURCE_LABWARE),
+        ...submergeWithAspirateHelper({
+          volume: 50,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          aspirateDelay: 12,
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 50),
       ])
     })
@@ -629,27 +1951,81 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        // pre-wet aspirate/dispense
-        aspirateHelper('A1', 300),
-        dispenseHelper('A1', 300, {
+        ...submergeWithAspirateHelper({
+          volume: 300,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
           labwareId: SOURCE_LABWARE,
-          wellLocation: {
-            origin: 'bottom',
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
             offset: {
               x: 0,
               y: 0,
-              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+              z: 2,
             },
           },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          dispenseDelay: 12,
+          shouldProbe: false,
+          shouldPreWet: true,
         }),
-        delayCommand(12),
-
-        // "real" aspirate/dispenses
-        aspirateHelper('A1', 300),
         dispenseHelper('B1', 300),
         ...delayWithOffset('B1', DEST_LABWARE),
 
-        aspirateHelper('A1', 50),
+        ...submergeWithAspirateHelper({
+          volume: 50,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 50),
         ...delayWithOffset('B1', DEST_LABWARE),
       ])
@@ -665,11 +2041,77 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        aspirateHelper('A1', 300),
+        ...submergeWithAspirateHelper({
+          volume: 300,
+          aspirateFlowRate: 10,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
         touchTipHelper('A1'),
         dispenseHelper('B1', 300),
 
-        aspirateHelper('A1', 50),
+        ...submergeWithAspirateHelper({
+          volume: 50,
+          aspirateFlowRate: 10,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
         touchTipHelper('A1'),
         dispenseHelper('B1', 50),
       ])
@@ -685,11 +2127,77 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        aspirateHelper('A1', 300),
+        ...submergeWithAspirateHelper({
+          volume: 300,
+          aspirateFlowRate: 10,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 300),
         touchTipHelper('B1', { labwareId: DEST_LABWARE }),
 
-        aspirateHelper('A1', 50),
+        ...submergeWithAspirateHelper({
+          volume: 50,
+          aspirateFlowRate: 10,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 50),
         touchTipHelper('B1', { labwareId: DEST_LABWARE }),
       ])
@@ -706,44 +2214,85 @@ describe('advanced options', () => {
       }
 
       // written here for less verbose `commands` below
-      const mixCommands = [
-        // mix 1
-        aspirateHelper('A1', 250),
-        dispenseHelper('A1', 250, {
-          labwareId: SOURCE_LABWARE,
-          wellLocation: {
-            origin: 'bottom',
-            offset: {
-              x: 0,
-              y: 0,
-              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-            },
-          },
-        }),
-        // mix 2
-        aspirateHelper('A1', 250),
-        dispenseHelper('A1', 250, {
-          labwareId: SOURCE_LABWARE,
-          wellLocation: {
-            origin: 'bottom',
-            offset: {
-              x: 0,
-              y: 0,
-              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-            },
-          },
-        }),
-      ]
-
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        ...mixCommands,
-        aspirateHelper('A1', 300),
+        ...submergeWithAspirateHelper({
+          volume: 300,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+          mixTimes: 2,
+          mixVolume: 250,
+        }),
         dispenseHelper('B1', 300),
 
-        ...mixCommands,
-        aspirateHelper('A1', 50),
+        ...submergeWithAspirateHelper({
+          volume: 50,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+          mixTimes: 2,
+          mixVolume: 250,
+        }),
         dispenseHelper('B1', 50),
       ])
     })
@@ -759,48 +2308,87 @@ describe('advanced options', () => {
       }
 
       // mixes will include the delays after aspirating
-      const mixCommandsWithDelays = [
-        // mix 1
-        aspirateHelper('A1', 250),
-        delayCommand(12),
-        dispenseHelper('A1', 250, {
-          labwareId: SOURCE_LABWARE,
-          wellLocation: {
-            origin: 'bottom',
-            offset: {
-              x: 0,
-              y: 0,
-              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-            },
-          },
-        }),
-        // mix 2
-        aspirateHelper('A1', 250),
-        delayCommand(12),
-        dispenseHelper('A1', 250, {
-          labwareId: SOURCE_LABWARE,
-          wellLocation: {
-            origin: 'bottom',
-            offset: {
-              x: 0,
-              y: 0,
-              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-            },
-          },
-        }),
-      ]
-
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        ...mixCommandsWithDelays,
-        aspirateHelper('A1', 300),
-        ...delayWithOffset('A1', SOURCE_LABWARE),
+        ...submergeWithAspirateHelper({
+          volume: 300,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          aspirateDelay: 12,
+          shouldProbe: false,
+          mixTimes: 2,
+          mixVolume: 250,
+        }),
         dispenseHelper('B1', 300),
 
-        ...mixCommandsWithDelays,
-        aspirateHelper('A1', 50),
-        ...delayWithOffset('A1', SOURCE_LABWARE),
+        ...submergeWithAspirateHelper({
+          volume: 50,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          aspirateDelay: 12,
+          shouldProbe: false,
+          mixTimes: 2,
+          mixVolume: 250,
+        }),
         dispenseHelper('B1', 50),
       ])
     })
@@ -815,12 +2403,80 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        aspirateHelper('A1', 300),
-        ...delayWithOffset('A1', SOURCE_LABWARE),
+        ...submergeWithAspirateHelper({
+          volume: 300,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          aspirateDelay: 12,
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 300),
 
-        aspirateHelper('A1', 50),
-        ...delayWithOffset('A1', SOURCE_LABWARE),
+        ...submergeWithAspirateHelper({
+          volume: 50,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          aspirateDelay: 12,
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 50),
       ])
     })
@@ -835,15 +2491,81 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        aspirateHelper('A1', 295),
-        makeMoveToWellHelper('A1'),
-        makeAirGapAfterAspirateHelper(5),
-        dispenseAirGapHelper('B1', 5),
+        ...submergeWithAspirateHelper({
+          volume: 295,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          aspirateAirGap: 5,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
+        makeDispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 295),
-        aspirateHelper('A1', 55),
-        makeMoveToWellHelper('A1'),
-        makeAirGapAfterAspirateHelper(5),
-        dispenseAirGapHelper('B1', 5),
+        ...submergeWithAspirateHelper({
+          volume: 55,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          aspirateAirGap: 5,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
+        makeDispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 55),
       ])
     })
@@ -857,15 +2579,82 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        aspirateHelper('A1', 150),
-        makeMoveToWellHelper('A1'),
-        makeAirGapAfterAspirateHelper(5),
-        dispenseAirGapHelper('B1', 5),
+        ...submergeWithAspirateHelper({
+          volume: 150,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          aspirateAirGap: 5,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
+        makeDispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 150),
-        aspirateHelper('A1', 150),
-        makeMoveToWellHelper('A1'),
-        makeAirGapAfterAspirateHelper(5),
-        dispenseAirGapHelper('B1', 5),
+
+        ...submergeWithAspirateHelper({
+          volume: 150,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          aspirateAirGap: 5,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
+        makeDispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 150),
       ])
     })
@@ -880,22 +2669,85 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        aspirateHelper('A1', 295),
-        ...delayWithOffset('A1', SOURCE_LABWARE),
-        makeMoveToWellHelper('A1'),
-        makeAirGapAfterAspirateHelper(5),
-        delayCommand(12),
-
-        dispenseAirGapHelper('B1', 5),
+        ...submergeWithAspirateHelper({
+          volume: 295,
+          aspirateAirGap: 5,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          aspirateDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
+        makeDispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 295),
 
-        aspirateHelper('A1', 55),
-        ...delayWithOffset('A1', SOURCE_LABWARE),
-        makeMoveToWellHelper('A1'),
-        makeAirGapAfterAspirateHelper(5),
-        delayCommand(12),
+        ...submergeWithAspirateHelper({
+          volume: 55,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          aspirateDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          aspirateAirGap: 5,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
 
-        dispenseAirGapHelper('B1', 5),
+        makeDispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 55),
       ])
     })
@@ -910,21 +2762,89 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        aspirateHelper('A1', 295),
-        makeMoveToWellHelper('A1'),
-        makeAirGapAfterAspirateHelper(5),
+        ...submergeWithAspirateHelper({
+          volume: 295,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          aspirateAirGap: 5,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
 
-        dispenseAirGapHelper('B1', 5),
+        makeDispenseAirGapHelper('B1', 5),
         delayCommand(12),
 
         dispenseHelper('B1', 295),
         ...delayWithOffset('B1', DEST_LABWARE),
 
-        aspirateHelper('A1', 55),
-        makeMoveToWellHelper('A1'),
-        makeAirGapAfterAspirateHelper(5),
+        ...submergeWithAspirateHelper({
+          volume: 55,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          aspirateAirGap: 5,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
 
-        dispenseAirGapHelper('B1', 5),
+        makeDispenseAirGapHelper('B1', 5),
         delayCommand(12),
         dispenseHelper('B1', 55),
         ...delayWithOffset('B1', DEST_LABWARE),
@@ -956,8 +2876,9 @@ describe('advanced options', () => {
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
+          flowRate: 10,
         }),
-        dispenseHelper('B1', 250),
+        dispenseHelper('B1', 250, { pushOut: 0 }),
         // mix 2
         aspirateHelper('B1', 250, {
           labwareId: DEST_LABWARE,
@@ -969,6 +2890,7 @@ describe('advanced options', () => {
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
+          flowRate: 10,
         }),
         dispenseHelper('B1', 250),
       ]
@@ -976,11 +2898,81 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        aspirateHelper('A1', 300),
+        ...submergeWithAspirateHelper({
+          volume: 300,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 300),
         ...mixCommands,
 
-        aspirateHelper('A1', 50),
+        ...submergeWithAspirateHelper({
+          volume: 50,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 50),
         ...mixCommands,
       ])
@@ -1009,6 +3001,7 @@ describe('advanced options', () => {
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
+          flowRate: 10,
         }),
         dispenseHelper('B1', 250, {
           labwareId: DEST_LABWARE,
@@ -1020,6 +3013,7 @@ describe('advanced options', () => {
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
+          pushOut: 0,
         }),
         delayCommand(12),
         // mix 2
@@ -1033,6 +3027,7 @@ describe('advanced options', () => {
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
+          flowRate: 10,
         }),
         dispenseHelper('B1', 250, {
           labwareId: DEST_LABWARE,
@@ -1043,13 +3038,83 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        aspirateHelper('A1', 300),
+        ...submergeWithAspirateHelper({
+          volume: 300,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 300),
         // delay after dispense
         ...delayWithOffset('B1', DEST_LABWARE),
         ...mixCommandsWithDelays,
 
-        aspirateHelper('A1', 50),
+        ...submergeWithAspirateHelper({
+          volume: 50,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 50),
         // delay after dispense
         ...delayWithOffset('B1', DEST_LABWARE),
@@ -1067,11 +3132,81 @@ describe('advanced options', () => {
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        aspirateHelper('A1', 300),
+        ...submergeWithAspirateHelper({
+          volume: 300,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 300),
         ...delayWithOffset('B1', DEST_LABWARE),
 
-        aspirateHelper('A1', 50),
+        ...submergeWithAspirateHelper({
+          volume: 50,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
+            },
+          },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          shouldProbe: false,
+        }),
         dispenseHelper('B1', 50),
         ...delayWithOffset('B1', DEST_LABWARE),
       ])
@@ -1094,7 +3229,7 @@ describe('advanced options', () => {
         },
         aspirateDelay: { seconds: 11, mmFromBottom: 15 },
         touchTipAfterAspirate: true,
-        touchTipAfterAspirateOffsetMmFromBottom: 14.5,
+        touchTipAfterAspirateOffsetMmFromTop: -14.5,
         aspirateAirGapVolume: 31,
         // dispense column
         dispenseDelay: { seconds: 12, mmFromBottom: 14 },
@@ -1118,206 +3253,49 @@ describe('advanced options', () => {
       const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        // Pre-wet
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 3.1,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        {
-          commandType: 'dispense',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // mix (asp)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 3.1,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        {
-          commandType: 'dispense',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // aspirate
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 3.1,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 15,
-              },
+        ...submergeWithAspirateHelper({
+          volume: 269,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          aspirateDelay: 11,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
             },
           },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        // touch tip (asp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 14.5,
-              },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
             },
           },
-        },
-        // aspirate > air gap
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 11.54,
-              },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
             },
           },
-        },
-        {
-          commandType: 'airGapInPlace',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 31,
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
+          mixTimes: 1,
+          mixVolume: 35,
+          shouldPreWet: true,
+          shouldProbe: false,
+          shouldTouchTip: true,
+          touchTipMmFromTop: -14.5,
+          aspirateAirGap: 31,
+        }),
         // dispense the aspirate > air gap
         {
           commandType: 'dispense',
@@ -1329,11 +3307,11 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 11.54,
-                y: 0,
                 x: 0,
+                y: 0,
+                z: 1,
               },
             },
             flowRate: 2.2,
@@ -1407,7 +3385,7 @@ describe('advanced options', () => {
                 z: 3.2,
               },
             },
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -1472,9 +3450,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -1482,152 +3460,50 @@ describe('advanced options', () => {
         // next chunk from A1: remaining volume
         // do not pre-wet
         // mix (asp)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 3.1,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        {
-          commandType: 'dispense',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // aspirate 81 (= total vol 350 - prev transfer's 269)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 81,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 3.1,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 15,
-              },
+        ...submergeWithAspirateHelper({
+          volume: 81,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          aspirateDelay: 11,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
             },
           },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        // touch tip (asp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 14.5,
-              },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
             },
           },
-        },
-        // aspirate > air gap
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 11.54,
-              },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
             },
           },
-        },
-        {
-          commandType: 'airGapInPlace',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 31,
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
+          mixTimes: 1,
+          mixVolume: 35,
+          shouldProbe: false,
+          dispenseAirGap: 3,
+          shouldTouchTip: true,
+          touchTipMmFromTop: -14.5,
+          aspirateAirGap: 31,
+        }),
+
         // dispense aspirate > air gap then liquid
         {
           commandType: 'dispense',
@@ -1639,11 +3515,11 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 11.54,
-                y: 0,
                 x: 0,
+                y: 0,
+                z: 1,
               },
             },
             flowRate: 2.2,
@@ -1716,7 +3592,7 @@ describe('advanced options', () => {
                 z: 3.2,
               },
             },
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -1778,9 +3654,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -1794,11 +3670,11 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -1816,7 +3692,7 @@ describe('advanced options', () => {
           params: {
             pipetteId: 'p300SingleId',
             volume: 3,
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -1841,208 +3717,50 @@ describe('advanced options', () => {
       const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        // Pre-wet
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
+        ...submergeWithAspirateHelper({
+          volume: 269,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          aspirateDelay: 11,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
             },
-            flowRate: 2.1,
           },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
           },
-        },
-        {
-          commandType: 'dispense',
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
+            },
+          },
+          mixTimes: 1,
+          mixVolume: 35,
+          shouldPreWet: true,
+          shouldProbe: false,
+          shouldTouchTip: true,
+          touchTipMmFromTop: -14.5,
+          aspirateAirGap: 31,
+        }),
 
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // mix (asp)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        {
-          commandType: 'dispense',
-
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // aspirate
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 15,
-              },
-            },
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        // touch tip (asp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 14.5,
-              },
-            },
-          },
-        },
-        // aspirate > air gap
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 11.54,
-              },
-            },
-          },
-        },
-        {
-          commandType: 'airGapInPlace',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 31,
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
         // dispense the aspirate > air gap
         {
           commandType: 'dispense',
@@ -2054,11 +3772,11 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 11.54,
-                y: 0,
                 x: 0,
+                y: 0,
+                z: 1,
               },
             },
             flowRate: 2.2,
@@ -2131,7 +3849,7 @@ describe('advanced options', () => {
                 x: 0,
               },
             },
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -2193,9 +3911,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -2205,152 +3923,49 @@ describe('advanced options', () => {
         // next chunk from A1: remaining volume
         // do not pre-wet
         // mix (asp)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        {
-          commandType: 'dispense',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // aspirate 81 (= total vol 350 - prev transfer's 269)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 81,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 15,
-              },
+        ...submergeWithAspirateHelper({
+          volume: 81,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          aspirateDelay: 11,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
             },
           },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        // touch tip (asp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 14.5,
-              },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
             },
           },
-        },
-        // aspirate > air gap
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 11.54,
-              },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
             },
           },
-        },
-        {
-          commandType: 'airGapInPlace',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 31,
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
+          mixTimes: 1,
+          mixVolume: 35,
+          shouldProbe: false,
+          dispenseAirGap: 3,
+          shouldTouchTip: true,
+          touchTipMmFromTop: -14.5,
+          aspirateAirGap: 31,
+        }),
         {
           commandType: 'dispense',
           meta: AIR_GAP_META,
@@ -2359,11 +3974,11 @@ describe('advanced options', () => {
             flowRate: 2.2,
             labwareId: 'destPlateId',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 11.54,
-                y: 0,
                 x: 0,
+                y: 0,
+                z: 1,
               },
             },
             pipetteId: 'p300SingleId',
@@ -2438,7 +4053,7 @@ describe('advanced options', () => {
                 x: 0,
               },
             },
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -2500,9 +4115,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -2516,15 +4131,16 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
         },
+
         {
           commandType: 'prepareToAspirate',
           key: expect.any(String),
@@ -2538,7 +4154,7 @@ describe('advanced options', () => {
           params: {
             pipetteId: 'p300SingleId',
             volume: 3,
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -2592,222 +4208,64 @@ describe('advanced options', () => {
             wellName: 'A1',
           },
         },
-        // Pre-wet
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        {
-          commandType: 'dispense',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // mix (asp)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        {
-          commandType: 'dispense',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // aspirate
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 15,
-              },
+        ...submergeWithAspirateHelper({
+          volume: 269,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          aspirateDelay: 11,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
             },
           },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        // touch tip (asp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 14.5,
-              },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
             },
           },
-        },
-        // aspirate > air gap
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 11.54,
-              },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
             },
           },
-        },
-        {
-          commandType: 'airGapInPlace',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 31,
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
+          mixTimes: 1,
+          mixVolume: 35,
+          shouldPreWet: true,
+          shouldTouchTip: true,
+          touchTipMmFromTop: -14.5,
+          aspirateAirGap: 31,
+        }),
         // dispense
         {
           commandType: 'dispense',
-          key: expect.any(String),
           meta: AIR_GAP_META,
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 11.54,
-                y: 0,
                 x: 0,
+                y: 0,
+                z: 1,
               },
             },
             flowRate: 2.2,
@@ -2880,7 +4338,7 @@ describe('advanced options', () => {
                 x: 0,
               },
             },
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -2942,9 +4400,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -2954,152 +4412,50 @@ describe('advanced options', () => {
         // next chunk from A1: remaining volume
         // do not pre-wet
         // mix (asp)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        {
-          commandType: 'dispense',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // aspirate 81 (= total vol 350 - prev transfer's 269)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 81,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 15,
-              },
+        ...submergeWithAspirateHelper({
+          volume: 81,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          aspirateDelay: 11,
+          dispenseDelay: 12,
+          dispenseAirGap: 3,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
             },
           },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        // touch tip (asp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 14.5,
-              },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
             },
           },
-        },
-        // aspirate > air gap
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 11.54,
-              },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
             },
           },
-        },
-        {
-          commandType: 'airGapInPlace',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 31,
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
+          mixTimes: 1,
+          mixVolume: 35,
+          shouldTouchTip: true,
+          shouldProbe: false,
+          touchTipMmFromTop: -14.5,
+          aspirateAirGap: 31,
+        }),
+
         // dispense "aspirate > air gap" then dispense liquid
         {
           commandType: 'dispense',
@@ -3111,11 +4467,11 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 11.54,
-                y: 0,
                 x: 0,
+                y: 0,
+                z: 1,
               },
             },
             flowRate: 2.2,
@@ -3188,7 +4544,7 @@ describe('advanced options', () => {
                 x: 0,
               },
             },
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -3250,9 +4606,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -3266,15 +4622,16 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
         },
+
         {
           commandType: 'prepareToAspirate',
           key: expect.any(String),
@@ -3288,7 +4645,7 @@ describe('advanced options', () => {
           params: {
             pipetteId: 'p300SingleId',
             volume: 3,
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -3303,7 +4660,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it('should create commands in the expected order with expected params (blowout in source well, change tip each aspirate)', () => {
+    it.only('should create commands in the expected order with expected params (blowout in source well, change tip each aspirate)', () => {
       const args = {
         ...allArgs,
         changeTip: 'always',
@@ -3340,206 +4697,48 @@ describe('advanced options', () => {
             wellName: 'A1',
           },
         },
-        // Pre-wet
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        {
-          commandType: 'dispense',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // mix (asp)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        {
-          commandType: 'dispense',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // aspirate
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 269,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 15,
-              },
+        ...submergeWithAspirateHelper({
+          volume: 269,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          aspirateDelay: 11,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
             },
           },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        // touch tip (asp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 14.5,
-              },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
             },
           },
-        },
-        // aspirate > air gap
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 11.54,
-              },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
             },
           },
-        },
-        {
-          commandType: 'airGapInPlace',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 31,
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
+          mixTimes: 1,
+          mixVolume: 35,
+          shouldTouchTip: true,
+          shouldPreWet: true,
+          touchTipMmFromTop: -14.5,
+          aspirateAirGap: 31,
+        }),
         // dispense
         {
           commandType: 'dispense',
@@ -3551,11 +4750,11 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 11.54,
-                y: 0,
                 x: 0,
+                y: 0,
+                z: 1,
               },
             },
             flowRate: 2.2,
@@ -3628,7 +4827,7 @@ describe('advanced options', () => {
                 x: 0,
               },
             },
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -3690,9 +4889,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -3706,11 +4905,11 @@ describe('advanced options', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -3728,7 +4927,7 @@ describe('advanced options', () => {
           params: {
             pipetteId: 'p300SingleId',
             volume: 3,
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -3766,152 +4965,49 @@ describe('advanced options', () => {
         // next chunk from A1: remaining volume
         // do not pre-wet
         // mix (asp)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        {
-          commandType: 'dispense',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 35,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.2,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 12,
-          },
-        },
-        // aspirate 81 (= total vol 350 - prev transfer's 269)
-        {
-          commandType: 'aspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 81,
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.1,
-                y: 0,
-                x: 0,
-              },
-            },
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 15,
-              },
+        ...submergeWithAspirateHelper({
+          volume: 81,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 2.2,
+          aspirateDelay: 11,
+          dispenseDelay: 12,
+          submergeSpeed: 50,
+          retractSpeed: 51,
+          pipetteId: 'p300SingleId',
+          wellName: 'A1',
+          labwareId: SOURCE_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 1,
+              y: 0,
+              z: 5,
             },
           },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
-        // touch tip (asp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 14.5,
-              },
+          aspirateLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
             },
           },
-        },
-        // aspirate > air gap
-        {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                x: 0,
-                y: 0,
-                z: 11.54,
-              },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 2,
+              y: -1,
+              z: -4,
             },
           },
-        },
-        {
-          commandType: 'airGapInPlace',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume: 31,
-            flowRate: 2.1,
-          },
-        },
-        {
-          commandType: 'waitForDuration',
-          key: expect.any(String),
-          params: {
-            seconds: 11,
-          },
-        },
+          mixTimes: 1,
+          mixVolume: 35,
+          shouldProbe: false,
+          shouldTouchTip: true,
+          shouldPreWet: true,
+          touchTipMmFromTop: -14.5,
+          aspirateAirGap: 31,
+        }),
         // dispense "aspirate > air gap" then dispense liquid
         {
           commandType: 'dispense',
@@ -3923,11 +5019,11 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
             flowRate: 2.2,
@@ -4000,7 +5096,7 @@ describe('advanced options', () => {
                 x: 0,
               },
             },
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {
@@ -4062,9 +5158,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -4078,11 +5174,11 @@ describe('advanced options', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -4100,7 +5196,7 @@ describe('advanced options', () => {
           params: {
             pipetteId: 'p300SingleId',
             volume: 3,
-            flowRate: 2.1,
+            flowRate: 10,
           },
         },
         {

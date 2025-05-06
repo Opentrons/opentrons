@@ -1,7 +1,7 @@
-import { useSelector, useDispatch } from 'react-redux'
-import styled, { css } from 'styled-components'
-import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -12,23 +12,24 @@ import {
   Flex,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
-  PrimaryButton,
-  SecondaryButton,
-  SPACING,
   LegacyStyledText,
   Modal,
+  PrimaryButton,
+  ReleaseNotes,
+  SecondaryButton,
+  SPACING,
 } from '@opentrons/components'
 
-import {
-  getShellUpdateState,
-  getAvailableShellUpdate,
-  downloadShellUpdate,
-  applyShellUpdate,
-} from '/app/redux/shell'
-
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
 import { ProgressBar } from '/app/atoms/ProgressBar'
+import {
+  applyShellUpdate,
+  downloadShellUpdate,
+  getAvailableShellUpdate,
+  getShellUpdateState,
+} from '/app/redux/shell'
+import { useIsOEMMode } from '/app/resources/robot-settings'
+
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
 import type { Dispatch } from '/app/redux/types'
@@ -85,6 +86,7 @@ export interface UpdateAppModalProps {
 export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const { closeModal } = props
   const dispatch = useDispatch<Dispatch>()
+  const isOEMMode = useIsOEMMode()
   const updateState = useSelector(getShellUpdateState)
   const {
     downloaded,
@@ -199,7 +201,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
             <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
               {t('branded:update_requires_restarting_app')}
             </UpdateAppBanner>
-            <ReleaseNotes source={releaseNotesText} />
+            <ReleaseNotes source={releaseNotesText} isOEMMode={isOEMMode} />
           </Flex>
         </Modal>
       ) : null}

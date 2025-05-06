@@ -1,6 +1,7 @@
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type { AddressableAreaName } from '../../deck'
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 import type { DropTipWellLocation, WellLocation } from './support'
+
 export type PipettingRunTimeCommand =
   | AspirateInPlaceRunTimeCommand
   | AspirateInPlaceRunTimeCommand
@@ -13,6 +14,7 @@ export type PipettingRunTimeCommand =
   | DropTipInPlaceRunTimeCommand
   | DropTipRunTimeCommand
   | GetTipPresenceRunTimeCommand
+  | GetNextTipRunTimeCommand
   | MoveToAddressableAreaForDropTipRunTimeCommand
   | PickUpTipRunTimeCommand
   | PrepareToAspirateRunTimeCommand
@@ -21,6 +23,9 @@ export type PipettingRunTimeCommand =
   | LiquidProbeRunTimeCommand
   | TryLiquidProbeRunTimeCommand
   | AirGapInPlaceRunTimeCommand
+  | PipetteSealToTipRunTimeCommand
+  | PipetteUnsealFromTipRunTimeCommand
+  | PressureDispenseRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
@@ -33,6 +38,7 @@ export type PipettingCreateCommand =
   | DropTipCreateCommand
   | DropTipInPlaceCreateCommand
   | GetTipPresenceCreateCommand
+  | GetNextTipCreateCommand
   | MoveToAddressableAreaForDropTipCreateCommand
   | PickUpTipCreateCommand
   | PrepareToAspirateCreateCommand
@@ -41,6 +47,9 @@ export type PipettingCreateCommand =
   | LiquidProbeCreateCommand
   | TryLiquidProbeCreateCommand
   | AirGapInPlaceCreateCommand
+  | PipetteSealToTipCreateCommand
+  | PipetteUnsealFromTipCreateCommand
+  | PressureDispenseCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -206,6 +215,16 @@ export interface GetTipPresenceRunTimeCommand
   result?: TipPresenceResult
 }
 
+export interface GetNextTipCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'getNextTip'
+  params: GetNextTipParams
+}
+export interface GetNextTipRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    GetNextTipCreateCommand {
+  result?: GetNextTipResult
+}
+
 export interface VerifyTipPresenceCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'verifyTipPresence'
@@ -217,9 +236,10 @@ export interface VerifyTipPresenceRunTimeCommand
   result?: any
 }
 
+export type LiquidProbeParams = WellLocationParam & PipetteAccessParams
 export interface LiquidProbeCreateCommand extends CommonCommandCreateInfo {
   commandType: 'liquidProbe'
-  params: WellLocationParam & PipetteAccessParams
+  params: LiquidProbeParams
 }
 export interface LiquidProbeRunTimeCommand
   extends CommonCommandRunTimeInfo,
@@ -237,6 +257,38 @@ export interface TryLiquidProbeRunTimeCommand
   result?: Record<string, unknown>
 }
 
+export interface PipetteSealToTipCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'sealPipetteToTip'
+  params: PipetteAccessParams & WellLocationParam
+}
+export interface PipetteUnsealFromTipCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'unsealPipetteFromTip'
+  params: PipetteAccessParams & WellLocationParam
+}
+
+export interface PressureDispenseCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'pressureDispense'
+  params: PipetteAccessParams &
+    WellLocationParam &
+    FlowRateParams &
+    VolumeParams
+}
+export interface PipetteSealToTipRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    PipetteSealToTipCreateCommand {
+  result?: PipetteSealToTipResult
+}
+export interface PipetteUnsealFromTipRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    PipetteUnsealFromTipCreateCommand {
+  result?: PipetteUnsealFromTipResult
+}
+export interface PressureDispenseRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    PressureDispenseCreateCommand {
+  result?: BasicLiquidHandlingResult
+}
 export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
@@ -244,9 +296,24 @@ export type AspDispAirgapParams = FlowRateParams &
 export type BlowoutParams = FlowRateParams &
   PipetteAccessParams &
   WellLocationParam
-export type TouchTipParams = PipetteAccessParams & WellLocationParam
+export type TouchTipParams = PipetteAccessParams &
+  WellLocationParam & {
+    speed?: number
+    mmFromEdge?: number
+  }
 export type DropTipParams = PipetteAccessParams & DropTipWellLocationParam
-export type PickUpTipParams = TouchTipParams
+export interface GetNextTipParams {
+  pipetteId: string
+  labwareIds: string[]
+}
+
+export interface GetNextTipResult {
+  nextTipInfo: {
+    labwareId: string
+    tipStartingWell: string
+  }
+}
+export type PickUpTipParams = PipetteAccessParams & WellLocationParam
 export type PrepareToAspirateParams = PipetteIdentityParams
 
 interface AddressableOffsetVector {
@@ -321,4 +388,14 @@ interface BasicLiquidHandlingResult {
 interface TipPresenceResult {
   // ot2 should alwasy return unknown
   status?: 'present' | 'absent' | 'unknown'
+}
+
+interface PipetteSealToTipResult {
+  position: AddressableOffsetVector
+  tipVolume: number
+  tipLength: number
+  tipDiameter: number
+}
+interface PipetteUnsealFromTipResult {
+  position: AddressableOffsetVector
 }

@@ -23,7 +23,7 @@ from ..error_recovery_policy import ErrorRecoveryPolicy, ErrorRecoveryType
 from ..notes.notes import CommandNote
 from ..state.update_types import StateUpdate
 from ..types import (
-    LabwareOffsetCreate,
+    LabwareOffsetCreateInternal,
     ModuleDefinition,
     Liquid,
     DeckConfigurationType,
@@ -109,6 +109,7 @@ class DoorChangeAction:
     """Handle events coming in from hardware control."""
 
     door_state: DoorState
+    module_serial: str | None = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -206,7 +207,7 @@ class AddLabwareOffsetAction:
 
     labware_offset_id: str
     created_at: datetime
-    request: LabwareOffsetCreate
+    request: LabwareOffsetCreateInternal
 
 
 @dataclasses.dataclass(frozen=True)

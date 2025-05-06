@@ -1,16 +1,20 @@
 import uniq from 'lodash/uniq'
 
-import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
 import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
+import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
+import { getAllLiquidClassDefs } from '../liquidClasses'
+
+import type { AddressableAreaName, CutoutId } from '../../deck/types/schemaV5'
 import type {
   DeckDefinition,
   LabwareDefinition2,
+  LabwareDefinition3,
+  LiquidClass,
   ModuleModel,
   RobotType,
   ThermalAdapterName,
 } from '../types'
-import type { AddressableAreaName, CutoutId } from '../../deck/types/schemaV5'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
@@ -25,6 +29,7 @@ export * from './parseProtocolData'
 export * from './volume'
 export * from './wellSets'
 export * from './getAreFlexSlotsAdjacent'
+export * from './getMmFromBottom'
 export * from './getModuleVizDims'
 export * from './getVectorDifference'
 export * from './getVectorSum'
@@ -32,6 +37,7 @@ export * from './getLoadedLabwareDefinitionsByUri'
 export * from './getFixedTrashLabwareDefinition'
 export * from './getOccludedSlotCountForModule'
 export * from './labwareInference'
+export * from './linearInterpolate'
 export * from './getAddressableAreasInProtocol'
 export * from './getFlexSurroundingSlots'
 export * from './getSimplestFlexDeckConfig'
@@ -40,11 +46,15 @@ export * from './formatRunTimeParameterValue'
 export * from './formatRunTimeParameterMinMax'
 export * from './orderRuntimeParameterRangeOptions'
 export * from './sortRunTimeParameters'
+export * from './parseAddressableArea'
+export * from './validateCustomLabwareHelper'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
 
-export const getLabwareDefURI = (def: LabwareDefinition2): string =>
+export const getLabwareDefURI = (
+  def: LabwareDefinition2 | LabwareDefinition3
+): string =>
   constructLabwareDefURI(
     def.namespace,
     def.parameters.loadName,
@@ -56,6 +66,30 @@ export const constructLabwareDefURI = (
   loadName: string,
   version: string
 ): string => `${namespace}/${loadName}/${version}`
+
+export interface URIDetails {
+  loadName: string
+  namespace: string
+  version: number
+}
+export const splitLabwareDefURI = (uri: string): URIDetails => {
+  const parts = uri.split('/')
+
+  if (parts.length !== 3) {
+    console.error(
+      `Error: Invalid URI format. Expected 3 parts, got ${parts.length}`
+    )
+    return { loadName: '', namespace: '', version: -1 }
+  } else {
+    const [namespace, loadName, versionStr] = parts
+
+    return {
+      namespace,
+      loadName,
+      version: Number(versionStr),
+    }
+  }
+}
 
 // Load names of "retired" labware
 // TODO(mc, 2019-12-3): how should this correspond to LABWAREV2_DO_NOT_LIST?
@@ -75,6 +109,12 @@ export const RETIRED_LABWARE = [
   // Replaced by opentrons_96_wellplate_200ul_pcr_full_skirt
   // https://opentrons.atlassian.net/browse/RLAB-230
   'armadillo_96_wellplate_200ul_pcr_full_skirt',
+  // adapter/labware combo defs
+  'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+  'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
+  'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
+  'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
+  'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
 ]
 
 export const getLabwareDisplayName = (
@@ -212,10 +252,12 @@ export const getWellsDepth = (
   return offsets[0]
 }
 
+type XYPlaneDimension = 'x' | 'y'
+
 export const getWellDimension = (
   labwareDef: LabwareDefinition2,
   wells: string[],
-  position: 'x' | 'y'
+  position: XYPlaneDimension
 ): number => {
   const offsets = wells.map(well => {
     const labwareWell = labwareDef.wells[well]
@@ -227,6 +269,19 @@ export const getWellDimension = (
     }
   })
   return offsets[0]
+}
+
+export const getMinXYDimension = (
+  labwareDef: LabwareDefinition2,
+  wells: string[]
+): number | null => {
+  return (
+    Math.min(
+      ...['x', 'y'].map(dim =>
+        getWellDimension(labwareDef, wells, dim as XYPlaneDimension)
+      )
+    ) ?? null
+  )
 }
 
 export const getSlotHasMatingSurfaceUnitVector = (
@@ -398,4 +453,13 @@ export const getCutoutIdFromAddressableArea = (
   )
 
   return null
+}
+
+export const getSortedLiquidClassDefs = (): Record<string, LiquidClass> => {
+  const liquidClassDefs = getAllLiquidClassDefs()
+  return Object.fromEntries(
+    Object.entries(liquidClassDefs).sort(([, valueA], [, valueB]) =>
+      valueA.displayName.localeCompare(valueB.displayName)
+    )
+  )
 }

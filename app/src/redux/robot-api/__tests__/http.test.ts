@@ -1,14 +1,13 @@
-import { vi, describe, it, expect, beforeAll, afterAll } from 'vitest'
-
 import { promisify } from 'util'
 import express from 'express'
-import multer from 'multer'
-import portfinder from 'portfinder'
-import fetch from 'node-fetch'
 import FormData from 'form-data'
+import multer from 'multer'
+import fetch from 'node-fetch'
+import portfinder from 'portfinder'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { robotApiUrl, fetchRobotApi } from '../http'
-import { HTTP_API_VERSION, GET, POST, PATCH, DELETE } from '../constants'
+import { DELETE, GET, HTTP_API_VERSION, PATCH, POST } from '../constants'
+import { fetchRobotApi, robotApiUrl } from '../http'
 
 import type { Application } from 'express'
 import type { RobotHost } from '../types'

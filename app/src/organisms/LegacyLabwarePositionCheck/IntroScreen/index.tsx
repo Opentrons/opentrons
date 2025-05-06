@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
@@ -10,27 +11,28 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  getLabwareDefinitionsFromCommands,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  PrimaryButton,
-  ModalShell,
-  getLabwareDefinitionsFromCommands,
-  SPACING,
   LegacyStyledText,
+  ModalShell,
+  PrimaryButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { RobotMotionLoader } from '../RobotMotionLoader'
-import { getPrepCommands } from './getPrepCommands'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
-import { getLatestCurrentOffsets } from '/app/transformations/runs'
-import { getIsOnDevice } from '/app/redux/config'
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
-import { useSelector } from 'react-redux'
-import { TwoUpTileLayout } from '../TwoUpTileLayout'
+
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { CALIBRATION_PROBE } from '/app/organisms/PipetteWizardFlows/constants'
+import { getIsOnDevice } from '/app/redux/config'
+import { getLatestCurrentOffsets } from '/app/transformations/runs'
+
 import { TerseOffsetTable } from '../ResultsSummary'
+import { RobotMotionLoader } from '../RobotMotionLoader'
+import { TwoUpTileLayout } from '../TwoUpTileLayout'
+import { getPrepCommands } from './getPrepCommands'
 
 import type { Dispatch } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -38,9 +40,9 @@ import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { Jog } from '/app/molecules/JogControls'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type { RegisterPositionAction } from '../types'
-import type { Jog } from '/app/molecules/JogControls'
 
 export const INTERVAL_MS = 3000
 
@@ -108,7 +110,7 @@ export const IntroScreen = (props: {
       body={
         <Trans
           t={t}
-          i18nKey="labware_position_check_description"
+          i18nKey="legacy_labware_position_check_description"
           components={{ block: <LegacyStyledText as="p" /> }}
         />
       }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -18,47 +19,30 @@ import {
   StyledText,
   useMenuHandleClickOutside,
 } from '@opentrons/components'
-import { getLabwareDefURI } from '@opentrons/shared-data'
-import { Divider } from '/app/atoms/structure'
+import { getLabwareDefIsStandard } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '/app/App/portal'
+import { Divider } from '/app/atoms/structure'
 import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
+import { getRequiredLabwareDetailsFromLoadCommands } from '/app/transformations/commands'
 
 import type { MouseEventHandler } from 'react'
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
-interface ProtocolLabwareDetailsProps {
-  requiredLabwareDetails: LoadLabwareRunTimeCommand[] | null
-}
-
-export const ProtocolLabwareDetails = (
-  props: ProtocolLabwareDetailsProps
-): JSX.Element => {
-  const { requiredLabwareDetails } = props
+export const ProtocolLabwareDetails = (props: {
+  commands: RunTimeCommand[]
+}): JSX.Element => {
+  const { commands } = props
   const { t } = useTranslation('protocol_details')
 
-  const labwareDetails =
-    requiredLabwareDetails != null
-      ? [
-          ...requiredLabwareDetails
-            .reduce((acc, labware) => {
-              if (labware.result?.definition == null) return acc
-              else if (!acc.has(getLabwareDefURI(labware.result.definition))) {
-                acc.set(getLabwareDefURI(labware.result.definition), {
-                  ...labware,
-                  quantity: 0,
-                })
-              }
-              acc.get(getLabwareDefURI(labware.result?.definition)).quantity++
-              return acc
-            }, new Map())
-            .values(),
-        ]
-      : []
+  const labwareAndLidDetails = getRequiredLabwareDetailsFromLoadCommands(
+    commands
+  )
 
   return (
     <>
-      {labwareDetails.length > 0 ? (
+      {labwareAndLidDetails.length > 0 ? (
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           <Flex flexDirection={DIRECTION_ROW}>
             <StyledText
@@ -78,13 +62,14 @@ export const ProtocolLabwareDetails = (
               {t('quantity')}
             </StyledText>
           </Flex>
-          {labwareDetails?.map((labware, index) => (
+          {labwareAndLidDetails?.map((labware, index) => (
             <ProtocolLabwareDetailItem
               key={index}
-              namespace={labware.params.namespace}
-              displayName={labware.result?.definition?.metadata?.displayName}
+              isStandard={getLabwareDefIsStandard(labware.labwareDef)}
+              displayName={labware.labwareDef.metadata.displayName}
               quantity={labware.quantity}
-              labware={{ definition: labware.result?.definition }}
+              labware={{ definition: labware.labwareDef }}
+              lidDisplayName={labware.lidDisplayName}
               data-testid={`ProtocolLabwareDetails_item_${index}`}
             />
           ))}
@@ -97,16 +82,18 @@ export const ProtocolLabwareDetails = (
 }
 
 interface ProtocolLabwareDetailItemProps {
-  namespace: string
+  isStandard: boolean
   displayName: string
-  quantity: string
+  quantity: number
+  lidDisplayName?: string
   labware: LabwareDefAndDate
 }
 
 export const ProtocolLabwareDetailItem = (
   props: ProtocolLabwareDetailItemProps
 ): JSX.Element => {
-  const { namespace, displayName, quantity, labware } = props
+  const { t } = useTranslation('protocol_details')
+  const { isStandard, displayName, quantity, labware, lidDisplayName } = props
   return (
     <>
       <Divider width="100%" />
@@ -121,7 +108,7 @@ export const ProtocolLabwareDetailItem = (
           width="66%"
           marginRight={SPACING.spacing20}
         >
-          {namespace === 'opentrons' ? (
+          {isStandard ? (
             <Icon
               color={COLORS.blue50}
               name="check-decagram"
@@ -133,12 +120,23 @@ export const ProtocolLabwareDetailItem = (
           ) : (
             <Flex marginLeft={SPACING.spacing20} />
           )}
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            paddingRight={SPACING.spacing32}
-          >
-            {displayName}
-          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              paddingRight={SPACING.spacing32}
+            >
+              {displayName}
+            </StyledText>
+            {lidDisplayName != null ? (
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                color={COLORS.grey60}
+                paddingRight={SPACING.spacing32}
+              >
+                {t('with_lid_name', { lid: lidDisplayName })}
+              </StyledText>
+            ) : null}
+          </Flex>
         </Flex>
         <StyledText desktopStyle="bodyDefaultRegular">{quantity}</StyledText>
         <LabwareDetailOverflowMenu labware={labware} />

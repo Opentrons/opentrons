@@ -1,13 +1,14 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { InputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { PipettePath } from '../../QuickTransferAdvancedSettings/PipettePath'
+
 import { useBlowOutLocationOptions } from '../../QuickTransferAdvancedSettings/BlowOut'
+import { PipettePath } from '../../QuickTransferAdvancedSettings/PipettePath'
 
 import type { ComponentProps } from 'react'
 import type { QuickTransferSummaryState } from '../../types'
@@ -196,7 +197,7 @@ describe('PipettePath', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Disposal volume (µL)',
-        error: 'Value must be between 1-160',
+        error: 'Value must be between 1 to 160',
         readOnly: true,
         type: 'number',
         value: 201,

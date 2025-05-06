@@ -35,12 +35,6 @@ class Point(NamedTuple):
     y: float = 0.0
     z: float = 0.0
 
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, Point):
-            return False
-        pairs = ((self.x, other.x), (self.y, other.y), (self.z, other.z))
-        return all(isclose(s, o, rel_tol=1e-05, abs_tol=1e-08) for s, o in pairs)
-
     def __add__(self, other: Any) -> Point:
         if not isinstance(other, Point):
             return NotImplemented
@@ -75,6 +69,12 @@ class Point(NamedTuple):
         z_diff = self.z - other.z
         return sqrt(x_diff**2 + y_diff**2 + z_diff**2)
 
+    def elementwise_isclose(
+        self, other: Point, *, rel_tol: float = 1e-05, abs_tol: float = 1e-08
+    ) -> bool:
+        pairs = ((self.x, other.x), (self.y, other.y), (self.z, other.z))
+        return all(isclose(s, o, rel_tol=rel_tol, abs_tol=abs_tol) for s, o in pairs)
+
 
 LocationLabware = Union[
     "Labware",
@@ -86,6 +86,15 @@ LocationLabware = Union[
     "OffDeckType",
     "ModuleContext",
 ]
+
+
+class MeniscusTrackingTarget(enum.Enum):
+    START = "start"
+    END = "end"
+    DYNAMIC = "dynamic"
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class Location:
@@ -129,12 +138,12 @@ class Location:
             "ModuleContext",
         ],
         *,
-        _ot_internal_is_meniscus: Optional[bool] = None,
+        _meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
     ):
         self._point = point
         self._given_labware = labware
         self._labware = LabwareLike(labware)
-        self._is_meniscus = _ot_internal_is_meniscus
+        self._meniscus_tracking = _meniscus_tracking
 
     # todo(mm, 2021-10-01): Figure out how to get .point and .labware to show up
     # in the rendered docs, and then update the class docstring to use cross-references.
@@ -148,8 +157,8 @@ class Location:
         return self._labware
 
     @property
-    def is_meniscus(self) -> Optional[bool]:
-        return self._is_meniscus
+    def meniscus_tracking(self) -> Optional[MeniscusTrackingTarget]:
+        return self._meniscus_tracking
 
     def __iter__(self) -> Iterator[Union[Point, LabwareLike]]:
         """Iterable interface to support unpacking. Like a tuple.
@@ -167,7 +176,7 @@ class Location:
             isinstance(other, Location)
             and other._point == self._point
             and other._labware == self._labware
-            and other._is_meniscus == self._is_meniscus
+            and other._meniscus_tracking == self._meniscus_tracking
         )
 
     def move(self, point: Point) -> "Location":
@@ -193,7 +202,7 @@ class Location:
         return Location(point=self.point + point, labware=self._given_labware)
 
     def __repr__(self) -> str:
-        return f"Location(point={repr(self._point)}, labware={self._labware}, is_meniscus={self._is_meniscus if self._is_meniscus is not None else False})"
+        return f"Location(point={repr(self._point)}, labware={self._labware}, meniscus_tracking={self._meniscus_tracking})"
 
 
 # TODO(mc, 2020-10-22): use MountType implementation for Mount

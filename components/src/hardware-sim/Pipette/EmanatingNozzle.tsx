@@ -1,5 +1,7 @@
 import { Fragment } from 'react'
-import { C_SELECTED_DARK, C_TRANSPARENT } from '../../styles'
+
+import { COLORS } from '../../helix-design-system'
+import { C_TRANSPARENT } from '../../styles'
 import { SINGLE_CHANNEL_PIPETTE_HEIGHT } from './constants'
 
 export const EmanatingNozzle = (props: {
@@ -14,15 +16,15 @@ export const EmanatingNozzle = (props: {
         cx={cx}
         cy={cy}
         r={0.5}
-        stroke={C_SELECTED_DARK}
-        fill={C_SELECTED_DARK}
+        stroke={COLORS.blue50}
+        fill={COLORS.blue50}
       ></circle>
       <circle
         data-testid="emanating_circle"
         cx={cx}
         cy={cy}
         r={0.5}
-        stroke={C_SELECTED_DARK}
+        stroke={COLORS.blue50}
         strokeWidth={'2px'}
         fill={C_TRANSPARENT}
       >

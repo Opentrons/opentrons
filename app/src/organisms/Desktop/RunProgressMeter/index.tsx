@@ -3,6 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
+} from '@opentrons/api-client'
+import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
@@ -16,37 +22,32 @@ import {
   Link,
   SIZE_1,
   SPACING,
-  TOOLTIP_LEFT,
   Tooltip,
+  TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 import { useCommandQuery } from '@opentrons/react-api-client'
-import {
-  RUN_STATUS_IDLE,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_RUNNING,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-} from '@opentrons/api-client'
 
 import { getModalPortalEl } from '/app/App/portal'
-import { useRunControls } from '/app/organisms/RunTimeControl'
+import { ProgressBar } from '/app/atoms/ProgressBar'
 import {
   InterventionModal,
   useInterventionModal,
 } from '/app/organisms/InterventionModal'
-import { ProgressBar } from '/app/atoms/ProgressBar'
-import { useDownloadRunLog } from '../Devices/hooks'
-import { InterventionTicks } from './InterventionTicks'
-import {
-  useNotifyRunQuery,
-  useNotifyAllCommandsQuery,
-  useRunStatus,
-  useMostRecentCompletedAnalysis,
-} from '/app/resources/runs'
+import { useRunControls } from '/app/organisms/RunTimeControl'
 import { useRobotType } from '/app/redux-resources/robots'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
+import {
+  useMostRecentCompletedAnalysis,
+  useNotifyAllCommandsQuery,
+  useNotifyRunQuery,
+  useRunStatus,
+} from '/app/resources/runs'
+
+import { useDownloadRunLog } from '../Devices/hooks'
 import { useRunProgressCopy } from './hooks'
+import { InterventionTicks } from './InterventionTicks'
 
 import type { MouseEventHandler } from 'react'
 
@@ -116,6 +117,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     stepCountStr,
     currentStepContents,
   } = useRunProgressCopy({
+    runId,
     runStatus,
     robotType,
     currentStepNumber,

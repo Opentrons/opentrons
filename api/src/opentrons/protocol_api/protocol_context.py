@@ -14,10 +14,8 @@ from typing import (
 
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
-from opentrons.config import feature_flags
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import (
     MagneticBlockModel,
@@ -198,6 +196,7 @@ class ProtocolContext(CommandPublisher):
                 core=self._core.load_robot(),
                 protocol_core=self._core,
                 api_version=self._api_version,
+                broker=broker,
             )
         except APIVersionError:
             self._robot = None
@@ -451,13 +450,16 @@ class ProtocolContext(CommandPublisher):
             values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
             adapter will use the same namespace as the labware, and the API will
             choose the adapter's version automatically.
-        :param lid: A lid to load the on top of the main labware. Accepts the same
-            values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
-            lid will use the same namespace as the labware, and the API will
-            choose the lid's version automatically.
 
                         .. versionadded:: 2.15
+        :param lid: A lid to load on the top of the main labware. Accepts the same
+            values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
+            lid will use the same namespace as the labware, and the API will
+            choose the adapter's version automatically.
+
+                        .. versionadded:: 2.23
         """
+
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
             raise APIVersionError(
                 api_element="Loading a labware off-deck",
@@ -867,7 +869,8 @@ class ProtocolContext(CommandPublisher):
                   .. versionchanged:: 2.15
                     Added ``MagneticBlockContext`` return value.
 
-                  .. versionchanged:: 2.23
+                  .. TODO uncomment when 2.23 is ready
+                    versionchanged:: 2.23
                     Added ``FlexStackerModuleContext`` return value.
         """
         if configuration:
@@ -1354,17 +1357,19 @@ class ProtocolContext(CommandPublisher):
             display_color=display_color,
         )
 
+    @requires_version(2, 23)
     def define_liquid_class(
         self,
         name: str,
     ) -> LiquidClass:
-        """Define a liquid class for use in the protocol."""
-        if feature_flags.allow_liquid_classes(
-            robot_type=RobotTypeEnum.robot_literal_to_enum(self._core.robot_type)
-        ):
-            return self._core.define_liquid_class(name=name)
-        else:
-            raise NotImplementedError("This method is not implemented.")
+        """
+        Define a liquid class for use in the protocol.
+        ..
+            This is intended for Opentrons internal use only and is not a guaranteed API.
+
+        :meta private:
+        """
+        return self._core.define_liquid_class(name=name)
 
     @property
     @requires_version(2, 5)
@@ -1389,13 +1394,13 @@ class ProtocolContext(CommandPublisher):
         version: Optional[int] = None,
     ) -> Labware:
         """
-        Load a stack of Lids onto a valid Deck Location or Adapter.
+        Load a stack of Opentrons Tough Auto-Sealing Lids onto a valid deck location or adapter.
 
         :param str load_name: A string to use for looking up a lid definition.
-            You can find the ``load_name`` for any standard lid on the Opentrons
+            You can find the ``load_name`` for any compatible lid on the Opentrons
             `Labware Library <https://labware.opentrons.com>`_.
         :param location: Either a :ref:`deck slot <deck-slots>`,
-            like ``1``, ``"1"``, or ``"D1"``, or the a valid Opentrons Adapter.
+            like ``1``, ``"1"``, or ``"D1"``, or a valid Opentrons Adapter.
         :param int quantity: The quantity of lids to be loaded in the stack.
         :param adapter: An adapter to load the lid stack on top of. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
@@ -1416,7 +1421,10 @@ class ProtocolContext(CommandPublisher):
             leave this unspecified to let ``load_lid_stack()`` choose a version
             automatically.
 
-        :return:  The initialized and loaded labware object representing the Lid Stack.
+        :return:  The initialized and loaded labware object representing the lid stack.
+
+        .. versionadded:: 2.23
+
         """
         if self._api_version < validation.LID_STACK_VERSION_GATE:
             raise APIVersionError(
@@ -1475,9 +1483,9 @@ class ProtocolContext(CommandPublisher):
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> Labware | None:
-        """Move a lid from a valid source to a new location. Can return a Lid Stack if one is created.
+        """Move a compatible lid from a valid source to a new location. Can return a lid stack if one is created.
 
-        :param source_location: Where to take the lid from. This is either:
+        :param source_location: The lid's starting location. This is either:
 
                 * A deck slot like ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
                 * A labware or adapter that's already been loaded on the deck
@@ -1494,7 +1502,7 @@ class ProtocolContext(CommandPublisher):
                   with :py:meth:`load_labware` or :py:meth:`load_adapter`.
                 * The special constant :py:obj:`OFF_DECK`.
 
-        :param use_gripper: Whether to use the Flex Gripper for this movement.
+        :param use_gripper: Whether to use the Flex Gripper to move the lid.
 
                 * If ``True``, use the gripper to perform an automatic
                   movement. This will raise an error in an OT-2 protocol.
@@ -1510,6 +1518,9 @@ class ProtocolContext(CommandPublisher):
         Before moving a lid to or from a labware in a hardware module, make sure that the
         labware's current and new locations are accessible, i.e., open the Thermocycler lid
         or open the Heater-Shaker's labware latch.
+
+        .. versionadded:: 2.23
+
         """
         source: Union[LabwareCore, DeckSlotName, StagingSlotName]
         if isinstance(source_location, Labware):

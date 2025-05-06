@@ -1,5 +1,6 @@
 // volume helpers tests
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import * as helpers from '..'
 
 interface BaseSpec<T extends (...args: any) => any> {

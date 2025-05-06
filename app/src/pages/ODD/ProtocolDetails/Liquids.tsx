@@ -1,6 +1,7 @@
-import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
+import last from 'lodash/last'
 import styled from 'styled-components'
+
 import {
   BORDERS,
   COLORS,
@@ -8,18 +9,19 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
-import { EmptySection } from './EmptySection'
-
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
+import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
+
+import { EmptySection } from './EmptySection'
+
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const Table = styled('table')`

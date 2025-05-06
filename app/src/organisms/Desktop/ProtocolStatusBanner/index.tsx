@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { SPACING, Banner, LegacyStyledText } from '@opentrons/components'
+
+import { Banner, LegacyStyledText, SPACING } from '@opentrons/components'
 
 import type { IconProps } from '@opentrons/components'
 

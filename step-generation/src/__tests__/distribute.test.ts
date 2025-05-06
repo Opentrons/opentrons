@@ -1,13 +1,17 @@
-import { beforeEach, describe, it, expect } from 'vitest'
-import { FIXED_TRASH_ID } from '../constants'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
-  WASTE_CHUTE_CUTOUT,
   fixtureTiprack300ul,
   getLabwareDefURI,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
+import { distribute } from '../commandCreators/compound/distribute'
+import { FIXED_TRASH_ID } from '../constants'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   blowoutHelper,
+  blowoutInPlaceHelper,
   DEFAULT_PIPETTE,
   delayCommand,
   delayWithOffset,
@@ -18,36 +22,25 @@ import {
   getRobotInitialStateNoTipsRemain,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeAirGapAfterAspirateHelper,
   makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
-  makeDispenseHelper,
   makeDispenseAirGapHelper,
+  makeDispenseHelper,
+  makeMoveToWellHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
-  blowoutInPlaceHelper,
-  makeMoveToWellHelper,
-  makeAirGapAfterAspirateHelper,
 } from '../fixtures'
-import { distribute } from '../commandCreators/compound/distribute'
-import type { CreateCommand, LabwareDefinition2 } from '@opentrons/shared-data'
-import type { DistributeArgs, InvariantContext, RobotState } from '../types'
 import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../utils/misc'
 
-const dispenseAirGapHelper = makeDispenseAirGapHelper({
-  wellLocation: {
-    origin: 'bottom',
-    offset: {
-      x: 0,
-      y: 0,
-      z: 11.54,
-    },
-  },
-})
+import type { CreateCommand, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { DistributeArgs, InvariantContext, RobotState } from '../types'
+
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
@@ -320,6 +313,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       // mix 2
       aspirateHelper('A1', 50),
@@ -452,7 +446,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
-      dispenseAirGapHelper('A2', 5),
+      makeDispenseAirGapHelper('A2', 5),
       dispenseHelper('A2', 100),
       dispenseHelper('A3', 100),
 
@@ -461,7 +455,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       makeMoveToWellHelper('A1'),
       makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
-      dispenseAirGapHelper('A4', 5),
+      makeDispenseAirGapHelper('A4', 5),
       dispenseHelper('A4', 100),
       dispenseHelper('A5', 100),
     ])
@@ -489,14 +483,14 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       aspirateHelper('A1', 200),
       makeMoveToWellHelper('A1'),
       makeAirGapAfterAspirateHelper(5),
-      dispenseAirGapHelper('A2', 5),
+      makeDispenseAirGapHelper('A2', 5),
       dispenseHelper('A2', 100),
       dispenseHelper('A3', 100),
 
       aspirateHelper('A1', 200),
       makeMoveToWellHelper('A1'),
       makeAirGapAfterAspirateHelper(5),
-      dispenseAirGapHelper('A4', 5),
+      makeDispenseAirGapHelper('A4', 5),
       dispenseHelper('A4', 100),
       dispenseHelper('A5', 100),
     ])
@@ -526,7 +520,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       makeMoveToWellHelper('A1'),
       makeAirGapAfterAspirateHelper(5),
 
-      dispenseAirGapHelper('A2', 5),
+      makeDispenseAirGapHelper('A2', 5),
       delayCommand(12),
       dispenseHelper('A2', 100),
       ...delayWithOffset('A2', DEST_LABWARE),
@@ -537,7 +531,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       makeMoveToWellHelper('A1'),
       makeAirGapAfterAspirateHelper(5),
 
-      dispenseAirGapHelper('A4', 5),
+      makeDispenseAirGapHelper('A4', 5),
       delayCommand(12),
       dispenseHelper('A4', 100),
       ...delayWithOffset('A4', DEST_LABWARE),
@@ -572,6 +566,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       // mix 2
       aspirateHelper('A1', 50),
@@ -713,6 +708,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       // mix 2
       aspirateHelper('A1', 250),
@@ -808,6 +804,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       delayCommand(12),
       // mix 2
@@ -860,7 +857,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         },
         aspirateDelay: { seconds: 11, mmFromBottom: 15 },
         touchTipAfterAspirate: true,
-        touchTipAfterAspirateOffsetMmFromBottom: 14.5,
         aspirateAirGapVolume: 31,
         // dispense column
         dispenseDelay: { seconds: 12, mmFromBottom: 14 },
@@ -868,6 +864,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutFlowRateUlSec: 2.3,
         blowoutOffsetFromTopMm: 3.3,
         dispenseAirGapVolume: 3,
+        touchTipAfterAspirateOffsetMmFromTop: -3.4,
       }
     })
     it('should create commands in the expected order with expected params', () => {
@@ -897,6 +894,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
+        // prewet
+        aspirateHelper('A1', 150),
+        delayCommand(11),
+        dispenseHelper('A1', 150, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         aspirateHelper('A1', 35),
         delayCommand(11),
@@ -918,9 +930,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -929,7 +941,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
-        dispenseAirGapHelper('B1', 31),
+        makeDispenseAirGapHelper('B1', 31),
         delayCommand(12),
         dispenseHelper('B1', 45),
         ...delayWithOffset('B1', DEST_LABWARE),
@@ -958,6 +970,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // no need to pickup tip/drop tip since change tip is never
+        // prewet
+        aspirateHelper('A1', 260),
+        delayCommand(11),
+        dispenseHelper('A1', 260, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate
@@ -966,9 +993,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -977,7 +1004,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
-        dispenseAirGapHelper('A2', 31),
+        makeDispenseAirGapHelper('A2', 31),
         delayCommand(12),
         dispenseHelper('A2', 100),
         ...delayWithOffset('A2', DEST_LABWARE),
@@ -999,9 +1026,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1009,7 +1036,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
-        dispenseAirGapHelper('A4', 31),
+        makeDispenseAirGapHelper('A4', 31),
         delayCommand(12),
         // dispense #3
         dispenseHelper('A4', 100),
@@ -1041,6 +1068,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // replace tip since change tip is always
         ...dropTipHelper(),
         pickUpTipHelper('A1'),
+        // prewet
+        aspirateHelper('A1', 260),
+        delayCommand(11),
+        dispenseHelper('A1', 260, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate
@@ -1049,9 +1091,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1060,7 +1102,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
-        dispenseAirGapHelper('A2', 31),
+        makeDispenseAirGapHelper('A2', 31),
         delayCommand(12),
         dispenseHelper('A2', 100),
         ...delayWithOffset('A2', DEST_LABWARE),
@@ -1080,6 +1122,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...dropTipHelper(),
         // next chunk from A1: remaining volume
         pickUpTipHelper('B1'),
+        // prewet
+        aspirateHelper('A1', 160),
+        delayCommand(11),
+        dispenseHelper('A1', 160, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate 100 liquid + 60 for disposal vol
@@ -1088,9 +1145,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1099,7 +1156,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
-        dispenseAirGapHelper('A4', 31),
+        makeDispenseAirGapHelper('A4', 31),
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
@@ -1131,6 +1188,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // replace tip at the beginning of the step
         ...dropTipHelper(),
         pickUpTipHelper('A1'),
+        // prewet
+        aspirateHelper('A1', 260),
+        delayCommand(11),
+        dispenseHelper('A1', 260, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate
@@ -1139,9 +1211,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1150,7 +1222,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
-        dispenseAirGapHelper('A2', 31),
+        makeDispenseAirGapHelper('A2', 31),
         delayCommand(12),
         dispenseHelper('A2', 100),
         ...delayWithOffset('A2', DEST_LABWARE),
@@ -1171,9 +1243,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1182,7 +1254,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
-        dispenseAirGapHelper('A4', 31),
+        makeDispenseAirGapHelper('A4', 31),
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
@@ -1210,6 +1282,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
+        // prewet
+        aspirateHelper('A1', 260),
+        delayCommand(11),
+        dispenseHelper('A1', 260, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // no need to replace tip since change tip is never
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1219,9 +1306,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1230,7 +1317,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
-        dispenseAirGapHelper('A2', 31),
+        makeDispenseAirGapHelper('A2', 31),
         delayCommand(12),
         dispenseHelper('A2', 100),
         ...delayWithOffset('A2', DEST_LABWARE),
@@ -1252,9 +1339,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1263,7 +1350,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
-        dispenseAirGapHelper('A4', 31),
+        makeDispenseAirGapHelper('A4', 31),
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
@@ -1296,6 +1383,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // replace tip
         ...dropTipHelper(),
         pickUpTipHelper('A1'),
+        // prewet
+        aspirateHelper('A1', 260),
+        delayCommand(11),
+        dispenseHelper('A1', 260, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate
@@ -1304,9 +1406,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1315,7 +1417,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
-        dispenseAirGapHelper('A2', 31),
+        makeDispenseAirGapHelper('A2', 31),
         delayCommand(12),
         dispenseHelper('A2', 100),
         ...delayWithOffset('A2', DEST_LABWARE),
@@ -1337,6 +1439,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...dropTipHelper(),
         // next chunk from A1: remaining volume
         pickUpTipHelper('B1'),
+        // prewet
+        aspirateHelper('A1', 160),
+        delayCommand(11),
+        dispenseHelper('A1', 160, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate 100 liquid + 60 for disposal vol
@@ -1345,9 +1462,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1356,7 +1473,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
-        dispenseAirGapHelper('A4', 31),
+        makeDispenseAirGapHelper('A4', 31),
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
@@ -1388,6 +1505,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // replace tip
         ...dropTipHelper(),
         pickUpTipHelper('A1'),
+        // prewet
+        aspirateHelper('A1', 260),
+        delayCommand(11),
+        dispenseHelper('A1', 260, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate
@@ -1396,9 +1528,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1407,7 +1539,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
-        dispenseAirGapHelper('A2', 31),
+        makeDispenseAirGapHelper('A2', 31),
         delayCommand(12),
         dispenseHelper('A2', 100),
         ...delayWithOffset('A2', DEST_LABWARE),
@@ -1429,9 +1561,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1440,7 +1572,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
-        dispenseAirGapHelper('A4', 31),
+        makeDispenseAirGapHelper('A4', 31),
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
@@ -1470,6 +1602,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // no need to replace tip since changeTip is never
+        // prewet
+        aspirateHelper('A1', 260),
+        delayCommand(11),
+        dispenseHelper('A1', 260, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate
@@ -1478,9 +1625,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1489,7 +1636,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
-        dispenseAirGapHelper('A2', 31),
+        makeDispenseAirGapHelper('A2', 31),
         delayCommand(12),
         dispenseHelper('A2', 100),
         ...delayWithOffset('A2', DEST_LABWARE),
@@ -1511,9 +1658,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1522,7 +1669,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
-        dispenseAirGapHelper('A4', 31),
+        makeDispenseAirGapHelper('A4', 31),
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
@@ -1555,6 +1702,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // replace tip
         ...dropTipHelper(),
         pickUpTipHelper('A1'),
+        // prewet
+        aspirateHelper('A1', 260),
+        delayCommand(11),
+        dispenseHelper('A1', 260, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate
@@ -1563,9 +1725,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1574,7 +1736,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
-        dispenseAirGapHelper('A2', 31),
+        makeDispenseAirGapHelper('A2', 31),
         delayCommand(12),
         dispenseHelper('A2', 100),
         ...delayWithOffset('A2', DEST_LABWARE),
@@ -1596,6 +1758,20 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...dropTipHelper(),
         // next chunk from A1: remaining volume
         pickUpTipHelper('B1'),
+        aspirateHelper('A1', 160),
+        delayCommand(11),
+        dispenseHelper('A1', 160, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate 100 liquid + 60 for disposal vol
@@ -1604,9 +1780,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1615,7 +1791,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
-        dispenseAirGapHelper('A4', 31),
+        makeDispenseAirGapHelper('A4', 31),
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
@@ -1647,6 +1823,21 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // replace tip
         ...dropTipHelper(),
         pickUpTipHelper('A1'),
+        // prewet
+        aspirateHelper('A1', 260),
+        delayCommand(11),
+        dispenseHelper('A1', 260, {
+          labwareId: SOURCE_LABWARE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+            },
+          },
+        }),
+        delayCommand(12),
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate
@@ -1655,9 +1846,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1666,7 +1857,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
-        dispenseAirGapHelper('A2', 31),
+        makeDispenseAirGapHelper('A2', 31),
         delayCommand(12),
         dispenseHelper('A2', 100),
         ...delayWithOffset('A2', DEST_LABWARE),
@@ -1688,9 +1879,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (asp)
         touchTipHelper('A1', {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 14.5,
+              z: -3.4,
             },
           },
         }),
@@ -1699,7 +1890,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
-        dispenseAirGapHelper('A4', 31),
+        makeDispenseAirGapHelper('A4', 31),
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
@@ -1748,10 +1939,10 @@ it('should return an error for the labware already being discarded in previous s
   const mockWasteChuteId = 'mockWasteChuteId'
   const wasteChuteInvariantContext = {
     ...invariantContext,
-    additionalEquipmentEntities: {
-      ...invariantContext.additionalEquipmentEntities,
+    wasteChuteEntities: {
+      ...invariantContext.wasteChuteEntities,
       mockWasteChuteId: {
-        name: 'wasteChute',
+        pythonName: 'waste_chute',
         id: mockWasteChuteId,
         location: WASTE_CHUTE_CUTOUT,
       },
@@ -1759,7 +1950,7 @@ it('should return an error for the labware already being discarded in previous s
   } as InvariantContext
 
   robotStateWithTip.labware = {
-    [SOURCE_LABWARE]: { slot: 'gripperWasteChute' },
+    [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'gripperWasteChute'] },
   }
 
   const distributeArgs = {

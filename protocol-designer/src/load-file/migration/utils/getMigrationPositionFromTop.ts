@@ -2,6 +2,7 @@ import type {
   LabwareDefinition2,
   LoadLabwareCreateCommand,
 } from '@opentrons/shared-data'
+import type { MoveLiquidPrefixType } from '../../../resources/types'
 
 export const getMigratedPositionFromTop = (
   labwareDefinitions: {
@@ -9,7 +10,7 @@ export const getMigratedPositionFromTop = (
   },
   loadLabwareCommands: LoadLabwareCreateCommand[],
   labware: string,
-  type: 'aspirate' | 'dispense' | 'mix'
+  type: MoveLiquidPrefixType
 ): number => {
   const matchingLoadLabware = loadLabwareCommands.find(
     command =>

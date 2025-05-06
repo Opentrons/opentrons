@@ -1,8 +1,10 @@
 import '@testing-library/jest-dom/vitest'
-import { screen, queryByAttribute } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../../testing/utils'
+
+import { queryByAttribute, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
 import { SPACING } from '../../../ui-style-constants'
 import { RadioButton } from '../RadioButton'
 
@@ -95,5 +97,23 @@ describe('RadioButton', () => {
       props.buttonLabel
     )
     expect(buttonLabelIdRadioButton).not.toBeInTheDocument()
+  })
+
+  it('renders subtext if supplied', () => {
+    props = { ...props, buttonSubLabel: { label: 'test label' } }
+
+    render(props)
+  })
+
+  it('onClick is called when ariaDisabled is true', () => {
+    props = {
+      ...props,
+      ariaDisabled: true,
+      onClick: vi.fn(),
+    }
+    render(props)
+    const label = screen.getByRole('label')
+    label.click()
+    expect(props.onClick).toHaveBeenCalled()
   })
 })

@@ -1,55 +1,55 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
-import capitalize from 'lodash/capitalize'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import capitalize from 'lodash/capitalize'
+
 import {
-  SPACING,
-  TYPOGRAPHY,
   LegacyStyledText,
   ModalShell,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
-import {
-  useDispatchApiRequests,
-  getRequestById,
-  SUCCESS,
-} from '/app/redux/robot-api'
+import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getCalibrationForPipette } from '/app/redux/calibration'
 import {
-  home,
-  move,
-  getMovementStatus,
-  HOMING,
-  MOVING,
-  ROBOT,
-  PIPETTE,
+  getRequestById,
+  SUCCESS,
+  useDispatchApiRequests,
+} from '/app/redux/robot-api'
+import {
   CHANGE_PIPETTE,
+  getMovementStatus,
+  home,
   HOME,
+  HOMING,
+  move,
+  MOVING,
+  PIPETTE,
+  ROBOT,
 } from '/app/redux/robot-controls'
-
-import { WizardHeader } from '/app/molecules/WizardHeader'
-import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import { useAttachedPipettes } from '/app/resources/instruments'
-import { ExitModal } from './ExitModal'
-import { Instructions } from './Instructions'
-import { ConfirmPipette } from './ConfirmPipette'
-import { ClearDeckModal } from './ClearDeckModal'
 
+import { ClearDeckModal } from './ClearDeckModal'
+import { ConfirmPipette } from './ConfirmPipette'
 import {
   ATTACH,
-  DETACH,
   CLEAR_DECK,
-  INSTRUCTIONS,
   CONFIRM,
-  SINGLE_CHANNEL_STEPS,
+  DETACH,
   EIGHT_CHANNEL_STEPS,
+  INSTRUCTIONS,
+  SINGLE_CHANNEL_STEPS,
 } from './constants'
+import { ExitModal } from './ExitModal'
+import { Instructions } from './Instructions'
 
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { State, Dispatch } from '/app/redux/types'
 import type { Mount } from '/app/redux/pipettes/types'
+import type { Dispatch, State } from '/app/redux/types'
 import type { WizardStep } from './types'
 
 interface Props {

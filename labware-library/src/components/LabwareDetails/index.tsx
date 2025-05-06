@@ -1,8 +1,8 @@
 // full-width labware details
 import { isNewLabware } from '../../definitions'
-import { Gallery, Tags, LoadName, NewLabwareAlert } from '../labware-ui'
-import { LabwareTitle } from './LabwareTitle'
+import { Gallery, LoadName, NewLabwareAlert, Tags } from '../labware-ui'
 import { LabwareDetailsBox } from './LabwareDetailsBox'
+import { LabwareTitle } from './LabwareTitle'
 import styles from './styles.module.css'
 
 import type { LabwareDefinition } from '../../types'

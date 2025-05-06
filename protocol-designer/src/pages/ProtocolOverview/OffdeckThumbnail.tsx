@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -17,11 +18,13 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { selectors } from '../../labware-ingred/selectors'
-import * as wellContentsSelectors from '../../top-selectors/well-contents'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
+
+import { wellFillFromWellContents } from '../../components/organisms/LabwareOnDeck/utils'
 import { getRobotType } from '../../file-data/selectors'
+import { selectors } from '../../labware-ingred/selectors'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
-import { wellFillFromWellContents } from '../../organisms/LabwareOnDeck/utils'
+import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { SlotHover } from './SlotHover'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -37,7 +40,7 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
   const robotType = useSelector(getRobotType)
   const deckSetup = useSelector(getInitialDeckSetup)
   const offDeckLabware = Object.values(deckSetup.labware).filter(
-    lw => lw.slot === 'offDeck'
+    lw => getSlotInLocationStack(lw.stack) === 'offDeck'
   )
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   const allWellContentsForActiveItem = useSelector(

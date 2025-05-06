@@ -1,9 +1,11 @@
-import reduce from 'lodash/reduce'
-import omitBy from 'lodash/omitBy'
 import mapValues from 'lodash/mapValues'
-import { getLabwareDefURI, DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
+import omitBy from 'lodash/omitBy'
+import reduce from 'lodash/reduce'
+
+import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
+
 import { COLORS } from '../../helix-design-system'
-import type { WellFill } from '../../hardware-sim'
+
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
@@ -13,9 +15,10 @@ import type {
 import type {
   LabwareEntities,
   LocationLiquidState,
-  RunCommandTimelineFrame,
   SingleLabwareLiquidState,
+  TimelineFrame,
 } from '@opentrons/step-generation'
+import type { WellFill } from '../../hardware-sim'
 import type { CommandTextData } from './types'
 
 //  copied from protocol-designer
@@ -127,11 +130,11 @@ export const wellFillFromWellContents = (
 
 export function getAllWellContentsForActiveItem(
   labwareEntities: LabwareEntities,
-  timelineFrame: RunCommandTimelineFrame
+  robotState: TimelineFrame
 ): WellContentsByLabware | null {
-  if (timelineFrame == null) return null
+  if (robotState == null) return null
 
-  const liquidState = timelineFrame.robotState.liquidState.labware
+  const liquidState = robotState.liquidState.labware
   const wellContentsByLabwareId = mapValues(
     liquidState,
     (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => {
@@ -144,25 +147,6 @@ export function getAllWellContentsForActiveItem(
   )
 
   return wellContentsByLabwareId
-}
-
-// Note: This is an O(n) operation.
-export function getLabwareDefinitionsFromCommands(
-  commands: RunTimeCommand[]
-): LabwareDefinition2[] {
-  return commands.reduce<LabwareDefinition2[]>((acc, command) => {
-    const isLoadingNewDef =
-      command.commandType === 'loadLabware' &&
-      !acc.some(
-        def =>
-          command.result?.definition != null &&
-          getLabwareDefURI(def) === getLabwareDefURI(command.result?.definition)
-      )
-
-    return isLoadingNewDef && command.result?.definition != null
-      ? [...acc, command.result?.definition]
-      : acc
-  }, [])
 }
 
 export function getCommandTextData(

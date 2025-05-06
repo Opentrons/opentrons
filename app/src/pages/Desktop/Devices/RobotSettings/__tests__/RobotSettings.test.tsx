@@ -1,21 +1,22 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { Route, MemoryRouter, Routes } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
-import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
 import { useRobot } from '/app/redux-resources/robots'
-import { RobotSettings } from '..'
-import { when } from 'vitest-when'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
+
+import { RobotSettings } from '..'
 
 vi.mock('/app/organisms/Desktop/RobotSettingsCalibration')
 vi.mock('/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking')

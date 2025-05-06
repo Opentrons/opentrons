@@ -412,6 +412,7 @@ class DoorStateNotification:
         HardwareEventType.DOOR_SWITCH_CHANGE
     ] = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
+    module_serial: str | None = None
 
 
 @dataclass(frozen=True)
@@ -600,6 +601,16 @@ class StatusBarState(enum.Enum):
         }
 
 
+@dataclass(frozen=True)
+class StatusBarUpdateEvent:
+    state: StatusBarState
+    enabled: bool
+
+
+StatusBarUpdateListener = Callable[[StatusBarUpdateEvent], None]
+StatusBarUpdateUnsubscriber = Callable[[], None]
+
+
 @dataclass
 class AionotifyEvent:
     flags: enum.EnumMeta
@@ -634,6 +645,12 @@ class InstrumentProbeType(enum.Enum):
     PRIMARY = enum.auto()
     SECONDARY = enum.auto()
     BOTH = enum.auto()
+
+
+class TipScrapeType(enum.Enum):
+    NONE = enum.auto()
+    RIGHT_ONE_COL = enum.auto()
+    LEFT_ONE_COL = enum.auto()
 
 
 class GripperProbe(enum.Enum):

@@ -10,8 +10,8 @@ on:
       - 'Makefile'
       - 'api/**'
       - 'g-code-testing/**'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
       - '.github/workflows/g-code-testing-lint-test.yaml'
       - '.github/actions/python/**'
     branches:
@@ -23,8 +23,8 @@ on:
       - 'Makefile'
       - 'g-code-testing/**'
       - 'api/**'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
       - '.github/workflows/g-code-testing-lint-test.yaml'
       - '.github/actions/python/**'
   workflow_dispatch:
@@ -40,7 +40,7 @@ defaults:
 jobs:
   lint-test:
     name: 'g-code-testing package linting and tests'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
         with:

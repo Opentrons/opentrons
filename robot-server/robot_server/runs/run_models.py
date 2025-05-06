@@ -1,4 +1,5 @@
 """Request and response models for run resources."""
+
 from datetime import datetime
 
 from enum import Enum
@@ -16,6 +17,7 @@ from opentrons.protocol_engine import (
     LoadedLabware,
     LoadedModule,
     LabwareOffset,
+    LegacyLabwareOffsetCreate,
     LabwareOffsetCreate,
     Liquid,
     LiquidClassRecordWithId,
@@ -265,7 +267,7 @@ class RunCreate(BaseModel):
         None,
         description="Protocol resource ID that this run will be using, if applicable.",
     )
-    labwareOffsets: List[LabwareOffsetCreate] = Field(
+    labwareOffsets: List[LegacyLabwareOffsetCreate | LabwareOffsetCreate] = Field(
         default_factory=list,
         description="Labware offsets to apply as labware are loaded.",
     )
@@ -347,6 +349,24 @@ class PlaceLabwareState(BaseModel):
     )
 
 
+class FlexStackerState(BaseModel):
+    """Provides the current state of a Flex Stacker."""
+
+    primaryLabwareURI: Optional[str] = Field(
+        None, description="The URI of the primary labware."
+    )
+    adapterLabwareURI: Optional[str] = Field(
+        None, description="The URI of the adapter labware."
+    )
+    lidLabwareURI: Optional[str] = Field(
+        None, description="The URI of the lid labware."
+    )
+    count: int = Field(0, description="The number of labware current in the hopper.")
+    maxCount: int = Field(
+        0, description="The maximum number of labware allowed in the hopper."
+    )
+
+
 class RunCurrentState(BaseModel):
     """Current details about a run."""
 
@@ -365,6 +385,7 @@ class RunCurrentState(BaseModel):
     activeNozzleLayouts: Dict[str, ActiveNozzleLayout]
     tipStates: Dict[str, TipState]
     placeLabwareState: Optional[PlaceLabwareState]
+    flexStackerStates: Optional[Dict[str, FlexStackerState]]
 
 
 class CommandLinkNoMeta(BaseModel):

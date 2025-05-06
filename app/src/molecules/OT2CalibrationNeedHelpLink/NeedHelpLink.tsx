@@ -1,13 +1,14 @@
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
-  Link,
-  Icon,
-  COLORS,
-  TYPOGRAPHY,
-  SIZE_1,
   ALIGN_CENTER,
+  COLORS,
+  Flex,
+  Icon,
+  Link,
+  SIZE_1,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { ComponentProps } from 'react'
@@ -27,7 +28,7 @@ export function NeedHelpLink(props: NeedHelpLinkProps): JSX.Element {
         color={COLORS.grey50}
         size={SIZE_1}
         marginRight={SPACING.spacing4}
-        name="question-mark-circle"
+        name="help"
       />
       <Link
         external

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import * as Selectors from '../selectors'
 
@@ -246,7 +246,7 @@ describe('shell selectors', () => {
             sleepMs: 25200000,
             brightness: 4,
             textSize: 1,
-            unfinishedUnboxingFlowRoute: '/welcome',
+            unfinishedUnboxingFlowRoute: '/choose-language',
           },
         },
       } as any
@@ -254,32 +254,8 @@ describe('shell selectors', () => {
         sleepMs: 25200000,
         brightness: 4,
         textSize: 1,
-        unfinishedUnboxingFlowRoute: '/welcome',
+        unfinishedUnboxingFlowRoute: '/choose-language',
       })
-    })
-  })
-
-  describe('applyHistoricOffsets', () => {
-    it('should return false if applyHistoricOffsets is selected', () => {
-      const state: State = {
-        config: {
-          protocols: {
-            applyHistoricOffsets: false,
-          },
-        },
-      } as any
-      expect(Selectors.getApplyHistoricOffsets(state)).toEqual(false)
-    })
-
-    it('should return true if applyHistoricOffsets is selected', () => {
-      const state: State = {
-        config: {
-          protocols: {
-            applyHistoricOffsets: true,
-          },
-        },
-      } as any
-      expect(Selectors.getApplyHistoricOffsets(state)).toEqual(true)
     })
   })
 

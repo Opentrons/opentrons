@@ -153,7 +153,7 @@ class AcknowledgeListener:
             )
         except asyncio.TimeoutError:
             log.error(
-                f"Message did not receive ack for message index {self._message.payload.message_index}"
+                f"Message did not receive ack for message index {self._message.payload.message_index} Missing node(s) {self._expected_nodes}"
             )
             return ErrorCode.timeout
         finally:
@@ -279,12 +279,14 @@ class CanMessenger:
         exclusive: bool = False,
     ) -> ErrorCode:
         if len(expected_nodes) == 0:
-            log.warning("Expected Nodes should have been specified")
             if node_id == NodeId.broadcast:
                 if not expected_nodes:
                     expected_nodes = list(self._known_nodes)
             else:
                 expected_nodes = [node_id]
+            log.warning(
+                f"Expected Nodes should have been specified, Setting expected nodes to {expected_nodes}"
+            )
 
         listener = AcknowledgeListener(
             can_messenger=self,
@@ -346,7 +348,11 @@ class CanMessenger:
         listener: MessageListenerCallback,
         filter: Optional[MessageListenerCallbackFilter] = None,
     ) -> None:
-        """Add a message listener."""
+        """Add a message listener.
+
+        Will not leak listener objects if called multiple times with the same-by-identity
+        function; it will overwrite the old entry each time in that case.
+        """
         self._listeners[listener] = listener, filter
 
     def remove_listener(self, listener: MessageListenerCallback) -> None:

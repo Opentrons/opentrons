@@ -1,6 +1,6 @@
-import { css } from 'styled-components'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -20,7 +20,8 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../../../../../../atoms'
+
+import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
   isTimeFormatMinutesSeconds,
   temperatureRangeFieldValue,
@@ -31,7 +32,7 @@ import {
   maskToTime,
 } from '../../../../../../steplist/fieldLevel/processing'
 import { uuid } from '../../../../../../utils'
-import { getTimeFromString, getStepIndex } from './utils'
+import { getStepIndex, getTimeFromString } from './utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerStepTypeGeneral } from './ThermocyclerProfileModal'
@@ -383,6 +384,7 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
               backgroundColor={COLORS.grey10}
               padding={SPACING.spacing12}
               borderRadius={BORDERS.borderRadius4}
+              data-testid={`cycleStep-${cycleStepIndex}`}
             >
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -503,6 +505,7 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
               backgroundColor={COLORS.grey10}
               padding={SPACING.spacing12}
               borderRadius={BORDERS.borderRadius4}
+              data-testid={`cycleStep-${cycleStepIndex}`}
             >
               <StyledText
                 desktopStyle="bodyDefaultRegular"
@@ -561,6 +564,7 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadius4}
+      data-testid="thermocyclerCycle"
     >
       {header}
       {bodyContent}

@@ -1,19 +1,25 @@
-import { useCallback, useRef, useEffect } from 'react'
-import difference from 'lodash/difference'
+import { useCallback, useContext, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
+import difference from 'lodash/difference'
 
-import { useInterval, truncateString } from '@opentrons/components'
+import { getProtocol } from '@opentrons/api-client'
+import {
+  truncateString,
+  useInterval,
+  useScrolling,
+} from '@opentrons/components'
 import {
   useAllProtocolIdsQuery,
-  useHost,
   useCreateLiveCommandMutation,
+  useHost,
 } from '@opentrons/react-api-client'
-import { getProtocol } from '@opentrons/api-client'
 
-import { checkShellUpdate } from '/app/redux/shell'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { checkShellUpdate } from '/app/redux/shell'
+
+import { SharedScrollRefContext } from './ODDProviders/ScrollRefProvider'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '/app/redux/types'
@@ -31,7 +37,7 @@ export function useSoftwareUpdatePoll(): void {
 
 export function useProtocolReceiptToast(): void {
   const host = useHost()
-  const { t } = useTranslation('protocol_info')
+  const { t, i18n } = useTranslation(['protocol_info', 'shared'])
   const { makeToast } = useToaster()
   const queryClient = useQueryClient()
   const protocolIdsQuery = useAllProtocolIdsQuery(
@@ -83,7 +89,7 @@ export function useProtocolReceiptToast(): void {
               }) as string,
               'success',
               {
-                closeButton: true,
+                buttonText: i18n.format(t('shared:close'), 'capitalize'),
                 disableTimeout: true,
                 displayType: 'odd',
               }
@@ -112,4 +118,33 @@ export function useProtocolReceiptToast(): void {
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [protocolIds])
+}
+
+export function useScrollRef(): {
+  isScrolling: boolean
+  refCallback: (node: HTMLElement | null) => void
+  element: HTMLElement | null
+} {
+  const refData = useContext(SharedScrollRefContext)
+  const isScrolling = useScrolling(refData?.element ?? null) // Assuming useScrolling is properly handling scroll state
+
+  if (refData == null) {
+    // log non critical error instead of throwing error to prevent white screens
+    console.error(
+      'useScrollRef must be used within a SharedScrollRefProvider. Falling back to dummy refs.'
+    )
+    return {
+      refCallback: () => null,
+      isScrolling: false,
+      element: null,
+    }
+  }
+
+  const { refCallback, element } = refData
+
+  return {
+    refCallback,
+    isScrolling,
+    element,
+  }
 }

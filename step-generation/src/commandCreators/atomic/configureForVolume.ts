@@ -1,4 +1,5 @@
 import { uuid } from '../../utils'
+
 import type { ConfigureForVolumeParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
@@ -8,9 +9,9 @@ export const configureForVolume: CommandCreator<ConfigureForVolumeParams> = (
   prevRobotState
 ) => {
   const { pipetteId, volume } = args
-
+  const pipette = invariantContext.pipetteEntities[pipetteId]
   // No-op if there is no pipette
-  if (!invariantContext.pipetteEntities[pipetteId]) {
+  if (!pipette) {
     return {
       commands: [],
     }
@@ -28,5 +29,6 @@ export const configureForVolume: CommandCreator<ConfigureForVolumeParams> = (
   ]
   return {
     commands,
+    python: `${pipette.pythonName}.configure_for_volume(${volume})`,
   }
 }

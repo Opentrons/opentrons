@@ -11,27 +11,28 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   POSITION_ABSOLUTE,
   SIZE_6,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+
+import { Divider } from '/app/atoms/structure'
+import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
+import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
+import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
 import {
-  getScanning,
   getConnectableRobots,
   getReachableRobots,
+  getScanning,
   getUnreachableRobots,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
-import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
-import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 
-import { Divider } from '/app/atoms/structure'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
 import type { State } from '/app/redux/types'

@@ -1,20 +1,22 @@
-import { it, describe, expect, beforeEach } from 'vitest'
-import {
-  makeInitialRobotState,
-  makeContext,
-  FIXED_TRASH_ID,
-} from '@opentrons/step-generation'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  FIXED_TRASH_ID,
+  makeContext,
+  makeInitialRobotState,
+} from '@opentrons/step-generation'
+
 import { THERMOCYCLER_STATE } from '../../constants'
 import { generateSubstepItem } from '../generateSubstepItem'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
-  RobotState,
   InvariantContext,
+  RobotState,
   ThermocyclerStateStepArgs,
 } from '../../../../step-generation/src/types'
-import type { StepArgsAndErrors, LabwareNamesByModuleId } from '../types'
+import type { LabwareNamesByModuleId, StepArgsAndErrors } from '../types'
 
 describe('generateSubstepItem', () => {
   const stepId = 'step123'
@@ -44,9 +46,9 @@ describe('generateSubstepItem', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '2' },
-        sourcePlateId: { slot: '4' },
-        destPlateId: { slot: '5' },
+        tiprack1Id: { stack: ['tiprack1Id', '2'] },
+        sourcePlateId: { stack: ['sourcePlateId', '4'] },
+        destPlateId: { stack: ['destPlateId', '5'] },
       },
       // @ts-expect-error(sa, 2021-6-15): this looks to be copied, because tiprackSetting is nowhere to be found in makeInitialRobotState
       tiprackSetting: { tiprack1Id: false },
@@ -201,6 +203,7 @@ describe('generateSubstepItem', () => {
                 preIngreds: {},
                 well: 'C1',
               },
+              isAirGap: false,
             },
           ],
         },
@@ -239,6 +242,7 @@ describe('generateSubstepItem', () => {
                 preIngreds: {},
                 well: 'A1',
               },
+              isAirGap: false,
               source: {
                 postIngreds: {},
                 preIngreds: {},
@@ -293,6 +297,7 @@ describe('generateSubstepItem', () => {
                 labwareId: tiprackId,
                 wellName: 'A1',
               },
+              isAirGap: false,
               source: { well: 'A1', preIngreds: {}, postIngreds: {} },
               dest: {
                 well: 'A1',
@@ -313,6 +318,7 @@ describe('generateSubstepItem', () => {
                 labwareId: tiprackId,
                 wellName: 'A1',
               },
+              isAirGap: false,
               dest: {
                 postIngreds: {
                   __air__: {
@@ -360,7 +366,7 @@ describe('generateSubstepItem', () => {
         volume: 50,
         times: 2,
         touchTip: false,
-        touchTipMmFromBottom: 5,
+        touchTipMmFromTop: -5,
         changeTip: 'always',
         blowoutLocation: null,
         blowoutFlowRateUlSec: 3,
@@ -403,6 +409,7 @@ describe('generateSubstepItem', () => {
             preIngreds: {},
             well: 'A1',
           },
+          isAirGap: false,
           source: {
             postIngreds: {},
             preIngreds: {},
@@ -429,6 +436,7 @@ describe('generateSubstepItem', () => {
             },
             well: 'A1',
           },
+          isAirGap: false,
           source: {
             postIngreds: {
               __air__: {
@@ -459,6 +467,7 @@ describe('generateSubstepItem', () => {
             preIngreds: {},
             well: 'A2',
           },
+          isAirGap: false,
           source: {
             postIngreds: {},
             preIngreds: {},
@@ -485,6 +494,7 @@ describe('generateSubstepItem', () => {
             },
             well: 'A2',
           },
+          isAirGap: false,
           source: {
             postIngreds: {
               __air__: {

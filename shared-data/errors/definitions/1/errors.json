@@ -130,6 +130,10 @@
       "detail": "Tip Hit Well Bottom",
       "category": "roboticsControlError"
     },
+    "2019": {
+      "detail": "Flex Stacker Stall or Collision Detected",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"
@@ -204,6 +208,18 @@
     },
     "3019": {
       "detail": "HEPA UV Failed",
+      "category": "roboticsInteractionError"
+    },
+    "3020": {
+      "detail": "Flex Stacker Shuttle Missing",
+      "category": "roboticsInteractionError"
+    },
+    "3021": {
+      "detail": "Flex Stacker Shuttle Labware Detection Failed",
+      "category": "roboticsInteractionError"
+    },
+    "3022": {
+      "detail": "Flex Stacker Hopper Labware Detection Failed",
       "category": "roboticsInteractionError"
     },
     "4000": {

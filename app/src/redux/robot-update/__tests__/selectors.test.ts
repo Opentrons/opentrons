@@ -1,10 +1,10 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import * as selectors from '../selectors'
-import * as Constants from '../constants'
-import { mockReachableRobot } from '../../discovery/__fixtures__'
 import { HEALTH_STATUS_NOT_OK } from '../../discovery'
+import { mockReachableRobot } from '../../discovery/__fixtures__'
 import * as discoSelectors from '../../discovery/selectors'
+import * as Constants from '../constants'
+import * as selectors from '../selectors'
 
 import type { State } from '../../types'
 

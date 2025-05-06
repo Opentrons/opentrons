@@ -1,13 +1,16 @@
-import { it, expect, describe } from 'vitest'
 import { screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
 import {
   FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../testing/utils'
+import { getCommandTextData } from '../../ProtocolTimelineScrubber/utils'
+import { mockRobotSideAnalysis } from '../fixtures'
 import { CommandText } from '../index'
 
 import type {
@@ -22,16 +25,15 @@ import type {
   DropTipRunTimeCommand,
   LabwareDefinition2,
   LoadLabwareRunTimeCommand,
+  LoadLiquidClassRunTimeCommand,
   LoadLiquidRunTimeCommand,
+  MoveToAddressableAreaForDropTipRunTimeCommand,
   MoveToAddressableAreaRunTimeCommand,
   MoveToWellRunTimeCommand,
   PrepareToAspirateRunTimeCommand,
   RunTimeCommand,
-  MoveToAddressableAreaForDropTipRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { CommandTextData } from '../../ProtocolTimelineScrubber'
-import { getCommandTextData } from '../../ProtocolTimelineScrubber/utils'
-import { mockRobotSideAnalysis } from '../fixtures'
 
 const mockCommandTextData: CommandTextData = {
   commands: mockRobotSideAnalysis.commands,
@@ -558,7 +560,7 @@ describe('CommandText', () => {
       { i18nInstance: i18n }
     )
     screen.getByText(
-      'Load NEST 96 Well Plate 100 µL PCR Full Skirt in Magnetic Module GEN2 in Slot 1'
+      'Load NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1'
     )
   })
   it('renders correct text for loadLabware in adapter', () => {
@@ -627,7 +629,9 @@ describe('CommandText', () => {
       />,
       { i18nInstance: i18n }
     )
-    screen.getByText('Load NEST 96 Well Plate 100 µL PCR Full Skirt off deck')
+    screen.getByText(
+      'Load NEST 96 Well Plate 100 µL PCR Full Skirt (2) off deck'
+    )
   })
   it('renders correct text for reloadLabware', () => {
     const reloadLabwareCommand = mockCommandTextData.commands.find(
@@ -690,6 +694,22 @@ describe('CommandText', () => {
       { i18nInstance: i18n }
     )
     screen.getByText('Load Water into fakeDisplayName')
+  })
+  it('renders correct text for loadLiquidClass', () => {
+    renderWithProviders(
+      <CommandText
+        allRunDefs={[]}
+        commandTextData={mockCommandTextData} // not relevant for loading liquid class
+        robotType={FLEX_ROBOT_TYPE}
+        command={
+          mockRobotSideAnalysis.commands.find(
+            c => c.commandType === 'loadLiquidClass'
+          ) as LoadLiquidClassRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )
+    screen.getByText('Loading Volatile Liquid Class')
   })
   it('renders correct text for temperatureModule/setTargetTemperature', () => {
     const mockTemp = 20

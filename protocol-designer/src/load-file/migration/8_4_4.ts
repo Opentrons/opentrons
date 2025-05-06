@@ -1,10 +1,11 @@
-import { swatchColors } from '../../organisms/DefineLiquidsModal/swatchColors'
+import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
+
 import type { ProtocolFile } from '@opentrons/shared-data'
 import type { Ingredients } from '@opentrons/step-generation'
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 import type { PDMetadata } from '../../file-types'
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 export const migrateFile = (
   appData: ProtocolFile<DesignerApplicationData>

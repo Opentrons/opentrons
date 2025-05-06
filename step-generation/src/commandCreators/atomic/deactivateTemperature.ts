@@ -1,10 +1,12 @@
 import {
+  HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import * as errorCreators from '../../errorCreators'
+import { uuid } from '../../utils'
+
 import type { ModuleOnlyParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
@@ -21,13 +23,15 @@ export const deactivateTemperature: CommandCreator<ModuleOnlyParams> = (
       errors: [errorCreators.missingModuleError()],
     }
   }
+  const module = invariantContext.moduleEntities[moduleId]
+  const type = module?.type
+  const pythonName = module?.pythonName
 
-  const moduleType = invariantContext.moduleEntities[moduleId]?.type
   const params = {
     moduleId,
   }
 
-  if (moduleType === TEMPERATURE_MODULE_TYPE) {
+  if (type === TEMPERATURE_MODULE_TYPE) {
     return {
       commands: [
         {
@@ -36,8 +40,9 @@ export const deactivateTemperature: CommandCreator<ModuleOnlyParams> = (
           params,
         },
       ],
+      python: `${pythonName}.deactivate()`,
     }
-  } else if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+  } else if (type === THERMOCYCLER_MODULE_TYPE) {
     return {
       commands: [
         {
@@ -51,8 +56,9 @@ export const deactivateTemperature: CommandCreator<ModuleOnlyParams> = (
           params,
         },
       ],
+      python: `${pythonName}.deactivate_lid()\n${pythonName}.deactivate_block()`,
     }
-  } else if (moduleType === HEATERSHAKER_MODULE_TYPE) {
+  } else if (type === HEATERSHAKER_MODULE_TYPE) {
     return {
       commands: [
         {
@@ -61,10 +67,11 @@ export const deactivateTemperature: CommandCreator<ModuleOnlyParams> = (
           params,
         },
       ],
+      python: `${pythonName}.deactivate_heater()`,
     }
   } else {
     console.error(
-      `setTemperature expected module ${moduleId} to be ${TEMPERATURE_MODULE_TYPE}, ${THERMOCYCLER_MODULE_TYPE} or ${HEATERSHAKER_MODULE_TYPE}, got ${moduleType}`
+      `setTemperature expected module ${moduleId} to be ${TEMPERATURE_MODULE_TYPE}, ${THERMOCYCLER_MODULE_TYPE} or ${HEATERSHAKER_MODULE_TYPE}, got ${type}`
     )
     // NOTE: "missing module" isn't exactly the right error here, but better than a whitescreen!
     // This should never be shown.

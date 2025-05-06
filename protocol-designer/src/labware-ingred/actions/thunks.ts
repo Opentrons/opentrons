@@ -1,36 +1,39 @@
 import { getIsTiprack } from '@opentrons/shared-data'
-import { getLabwarePythonName, uuid } from '../../utils'
-import { getLabwareEntities } from '../../step-forms/selectors'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
+
+import { getRobotType } from '../../file-data/selectors'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { getLabwareEntities } from '../../step-forms/selectors'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { getLabwarePythonName, uuid } from '../../utils'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import { getRobotType } from '../../file-data/selectors'
-import type { LabwareEntities } from '@opentrons/step-generation'
 import {
-  selectNestedLabware,
+  selectFixture,
   selectLabware,
   selectModule,
-  selectFixture,
+  selectNestedLabware,
 } from './actions'
+
+import type { LabwareEntities } from '@opentrons/step-generation'
 import type {
   LabwareOnDeck,
   ModuleOnDeck,
   NormalizedLabware,
   NormalizedLabwareById,
 } from '../../step-forms'
-import type {
-  CreateContainerArgs,
-  CreateContainerAction,
-  DuplicateLabwareAction,
-  SelectNestedLabwareAction,
-  SelectLabwareAction,
-  SelectModuleAction,
-  SelectFixtureAction,
-  DeleteContainerAction,
-} from './actions'
 import type { ThunkAction } from '../../types'
 import type { Fixture } from '../types'
+import type {
+  CreateContainerAction,
+  CreateContainerArgs,
+  DeleteContainerAction,
+  DuplicateLabwareAction,
+  SelectFixtureAction,
+  SelectLabwareAction,
+  SelectModuleAction,
+  SelectNestedLabwareAction,
+} from './actions'
 
 export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'
@@ -77,7 +80,7 @@ export const createContainer: (
   const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
     args.labwareDefURI
   ]
-  const displayCategory = labwareDef.metadata.displayCategory
+  const labwareDisplayCategory = labwareDef.metadata.displayCategory
   const slot =
     args.slot ||
     getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDef)
@@ -90,6 +93,9 @@ export const createContainer: (
         : null
 
     if (adapterId != null && args.adapterUnderLabwareDefURI != null) {
+      const adapterDef = labwareDefSelectors.getLabwareDefsByURI(state)[
+        args.adapterUnderLabwareDefURI
+      ]
       dispatch({
         type: 'CREATE_CONTAINER',
         payload: {
@@ -97,7 +103,7 @@ export const createContainer: (
           labwareDefURI: args.adapterUnderLabwareDefURI,
           id: adapterId,
           slot,
-          displayCategory,
+          displayCategory: adapterDef.metadata.displayCategory,
         },
       })
       dispatch({
@@ -106,13 +112,13 @@ export const createContainer: (
           ...args,
           id,
           slot: adapterId,
-          displayCategory,
+          displayCategory: labwareDisplayCategory,
         },
       })
     } else {
       dispatch({
         type: 'CREATE_CONTAINER',
-        payload: { ...args, id, slot, displayCategory },
+        payload: { ...args, id, slot, displayCategory: labwareDisplayCategory },
       })
     }
     if (isTiprack) {
@@ -145,7 +151,9 @@ export const duplicateLabware: (
   )
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const templateLabwareIdIsOffDeck =
-    initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
+    getSlotInLocationStack(
+      initialDeckSetup.labware[templateLabwareId].stack
+    ) === 'offDeck'
   const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
     templateLabwareDefURI
   ]
@@ -195,9 +203,9 @@ export const duplicateLabware: (
 }
 
 interface EditSlotInfo {
-  createdModuleForSlot?: ModuleOnDeck | null
   createdLabwareForSlot?: LabwareOnDeck | null
   createdNestedLabwareForSlot?: LabwareOnDeck | null
+  createdModuleForSlot?: ModuleOnDeck | null
   preSelectedFixture?: Fixture | null
 }
 

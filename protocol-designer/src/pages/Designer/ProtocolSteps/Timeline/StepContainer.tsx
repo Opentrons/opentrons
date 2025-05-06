@@ -1,6 +1,7 @@
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useEffect, useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -20,28 +21,29 @@ import {
   StyledText,
   useConditionalConfirm,
 } from '@opentrons/components'
+
+import { LINE_CLAMP_TEXT_STYLE } from '../../../../components/atoms'
 import {
   ConfirmDeleteModal,
   DELETE_MULTIPLE_STEP_FORMS,
   DELETE_STEP_FORM,
   getMainPagePortalEl,
-} from '../../../../organisms'
+} from '../../../../components/organisms'
 import { actions as steplistActions } from '../../../../steplist'
 import {
   deselectAllSteps,
   populateForm,
 } from '../../../../ui/steps/actions/actions'
 import { getMultiSelectItemIds } from '../../../../ui/steps/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../../../atoms'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
+import type { ThunkDispatch } from 'redux-thunk'
 import type {
-  SetStateAction,
   Dispatch,
   MouseEvent as ReactMouseEvent,
+  SetStateAction,
 } from 'react'
-import type { ThunkDispatch } from 'redux-thunk'
 import type { IconName } from '@opentrons/components'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
@@ -49,7 +51,7 @@ import type { BaseState } from '../../../../types'
 const STARTING_DECK_STATE = 'Starting deck'
 const FINAL_DECK_STATE = 'Ending deck'
 const PX_HEIGHT_TO_TOP_OF_CONTAINER = 32
-const PX_SIDEBAR_MIN_WIDTH_FOR_ICON = 179
+export const PX_SIDEBAR_MIN_WIDTH_FOR_ICON = 170
 
 export interface StepContainerProps {
   title: string

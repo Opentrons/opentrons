@@ -1,6 +1,6 @@
-import type { LogLevel } from '../../logger'
 import type { Language } from '/app/i18n'
 import type { ProtocolSort } from '/app/redux/protocol-storage'
+import type { LogLevel } from '../../logger'
 
 export type UrlProtocol = 'file:' | 'http:'
 
@@ -12,11 +12,12 @@ export type DevInternalFlag =
   | 'forceHttpPolling'
   | 'protocolStats'
   | 'enableRunNotes'
-  | 'lpcRedesign'
   | 'protocolTimeline'
   | 'enableLabwareCreator'
   | 'reactQueryDevtools'
   | 'reactScan'
+  | 'quickTransferExportPython'
+  | 'liquidClassesForQuickTransfer'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
@@ -285,4 +286,8 @@ export type ConfigV25 = Omit<ConfigV24, 'version'> & {
   }
 }
 
-export type Config = ConfigV25
+export type ConfigV26 = Omit<ConfigV25, 'version'> & {
+  version: 26
+}
+
+export type Config = ConfigV26

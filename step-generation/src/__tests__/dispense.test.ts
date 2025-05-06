@@ -1,27 +1,31 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
-import { OT2_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
+
+import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { dispense } from '../commandCreators/atomic/dispense'
 import {
-  absorbanceReaderCollision,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
-import {
+  DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getInitialRobotStateWithOffDeckLabwareStandard,
   getRobotStateWithTipStandard,
-  makeContext,
-  getErrorResult,
   getSuccessResult,
-  DEFAULT_PIPETTE,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { dispense } from '../commandCreators/atomic/dispense'
+import {
+  absorbanceReaderCollision,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getSlotInLocationStack,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+
 import type { DispenseAtomicCommandParams } from '../commandCreators/atomic/dispense'
 import type { InvariantContext, RobotState } from '../types'
 
@@ -84,6 +88,14 @@ describe('dispense', () => {
           },
         },
       ])
+      expect(getSuccessResult(result).python).toBe(
+        `
+mock_pipette.dispense(
+    volume=50,
+    location=mock_source_plate["A1"].bottom(z=5),
+    rate=6 / mock_pipette.flow_rate.dispense,
+)`.trimStart()
+      )
     })
     it('dispensing without tip should throw error', () => {
       const result = dispense(params, invariantContext, initialRobotState)
@@ -135,7 +147,7 @@ describe('dispense', () => {
       robotStateWithTip = {
         ...robotStateWithTip,
         labware: {
-          [SOURCE_LABWARE]: { slot: 'A4' },
+          [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'A4'] },
         },
       }
       const result = dispense(params, invariantContext, robotStateWithTip)
@@ -280,7 +292,9 @@ describe('dispense', () => {
       when(getIsHeaterShakerEastWestWithLatchOpen)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          )
         )
         .thenReturn(true)
 
@@ -294,7 +308,9 @@ describe('dispense', () => {
       when(getIsHeaterShakerEastWestMultiChannelPipette)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           expect.anything()
         )
         .thenReturn(true)
@@ -309,7 +325,9 @@ describe('dispense', () => {
       when(pipetteAdjacentHeaterShakerWhileShaking)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           OT2_ROBOT_TYPE
         )
         .thenReturn(true)
@@ -324,7 +342,9 @@ describe('dispense', () => {
       when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           expect.anything(),
           expect.anything()
         )

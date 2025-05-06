@@ -1,8 +1,20 @@
+import { useTranslation } from 'react-i18next'
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
-import { useTranslation } from 'react-i18next'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+
+import {
+  FLEX_ROBOT_TYPE,
+  getLoadedLabwareDefinitionsByUri,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
+
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import {
+  getIsFixtureMismatch,
+  useDeckConfigurationCompatibility,
+} from '/app/resources/deck_configuration'
+
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { useRunCalibrationStatus } from './useRunCalibrationStatus'
 import { useRunHasStarted } from './useRunHasStarted'
@@ -11,8 +23,8 @@ import { useUnmatchedModulesForProtocol } from './useUnmatchedModulesForProtocol
 interface LPCDisabledReasonProps {
   runId: string
   robotName?: string
-  hasMissingModulesForOdd?: boolean
-  hasMissingCalForOdd?: boolean
+  hasMissingModulesForFlex?: boolean
+  hasMissingCalForFlex?: boolean
 }
 export function useLPCDisabledReason(
   props: LPCDisabledReasonProps
@@ -20,8 +32,8 @@ export function useLPCDisabledReason(
   const {
     runId,
     robotName,
-    hasMissingModulesForOdd,
-    hasMissingCalForOdd,
+    hasMissingModulesForFlex,
+    hasMissingCalForFlex,
   } = props
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const runHasStarted = useRunHasStarted(runId)
@@ -32,15 +44,22 @@ export function useLPCDisabledReason(
   )
 
   const isCalibrationComplete =
-    robotName != null ? complete : !hasMissingCalForOdd
+    robotName != null ? complete : !hasMissingCalForFlex
   const { missingModuleIds } = unmatchedModuleResults
+  const isFlex = useIsFlex(robotName ?? '')
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE,
+    robotProtocolAnalysis
+  )
+  const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
   const hasMissingModules =
-    hasMissingModulesForOdd ?? missingModuleIds.length > 0
+    hasMissingModulesForFlex ?? missingModuleIds.length > 0
   const calibrationIncomplete = !hasMissingModules && !isCalibrationComplete
-  const moduleSetupIncomplete = hasMissingModules && isCalibrationComplete
+  const moduleSetupIncomplete =
+    (hasMissingModules || isFixtureMismatch) && isCalibrationComplete
   const moduleAndCalibrationIncomplete =
     hasMissingModules && !isCalibrationComplete
   const labwareDefinitions =
@@ -97,13 +116,13 @@ export function useLPCDisabledReason(
         ? 'labware_position_check_not_available_empty_protocol'
         : 'must_have_labware_and_pip'
     )
-  } else if (!tipRackLoadedInProtocol) {
+  } else if (!tipRackLoadedInProtocol && !isFlex) {
     lpcDisabledReason = t(
       robotName != null
         ? 'lpc_disabled_no_tipracks_loaded'
         : 'no_tiprack_loaded'
     )
-  } else if (!tipsArePickedUp) {
+  } else if (!tipsArePickedUp && !isFlex) {
     lpcDisabledReason = t(
       robotName != null ? 'lpc_disabled_no_tipracks_used' : 'no_tiprack_used'
     )

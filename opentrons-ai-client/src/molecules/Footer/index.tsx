@@ -1,4 +1,6 @@
+import { Trans, useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -7,18 +9,27 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Trans, useTranslation } from 'react-i18next'
 
 const NewLineText = styled.span`
   display: block;
 `
 
-const BlueLink = styled.a`
-  color: ${COLORS.blue50};
-  text-decoration: none;
+const LinkText = styled.a`
+  color: ${COLORS.black90};
+  text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
 
   &:hover {
-    text-decoration: underline;
+    color: ${COLORS.blue50};
+  }
+
+  &:focus-visible {
+    color: ${COLORS.blue50};
+    outline: 2px solid ${COLORS.blue50};
+    outline-offset: 0.25rem;
+  }
+
+  &:disabled {
+    color: ${COLORS.grey40};
   }
 `
 
@@ -44,18 +55,18 @@ export function Footer(): JSX.Element {
     >
       <FooterText>
         <Trans
-          i18nKey={'privacy_policy'}
+          i18nKey="privacy_policy"
           t={t}
           components={{
             privacyPolicyLink: (
-              <BlueLink
+              <LinkText
                 href="https://insights.opentrons.com/hubfs/Legal%20Documentation/Opentrons-Labworks-Privacy-Policy-5-4-23.docx-1.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
               />
             ),
             EULALink: (
-              <BlueLink
+              <LinkText
                 href="https://insights.opentrons.com/hubfs/Legal%20Documentation/Opentrons%20EULA%2020240710.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -63,7 +74,9 @@ export function Footer(): JSX.Element {
             ),
           }}
         />
-        <NewLineText>{t('copyright')}</NewLineText>
+        <NewLineText>
+          {t('copyright', { year: new Date().getFullYear() })}
+        </NewLineText>
       </FooterText>
     </Flex>
   )

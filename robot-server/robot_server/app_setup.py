@@ -6,6 +6,8 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
+
 from opentrons import __version__
 
 from .errors.exception_handlers import exception_handlers
@@ -104,7 +106,6 @@ app = FastAPI(
     lifespan=_lifespan,
 )
 
-# cors
 app.add_middleware(
     CORSMiddleware,
     allow_origins=("*"),
@@ -112,6 +113,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.middleware("http")(server_timing_middleware())
 
 # main router
 router.install_on_app(app)

@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 
 import {
   BORDERS,
@@ -15,8 +15,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SPACING,
-  TOOLTIP_LEFT,
   Tooltip,
+  TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -36,24 +36,24 @@ import {
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
 
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
-  useChainLiveCommands,
-  useRunCalibrationStatus,
-  useModuleRenderInfoForProtocolById,
-  useUnmatchedModulesForProtocol,
-} from '/app/resources/runs'
+  getModuleImage,
+  getModulePrepCommands,
+} from '/app/local-resources/modules'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
-  getModulePrepCommands,
-  getModuleImage,
-} from '/app/local-resources/modules'
+  useChainLiveCommands,
+  useModuleRenderInfoForProtocolById,
+  useRunCalibrationStatus,
+  useUnmatchedModulesForProtocol,
+} from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
-import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 
@@ -64,8 +64,8 @@ import type {
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type {
-  ProtocolCalibrationStatus,
   ModuleRenderInfoForProtocol,
+  ProtocolCalibrationStatus,
 } from '/app/resources/runs'
 
 interface SetupModulesListProps {
@@ -272,6 +272,7 @@ export function ModulesListItem({
         <TertiaryButton
           {...targetProps}
           onClick={handleCalibrateClick}
+          width="max-content"
           disabled={!calibrationStatus?.complete || isModuleTooHot}
         >
           {t('calibrate_now')}
@@ -297,6 +298,11 @@ export function ModulesListItem({
 
   // convert slot name to cutout id
   const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
+
+  const portDisplay =
+    attachedModuleMatch?.usbPort?.hubPort != null
+      ? `${attachedModuleMatch.usbPort.port}.${attachedModuleMatch.usbPort.hubPort}`
+      : attachedModuleMatch?.usbPort?.port
 
   return (
     <>
@@ -369,10 +375,10 @@ export function ModulesListItem({
                   : TC_MODULE_LOCATION_OT2
                 : slotName}
             </LegacyStyledText>
-            {attachedModuleMatch?.usbPort.port != null ? (
+            {portDisplay != null ? (
               <LegacyStyledText as="p">
                 {t('usb_port_number', {
-                  port: attachedModuleMatch.usbPort.port,
+                  port: portDisplay,
                 })}
               </LegacyStyledText>
             ) : null}

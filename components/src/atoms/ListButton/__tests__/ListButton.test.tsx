@@ -1,10 +1,12 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../testing/utils'
-import { COLORS } from '../../../helix-design-system'
 
 import { ListButton } from '..'
+import { COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 
@@ -38,6 +40,12 @@ describe('ListButton', () => {
     render(props)
     const listButton = screen.getByTestId('ListButton_notConnected')
     expect(listButton).toHaveStyle(`backgroundColor: ${COLORS.yellow30}`)
+  })
+  it('should render correct style - onColor', () => {
+    props.type = 'onColor'
+    render(props)
+    const listButton = screen.getByTestId('ListButton_onColor')
+    expect(listButton).toHaveStyle(`backgroundColor: ${COLORS.white}`)
   })
   it('should call on click when pressed', () => {
     render(props)

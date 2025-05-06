@@ -1,20 +1,22 @@
-import { ErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
 import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
+import { ErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
+import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
+import { ConfirmAttachmentModal } from '/app/organisms/ModuleCard/ConfirmAttachmentModal'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+
 import {
   ConfirmCancelModal,
+  ConfirmMissingStepsModal,
   HeaterShakerIsRunningModal,
   ProtocolAnalysisErrorModal,
   ProtocolDropTipModal,
   RunFailedModal,
-  ConfirmMissingStepsModal,
 } from './modals'
-import { ConfirmAttachmentModal } from '/app/organisms/ModuleCard/ConfirmAttachmentModal'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RunControls } from '/app/organisms/RunTimeControl'
-import type { UseRunErrorsResult } from '../hooks'
 import type { UseRunHeaderModalContainerResult } from '.'
+import type { UseRunErrorsResult } from '../hooks'
 
 export interface RunHeaderModalContainerProps {
   runId: string
@@ -41,6 +43,7 @@ export function RunHeaderModalContainer(
     recoveryModalUtils,
     missingStepsModalUtils,
     dropTipUtils,
+    offsetConflictModalUtils,
   } = runHeaderModalContainerUtils
   const { dropTipModalUtils, dropTipWizardUtils } = dropTipUtils
 
@@ -52,6 +55,7 @@ export function RunHeaderModalContainer(
           runStatus={runStatus}
           runId={runId}
           unvalidatedFailedCommand={recoveryModalUtils.failedCommand}
+          runLwDefsByUri={recoveryModalUtils.runLwDefsByUri}
           protocolAnalysis={robotProtocolAnalysis}
         />
       ) : null}
@@ -88,6 +92,9 @@ export function RunHeaderModalContainer(
       )}
       {missingStepsModalUtils.showModal && (
         <ConfirmMissingStepsModal {...missingStepsModalUtils.modalProps} />
+      )}
+      {offsetConflictModalUtils.showModal && (
+        <LabwareOffsetsConflictModal {...props} isOnDevice={false} />
       )}
     </>
   )

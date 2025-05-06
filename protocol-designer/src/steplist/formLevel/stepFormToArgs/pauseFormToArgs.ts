@@ -1,19 +1,22 @@
-import { getTimeFromForm } from '../../utils/getTimeFromForm'
 import {
-  PAUSE_UNTIL_TIME,
-  PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
 } from '../../../constants'
-import type { HydratedPauseFormData } from '../../../form-types'
+import { getTimeFromForm } from '../../utils/getTimeFromForm'
+
 import type {
-  WaitForTemperatureArgs,
   PauseArgs,
+  WaitForTemperatureArgs,
 } from '@opentrons/step-generation'
+import type { HydratedPauseFormData } from '../../../form-types'
 
 export const pauseFormToArgs = (
   formData: HydratedPauseFormData
 ): PauseArgs | WaitForTemperatureArgs | null => {
-  const { hours, minutes, seconds } = getTimeFromForm(formData, 'pauseTime')
+  const { hours, minutes, seconds } = getTimeFromForm(
+    'pauseTime' in formData ? formData.pauseTime ?? null : null
+  )
   const totalSeconds = (hours ?? 0) * 3600 + minutes * 60 + seconds
   const temperature = parseFloat(formData.pauseTemperature as string)
   const message = formData.pauseMessage ?? ''

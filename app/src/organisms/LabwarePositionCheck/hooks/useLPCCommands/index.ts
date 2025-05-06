@@ -1,37 +1,36 @@
 import { useState } from 'react'
 
-import { useApplyLPCOffsets } from './useApplyLPCOffsets'
-import { useHandleJog } from './useHandleJog'
-import { useHandleConditionalCleanup } from './useHandleConditionalCleanup'
+import { fullHomeCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/commands'
 import { useChainMaintenanceCommands } from '/app/resources/maintenance_runs'
-import { useHandleProbeCommands } from './useHandleProbeCommands'
-import { useHandleStartLPC } from './useHandleStartLPC'
-import { useHandlePrepModules } from './useHandlePrepModules'
-import { useHandleConfirmLwModulePlacement } from './useHandleConfirmLwModulePlacement'
-import { useHandleConfirmLwFinalPosition } from './useHandleConfirmLwFinalPosition'
-import { useHandleResetLwModulesOnDeck } from './useHandleResetLwModulesOnDeck'
-import { useBuildOffsetsToApply } from './useBuildOffsetsToApply'
-import { useHandleValidMoveToMaintenancePosition } from './useHandleValidMoveToMaintenancePosition'
 
-import type { CreateCommand } from '@opentrons/shared-data'
+import { useHandleClose } from './useHandleClose'
+import { useHandleConfirmLwFinalPosition } from './useHandleConfirmLwFinalPosition'
+import { useHandleConfirmLwModulePlacement } from './useHandleConfirmLwModulePlacement'
+import { useHandleJog } from './useHandleJog'
+import { useHandlePrepModules } from './useHandlePrepModules'
+import { useHandleProbeCommands } from './useHandleProbeCommands'
+import { useHandleResetLwModulesOnDeck } from './useHandleResetLwModulesOnDeck'
+import { useHandleStartLPC } from './useHandleStartLPC'
+import { useHandleValidMoveToMaintenancePosition } from './useHandleValidMoveToMaintenancePosition'
+import { useSaveWorkingOffsets } from './useSaveWorkingOffsets'
+
 import type { CommandData } from '@opentrons/api-client'
-import type { UseProbeCommandsResult } from './useHandleProbeCommands'
-import type { UseHandleConditionalCleanupResult } from './useHandleConditionalCleanup'
-import type { UseHandleJogResult } from './useHandleJog'
-import type { UseApplyLPCOffsetsResult } from './useApplyLPCOffsets'
-import type { UseHandleStartLPCResult } from './useHandleStartLPC'
-import type { UseHandlePrepModulesResult } from './useHandlePrepModules'
-import type { UseHandleConfirmPlacementResult } from './useHandleConfirmLwModulePlacement'
-import type { UseHandleConfirmPositionResult } from './useHandleConfirmLwFinalPosition'
-import type { UseHandleResetLwModulesOnDeckResult } from './useHandleResetLwModulesOnDeck'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type { LPCWizardFlexProps } from '/app/organisms/LabwarePositionCheck/LPCWizardFlex'
-import type { UseBuildOffsetsToApplyResult } from './useBuildOffsetsToApply'
+import type { UseHandleConditionalCleanupResult } from './useHandleClose'
+import type { UseHandleConfirmPositionResult } from './useHandleConfirmLwFinalPosition'
+import type { UseHandleConfirmPlacementResult } from './useHandleConfirmLwModulePlacement'
+import type { UseHandleJogResult } from './useHandleJog'
+import type { UseHandlePrepModulesResult } from './useHandlePrepModules'
+import type { UseProbeCommandsResult } from './useHandleProbeCommands'
+import type { UseHandleResetLwModulesOnDeckResult } from './useHandleResetLwModulesOnDeck'
+import type { UseHandleStartLPCResult } from './useHandleStartLPC'
 import type { UseHandleValidMoveToMaintenancePositionResult } from './useHandleValidMoveToMaintenancePosition'
+import type { UseBuildOffsetsToApplyResult } from './useSaveWorkingOffsets'
 
 export interface UseLPCCommandsProps extends LPCWizardFlexProps {}
 
-export type UseLPCCommandsResult = UseApplyLPCOffsetsResult &
-  UseHandleJogResult &
+export type UseLPCCommandsResult = UseHandleJogResult &
   UseHandleConditionalCleanupResult &
   UseProbeCommandsResult &
   UseHandleStartLPCResult &
@@ -44,6 +43,7 @@ export type UseLPCCommandsResult = UseApplyLPCOffsetsResult &
     errorMessage: string | null
     isRobotMoving: boolean
     toggleRobotMoving: (isMoving: boolean) => Promise<void>
+    home: () => Promise<void>
   }
 
 // Consolidates all command handlers and handler state for injection into LPC.
@@ -66,17 +66,22 @@ export function useLPCCommands(
       continuePastCommandFailure
     ).catch((e: Error) => {
       if (!shouldPropogateError) {
+        console.error(`Error during LPC command: ${e.message}`)
         setErrorMessage(`Error during LPC command: ${e.message}`)
         return Promise.resolve([])
       } else {
+        console.error(`Error during LPC command: ${e.message}`)
         return Promise.reject(e)
       }
     })
 
-  const applyLPCOffsetsUtils = useApplyLPCOffsets({ ...props, setErrorMessage })
-  const buildLPCOffsets = useBuildOffsetsToApply({ ...props, setErrorMessage })
-  const handleJogUtils = useHandleJog({ ...props, setErrorMessage })
-  const handleConditionalCleanupUtils = useHandleConditionalCleanup(props)
+  const applyWorkingOffsets = useSaveWorkingOffsets({ ...props })
+  const handleJogUtils = useHandleJog({
+    ...props,
+    setErrorMessage,
+    chainLPCCommands,
+  })
+  const handleConditionalCleanupUtils = useHandleClose(props)
   const handleProbeCommands = useHandleProbeCommands({
     ...props,
     chainLPCCommands,
@@ -109,8 +114,9 @@ export function useLPCCommands(
         setIsRobotMoving(isMoving)
         resolve()
       }),
-    ...applyLPCOffsetsUtils,
-    ...buildLPCOffsets,
+    home: () =>
+      chainLPCCommands(fullHomeCommands(), false).then(() => Promise.resolve()),
+    ...applyWorkingOffsets,
     ...handleJogUtils,
     ...handleConditionalCleanupUtils,
     ...handleProbeCommands,

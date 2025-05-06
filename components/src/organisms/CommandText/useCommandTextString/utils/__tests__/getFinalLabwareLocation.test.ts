@@ -1,6 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { fixtureTiprack10ul } from '@opentrons/shared-data'
+
 import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 describe('getFinalLabwareLocation', () => {
@@ -28,7 +31,7 @@ describe('getFinalLabwareLocation', () => {
           startedAt: 'fake_timestamp',
           completedAt: 'fake_timestamp',
         },
-      ])
+      ]).location
     ).toBe(location)
   })
   it('calculates labware location after only load_labware and move_labware', () => {
@@ -69,7 +72,7 @@ describe('getFinalLabwareLocation', () => {
           startedAt: 'fake_timestamp',
           completedAt: 'fake_timestamp',
         },
-      ])
+      ]).location
     ).toBe(finalLocation)
   })
   it('calculates labware location after multiple moves', () => {
@@ -124,7 +127,7 @@ describe('getFinalLabwareLocation', () => {
           startedAt: 'fake_timestamp',
           completedAt: 'fake_timestamp',
         },
-      ])
+      ]).location
     ).toBe(finalLocation)
   })
 })

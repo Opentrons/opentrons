@@ -6,10 +6,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
+  Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import type { OddModalHeaderBaseProps } from './types'
 
 export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
@@ -18,6 +20,7 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
     hasExitIcon,
     iconName,
     iconColor,
+    tagText,
     onClick,
     ...styleProps
   } = props
@@ -44,6 +47,7 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
             alignSelf={ALIGN_CENTER}
           />
         ) : null}
+        {tagText != null ? <Tag type="default" text={tagText} /> : null}
         <LegacyStyledText
           fontWeight={TYPOGRAPHY.fontWeightBold}
           fontSize={TYPOGRAPHY.fontSize28}

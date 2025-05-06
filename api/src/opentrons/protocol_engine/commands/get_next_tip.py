@@ -73,8 +73,8 @@ class GetNextTipImplementation(
         pipette_id = params.pipetteId
         starting_tip_name = params.startingTipWell
 
-        num_tips = self._state_view.tips.get_pipette_active_channels(pipette_id)
-        nozzle_map = self._state_view.tips.get_pipette_nozzle_map(pipette_id)
+        num_tips = self._state_view.pipettes.get_active_channels(pipette_id)
+        nozzle_map = self._state_view.pipettes.get_nozzle_configuration(pipette_id)
 
         if (
             starting_tip_name is not None
@@ -120,7 +120,7 @@ class GetNextTip(BaseCommand[GetNextTipParams, GetNextTipResult, ErrorOccurrence
 
     commandType: GetNextTipCommandType = "getNextTip"
     params: GetNextTipParams
-    result: Optional[GetNextTipResult]
+    result: Optional[GetNextTipResult] = None
 
     _ImplementationCls: Type[GetNextTipImplementation] = GetNextTipImplementation
 

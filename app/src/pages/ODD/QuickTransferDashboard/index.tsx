@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -11,42 +11,43 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   POSITION_STATIC,
   POSITION_STICKY,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
-import {
-  ANALYTICS_QUICK_TRANSFER_TAB_SELECTED,
-  ANALYTICS_QUICK_TRANSFER_FLOW_STARTED,
-} from '/app/redux/analytics'
-import { SmallButton, FloatingActionButton } from '/app/atoms/buttons'
+import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import {
+  ANALYTICS_QUICK_TRANSFER_FLOW_STARTED,
+  ANALYTICS_QUICK_TRANSFER_TAB_SELECTED,
+} from '/app/redux/analytics'
+import {
+  getHasDismissedQuickTransferIntro,
   getPinnedQuickTransferIds,
   getQuickTransfersOnDeviceSortKey,
-  getHasDismissedQuickTransferIntro,
   updateConfigValue,
 } from '/app/redux/config'
-import { PinnedTransferCarousel } from './PinnedTransferCarousel'
-import { sortQuickTransfers } from './utils'
-import { QuickTransferCard } from './QuickTransferCard'
-import { NoQuickTransfers } from './NoQuickTransfers'
-import { PipetteNotAttachedErrorModal } from './PipetteNotAttachedErrorModal'
-import { StorageLimitReachedErrorModal } from './StorageLimitReachedErrorModal'
-import { IntroductoryModal } from './IntroductoryModal'
-import { DeleteTransferConfirmationModal } from './DeleteTransferConfirmationModal'
 
-import type { ProtocolResource } from '@opentrons/shared-data'
+import { DeleteTransferConfirmationModal } from './DeleteTransferConfirmationModal'
+import { IntroductoryModal } from './IntroductoryModal'
+import { NoQuickTransfers } from './NoQuickTransfers'
+import { PinnedTransferCarousel } from './PinnedTransferCarousel'
+import { PipetteNotAttachedErrorModal } from './PipetteNotAttachedErrorModal'
+import { QuickTransferCard } from './QuickTransferCard'
+import { StorageLimitReachedErrorModal } from './StorageLimitReachedErrorModal'
+import { sortQuickTransfers } from './utils'
+
 import type { PipetteData } from '@opentrons/api-client'
-import type { Dispatch } from '/app/redux/types'
+import type { ProtocolResource } from '@opentrons/shared-data'
 import type { QuickTransfersOnDeviceSortKey } from '/app/redux/config/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function QuickTransferDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
@@ -221,13 +222,10 @@ export function QuickTransferDashboard(): JSX.Element {
           {pinnedTransfers.length > 0 ? (
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              marginBottom={SPACING.spacing32}
+              gap={SPACING.spacing8}
+              paddingBottom={SPACING.spacing32}
             >
-              <LegacyStyledText
-                as="p"
-                marginBottom={SPACING.spacing8}
-                color={COLORS.grey60}
-              >
+              <LegacyStyledText as="p" color={COLORS.grey60}>
                 {t('pinned_transfers')}
               </LegacyStyledText>
               <PinnedTransferCarousel

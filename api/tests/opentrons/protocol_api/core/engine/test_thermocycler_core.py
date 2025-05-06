@@ -1,4 +1,5 @@
 """Tests for the engine based Protocol API module core implementations."""
+
 from typing import cast
 import pytest
 from _pytest.fixtures import SubRequest
@@ -14,6 +15,7 @@ from opentrons.hardware_control.modules import (
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import ThermocyclerModuleCore
+from opentrons.protocol_api.core.engine.protocol import ProtocolCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from ... import versions_below, versions_at_or_above
@@ -34,9 +36,16 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncThermocyclerHardware:
 
 
 @pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol core."""
+    return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
 def subject(
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncThermocyclerHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> ThermocyclerModuleCore:
     """Get a ThermocyclerModuleCore test subject."""
     return ThermocyclerModuleCore(
@@ -44,6 +53,7 @@ def subject(
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 
@@ -52,6 +62,7 @@ def subject_below_221(
     request: SubRequest,
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncThermocyclerHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> ThermocyclerModuleCore:
     """Get a ThermocyclerCore below API version 2.21."""
     return ThermocyclerModuleCore(
@@ -59,6 +70,7 @@ def subject_below_221(
         engine_client=mock_engine_client,
         api_version=cast(APIVersion, request.param),
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 
@@ -67,6 +79,7 @@ def subject_at_or_above_221(
     request: SubRequest,
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncThermocyclerHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> ThermocyclerModuleCore:
     """Get a ThermocyclerCore below API version 2.21."""
     return ThermocyclerModuleCore(
@@ -74,6 +87,7 @@ def subject_at_or_above_221(
         engine_client=mock_engine_client,
         api_version=cast(APIVersion, request.param),
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 
@@ -81,6 +95,7 @@ def test_create(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncThermocyclerHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should be able to create a thermocycler module core."""
     result = ThermocyclerModuleCore(
@@ -88,6 +103,7 @@ def test_create(
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
     assert result.module_id == "1234"

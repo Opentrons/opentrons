@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -11,9 +11,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useToaster } from '/app/organisms/ToasterOven'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useToaster } from '/app/organisms/ToasterOven'
+
 import type { NumberParameter } from '@opentrons/shared-data'
 
 interface ChooseNumberProps {

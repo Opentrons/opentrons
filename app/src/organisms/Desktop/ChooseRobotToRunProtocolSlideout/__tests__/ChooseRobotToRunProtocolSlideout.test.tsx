@@ -1,11 +1,12 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getConnectableRobots,
@@ -14,7 +15,6 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '/app/redux/discovery'
-import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -25,11 +25,12 @@ import {
   storedProtocolData as storedProtocolDataFixture,
   storedProtocolDataWithCsvRunTimeParameter,
 } from '/app/redux/protocol-storage/__fixtures__'
-import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { ChooseRobotToRunProtocolSlideout } from '../'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { useCloseCurrentRun, useCurrentRunId } from '/app/resources/runs'
 import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
-import { useCurrentRunId, useCloseCurrentRun } from '/app/resources/runs'
+
+import { ChooseRobotToRunProtocolSlideout } from '../'
+import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 
 import type { ComponentProps } from 'react'
 import type { State } from '/app/redux/types'
@@ -47,6 +48,9 @@ vi.mock(
 )
 vi.mock('/app/resources/useNotifyDataReady')
 vi.mock('/app/resources/runs')
+
+// note for auto scroll to top
+window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 const render = (
   props: ComponentProps<typeof ChooseRobotToRunProtocolSlideout>
@@ -107,7 +111,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
     when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, false, null)
       .thenReturn([])
     when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
@@ -118,6 +122,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
         storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
+        false,
         null
       )
       .thenReturn([])
@@ -300,100 +305,6 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     // screen.getByText(
     //   'This robot is busy and can’t run this protocol right now.'
     // )
-  })
-
-  it('renders apply historic offsets as determinate if candidates available', async () => {
-    const mockOffsetCandidate = {
-      id: 'third_offset_id',
-      labwareDisplayName: 'Third Fake Labware Display Name',
-      location: { slotName: '3' },
-      vector: { x: 7, y: 8, z: 9 },
-      definitionUri: 'thirdFakeDefURI',
-      createdAt: '2022-05-11T13:34:51.012179+00:00',
-      runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
-    }
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
-      .thenReturn([mockOffsetCandidate])
-    vi.mocked(getConnectableRobots).mockReturnValue([
-      mockConnectableRobot,
-      { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
-    ])
-    render({
-      storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: vi.fn(),
-      showSlideout: true,
-    })
-    expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenCalledWith(
-      expect.any(Object),
-      null,
-      [
-        {
-          vector: mockOffsetCandidate.vector,
-          location: mockOffsetCandidate.location,
-          definitionUri: mockOffsetCandidate.definitionUri,
-        },
-      ]
-    )
-    expect(screen.getByRole('checkbox')).toBeChecked()
-    const proceedButton = screen.getByRole('button', {
-      name: 'Continue to parameters',
-    })
-    fireEvent.click(proceedButton)
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    await waitFor(() => {
-      expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
-        files: [expect.any(File)],
-        protocolKey: storedProtocolDataFixture.protocolKey,
-        runTimeParameterValues: expect.any(Object),
-        runTimeParameterFiles: expect.any(Object),
-      })
-    })
-  })
-
-  it('renders apply historic offsets as indeterminate if no candidates available', () => {
-    const mockOffsetCandidate = {
-      id: 'third_offset_id',
-      labwareDisplayName: 'Third Fake Labware Display Name',
-      location: { slotName: '3' },
-      vector: { x: 7, y: 8, z: 9 },
-      definitionUri: 'thirdFakeDefURI',
-      createdAt: '2022-05-11T13:34:51.012179+00:00',
-      runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
-    }
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
-      .thenReturn([mockOffsetCandidate])
-    vi.mocked(getConnectableRobots).mockReturnValue([
-      mockConnectableRobot,
-      { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
-    ])
-    provideNullCurrentRunIdFor('otherIp')
-    render({
-      storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: vi.fn(),
-      showSlideout: true,
-    })
-    const otherRobot = screen.getByText('otherRobot')
-    fireEvent.click(otherRobot) // unselect default robot
-
-    expect(screen.getByRole('checkbox')).toBeChecked()
-    const proceedButton = screen.getByRole('button', {
-      name: 'Continue to parameters',
-    })
-    fireEvent.click(proceedButton)
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenLastCalledWith(
-      expect.any(Object),
-      null,
-      [
-        {
-          vector: mockOffsetCandidate.vector,
-          location: mockOffsetCandidate.location,
-          definitionUri: mockOffsetCandidate.definitionUri,
-        },
-      ]
-    )
   })
 
   it('disables proceed button if no available robots', () => {

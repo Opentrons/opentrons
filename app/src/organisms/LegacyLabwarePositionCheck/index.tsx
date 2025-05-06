@@ -1,18 +1,20 @@
 import { Component } from 'react'
-import { useLogger } from '../../logger'
-import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
-import { FatalErrorModal } from './FatalErrorModal'
-import { getIsOnDevice } from '/app/redux/config'
 import { useSelector } from 'react-redux'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { getIsOnDevice } from '/app/redux/config'
+
+import { useLogger } from '../../logger'
+import { FatalErrorModal } from './FatalErrorModal'
+import { LegacyLabwarePositionCheckComponent } from './LegacyLabwarePositionCheckComponent'
+
 import type { ErrorInfo, ReactNode } from 'react'
+import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
 } from '@opentrons/shared-data'
-import type { LabwareOffset } from '@opentrons/api-client'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => void
@@ -23,7 +25,7 @@ interface LabwarePositionCheckModalProps {
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   protocolName: string
   setMaintenanceRunId?: (id: string | null) => void
-  isDeletingMaintenanceRun?: boolean
+  isDeletingMaintenanceRun: boolean
   caughtError?: Error
 }
 
@@ -46,7 +48,7 @@ export const LegacyLabwarePositionCheck = (
       onClose={props.onCloseClick}
       isOnDevice={isOnDevice}
     >
-      <LabwarePositionCheckComponent {...props} />
+      <LegacyLabwarePositionCheckComponent {...props} />
     </ErrorBoundary>
   )
 }

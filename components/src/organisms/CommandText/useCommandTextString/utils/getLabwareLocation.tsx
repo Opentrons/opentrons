@@ -1,14 +1,27 @@
-import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
+import {
+  FLEX_STACKER_MODULE_V1,
+  getCutoutDisplayName,
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  getModuleModelFromAddressableArea,
+  getSlotFromAddressableAreaName,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
+} from '@opentrons/shared-data'
+
+import { getModuleDisplayLocation } from './getModuleDisplayLocation'
+import { getModuleModel } from './getModuleModel'
 
 import type {
+  AddressableAreaName,
+  CutoutId,
   LabwareDefinition2,
   LabwareLocation,
+  LabwareLocationSequence,
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
 import type { LoadedLabwares, LoadedModules } from './types'
-import { getModuleDisplayLocation } from './getModuleDisplayLocation'
-import { getModuleModel } from './getModuleModel'
 
 export interface LocationResult {
   slotName: string
@@ -22,12 +35,24 @@ interface BaseParams {
   loadedLabwares: LoadedLabwares
   robotType: RobotType
 }
+interface SequenceBaseParams {
+  locationSequence: LabwareLocationSequence
+  loadedModules: LoadedModules
+  loadedLabwares: LoadedLabwares
+}
 
 export interface LocationSlotOnlyParams extends BaseParams {
   detailLevel: 'slot-only'
 }
 
+export interface SequenceSlotOnlyParams extends SequenceBaseParams {
+  detailLevel: 'slot-only'
+}
 export interface LocationFullParams extends BaseParams {
+  allRunDefs: LabwareDefinition2[]
+  detailLevel?: 'full'
+}
+export interface SequenceFullParams extends SequenceBaseParams {
   allRunDefs: LabwareDefinition2[]
   detailLevel?: 'full'
 }
@@ -35,6 +60,106 @@ export interface LocationFullParams extends BaseParams {
 export type GetLabwareLocationParams =
   | LocationSlotOnlyParams
   | LocationFullParams
+
+export type GetLabwareLocationFromSequenceParams =
+  | SequenceSlotOnlyParams
+  | SequenceFullParams
+
+export function getLabwareLocationFromSequence(
+  params: GetLabwareLocationFromSequenceParams
+): LocationResult {
+  const {
+    loadedLabwares,
+    loadedModules,
+    locationSequence,
+    detailLevel = 'full',
+  } = params
+  return locationSequence.reduce<LocationResult>(
+    (acc, sequenceItem, index) => {
+      if (sequenceItem.kind === 'notOnDeck') {
+        return {
+          ...acc,
+          slotName: sequenceItem.logicalLocationName,
+        }
+      } else if (
+        sequenceItem.kind === 'onCutoutFixture' &&
+        acc.slotName == null
+      ) {
+        return {
+          ...acc,
+          slotName: getCutoutDisplayName(sequenceItem.cutoutId as CutoutId),
+        }
+      } else if (
+        sequenceItem.kind === 'onAddressableArea' &&
+        (WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
+          sequenceItem.addressableAreaName as AddressableAreaName
+        ) ||
+          MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+            sequenceItem.addressableAreaName as AddressableAreaName
+          ))
+      ) {
+        return {
+          ...acc,
+          slotName: sequenceItem.addressableAreaName,
+        }
+      } else if (sequenceItem.kind === 'onAddressableArea') {
+        const slotName = getSlotFromAddressableAreaName(
+          sequenceItem.addressableAreaName as AddressableAreaName
+        )
+        const moduleModel = getModuleModelFromAddressableArea(
+          sequenceItem.addressableAreaName as AddressableAreaName
+        )
+        return {
+          ...acc,
+          slotName,
+          moduleModel:
+            moduleModel === FLEX_STACKER_MODULE_V1
+              ? undefined
+              : moduleModel ?? undefined,
+        }
+      } else if (sequenceItem.kind === 'onModule') {
+        const moduleModel = getModuleModel(loadedModules, sequenceItem.moduleId)
+        if (moduleModel == null) {
+          console.error('labware is located on an unknown module model')
+        } else {
+          return {
+            ...acc,
+            moduleModel:
+              moduleModel === FLEX_STACKER_MODULE_V1
+                ? undefined
+                : moduleModel ?? undefined,
+          }
+        }
+      }
+      // TODO(tz, 4-16-25): add inHopperLocation when logic is merged
+      else if (detailLevel === 'full') {
+        const { allRunDefs } = params as SequenceFullParams
+        if (sequenceItem.kind === 'onLabware' && acc.adapterName == null) {
+          if (!Array.isArray(loadedLabwares)) {
+            console.error('Cannot get location from loaded labwares object')
+          } else {
+            const nestedLabware = loadedLabwares.find(
+              lw => lw.id === sequenceItem.labwareId
+            )
+            const nestedLabwareDef = allRunDefs.find(
+              def => getLabwareDefURI(def) === nestedLabware?.definitionUri
+            )
+            const nestedLabwareName =
+              nestedLabwareDef != null
+                ? getLabwareDisplayName(nestedLabwareDef)
+                : ''
+            return {
+              ...acc,
+              adapterName: nestedLabwareName,
+            }
+          }
+        }
+      }
+      return { ...acc }
+    },
+    { slotName: '' }
+  )
+}
 
 // detailLevel returns additional information about the module and adapter in the same location, if applicable.
 // if 'slot-only', returns the underlying slot location.
@@ -57,7 +182,9 @@ export function getLabwareLocation(
   } else if ('slotName' in location) {
     return { slotName: location.slotName }
   } else if ('addressableAreaName' in location) {
-    return { slotName: location.addressableAreaName }
+    return {
+      slotName: getSlotFromAddressableAreaName(location.addressableAreaName),
+    }
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModel(loadedModules, location.moduleId)
     if (moduleModel == null) {

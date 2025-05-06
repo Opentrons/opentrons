@@ -13,11 +13,11 @@ import {
 } from '@opentrons/components'
 
 import type {
-  Props as ReactSelectProps,
-  StylesConfig,
-  OptionProps,
   CSSObjectWithLabel,
   DropdownIndicatorProps,
+  OptionProps,
+  Props as ReactSelectProps,
+  StylesConfig,
 } from 'react-select'
 import type { DropdownBorder } from '@opentrons/components'
 

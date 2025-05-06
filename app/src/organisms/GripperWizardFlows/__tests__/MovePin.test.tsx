@@ -1,10 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { instrumentsResponseFixture } from '@opentrons/api-client'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { MovePin } from '../MovePin'
 import {
   GRIPPER_FLOW_TYPES,
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
@@ -12,6 +13,7 @@ import {
   REMOVE_PIN_FROM_REAR_JAW,
   SECTIONS,
 } from '../constants'
+import { MovePin } from '../MovePin'
 
 import type { ComponentProps } from 'react'
 import type { CommandData } from '@opentrons/api-client'

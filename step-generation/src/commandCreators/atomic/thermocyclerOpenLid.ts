@@ -1,11 +1,14 @@
 import { uuid } from '../../utils'
+
 import type { ModuleOnlyParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
+
 export const thermocyclerOpenLid: CommandCreator<ModuleOnlyParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
+  const pythonName = invariantContext.moduleEntities[args.moduleId].pythonName
   return {
     commands: [
       {
@@ -16,5 +19,6 @@ export const thermocyclerOpenLid: CommandCreator<ModuleOnlyParams> = (
         },
       },
     ],
+    python: `${pythonName}.open_lid()`,
   }
 }

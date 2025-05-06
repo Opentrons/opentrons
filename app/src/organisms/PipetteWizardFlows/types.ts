@@ -1,8 +1,8 @@
 import type { Dispatch, SetStateAction } from 'react'
 import type { useCreateCommandMutation } from '@opentrons/react-api-client'
-import type { PipetteMount, CreateCommand } from '@opentrons/shared-data'
-import type { SECTIONS, FLOWS } from './constants'
+import type { CreateCommand, PipetteMount } from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import type { FLOWS, SECTIONS } from './constants'
 
 export type PipetteWizardStep =
   | BeforeBeginningStep

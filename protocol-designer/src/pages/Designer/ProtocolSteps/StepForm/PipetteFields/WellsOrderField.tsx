@@ -1,23 +1,27 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
-  useHoverTooltip,
-  Tooltip,
-  ListButton,
-  StyledText,
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  COLORS,
-  Icon,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  ListButton,
+  SPACING,
+  StyledText,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
-import { WellOrderModal } from '../../../../../organisms'
+
+import { WellOrderModal } from '../../../../../components/organisms'
+
 import type { WellOrderOption } from '../../../../../form-types'
+import type { MoveLiquidPrefixType } from '../../../../../resources/types'
 import type { FieldProps } from '../types'
 
 export interface WellsOrderFieldProps {
-  prefix: 'aspirate' | 'dispense' | 'mix'
+  prefix: MoveLiquidPrefixType
   firstName: string
   secondName: string
   updateFirstWellOrder: FieldProps['updateValue']
@@ -79,6 +83,7 @@ export function WellsOrderField(props: WellsOrderFieldProps): JSX.Element {
           padding={SPACING.spacing12}
           gridGap={SPACING.spacing8}
           alignItems={ALIGN_CENTER}
+          testId={`WellsOrderField_ListButton_${prefix}`}
         >
           <Icon name="well-order" size="1.25rem" />
           <StyledText desktopStyle="bodyDefaultRegular">

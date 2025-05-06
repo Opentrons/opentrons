@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import (
     Dict,
@@ -36,7 +37,8 @@ from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate
 )
 from opentrons.types import DeckSlotName, MountType, StagingSlotName
 from .update_types import AbsorbanceReaderStateUpdate, FlexStackerStateUpdate
-from ..errors import ModuleNotConnectedError
+from ..errors import ModuleNotConnectedError, AreaNotInDeckConfigurationError
+from ..resources import deck_configuration_provider
 
 from ..types import (
     LoadedModule,
@@ -53,6 +55,7 @@ from ..types import (
     DeckType,
     LabwareMovementOffsetData,
     AddressableAreaLocation,
+    StackerStoredLabwareGroup,
 )
 
 from ..resources import DeckFixedLabware
@@ -148,11 +151,14 @@ class HardwareModule:
 class ModuleState:
     """The internal data to keep track of loaded modules."""
 
-    slot_by_module_id: Dict[str, Optional[DeckSlotName]]
-    """The deck slot that each module has been loaded into.
+    load_location_by_module_id: Dict[str, Optional[str]]
+    """The Cutout ID of the cutout (Flex) or slot (OT-2) that each module has been loaded.
 
     This will be None when the module was added via
     ProtocolEngine.use_attached_modules() instead of an explicit loadModule command.
+    AddressableAreaLocation is used to represent a literal Deck Slot for OT-2 locations.
+    The CutoutID string for a given Cutout that a Module Fixture is loaded into is used
+    for Flex. The type distinction is in place for implementation seperation between the two.
     """
 
     additional_slots_occupied_by_module_id: Dict[str, List[DeckSlotName]]
@@ -212,7 +218,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     ) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
-            slot_by_module_id={},
+            load_location_by_module_id={},
             additional_slots_occupied_by_module_id={},
             requested_model_by_id={},
             hardware_by_module_id={},
@@ -315,11 +321,19 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         requested_model: Optional[ModuleModel],
         module_live_data: Optional[LiveData],
     ) -> None:
+        # Loading slot name to Cutout ID (Flex)(OT-2) resolution
+        load_location: Optional[str]
+        if slot_name is not None:
+            load_location = deck_configuration_provider.get_cutout_id_by_deck_slot_name(
+                slot_name
+            )
+        else:
+            load_location = slot_name
+
         actual_model = definition.model
         live_data = module_live_data["data"] if module_live_data else None
-
         self._state.requested_model_by_id[module_id] = requested_model
-        self._state.slot_by_module_id[module_id] = slot_name
+        self._state.load_location_by_module_id[module_id] = load_location
         self._state.hardware_by_module_id[module_id] = HardwareModule(
             serial_number=serial_number,
             definition=definition,
@@ -371,8 +385,12 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         elif ModuleModel.is_flex_stacker(actual_model):
             self._state.substate_by_module_id[module_id] = FlexStackerSubState(
                 module_id=FlexStackerId(module_id),
-                in_static_mode=False,
-                hopper_labware_ids=[],
+                pool_primary_definition=None,
+                pool_adapter_definition=None,
+                pool_lid_definition=None,
+                contained_labware_bottom_first=[],
+                max_pool_count=0,
+                pool_overlap=0,
             )
 
     def _update_additional_slots_occupied_by_thermocycler(
@@ -642,12 +660,17 @@ class ModuleView:
     def get(self, module_id: str) -> LoadedModule:
         """Get module data by the module's unique identifier."""
         try:
-            slot_name = self._state.slot_by_module_id[module_id]
+            load_location = self._state.load_location_by_module_id[module_id]
             attached_module = self._state.hardware_by_module_id[module_id]
 
         except KeyError as e:
             raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
+        slot_name = None
+        if isinstance(load_location, str):
+            slot_name = deck_configuration_provider.get_deck_slot_for_cutout_id(
+                load_location
+            )
         location = (
             DeckSlotLocation(slotName=slot_name) if slot_name is not None else None
         )
@@ -661,19 +684,37 @@ class ModuleView:
 
     def get_all(self) -> List[LoadedModule]:
         """Get a list of all module entries in state."""
-        return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
+        return [
+            self.get(mod_id) for mod_id in self._state.load_location_by_module_id.keys()
+        ]
 
     def get_by_slot(
         self,
         slot_name: DeckSlotName,
     ) -> Optional[LoadedModule]:
         """Get the module located in a given slot, if any."""
-        slots_by_id = reversed(list(self._state.slot_by_module_id.items()))
+        locations_by_id = reversed(list(self._state.load_location_by_module_id.items()))
 
-        for module_id, module_slot in slots_by_id:
+        for module_id, load_location in locations_by_id:
+            module_slot: Optional[DeckSlotName]
+            if isinstance(load_location, str):
+                module_slot = deck_configuration_provider.get_deck_slot_for_cutout_id(
+                    load_location
+                )
+            else:
+                module_slot = load_location
             if module_slot == slot_name:
                 return self.get(module_id)
 
+        return None
+
+    def get_by_addressable_area(
+        self, addressable_area_name: str
+    ) -> Optional[LoadedModule]:
+        """Get the module associated with this addressable area, if any."""
+        for module_id in self._state.load_location_by_module_id.keys():
+            if addressable_area_name == self.get_provided_addressable_area(module_id):
+                return self.get(module_id)
         return None
 
     def _get_module_substate(
@@ -803,6 +844,26 @@ class ModuleView:
             )
         return location
 
+    def get_provided_addressable_area(self, module_id: str) -> str:
+        """Get the addressable area provided by this module.
+
+        If the current deck does not allow modules to provide locations (i.e., is an OT-2 deck)
+        then return the addressable area underneath the module.
+        """
+        module = self.get(module_id)
+
+        if isinstance(module.location, DeckSlotLocation):
+            location = module.location.slotName
+        elif module.model == ModuleModel.THERMOCYCLER_MODULE_V2:
+            location = DeckSlotName.SLOT_B1
+        else:
+            raise ValueError(
+                "Module location invalid for nominal module offset calculation."
+            )
+        if not self.get_deck_supports_module_fixtures():
+            return location.value
+        return self.ensure_and_convert_module_fixture_location(location, module.model)
+
     def get_requested_model(self, module_id: str) -> Optional[ModuleModel]:
         """Return the model by which this module was requested.
 
@@ -871,10 +932,39 @@ class ModuleView:
         Includes the slot-specific transform. Does not include the child's
         Labware Position Check offset.
         """
-        if (
-            self._state.deck_type == DeckType.OT2_STANDARD
-            or self._state.deck_type == DeckType.OT2_SHORT_TRASH
-        ):
+        base = self.get_nominal_offset_to_child_from_addressable_area(module_id)
+        if self.get_deck_supports_module_fixtures():
+            module_addressable_area = self.get_provided_addressable_area(module_id)
+            module_addressable_area_position = (
+                addressable_areas.get_addressable_area_offsets_from_cutout(
+                    module_addressable_area
+                )
+            )
+            return base + LabwareOffsetVector(
+                x=module_addressable_area_position.x,
+                y=module_addressable_area_position.y,
+                z=module_addressable_area_position.z,
+            )
+        else:
+            return base
+
+    def get_nominal_offset_to_child_from_addressable_area(
+        self, module_id: str
+    ) -> LabwareOffsetVector:
+        """Get the position offset for a child of this module from the nearest AA.
+
+        On the Flex, this is always (0, 0, 0); on the OT-2, since modules load on top
+        of addressable areas rather than providing addressable areas, the offset is
+        the labwareOffset from the module definition, rotated by the module's
+        slotTransform if appropriate.
+        """
+        if self.get_deck_supports_module_fixtures():
+            return LabwareOffsetVector(
+                x=0,
+                y=0,
+                z=0,
+            )
+        else:
             definition = self.get_definition(module_id)
             slot = self.get_location(module_id).slotName.id
 
@@ -908,29 +998,6 @@ class ModuleView:
                 x=xformed[0],
                 y=xformed[1],
                 z=xformed[2],
-            )
-        else:
-            module = self.get(module_id)
-            if isinstance(module.location, DeckSlotLocation):
-                location = module.location.slotName
-            elif module.model == ModuleModel.THERMOCYCLER_MODULE_V2:
-                location = DeckSlotName.SLOT_B1
-            else:
-                raise ValueError(
-                    "Module location invalid for nominal module offset calculation."
-                )
-            module_addressable_area = self.ensure_and_convert_module_fixture_location(
-                location, module.model
-            )
-            module_addressable_area_position = (
-                addressable_areas.get_addressable_area_offsets_from_cutout(
-                    module_addressable_area
-                )
-            )
-            return LabwareOffsetVector(
-                x=module_addressable_area_position.x,
-                y=module_addressable_area_position.y,
-                z=module_addressable_area_position.z,
             )
 
     def get_module_calibration_offset(
@@ -1139,12 +1206,21 @@ class ModuleView:
             else:
                 neighbor_slot = DeckSlotName.from_primitive(neighbor_int)
 
-        return neighbor_slot in self._state.slot_by_module_id.values()
+        # Convert the load location list from addressable areas and cutout IDs to a slot name list
+        load_locations = self._state.load_location_by_module_id.values()
+        module_slots = []
+        for location in load_locations:
+            if isinstance(location, str):
+                module_slots.append(
+                    deck_configuration_provider.get_deck_slot_for_cutout_id(location)
+                )
+
+        return neighbor_slot in module_slots
 
     def select_hardware_module_to_load(  # noqa: C901
         self,
         model: ModuleModel,
-        location: DeckSlotLocation,
+        location: str,
         attached_modules: Sequence[HardwareModule],
         expected_serial_number: Optional[str] = None,
     ) -> HardwareModule:
@@ -1173,10 +1249,13 @@ class ModuleView:
         """
         existing_mod_in_slot = None
 
-        for mod_id, slot in self._state.slot_by_module_id.items():
-            if slot == location.slotName:
+        for (
+            mod_id,
+            load_location,
+        ) in self._state.load_location_by_module_id.items():
+            if isinstance(load_location, str) and location == load_location:
                 existing_mod_in_slot = self._state.hardware_by_module_id.get(mod_id)
-                break
+
         if existing_mod_in_slot:
             existing_def = existing_mod_in_slot.definition
 
@@ -1184,9 +1263,9 @@ class ModuleView:
                 return existing_mod_in_slot
 
             else:
+                _err = f" present in {location}"
                 raise errors.ModuleAlreadyPresentError(
-                    f"A {existing_def.model.value} is already"
-                    f" present in {location.slotName.value}"
+                    f"A {existing_def.model.value} is already" + _err
                 )
 
         for m in attached_modules:
@@ -1228,10 +1307,7 @@ class ModuleView:
     ) -> None:
         """Raise if the given location has a module in it."""
         for module in self.get_all():
-            if (
-                module.location == location
-                and module.model != ModuleModel.FLEX_STACKER_MODULE_V1
-            ):
+            if module.location == location:
                 raise errors.LocationIsOccupiedError(
                     f"Module {module.model} is already present at {location}."
                 )
@@ -1274,27 +1350,30 @@ class ModuleView:
         else:
             return False
 
-    def convert_absorbance_reader_data_points(
-        self, data: List[float]
-    ) -> Dict[str, float]:
+    @staticmethod
+    def convert_absorbance_reader_data_points(data: List[float]) -> Dict[str, float]:
         """Return the data from the Absorbance Reader module in a map of wells for each read value."""
         if len(data) == 96:
             # We have to reverse the reader values because the Opentrons Absorbance Reader is rotated 180 degrees on the deck
-            data.reverse()
+            raw_data = data.copy()
+            raw_data.reverse()
             well_map: Dict[str, float] = {}
-            for i, value in enumerate(data):
+            for i, value in enumerate(raw_data):
                 row = chr(ord("A") + i // 12)  # Convert index to row (A-H)
                 col = (i % 12) + 1  # Convert index to column (1-12)
                 well_key = f"{row}{col}"
-                truncated_value = float(
-                    "{:.5}".format(str(value))
-                )  # Truncate the returned value to the third decimal place
-                well_map[well_key] = truncated_value
+                # Truncate the value to the third decimal place
+                well_map[well_key] = max(0.0, math.floor(value * 1000) / 1000)
             return well_map
         else:
             raise ValueError(
                 "Only readings of 96 Well labware are supported for conversion to map of values by well."
             )
+
+    def get_deck_supports_module_fixtures(self) -> bool:
+        """Check if the loaded deck supports modules as fixtures."""
+        deck_type = self._state.deck_type
+        return deck_type not in [DeckType.OT2_STANDARD, DeckType.OT2_SHORT_TRASH]
 
     def ensure_and_convert_module_fixture_location(
         self,
@@ -1307,8 +1386,8 @@ class ModuleView:
         """
         deck_type = self._state.deck_type
 
-        if deck_type == DeckType.OT2_STANDARD or deck_type == DeckType.OT2_SHORT_TRASH:
-            raise ValueError(
+        if not self.get_deck_supports_module_fixtures():
+            raise AreaNotInDeckConfigurationError(
                 f"Invalid Deck Type: {deck_type.name} - Does not support modules as fixtures."
             )
 
@@ -1333,6 +1412,7 @@ class ModuleView:
             # only allowed in column 3
             assert deck_slot.value[-1] == "3"
             return f"absorbanceReaderV1{deck_slot.value}"
+
         elif model == ModuleModel.FLEX_STACKER_MODULE_V1:
             # loaded to column 3 but the addressable area is in column 4
             assert deck_slot.value[-1] == "3"
@@ -1353,3 +1433,51 @@ class ModuleView:
             addressableAreaName="absorbanceReaderV1LidDock" + lid_doc_slot.value
         )
         return lid_dock_area
+
+    def get_stacker_max_fill_height(self, module_id: str) -> float:
+        """Get the maximum fill height for the Flex Stacker."""
+        definition = self.get_definition(module_id)
+
+        if (
+            definition.moduleType == ModuleType.FLEX_STACKER
+            and hasattr(definition.dimensions, "maxStackerFillHeight")
+            and definition.dimensions.maxStackerFillHeight is not None
+        ):
+            return definition.dimensions.maxStackerFillHeight
+        else:
+            raise errors.WrongModuleTypeError(
+                f"Cannot get max fill height of {definition.moduleType}"
+            )
+
+    def stacker_max_pool_count_by_height(
+        self,
+        module_id: str,
+        pool_height: float,
+        pool_overlap: float,
+    ) -> int:
+        """Get the maximum stack count for the Flex Stacker by stack height."""
+        max_fill_height = self.get_stacker_max_fill_height(module_id)
+        assert max_fill_height > 0
+        # Subtracting the pool overlap from the stack element (pool height) allows us to account for
+        # elements nesting on one-another, and we must subtract from max height to apply starting offset.
+        # Ex: Let H be the total height of the stack; h be the height of a stack element;
+        # d be the stack overlap; and N be the number of labware. Then for N >= 1,
+        # H = Nh - (N-1)d
+        # H = Nh - Nd + d
+        # H - d = N(h-d)
+        # (H-d)/(h-d) = N
+        return math.floor(
+            (max_fill_height - pool_overlap) / (pool_height - pool_overlap)
+        )
+
+    def stacker_contained_labware(
+        self, module_id: str
+    ) -> list[StackerStoredLabwareGroup]:
+        """Get the labware contained in a Flex Stacker."""
+        substate = self.get_flex_stacker_substate(module_id)
+        return substate.get_contained_labware()
+
+    def stacker_max_pool_count(self, module_id: str) -> int | None:
+        """Get the max stored labware in this stacker configuration."""
+        substate = self.get_flex_stacker_substate(module_id)
+        return substate.get_max_pool_count()

@@ -1,13 +1,13 @@
 import { css } from 'styled-components'
 
-import {
-  Btn,
-  Icon,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  COLORS,
-} from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import {
+  ALIGN_CENTER,
+  Btn,
+  COLORS,
+  Icon,
+  JUSTIFY_CENTER,
+} from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 

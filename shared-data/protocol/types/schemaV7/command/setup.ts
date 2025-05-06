@@ -1,10 +1,10 @@
 import type {
-  CommonCommandRunTimeInfo,
   CommonCommandCreateInfo,
+  CommonCommandRunTimeInfo,
   LabwareDefinition2,
   LabwareOffset,
-  PipetteName,
   ModuleModel,
+  PipetteName,
 } from '../../../../js'
 
 export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
