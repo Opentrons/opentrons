@@ -48,6 +48,7 @@ from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons_shared_data.labware import load_definition as load_labware_definition
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
+    SYSTEM_LOCATION,
     OFF_DECK_LOCATION,
     LabwareOffsetVector,
     DeckSlotLocation,
@@ -951,23 +952,47 @@ def test_get_obstacle_highest_z_with_lid(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
         labware_def=nice_labware_definition,
     )
+
     lid_def = nice_labware_definition.model_copy(
         update={
             "version": "lid-lw",  # this is to make sure definitionURI is unique
             "dimensions": LabwareDimensions(xDimension=0, yDimension=0, zDimension=100),
         }
     )
+
     load_labware_lid = load_labware_action(
         labware_id="lid-id",
         labware_def=lid_def,
         location=OnLabwareLocation(labwareId="labware-id"),
     )
+
+    lid_stack_def = nice_labware_definition.model_copy(
+        update={
+            "version": "lid-stack",
+            "parameters": LabwareDefinition2Parameters.model_construct(
+                format="96Standard",
+                loadName="protocol_engine_lid_stack_object",
+                isTiprack=False,
+                isMagneticModuleCompatible=False,
+            ),
+            "dimensions": LabwareDimensions(xDimension=0, yDimension=0, zDimension=50),
+        }
+    )
+
+    load_lid_stack = load_labware_action(
+        labware_id="lid-stack-id",
+        labware_def=lid_stack_def,
+        location=SYSTEM_LOCATION,
+    )
+
     labware_store.handle_action(load_labware)
+    labware_store.handle_action(load_lid_stack)
     labware_store.handle_action(load_labware_lid)
 
-    # the highest Z should be the max of the highest Z of the on-deck labware
-    # the labware's highest z is the z dimension of the lid + labware's height
+    # The highest Z should be the max of the highest Z of the on-deck labware
+    # The labware's highest z is the z dimension of the lid + labware's height
     labware_height = labware_view.get_dimensions(labware_id="labware-id").z
+
     assert subject.get_all_obstacle_highest_z() == 100 + labware_height
 
 
