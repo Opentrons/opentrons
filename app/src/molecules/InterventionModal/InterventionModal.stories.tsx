@@ -1,5 +1,5 @@
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 
 import { LegacyStyledText } from '@opentrons/components'
 
@@ -15,7 +15,7 @@ const dummyConfig = {
     isOnDevice: false,
   },
 } as any
-const store: Store<any> = createStore(
+const store: Store<any> = legacy_createStore(
   configReducer,
   dummyConfig as StoreEnhancer
 )

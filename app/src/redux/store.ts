@@ -1,4 +1,4 @@
-import { applyMiddleware, compose, createStore } from 'redux'
+import { applyMiddleware, compose, legacy_createStore } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
 import thunk from 'redux-thunk'
 
@@ -16,7 +16,7 @@ const composeEnhancers =
   (window as any)?.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__?.({ maxAge: 200 }) ??
   compose
 
-export const store = createStore(
+export const store = legacy_createStore(
   rootReducer,
   composeEnhancers(middleware) as StoreEnhancer
 )

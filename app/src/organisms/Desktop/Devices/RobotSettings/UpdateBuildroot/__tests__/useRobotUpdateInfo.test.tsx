@@ -1,7 +1,7 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -40,7 +40,7 @@ describe('useRobotUpdateInfo', () => {
 
   beforeEach(() => {
     vi.useFakeTimers()
-    store = createStore(vi.fn(), {})
+    store = legacy_createStore(vi.fn(), {})
     store.dispatch = vi.fn()
     wrapper = ({ children }) => (
       <I18nextProvider i18n={i18n}>

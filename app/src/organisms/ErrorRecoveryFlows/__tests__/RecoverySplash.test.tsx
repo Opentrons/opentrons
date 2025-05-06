@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, renderHook, screen, waitFor } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -28,7 +28,7 @@ vi.mock('/app/redux/config')
 vi.mock('../shared')
 vi.mock('../../ToasterOven')
 
-const store: Store<any> = createStore(vi.fn(), {})
+const store: Store<any> = legacy_createStore(vi.fn(), {})
 
 describe('useRunPausedSplash', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>

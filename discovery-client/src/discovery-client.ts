@@ -17,7 +17,7 @@ export function createDiscoveryClient(
   options: DiscoveryClientOptions
 ): DiscoveryClient {
   const { onListChange, logger, enableMDNS = true } = options
-  const { getState, dispatch, subscribe } = Store.createStore()
+  const { getState, dispatch, subscribe } = Store.legacy_createStore()
   const getAddresses = (): Address[] => Store.getAddresses(getState())
   const getRobots = (): DiscoveryClientRobot[] => Store.getRobots(getState())
   let unsubscribe: (() => void) | null = null

@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -28,7 +28,7 @@ vi.mock('/app/redux/calibration')
 vi.mock('/app/redux/robot-api')
 vi.mock('/app/redux/discovery')
 
-const store: Store<any> = createStore(vi.fn(), {})
+const store: Store<any> = legacy_createStore(vi.fn(), {})
 
 describe('useDeckCalibrationData hook', () => {
   let dispatchApiRequest: DispatchApiRequestType

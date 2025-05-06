@@ -17,7 +17,7 @@ const middleware = applyMiddleware(
 )
  create store
 c
-const store = createStore(reducer, middleware)
+const store = legacy_createStore(reducer, middleware)
 ```
 
 ## sending an event to mixpanel

@@ -4,7 +4,7 @@ import { I18nextProvider } from 'react-i18next'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { render } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { vi } from 'vitest'
 
 import type { RenderOptions, RenderResult } from '@testing-library/react'
@@ -28,7 +28,7 @@ export function renderWithProviders<State>(
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { initialState = {}, i18nInstance = null } = options || {}
 
-  const store: Store<State> = createStore(
+  const store: Store<State> = legacy_createStore(
     vi.fn(),
     initialState as PreloadedState<State>
   )

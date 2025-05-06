@@ -86,7 +86,7 @@ export function configureStore(): StoreType {
   const reducer = getRootReducer()
   const composeEnhancers: any =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-  const store = createStore(
+  const store = legacy_createStore(
     reducer,
     /* preloadedState, */
     composeEnhancers(

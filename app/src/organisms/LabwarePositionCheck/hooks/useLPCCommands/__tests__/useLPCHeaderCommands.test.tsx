@@ -1,7 +1,7 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider, useSelector } from 'react-redux'
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { i18n } from '/app/i18n'
@@ -67,7 +67,7 @@ describe('useLPCHeaderCommands', () => {
       runId: mockRunId,
     }
 
-    store = createStore(vi.fn(), {})
+    store = legacy_createStore(vi.fn(), {})
     store.dispatch = vi.fn()
 
     wrapper = ({ children }) => (
