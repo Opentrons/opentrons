@@ -423,7 +423,11 @@ export function LiquidEditor({
                 ) : null}
               </Flex>
             ) : null}
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing8}
+              width={LIQUID_CONTAINER_WIDTH}
+            >
               {liquidInfo.length > 0 ? (
                 <StyledText desktopStyle="bodyDefaultSemiBold">
                   {t('liquids_added')}
