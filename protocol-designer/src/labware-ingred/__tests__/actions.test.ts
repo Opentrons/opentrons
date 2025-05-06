@@ -1,4 +1,4 @@
-import configureMockStore from 'redux-mock-store'
+import { legacy_configureStore } from 'redux-mock-store';
 import { thunk } from 'redux-thunk'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -25,7 +25,7 @@ vi.mock('../../utils')
 vi.mock('../utils')
 
 const middlewares = [thunk]
-const mockStore = configureMockStore(middlewares)
+const mockStore = legacy_configureStore(middlewares)
 
 afterEach(() => {
   vi.resetAllMocks()
