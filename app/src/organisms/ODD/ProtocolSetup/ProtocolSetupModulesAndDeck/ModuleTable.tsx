@@ -9,7 +9,9 @@ import {
   COLORS,
   DeckInfoLabel,
   Flex,
+  InfoScreen,
   JUSTIFY_SPACE_BETWEEN,
+  DIRECTION_COLUMN,
   LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
@@ -27,6 +29,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
 import {
   getFlexStackerPrepCommands,
   getModulePrepCommands,
@@ -48,6 +51,8 @@ import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
+import { ModuleTableItem } from './ModuleTableItem'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
@@ -111,272 +116,6 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
             />
           )
         })}
-    </>
-  )
-}
-
-type ModuleStatusType =
-  | 'locationConflict'
-  | 'disconnected'
-  | 'shuttleMissing'
-  | 'calibrationBlocked'
-  | 'needsCalibration'
-  | 'needsHome'
-  | 'connected' // when the module is connected and ready
-
-export const getModuleDisplayStatus = (
-  attachedModule: AttachedModule | null,
-  conflictedFixture: CutoutConfig | null,
-  calibrationStatus: ProtocolCalibrationStatus
-): ModuleStatusType => {
-  // deck location conflict
-  if (conflictedFixture !== null) {
-    return 'locationConflict'
-  }
-  // module is not connected
-  if (!!!attachedModule) {
-    return 'disconnected'
-  } else {
-    // flex stacker module does not require calibration
-    // but needs to check for missing shuttle or home
-    if (attachedModule.moduleType === FLEX_STACKER_MODULE_TYPE) {
-      if (attachedModule.data.platformState === 'missing') {
-        return 'shuttleMissing'
-      }
-      if (
-        attachedModule.data.platformState !== 'extended' ||
-        attachedModule.data.latchState !== 'closed'
-      ) {
-        return 'needsHome'
-      }
-      return 'connected'
-    }
-
-    // module is connected but instrument not calibrated
-    if (!calibrationStatus.complete) {
-      return 'calibrationBlocked'
-    }
-
-    // Absorbance reader module does not require calibration
-    if (
-      attachedModule.moduleType !== ABSORBANCE_READER_TYPE &&
-      (!!!attachedModule.moduleOffset ||
-        !!!attachedModule.moduleOffset?.last_modified)
-    ) {
-      return 'needsCalibration'
-    }
-    return 'connected'
-  }
-}
-
-interface ModuleTableItemProps {
-  calibrationStatus: ProtocolCalibrationStatus
-  chainLiveCommands: (
-    commands: ModulePrepCommandsType[],
-    continuePastCommandFailure: boolean
-  ) => Promise<CommandData[]>
-  conflictedFixture: CutoutConfig | null
-  isLoading: boolean
-  module: AttachedProtocolModuleMatch
-  prepCommandErrorMessage: string
-  setPrepCommandErrorMessage: Dispatch<SetStateAction<string>>
-  deckDef: DeckDefinition
-  robotName: string
-}
-
-function ModuleTableItem({
-  module,
-  calibrationStatus,
-  chainLiveCommands,
-  isLoading,
-  prepCommandErrorMessage,
-  setPrepCommandErrorMessage,
-  conflictedFixture,
-  deckDef,
-  robotName,
-}: ModuleTableItemProps): JSX.Element {
-  const { i18n, t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
-
-  const { makeSnackbar } = useToaster()
-
-  const handleCalibrate = (): void => {
-    if (module.attachedModuleMatch !== null) {
-      if (getModuleTooHot(module.attachedModuleMatch)) {
-        makeSnackbar(t('module_wizard_flows:module_too_hot') as string)
-      } else {
-        chainLiveCommands(
-          getModulePrepCommands(module.attachedModuleMatch),
-          false
-        ).catch((e: Error) => {
-          setPrepCommandErrorMessage(e.message)
-        })
-        setShowModuleWizard(true)
-      }
-    } else {
-      makeSnackbar(t('attach_module') as string)
-    }
-  }
-
-  const homeStacker = (): void => {
-    if (
-      module.attachedModuleMatch !== null &&
-      module.attachedModuleMatch.moduleType === FLEX_STACKER_MODULE_TYPE
-    ) {
-      chainLiveCommands(
-        getFlexStackerPrepCommands(module.attachedModuleMatch),
-        // if the close latch command fails, we still want to home the shuttle
-        true
-      ).catch((e: Error) => {
-        setPrepCommandErrorMessage(e.message)
-      })
-    }
-  }
-
-  const displayStatus = getModuleDisplayStatus(
-    module.attachedModuleMatch,
-    conflictedFixture,
-    calibrationStatus
-  )
-
-  const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
-
-  const buildModuleDisplay = (): JSX.Element => {
-    switch (displayStatus) {
-      case 'locationConflict':
-        return (
-          <>
-            <Chip
-              text={t('location_conflict')}
-              type="warning"
-              background={false}
-              iconName="connection-status"
-            />
-            <SmallButton
-              buttonCategory="rounded"
-              buttonText={t('resolve')}
-              onClick={() => {
-                setShowLocationConflictModal(true)
-              }}
-            />
-          </>
-        )
-      case 'connected':
-        return (
-          <Chip
-            text={t('module_connected')}
-            type="success"
-            background={false}
-            iconName="connection-status"
-          />
-        )
-      case 'shuttleMissing':
-        return (
-          <Chip
-            text={t('missing_shuttle')}
-            type="warning"
-            background={false}
-            iconName="ot-alert"
-          />
-        )
-      case 'calibrationBlocked':
-        return (
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {calibrationStatus?.reason === 'attach_pipette_failure_reason'
-              ? t('calibration_required_attach_pipette_first')
-              : t('calibration_required_calibrate_pipette_first')}
-          </LegacyStyledText>
-        )
-      case 'needsCalibration':
-        return (
-          <SmallButton
-            buttonCategory="rounded"
-            buttonText={i18n.format(t('calibrate'), 'capitalize')}
-            onClick={handleCalibrate}
-          />
-        )
-      case 'needsHome':
-        return (
-          <SmallButton
-            buttonCategory="rounded"
-            buttonText={t('home_stacker')}
-            onClick={homeStacker}
-          />
-        )
-      case 'disconnected':
-      default:
-        return (
-          <Chip
-            text={t('module_disconnected')}
-            type="warning"
-            background={false}
-            iconName="connection-status"
-          />
-        )
-    }
-  }
-
-  return (
-    <>
-      {showModuleWizard && module.attachedModuleMatch !== null ? (
-        <ModuleWizardFlows
-          attachedModule={module.attachedModuleMatch}
-          closeFlow={() => {
-            setShowModuleWizard(false)
-          }}
-          isPrepCommandLoading={isLoading}
-          prepCommandErrorMessage={
-            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
-          }
-        />
-      ) : null}
-      {showLocationConflictModal && conflictedFixture !== null ? (
-        <LocationConflictModal
-          onCloseClick={() => {
-            setShowLocationConflictModal(false)
-          }}
-          cutoutId={conflictedFixture.cutoutId}
-          requiredModule={module.moduleDef.model}
-          deckDef={deckDef}
-          isOnDevice={true}
-          robotName={robotName}
-        />
-      ) : null}
-      <Flex
-        alignItems={ALIGN_CENTER}
-        backgroundColor={
-          displayStatus === 'connected' ? COLORS.green35 : COLORS.yellow35
-        }
-        borderRadius={BORDERS.borderRadius8}
-        cursor="inherit"
-        gridGap={SPACING.spacing24}
-        padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      >
-        <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {getModuleDisplayName(module.moduleDef.model)}
-          </LegacyStyledText>
-        </Flex>
-        <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
-          <DeckInfoLabel
-            deckLabel={
-              getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
-                ? TC_MODULE_LOCATION_OT3
-                : module.slotName
-            }
-          />
-        </Flex>
-        <Flex
-          flex="4 0 0"
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-        >
-          {buildModuleDisplay()}
-        </Flex>
-      </Flex>
     </>
   )
 }

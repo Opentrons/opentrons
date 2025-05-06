@@ -6,7 +6,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { getModuleDisplayStatus } from '../ModuleTable' // Assuming getModuleDisplayStatus is exported or made available for testing
+import { getModuleDisplayStatus } from '../ModuleTableItem' // Assuming getModuleDisplayStatus is exported or made available for testing
 
 import type {
   AbsorbanceReaderModule,
