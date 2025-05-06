@@ -17,12 +17,12 @@ import { getStackerLocationFromSlotName } from '/app/transformations/commands'
 
 import { InterventionCommandMessage } from './InterventionCommandMessage'
 
+import type { ComponentProps } from 'react'
 import type { RunData } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   FlexStackerEmptyRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 const STACKER_IMAGE_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
