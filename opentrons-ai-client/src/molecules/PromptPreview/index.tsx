@@ -18,6 +18,7 @@ import { PromptPreviewSection } from '../PromptPreviewSection'
 
 import type { PromptPreviewSectionProps } from '../PromptPreviewSection'
 
+const LABWARE_LIQUIDS_SECTION_INDEX = 4
 interface PromptPreviewProps {
   isSubmitButtonEnabled?: boolean
   handleSubmit: () => void
@@ -78,7 +79,7 @@ export function PromptPreview({
       )}
 
       {Object.values(promptPreviewData).map((section, index) => {
-        const isLabwareLiquidsSection = index === 4
+        const isLabwareLiquidsSection = index === LABWARE_LIQUIDS_SECTION_INDEX
         const isStepsSection = index === lastSectionIndex
         return (
           section.items.length > 0 && (

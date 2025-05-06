@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import styled from 'styled-components'
 
 import {
@@ -35,7 +35,7 @@ const TagsContainer = styled.div<{
   display: flex;
   grid-gap: ${SPACING.spacing4};
   /* When oneItemPerRow is true, disable wrapping to keep a single column layout */
-  flex-wrap: ${props => (props.oneItemPerRow ? 'nowrap' : WRAP)};
+  flex-wrap: ${props => (props.oneItemPerRow ? 'NOWRAP' : WRAP)};
   justify-content: flex-start;
   width: 100%;
   flex-direction: ${props => (props.oneItemPerRow ? 'column' : 'row')};
@@ -77,7 +77,7 @@ const StepTag = styled.div`
   border-radius: ${BORDERS.borderRadius4};
   padding: ${SPACING.spacing2} ${SPACING.spacing8};
   width: 100%;
-  font-size: 0.87rem;
+  font-size: 0.875rem;
 `
 
 // Component to handle multiline steps
@@ -134,7 +134,7 @@ export function PromptPreviewSection({
 
           // Render each tag, forcing a break for stacked layouts
           return (
-            <React.Fragment key={`item-row-${index}`}>
+            <Fragment key={`item-row-${index}`}>
               <TagItemWrapper
                 data-testid={`item-tag-wrapper-${index}`}
                 itemMaxWidth={itemMaxWidth}
@@ -146,7 +146,7 @@ export function PromptPreviewSection({
                 )}
               </TagItemWrapper>
               {stackItems && <LineBreakWrapper />}
-            </React.Fragment>
+            </Fragment>
           )
         })}
       </TagsContainer>

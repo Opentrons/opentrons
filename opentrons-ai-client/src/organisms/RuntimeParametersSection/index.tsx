@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 
 import {
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -46,7 +46,15 @@ export function RuntimeParametersSection(): JSX.Element | null {
       height="100%"
       gap={SPACING.spacing16}
     >
-      <PillLabel>Optional</PillLabel>
+      <Flex>
+        <Chip
+          text={t('optional')}
+          type="neutral"
+          background={true}
+          chipSize="medium"
+          hasIcon={false}
+        />
+      </Flex>
       <StyledText color={COLORS.grey60} desktopStyle="bodyDefaultRegular">
         {t('runtime_parameters_section_textbody')}
       </StyledText>
@@ -60,17 +68,3 @@ export function RuntimeParametersSection(): JSX.Element | null {
     </Flex>
   )
 }
-
-// Create a custom pill-shaped label from scratch instead of extending Tag
-const PillLabel = styled.div`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: ${COLORS.grey30};
-  color: ${COLORS.grey60};
-  padding: 0.15rem 0.5rem;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 400;
-  width: max-content;
-`
