@@ -242,6 +242,8 @@ jobs:
             target: 'odd'
           - os: 'macos-latest'
             target: 'odd'
+          - os: 'ubuntu-24.04-arm'
+            target: 'odd'
 
     runs-on: ${{ matrix.os }}
     name: 'Build ${{matrix.variant}} ${{matrix.target}} app on ${{matrix.os}}'
