@@ -68,7 +68,6 @@ describe('SlotInformation', () => {
       modules: mockModules,
     }
     render(props)
-    screen.debug()
 
     expect(screen.getAllByText('Liquid').length).toBe(1)
     expect(screen.getAllByText('Labware').length).toBe(
