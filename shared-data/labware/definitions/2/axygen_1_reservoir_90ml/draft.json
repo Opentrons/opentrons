@@ -15,19 +15,19 @@
   },
   "dimensions": {
     "xDimension": 127.76,
-    "yDimension": 85.47,
-    "zDimension": 19.05
+    "yDimension": 85.48,
+    "zDimension": 19.15
   },
   "wells": {
     "A1": {
       "depth": 12.42,
       "shape": "rectangular",
-      "xDimension": 106.76,
-      "yDimension": 70.52,
+      "xDimension": 106.8,
+      "yDimension": 70.5,
       "totalLiquidVolume": 90000,
       "x": 63.88,
-      "y": 42.735,
-      "z": 6.63,
+      "y": 42.74,
+      "z": 6.73,
       "geometryDefinitionId": "cuboidalWell"
     }
   },
