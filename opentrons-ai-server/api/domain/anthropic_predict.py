@@ -84,7 +84,7 @@ class AnthropicPredict:
 
         deck_layout = load_file_content(filename="deck_layout.md")
         tip_handling = load_file_content("tip_handling.md")
-        step_types = load_file_content("step-types.ts")
+        step_types = load_file_content("form-types.txt")
         loadnames = load_file_content("pd_api_names.md")
         load_step_doc = load_file_content("step_doc_flex.md")
         expected_json = load_file_content("expected.md")

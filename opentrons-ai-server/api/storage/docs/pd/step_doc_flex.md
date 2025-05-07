@@ -1,5 +1,14 @@
 # Protocol Designer Documentation for OT-2 and Flex (LLM-friendly)
 
+**Schema Version: 8**
+
+This document outlines the JSON structure used by Opentrons Protocol Designer. For a successful import, a protocol file must adhere to a minimal structure. Key top-level fields include:
+- `"metadata"`: Contains protocol metadata like name and description.
+- `"robot"`: Defines the robot model (`"OT-2 Standard"` or `"OT-3 Standard"`) and `deckId`. 
+- `"designerApplication"`: Contains Protocol Designer specific data, including its version and the core `data` object.
+  - `data`: Holds `savedStepForms` (including `__INITIAL_DECK_SETUP_STEP__`), `orderedStepIds`, and definitions for `pipettes`, `modules`, `labware`, etc.
+
+
 ## Overall structure
 
 ```json
@@ -31,9 +40,7 @@
       "labware": {}
     }
   },
-  "liquids": {},
   "robot": {},
-  "commands": []
 }
 ```
 
@@ -55,7 +62,7 @@ Define a pipette:
 ```json
 "pipettes": {
   "pipette_left": {
-    "pipetteName": "" // pipette API name e.g., "p50_multi_flex"
+    "pipetteName": "" // pipette API name e.g., "p1000_single_flex"
   }
 }
 ```
@@ -63,7 +70,7 @@ Define a pipette:
 Define mount:
 
 ```json
-"pipetteLocationUpdate": {"pipette_left": ""} // "left" or "right"
+"pipetteLocationUpdate": {"pipette_left": ""} // "left" or "right", e.g., "pipette_left": "left"
 ```
 
 Define tiprack assignment:
@@ -76,23 +83,8 @@ Define tiprack assignment:
 }
 ```
 
-Load pipette:
-
-```json
-"commands": [
-  {
-    "commandType": "loadPipette",
-    "params": {
-      "pipetteName": "",   // Must use exact API names from Protocol Designer docs
-      "mount": "",         // Must be either "left" or "right"
-      "pipetteId": ""      // Must be consistent across JSON
-    }
-  }
-]
-```
-
 Note that pipette ID `pipette_left` must be consistent across different fields:
-"pipettes", "pipetteLocationUpdate", and "commands".
+"pipettes", "pipetteLocationUpdate", "pipetteTiprackAssignments" and where it is used.
 
 #### Add modules (Common)
 
@@ -100,7 +92,7 @@ Note that pipette ID `pipette_left` must be consistent across different fields:
 
 ```json
 "modules": {
-  "module-1": {
+  "module-1": { // id must be consistent across JSON
     "model": "" // API model name e.g., "heaterShakerModuleV1"
   }
 }
@@ -110,24 +102,10 @@ Note that pipette ID `pipette_left` must be consistent across different fields:
 
 ```json
 "moduleLocationUpdate": {
-  "module-1": "D1"
+  "module-1": "D1" // Must be string value from "A1, A2, A3, B1, B2, B3, C1, C2, C3, D1, D2, D3" for Flex, or "1-11" for OT-2
 }
 ```
 
-- Load module:
-
-```json
-{
-  "commandType": "loadModule",
-  "params": {
-    "model": "", // Must use exact module model API name e.g., "heaterShakerModuleV1"
-    "moduleId": "module-1", // Must be consistent across JSON
-    "location": {
-      "slotName": "" // Must be string value from "A1, A2, A3, B1, B2, B3, C1, C2, C3, D1, D2, D3" for Flex, or "1-11" for OT-2
-    }
-  }
-}
-```
 
 #### Add labware
 
@@ -135,7 +113,7 @@ Note that pipette ID `pipette_left` must be consistent across different fields:
 
 ```json
 "labware": {
-  "labware-1": {
+  "labware-1": { // ID must be consistent across JSON e.g., labware-1
     "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
     "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
   }
@@ -146,30 +124,10 @@ Note that pipette ID `pipette_left` must be consistent across different fields:
 
 ```json
 "labwareLocationUpdate": {
-  "labware-1": "C2"
+  "labware-1": "C2" // Must be string value from "A1, A2, A3, B1, B2, B3, C1, C2, C3, D1, D2, D3" for Flex, or "1-11" for OT-2
 }
 ```
 
-- Load labware:
-
-```json
-"commands": [
-  {
-    "commandType": "loadLabware",
-    "params": {
-      "displayName": "",            // Human-readable labware name
-      "labwareId": "labware-1",     // Must be consistent across JSON e.g., labware-1
-      "loadName": "",               // Must use exact API names from Protocol Designer docs
-      "namespace": "opentrons",     // Provider must always be opentrons
-      "version": 1,                 // Version number
-      "location": {
-        "slotName": "C2"            // For Flex: Must be string value one of D1, D2, D3, C1, C2, C3, B1, B2, B3, A1, A2, A3
-                                    // For OT-2: Value options are: 1-11
-      }
-    }
-  }
-]
-```
 
 #### Add liquid
 
@@ -177,7 +135,7 @@ Define liquid by filling out these fields:
 
 ```json
 "ingredients": {
-  "0": {   // Identifier for liquid - starting from "0"
+  "0": {   // ID-Identifier for liquid - starting from "0"
     "displayName": "", // Display name e.g., "water"
     "description": "", // Description e.g., "samples for mixing"
     "displayColor": "", // Color e.g., #50d5ffff
@@ -186,15 +144,6 @@ Define liquid by filling out these fields:
 }
 ```
 
-```json
-"liquids": {
-  "0": {
-    "displayName": "", // Display name e.g., "water"
-    "description": "", // Description e.g., "samples for mixing"
-    "displayColor": "", // Color e.g., #50d5ffff
-  }
-}
-```
 
 #### Common step types (both OT-2 and Flex)
 
@@ -210,11 +159,12 @@ Define liquid by filling out these fields:
 
 #### Add a gripper (Flex only)
 
+With 
 ```json
 "gripperLocationUpdate": {"gripper-1": "mounted"}
 ```
 
-or if no gripper:
+Without gripper:
 
 ```json
 "gripperLocationUpdate": {}
@@ -227,7 +177,7 @@ Three types of fixtures; at least one of them must exist on the deck:
 1. If `Trash Bin` is selected:
 
 ```json
-"trashBinLocationUpdate": {"trashbin-1": "cutoutA3"}
+"trashBinLocationUpdate": {"trashbin-1": "cutoutA3"} # Note that `"trashbin-1"` is ID thus must be consistent accross JSON
 ```
 
 else:
@@ -239,7 +189,7 @@ else:
 2. If `Waste Chute` is selected:
 
 ```json
-"wasteChuteLocationUpdate": {"wastechute-1": "cutoutD3"}
+"wasteChuteLocationUpdate": {"wastechute-1": "cutoutD3"} # Note that `"wastechute-1"` is ID thus must be consistent accross JSON
 ```
 
 else:
@@ -251,7 +201,7 @@ else:
 3. If `Staging Area` is selected:
 
 ```json
-"stagingAreaLocationUpdate": {"stagingarea-1": "cutoutB3"}
+"stagingAreaLocationUpdate": {"stagingarea-1": "cutoutB3"} # Note that `"stagingarea-1"` is ID thus must be consistent accross JSON
 ```
 
 else:
@@ -306,31 +256,24 @@ else:
    - Labware IDs: Use format like "labware-1", "labware-2"
    - Liquid IDs: Use sequential numbers starting from "0"
 
-3. Command Order:
 
-   1. Load Pipettes
-   2. Load Modules (if any)
-   3. Load Labware
-
-4. Identifier Consistency:
+3. Identifier Consistency:
 
    - **Pipette Identifiers** must be consistent across:
 
      - `designerApplication.data.pipetteTiprackAssignments`
      - `savedStepForms.__INITIAL_DECK_SETUP_STEP__.pipetteLocationUpdate`
      - `data.pipettes`
-     - `commands[].params.pipetteId`
 
    - **Labware Identifiers** must be consistent across:
 
      - `savedStepForms.__INITIAL_DECK_SETUP_STEP__.labwareLocationUpdate`
      - `data.labware`
-     - `commands[].params.labwareId`
 
    - **Module Identifiers** must be consistent across:
      - `savedStepForms.__INITIAL_DECK_SETUP_STEP__.moduleLocationUpdate` (e.g., "hs-1")
      - `data.modules`
-     - `commands[].params.moduleId`
+
 
 ## Case 1: Basic Pipette and Tiprack Setup
 
