@@ -54,11 +54,15 @@ export const migrateFile = (
         dispense_touchTip_checkbox,
         ...rest
       } = form
+      const aspirateLabwareUri =
+        equipmentLoadInfoFromCommands.labware[aspirate_labware].labwareDefURI
       const isAspirateLabwareTouchtipDisabled = labwareDefinitions[
-        aspirate_labware
+        aspirateLabwareUri
       ].parameters.quirks?.includes('touchTipDisabled')
+      const dispenseLabwareUri =
+        equipmentLoadInfoFromCommands.labware[dispense_labware].labwareDefURI
       const isDispenseLabwareTouchtipDisabled = labwareDefinitions[
-        dispense_labware
+        dispenseLabwareUri
       ].parameters.quirks?.includes('touchTipDisabled')
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
         labwareDefinitions,
@@ -173,8 +177,10 @@ export const migrateFile = (
           ...rest
         } = form
         const tipRackDef = labwareDefinitions[form.tipRack]
+        const mixLabwareUri =
+          equipmentLoadInfoFromCommands.labware[labware].labwareDefURI
         const isLabwareTouchtipDisabled = labwareDefinitions[
-          labware
+          mixLabwareUri
         ].parameters.quirks?.includes('touchTipDisabled')
         const pipetteName =
           equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
