@@ -341,7 +341,6 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                   border="none"
                   onMouseEnter={() => onEnter?.(option.value)}
                   onMouseLeave={onExit}
-                  role="option"
                 >
                   <Flex
                     gridGap={SPACING.spacing8}
