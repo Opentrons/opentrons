@@ -15,10 +15,12 @@ from opentrons.drivers.flex_stacker.driver import (
     STACKER_MOTION_CONFIG,
 )
 from opentrons.drivers.flex_stacker.types import (
+    AxisParams,
     Direction,
     LEDColor,
     LEDPattern,
     MoveResult,
+    MoveParams,
     StackerAxis,
     StallGuardParams,
 )
@@ -46,12 +48,24 @@ async def _prepare_for_action(stacker: FlexStackerDriver) -> bool:
     return True
 
 
+async def set_led_state(
+    stacker: FlexStackerDriver,
+    power: float,
+    color: Optional[LEDColor] = None,
+    pattern: Optional[LEDPattern] = None,
+    duration: Optional[int] = None,
+    reps: Optional[int] = None,
+) -> bool:
+    """Sets the statusbar state."""
+    return await stacker.set_led(
+        power, color=color, pattern=pattern, duration=duration, reps=reps
+    )
+
+
 async def reset_stall_detected(stacker: FlexStackerDriver) -> None:
     """Sets the statusbar to normal."""
     if STACKER_STATES[stacker]["stall_detected"]:
-        await stacker.set_led(
-            power=0.5, color=LEDColor.GREEN, pattern=LEDPattern.STATIC
-        )
+        await set_led_state(stacker, 0.5, LEDColor.GREEN, LEDPattern.STATIC)
         STACKER_STATES[stacker]["stall_detected"] = False
 
 
@@ -65,11 +79,22 @@ async def move_axis(
     current: Optional[float] = None,
 ) -> bool:
     """Move the axis in a direction by the given distance in mm."""
+    await reset_stall_detected(stacker)
     default = STACKER_MOTION_CONFIG[axis]["move"]
-    await stacker.set_run_current(
-        axis, current if current is not None else default.run_current
-    )
-    await stacker.set_ihold_current(axis, default.hold_current)
+    old_run_current = STACKER_STATES[stacker]["motion_params"][axis]["run_current"]
+    new_run_current = current if current is not None else default.run_current
+    if new_run_current != old_run_current:
+        await stacker.set_run_current(axis, new_run_current)
+        STACKER_STATES[stacker]["motion_params"][axis]["run_current"] = new_run_current
+
+    old_hold_current = STACKER_STATES[stacker]["motion_params"][axis]["hold_current"]
+    new_hold_current = default.hold_current
+    if new_hold_current != old_hold_current:
+        await stacker.set_ihold_current(axis, new_hold_current)
+        STACKER_STATES[stacker]["motion_params"][axis][
+            "hold_current"
+        ] = new_hold_current
+
     motion_params = default.move_params.update(
         max_speed=speed, acceleration=acceleration
     )
@@ -92,15 +117,25 @@ async def home_axis(
     current: Optional[float] = None,
 ) -> bool:
     """Home flex stacker axis."""
+    await reset_stall_detected(stacker)
     default = STACKER_MOTION_CONFIG[axis]["home"]
-    await stacker.set_run_current(
-        axis, current if current is not None else default.run_current
-    )
-    await stacker.set_ihold_current(axis, default.hold_current)
+    old_run_current = STACKER_STATES[stacker]["motion_params"][axis]["run_current"]
+    new_run_current = current if current is not None else default.run_current
+    if new_run_current != old_run_current:
+        await stacker.set_run_current(axis, new_run_current)
+        STACKER_STATES[stacker]["motion_params"][axis]["run_current"] = new_run_current
+
+    old_hold_current = STACKER_STATES[stacker]["motion_params"][axis]["hold_current"]
+    new_hold_current = default.hold_current
+    if new_hold_current != old_hold_current:
+        await stacker.set_ihold_current(axis, new_hold_current)
+        STACKER_STATES[stacker]["motion_params"][axis][
+            "hold_current"
+        ] = new_hold_current
+
     motion_params = default.move_params.update(
         max_speed=speed, acceleration=acceleration
     )
-
     success = await stacker.move_to_limit_switch(
         axis=axis, direction=direction, params=motion_params
     )
@@ -126,13 +161,6 @@ async def close_latch(
     acceleration: Optional[float] = None,
 ) -> bool:
     """Close the latch, dropping any labware its holding."""
-    # Dont move the latch if its already closed.
-    await get_limit_switch_status(stacker)
-    if (
-        STACKER_STATES[stacker]["limit_switch_status"][StackerAxis.L]
-        == StackerAxisState.EXTENDED
-    ):
-        return True
     success = await home_axis(
         stacker,
         StackerAxis.L,
@@ -142,11 +170,7 @@ async def close_latch(
     )
     # Check that the latch is closed.
     await get_limit_switch_status(stacker)
-    return (
-        success
-        and STACKER_STATES[stacker]["limit_switch_status"][StackerAxis.L]
-        == StackerAxisState.EXTENDED
-    )
+    return success and STACKER_STATES[stacker]["limit_switch_status"][StackerAxis.L]
 
 
 async def open_latch(
@@ -155,19 +179,13 @@ async def open_latch(
     acceleration: Optional[float] = None,
 ) -> bool:
     """Open the latch."""
+    # The latch only has one limit switch, so we have to travel a fixed distance
+    # to open the latch.
     MAX_TRAVEL = {
         StackerAxis.X: 194.0,
         StackerAxis.Z: 139.5,
         StackerAxis.L: 22.0,
     }
-    # Dont move the latch if its already opened.
-    if (
-        STACKER_STATES[stacker]["limit_switch_status"][StackerAxis.L]
-        == StackerAxisState.RETRACTED
-    ):
-        return True
-    # The latch only has one limit switch, so we have to travel a fixed distance
-    # to open the latch.
     success = await move_axis(
         stacker,
         StackerAxis.L,
@@ -187,7 +205,13 @@ async def _move_and_home_axis(
     axis: StackerAxis,
     direction: Direction,
     offset: float = 0,
-) -> MoveResult:
+) -> bool:
+    """Move the axis in a direction by the given offset in mm and home it.
+
+    Warning: It is assumed that the axis is already in a known state
+    before this function gets called. Do not use this function if the axis
+    has not been homed/has recently stalled.
+    """
     MAX_TRAVEL = {
         StackerAxis.X: 194.0,
         StackerAxis.Z: 139.5,
@@ -195,22 +219,25 @@ async def _move_and_home_axis(
     }
     distance = MAX_TRAVEL[axis] - offset
     await move_axis(stacker, axis, direction, distance)
-    return await stacker.home_axis(axis, direction)
+    return await home_axis(stacker, axis, direction)
 
 
 async def dispense_labware(stacker: FlexStackerDriver, labware_height: float) -> bool:
     """Dispenses the next labware in the stacker."""
-    await reset_stall_detected(stacker)
     OFFSET_SM = 5.0
     OFFSET_MD = 10.0
+
     await _prepare_for_action(stacker)
+
     # Move platform along the X then Z axis
     await _move_and_home_axis(stacker, StackerAxis.X, Direction.RETRACT, OFFSET_SM)
     await _move_and_home_axis(stacker, StackerAxis.Z, Direction.EXTEND, OFFSET_SM)
+
     # Transfer
     await open_latch(stacker)
     await move_axis(stacker, StackerAxis.Z, Direction.RETRACT, (labware_height / 2) + 2)
     await close_latch(stacker)
+
     # Move platform along the Z then X axis
     offset = labware_height / 2 + OFFSET_MD
     await _move_and_home_axis(stacker, StackerAxis.Z, Direction.RETRACT, offset)
@@ -221,20 +248,21 @@ async def dispense_labware(stacker: FlexStackerDriver, labware_height: float) ->
 async def store_labware(stacker: FlexStackerDriver, labware_height: float) -> bool:
     """Stores a labware in the stacker."""
     await _prepare_for_action(stacker)
-    OFFSET_SM = 5.0
-    OFFSET_MD = 10.0
-    OFFSET_LG = 20.0
-    MEDIUM_LABWARE_Z_LIMIT = 20.0
     MAX_TRAVEL = {
         StackerAxis.X: 194.0,
         StackerAxis.Z: 139.5,
         StackerAxis.L: 22.0,
     }
+    MEDIUM_LABWARE_Z_LIMIT = 20.0
+    OFFSET_SM = 5.0
+    OFFSET_MD = 10.0
+    OFFSET_LG = 20.0
     # Move X then Z axis
     offset = OFFSET_MD if labware_height < MEDIUM_LABWARE_Z_LIMIT else OFFSET_LG * 2
     distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
     await _move_and_home_axis(stacker, StackerAxis.X, Direction.RETRACT, OFFSET_SM)
     await move_axis(stacker, StackerAxis.Z, Direction.EXTEND, distance)
+
     # Transfer
     await open_latch(stacker)
     z_speed = (
@@ -343,6 +371,9 @@ class Stacker_Axis_Acc_Lifetime_Test:
                 "stall_detected": False,
                 "device_info": (await stacker.get_device_info()).to_dict(),
                 "limit_switch_status": {},
+                "motion_params": {
+                    axis: AxisParams(0, 0, MoveParams(0, 0, 0)) for axis in StackerAxis
+                },
             }
             await stacker.set_led(
                 power=0.5, color=LEDColor.GREEN, pattern=LEDPattern.STATIC
@@ -388,6 +419,29 @@ class Stacker_Axis_Acc_Lifetime_Test:
     def dict_values_to_line(self, dict: Dict) -> str:
         """Convert values to line."""
         return ",".join(map(str, dict.values())) + "\n"
+
+    def log_stacker_error(
+        self,
+        stacker: FlexStackerDriver,
+        cycle: int,
+        error_type: str,
+        error_message: str,
+        test_file: str,
+    ) -> None:
+        """Log stacker error."""
+        serial_number = STACKER_STATES[stacker]["device_info"]["serial"]
+        error_data = self.test_data.copy()
+        error_data["Cycle"] = str(cycle)
+        error_data["Stacker"] = serial_number
+        error_data["State"] = error_type
+        error_data["Error"] = error_message
+        test_data_line = self.dict_values_to_line(error_data)
+        data.append_data_to_file(
+            test_name=self.test_name,
+            run_id=self.test_date,
+            file_name=test_file,
+            data=test_data_line,
+        )
 
     async def move_stacker(
         self, stacker: FlexStackerDriver, test_file: str, label: str
@@ -448,11 +502,18 @@ class Stacker_Axis_Acc_Lifetime_Test:
                 cycle += 1
             except FlexStackerStallError:
                 print(f"\nSTALL ERROR DETECTED on Stacker {serial_number}!")
+                self.log_stacker_error(
+                    stacker, cycle, "STALL ERROR", "FlexStackerStallError", test_file
+                )
                 self.exit_stacker()
             except KeyboardInterrupt:
+                self.log_stacker_error(
+                    stacker, cycle, "INTERRUPTED", "KeyboardInterrupt", test_file
+                )
                 self.exit_stacker()
             except Exception as e:
                 print(f"\nUNEXPECTED ERROR {e} on Stacker {serial_number}")
+                self.log_stacker_error(stacker, cycle, "ERROR", str(e), test_file)
                 self.exit_stacker()
 
     async def run_async_tasks(self) -> None:
