@@ -9,10 +9,10 @@ import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getLabwarePythonName, uuid } from '../../utils'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 import {
+  selectAdapter,
   selectFixture,
-  selectLabware,
   selectModule,
-  selectNestedLabware,
+  selectTopLabware,
 } from './actions'
 
 import type { LabwareEntities } from '@opentrons/step-generation'
@@ -29,10 +29,11 @@ import type {
   CreateContainerArgs,
   DeleteContainerAction,
   DuplicateLabwareAction,
+  SelectAdapterAction,
   SelectFixtureAction,
-  SelectLabwareAction,
   SelectModuleAction,
-  SelectNestedLabwareAction,
+  SelectTopLabwareAction,
+  ZoomedIntoSlotAction,
 } from './actions'
 
 export interface RenameLabwareAction {
@@ -44,10 +45,9 @@ export interface RenameLabwareAction {
 }
 export const renameLabware: (
   args: RenameLabwareAction['payload']
-) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
-  dispatch,
-  getState
-) => {
+) => ThunkAction<
+  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+> = args => (dispatch, getState) => {
   const { labwareId } = args
   const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(
     getState()
@@ -70,10 +70,9 @@ export const renameLabware: (
 }
 export const createContainer: (
   args: CreateContainerArgs
-) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
-  dispatch,
-  getState
-) => {
+) => ThunkAction<
+  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+> = args => (dispatch, getState) => {
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
@@ -128,6 +127,12 @@ export const createContainer: (
       renameLabware({
         labwareId: id,
       })(dispatch, getState)
+    }
+    if (slot === 'offDeck') {
+      dispatch({
+        type: 'ZOOMED_INTO_SLOT',
+        payload: { slot: id, cutout: null },
+      })
     }
   } else {
     console.warn('no slots available, cannot create labware')
@@ -203,8 +208,8 @@ export const duplicateLabware: (
 }
 
 interface EditSlotInfo {
-  createdLabwareForSlot?: LabwareOnDeck | null
-  createdNestedLabwareForSlot?: LabwareOnDeck | null
+  createdTopLabwareForSlot?: LabwareOnDeck | null
+  createdAdapterForSlot?: LabwareOnDeck | null
   createdModuleForSlot?: ModuleOnDeck | null
   preSelectedFixture?: Fixture | null
 }
@@ -212,26 +217,26 @@ interface EditSlotInfo {
 export const editSlotInfo: (
   args: EditSlotInfo
 ) => ThunkAction<
-  | SelectNestedLabwareAction
-  | SelectLabwareAction
+  | SelectTopLabwareAction
+  | SelectAdapterAction
   | SelectModuleAction
   | SelectFixtureAction
 > = args => dispatch => {
   const {
     createdModuleForSlot,
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
     preSelectedFixture,
   } = args
 
   dispatch(
-    selectNestedLabware({
-      nestedLabwareDefUri: createdNestedLabwareForSlot?.labwareDefURI ?? null,
+    selectTopLabware({
+      labwareDefUri: createdTopLabwareForSlot?.labwareDefURI ?? null,
     })
   )
   dispatch(
-    selectLabware({
-      labwareDefUri: createdLabwareForSlot?.labwareDefURI ?? null,
+    selectAdapter({
+      adapterDefUri: createdAdapterForSlot?.labwareDefURI ?? null,
     })
   )
   dispatch(selectModule({ moduleModel: createdModuleForSlot?.model ?? null }))
