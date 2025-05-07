@@ -379,7 +379,7 @@ def retract_and_wait(
     volume: float,
     trial: int,
     channel: int = 1,  # TODO hookup
-    blank: bool = False,  # TODO hookup
+    blank: bool = False,
 ) -> MeasurementData:
     """Retract away from the scale and record the weight."""
     m_tag = create_measurement_tag(mode, None if blank else volume, channel, trial)
@@ -414,6 +414,10 @@ def aspirate_with_liquid_class(
     submerge_depth_override: Optional[float] = None,
 ) -> None:
     """Aspirate with liquid class."""
+    channel = 1
+    fixture_settings.recorder.set_sample_tag(
+        create_measurement_tag("aspirate", volume, channel, trial)
+    )
     fixture_settings.pipette._core.aspirate_liquid_class(  # type: ignore [attr-defined]
         volume=volume,
         source=fixture_settings.liquid_source,
@@ -438,6 +442,10 @@ def dispense_with_liquid_class(
     submerge_depth_override: Optional[float] = None,
 ) -> None:
     """Dispense with Liquid Class."""
+    channel = 1
+    fixture_settings.recorder.set_sample_tag(
+        create_measurement_tag("dispense", volume, channel, trial)
+    )
     fixture_settings.pipette._core.dispense_liquid_class(  # type: ignore [attr-defined]
         volume=volume,
         dest=fixture_settings.liquid_source,
@@ -450,7 +458,7 @@ def dispense_with_liquid_class(
             )
         ],
         add_final_air_gap=True,
-        trash_location=trash_location,
+        trash_location=fixture_settings.pipette.trash_container,
     )
 
 
@@ -458,7 +466,10 @@ def run_blank_test(
     fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
 ) -> List[MeasurementData]:
     """Run a "blank" trial to measure the evaporation."""
-
+    next_tip = fixture_settings.tips[tip][
+        0
+    ]  # this is the next tip we're gonna use we just need the uri
+    tiprack_uri = next_tip.parent.uri
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
@@ -472,13 +483,23 @@ def run_blank_test(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, blank=True
     )
     aspirate_with_liquid_class(
-        fixture_settings, tip, volume, trial, submerge_depth_override=15
+        fixture_settings,
+        tip,
+        volume,
+        trial,
+        transfer_properties=transfer_properties,
+        submerge_depth_override=15,
     )
     post_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial, blank=True
     )
     dispense_with_liquid_class(
-        fixture_settings, tip, volume, trial, submerge_depth_override=15
+        fixture_settings,
+        tip,
+        volume,
+        trial,
+        transfer_properties=transfer_properties,
+        submerge_depth_override=15,
     )
     post_dispense = retract_and_wait(
         fixture_settings, MeasurementType.DISPENSE, tip, volume, trial, blank=True
