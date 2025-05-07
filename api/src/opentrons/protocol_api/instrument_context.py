@@ -1708,6 +1708,8 @@ class InstrumentContext(publisher.CommandPublisher):
               - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
               - ``"per source"``: Use one tip for each source well, even if
                 :ref:`tip refilling <complex-tip-refilling>` is required.
+              - ``"per destination"``: Use one tip for each destination well, even if
+                :ref:`tip refilling <complex-tip-refilling>` is required.
               - ``"never"``: Do not pick up or drop tips at all.
 
             See :ref:`param-tip-handling` for details.
