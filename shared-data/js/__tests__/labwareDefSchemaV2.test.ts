@@ -8,6 +8,7 @@ import type {
   InnerWellGeometry,
   LabwareDefinition2,
   LabwareWell,
+  WellSegment,
 } from '../types'
 import { SHARED_GEOMETRY_GROUPS } from './sharedGeometryGroups'
 import range from 'lodash/range'
@@ -296,16 +297,11 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
 
   test("a well's depth should equal the height of its geometry", () => {
     for (const well of Object.values(labwareDef.wells)) {
-      const wellGeometryId = well.geometryDefinitionId
-
-      if (wellGeometryId === undefined) return
-      if (labwareDef.innerLabwareGeometry == null) return
-
-      const wellGeometry = labwareDef.innerLabwareGeometry[wellGeometryId]
-      if (wellGeometry === undefined) return
+      const wellGeometry = getWellGeometry(labwareDef, well)
+      if (wellGeometry === null) return
+      const topFrustumHeight = wellGeometry.sections[0].topHeight
 
       const wellDepth = well.depth
-      const topFrustumHeight = wellGeometry.sections[0].topHeight
 
       const labwareWithWellDepthMismatches = [
         // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
@@ -339,6 +335,20 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
       } else {
         expect(wellDepth).toStrictEqual(topFrustumHeight)
       }
+    }
+  })
+
+  test("a well's diameter/xDimension/yDimension should agree with its geometry", () => {
+    for (const well of Object.values(labwareDef.wells)) {
+      const wellGeometry = getWellGeometry(labwareDef, well)
+      if (wellGeometry === null) return
+      const topSection = wellGeometry.sections[0]
+
+      const wellDimensions = extractDimensionsFromWell(well)
+      const geometryDimensions = extractTopDimensionsFromGeometrySection(
+        topSection
+      )
+      expect(wellDimensions).toStrictEqual(geometryDimensions)
     }
   })
 }
@@ -545,4 +555,71 @@ function pairs<T>(array: T[]): Array<[T, T]> {
     array[firstIndex],
     array[firstIndex + 1],
   ])
+}
+
+/** A helper for looking up a well's geometry, if it exists. */
+function getWellGeometry(
+  labware: LabwareDefinition2,
+  well: LabwareWell
+): InnerWellGeometry | null {
+  if (well.geometryDefinitionId === undefined) return null
+  return labware.innerLabwareGeometry?.[well.geometryDefinitionId] ?? null
+}
+
+/**
+ * Extract some shape-specific properties from a well.
+ * Fall back to undefined if that property doesn't exist, given the well's shape.
+ */
+function extractDimensionsFromWell(
+  well: LabwareWell
+): {
+  diameter?: number
+  xDimension?: number
+  yDimension?: number
+} {
+  switch (well.shape) {
+    case 'circular':
+      return { diameter: well.diameter }
+    case 'rectangular':
+      return {
+        xDimension: well.xDimension,
+        yDimension: well.yDimension,
+      }
+    // Deliberately no default case, for exhaustiveness checking.
+  }
+}
+
+/**
+ * Extract some shape-specific properties from a geometry section.
+ * Fall back to undefined if that property doesn't exist, given the geometry section's shape.
+ */
+function extractTopDimensionsFromGeometrySection(
+  section: WellSegment
+): { diameter?: number; xDimension?: number; yDimension?: number } {
+  switch (section.shape) {
+    case 'spherical':
+      return {}
+    case 'conical':
+      return { diameter: section.topDiameter }
+    case 'cuboidal':
+      return {
+        xDimension: section.topXDimension,
+        yDimension: section.topYDimension,
+      }
+    case 'roundedcuboid':
+    case 'squaredcone': {
+      switch (section.bottomCrossSection) {
+        case 'circular': // Circular bottom, rectangular top.
+          return {
+            xDimension: section.rectangleXDimension,
+            yDimension: section.rectangleYDimension,
+          }
+        case 'rectangular': // Rectangular bottom, circular top.
+          return {
+            diameter: section.circleDiameter,
+          }
+      }
+    }
+    // Deliberately no default case, for exhaustiveness checking.
+  }
 }
