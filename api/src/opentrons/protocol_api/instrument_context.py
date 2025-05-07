@@ -740,8 +740,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @publisher.publish(command=cmds.air_gap)
     @requires_version(2, 0)
-    def air_gap(
-        self, volume: Optional[float] = None, height: Optional[float] = None
+    def air_gap(  # noqa: C901
+        self,
+        volume: Optional[float] = None,
+        height: Optional[float] = None,
+        rate: Optional[float] = None,
+        flow_rate: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Draw air into the pipette's tip at the current well.
@@ -755,6 +759,16 @@ class InstrumentContext(publisher.CommandPublisher):
         :param height: The height, in mm, to move above the current well before creating
                        the air gap. The default is 5 mm above the current well.
         :type height: float
+
+        :param rate: A multiplier for the default flow rate of the pipette. Calculated
+                     as ``rate`` multiplied by :py:attr:`flow_rate.aspirate
+                     <flow_rate>`. If neither rate nor flow_rate is specified, the pipette
+                     will aspirate at a rate of 1.0 * InstrumentContext.flow_rate.aspirate. See
+                     :ref:`new-plunger-flow-rates`.
+        :type rate: float
+
+        :param flow_rate: The rate, in µL/s, at which the pipette will draw in air.
+        :type flow_rate: float
 
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
 
@@ -779,9 +793,30 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.22
             No longer implemented as an aspirate.
+
+        .. versionchanged:: 2.24
+            Adds the ``rate`` and ``flow_rate`` parameter. You can only define one or the other. If
+            both are unspecified then ``rate`` is by default set to 1.0.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
+
+        if rate is not None and self.api_version < APIVersion(2, 24):
+            raise APIVersionError(
+                api_element="rate",
+                until_version="2.24",
+                current_version=f"{self._api_version}",
+            )
+
+        if flow_rate is not None and self.api_version < APIVersion(2, 24):
+            raise APIVersionError(
+                api_element="flow_rate",
+                until_version="2.24",
+                current_version=f"{self._api_version}",
+            )
+
+        if flow_rate is not None and rate is not None:
+            raise ValueError("Cannot define both flow_rate and rate.")
 
         if height is None:
             height = 5
@@ -793,8 +828,14 @@ class InstrumentContext(publisher.CommandPublisher):
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
             self._core.prepare_to_aspirate()
             c_vol = self._core.get_available_volume() if volume is None else volume
-            flow_rate = self._core.get_aspirate_flow_rate()
-            self._core.air_gap_in_place(c_vol, flow_rate)
+            if flow_rate is not None:
+                calculated_rate = flow_rate
+            elif rate is not None:
+                calculated_rate = rate * self._core.get_aspirate_flow_rate()
+            else:
+                calculated_rate = self._core.get_aspirate_flow_rate()
+
+            self._core.air_gap_in_place(c_vol, calculated_rate)
         else:
             self.aspirate(volume)
         return self
