@@ -3,6 +3,7 @@ import {
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_FIXTURES,
   FLEX_STACKER_V1_FIXTURE,
+  getAAFromCutoutId,
   getDeckDefFromRobotType,
   HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
@@ -73,7 +74,16 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     showExpansion = true,
     height = '455px',
   } = props
+
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  deckConfig.map(cutoutConfig => {
+    const aa = getAAFromCutoutId(
+      cutoutConfig.cutoutId,
+      cutoutConfig.cutoutFixtureId,
+      deckDef
+    )
+    console.log('aa: ', aa)
+  })
 
   const stagingAreaFixtures = deckConfig.filter(
     ({ cutoutFixtureId }) => cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
@@ -89,7 +99,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
   )
   const emptyCutouts = deckConfig.filter(
-    ({ cutoutFixtureId, cutoutId }) =>
+    ({ cutoutFixtureId, cutoutId, addressableAreas }) =>
       editableCutoutIds.includes(cutoutId) &&
       cutoutFixtureId != null &&
       SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
@@ -123,35 +133,57 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
   )
 
+  const ot3DefaultSingleSlotOnDeck: Record<CutoutId, CutoutFixtureId> = {
+    cutoutD1: 'singleLeftSlot',
+    cutoutC1: 'singleLeftSlot',
+    cutoutB1: 'singleLeftSlot',
+    cutoutA1: 'singleLeftSlot',
+    cutoutD2: 'singleCenterSlot',
+    cutoutC2: 'singleCenterSlot',
+    cutoutB2: 'singleCenterSlot',
+    cutoutA2: 'singleCenterSlot',
+    // cutoutD3: 'stagingAreaRightSlot',
+    // cutoutC3: 'stagingAreaRightSlot',
+    // cutoutB3: 'stagingAreaRightSlot',
+    // cutoutA3: 'stagingAreaRightSlot',
+  }
+
+  const ot3DefaultStagingSlotOnDeck: Record<CutoutId, CutoutFixtureId> = {
+    cutoutD3: 'stagingAreaRightSlot',
+    cutoutC3: 'stagingAreaRightSlot',
+    cutoutB3: 'stagingAreaRightSlot',
+    cutoutA3: 'stagingAreaRightSlot',
+  }
+
   return (
     <RobotCoordinateSpace
       height={height}
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
-      {deckDef.locations.cutouts.map(cutout => (
+      {Object.keys(ot3DefaultSingleSlotOnDeck).map(key => (
         // give the outside of the base fixture svgs a stroke for extra spacing
-        <g key={cutout.id} stroke={COLORS.white} strokeWidth="4">
+        <g key={key} stroke={COLORS.white} strokeWidth="4">
           <SingleSlotFixture
-            data-testid={cutout.id}
-            cutoutId={cutout.id}
-            deckDefinition={deckDef}
+            data-testid={key}
+            cutoutId={key}
             slotClipColor={COLORS.transparent}
             fixtureBaseColor={lightFill}
+            deckDefinition={deckDef}
             showExpansion={showExpansion}
           />
         </g>
       ))}
-      {stagingAreaFixtures.map(({ cutoutId, cutoutFixtureId }) => (
+      {Object.entries(ot3DefaultStagingSlotOnDeck).map(([key, value]) => (
         <StagingAreaConfigFixture
-          data-testid={cutoutId}
-          key={cutoutId}
+          data-testid={key}
+          key={key}
           deckDefinition={deckDef}
           handleClickRemove={
-            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+            editableCutoutIds.includes(key) ? handleClickRemove : undefined
           }
-          fixtureLocation={cutoutId}
-          cutoutFixtureId={cutoutFixtureId}
-          selected={cutoutId === selectedCutoutId}
+          fixtureLocation={key}
+          cutoutFixtureId={value}
+          selected={key === selectedCutoutId}
         />
       ))}
       {emptyCutouts.map(({ cutoutId }) => (
@@ -163,6 +195,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           fixtureLocation={cutoutId}
         />
       ))}
+      {
+        /*
       {wasteChuteFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <WasteChuteConfigFixture
           data-testid={cutoutId}
@@ -301,17 +335,18 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           label={staticFixture.label}
           fixtureLocation={staticFixture.location}
         />
-      ))}
-      <SlotLabels
-        robotType={FLEX_ROBOT_TYPE}
-        color={darkFill}
-        show4thColumn={
-          stagingAreaFixtures.length > 0 ||
-          wasteChuteStagingAreaFixtures.length > 0 ||
-          magneticBlockStagingAreaFixtures.length > 0 ||
-          absorbanceReaderFixtures.length > 0
-        }
-      />
+      ))}*/
+        <SlotLabels
+          robotType={FLEX_ROBOT_TYPE}
+          color={darkFill}
+          show4thColumn={
+            stagingAreaFixtures.length > 0 ||
+            wasteChuteStagingAreaFixtures.length > 0 ||
+            magneticBlockStagingAreaFixtures.length > 0 ||
+            absorbanceReaderFixtures.length > 0
+          }
+        />
+      }
       {children}
     </RobotCoordinateSpace>
   )

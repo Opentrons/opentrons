@@ -5,8 +5,13 @@ import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import { getAllLiquidClassDefs } from '../liquidClasses'
 
-import type { AddressableAreaName, CutoutId } from '../../deck/types/schemaV5'
 import type {
+  AddressableAreaName,
+  CutoutFixtureId,
+  CutoutId,
+} from '../../deck/types/schemaV5'
+import type {
+  AddressableArea,
   DeckDefinition,
   LabwareDefinition2,
   LabwareDefinition3,
@@ -453,6 +458,24 @@ export const getCutoutIdFromAddressableArea = (
   )
 
   return null
+}
+
+export const getAAFromCutoutId = (
+  inputCutoutId: CutoutId,
+  cutoutFixtureId: CutoutFixtureId,
+  deckDefinition: DeckDefinition
+): AddressableAreaName[] | undefined => {
+  /**
+   * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
+   */
+  const cutoutFixture =
+    cutoutFixtureId === 'singleRightSlot'
+      ? 'stagingAreaRightSlot'
+      : cutoutFixtureId
+  const fixture = deckDefinition.cutoutFixtures.find(
+    fixture => fixture.id === cutoutFixture
+  )
+  return fixture?.providesAddressableAreas[inputCutoutId]
 }
 
 export const getSortedLiquidClassDefs = (): Record<string, LiquidClass> => {
