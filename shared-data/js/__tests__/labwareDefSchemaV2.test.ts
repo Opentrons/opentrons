@@ -146,12 +146,12 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   // This batch may have incompletely-updated geometry from recent work related to
   // liquid level detection and meniscus-relative pipetting. Probably, the wells were
   // updated but not the overall labware dimensions. This needs to be investigated and fixed.
-  'nest_96_wellplate_100ul_pcr_full_skirt/3.json': standard96WellNames,
+  'nest_96_wellplate_100ul_pcr_full_skirt/3.json': standard96WellNames, // Fixed in v4 of this labware.
   'opentrons_24_tuberack_nest_1.5ml_screwcap/2.json': standard24WellNames,
   'opentrons_24_tuberack_nest_2ml_screwcap/2.json': standard24WellNames,
   'usascientific_12_reservoir_22ml/2.json': generateStandardWellNames(1, 12), // Fixed in v3 of this labware.
-  'corning_12_wellplate_6.9ml_flat/3.json': generateStandardWellNames(3, 4),
-  'biorad_96_wellplate_200ul_pcr/3.json': standard96WellNames,
+  'corning_12_wellplate_6.9ml_flat/3.json': generateStandardWellNames(3, 4), // Fixed in v4 of this labware.
+  'biorad_96_wellplate_200ul_pcr/3.json': standard96WellNames, // Fixed in v4 of this labware.
 }
 
 const filterWells = (
