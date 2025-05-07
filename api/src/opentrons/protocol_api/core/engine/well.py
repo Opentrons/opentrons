@@ -197,12 +197,14 @@ class WellCore(AbstractWellCore):
             raise PipetteNotAttachedError(f"No pipette present on mount {mount}")
         pipette_id = pipette_from_mount.id
         starting_liquid_height = self.current_liquid_height()
-        projected_final_height = self._engine_client.state.geometry.get_well_height_after_liquid_handling_no_error(
-            labware_id=labware_id,
-            well_name=well_name,
-            pipette_id=pipette_id,
-            initial_height=starting_liquid_height,
-            volume=operation_volume,
+        projected_final_height = (
+            self._engine_client.state.geometry.get_well_height_after_liquid_handling(
+                labware_id=labware_id,
+                well_name=well_name,
+                pipette_id=pipette_id,
+                initial_height=starting_liquid_height,
+                volume=operation_volume,
+            )
         )
         return projected_final_height
 
