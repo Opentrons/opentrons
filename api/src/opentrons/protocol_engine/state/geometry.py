@@ -535,8 +535,8 @@ class GeometryView:
             assert_type(definition, LabwareDefinition3)
 
             slot_front_left_to_labware_back_left = Point(
-                definition.extents.total.backLeftBottom.x,
-                definition.extents.total.backLeftBottom.y,
+                definition.extents.footprint.backLeft.x,
+                definition.extents.footprint.backLeft.y,
                 definition.extents.total.backLeftBottom.z,
             )
             return slot_front_left + slot_front_left_to_labware_back_left
