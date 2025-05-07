@@ -81,19 +81,17 @@ async def move_axis(
     """Move the axis in a direction by the given distance in mm."""
     await reset_stall_detected(stacker)
     default = STACKER_MOTION_CONFIG[axis]["move"]
-    old_run_current = STACKER_STATES[stacker]["motion_params"][axis]["run_current"]
+    old_run_current = STACKER_STATES[stacker]["motion_params"][axis].run_current
     new_run_current = current if current is not None else default.run_current
     if new_run_current != old_run_current:
         await stacker.set_run_current(axis, new_run_current)
-        STACKER_STATES[stacker]["motion_params"][axis]["run_current"] = new_run_current
+        STACKER_STATES[stacker]["motion_params"][axis].run_current = new_run_current
 
-    old_hold_current = STACKER_STATES[stacker]["motion_params"][axis]["hold_current"]
+    old_hold_current = STACKER_STATES[stacker]["motion_params"][axis].hold_current
     new_hold_current = default.hold_current
     if new_hold_current != old_hold_current:
         await stacker.set_ihold_current(axis, new_hold_current)
-        STACKER_STATES[stacker]["motion_params"][axis][
-            "hold_current"
-        ] = new_hold_current
+        STACKER_STATES[stacker]["motion_params"][axis].hold_current = new_hold_current
 
     motion_params = default.move_params.update(
         max_speed=speed, acceleration=acceleration
@@ -119,19 +117,17 @@ async def home_axis(
     """Home flex stacker axis."""
     await reset_stall_detected(stacker)
     default = STACKER_MOTION_CONFIG[axis]["home"]
-    old_run_current = STACKER_STATES[stacker]["motion_params"][axis]["run_current"]
+    old_run_current = STACKER_STATES[stacker]["motion_params"][axis].run_current
     new_run_current = current if current is not None else default.run_current
     if new_run_current != old_run_current:
         await stacker.set_run_current(axis, new_run_current)
-        STACKER_STATES[stacker]["motion_params"][axis]["run_current"] = new_run_current
+        STACKER_STATES[stacker]["motion_params"][axis].run_current = new_run_current
 
-    old_hold_current = STACKER_STATES[stacker]["motion_params"][axis]["hold_current"]
+    old_hold_current = STACKER_STATES[stacker]["motion_params"][axis].hold_current
     new_hold_current = default.hold_current
     if new_hold_current != old_hold_current:
         await stacker.set_ihold_current(axis, new_hold_current)
-        STACKER_STATES[stacker]["motion_params"][axis][
-            "hold_current"
-        ] = new_hold_current
+        STACKER_STATES[stacker]["motion_params"][axis].hold_current = new_hold_current
 
     motion_params = default.move_params.update(
         max_speed=speed, acceleration=acceleration
@@ -427,14 +423,37 @@ class Stacker_Axis_Acc_Lifetime_Test:
         error_type: str,
         error_message: str,
         test_file: str,
+        sensor_states: Optional[Any] = None,
     ) -> None:
         """Log stacker error."""
+        expected_sensor_states = {
+            "XE": True,
+            "XR": False,
+            "ZE": False,
+            "ZR": True,
+            "LR": True,
+        }
         serial_number = STACKER_STATES[stacker]["device_info"]["serial"]
         error_data = self.test_data.copy()
         error_data["Cycle"] = str(cycle)
         error_data["Stacker"] = serial_number
         error_data["State"] = error_type
         error_data["Error"] = error_message
+        if sensor_states:
+            print("sensor states recorded")
+            mismatches = []
+            for key, expected in expected_sensor_states.items():
+                actual = getattr(sensor_states, key, None)
+                error_data[key] = actual if actual is not None else ""
+                if actual != expected:
+                    mismatches.append(f"{key}=Expected:{expected},Actual:{actual}")
+            if mismatches:
+                error_message += f" - Sensor mismatch: {'; '.join(mismatches)}"
+                error_data["Error"] = error_message
+        else:
+            for key in expected_sensor_states:
+                error_data[key] = ""
+
         test_data_line = self.dict_values_to_line(error_data)
         data.append_data_to_file(
             test_name=self.test_name,
@@ -449,6 +468,22 @@ class Stacker_Axis_Acc_Lifetime_Test:
         """Move stackers."""
         cycle = 1
         setattr(self, f"stacker{label}_active", True)
+        # Log test start
+        try:
+            serial_number = STACKER_STATES[stacker]["device_info"]["serial"]
+        except Exception as e:
+            serial_number = f"UNKNOWN due to error: {e}"
+
+        start_log = self.test_data.copy()
+        start_log["Cycle"] = str(cycle)
+        start_log["Stacker"] = serial_number
+        start_log["State"] = "START"
+        data.append_data_to_file(
+            test_name=self.test_name,
+            run_id=self.test_date,
+            file_name=test_file,
+            data=self.dict_values_to_line(start_log),
+        )
         while getattr(self, f"stacker{label}_active") and cycle <= self.cycles:
             print(f"\n-> Stacker{label} Test Cycle {cycle}/{self.cycles}")
             try:
@@ -502,18 +537,43 @@ class Stacker_Axis_Acc_Lifetime_Test:
                 cycle += 1
             except FlexStackerStallError:
                 print(f"\nSTALL ERROR DETECTED on Stacker {serial_number}!")
+                try:
+                    sensor_states = await stacker.get_limit_switches_status()
+                except Exception:
+                    sensor_states = None
                 self.log_stacker_error(
-                    stacker, cycle, "STALL ERROR", "FlexStackerStallError", test_file
+                    stacker,
+                    cycle,
+                    "STALL ERROR",
+                    "FlexStackerStallError",
+                    test_file,
+                    sensor_states,
                 )
                 self.exit_stacker()
             except KeyboardInterrupt:
+                print("\nKeyboardInterrupt detected!")
+                try:
+                    sensor_states = await stacker.get_limit_switches_status()
+                except Exception:
+                    sensor_states = None
                 self.log_stacker_error(
-                    stacker, cycle, "INTERRUPTED", "KeyboardInterrupt", test_file
+                    stacker,
+                    cycle,
+                    "INTERRUPTED",
+                    "KeyboardInterrupt",
+                    test_file,
+                    sensor_states,
                 )
                 self.exit_stacker()
             except Exception as e:
                 print(f"\nUNEXPECTED ERROR {e} on Stacker {serial_number}")
-                self.log_stacker_error(stacker, cycle, "ERROR", str(e), test_file)
+                try:
+                    sensor_states = await stacker.get_limit_switches_status()
+                except Exception:
+                    sensor_states = None
+                self.log_stacker_error(
+                    stacker, cycle, "ERROR", str(e), test_file, sensor_states
+                )
                 self.exit_stacker()
 
     async def run_async_tasks(self) -> None:
