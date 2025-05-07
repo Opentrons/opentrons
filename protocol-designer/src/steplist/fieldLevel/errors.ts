@@ -20,8 +20,8 @@ const FIELD_ERRORS: Record<FieldError, string> = {
   REQUIRED: 'This field is required',
   UNDER_WELL_MINIMUM: 'or more wells are required',
   NON_ZERO: 'Must be greater than zero',
-  UNDER_RANGE_MINIMUM: 'Min is',
-  OVER_RANGE_MAXIMUM: 'Max is',
+  UNDER_RANGE_MINIMUM: 'Enter a value within the specified range',
+  OVER_RANGE_MAXIMUM: 'Enter a value within the specified range',
   NOT_A_REAL_NUMBER: 'Must be a number',
   OUTSIDE_OF_RANGE: 'Must be between',
 }
@@ -60,13 +60,13 @@ export const minFieldValue = (minimum: number): ErrorChecker => (
 ): string | null =>
   !value || Number(value) >= minimum
     ? null
-    : `${FIELD_ERRORS.UNDER_RANGE_MINIMUM} ${minimum}`
+    : `${FIELD_ERRORS.UNDER_RANGE_MINIMUM}`
 export const maxFieldValue = (maximum: number): ErrorChecker => (
   value: unknown
 ): string | null =>
   !value || Number(value) <= maximum
     ? null
-    : `${FIELD_ERRORS.OVER_RANGE_MAXIMUM} ${maximum}`
+    : `${FIELD_ERRORS.OVER_RANGE_MAXIMUM}`
 export const temperatureRangeFieldValue = (
   minimum: number,
   maximum: number

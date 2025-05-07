@@ -295,7 +295,7 @@
         "label": "Step Notes"
       },
       "temperature": {
-        "caption": "Valid range is 4 – 95˚C",
+        "caption": "Must be between 4 – 95˚C",
         "setTemperature": "Temperature",
         "toggleOff": "Deactivate",
         "toggleOn": "Set"
