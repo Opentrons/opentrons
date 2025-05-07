@@ -55,7 +55,7 @@ export function LabwareCardOverflowMenu(
     },
   })
   const topLabwareId = labwareIds[0]
-  const disAllowNickname =
+  const disallowNickname =
     labwareIds.length > 1 ||
     deckSetupLabware[topLabwareId].def.allowedRoles?.includes('adapter') ||
     deckSetupLabware[topLabwareId].def.parameters.isTiprack ||
@@ -126,7 +126,7 @@ export function LabwareCardOverflowMenu(
           e.stopPropagation()
         }}
       >
-        {!disAllowNickname ? (
+        {!disallowNickname ? (
           <MenuItem
             onClick={(e: MouseEvent) => {
               handleAddNickname(e)
