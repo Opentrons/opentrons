@@ -1,11 +1,17 @@
 site_name: Opentrons Python Protocol API
+
 nav:
   - Welcome: index.md
   - Tutorial: tutorial.md
   - Versioning: versioning.md
   - Labware: labware.md
   - API Reference: api-reference.md
-theme: material
+
+theme:
+  name: material
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
 
 plugins:
   - search
@@ -41,6 +47,7 @@ markdown_extensions:
       alternate_style: true
   - toc:
       permalink: true
+
 extra:
   apiLevel: 2.23
   
