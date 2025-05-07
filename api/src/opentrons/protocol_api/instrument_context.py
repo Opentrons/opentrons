@@ -802,7 +802,9 @@ class InstrumentContext(publisher.CommandPublisher):
             if last_location is None or isinstance(
                 last_location, (TrashBin, WasteChute)
             ):
-                raise RuntimeError("No valid current location cache present")
+                raise RuntimeError(
+                    f"Cached location of {last_location} is not valid for touch tip."
+                )
             parent_labware, well = last_location.labware.get_parent_labware_and_well()
             if not well or not parent_labware:
                 raise RuntimeError(
@@ -907,7 +909,9 @@ class InstrumentContext(publisher.CommandPublisher):
             isinstance(last_location, types.Location)
             and not last_location.labware.is_well
         ):
-            raise RuntimeError("No previous valid location cached to perform air gap")
+            raise RuntimeError(
+                f"Cached location of {last_location} is not valid for air gap."
+            )
         target: Union[types.Location, TrashBin, WasteChute]
         if isinstance(last_location, types.Location):
             target = last_location.labware.as_well().top(height)

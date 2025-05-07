@@ -578,7 +578,7 @@ def validate_location(
         A `WasteChute` if the input location is a waste chute
 
     Raises:
-        NoLocationError: The is no input location and no cached location.
+        NoLocationError: There is no input location and no cached location.
         LocationTypeError: The location supplied is of unexpected type.
     """
     from .labware import Well

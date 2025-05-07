@@ -415,7 +415,7 @@ def test_move_to_trash(
     mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
-    """It should move the pipette to a trash."""
+    """It should move the pipette to a trash and update the location cache."""
     mock_trash = decoy.mock(cls=TrashBin)
 
     decoy.when(mock_trash.offset).then_return(DisposalOffset(x=1, y=2, z=3))

@@ -1189,12 +1189,12 @@ def test_touch_tip_raises_if_trash_last_location(
     decoy.when(mock_instrument_core.has_tip()).then_return(True)
     mock_trash = decoy.mock(cls=TrashBin)
     decoy.when(mock_protocol_core.get_last_location()).then_return(mock_trash)
-    with pytest.raises(RuntimeError, match="No valid current location"):
+    with pytest.raises(RuntimeError, match="not valid for touch tip"):
         subject.touch_tip()
 
     mock_chute = decoy.mock(cls=WasteChute)
     decoy.when(mock_protocol_core.get_last_location()).then_return(mock_chute)
-    with pytest.raises(RuntimeError, match="No valid current location"):
+    with pytest.raises(RuntimeError, match="not valid for touch tip"):
         subject.touch_tip()
 
 
@@ -2011,12 +2011,12 @@ def test_air_gap_over_trash_or_waste_chute_raises(
     decoy.when(mock_instrument_core.has_tip()).then_return(True)
     decoy.when(mock_protocol_core.get_last_location()).then_return(mock_chute)
 
-    with pytest.raises(RuntimeError, match="cached to perform air gap"):
+    with pytest.raises(RuntimeError, match="not valid for air gap"):
         subject.air_gap(volume=10, height=11)
 
     decoy.when(mock_protocol_core.get_last_location()).then_return(mock_trash)
 
-    with pytest.raises(RuntimeError, match="cached to perform air gap"):
+    with pytest.raises(RuntimeError, match="not valid for air gap"):
         subject.air_gap(volume=10, height=11)
 
 
