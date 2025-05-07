@@ -7,7 +7,6 @@ from numpy.typing import NDArray
 from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict, Set
 from dataclasses import dataclass
 from functools import cached_property
-from math import isclose
 
 from opentrons.types import (
     Point,
@@ -33,7 +32,6 @@ from ..errors import (
     LabwareNotLoadedOnLabwareError,
     LabwareNotLoadedOnModuleError,
     LabwareMovementNotAllowedError,
-    OperationLocationNotInWellError,
     InvalidLabwarePositionError,
     LabwareNotOnDeckError,
 )
@@ -522,39 +520,23 @@ class GeometryView:
             z=origin_pos.z + cal_offset.z,
         )
 
-    def validate_well_position(
+    def _validate_well_position(
         self,
-        well_location: WellLocationType,
-        z_offset: float,
-        pipette_id: Optional[str] = None,
-    ) -> None:
-        """Raise exception if operation location is not within well.
-
-        Primarily this checks if there is not enough liquid in a well to do meniscus-relative static aspiration.
-        """
-        if well_location.origin == WellOrigin.MENISCUS:
-            assert pipette_id is not None, "pipette id is None"
-            lld_min_height = self._pipettes.get_current_tip_lld_settings(
-                pipette_id=pipette_id
-            )
-            if z_offset < lld_min_height:
-                if isinstance(well_location, LiquidHandlingWellLocation):
-                    raise OperationLocationNotInWellError(
-                        f"Specifying {well_location.origin} with a height offset of {well_location.offset.z} results in a height of {z_offset} mm; the minimum allowed height for liquid tracking is {lld_min_height} mm"
-                    )
-                else:
-                    raise OperationLocationNotInWellError(
-                        f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location that could be below the bottom of the well"
-                    )
-        elif z_offset < 0 and not isclose(z_offset, 0, abs_tol=0.0000001):
-            if isinstance(well_location, LiquidHandlingWellLocation):
-                raise OperationLocationNotInWellError(
-                    f"Specifying {well_location.origin} with an offset of {well_location.offset} and a volume offset of {well_location.volumeOffset} results in an operation location below the bottom of the well"
-                )
-            else:
-                raise OperationLocationNotInWellError(
-                    f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location below the bottom of the well"
-                )
+        target_height: LiquidTrackingType,  # height in mm inside a well relative to the bottom
+        well_max_height: float,
+        pipette_id: str,
+    ) -> LiquidTrackingType:
+        """If well offset would be outside the bounds of a well, silently bring it back to the boundary."""
+        if isinstance(target_height, SimulatedProbeResult):
+            return target_height
+        lld_min_height = self._pipettes.get_current_tip_lld_settings(
+            pipette_id=pipette_id
+        )
+        if target_height < lld_min_height:
+            target_height = lld_min_height
+        elif target_height > well_max_height:
+            target_height = well_max_height
+        return target_height
 
     def validate_probed_height(
         self,
@@ -595,7 +577,7 @@ class GeometryView:
 
         offset = WellOffset(x=0, y=0, z=well_depth)
         if well_location is not None:
-            offset = well_location.offset
+            offset = well_location.offset  # location of the bottom of the well
             offset_adjustment = self.get_well_offset_adjustment(
                 labware_id=labware_id,
                 well_name=well_name,
@@ -606,11 +588,6 @@ class GeometryView:
             )
             if not isinstance(offset_adjustment, SimulatedProbeResult):
                 offset = offset.model_copy(update={"z": offset.z + offset_adjustment})
-                self.validate_well_position(
-                    well_location=well_location,
-                    z_offset=offset.z,
-                    pipette_id=pipette_id,
-                )
         return Point(
             x=labware_pos.x + offset.x + well_def.x,
             y=labware_pos.y + offset.y + well_def.y,
@@ -2107,6 +2084,8 @@ class GeometryView:
 
         This is given an initial handling height, with reference to the well bottom.
         """
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        well_depth = well_def.depth
         well_geometry = self._labware.get_well_geometry(
             labware_id=labware_id, well_name=well_name
         )
@@ -2122,8 +2101,16 @@ class GeometryView:
                     pipette_id=pipette_id,
                 )
             )
-            return find_height_at_well_volume(
+            # NOTE(cm): if final_volume is outside the bounds of the well, it will get
+            # adjusted inside find_height_at_well_volume to accomodate well the height
+            # calculation.
+            height_inside_well = find_height_at_well_volume(
                 target_volume=final_volume, well_geometry=well_geometry
+            )
+            return self._validate_well_position(
+                target_height=height_inside_well,
+                well_max_height=well_depth,
+                pipette_id=pipette_id,
             )
         except InvalidLiquidHeightFound as _exception:
             raise InvalidLiquidHeightFound(
@@ -2131,6 +2118,7 @@ class GeometryView:
                 + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
             )
 
+    # maybe dont need this anymore ???
     def get_well_height_after_liquid_handling_no_error(
         self,
         labware_id: str,
