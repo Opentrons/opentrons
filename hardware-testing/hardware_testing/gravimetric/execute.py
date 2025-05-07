@@ -462,9 +462,12 @@ def _run_trial(
             channel_count=trial.channel_count,
         )
 
-        print("\n\n\n\n\n\n\n\n\n\n\n\nhere")
-        print(trial.liquid_tracker.get_liquid_height(trial.well))
-        print(approach, submerge, retract)
+        print("\n\n\n")
+        print(f"Liquid Height = {trial.liquid_tracker.get_liquid_height(trial.well)}")
+        print(f"Approach = {approach}")
+        print(f"Submerge = {submerge}")
+        print(f"Retract = {retract}")
+        print("\n\n\n")
 
         def _enable() -> None:
             # NOTE: setting all position references to BOTTOM
