@@ -11,7 +11,7 @@ import type { DropdownMenuProps } from '../../molecules'
 import exampleImage from '../../images/labware/measurement-guide/images/spacing/spacing-well-rectangular@3x.png'
 
 const meta: Meta<typeof ListItemComponent> = {
-  title: 'ListItem',
+  title: 'Helix/Atoms/ListItem',
   component: ListItemComponent,
   argTypes: {
     type: {

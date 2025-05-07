@@ -18,11 +18,11 @@ import {
   getWellGroupForLiquidId,
 } from '/app/transformations/analysis'
 
-import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { LabwareByLiquidId } from '/app/transformations/commands'
 
 interface LabwareLiquidsDetailModalProps {
   labwareId: string

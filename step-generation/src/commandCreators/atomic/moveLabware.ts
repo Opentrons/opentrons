@@ -109,7 +109,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     })
   )
   const hasMultipleObjectsInSameSlot =
-    largestStackLoadnames?.length > 0 && !isStackingAllowed
+    largestStackLoadnames?.length > 0 &&
+    !isStackingAllowed &&
+    !newLocationInWasteChute
 
   if (!labwareId || !prevRobotState.labware[labwareId]) {
     errors.push(

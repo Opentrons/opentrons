@@ -308,6 +308,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   aspirateRetractYOffset: number
   aspirateRetractZOffset: number
   aspirateRetractPositionReference: PositionReference
+  aspirateRetractDelay: InnerDelayArgs | null
   dispenseSubmergeSpeed: number | null
   dispenseSubmergeXOffset: number
   dispenseSubmergeYOffset: number
@@ -693,6 +694,7 @@ export type ErrorType =
   | 'PIPETTING_INTO_COLUMN_4'
   | 'POSSIBLE_PIPETTE_COLLISION'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
+  | 'RETRACT_BELOW_ASPIRATE'
   | 'SUBMERGE_BELOW_ASPIRATE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'

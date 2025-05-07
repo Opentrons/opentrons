@@ -75,7 +75,7 @@ describe('moveToWell', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      'mockPythonName.move_to(mockPythonName["A1"].bottom(z=1))'
+      'mock_pipette.move_to(mock_source_plate["A1"].bottom(z=1))'
     )
   })
   it('should apply the optional params to the command', () => {

@@ -389,9 +389,6 @@ export function DeviceResetSlideout({
 }
 
 // Keys in this object do not need to map to the server's HTTP API.
-//
-// This is `{ot2Only: ..., flexOnly: ...}`` instead of `OT2Only | FlexOnly`` to be
-// defensive against the robot type changing
 interface DisplayedResetOptionState {
   common: {
     runsHistory: boolean
