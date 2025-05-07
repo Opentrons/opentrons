@@ -865,7 +865,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param rate: A multiplier for the default flow rate of the pipette. Calculated
                      as ``rate`` multiplied by :py:attr:`flow_rate.aspirate
-                     <flow_rate>`. If not specified, defaults to 1.0. See
+                     <flow_rate>`. If neither rate nor flow_rate is specified, the pipette
+                     will aspirate at a rate of 1.0 * InstrumentContext.flow_rate.aspirate. See
                      :ref:`new-plunger-flow-rates`.
         :type rate: float
 
@@ -897,26 +898,27 @@ class InstrumentContext(publisher.CommandPublisher):
             No longer implemented as an aspirate.
 
         .. versionchanged:: 2.24
-            Adds the ``rate`` and ``flow_rate`` parameter. You can only define one or the other.
+            Adds the ``rate`` and ``flow_rate`` parameter. You can only define one or the other. If
+            both are unspecified then ``rate`` is by default set to 1.0.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
 
-        if rate and self.api_version < APIVersion(2, 24):
+        if rate is not None and self.api_version < APIVersion(2, 24):
             raise APIVersionError(
                 api_element="rate",
                 until_version="2.24",
                 current_version=f"{self._api_version}",
             )
 
-        if flow_rate and self.api_version < APIVersion(2, 24):
+        if flow_rate is not None and self.api_version < APIVersion(2, 24):
             raise APIVersionError(
                 api_element="flow_rate",
                 until_version="2.24",
                 current_version=f"{self._api_version}",
             )
 
-        if flow_rate and rate:
+        if flow_rate is not None and rate is not None:
             raise ValueError("Cannot define both flow_rate and rate.")
 
         if height is None:
