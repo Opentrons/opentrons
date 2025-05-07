@@ -4,7 +4,11 @@ import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
 
-import { fixture96Plate, fixtureTiprackAdapter, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  fixtureTiprackAdapter,
+  FLEX_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'

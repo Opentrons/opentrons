@@ -16,9 +16,7 @@ import { i18n } from '../../../../assets/localization'
 import { getRobotType } from '../../../../file-data/selectors'
 import { createCustomLabwareDef } from '../../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import {
-  selectTopLabware,
-} from '../../../../labware-ingred/actions'
+import { selectTopLabware } from '../../../../labware-ingred/actions'
 import { selectors } from '../../../../labware-ingred/selectors'
 import {
   getInitialDeckSetup,
