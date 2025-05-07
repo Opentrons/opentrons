@@ -34,6 +34,7 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 - Choose a new tip drop location from the dropdown menu when an uploaded protocol is missing a drop tip location.
 - Protocol Designer correctly updates adapter and labware combination definitions when you upload a protocol designed in Protocol Designer v7.0.0 or earlier.
 - When adding a disposal volume, a blowout location is now required.
+- No longer allow touch tip with incompatible labware. This results in a change in behavior from imported protocols that had touch tip on incompatible labware.
 
 Running a protocol created in Protocol Designer now requires Opentrons App version 8.4.0 or newer.
 
