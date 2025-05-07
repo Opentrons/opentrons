@@ -297,14 +297,9 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
 
   test("a well's dimensions should agree with its geometry", context => {
     const xfailLabware = [
-      'corning_24_wellplate_3.4ml_flat',
-      'corning_6_wellplate_16.8ml_flat',
-      'corning_96_wellplate_360ul_flat',
-      'nest_96_wellplate_2ml_deep',
       'opentrons_15_tuberack_falcon_15ml_conical',
       'opentrons_24_aluminumblock_nest_1.5ml_screwcap',
       'opentrons_24_aluminumblock_nest_2ml_screwcap',
-      'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap',
       'opentrons_6_tuberack_falcon_50ml_conical',
       'opentrons_6_tuberack_nest_50ml_conical',
     ]
