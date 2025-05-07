@@ -31,6 +31,7 @@ import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { ThunkDispatch } from '../../../types'
 
 const STANDARD_X_WIDTH = 127.76
 const STANDARD_Y_HEIGHT = 85.48
@@ -44,8 +45,7 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
   const { t, i18n } = useTranslation('starting_deck_state')
   const terminalItemId = useSelector(getSelectedTerminalItemId)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-
-  const dispatch = useDispatch<any>()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedSlot } = selectedSlotInfo

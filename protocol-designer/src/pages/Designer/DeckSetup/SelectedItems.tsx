@@ -42,13 +42,15 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
   const defs = getAllLabwareDefs()
   const deckSetup = useSelector(getInitialDeckSetup)
   const { labware } = deckSetup
-  const matchingSelectedTopLabwareOnDeck = Object.values(labware).find(lw => {
-    const matchingSlot = getSlotInLocationStack(lw.stack)
-    return (
-      lw.labwareDefURI === selectedTopLabwareDefUri &&
-      matchingSlot === selectedSlot.slot
-    )
-  })
+  const matchingSelectedTopLabwareOnDeck = Object.values(labware).find(
+    ({ stack, labwareDefURI }) => {
+      const matchingSlot = getSlotInLocationStack(stack)
+      return (
+        labwareDefURI === selectedTopLabwareDefUri &&
+        matchingSlot === selectedSlot.slot
+      )
+    }
+  )
   const selectedAdapterDef =
     selectedAdapterDefUri != null
       ? defs[selectedAdapterDefUri] ?? customLabwareDefs[selectedAdapterDefUri]
