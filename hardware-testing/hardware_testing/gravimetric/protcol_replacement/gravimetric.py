@@ -16,6 +16,10 @@ from opentrons.protocol_api import (
     LiquidClass,
 )
 from opentrons import version
+from opentrons.protocol_api._liquid_properties import TransferProperties
+from opentrons.protocol_api.core.engine import (
+    transfer_components_executor as tx_comps_executor,
+)
 from opentrons.config import infer_config_base_dir
 
 metadata = {"protocolName": "Gravimetric QC"}
@@ -127,14 +131,14 @@ class FixtureSettings:
             ctx.params.qc_test_profile.parse_as_csv()  # type: ignore [attr-defined]
         )
         name = lookup_key("name", csv_params)[0]
-        increment = bool(lookup_key("increment", csv_params)[0])
+        increment = bool(lookup_key("increment", csv_params)[0] == "TRUE")
         mount = lookup_key("mount", csv_params)[0]
         pipette_volume = int(lookup_key("pipette", csv_params)[0])
         pipette_channels = int(lookup_key("pipette", csv_params)[1])
         tip_sizes = [int(tip) for tip in lookup_key("tips", csv_params)]
         trials = int(lookup_key("trials", csv_params)[0])
-        return_tip = bool(lookup_key("return_tip", csv_params)[0] == "True")
-        touch_tip = bool(lookup_key("touch_tip", csv_params)[0] == "True")
+        return_tip = bool(lookup_key("return_tip", csv_params)[0] == "TRUE")
+        touch_tip = bool(lookup_key("touch_tip", csv_params)[0] == "TRUE")
         liquid_name = lookup_key("liquid", csv_params)[0]
         liquid_desc = lookup_key("liquid", csv_params)[1]
         liquid_col = lookup_key("liquid", csv_params)[2]
@@ -144,9 +148,7 @@ class FixtureSettings:
         tipracks_200ul = [slot for slot in lookup_key("tipracks_200ul", csv_params)]
         tipracks_1000ul = [slot for slot in lookup_key("tipracks_1000ul", csv_params)]
         labware_on_scale = lookup_key("labware_on_scale", csv_params)[0]
-        labware_on_scale_well_name = lookup_key(
-            "labware_on_scale_well_name", csv_params
-        )[0]
+        labware_on_scale_well_name = lookup_key("labware_on_scale", csv_params)[1]
         slot_scale = lookup_key("slot_scale", csv_params)[0]
         volumes_to_test_20ul = [
             float(volume) for volume in lookup_key("volumes_to_test_20ul", csv_params)
@@ -408,10 +410,23 @@ def aspirate_with_liquid_class(
     tip: int,
     volume: float,
     trial: int,
+    transfer_properties: TransferProperties,
     submerge_depth_override: Optional[float] = None,
 ) -> None:
     """Aspirate with liquid class."""
-    pass
+    fixture_settings.pipette._core.aspirate_liquid_class(  # type: ignore [attr-defined]
+        volume=volume,
+        source=fixture_settings.liquid_source,
+        transfer_properties=transfer_properties,
+        transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
+        tip_contents=[
+            tx_comps_executor.LiquidAndAirGapPair(
+                liquid=0,
+                air_gap=0,
+            )
+        ],
+        volume_for_pipette_mode_configuration=volume,
+    )
 
 
 def dispense_with_liquid_class(
@@ -419,16 +434,40 @@ def dispense_with_liquid_class(
     tip: int,
     volume: float,
     trial: int,
+    transfer_properties: TransferProperties,
     submerge_depth_override: Optional[float] = None,
 ) -> None:
     """Dispense with Liquid Class."""
-    pass
+    fixture_settings.pipette._core.dispense_liquid_class(  # type: ignore [attr-defined]
+        volume=volume,
+        dest=fixture_settings.liquid_source,
+        transfer_properties=transfer_properties,
+        transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
+        tip_contents=[
+            tx_comps_executor.LiquidAndAirGapPair(  # TODO fix
+                liquid=volume,
+                air_gap=0,
+            )
+        ],
+        add_final_air_gap=True,
+        trash_location=trash_location,
+    )
 
 
 def run_blank_test(
     fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
 ) -> List[MeasurementData]:
     """Run a "blank" trial to measure the evaporation."""
+
+    transfer_properties = fixture_settings.liquid_class.get_for(
+        fixture_settings.pipette.name, tip_rack=tiprack_uri
+    )
+    fixture_settings.pipette._core.load_liquid_class(  # type: ignore [attr-defined]
+        name=fixture_settings.liquid_class.name,
+        transfer_properties=transfer_properties,
+        tiprack_uri=tiprack_uri,
+    )
+
     pre_aspriate = retract_and_wait(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, blank=True
     )
@@ -456,15 +495,32 @@ def run_one_test(
 ) -> List[MeasurementData]:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
     tip_well = fixture_settings.tips[tip].pop(0)
+    tiprack_uri = tip_well.parent.uri
+    transfer_properties = fixture_settings.liquid_class.get_for(
+        fixture_settings.pipette.name, tip_rack=tiprack_uri
+    )
+    fixture_settings.pipette._core.load_liquid_class(  # type: ignore [attr-defined]
+        name=fixture_settings.liquid_class.name,
+        transfer_properties=transfer_properties,
+        tiprack_uri=tiprack_uri,
+    )
     fixture_settings.pipette.pick_up_tip(tip_well)
     pre_aspriate = retract_and_wait(
-        fixture_settings, MeasurementType.INIT, tip, volume, trial
+        fixture_settings,
+        MeasurementType.INIT,
+        tip,
+        volume,
+        trial,
     )
-    aspirate_with_liquid_class(fixture_settings, tip, volume, trial)
+    aspirate_with_liquid_class(
+        fixture_settings, tip, volume, trial, transfer_properties
+    )
     post_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial
     )
-    dispense_with_liquid_class(fixture_settings, tip, volume, trial)
+    dispense_with_liquid_class(
+        fixture_settings, tip, volume, trial, transfer_properties
+    )
     post_dispense = retract_and_wait(
         fixture_settings, MeasurementType.DISPENSE, tip, volume, trial
     )
