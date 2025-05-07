@@ -35,6 +35,7 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 - Protocol Designer correctly updates adapter and labware combination definitions when you upload a protocol designed in Protocol Designer v7.0.0 or earlier.
 - When adding a disposal volume, a blowout location is now required.
 - No longer allow touch tip with incompatible labware. This results in a change in behavior from imported protocols that had touch tip on incompatible labware.
+- If multiple labware end up in the same slot at the same time due to deleting/rearranging steps, a timeline error is now raised.
 
 Running a protocol created in Protocol Designer now requires Opentrons App version 8.4.0 or newer.
 
