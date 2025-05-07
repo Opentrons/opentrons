@@ -4462,8 +4462,18 @@ def test_virtual_get_well_height_after_liquid_handling_no_error(
     decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
         get_default_nozzle_map(pip_type)
     )
+    fake_min_height = 0.5
+    decoy.when(
+        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+    ).then_return(fake_min_height)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
         well_plate_def
+    )
+    well_def = well_plate_def.wells["B2"]
+    # make the depth match the phoney baloney innerwellgeoemtry
+    well_def = well_def.model_copy(update={"depth": 45.0})
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
     )
 
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
