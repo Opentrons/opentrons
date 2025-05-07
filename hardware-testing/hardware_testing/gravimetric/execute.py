@@ -867,7 +867,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         unit_tag,
         str(cfg.tip_volume),
     ]
-    simplified_results_for_calibration_test: List[List[str]] = []
+    simplified_results_for_calibration_test_asp: List[List[str]] = []
+    simplified_results_for_calibration_test_disp: List[List[str]] = []
 
     total_tips = len(
         [tip for chnl_tips in resources.tips.values() for tip in chnl_tips]
@@ -1004,7 +1005,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 trial: [] for trial in range(cfg.trials)
             }
             # CREATE new line entry for this volume to be tested (line includes all trials)
-            simplified_results_for_calibration_test.append(meta_data + [str(volume)])
+            simplified_results_for_calibration_test_asp.append(meta_data + [str(volume)])
+            simplified_results_for_calibration_test_disp.append(meta_data + [str(volume)])
             for channel in trials[volume].keys():
                 channel_offset = _get_channel_offset(cfg, channel)
                 actual_asp_list_channel = []
@@ -1089,8 +1091,11 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     # FIXME: see why it takes so long to store CSV data
                     resources.test_report.save_to_disk()
 
-                    simplified_results_for_calibration_test[-1].append(
+                    simplified_results_for_calibration_test_asp[-1].append(
                         str(round(asp_with_evap, 2))
+                    )
+                    simplified_results_for_calibration_test_disp[-1].append(
+                        str(round(disp_with_evap, 2))
                     )
 
                     ui.print_info("dropping tip")
@@ -1255,13 +1260,23 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         channel_count=len(channels_to_test),
         test_report=resources.test_report,
     )
-    csv_data_str = "\n".join(
-        ["\t".join(csv_line) for csv_line in simplified_results_for_calibration_test]
+    csv_data_str_asp = "\n".join(
+        ["\t".join(csv_line) for csv_line in simplified_results_for_calibration_test_asp]
     )
-    print(csv_data_str)
+    csv_data_str_disp = "\n".join(
+        ["\t".join(csv_line) for csv_line in simplified_results_for_calibration_test_disp]
+    )
+    print(csv_data_str_asp)
+    print(csv_data_str_disp)
     dump_data_to_file(
         resources.test_report._test_name,
         resources.test_report._run_id,
         f"aspirate-volumes-{resources.test_report._tag}.csv",
-        csv_data_str,
+        csv_data_str_asp,
+    )
+    dump_data_to_file(
+        resources.test_report._test_name,
+        resources.test_report._run_id,
+        f"dispense-volumes-{resources.test_report._tag}.csv",
+        csv_data_str_disp,
     )
