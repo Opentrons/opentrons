@@ -423,7 +423,8 @@ def _find_height_in_partial_frustum(
     # if we finish looping through the whole well, bottom_section will be the well's volume
     total_well_volume = bottom_section_volume
     # if we've looked through all sections and can't find the target volume, raise an error
-    # also this code should never be reached bc an error should be raised by find_height_at_well_volume
+    # also this code should never be reached bc an invalid target volume should be changed
+    # by find_height_at_well_volume
     raise InvalidLiquidHeightFound(
         f"Target volume {target_volume} uL exceeds the well volume {total_well_volume} uL."
     )
@@ -432,7 +433,6 @@ def _find_height_in_partial_frustum(
 def find_height_at_well_volume(
     target_volume: LiquidTrackingType,
     well_geometry: InnerWellGeometry,
-    raise_error_if_result_invalid: bool = True,
 ) -> LiquidTrackingType:
     """Find the height within a well, at a known volume."""
     # comparisons with SimulatedProbeResult objects aren't meaningful, just
@@ -443,12 +443,10 @@ def find_height_at_well_volume(
     volumetric_capacity = get_well_volumetric_capacity(well_geometry)
     max_volume = sum(row[1] for row in volumetric_capacity)
 
-    if raise_error_if_result_invalid:
-        if target_volume < 0 or target_volume > max_volume:
-            raise InvalidLiquidHeightFound(
-                f"Invalid target volume {target_volume} uL; max volume is {max_volume} uL"
-            )
-
+    if target_volume < 0:
+        target_volume = 0
+    elif target_volume > max_volume:
+        target_volume = max_volume
     sorted_well = sorted(well_geometry.sections, key=lambda section: section.topHeight)
     # find the section the target volume is in and compute the height
     return _find_height_in_partial_frustum(
