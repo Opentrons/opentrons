@@ -2385,7 +2385,7 @@ def test_distribute_liquid_raises_if_tip_has_liquid(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-@pytest.mark.parametrize("new_tip", ["always", "per source"])
+@pytest.mark.parametrize("new_tip", ["always", "per source", "per destination"])
 def test_distribute_liquid_raises_for_incompatible_tip_policies(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
@@ -2754,7 +2754,7 @@ def test_consolidate_liquid_raises_if_tip_has_liquid(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-@pytest.mark.parametrize("new_tip", ["always", "per source"])
+@pytest.mark.parametrize("new_tip", ["always", "per source", "per destination"])
 def test_consolidate_liquid_raises_for_incompatible_tip_policies(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
