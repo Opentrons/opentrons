@@ -15,7 +15,6 @@ import {
   StyledText,
   useOnClickOutside,
 } from '@opentrons/components'
-import { getTopLocationInStack } from '@opentrons/step-generation'
 
 import {
   ConfirmDeleteEntityInUseModal,
