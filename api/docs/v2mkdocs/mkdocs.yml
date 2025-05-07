@@ -5,7 +5,14 @@ nav:
   - Tutorial: tutorial.md
   - Versioning: versioning.md
   - Labware: labware.md
-  - API Reference: api-reference.md
+  - API Reference:
+    - Protocols: api-reference/protocols.md
+    - Instruments: api-reference/instruments.md
+    - Labware and Trash Containers: api-reference/labware.md
+    - Wells and Liquids: api-reference/wells-liquids.md
+    - Modules: api-reference/modules.md
+    - Useful Types: api-reference/types.md
+    - Executing and Simulating: api-reference/execute-simulate.md
 
 theme:
   name: material
@@ -31,7 +38,9 @@ plugins:
             filters: 
               - "public"
               - "!^__"
-            heading_level: 3
+            show_root_heading: true
+            show_symbol_type_toc: true
+            heading_level: 2
             autolink: true
   - autorefs
   - macros
