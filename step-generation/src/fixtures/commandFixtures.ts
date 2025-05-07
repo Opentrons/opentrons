@@ -468,6 +468,71 @@ export const submergeWithAspirateHelper = (submergeParams: {
   ]
 }
 
+export const blowoutInTrashCommands = (args: {
+  pipetteId: string
+  addressableAreaName: string
+  blowoutFlowRate: number
+  dispenseAirGap?: number
+  aspirateDelay?: number
+  aspirateFlowRate?: number
+}) => {
+  const {
+    pipetteId,
+    addressableAreaName,
+    blowoutFlowRate,
+    aspirateDelay = 0,
+    dispenseAirGap = 0,
+    aspirateFlowRate,
+  } = args
+  return [
+    {
+      commandType: 'moveToAddressableArea',
+      key: expect.any(String),
+      params: {
+        pipetteId,
+        addressableAreaName,
+        offset: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+      },
+    },
+    {
+      commandType: 'blowOutInPlace',
+      key: expect.any(String),
+      params: {
+        pipetteId,
+        flowRate: blowoutFlowRate,
+      },
+    },
+    ...(dispenseAirGap > 0
+      ? [
+          {
+            commandType: 'airGapInPlace',
+            key: expect.any(String),
+            params: {
+              pipetteId,
+              volume: dispenseAirGap,
+              ...(aspirateFlowRate != null
+                ? { flowRate: aspirateFlowRate }
+                : {}),
+            },
+          },
+          ...(aspirateDelay > 0
+            ? [
+                {
+                  commandType: 'waitForDuration',
+                  key: expect.any(String),
+                  params: { seconds: aspirateDelay },
+                },
+              ]
+            : []),
+        ]
+      : []),
+  ]
+}
+
 export const dispenseHelperLiquidClass = (params: {
   pipetteId: string
   labwareId: string
@@ -493,6 +558,8 @@ export const dispenseHelperLiquidClass = (params: {
   touchTipMmFromEdge?: number
   touchTipSpeed?: number
   pushOut?: number
+  shouldBlowoutInDestination?: boolean
+  blowoutFlowRate?: number
 }) => {
   const {
     volume,
@@ -519,6 +586,8 @@ export const dispenseHelperLiquidClass = (params: {
     touchTipMmFromEdge,
     touchTipSpeed,
     pushOut,
+    shouldBlowoutInDestination = false,
+    blowoutFlowRate,
   } = params
   const mixCommands = []
   for (let i = 0; i < mixTimes; i++) {
@@ -549,7 +618,7 @@ export const dispenseHelperLiquidClass = (params: {
             pipetteId,
             volume: mixVolume,
             flowRate: dispenseFlowRate,
-            pushOut: 0,
+            ...(i === mixTimes - 1 ? { pushOut } : { pushOut: 0 }),
           },
         },
         ...(dispenseDelay > 0
@@ -565,7 +634,6 @@ export const dispenseHelperLiquidClass = (params: {
     )
   }
   const effectivePushOut = mixTimes > 0 ? 0 : pushOut
-
   return [
     {
       commandType: 'moveToWell',
@@ -586,8 +654,20 @@ export const dispenseHelperLiquidClass = (params: {
               pipetteId,
               volume: aspirateAirGap,
               flowRate: dispenseFlowRate,
+              pushOut: 0,
             },
           },
+          ...(dispenseDelay > 0
+            ? [
+                {
+                  commandType: 'waitForDuration',
+                  key: expect.any(String),
+                  params: {
+                    seconds: dispenseDelay,
+                  },
+                },
+              ]
+            : []),
         ]
       : []),
     {
@@ -610,8 +690,6 @@ export const dispenseHelperLiquidClass = (params: {
           },
         ]
       : []),
-
-    ...(mixTimes > 0 ? mixCommands : []),
     {
       commandType: 'dispenseInPlace',
       key: expect.any(String),
@@ -631,6 +709,7 @@ export const dispenseHelperLiquidClass = (params: {
           },
         ]
       : []),
+    ...(mixTimes > 0 ? mixCommands : []),
     {
       commandType: 'moveToWell',
       key: expect.any(String),
@@ -648,6 +727,15 @@ export const dispenseHelperLiquidClass = (params: {
             commandType: 'waitForDuration',
             key: expect.any(String),
             params: { seconds: retractDelay },
+          },
+        ]
+      : []),
+    ...(shouldBlowoutInDestination
+      ? [
+          {
+            commandType: 'blowOutInPlace',
+            key: expect.any(String),
+            params: { pipetteId, flowRate: blowoutFlowRate },
           },
         ]
       : []),
@@ -670,26 +758,35 @@ export const dispenseHelperLiquidClass = (params: {
               speed: touchTipSpeed,
             },
           },
-          ...(dispenseAirGap > 0
+        ]
+      : []),
+    ...(dispenseAirGap > 0
+      ? [
+          {
+            commandType: 'moveToWell',
+            key: expect.any(String),
+            params: {
+              pipetteId: 'p300SingleId',
+              labwareId,
+              wellName,
+              wellLocation: retractLocation,
+            },
+          },
+          {
+            commandType: 'airGapInPlace',
+            key: expect.any(String),
+            params: {
+              pipetteId,
+              flowRate: aspirateFlowRate,
+              volume: dispenseAirGap,
+            },
+          },
+          ...(aspirateDelay > 0
             ? [
                 {
-                  commandType: 'moveToWell',
+                  commandType: 'waitForDuration',
                   key: expect.any(String),
-                  params: {
-                    pipetteId: 'p300SingleId',
-                    labwareId: SOURCE_LABWARE,
-                    wellName,
-                    wellLocation: retractLocation,
-                  },
-                },
-                {
-                  commandType: 'airGapInPlace',
-                  key: expect.any(String),
-                  params: {
-                    pipetteId,
-                    flowRate: aspirateFlowRate,
-                    volume: dispenseAirGap,
-                  },
+                  params: { seconds: aspirateDelay },
                 },
               ]
             : []),
