@@ -462,6 +462,10 @@ def _run_trial(
             channel_count=trial.channel_count,
         )
 
+        print("\n\n\n\n\n\n\n\n\n\n\n\nhere")
+        print(trial.liquid_tracker.get_liquid_height(trial.well))
+        print(approach, submerge, retract)
+
         def _enable() -> None:
             # NOTE: setting all position references to BOTTOM
             _asp_or_disp.submerge.position_reference = PositionReference.WELL_TOP
