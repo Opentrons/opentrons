@@ -6,7 +6,6 @@ import { css } from 'styled-components'
 import {
   BORDERS,
   COLORS,
-  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Divider,
   Flex,
