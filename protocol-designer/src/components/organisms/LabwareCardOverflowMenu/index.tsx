@@ -15,6 +15,7 @@ import {
   StyledText,
   useOnClickOutside,
 } from '@opentrons/components'
+import { getTopLocationInStack } from '@opentrons/step-generation'
 
 import {
   ConfirmDeleteEntityInUseModal,
@@ -118,6 +119,8 @@ export function LabwareCardOverflowMenu(
       <Flex
         ref={overflowWrapperRef}
         css={OVERFLOW_STYLE}
+        top={40}
+        right={4}
         onClick={(e: MouseEvent) => {
           e.preventDefault()
           e.stopPropagation()
@@ -153,9 +156,7 @@ export function LabwareCardOverflowMenu(
 const OVERFLOW_STYLE = css`
   white-space: ${NO_WRAP};
   position: ${POSITION_ABSOLUTE};
-  top: 40;
   z-index: 2;
-  right: 4;
   border-radius: ${BORDERS.borderRadius8};
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
   background-color: ${COLORS.white};
