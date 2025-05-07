@@ -6,6 +6,7 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { DeckInfoLabel } from '../../molecules'
 import { DeckLabel } from '../../molecules/DeckLabel'
 import { Box } from '../../primitives'
+import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
 import type { ForwardedRef } from 'react'
@@ -45,14 +46,14 @@ const DeckLabelSetComponent = (
         },
       }}
     >
-      <BoxAndIconContainer width={width} height={height}>
+      <BoxAndIconContainer width="100%" height="100%">
         <StyledBox
-          width="100%"
-          height="100%"
+          width={width}
+          height={height}
           isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
           data-testid="DeckLabeSet"
         />
-        {showModuleIcon && (
+        {!showModuleIcon && (
           <IconWrapper>
             <DeckInfoLabel iconName="stacked" highlight />
           </IconWrapper>
@@ -110,14 +111,12 @@ const LabelContainer = styled.div`
 `
 
 const IconWrapper = styled(Box)<StyledBoxProps>`
-  position: absolute;
+  position: ${POSITION_ABSOLUTE};
   top: -${SPACING.spacing8};
   right: -${SPACING.spacing8};
-  z-index: 1;
+  z-index: 3;
 `
 
 const BoxAndIconContainer = styled(Box)<StyledBoxProps>`
-  position: relative;
-  width: ${(props: { width: number }) => props.width}px;
-  height: ${(props: { height: number }) => props.height}px;
+  position: ${POSITION_RELATIVE};
 `
