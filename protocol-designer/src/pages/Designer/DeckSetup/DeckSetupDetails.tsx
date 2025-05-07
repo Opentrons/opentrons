@@ -332,6 +332,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                 slotBoundingBox={labwareInterfaceBoundingBox}
                 itemId={slotId}
                 terminalItemId={terminalItemId}
+                hover={hover}
+                setHover={setHover}
               />
             </Module>
           </Fragment>
@@ -474,6 +476,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               slotBoundingBox={slotBoundingBox}
               itemId={slot}
               terminalItemId={terminalItemId}
+              hover={hover}
+              setHover={setHover}
             />
           </Fragment>
         )
@@ -553,6 +557,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               }}
               itemId={slotOnDeck ?? ''}
               terminalItemId={terminalItemId}
+              hover={hover}
+              setHover={setHover}
             />
           </Fragment>
         )
