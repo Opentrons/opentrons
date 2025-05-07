@@ -53,7 +53,7 @@ const DeckLabelSetComponent = (
           isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
           data-testid="DeckLabeSet"
         />
-        {!showModuleIcon && (
+        {showModuleIcon && (
           <IconWrapper>
             <DeckInfoLabel iconName="stacked" highlight />
           </IconWrapper>
@@ -110,13 +110,13 @@ const LabelContainer = styled.div`
   }
 `
 
-const IconWrapper = styled(Box)<StyledBoxProps>`
+const IconWrapper = styled(Box)`
   position: ${POSITION_ABSOLUTE};
   top: -${SPACING.spacing8};
   right: -${SPACING.spacing8};
   z-index: 3;
 `
 
-const BoxAndIconContainer = styled(Box)<StyledBoxProps>`
+const BoxAndIconContainer = styled(Box)`
   position: ${POSITION_RELATIVE};
 `
