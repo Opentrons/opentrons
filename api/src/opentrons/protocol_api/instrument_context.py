@@ -401,7 +401,8 @@ class InstrumentContext(publisher.CommandPublisher):
             Behavior of the ``volume`` parameter.
 
         .. versionchanged:: 2.24
-            Can dispense over trash bin or waste chute implicitly.
+            If previously moved to, dispensed or blown out into a trash bin or waste chute,
+            you do not need to include location if dispensing into that disposal location.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
@@ -661,7 +662,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: This instance.
 
         .. versionchanged:: 2.24
-            Can blow out over trash bin or waste chute implicitly.
+            If previously moved to, dispensed or blown out into a trash bin or waste chute,
+            you do not need to include location if blowing out into that disposal location.
         """
         well: Optional[labware.Well] = None
         move_to_location: types.Location
