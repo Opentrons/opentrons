@@ -47,6 +47,10 @@ class Stacker_TOF_Validation_Test:
             "X-Axis":TOFSensor.X,
             "Z-Axis":TOFSensor.Z,
         }
+        self.directions = {
+            "Retract":Direction.RETRACT,
+            "Extend":Direction.EXTEND,
+        }
 
     async def test_setup(self):
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
@@ -73,16 +77,26 @@ class Stacker_TOF_Validation_Test:
         print("FILE PATH = ", self.test_path)
         print("FILE NAMES = ")
         for stacker in self.stackers:
-            self.test_tag_x = f"x-axis_lab{self.labware_amount}_{stacker}"
-            self.test_tag_z = f"z-axis_lab{self.labware_amount}_{stacker}"
-            test_file_x = data.create_file_name(self.test_name, self.test_id, self.test_tag_x)
-            test_file_z = data.create_file_name(self.test_name, self.test_id, self.test_tag_z)
-            data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file_x, data=self.test_header)
-            data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file_z, data=self.test_header)
-            self.test_files.append(test_file_x)
-            self.test_files.append(test_file_z)
-            print(test_file_x)
-            print(test_file_z)
+            self.test_tag_x_ret = f"x-axis_lab{self.labware_amount}_retract_{stacker}"
+            self.test_tag_x_ext = f"x-axis_lab{self.labware_amount}_extend_{stacker}"
+            self.test_tag_z_ret = f"z-axis_lab{self.labware_amount}_retract_{stacker}"
+            self.test_tag_z_ext = f"z-axis_lab{self.labware_amount}_extend_{stacker}"
+            test_file_x_ret = data.create_file_name(self.test_name, self.test_id, self.test_tag_x_ret)
+            test_file_x_ext = data.create_file_name(self.test_name, self.test_id, self.test_tag_x_ext)
+            test_file_z_ret = data.create_file_name(self.test_name, self.test_id, self.test_tag_z_ret)
+            test_file_z_ext = data.create_file_name(self.test_name, self.test_id, self.test_tag_z_ext)
+            data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file_x_ret, data=self.test_header)
+            data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file_x_ext, data=self.test_header)
+            data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file_z_ret, data=self.test_header)
+            data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file_z_ext, data=self.test_header)
+            self.test_files.append(test_file_x_ret)
+            self.test_files.append(test_file_x_ext)
+            self.test_files.append(test_file_z_ret)
+            self.test_files.append(test_file_z_ext)
+            print(test_file_x_ret)
+            print(test_file_x_ext)
+            print(test_file_z_ret)
+            print(test_file_z_ext)
 
     def dict_keys_to_line(self, dict):
         return str.join(",", list(dict.keys()))+"\n"
@@ -92,27 +106,27 @@ class Stacker_TOF_Validation_Test:
 
     async def read_stacker_tof(self):
         for i in range(len(self.stackers)):
-            i = 1
             print(f"\n>> Stacker = {self.stackers[i]}")
             for axis, tof_axis in self.tof_axes.items():
-                for k in range(self.samples):
-                    sample = k + 1
-                    print(f">>> Reading {axis} Sample = {sample}")
-                    elapsed_time = (time.time() - self.start_time)/60
-                    await self.api.attached_modules[i].home_axis(StackerAxis.X, Direction.EXTEND)
-                    hist = await self.api.attached_modules[i]._driver.get_tof_histogram(tof_axis)
-                    for zone, bins_list in hist.bins.items():
-                        test_data = self.test_data.copy()
-                        test_data["Time"] = str(elapsed_time)
-                        test_data["Sample"] = str(sample)
-                        test_data["Zone"] = str(zone)
-                        bins_dict = {index: str(value) for index, value in enumerate(bins_list)}
-                        test_data.update(bins_dict)
-                        test_data = self.dict_values_to_line(test_data)
-                        for test_file in self.test_files:
-                            if self.stackers[i] in test_file and axis.lower() in test_file:
-                                data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
-                    time.sleep(self.interval)
+                for pos, direction in self.directions.items():
+                    for k in range(self.samples):
+                        sample = k + 1
+                        print(f">>> Reading {axis} {pos} Sample = {sample}")
+                        elapsed_time = (time.time() - self.start_time)/60
+                        await self.api.attached_modules[i].home_axis(StackerAxis.X, direction)
+                        hist = await self.api.attached_modules[i]._driver.get_tof_histogram(tof_axis)
+                        for zone, bins_list in hist.bins.items():
+                            test_data = self.test_data.copy()
+                            test_data["Time"] = str(elapsed_time)
+                            test_data["Sample"] = str(sample)
+                            test_data["Zone"] = str(zone)
+                            bins_dict = {index: str(value) for index, value in enumerate(bins_list)}
+                            test_data.update(bins_dict)
+                            test_data = self.dict_values_to_line(test_data)
+                            for test_file in self.test_files:
+                                if self.stackers[i] in test_file and axis.lower() in test_file and pos.lower() in test_file:
+                                    data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
+                        time.sleep(self.interval)
                 print("")
 
     async def _home(
