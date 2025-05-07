@@ -119,8 +119,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     },
   })
 
-  const menuItemsRefs = useRef<HTMLDivElement[] | null>([])
-  const menuItemsContainerRef = useRef<HTMLDivElement>(null)
+  const menuItemsContainerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     if (
