@@ -280,6 +280,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   touchTipAfterDispense: boolean
   /** Optional offset for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseOffsetMmFromTop: number
+  /** Optional offset for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterDispenseMmFromEdge: number | null
   /** Optional speed for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseSpeed: number | null
   /** Flow rate in uL/sec for all dispenses */
@@ -309,16 +311,20 @@ export type SharedTransferLikeArgs = CommonArgs & {
   aspirateRetractZOffset: number
   aspirateRetractPositionReference: PositionReference
   aspirateRetractDelay: InnerDelayArgs | null
+  dispensePositionReference: PositionReference
+  dispenseZOffset: number
   dispenseSubmergeSpeed: number | null
   dispenseSubmergeXOffset: number
   dispenseSubmergeYOffset: number
   dispenseSubmergeZOffset: number
   dispenseSubmergePositionReference: PositionReference
+  dispenseSubmergeDelay: InnerDelayArgs | null
   dispenseRetractSpeed: number | null
   dispenseRetractXOffset: number
   dispenseRetractYOffset: number
   dispenseRetractZOffset: number
   dispenseRetractPositionReference: PositionReference
+  dispenseRetractDelay: InnerDelayArgs | null
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {

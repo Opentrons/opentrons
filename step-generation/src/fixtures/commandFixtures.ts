@@ -310,7 +310,7 @@ export const submergeWithAspirateHelper = (submergeParams: {
       commandType: 'moveToWell',
       key: expect.any(String),
       params: {
-        pipetteId: 'p300SingleId',
+        pipetteId,
         labwareId: SOURCE_LABWARE,
         speed: submergeSpeed,
         wellName,
@@ -427,16 +427,20 @@ export const submergeWithAspirateHelper = (submergeParams: {
               speed: touchTipSpeed,
             },
           },
-          {
-            commandType: 'moveToWell',
-            key: expect.any(String),
-            params: {
-              pipetteId: 'p300SingleId',
-              labwareId: SOURCE_LABWARE,
-              wellName,
-              wellLocation: retractLocation,
-            },
-          },
+          ...(aspirateAirGap > 0
+            ? [
+                {
+                  commandType: 'moveToWell',
+                  key: expect.any(String),
+                  params: {
+                    pipetteId: 'p300SingleId',
+                    labwareId: SOURCE_LABWARE,
+                    wellName,
+                    wellLocation: retractLocation,
+                  },
+                },
+              ]
+            : []),
         ]
       : []),
     ...(aspirateAirGap > 0
@@ -463,6 +467,237 @@ export const submergeWithAspirateHelper = (submergeParams: {
       : []),
   ]
 }
+
+export const dispenseHelperLiquidClass = (params: {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  volume: number
+  submergeSpeed: number
+  retractSpeed: number
+  dispenseFlowRate: number
+  submergeLocation: WellLocation
+  dispenseLocation: WellLocation
+  retractLocation: WellLocation
+  aspirateFlowRate?: number
+  aspirateAirGap?: number
+  dispenseAirGap?: number
+  shouldTouchTip?: boolean
+  submergeDelay?: number
+  aspirateDelay?: number
+  retractDelay?: number
+  dispenseDelay?: number
+  mixTimes?: number
+  mixVolume?: number
+  touchTipMmFromTop?: number
+  touchTipMmFromEdge?: number
+  touchTipSpeed?: number
+  pushOut?: number
+}) => {
+  const {
+    volume,
+    aspirateFlowRate,
+    dispenseFlowRate,
+    submergeSpeed,
+    retractSpeed,
+    pipetteId,
+    labwareId,
+    wellName,
+    submergeLocation,
+    dispenseLocation,
+    retractLocation,
+    shouldTouchTip = false,
+    submergeDelay = 0,
+    aspirateDelay = 0,
+    retractDelay = 0,
+    dispenseDelay = 0,
+    mixTimes = 0,
+    mixVolume = 0,
+    aspirateAirGap = 0,
+    dispenseAirGap = 0,
+    touchTipMmFromTop,
+    touchTipMmFromEdge,
+    touchTipSpeed,
+    pushOut,
+  } = params
+  const mixCommands = []
+  for (let i = 0; i < mixTimes; i++) {
+    mixCommands.push(
+      ...[
+        {
+          commandType: 'aspirateInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId,
+            volume: mixVolume,
+            flowRate: aspirateFlowRate,
+          },
+        },
+        ...(aspirateDelay > 0
+          ? [
+              {
+                commandType: 'waitForDuration',
+                key: expect.any(String),
+                params: { seconds: aspirateDelay },
+              },
+            ]
+          : []),
+        {
+          commandType: 'dispenseInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId,
+            volume: mixVolume,
+            flowRate: dispenseFlowRate,
+            pushOut: 0,
+          },
+        },
+        ...(dispenseDelay > 0
+          ? [
+              {
+                commandType: 'waitForDuration',
+                key: expect.any(String),
+                params: { seconds: dispenseDelay },
+              },
+            ]
+          : []),
+      ]
+    )
+  }
+  const effectivePushOut = mixTimes > 0 ? 0 : pushOut
+
+  return [
+    {
+      commandType: 'moveToWell',
+      key: expect.any(String),
+      params: {
+        pipetteId,
+        labwareId,
+        wellName,
+        wellLocation: submergeLocation,
+      },
+    },
+    ...(aspirateAirGap > 0
+      ? [
+          {
+            commandType: 'dispenseInPlace',
+            key: expect.any(String),
+            params: {
+              pipetteId,
+              volume: aspirateAirGap,
+              flowRate: dispenseFlowRate,
+            },
+          },
+        ]
+      : []),
+    {
+      commandType: 'moveToWell',
+      key: expect.any(String),
+      params: {
+        pipetteId,
+        labwareId,
+        speed: submergeSpeed,
+        wellName,
+        wellLocation: dispenseLocation,
+      },
+    },
+    ...(submergeDelay > 0
+      ? [
+          {
+            commandType: 'waitForDuration',
+            key: expect.any(String),
+            params: { seconds: submergeDelay },
+          },
+        ]
+      : []),
+
+    ...(mixTimes > 0 ? mixCommands : []),
+    {
+      commandType: 'dispenseInPlace',
+      key: expect.any(String),
+      params: {
+        pipetteId: 'p300SingleId',
+        volume,
+        flowRate: dispenseFlowRate,
+        ...(effectivePushOut != null ? { pushOut: effectivePushOut } : {}),
+      },
+    },
+    ...(dispenseDelay > 0
+      ? [
+          {
+            commandType: 'waitForDuration',
+            key: expect.any(String),
+            params: { seconds: dispenseDelay },
+          },
+        ]
+      : []),
+    {
+      commandType: 'moveToWell',
+      key: expect.any(String),
+      params: {
+        pipetteId,
+        labwareId,
+        speed: retractSpeed,
+        wellName,
+        wellLocation: retractLocation,
+      },
+    },
+    ...(retractDelay > 0
+      ? [
+          {
+            commandType: 'waitForDuration',
+            key: expect.any(String),
+            params: { seconds: retractDelay },
+          },
+        ]
+      : []),
+    ...(shouldTouchTip
+      ? [
+          {
+            commandType: 'touchTip',
+            key: expect.any(String),
+            params: {
+              pipetteId,
+              labwareId,
+              wellName,
+              wellLocation: {
+                origin: WELL_ORIGIN_TOP,
+                offset: {
+                  z: touchTipMmFromTop,
+                },
+              },
+              mmFromEdge: touchTipMmFromEdge,
+              speed: touchTipSpeed,
+            },
+          },
+          ...(dispenseAirGap > 0
+            ? [
+                {
+                  commandType: 'moveToWell',
+                  key: expect.any(String),
+                  params: {
+                    pipetteId: 'p300SingleId',
+                    labwareId: SOURCE_LABWARE,
+                    wellName,
+                    wellLocation: retractLocation,
+                  },
+                },
+                {
+                  commandType: 'airGapInPlace',
+                  key: expect.any(String),
+                  params: {
+                    pipetteId,
+                    flowRate: aspirateFlowRate,
+                    volume: dispenseAirGap,
+                  },
+                },
+              ]
+            : []),
+        ]
+      : []),
+  ]
+}
+
 export const makeMoveToWellHelper = (wellName: string, labwareId?: string) => ({
   commandType: 'moveToWell',
   key: expect.any(String),

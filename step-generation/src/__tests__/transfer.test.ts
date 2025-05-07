@@ -5,9 +5,11 @@ import {
   getLabwareDefURI,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
   WASTE_CHUTE_CUTOUT,
   WELL_ORIGIN_BOTTOM,
+  WELL_ORIGIN_CENTER,
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
@@ -20,17 +22,16 @@ import {
   delayWithOffset,
   DEST_LABWARE,
   DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  dispenseHelperLiquidClass,
   dropTipHelper,
   getErrorResult,
   getFlowRateAndOffsetParamsTransferLike,
   getRobotStateWithTipStandard,
   getSuccessResult,
-  makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
   makeDispenseAirGapHelper,
   makeDispenseHelper,
-  makeMoveToWellHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
@@ -46,7 +47,6 @@ import type { InvariantContext, RobotState, TransferArgs } from '../types'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
-const touchTipHelper = makeTouchTipHelper()
 
 let invariantContext: InvariantContext
 let robotStateWithTip: RobotState
@@ -78,6 +78,7 @@ beforeEach(() => {
     aspirateYOffset: 0,
     dispenseYOffset: 0,
     aspirateZOffset: 2,
+    dispenseZOffset: 3,
     aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
     aspirateSubmergeSpeed: 50,
     aspirateSubmergeXOffset: 1,
@@ -90,6 +91,18 @@ beforeEach(() => {
     aspirateRetractZOffset: -4,
     aspirateRetractPositionReference: POSITION_REFERENCE_TOP,
     aspirateFlowRateUlSec: 10,
+    dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseSubmergeSpeed: 52,
+    dispenseSubmergeXOffset: 2,
+    dispenseSubmergeYOffset: 1,
+    dispenseSubmergeZOffset: -2,
+    dispenseSubmergePositionReference: POSITION_REFERENCE_CENTER,
+    dispenseRetractSpeed: 53,
+    dispenseRetractXOffset: 3,
+    dispenseRetractYOffset: -2,
+    dispenseRetractZOffset: -5,
+    dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
+    dispenseFlowRateUlSec: 12,
   }
 
   invariantContext = makeContext()
@@ -208,9 +221,41 @@ describe('pick up tip if no tip on pipette', () => {
           },
         },
       }),
-      dispenseHelper('B2', 30),
-      makeMoveToWellHelper('B2', 'destPlateId'),
-      ...makeAirGapHelper(5, 10),
+      ...dispenseHelperLiquidClass({
+        volume: 30,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        dispenseAirGap: 5,
+        pipetteId: 'p300SingleId',
+        wellName: 'B2',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
       //   drop tip at end
       {
         commandType: 'moveToAddressableArea',
@@ -306,7 +351,40 @@ it('single transfer: 1 source & 1 dest', () => {
       },
       shouldProbe: false,
     }),
-    dispenseHelper('B2', 30),
+    ...dispenseHelperLiquidClass({
+      volume: 30,
+      aspirateFlowRate: 10,
+      dispenseFlowRate: 12,
+      submergeSpeed: 52,
+      retractSpeed: 53,
+      pipetteId: 'p300SingleId',
+      wellName: 'B2',
+      labwareId: DEST_LABWARE,
+      submergeLocation: {
+        origin: WELL_ORIGIN_CENTER,
+        offset: {
+          x: 2,
+          y: 1,
+          z: -2,
+        },
+      },
+      retractLocation: {
+        origin: WELL_ORIGIN_TOP,
+        offset: {
+          x: 3,
+          y: -2,
+          z: -5,
+        },
+      },
+      dispenseLocation: {
+        origin: WELL_ORIGIN_BOTTOM,
+        offset: {
+          x: 0,
+          y: 0,
+          z: 3,
+        },
+      },
+    }),
   ])
 })
 
@@ -394,7 +472,7 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
       commandType: 'dispenseInPlace',
       key: expect.any(String),
       params: {
-        flowRate: 2.2,
+        flowRate: 12,
         pipetteId: 'p300SingleId',
         volume: 30,
       },
@@ -451,7 +529,40 @@ test('transfer with multiple sets of wells', () => {
       },
       shouldProbe: false,
     }),
-    dispenseHelper('B2', 30),
+    ...dispenseHelperLiquidClass({
+      volume: 30,
+      aspirateFlowRate: 10,
+      dispenseFlowRate: 12,
+      submergeSpeed: 52,
+      retractSpeed: 53,
+      pipetteId: 'p300SingleId',
+      wellName: 'B2',
+      labwareId: DEST_LABWARE,
+      submergeLocation: {
+        origin: WELL_ORIGIN_CENTER,
+        offset: {
+          x: 2,
+          y: 1,
+          z: -2,
+        },
+      },
+      retractLocation: {
+        origin: WELL_ORIGIN_TOP,
+        offset: {
+          x: 3,
+          y: -2,
+          z: -5,
+        },
+      },
+      dispenseLocation: {
+        origin: WELL_ORIGIN_BOTTOM,
+        offset: {
+          x: 0,
+          y: 0,
+          z: 3,
+        },
+      },
+    }),
 
     ...submergeWithAspirateHelper({
       volume: 30,
@@ -488,7 +599,40 @@ test('transfer with multiple sets of wells', () => {
       shouldProbe: false,
     }),
 
-    dispenseHelper('C2', 30),
+    ...dispenseHelperLiquidClass({
+      volume: 30,
+      aspirateFlowRate: 10,
+      dispenseFlowRate: 12,
+      submergeSpeed: 52,
+      retractSpeed: 53,
+      pipetteId: 'p300SingleId',
+      wellName: 'C2',
+      labwareId: DEST_LABWARE,
+      submergeLocation: {
+        origin: WELL_ORIGIN_CENTER,
+        offset: {
+          x: 2,
+          y: 1,
+          z: -2,
+        },
+      },
+      retractLocation: {
+        origin: WELL_ORIGIN_TOP,
+        offset: {
+          x: 3,
+          y: -2,
+          z: -5,
+        },
+      },
+      dispenseLocation: {
+        origin: WELL_ORIGIN_BOTTOM,
+        offset: {
+          x: 0,
+          y: 0,
+          z: 3,
+        },
+      },
+    }),
   ])
 
   // TODO Ian 2018-04-02 robotState, liquidState checks
@@ -573,7 +717,7 @@ describe('single transfer exceeding pipette max', () => {
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -605,9 +749,42 @@ describe('single transfer exceeding pipette max', () => {
           },
         },
       }),
-      dispenseHelper('A3', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'A3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -640,9 +817,42 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('A3', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'A3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -675,9 +885,42 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B3', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -711,7 +954,40 @@ describe('single transfer exceeding pipette max', () => {
         shouldProbe: false,
       }),
 
-      dispenseHelper('B3', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
     ])
   })
 
@@ -728,7 +1004,7 @@ describe('single transfer exceeding pipette max', () => {
       pickUpTipHelper('A1'),
 
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -761,14 +1037,47 @@ describe('single transfer exceeding pipette max', () => {
         },
       }),
 
-      dispenseHelper('A3', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'A3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       // replace tip before next asp-disp chunk
       ...dropTipHelper(),
       pickUpTipHelper('B1'),
 
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -802,14 +1111,47 @@ describe('single transfer exceeding pipette max', () => {
         shouldProbe: false,
       }),
 
-      dispenseHelper('A3', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'A3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       // replace tip before next source-dest well pair
       ...dropTipHelper(),
       pickUpTipHelper('C1'),
 
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -842,14 +1184,47 @@ describe('single transfer exceeding pipette max', () => {
         },
       }),
 
-      dispenseHelper('B3', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       // replace tip before next asp-disp chunk
       ...dropTipHelper(),
       pickUpTipHelper('D1'),
 
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -883,7 +1258,40 @@ describe('single transfer exceeding pipette max', () => {
         shouldProbe: false,
       }),
 
-      dispenseHelper('B3', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
     ])
   })
 
@@ -901,7 +1309,7 @@ describe('single transfer exceeding pipette max', () => {
       pickUpTipHelper('A1'),
 
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -934,10 +1342,43 @@ describe('single transfer exceeding pipette max', () => {
         },
       }),
 
-      dispenseHelper('B1', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -971,11 +1412,44 @@ describe('single transfer exceeding pipette max', () => {
         shouldProbe: false,
       }),
 
-      dispenseHelper('B1', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       // same source, different dest: no change
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1009,10 +1483,43 @@ describe('single transfer exceeding pipette max', () => {
         shouldProbe: false,
       }),
 
-      dispenseHelper('B2', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B2',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1045,14 +1552,47 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B2', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B2',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       // new source, different dest: change tip
       ...dropTipHelper(),
       pickUpTipHelper('B1'),
 
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1084,10 +1624,43 @@ describe('single transfer exceeding pipette max', () => {
           },
         },
       }),
-      dispenseHelper('B2', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B2',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1120,7 +1693,40 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B2', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B2',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
     ])
   })
 
@@ -1139,7 +1745,7 @@ describe('single transfer exceeding pipette max', () => {
       pickUpTipHelper('A1'),
 
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1171,10 +1777,43 @@ describe('single transfer exceeding pipette max', () => {
           },
         },
       }),
-      dispenseHelper('B1', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1207,14 +1846,47 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B1', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B1',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       // same source, different dest: change tip
       ...dropTipHelper(),
       pickUpTipHelper('B1'),
 
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1247,10 +1919,43 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B2', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B2',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1283,12 +1988,45 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B2', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B2',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       // different source, same dest: no change
 
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1321,10 +2059,43 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B2', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B2',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1357,7 +2128,40 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B2', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B2',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
     ])
   })
 
@@ -1374,7 +2178,7 @@ describe('single transfer exceeding pipette max', () => {
     expect(res.commands).toEqual([
       // no pick up tip
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1407,10 +2211,43 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('A3', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'A3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1444,10 +2281,43 @@ describe('single transfer exceeding pipette max', () => {
         shouldProbe: false,
       }),
 
-      dispenseHelper('A3', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'A3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1480,10 +2350,43 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B3', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
 
       ...submergeWithAspirateHelper({
-        volume: 50,
+        volume: 175,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1516,7 +2419,40 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B3', 50),
+      ...dispenseHelperLiquidClass({
+        volume: 175,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
     ])
   })
 
@@ -1534,7 +2470,7 @@ describe('single transfer exceeding pipette max', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 629 / 3,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1567,10 +2503,43 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('A3', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 629 / 3,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'A3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
       // last 2 chunks split evenly
       ...submergeWithAspirateHelper({
-        volume: 164.5,
+        volume: 629 / 3,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1603,9 +2572,42 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('A3', 164.5),
+      ...dispenseHelperLiquidClass({
+        volume: 629 / 3,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'A3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
       ...submergeWithAspirateHelper({
-        volume: 164.5,
+        volume: 629 / 3,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1638,10 +2640,42 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('A3', 164.5),
-
+      ...dispenseHelperLiquidClass({
+        volume: 629 / 3,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'A3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
       ...submergeWithAspirateHelper({
-        volume: 300,
+        volume: 629 / 3,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1674,10 +2708,43 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B3', 300),
+      ...dispenseHelperLiquidClass({
+        volume: 629 / 3,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
       // last 2 chunks split evenly
       ...submergeWithAspirateHelper({
-        volume: 164.5,
+        volume: 629 / 3,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1710,9 +2777,42 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B3', 164.5),
+      ...dispenseHelperLiquidClass({
+        volume: 629 / 3,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
       ...submergeWithAspirateHelper({
-        volume: 164.5,
+        volume: 629 / 3,
         aspirateFlowRate: 10,
         submergeSpeed: 50,
         retractSpeed: 51,
@@ -1745,7 +2845,40 @@ describe('single transfer exceeding pipette max', () => {
         },
         shouldProbe: false,
       }),
-      dispenseHelper('B3', 164.5),
+      ...dispenseHelperLiquidClass({
+        volume: 629 / 3,
+        aspirateFlowRate: 10,
+        dispenseFlowRate: 12,
+        submergeSpeed: 52,
+        retractSpeed: 53,
+        pipetteId: 'p300SingleId',
+        wellName: 'B3',
+        labwareId: DEST_LABWARE,
+        submergeLocation: {
+          origin: WELL_ORIGIN_CENTER,
+          offset: {
+            x: 2,
+            y: 1,
+            z: -2,
+          },
+        },
+        retractLocation: {
+          origin: WELL_ORIGIN_TOP,
+          offset: {
+            x: 3,
+            y: -2,
+            z: -5,
+          },
+        },
+        dispenseLocation: {
+          origin: WELL_ORIGIN_BOTTOM,
+          offset: {
+            x: 0,
+            y: 0,
+            z: 3,
+          },
+        },
+      }),
     ])
   })
 })
@@ -1773,9 +2906,9 @@ describe('advanced options', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         ...submergeWithAspirateHelper({
-          volume: 300,
+          volume: 175,
           aspirateFlowRate: 10,
-          dispenseFlowRate: 2.2,
+          dispenseFlowRate: 12,
           submergeSpeed: 50,
           retractSpeed: 51,
           pipetteId: 'p300SingleId',
@@ -1808,11 +2941,44 @@ describe('advanced options', () => {
           shouldProbe: false,
           shouldPreWet: true,
         }),
-        dispenseHelper('B1', 300),
-
-        ...submergeWithAspirateHelper({
-          volume: 50,
+        ...dispenseHelperLiquidClass({
+          volume: 175,
           aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
+        ...submergeWithAspirateHelper({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
           submergeSpeed: 50,
           retractSpeed: 51,
           pipetteId: 'p300SingleId',
@@ -1843,9 +3009,43 @@ describe('advanced options', () => {
             },
           },
           shouldProbe: false,
+          shouldPreWet: true,
         }),
 
-        dispenseHelper('B1', 50),
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
       ])
     })
 
@@ -1862,9 +3062,9 @@ describe('advanced options', () => {
       expect(res.commands).toEqual([
         // pre-wet aspirate/dispense
         ...submergeWithAspirateHelper({
-          volume: 300,
+          volume: 175,
           aspirateFlowRate: 10,
-          dispenseFlowRate: 2.2,
+          dispenseFlowRate: 12,
           submergeSpeed: 50,
           retractSpeed: 51,
           pipetteId: 'p300SingleId',
@@ -1898,12 +3098,44 @@ describe('advanced options', () => {
           shouldProbe: false,
           shouldPreWet: true,
         }),
-        dispenseHelper('B1', 300),
-
-        ...submergeWithAspirateHelper({
-          volume: 50,
+        ...dispenseHelperLiquidClass({
+          volume: 175,
           aspirateFlowRate: 10,
-          dispenseFlowRate: 2.2,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
+        ...submergeWithAspirateHelper({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
           submergeSpeed: 50,
           retractSpeed: 51,
           pipetteId: 'p300SingleId',
@@ -1935,8 +3167,42 @@ describe('advanced options', () => {
           },
           aspirateDelay: 12,
           shouldProbe: false,
+          shouldPreWet: true,
         }),
-        dispenseHelper('B1', 50),
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
       ])
     })
 
@@ -1952,9 +3218,9 @@ describe('advanced options', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         ...submergeWithAspirateHelper({
-          volume: 300,
+          volume: 175,
           aspirateFlowRate: 10,
-          dispenseFlowRate: 2.2,
+          dispenseFlowRate: 12,
           submergeSpeed: 50,
           retractSpeed: 51,
           pipetteId: 'p300SingleId',
@@ -1988,13 +3254,47 @@ describe('advanced options', () => {
           shouldProbe: false,
           shouldPreWet: true,
         }),
-        dispenseHelper('B1', 300),
-        ...delayWithOffset('B1', DEST_LABWARE),
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          dispenseDelay: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
 
         ...submergeWithAspirateHelper({
-          volume: 50,
+          volume: 175,
           aspirateFlowRate: 10,
-          dispenseFlowRate: 2.2,
+          dispenseFlowRate: 12,
+          dispenseDelay: 12,
           submergeSpeed: 50,
           retractSpeed: 51,
           pipetteId: 'p300SingleId',
@@ -2025,9 +3325,43 @@ describe('advanced options', () => {
             },
           },
           shouldProbe: false,
+          shouldPreWet: true,
         }),
-        dispenseHelper('B1', 50),
-        ...delayWithOffset('B1', DEST_LABWARE),
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          dispenseDelay: 12,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
       ])
     })
 
@@ -2036,13 +3370,15 @@ describe('advanced options', () => {
         ...advArgs,
         volume: 350,
         touchTipAfterAspirate: true,
+        touchTipAfterAspirateOffsetMmFromTop: -2,
+        touchTipAfterAspirateMmFromEdge: 0.1,
+        touchTipAfterAspirateSpeed: 17,
       }
-
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         ...submergeWithAspirateHelper({
-          volume: 300,
+          volume: 175,
           aspirateFlowRate: 10,
           submergeSpeed: 50,
           retractSpeed: 51,
@@ -2074,12 +3410,47 @@ describe('advanced options', () => {
             },
           },
           shouldProbe: false,
+          shouldTouchTip: true,
+          touchTipMmFromEdge: 0.1,
+          touchTipMmFromTop: -2,
+          touchTipSpeed: 17,
         }),
-        touchTipHelper('A1'),
-        dispenseHelper('B1', 300),
-
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
         ...submergeWithAspirateHelper({
-          volume: 50,
+          volume: 175,
           aspirateFlowRate: 10,
           submergeSpeed: 50,
           retractSpeed: 51,
@@ -2111,9 +3482,45 @@ describe('advanced options', () => {
             },
           },
           shouldProbe: false,
+          shouldTouchTip: true,
+          touchTipMmFromEdge: 0.1,
+          touchTipMmFromTop: -2,
+          touchTipSpeed: 17,
         }),
-        touchTipHelper('A1'),
-        dispenseHelper('B1', 50),
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
       ])
     })
 
@@ -2122,13 +3529,16 @@ describe('advanced options', () => {
         ...advArgs,
         volume: 350,
         touchTipAfterDispense: true,
+        touchTipAfterDispenseMmFromEdge: 1.5,
+        touchTipAfterDispenseOffsetMmFromTop: -0.5,
+        touchTipAfterDispenseSpeed: 60,
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         ...submergeWithAspirateHelper({
-          volume: 300,
+          volume: 175,
           aspirateFlowRate: 10,
           submergeSpeed: 50,
           retractSpeed: 51,
@@ -2161,11 +3571,47 @@ describe('advanced options', () => {
           },
           shouldProbe: false,
         }),
-        dispenseHelper('B1', 300),
-        touchTipHelper('B1', { labwareId: DEST_LABWARE }),
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+          shouldTouchTip: true,
+          touchTipMmFromEdge: 1.5,
+          touchTipMmFromTop: -0.5,
+          touchTipSpeed: 60,
+        }),
 
         ...submergeWithAspirateHelper({
-          volume: 50,
+          volume: 175,
           aspirateFlowRate: 10,
           submergeSpeed: 50,
           retractSpeed: 51,
@@ -2198,8 +3644,44 @@ describe('advanced options', () => {
           },
           shouldProbe: false,
         }),
-        dispenseHelper('B1', 50),
-        touchTipHelper('B1', { labwareId: DEST_LABWARE }),
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+          shouldTouchTip: true,
+          touchTipMmFromEdge: 1.5,
+          touchTipMmFromTop: -0.5,
+          touchTipSpeed: 60,
+        }),
       ])
     })
 
@@ -2218,9 +3700,9 @@ describe('advanced options', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         ...submergeWithAspirateHelper({
-          volume: 300,
+          volume: 175,
           aspirateFlowRate: 10,
-          dispenseFlowRate: 2.2,
+          dispenseFlowRate: 12,
           submergeSpeed: 50,
           retractSpeed: 51,
           pipetteId: 'p300SingleId',
@@ -2254,12 +3736,45 @@ describe('advanced options', () => {
           mixTimes: 2,
           mixVolume: 250,
         }),
-        dispenseHelper('B1', 300),
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
 
         ...submergeWithAspirateHelper({
-          volume: 50,
+          volume: 175,
           aspirateFlowRate: 10,
-          dispenseFlowRate: 2.2,
+          dispenseFlowRate: 12,
           submergeSpeed: 50,
           retractSpeed: 51,
           pipetteId: 'p300SingleId',
@@ -2293,10 +3808,43 @@ describe('advanced options', () => {
           mixTimes: 2,
           mixVolume: 250,
         }),
-        dispenseHelper('B1', 50),
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
       ])
     })
-    it('should delay after mix aspirate and regular aspirate', () => {
+    it.only('should delay after mix aspirate and regular aspirate', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -2312,9 +3860,9 @@ describe('advanced options', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         ...submergeWithAspirateHelper({
-          volume: 300,
+          volume: 175,
           aspirateFlowRate: 10,
-          dispenseFlowRate: 2.2,
+          dispenseFlowRate: 12,
           submergeSpeed: 50,
           retractSpeed: 51,
           pipetteId: 'p300SingleId',
@@ -2349,12 +3897,45 @@ describe('advanced options', () => {
           mixTimes: 2,
           mixVolume: 250,
         }),
-        dispenseHelper('B1', 300),
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
 
         ...submergeWithAspirateHelper({
-          volume: 50,
+          volume: 175,
           aspirateFlowRate: 10,
-          dispenseFlowRate: 2.2,
+          dispenseFlowRate: 12,
           submergeSpeed: 50,
           retractSpeed: 51,
           pipetteId: 'p300SingleId',
@@ -2389,7 +3970,40 @@ describe('advanced options', () => {
           mixTimes: 2,
           mixVolume: 250,
         }),
-        dispenseHelper('B1', 50),
+        ...dispenseHelperLiquidClass({
+          volume: 175,
+          aspirateFlowRate: 10,
+          dispenseFlowRate: 12,
+          submergeSpeed: 52,
+          retractSpeed: 53,
+          pipetteId: 'p300SingleId',
+          wellName: 'B1',
+          labwareId: DEST_LABWARE,
+          submergeLocation: {
+            origin: WELL_ORIGIN_CENTER,
+            offset: {
+              x: 2,
+              y: 1,
+              z: -2,
+            },
+          },
+          retractLocation: {
+            origin: WELL_ORIGIN_TOP,
+            offset: {
+              x: 3,
+              y: -2,
+              z: -5,
+            },
+          },
+          dispenseLocation: {
+            origin: WELL_ORIGIN_BOTTOM,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3,
+            },
+          },
+        }),
       ])
     })
 
@@ -4660,7 +6274,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it.only('should create commands in the expected order with expected params (blowout in source well, change tip each aspirate)', () => {
+    it('should create commands in the expected order with expected params (blowout in source well, change tip each aspirate)', () => {
       const args = {
         ...allArgs,
         changeTip: 'always',
