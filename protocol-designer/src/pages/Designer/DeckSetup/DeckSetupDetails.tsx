@@ -33,6 +33,7 @@ import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
+import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
 import { SelectedItems } from './Selectedtems'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
 import { SlotWarning } from './SlotWarning'
@@ -325,6 +326,13 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   stagingAreaAddressableAreas={[]}
                 />
               ) : null}
+
+              <ActiveLabwareControls
+                slotPosition={[0, 0, 0]}
+                slotBoundingBox={labwareInterfaceBoundingBox}
+                itemId={slotId}
+                terminalItemId={terminalItemId}
+              />
             </Module>
           </Fragment>
         ) : null
@@ -461,6 +469,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                 isSelected={selectedZoomInSlot != null}
               />
             )}
+            <ActiveLabwareControls
+              slotPosition={[0, 0, 0]}
+              slotBoundingBox={slotBoundingBox}
+              itemId={slot}
+              terminalItemId={terminalItemId}
+            />
           </Fragment>
         )
       })}
@@ -528,6 +542,16 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               }
               labwareOnDeck={labware}
               isSelected={selectedZoomInSlot != null}
+              terminalItemId={terminalItemId}
+            />
+            <ActiveLabwareControls
+              slotPosition={[0, 0, 0]}
+              slotBoundingBox={{
+                xDimension: labware.def.dimensions.xDimension,
+                yDimension: labware.def.dimensions.yDimension,
+                zDimension: 0,
+              }}
+              itemId={slotOnDeck ?? ''}
               terminalItemId={terminalItemId}
             />
           </Fragment>
