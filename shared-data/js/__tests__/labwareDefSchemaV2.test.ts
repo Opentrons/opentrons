@@ -12,6 +12,7 @@ import type {
   LabwareDefinition2,
   LabwareWell,
   UserDefinedVolumes,
+  WellSegment,
 } from '../types'
 
 const definitionsDir = path.join(__dirname, '../../labware/definitions/2')
@@ -237,7 +238,7 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     }
   })
 
-  test('sections of a well geometry should be sorted top to bottom', () => {
+  test('sections of a well geometry, or elements in a height-volume map, should be sorted top to bottom', () => {
     const geometries = Object.values(labwareDef.innerLabwareGeometry ?? [])
     for (const geometry of geometries) {
       if ('sections' in geometry) {
@@ -296,23 +297,23 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     }
   })
 
-  function isInnerWellGeometry(
-    def: InnerWellGeometry | UserDefinedVolumes
-  ): def is InnerWellGeometry {
-    return 'sections' in def
-  }
-
-  test("a well's depth should equal the height of its geometry", () => {
+  test("a well's dimensions (depth/xDimension/yDimension/diameter) should agree with its geometry", () => {
     for (const well of Object.values(labwareDef.wells)) {
       const wellGeometryId = well.geometryDefinitionId
-      if (wellGeometryId === undefined) return
-      const wellDepth = well.depth
-
+      if (wellGeometryId == null) return
       const innerGeometryObject =
         labwareDef.innerLabwareGeometry?.[wellGeometryId]
-      if (innerGeometryObject === undefined) return
+      if (innerGeometryObject == null) return
       if (!isInnerWellGeometry(innerGeometryObject)) return
-      const topFrustumHeight = innerGeometryObject.sections[0].topHeight
+
+      const topSection = innerGeometryObject.sections[0]
+
+      const depthFromWell = well.depth
+      const xyDimensionsFromWell = extractXYDimensionsFromWell(well)
+      const depthFromGeometry = topSection.topHeight
+      const xyDimensionsFromGeometry = extractTopDimensionsFromGeometrySection(
+        topSection
+      )
 
       const labwareWithWellDepthMismatches = [
         // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
@@ -338,10 +339,12 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
       } else if (
         labwareWithWellDepthMismatches.includes(labwareDef.parameters.loadName)
       ) {
-        expect(wellDepth).not.toStrictEqual(topFrustumHeight)
+        expect(depthFromWell).not.toStrictEqual(depthFromGeometry)
       } else {
-        expect(wellDepth).toStrictEqual(topFrustumHeight)
+        expect(depthFromWell).toStrictEqual(depthFromGeometry)
       }
+
+      expect(xyDimensionsFromWell).toStrictEqual(xyDimensionsFromGeometry)
     }
   })
 }
@@ -550,5 +553,69 @@ function getGeometry(
       )
     }
     return result
+  }
+}
+
+function isInnerWellGeometry(
+  def: InnerWellGeometry | UserDefinedVolumes
+): def is InnerWellGeometry {
+  return 'sections' in def
+}
+
+/**
+ * Extract some shape-specific properties from a well.
+ * Fall back to undefined if that property doesn't exist, given the well's shape.
+ */
+function extractXYDimensionsFromWell(
+  well: LabwareWell
+): {
+  diameter?: number
+  xDimension?: number
+  yDimension?: number
+} {
+  switch (well.shape) {
+    case 'circular':
+      return { diameter: well.diameter }
+    case 'rectangular':
+      return {
+        xDimension: well.xDimension,
+        yDimension: well.yDimension,
+      }
+    // Deliberately no default case, for exhaustiveness checking.
+  }
+}
+
+/**
+ * Extract some shape-specific properties from a geometry section.
+ * Fall back to undefined if that property doesn't exist, given the geometry section's shape.
+ */
+function extractTopDimensionsFromGeometrySection(
+  section: WellSegment
+): { diameter?: number; xDimension?: number; yDimension?: number } {
+  switch (section.shape) {
+    case 'spherical':
+      return {}
+    case 'conical':
+      return { diameter: section.topDiameter }
+    case 'cuboidal':
+      return {
+        xDimension: section.topXDimension,
+        yDimension: section.topYDimension,
+      }
+    case 'roundedcuboid':
+    case 'squaredcone': {
+      switch (section.bottomCrossSection) {
+        case 'circular': // Circular bottom, rectangular top.
+          return {
+            xDimension: section.rectangleXDimension,
+            yDimension: section.rectangleYDimension,
+          }
+        case 'rectangular': // Rectangular bottom, circular top.
+          return {
+            diameter: section.circleDiameter,
+          }
+      }
+    }
+    // Deliberately no default case, for exhaustiveness checking.
   }
 }
