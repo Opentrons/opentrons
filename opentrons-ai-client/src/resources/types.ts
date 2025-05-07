@@ -31,6 +31,7 @@ export interface CreatePrompt {
   mounts: string[]
   flexGripper: boolean
   modules: string[]
+  fixtures: string[]
   labware: string[]
   liquids: string[]
   runtime_parameters?: string
