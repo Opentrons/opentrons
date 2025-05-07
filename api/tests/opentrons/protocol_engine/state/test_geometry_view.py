@@ -2016,7 +2016,7 @@ def test_get_well_position_adjusts_well_position_to_boundaries(
     )
     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
-    # should not constraint user-specified offsets
+    # should not constrain user-specified offsets
     meniscus_well_offset = WellOffset(x=2, y=3, z=-40)
     well_def = well_plate_def.wells["B2"]
     lld_min_height = 0.5
