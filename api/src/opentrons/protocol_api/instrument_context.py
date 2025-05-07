@@ -870,7 +870,7 @@ class InstrumentContext(publisher.CommandPublisher):
                      :ref:`new-plunger-flow-rates`.
         :type rate: float
 
-        :param flow_rate: The speed, in µL/s, at which the pipette will draw in air.
+        :param flow_rate: The rate, in µL/s, at which the pipette will draw in air.
         :type flow_rate: float
 
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
