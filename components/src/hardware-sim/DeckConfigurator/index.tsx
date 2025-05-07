@@ -76,14 +76,15 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   } = props
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  deckConfig.map(cutoutConfig => {
-    const aa = getAAFromCutoutId(
-      cutoutConfig.cutoutId,
-      cutoutConfig.cutoutFixtureId,
+  const deckConfigWithAA = deckConfig.reduce((acc, obj) => {
+    acc.push({ ...obj, aa: getAAFromCutoutId(
+      obj.cutoutId,
+      obj.cutoutFixtureId,
       deckDef
-    )
-    console.log('aa: ', aa)
-  })
+    )});
+    return acc;
+}, []);
+  console.log("deckConfigWithAA: ", deckConfigeWithAA)
 
   const stagingAreaFixtures = deckConfig.filter(
     ({ cutoutFixtureId }) => cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
