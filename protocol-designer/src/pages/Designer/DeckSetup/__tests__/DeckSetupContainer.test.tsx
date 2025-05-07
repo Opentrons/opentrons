@@ -29,7 +29,6 @@ import { getCutoutIdForAddressableArea } from '../utils'
 
 import type * as OpentronsComponents from '@opentrons/components'
 import type * as OpentronsShared from '@opentrons/shared-data'
-import type { DeckDefinition } from '@opentrons/shared-data'
 
 vi.mock('../../../../ui/steps/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
@@ -66,7 +65,7 @@ const render = () => {
         ({
           ...deckExample,
           locations: { addressableAreas: [{ id: 'cutoutD3' }] },
-        } as any) as DeckDefinition
+        } as any) as OpentronsShared.DeckDefinition
       }
       setViewBox={vi.fn()}
       viewBox="mockViewBox"
