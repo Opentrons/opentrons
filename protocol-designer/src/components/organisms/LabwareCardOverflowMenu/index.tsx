@@ -42,15 +42,6 @@ export function LabwareCardOverflowMenu(
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const { labware: deckSetupLabware } = deckSetup
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const topLabwareId = labwareIds[0]
-  const disAllowNickname =
-    labwareIds.length > 1 ||
-    deckSetupLabware[topLabwareId].def.allowedRoles?.includes('adapter') ||
-    deckSetupLabware[topLabwareId].def.parameters.isTiprack ||
-    deckSetupLabware[topLabwareId].def.parameters.quirks?.includes(
-      'tiprackAdapterFor96Channel'
-    )
-
   const [
     showDeleteEntityInUseModal,
     setShowDeleteEntityInUseModal,
@@ -63,6 +54,14 @@ export function LabwareCardOverflowMenu(
       }
     },
   })
+  const topLabwareId = labwareIds[0]
+  const disAllowNickname =
+    labwareIds.length > 1 ||
+    deckSetupLabware[topLabwareId].def.allowedRoles?.includes('adapter') ||
+    deckSetupLabware[topLabwareId].def.parameters.isTiprack ||
+    deckSetupLabware[topLabwareId].def.parameters.quirks?.includes(
+      'tiprackAdapterFor96Channel'
+    )
 
   const isLabwareOnSlotInUse =
     topLabwareId != null
@@ -92,6 +91,12 @@ export function LabwareCardOverflowMenu(
     }
   }
 
+  const handleAddNickname = (e: MouseEvent): void => {
+    setShowNickNameModal(true)
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
   return (
     <>
       {isLabwareOnSlotInUse && showDeleteEntityInUseModal ? (
@@ -112,16 +117,8 @@ export function LabwareCardOverflowMenu(
         />
       ) : null}
       <Flex
-        whiteSpace={NO_WRAP}
         ref={overflowWrapperRef}
-        position={POSITION_ABSOLUTE}
-        top={40}
-        zIndex={2}
-        right={4}
-        borderRadius={BORDERS.borderRadius8}
-        boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
-        backgroundColor={COLORS.white}
-        flexDirection={DIRECTION_COLUMN}
+        css={OVERFLOW_STYLE}
         onClick={(e: MouseEvent) => {
           e.preventDefault()
           e.stopPropagation()
@@ -129,11 +126,8 @@ export function LabwareCardOverflowMenu(
       >
         {!disAllowNickname ? (
           <MenuItem
-            css={CURSOR_STYLE}
             onClick={(e: MouseEvent) => {
-              setShowNickNameModal(true)
-              e.preventDefault()
-              e.stopPropagation()
+              handleAddNickname(e)
             }}
           >
             <StyledText desktopStyle="bodyDefaultRegular">
@@ -144,13 +138,12 @@ export function LabwareCardOverflowMenu(
 
         <Divider marginY="0" />
         <MenuItem
-          css={CURSOR_STYLE}
           onClick={(e: MouseEvent) => {
             handleClearLabware(e)
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
-            {t('delete')}
+            {t('delete_labware')}
           </StyledText>
         </MenuItem>
       </Flex>
@@ -158,6 +151,14 @@ export function LabwareCardOverflowMenu(
   )
 }
 
-const CURSOR_STYLE = css`
-  cursor: ${CURSOR_POINTER};
+const OVERFLOW_STYLE = css`
+  white-space: ${NO_WRAP};
+  position: ${POSITION_ABSOLUTE}'
+  top: 40;
+  z-index: 2;
+  right: 4;
+  border-radius: ${BORDERS.borderRadius8};
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+  background-color: ${COLORS.white};
+  flex-direction: {DIRECTION_COLUMN};
 `
