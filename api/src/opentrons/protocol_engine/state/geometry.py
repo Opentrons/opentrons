@@ -2131,47 +2131,6 @@ class GeometryView:
                 + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
             )
 
-    # maybe dont need this anymore ???
-    def get_well_height_after_liquid_handling_no_error(
-        self,
-        labware_id: str,
-        well_name: str,
-        pipette_id: str,
-        initial_height: LiquidTrackingType,
-        volume: float,
-    ) -> LiquidTrackingType:
-        """Return what the height of liquid in a labware well after liquid handling will be.
-
-        This raises no error if the value returned is an invalid physical location, so it should never be
-        used for navigation, only for a pre-emptive estimate.
-        """
-        well_geometry = self._labware.get_well_geometry(
-            labware_id=labware_id, well_name=well_name
-        )
-        try:
-            initial_volume = find_volume_at_well_height(
-                target_height=initial_height, well_geometry=well_geometry
-            )
-            final_volume = initial_volume + (
-                volume
-                * self.get_nozzles_per_well(
-                    labware_id=labware_id,
-                    target_well_name=well_name,
-                    pipette_id=pipette_id,
-                )
-            )
-            well_volume = find_height_at_well_volume(
-                target_volume=final_volume,
-                well_geometry=well_geometry,
-                raise_error_if_result_invalid=False,
-            )
-            return well_volume
-        except InvalidLiquidHeightFound as _exception:
-            raise InvalidLiquidHeightFound(
-                message=_exception.message
-                + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
-            )
-
     def get_well_height_at_volume(
         self, labware_id: str, well_name: str, volume: LiquidTrackingType
     ) -> LiquidTrackingType:
