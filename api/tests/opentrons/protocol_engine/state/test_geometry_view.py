@@ -4520,7 +4520,7 @@ def test_get_height_of_labware_stack(
 
 
 @pytest.mark.parametrize("initial_liquid_height", [5.6, SimulatedProbeResult()])
-def test_virtual_get_well_height_after_liquid_handling_no_error(
+def test_virtual_get_well_height_after_liquid_handling(
     decoy: Decoy,
     subject: GeometryView,
     mock_labware_view: LabwareView,
@@ -4551,7 +4551,7 @@ def test_virtual_get_well_height_after_liquid_handling_no_error(
         _TEST_INNER_WELL_GEOMETRY
     )
     operation_volume = 1000.0
-    result_estimate = subject.get_well_height_after_liquid_handling_no_error(
+    result_estimate = subject.get_well_height_after_liquid_handling(
         labware_id="labware-id",
         well_name="B2",
         pipette_id="pipette-id",

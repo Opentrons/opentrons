@@ -433,7 +433,6 @@ def _find_height_in_partial_frustum(
 def find_height_at_well_volume(
     target_volume: LiquidTrackingType,
     well_geometry: InnerWellGeometry,
-    raise_error_if_result_invalid: bool = True,
 ) -> LiquidTrackingType:
     """Find the height within a well, at a known volume."""
     # comparisons with SimulatedProbeResult objects aren't meaningful, just
