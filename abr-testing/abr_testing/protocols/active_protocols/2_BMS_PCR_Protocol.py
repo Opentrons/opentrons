@@ -14,7 +14,7 @@ metadata = {
     "protocolName": "PCR Protocol with TC Auto Sealing Lid",
     "author": "Rami Farawi <ndiehl@opentrons.com",
 }
-requirements = {"robotType": "Flex", "apiLevel": "2.22"}
+requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -24,6 +24,8 @@ def add_parameters(parameters: ParameterContext) -> None:
     helpers.create_csv_parameter(parameters)
     helpers.create_tc_lid_deck_riser_parameter(parameters)
     helpers.create_deactivate_modules_parameter(parameters)
+    helpers.create_meniscus_z_parameter(parameters)
+    helpers.create_probe_liquid_height_parameter(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -33,6 +35,8 @@ def run(protocol: ProtocolContext) -> None:
     parsed_csv = protocol.params.parameters_csv.parse_as_csv()  # type: ignore[attr-defined]
     deck_riser = protocol.params.deck_riser  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
+    probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
+    meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "02")
 
     rxn_vol = 50
@@ -90,7 +94,12 @@ def run(protocol: ProtocolContext) -> None:
         "Mastermix": [{"well": mmx_pic, "volume": 500.0}],
         "DNA": [{"well": dna_pic, "volume": 100.0}],
     }
-    helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, p50)
+    if probe_height_bool:
+        helpers.find_liquid_height_of_loaded_liquids(
+            protocol, liquid_vols_and_wells, p50
+        )
+    else:
+        helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
     # adding water
     protocol.comment("\n\n----------ADDING WATER----------\n")
     p50.pick_up_tip()
@@ -109,8 +118,12 @@ def run(protocol: ProtocolContext) -> None:
             break
 
         p50.configure_for_volume(water_vol)
-        p50.aspirate(water_vol, water)
-        p50.dispense(water_vol, dest_plate_1[dest_well], rate=0.5)
+        p50.aspirate(water_vol, water.meniscus(z=meniscus_z, target="end"))
+        p50.dispense(
+            water_vol,
+            dest_plate_1[dest_well].meniscus(z=meniscus_z, target="end"),
+            rate=0.5,
+        )
         p50.configure_for_volume(50)
         p50.blow_out()
     p50.drop_tip()
@@ -141,8 +154,12 @@ def run(protocol: ProtocolContext) -> None:
         if mmx_vol == 0:
             break
         p50.configure_for_volume(mmx_vol)
-        p50.aspirate(mmx_vol, reagent_rack[mmx_tube])
-        p50.dispense(mmx_vol, dest_plate_1[dest_well].top())
+        p50.aspirate(
+            mmx_vol, reagent_rack[mmx_tube].meniscus(z=meniscus_z, target="end")
+        )
+        p50.dispense(
+            mmx_vol, dest_plate_1[dest_well].meniscus(z=meniscus_z, target="end")
+        )
         protocol.delay(seconds=2)
         p50.blow_out()
         p50.touch_tip()
@@ -166,8 +183,15 @@ def run(protocol: ProtocolContext) -> None:
         if dna_vol == 0:
             break
         p50.configure_for_volume(dna_vol)
-        p50.aspirate(dna_vol, source_plate_1[dest_and_source_well])
-        p50.dispense(dna_vol, dest_plate_1[dest_and_source_well], rate=0.5)
+        p50.aspirate(
+            dna_vol,
+            source_plate_1[dest_and_source_well].meniscus(z=meniscus_z, target="end"),
+        )
+        p50.dispense(
+            dna_vol,
+            dest_plate_1[dest_and_source_well].meniscus(z=meniscus_z, target="end"),
+            rate=0.5,
+        )
 
         p50.mix(
             10,
@@ -210,7 +234,7 @@ def run(protocol: ProtocolContext) -> None:
         mmx_pic.append(water)
     # Empty plates into liquid waste
     p50.configure_nozzle_layout(style=ALL, tip_racks=tiprack_50)
-    helpers.clean_up_plates(p50, [source_plate_1, dest_plate_1], liquid_waste, 50)
+    helpers.clean_up_plates(p50, [source_plate_1, dest_plate_1], liquid_waste)
     # Probe liquid waste
     helpers.find_liquid_height_of_all_wells(protocol, p50, [liquid_waste])
     if deactivate_modules_bool:

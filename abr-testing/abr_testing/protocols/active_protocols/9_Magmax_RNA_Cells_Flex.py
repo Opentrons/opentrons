@@ -26,7 +26,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.22",
+    "apiLevel": "2.23",
 }
 """
 Slot A1: Tips 200
@@ -611,9 +611,7 @@ def run(protocol: ProtocolContext) -> None:
         )
     elute(elution_vol)
     end_list_of_wells_to_probe = [waste_reservoir["A1"]]
-    helpers.clean_up_plates(
-        m1000, [elutionplate, sample_plate], waste_reservoir["A1"], 200
-    )
+    helpers.clean_up_plates(m1000, [elutionplate, sample_plate], waste_reservoir["A1"])
     helpers.find_liquid_height_of_all_wells(protocol, m1000, end_list_of_wells_to_probe)
     # Run plate reader
     helpers.plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)

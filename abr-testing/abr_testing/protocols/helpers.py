@@ -221,6 +221,29 @@ def create_csv_parameter(parameters: ParameterContext) -> None:
     )
 
 
+def create_probe_liquid_height_parameter(parameters: ParameterContext) -> None:
+    """Create parameter for probe liquid height."""
+    parameters.add_bool(
+        variable_name="probe_liquid_height",
+        display_name="Probe Liquid Height",
+        description="True means probe liquid height at start of run.",
+        default=False,
+    )
+
+
+def create_meniscus_z_parameter(parameters: ParameterContext) -> None:
+    """Create meniscus z parameter."""
+    # NOTE: meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
+    parameters.add_float(
+        variable_name="meniscus_z",
+        display_name="Meniscus Z",
+        default=-0.5,
+        minimum=-10.0,
+        maximum=10.0,
+        description="Z offset for meniscus height. Default is -1.5mm.",
+    )
+
+
 def create_disposable_lid_parameter(parameters: ParameterContext) -> None:
     """Create parameter to use/not use disposable lid."""
     parameters.add_bool(
@@ -498,7 +521,6 @@ def clean_up_plates(
     pipette: InstrumentContext,
     list_of_labware: List[Labware],
     liquid_waste: Well,
-    tip_size: int,
 ) -> None:
     """Aspirate liquid from labware and dispense into liquid waste."""
     pipette.pick_up_tip()
@@ -512,15 +534,11 @@ def clean_up_plates(
         elif num_of_active_channels == 96:
             list_of_wells = [labware.wells()[0]]
         for well in list_of_wells:
-            vol_removed = 0.0
-            while well.max_volume > vol_removed:
-                pipette.aspirate(tip_size, well)
-                pipette.dispense(
-                    tip_size,
-                    liquid_waste.top(),
+            vol_transfer = well.current_liquid_volume()  # type: ignore
+            if isinstance(vol_transfer, float):
+                pipette.transfer(
+                    vol_transfer, well, liquid_waste.top(), new_tip="never"
                 )
-                pipette.blow_out(liquid_waste.top())
-                vol_removed += pipette.max_volume
     if pipette.channels != num_of_active_channels:
         pipette.drop_tip()
     else:

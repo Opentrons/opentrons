@@ -17,7 +17,7 @@ metadata = {
     "protocolName": "Flex ZymoBIOMICS Magbead DNA Extraction: Cells",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.21"}
+requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 """
 Slot A1: Tips 1000
 Slot A2: Tips 1000
@@ -538,7 +538,6 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         m1000,
         [elutionplate, sample_plate, res1, res3, res2],
         waste_reservoir["A1"],
-        1000,
     )
     helpers.find_liquid_height_of_all_wells(protocol, m1000, [waste_reservoir["A1"]])
     if deactivate_modules_bool:

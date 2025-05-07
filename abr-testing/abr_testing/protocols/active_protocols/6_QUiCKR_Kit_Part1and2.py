@@ -4,7 +4,7 @@ from abr_testing.protocols import helpers
 from typing import List, Dict
 
 metadata = {"protocolName": "QUiCKR V2 kit - part 1 and 2", "author": "Opentrons"}
-requirements = {"robotType": "Flex", "apiLevel": "2.20"}
+requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -245,4 +245,4 @@ def run(protocol: ProtocolContext) -> None:
             p.return_tip()
             p.reset_tipracks()
     all_plates = plate_384 + plate_96 + [reagent_res]
-    helpers.clean_up_plates(p, all_plates, liquid_waste["A1"], 50)
+    helpers.clean_up_plates(p, all_plates, liquid_waste["A1"])

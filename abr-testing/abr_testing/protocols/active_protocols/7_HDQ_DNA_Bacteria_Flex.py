@@ -26,7 +26,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.22",
+    "apiLevel": "2.23",
 }
 """
 Slot A1: Tips 1000
@@ -671,7 +671,7 @@ def run(protocol: ProtocolContext) -> None:
         waste_reservoir.wells()[0],
     ]
     m1000.reset_tipracks()
-    helpers.clean_up_plates(m1000, [res1, elutionplate], waste_reservoir["A1"], 1000)
+    helpers.clean_up_plates(m1000, [res1, elutionplate], waste_reservoir["A1"])
     helpers.find_liquid_height_of_all_wells(protocol, m1000, end_wells_with_liquid)
     if deactivate_modules_bool:
         helpers.deactivate_modules(protocol)

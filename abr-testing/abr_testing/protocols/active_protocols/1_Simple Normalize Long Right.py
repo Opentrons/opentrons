@@ -2,10 +2,8 @@
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
-    Labware,
     SINGLE,
     ALL,
-    InstrumentContext,
     Well,
 )
 from abr_testing.protocols import helpers
@@ -17,71 +15,21 @@ metadata = {
     "source": "Protocol Library",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.22"}
+requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
-    helpers.create_single_pipette_mount_parameter(parameters)
+    helpers.create_probe_liquid_height_parameter(parameters)
     helpers.create_csv_parameter(parameters)
-    helpers.create_dot_bottom_parameter(parameters)
-
-
-def get_next_tip_by_row(tip_rack: Labware, pipette: InstrumentContext) -> Well | None:
-    """Get next tip by row.
-
-    This function returns the well name of the next tip to pick up for a given
-    tiprack with row-bias. Returns None if the pipette is out of tips
-    """
-    if tip_rack.is_tiprack:
-        if pipette.channels == 8:
-            for passes in range(
-                0, int(len(tip_rack.columns()[0]) / pipette.active_channels)
-            ):
-                for column in tip_rack.columns():
-                    # When the pipette's starting channels is H1, consume tips starting at top row.
-                    if pipette._core.get_nozzle_map().starting_nozzle == "H1":
-                        active_column = column
-                    else:
-                        # We reverse our tiprack reference to consume tips starting at bottom.
-                        active_column = column[::-1]
-
-                    if len(active_column) >= (
-                        ((pipette.active_channels * passes) + pipette.active_channels)
-                    ) and all(
-                        well.has_tip is True
-                        for well in active_column[
-                            (pipette.active_channels * passes) : (
-                                (
-                                    (pipette.active_channels * passes)
-                                    + pipette.active_channels
-                                )
-                            )
-                        ]
-                    ):
-                        return active_column[
-                            (
-                                (pipette.active_channels * passes)
-                                + (pipette.active_channels - 1)
-                            )
-                        ]
-            # No valid tips were found for current pipette configuration in provided tip rack.
-            return None
-        else:
-            raise ValueError(
-                "Parameter 'pipette' of get_next_tip_by_row must be an 8 Channel Pipette."
-            )
-    else:
-        raise ValueError(
-            "Parameter 'tip_rack' of get_next_tip_by_row must be a recognized Tip Rack labware."
-        )
+    helpers.create_meniscus_z_parameter(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
-    mount_pos = protocol.params.pipette_mount  # type: ignore[attr-defined]
     all_data = protocol.params.parameters_csv.parse_as_csv()  # type: ignore[attr-defined]
+    probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
+    meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     data = all_data[1:]
     helpers.comment_protocol_version(protocol, "02")
     # DECK SETUP AND LABWARE
@@ -97,6 +45,7 @@ def run(protocol: ProtocolContext) -> None:
     waste_reservoir = protocol.load_labware(
         "nest_1_reservoir_195ml", "C1", "Liquid Waste"
     )
+    waste_reservoir.load_empty(waste_reservoir.wells())
     sample_plate_2 = protocol.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
@@ -106,6 +55,10 @@ def run(protocol: ProtocolContext) -> None:
     sample_plate_4 = protocol.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "A2"
     )
+    sample_plates = [sample_plate_1, sample_plate_2, sample_plate_3, sample_plate_4]
+    for plate in sample_plates:
+        plate.load_empty(plate.wells())
+
     protocol.load_trash_bin("A3")
 
     # reagentg146
@@ -118,12 +71,11 @@ def run(protocol: ProtocolContext) -> None:
 
     # pipette
     p1000 = protocol.load_instrument(
-        "flex_8channel_1000", mount_pos, liquid_presence_detection=True
+        "flex_8channel_1000", "left", tip_racks=[tiprack_x_1]
     )
     p1000_single = protocol.load_instrument(
         "flex_1channel_1000",
         "right",
-        liquid_presence_detection=True,
         tip_racks=[tiprack_x_2, tiprack_x_3],
     )
     # LOAD LIQUIDS
@@ -134,12 +86,14 @@ def run(protocol: ProtocolContext) -> None:
         "Dye": [{"well": [Dye_1, Dye_2, Dye_3], "volume": 675.0}],
         "Diluent": [{"well": [Diluent_1, Diluent_2, Diluent_3], "volume": 675.0}],
     }
-    current_rack = tiprack_x_1
     # CONFIGURE SINGLE LAYOUT
     p1000.configure_nozzle_layout(style=SINGLE, start="H1", tip_racks=[tiprack_x_1])
-    helpers.find_liquid_height_of_loaded_liquids(
-        protocol, liquid_vols_and_wells, p1000_single
-    )
+    if probe_height_bool:
+        helpers.find_liquid_height_of_loaded_liquids(
+            protocol, liquid_vols_and_wells, p1000_single
+        )
+    else:
+        helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
 
     for X in range(1):
         protocol.comment("==============================================")
@@ -148,48 +102,42 @@ def run(protocol: ProtocolContext) -> None:
 
         current = 0
 
-        well = get_next_tip_by_row(current_rack, p1000)
-        p1000.pick_up_tip(well)
+        p1000.pick_up_tip()
         while current < len(data):
             CurrentWell = str(data[current][0])
             DyeVol = float(data[current][1])
-            if DyeVol != 0 and DyeVol < 100:
-                p1000.liquid_presence_detection = False
+            while Dye_1.current_liquid_volume() < DyeVol:
                 p1000.transfer(
                     DyeVol,
-                    Dye_1.bottom(z=2),
+                    Dye_1.meniscus(z=meniscus_z, target="end"),
                     sample_plate_1.wells_by_name()[CurrentWell].top(z=1),
                     new_tip="never",
                 )
-                if DyeVol > 20:
-                    wells.append(sample_plate_1.wells_by_name()[CurrentWell])
             current += 1
         p1000.blow_out(location=waste_reservoir["A1"])
         p1000.touch_tip()
         p1000.drop_tip()
-        p1000.liquid_presence_detection = True
 
         protocol.comment("==============================================")
         protocol.comment("Adding Diluent Sample Plate 1")
         protocol.comment("==============================================")
 
         current = 0
+        p1000.pick_up_tip()
         while current < len(data):
             CurrentWell = str(data[current][0])
             DilutionVol = float(data[current][2])
-            if DilutionVol != 0 and DilutionVol < 100:
-                well = get_next_tip_by_row(current_rack, p1000)
-                p1000.pick_up_tip(well)
-                p1000.aspirate(DilutionVol, Diluent_1.bottom(z=dot_bottom))
+            while Diluent_1.current_liquid_volume() < DilutionVol:
+                p1000.aspirate(
+                    DilutionVol, Diluent_1.meniscus(z=meniscus_z, target="end")
+                )
                 p1000.dispense(
                     DilutionVol, sample_plate_1.wells_by_name()[CurrentWell].top(z=0.2)
                 )
-                if DilutionVol > 20:
-                    wells.append(sample_plate_1.wells_by_name()[CurrentWell])
-                p1000.blow_out(location=waste_reservoir["A1"])
-                p1000.touch_tip()
-                p1000.drop_tip()
+            p1000.blow_out(location=waste_reservoir["A1"])
+            p1000.touch_tip()
             current += 1
+        p1000.drop_tip()
 
         protocol.comment("Changing pipette configuration to 8ch.")
 
@@ -201,15 +149,13 @@ def run(protocol: ProtocolContext) -> None:
         while current < len(data):
             CurrentWell = str(data[current][0])
             DyeVol = float(data[current][1])
-            if DyeVol != 0 and DyeVol < 100:
+            while Dye_2.current_liquid_volume() < DyeVol:
                 p1000_single.transfer(
                     DyeVol,
-                    Dye_2.bottom(z=2),
+                    Dye_2.meniscus(z=meniscus_z, target="end"),
                     sample_plate_2.wells_by_name()[CurrentWell].top(z=1),
                     new_tip="never",
                 )
-                if DyeVol > 20:
-                    wells.append(sample_plate_2.wells_by_name()[CurrentWell])
             current += 1
         p1000_single.blow_out(location=waste_reservoir["A1"])
         p1000_single.touch_tip()
@@ -223,14 +169,14 @@ def run(protocol: ProtocolContext) -> None:
         while current < len(data):
             CurrentWell = str(data[current][0])
             DilutionVol = float(data[current][2])
-            if DilutionVol != 0 and DilutionVol < 100:
+            while Diluent_2.current_liquid_volume() < DilutionVol:
                 p1000_single.pick_up_tip()
-                p1000_single.aspirate(DilutionVol, Diluent_2.bottom(z=dot_bottom))
+                p1000_single.aspirate(
+                    DilutionVol, Diluent_2.meniscus(z=meniscus_z, target="end")
+                )
                 p1000_single.dispense(
                     DilutionVol, sample_plate_2.wells_by_name()[CurrentWell].top(z=0.2)
                 )
-                if DilutionVol > 20:
-                    wells.append(sample_plate_2.wells_by_name()[CurrentWell])
                 p1000_single.blow_out(location=waste_reservoir["A1"])
                 p1000_single.touch_tip()
                 p1000_single.return_tip()
@@ -245,20 +191,16 @@ def run(protocol: ProtocolContext) -> None:
         while current < len(data):
             CurrentWell = str(data[current][0])
             DyeVol = float(data[current][1])
-            if DyeVol != 0 and DyeVol < 100:
-                p1000_single.liquid_presence_detection = False
+            if Dye_3.current_liquid_volume() < DyeVol:
                 p1000_single.transfer(
                     DyeVol,
-                    Dye_3.bottom(z=2),
+                    Dye_3.meniscus(z=meniscus_z, target="end"),
                     sample_plate_3.wells_by_name()[CurrentWell].top(z=1),
                     blow_out=True,
                     blowout_location="destination well",
                     new_tip="never",
                 )
-                if DyeVol > 20:
-                    wells.append(sample_plate_3.wells_by_name()[CurrentWell])
             current += 1
-        p1000_single.liquid_presence_detection = True
         p1000_single.blow_out(location=waste_reservoir["A1"])
         p1000_single.touch_tip()
         p1000_single.return_tip()
@@ -269,14 +211,14 @@ def run(protocol: ProtocolContext) -> None:
         while current < len(data):
             CurrentWell = str(data[current][0])
             DilutionVol = float(data[current][2])
-            if DilutionVol != 0 and DilutionVol < 100:
+            while Diluent_3.current_liquid_volume() < DilutionVol:
                 p1000_single.pick_up_tip()
-                p1000_single.aspirate(DilutionVol, Diluent_3.bottom(z=dot_bottom))
+                p1000_single.aspirate(
+                    DilutionVol, Diluent_3.meniscus(z=meniscus_z, target="end")
+                )
                 p1000_single.dispense(
                     DilutionVol, sample_plate_3.wells_by_name()[CurrentWell].top(z=0.2)
                 )
-                if DilutionVol > 20:
-                    wells.append(sample_plate_3.wells_by_name()[CurrentWell])
                 p1000_single.blow_out(location=waste_reservoir["A1"])
                 p1000_single.touch_tip()
                 p1000_single.return_tip()
@@ -292,7 +234,6 @@ def run(protocol: ProtocolContext) -> None:
             CurrentWell = str(data[current][0])
             DyeVol = float(data[current][1])
             if DyeVol != 0 and DyeVol < 100:
-                p1000_single.liquid_presence_detection = False
                 p1000_single.transfer(
                     DyeVol,
                     Dye_3.bottom(z=2),
@@ -304,7 +245,6 @@ def run(protocol: ProtocolContext) -> None:
                 if DyeVol > 20:
                     wells.append(sample_plate_4.wells_by_name()[CurrentWell])
             current += 1
-        p1000_single.liquid_presence_detection = True
         p1000_single.blow_out(location=waste_reservoir["A1"])
         p1000_single.touch_tip()
         p1000_single.return_tip()
@@ -315,9 +255,11 @@ def run(protocol: ProtocolContext) -> None:
         while current < len(data):
             CurrentWell = str(data[current][0])
             DilutionVol = float(data[current][2])
-            if DilutionVol != 0 and DilutionVol < 100:
+            while Diluent_3.current_liquid_volume() < DilutionVol:
                 p1000_single.pick_up_tip()
-                p1000_single.aspirate(DilutionVol, Diluent_3.bottom(z=dot_bottom))
+                p1000_single.aspirate(
+                    DilutionVol, Diluent_3.meniscus(z=meniscus_z, target="end")
+                )
                 p1000_single.dispense(
                     DilutionVol, sample_plate_4.wells_by_name()[CurrentWell].top(z=0.2)
                 )
@@ -335,7 +277,6 @@ def run(protocol: ProtocolContext) -> None:
         p1000,
         [sample_plate_1, sample_plate_2, sample_plate_3, sample_plate_4],
         waste_reservoir["A1"],
-        200,
     )
     helpers.find_liquid_height_of_all_wells(
         protocol, p1000_single, [waste_reservoir["A1"]]
