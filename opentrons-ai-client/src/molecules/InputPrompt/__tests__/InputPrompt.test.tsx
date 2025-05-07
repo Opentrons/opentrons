@@ -9,13 +9,19 @@ import { InputPrompt } from '../index'
 import type { ReactNode } from 'react'
 
 const mockTrackEvent = vi.fn()
+const mockCallApi = vi.fn().mockResolvedValue(undefined)
 
 vi.mock('../../../resources/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockTrackEvent,
 }))
 
-vi.mock('../../../hooks/useTrackEvent', () => ({
-  useTrackEvent: () => mockTrackEvent,
+vi.mock('../../../resources/hooks/useApiCall', () => ({
+  useApiCall: () => ({
+    data: null,
+    error: null,
+    isLoading: false,
+    callApi: mockCallApi,
+  }),
 }))
 
 const WrappingForm = (wrappedComponent: {
@@ -64,17 +70,30 @@ describe('InputPrompt', () => {
   it('should track event when send button is clicked', async () => {
     render()
     const textbox = screen.getByRole('textbox')
-    fireEvent.change(textbox, { target: { value: ['test'] } })
+    // Ensure the textbox change updates the state and enables the button
+    fireEvent.change(textbox, { target: { value: 'test' } })
+
+    // Add a small wait to ensure state updates propagate
+    await waitFor(() => {
+      expect(screen.getByRole('button')).not.toBeDisabled()
+    })
+
     const sendButton = screen.getByRole('button')
+    expect(sendButton).not.toBeDisabled() // Double check before clicking
     fireEvent.click(sendButton)
 
+    // Wait for callApi to be called first, since that happens before trackEvent
     await waitFor(() => {
-      expect(mockTrackEvent).toHaveBeenCalledWith({
-        name: 'chat-submitted',
-        properties: {
-          chat: 'test',
-        },
-      })
+      expect(mockCallApi).toHaveBeenCalled()
+    })
+
+    // Then check if trackEvent was called with the expected arguments
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'chat-submitted',
+      properties: {
+        chat: 'test',
+        protocol_format: 'Python',
+      },
     })
   })
 })

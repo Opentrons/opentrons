@@ -25,6 +25,7 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getSlotInLocationStack,
   pipetteAdjacentHeaterShakerWhileShaking,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
@@ -102,10 +103,10 @@ describe('aspirate', () => {
     ])
     expect(getSuccessResult(result).python).toBe(
       `
-mockPythonName.aspirate(
+mock_pipette.aspirate(
     volume=50,
-    location=mockPythonName["A1"].bottom(z=5),
-    rate=6 / mockPythonName.flow_rate.aspirate,
+    location=mock_source_plate["A1"].bottom(z=5),
+    rate=6 / mock_pipette.flow_rate.aspirate,
 )`.trimStart()
     )
   })
@@ -430,7 +431,7 @@ mockPythonName.aspirate(
     when(getIsHeaterShakerEastWestMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything()
       )
       .thenReturn(true)
@@ -459,7 +460,7 @@ mockPythonName.aspirate(
     when(getIsHeaterShakerEastWestWithLatchOpen)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack)
       )
       .thenReturn(true)
 
@@ -487,7 +488,7 @@ mockPythonName.aspirate(
     when(pipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         OT2_ROBOT_TYPE
       )
       .thenReturn(true)
@@ -516,7 +517,7 @@ mockPythonName.aspirate(
     when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything(),
         expect.anything()
       )

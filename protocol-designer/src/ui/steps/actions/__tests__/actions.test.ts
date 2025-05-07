@@ -27,13 +27,13 @@ const mockStore = configureMockStore([thunk])
 const initialRobotState: RobotState = {
   labware: {
     fixedTrash: {
-      slot: '12',
+      stack: ['fixedTrash', '12'],
     },
     tiprackId: {
-      slot: '1',
+      stack: ['tiprackId', '1'],
     },
     plateId: {
-      slot: '7',
+      stack: ['plateId', '7'],
     },
   },
   modules: {},
@@ -321,14 +321,14 @@ describe('steps actions', () => {
                   ],
                   robotState: {
                     labware: {
-                      plateId: {
-                        slot: '7',
+                      fixedTrash: {
+                        stack: ['fixedTrash', '12'],
                       },
                       tiprackId: {
-                        slot: '1',
+                        stack: ['tiprackId', '1'],
                       },
-                      fixedTrash: {
-                        slot: '12',
+                      plateId: {
+                        stack: ['plateId', '7'],
                       },
                     },
                     liquidState: {
@@ -469,13 +469,14 @@ describe('steps actions', () => {
                   robotState: {
                     labware: {
                       plateId: {
-                        slot: '7',
+                        stack: ['plateId', '7'],
                       },
                       tiprackId: {
-                        slot: '1',
+                        stack: ['tiprackId', '1'],
                       },
+
                       fixedTrash: {
-                        slot: '12',
+                        stack: ['fixedTrash', '12'],
                       },
                     },
                     liquidState: {

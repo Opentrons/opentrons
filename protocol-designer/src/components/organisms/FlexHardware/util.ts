@@ -103,9 +103,11 @@ export const updateInitialDeckState = (
         getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
     const matching4thColumnLabware =
-      matchingFixture != null && matchingFixture.name === 'stagingArea'
-        ? Object.values(labwareOnDeck).find(
-            labware => labware.slot === fourthColumnSlot
+      matchingFixture != null &&
+      matchingFixture.name === 'stagingArea' &&
+      fourthColumnSlot != null
+        ? Object.values(labwareOnDeck).find(labware =>
+            labware.stack.includes(fourthColumnSlot)
           ) ?? null
         : null
     const {
@@ -175,9 +177,10 @@ export const updateInitialDeckState = (
           : null
       const matching4thColumnLabwarNextToMagBlock =
         matchingStagingArea != null &&
-        matchingStagingArea.name === 'stagingArea'
-          ? Object.values(labwareOnDeck).find(
-              labware => labware.slot === fourthColumnSlotNextToMagBlock
+        matchingStagingArea.name === 'stagingArea' &&
+        fourthColumnSlotNextToMagBlock != null
+          ? Object.values(labwareOnDeck).find(labware =>
+              labware.stack.includes(fourthColumnSlotNextToMagBlock)
             ) ?? null
           : null
       const { fixtureIds, fourthColumnSlotLabwareId } = getHardwareInSlotInUse(
@@ -267,8 +270,9 @@ export const updateInitialDeckState = (
       )
 
       const matching4thColumnLabwareInD4 =
-        Object.values(labwareOnDeck).find(labware => labware.slot === 'D4') ??
-        null
+        Object.values(labwareOnDeck).find(labware =>
+          labware.stack.includes('D4')
+        ) ?? null
 
       const { fixtureIds, fourthColumnSlotLabwareId } = getHardwareInSlotInUse(
         savedSteps,

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -21,7 +20,6 @@ import {
 
 import { LiquidButton } from '../../../components/molecules'
 import { getOnlyLatestDefs } from '../../../labware-defs'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getSelectedTerminalItemId } from '../../../ui/steps'
@@ -41,7 +39,6 @@ interface OffDeckProps {
 export function OffDeck(props: OffDeckProps): JSX.Element {
   const { setOverflowMenu } = props
   const { t, i18n } = useTranslation('starting_deck_state')
-  const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
   const terminalItemId = useSelector(getSelectedTerminalItemId)
 
   const dispatch = useDispatch()
@@ -49,13 +46,8 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedLabwareDefUri, selectedSlot } = selectedSlotInfo
 
-  const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getOnlyLatestDefs()
 
-  const hoveredLabwareDef =
-    hoveredLabware != null
-      ? defs[hoveredLabware] ?? customLabwareDefs[hoveredLabware] ?? null
-      : null
   const offDeckLabware =
     selectedLabwareDefUri != null ? defs[selectedLabwareDefUri] ?? null : null
 
@@ -78,32 +70,7 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
       )}
     </RobotWorkSpace>
   )
-  if (hoveredLabwareDef != null && hoveredLabwareDef !== offDeckLabware) {
-    labware = (
-      <RobotWorkSpace
-        key={hoveredLabwareDef.parameters.loadName}
-        viewBox={`-15 -22 ${
-          hoveredLabwareDef.dimensions.xDimension /
-          SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
-        } ${
-          hoveredLabwareDef.dimensions.yDimension /
-          SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
-        }`}
-      >
-        {() => (
-          <>
-            <LabwareRender definition={hoveredLabwareDef} />
-            <LabwareLabel
-              isLast={true}
-              isSelected={false}
-              labwareDef={hoveredLabwareDef}
-              position={[0, 0, 0]}
-            />
-          </>
-        )}
-      </RobotWorkSpace>
-    )
-  } else if (offDeckLabware != null) {
+  if (offDeckLabware != null) {
     const def = offDeckLabware
     labware = (
       <RobotWorkSpace
@@ -183,7 +150,6 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
 
           <DeckSetupToolbox
             position={POSITION_RELATIVE}
-            setHoveredLabware={setHoveredLabware}
             onCloseClick={() => {
               dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
             }}

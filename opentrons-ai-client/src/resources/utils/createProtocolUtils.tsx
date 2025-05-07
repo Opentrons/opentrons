@@ -13,8 +13,10 @@ import {
   NO_PIPETTES,
   OPENTRONS_FLEX,
   OPENTRONS_OT2,
+  ROBOT_FIELD_NAME,
   TWO_PIPETTES,
 } from '../../organisms/InstrumentsSection'
+import { PROTOCOL_FORMAT, PYTHON } from '../constants'
 import { getOnlyLatestDefs } from './labware'
 
 import type { UseFormWatch } from 'react-hook-form'
@@ -100,6 +102,19 @@ export function generatePromptPreviewModulesItems(
   return items.filter(Boolean)
 }
 
+export function generatePromptPreviewFixtureItems(
+  watch: UseFormWatch<CreateProtocolFormData>,
+  t: any
+): string[] {
+  const { fixtures } = watch()
+
+  if (fixtures === undefined || fixtures?.length === 0) return []
+
+  const items = fixtures?.map(fixture => fixture.name)
+
+  return items.filter(Boolean)
+}
+
 export function generatePromptPreviewLabwareLiquidsItems(
   watch: UseFormWatch<CreateProtocolFormData>,
   t: any
@@ -112,9 +127,7 @@ export function generatePromptPreviewLabwareLiquidsItems(
   // Add all labware items
   labwares?.forEach(labware => {
     items.push(
-      `${labware.count} x ${
-        getLabwareDisplayName(defs[labware.labwareURI]) as string
-      }`
+      `${labware.count} x ${getLabwareDisplayName(defs[labware.labwareURI])}`
     )
   })
 
@@ -226,6 +239,26 @@ export function generatePromptPreviewStepsItems(
   return steps.filter(Boolean)
 }
 
+export function generatePromptPreviewRuntimeParametersItems(
+  watch: UseFormWatch<CreateProtocolFormData>,
+  t: any
+): string[] {
+  const { runtime_parameters } = watch()
+  const protocolFormat = watch(PROTOCOL_FORMAT)
+  const robotType = watch(ROBOT_FIELD_NAME)
+
+  // Only show in preview if Protocol is Python and robot is Flex
+  if (
+    protocolFormat !== PYTHON ||
+    robotType !== OPENTRONS_FLEX ||
+    !runtime_parameters
+  ) {
+    return []
+  }
+
+  return [runtime_parameters].filter(Boolean)
+}
+
 export function generatePromptPreviewData(
   watch: UseFormWatch<CreateProtocolFormData>,
   t: any
@@ -251,8 +284,16 @@ export function generatePromptPreviewData(
       items: generatePromptPreviewModulesItems(watch, t),
     },
     {
+      title: t('fixtures_title'),
+      items: generatePromptPreviewFixtureItems(watch, t),
+    },
+    {
       title: t('labware_liquids_title'),
       items: generatePromptPreviewLabwareLiquidsItems(watch, t),
+    },
+    {
+      title: t('runtime_parameters_title'),
+      items: generatePromptPreviewRuntimeParametersItems(watch, t),
     },
     {
       title: t('steps_title'),
@@ -266,7 +307,8 @@ export function generateChatPrompt(
   t: any,
   setCreateProtocolChatAtom: (
     args_0: CreatePrompt | ((prev: CreatePrompt) => CreatePrompt)
-  ) => void
+  ) => void,
+  isPdProtocolGenerationEnabled: boolean = false
 ): string {
   const protocolFormat = `- ${startCase(values.protocol_format)}`
 
@@ -336,6 +378,7 @@ export function generateChatPrompt(
     values.instruments.robot === OPENTRONS_FLEX
       ? `\n- ${t('with_flex_gripper')}`
       : ''
+
   const modules = values.modules
     .map(
       module =>
@@ -344,6 +387,11 @@ export function generateChatPrompt(
         }`
     )
     .join('\n')
+
+  const fixtures = values.fixtures
+    .map(fixture => `- ${fixture.name}`)
+    .join('\n')
+
   const labwares = values.labwares
     .map(
       labware =>
@@ -352,22 +400,50 @@ export function generateChatPrompt(
         }`
     )
     .join('\n')
+
   const liquids = values.liquids.map(liquid => `- ${liquid}`).join('\n')
+
   const steps = Array.isArray(values.steps)
     ? values.steps.map(step => `- ${step}`).join('\n')
     : values.steps
 
-  const prompt = `${t('create_protocol_prompt_robot', { robotType })}\n${t(
-    'protocol_format'
-  )}:\n${protocolFormat}\n\n${t(
-    'application_title'
-  )}:\n${scientificApplication}\n\n${t('description')}:\n${description}\n\n${t(
-    'pipette_mounts'
-  )}:\n\n${pipetteMounts}${flexGripper}\n\n${t(
-    'modules_title'
-  )}:\n${modules}\n\n${t('labware_section_title')}:\n${labwares}\n\n${t(
-    'liquid_section_title'
-  )}:\n${liquids}\n\n${t('steps_section_title')}:\n${steps}\n`
+  const moduleSection =
+    values.modules.length > 0 ? `\n\n${t('modules_title')}:\n${modules}` : ''
+
+  const fixtureSection =
+    values.fixtures.length > 0 ? `\n\n${t('fixtures_title')}:\n${fixtures}` : ''
+
+  const runtimeParametersSection =
+    values.protocol_format === PYTHON &&
+    values.instruments.robot === OPENTRONS_FLEX &&
+    values.runtime_parameters
+      ? `\n\n${t(
+          'runtime_parameters_title'
+        )}:\n- ${values.runtime_parameters.replace(/\n/g, '\n- ')}`
+      : ''
+
+  const prompt = `${
+    values.protocol_format === PYTHON
+      ? t('create_protocol_prompt_robot', { robotType }) + '\n'
+      : ''
+  }
+
+${t('protocol_format_title')}:\n${protocolFormat}
+
+${t('application_title')}:\n${scientificApplication}
+
+${t('description')}:\n${description}
+
+${t(
+  'pipette_mounts'
+)}:\n\n${pipetteMounts}${flexGripper}${moduleSection}${fixtureSection}
+
+\n${t('labware_section_title')}:\n${labwares}
+
+\n${t('liquid_section_title')}:\n${liquids}${runtimeParametersSection}
+
+\n${t('steps_section_title')}:\n${steps}
+`
 
   setCreateProtocolChatAtom({
     prompt,
@@ -388,13 +464,18 @@ export function generateChatPrompt(
             : ''
         }`
     ),
+    fixtures: values.fixtures.map(fixture => fixture.name),
     labware: values.labwares.map(
       labware => `${labware.labwareURI}, quantity: ${labware.count}`
     ),
     liquids: values.liquids,
+    runtime_parameters: values.runtime_parameters,
     steps: Array.isArray(values.steps) ? values.steps : [values.steps],
-    fake: values.protocol_format === 'Protocol Designer',
+    fake:
+      !isPdProtocolGenerationEnabled &&
+      values.protocol_format === 'Protocol Designer',
     fake_key:
+      !isPdProtocolGenerationEnabled &&
       values.protocol_format === 'Protocol Designer'
         ? 'pd serial diliution'
         : undefined,

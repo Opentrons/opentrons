@@ -3,6 +3,7 @@ import floor from 'lodash/floor'
 import {
   getPipetteSpecsV2,
   POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
 
 import {
@@ -49,8 +50,20 @@ export const migrateFile = (
         dispense_labware,
         liquidClassesSupported,
         liquidClass,
+        aspirate_touchTip_checkbox,
+        dispense_touchTip_checkbox,
         ...rest
       } = form
+      const aspirateLabwareUri =
+        equipmentLoadInfoFromCommands.labware[aspirate_labware].labwareDefURI
+      const isAspirateLabwareTouchtipDisabled = labwareDefinitions[
+        aspirateLabwareUri
+      ].parameters.quirks?.includes('touchTipDisabled')
+      const dispenseLabwareUri =
+        equipmentLoadInfoFromCommands.labware[dispense_labware].labwareDefURI
+      const isDispenseLabwareTouchtipDisabled = labwareDefinitions[
+        dispenseLabwareUri
+      ].parameters.quirks?.includes('touchTipDisabled')
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
         labwareDefinitions,
         loadLabwareCommands,
@@ -85,16 +98,24 @@ export const migrateFile = (
           id,
           aspirate_labware,
           dispense_labware,
+          aspirate_touchTip_checkbox: isAspirateLabwareTouchtipDisabled
+            ? false
+            : aspirate_touchTip_checkbox,
           aspirate_touchTip_mmFromTop:
-            aspirate_touchTip_mmFromBottom == null
+            aspirate_touchTip_mmFromBottom == null ||
+            isAspirateLabwareTouchtipDisabled
               ? null
               : floor(
                   aspirate_touchTip_mmFromBottom -
                     matchingAspirateLabwareWellDepth,
                   1
                 ),
+          dispense_touchTip_checkbox: isDispenseLabwareTouchtipDisabled
+            ? false
+            : dispense_touchTip_checkbox,
           dispense_touchTip_mmfromTop:
-            dispense_touchTip_mmFromBottom == null
+            dispense_touchTip_mmFromBottom == null ||
+            isDispenseLabwareTouchtipDisabled
               ? null
               : floor(
                   dispense_touchTip_mmFromBottom -
@@ -114,17 +135,23 @@ export const migrateFile = (
           aspirate_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE, // this field and the following were previously not configurable and defaulted to 0mm
           dispense_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
           aspirate_position_reference: POSITION_REFERENCE_BOTTOM,
-          aspirate_retract_position_reference: POSITION_REFERENCE_BOTTOM,
-          aspirate_submerge_mmFromBottom: null,
+          aspirate_retract_position_reference: POSITION_REFERENCE_TOP,
+          aspirate_retract_mmFromBottom: 0,
+          aspirate_retract_x_position: null,
+          aspirate_retract_y_position: null,
+          aspirate_submerge_mmFromBottom: 0,
           aspirate_submerge_x_position: null,
           aspirate_submerge_y_position: null,
-          aspirate_submerge_position_reference: POSITION_REFERENCE_BOTTOM,
+          aspirate_submerge_position_reference: POSITION_REFERENCE_TOP,
           dispense_position_reference: POSITION_REFERENCE_BOTTOM,
-          dispense_retract_position_reference: POSITION_REFERENCE_BOTTOM,
-          dispense_submerge_mmFromBottom: null,
+          dispense_retract_position_reference: POSITION_REFERENCE_TOP,
+          dispense_retract_mmFromBottom: 0,
+          dispense_retract_x_position: null,
+          dispense_retract_y_position: null,
+          dispense_submerge_position_reference: POSITION_REFERENCE_TOP,
+          dispense_submerge_mmFromBottom: 0,
           dispense_submerge_x_position: null,
           dispense_submerge_y_position: null,
-          dispense_submerge_position_reference: POSITION_REFERENCE_BOTTOM,
           liquidClassesSupported: liquidClassesSupported ?? false,
           liquidClass: 'none',
           pushOut_checkbox:
@@ -146,9 +173,15 @@ export const migrateFile = (
           mix_touchTip_mmFromBottom,
           labware,
           liquidClassesSupported,
+          mix_touchTip_checkbox,
           ...rest
         } = form
         const tipRackDef = labwareDefinitions[form.tipRack]
+        const mixLabwareUri =
+          equipmentLoadInfoFromCommands.labware[labware].labwareDefURI
+        const isLabwareTouchtipDisabled = labwareDefinitions[
+          mixLabwareUri
+        ].parameters.quirks?.includes('touchTipDisabled')
         const pipetteName =
           equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
           null
@@ -175,8 +208,11 @@ export const migrateFile = (
             ...rest,
             id,
             labware,
+            mix_touchTip_checkbox: isLabwareTouchtipDisabled
+              ? false
+              : mix_touchTip_checkbox,
             mix_touchTip_mmFromTop:
-              mix_touchTip_mmFromBottom == null
+              mix_touchTip_mmFromBottom == null || isLabwareTouchtipDisabled
                 ? null
                 : floor(
                     mix_touchTip_mmFromBottom - matchingLabwareWellDepth,

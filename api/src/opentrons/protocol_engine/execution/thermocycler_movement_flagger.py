@@ -1,14 +1,17 @@
 """Helpers for flagging unsafe movements to a Thermocycler Module."""
-
 from typing import Optional
 
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import Thermocycler as HardwareThermocycler
 
+
+from opentrons.protocol_engine.state.module_substates import ThermocyclerModuleId
 from ..types import ModuleLocation, LabwareLocation
 from ..state.state import StateStore
 from ..errors import ThermocyclerNotOpenError, WrongModuleTypeError
+
+from .equipment import EquipmentHandler
 
 
 class ThermocyclerMovementFlagger:
@@ -19,7 +22,10 @@ class ThermocyclerMovementFlagger:
     """
 
     def __init__(
-        self, state_store: StateStore, hardware_api: HardwareControlAPI
+        self,
+        state_store: StateStore,
+        hardware_api: HardwareControlAPI,
+        equipment: EquipmentHandler,
     ) -> None:
         """Initialize the ThermocyclerMovementFlagger.
 
@@ -28,18 +34,59 @@ class ThermocyclerMovementFlagger:
                          which Thermocycler a labware is in, if any.
             hardware_api: The underlying hardware interface. Used to query
                           Thermocyclers' current lid states.
+            equipment: The protocol engine interface to move a present thermocycler to an
+                            operable state if need be.
         """
         self._state_store = state_store
         self._hardware_api = hardware_api
+        self._equipment = equipment
 
-    async def raise_if_labware_in_non_open_thermocycler(
+    async def _verify_tc_lid_status(self, module_id: str) -> None:
+        """Ensure the thermocycler's lid state is correct or raise an error."""
+        try:
+            hw_tc_lid_status = await self._get_hardware_thermocycler_lid_status(
+                module_id=module_id
+            )
+        except self._HardwareThermocyclerMissingError as e:
+            raise ThermocyclerNotOpenError(
+                "Thermocycler must be open when moving to labware inside it,"
+                " but can't confirm Thermocycler's current status."
+            ) from e
+
+        if (
+            hw_tc_lid_status == ThermocyclerLidStatus.IN_BETWEEN
+            or hw_tc_lid_status == ThermocyclerLidStatus.UNKNOWN
+        ):
+            # NOTE(cm): due to a potential hardware bug, the thermocycler might lose its position
+            # status when idling in an open position and default to UNKNOWN or IN_BETWEEN.
+            # This tries to recover only from an unexpected known position.
+            await self._open_tc_lid(module_id=module_id)
+            hw_tc_lid_status = await self._get_hardware_thermocycler_lid_status(
+                module_id=module_id
+            )
+        if hw_tc_lid_status != ThermocyclerLidStatus.OPEN:
+            raise ThermocyclerNotOpenError(
+                f"Thermocycler must be open when moving to labware inside it,"
+                f' but Thermocycler is currently "{hw_tc_lid_status}".'
+            )
+
+    async def _open_tc_lid(self, module_id: str) -> None:
+        """Try to open the thermocycler lid."""
+        tc_hardware = self._equipment.get_module_hardware_api(
+            ThermocyclerModuleId(module_id)
+        )
+        if tc_hardware:
+            await tc_hardware.open()
+
+    async def ensure_labware_in_open_thermocycler(
         self, labware_parent: LabwareLocation
     ) -> None:
         """Flag unsafe movements to a Thermocycler.
 
         If the given labware is in a Thermocycler, and that Thermocycler's lid isn't
         currently open according the engine's thermocycler state as well as
-        the hardware API (for non-virtual modules), raises ThermocyclerNotOpenError.
+        the hardware API (for non-virtual modules), tries to open the thermocycler lid.
+        If this is unsuccessful, raises ThermocyclerNotOpenError.
         If it is a virtual module, checks only for thermocycler lid state in engine.
 
         Otherwise, no-ops.
@@ -81,21 +128,7 @@ class ThermocyclerMovementFlagger:
         # There is a chance that the engine might not have the latest lid status;
         # do a hardware state check just to be sure that the lid is truly open.
         if not self._state_store.config.use_virtual_modules:
-            try:
-                hw_tc_lid_status = await self._get_hardware_thermocycler_lid_status(
-                    module_id=tc_substate.module_id
-                )
-            except self._HardwareThermocyclerMissingError as e:
-                raise ThermocyclerNotOpenError(
-                    "Thermocycler must be open when moving to labware inside it,"
-                    " but can't confirm Thermocycler's current status."
-                ) from e
-
-            if hw_tc_lid_status != ThermocyclerLidStatus.OPEN:
-                raise ThermocyclerNotOpenError(
-                    f"Thermocycler must be open when moving to labware inside it,"
-                    f' but Thermocycler is currently "{hw_tc_lid_status}".'
-                )
+            await self._verify_tc_lid_status(module_id=module_id)
 
     async def _get_hardware_thermocycler_lid_status(
         self,

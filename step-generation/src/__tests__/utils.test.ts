@@ -333,10 +333,10 @@ describe('makeInitialRobotState', () => {
           liquidEntities: {},
         },
         labwareLocations: {
-          somePlateId: { slot: '1' },
-          tiprack10Id: { slot: '2' },
-          tiprack300Id: { slot: '4' },
-          fixedTrash: { slot: '12' },
+          somePlateId: { stack: ['somePlateId', '1'] },
+          tiprack10Id: { stack: ['tiprack10Id', '2'] },
+          tiprack300Id: { stack: ['tiprack300Id', '4'] },
+          fixedTrash: { stack: ['fixedTrash', '12'] },
         },
         moduleLocations: {
           someTempModuleId: {
@@ -657,7 +657,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: true,
@@ -677,7 +677,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: true,
@@ -697,7 +697,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: false,
@@ -717,7 +717,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId },
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] },
       },
       labwareId: 'someOtherLabwareNotOnTC',
       expected: false,
@@ -809,7 +809,7 @@ describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
   let labwareState: RobotState['labware']
   beforeEach(() => {
     labwareState = {
-      labwareId: { slot: '2' },
+      labwareId: { stack: ['labwareId', '2'] },
     }
     labwareEntities = {
       labwareId: {
@@ -841,7 +841,7 @@ describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
     ).toBe(false)
   })
   it('should return false when there is NO labware next to a heater shaker', () => {
-    labwareState.labwareId.slot = '9'
+    labwareState.labwareId.stack = ['labwareId', '9']
     when(getIsLabwareAboveHeight)
       .calledWith(
         expect.any(Object),

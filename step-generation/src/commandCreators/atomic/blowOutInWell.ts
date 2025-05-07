@@ -10,6 +10,7 @@ import {
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   getLabwareSlot,
+  getSlotInLocationStack,
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
   pipetteIntoHeaterShakerLatchOpen,
@@ -38,11 +39,7 @@ export const blowOutInWell: CommandCreator<BlowoutParams> = (
     false
   const pipetteData = prevRobotState.pipettes[pipetteId]
   const labwareState = prevRobotState.labware
-  const slotName = getLabwareSlot(
-    labwareId,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(labwareId, prevRobotState.labware)
   // TODO Ian 2018-04-30 this logic using command creator args + robotstate to push errors
   // is duplicated across several command creators (eg aspirate & blowout overlap).
   // You can probably make higher-level error creator util fns to be more DRY
@@ -80,14 +77,17 @@ export const blowOutInWell: CommandCreator<BlowoutParams> = (
         labware: labwareId,
       })
     )
-  } else if (prevRobotState.labware[labwareId]?.slot === 'offDeck') {
+  } else if (
+    getSlotInLocationStack(prevRobotState.labware[labwareId].stack) ===
+    'offDeck'
+  ) {
     errors.push(errorCreators.labwareOffDeck())
   }
 
   if (COLUMN_4_SLOTS.includes(slotName)) {
     errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
   } else if (labwareState[slotName] != null) {
-    const adapterSlot = labwareState[slotName].slot
+    const adapterSlot = getSlotInLocationStack(labwareState[slotName].stack)
     if (COLUMN_4_SLOTS.includes(adapterSlot)) {
       errors.push(
         errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })

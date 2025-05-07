@@ -8,8 +8,6 @@ interface SelectedModuleLabwareRenderProps {
   nestedLabwareDef: LabwareDefinition2 | null
   labwareDef: LabwareDefinition2 | null
   moduleModel: ModuleModel | null
-  hoveredLabware: string | null
-  hoveredLabwareDef: LabwareDefinition2 | null
   labwareOnDeck?: LabwareOnDeck
   nestedLabwareOnDeck?: LabwareOnDeck
 }
@@ -20,37 +18,26 @@ export function SelectedModuleLabwareRender(
     labwareOnDeck,
     labwareDef,
     moduleModel,
-    hoveredLabware,
     nestedLabwareDef,
     nestedLabwareOnDeck,
-    hoveredLabwareDef,
   } = props
   return (
     <>
-      {labwareDef != null && moduleModel != null && hoveredLabware == null ? (
+      {labwareDef != null && moduleModel != null ? (
         <LabwareRenderOnDeck labwareDef={labwareDef} x={0} y={0} />
       ) : null}
-      {labwareOnDeck != null &&
-      moduleModel != null &&
-      hoveredLabware == null ? (
+      {labwareOnDeck != null && moduleModel != null ? (
         <LabwareOnDeckComponent labwareOnDeck={labwareOnDeck} x={0} y={0} />
       ) : null}
-      {nestedLabwareDef != null &&
-      moduleModel != null &&
-      hoveredLabware == null ? (
+      {nestedLabwareDef != null && moduleModel != null ? (
         <LabwareRenderOnDeck labwareDef={nestedLabwareDef} x={0} y={0} />
       ) : null}
-      {nestedLabwareOnDeck != null &&
-      moduleModel != null &&
-      hoveredLabware == null ? (
+      {nestedLabwareOnDeck != null && moduleModel != null ? (
         <LabwareOnDeckComponent
           labwareOnDeck={nestedLabwareOnDeck}
           x={0}
           y={0}
         />
-      ) : null}
-      {hoveredLabwareDef != null && moduleModel != null ? (
-        <LabwareRenderOnDeck labwareDef={hoveredLabwareDef} x={0} y={0} />
       ) : null}
     </>
   )

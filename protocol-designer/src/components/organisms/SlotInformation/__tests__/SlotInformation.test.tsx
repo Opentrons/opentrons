@@ -40,7 +40,6 @@ describe('SlotInformation', () => {
       location: 'A1',
       liquids: [],
       labwares: [],
-      adapters: [],
       modules: [],
       fixtures: [],
     }
@@ -65,12 +64,10 @@ describe('SlotInformation', () => {
     props = {
       ...props,
       liquids: mockLiquids,
-      labwares: mockLabwares,
-      adapters: mockAdapters,
+      labwares: [...mockLabwares, ...mockAdapters],
       modules: mockModules,
     }
     render(props)
-    screen.debug()
 
     expect(screen.getAllByText('Liquid').length).toBe(1)
     expect(screen.getAllByText('Labware').length).toBe(

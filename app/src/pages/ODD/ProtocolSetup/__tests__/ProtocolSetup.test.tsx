@@ -119,7 +119,9 @@ vi.mock('/app/redux/discovery/selectors')
 vi.mock('../ConfirmAttachedModal')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/resources/runs')
-vi.mock('/app/resources/deck_configuration/hooks')
+vi.mock(
+  '/app/resources/deck_configuration/hooks/useDeckConfigurationCompatibility'
+)
 vi.mock('/app/resources/deck_configuration/useNotifyDeckConfigurationQuery')
 vi.mock('../ConfirmSetupStepsCompleteModal')
 vi.mock('/app/redux-resources/analytics')

@@ -19,6 +19,7 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getSlotInLocationStack,
   pipetteAdjacentHeaterShakerWhileShaking,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
@@ -89,10 +90,10 @@ describe('dispense', () => {
       ])
       expect(getSuccessResult(result).python).toBe(
         `
-mockPythonName.dispense(
+mock_pipette.dispense(
     volume=50,
-    location=mockPythonName["A1"].bottom(z=5),
-    rate=6 / mockPythonName.flow_rate.dispense,
+    location=mock_source_plate["A1"].bottom(z=5),
+    rate=6 / mock_pipette.flow_rate.dispense,
 )`.trimStart()
       )
     })
@@ -146,7 +147,7 @@ mockPythonName.dispense(
       robotStateWithTip = {
         ...robotStateWithTip,
         labware: {
-          [SOURCE_LABWARE]: { slot: 'A4' },
+          [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'A4'] },
         },
       }
       const result = dispense(params, invariantContext, robotStateWithTip)
@@ -291,7 +292,9 @@ mockPythonName.dispense(
       when(getIsHeaterShakerEastWestWithLatchOpen)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          )
         )
         .thenReturn(true)
 
@@ -305,7 +308,9 @@ mockPythonName.dispense(
       when(getIsHeaterShakerEastWestMultiChannelPipette)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           expect.anything()
         )
         .thenReturn(true)
@@ -320,7 +325,9 @@ mockPythonName.dispense(
       when(pipetteAdjacentHeaterShakerWhileShaking)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           OT2_ROBOT_TYPE
         )
         .thenReturn(true)
@@ -335,7 +342,9 @@ mockPythonName.dispense(
       when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           expect.anything(),
           expect.anything()
         )

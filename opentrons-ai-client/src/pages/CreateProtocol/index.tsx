@@ -15,13 +15,14 @@ import { ResizeBar } from '../../atoms/ResizeBar'
 import { PromptPreview } from '../../molecules/PromptPreview'
 import {
   ProtocolSectionsContainer,
-  sections,
+  TOTAL_STEPS,
 } from '../../organisms/ProtocolSectionsContainer'
 import {
   chatDataAtom,
   chatHistoryAtom,
   createProtocolAtom,
   createProtocolChatAtom,
+  featureFlagsAtom,
   headerWithMeterAtom,
   updateProtocolChatAtom,
 } from '../../resources/atoms'
@@ -33,7 +34,10 @@ import {
 
 import type { MouseEvent } from 'react'
 import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
-import type { DisplayModules } from '../../organisms/ModulesSection'
+import type {
+  DisplayFixture,
+  DisplayModule,
+} from '../../organisms/ModulesAndFixturesSection'
 
 export interface CreateProtocolFormData {
   protocol_format: 'Protocol Designer' | 'Python'
@@ -49,13 +53,13 @@ export interface CreateProtocolFormData {
     rightPipette: string
     flexGripper: string
   }
-  modules: DisplayModules[]
+  modules: DisplayModule[]
+  fixtures: DisplayFixture[]
   labwares: DisplayLabware[]
   liquids: string[]
+  runtime_parameters?: string
   steps: string[] | string
 }
-
-const TOTAL_STEPS = sections.length
 
 export function CreateProtocol(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
@@ -73,6 +77,8 @@ export function CreateProtocol(): JSX.Element | null {
   const [isResizing, setIsResizing] = useState(false)
   const [initialMouseX, setInitialMouseX] = useState(0)
   const [initialLeftWidth, setInitialLeftWidth] = useState(50)
+  const [featureFlags] = useAtom(featureFlagsAtom)
+  const isPdProtocolGenerationEnabled = featureFlags.enablePDProtocolGeneration
 
   const parentRef = useRef<HTMLDivElement>(null)
 
@@ -85,6 +91,7 @@ export function CreateProtocol(): JSX.Element | null {
       },
       instruments: {},
       modules: [],
+      fixtures: [],
       labwares: [],
       liquids: [''],
       steps: [''],
@@ -205,7 +212,8 @@ export function CreateProtocol(): JSX.Element | null {
     const chatPromptData = generateChatPrompt(
       methods.getValues(),
       t,
-      setCreateProtocolChatAtom
+      setCreateProtocolChatAtom,
+      isPdProtocolGenerationEnabled
     )
 
     trackEvent({
