@@ -1,4 +1,4 @@
-# shared-data/python makefile
+# shared-data python code makefile
 
 include ../../scripts/python.mk
 include ../../scripts/push.mk
@@ -45,7 +45,7 @@ gripper_sources = $(wildcard ../gripper/definitions/*.json) $(wildcard ../grippe
 
 json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_sources) $(protocol_sources) $(gripper_sources)
 
-tests ?= tests
+tests ?= python_tests
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
@@ -95,13 +95,13 @@ sdist: setup.py $(py_sources) $(json_sources)
 
 .PHONY: lint
 lint: $(py_sources)
-	$(python) -m mypy opentrons_shared_data tests
-	$(python) -m black --check opentrons_shared_data tests setup.py
-	$(python) -m flake8 opentrons_shared_data tests setup.py
+	$(python) -m mypy python/opentrons_shared_data python_tests
+	$(python) -m black --check python/opentrons_shared_data python_tests setup.py
+	$(python) -m flake8 python/opentrons_shared_data python_tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black opentrons_shared_data tests setup.py
+	$(python) -m black python/opentrons_shared_data python_tests
 
 .PHONY: push-no-restart
 push-no-restart: wheel
