@@ -1,0 +1,34 @@
+Exception raised by protocol
+Traceback (most recent call last):
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocols\execution\execute_python.py", line 160, in exec_run
+    exec("run(__context)", new_globs)
+  File "<string>", line 1, in <module>
+  File "waste_chute_tip_removal.py", line 82, in run
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\hardware_control\instruments\ot3\pipette_handler.py", line 1005, in get_pipette
+    raise top_types.PipetteNotAttachedError(
+opentrons.types.PipetteNotAttachedError: 'No pipette attached to LEFT mount'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_runner\task_queue.py", line 84, in _run
+    await self._run_func()
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_runner\task_queue.py", line 61, in _do_run
+    await func(*args, **kwargs)
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_runner\protocol_runner.py", line 254, in run_func
+    await self._protocol_executor.execute(
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_runner\python_protocol_wrappers.py", line 159, in execute
+    await to_thread.run_sync(
+  File "C:\Users\Rhyann Clarke\.virtualenvs\abr-testing-6acHInfl\lib\site-packages\anyio\to_thread.py", line 33, in run_sync
+    return await get_asynclib().run_sync_in_worker_thread(
+  File "C:\Users\Rhyann Clarke\.virtualenvs\abr-testing-6acHInfl\lib\site-packages\anyio\_backends\_asyncio.py", line 877, in run_sync_in_worker_thread
+    return await future
+  File "C:\Users\Rhyann Clarke\.virtualenvs\abr-testing-6acHInfl\lib\site-packages\anyio\_backends\_asyncio.py", line 807, in run
+    result = context.run(func, *args)
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocols\execution\execute.py", line 39, in run_protocol
+    exec_run(
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocols\execution\execute_python.py", line 169, in exec_run
+    _raise_pretty_protocol_error(exception=e, filename=filename)
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocols\execution\execute_python.py", line 71, in _raise_pretty_protocol_error
+    raise ExceptionInProtocolError(
+opentrons.protocols.execution.errors.ExceptionInProtocolError: PipetteNotAttachedError [line 82]: 'No pipette attached to LEFT mount'

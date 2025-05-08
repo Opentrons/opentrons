@@ -58,7 +58,7 @@ def run(protocol: ProtocolContext) -> None:
     dest_plate_1 = tc_mod.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "Destination Plate 1"
     )
-
+    dest_plate_1.load_empty(dest_plate_1.wells())
     source_plate_1 = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "D1", "DNA Plate 1"
     )
@@ -89,6 +89,7 @@ def run(protocol: ProtocolContext) -> None:
     water: Well = reagent_rack["B1"]
     mmx_pic: List[Well] = reagent_rack.rows()[0]
     dna_pic: List[Well] = source_plate_1.wells()
+    
     liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
         "Water": [{"well": water, "volume": 500.0}],
         "Mastermix": [{"well": mmx_pic, "volume": 500.0}],
@@ -121,7 +122,7 @@ def run(protocol: ProtocolContext) -> None:
         p50.aspirate(water_vol, water.meniscus(z=meniscus_z, target="end"))
         p50.dispense(
             water_vol,
-            dest_plate_1[dest_well].meniscus(z=meniscus_z, target="end"),
+            dest_plate_1[dest_well].meniscus(z=2, target="end"),
             rate=0.5,
         )
         p50.configure_for_volume(50)
@@ -158,7 +159,7 @@ def run(protocol: ProtocolContext) -> None:
             mmx_vol, reagent_rack[mmx_tube].meniscus(z=meniscus_z, target="end")
         )
         p50.dispense(
-            mmx_vol, dest_plate_1[dest_well].meniscus(z=meniscus_z, target="end")
+            mmx_vol, dest_plate_1[dest_well].meniscus(z=2, target="end")
         )
         protocol.delay(seconds=2)
         p50.blow_out()
@@ -189,7 +190,7 @@ def run(protocol: ProtocolContext) -> None:
         )
         p50.dispense(
             dna_vol,
-            dest_plate_1[dest_and_source_well].meniscus(z=meniscus_z, target="end"),
+            dest_plate_1[dest_and_source_well].meniscus(z=2, target="end"),
             rate=0.5,
         )
 
