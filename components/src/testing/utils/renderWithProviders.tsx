@@ -9,7 +9,7 @@ import { legacy_createStore } from 'redux'
 import { vi } from 'vitest'
 
 import type { RenderOptions, RenderResult } from '@testing-library/react'
-import type {  Store } from 'redux'
+import type { Store } from 'redux'
 import type {
   ComponentProps,
   ComponentType,
@@ -29,10 +29,7 @@ export function renderWithProviders<State>(
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { initialState = {}, i18nInstance = null } = options || {}
 
-  const store: Store<State> = legacy_createStore(
-    vi.fn(),
-    initialState
-  )
+  const store: Store<State> = legacy_createStore(vi.fn(), initialState)
   store.dispatch = vi.fn()
   store.getState = vi.fn(() => initialState) as () => State
 

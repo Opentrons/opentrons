@@ -1,4 +1,4 @@
-import { legacy_configureStore } from 'redux-mock-store';
+import { legacy_configureStore } from 'redux-mock-store'
 import { thunk } from 'redux-thunk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
