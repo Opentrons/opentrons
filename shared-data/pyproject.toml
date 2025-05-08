@@ -1,0 +1,99 @@
+[project]
+
+name = "opentrons_shared_data"
+description = """\
+A bundle of data and python binding that supports the Opentrons API.\
+Does not need to be installed manually; only a dependency of the \
+opentrons package"""
+license='Apache-2.0'
+requires-python='>=3.10'
+authors=[{name = 'Opentrons', email = 'engineering@opentrons.com'}]
+keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "jsonschema>=4.0.0,<5",
+    "typing-extensions>=4.0.0,<5",
+    "pydantic>=2.0.0,<3.0.0",
+]
+dynamic = ['version']
+
+[project.urls]
+"Source Code" = "https://github.com/Opentrons/opentrons"
+
+[build-system]
+requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3']
+build-backend = 'hatchling.build'
+
+# We are keeping this commented-out code as a warning to the unwary. If you uncomment it
+# to quiet the warning from build, then it will make it impossible to run pipenv in this
+# directory, because pipenv will build a virtualenv and virtualenv will make a
+# setuptools.dist.Distribution() and that will see this line and invoke setuptools_scm and
+# that will fail because it's not actually configured. The warning that might make you
+# do this in the first place happens because hatch-vcs inherits from setuptools_scm but it
+# doesn't matter.
+#[tool.setuptools_scm]
+
+[tool.hatch.build.hooks.vcs-tunable]
+version-file="python/opentrons_shared_data/_version.py"
+tag-pattern='v(?P<version>.*)'
+fallback_version='0.0.0-dev'
+
+
+[tool.hatch.version]
+source = 'vcs-tunable'
+
+[tool.hatch.version.raw-options]
+root = '..'
+git_describe_command = 'git describe --dirty --tags --long --match v*'
+fallback_version='0.0.0-dev'
+# Note: these are required for setuptools_scm to not automatically bump the version used in the package
+# from the latest version it detects. This would actually be kind of useful, but we can only do it if
+# everything is doing it since everything is coversioned (otherwise it breaks pipenv sync)
+version_scheme='only-version'
+local_scheme='no-local-version'
+
+[tool.hatch.build.targets.sdist]
+include = [
+   'python/opentrons_shared_data',
+   'python_tests',
+   'command',
+   'commandAnnotation',
+   'errors',
+   'deck',
+   'gripper',
+   'labware',
+   'liquid',
+   'liquid-class',
+   'module',
+   'pipette',
+   'protocol',
+   'robot']
+
+[tool.hatch.build.targets.sdist.force-include]
+'../LICENSE' = '../LICENSE'
+
+[tool.hatch.build.targets.wheel]
+packages = ['python/opentrons_shared_data']
+[tool.hatch.build.targets.wheel.force-include]
+'command' = 'opentrons_shared_data/data/command'
+'commandAnnotation' = 'opentrons_shared_data/data/commandAnnotation'
+'errors' = 'opentrons_shared_data/data/errors'
+'deck' = 'opentrons_shared_data/data/deck'
+'gripper' = 'opentrons_shared_data/data/gripper'
+'labware' = 'opentrons_shared_data/data/labware'
+'liquid' = 'opentrons_shared_data/data/liquid'
+'liquid-class' = 'opentrons_shared_data/data/liquid-class'
+'module' = 'opentrons_shared_data/data/module'
+'pipette' = 'opentrons_shared_data/data/pipette'
+'protocol' = 'opentrons_shared_data/data/protocol'
+'robot' = 'opentrons_shared_data/data/robot'
+'../LICENSE' = 'LICENSE'
