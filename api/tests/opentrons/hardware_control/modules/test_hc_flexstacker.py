@@ -205,7 +205,7 @@ async def test_stacker_status_bar_event_handler(
     event: StatusBarUpdateEvent,
     params: tuple[float, LEDColor, LEDPattern],
 ) -> None:
-    subject.set_door_intervention(door_intervention)
+    subject.set_stacker_identify(door_intervention)
     await subject._handle_status_bar_event(event)
     mock_driver.set_led.assert_called_with(
         params[0], color=params[1], pattern=params[2], duration=None, reps=None

@@ -177,7 +177,7 @@ class FlexStacker(mod_abc.AbstractModule):
         self._stall_detected = False
         self._stacker_status = FlexStackerStatus.IDLE
         self._last_status_bar_event: Optional[StatusBarUpdateEvent] = None
-        self._door_intervention = False
+        self._should_identify = False
 
     async def _initialized_callback(self) -> None:
         """Called by the reader once the module is initialized."""
@@ -257,8 +257,8 @@ class FlexStacker(mod_abc.AbstractModule):
         return {"status": self.status.value, "data": data}
 
     @property
-    def door_intervention(self) -> bool:
-        return self._door_intervention
+    def should_identify(self) -> bool:
+        return self._should_identify
 
     async def prep_for_update(self) -> str:
         await self._poller.stop()
@@ -594,7 +594,7 @@ class FlexStacker(mod_abc.AbstractModule):
                 case StatusBarState.RUNNING:
                     await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.STATIC)
                 case StatusBarState.PAUSED:
-                    if self.door_intervention:
+                    if self.should_identify:
                         await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
                     else:
                         await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
@@ -612,6 +612,7 @@ class FlexStacker(mod_abc.AbstractModule):
                     await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
                 case _:
                     await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
+        self.set_stacker_identify(False)
 
     async def identify(self) -> None:
         """Identify the module."""
@@ -619,8 +620,8 @@ class FlexStacker(mod_abc.AbstractModule):
         if self._last_status_bar_event:
             await self._handle_status_bar_event(self._last_status_bar_event)
 
-    def set_door_intervention(self, state: bool) -> None:
-        self._door_intervention = state
+    def set_stacker_identify(self, state: bool) -> None:
+        self._should_identify = state
 
 
 class FlexStackerReader(Reader):

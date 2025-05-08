@@ -147,9 +147,7 @@ class EmptyImpl(AbstractCommandImpl[EmptyParams, SuccessData[EmptyResult]]):
         self._run_control = run_control
         self._equipment = equipment
 
-    async def execute(  # noqa: C901
-        self, params: EmptyParams
-    ) -> SuccessData[EmptyResult]:
+    async def execute(self, params: EmptyParams) -> SuccessData[EmptyResult]:
         """Execute the stacker empty command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
@@ -206,13 +204,10 @@ class EmptyImpl(AbstractCommandImpl[EmptyParams, SuccessData[EmptyResult]]):
             module_id=stacker_state.module_id
         )
         if stacker_hw:
-            stacker_hw.set_door_intervention(True)
+            stacker_hw.set_stacker_identify(True)
 
         if params.strategy == StackerFillEmptyStrategy.MANUAL_WITH_PAUSE:
             await self._run_control.wait_for_resume()
-
-        if stacker_hw:
-            stacker_hw.set_door_intervention(False)
 
         if stacker_state.pool_primary_definition is None:
             raise FlexStackerLabwarePoolNotYetDefinedError(
