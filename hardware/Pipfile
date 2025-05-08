@@ -10,6 +10,7 @@ typing-extensions = ">=4.0.0,<5"
 numpy = "==1.22.3"
 pydantic = "==2.9.0"
 pydantic-settings = "==2.4.0"
+opentrons-shared-data = { editable = true, path = "../shared-data" }
 
 [dev-packages]
 pytest = "==7.4.4"
@@ -26,7 +27,7 @@ types-mock = "~=5.1.0"
 hypothesis = "~=6.96.1"
 pytest-asyncio = "~=0.23.0"
 matplotlib = "*"
-opentrons-shared-data = { editable = true, path = "../shared-data/python" }
+build = "~=1.2.0"
 
 [requires]
 python_version = "3.10"
