@@ -144,10 +144,9 @@ describe('CreateProtocol', () => {
     await fillInstrumentsSectionAndClickConfirm()
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Modules' })).toHaveAttribute(
-        'aria-expanded',
-        'true'
-      )
+      expect(
+        screen.getByRole('button', { name: 'Modules & Fixtures' })
+      ).toHaveAttribute('aria-expanded', 'true')
     })
   })
 

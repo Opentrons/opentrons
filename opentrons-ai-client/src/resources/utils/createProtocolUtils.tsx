@@ -102,6 +102,19 @@ export function generatePromptPreviewModulesItems(
   return items.filter(Boolean)
 }
 
+export function generatePromptPreviewFixtureItems(
+  watch: UseFormWatch<CreateProtocolFormData>,
+  t: any
+): string[] {
+  const { fixtures } = watch()
+
+  if (fixtures === undefined || fixtures?.length === 0) return []
+
+  const items = fixtures?.map(fixture => fixture.name)
+
+  return items.filter(Boolean)
+}
+
 export function generatePromptPreviewLabwareLiquidsItems(
   watch: UseFormWatch<CreateProtocolFormData>,
   t: any
@@ -271,6 +284,10 @@ export function generatePromptPreviewData(
       items: generatePromptPreviewModulesItems(watch, t),
     },
     {
+      title: t('fixtures_title'),
+      items: generatePromptPreviewFixtureItems(watch, t),
+    },
+    {
       title: t('labware_liquids_title'),
       items: generatePromptPreviewLabwareLiquidsItems(watch, t),
     },
@@ -361,6 +378,7 @@ export function generateChatPrompt(
     values.instruments.robot === OPENTRONS_FLEX
       ? `\n- ${t('with_flex_gripper')}`
       : ''
+
   const modules = values.modules
     .map(
       module =>
@@ -369,6 +387,11 @@ export function generateChatPrompt(
         }`
     )
     .join('\n')
+
+  const fixtures = values.fixtures
+    .map(fixture => `- ${fixture.name}`)
+    .join('\n')
+
   const labwares = values.labwares
     .map(
       labware =>
@@ -377,13 +400,20 @@ export function generateChatPrompt(
         }`
     )
     .join('\n')
+
   const liquids = values.liquids.map(liquid => `- ${liquid}`).join('\n')
+
   const steps = Array.isArray(values.steps)
     ? values.steps.map(step => `- ${step}`).join('\n')
     : values.steps
 
-  // Add runtime parameters to the prompt if it exists and conditions are met
-  const runtimeParameters =
+  const moduleSection =
+    values.modules.length > 0 ? `\n\n${t('modules_title')}:\n${modules}` : ''
+
+  const fixtureSection =
+    values.fixtures.length > 0 ? `\n\n${t('fixtures_title')}:\n${fixtures}` : ''
+
+  const runtimeParametersSection =
     values.protocol_format === PYTHON &&
     values.instruments.robot === OPENTRONS_FLEX &&
     values.runtime_parameters
@@ -392,25 +422,28 @@ export function generateChatPrompt(
         )}:\n- ${values.runtime_parameters.replace(/\n/g, '\n- ')}`
       : ''
 
-  // Only include modules section if modules are selected
-  const modulesSection =
-    values.modules.length > 0 ? `\n\n${t('modules_title')}:\n${modules}` : ''
-
   const prompt = `${
     values.protocol_format === PYTHON
       ? t('create_protocol_prompt_robot', { robotType }) + '\n'
       : ''
-  }\n${t('protocol_format_title')}:\n${protocolFormat}\n\n${t(
-    'application_title'
-  )}:\n${scientificApplication}\n\n${t('description')}:\n${description}\n\n${t(
-    'pipette_mounts'
-  )}:\n\n${pipetteMounts}${flexGripper}${modulesSection}\n\n${t(
-    'labware_section_title'
-  )}:\n${labwares}\n\n${t(
-    'liquid_section_title'
-  )}:\n${liquids}${runtimeParameters}\n\n${t(
-    'steps_section_title'
-  )}:\n${steps}\n`
+  }
+
+${t('protocol_format_title')}:\n${protocolFormat}
+
+${t('application_title')}:\n${scientificApplication}
+
+${t('description')}:\n${description}
+
+${t(
+  'pipette_mounts'
+)}:\n\n${pipetteMounts}${flexGripper}${moduleSection}${fixtureSection}
+
+\n${t('labware_section_title')}:\n${labwares}
+
+\n${t('liquid_section_title')}:\n${liquids}${runtimeParametersSection}
+
+\n${t('steps_section_title')}:\n${steps}
+`
 
   setCreateProtocolChatAtom({
     prompt,
@@ -431,6 +464,7 @@ export function generateChatPrompt(
             : ''
         }`
     ),
+    fixtures: values.fixtures.map(fixture => fixture.name),
     labware: values.labwares.map(
       labware => `${labware.labwareURI}, quantity: ${labware.count}`
     ),
