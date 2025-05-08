@@ -245,4 +245,4 @@ def run(protocol: ProtocolContext) -> None:
             p.return_tip()
             p.reset_tipracks()
     all_plates = plate_384 + plate_96 + [reagent_res]
-    helpers.clean_up_plates(p, all_plates, liquid_waste["A1"])
+    helpers.clean_up_plates(protocol, p, all_plates, liquid_waste["A1"])

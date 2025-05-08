@@ -274,6 +274,7 @@ def run(protocol: ProtocolContext) -> None:
     # Probe heights
     p1000.configure_nozzle_layout(style=ALL, tip_racks=[tiprack_x_3])
     helpers.clean_up_plates(
+        protocol,
         p1000,
         [sample_plate_1, sample_plate_2, sample_plate_3, sample_plate_4],
         waste_reservoir["A1"],

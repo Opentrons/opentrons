@@ -2,7 +2,6 @@
 from opentrons.protocol_api import (
     ParameterContext,
     ProtocolContext,
-    Labware,
     Well,
     InstrumentContext,
 )
@@ -76,8 +75,6 @@ def run(protocol: ProtocolContext) -> None:
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "02")
 
-    unused_lids: List[Labware] = []
-    used_lids: List[Labware] = []
     global p200_tips
     global p50_tips
 
@@ -112,7 +109,7 @@ def run(protocol: ProtocolContext) -> None:
     tiprack_50_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "6")
     # Opentrons tough pcr auto sealing lids
     if disposable_lid:
-        unused_lids = helpers.load_disposable_lids(protocol, 3, ["C4"], deck_riser)
+        unused_lids = helpers.load_disposable_lids(protocol, 3, "C4", deck_riser)
     # ========== THIRD ROW ===========
     thermocycler: ThermocyclerContext = protocol.load_module(
         helpers.tc_str
@@ -333,12 +330,8 @@ def run(protocol: ProtocolContext) -> None:
             if HYBRIDDECK:
                 protocol.comment("Hybridize on Deck")
                 if disposable_lid:
-                    (
-                        lid_on_plate,
-                        unused_lids,
-                        used_lids,
-                    ) = helpers.use_disposable_lid_with_tc(
-                        protocol, unused_lids, used_lids, sample_plate_1, thermocycler
+                    helpers.use_disposable_lid_with_tc(
+                        protocol, unused_lids, sample_plate_1, thermocycler
                     )
                 else:
                     thermocycler.close_lid()
@@ -375,15 +368,9 @@ def run(protocol: ProtocolContext) -> None:
                 thermocycler.open_lid()
                 if disposable_lid:
                     if trash_lid:
-                        protocol.move_labware(lid_on_plate, trash_bin, use_gripper=True)
-                    elif len(used_lids) <= 1:
-                        protocol.move_labware(
-                            lid_on_plate, deck_riser, use_gripper=True
-                        )
+                        protocol.move_lid(sample_plate_1, trash_bin, use_gripper=True)
                     else:
-                        protocol.move_labware(
-                            lid_on_plate, used_lids[-2], use_gripper=True
-                        )
+                        protocol.move_lid(sample_plate_1, deck_riser, use_gripper=True)
             else:
                 protocol.comment("Hybridize off Deck")
 
@@ -416,14 +403,9 @@ def run(protocol: ProtocolContext) -> None:
                 p200_tips += 1
                 tipcheck()
             if disposable_lid:
-                (
-                    lid_on_plate,
-                    unused_lids,
-                    used_lids,
-                ) = helpers.use_disposable_lid_with_tc(
+                helpers.use_disposable_lid_with_tc(
                     protocol,
                     unused_lids,
-                    used_lids,
                     sample_plate_1,
                     thermocycler,
                 )
@@ -473,11 +455,9 @@ def run(protocol: ProtocolContext) -> None:
             thermocycler.open_lid()
             if disposable_lid:
                 if trash_lid:
-                    protocol.move_labware(lid_on_plate, trash_bin, use_gripper=True)
-                elif len(used_lids) <= 1:
-                    protocol.move_labware(lid_on_plate, "B4", use_gripper=True)
+                    protocol.move_lid(sample_plate_1, trash_bin, use_gripper=True)
                 else:
-                    protocol.move_labware(lid_on_plate, used_lids[-2], use_gripper=True)
+                    protocol.move_labware(sample_plate_1, "B4", use_gripper=True)
 
             if DRYRUN is False:
                 protocol.delay(minutes=2)
@@ -747,14 +727,9 @@ def run(protocol: ProtocolContext) -> None:
             if DRYRUN is False:
                 if DRYRUN is False:
                     if disposable_lid:
-                        (
-                            lid_on_plate,
-                            unused_lids,
-                            used_lids,
-                        ) = helpers.use_disposable_lid_with_tc(
+                        helpers.use_disposable_lid_with_tc(
                             protocol,
                             unused_lids,
-                            used_lids,
                             sample_plate_1,
                             thermocycler,
                         )
@@ -785,13 +760,9 @@ def run(protocol: ProtocolContext) -> None:
                 thermocycler.open_lid()
                 if disposable_lid:
                     if trash_lid:
-                        protocol.move_labware(lid_on_plate, trash_bin, use_gripper=True)
-                    elif len(used_lids) <= 1:
-                        protocol.move_labware(lid_on_plate, "B4", use_gripper=True)
+                        protocol.move_lid(sample_plate_1, trash_bin, use_gripper=True)
                     else:
-                        protocol.move_labware(
-                            lid_on_plate, used_lids[-2], use_gripper=True
-                        )
+                        protocol.move_lid(sample_plate_1, "B4", use_gripper=True)
 
         if STEP_CLEANUP == 1:
             protocol.comment("==============================================")

@@ -72,6 +72,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         default=True,
         description="If hellma plate is rotated, set to True.",
     )
+    helpers.create_probe_liquid_height_parameter(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -91,6 +92,7 @@ def run(protocol: ProtocolContext) -> None:
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     plate_type = protocol.params.labware_plate_reader_compatible  # type: ignore [attr-defined]
     plate_orientation = protocol.params.plate_orientation  # type: ignore[attr-defined]
+    probe_liquid_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "02")
     plate_name_str = "hellma_plate_" + str(plate_orientation)
 
@@ -200,8 +202,12 @@ def run(protocol: ProtocolContext) -> None:
         "Wash 8": [{"well": wash8, "volume": 9500.0}],
         "Wash 9": [{"well": wash9, "volume": 9500.0}],
     }
-
-    helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, m1000)
+    if probe_liquid_height_bool:
+        helpers.find_liquid_height_of_loaded_liquids(
+            protocol, liquid_vols_and_wells, m1000
+        )
+    else:
+        helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
     # run plate reader
     helpers.plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)
 
@@ -611,7 +617,9 @@ def run(protocol: ProtocolContext) -> None:
         )
     elute(elution_vol)
     end_list_of_wells_to_probe = [waste_reservoir["A1"]]
-    helpers.clean_up_plates(m1000, [elutionplate, sample_plate], waste_reservoir["A1"])
+    helpers.clean_up_plates(
+        protocol, m1000, [elutionplate, sample_plate], waste_reservoir["A1"]
+    )
     helpers.find_liquid_height_of_all_wells(protocol, m1000, end_list_of_wells_to_probe)
     # Run plate reader
     helpers.plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)

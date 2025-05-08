@@ -1,6 +1,6 @@
 """BMS PCR Protocol."""
 
-from opentrons.protocol_api import ParameterContext, ProtocolContext, Labware
+from opentrons.protocol_api import ParameterContext, ProtocolContext
 from opentrons.protocol_api.module_contexts import (
     ThermocyclerContext,
     TemperatureModuleContext,
@@ -70,9 +70,7 @@ def run(protocol: ProtocolContext) -> None:
 
     # Opentrons tough pcr auto sealing lids
     if disposable_lid:
-        unused_lids = helpers.load_disposable_lids(protocol, 3, ["C3"], deck_riser)
-    used_lids: List[Labware] = []
-
+        unused_lids = helpers.load_disposable_lids(protocol, 3, "C3", deck_riser)
     # LOAD PIPETTES
     p50 = protocol.load_instrument(
         "flex_8channel_50",
@@ -206,10 +204,9 @@ def run(protocol: ProtocolContext) -> None:
 
     if real_mode:
         if disposable_lid:
-            lid_on_plate, unused_lids, used_lids = helpers.use_disposable_lid_with_tc(
-                protocol, unused_lids, used_lids, dest_plate_1, tc_mod
+            helpers.use_disposable_lid_with_tc(
+                protocol, unused_lids, dest_plate_1, tc_mod
             )
-        else:
             tc_mod.close_lid()
         helpers.perform_pcr(
             protocol,
@@ -226,16 +223,13 @@ def run(protocol: ProtocolContext) -> None:
 
         tc_mod.open_lid()
         if disposable_lid:
-            if len(used_lids) <= 1:
-                protocol.move_labware(lid_on_plate, "C2", use_gripper=True)
-            else:
-                protocol.move_labware(lid_on_plate, used_lids[-2], use_gripper=True)
+            protocol.move_lid(dest_plate_1, "C2", use_gripper=True)
         p50.drop_tip()
         p50.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=tiprack_50)
         mmx_pic.append(water)
     # Empty plates into liquid waste
     p50.configure_nozzle_layout(style=ALL, tip_racks=tiprack_50)
-    helpers.clean_up_plates(p50, [source_plate_1, dest_plate_1], liquid_waste)
+    helpers.clean_up_plates(protocol, p50, [source_plate_1, dest_plate_1], liquid_waste)
     # Probe liquid waste
     helpers.find_liquid_height_of_all_wells(protocol, p50, [liquid_waste])
     if deactivate_modules_bool:

@@ -565,7 +565,7 @@ def run(protocol: ProtocolContext) -> None:
             m1000.return_tip()
         # 2. Mix tartrazine
         m1000.pick_up_tip()
-        top_of_tartrazine = helpers.find_liquid_height(m1000, tartrazine_well)
+        top_of_tartrazine = 0.1
         for i in range(20):
             m1000.aspirate(1, tartrazine_well.bottom(z=1))
             m1000.dispense(1, tartrazine_well.bottom(z=top_of_tartrazine + 1))
@@ -573,13 +573,15 @@ def run(protocol: ProtocolContext) -> None:
         # 2. Fill plate with tartrazine
         for well in plate_for_plate_reader.rows()[0]:
             m50.pick_up_tip()
-            height = helpers.find_liquid_height(m50, tartrazine_well)
+            # height = helpers.find_liquid_height(m50, tartrazine_well)
+            height = 1
             m50.prepare_to_aspirate()
             if height <= 0.0:
                 # If a negative tartrazine height is found,
                 # the protocol will pause, prompt a refill, and reprobe.
                 protocol.pause("Fill tartrazine")
-                height = helpers.find_liquid_height(m50, tartrazine_well)
+                # height = helpers.find_liquid_height(m50, tartrazine_well)
+                height = 1
             m50.aspirate(10, tartrazine_well.bottom(z=height), rate=0.15)
             m50.air_gap(5)
             m50.dispense(5, well.top())
@@ -671,7 +673,9 @@ def run(protocol: ProtocolContext) -> None:
         waste_reservoir.wells()[0],
     ]
     m1000.reset_tipracks()
-    helpers.clean_up_plates(m1000, [res1, elutionplate], waste_reservoir["A1"])
+    helpers.clean_up_plates(
+        protocol, m1000, [res1, elutionplate], waste_reservoir["A1"]
+    )
     helpers.find_liquid_height_of_all_wells(protocol, m1000, end_wells_with_liquid)
     if deactivate_modules_bool:
         helpers.deactivate_modules(protocol)

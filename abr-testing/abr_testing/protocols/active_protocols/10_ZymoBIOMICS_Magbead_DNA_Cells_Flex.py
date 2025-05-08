@@ -535,6 +535,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     elute(elution_vol)
     h_s.deactivate_heater()
     helpers.clean_up_plates(
+        protocol,
         m1000,
         [elutionplate, sample_plate, res1, res3, res2],
         waste_reservoir["A1"],
