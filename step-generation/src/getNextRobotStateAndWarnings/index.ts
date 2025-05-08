@@ -59,7 +59,8 @@ import type {
 function _getNextRobotStateAndWarningsSingleCommand(
   command: CreateCommand,
   invariantContext: InvariantContext,
-  robotStateAndWarnings: RobotStateAndWarnings
+  robotStateAndWarnings: RobotStateAndWarnings,
+  prevCommand: CreateCommand | null
 ): void {
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
   switch (command.commandType) {
@@ -132,16 +133,15 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'liquidProbe':
       break
 
-    case 'loadLiquid':
-      forLoadLiquid(command.params, invariantContext, robotStateAndWarnings)
-      break
-
     case 'aspirateInPlace':
-      forAspirateInPlace(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
+      if (prevCommand?.commandType === 'moveToWell') {
+        forAspirateInPlace(
+          command.params,
+          invariantContext,
+          robotStateAndWarnings,
+          prevCommand.params
+        )
+      }
       break
 
     case 'dropTipInPlace':
@@ -353,7 +353,14 @@ export function getNextRobotStateAndWarningsSingleCommand(
     robotState: prevRobotState,
   }
   return produce(prevState, draft => {
-    _getNextRobotStateAndWarningsSingleCommand(command, invariantContext, draft)
+    let prevCommand: CreateCommand | null = null
+    _getNextRobotStateAndWarningsSingleCommand(
+      command,
+      invariantContext,
+      draft,
+      prevCommand
+    )
+    prevCommand = command
   })
 }
 // Get next state after multiple commands
@@ -368,12 +375,15 @@ export function getNextRobotStateAndWarnings(
   }
   const strippedCommands = stripNoOpCommands(commands)
   return produce(prevState, draft => {
+    let prevCommand: CreateCommand | null = null
     strippedCommands.forEach(command => {
       _getNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,
-        draft
+        draft,
+        prevCommand
       )
+      prevCommand = command
     })
   })
 }
