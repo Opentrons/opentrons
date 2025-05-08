@@ -274,6 +274,19 @@ export function SelectLabwareModal(
     setAreCategoriesExpanded(updatedExpandState)
   }
 
+  const handleAddLabwareClick = (): void => {
+    if (slotFull) {
+      makeSnackbar(t('no_space') as string)
+      return
+    }
+    if (hasNoLabware) {
+      makeSnackbar(t('select_before_proceeding') as string)
+    } else {
+      onConfirm()
+      handleResetLabwareTools()
+    }
+  }
+
   return createPortal(
     <Modal
       childrenPadding={SPACING.spacing24}
@@ -319,14 +332,7 @@ export function SelectLabwareModal(
             </SecondaryButton>
             <PrimaryButton
               data-testid="SelectLabwareModal_confirm"
-              onClick={() => {
-                if (hasNoLabware) {
-                  makeSnackbar(t('select_before_proceeding') as string)
-                } else {
-                  onConfirm()
-                  handleResetLabwareTools()
-                }
-              }}
+              onClick={handleAddLabwareClick}
             >
               {t('add_labware')}
             </PrimaryButton>
