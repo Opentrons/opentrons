@@ -243,11 +243,19 @@ class FlexStacker(mod_abc.AbstractModule):
     def is_simulated(self) -> bool:
         return isinstance(self._driver, SimulatingDriver)
 
+    def _get_platform_live_data(self) -> PlatformState:
+        """Get the platform state for live data."""
+        if self.initialized and self.platform_state == PlatformState.UNKNOWN:
+            # If the platform state is unknown, we need to poll it
+            if self.limit_switch_status[StackerAxis.X] != StackerAxisState.UNKNOWN:
+                return PlatformState.MISSING
+        return self.platform_state
+
     @property
     def live_data(self) -> LiveData:
         data: FlexStackerData = {
             "latchState": self.latch_state.value,
-            "platformState": self.platform_state.value,
+            "platformState": self._get_platform_live_data().value,
             "hopperDoorState": self.hopper_door_state.value,
             "axisStateX": self.limit_switch_status[StackerAxis.X].value,
             "axisStateZ": self.limit_switch_status[StackerAxis.Z].value,
@@ -342,6 +350,7 @@ class FlexStacker(mod_abc.AbstractModule):
         success = await self._driver.move_to_limit_switch(
             axis=axis, direction=direction, params=motion_params
         )
+        await self._reader.get_limit_switch_status()
         if success == MoveResult.STALL_ERROR:
             self._stall_detected = True
             raise FlexStackerStallError(self.device_info["serial"], axis)
