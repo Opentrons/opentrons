@@ -638,6 +638,53 @@ def test_blow_out_to_location(
     )
 
 
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 24)))
+def test_blow_out_with_trash_last_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should blow out into a previously accessed disposal location."""
+    mock_chute = decoy.mock(cls=WasteChute)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.LEFT)
+    decoy.when(mock_protocol_core.get_last_location(mount=Mount.LEFT)).then_return(
+        mock_chute
+    )
+    subject.blow_out()
+
+    decoy.verify(
+        mock_instrument_core.blow_out(
+            location=mock_chute, well_core=None, in_place=True
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize(
+    "api_version",
+    versions_between(
+        low_exclusive_bound=APIVersion(2, 13), high_inclusive_bound=APIVersion(2, 23)
+    ),
+)
+def test_blow_out_with_trash_last_location_raises_earlier_api(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise if a trash is the last accessed location and on 2.23."""
+    mock_trash = decoy.mock(cls=TrashBin)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.LEFT)
+    decoy.when(mock_protocol_core.get_last_location(mount=Mount.LEFT)).then_return(
+        mock_trash
+    )
+    with pytest.raises(
+        RuntimeError, match="blow out is called without an explicit location"
+    ):
+        subject.blow_out()
+
+
 def test_blow_out_raises_no_location(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -1185,6 +1232,25 @@ def test_touch_tip(
     )
 
 
+def test_touch_tip_raises_if_trash_last_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise if the last location was a trash bin or waste chute."""
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    mock_trash = decoy.mock(cls=TrashBin)
+    decoy.when(mock_protocol_core.get_last_location()).then_return(mock_trash)
+    with pytest.raises(RuntimeError, match="not valid for touch tip"):
+        subject.touch_tip()
+
+    mock_chute = decoy.mock(cls=WasteChute)
+    decoy.when(mock_protocol_core.get_last_location()).then_return(mock_chute)
+    with pytest.raises(RuntimeError, match="not valid for touch tip"):
+        subject.touch_tip()
+
+
 def test_return_height(
     decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
 ) -> None:
@@ -1484,6 +1550,61 @@ def test_aspirate_0_volume_means_aspirate_nothing(
         ),
         times=1,
     )
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 24)))
+def test_dispense_with_trash_last_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should dispense into a previously accessed trash."""
+    mock_trash = decoy.mock(cls=TrashBin)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.LEFT)
+    decoy.when(mock_protocol_core.get_last_location(mount=Mount.LEFT)).then_return(
+        mock_trash
+    )
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(4.5)).then_return(6.7)
+    subject.dispense(volume=12.3, rate=4.5)
+
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=mock_trash,
+            well_core=None,
+            in_place=True,
+            volume=12.3,
+            rate=4.5,
+            flow_rate=6.7,
+            push_out=None,
+            meniscus_tracking=None,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize(
+    "api_version",
+    versions_between(
+        low_exclusive_bound=APIVersion(2, 13), high_inclusive_bound=APIVersion(2, 23)
+    ),
+)
+def test_dispense_with_trash_last_location_raises_earlier_api(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise if a trash is the last accessed location and on 2.23."""
+    mock_trash = decoy.mock(cls=TrashBin)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.LEFT)
+    decoy.when(mock_protocol_core.get_last_location(mount=Mount.LEFT)).then_return(
+        mock_trash
+    )
+    with pytest.raises(
+        RuntimeError, match="dispense is called without an explicit location"
+    ):
+        subject.dispense(volume=12.3, rate=4.5)
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
@@ -1940,6 +2061,60 @@ def test_air_gap_has_flow_rate_and_rate(
     decoy.when(mock_well.top(z=5.0)).then_return(top_location)
     with pytest.raises(ValueError, match="Cannot define both flow_rate and rate."):
         subject.air_gap(volume=10, height=5, flow_rate=100, rate=5.0)
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 24)))
+def test_air_gap_over_trash(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentContext,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """It should air gap over a disposal location."""
+    mock_trash = decoy.mock(cls=TrashBin)
+    mock_trash_2 = decoy.mock(cls=TrashBin)
+    mock_move_to = decoy.mock(func=subject.move_to)
+    monkeypatch.setattr(subject, "move_to", mock_move_to)
+
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_protocol_core.get_last_location()).then_return(mock_trash)
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate()).then_return(11)
+    decoy.when(mock_trash.top(11)).then_return(mock_trash_2)
+
+    subject.air_gap(volume=10, height=11)
+
+    decoy.verify(mock_move_to(mock_trash_2, publish=False))
+    decoy.verify(mock_instrument_core.prepare_to_aspirate())
+    decoy.verify(mock_instrument_core.air_gap_in_place(10, 11))
+
+
+@pytest.mark.parametrize(
+    "api_version",
+    versions_between(
+        low_exclusive_bound=APIVersion(2, 13), high_inclusive_bound=APIVersion(2, 23)
+    ),
+)
+def test_air_gap_over_trash_or_waste_chute_raises(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should raise if a disposal location is the last accessed on versions below 2.23."""
+    mock_chute = decoy.mock(cls=WasteChute)
+    mock_trash = decoy.mock(cls=TrashBin)
+
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_protocol_core.get_last_location()).then_return(mock_chute)
+
+    with pytest.raises(RuntimeError, match="not valid for air gap"):
+        subject.air_gap(volume=10, height=11)
+
+    decoy.when(mock_protocol_core.get_last_location()).then_return(mock_trash)
+
+    with pytest.raises(RuntimeError, match="not valid for air gap"):
+        subject.air_gap(volume=10, height=11)
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])

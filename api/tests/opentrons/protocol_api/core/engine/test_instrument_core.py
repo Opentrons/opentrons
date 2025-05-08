@@ -374,6 +374,43 @@ def test_move_to_coordinates(
     )
 
 
+def test_move_to_trash(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should move the pipette to a trash and update the location cache."""
+    mock_trash = decoy.mock(cls=TrashBin)
+
+    decoy.when(mock_trash.offset).then_return(DisposalOffset(x=1, y=2, z=3))
+    decoy.when(mock_trash.area_name).then_return("waste management")
+
+    subject.move_to(
+        location=mock_trash,
+        well_core=None,
+        force_direct=True,
+        minimum_z_height=42.0,
+        speed=4.56,
+    )
+
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.MoveToAddressableAreaForDropTipParams(
+                pipetteId="abc123",
+                addressableAreaName="waste management",
+                offset=AddressableOffsetVector(x=1, y=2, z=3),
+                forceDirect=True,
+                speed=4.56,
+                minimumZHeight=None,
+                alternateDropLocation=False,
+                ignoreTipConfiguration=True,
+            )
+        ),
+        mock_protocol_core.set_last_location(location=mock_trash, mount=Mount.LEFT),
+    )
+
+
 def test_pick_up_tip(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -945,6 +982,48 @@ def test_blow_out_in_place(
     )
 
 
+def test_blow_out_to_trash_bin(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should move to a trash and blow out there."""
+    decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
+    mock_trash = decoy.mock(cls=TrashBin)
+
+    decoy.when(mock_trash.offset).then_return(DisposalOffset(x=1, y=2, z=3))
+    decoy.when(mock_trash.area_name).then_return("rubbish")
+
+    subject.blow_out(
+        location=mock_trash,
+        well_core=None,
+        in_place=False,
+    )
+
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.MoveToAddressableAreaForDropTipParams(
+                pipetteId="abc123",
+                addressableAreaName="rubbish",
+                offset=AddressableOffsetVector(x=1, y=2, z=3),
+                forceDirect=False,
+                speed=None,
+                minimumZHeight=None,
+                alternateDropLocation=False,
+                ignoreTipConfiguration=True,
+            )
+        ),
+        mock_engine_client.execute_command(
+            cmd.BlowOutInPlaceParams(
+                pipetteId="abc123",
+                flowRate=6.7,
+            )
+        ),
+        mock_protocol_core.set_last_location(location=mock_trash, mount=Mount.LEFT),
+    )
+
+
 def test_dispense_to_well(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -1089,6 +1168,56 @@ def test_dispense_to_coordinates(
                 pushOut=None,
             )
         ),
+    )
+
+
+def test_dispense_to_trash_bin(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should move to a trash and dispense there."""
+    decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
+    mock_trash = decoy.mock(cls=TrashBin)
+
+    decoy.when(mock_trash.offset).then_return(DisposalOffset(x=1, y=2, z=3))
+    decoy.when(mock_trash.area_name).then_return("garbage day")
+
+    subject.dispense(
+        volume=12.34,
+        rate=5.6,
+        flow_rate=7.8,
+        well_core=None,
+        location=mock_trash,
+        in_place=False,
+        push_out=None,
+        meniscus_tracking=None,
+    )
+
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.MoveToAddressableAreaForDropTipParams(
+                pipetteId="abc123",
+                addressableAreaName="garbage day",
+                offset=AddressableOffsetVector(x=1, y=2, z=3),
+                forceDirect=False,
+                speed=None,
+                minimumZHeight=None,
+                alternateDropLocation=False,
+                ignoreTipConfiguration=True,
+            )
+        ),
+        mock_engine_client.execute_command(
+            cmd.DispenseInPlaceParams(
+                pipetteId="abc123",
+                volume=12.34,
+                correctionVolume=None,
+                flowRate=7.8,
+                pushOut=None,
+            )
+        ),
+        mock_protocol_core.set_last_location(location=mock_trash, mount=Mount.LEFT),
     )
 
 

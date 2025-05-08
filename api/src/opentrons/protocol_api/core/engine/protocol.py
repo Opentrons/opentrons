@@ -112,7 +112,7 @@ class ProtocolCore(
         self._engine_client = engine_client
         self._api_version = api_version
         self._sync_hardware = sync_hardware
-        self._last_location: Optional[Location] = None
+        self._last_location: Optional[Union[Location, TrashBin, WasteChute]] = None
         self._last_mount: Optional[Mount] = None
         self._labware_cores_by_id: Dict[str, LabwareCore] = {}
         self._module_cores_by_id: Dict[
@@ -918,7 +918,7 @@ class ProtocolCore(
     def get_last_location(
         self,
         mount: Optional[Mount] = None,
-    ) -> Optional[Location]:
+    ) -> Optional[Union[Location, TrashBin, WasteChute]]:
         """Get the last accessed location."""
         if mount is None or mount == self._last_mount:
             return self._last_location
@@ -927,7 +927,7 @@ class ProtocolCore(
 
     def set_last_location(
         self,
-        location: Optional[Location],
+        location: Optional[Union[Location, TrashBin, WasteChute]],
         mount: Optional[Mount] = None,
     ) -> None:
         """Set the last accessed location."""
