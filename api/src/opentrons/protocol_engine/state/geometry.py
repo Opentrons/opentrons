@@ -534,15 +534,8 @@ class GeometryView:
         else:
             assert_type(definition, LabwareDefinition3)
 
-            # We want to place the labware's front-left-bottom (-x, -y, -z) at the slot's front-left.
-
-            # Within the labware's local coordinate system, where the left (-x) edge is.
             labware_footprint_left_x = definition.extents.footprint.backLeft.x
-
-            # Within the labware's local coordinate system, where the front (-y) edge is.
             labware_footprint_front_y = definition.extents.footprint.frontRight.y
-
-            # Within the labware's local coordinate system, where the bottom (-z) plane is.
             labware_footprint_bottom_z = definition.extents.total.backLeftBottom.z
 
             labware_origin_to_labware_front_left_bottom = Point(
@@ -550,16 +543,11 @@ class GeometryView:
                 labware_footprint_front_y,
                 labware_footprint_bottom_z,
             )
-
             labware_front_left_bottom_to_labware_origin = (
-                labware_origin_to_labware_front_left_bottom * -1
+                -1 * labware_origin_to_labware_front_left_bottom
             )
 
-            print(
-                "MAX: labware_front_left_bottom_to_labware_origin",
-                labware_front_left_bottom_to_labware_origin,
-            )
-            return labware_front_left_bottom_to_labware_origin
+            return slot_front_left + labware_front_left_bottom_to_labware_origin
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""

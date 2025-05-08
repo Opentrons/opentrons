@@ -791,13 +791,13 @@ def test_get_labware_origin_position_with_lw_definition3(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(Point(1, 2, 3))
 
-    expected_parent = Point(1, 2, 3)
-    expected_offset = Point(
+    expected_parent = Point(1, 52, 3)
+    expected_lw_offset = Point(
         x=_MOCK_LABWARE_DEFINITION3.extents.footprint.backLeft.x,
         y=_MOCK_LABWARE_DEFINITION3.extents.footprint.backLeft.y,
         z=_MOCK_LABWARE_DEFINITION3.extents.total.backLeftBottom.z,
     )
-    expected_point = expected_parent + expected_offset
+    expected_point = expected_parent + expected_lw_offset
 
     result = subject.get_labware_origin_position("labware-id")
 
