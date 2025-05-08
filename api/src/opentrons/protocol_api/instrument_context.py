@@ -916,7 +916,6 @@ class InstrumentContext(publisher.CommandPublisher):
             No longer implemented as an aspirate.
         .. versionchanged:: 2.24
             Added the ``in_place`` option.
-
         .. versionchanged:: 2.24
             Adds the ``rate`` and ``flow_rate`` parameter. You can only define one or the other. If
             both are unspecified then ``rate`` is by default set to 1.0.
