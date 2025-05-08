@@ -19,6 +19,9 @@ import {
 import { useToaster } from '/app/organisms/ToasterOven'
 import { checkShellUpdate } from '/app/redux/shell'
 
+import { useNotifyDeckConfigurationQuery } from '../resources/deck_configuration'
+import { useAttachedPipettes } from '../resources/instruments'
+import { useAttachedModules } from '../resources/modules'
 import { SharedScrollRefContext } from './ODDProviders/ScrollRefProvider'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
@@ -118,6 +121,46 @@ export function useProtocolReceiptToast(): void {
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [protocolIds])
+}
+
+export function useModuleAttachedToast(launchModuleSetupCallback: () => void) {
+  const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
+  const { makeToast } = useToaster()
+  const attachedModules = useAttachedModules()
+  const attachedPipettes = useAttachedPipettes()
+  const deckConfig = useNotifyDeckConfigurationQuery({
+    enabled: attachedModules.length > 0,
+  }).data
+  const moduleSerials = attachedModules
+    .filter(m => m.moduleOffset === undefined)
+    .map(m => m.serialNumber)
+  const moduleSerialsRef = useRef(moduleSerials)
+
+  useEffect(() => {
+    if (deckConfig === undefined) return
+    const modulesInDeckConfig = deckConfig
+      ?.filter(c => c.opentronsModuleSerialNumber)
+      .map(m => m.opentronsModuleSerialNumber)
+    const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
+    const newUnconfiguredModules = difference(
+      newModuleSerials,
+      modulesInDeckConfig
+    )
+    const hasPipette =
+      attachedPipettes.left !== null || attachedPipettes.right !== null
+    if (hasPipette && newUnconfiguredModules.length > 0) {
+      makeToast(t('module_added'), 'info', {
+        buttonText: i18n.format(t('shared:close'), 'capitalize'),
+        linkText: t('module_added_link'),
+        onLinkClick: launchModuleSetupCallback,
+        disableTimeout: true,
+        displayType: 'odd',
+      })
+    }
+    moduleSerialsRef.current = moduleSerials
+    // dont want this hook to rerun when other deps change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [moduleSerials])
 }
 
 export function useScrollRef(): {
