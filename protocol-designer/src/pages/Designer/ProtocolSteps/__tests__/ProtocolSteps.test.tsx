@@ -14,6 +14,7 @@ import {
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import {
   getActiveItem,
   getSelectedStepId,
@@ -40,10 +41,11 @@ vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../components/organisms/Alerts')
 vi.mock('../../../../components/molecules/LiquidButton')
+vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../Timeline/utils')
 const render = () => {
   return renderWithProviders(
-    <ProtocolSteps isZoomedIn={false} showLiquidOverflowMenu={vi.fn()} />,
+    <ProtocolSteps zoomedInSlot={null} showLiquidOverflowMenu={vi.fn()} />,
     {
       i18nInstance: i18n,
     }
@@ -96,6 +98,12 @@ describe('ProtocolSteps', () => {
     vi.mocked(getSelectedStepId).mockReturnValue(
       '0522fde8-25a3-4840-b84a-af7282bd80d5'
     )
+    vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
+      modules: {},
+      labware: {},
+      additionalEquipmentOnDeck: {},
+      pipettes: {},
+    })
   })
 
   it('renders each component in ProtocolSteps', () => {
