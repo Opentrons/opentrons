@@ -17,20 +17,16 @@ sphinx_build := $(pipenv) run sphinx-build -W --keep-going
 # github.com/Opentrons/opentrons/issues/6135
 sphinx_build_allow_warnings := $(pipenv) run sphinx-build
 
-ot_project := $(OPENTRONS_PROJECT)
-project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
-
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,api,$(project_rs_default),opentrons,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,api,$(PROJECT),opentrons,$(BUILD_NUMBER))
 
 # Find the version of the sdist file from git using a helper script.
-sdist_file = dist/$(call python_get_sdistname,api,$(project_rs_default),opentrons)
+sdist_file = dist/$(call python_get_sdistname,api,$(PROJECT),opentrons)
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
-version_file = $(call python_get_git_version,api,$(project_rs_default),opentrons)
+version_file = $(call python_get_git_version,api,$(PROJECT),opentrons)
 
 # These variables are for simulating python protocols
 sim_log_level ?= info
@@ -93,19 +89,23 @@ teardown:
 	-$(pipenv) --rm
 
 .PHONY: wheel
-wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel: export OPENTRONS_PROJECT=$(PROJECT)
+wheel: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 wheel:
 	$(clean_wheel_cmd)
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_rs_default)
+sdist: export OPENTRONS_PROJECT=$(PROJECT)
+sdist: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+sdist: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 sdist:
 	$(clean_sdist_cmd)
-	$(python) setup.py sdist
+	$(python) -m build --sdist .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -124,12 +124,12 @@ test-ot2:
 .PHONY: lint
 lint:
 	$(python) -m mypy src tests
-	$(python) -m black --check src tests docs/v2/example_protocols setup.py
-	$(python) -m flake8 src tests setup.py
+	$(python) -m black --check src tests docs/v2/example_protocols
+	$(python) -m flake8 src tests
 
 .PHONY: format
 format:
-	$(python) -m black src tests docs/v2/example_protocols setup.py
+	$(python) -m black src tests docs/v2/example_protocols
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
