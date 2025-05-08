@@ -2,19 +2,24 @@ import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
+  Chip,
   DIRECTION_COLUMN,
+  Divider,
   Flex,
   InfoScreen,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { ControlledEmptySelectorButtonGroup } from '../../molecules/ControlledEmptySelectorButtonGroup'
+import { FixtureListItemGroup } from '../../molecules/FixtureListItemGroup'
+import { FixturesButtonGroup } from '../../molecules/FixturesButtonGroup'
 import { ModuleListItemGroup } from '../../molecules/ModuleListItemGroup'
+import { ModulesButtonGroup } from '../../molecules/ModulesButtonGroup'
 import { OPENTRONS_FLEX, ROBOT_FIELD_NAME } from '../InstrumentsSection'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-export interface DisplayModules {
+export interface DisplayModule {
   type: ModuleType
   model: ModuleModel
   name: string
@@ -24,14 +29,22 @@ export interface DisplayModules {
   }
 }
 
-export const MODULES_FIELD_NAME = 'modules'
+export type FixtureType = 'wasteChute' | 'trashBin' | 'stagingArea'
 
-export function ModulesSection(): JSX.Element | null {
+export interface DisplayFixture {
+  type: FixtureType
+  name: string
+}
+
+export const MODULES_FIELD_NAME = 'modules'
+export const FIXTURES_FIELD_NAME = 'fixtures'
+
+export function ModulesAndFixturesSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const { watch } = useFormContext()
   const robotType = watch(ROBOT_FIELD_NAME)
 
-  const allModules: DisplayModules[] = [
+  const allModules: DisplayModule[] = [
     {
       type: 'heaterShakerModuleType',
       model: 'heaterShakerModuleV1',
@@ -64,6 +77,12 @@ export function ModulesSection(): JSX.Element | null {
     },
   ]
 
+  const allFixtures: DisplayFixture[] = [
+    { type: 'wasteChute', name: t('waste_chute') },
+    { type: 'trashBin', name: t('trash_bin') },
+    { type: 'stagingArea', name: t('staging_area') },
+  ]
+
   const modules =
     robotType === OPENTRONS_FLEX
       ? allModules.filter(
@@ -83,7 +102,8 @@ export function ModulesSection(): JSX.Element | null {
             module.type === 'magneticModuleType'
         )
 
-  const modulesWatch: DisplayModules[] = watch(MODULES_FIELD_NAME) ?? []
+  const modulesWatch: DisplayModule[] = watch(MODULES_FIELD_NAME) ?? []
+  const fixturesWatch: DisplayFixture[] = watch(FIXTURES_FIELD_NAME) ?? []
 
   return (
     <Flex
@@ -91,13 +111,36 @@ export function ModulesSection(): JSX.Element | null {
       height="100%"
       gap={SPACING.spacing24}
     >
-      <ControlledEmptySelectorButtonGroup modules={modules} />
-
+      <Flex>
+        <Chip
+          text={t('optional')}
+          type="neutral"
+          background={true}
+          chipSize="medium"
+          hasIcon={false}
+        />
+      </Flex>
+      <StyledText desktopStyle="headingSmallRegular">
+        {t('modules_title')}
+      </StyledText>
+      <ModulesButtonGroup modules={modules} />
       {modulesWatch.length === 0 && (
         <InfoScreen content={t('no_modules_added_yet')} />
       )}
-
       <ModuleListItemGroup />
+      {robotType === OPENTRONS_FLEX && (
+        <>
+          <Divider />
+          <StyledText desktopStyle="headingSmallRegular">
+            {t('fixtures_title')}
+          </StyledText>
+          <FixturesButtonGroup fixtures={allFixtures} />
+          {fixturesWatch.length === 0 && (
+            <InfoScreen content={t('no_fixtures_added_yet')} />
+          )}
+          <FixtureListItemGroup />
+        </>
+      )}
     </Flex>
   )
 }

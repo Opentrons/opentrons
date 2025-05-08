@@ -15,7 +15,7 @@ import { ResizeBar } from '../../atoms/ResizeBar'
 import { PromptPreview } from '../../molecules/PromptPreview'
 import {
   ProtocolSectionsContainer,
-  sections,
+  TOTAL_STEPS,
 } from '../../organisms/ProtocolSectionsContainer'
 import {
   chatDataAtom,
@@ -34,7 +34,10 @@ import {
 
 import type { MouseEvent } from 'react'
 import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
-import type { DisplayModules } from '../../organisms/ModulesSection'
+import type {
+  DisplayFixture,
+  DisplayModule,
+} from '../../organisms/ModulesAndFixturesSection'
 
 export interface CreateProtocolFormData {
   protocol_format: 'Protocol Designer' | 'Python'
@@ -50,13 +53,13 @@ export interface CreateProtocolFormData {
     rightPipette: string
     flexGripper: string
   }
-  modules: DisplayModules[]
+  modules: DisplayModule[]
+  fixtures: DisplayFixture[]
   labwares: DisplayLabware[]
   liquids: string[]
+  runtime_parameters?: string
   steps: string[] | string
 }
-
-const TOTAL_STEPS = sections.length
 
 export function CreateProtocol(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
@@ -88,6 +91,7 @@ export function CreateProtocol(): JSX.Element | null {
       },
       instruments: {},
       modules: [],
+      fixtures: [],
       labwares: [],
       liquids: [''],
       steps: [''],

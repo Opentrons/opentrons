@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import round from 'lodash/round'
 
 import {
   ALIGN_CENTER,
@@ -17,7 +18,11 @@ import {
   StyledText,
   ToggleGroup,
 } from '@opentrons/components'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  getDeckDefFromRobotType,
+  getPositionFromSlotId,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 import { NAV_BAR_HEIGHT_REM } from '../../../components/atoms'
 import { HotKeyDisplay, LiquidButton } from '../../../components/molecules'
@@ -25,6 +30,7 @@ import {
   SlotDetailsContainer,
   TimelineAlerts,
 } from '../../../components/organisms'
+import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
 import {
   getRobotStateTimeline,
@@ -35,6 +41,7 @@ import {
   getUnsavedForm,
 } from '../../../step-forms/selectors'
 import { HARDWARE_ID, START_TERMINAL_ITEM_ID } from '../../../steplist'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import {
   getActiveItem,
   getHoveredTerminalItemId,
@@ -44,6 +51,7 @@ import {
   getSelectedTerminalItemId,
 } from '../../../ui/steps/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
+import { zoomInOnCoordinate } from '../DeckSetup/utils'
 import { OffDeck } from '../OffDeck'
 import { BatchEditToolbox } from './BatchEditToolbox'
 import { DraggableSidebar } from './DraggableSidebar'
@@ -57,13 +65,15 @@ import type { DeckSlot } from '../../../types'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 const STEP_SUMMARY_HEIGHT = '18.2rem'
+const WASTE_CHUTE_SPACE = 30
+const DETAILS_HOVER_SPACE = 60
 
 interface ProtocolStepsProps {
-  isZoomedIn: boolean
+  zoomedInSlot: string | null
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
 }
 export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
-  const { isZoomedIn, showLiquidOverflowMenu } = props
+  const { zoomedInSlot, showLiquidOverflowMenu } = props
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
@@ -74,8 +84,30 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   const enableHotKeyDisplay = useSelector(getEnableHotKeysDisplay)
   const robotType = useSelector(getRobotType)
   const activeItem = useSelector(getActiveItem)
+  const deckSetup = useSelector(getDeckSetupForActiveItem)
+  const { labware, additionalEquipmentOnDeck } = deckSetup
   const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
   const savedStepForms = useSelector(getSavedStepForms)
+  const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
+  const viewBoxX = deckDef.cornerOffsetFromOrigin[0]
+  const windowInnerWidthRem = window.innerWidth / 16
+  const deckMapRatio = round(
+    (windowInnerWidthRem - DECK_SETUP_TOOLS_WIDTH_REM) / windowInnerWidthRem,
+    2
+  )
+  const viewBoxY = Object.values(additionalEquipmentOnDeck).some(
+    ae => ae.name === 'wasteChute'
+  )
+    ? deckDef.cornerOffsetFromOrigin[1] -
+      WASTE_CHUTE_SPACE -
+      DETAILS_HOVER_SPACE
+    : deckDef.cornerOffsetFromOrigin[1]
+  const viewBoxWidth = deckDef.dimensions[0] / deckMapRatio
+  const viewBoxHeight = deckDef.dimensions[1] + DETAILS_HOVER_SPACE
+  const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
+
+  const [viewBox, setViewBox] = useState<string>(initialViewBox)
+
   const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
@@ -83,7 +115,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
     typeof leftString | typeof rightString
   >(leftString)
   const isOffDeck = deckView === rightString
-
+  const isZoomedIn = zoomedInSlot != null
   // Note (02/03/25:kk) use DrraggableSidebar's initial width
   const [targetWidth, setTargetWidth] = useState<number>(235)
 
@@ -110,6 +142,29 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   } else if (hoveredTerminalItem === HARDWARE_ID) {
     header = t(selectedTerminalItemId)
   }
+
+  const zoomedInOnOffDeck =
+    zoomedInSlot != null && labware[zoomedInSlot] != null
+  //  zoom in already if you are exiting from adding liquids
+  useEffect(() => {
+    if (zoomedInSlot != null && !zoomedInOnOffDeck) {
+      const zoomInSlotPosition = getPositionFromSlotId(
+        zoomedInSlot ?? '',
+        deckDef
+      )
+      if (zoomInSlotPosition != null) {
+        const zoomedInViewBox = zoomInOnCoordinate({
+          x: zoomInSlotPosition[0],
+          y: zoomInSlotPosition[1],
+
+          deckDef,
+        })
+        setViewBox(zoomedInViewBox)
+      }
+    } else if (zoomedInOnOffDeck) {
+      setDeckView(rightString)
+    }
+  }, [zoomedInSlot, labware, zoomedInOnOffDeck])
 
   return (
     <Flex
@@ -201,6 +256,10 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
                 <TimelineEditHardware />
               ) : deckView === leftString ? (
                 <DeckSetupContainer
+                  viewBox={viewBox}
+                  setViewBox={setViewBox}
+                  deckDef={deckDef}
+                  initialViewBox={initialViewBox}
                   hoverSlot={hoverSlot}
                   setHoverSlot={setHoverSlot}
                   robotType={robotType}

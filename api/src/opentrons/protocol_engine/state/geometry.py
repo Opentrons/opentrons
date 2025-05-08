@@ -889,6 +889,13 @@ class GeometryView:
                 f"Labware {labware_id} does not have a slot associated with it"
                 f" since it is no longer on the deck."
             )
+        else:
+            _LOG.error(
+                f"Unhandled location type in get_ancestor_slot_name: {labware.location}"
+            )
+            raise errors.InvalidLabwarePositionError(
+                f"Cannot get ancestor slot of {self._labware.get_display_name(labware_id)} with location {labware.location}"
+            )
 
         return slot_name
 

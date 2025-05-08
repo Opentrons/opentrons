@@ -2,36 +2,36 @@ import { Controller, useFormContext } from 'react-hook-form'
 
 import { EmptySelectorButton, Flex, SPACING, WRAP } from '@opentrons/components'
 
-import { MODULES_FIELD_NAME } from '../../organisms/ModulesSection'
+import { FIXTURES_FIELD_NAME } from '../../organisms/ModulesAndFixturesSection'
 
-import type { DisplayModules } from '../../organisms/ModulesSection'
+import type { DisplayFixture } from '../../organisms/ModulesAndFixturesSection'
 
-export function ControlledEmptySelectorButtonGroup({
-  modules,
+export function FixturesButtonGroup({
+  fixtures,
 }: {
-  modules: DisplayModules[]
+  fixtures: DisplayFixture[]
 }): JSX.Element | null {
   const { watch } = useFormContext()
-  const modulesWatch: DisplayModules[] = watch(MODULES_FIELD_NAME) ?? []
+  const fixturesWatch: DisplayFixture[] = watch(FIXTURES_FIELD_NAME) ?? []
 
   return (
     <Controller
       defaultValue={[]}
-      name={MODULES_FIELD_NAME}
+      name={FIXTURES_FIELD_NAME}
       render={({ field }) => {
         return (
           <Flex flexWrap={WRAP} gap={SPACING.spacing8}>
-            {modules.map(module => (
+            {fixtures.map(fixture => (
               <EmptySelectorButton
-                key={module.type}
+                key={fixture.type}
                 iconName="plus"
                 onClick={() => {
-                  if (modulesWatch.some(m => m.type === module.type)) {
+                  if (fixturesWatch.some(m => m.type === fixture.type)) {
                     return
                   }
-                  field.onChange([...modulesWatch, module])
+                  field.onChange([...fixturesWatch, fixture])
                 }}
-                text={module.name}
+                text={fixture.name}
                 textAlignment="left"
               />
             ))}
