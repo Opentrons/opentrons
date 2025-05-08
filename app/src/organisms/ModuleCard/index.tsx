@@ -127,7 +127,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [hasSecondary, setHasSecondary] = useState(false)
   const [showAboutModule, setShowAboutModule] = useState(false)
   const [showTestShake, setShowTestShake] = useState(false)
-  const [showHSWizard, setShowHSWizard] = useState(false)
+  const [showSetupWizard, setShowSetupWizard] = useState(false)
   const [showFWBanner, setShowFWBanner] = useState(true)
   const [showCalModal, setShowCalModal] = useState(false)
 
@@ -247,7 +247,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   const handleInstructionsClick = (): void => {
-    setShowHSWizard(true)
+    setShowSetupWizard(true)
   }
 
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
@@ -286,15 +286,17 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           }
         />
       ) : null}
-      {showHSWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
-        <ModuleSetupModal
-          close={() => {
-            setShowHSWizard(false)
-          }}
-          moduleDisplayName={getModuleDisplayName(module.moduleModel)}
-          moduleModel={module.moduleModel}
-        />
-      )}
+      {showSetupWizard &&
+        (module.moduleType === HEATERSHAKER_MODULE_TYPE ||
+          module.moduleType === FLEX_STACKER_MODULE_TYPE) && (
+          <ModuleSetupModal
+            close={() => {
+              setShowSetupWizard(false)
+            }}
+            moduleDisplayName={getModuleDisplayName(module.moduleModel)}
+            moduleModel={module.moduleModel}
+          />
+        )}
       {showSlideout && (
         <ModuleSlideout
           module={module}
