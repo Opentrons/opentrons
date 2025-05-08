@@ -12,7 +12,6 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
-  InfoScreen,
   InputField,
   JUSTIFY_CENTER,
   JUSTIFY_END,
@@ -45,8 +44,8 @@ import { getOnlyLatestDefs } from '../../../labware-defs'
 import { createCustomLabwareDef } from '../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import {
-  selectLabware,
-  selectNestedLabware,
+  selectAdapter,
+  selectTopLabware,
 } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import {
@@ -83,7 +82,6 @@ interface SelectLabwareModalProps {
   slot: DeckSlotId
   onClose: () => void
   onConfirm: () => void
-  slotFull: boolean
 }
 
 interface LabwareInfo {
@@ -94,7 +92,7 @@ interface LabwareInfo {
 export function SelectLabwareModal(
   props: SelectLabwareModalProps
 ): JSX.Element {
-  const { slot, onClose, onConfirm, slotFull } = props
+  const { slot, onClose, onConfirm } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)
   const { makeSnackbar } = useKitchen()
@@ -108,12 +106,13 @@ export function SelectLabwareModal(
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
-    selectedLabwareDefUri,
+    selectedTopLabwareDefUri,
     selectedModuleModel,
-    selectedNestedLabwareDefUri,
+    selectedAdapterDefUri,
   } = zoomedInSlotInfo
 
-  const hasNoLabware = selectedLabwareDefUri == null
+  const hasNoLabware =
+    selectedTopLabwareDefUri == null && selectedAdapterDefUri == null
   const createCategoryState = (state: boolean): Record<string, boolean> =>
     Object.fromEntries(ALL_ORDERED_CATEGORIES.map(cat => [cat, state]))
 
@@ -274,22 +273,8 @@ export function SelectLabwareModal(
     setAreCategoriesExpanded(updatedExpandState)
   }
 
-  const handleAddLabwareClick = (): void => {
-    if (slotFull) {
-      makeSnackbar(t('no_space') as string)
-      return
-    }
-    if (hasNoLabware) {
-      makeSnackbar(t('select_before_proceeding') as string)
-    } else {
-      onConfirm()
-      handleResetLabwareTools()
-    }
-  }
-
   return createPortal(
     <Modal
-      childrenPadding={SPACING.spacing24}
       marginLeft="0"
       title={t('add_labware')}
       type="info"
@@ -304,23 +289,21 @@ export function SelectLabwareModal(
           padding={`0 ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing24}`}
           gridGap="36px"
         >
-          {!slotFull ? (
-            <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_CENTER}>
-              <StyledLabel css={LINK_BUTTON_STYLE}>
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {t('upload_custom_labware')}
-                </StyledText>
-                <input
-                  data-testid="customLabwareInput"
-                  type="file"
-                  onChange={e => {
-                    dispatch(createCustomLabwareDef(e))
-                    handleCategoryClick(CUSTOM_CATEGORY, true)
-                  }}
-                />
-              </StyledLabel>
-            </Flex>
-          ) : null}
+          <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_CENTER}>
+            <StyledLabel css={LINK_BUTTON_STYLE}>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('upload_custom_labware')}
+              </StyledText>
+              <input
+                data-testid="customLabwareInput"
+                type="file"
+                onChange={e => {
+                  dispatch(createCustomLabwareDef(e))
+                  handleCategoryClick(CUSTOM_CATEGORY, true)
+                }}
+              />
+            </StyledLabel>
+          </Flex>
           <Flex justifyContent={JUSTIFY_END} gridGap={SPACING.spacing8}>
             <SecondaryButton
               onClick={() => {
@@ -332,7 +315,14 @@ export function SelectLabwareModal(
             </SecondaryButton>
             <PrimaryButton
               data-testid="SelectLabwareModal_confirm"
-              onClick={handleAddLabwareClick}
+              onClick={() => {
+                if (hasNoLabware) {
+                  makeSnackbar(t('select_before_proceeding') as string)
+                } else {
+                  onConfirm()
+                  handleResetLabwareTools()
+                }
+              }}
             >
               {t('add_labware')}
             </PrimaryButton>
@@ -341,7 +331,7 @@ export function SelectLabwareModal(
       }
     >
       <Flex
-        // paddingTop={SPACING.spacing8}
+        paddingTop={SPACING.spacing8}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
       >
@@ -409,9 +399,9 @@ export function SelectLabwareModal(
                         buttonValue={uri}
                         onChange={e => {
                           e.stopPropagation()
-                          dispatch(selectLabware({ labwareDefUri: uri }))
+                          dispatch(selectTopLabware({ labwareDefUri: uri }))
                         }}
-                        isSelected={uri === selectedLabwareDefUri}
+                        isSelected={uri === selectedTopLabwareDefUri}
                       />
                     )
                   )}
@@ -419,164 +409,159 @@ export function SelectLabwareModal(
               </ListButtonAccordionContainer>
             </ListButton>
           ) : null}
-          {slotFull ? (
-            <InfoScreen
-              content={t('remove_existing_labware')}
-              subContent={t('labware_already_in_slot')}
-            />
-          ) : (
-            <>
-              {ORDERED_CATEGORIES.map(category => {
-                if (filteredLabwareByCategory[category].length > 0) {
-                  return (
-                    <ListButton
-                      key={`ListButton_${category}`}
-                      type="noActive"
-                      onClick={() => {
-                        handleCategoryClick(category)
-                      }}
+          {ORDERED_CATEGORIES.map(category => {
+            if (filteredLabwareByCategory[category].length > 0) {
+              return (
+                <ListButton
+                  key={`ListButton_${category}`}
+                  type="noActive"
+                  onClick={() => {
+                    handleCategoryClick(category)
+                  }}
+                >
+                  <ListButtonAccordionContainer id={`${category}_${slot}`}>
+                    <ListButtonAccordion
+                      mainHeadline={t(`${category}`)}
+                      isExpanded={areCategoriesExpanded[category]}
                     >
-                      <ListButtonAccordionContainer id={`${category}_${slot}`}>
-                        <ListButtonAccordion
-                          mainHeadline={t(`${category}`)}
-                          isExpanded={areCategoriesExpanded[category]}
-                        >
-                          {filteredLabwareByCategory[category]?.map(
-                            ({ def, uri }, index) => {
-                              const loadName = def.parameters.loadName
+                      {filteredLabwareByCategory[category]?.map(
+                        ({ def, uri }, index) => {
+                          const loadName = def.parameters.loadName
+                          const isAdapter = def.allowedRoles?.includes(
+                            'adapter'
+                          )
 
-                              return searchFilter(def.metadata.displayName) &&
-                                !getIsLabwareFiltered(def) ? (
-                                <Fragment
-                                  key={`${index}_${category}_${loadName}`}
-                                >
-                                  <ListButtonRadioButton
-                                    id={`${index}_${category}_${loadName}`}
-                                    buttonText={def.metadata.displayName}
-                                    buttonValue={uri}
-                                    onChange={e => {
-                                      e.stopPropagation()
-                                      dispatch(
-                                        selectLabware({
-                                          labwareDefUri:
-                                            uri === selectedLabwareDefUri
-                                              ? null
-                                              : uri,
-                                        })
-                                      )
-                                      // reset the nested labware def uri in case it is not compatible
-                                      dispatch(
-                                        selectNestedLabware({
-                                          nestedLabwareDefUri: null,
-                                        })
-                                      )
-                                    }}
-                                    isSelected={uri === selectedLabwareDefUri}
-                                  />
+                          return searchFilter(def.metadata.displayName) &&
+                            !getIsLabwareFiltered(def) ? (
+                            <Fragment key={`${index}_${category}_${loadName}`}>
+                              <ListButtonRadioButton
+                                id={`${index}_${category}_${loadName}`}
+                                buttonText={def.metadata.displayName}
+                                buttonValue={uri}
+                                onChange={e => {
+                                  e.stopPropagation()
+                                  if (isAdapter) {
+                                    dispatch(
+                                      selectAdapter({
+                                        adapterDefUri:
+                                          uri === selectedAdapterDefUri
+                                            ? null
+                                            : uri,
+                                      })
+                                    )
+                                    dispatch(
+                                      selectTopLabware({
+                                        labwareDefUri: null,
+                                      })
+                                    )
+                                  } else {
+                                    dispatch(
+                                      selectTopLabware({
+                                        labwareDefUri:
+                                          uri === selectedTopLabwareDefUri
+                                            ? null
+                                            : uri,
+                                      })
+                                    )
+                                  }
+                                }}
+                                isSelected={
+                                  (isAdapter &&
+                                    uri === selectedAdapterDefUri) ||
+                                  (!isAdapter &&
+                                    uri === selectedTopLabwareDefUri)
+                                }
+                              />
 
-                                  {uri === selectedLabwareDefUri &&
-                                    getLabwareCompatibleWithAdapter(
-                                      defs,
-                                      loadName
-                                    )?.length > 0 && (
-                                      <ListButtonAccordionContainer
-                                        id={`nestedAccordionContainer_${loadName}`}
-                                      >
-                                        <ListButtonAccordion
-                                          key={`${index}_${category}_${loadName}_accordion`}
-                                          isNested
-                                          mainHeadline={t(
-                                            'adapter_compatible_lab'
-                                          )}
-                                          isExpanded={
-                                            uri === selectedLabwareDefUri
-                                          }
-                                        >
-                                          {has96Channel &&
-                                          loadName === ADAPTER_96_CHANNEL
-                                            ? permittedTipracks.map(
-                                                (tiprackDefUri, index) => {
-                                                  const nestedDef =
-                                                    defs[tiprackDefUri]
-                                                  return (
-                                                    <ListButtonRadioButton
-                                                      key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
-                                                      id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
-                                                      buttonText={
-                                                        nestedDef?.metadata
-                                                          .displayName ?? ''
-                                                      }
-                                                      buttonValue={
-                                                        tiprackDefUri
-                                                      }
-                                                      onChange={e => {
-                                                        e.stopPropagation()
-                                                        dispatch(
-                                                          selectNestedLabware({
-                                                            nestedLabwareDefUri: tiprackDefUri,
-                                                          })
-                                                        )
-                                                      }}
-                                                      isSelected={
-                                                        tiprackDefUri ===
-                                                        selectedNestedLabwareDefUri
-                                                      }
-                                                    />
-                                                  )
-                                                }
+                              {isAdapter &&
+                                uri === selectedAdapterDefUri &&
+                                getLabwareCompatibleWithAdapter(defs, loadName)
+                                  ?.length > 0 && (
+                                  <ListButtonAccordionContainer
+                                    id={`nestedAccordionContainer_${loadName}`}
+                                  >
+                                    <ListButtonAccordion
+                                      key={`${index}_${category}_${loadName}_accordion`}
+                                      isNested
+                                      mainHeadline={t('adapter_compatible_lab')}
+                                      isExpanded={uri === selectedAdapterDefUri}
+                                    >
+                                      {has96Channel &&
+                                      loadName === ADAPTER_96_CHANNEL
+                                        ? permittedTipracks.map(
+                                            (tiprackDefUri, index) => {
+                                              const nestedDef =
+                                                defs[tiprackDefUri]
+                                              return (
+                                                <ListButtonRadioButton
+                                                  key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
+                                                  id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
+                                                  buttonText={
+                                                    nestedDef?.metadata
+                                                      .displayName ?? ''
+                                                  }
+                                                  buttonValue={tiprackDefUri}
+                                                  onChange={e => {
+                                                    e.stopPropagation()
+                                                    dispatch(
+                                                      selectTopLabware({
+                                                        labwareDefUri: tiprackDefUri,
+                                                      })
+                                                    )
+                                                  }}
+                                                  isSelected={
+                                                    tiprackDefUri ===
+                                                    selectedTopLabwareDefUri
+                                                  }
+                                                />
                                               )
-                                            : getLabwareCompatibleWithAdapter(
-                                                {
-                                                  ...defs,
-                                                  ...customLabwareDefs,
-                                                },
-                                                loadName
-                                              ).map(nestedDefUri => {
-                                                const nestedDef =
-                                                  defs[nestedDefUri] ??
-                                                  customLabwareDefs[
-                                                    nestedDefUri
-                                                  ]
+                                            }
+                                          )
+                                        : getLabwareCompatibleWithAdapter(
+                                            { ...defs, ...customLabwareDefs },
+                                            loadName
+                                          ).map(nestedDefUri => {
+                                            const nestedDef =
+                                              defs[nestedDefUri] ??
+                                              customLabwareDefs[nestedDefUri]
 
-                                                return (
-                                                  <ListButtonRadioButton
-                                                    key={`${index}_${category}_${loadName}_${nestedDefUri}`}
-                                                    id={`${index}_${category}_${loadName}_${nestedDefUri}`}
-                                                    buttonText={
-                                                      nestedDef?.metadata
-                                                        .displayName ?? ''
-                                                    }
-                                                    buttonValue={nestedDefUri}
-                                                    onChange={e => {
-                                                      e.stopPropagation()
-                                                      dispatch(
-                                                        selectNestedLabware({
-                                                          nestedLabwareDefUri: nestedDefUri,
-                                                        })
-                                                      )
-                                                    }}
-                                                    isSelected={
-                                                      nestedDefUri ===
-                                                      selectedNestedLabwareDefUri
-                                                    }
-                                                  />
-                                                )
-                                              })}
-                                        </ListButtonAccordion>
-                                      </ListButtonAccordionContainer>
-                                    )}
-                                </Fragment>
-                              ) : null
-                            }
-                          )}
-                        </ListButtonAccordion>
-                      </ListButtonAccordionContainer>
-                    </ListButton>
-                  )
-                }
-              })}
-            </>
-          )}
+                                            return (
+                                              <ListButtonRadioButton
+                                                key={`${index}_${category}_${loadName}_${nestedDefUri}`}
+                                                id={`${index}_${category}_${loadName}_${nestedDefUri}`}
+                                                buttonText={
+                                                  nestedDef?.metadata
+                                                    .displayName ?? ''
+                                                }
+                                                buttonValue={nestedDefUri}
+                                                onChange={e => {
+                                                  e.stopPropagation()
+                                                  dispatch(
+                                                    selectTopLabware({
+                                                      labwareDefUri: nestedDefUri,
+                                                    })
+                                                  )
+                                                }}
+                                                isSelected={
+                                                  nestedDefUri ===
+                                                  selectedTopLabwareDefUri
+                                                }
+                                              />
+                                            )
+                                          })}
+                                    </ListButtonAccordion>
+                                  </ListButtonAccordionContainer>
+                                )}
+                            </Fragment>
+                          ) : null
+                        }
+                      )}
+                    </ListButtonAccordion>
+                  </ListButtonAccordionContainer>
+                </ListButton>
+              )
+            }
+          })}
         </Flex>
       </Flex>
     </Modal>,
