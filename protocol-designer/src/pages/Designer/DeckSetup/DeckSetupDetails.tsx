@@ -472,7 +472,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               />
             )}
             <ActiveLabwareControls
-              slotPosition={[0, 0, 0]}
+              slotPosition={slotPosition}
               slotBoundingBox={slotBoundingBox}
               itemId={slot}
               terminalItemId={terminalItemId}

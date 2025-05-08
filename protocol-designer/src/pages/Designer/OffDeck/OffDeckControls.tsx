@@ -9,7 +9,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { START_TERMINAL_ITEM_ID } from '../../../steplist'
+import { END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -47,7 +47,7 @@ export function OffDeckControls(
   } = props
   const { t } = useTranslation('starting_deck_state')
   if (
-    terminalItemId !== START_TERMINAL_ITEM_ID ||
+    terminalItemId === END_TERMINAL_ITEM_ID ||
     slotPosition === null ||
     isSelected
   )
@@ -76,7 +76,11 @@ export function OffDeckControls(
           setHover(null)
         },
         onClick: () => {
-          setShowMenuListForId(labwareId)
+          if (terminalItemId === START_TERMINAL_ITEM_ID) {
+            setShowMenuListForId(labwareId)
+          } else {
+            console.log('fds')
+          }
         },
       }}
     >
@@ -87,14 +91,11 @@ export function OffDeckControls(
           opacity: ${hoverOpacity};
         `}
       >
-        <Link
-          role="button"
-          onClick={() => {
-            setShowMenuListForId(labwareId)
-          }}
-        >
+        <Link role="button">
           <StyledText desktopStyle="bodyDefaultSemiBold">
-            {t('edit_labware')}
+            {terminalItemId === START_TERMINAL_ITEM_ID
+              ? t('edit_labware')
+              : t('view_labware')}
           </StyledText>
         </Link>
       </Flex>

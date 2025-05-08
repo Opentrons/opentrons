@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
@@ -35,11 +36,11 @@ export function ActiveLabwareControls(
     hover,
     setHover,
   } = props
-
+  const { t } = useTranslation('starting_deck_state')
   if (terminalItemId != null || slotPosition == null) {
     return null
   }
-  const hoverOpacity = hover != null && hover === itemId
+  const hoverOpacity = hover != null && hover === itemId ? 1 : 0
 
   return (
     <RobotCoordsForeignDiv
@@ -72,7 +73,7 @@ export function ActiveLabwareControls(
       >
         <Link role="button">
           <StyledText desktopStyle="bodyLargeSemiBold">
-            {'labware details'}
+            {t('view_labware')}
           </StyledText>
         </Link>
       </Flex>
