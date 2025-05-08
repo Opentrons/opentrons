@@ -74,6 +74,5 @@ const _allReducers = {
   customDefs,
   labwareUploadMessage,
 }
-export const rootReducer: Reducer<RootState, Action> = combineReducers(
-  _allReducers
-)
+
+export const rootReducer = combineReducers(_allReducers)

@@ -22,7 +22,7 @@ vi.mock('../../../../step-forms/selectors')
 vi.mock('../../selectors')
 vi.mock('../../../../file-data/selectors')
 
-const mockStore = legacy_configureStore([thunk])
+const mockStore = legacy_configureStore([thunk] as any)
 
 const initialRobotState: RobotState = {
   labware: {

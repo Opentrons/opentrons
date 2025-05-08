@@ -25,7 +25,7 @@ vi.mock('../../utils')
 vi.mock('../utils')
 
 const middlewares = [thunk]
-const mockStore = legacy_configureStore(middlewares)
+const mockStore = legacy_configureStore(middlewares as any)
 
 afterEach(() => {
   vi.resetAllMocks()

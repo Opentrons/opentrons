@@ -8,7 +8,7 @@ import { legacy_createStore } from 'redux'
 import { vi } from 'vitest'
 
 import type { RenderOptions, RenderResult } from '@testing-library/react'
-import type { PreloadedState, Store } from 'redux'
+import type {  Store } from 'redux'
 import type {
   ComponentProps,
   ComponentType,
@@ -30,7 +30,7 @@ export function renderWithProviders<State>(
 
   const store: Store<State> = legacy_createStore(
     vi.fn(),
-    initialState as PreloadedState<State>
+    initialState
   )
   store.dispatch = vi.fn()
   store.getState = vi.fn(() => initialState) as () => State

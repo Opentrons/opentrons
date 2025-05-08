@@ -8,7 +8,7 @@ import { deleteMultipleSteps } from '../actions/actions'
 
 vi.mock('../../step-forms/selectors')
 
-const mockStore = legacy_configureStore([thunk])
+const mockStore = legacy_configureStore([thunk] as any)
 describe('step list actions', () => {
   describe('deleteMultipleSteps', () => {
     let store: any

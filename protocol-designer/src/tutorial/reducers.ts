@@ -10,7 +10,8 @@ import type { AddHintAction, RemoveHintAction } from './actions'
 import type { HintKey } from './index'
 
 type HintReducerState = HintKey[]
-const hints = handleActions<HintReducerState>(
+
+const hints = handleActions<HintReducerState, AddHintAction>(
   {
     //  @ts-expect-error
     ADD_HINT: (
@@ -19,7 +20,7 @@ const hints = handleActions<HintReducerState>(
     ): HintReducerState => uniq([...state, action.payload.hintKey]),
   },
   []
-)
+) as Reducer<HintReducerState, Action>
 export type DismissedHintReducerState = Record<
   HintKey,
   {

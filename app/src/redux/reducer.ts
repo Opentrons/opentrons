@@ -38,22 +38,29 @@ import { systemInfoReducer } from './system-info/reducer'
 import type { Reducer } from 'redux'
 import type { Action, State } from './types'
 
-export const rootReducer: Reducer<State, Action> = combineReducers({
-  robotApi: robotApiReducer,
-  robotAdmin: robotAdminReducer,
-  robotControls: robotControlsReducer,
-  robotSettings: robotSettingsReducer,
-  robotUpdate: robotUpdateReducer,
-  pipettes: pipettesReducer,
-  networking: networkingReducer,
-  config: configReducer,
-  discovery: discoveryReducer,
-  labware: customLabwareReducer,
-  shell: shellReducer,
-  systemInfo: systemInfoReducer,
-  alerts: alertsReducer,
-  sessions: sessionReducer,
-  calibration: calibrationReducer,
-  protocolStorage: protocolStorageReducer,
-  protocolRuns: protocolRunReducer,
-})
+export const rootReducer: Reducer<State, Action> = (
+  state: State | undefined,
+  action: Action
+): State => {
+  const combinedReducer = combineReducers({
+    robotApi: robotApiReducer,
+    robotAdmin: robotAdminReducer,
+    robotControls: robotControlsReducer,
+    robotSettings: robotSettingsReducer,
+    robotUpdate: robotUpdateReducer,
+    pipettes: pipettesReducer,
+    networking: networkingReducer,
+    config: configReducer,
+    discovery: discoveryReducer,
+    labware: customLabwareReducer,
+    shell: shellReducer,
+    systemInfo: systemInfoReducer,
+    alerts: alertsReducer,
+    sessions: sessionReducer,
+    calibration: calibrationReducer,
+    protocolStorage: protocolStorageReducer,
+    protocolRuns: protocolRunReducer,
+  })
+
+  return combinedReducer(state, action)
+}

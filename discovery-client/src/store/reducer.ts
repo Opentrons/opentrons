@@ -10,7 +10,6 @@ import {
 } from '../constants'
 import * as Actions from './actions'
 
-import type { Reducer } from 'redux'
 import type {
   HealthErrorResponse,
   HealthResponse,
@@ -252,7 +251,7 @@ export const manualAddressesReducer = (
   return state
 }
 
-export const reducer: Reducer<State, Action> = combineReducers({
+export const reducer = combineReducers({
   robotsByName: robotsByNameReducer,
   hostsByIp: hostsByIpReducer,
   manualAddresses: manualAddressesReducer,

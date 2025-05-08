@@ -8,7 +8,7 @@ import { getBatchEditFieldChanges } from '../selectors'
 
 vi.mock('../selectors')
 
-const mockStore = legacy_configureStore([thunk])
+const mockStore = legacy_configureStore([thunk] as any)
 
 describe('saveStepFormsMulti', () => {
   let store: any
