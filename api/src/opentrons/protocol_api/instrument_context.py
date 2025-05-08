@@ -401,8 +401,8 @@ class InstrumentContext(publisher.CommandPublisher):
             Behavior of the ``volume`` parameter.
 
         .. versionchanged:: 2.24
-            If previously moved to, dispensed or blown out into a trash bin or waste chute,
-            you do not need to include location if dispensing into that disposal location.
+            ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
+            into a trash bin or waste chute.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
@@ -662,8 +662,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: This instance.
 
         .. versionchanged:: 2.24
-            If previously moved to, dispensed or blown out into a trash bin or waste chute,
-            you do not need to include location if blowing out into that disposal location.
+            ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
+            into a trash bin or waste chute.
         """
         well: Optional[labware.Well] = None
         move_to_location: types.Location
