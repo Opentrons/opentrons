@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -16,120 +17,111 @@ import {
   RobotWorkSpace,
   SPACING,
   StyledText,
-  Tag,
-  TYPOGRAPHY,
 } from '@opentrons/components'
-import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
+import {
+  AIR,
+  getFullStackFromLabwares,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
-import { LabwareRenderOnDeck } from '../../../pages/Designer/DeckSetup/LabwareRenderOnDeck'
-import { LabwareOnDeck } from '../LabwareOnDeck'
+import { selectors } from '../../../labware-ingred/selectors'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import * as wellContentsSelectors from '../../../top-selectors/well-contents'
+import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
+import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
+import { getMainPagePortalEl } from '../Portal'
+import { LiquidCardList } from './LiquidCardList'
+
+import type { WellGroup } from '@opentrons/components'
+
+export interface WellContentsByNumber {
+  [wellName: string]: number
+}
 
 interface SlotDetailModalProps {
   closeModal: () => void
-  labwareId: string
+  // slotId or labwareId for off-deck labware
+  itemId: string
 }
-
-const LabwareThumbnail = styled.svg`
-  transform: scale(1, -1);
-  flex-shrink: 0;
-`
 
 export const SlotDetailModal = (
   props: SlotDetailModalProps
 ): JSX.Element | null => {
-  const { closeModal, labwareId } = props
-  const { t, i18n } = useTranslation('protocol_setup')
-  const definitionsByURI = useMemo(
-    () => getLabwareDefinitionsByURIForProtocol(protocolData.commands),
-    [protocolData]
+  const { closeModal, itemId } = props
+  const { t } = useTranslation('protocol_steps')
+  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+  const nickNames = useSelector(getLabwareNicknamesById)
+  const allWellContentsForActiveItem = useSelector(
+    wellContentsSelectors.getAllWellContentsForActiveItem
   )
+  const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
+  const allIngredientGroupFields = useSelector(
+    selectors.allIngredientGroupFields
+  )
+  const { labware } = activeDeckSetup
+  const fullStackFromLabwares =
+    labware[itemId] != null
+      ? labware[itemId].stack
+      : getFullStackFromLabwares(labware, itemId)
+  const labwareId = fullStackFromLabwares[0]
+  const labwareOnDeck = labware[labwareId]
+  const wellContents =
+    allWellContentsForActiveItem != null
+      ? allWellContentsForActiveItem[labwareId]
+      : null
 
-  const labwareInStack = stackedItems.filter(
-    (lw): lw is LabwareInStack => 'labwareId' in lw
+  const allWellFill = wellFillFromWellContents(
+    wellContents,
+    liquidDisplayColors
   )
-  const firstDefUri = labwareInStack[0].definitionUri
-  const isVariedStack = !labwareInStack.every(
-    lw => lw.definitionUri === firstDefUri
-  )
-  const [selectedLabware, setSelectedLabware] = useState(labwareInStack[0])
-  const wellFill = getWellFillFromLabwareId(
-    selectedLabware.labwareId,
-    protocolData?.liquids ?? [],
-    labwareByLiquidId
-  )
+  const allLiquidIdsOnLabware =
+    wellContents != null
+      ? Object.values(wellContents)
+          .flatMap(contents => contents.groupIds)
+          ?.filter(group => group !== AIR)
+      : []
+  const individualIds = Array.from(new Set(allLiquidIdsOnLabware))
 
-  const labwareDefinition = definitionsByURI[selectedLabware.definitionUri]
-
-  const commands = protocolData?.commands ?? []
-  const liquids = parseLiquidsInLoadOrder(
-    protocolData?.liquids != null ? protocolData?.liquids : [],
-    commands
-  )
-  const liquidsByIdForLabware = getLiquidsByIdForLabware(
-    selectedLabware.labwareId,
-    labwareByLiquidId
-  )
-  const filteredLiquidsInLoadOrder = liquids.filter(liquid => {
-    return Object.keys(liquidsByIdForLabware).some(key => key === liquid.id)
-  })
   const [selectedLiquidId, setSelectedLiquidId] = useState<string | undefined>(
-    filteredLiquidsInLoadOrder.length > 0
-      ? filteredLiquidsInLoadOrder[0].id
+    Object.values(allWellFill).length > 0
+      ? Object.values(allIngredientGroupFields).find(
+          ingred => ingred.displayColor === Object.values(allWellFill)[0]
+        )?.liquidGroupId
       : undefined
   )
+  const wellContentsWithLiquidId: WellGroup =
+    wellContents != null && selectedLiquidId != null
+      ? Object.values(wellContents).reduce((acc: WellGroup, wellContents) => {
+          if (wellContents.groupIds[0] === selectedLiquidId) {
+            acc[wellContents.wellName ?? 'A1'] = null
+          }
+          return acc
+        }, {})
+      : {}
 
-  useEffect(() => {
-    setSelectedLiquidId(
-      filteredLiquidsInLoadOrder.length > 0
-        ? filteredLiquidsInLoadOrder[0].id
-        : undefined
-    )
-  }, [selectedLabware])
+  const volumeByWell: WellContentsByNumber =
+    wellContents != null && selectedLiquidId != null
+      ? Object.values(wellContents).reduce((acc: WellContentsByNumber, wc) => {
+          if (wc.groupIds[0] === selectedLiquidId) {
+            acc[wc.wellName ?? 'A1'] = Object.values(wc.ingreds)[0].volume
+          }
+          return acc
+        }, {})
+      : {}
 
-  if (protocolData == null) return null
-  const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.id)
-  const disabledLiquidIds = liquidIds.filter(id => id !== selectedLiquidId)
-
-  const labwareRender = (
-    <LabwareRender
-      definition={labwareDefinition}
-      wellFill={wellFill}
-      wellLabelOption="SHOW_LABEL_INSIDE"
-      highlightedWells={
-        selectedLiquidId != null &&
-        Object.entries(liquidsByIdForLabware).length > 0
-          ? getWellGroupForLiquidId(liquidsByIdForLabware, selectedLiquidId)
-          : {}
-      }
-      disabledWells={
-        selectedLiquidId != null &&
-        Object.entries(liquidsByIdForLabware).length > 0
-          ? getDisabledWellGroupForLiquidId(
-              liquidsByIdForLabware,
-              disabledLiquidIds
-            )
-          : []
-      }
-    />
-  )
-  const slotDisplayName =
-    slotName === 'offDeck'
-      ? i18n.format(t('protocol_command_text:off_deck'), 'upperCase')
-      : slotName
+  const slotName = getSlotInLocationStack(labwareOnDeck.stack)
   const modalTitle = (
-    <Flex alignItems={ALIGN_CENTER}>
-      <StyledText
-        desktopStyle="bodyLargeSemiBold"
-        marginRight={SPACING.spacing4}
-      >
+    <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
+      <StyledText desktopStyle="bodyLargeSemiBold">
         {t('labware_in')}
       </StyledText>
-
-      <DeckInfoLabel deckLabel={slotDisplayName} />
+      <DeckInfoLabel
+        deckLabel={slotName === 'offDeck' ? t('off_deck') : slotName}
+      />
     </Flex>
   )
 
-  return (
+  return createPortal(
     <Modal
       title={modalTitle}
       hasHeader
@@ -137,13 +129,12 @@ export const SlotDetailModal = (
       closeOnOutsideClick
       childrenPadding={0}
       width={selectedLiquidId != null ? '47rem' : '31.25rem'}
-      marginLeft="0"
       overflowY="hidden"
     >
       <Box
         backgroundColor={COLORS.grey10}
         padding={SPACING.spacing16}
-        height={selectedLiquidId != null || isVariedStack ? '28rem' : '25rem'}
+        height={selectedLiquidId != null ? '28rem' : '25rem'}
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
           <Flex
@@ -152,47 +143,41 @@ export const SlotDetailModal = (
             gridGap={SPACING.spacing16}
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
-            width={isVariedStack ? '' : '100%'}
+            width="100%"
           >
             <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
-              <StyledText
-                desktopStyle="bodyDefaultSemiBold"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-              >
-                {selectedLabware.displayName}
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {nickNames[labwareId]}
               </StyledText>
-              {selectedLabware.lidDisplayName != null ? (
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
-                  fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.grey60}
-                >
-                  {selectedLabware.lidDisplayName}
-                </StyledText>
-              ) : null}
             </Flex>
-          
-
-            {/* <LabwareThumbnail
-              viewBox={`${labwareDefinition.cornerOffsetFromSlot.x} ${labwareDefinition.cornerOffsetFromSlot.y} ${labwareDefinition.dimensions.xDimension} ${labwareDefinition.dimensions.yDimension}`}
-              width={
-                selectedLiquidId != null && isVariedStack ? '20rem' : '29rem'
-              }
+            <RobotWorkSpace
+              key={labwareOnDeck.def.parameters.loadName}
+              viewBox={`0 0 ${labwareOnDeck.def.dimensions.xDimension} ${labwareOnDeck.def.dimensions.yDimension}`}
             >
-             
-            </LabwareThumbnail> */}
+              {() => (
+                <g>
+                  <LabwareRender
+                    definition={labwareOnDeck.def}
+                    wellFill={allWellFill}
+                    highlightedWells={wellContentsWithLiquidId}
+                  />
+                </g>
+              )}
+            </RobotWorkSpace>
           </Flex>
           {selectedLiquidId != null ? (
             <LiquidCardList
-              selectedLabwareDefinition={labwareDefinition}
+              selectedLabwareDefinition={labwareOnDeck.def}
               selectedLiquidId={selectedLiquidId ?? ''}
               setSelectedLiquidId={setSelectedLiquidId}
-              liquidsInLoadOrder={filteredLiquidsInLoadOrder}
-              liquidsByIdForLabware={liquidsByIdForLabware}
+              allIngredGroupFields={allIngredientGroupFields}
+              individualIds={individualIds}
+              volumeByWell={volumeByWell}
             />
           ) : null}
         </Flex>
       </Box>
-    </Modal>
+    </Modal>,
+    getMainPagePortalEl()
   )
 }
