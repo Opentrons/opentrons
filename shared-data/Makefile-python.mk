@@ -20,10 +20,6 @@ PATH := $(shell cd ../.. && yarn bin):$(PATH)
 # documentation
 BUILD_NUMBER ?=
 
-ot_project := $(OPENTRONS_PROJECT)
-project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
-
 # this may be set as an environment variable to select the version of
 # python to run if pyenv is not available. it should always be set to
 # point to a python3.6.
@@ -32,8 +28,8 @@ OT_PYTHON ?= python
 BUILD_DIR := dist
 
 
-wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,$(project_rs_default),opentrons_shared_data,$(BUILD_NUMBER),../../scripts/python_build_utils.py)
-sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,$(project_rs_default),opentrons_shared_data,,../../scripts/python_build_utils.py)
+wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,$(PROJECT),opentrons_shared_data,$(BUILD_NUMBER),../../scripts/python_build_utils.py)
+sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,$(PROJECT),opentrons_shared_data,,../../scripts/python_build_utils.py)
 
 py_sources = $(filter %.py,$(shell $(SHX) find python/opentrons_shared_data)) python/opentrons_shared_data/py.typed
 deck_sources = $(wildcard deck/definitions/*/*.json) $(wildcard deck/schemas/*.json)
@@ -78,14 +74,18 @@ clean:
 	$(clean_cache_cmd)
 
 .PHONY: wheel
-wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel: export OPENTRONS_PROJECT=$(PROJECT)
+wheel: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 wheel: $(py_sources) $(json_sources)
 	$(python) -m build --wheel $(build_wheel_opts) .
 	$(SHX) ls $(BUILD_DIR)
 
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_rs_default)
+sdist: export OPENTRONS_PROJECT=$(PROJECT)
+sdist: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+sdist: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 sdist: $(py_sources) $(json_sources)
 	$(python) -m build --sdist .
 	$(SHX) ls $(BUILD_DIR)
