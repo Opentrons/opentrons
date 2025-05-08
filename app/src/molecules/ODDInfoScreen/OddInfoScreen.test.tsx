@@ -26,7 +26,7 @@ describe('OddInfoScreen', () => {
       type: 'success',
       header: 'Success Header',
       subText: 'This is a success message.',
-      text: 'large',
+      textSize: 'large',
     })
     expect(screen.getByText('Success Header')).toBeInTheDocument()
     expect(screen.getByText('This is a success message.')).toBeInTheDocument()

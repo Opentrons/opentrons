@@ -25,7 +25,7 @@ export default {
     subText: {
       control: 'text',
     },
-    text: {
+    textSize: {
       options: ['small', 'large'],
       control: {
         type: 'radio',
@@ -51,6 +51,6 @@ Default.args = {
   hasIcon: true,
   header: 'Header',
   subText: 'Subtext',
-  text: 'small',
+  textSize: 'small',
   iconName: undefined,
 }

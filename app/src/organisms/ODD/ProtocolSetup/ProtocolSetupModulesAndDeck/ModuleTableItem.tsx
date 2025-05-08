@@ -57,11 +57,11 @@ export const getModuleDisplayStatus = (
   calibrationStatus: ProtocolCalibrationStatus
 ): ModuleStatusType => {
   // deck location conflict
-  if (conflictedFixture !== null) {
+  if (conflictedFixture != null) {
     return 'locationConflict'
   }
   // module is not connected
-  if (!!!attachedModule) {
+  if (attachedModule == null) {
     return 'disconnected'
   } else {
     // flex stacker module does not require calibration
@@ -87,8 +87,7 @@ export const getModuleDisplayStatus = (
     // Absorbance reader module does not require calibration
     if (
       attachedModule.moduleType !== ABSORBANCE_READER_TYPE &&
-      (!!!attachedModule.moduleOffset ||
-        !!!attachedModule.moduleOffset?.last_modified)
+      attachedModule.moduleOffset?.last_modified == null
     ) {
       return 'needsCalibration'
     }
@@ -127,7 +126,7 @@ export function ModuleTableItem({
   const { makeSnackbar } = useToaster()
 
   const handleCalibrate = (): void => {
-    if (module.attachedModuleMatch !== null) {
+    if (module.attachedModuleMatch != null) {
       if (getModuleTooHot(module.attachedModuleMatch)) {
         makeSnackbar(t('module_wizard_flows:module_too_hot') as string)
       } else {
@@ -148,10 +147,7 @@ export function ModuleTableItem({
   const isDoorOpen = true
 
   const homeStacker = (): void => {
-    if (
-      module.attachedModuleMatch !== null &&
-      module.attachedModuleMatch.moduleType === FLEX_STACKER_MODULE_TYPE
-    ) {
+    if (module.attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE) {
       chainLiveCommands(
         getFlexStackerPrepCommands(module.attachedModuleMatch),
         // if the close latch command fails, we still want to home the shuttle
@@ -297,7 +293,7 @@ export function ModuleTableItem({
 
   return (
     <>
-      {showModuleWizard && module.attachedModuleMatch !== null ? (
+      {showModuleWizard && module.attachedModuleMatch != null ? (
         <ModuleWizardFlows
           attachedModule={module.attachedModuleMatch}
           closeFlow={() => {
@@ -309,7 +305,7 @@ export function ModuleTableItem({
           }
         />
       ) : null}
-      {showLocationConflictModal && conflictedFixture !== null ? (
+      {showLocationConflictModal && conflictedFixture != null ? (
         <LocationConflictModal
           onCloseClick={() => {
             setShowLocationConflictModal(false)

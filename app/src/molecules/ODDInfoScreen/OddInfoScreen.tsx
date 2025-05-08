@@ -22,10 +22,10 @@ export type OddInfoScreenType =
 
 interface OddInfoScreenProps extends StyleProps {
   type: OddInfoScreenType
-  hasIcon?: boolean
   header: string
+  hasIcon?: boolean
   subText?: string
-  text?: 'small' | 'large'
+  textSize?: 'small' | 'large'
   iconName?: string
 }
 
@@ -66,10 +66,10 @@ const INFO_SCREEN_PROPS_BY_SIZE: Record<
 export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
   const {
     type,
-    hasIcon = true,
     header,
+    hasIcon = true,
     subText,
-    text = 'small',
+    textSize = 'small',
     iconName,
     ...styleProps
   } = props
@@ -77,9 +77,9 @@ export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
   const iconType = iconName ?? (type === 'success' ? 'ot-check' : 'ot-alert')
   const backgroundColor = INFO_SCREEN_PROPS_BY_TYPE[type].backgroundColor
   const iconColor = INFO_SCREEN_PROPS_BY_TYPE[type].iconColor
-  const iconSize = INFO_SCREEN_PROPS_BY_SIZE[text].iconSize
-  const headerStyle = INFO_SCREEN_PROPS_BY_SIZE[text].headerStyle
-  const subTextStyle = INFO_SCREEN_PROPS_BY_SIZE[text].subTextStyle
+  const iconSize = INFO_SCREEN_PROPS_BY_SIZE[textSize].iconSize
+  const headerStyle = INFO_SCREEN_PROPS_BY_SIZE[textSize].headerStyle
+  const subTextStyle = INFO_SCREEN_PROPS_BY_SIZE[textSize].subTextStyle
 
   return (
     <Flex
