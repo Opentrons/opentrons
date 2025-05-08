@@ -15,15 +15,16 @@ import {
   COLUMN_3_X_ADJUSTMENT,
   FIXTURE_HEIGHT,
   Y_ADJUSTMENT,
+  COLUMN_4_AA
 } from './constants'
 
-import type { AddressableArea, CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type { AddressableArea, AddressableAreaName, CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
 interface EmptyConfigFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  addressableArea: AddressableArea
-  handleClickAdd: (fixtureLocation: CutoutId) => void
+  addressableArea: AddressableAreaName
+  handleClickAdd: (fixtureLocation: CutoutId, addressableArea: AddressableAreaName) => void
 }
 
 export function EmptyConfigFixture(
@@ -34,11 +35,6 @@ export function EmptyConfigFixture(
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
-
-  console.log("addressableArea: ", addressableArea)
-  console.log("fixtureLocation: ", fixtureLocation)
-  const COLUMN_4_AA = ['D4', 'C4', 'B4', 'A4']
-
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
@@ -91,7 +87,7 @@ export function EmptyConfigFixture(
       <Btn
         css={EMPTY_CONFIG_STYLE}
         onClick={() => {
-          handleClickAdd(fixtureLocation)
+          handleClickAdd(fixtureLocation, addressableArea)
         }}
         data-testid={fixtureLocation}
       >

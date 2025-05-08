@@ -39,6 +39,7 @@ describe('Touchscreen AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
+      addressableArea: 'D3',
       closeModal: mockCloseModal,
       isOnDevice: true,
     }
@@ -94,6 +95,7 @@ describe('Desktop AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
+      addressableArea: 'D3',
       closeModal: mockCloseModal,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({

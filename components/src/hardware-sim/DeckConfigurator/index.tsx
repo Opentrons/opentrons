@@ -36,6 +36,8 @@ import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
 
 import type { ReactNode } from 'react'
 import type {
+  AddressableAreaName,
+  CutoutConfig,
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
@@ -76,7 +78,10 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   } = props
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const deckConfigWithAA = deckConfig.reduce((acc, obj) => {
+  interface CutoutConfigMap extends CutoutConfig{
+    aa: AddressableAreaName
+  }
+  const deckConfigWithAA = deckConfig.reduce<CutoutConfigMap[]>((acc, obj) => {
     const aaPerCutoutFixture = getAAFromCutoutId(
       obj.cutoutId,
       obj.cutoutFixtureId,
@@ -88,7 +93,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     return acc;
   }, []);
 
-  const stagingAreaFixtures = deckConfig.filter(
+  const stagingAreaFixtures = deckConfigWithAA.filter(
     ({ cutoutFixtureId }) => cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
   )
   const wasteChuteFixtures = deckConfig.filter(
@@ -146,13 +151,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     cutoutC2: 'singleCenterSlot',
     cutoutB2: 'singleCenterSlot',
     cutoutA2: 'singleCenterSlot',
-    // cutoutD3: 'stagingAreaRightSlot',
-    // cutoutC3: 'stagingAreaRightSlot',
-    // cutoutB3: 'stagingAreaRightSlot',
-    // cutoutA3: 'stagingAreaRightSlot',
-  }
-
-  const ot3DefaultStagingSlotOnDeck: Record<CutoutId, CutoutFixtureId> = {
     cutoutD3: 'stagingAreaRightSlot',
     cutoutC3: 'stagingAreaRightSlot',
     cutoutB3: 'stagingAreaRightSlot',
@@ -164,12 +162,12 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       height={height}
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
-      {Object.keys(ot3DefaultSingleSlotOnDeck).map(key => (
+      {Object.keys(ot3DefaultSingleSlotOnDeck).map((key) => (
         // give the outside of the base fixture svgs a stroke for extra spacing
         <g key={key} stroke={COLORS.white} strokeWidth="4">
           <SingleSlotFixture
             data-testid={key}
-            cutoutId={key}
+            cutoutId={key as CutoutId}
             slotClipColor={COLORS.transparent}
             fixtureBaseColor={lightFill}
             deckDefinition={deckDef}
@@ -177,17 +175,17 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           />
         </g>
       ))}
-      {Object.entries(ot3DefaultStagingSlotOnDeck).map(([key, value]) => (
+      {stagingAreaFixtures.map(({ cutoutId, cutoutFixtureId, aa }) => (
         <StagingAreaConfigFixture
-          data-testid={key}
-          key={key}
+          data-testid={cutoutId}
+          key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={
-            editableCutoutIds.includes(key) ? handleClickRemove : undefined
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
           }
-          fixtureLocation={key}
-          cutoutFixtureId={value}
-          selected={key === selectedCutoutId}
+          fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
+          selected={cutoutId === selectedCutoutId}
         />
       ))}
       {emptyCutouts.map(({ cutoutId, aa }) => (
