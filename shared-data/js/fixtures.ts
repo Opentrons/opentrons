@@ -164,6 +164,26 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
+export const getAAFromCutoutId = (
+  inputCutoutId: CutoutId,
+  cutoutFixtureId: CutoutFixtureId,
+  deckDefinition: DeckDefinition
+): AddressableAreaName[] | undefined => {
+  /**
+   * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
+   */
+  // remove this when implemented in the server
+  console.log(deckDefinition)
+  const cutoutFixture =
+    cutoutFixtureId === 'singleRightSlot'
+      ? 'stagingAreaRightSlot'
+      : cutoutFixtureId
+  const fixture = deckDefinition.cutoutFixtures.find(
+    fixture => fixture.id === cutoutFixture
+  )
+  return fixture?.providesAddressableAreas[inputCutoutId]
+}
+
 export function getCutoutFixtureIdsForModuleModel(
   moduleModel: ModuleModel
 ): CutoutFixtureId[] {

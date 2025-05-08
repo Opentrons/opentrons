@@ -460,24 +460,6 @@ export const getCutoutIdFromAddressableArea = (
   return null
 }
 
-export const getAAFromCutoutId = (
-  inputCutoutId: CutoutId,
-  cutoutFixtureId: CutoutFixtureId,
-  deckDefinition: DeckDefinition
-): AddressableAreaName[] | undefined => {
-  /**
-   * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
-   */
-  const cutoutFixture =
-    cutoutFixtureId === 'singleRightSlot'
-      ? 'stagingAreaRightSlot'
-      : cutoutFixtureId
-  const fixture = deckDefinition.cutoutFixtures.find(
-    fixture => fixture.id === cutoutFixture
-  )
-  return fixture?.providesAddressableAreas[inputCutoutId]
-}
-
 export const getSortedLiquidClassDefs = (): Record<string, LiquidClass> => {
   const liquidClassDefs = getAllLiquidClassDefs()
   return Object.fromEntries(

@@ -77,14 +77,16 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const deckConfigWithAA = deckConfig.reduce((acc, obj) => {
-    acc.push({ ...obj, aa: getAAFromCutoutId(
+    const aaPerCutoutFixture = getAAFromCutoutId(
       obj.cutoutId,
       obj.cutoutFixtureId,
       deckDef
-    )});
+    )
+    aaPerCutoutFixture?.forEach(item => {
+      acc.push({ ...obj, aa: item });
+    })
     return acc;
-}, []);
-  console.log("deckConfigWithAA: ", deckConfigeWithAA)
+  }, []);
 
   const stagingAreaFixtures = deckConfig.filter(
     ({ cutoutFixtureId }) => cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
@@ -99,12 +101,13 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       cutoutFixtureId != null &&
       WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
   )
-  const emptyCutouts = deckConfig.filter(
-    ({ cutoutFixtureId, cutoutId, addressableAreas }) =>
+  const emptyCutouts = deckConfigWithAA.filter(
+    ({ cutoutFixtureId, cutoutId, aa }) =>
       editableCutoutIds.includes(cutoutId) &&
       cutoutFixtureId != null &&
       SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
   )
+  console.log("emptyCutouts: ", emptyCutouts)
   const trashBinFixtures = deckConfig.filter(
     ({ cutoutFixtureId }) => cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
   )
@@ -187,10 +190,11 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           selected={key === selectedCutoutId}
         />
       ))}
-      {emptyCutouts.map(({ cutoutId }) => (
+      {emptyCutouts.map(({ cutoutId, aa }) => (
         <EmptyConfigFixture
           data-testid={cutoutId}
           key={cutoutId}
+          addressableArea={aa}
           deckDefinition={deckDef}
           handleClickAdd={handleClickAdd}
           fixtureLocation={cutoutId}
