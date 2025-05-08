@@ -552,7 +552,6 @@ class GeometryView:
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
         origin_pos = self.get_labware_origin_position(labware_id)
-        print("MAX: origin_pos", origin_pos)
         cal_offset = self._labware.get_labware_offset_vector(labware_id)
         return Point(
             x=origin_pos.x + cal_offset.x,
@@ -630,8 +629,6 @@ class GeometryView:
         labware_pos = self.get_labware_position(labware_id)
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
-
-        print("MAX: labware pos", labware_pos)
 
         offset = WellOffset(x=0, y=0, z=well_depth)
         if well_location is not None:
