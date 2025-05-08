@@ -33,7 +33,7 @@ const DeckLabelSetComponent = (
     width,
     height,
     invert = false,
-    showModuleIcon = true,
+    showModuleIcon = false,
   } = props
 
   return (
