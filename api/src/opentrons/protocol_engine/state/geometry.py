@@ -534,16 +534,37 @@ class GeometryView:
         else:
             assert_type(definition, LabwareDefinition3)
 
-            slot_front_left_to_labware_back_left = Point(
-                definition.extents.footprint.backLeft.x,
-                definition.extents.footprint.backLeft.y,
-                definition.extents.total.backLeftBottom.z,
+            # We want to place the labware's front-left-bottom (-x, -y, -z) at the slot's front-left.
+
+            # Within the labware's local coordinate system, where the left (-x) edge is.
+            labware_footprint_left_x = definition.extents.footprint.backLeft.x
+
+            # Within the labware's local coordinate system, where the front (-y) edge is.
+            labware_footprint_front_y = definition.extents.footprint.frontRight.y
+
+            # Within the labware's local coordinate system, where the bottom (-z) plane is.
+            labware_footprint_bottom_z = definition.extents.total.backLeftBottom.z
+
+            labware_origin_to_labware_front_left_bottom = Point(
+                labware_footprint_left_x,
+                labware_footprint_front_y,
+                labware_footprint_bottom_z,
             )
-            return slot_front_left + slot_front_left_to_labware_back_left
+
+            labware_front_left_bottom_to_labware_origin = (
+                labware_origin_to_labware_front_left_bottom * -1
+            )
+
+            print(
+                "MAX: labware_front_left_bottom_to_labware_origin",
+                labware_front_left_bottom_to_labware_origin,
+            )
+            return labware_front_left_bottom_to_labware_origin
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
         origin_pos = self.get_labware_origin_position(labware_id)
+        print("MAX: origin_pos", origin_pos)
         cal_offset = self._labware.get_labware_offset_vector(labware_id)
         return Point(
             x=origin_pos.x + cal_offset.x,
@@ -621,6 +642,8 @@ class GeometryView:
         labware_pos = self.get_labware_position(labware_id)
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
+
+        print("MAX: labware pos", labware_pos)
 
         offset = WellOffset(x=0, y=0, z=well_depth)
         if well_location is not None:
