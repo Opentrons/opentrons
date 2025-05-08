@@ -173,6 +173,7 @@
   "setup_instructions": "Setup Instructions",
   "shake_speed": "shake speed",
   "shaker": "Shaker",
+  "stacker": "Stacker",
   "staging_area_slot": "Staging area slot",
   "status": "Status",
   "target_speed": "Target: {{speed}} RPM",

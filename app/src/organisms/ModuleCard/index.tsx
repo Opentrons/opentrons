@@ -292,6 +292,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             setShowHSWizard(false)
           }}
           moduleDisplayName={getModuleDisplayName(module.moduleModel)}
+          moduleModel={module.moduleModel}
         />
       )}
       {showSlideout && (
