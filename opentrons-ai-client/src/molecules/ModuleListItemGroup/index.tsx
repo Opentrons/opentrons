@@ -21,13 +21,13 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { MODULES_FIELD_NAME } from '../../organisms/ModulesSection'
+import { MODULES_FIELD_NAME } from '../../organisms/ModulesAndFixturesSection'
 import { getOnlyLatestDefs } from '../../resources/utils'
 import { ModuleDiagram } from '../ModelDiagram'
 
 import type { DropdownBorder } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
-import type { DisplayModules } from '../../organisms/ModulesSection'
+import type { DisplayModule } from '../../organisms/ModulesAndFixturesSection'
 
 export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [
@@ -68,7 +68,7 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
 export function ModuleListItemGroup(): JSX.Element | null {
   const { watch, setValue } = useFormContext()
   const { t } = useTranslation('create_protocol')
-  const modulesWatch: DisplayModules[] = watch(MODULES_FIELD_NAME) ?? []
+  const modulesWatch: DisplayModule[] = watch(MODULES_FIELD_NAME) ?? []
 
   const allDefinitionsValues = useMemo(
     () => Object.values(getOnlyLatestDefs()),
@@ -93,7 +93,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
             name={MODULES_FIELD_NAME}
             render={({ field }) => {
               const currentModule = field.value.find(
-                (m: DisplayModules) => m.type === module.type
+                (m: DisplayModule) => m.type === module.type
               )
 
               return (
@@ -119,7 +119,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                             },
                             onClick: (value: string) => {
                               field.onChange(
-                                field.value.map((m: DisplayModules) =>
+                                field.value.map((m: DisplayModule) =>
                                   m.type === module.type
                                     ? {
                                         ...m,

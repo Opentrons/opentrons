@@ -31,11 +31,11 @@ import type {
   OpenIngredientSelectorAction,
   RemoveWellsContentsAction,
   RenameLabwareAction,
+  SelectAdapterAction,
   SelectFixtureAction,
-  SelectLabwareAction,
   SelectLiquidAction,
   SelectModuleAction,
-  SelectNestedLabwareAction,
+  SelectTopLabwareAction,
   SetWellContentsAction,
   ZoomedIntoSlotAction,
 } from '../actions'
@@ -302,8 +302,8 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
 )
 
 const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
-  selectedLabwareDefUri: null,
-  selectedNestedLabwareDefUri: null,
+  selectedTopLabwareDefUri: null,
+  selectedAdapterDefUri: null,
   selectedModuleModel: null,
   selectedFixture: null,
   selectedSlot: { slot: null, cutout: null },
@@ -312,20 +312,20 @@ const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
 export const zoomedInSlotInfo = ((
   state: ZoomedIntoSlotInfoState = selectedSlotInfoInitialState,
   action:
-    | SelectLabwareAction
-    | SelectNestedLabwareAction
+    | SelectTopLabwareAction
+    | SelectAdapterAction
     | SelectModuleAction
     | SelectFixtureAction
     | ZoomedIntoSlotAction
 ): ZoomedIntoSlotInfoState => {
   switch (action.type) {
-    case 'SELECT_LABWARE': {
+    case 'SELECT_TOP_LABWARE': {
       const { labwareDefUri } = action.payload
-      return { ...state, selectedLabwareDefUri: labwareDefUri }
+      return { ...state, selectedTopLabwareDefUri: labwareDefUri }
     }
-    case 'SELECT_NESTED_LABWARE': {
-      const { nestedLabwareDefUri } = action.payload
-      return { ...state, selectedNestedLabwareDefUri: nestedLabwareDefUri }
+    case 'SELECT_ADAPTER': {
+      const { adapterDefUri } = action.payload
+      return { ...state, selectedAdapterDefUri: adapterDefUri }
     }
     case 'SELECT_MODULE': {
       const { moduleModel } = action.payload

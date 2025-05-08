@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
@@ -16,11 +15,11 @@ import { ControlledTextAreaField } from '../../atoms/ControlledTextAreaField'
 import { PROTOCOL_FORMAT, PYTHON } from '../../resources/constants'
 import { OPENTRONS_FLEX, ROBOT_FIELD_NAME } from '../InstrumentsSection'
 
-export const RUNTIME_PARAMETERS_FIELD_NAME = 'runtime_parameters'
+const RUNTIME_PARAMETERS_FIELD_NAME = 'runtime_parameters'
 
 export function RuntimeParametersSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
-  const { control, trigger } = useFormContext()
+  const { control } = useFormContext()
 
   const protocolFormat = useWatch({ control, name: PROTOCOL_FORMAT })
 
@@ -29,11 +28,6 @@ export function RuntimeParametersSection(): JSX.Element | null {
   // Only show this section when protocol format is Python and robot type is Flex
   const shouldShowSection =
     protocolFormat === PYTHON && robotType === OPENTRONS_FLEX
-
-  // trigger form validation on mount for when users come back to this section after moving on
-  useEffect(() => {
-    void trigger([RUNTIME_PARAMETERS_FIELD_NAME])
-  })
 
   if (!shouldShowSection) {
     return <InfoScreen content={t('runtime_parameters_unavailable')} />

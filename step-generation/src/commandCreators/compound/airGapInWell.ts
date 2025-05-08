@@ -35,7 +35,13 @@ export const airGapInWell: CommandCreator<AirGapInWellArgs> = (
 
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
-    python: `${pipettePythonName}.air_gap(volume=${volume}, height=${AIR_GAP_OFFSET_FROM_TOP})`,
+    python: `${pipettePythonName}.air_gap(${[
+      `volume=${volume}`,
+      `height=${AIR_GAP_OFFSET_FROM_TOP}`,
+      `flow_rate=${flowRate}`,
+    ].join(', ')})`,
+    // Python air_gap() does not have a way to specify the labwareId+wellName.
+    // We expect the previous command to have already moved the pipette to the well.
   })
 
   const commandCreators = [
