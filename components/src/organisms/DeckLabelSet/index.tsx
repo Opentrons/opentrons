@@ -33,7 +33,7 @@ const DeckLabelSetComponent = (
     width,
     height,
     invert = false,
-    showModuleIcon = false,
+    showModuleIcon = true,
   } = props
 
   return (
@@ -46,7 +46,7 @@ const DeckLabelSetComponent = (
         },
       }}
     >
-      <BoxAndIconContainer width="100%" height="100%">
+      <Box position={POSITION_RELATIVE} width="100%" height="100%">
         <StyledBox
           width={width}
           height={height}
@@ -54,8 +54,12 @@ const DeckLabelSetComponent = (
           data-testid="DeckLabeSet"
         />
         {showModuleIcon && (
-          <IconWrapper>
-            <DeckInfoLabel iconName="stacked" highlight />
+          <IconWrapper leftPosition={width - 16}>
+            <DeckInfoLabel
+              iconName="stacked"
+              highlight
+              transform="scale(0.75)"
+            />
           </IconWrapper>
         )}
         <LabelContainer ref={ref}>
@@ -70,7 +74,7 @@ const DeckLabelSetComponent = (
               ))
             : null}
         </LabelContainer>
-      </BoxAndIconContainer>
+      </Box>
     </RobotCoordsForeignDiv>
   )
 }
@@ -110,13 +114,13 @@ const LabelContainer = styled.div`
   }
 `
 
-const IconWrapper = styled(Box)`
+interface IconWrapperProps {
+  leftPosition: number
+}
+
+const IconWrapper = styled(Box)<IconWrapperProps>`
   position: ${POSITION_ABSOLUTE};
   top: -${SPACING.spacing8};
-  right: -${SPACING.spacing8};
+  left: ${props => `${props.leftPosition}px`};
   z-index: 3;
-`
-
-const BoxAndIconContainer = styled(Box)`
-  position: ${POSITION_RELATIVE};
 `
