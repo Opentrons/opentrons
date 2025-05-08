@@ -24,7 +24,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.22",
+    "apiLevel": "2.23",
 }
 
 # SCRIPT SETTINGS
@@ -63,6 +63,8 @@ def add_parameters(parameters: ParameterContext) -> None:
     helpers.create_tc_lid_deck_riser_parameter(parameters)
     helpers.create_disposable_lid_trash_location(parameters)
     helpers.create_deactivate_modules_parameter(parameters)
+    helpers.create_probe_liquid_height_parameter(parameters)
+    helpers.create_meniscus_z_parameter(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -72,7 +74,9 @@ def run(protocol: ProtocolContext) -> None:
     disposable_lid = protocol.params.disposable_lid  # type: ignore[attr-defined]
     deck_riser = protocol.params.deck_riser  # type: ignore[attr-defined]
     trash_lid = protocol.params.trash_lid  # type: ignore[attr-defined]
+    probe_liquid_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
+    meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "02")
 
     global p200_tips
@@ -99,7 +103,7 @@ def run(protocol: ProtocolContext) -> None:
         helpers.temp_str, "3"
     )  # type: ignore[assignment]
     reagent_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
-        "armadillo_96_wellplate_200ul_pcr_full_skirt", temp_block, "Reagent Plate"
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", temp_block, "Reagent Plate"
     )
     # ========== SECOND ROW ==========
     MAG_PLATE_SLOT: MagneticBlockContext = protocol.load_module(
@@ -115,7 +119,7 @@ def run(protocol: ProtocolContext) -> None:
         helpers.tc_str
     )  # type: ignore[assignment]
     sample_plate_1 = thermocycler.load_labware(
-        "armadillo_96_wellplate_200ul_pcr_full_skirt"
+        "opentrons_96_wellplate_200ul_pcr_full_skirt"
     )
     thermocycler.open_lid()
     tiprack_200_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "8")
@@ -193,24 +197,31 @@ def run(protocol: ProtocolContext) -> None:
     # Load liquids and probe
     liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
         "Reagents": [
-            {"well": reagent_plate.columns()[3], "volume": 75.0},
+            {"well": reagent_plate.columns()[3], "volume": 200.0},
             {"well": reagent_plate.columns()[4], "volume": 15.0},
             {"well": reagent_plate.columns()[5], "volume": 20.0},
             {"well": reagent_plate.columns()[6], "volume": 65.0},
         ],
         "AMPure": [{"well": reservoir.columns()[0], "volume": 120.0}],
         "SMB": [{"well": reservoir.columns()[1], "volume": 750.0}],
-        "EtOH": [{"well": reservoir.columns()[3], "volume": 900.0}],
+        "EtOH": [{"well": reservoir.columns()[3], "volume": 1000.0}],
         "RSB": [{"well": reservoir.columns()[4], "volume": 96.0}],
         "Wash": [
-            {"well": sample_plate_2.columns()[8], "volume": 1000.0},
-            {"well": sample_plate_2.columns()[9], "volume": 1000.0},
-            {"well": sample_plate_2.columns()[10], "volume": 1000.0},
-            {"well": sample_plate_2.columns()[11], "volume": 1000.0},
+            {"well": sample_plate_2.columns()[8], "volume": 2000.0},
+            {"well": sample_plate_2.columns()[9], "volume": 2000.0},
+            {"well": sample_plate_2.columns()[10], "volume": 2000.0},
+            {"well": sample_plate_2.columns()[11], "volume": 2000.0},
         ],
         "Samples": [{"well": sample_plate_1.wells(), "volume": 150.0}],
     }
-    helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, p50)
+    wells_col_1_to_7 = [well for col in sample_plate_2.columns()[:7] for well in col]
+    sample_plate_2.load_empty(wells_col_1_to_7)
+    if probe_liquid_height_bool:
+        helpers.find_liquid_height_of_loaded_liquids(
+            protocol, liquid_vols_and_wells, p50
+        )
+    else:
+        helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
     # tip and sample tracking
     if COLUMNS == 1:
         column_1_list = ["A1"]  # Plate 1
@@ -287,9 +298,11 @@ def run(protocol: ProtocolContext) -> None:
             NHB2Vol = 50
             for loop, X in enumerate(column_1_list):
                 p50.pick_up_tip()
-                p50.aspirate(NHB2Vol, NHB2.bottom(z=dot_bottom))  # original = ()
+                p50.aspirate(
+                    NHB2Vol, NHB2.meniscus(z=meniscus_z, target="end")
+                )  # original = ()
                 p50.dispense(
-                    NHB2Vol, sample_plate_1[X].bottom(z=dot_bottom)
+                    NHB2Vol, sample_plate_1[X].meniscus(z=meniscus_z, target="end")
                 )  # original = ()
                 p50.touch_tip(sample_plate_1[X])
                 p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
@@ -300,8 +313,12 @@ def run(protocol: ProtocolContext) -> None:
             PanelVol = 10
             for loop, X in enumerate(column_1_list):
                 p50.pick_up_tip()
-                p50.aspirate(PanelVol, Panel.bottom(z=dot_bottom))  # original = ()
-                p50.dispense(PanelVol, sample_plate_1[X].bottom(z=dot_bottom))
+                p50.aspirate(
+                    PanelVol, Panel.meniscus(z=meniscus_z, target="end")
+                )  # original = ()
+                p50.dispense(
+                    PanelVol, sample_plate_1[X].meniscus(z=meniscus_z, target="end")
+                )
                 p50.touch_tip(sample_plate_1[X])
                 # original = ()
                 p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
@@ -314,12 +331,16 @@ def run(protocol: ProtocolContext) -> None:
             EHB2MixVol = 90
             for loop, X in enumerate(column_1_list):
                 p1000.pick_up_tip()
-                p1000.aspirate(EHB2Vol, EHB2.bottom(z=dot_bottom))  # original = ()
+                p1000.aspirate(
+                    EHB2Vol, EHB2.meniscus(z=meniscus_z, target="end")
+                )  # original = ()
                 p1000.dispense(
-                    EHB2Vol, sample_plate_1[X].bottom(z=dot_bottom)
+                    EHB2Vol, sample_plate_1[X].meniscus(z=meniscus_z, target="end")
                 )  # original = ()
                 p1000.touch_tip(sample_plate_1[X])
-                p1000.move_to(sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
+                p1000.move_to(
+                    sample_plate_1[X].meniscus(z=meniscus_z, target="end")
+                )  # original = ()
                 p1000.mix(EHB2MixRep, EHB2MixVol)
                 # checked
                 p1000.touch_tip(sample_plate_1[X])
@@ -392,10 +413,16 @@ def run(protocol: ProtocolContext) -> None:
             TransferSup = 100
             for loop, X in enumerate(column_1_list):
                 p1000.pick_up_tip()
-                p1000.move_to(sample_plate_1[X].bottom(z=0.5))
-                p1000.aspirate(TransferSup + 1, rate=0.25)
+                p1000.aspirate(
+                    TransferSup + 1,
+                    sample_plate_1[X].meniscus(z=meniscus_z, target="end"),
+                    rate=0.25,
+                )
                 p1000.dispense(
-                    TransferSup + 1, sample_plate_2[column_2_list[loop]].bottom(z=1)
+                    TransferSup + 1,
+                    sample_plate_2[column_2_list[loop]].meniscus(
+                        z=meniscus_z, target="end"
+                    ),
                 )
                 p1000.touch_tip(sample_plate_2[column_2_list[loop]])
                 # checked
@@ -413,7 +440,8 @@ def run(protocol: ProtocolContext) -> None:
                 thermocycler.close_lid()
 
             protocol.comment("--> ADDING SMB")
-            SMBVol = 250
+            SMBVol = 180
+            SMBVolTotal = 0.0
             SMBMixRPM = heater_shaker_speed
             SMBMixRep = 5.0 if DRYRUN is False else 0.1  # minutes
             SMBPremix = 3 if DRYRUN is False else 1
@@ -421,10 +449,16 @@ def run(protocol: ProtocolContext) -> None:
             for loop, X in enumerate(column_2_list):
                 p1000.pick_up_tip()
                 p1000.mix(SMBPremix, 200, SMB.bottom(z=1))
-                p1000.aspirate(SMBVol / 2, SMB.bottom(z=1), rate=0.25)
+                p1000.aspirate(
+                    SMBVol / 2, SMB.meniscus(z=meniscus_z, target="end"), rate=0.25
+                )
+                SMBVolTotal += SMBVol / 2
                 p1000.dispense(SMBVol / 2, sample_plate_2[X].top(z=-7), rate=0.25)
-                p1000.aspirate(SMBVol / 2, SMB.bottom(z=1), rate=0.25)
-                p1000.dispense(SMBVol / 2, sample_plate_2[X].bottom(z=1), rate=0.25)
+                p1000.aspirate(SMBVol / 2, SMB.meniscus(z=1, target="end"), rate=0.25)
+                SMBVolTotal += SMBVol / 2
+                p1000.dispense(
+                    SMBVol / 2, sample_plate_2[X].meniscus(z=1, target="end"), rate=0.25
+                )
                 p1000.default_speed = 5
                 p1000.move_to(sample_plate_2[X].bottom(z=5))
                 for Mix in range(2):
@@ -457,7 +491,7 @@ def run(protocol: ProtocolContext) -> None:
                 if trash_lid:
                     protocol.move_lid(sample_plate_1, trash_bin, use_gripper=True)
                 else:
-                    protocol.move_labware(sample_plate_1, "B4", use_gripper=True)
+                    protocol.move_lid(sample_plate_1, "B4", use_gripper=True)
 
             if DRYRUN is False:
                 protocol.delay(minutes=2)
@@ -489,13 +523,12 @@ def run(protocol: ProtocolContext) -> None:
             washreps = 6
             washcount = 0
             for wash in range(washreps):
-
                 protocol.comment("--> Adding EEW")
                 EEWVol = 200
                 for loop, X in enumerate(column_2_list):
                     p1000.pick_up_tip()
                     p1000.aspirate(
-                        EEWVol, WASHES[loop].bottom(z=dot_bottom)
+                        EEWVol, WASHES[loop].meniscus(z=meniscus_z, target="end")
                     )  # original = ()
                     p1000.dispense(
                         EEWVol, sample_plate_2[X].bottom(z=dot_bottom)
@@ -548,7 +581,7 @@ def run(protocol: ProtocolContext) -> None:
             for loop, X in enumerate(column_2_list):
                 p1000.pick_up_tip()
                 p1000.aspirate(
-                    EEWVol, WASHES[loop].bottom(z=dot_bottom)
+                    EEWVol, WASHES[loop].meniscus(z=meniscus_z, target="end")
                 )  # original = ()
                 p1000.dispense(
                     EEWVol, sample_plate_2[X].bottom(z=dot_bottom)
@@ -626,7 +659,9 @@ def run(protocol: ProtocolContext) -> None:
             EluteVol = 23
             for loop, X in enumerate(column_3_list):
                 p50.pick_up_tip()
-                p50.aspirate(EluteVol, Elute.bottom(z=dot_bottom))  # original = ()
+                p50.aspirate(
+                    EluteVol, Elute.meniscus(z=meniscus_z, target="end")
+                )  # original = ()
                 p50.dispense(
                     EluteVol, sample_plate_2[X].bottom(z=dot_bottom)
                 )  # original = ()
@@ -855,10 +890,12 @@ def run(protocol: ProtocolContext) -> None:
 
             for X_times in range(2):
                 protocol.comment("--> ETOH Wash")
-                ETOHMaxVol = 150
+                ETOHMaxVol = 100
                 for loop, X in enumerate(column_5_list):
                     p1000.pick_up_tip()
-                    p1000.aspirate(ETOHMaxVol, EtOH.bottom(z=1))
+                    p1000.aspirate(
+                        ETOHMaxVol, EtOH.meniscus(z=meniscus_z, target="end")
+                    )
                     p1000.move_to(EtOH.top(z=0))
                     p1000.move_to(EtOH.top(z=-5))
                     p1000.move_to(EtOH.top(z=0))
@@ -979,10 +1016,16 @@ def run(protocol: ProtocolContext) -> None:
             TransferSup = 30
             for loop, X in enumerate(column_5_list):
                 p1000.pick_up_tip()
-                p1000.move_to(sample_plate_2[X].bottom(z=0.5))
-                p1000.aspirate(TransferSup + 1, rate=0.25)
+                p1000.aspirate(
+                    TransferSup + 1,
+                    sample_plate_2[X].meniscus(z=meniscus_z, target="end"),
+                    rate=0.25,
+                )
                 p1000.dispense(
-                    TransferSup + 1, sample_plate_1[column_6_list[loop]].bottom(z=1)
+                    TransferSup + 1,
+                    sample_plate_1[column_6_list[loop]].meniscus(
+                        z=meniscus_z, target="end"
+                    ),
                 )
                 p1000.touch_tip(sample_plate_1[column_6_list[loop]])
                 p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()

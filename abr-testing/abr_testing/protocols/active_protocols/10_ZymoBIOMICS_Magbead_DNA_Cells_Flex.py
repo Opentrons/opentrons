@@ -55,6 +55,8 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
     helpers.create_single_pipette_mount_parameter(parameters)
     helpers.create_dot_bottom_parameter(parameters)
     helpers.create_deactivate_modules_parameter(parameters)
+    helpers.create_meniscus_z_parameter(parameters)
+    helpers.create_probe_liquid_height_parameter(parameters)
 
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
@@ -63,6 +65,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
+    probe_height_bool = protocol.params.probe_liquid_height # type: ignore[attr-defined]
+    meniscus_z = protocol.params.meniscus_z # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "01")
 
     dry_run = False
@@ -124,7 +128,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         helpers.temp_str, "D3"
     )  # type: ignore[assignment]
     elutionplate, temp_adapter = helpers.load_temp_adapter_and_labware(
-        "armadillo_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
     )
     magblock: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
@@ -169,7 +173,10 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         "Samples": [{"well": samps, "volume": 0.0}],
         "Reagents": [{"well": all_washes, "volume": 9800.0}],
     }
-    helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, m1000)
+    if probe_height_bool:
+        helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+    else:
+        helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, m1000)
 
     m1000.flow_rate.aspirate = 300
     m1000.flow_rate.dispense = 300
@@ -184,11 +191,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
 
         for i, m in enumerate(samples_m):
             m1000.pick_up_tip(tips_sn[8 * i])
-            loc = m.bottom(dot_bottom)
+            loc = m.meniscus(z=meniscus_z, target="end")
             for _ in range(num_trans):
-                if m1000.current_volume > 0:
-                    # void air gap if necessary
-                    m1000.dispense(m1000.current_volume, m.top())
                 m1000.move_to(m.center())
                 m1000.transfer(vol_per_trans, loc, waste, new_tip="never", air_gap=20)
                 m1000.blow_out(waste)

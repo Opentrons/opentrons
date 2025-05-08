@@ -29,6 +29,8 @@ def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
     helpers.create_dot_bottom_parameter(parameters)
     helpers.create_deactivate_modules_parameter(parameters)
+    helpers.create_probe_liquid_height_parameter(parameters)
+    helpers.create_meniscus_z_parameter(parameters)
     parameters.add_bool(
         variable_name="column_tip_pickup",
         display_name="Perform Column Tip Pickup",
@@ -42,6 +44,8 @@ def run(protocol: ProtocolContext) -> None:
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     column_tip_pick_up = protocol.params.column_tip_pickup  # type: ignore[attr-defined]
+    probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
+    meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
 
     def transfer(
         pipette: InstrumentContext,
@@ -66,9 +70,9 @@ def run(protocol: ProtocolContext) -> None:
         original_disp_rate = pipette.flow_rate.dispense
 
         # Perform transfer
-        pipette.aspirate(volume, source.bottom(1))
+        pipette.aspirate(volume, source.bottom(z=dot_bottom))
         pipette.move_to(source.top(), speed=5)
-        pipette.dispense(volume, dest.bottom(dot_bottom))
+        pipette.dispense(volume, dest.bottom(z=dot_bottom))
         pipette.move_to(dest.top(), speed=5)
 
         # Mix if specified
@@ -101,6 +105,7 @@ def run(protocol: ProtocolContext) -> None:
     pcr1_plate = thermocycler.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", label="PCR1"
     )
+    pcr1_plate.load_empty(pcr1_plate.wells())
     dna_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "A3", label="DNA"
     )
@@ -142,19 +147,22 @@ def run(protocol: ProtocolContext) -> None:
     # Load liquids and probe.
     liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
         "Water": [{"well": reservoir.wells(), "volume": 150}],
-        "pcr_mm1": [{"well": pcr_reagents_plate.columns()[0], "volume": 100}],
-        "pcr_mm2": [{"well": pcr_reagents_plate.columns()[1], "volume": 100}],
+        "pcr_mm1": [{"well": pcr_reagents_plate.wells(), "volume": 100}],
+        "pcr_mm2": [{"well": pcr_reagents_plate.wells(), "volume": 100}],
         "Index": [{"well": indices_plate.wells(), "volume": 100}],
         "DNA": [{"well": dna_plate.wells(), "volume": 100}],
     }
     pcr_mm1 = pcr_reagents_plate["A1"]
     pcr_mm2 = pcr_reagents_plate["A2"]
-    helpers.load_wells_with_custom_liquids(
-        protocol, liquid_vols_and_wells=liquid_vols_and_wells
-    )
-    helpers.find_liquid_height_of_loaded_liquids(
-        protocol, liquid_vols_and_wells=liquid_vols_and_wells, pipette=p96
-    )
+
+    if probe_height_bool:
+        helpers.find_liquid_height_of_loaded_liquids(
+            protocol, liquid_vols_and_wells=liquid_vols_and_wells, pipette=p96
+        )
+    else:
+        helpers.load_wells_with_custom_liquids(
+            protocol, liquid_vols_and_wells=liquid_vols_and_wells
+        )
     # Protocol steps
     protocol.comment("Starting MiSeq library preparation protocol")
 
@@ -249,11 +257,10 @@ def run(protocol: ProtocolContext) -> None:
     all()
     p96.pick_up_tip(tiprack_1["A1"])
     transfer(p96, 5, indices_plate["A1"], pcr2_plate["A1"])
-    # p96.return_tip()
-
+    p96.return_tip()
     # Steps 11-12: PCR1 dilution setup
     protocol.comment("Setting up PCR1 dilution")
-    # p96.pick_up_tip()
+    p96.pick_up_tip(tiprack_1["A1"])
     transfer(p96, 40, reservoir["A1"], pcr1_dilution_plate["A1"])
     transfer(p96, 5, pcr1_plate["A1"], pcr1_dilution_plate["A1"], mix_after=(10, 45))
 

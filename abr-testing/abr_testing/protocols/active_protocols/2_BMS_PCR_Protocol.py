@@ -87,7 +87,7 @@ def run(protocol: ProtocolContext) -> None:
     water: Well = reagent_rack["B1"]
     mmx_pic: List[Well] = reagent_rack.rows()[0]
     dna_pic: List[Well] = source_plate_1.wells()
-    
+
     liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
         "Water": [{"well": water, "volume": 500.0}],
         "Mastermix": [{"well": mmx_pic, "volume": 500.0}],
@@ -156,9 +156,7 @@ def run(protocol: ProtocolContext) -> None:
         p50.aspirate(
             mmx_vol, reagent_rack[mmx_tube].meniscus(z=meniscus_z, target="end")
         )
-        p50.dispense(
-            mmx_vol, dest_plate_1[dest_well].meniscus(z=2, target="end")
-        )
+        p50.dispense(mmx_vol, dest_plate_1[dest_well].meniscus(z=2, target="end"))
         protocol.delay(seconds=2)
         p50.blow_out()
         p50.touch_tip()

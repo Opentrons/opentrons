@@ -64,6 +64,8 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_bool(
         variable_name="plate_reader", display_name="Plate Reader Use", default=False
     )
+    helpers.create_probe_liquid_height_parameter(parameters)
+    helpers.create_meniscus_z_parameter(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -73,6 +75,8 @@ def run(protocol: ProtocolContext) -> None:
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     plate_reader_bool = protocol.params.plate_reader  # type: ignore[attr-defined]
+    probe_height_bool = protocol.params.probe_liquid_height # type: ignore[attr-defined]
+    meniscus_z = protocol.params.meniscus_z # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "02")
 
     dry_run = False
@@ -119,7 +123,7 @@ def run(protocol: ProtocolContext) -> None:
         helpers.temp_str, "D3"
     )  # type: ignore[assignment]
     elutionplate, temp_adapter = helpers.load_temp_adapter_and_labware(
-        "armadillo_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
     )
     magnetic_block: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
@@ -211,7 +215,10 @@ def run(protocol: ProtocolContext) -> None:
     m1000.flow_rate.aspirate = 300
     m1000.flow_rate.dispense = 300
     m1000.flow_rate.blow_out = 300
-    helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, m1000)
+    if probe_height_bool:
+        helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+    else:
+        helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, m1000)
 
     def tiptrack(tipbox: List[Well]) -> None:
         """Track Tips."""
@@ -235,13 +242,9 @@ def run(protocol: ProtocolContext) -> None:
 
         for i, m in enumerate(samples_m):
             m1000.pick_up_tip(tips_sn[8 * i])
-            loc = m.bottom(dot_bottom)
+            loc = m.meniscus(z=meniscus_z, target="end")
             for _ in range(num_trans):
-                if m1000.current_volume > 0:
-                    # void air gap if necessary
-                    m1000.dispense(m1000.current_volume, m.top())
                 m1000.move_to(m.center())
-                m1000.prepare_to_aspirate()
                 m1000.transfer(vol_per_trans, loc, waste, new_tip="never", air_gap=20)
                 m1000.blow_out(waste)
                 m1000.prepare_to_aspirate()
@@ -357,10 +360,9 @@ def run(protocol: ProtocolContext) -> None:
             for t in range(num_transfers):
                 if i == 0 and t == 0:
                     for _ in range(3):
-                        m1000.require_liquid_presence(src)
                         m1000.aspirate(tvol, src.bottom(1))
                         m1000.dispense(tvol, src.bottom(4))
-                m1000.aspirate(tvol, src.bottom(height))
+                m1000.aspirate(tvol, src.meniscus(z=meniscus_z, target="end"))
                 m1000.air_gap(10)
                 m1000.dispense(m1000.current_volume, samples_m[i].top())
                 m1000.prepare_to_aspirate()
@@ -510,7 +512,7 @@ def run(protocol: ProtocolContext) -> None:
         tiptrack(tips)
         for i, (m, e) in enumerate(zip(samples_m, elution_samples_m)):
             m1000.flow_rate.aspirate = 25
-            m1000.aspirate(vol, e.bottom(dot_bottom))
+            m1000.aspirate(vol, e.meniscus(z=meniscus_z, target="end"))
             m1000.air_gap(20)
             m1000.dispense(m1000.current_volume, m.top())
         m1000.flow_rate.aspirate = 150
@@ -536,17 +538,16 @@ def run(protocol: ProtocolContext) -> None:
             m1000.flow_rate.dispense = 100
             m1000.flow_rate.aspirate = 150
             m1000.transfer(
-                vol, m.bottom(dot_bottom), e.bottom(5), air_gap=20, new_tip="never"
+                vol, m.meniscus(z=meniscus_z, target="end"), e.bottom(5), air_gap=20, new_tip="never"
             )
             m1000.blow_out(e.top(-2))
-            m1000.prepare_to_aspirate()
             m1000.air_gap(20)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
     if plate_reader_bool:
         # Plate reader steps
         # 1. Fill plate with water
-        water_well = reservoir_for_plate_reader["A2"]
+        water_well = reservoir_for_plate_reader["A2"].meniscus(z = meniscus_z, target="end")
         total_dispensed = 0
         for well in plate_for_plate_reader.rows()[0]:
             m1000.pick_up_tip()
