@@ -29,7 +29,6 @@ import type { ModuleModel } from '@opentrons/shared-data'
 const MODULE_SETUP_URL = 'https://support.opentrons.com/s/modules'
 const ABSORBANCE_READER_MANUAL_URL =
   'https://insights.opentrons.com/hubfs/Absorbance%20Plate%20Reader%20Instruction%20Manual.pdf'
-
 const FLEX_STACKER_QUICKSTART_GUIDE_URL =
   'https://insights.opentrons.com/hubfs/Opentrons%20Flex%20Stacker%20Quickstart%20Guide.pdf'
 
@@ -48,29 +47,29 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
     'device_details',
   ])
 
-  const instructionByModel: Partial<ModuleModel, string> = {
-    [ABSORBANCE_READER_V1]: t('module_instructions_manual'),
-    [FLEX_STACKER_MODULE_V1]: t('branded:module_instructions_quickstart', {
-      moduleName: t('device_details:stacker'),
-    }),
+  let instructionText
+  let instructionURL
+  let instructionQRCode
+  switch (moduleModel) {
+    case ABSORBANCE_READER_V1:
+      instructionText = t('module_instructions_manual')
+      instructionURL = ABSORBANCE_READER_MANUAL_URL
+      instructionQRCode = absorbanceReaderManualQRCode
+      break
+    case FLEX_STACKER_MODULE_V1:
+      instructionText = t('branded:module_instructions_quickstart', {
+        moduleName: t('device_details:stacker'),
+      })
+      instructionURL = FLEX_STACKER_QUICKSTART_GUIDE_URL
+      instructionQRCode = stackerQuickstartQRCode
+      break
+    default:
+      // Legacy module instructions direct user to the help center instead of the quickstart guide
+      instructionText = t('branded:modal_instructions')
+      instructionURL = MODULE_SETUP_URL
+      instructionQRCode = helpCenterQRCode
+      break
   }
-
-  const instructionURLByModel: Partial<ModuleModel, string> = {
-    [ABSORBANCE_READER_V1]: ABSORBANCE_READER_MANUAL_URL,
-    [FLEX_STACKER_MODULE_V1]: FLEX_STACKER_QUICKSTART_GUIDE_URL,
-  }
-
-  const instructionQRCodeByModel: Partial<ModuleModel, string> = {
-    [ABSORBANCE_READER_V1]: absorbanceReaderManualQRCode,
-    [FLEX_STACKER_MODULE_V1]: stackerQuickstartQRCode,
-  }
-
-  // Legacy module instructions direct user to the help center instead of the quickstart guide
-  const instructionText =
-    instructionByModel[moduleModel] ?? t('branded:modal_instructions')
-  const instructionURL = instructionURLByModel[moduleModel] ?? MODULE_SETUP_URL
-  const instructionQRCode =
-    instructionQRCodeByModel[moduleModel] ?? helpCenterQRCode
 
   return createPortal(
     <Modal
