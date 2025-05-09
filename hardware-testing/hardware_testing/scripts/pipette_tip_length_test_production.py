@@ -242,7 +242,7 @@ async def _main() -> None:
         is_simulating=args.simulate, use_defaults=True
     )
     tip_overlap = 10.5
-    tip_length = {"T1K": 95.6-tip_overlap, "T200": 58.35-tip_overlap, "T50": 57.9-tip_overlap}
+    tip_length = {"T1K": 95.6-tip_overlap, "T200": 58.35-tip_overlap, "T50": 57.9-tip_overlap, "T20": 52-tip_overlap}
     dial_data = {
                 "Pipette id": None,
                 "Noz_Height(mm)": None,
@@ -422,8 +422,8 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--tiprack", action="store_true")
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
-    parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
-    parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C1")
+    parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="C1")
+    parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C2")
     parser.add_argument("--dial_indicator", action="store_true")
     parser.add_argument("--tip_size", type=str, default="T200", help="Tip Size")
     parser.add_argument("--tips_to_use", type=int, default=96)
