@@ -133,6 +133,10 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'liquidProbe':
       break
 
+    case 'loadLiquid':
+      forLoadLiquid(command.params, invariantContext, robotStateAndWarnings)
+      break
+
     case 'aspirateInPlace':
       if (prevCommand?.commandType === 'moveToWell') {
         forAspirate(
