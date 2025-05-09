@@ -29,6 +29,7 @@ import type { Dispatch } from '/app/redux/types'
 
 const UPDATE_RECHECK_INTERVAL_MS = 60000
 const PROTOCOL_IDS_RECHECK_INTERVAL_MS = 3000
+const ATTACHED_MODULE_POLL_MS = 3000
 
 export function useSoftwareUpdatePoll(): void {
   const dispatch = useDispatch<Dispatch>()
@@ -126,8 +127,11 @@ export function useProtocolReceiptToast(): void {
 export function useModuleAttachedToast(launchModuleSetupCallback: () => void) {
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
   const { makeToast } = useToaster()
-  const attachedModules = useAttachedModules()
-  const attachedPipettes = useAttachedPipettes()
+  const attachedModules =
+    useAttachedModules({
+      refetchInterval: ATTACHED_MODULE_POLL_MS,
+    }) ?? []
+  const attachedPipettes = useAttachedPipettes(attachedModules.length > 0)
   const deckConfig = useNotifyDeckConfigurationQuery({
     enabled: attachedModules.length > 0,
   }).data
@@ -137,29 +141,33 @@ export function useModuleAttachedToast(launchModuleSetupCallback: () => void) {
   const moduleSerialsRef = useRef(moduleSerials)
 
   useEffect(() => {
-    if (deckConfig === undefined) return
-    const modulesInDeckConfig = deckConfig
-      ?.filter(c => c.opentronsModuleSerialNumber)
-      .map(m => m.opentronsModuleSerialNumber)
-    const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
-    const newUnconfiguredModules = difference(
-      newModuleSerials,
-      modulesInDeckConfig
-    )
-    const hasPipette =
-      attachedPipettes.left !== null || attachedPipettes.right !== null
-    if (hasPipette && newUnconfiguredModules.length > 0) {
-      makeToast(t('module_added'), 'info', {
-        buttonText: i18n.format(t('shared:close'), 'capitalize'),
-        linkText: t('module_added_link'),
-        onLinkClick: launchModuleSetupCallback,
-        disableTimeout: true,
-        displayType: 'odd',
-      })
+    if (deckConfig != null) {
+      const modulesInDeckConfig = deckConfig
+        ?.filter(c => c.opentronsModuleSerialNumber)
+        .map(m => m.opentronsModuleSerialNumber)
+      const newModuleSerials = difference(
+        moduleSerials,
+        moduleSerialsRef.current
+      )
+      const newUnconfiguredModules = difference(
+        newModuleSerials,
+        modulesInDeckConfig
+      )
+      const hasPipette =
+        attachedPipettes.left !== null || attachedPipettes.right !== null
+      if (hasPipette && newUnconfiguredModules.length > 0) {
+        makeToast(t('module_added'), 'info', {
+          buttonText: i18n.format(t('shared:close'), 'capitalize'),
+          linkText: t('module_added_link'),
+          onLinkClick: launchModuleSetupCallback,
+          disableTimeout: true,
+          displayType: 'odd',
+        })
+      }
+      moduleSerialsRef.current = moduleSerials
+      // dont want this hook to rerun when other deps change
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }
-    moduleSerialsRef.current = moduleSerials
-    // dont want this hook to rerun when other deps change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleSerials])
 }
 
