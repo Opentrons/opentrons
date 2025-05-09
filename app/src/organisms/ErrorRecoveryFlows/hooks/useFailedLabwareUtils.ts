@@ -95,7 +95,7 @@ export function useFailedLabwareUtils({
         failedCommand,
         runCommands,
       }),
-    [failedCommandByRunRecord?.key, runCommands?.meta.totalLength]
+    [failedCommand, runCommands]
   )
   const relevantPickUpTipCommand = getRelevantPickUpTipCommand(
     failedCommandByRunRecord,
@@ -110,7 +110,7 @@ export function useFailedLabwareUtils({
         recentRelevantFailedLabwareCmd,
         runRecord
       ),
-    [protocolAnalysis?.id, recentRelevantFailedLabwareCmd?.key]
+    [protocolAnalysis, recentRelevantFailedLabwareCmd, runRecord]
   )
   const relevantPickUpTipCmdDetails = useMemo(
     () =>
@@ -119,16 +119,16 @@ export function useFailedLabwareUtils({
         relevantPickUpTipCommand,
         runRecord
       ),
-    [protocolAnalysis?.id, relevantPickUpTipCommand?.key]
+    [protocolAnalysis, relevantPickUpTipCommand, runRecord]
   )
 
   const failedLabware = useMemo(
     () => getLabwareInfoFrom(recentRelevantFailedLabwareCmd, runRecord),
-    [recentRelevantFailedLabwareCmd?.key]
+    [recentRelevantFailedLabwareCmd, runRecord]
   )
   const relevantPickUpTipLabware = useMemo(
     () => getLabwareInfoFrom(relevantPickUpTipCommand, runRecord),
-    [recentRelevantFailedLabwareCmd?.key]
+    [relevantPickUpTipCommand, runRecord]
   )
   const relevantPickUpTipLwLocs = useRelevantFailedLwLocations({
     failedLabware: relevantPickUpTipLabware,

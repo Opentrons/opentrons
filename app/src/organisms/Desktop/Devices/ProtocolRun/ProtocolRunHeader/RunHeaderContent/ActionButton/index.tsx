@@ -17,7 +17,6 @@ import {
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
 import {
-  useCloseCurrentRun,
   useCurrentRunId,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
@@ -25,7 +24,10 @@ import {
   useModuleCalibrationStatus,
 } from '/app/resources/runs'
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
-import { getFallbackRobotSerialNumber, isRunAgainStatus } from '../../utils'
+import {
+  getFallbackRobotSerialNumber,
+  isValidRunAgainStatus,
+} from '../../utils'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
 
@@ -35,6 +37,7 @@ export type BaseActionButtonProps = RunHeaderContentProps
 
 interface ActionButtonProps extends BaseActionButtonProps {
   isResetRunLoadingRef: MutableRefObject<boolean>
+  isClosingCurrentRun: boolean
 }
 
 export function ActionButton(props: ActionButtonProps): JSX.Element {
@@ -44,6 +47,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     runStatus,
     isResetRunLoadingRef,
     runHeaderModalContainerUtils,
+    isClosingCurrentRun,
   } = props
   const {
     missingStepsModalUtils,
@@ -79,8 +83,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const isCurrentRun = currentRunId === runId
   const isOtherRunCurrent = currentRunId != null && currentRunId !== runId
   const isProtocolNotReady = protocolData == null || !!isProtocolAnalyzing
-  const isValidRunAgain = isRunAgainStatus(runStatus)
-  const { isClosingCurrentRun } = useCloseCurrentRun()
+  const isValidRunAgain = isValidRunAgainStatus(runStatus, isClosingCurrentRun)
 
   const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
     isCurrentRun,
@@ -89,7 +92,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolNotReady,
     isRobotOnWrongVersionOfSoftware,
     isValidRunAgain,
-    isClosingCurrentRun,
     ...props,
   })
 
@@ -114,7 +116,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isValidRunAgain,
     isOtherRunCurrent,
     isRobotOnWrongVersionOfSoftware,
-    isClosingCurrentRun,
     ...props,
   })
 
@@ -126,7 +127,10 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
         boxShadow="none"
         display={DISPLAY_FLEX}
         padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
-        disabled={isDisabled && !validRunAgainButRequiresSetup}
+        // TODO(jh, 05-05-25): These boolean checks should live in useActionBtnDisabledUtils as a part of the singular disabled check.
+        disabled={
+          isDisabled && (!validRunAgainButRequiresSetup || isClosingCurrentRun)
+        }
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
         {...targetProps}

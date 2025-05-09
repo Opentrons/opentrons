@@ -63,6 +63,18 @@ const customButtonStyle = (
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: ${SPACING.spacing16} ${SPACING.spacing24};
+    background-color: ${isMissingDefaultOffset ? COLORS.blue50 : COLORS.blue35};
+    border: none;
+    color: ${isMissingDefaultOffset ? COLORS.white : COLORS.black90};
+
+    &:hover,
+    &:focus,
+    &:focus-visible {
+      background-color: ${isMissingDefaultOffset ? '' : COLORS.blue40};
+      border: none;
+      color: ${isMissingDefaultOffset ? COLORS.white : COLORS.black90};
+      box-shadow: none;
+    }
   }
 `
 

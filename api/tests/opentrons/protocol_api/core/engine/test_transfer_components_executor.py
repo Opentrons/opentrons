@@ -1637,6 +1637,9 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
             or []
         ),
     )
+    assert subject.tip_state.last_liquid_and_air_gap_in_tip == LiquidAndAirGapPair(
+        air_gap=air_gap_volume if expect_air_gap else 0, liquid=0
+    )
 
 
 def test_multi_dispense_retract_raises_for_invalid_retract_point(

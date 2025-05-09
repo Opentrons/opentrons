@@ -1,30 +1,22 @@
 import { useModulesQuery } from '@opentrons/react-api-client'
-import {
-  FLEX_ROBOT_TYPE,
-  getDeckDefFromRobotType,
-} from '@opentrons/shared-data'
 
 import {
   useTrackEvent,
   ANALYTICS_MODULE_COMMAND_ERROR,
   ANALYTICS_MODULE_COMMAND_COMPLETED,
 } from '/app/redux/analytics'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import {
-  getAttachedProtocolModuleMatches,
-  getProtocolModulesInfo,
-} from '/app/transformations/analysis'
 
 import type {
   CommandStatus,
   ModuleOnlyParams,
   ModuleType,
   TemperatureParams,
+  TemperatureModuleAwaitTemperatureParams,
+  ThermocyclerSetTargetBlockTemperatureParams,
   RunTimeCommand,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
-import type { CommandData, AttachedModule } from '@opentrons/api-client'
+import type { CommandData } from '@opentrons/api-client'
 
 const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
   'thermocycler/closeLid',
@@ -53,11 +45,14 @@ interface BaseModuleAnalytics {
     data: CommandData['data'] | undefined
   }
   errorDetails: string
+  runId?: string | null
+  analysis?: CompletedProtocolAnalysis | null
 }
 
 export interface ModuleAnalyticProtocolCommand extends BaseModuleAnalytics {
   kind: 'protocolCommand'
-  runId: string
+  runId: string | null
+  analysis: CompletedProtocolAnalysis | null
   params: CommandData['data']['params'] | undefined
 }
 
@@ -77,47 +72,27 @@ export interface UseModuleCommandAnalyticsResult {
   reportModuleCommand: (params: ModuleAnalyticType) => void
 }
 
-function UseMostRecentAnalysisWrapper(
-  runId: string | null
-): CompletedProtocolAnalysis | null {
-  return useMostRecentCompletedAnalysis(runId)
-}
-export function useModuleCommandAnalytics(
-  modules?: AttachedModule[]
-): UseModuleCommandAnalyticsResult {
+export function useModuleCommandAnalytics(): UseModuleCommandAnalyticsResult {
   const doTrackEvent = useTrackEvent()
-  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
   const moduleQuery = useModulesQuery()
+
   const reportModuleCommand = ({
     kind,
     analyticCommand,
     errorDetails,
+    analysis,
+    runId,
     ...rest
   }: BaseModuleAnalytics): void => {
     if (!isValidCommandType(analyticCommand)) return
 
     const attachedModules = moduleQuery?.data?.data ?? []
-    const mostRecentAnalysis = UseMostRecentAnalysisWrapper(
-      'runId' in rest && typeof rest.runId === 'string' ? rest.runId : null
-    )
-    const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-    const protocolModulesInfo =
-      mostRecentAnalysis != null
-        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-        : []
-
-    const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-      attachedModules,
-      protocolModulesInfo,
-      deckConfig
-    )
-
-    const matchedModules = attachedProtocolModuleMatches.map(module => ({
-      moduleType: module.attachedModuleMatch?.moduleType,
-      moduleId: module.attachedModuleMatch?.id,
-      serialNumber: module.attachedModuleMatch?.serialNumber,
-      firmwareVersion: module.attachedModuleMatch?.firmwareVersion,
+    const matchedModules = attachedModules.map(module => ({
+      moduleType: module.moduleType,
+      moduleId: module.id,
+      serialNumber: module.serialNumber,
+      firmwareVersion: module.firmwareVersion,
     }))
 
     const { moduleId, celsius } = isParamType(
@@ -159,6 +134,7 @@ export function useModuleCommandAnalytics(
         reportedSerialNumber,
         reportedTemperature,
         reportedFirmwareVersion,
+        ...(runId != null ? { transactionId: runId } : {}), // Acts as an idempotency key for Mixpanel reporting.
       },
     })
   }
@@ -170,20 +146,25 @@ function isModuleOnlyParams(params: unknown): params is ModuleOnlyParams {
   return typeof params === 'object' && params !== null && 'moduleId' in params
 }
 
-function isTemperatureParams(params: unknown): params is TemperatureParams {
+type AllTemperatureParams =
+  | TemperatureModuleAwaitTemperatureParams
+  | TemperatureParams
+  | ThermocyclerSetTargetBlockTemperatureParams
+
+function isTemperatureParams(params: unknown): params is AllTemperatureParams {
   return typeof params === 'object' && params !== null && 'celsius' in params
 }
 
 /* Checks param type and returns variables found */
 function isParamType(params: unknown): { moduleId: string; celsius: string } {
-  if (isModuleOnlyParams(params)) {
-    return { moduleId: String(params.moduleId), celsius: '' }
-  }
   if (isTemperatureParams(params)) {
     return {
       moduleId: String(params.moduleId),
       celsius: String(params.celsius),
     }
+  }
+  if (isModuleOnlyParams(params)) {
+    return { moduleId: String(params.moduleId), celsius: '' }
   }
   return { moduleId: '', celsius: '' }
 }

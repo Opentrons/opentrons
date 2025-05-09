@@ -150,7 +150,7 @@ async def test_dispense_while_tracking_implementation(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=-123.0,
+            operation_volume=None,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -168,7 +168,7 @@ async def test_dispense_while_tracking_implementation(
                 liquid_operated=update_types.LiquidOperatedUpdate(
                     labware_id=stateupdateLabware,
                     well_names=["A3", "A4"],
-                    volume_added=68,
+                    volume_added=84,
                 ),
                 ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
                     pipette_id="pipette-id-abc", ready_to_aspirate=False
@@ -176,16 +176,22 @@ async def test_dispense_while_tracking_implementation(
             ),
         )
     else:
+
         assert result == SuccessData(
             public=DispenseWhileTrackingResult(
                 volume=42, position=DeckPoint(x=1, y=2, z=3)
             ),
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteEjectedFluidUpdate(
-                    pipette_id="pipette-id-abc", volume=42
+                    pipette_id="pipette-id-abc", volume=42, type="ejected"
                 ),
                 ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
                     pipette_id="pipette-id-abc", ready_to_aspirate=False
+                ),
+                liquid_operated=update_types.LiquidOperatedUpdate(
+                    labware_id="funky-labware",
+                    well_names=["A3", "A4"],
+                    volume_added=84.0,
                 ),
             ),
         )
@@ -289,7 +295,7 @@ async def test_overpressure_error(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=-50.0,
+            operation_volume=None,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -301,7 +307,7 @@ async def test_overpressure_error(
                 id=error_id,
                 createdAt=error_timestamp,
                 wrappedErrors=[matchers.Anything()],
-                errorInfo={"retryLocation": (position.x, position.y, position.z)},
+                errorInfo={"retryLocation": (4.0, 5.0, 6.0)},
             ),
             state_update=update_types.StateUpdate(
                 liquid_operated=update_types.LiquidOperatedUpdate(
@@ -323,9 +329,14 @@ async def test_overpressure_error(
                 id=error_id,
                 createdAt=error_timestamp,
                 wrappedErrors=[matchers.Anything()],
-                errorInfo={"retryLocation": (position.x, position.y, position.z)},
+                errorInfo={"retryLocation": (4.0, 5.0, 6.0)},
             ),
             state_update=update_types.StateUpdate(
+                liquid_operated=update_types.LiquidOperatedUpdate(
+                    labware_id="funky-labware",
+                    well_names=["A3", "A4"],
+                    volume_added=update_types.CLEAR,
+                ),
                 pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                     pipette_id="pipette-id"
                 ),
@@ -333,4 +344,5 @@ async def test_overpressure_error(
                     pipette_id="pipette-id", ready_to_aspirate=False
                 ),
             ),
+            state_update_if_false_positive=update_types.StateUpdate(),
         )

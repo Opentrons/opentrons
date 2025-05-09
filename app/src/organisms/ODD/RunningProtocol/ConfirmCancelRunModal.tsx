@@ -1,32 +1,29 @@
-import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 import {
-  useStopRunMutation,
   useDeleteRunMutation,
   useDismissCurrentRunMutation,
+  useStopRunMutation,
 } from '@opentrons/react-api-client'
-
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { useRunStatus } from '/app/resources/runs'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useNotifyRunQuery } from '/app/resources/runs'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { CancelingRunModal } from './CancelingRunModal'
-
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string
@@ -61,8 +58,9 @@ export function ConfirmCancelRunModal({
       }
     },
   })
-  const runStatus = useRunStatus(runId)
   const localRobot = useSelector(getLocalRobot)
+  const { data, isError: isRunFetchError } = useNotifyRunQuery(runId)
+  const runStatus = data?.data.status
   const robotName = localRobot?.name ?? ''
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const navigate = useNavigate()
@@ -85,7 +83,7 @@ export function ConfirmCancelRunModal({
   }
 
   useEffect(() => {
-    if (runStatus === RUN_STATUS_STOPPED) {
+    if (runStatus === RUN_STATUS_STOPPED || isRunFetchError) {
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       if (!isActiveRun) {
         dismissCurrentRun(runId)

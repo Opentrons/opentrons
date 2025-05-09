@@ -152,7 +152,7 @@ export const updateLPCDeck = (
 
 export const updateLPCLabware = (
   runId: string,
-  labware: LPCLabwareInfo
+  labware: LPCLabwareInfo['labware']
 ): UpdateLPCLabwareAction => ({
   type: UPDATE_LPC_LABWARE,
   payload: { runId, labware },

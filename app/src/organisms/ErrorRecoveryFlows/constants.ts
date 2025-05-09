@@ -1,12 +1,12 @@
 import { css } from 'styled-components'
 
 import {
-  RESPONSIVENESS,
-  SPACING,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  RESPONSIVENESS,
+  SPACING,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
@@ -141,6 +141,7 @@ export const RECOVERY_MAP = {
     STEPS: {
       MANUAL_FILL: 'manual-fill',
       RETRY_SAME_TIPS: 'retry-same-tips',
+      SKIP: 'skip',
     },
   },
   MANUAL_FILL_AND_RETRY_NEW_TIPS: {
@@ -173,7 +174,6 @@ export const RECOVERY_MAP = {
       RETRY: 'retry',
     },
   },
-  REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
   RETRY_STEP: {
     ROUTE: 'retry-step',
     STEPS: { CONFIRM_RETRY: 'confirm-retry' },
@@ -223,7 +223,6 @@ const {
   ROBOT_DOOR_OPEN,
   ROBOT_DOOR_OPEN_SPECIAL,
   DROP_TIP_FLOWS,
-  REFILL_AND_RESUME,
   IGNORE_AND_SKIP,
   CANCEL_RUN,
   RETRY_NEW_TIPS,
@@ -273,7 +272,6 @@ export const STEP_ORDER: StepOrder = {
     DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT,
     DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP,
   ],
-  [REFILL_AND_RESUME.ROUTE]: [],
   [IGNORE_AND_SKIP.ROUTE]: [
     IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND,
     IGNORE_AND_SKIP.STEPS.SKIP_STEP,
@@ -282,6 +280,7 @@ export const STEP_ORDER: StepOrder = {
   [MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE]: [
     MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.MANUAL_FILL,
     MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
+    MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.SKIP,
   ],
   [MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE]: [
     MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.MANUAL_FILL,
@@ -406,6 +405,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     [MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS]: {
       allowDoorOpen: true,
     },
+    [MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.SKIP]: {
+      allowDoorOpen: true,
+    },
   },
   [MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE]: {
     [MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.MANUAL_FILL]: {
@@ -450,7 +452,6 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     [MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE]: { allowDoorOpen: true },
     [MANUAL_REPLACE_AND_RETRY.STEPS.RETRY]: { allowDoorOpen: true },
   },
-  [REFILL_AND_RESUME.ROUTE]: {},
   [RETRY_STEP.ROUTE]: {
     [RETRY_STEP.STEPS.CONFIRM_RETRY]: {
       allowDoorOpen: false,

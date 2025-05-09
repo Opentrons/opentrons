@@ -293,6 +293,33 @@ describe('useRecoveryCommands', () => {
     )
   })
 
+  it('should reject with error and call proceedToRouteAndStep when pickUpTips has invalid input', async () => {
+    const testProps = {
+      ...props,
+      failedLabwareUtils: {
+        ...mockFailedLabwareUtils,
+        selectedTipLocations: null,
+        relevantPickUpTipLabware: null,
+      },
+    }
+
+    const { result } = renderHook(() => useRecoveryCommands(testProps))
+
+    await act(async () => {
+      await expect(result.current.pickUpTips()).rejects.toThrow(
+        'Invalid use of pickUpTips command'
+      )
+    })
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE
+    )
+    expect(mockReportActionSelectedResult).toHaveBeenCalledWith(
+      RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
+      'failed'
+    )
+  })
+
   it('should call releaseGripperJaws and resolve the promise', async () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 
