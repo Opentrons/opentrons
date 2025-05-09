@@ -238,13 +238,12 @@ def _get_tip_z_error(
 def _get_height_of_liquid_in_well(
     pipette: InstrumentContext,
     well: Well,
-    simulating: bool,
 ) -> float:
-    if pipette.detect_liquid_presence(well) and not simulating:
+    if pipette.detect_liquid_presence(well):
         height = pipette.measure_liquid_height(well) - well.bottom().point.z
     else:
         height = 0.0
-    return height  # type: ignore[return-value]
+    return height
 
 
 def _test_for_finding_liquid_height(
@@ -317,9 +316,7 @@ def _test_for_finding_liquid_height(
         liquid_pipette.blow_out(well.top(z=-9)).prepare_to_aspirate()
         # get height of liquid
         if probe_yes_or_no == "yes":
-            height = _get_height_of_liquid_in_well(
-                probing_pipette, well, ctx.is_simulating()
-            )
+            height = _get_height_of_liquid_in_well(probing_pipette, well)
         else:
             height = 0
         corrected_height = height + tip_z_error

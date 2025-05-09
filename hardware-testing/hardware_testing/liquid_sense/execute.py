@@ -10,9 +10,9 @@ from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 from hardware_testing.gravimetric.helpers import (
     _jog_to_find_liquid_height,
 )
-from hardware_testing.gravimetric.config import LIQUID_PROBE_SETTINGS
 from hardware_testing.gravimetric.tips import get_unused_tips
 from hardware_testing.data import ui, get_testing_data_directory
+from opentrons.config.defaults_ot3 import DEFAULT_LIQUID_PROBE_SETTINGS
 from opentrons.hardware_control.types import (
     InstrumentProbeType,
     PipetteSensorId,
@@ -412,9 +412,6 @@ def _run_trial(
     start_pos: Dict[Axis, float],
 ) -> Tuple[float, LLDResult]:
     hw_api = get_sync_hw_api(run_args.ctx)
-    lqid_cfg: Dict[str, int] = LIQUID_PROBE_SETTINGS[run_args.pipette_volume][
-        run_args.pipette_channels
-    ][tip]
     data_dir = get_testing_data_directory()
     probes: List[InstrumentProbeType] = [InstrumentProbeType.PRIMARY]
     probe_target: InstrumentProbeType = InstrumentProbeType.PRIMARY
@@ -430,7 +427,7 @@ def _run_trial(
         data_files[probe] = data_file
 
     plunger_speed = (
-        lqid_cfg["plunger_speed"]
+        DEFAULT_LIQUID_PROBE_SETTINGS.plunger_speed
         if run_args.plunger_speed == -1
         else run_args.plunger_speed
     )
@@ -447,7 +444,7 @@ def _run_trial(
         mount_speed=run_args.z_speed,
         plunger_speed=plunger_speed,
         plunger_impulse_time=0.2,
-        sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
+        sensor_threshold_pascals=DEFAULT_LIQUID_PROBE_SETTINGS.sensor_threshold_pascals,
         aspirate_while_sensing=run_args.aspirate,
         z_overlap_between_passes_mm=0.1,
         plunger_reset_offset=2.0,

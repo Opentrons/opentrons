@@ -24,45 +24,24 @@ TIP_VOLUME = 50
 ASPIRATE_VOLUME = 2
 PRESSURE_READINGS = ["open-pa", "sealed-pa", "aspirate-pa", "dispense-pa"]
 
-THRESHOLDS_1000 = {
+THRESHOLDS = {
     "open-pa": (
-        0,
-        20,
+        -10,
+        10,
     ),
     "sealed-pa": (
-        5,
-        50,
+        -30,
+        30,
     ),
     "aspirate-pa": (
-        -900,
-        -500,
+        -600,
+        -400,
     ),
     "dispense-pa": (
         2500,
         3500,
     ),
 }
-
-THRESHOLDS_200 = {
-    "open-pa": (
-        -50,
-        50,
-    ),
-    "sealed-pa": (
-        -100,
-        100,
-    ),
-    "aspirate-pa": (
-        -2000,
-        -500,
-    ),
-    "dispense-pa": (
-        1000,
-        2500,
-    ),
-}
-
-PROBE_POSITIONS = [InstrumentProbeType.PRIMARY, InstrumentProbeType.SECONDARY]
 
 
 def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
@@ -73,7 +52,7 @@ def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
-    for p in PROBE_POSITIONS:
+    for p in InstrumentProbeType:
         for r in PRESSURE_READINGS:
             tag = _get_test_tag(p, r)
             lines.append(CSVLine(tag, [float, CSVResult]))
@@ -104,14 +83,8 @@ async def _read_from_sensor(
     return sum(readings) / num_readings
 
 
-def check_value(
-    test_value: float, test_name: str, pipette: Literal[1000, 200]
-) -> CSVResult:
+def check_value(test_value: float, test_name: str) -> CSVResult:
     """Determine if value is within pass limits."""
-    if pipette == 1000:
-        THRESHOLDS = THRESHOLDS_1000
-    if pipette == 200:
-        THRESHOLDS = THRESHOLDS_200
     low_limit = THRESHOLDS[test_name][0]
     high_limit = THRESHOLDS[test_name][1]
 
@@ -130,7 +103,7 @@ async def run(
     home_pos = await api.gantry_position(OT3Mount.LEFT)
     await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
 
-    for probe in PROBE_POSITIONS:
+    for probe in InstrumentProbeType:
         sensor_id = sensor_id_for_instrument(probe)
         ui.print_header(f"Sensor: {probe}")
 
@@ -143,7 +116,7 @@ async def run(
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 continue
         print(f"open-pa: {open_pa}")
-        open_result = check_value(open_pa, "open-pa", pipette)
+        open_result = check_value(open_pa, "open-pa")
         report(section, _get_test_tag(probe, "open-pa"), [open_pa, open_result])
 
         # SEALED-Pa
@@ -161,7 +134,7 @@ async def run(
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
         print(f"sealed-pa: {sealed_pa}")
-        sealed_result = check_value(sealed_pa, "sealed-pa", pipette)
+        sealed_result = check_value(sealed_pa, "sealed-pa")
         report(section, _get_test_tag(probe, "sealed-pa"), [sealed_pa, sealed_result])
 
         # ASPIRATE-Pa
@@ -176,14 +149,14 @@ async def run(
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
         print(f"aspirate-pa: {aspirate_pa}")
-        aspirate_result = check_value(aspirate_pa, "aspirate-pa", pipette)
+        aspirate_result = check_value(aspirate_pa, "aspirate-pa")
         report(
             section, _get_test_tag(probe, "aspirate-pa"), [aspirate_pa, aspirate_result]
         )
 
         # DISPENSE-Pa
         dispense_pa = 0.0
-        await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME, is_full_dispense=True)
+        await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME)
         if not api.is_simulator:
             try:
                 dispense_pa = await _read_from_sensor(
@@ -193,7 +166,7 @@ async def run(
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
         print(f"dispense-pa: {dispense_pa}")
-        dispense_result = check_value(dispense_pa, "dispense-pa", pipette)
+        dispense_result = check_value(dispense_pa, "dispense-pa")
         report(
             section, _get_test_tag(probe, "dispense-pa"), [dispense_pa, dispense_result]
         )

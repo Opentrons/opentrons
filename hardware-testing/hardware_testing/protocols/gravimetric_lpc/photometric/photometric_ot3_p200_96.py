@@ -3,7 +3,10 @@ from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api._types import OffDeckType
 
 metadata = {"protocolName": "photometric-ot3-p200-96"}
-requirements = {"robotType": "Flex", "apiLevel": "2.15"}
+requirements = {
+    "robotType": "Flex",
+    "apiLevel": "2.23",
+}  # NOTE: apiLevel is ignored by script
 
 SLOTS_TIPRACK = {
     20: [5, 6, 8, 9, 11],

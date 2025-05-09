@@ -152,6 +152,8 @@ class GravimetricRecording(List):
 
     def calculate_cv(self) -> float:
         """Calculate the percent CV of the recording."""
+        if not self.average:
+            return 0.0
         return self.stdev / self.average
 
     def calculate_d(self, target: float) -> float:
@@ -307,9 +309,7 @@ class GravimetricRecorder:
         # NOTE: it's ok if this fails b/c prior process is already using port
         #       the server just needs to be running, doesn't matter when it started
         Popen(f"nohup {SERVER_CMD} --test-name {self._cfg.test_name} &", shell=True)
-        if not self.is_simulator:
-            sleep(2)  # small delay so nohup output isn't confusing
-            ui.get_user_ready("open WEBPAGE to port 8080")
+        ui.print_info("\nopen WEBPAGE to port 8080\n")
 
     @property
     def tag(self) -> str:

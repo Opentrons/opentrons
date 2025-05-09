@@ -1,6 +1,5 @@
 """Gravimetric OT3."""
-from json import load as json_load
-from pathlib import Path
+from traceback import format_exc
 import argparse
 from typing import List, Union, Dict, Optional, Any, Tuple
 from dataclasses import dataclass
@@ -39,16 +38,18 @@ from .config import (
     ConfigType,
     get_tip_volumes_for_qc,
 )
+from . import config
 from .measurement.record import GravimetricRecorder
 from .measurement import DELAY_FOR_MEASUREMENT, SupportedLiquid
 from .measurement.scale import Scale
 from .trial import TestResources, _change_pipettes
 from .tips import get_tips
-from hardware_testing.drivers import asair_sensor
-from opentrons.protocol_api import InstrumentContext
+from hardware_testing.drivers import asair_sensor, de_static_fixture
+from opentrons.protocol_api import InstrumentContext, disposal_locations
 from opentrons.protocol_engine.types import LabwareOffset
 
-API_LEVEL = "2.18"
+
+CUSTOM_LABWARE_URIS = ["radwag_pipette_calibration_vial", "de_static_fixture"]
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
@@ -171,66 +172,84 @@ class RunArgs:
     increment: bool
     name: str
     environment_sensor: asair_sensor.AsairSensorBase
+    de_static: de_static_fixture.DeStaticFixtureBase
     trials: int
     ctx: ProtocolContext
     protocol_cfg: Any
     test_report: report.CSVReport
     liquid: str
+    dilution: float
+    reverse_tips: bool
+    tune_volume_correction: bool
 
     @classmethod
-    def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
-        if not args.simulate and not args.skip_labware_offsets:
-            # getting labware offsets must be done before creating the protocol context
-            # because it requires the robot-server to be running
-            ui.print_title("SETUP")
-            ui.print_info(
-                "Starting opentrons-robot-server, so we can http GET labware offsets"
-            )
-            LABWARE_OFFSETS.extend(workarounds.http_get_all_labware_offsets())
-            # ui.print_info(f"found {len(LABWARE_OFFSETS)} offsets:")
-            # for offset in LABWARE_OFFSETS:
-            #    ui.print_info(f"\t{offset.createdAt}:")
-            #    ui.print_info(f"\t\t{offset.definitionUri}")
-            #    ui.print_info(f"\t\t{offset.vector}")
-        # gather the custom labware (for simulation)
-        custom_defs = {}
-        if args.simulate:
-            labware_dir = Path(__file__).parent.parent / "labware"
-            custom_def_uris = [
-                "radwag_pipette_calibration_vial",
-            ]
-            for def_uri in custom_def_uris:
-                with open(labware_dir / def_uri / "1.json", "r") as f:
-                    custom_def = json_load(f)
-                custom_defs[def_uri] = custom_def
-        _ctx = helpers.get_api_context(
-            API_LEVEL,  # type: ignore[attr-defined]
-            is_simulating=args.simulate,
-            pipette_left=PIPETTE_MODEL_NAME[args.pipette][args.channels],
-            extra_labware=custom_defs,
+    def _get_protocol_context(
+        cls, api_level: str, args: argparse.Namespace
+    ) -> ProtocolContext:
+        include_labware_offsets = bool(
+            not args.simulate and not args.skip_labware_offsets
         )
-        for offset in LABWARE_OFFSETS:
-            engine = _ctx._core._engine_client._transport._engine  # type: ignore[attr-defined]
-            engine.state_view._labware_store._add_labware_offset(offset)
+        _left_pip = PIPETTE_MODEL_NAME[args.pipette][args.channels]
+        _right_pip = (
+            PIPETTE_MODEL_NAME[args.pipette][args.channels]
+            if args.channels < 96
+            else None
+        )
+        _ctx = helpers.get_api_context(
+            api_level=api_level,  # default to using latest version
+            is_simulating=args.simulate,
+            pipette_left=_left_pip,
+            pipette_right=_right_pip,
+            custom_labware_uris_for_simulation=CUSTOM_LABWARE_URIS,
+            include_labware_offsets=include_labware_offsets,
+        )
         return _ctx
 
     @classmethod
     def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":  # noqa: C901
         """Build."""
-        _ctx = RunArgs._get_protocol_context(args)
-        operator_name = helpers._get_operator_name(_ctx.is_simulating())
-        robot_serial = helpers._get_robot_serial(_ctx.is_simulating())
+        # TEST META DATA
+        operator_name = helpers._get_operator_name(args.simulate or args.skip_input)
+        robot_serial = helpers._get_robot_serial(args.simulate or args.skip_input)
         run_id, start_time = create_run_id_and_start_time()
-        environment_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating())
+        environment_sensor = asair_sensor.BuildAsairSensor(args.simulate)
+        de_static = de_static_fixture.find_and_build(
+            args.simulate or not args.de_static
+        )
         git_description = get_git_description()
+
+        # SCALE
         if not args.photometric:
-            scale = Scale.build(simulate=_ctx.is_simulating())
+            scale = Scale.build(simulate=(args.simulate or args.sim_scale))
+        else:
+            scale = None
+
+        # TIPS
+        tip_batches: Dict[str, str] = {}
+        if args.tip == 0:
+            tip_volumes: List[int] = get_tip_volumes_for_qc(
+                args.pipette, args.channels, args.extra, args.photometric
+            )
+            for tip in tip_volumes:
+                tip_batches[f"tips_{tip}ul"] = helpers._get_tip_batch(True, tip)
+        else:
+            tip_volumes = [args.tip]
+            tip_batches[f"tips_{args.tip}ul"] = helpers._get_tip_batch(True, args.tip)
+
+        # PROTOCOL CONTEXT
+        _cfg_dict = PHOTOMETRIC_CFG if args.photometric else GRAVIMETRIC_CFG_INCREMENT
+        protocol_cfg = _cfg_dict[args.pipette][args.channels][max(tip_volumes)]
+        _ctx = RunArgs._get_protocol_context(
+            protocol_cfg.requirements["apiLevel"], args
+        )
+
+        # PIPETTE
         ui.print_header("LOAD PIPETTE")
         pipette = helpers._load_pipette(
             _ctx,
             args.channels,
             args.pipette,
-            "left",
+            args.mount,
             args.increment,
             args.photometric,
             args.gantry_speed if not args.photometric else None,
@@ -241,76 +260,58 @@ class RunArgs:
 
         recorder: Optional[GravimetricRecorder] = None
         kind = ConfigType.photometric if args.photometric else ConfigType.gravimetric
-        tip_batches: Dict[str, str] = {}
-        if args.tip == 0:
-            tip_volumes: List[int] = get_tip_volumes_for_qc(
-                args.pipette, args.channels, args.extra, args.photometric
-            )
-            for tip in tip_volumes:
-                tip_batches[f"tips_{tip}ul"] = helpers._get_tip_batch(
-                    _ctx.is_simulating(), tip
-                )
-        else:
-            tip_volumes = [args.tip]
-            tip_batches[f"tips_{args.tip}ul"] = helpers._get_tip_batch(
-                _ctx.is_simulating(), args.tip
-            )
 
-        volumes: List[Tuple[int, List[float]]] = []
+        volumes: Dict[int, List[float]] = {}
         for tip in tip_volumes:
-            vls = helpers._get_volumes(
-                _ctx,
-                args.increment,
-                args.channels,
-                args.pipette,
-                tip,
-                args.user_volumes,
-                kind,
-                False,  # set extra to false so we always do the normal tests first
-                args.channels,
-                mode=args.mode,  # NOTE: only needed for increment test
-            )
-            if len(vls) > 0:
-                volumes.append(
-                    (
-                        tip,
-                        vls,
-                    )
-                )
-        if args.isolate_volumes:
-            # check that all volumes passed in are actually test volumes
-            all_vols = set(
-                [vol for tip_vol_list in volumes for vol in tip_vol_list[-1]]
-            )
-            for isolated_volume in args.isolate_volumes:
-                assert isolated_volume in all_vols, (
-                    f"cannot isolate volume {isolated_volume}, " f"not a test volume"
-                )
-        if args.extra:
-            # if we use extra, add those tests after
-            for tip in tip_volumes:
+            if not volumes.get(tip):
+                volumes[tip] = []
+            if args.user_volumes:
+                vls = [float(v) for v in args.user_volumes]
+            else:
                 vls = helpers._get_volumes(
                     _ctx,
                     args.increment,
                     args.channels,
                     args.pipette,
                     tip,
-                    args.user_volumes,
                     kind,
-                    True,
-                    args.channels,
+                    extra=False,  # set extra to false so we always do the normal tests first
+                    channels=args.channels,
+                    mode=args.mode,  # NOTE: only needed for increment test
                 )
-                if len(vls) > 0:
-                    volumes.append(
-                        (
-                            tip,
-                            vls,
-                        )
+            volumes[tip] += vls
+        if args.extra:
+            # if we use extra, add those tests after
+            for tip in tip_volumes:
+                if not volumes.get(tip):
+                    volumes[tip] = []
+                if args.user_volumes:
+                    vls = [float(v) for v in args.user_volumes]
+                else:
+                    vls = helpers._get_volumes(
+                        _ctx,
+                        args.increment,
+                        args.channels,
+                        args.pipette,
+                        tip,
+                        kind,
+                        True,
+                        args.channels,
                     )
+                volumes[tip] += vls
+        if args.isolate_volumes:
+            # check that all volumes passed in are actually test volumes
+            all_vols = set(
+                [vol for tip_vol_list in volumes.values() for vol in tip_vol_list]
+            )
+            for isolated_volume in args.isolate_volumes:
+                assert isolated_volume in all_vols, (
+                    f"cannot isolate volume {isolated_volume}, " f"not a test volume"
+                )
         if not volumes:
             raise ValueError("no volumes to test, check the configuration")
         volumes_list: List[float] = []
-        for _, vls in volumes:
+        for _, vls in volumes.items():
             volumes_list.extend(vls)
 
         if args.trials == 0:
@@ -319,13 +320,14 @@ class RunArgs:
             trials = args.trials
 
         if args.photometric:
-            _tip_cfg = max(tip_volumes)
             if len(tip_volumes) > 0:
                 ui.print_info(
-                    f"WARNING: using source Protocol for {_tip_cfg} tip, "
+                    f"WARNING: using source Protocol for {max(tip_volumes)} tip, "
                     f"but test includes multiple tips ({tip_volumes})"
                 )
-            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels][_tip_cfg]
+            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels][
+                max(tip_volumes)
+            ]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
             report = execute_photometric.build_pm_report(
                 test_volumes=volumes_list,
@@ -335,28 +337,30 @@ class RunArgs:
                 git_description=git_description,
                 tip_batches=tip_batches,
                 environment_sensor=environment_sensor,
+                de_static=de_static,
                 trials=trials,
                 name=name,
                 robot_serial=robot_serial,
                 fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
             )
         else:
-            if args.increment:
+            if args.increment or args.isolate_channels == [1]:
                 assert len(tip_volumes) == 1, (
                     f"tip must be specified "
-                    f"when running --increment test "
+                    f"when running --increment or --isolate-channels 1 test "
                     f"with {args.channels}ch P{args.pipette}"
                 )
                 protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][
-                    tip_volumes[0]
+                    max(tip_volumes)
                 ]
             else:
                 protocol_cfg = GRAVIMETRIC_CFG[args.pipette][args.channels]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
-            recorder = execute._load_scale(
-                name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
-            )
-
+            assert scale
+            recorder = execute._load_scale(name, scale, run_id, pipette_tag, start_time)
+            assert (
+                0.0 <= args.dilution <= 1.0
+            ), f"dilution must be between 0-1, not {args.dilution}"
             report = execute.build_gm_report(
                 test_volumes=volumes_list,
                 run_id=run_id,
@@ -370,13 +374,20 @@ class RunArgs:
                 increment=args.increment,
                 name=name,
                 environment_sensor=environment_sensor,
+                de_static=de_static,
                 trials=trials,
                 fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
             )
 
         return RunArgs(
             tip_volumes=tip_volumes,
-            volumes=volumes,
+            volumes=[
+                (
+                    t,
+                    vls,
+                )
+                for t, vls in volumes.items()
+            ],
             run_id=run_id,
             pipette=pipette,
             pipette_tag=pipette_tag,
@@ -390,11 +401,15 @@ class RunArgs:
             increment=args.increment,
             name=name,
             environment_sensor=environment_sensor,
+            de_static=de_static,
             trials=trials,
             ctx=_ctx,
             protocol_cfg=protocol_cfg,
             test_report=report,
             liquid=args.liquid,
+            dilution=args.dilution,
+            reverse_tips=args.reverse_tips,
+            tune_volume_correction=args.tune_volume_correction,
         )
 
 
@@ -402,25 +417,30 @@ def build_gravimetric_cfg(
     protocol: ProtocolContext,
     tip_volume: int,
     increment: bool,
+    interactive: bool,
+    nominal_plunger: bool,
     return_tip: bool,
     blank: bool,
     mix: bool,
-    user_volumes: bool,
+    user_volumes: List[float],
     gantry_speed: int,
     scale_delay: int,
     isolate_channels: List[int],
     isolate_volumes: List[float],
     extra: bool,
     jog: bool,
+    lld_every_tip: bool,
     same_tip: bool,
     ignore_fail: bool,
     mode: str,
+    starting_tip: str,
+    use_old_method: bool,
     run_args: RunArgs,
 ) -> GravimetricConfig:
     """Build."""
     return GravimetricConfig(
         name=run_args.name,
-        pipette_mount="left",
+        pipette_mount=run_args.pipette.mount,
         pipette_volume=run_args.pipette_volume,
         pipette_channels=run_args.pipette_channels,
         tip_volume=tip_volume,
@@ -428,7 +448,10 @@ def build_gravimetric_cfg(
         labware_on_scale=run_args.protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
         slot_scale=run_args.protocol_cfg.SLOT_SCALE,  # type: ignore[attr-defined]
         slots_tiprack=run_args.protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
+        slot_de_static=run_args.protocol_cfg.SLOT_DE_STATIC,  # type: ignore[attr-defined]
         increment=increment,
+        interactive=interactive,
+        nominal_plunger=nominal_plunger,
         return_tip=return_tip,
         blank=blank,
         mix=mix,
@@ -440,10 +463,15 @@ def build_gravimetric_cfg(
         kind=ConfigType.gravimetric,
         extra=extra,
         jog=jog,
+        lld_every_tip=lld_every_tip,
         same_tip=same_tip,
         ignore_fail=ignore_fail,
         mode=mode,
         liquid=run_args.liquid,
+        dilution=run_args.dilution,
+        starting_tip=starting_tip,
+        use_old_method=use_old_method,
+        tune_volume_correction=run_args.tune_volume_correction,
     )
 
 
@@ -452,26 +480,30 @@ def build_photometric_cfg(
     tip_volume: int,
     return_tip: bool,
     mix: bool,
-    user_volumes: bool,
+    user_volumes: List[float],
     touch_tip: bool,
     refill: bool,
     extra: bool,
     jog: bool,
+    lld_every_tip: bool,
     same_tip: bool,
     ignore_fail: bool,
     pipette_channels: int,
     photoplate_column_offset: List[int],
     dye_well_column_offset: List[int],
     mode: str,
+    starting_tip: str,
+    use_old_method: bool,
     run_args: RunArgs,
 ) -> PhotometricConfig:
     """Run."""
     return PhotometricConfig(
         name=run_args.name,
-        pipette_mount="left",
+        pipette_mount=run_args.pipette.mount,
         pipette_volume=run_args.pipette_volume,
         pipette_channels=pipette_channels,
         increment=False,
+        nominal_plunger=False,
         tip_volume=tip_volume,
         trials=run_args.trials,
         photoplate=run_args.protocol_cfg.PHOTOPLATE_LABWARE,  # type: ignore[attr-defined]
@@ -479,6 +511,7 @@ def build_photometric_cfg(
         reservoir=run_args.protocol_cfg.RESERVOIR_LABWARE,  # type: ignore[attr-defined]
         reservoir_slot=run_args.protocol_cfg.SLOT_RESERVOIR,  # type: ignore[attr-defined]
         slots_tiprack=run_args.protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
+        slot_de_static=run_args.protocol_cfg.SLOT_DE_STATIC,  # type: ignore[attr-defined]
         return_tip=return_tip,
         mix=mix,
         user_volumes=user_volumes,
@@ -487,11 +520,17 @@ def build_photometric_cfg(
         kind=ConfigType.photometric,
         extra=extra,
         jog=jog,
+        lld_every_tip=lld_every_tip,
         same_tip=same_tip,
         ignore_fail=ignore_fail,
         photoplate_column_offset=photoplate_column_offset,
         dye_well_column_offset=dye_well_column_offset,
         mode=mode,
+        interactive=False,
+        starting_tip=starting_tip,
+        liquid=run_args.liquid,
+        dilution=run_args.dilution,
+        use_old_method=use_old_method,
     )
 
 
@@ -513,12 +552,15 @@ def _main(
             args.refill,
             args.extra,
             args.jog,
+            args.lld_every_tip,
             args.same_tip,
             args.ignore_fail,
             args.channels,
             args.photoplate_col_offset,
             args.dye_well_col_offset,
             args.mode,
+            args.starting_tip,
+            args.use_old_method,
             run_args,
         )
         union_cfg = cfg_pm
@@ -527,6 +569,8 @@ def _main(
             run_args.ctx,
             tip,
             args.increment,
+            args.interactive,
+            args.nominal_plunger or args.increment,
             args.return_tip,
             False if args.no_blank else True,
             args.mix,
@@ -537,9 +581,12 @@ def _main(
             args.isolate_volumes if args.isolate_volumes else [],
             args.extra,
             args.jog,
+            args.lld_every_tip,
             args.same_tip,
             args.ignore_fail,
             args.mode,
+            args.starting_tip,
+            args.use_old_method,
             run_args,
         )
 
@@ -552,21 +599,27 @@ def _main(
         getattr(union_cfg, "increment", False)
         or union_cfg.pipette_channels == 96
         or args.photometric
+        or args.isolate_channels == [1]  # NOTE: special case
+    )
+    _tip_racks = helpers._load_tipracks(
+        run_args.ctx, union_cfg, use_adapters=args.channels == 96
+    )
+    _tips = get_tips(
+        run_args.ctx,
+        run_args.pipette,
+        tip,
+        all_channels=all_channels_same_time,
+        reverse=run_args.reverse_tips,
+        starting_tip=args.starting_tip,
     )
     test_resources = TestResources(
         ctx=run_args.ctx,
         pipette=run_args.pipette,
-        tipracks=helpers._load_tipracks(
-            run_args.ctx, union_cfg, use_adapters=args.channels == 96
-        ),
+        tipracks=_tip_racks,
         test_volumes=volumes,
-        tips=get_tips(
-            run_args.ctx,
-            run_args.pipette,
-            tip,
-            all_channels=all_channels_same_time,
-        ),
+        tips=_tips,
         env_sensor=run_args.environment_sensor,
+        de_static=run_args.de_static,
         recorder=run_args.recorder,
         test_report=run_args.test_report,
     )
@@ -580,16 +633,23 @@ def _main(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Pipette Testing")
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--skip-input", action="store_true")
+    parser.add_argument("--de-static", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 200, 1000], required=True)
+    parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[0, 20, 50, 200, 1000], default=0)
     parser.add_argument("--trials", type=int, default=0)
     parser.add_argument("--increment", action="store_true")
+    parser.add_argument("--interactive", action="store_true")
+    parser.add_argument("--nominal-plunger", action="store_true")
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
     parser.add_argument("--no-blank", action="store_true")
+    parser.add_argument("--sim-scale", action="store_true")
+    parser.add_argument("--blank-trials", type=int, default=10)
     parser.add_argument("--mix", action="store_true")
-    parser.add_argument("--user-volumes", action="store_true")
+    parser.add_argument("--user-volumes", nargs="+", type=float, default=[])
     parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
     parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
     parser.add_argument("--photometric", action="store_true")
@@ -599,8 +659,10 @@ if __name__ == "__main__":
     parser.add_argument("--isolate-volumes", nargs="+", type=float, default=None)
     parser.add_argument("--extra", action="store_true")
     parser.add_argument("--jog", action="store_true")
+    parser.add_argument("--lld-every-tip", action="store_true")
     parser.add_argument("--same-tip", action="store_true")
     parser.add_argument("--ignore-fail", action="store_true")
+    parser.add_argument("--use-old-method", action="store_true")
     parser.add_argument("--photoplate-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument("--dye-well-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument(
@@ -612,9 +674,20 @@ if __name__ == "__main__":
         choices=[liq.value.lower() for liq in SupportedLiquid],
         default="water",
     )
+    parser.add_argument("--dilution", type=float, default=1.0)
+    parser.add_argument("--reverse-tips", action="store_true")
+    parser.add_argument(
+        "--starting-tip",
+        type=str,
+        choices=[f"{c}{str(r + 1)}" for r in range(12) for c in "ABCDEFGH"],
+        default="",
+    )
+    parser.add_argument("--serial-log", action="store_true")
+    parser.add_argument("--tune-volume-correction", action="store_true")
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
-    if not run_args.ctx.is_simulating():
+    config.NUM_BLANK_TRIALS = args.blank_trials
+    if not run_args.ctx.is_simulating() and args.serial_log:
         serial_logger = subprocess.Popen(
             [
                 "python3 -m opentrons_hardware.scripts.can_mon > /data/testing_data/serial.log"
@@ -624,15 +697,37 @@ if __name__ == "__main__":
         sleep(1)
     hw = workarounds.get_sync_hw_api(run_args.ctx)
     try:
-        if not run_args.ctx.is_simulating() and not args.photometric:
+        if not True and not args.photometric:
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
         run_args.ctx.home()
+        # NOTE: there is a chance that the pipette has a tip still attached
+        #       from a previous run (eg: previous run ended in error)
+        #       so here we just assume there's a tip and drop the tip no matter what
+        hw_mount = (
+            helpers.OT3Mount.LEFT
+            if run_args.pipette.mount == "left"
+            else helpers.OT3Mount.RIGHT
+        )
+        hw.add_tip(hw_mount, tip_length=120)  # langer than any tip, to be safe
+        _trash = run_args.pipette.trash_container
+        if not isinstance(_trash, disposal_locations.TrashBin):
+            # FIXME: (sigler) not sure why during simulation it's a Labware
+            run_args.pipette.move_to(_trash["A1"].top())  # type: ignore[index]
+        else:
+            run_args.pipette.move_to(_trash.top())
+        hw.drop_tip(hw_mount)
+        hw._move_to_plunger_bottom(hw_mount, rate=1.0)
+        hw.retract(hw_mount)
 
         for tip, volumes in run_args.volumes:
             if args.channels == 96 and not run_args.ctx.is_simulating():
                 ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
             _main(args, run_args, tip, volumes)
+    except Exception as e:
+        ui.print_error(str(e))
+        ui.print_info(format_exc())
+        raise e
     finally:
         if run_args.recorder is not None:
             ui.print_info("ending recording")

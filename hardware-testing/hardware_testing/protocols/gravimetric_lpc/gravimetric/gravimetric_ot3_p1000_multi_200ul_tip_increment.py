@@ -2,14 +2,17 @@
 from opentrons.protocol_api import ProtocolContext
 
 metadata = {"protocolName": "gravimetric-ot3-p1000-multi-200ul-tip-increment"}
-requirements = {"robotType": "Flex", "apiLevel": "2.15"}
+requirements = {
+    "robotType": "Flex",
+    "apiLevel": "2.23",
+}  # NOTE: apiLevel is ignored by script
 
 SLOT_SCALE = 4
 SLOTS_TIPRACK = {
     200: [2, 3, 5, 6, 7, 8, 9, 10, 11],
 }
 LABWARE_ON_SCALE = "usascientific_12_reservoir_22ml"
-
+SLOT_DE_STATIC = 1
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""

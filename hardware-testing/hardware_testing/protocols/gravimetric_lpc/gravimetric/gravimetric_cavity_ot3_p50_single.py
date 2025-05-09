@@ -3,7 +3,7 @@ from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api._types import OffDeckType
 
 metadata = {"protocolName": "gravimetric-cavity-ot3-p50-single"}
-requirements = {"robotType": "Flex", "apiLevel": "2.15"}
+requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
 SLOT_SCALE = 4
 SLOTS_TIPRACK = {20: [2, 3, 5, 6, 7, 8, 9, 10], 50: [2, 3, 5, 6, 7, 8, 9, 10]}

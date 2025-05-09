@@ -186,7 +186,7 @@ class RunArgs:
         else:
             trash = _ctx.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
         pipette.trash_container = trash
-        pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
+        pipette_tag = helpers._get_tag_from_pipette(pipette)
 
         trials = args.trials
 

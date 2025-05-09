@@ -2,12 +2,7 @@
 from math import pi
 from typing import List, Optional, Dict, Tuple
 
-from opentrons.protocol_api import (
-    ProtocolContext,
-    InstrumentContext,
-    Labware,
-    ParameterContext,
-)
+from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware
 
 ##############################################
 #                EDIT - START                #
@@ -16,7 +11,7 @@ from opentrons.protocol_api import (
 # FIXME: make these variables configurable through RUNTIME-VARIABLES
 
 metadata = {"protocolName": "Flex: Diluent for 96ch"}
-requirements = {"robotType": "Flex", "apiLevel": "2.21"}
+requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 RETURN_TIP = False
 FILL_MULTIPLE_PLATES = True
@@ -25,6 +20,7 @@ LIQUID_NAME = "Diluent"
 LIQUID_DESCRIPTION = "Artel MVS Diluent"
 LIQUID_COLOR = "#0000FF"
 
+TARGET_VOLUME = 195
 TARGET_PUSH_OUT = 15
 TARGET_SOURCES = [
     {
@@ -59,18 +55,6 @@ MIN_VOL_SRC = {
     "nest_12_reservoir_15ml": 3000,
     "nest_1_reservoir_195ml": 30000,
 }
-
-
-def add_parameters(parameters: ParameterContext) -> None:
-    """Build the runtime parameters."""
-    parameters.add_float(
-        display_name="Target volume of diluent",
-        variable_name="target_volume",
-        default=195,
-        minimum=1,
-        maximum=200,
-        description="How much diluent to put in each well",
-    )
 
 
 class _LiquidHeightInFlatBottomWell:
@@ -176,7 +160,7 @@ def _assign_starting_volumes(
     )
     for test in TARGET_SOURCES:
         src_ul_per_trial = _start_volumes_per_trial(
-            ctx.params.target_volume,  # type: ignore[attr-defined]
+            TARGET_VOLUME,
             reservoir.load_name,
             pipette.channels,
             len(test["destinations"]),
@@ -237,15 +221,13 @@ def run(ctx: ProtocolContext) -> None:
     plate = ctx.load_labware("corning_96_wellplate_360ul_flat", "D2")
     pipette = ctx.load_instrument("flex_8channel_1000", "left", tip_racks=[tips])
     _assign_starting_volumes(ctx, pipette, reservoir)
-
-    ctx.load_trash_bin("A3")
     for i in range(12):
-        pipette.configure_for_volume(ctx.params.target_volume)  # type: ignore[attr-defined]
+        pipette.configure_for_volume(TARGET_VOLUME)
         pipette.pick_up_tip()
         for test in TARGET_SOURCES:
             _transfer(
                 ctx,
-                ctx.params.target_volume,  # type: ignore[attr-defined]
+                TARGET_VOLUME,
                 pipette,
                 reservoir,
                 plate,

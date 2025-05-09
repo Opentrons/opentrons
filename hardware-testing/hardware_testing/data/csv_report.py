@@ -361,9 +361,6 @@ class CSVReport:
             raise ValueError(f"unexpected arguments to Report(): {args}")
         # set the results of each section based on current
         self._refresh_results_overview_values()
-        # save to disk after storing new values
-        if self._file_name:
-            self.save_to_disk()
 
     def __getitem__(self, item: str) -> CSVSection:
         """CSV Report get item."""

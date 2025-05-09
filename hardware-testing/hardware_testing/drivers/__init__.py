@@ -1,4 +1,7 @@
 """The driver package."""
+from typing import Callable, Optional
+
+from serial import Serial  # type: ignore[import]
 from serial.tools.list_ports import comports  # type: ignore[import]
 
 from .radwag import RadwagScaleBase, RadwagScale, SimRadwagScale
@@ -42,12 +45,30 @@ def find_port(vid: int, pid: int) -> str:
     raise RuntimeError(f"Unable to find serial " f"port for VID:PID={vid}:{pid}")
 
 
+def search_for_port_with_filter(
+    filter_cb: Callable, baudrate: int = 115200
+) -> Optional[str]:
+    available_port_names = [p.device for p in comports()]
+    test_port = Serial(port=None, baudrate=baudrate)
+    for port_name in available_port_names:
+        try:
+            test_port.port = port_name
+            test_port.open()
+            if filter_cb(test_port):
+                return port_name
+        except Exception as e:
+            print(e)
+            continue
+        finally:
+            if test_port.is_open:
+                test_port.close()
+    return None
+
+
 __all__ = [
     "list_ports_and_select",
     "find_port",
     "RadwagScaleBase",
     "RadwagScale",
     "SimRadwagScale",
-    "AsairSensor",
-    "AsairSensorError",
 ]

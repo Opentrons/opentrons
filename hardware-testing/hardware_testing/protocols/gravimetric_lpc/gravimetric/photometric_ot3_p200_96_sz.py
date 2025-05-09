@@ -2,7 +2,7 @@
 from opentrons.protocol_api import ProtocolContext
 
 metadata = {"protocolName": "photometric-ot3-p200-96"}
-requirements = {"robotType": "Flex", "apiLevel": "2.15"}
+requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
 SLOTS_TIPRACK = {
     50: [5, 6, 8, 9, 11],

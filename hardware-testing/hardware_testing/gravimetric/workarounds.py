@@ -55,6 +55,7 @@ def http_get_all_labware_offsets() -> List[LabwareOffset]:
             createdAt=offset_data["createdAt"],
             definitionUri=offset_data["definitionUri"],
             location=offset_data["location"],
+            locationSequence=offset_data.get("locationSequence"),
             vector=offset_data["vector"],
         )
         offsets.append(new_offset)

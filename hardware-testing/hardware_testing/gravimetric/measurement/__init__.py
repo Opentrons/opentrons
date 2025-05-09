@@ -19,6 +19,7 @@ class SupportedLiquid(Enum):
     ETHANOL = "ethanol"
     GLYCEROL = "glycerol"
     HEXANE = "hexane"
+    ISOPROPYL = "isopropyl"
 
     @classmethod
     def from_string(cls, s: str) -> "SupportedLiquid":
@@ -28,12 +29,19 @@ class SupportedLiquid(Enum):
                 return liq
         raise ValueError(f"no supported liquid matching {s}")
 
+    def name_with_dilution(self, dilution: float) -> str:
+        """Name with dilution."""
+        if dilution == 0.0 or dilution == 1.0:
+            return str(self.name)
+        return f"{self.name}-{int(dilution * 100.0)}"
 
-RELATIVE_DENSITY: Dict[SupportedLiquid, float] = {
+
+RELATIVE_DENSITIES_WIKIPEDIA: Dict[SupportedLiquid, float] = {
     SupportedLiquid.WATER: 1.0,
-    SupportedLiquid.ETHANOL: 0.78905,  # wikipedia
-    SupportedLiquid.GLYCEROL: 1.261,  # wikipedia
-    SupportedLiquid.HEXANE: 0.6606,  # wikipedia
+    SupportedLiquid.ETHANOL: 0.78905,
+    SupportedLiquid.GLYCEROL: 1.261,
+    SupportedLiquid.HEXANE: 0.6606,
+    SupportedLiquid.ISOPROPYL: 0.786,  # TODO: check this is correct
 }
 
 CONSTANT_SCALE_CALIBRATED_DENSITY_KG_M3: Final = 7950  # from certificate
@@ -170,7 +178,7 @@ def record_measurement_data(
     env_data = read_environment_data(mount, ctx.is_simulating(), env_sensor)
     # NOTE: we need to delay some amount, to give the scale time to accumulate samples
     with recorder.samples_of_tag(tag):
-        if ctx.is_simulating():
+        if recorder.is_simulator:
             # NOTE: give a bit of time during simulation, so some fake data can be stored
             sleep(0.1)
         elif shorten:
@@ -187,9 +195,9 @@ def calculate_change_in_volume(
     before: MeasurementData,
     after: MeasurementData,
     liquid: SupportedLiquid = SupportedLiquid.WATER,
+    dilution: float = 1.0,
 ) -> float:
     """Calculate volume of water."""
-    # TODO: actually calculate volume
     avg_env = get_average_reading([before.environment, after.environment])
     water_density_at_this_temperature_kg_m3 = sum(
         [
@@ -200,9 +208,18 @@ def calculate_change_in_volume(
             CONSTANT_WATER_DENSITY["5"] * pow(10, -7) * pow(avg_env.celsius_liquid, 4),
         ]
     )
-    liquid_density_kg_m3 = (
-        RELATIVE_DENSITY[liquid] * water_density_at_this_temperature_kg_m3
+    # NOTE: dilution assumes we're diluting with deionized water
+    rel_density_liq = RELATIVE_DENSITIES_WIKIPEDIA[liquid]
+    rel_density_dih2o = RELATIVE_DENSITIES_WIKIPEDIA[SupportedLiquid.WATER]
+    rel_density_mix = (dilution * rel_density_liq) + (
+        (1.0 - dilution) * rel_density_dih2o
     )
+    dil_str = "" if dilution in [0.0, 1.0] else f"-{int(dilution * 100)}"
+    print(
+        f"Calculating uL of {liquid.name.upper()}{dil_str} "
+        f"(relative density = {round(rel_density_mix, 3)})"
+    )
+    liquid_density_kg_m3 = rel_density_mix * water_density_at_this_temperature_kg_m3
     # equations in ISO use hPa, so sticking with that
     air_pressure_hpa = avg_env.pascals_air / 100
     air_density_kg_m3 = (

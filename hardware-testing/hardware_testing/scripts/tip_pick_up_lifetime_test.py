@@ -30,12 +30,12 @@ def _convert(seconds: float) -> str:
 
 def _getch() -> str:
     fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)  # type: ignore[attr-defined]
+    old_settings = termios.tcgetattr(fd)
     try:
-        tty.setraw(fd)  # type: ignore[attr-defined]
+        tty.setraw(fd)
         ch = sys.stdin.read(1)
     finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)  # type: ignore[attr-defined]
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
 
 

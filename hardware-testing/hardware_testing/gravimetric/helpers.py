@@ -1,6 +1,5 @@
 """Opentrons helper methods."""
 import asyncio
-from random import random, randint
 from types import MethodType
 from typing import Any, List, Dict, Optional, Tuple, Union
 from statistics import stdev
@@ -8,7 +7,10 @@ from . import config
 from .liquid_class.defaults import get_liquid_class
 from .increments import get_volume_increments
 from inspect import getsource
+from pathlib import Path
+from json import load as json_load
 
+from hardware_testing.drivers import de_static_fixture
 from hardware_testing.data import ui
 from opentrons import protocol_api
 from opentrons.protocols.api_support.deck_type import (
@@ -18,7 +20,6 @@ from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocol_api._types import OffDeckType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.types import APIVersion
-from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.hardware_control.thread_manager import ThreadManager
 from opentrons.hardware_control.types import OT3Mount, Axis, HardwareFeatureFlags
 from opentrons.hardware_control.ot3api import OT3API
@@ -27,17 +28,18 @@ from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons import execute, simulate
 from opentrons.types import Point, Location, Mount
 from opentrons.config.types import OT3Config, RobotConfig
-from opentrons_shared_data.labware.types import LabwareDefinition
 
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
 from opentrons.protocol_api.labware import SET_OFFSET_RESTORED_API_VERSION
 from .workarounds import (
     get_sync_hw_api,
+    http_get_all_labware_offsets,
     get_latest_offset_for_labware,
 )
 from hardware_testing.opentrons_api.helpers_ot3 import (
     clear_pipette_ul_per_mm,
+    stop_server_ot3,
 )
 from opentrons.protocol_engine.types import LabwareOffset
 
@@ -46,6 +48,13 @@ from opentrons.protocol_engine.notes import CommandNoteAdder
 
 from opentrons.protocol_engine import StateView
 from opentrons.protocol_api.core.engine import pipette_movement_conflict
+
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+
+
+# NOTE: specific tags/branches can be tied to specific versions,
+#       however for CI this should remain as latest API
+DEFAULT_API_LEVEL = str(MAX_SUPPORTED_VERSION)
 
 
 def _add_fake_simulate(
@@ -73,14 +82,15 @@ def _add_fake_comment_pause(
 
 
 def get_api_context(
-    api_level: str,
+    api_level: Optional[str] = None,
     is_simulating: bool = False,
     pipette_left: Optional[str] = None,
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
-    extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
+    custom_labware_uris_for_simulation: Optional[List[str]] = None,
     deck_version: str = guess_deck_type_from_global_config(),
     stall_detection_enable: Optional[bool] = None,
+    include_labware_offsets: bool = True,
 ) -> protocol_api.ProtocolContext:
     """Get api context."""
 
@@ -106,6 +116,36 @@ def get_api_context(
             stall_detection_enable=stall_detection_enable,
         )
 
+    if include_labware_offsets and not is_simulating:
+        ui.print_info(
+            "Starting opentrons-robot-server, so we can http GET labware offsets"
+        )
+        offsets = http_get_all_labware_offsets()
+        print(f"found {len(offsets)} labware offsets")
+        for offset in offsets:
+            print(f"\t{offset.createdAt}:")
+            print(f"\t\t{offset.definitionUri}")
+            print(f"\t\t{offset.vector}")
+    else:
+        offsets = []
+        if not is_simulating:
+            stop_server_ot3()
+
+    # gather the custom labware (for simulation)
+    extra_labware = {}
+    if is_simulating and custom_labware_uris_for_simulation:
+        for def_uri in custom_labware_uris_for_simulation:
+            labware_path = (
+                Path(__file__).parent.parent
+                / "labware"
+                / def_uri
+                / "1.json"  # assuming v1
+            )
+            with open(labware_path, "r") as f:
+                extra_labware[def_uri] = json_load(f)
+
+    if api_level is None:
+        api_level = DEFAULT_API_LEVEL
     papi: protocol_api.ProtocolContext
     if is_simulating:
         papi = simulate.get_protocol_api(
@@ -125,6 +165,11 @@ def get_api_context(
             version=APIVersion.from_string(api_level), extra_labware=extra_labware
         )
 
+    # add labware offsets to engine's state
+    if offsets:
+        engine = papi._core._engine_client._transport._engine  # type: ignore[attr-defined]
+        for offset in offsets:
+            engine.state_view._labware_store._add_labware_offset(offset)
     return papi
 
 
@@ -176,11 +221,11 @@ def gantry_position_as_point(position: Dict[Axis, float]) -> Point:
 def _jog_to_find_liquid_height(
     ctx: ProtocolContext, pipette: InstrumentContext, well: Well
 ) -> float:
+    if ctx.is_simulating():
+        return well.depth - 1
     _well_depth = well.depth
     _liquid_height = _well_depth + 2
     _jog_size = -1.0
-    if ctx.is_simulating():
-        return _liquid_height - 1
     while True:
         pipette.move_to(well.bottom(_liquid_height))
         inp = input(
@@ -202,20 +247,10 @@ def _sense_liquid_height(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
     well: Well,
-    cfg: config.VolumetricConfig,
 ) -> float:
-    hwapi = get_sync_hw_api(ctx)
-    pipette.move_to(well.top())
-    lps = config._get_liquid_probe_settings(cfg, well)
-    # NOTE: very important that probing is done only 1x time,
-    #       with a DRY tip, for reliability
-    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, well.depth, lps)
     if ctx.is_simulating():
-        probed_z = well.top().point.z - 1
-    liq_height = probed_z - well.bottom().point.z
-    if abs(liq_height - well.depth) < 0.01:
-        raise RuntimeError("unable to probe liquid, reach max travel distance")
-    return liq_height
+        return well.depth - 1.0
+    return pipette.measure_liquid_height(well)
 
 
 def _calculate_average(volume_list: List[float]) -> float:
@@ -223,14 +258,19 @@ def _calculate_average(volume_list: List[float]) -> float:
 
 
 def _reduce_volumes_to_not_exceed_software_limit(
+    liquid: str,
+    dilution: float,
     test_volumes: List[float],
     pipette_volume: int,
     pipette_channels: int,
     tip_volume: int,
 ) -> List[float]:
     for i, v in enumerate(test_volumes):
-        liq_cls = get_liquid_class(pipette_volume, pipette_channels, tip_volume, int(v))
-        max_vol = tip_volume - liq_cls.aspirate.trailing_air_gap
+        liq_cls = get_liquid_class(
+            liquid, dilution, pipette_volume, pipette_channels, tip_volume, int(v)
+        )
+        assert liq_cls.aspirate.air_gap is not None
+        max_vol = tip_volume - liq_cls.aspirate.air_gap
         test_volumes[i] = min(v, max_vol - 0.1)
     return test_volumes
 
@@ -379,7 +419,6 @@ def _get_volumes(
     pipette_channels: int,
     pipette_volume: int,
     tip_volume: int,
-    user_volumes: bool,
     kind: config.ConfigType,
     extra: bool,
     channels: int,
@@ -389,25 +428,10 @@ def _get_volumes(
         test_volumes = get_volume_increments(
             pipette_channels, pipette_volume, tip_volume, mode=mode
         )
-    elif user_volumes:
-        if ctx.is_simulating():
-            rand_vols = [round(random() * tip_volume, 1) for _ in range(randint(1, 3))]
-            _inp = ",".join([str(r) for r in rand_vols])
-        else:
-            _inp = input(
-                f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
-            )
-        test_volumes = [
-            float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
-        ]
     else:
         test_volumes = get_test_volumes(
             kind, channels, pipette_volume, tip_volume, extra
         )
-    if not _check_if_software_supports_high_volumes():
-        _override_software_supports_high_volumes()
-        if not _check_if_software_supports_high_volumes():
-            raise RuntimeError("you are not the correct branch")
     return test_volumes
 
 
@@ -423,13 +447,18 @@ def _load_pipette(
     pip_name = f"flex_{pipette_channels}channel_{pipette_volume}"
     ui.print_info(f'pipette "{pip_name}" on mount "{pipette_mount}"')
 
+    if not _check_if_software_supports_high_volumes():
+        _override_software_supports_high_volumes()
+        if not _check_if_software_supports_high_volumes():
+            raise RuntimeError("you are not the correct branch")
+
     # if we're doing multiple tests in one run, the pipette may already be loaded
     loaded_pipettes = ctx.loaded_instruments
     if pipette_mount in loaded_pipettes.keys():
         return loaded_pipettes[pipette_mount]
 
+    trash = ctx.load_trash_bin("A3")
     pipette = ctx.load_instrument(pip_name, pipette_mount)
-    loaded_pipettes = ctx.loaded_instruments
     assert pipette.max_volume == pipette_volume, (
         f"expected {pipette_volume} uL pipette, "
         f"but got a {pipette.max_volume} uL pipette"
@@ -450,17 +479,12 @@ def _load_pipette(
         pipette_movement_conflict.check_safe_for_pipette_movement = (
             _override_check_safe_for_pipette_movement
         )
-    try:
-        trash = pipette.trash_container
-    except NoTrashDefinedError:
-        trash = ctx.load_trash_bin("A3")
-        pipette.trash_container = trash
-        pass
+    pipette.trash_container = trash
     return pipette
 
 
 def _get_tag_from_pipette(
-    pipette: InstrumentContext, increment: bool, user_volumes: bool
+    pipette: InstrumentContext, increment: bool = False, user_volumes: List[float] = []
 ) -> str:
     pipette_tag = get_pipette_unique_name(pipette)
     ui.print_info(f'found pipette "{pipette_tag}"')
@@ -474,8 +498,9 @@ def _get_tag_from_pipette(
 
 
 def _get_offsets_from_ctx(ctx: ProtocolContext) -> List[LabwareOffset]:
-    state = ctx._core._engine_client._transport._engine.state_view  # type: ignore[attr-defined]
-    ctx_offsets = state._labware_store._state.labware_offsets_by_id
+    ctx_offsets = (
+        ctx._core._engine_client._transport._engine.state_view._labware_store._state.labware_offsets_by_id  # type: ignore[attr-defined]
+    )
     return [_o for _o in ctx_offsets.values()]
 
 
@@ -571,3 +596,34 @@ def get_default_trials(increment: bool, kind: config.ConfigType, channels: int) 
         return 3
     else:
         return config.QC_DEFAULT_TRIALS[kind][channels]
+
+
+def de_static_attached_tip(
+    pipette: InstrumentContext,
+    well: Well,
+    fixture: de_static_fixture.DeStaticFixtureBase,
+    overdo_it: bool,
+) -> None:
+    def _reset_de_static_bar() -> None:
+        fixture.wait_for_disabled()
+        fixture.enable_power_for_one_second()
+
+    # move to TOP
+    pipette.move_to(well.top())
+    fixture.enable_power_for_one_second()
+
+    if overdo_it:
+        # move to BOTTOM
+        pipette.move_to(well.bottom(), speed=well.depth)
+        _reset_de_static_bar()
+        # move to TOP
+        pipette.move_to(well.top(), speed=well.depth)
+        _reset_de_static_bar()
+        # aspirate
+        pipette.aspirate(pipette.max_volume, well.top())
+        _reset_de_static_bar()
+        # dispense
+        pipette.dispense(pipette.max_volume, well.top())
+        _reset_de_static_bar()
+        # prepare to aspirate
+        pipette.prepare_to_aspirate()

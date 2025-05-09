@@ -11,7 +11,7 @@ from hardware_testing.opentrons_api.types import Point
 from . import helpers
 from . import report
 from hardware_testing.data import ui
-from hardware_testing.drivers import asair_sensor
+from hardware_testing.drivers import asair_sensor, de_static_fixture
 
 
 @dataclass
@@ -30,6 +30,7 @@ class VolumetricTrial:
     acceptable_cv: Optional[float]
     acceptable_d: Optional[float]
     env_sensor: asair_sensor.AsairSensorBase
+    de_static: de_static_fixture.DeStaticFixtureBase
 
 
 @dataclass
@@ -73,6 +74,7 @@ class TestResources:
     test_volumes: List[float]
     tips: Dict[int, List[Well]]
     env_sensor: asair_sensor.AsairSensorBase
+    de_static: de_static_fixture.DeStaticFixtureBase
     recorder: Optional[GravimetricRecorder]
     test_report: CSVReport
 
@@ -89,6 +91,7 @@ def build_gravimetric_trials(
     liquid_tracker: LiquidTracker,
     blank: bool,
     env_sensor: asair_sensor.AsairSensorBase,
+    de_static: de_static_fixture.DeStaticFixtureBase,
 ) -> Dict[float, Dict[int, List[GravimetricTrial]]]:
     """Build a list of all the trials that will be run."""
     trial_list: Dict[float, Dict[int, List[GravimetricTrial]]] = {}
@@ -121,6 +124,7 @@ def build_gravimetric_trials(
                     acceptable_d=None,
                     cfg=cfg,
                     env_sensor=env_sensor,
+                    de_static=de_static,
                     mode=cfg.mode,
                 )
             )
@@ -174,6 +178,7 @@ def build_gravimetric_trials(
                             acceptable_d=d,
                             cfg=cfg,
                             env_sensor=env_sensor,
+                            de_static=de_static,
                             mode=cfg.mode,
                         )
                     )
@@ -190,6 +195,7 @@ def build_photometric_trials(
     liquid_tracker: LiquidTracker,
     cfg: config.PhotometricConfig,
     env_sensor: asair_sensor.AsairSensorBase,
+    de_static: de_static_fixture.DeStaticFixtureBase,
 ) -> Dict[float, List[PhotometricTrial]]:
     """Build a list of all the trials that will be run."""
     trial_list: Dict[float, List[PhotometricTrial]] = {vol: [] for vol in test_volumes}
@@ -225,6 +231,7 @@ def build_photometric_trials(
                     acceptable_cv=cv,
                     acceptable_d=d,
                     env_sensor=env_sensor,
+                    de_static=de_static,
                 )
             )
     return trial_list
@@ -235,10 +242,11 @@ def _finish_test(
     resources: TestResources,
     return_tip: bool,
 ) -> None:
+    resources.test_report.save_to_disk()
     # there are WAY too many tips on a 96ch pipette
     # so drop them incase something bad happened during the test run
     if resources.pipette.channels == 96 and resources.pipette.has_tip:
-        resources.ctx.home()
+        resources.pipette._retract()
         if resources.pipette.current_volume > 0:
             ui.print_info("dispensing liquid to trash")
             trash_container = resources.pipette.trash_container
