@@ -311,7 +311,9 @@ Labware:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -337,7 +339,7 @@ Labware:
       "orderedStepIds": [],
       "pipettes": {
         "pipette_left": {
-          "pipetteName": "p50_multi_flex"
+          "pipetteName": "p50_single_flex"
         }
       },
       "modules": {},
@@ -352,30 +354,7 @@ Labware:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p50_multi_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
-        "labwareId": "labware-1",
-        "loadName": "opentrons_flex_96_filtertiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
@@ -413,13 +392,15 @@ Labware:
 ```json
 {
   "metadata": {
-    "protocolName": "Heater shaker load",
-    "description": "Load heater shaker to the deck. No steps or commands."
+    "protocolName": " Heater shaker load",
+    "description": "Load heater shaker to the deck. No steps or commands.."
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -428,11 +409,11 @@ Labware:
           "labwareLocationUpdate": {
             "labware-1": "C2"
           },
-          "pipetteLocationUpdate": {
-            "pipette_left": "left"
-          },
           "moduleLocationUpdate": {
             "hs-1": "D1"
+          },
+          "pipetteLocationUpdate": {
+            "pipette_left": "left"
           },
           "trashBinLocationUpdate": {
             "trashbin-1": "cutoutA3"
@@ -447,7 +428,7 @@ Labware:
       "orderedStepIds": [],
       "pipettes": {
         "pipette_left": {
-          "pipetteName": "p50_multi_flex"
+          "pipetteName": "p50_single_flex"
         }
       },
       "modules": {
@@ -466,80 +447,10 @@ Labware:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p50_multi_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "heaterShakerModuleV1",
-        "location": {
-          "slotName": "D1"
-        },
-        "moduleId": "hs-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
-        "labwareId": "labware-1",
-        "loadName": "opentrons_flex_96_filtertiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
-### Key Differences from Template
-
-1. **Metadata Section**
-
-   - Filled `protocolName` and `description` with heater-shaker specific information
-
-2. **designerApplication.data Section**
-
-   - **pipetteTiprackAssignments**: Added mapping for single pipette to tiprack
-     ```json
-     "pipette_left": ["opentrons/opentrons_96_tiprack_300ul/1"]
-     ```
-   - **savedStepForms**:
-     - Added labware location: `"labware-1": "5"`
-     - Added pipette location: `"pipette_left": "left"`
-     - Added module location: `"hs-1": "1"`
-     - Removed template `step-n` object
-   - **orderedStepIds**: Remains empty array (no steps)
-
-3. **robot Section**
-
-   - Added specific model and deckId for OT-2
-     ```json
-     "model": "OT-2 Standard",
-     "deckId": "ot2_standard"
-     ```
-
-4. **commands Section**
-
-   - Added three specific commands in order:
-     1. loadPipette command for P300 Single-Channel
-     2. loadModule command for heater-shaker
-     3. loadLabware command for tiprack
-   - Each command uses consistent identifiers:
-     - Pipette: "pipette_left"
-     - Module: "hs-1"
-     - Labware: "labware-1"
 
 ## Case 3: Load thermocycler module
 
@@ -554,7 +465,7 @@ Robot:
 - Flex
 
 Pipette mount:
-- Left: p50_multi_flex
+- Left: p50_single_flex
 
 Gripper
 - mounted
@@ -580,7 +491,9 @@ Labware:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -589,11 +502,11 @@ Labware:
           "labwareLocationUpdate": {
             "labware-1": "C2"
           },
-          "pipetteLocationUpdate": {
-            "pipette_left": "left"
-          },
           "moduleLocationUpdate": {
             "tc-1": "B1"
+          },
+          "pipetteLocationUpdate": {
+            "pipette_left": "left"
           },
           "trashBinLocationUpdate": {
             "trashbin-1": "cutoutA3"
@@ -608,7 +521,7 @@ Labware:
       "orderedStepIds": [],
       "pipettes": {
         "pipette_left": {
-          "pipetteName": "p50_multi_flex"
+          "pipetteName": "p50_single_flex"
         }
       },
       "modules": {
@@ -628,39 +541,6 @@ Labware:
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
   },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p50_multi_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "thermocyclerModuleV2",
-        "location": {
-          "slotName": "B1"
-        },
-        "moduleId": "tc-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
-        "labwareId": "labware-1",
-        "loadName": "opentrons_flex_96_filtertiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    }
-  ]
 }
 ```
 
@@ -677,7 +557,7 @@ Robot:
 - Flex
 
 Pipette mount:
-- right: p1000_single_flex
+- right: p50_single_flex
 
 Gripper:
 - No need
@@ -689,7 +569,7 @@ Fixtures:
 - Waste chute
 
 Labware:
-- opentrons_flex_96_filtertiprack_1000ul in slot C2
+- opentrons_flex_96_filtertiprack_50ul in slot C2
 ```
 
 ### Output
@@ -703,7 +583,9 @@ Labware:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_right": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -712,24 +594,28 @@ Labware:
           "labwareLocationUpdate": {
             "labware-1": "C2"
           },
-          "pipetteLocationUpdate": {
-            "pipette_right": "right"
-          },
           "moduleLocationUpdate": {
-            "t-1": "C1"
+            "t-1": "D1"
           },
-          "trashBinLocationUpdate": {},
-          "wasteChuteLocationUpdate": {
-            "wastechute-1": "cutoutD3"
+          "pipetteLocationUpdate": {
+            "pipette_left": "left"
           },
+          "trashBinLocationUpdate": {
+            "trashbin-1": "cutoutA3"
+          },
+          "wasteChuteLocationUpdate": {},
           "stagingAreaLocationUpdate": {},
-          "gripperLocationUpdate": {}
+          "gripperLocationUpdate": {
+            "gripper-1": "mounted"
+          },
+          "stepType": "manualIntervention",
+          "id": "__INITIAL_DECK_SETUP_STEP__"
         }
       },
       "orderedStepIds": [],
       "pipettes": {
-        "pipette_right": {
-          "pipetteName": "p1000_single_flex"
+        "pipette_left": {
+          "pipetteName": "p50_single_flex"
         }
       },
       "modules": {
@@ -739,8 +625,8 @@ Labware:
       },
       "labware": {
         "labware-1": {
-          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
-          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
         }
       }
     }
@@ -749,39 +635,6 @@ Labware:
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
   },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_single_flex",
-        "mount": "right",
-        "pipetteId": "pipette_right"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "temperatureModuleV2",
-        "location": {
-          "slotName": "C1"
-        },
-        "moduleId": "t-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
-        "labwareId": "labware-1",
-        "loadName": "opentrons_flex_96_filtertiprack_1000ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    }
-  ]
 }
 ```
 
@@ -809,7 +662,7 @@ Fixtures:
 
 Labware:
 - opentrons_flex_96_tiprack_50ul in slot C2
-- opentrons_flex_96_filtertiprack_200ul in slot B2
+- opentrons_flex_96_filtertiprack_1000ul in slot B2
 ```
 
 ### output
@@ -818,13 +671,17 @@ Labware:
 {
   "metadata": {
     "protocolName": "Load two pipettes: left and right mounts",
-    "description": "Load two pipettes to the left and right mounts. No steps and commands."
+    "description": "Load two pipettes to the left and right mounts. No steps."
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_50ul/1"],
-        "pipette_right": ["opentrons/opentrons_flex_96_filtertiprack_200ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ],
+        "pipette_right": [
+          "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -832,13 +689,13 @@ Labware:
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
             "labware-1": "C2",
-            "labware-2": "B2"
+            "labware-2": "D2"
           },
+          "moduleLocationUpdate": {},
           "pipetteLocationUpdate": {
             "pipette_left": "left",
             "pipette_right": "right"
           },
-          "moduleLocationUpdate": {},
           "trashBinLocationUpdate": {
             "trashbin-1": "cutoutA3"
           },
@@ -846,7 +703,9 @@ Labware:
           "stagingAreaLocationUpdate": {},
           "gripperLocationUpdate": {
             "gripper-1": "mounted"
-          }
+          },
+          "stepType": "manualIntervention",
+          "id": "__INITIAL_DECK_SETUP_STEP__"
         }
       },
       "orderedStepIds": [],
@@ -861,12 +720,12 @@ Labware:
       "modules": {},
       "labware": {
         "labware-1": {
-          "displayName": "Opentrons Flex 96 Tip Rack 50 µL",
-          "labwareDefURI": "opentrons/opentrons_flex_96_tiprack_50ul/1"
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
         },
         "labware-2": {
-          "displayName": "Opentrons Flex 96 Filter Tip Rack 200 µL",
-          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_200ul/1"
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
         }
       }
     }
@@ -874,51 +733,7 @@ Labware:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p50_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_multi_flex",
-        "mount": "right",
-        "pipetteId": "pipette_right"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Tip Rack 50 µL",
-        "labwareId": "labware-1",
-        "loadName": "opentrons_flex_96_tiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 200 µL",
-        "labwareId": "labware-2",
-        "loadName": "opentrons_flex_96_filtertiprack_200ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "B2"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
@@ -928,7 +743,7 @@ Labware:
 
 ```text
 Metadata:
-- ProtocolName: Basic protocol
+- ProtocolName: Basic protocol with liquid 
 - Description: protocol with a pipette and tips and a tiprack. No steps.
 
 Robot:
@@ -956,18 +771,20 @@ Liquid
 ```json
 {
   "metadata": {
-    "protocolName": "Basic protocol",
-    "description": "protocol with a pipette and tips and a tiprack. No steps."
+    "protocolName": "Basic protocol with liquid",
+    "description": "Defining liquid. Water with a blue color."
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_50ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ]
       },
       "ingredients": {
         "0": {
           "displayName": "water",
-          "description": "blue",
+          "description": "blue water sample",
           "displayColor": "#50d5ffff",
           "liquidGroupId": "0"
         }
@@ -1008,95 +825,10 @@ Liquid
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-
-  "liquids": {
-    "0": {
-      "displayName": "water",
-      "description": "blue",
-      "displayColor": "#50d5ffff"
-    }
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p50_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Tip Rack 50 µL",
-        "labwareId": "labware-1",
-        "loadName": "opentrons_flex_96_tiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
-### Key Differences from Template
-
-1. **Metadata Section**
-
-   - Filled `protocolName` and `description` with basic protocol information
-
-2. **designerApplication.data Section**
-
-   - **pipetteTiprackAssignments**: Added mapping for multi-channel pipette to tiprack
-     ```json
-     "pipette-left": ["opentrons/opentrons_96_tiprack_300ul/1"]
-     ```
-   - **ingredients**: Added liquid definition for water
-     ```json
-     "0": {
-       "name": "water",
-       "displayColor": "#50d5ffff",
-       "liquidClass": null,
-       "description": "water",
-       "serialize": false,
-       "liquidGroupId": "0"
-     }
-     ```
-   - **ingredLocations**: Remains empty object (no specific location assigned)
-   - **savedStepForms**:
-     - Added labware location: `"labware-1": "2"`
-     - Added pipette location: `"pipette-left": "left"`
-     - Included stepType and id fields
-     - Removed template `step-n` object
-   - **orderedStepIds**: Remains empty array (no steps)
-
-3. **robot Section**
-
-   - Added specific model and deckId for OT-2
-     ```json
-     "model": "OT-2 Standard",
-     "deckId": "ot2_standard"
-     ```
-
-4. **commands Section**
-
-   - Added two specific commands in order:
-     1. loadPipette command for P300 Multi-Channel
-     2. loadLabware command for tiprack
-   - Each command uses consistent identifiers:
-     - Pipette: "pipette-left"
-     - Labware: "labware-1"
-
-5. **Special Considerations**
-
-   - Liquid definitions are stored in the ingredients object with unique identifiers
-   - Each liquid has associated properties including color, description, and group ID
-   - Liquid locations can be specified in ingredLocations when needed
-   - Default blue color (#50d5ffff) assigned to water
 
 ## Case 7: Add liquid
 
@@ -1116,7 +848,7 @@ Fixture:
 - Trashbin
 
 Labware:
-- opentrons_flex_96_tiprack_200ul in slot C2
+- opentrons_flex_96_filtertiprack_1000ul in slot D1
 - nest_12_reservoir_15ml in slot B1
 
 Liquid
@@ -1128,24 +860,26 @@ Liquid
 ```json
 {
   "metadata": {
-    "protocolName": "Add liquid",
-    "description": "Add 13333ul of water to A1 of the reservoir"
+    "protocolName": "Basic protocol with liquid",
+    "description": "Add 13333ul of water to A1 of the reservoir."
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_200ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        ]
       },
       "ingredients": {
         "0": {
           "displayName": "water",
-          "description": "for mixing",
+          "description": "blue water sample",
           "displayColor": "#50d5ffff",
           "liquidGroupId": "0"
         }
       },
       "ingredLocations": {
-        "labware-2": {
+        "labware-1": {
           "A1": {
             "0": {
               "volume": 13333
@@ -1156,13 +890,13 @@ Liquid
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "labware-1": "C2",
-            "labware-2": "B1"
+            "labware-1": "B1",
+            "labware-2": "D1"
           },
+          "moduleLocationUpdate": {},
           "pipetteLocationUpdate": {
             "pipette_left": "left"
           },
-          "moduleLocationUpdate": {},
           "trashBinLocationUpdate": {
             "trashbin-1": "cutoutA3"
           },
@@ -1180,12 +914,12 @@ Liquid
       "modules": {},
       "labware": {
         "labware-1": {
-          "displayName": "Opentrons Flex 96 Tip Rack 200 µL",
-          "labwareDefURI": "opentrons/opentrons_flex_96_tiprack_200ul/1"
+          "displayName": "NEST 12 Well Reservoir 15 mL",
+          "labwareDefURI": "opentrons/nest_12_reservoir_15ml/1"
         },
         "labware-2": {
-          "displayName": "NEST 12 Well Reservoir 15 mL",
-          "labwareDefURI": "opentrons/nest_12_reservoir_15ml/2"
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
         }
       }
     }
@@ -1193,126 +927,9 @@ Liquid
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "liquids": {
-    "0": {
-      "displayName": "water",
-      "description": "for mixing",
-      "displayColor": "#50d5ffff"
-    }
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Tip Rack 200 µL",
-        "labwareId": "labware-1",
-        "loadName": "opentrons_flex_96_tiprack_200ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "NEST 12 Well Reservoir 15 mL",
-        "labwareId": "labware-2",
-        "loadName": "nest_12_reservoir_15ml",
-        "namespace": "opentrons",
-        "version": 2,
-        "location": {
-          "slotName": "B1"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
-
-### Key Differences between Case 7 and Case 6
-
-1. **Additional Labware**
-
-   - Case 7 adds a NEST 12 Well Reservoir
-   - Second labware appears in `labwareLocationUpdate` and `commands`
-
-   ```json
-   "labwareLocationUpdate": {
-     "labware-2": "2",  // Tiprack
-     "labware-1": "5"   // Reservoir (new)
-   }
-   ```
-
-2. **ingredLocations Structure**
-
-   - Case 6: Empty object `"ingredLocations": {}`
-   - Case 7: Specifies liquid volume and location
-
-   ```json
-   "ingredLocations": {
-     "labware-1": {
-       "A1": {
-         "0": {
-           "volume": 10000
-         }
-       }
-     }
-   }
-   ```
-
-3. **commands Section**
-
-   - Case 6: Two commands (loadPipette, loadLabware)
-   - Case 7: Three commands:
-
-     1. loadPipette command (unchanged)
-     2. loadLabware for tiprack (unchanged)
-     3. New loadLabware command for reservoir:
-
-     ```json
-     {
-       "commandType": "loadLabware",
-       "params": {
-         "displayName": "NEST 12 Well Reservoir 15 mL",
-         "labwareId": "labware-1",
-         "loadName": "nest_12_reservoir_15ml",
-         "namespace": "opentrons",
-         "version": 1,
-         "location": {
-           "slotName": "5"
-         }
-       }
-     }
-     ```
-
-4. **Labware Identifiers**
-
-   - Case 7 introduces more complex labware identification:
-     - Reservoir: "labware-1"
-     - Tiprack: "labware-2"
-   - These IDs must be consistent across:
-     - `savedStepForms.labwareLocationUpdate`
-     - `ingredLocations`
-     - `commands[].params.labwareId`
-
-5. **Special Considerations for Liquid Handling**
-
-   - Case 7 demonstrates:
-     - Well specification (A1)
-     - Volume specification (10000 µL)
-     - Liquid-labware association
-     - Consistent liquid ID usage ("0" for water)
 
 ## Case 8: Heater-shaker module with well plate (Flex only)
 
@@ -1332,7 +949,7 @@ Pipette Mount:
 Gripper: No
 
 Module:
-- heaterShakerModuleV1
+- heaterShakerModuleV1 in D1
 
 Fixtures
 - Trashbin
@@ -1348,25 +965,24 @@ Labware:
 Placing labware on heater shaker module requires adapter. The list of adapters and their corresponding compatible labware is as follows:
 
 <Adapters>
+
 - Opentrons 96 Deep Well Heater-Shaker Adapter
-   - NEST 96 Deep Well Plate 2mL
+  - NEST 96 Deep Well Plate 2mL
 
 - Opentrons 96 Flat Bottom Heater-Shaker Adapter
-
   - NEST 96 Well Plate 200 uL Flat
 
 - Opentrons 96 PCR Heater-Shaker Adapter
-
   - Armadillo 96 Well Plate 200 uL PCR Full Skirt
   - Bio-Rad 96 Well Plate 200 uL PCR
   - NEST 96 Well Plate 100 uL PCR Full Skirt
   - Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt
 
 - Opentrons Universal Flat Heater-Shaker Adapter
-
   - Corning 384 Well Plate 112 uL Flat
   - Corning 96 Well Plate 360 uL Flat
-    `</Adapters>`
+  
+</Adapters>
 
 ### Output
 
@@ -1379,19 +995,19 @@ Placing labware on heater shaker module requires adapter. The list of adapters a
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_200ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "labwareLocationUpdate": {
-              "labware-1": "C2", // Tiprack adapter placed in slot C2
-              "labware-2": "labware-1", // Tiprack placed on tiprack adapter (labware-1)
-              "labware-3": "hs-1", // Universal flat adapter placed on heater-shaker module
-              "labware-4": "labware-3" // Well plate placed on universal flat adapter (labware-3)
-            }
+            "labware-1": "C2",
+            "labware-2": "labware-1",
+            "labware-3": "hs-1",
+            "labware-4": "labware-3"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -1400,7 +1016,7 @@ Placing labware on heater shaker module requires adapter. The list of adapters a
             "hs-1": "D1"
           },
           "trashBinLocationUpdate": {
-            "trashbin-1": "cutoutA3"
+            "trash-1": "cutoutA3"
           },
           "wasteChuteLocationUpdate": {},
           "stagingAreaLocationUpdate": {},
@@ -1424,8 +1040,8 @@ Placing labware on heater shaker module requires adapter. The list of adapters a
           "labwareDefURI": "opentrons/opentrons_flex_96_tiprack_adapter/1"
         },
         "labware-2": {
-          "displayName": "Opentrons Flex 96 Filter Tip Rack 200 µL",
-          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_200ul/1"
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
         },
         "labware-3": {
           "displayName": "Opentrons Universal Flat Heater-Shaker Adapter",
@@ -1433,7 +1049,7 @@ Placing labware on heater shaker module requires adapter. The list of adapters a
         },
         "labware-4": {
           "displayName": "Corning 96 Well Plate 360 µL Flat",
-          "labwareDefURI": "opentrons/corning_96_wellplate_360ul_flat/3"
+          "labwareDefURI": "opentrons/corning_96_wellplate_360ul_flat/2"
         }
       }
     }
@@ -1441,80 +1057,7 @@ Placing labware on heater shaker module requires adapter. The list of adapters a
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "liquids": {},
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_96",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "heaterShakerModuleV1",
-        "location": {
-          "slotName": "D1"
-        },
-        "moduleId": "hs-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Tip Rack Adapter",
-        "labwareId": "labware-1",
-        "loadName": "opentrons_flex_96_tiprack_adapter",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Universal Flat Heater-Shaker Adapter",
-        "labwareId": "labware-3",
-        "loadName": "opentrons_universal_flat_adapter",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "moduleId": "hs-1"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 200 µL",
-        "labwareId": "labware-2",
-        "loadName": "opentrons_flex_96_filtertiprack_200ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "labwareId": "labware-1"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Corning 96 Well Plate 360 µL Flat",
-        "labwareId": "labware-4",
-        "loadName": "corning_96_wellplate_360ul_flat",
-        "namespace": "opentrons",
-        "version": 3,
-        "location": {
-          "labwareId": "labware-3"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
@@ -1566,20 +1109,22 @@ Labware:
 {
   "metadata": {
     "protocolName": "Thermocycler with plate",
-    "description": "Thermocycler with plate"
+    "description": "Thermocycler with plate. No steps or commands."
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-filter-tiprack": "C2",
-            "lw-wellplate": "tc-1"
+            "labware-1": "C2",
+            "labware-2": "tc-1"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -1607,13 +1152,13 @@ Labware:
         }
       },
       "labware": {
-        "lw-filter-tiprack": {
+        "labware-1": {
           "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
           "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
         },
-        "lw-wellplate": {
+        "labware-2": {
           "displayName": "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
-          "labwareDefURI": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/3"
+          "labwareDefURI": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2"
         }
       }
     }
@@ -1622,106 +1167,13 @@ Labware:
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
   },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "thermocyclerModuleV2",
-        "location": {
-          "slotName": "B1"
-        },
-        "moduleId": "tc-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
-        "labwareId": "lw-filter-tiprack",
-        "loadName": "opentrons_flex_96_filtertiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
-        "labwareId": "lw-wellplate",
-        "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
-        "namespace": "opentrons",
-        "version": 3,
-        "location": {
-          "moduleId": "tc-1"
-        }
-      }
-    }
-  ]
 }
 ```
 
-### Key Differences from the Template
+**Note**
+- For Flex robot, note that thermocycler is always in slot B1 (covering B1 and A1 slots in practice).
+- For OT-2 robot, note that thermocycler is always in slot 7 (covering 7, 8, 10, 11) slots in practice).
 
-1. **Metadata Section**
-
-   - Filled `protocolName` and `description` with thermocycler-specific information
-
-2. **designerApplication.data Section**
-
-   - **pipetteTiprackAssignments**: Added mapping for single-channel pipette
-
-     ```json
-     "pipette-left": ["opentrons/opentrons_96_tiprack_300ul/1"]
-     ```
-
-   - **savedStepForms**: Special labware location structure:
-
-     ```json
-     "labwareLocationUpdate": {
-       "labware-1": "2",              // Tiprack in slot 2
-       "labware-2": "module-tc-1"     // Well plate on thermocycler
-     }
-     ```
-
-     - Added module location: `"module-tc-1": "7"`
-     - Added pipette location: `"pipette-left": "left"`
-
-3. **commands Section**
-
-   - Added four specific commands in order:
-     1. loadPipette command for P300 Single-Channel
-     2. loadModule command for thermocycler
-     3. loadLabware command for tiprack
-     4. loadLabware command for PCR plate
-
-4. **Special Features**
-
-   - **Module-Based Labware Location**: PCR plate references module directly
-     ```json
-     "location": {
-       "moduleId": "module-tc-1"
-     }
-     ```
-   - **No Adapter Required**: Unlike heater-shaker, thermocycler doesn't need an adapter
-   - **Slot Restrictions**: Thermocycler must be in slot 7
-
-5. **Key Dependencies**
-
-   - Direct Module → Well Plate relationship (no adapter needed)
-   - Consistent module ID usage (`module-tc-1`)
-   - Labware compatibility with thermocycler
-   - Proper slot allocation considering thermocycler's space requirements (slots 7, 8, 10, 11)
 
 ## Case 10: Temperature with plate
 
@@ -1742,8 +1194,8 @@ Gripper
 - No
 
 Module:
-- Temperature module C1
-- Temperature module B1
+- Temperature module 1 in C1
+- Temperature module 2 in B1
 
 Fixture:
 - Trashbin
@@ -1795,22 +1247,24 @@ Placing labware on temperature module requires Aluminum blocks and/or adapters. 
 {
   "metadata": {
     "protocolName": "Temperature with plate",
-    "description": "Temperature with plate"
+    "description": "Temperature with plate. No steps or commands."
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_1000ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_tiprack_1000ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "tiprack-1": "C2",
-            "aluminum-block-nest-2ml": "t-1",
-            "adapter_temp_mod_deep_well": "t-2",
-            "well_plate_nest_96_2ml": "adapter_temp_mod_deep_well"
+            "labware-1": "C2",
+            "labware-2": "t-1",
+            "labware-3": "t-2",
+            "labware-4": "labware-3"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -1842,21 +1296,21 @@ Placing labware on temperature module requires Aluminum blocks and/or adapters. 
         }
       },
       "labware": {
-        "tiprack-1": {
+        "labware-1": {
           "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
           "labwareDefURI": "opentrons/opentrons_flex_96_tiprack_1000ul/1"
         },
-        "aluminum-block-nest-2ml": {
+        "labware-2": {
           "displayName": "Opentrons 24 Well Aluminum Block with NEST 2 mL Snapcap",
-          "labwareDefURI": "opentrons/opentrons_24_aluminumblock_nest_2ml_snapcap/2"
+          "labwareDefURI": "opentrons/opentrons_24_aluminumblock_nest_2ml_snapcap/1"
         },
-        "adapter_temp_mod_deep_well": {
+        "labware-3": {
           "displayName": "Opentrons 96 Deep Well Temperature Module Adapter",
           "labwareDefURI": "opentrons/opentrons_96_deep_well_temp_mod_adapter/1"
         },
-        "well_plate_nest_96_2ml": {
+        "labware-4": {
           "displayName": "NEST 96 Deep Well Plate 2mL",
-          "labwareDefURI": "opentrons/nest_96_wellplate_2ml_deep/3"
+          "labwareDefURI": "opentrons/nest_96_wellplate_2ml_deep/2"
         }
       }
     }
@@ -1864,89 +1318,7 @@ Placing labware on temperature module requires Aluminum blocks and/or adapters. 
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_multi_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "temperatureModuleV2",
-        "location": {
-          "slotName": "C1"
-        },
-        "moduleId": "t-1"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "temperatureModuleV2",
-        "location": {
-          "slotName": "B1"
-        },
-        "moduleId": "t-2"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons 96 Deep Well Temperature Module Adapter",
-        "labwareId": "adapter_temp_mod_deep_well",
-        "loadName": "opentrons_96_deep_well_temp_mod_adapter",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "moduleId": "t-2"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
-        "labwareId": "tiprack-1",
-        "loadName": "opentrons_flex_96_tiprack_1000ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons 24 Well Aluminum Block with NEST 2 mL Snapcap",
-        "labwareId": "aluminum-block-nest-2ml",
-        "loadName": "opentrons_24_aluminumblock_nest_2ml_snapcap",
-        "namespace": "opentrons",
-        "version": 2,
-        "location": {
-          "moduleId": "t-1"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "NEST 96 Deep Well Plate 2mL",
-        "labwareId": "well_plate_nest_96_2ml",
-        "loadName": "nest_96_wellplate_2ml_deep",
-        "namespace": "opentrons",
-        "version": 3,
-        "location": {
-          "labwareId": "adapter_temp_mod_deep_well"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
@@ -1988,15 +1360,18 @@ Labware:
   },
   "designerApplication": {
     "data": {
+      "_internalAppBuildDate": "Mon, 05 May 2025 20:38:07 GMT",
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-filter-tip-rack": "C2"
+            "labware-1": "C2"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -2026,7 +1401,7 @@ Labware:
         }
       },
       "labware": {
-        "lw-filter-tip-rack": {
+        "labware-1": {
           "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
           "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
         }
@@ -2036,51 +1411,18 @@ Labware:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p50_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "absorbanceReaderV1",
-        "location": {
-          "slotName": "B3"
-        },
-        "moduleId": "apr-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
-        "labwareId": "lw-filter-tip-rack",
-        "loadName": "opentrons_flex_96_filtertiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
-## Case 12: Load Magnetic Block Module (Flex only)
+## Case 12: Load `Magnetic Block` Module (Flex only)
 
 ### Input
 
 ```text
 Metadata:
   - protocolName: Load Magnetic Block module
-  - description": Load Magnetic Block module
+  - description": Load Magnetic Block module and plate
 
 Robot: Flex
 
@@ -2107,26 +1449,30 @@ This Magnetic Block allows the following plates
 - NEST 96 Deep Well Plate 2mL
 - Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt
 
+
+
 ### Output
 
 ```json
 {
   "metadata": {
     "protocolName": "Load Magnetic Block module",
-    "description": "Load Magnetic Block module"
+    "description": "Load Magnetic Block module and plate"
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_50ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-tiprack-1": "D1",
-            "lw-wellplate-1": "magnetic-block-1"
+            "labware-1": "D1",
+            "labware-2": "magnetic-block-1"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -2154,13 +1500,13 @@ This Magnetic Block allows the following plates
         }
       },
       "labware": {
-        "lw-tiprack-1": {
+        "labware-1": {
           "displayName": "Opentrons Flex 96 Tip Rack 50 µL",
           "labwareDefURI": "opentrons/opentrons_flex_96_tiprack_50ul/1"
         },
-        "lw-wellplate-1": {
+        "labware-2": {
           "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
-          "labwareDefURI": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/3"
+          "labwareDefURI": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2"
         }
       }
     }
@@ -2168,53 +1514,7 @@ This Magnetic Block allows the following plates
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_multi_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "magneticBlockV1",
-        "location": {
-          "slotName": "D2"
-        },
-        "moduleId": "magnetic-block-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Tip Rack 50 µL",
-        "labwareId": "lw-tiprack-1",
-        "loadName": "opentrons_flex_96_tiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "D1"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
-        "labwareId": "lw-wellplate-1",
-        "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "namespace": "opentrons",
-        "version": 3,
-        "location": {
-          "moduleId": "magnetic-block-1"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
@@ -2251,20 +1551,22 @@ Labware:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_96_tiprack_300ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_96_tiprack_300ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-tiprack-1": "2"
+            "labware-1": "2"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
           },
           "moduleLocationUpdate": {
-            "mm-1": "1"
+            "magentic-module-1": "1"
           },
           "trashBinLocationUpdate": {
             "trashbin-1": "cutout12"
@@ -2281,12 +1583,12 @@ Labware:
         }
       },
       "modules": {
-        "mm-1": {
+        "magentic-module-1": {
           "model": "magneticModuleV2"
         }
       },
       "labware": {
-        "lw-tiprack-1": {
+        "labware-1": {
           "displayName": "Opentrons OT-2 96 Tip Rack 300 µL",
           "labwareDefURI": "opentrons/opentrons_96_tiprack_300ul/1"
         }
@@ -2296,40 +1598,7 @@ Labware:
   "robot": {
     "model": "OT-2 Standard",
     "deckId": "ot2_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p300_multi_gen2",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "magneticModuleV2",
-        "location": {
-          "slotName": "1"
-        },
-        "moduleId": "mm-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons OT-2 96 Tip Rack 300 µL",
-        "labwareId": "lw-tiprack-1",
-        "loadName": "opentrons_96_tiprack_300ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "2"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
@@ -2343,24 +1612,19 @@ heaterShaker has the following fields:
   "stepType": "heaterShaker", // Required
   "stepName": "string", // Optional - display name for this step
   "stepDetails": "string", // Optional - description/notes
-
-  // MODULE CONTROL
-  "moduleId": "string", // Required - ID of the heater-shaker module
-
-  // TEMPERATURE CONTROL
-  "setHeaterShakerTemperature": boolean, // Whether to set temperature
-  "targetHeaterShakerTemperature": "number-as-string" | null, // Temperature in °C (37-95°C)
-
-  // SHAKE CONTROL
-  "setShake": boolean, // Whether to shake
-  "targetSpeed": "number-as-string" | null, // RPM for shaking (200-3000 RPM)
-
   // TIMER
   "heaterShakerSetTimer": boolean | null, // Whether to use a timer
   "heaterShakerTimer": "string" | null, // Time in seconds or minutes format
-
   // LATCH CONTROL
   "latchOpen": boolean // Whether the latch should be open (can't be open while shaking)
+  // MODULE CONTROL
+  "moduleId": "string", // Required - ID of the heater-shaker module, e.g., hs-1
+  // SHAKE CONTROL
+  "setHeaterShakerTemperature": boolean, // Whether to set temperature
+  "setShake": boolean, // Whether to shake
+  // TEMPERATURE CONTROL
+  "targetHeaterShakerTemperature": "number-as-string" | null, // Temperature in °C (37-95°C)
+  "targetSpeed": "number-as-string" | null, // RPM for shaking (200-3000 RPM)
 }
 ```
 
@@ -2374,20 +1638,20 @@ Additonal notes:
 ### Input
 
 ```text
-- ProtocolName: Heater-Shaker
+- ProtocolName: Heater-Shaker module
 - Description: Close the latch of Heater-Shaker module
 
 Robot:
 - Flex
 
 Module:
-- Heater-Shaker Module GEN1 in slot 1
+- heaterShakerModuleV1
 
 Pipette Mount:
-- Left mount: single channel pipette
+- Left mount: Flex 1-Channel 50 µL (p50_single_flex)
 
 Steps:
-1. Close Heater-Shaker labware latch
+1. Close Heater-Shaker latch.
 ```
 
 ### Output
@@ -2395,20 +1659,22 @@ Steps:
 ```json
 {
   "metadata": {
-    "protocolName": "heaterShaker step",
-    "description": "stepType: heaterShaker"
+    "protocolName": "Heater-Shaker module",
+    "description": "Close the latch of Heater-Shaker module"
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-tiprack-1": "C2"
+            "labware-1": "C2"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -2428,7 +1694,7 @@ Steps:
           "stepType": "heaterShaker",
           "stepName": "heater-shaker",
           "stepDetails": "",
-          "heaterShakerSetTimer": null,
+          "heaterShakerSetTimer": null, 
           "heaterShakerTimer": null,
           "latchOpen": false,
           "moduleId": "hs-1",
@@ -2438,7 +1704,9 @@ Steps:
           "targetSpeed": null
         }
       },
-      "orderedStepIds": ["step-1"],
+      "orderedStepIds": [
+        "step-1"
+      ],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p50_single_flex"
@@ -2450,7 +1718,7 @@ Steps:
         }
       },
       "labware": {
-        "lw-tiprack-1": {
+        "labware-1": {
           "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
           "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
         }
@@ -2460,44 +1728,11 @@ Steps:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p50_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "heaterShakerModuleV1",
-        "location": {
-          "slotName": "D1"
-        },
-        "moduleId": "hs-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
-        "labwareId": "lw-tiprack-1",
-        "loadName": "opentrons_flex_96_filtertiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
-Example, lets shake for 2 mins and speed of 500tpm:
+Example, lets shake for 2 mins and speed of 500rpm:
 
 ```json
 "step-1": {
@@ -2537,14 +1772,14 @@ temperature has the following step:
 Additonal notes:
 
 - Temperature range: 4-95°C
-- Setting temperature to null or setting setTemperature to "false" will deactivate the module
+- Setting temperature to `null` or `false` will deactivate the module
 
 ### Input
 
 ```text
 Metadata:
 - ProtocolName: Load temperature step
-- Description: Add a temerature step, by default it is deactivate
+- Description: Add a temperature step, by default it is deactivated
 
 Robot:
 - Flex
@@ -2567,20 +1802,22 @@ Steps:
 ```json
 {
   "metadata": {
-    "protocolName": "temperature",
-    "description": "Steptype: temperature"
+    "protocolName": "Load temperature step",
+    "description": "Add a temperature step, by default it is deactivated"
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_50ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-tiprack-1": "C2"
+            "labware-1": "C2"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -2589,7 +1826,7 @@ Steps:
             "t-1": "C1"
           },
           "trashBinLocationUpdate": {
-            "934601e3-b53d-480d-985b-199293ecf08e:trashBin": "cutoutA3"
+            "trashbin-1": "cutoutA3"
           },
           "wasteChuteLocationUpdate": {},
           "stagingAreaLocationUpdate": {},
@@ -2605,10 +1842,12 @@ Steps:
           "targetTemperature": null
         }
       },
-      "orderedStepIds": ["step-1"],
+      "orderedStepIds": [
+        "step-1"
+      ],
       "pipettes": {
         "pipette_left": {
-          "pipetteName": "p50_single_flex"
+          "pipetteName": "p50_multi_flex"
         }
       },
       "modules": {
@@ -2617,7 +1856,7 @@ Steps:
         }
       },
       "labware": {
-        "lw-tiprack-1": {
+        "labware-1": {
           "displayName": "Opentrons Flex 96 Tip Rack 50 µL",
           "labwareDefURI": "opentrons/opentrons_flex_96_tiprack_50ul/1"
         }
@@ -2627,40 +1866,7 @@ Steps:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p50_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "temperatureModuleV2",
-        "location": {
-          "slotName": "C1"
-        },
-        "moduleId": "t-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Tip Rack 50 µL",
-        "labwareId": "lw-tiprack-1",
-        "loadName": "opentrons_flex_96_tiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
@@ -2803,22 +2009,23 @@ Steps:
 ```json
 {
   "metadata": {
-    "protocolName": "thermocycler",
-    "description": "Steptype: thermocycler"
+    "protocolName": "PCR",
+    "description": "PCR"
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_200ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
-          "stepType": "manualIntervention",
-          "id": "__INITIAL_DECK_SETUP_STEP__",
           "labwareLocationUpdate": {
-            "lw-tip-rack-1": "C2"
+            "labware-1": "C2",
+            "labware-2": "tc-1"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -2831,9 +2038,7 @@ Steps:
           },
           "wasteChuteLocationUpdate": {},
           "stagingAreaLocationUpdate": {},
-          "gripperLocationUpdate": {
-            "gripper-1": "mounted"
-          }
+          "gripperLocationUpdate": {}
         },
         "step-1": {
           "id": "step-1",
@@ -2858,7 +2063,9 @@ Steps:
           "thermocyclerFormType": "thermocyclerState"
         }
       },
-      "orderedStepIds": ["step-1"],
+      "orderedStepIds": [
+        "step-1"
+      ],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p1000_single_flex"
@@ -2870,9 +2077,13 @@ Steps:
         }
       },
       "labware": {
-        "lw-tip-rack-1": {
-          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
-          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        "labware-1": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 200 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_200ul/1"
+        },
+        "labware-2": {
+          "displayName": "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
+          "labwareDefURI": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2"
         }
       }
     }
@@ -2880,49 +2091,15 @@ Steps:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "thermocyclerModuleV2",
-        "location": {
-          "slotName": "B1"
-        },
-        "moduleId": "tc-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
-        "labwareId": "lw-tip-rack-1",
-        "loadName": "opentrons_flex_96_filtertiprack_1000ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
-Thermocycler step with profile settings, for example
+For example, Thermocycler step with profile settings:
 
 ```text
 Robot
 - Flex
-
 
 Steps:
 1. Thermocycler step:
@@ -2933,101 +2110,99 @@ Steps:
    - Hold block temperature at 4C and open lid.
 ```
 
-Ste would be something like below:
+Step would be something like below:
 
 ```json
-{
-  "step-1": {
-    "id": "step-1",
-    "stepType": "thermocycler",
-    "stepName": "thermocycler",
-    "stepDetails": "",
-    "blockIsActive": false,
-    "blockIsActiveHold": true,
-    "blockTargetTemp": null,
-    "blockTargetTempHold": "4",
-    "lidIsActive": false,
-    "lidIsActiveHold": false,
-    "lidOpen": false,
-    "lidOpenHold": true,
-    "lidTargetTemp": null,
-    "lidTargetTempHold": null,
-    "moduleId": "tc-1",
-    "orderedProfileItems": [
-      "9fd6374e-4136-42bf-8a27-336762d162bd",
-      "4ad7046d-a676-46a1-90bb-215457b9e712",
-      "7635bad9-026b-4c97-8b66-2f46bf29cc66"
-    ],
-    "profileItemsById": {
-      "9fd6374e-4136-42bf-8a27-336762d162bd": {
-        "id": "9fd6374e-4136-42bf-8a27-336762d162bd",
-        "title": "",
-        "steps": [
-          {
-            "durationMinutes": "00",
-            "durationSeconds": "57",
-            "id": "0899cc82-cffb-478f-9d31-987e6231385a",
-            "temperature": "72",
-            "title": "1",
-            "type": "profileStep"
-          }
-        ],
-        "type": "profileCycle",
-        "repetitions": "1"
-      },
-      "4ad7046d-a676-46a1-90bb-215457b9e712": {
-        "id": "4ad7046d-a676-46a1-90bb-215457b9e712",
-        "title": "",
-        "steps": [
-          {
-            "durationMinutes": "00",
-            "durationSeconds": "09",
-            "id": "3743db8e-f9f3-4e0d-b36f-e38e16ef3e68",
-            "temperature": "75",
-            "title": "1",
-            "type": "profileStep"
-          },
-          {
-            "durationMinutes": "00",
-            "durationSeconds": "10",
-            "id": "b5f62f15-cbfa-45fa-89a5-4fd13ee79b80",
-            "temperature": "84",
-            "title": "2",
-            "type": "profileStep"
-          },
-          {
-            "durationMinutes": "00",
-            "durationSeconds": "43",
-            "id": "9affb062-345c-4e1c-bfc3-707d200d8f5b",
-            "temperature": "65",
-            "title": "3",
-            "type": "profileStep"
-          }
-        ],
-        "type": "profileCycle",
-        "repetitions": "12"
-      },
-      "7635bad9-026b-4c97-8b66-2f46bf29cc66": {
-        "id": "7635bad9-026b-4c97-8b66-2f46bf29cc66",
-        "title": "",
-        "steps": [
-          {
-            "durationMinutes": "03",
-            "durationSeconds": "00",
-            "id": "874908cc-4e88-4450-8ca1-c722a0fe9cb8",
-            "temperature": "62",
-            "title": "1",
-            "type": "profileStep"
-          }
-        ],
-        "type": "profileCycle",
-        "repetitions": "1"
-      }
+"step-1": {
+  "id": "step-1",
+  "stepType": "thermocycler",
+  "stepName": "thermocycler",
+  "stepDetails": "",
+  "blockIsActive": false,
+  "blockIsActiveHold": true,
+  "blockTargetTemp": null,
+  "blockTargetTempHold": "4",
+  "lidIsActive": false,
+  "lidIsActiveHold": false,
+  "lidOpen": false,
+  "lidOpenHold": true,
+  "lidTargetTemp": null,
+  "lidTargetTempHold": null,
+  "moduleId": "tc-1",
+  "orderedProfileItems": [
+    "cycle-1",
+    "cycle-2",
+    "cycle-3"
+  ],
+  "profileItemsById": {
+    "cycle-1": {
+      "id": "cycle-1",
+      "title": "",
+      "steps": [
+        {
+          "durationMinutes": "00",
+          "durationSeconds": "57",
+          "id": "ca370c2f-649d-49ab-a59a-401882b33393",
+          "temperature": "72",
+          "title": "1",
+          "type": "profileStep"
+        }
+      ],
+      "type": "profileCycle",
+      "repetitions": "1"
     },
-    "profileTargetLidTemp": "91",
-    "profileVolume": "25",
-    "thermocyclerFormType": "thermocyclerProfile"
-  }
+    "cycle-2": {
+      "id": "cycle-2",
+      "title": "",
+      "steps": [
+        {
+          "durationMinutes": "00",
+          "durationSeconds": "09",
+          "id": "8dc7d7a6-e4c7-4836-866d-f819ed7e3949",
+          "temperature": "75",
+          "title": "1",
+          "type": "profileStep"
+        },
+        {
+          "durationMinutes": "00",
+          "durationSeconds": "10",
+          "id": "7e9d4a97-434d-4be5-ac9a-c98da3983544",
+          "temperature": "84",
+          "title": "2",
+          "type": "profileStep"
+        },
+        {
+          "durationMinutes": "00",
+          "durationSeconds": "43",
+          "id": "6466314f-d552-48a1-a241-00f59cc201c2",
+          "temperature": "65",
+          "title": "3",
+          "type": "profileStep"
+        }
+      ],
+      "type": "profileCycle",
+      "repetitions": "12"
+    },
+    "cycle-3": {
+      "id": "cycle-3",
+      "title": "",
+      "steps": [
+        {
+          "durationMinutes": "03",
+          "durationSeconds": "00",
+          "id": "21311fe3-c59a-4920-bac3-7c6ca5ae23b9",
+          "temperature": "62",
+          "title": "1",
+          "type": "profileStep"
+        }
+      ],
+      "type": "profileCycle",
+      "repetitions": "1"
+    }
+  },
+  "profileTargetLidTemp": "90",
+  "profileVolume": "25",
+  "thermocyclerFormType": "thermocyclerProfile"
 }
 ```
 
@@ -3056,7 +2231,7 @@ Absorbance Plate Reader has the following parameters:
   // For "multi" mode: can contain 1-6 wavelengths
 
   "referenceWavelength": "562", // Optional, only used in "single" mode
-  "referenceWavelengthActive": true, // Boolean to enable/disable reference wavelength
+  "referenceWavelengthActive": false, // Boolean to enable/disable reference wavelength
 
   // Fields for absorbanceReaderRead:
   "fileName": null, // Optional file name where results will be saved
@@ -3065,6 +2240,93 @@ Absorbance Plate Reader has the following parameters:
   "lidOpen": null // true for opening the lid, false for closing the lid
 }
 ```
+
+Note that for absorbance plate reader, gripper is always ussed.
+
+
+with `mode='single'`
+
+```json
+{
+  "metadata": {
+    "protocolName": "absorbanceReader",
+    "description": "absorbance plate reader"
+  },
+  "designerApplication": {
+    "data": {
+      "pipetteTiprackAssignments": {
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ]
+      },
+      "ingredients": {},
+      "ingredLocations": {},
+      "savedStepForms": {
+        "__INITIAL_DECK_SETUP_STEP__": {
+          "labwareLocationUpdate": {
+            "labware-1": "C2"
+          },
+          "pipetteLocationUpdate": {
+            "pipette_left": "left"
+          },
+          "moduleLocationUpdate": {
+            "apr-1": "B3"
+          },
+          "trashBinLocationUpdate": {
+            "trashbin-1": "cutoutA3"
+          },
+          "wasteChuteLocationUpdate": {},
+          "stagingAreaLocationUpdate": {},
+          "gripperLocationUpdate": {
+            "gripper-1": "mounted"
+          }
+        },
+        "step-1": {
+          "id": "step-1",
+          "stepType": "absorbanceReader",
+          "stepName": "absorbance plate reader",
+          "stepDetails": "",
+          "absorbanceReaderFormType": "absorbanceReaderInitialize",
+          "fileName": null,
+          "lidOpen": null,
+          "mode": "single",
+          "moduleId": "apr-1",
+          "referenceWavelength": null,
+          "referenceWavelengthActive": false,
+          "wavelengths": [
+            "450"
+          ]
+        }
+      },
+      "orderedStepIds": [
+        "step-1"
+      ],
+      "pipettes": {
+        "pipette_left": {
+          "pipetteName": "p50_multi_flex"
+        }
+      },
+      "modules": {
+        "apr-1": {
+          "model": "absorbanceReaderV1"
+        }
+      },
+      "labware": {
+        "labware-1": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        }
+      }
+    }
+  },
+  "robot": {
+    "model": "OT-3 Standard",
+    "deckId": "ot3_standard"
+  }
+}
+```
+
+
 
 with `mode="multi"`
 
@@ -3087,7 +2349,7 @@ with `mode="multi"`
 
 ## Case 18: Steptype: mix step
 
-mix step acceptes the following parameters:
+`mix` step accepts the following parameters:
 
 ```json
 {
@@ -3125,85 +2387,7 @@ mix step acceptes the following parameters:
 
   // TOUCH TIP
   "mix_touchTip_checkbox": boolean, // Whether to touch tip after mixing
-  "mix_touchTip_mmFromTop": number | null, // Optional - distance from well top in mm for touch tip
-
-  // FLOW RATES
-  "aspirate_flowRate": number | null, // Optional - flow rate for aspiration in µL/sec
-  "dispense_flowRate": number | null, // Optional - flow rate for dispensing in µL/sec
-
-  // DELAYS
-  "aspirate_delay_checkbox": boolean, // Whether to add delay after aspiration
-  "aspirate_delay_seconds": number | null, // Optional - seconds to delay after aspiration
-  "dispense_delay_checkbox": boolean, // Whether to add delay after dispensing
-  "dispense_delay_seconds": number | null, // Optional - seconds to delay after dispensing
-
-  // BLOWOUT
-  "blowout_checkbox": boolean, // Whether to perform blowout
-  "blowout_location": string | null, // Optional - location for blowout
-  "blowout_flowRate": number | null, // Optional - flow rate for blowout in µL/sec
-  "blowout_z_offset": number | null // Optional - z offset for blowout
-}
-```
-
-Additonal notes:
-
-Let me search for details about the mix step type:
-
-Search files...
-Let me look for more details about the mix step:
-
-Search files...
-Let me search for additional information on the mix step limitations and configurations:
-
-Search files...
-Now let me look for ChangeTipOptions and WellOrderOptions:
-
-Search files...
-Now let me look for more details about the ChangeTipOptions and WellOrderOption:
-
-Search files...
-Let me also look for specific details about flow rates:
-
-Search files...
-Based on all the gathered information, I'll create a comprehensive specification for the mix step type:
-
-```json
-{
-  "id": "string", // Required - unique ID for this step
-  "stepType": "mix", // Required
-  "stepName": "string", // Optional - display name for this step
-  "stepDetails": "string", // Optional - description/notes
-
-  // LABWARE & PIPETTE SELECTION
-  "labware": "LabwareEntity", // Required - the labware containing wells to mix in
-  "pipette": "PipetteEntity", // Required - the pipette to use for mixing
-  "tipRack": "string", // Required - ID of the tip rack to use
-  "nozzles": "NozzleConfigurationStyle" | null, // Optional - setting for 96-channel pipette configuration
-
-  // WELLS SELECTION & ORDER
-  "wells": ["A1", "B1", ...], // Required - wells to mix in
-  "mix_wellOrder_first": "t2b" | "b2t" | "l2r" | "r2l", // Required - primary well traversal direction
-  "mix_wellOrder_second": "t2b" | "b2t" | "l2r" | "r2l", // Required - secondary well traversal direction
-
-  // MIXING PARAMETERS
-  "volume": number, // Required - volume to aspirate and dispense during each mix (must not exceed pipette/tip capacity)
-  "times": number | null, // Optional - number of times to mix (1-999)
-
-  // TIP HANDLING
-  "changeTip": "always" | "once" | "never" | "perSource" | "perDest", // Required - when to use a new tip
-  "dropTip_location": "string", // Required - location to drop the tip (often "trashId")
-  "pickUpTip_location": "string" | null, // Optional - location to pick up tips
-  "pickUpTip_wellNames": ["A1", ...] | null, // Optional - specific wells to pick up tips from
-  "dropTip_wellNames": ["A1", ...] | null, // Optional - specific wells to drop tips in
-
-  // POSITIONING
-  "mix_mmFromBottom": number | null, // Optional - distance from well bottom in mm (default: 0.5)
-  "mix_x_position": number | null, // Optional - x position offset
-  "mix_y_position": number | null, // Optional - y position offset
-
-  // TOUCH TIP
-  "mix_touchTip_checkbox": boolean, // Whether to touch tip after mixing
-  "mix_touchTip_mmFromTop": number | null, // Optional - distance from well top in mm for touch tip
+  "mix_touchTip_mmFromBottom": number | null, // Optional - distance from well bottom in mm for touch tip
 
   // FLOW RATES
   "aspirate_flowRate": number | null, // Optional - flow rate for aspiration in µL/sec
@@ -3243,11 +2427,12 @@ Additional notes:
 8. Optional delays can be added after aspiration or dispensing for certain liquids that benefit from settling time
 9. Blowout is an optional step to expel any remaining liquid after the final dispense
 
+
 ### Input
 
 ```text
 Metadata:
-- ProtocolName: Step mix example
+- ProtocolName: `mix` step example
 - Description: This protocol shows an example of mix step.
 
 Robot:
@@ -3258,7 +2443,7 @@ Pipette Mount:
 
 Labware:
 - corning_96_wellplate_360ul_flat
-- opentrons_flex_96_filtertiprack_50ul
+- opentrons_flex_96_filtertiprack_1000ul
 
 Steps:
 1. Mix 30uL five times in the first five wells from the first column of the well plate.
@@ -3269,21 +2454,23 @@ Steps:
 ```json
 {
   "metadata": {
-    "protocolName": "mix",
-    "description": "Steptype: mix"
+    "protocolName": "Step mix example",
+    "description": "This protocol shows an example of mix step."
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-tiprack-1": "C2",
-            "lw-wellplate-1": "C1"
+            "labware-1": "B1",
+            "labware-2": "C2"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -3303,7 +2490,7 @@ Steps:
           "stepDetails": "",
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": "1",
-          "aspirate_flowRate": "478",
+          "aspirate_flowRate": "716",
           "blowout_checkbox": false,
           "blowout_flowRate": null,
           "blowout_location": null,
@@ -3311,13 +2498,12 @@ Steps:
           "changeTip": "always",
           "dispense_delay_checkbox": false,
           "dispense_delay_seconds": "1",
-          "dispense_flowRate": null,
+          "dispense_flowRate": "716",
           "dropTip_location": "trashbin-1",
-          "labware": "lw-wellplate-1",
-          "liquidClassesSupported": true,
+          "labware": "labware-1",
           "mix_mmFromBottom": 1,
           "mix_touchTip_checkbox": false,
-          "mix_touchTip_mmFromTop": null,
+          "mix_touchTip_mmFromBottom": null,
           "mix_wellOrder_first": "t2b",
           "mix_wellOrder_second": "l2r",
           "mix_x_position": 0,
@@ -3325,12 +2511,20 @@ Steps:
           "nozzles": null,
           "pipette": "pipette_left",
           "times": "5",
-          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
           "volume": "30",
-          "wells": ["A1", "B1", "C1", "D1", "E1"]
+          "wells": [
+            "A1",
+            "B1",
+            "C1",
+            "D1",
+            "E1"
+          ]
         }
       },
-      "orderedStepIds": ["step-1"],
+      "orderedStepIds": [
+        "step-1"
+      ],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p1000_single_flex"
@@ -3338,13 +2532,13 @@ Steps:
       },
       "modules": {},
       "labware": {
-        "lw-tiprack-1": {
-          "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
-          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        },
-        "lw-wellplate-1": {
+        "labware-1": {
           "displayName": "Corning 96 Well Plate 360 µL Flat",
-          "labwareDefURI": "opentrons/corning_96_wellplate_360ul_flat/3"
+          "labwareDefURI": "opentrons/corning_96_wellplate_360ul_flat/2"
+        },
+        "labware-2": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
         }
       }
     }
@@ -3352,53 +2546,18 @@ Steps:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
-        "labwareId": "lw-tiprack-1",
-        "loadName": "opentrons_flex_96_filtertiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Corning 96 Well Plate 360 µL Flat",
-        "labwareId": "lw-wellplate-1",
-        "loadName": "corning_96_wellplate_360ul_flat",
-        "namespace": "opentrons",
-        "version": 3,
-        "location": {
-          "slotName": "C1"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
 ### Remarks
-
 For `changeTip`, `always` is the default.
+
+
 
 ## Case 19: Steptype: moveLabware (move)
 
-moveLabware step takes the following parameters:
+`moveLabware` step takes the following parameters:
 
 ```json
 {
@@ -3440,7 +2599,7 @@ Robot:
 - Flex
 
 Labware:
-- Opentrons Flex 96 Tip Rack 1000 uL in C2
+- opentrons_flex_96_filtertiprack_50ul in C2
 
 Pipette Mount:
 - Left: p1000_single_flex
@@ -3454,20 +2613,22 @@ Steps:
 ```json
 {
   "metadata": {
-    "protocolName": "move",
-    "description": "stepype: movelabware"
+    "protocolName": "move step example",
+    "description": "move step example"
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_1000ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-tip-rack-1": "C2"
+            "labware-1": "C2"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -3487,22 +2648,24 @@ Steps:
           "stepType": "moveLabware",
           "stepName": "move",
           "stepDetails": "",
-          "labware": "lw-tip-rack-1",
+          "labware": "labware-1",
           "newLocation": "A1",
           "useGripper": true
         }
       },
-      "orderedStepIds": ["step-1"],
+      "orderedStepIds": [
+        "step-1"
+      ],
       "pipettes": {
         "pipette_left": {
-          "pipetteName": "p1000_single_flex"
+          "pipetteName": "p50_multi_flex"
         }
       },
       "modules": {},
       "labware": {
-        "lw-tip-rack-1": {
-          "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
-          "labwareDefURI": "opentrons/opentrons_flex_96_tiprack_1000ul/1"
+        "labware-1": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
         }
       }
     }
@@ -3510,36 +2673,13 @@ Steps:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
-        "labwareId": "lw-tip-rack-1",
-        "loadName": "opentrons_flex_96_tiprack_1000ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
 ## Case 20: Steptype: pause
 
-pause step accepts the following parameters:
+`pause` step accepts the following parameters:
 
 ```json
 {
@@ -3555,46 +2695,8 @@ pause step accepts the following parameters:
   "pauseMessage": "string", // Message to show during pause
 
   // FOR TIME-BASED PAUSE (when pauseAction is "untilTime")
-  "pauseTime": "string", // Format: "HH:MM:SS" or "MM:SS"
+  "pauseTime": "string", // Format should be: "HH:MM:SS"
   // Examples: "00:01:30" (1 min 30 sec) or "01:30" (1 min 30 sec)
-
-  // FOR TEMPERATURE-BASED PAUSE (when pauseAction is "untilTemperature")
-  "moduleId": "string", // Required - ID of the temperature/thermocycler/heater-shaker module
-  "pauseTemperature": "string" // Required - target temperature to wait for
-}
-```
-
-Search files...
-Let me search for more details about the pause step constants:
-
-Search files...
-Let me search specifically for pause time format:
-
-Search files...
-Let me search for more info about PAUSE constants:
-
-Search files...
-Let me try one more specific search to find all PAUSE constants:
-
-Search files...
-Based on all the gathered information, I'll now create a comprehensive specification for the pause step type:
-
-```json
-{
-  "id": "string", // Required - unique ID for this step
-  "stepType": "pause", // Required
-  "stepName": "string", // Optional - display name for this step
-  "stepDetails": "string", // Optional - description/notes
-
-  // PAUSE ACTION TYPE - Required
-  "pauseAction": "untilResume" | "untilTime" | "untilTemperature",
-
-  // PAUSE MESSAGE - Optional
-  "pauseMessage": "string", // Message to show during pause
-
-  // FOR TIME-BASED PAUSE (when pauseAction is "untilTime")
-  "pauseTime": "string", // Format: "HH:MM:SS" not ("MM:SS")
-  // Example: "00:01:30" (1 min 30 sec)
 
   // FOR TEMPERATURE-BASED PAUSE (when pauseAction is "untilTemperature")
   "moduleId": "string", // Required - ID of the temperature/thermocycler/heater-shaker module
@@ -3656,20 +2758,22 @@ Steps:
 ```json
 {
   "metadata": {
-    "protocolName": "pause",
+    "protocolName": "pause step",
     "description": "steptype: pause"
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-tip-rack-1": "C2"
+            "labware-1": "C2"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -3689,12 +2793,14 @@ Steps:
           "stepDetails": "",
           "moduleId": null,
           "pauseAction": "untilTime",
-          "pauseMessage": "wait 21s please",
+          "pauseMessage": "",
           "pauseTemperature": null,
           "pauseTime": "00:00:21"
         }
       },
-      "orderedStepIds": ["step-1"],
+      "orderedStepIds": [
+        "step-1"
+      ],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p1000_multi_flex"
@@ -3702,7 +2808,7 @@ Steps:
       },
       "modules": {},
       "labware": {
-        "lw-tip-rack-1": {
+        "labware-1": {
           "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
           "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
         }
@@ -3712,30 +2818,7 @@ Steps:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_multi_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
-        "labwareId": "lw-tip-rack-1",
-        "loadName": "opentrons_flex_96_filtertiprack_1000ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
@@ -3761,10 +2844,8 @@ Labware:
 Pipette mount:
 - Left mount: Flex 1-Channel 1000 µL
 
-
 Steps:
-1. Using the single-channel pipette, transfer 20 uL from well A1 of the reservoir to wells of the first column of the well plate.
-Use a new tip for each transfer.
+1. Using the single-channel pipette, transfer 20 uL from well A1 of the reservoir to wells of the first column of the well plate. Use a new tip for each transfer.
 ```
 
 ### output
@@ -3772,22 +2853,24 @@ Use a new tip for each transfer.
 ```json
 {
   "metadata": {
-    "protocolName": "moveLiquid-single-channel transfer ",
-    "description": "transfer with single channel pipette"
+    "protocolName": "moveLiquid step",
+    "description": "moveLiquid step example"
   },
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_1000ul/1"]
+        "pipette_left": [
+          "opentrons/opentrons_flex_96_tiprack_1000ul/1"
+        ]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-tiprack": "C2",
-            "lw-nest-reservoir": "C1",
-            "lw-wellplate": "D1"
+            "labware-1": "C2",
+            "labware-2": "C1",
+            "labware-3": "D1"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -3811,32 +2894,19 @@ Use a new tip for each transfer.
           "aspirate_delay_mmFromBottom": null,
           "aspirate_delay_seconds": "1",
           "aspirate_flowRate": "716",
-          "aspirate_labware": "lw-nest-reservoir",
+          "aspirate_labware": "labware-2",
           "aspirate_mix_checkbox": false,
           "aspirate_mix_times": null,
           "aspirate_mix_volume": null,
           "aspirate_mmFromBottom": null,
-          "aspirate_position_reference": null,
-          "aspirate_retract_delay_seconds": null,
-          "aspirate_retract_mmFromBottom": null,
-          "aspirate_retract_speed": null,
-          "aspirate_retract_x_position": 0,
-          "aspirate_retract_y_position": 0,
-          "aspirate_retract_position_reference": null,
-          "aspirate_submerge_delay_seconds": null,
-          "aspirate_submerge_speed": null,
-          "aspirate_submerge_mmFromBottom": null,
-          "aspirate_submerge_x_position": 0,
-          "aspirate_submerge_y_position": 0,
-          "aspirate_submerge_position_reference": null,
           "aspirate_touchTip_checkbox": false,
-          "aspirate_touchTip_mmFromTop": null,
-          "aspirate_touchTip_speed": null,
-          "aspirate_touchTip_mmFromEdge": null,
+          "aspirate_touchTip_mmFromBottom": null,
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
           "aspirate_wells_grouped": false,
-          "aspirate_wells": ["A1"],
+          "aspirate_wells": [
+            "A1"
+          ],
           "aspirate_x_position": 0,
           "aspirate_y_position": 0,
           "blowout_checkbox": false,
@@ -3850,49 +2920,41 @@ Use a new tip for each transfer.
           "dispense_delay_mmFromBottom": null,
           "dispense_delay_seconds": "1",
           "dispense_flowRate": "716",
-          "dispense_labware": "lw-wellplate",
+          "dispense_labware": "labware-3",
           "dispense_mix_checkbox": false,
           "dispense_mix_times": null,
           "dispense_mix_volume": null,
           "dispense_mmFromBottom": null,
-          "dispense_position_reference": null,
-          "dispense_retract_delay_seconds": null,
-          "dispense_retract_mmFromBottom": null,
-          "dispense_retract_speed": null,
-          "dispense_retract_x_position": 0,
-          "dispense_retract_y_position": 0,
-          "dispense_retract_position_reference": null,
-          "dispense_submerge_delay_seconds": null,
-          "dispense_submerge_speed": null,
-          "dispense_submerge_mmFromBottom": null,
-          "dispense_submerge_x_position": 0,
-          "dispense_submerge_y_position": 0,
-          "dispense_submerge_position_reference": null,
           "dispense_touchTip_checkbox": false,
-          "dispense_touchTip_mmFromTop": null,
-          "dispense_touchTip_speed": null,
-          "dispense_touchTip_mmFromEdge": null,
+          "dispense_touchTip_mmFromBottom": null,
           "dispense_wellOrder_first": "t2b",
           "dispense_wellOrder_second": "l2r",
-          "dispense_wells": ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+          "dispense_wells": [
+            "A1",
+            "B1",
+            "C1",
+            "D1",
+            "E1",
+            "F1",
+            "G1",
+            "H1"
+          ],
           "dispense_x_position": 0,
           "dispense_y_position": 0,
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": null,
           "dropTip_location": "trashbin-1",
-          "liquidClassesSupported": true,
-          "liquidClass": null,
           "nozzles": null,
           "path": "single",
           "pipette": "pipette_left",
           "preWetTip": false,
-          "pushOut_checkbox": null,
-          "pushOut_volume": null,
           "tipRack": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
           "volume": "20"
         }
       },
-      "orderedStepIds": ["step-1"],
+      "orderedStepIds": [
+        "step-1"
+      ],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p1000_single_flex"
@@ -3900,17 +2962,17 @@ Use a new tip for each transfer.
       },
       "modules": {},
       "labware": {
-        "lw-tiprack": {
+        "labware-1": {
           "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
           "labwareDefURI": "opentrons/opentrons_flex_96_tiprack_1000ul/1"
         },
-        "lw-nest-reservoir": {
+        "labware-2": {
           "displayName": "NEST 12 Well Reservoir 15 mL",
-          "labwareDefURI": "opentrons/nest_12_reservoir_15ml/2"
+          "labwareDefURI": "opentrons/nest_12_reservoir_15ml/1"
         },
-        "lw-wellplate": {
+        "labware-3": {
           "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
-          "labwareDefURI": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/3"
+          "labwareDefURI": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2"
         }
       }
     }
@@ -3918,56 +2980,7 @@ Use a new tip for each transfer.
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
-        "labwareId": "lw-tiprack",
-        "loadName": "opentrons_flex_96_tiprack_1000ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "NEST 12 Well Reservoir 15 mL",
-        "labwareId": "lw-nest-reservoir",
-        "loadName": "nest_12_reservoir_15ml",
-        "namespace": "opentrons",
-        "version": 2,
-        "location": {
-          "slotName": "C1"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
-        "labwareId": "lw-wellplate",
-        "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "namespace": "opentrons",
-        "version": 3,
-        "location": {
-          "slotName": "D1"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
@@ -3994,22 +3007,22 @@ Use a new tip for each transfer.
 - "4743347b-e522-437e-b0c7-8494c1f7715c:trashBin"
 
 If user sets "blowout_location" to "Trash Bin" then its value is set to
-"4743347b-e522-437e-b0c7-8494c1f7715c:trashBin"
+"trashbin-1"
 
 If user chooses "Trash bin" for drop tip location:
-"dropTip_location": "4743347b-e522-437e-b0c7-8494c1f7715c:trashBin"
+"dropTip_location": "trashbin-1"
 
-## Case 22: Transfer (moveLiquid) step with a multi-channel pipette
+## Case 22: moveLiquid (Transfer) step with a multi-channel pipette
 
 Depending on a single or multi-channel, a well selection behaves differently.
 
-- For a single-channel it works in terms of individuals wells, user can choose wells.
+- For a single-channel it works in terms of individual wells. An user can choose wells.
 - For multi channel pipette, PD only works with column-wise. That is, you can select an individual column not a row.
 
 ### Input
 
 ```text
-Robot: Configuration:
+Robot: 
 - Flex
 
 Steps:

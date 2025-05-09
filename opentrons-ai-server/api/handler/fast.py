@@ -343,6 +343,8 @@ async def create_protocol(
         protocol_format = body.protocol_format
         logger.debug(f"Received protocol_format: {protocol_format.value}")
 
+        # import code
+        # code.interact(local=dict(globals(), **locals()))
         response = _generate_llm_response(
             model_type=settings.model, user_id=str(user.sub), prompt=body.prompt, protocol_format=protocol_format, protocol_action="create"
         )
@@ -357,10 +359,44 @@ async def create_protocol(
         return _format_response(response, protocol_format, bool(body.fake))
 
     except Exception as e:
-        logger.exception("Error processing protocol creation")
+        logger.error(f"Unhandled error in create_protocol: {str(e)}", extra={"error_details": str(e), "exception_type": e.__class__.__name__})
+        
+        # Prepare a serializable representation of the caught error 'e'
+        # This will be the content of the "detail" field of the HTTPException we raise.
+        error_payload_for_detail: dict[str, Any] = {"message": "Internal server error"}
+
+        if isinstance(e, HTTPException):
+            error_payload_for_detail["original_exception_type"] = e.__class__.__name__
+            # If 'e' is an HTTPException, its 'detail' field is what we're interested in.
+            # 'e.detail' can be a string or a dict.
+            if isinstance(e.detail, str):
+                # If e.detail is a simple string, use it.
+                error_payload_for_detail["original_http_error_detail"] = e.detail
+            elif isinstance(e.detail, dict):
+                # If e.detail is a dict, we need to make sure it's serializable.
+                # Specifically, any nested non-serializable objects (like another Exception)
+                # need to be stringified.
+                serializable_sub_detail: dict[str, Any] = {}
+                for k, v_obj in e.detail.items():
+                    if isinstance(v_obj, (str, int, float, bool, list, dict, type(None))):
+                        serializable_sub_detail[k] = v_obj
+                    else:
+                        # If a value in e.detail is not easily serializable, convert it to a string.
+                        serializable_sub_detail[k] = str(v_obj)
+                error_payload_for_detail["original_http_error_detail"] = serializable_sub_detail
+            else:
+                # Fallback if e.detail is neither string nor dict
+                error_payload_for_detail["original_http_error_detail"] = str(e.detail)
+        else:
+            # If 'e' is not an HTTPException (e.g., a standard Python Exception),
+            # include its type and string representation.
+            error_payload_for_detail["original_exception_type"] = e.__class__.__name__
+            error_payload_for_detail["original_error_message"] = str(e)
+
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
-        ) from e
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=error_payload_for_detail # This 'detail' is now guaranteed to be serializable
+        )
 
 
 @tracer.wrap()

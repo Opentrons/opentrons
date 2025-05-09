@@ -94,6 +94,7 @@
   "add_step_caption": "Example: \"Transfer 10 uL from each of the wells in the source labware to the same wells in the destination labware. Use a new tip for each transfer.\"",
   "none": "None",
   "create_protocol_prompt_robot": "Write a protocol using the Opentrons Python Protocol API v2 for {{robotType}} robot according to the following description:\n\n",
+  "create_protocol_pd_prompt_robot": "Write a {{format}} protocol for {{robotType}} robot according to the following description:\n\n",
   "description": "Description",
   "pipette_mounts": "Pipette mount(s)",
   "mounted_left": "is mounted on the left",

@@ -425,10 +425,9 @@ export function generateChatPrompt(
   const prompt = `${
     values.protocol_format === PYTHON
       ? t('create_protocol_prompt_robot', { robotType }) + '\n'
-      : ''
+      : t('create_protocol_pd_prompt_robot', { format: startCase(values.protocol_format), robotType }) + '\n'
   }
 
-${t('protocol_format_title')}:\n${protocolFormat}
 
 ${t('application_title')}:\n${scientificApplication}
 
