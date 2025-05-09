@@ -58,7 +58,7 @@ zipp = "==3.5.0"
 sqlalchemy = "==1.4.51"
 opentrons-hardware = {editable = true, path='../hardware', extras=['FLEX']}
 opentrons = { editable = true, path = "../api"}
-opentrons-shared-data = { editable = true, path = "../shared-data/python" }
+opentrons-shared-data = { editable = true, path = "../shared-data" }
 server-utils = {editable = true, path = "./../server-utils"}
 performance-metrics = {editable = true, path = "../performance-metrics" }
 robot-server = { editable = true, path = "."}
@@ -67,3 +67,4 @@ pydantic-settings = "==2.4.0"
 # versions above 0.18.1 require a version of triomphe that requires a version of
 # rust too new for openembedded
 rpds-py = "==0.18.1"
+build = "~=1.2.0"
