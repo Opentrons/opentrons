@@ -53,7 +53,6 @@ export function dispenseUpdateLiquidState(
   } else if (nozzles === SINGLE) {
     channels = 1
   }
-  console.log('prevLiquidState', prevLiquidState)
   //  TODO: fix this bug, i guess if both entities exist, we default to updating liquid state
   //  into the first one listed which is wrong if the user is using the 2nd one listed
   const trashId =
@@ -94,7 +93,6 @@ export function dispenseUpdateLiquidState(
     prevLiquidState.labware[sourceId] != null
       ? prevLiquidState.labware[sourceId]
       : null
-  console.log('liquidLabware', liquidLabware)
   let liquidTrash: LocationLiquidState | null = null
   if (prevLiquidState.trashBins[sourceId] != null) {
     liquidTrash = prevLiquidState.trashBins[sourceId]
@@ -121,7 +119,6 @@ export function dispenseUpdateLiquidState(
       return splitLiquid(volume || 0, prevTipLiquidState)
     }
   )
-  console.log('splitLiquidStates', splitLiquidStates)
   let mergeLiquidtoSingleWell = null
   //  a labware will always have a well
   if (well != null && liquidLabware != null) {
@@ -139,7 +136,6 @@ export function dispenseUpdateLiquidState(
       ),
     }
   }
-  console.log('mergeLiquidtoSingleWell', mergeLiquidtoSingleWell)
   //  waste chute and trash bin don't have wells
   if (well == null && liquidTrash != null) {
     mergeLiquidtoSingleWell = reduce(
@@ -174,7 +170,6 @@ export function dispenseUpdateLiquidState(
   const labwareLiquidState = allWellsShared
     ? mergeLiquidtoSingleWell
     : mergeTipLiquidToOwnWell
-  console.log('liquid state', labwareLiquidState)
 
   prevLiquidState.pipettes[pipetteId] = mapValues(splitLiquidStates, 'source')
   if (liquidTrash != null && labwareLiquidState != null) {
