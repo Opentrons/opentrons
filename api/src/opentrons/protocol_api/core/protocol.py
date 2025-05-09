@@ -216,7 +216,7 @@ class AbstractProtocol(
     def get_last_location(
         self,
         mount: Optional[Mount] = None,
-    ) -> Optional[Location]:
+    ) -> Optional[Union[Location, TrashBin, WasteChute]]:
         ...
 
     @abstractmethod
