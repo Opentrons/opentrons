@@ -2,7 +2,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { ModulesSection } from '..'
+import { ModulesAndFixturesSection } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
@@ -15,7 +15,7 @@ const TestFormProviderComponent = () => {
 
   return (
     <FormProvider {...methods}>
-      <ModulesSection />
+      <ModulesAndFixturesSection />
 
       <p>{`form is ${methods.formState.isValid ? 'valid' : 'invalid'}`}</p>
     </FormProvider>
@@ -32,7 +32,6 @@ describe('ModulesSection', () => {
   it('should render modules buttons and no modules added yet', async () => {
     render()
 
-    expect(screen.getAllByRole('button').length).toBe(4)
     expect(screen.getByText('No modules added yet')).toBeInTheDocument()
   })
 

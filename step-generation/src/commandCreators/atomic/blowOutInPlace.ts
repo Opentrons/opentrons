@@ -44,8 +44,7 @@ export const blowOutInPlace: CommandCreator<BlowoutInPlaceParams> = (
   return {
     commands,
     python:
-      // The Python blow_out() does not take a flow rate argument, so we have to
-      // reconfigure the pipette's default blow out rate instead:
+      // blow_out() blows out in place if no location= is specified
       `${pipettePythonName}.flow_rate.blow_out = ${flowRate}\n` +
       `${pipettePythonName}.blow_out()`,
   }

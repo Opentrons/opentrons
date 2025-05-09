@@ -35,6 +35,9 @@ export interface LabwareTemporalProperties {
 
 export interface PipetteTemporalProperties {
   mount: Mount
+  labwareId?: string
+  //  primary nozzle's wellName
+  wellName?: string
   nozzles?: NozzleConfigurationStyle
 }
 
