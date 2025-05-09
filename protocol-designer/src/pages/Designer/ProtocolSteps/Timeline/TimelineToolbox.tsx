@@ -39,8 +39,9 @@ import {
   selectTerminalItem,
 } from '../../../../ui/steps/actions/actions'
 import { AddStepButton } from './AddStepButton'
+// import { HardwareStep } from './HardwareStep'
+import { Configurations } from './Configurations'
 import { DraggableSteps } from './DraggableSteps'
-import { HardwareStep } from './HardwareStep'
 import { PresavedStep } from './PresavedStep'
 import { TerminalItemStep } from './TerminalItemStep'
 
@@ -162,7 +163,8 @@ export const TimelineToolbox = ({
         gridGap={SPACING.spacing4}
         width="100%"
       >
-        <HardwareStep sidebarWidth={sidebarWidth} />
+        {/* <HardwareStep sidebarWidth={sidebarWidth} /> */}
+        <Configurations sidebarWidth={sidebarWidth} />
         <Flex
           padding={SPACING.spacing12}
           flexDirection={DIRECTION_COLUMN}

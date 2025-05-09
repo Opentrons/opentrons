@@ -33,6 +33,7 @@ import {
 import {
   END_TERMINAL_ITEM_ID,
   HARDWARE_ID,
+  LIQUID_ID,
   PRESAVED_STEP_ID,
   START_TERMINAL_ITEM_ID,
 } from '../../steplist'
@@ -70,6 +71,10 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
   ) => {
     let robotState = null
     if (activeItem == null) return null
+
+    if (activeItem.id === LIQUID_ID) {
+      return initialRobotState
+    }
 
     if (
       activeItem.selectionType === TERMINAL_ITEM_SELECTION_TYPE &&

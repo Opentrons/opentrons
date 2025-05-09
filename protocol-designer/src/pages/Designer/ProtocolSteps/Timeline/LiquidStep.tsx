@@ -16,7 +16,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { HARDWARE_ID } from '../../../../steplist'
+import { LIQUID_ID, START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
@@ -29,16 +29,16 @@ import { PX_SIDEBAR_MIN_WIDTH_FOR_ICON } from './StepContainer'
 
 import type { ThunkDispatch } from '../../../../types'
 
-interface HardwareStepProps {
+interface LiquidStepProps {
   sidebarWidth: number
 }
 
-export function HardwareStep(props: HardwareStepProps): JSX.Element {
+export function LiquidStep(props: LiquidStepProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
   const { sidebarWidth } = props
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const hovered = useSelector(getHoveredTerminalItemId) === HARDWARE_ID
-  const selected = useSelector(getSelectedTerminalItemId) === HARDWARE_ID
+  const hovered = useSelector(getHoveredTerminalItemId) === LIQUID_ID
+  const selected = useSelector(getSelectedTerminalItemId) === LIQUID_ID
 
   let backgroundColor = COLORS.blue20
   let color = COLORS.black90
@@ -55,10 +55,10 @@ export function HardwareStep(props: HardwareStepProps): JSX.Element {
     <Box
       role="button"
       onClick={() => {
-        dispatch(selectTerminalItem(HARDWARE_ID))
+        dispatch(selectTerminalItem(LIQUID_ID))
       }}
       onMouseEnter={() => {
-        dispatch(hoverOnTerminalItem(HARDWARE_ID))
+        dispatch(hoverOnTerminalItem(LIQUID_ID))
       }}
       onMouseLeave={() => {
         dispatch(hoverOnTerminalItem(null))
@@ -77,13 +77,18 @@ export function HardwareStep(props: HardwareStepProps): JSX.Element {
         justifyContent={hasText ? JUSTIFY_START : JUSTIFY_CENTER}
         width="100%"
       >
-        <Icon size="1.25rem" name="deck-map" color={color} minWidth="1.25rem" />
+        <Icon
+          size="1.25rem"
+          name="water-drop"
+          color={color}
+          minWidth="1.25rem"
+        />
         {hasText ? (
           <StyledText
             desktopStyle="bodyDefaultRegular"
             css={LINE_CLAMP_TEXT_STYLE(1)}
           >
-            {t('deck_hardware')}
+            {t('liquids')}
           </StyledText>
         ) : null}
       </Flex>

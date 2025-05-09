@@ -75,12 +75,12 @@ export function ResetSettingsModal(
           <StyledText color={COLORS.grey60} desktopStyle="captionRegular">
             {isLiquidClassSelected
               ? t(
-                  'protocol_steps:comfirm_reset_settings.liquid_class_selected',
+                  'protocol_steps:confirm_reset_settings.liquid_class_selected',
                   {
                     liquidClassName,
                   }
                 )
-              : t('protocol_steps:comfirm_reset_settings.no_liquid_class')}
+              : t('protocol_steps:confirm_reset_settings.no_liquid_class')}
           </StyledText>
         </Flex>
       </Flex>

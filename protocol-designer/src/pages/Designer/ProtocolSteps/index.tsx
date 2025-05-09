@@ -20,7 +20,7 @@ import {
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { NAV_BAR_HEIGHT_REM } from '../../../components/atoms'
-import { HotKeyDisplay, LiquidButton } from '../../../components/molecules'
+import { ExportButton, HotKeyDisplay } from '../../../components/molecules'
 import {
   SlotDetailsContainer,
   TimelineAlerts,
@@ -34,7 +34,11 @@ import {
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../step-forms/selectors'
-import { HARDWARE_ID, START_TERMINAL_ITEM_ID } from '../../../steplist'
+import {
+  HARDWARE_ID,
+  LIQUID_ID,
+  START_TERMINAL_ITEM_ID,
+} from '../../../steplist'
 import {
   getActiveItem,
   getHoveredTerminalItemId,
@@ -92,9 +96,16 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
     currentStep = savedStepForms[selectedStepId]
   } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId == null) {
     currentStep = null
+  } else if (hoveredTerminalItem === LIQUID_ID && selectedStepId == null) {
+    currentStep = undefined
   } else {
     currentStep = activeItem?.id != null ? savedStepForms[activeItem.id] : null
   }
+
+  console.log('activeItem', activeItem)
+  console.log('currentStep', currentStep)
+  console.log('selectedTerminalItemId', selectedTerminalItemId)
+  console.log('hoveredTerminalItem', hoveredTerminalItem)
 
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
@@ -107,7 +118,10 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   let header: string = t(activeItem?.id)
   if (currentStep != null) {
     header = i18n.format(currentStep.stepName, 'titleCase')
-  } else if (hoveredTerminalItem === HARDWARE_ID) {
+  } else if (
+    hoveredTerminalItem === HARDWARE_ID ||
+    hoveredTerminalItem === LIQUID_ID
+  ) {
     header = t(selectedTerminalItemId)
   }
 
@@ -126,6 +140,13 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
             : SPACING.spacing12
         }
       >
+        {/* {selectedTerminalItemId === LIQUID_ID ? (
+          <LiquidsOverflowMenu
+            onClose={() => {}}
+            showLiquidsModal={() => {}}
+            overflowWrapperRef={}
+          />
+        ) : null} */}
         <DraggableSidebar setTargetWidth={setTargetWidth} />
       </Flex>
       <Flex
@@ -143,9 +164,9 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
           overflow={OVERFLOW_AUTO}
           flexDirection={DIRECTION_COLUMN}
         >
-          {isZoomedIn ? null : (
+          {isZoomedIn || formData != null ? null : (
             <Flex justifyContent={JUSTIFY_END}>
-              <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
+              <ExportButton />
             </Flex>
           )}
           <Flex

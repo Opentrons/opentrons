@@ -15,11 +15,13 @@ export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
 export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'
 export const PRESAVED_STEP_ID: '__presaved_step__' = '__presaved_step__'
 export const HARDWARE_ID: '__hardware__' = '__hardware__'
+export const LIQUID_ID: '__liquids__' = '__liquids__'
 export type TerminalItemId =
   | typeof START_TERMINAL_ITEM_ID
   | typeof END_TERMINAL_ITEM_ID
   | typeof PRESAVED_STEP_ID
   | typeof HARDWARE_ID
+  | typeof LIQUID_ID
 export type WellIngredientNames = Record<string, string>
 // TODO: IL 2019-11-26 untangle single vs multi-channel data types for substeps.
 // We tried to unify them with Maybes and Unions, but really they should be

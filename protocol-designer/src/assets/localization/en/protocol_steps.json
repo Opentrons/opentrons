@@ -15,7 +15,8 @@
   "blowout_position": "Blowout position from top",
   "change_tips": "Change tips",
   "column": "Column",
-  "comfirm_reset_settings": {
+  "configurations": "Configurations",
+  "confirm_reset_settings": {
     "no_liquid_class": "Continuing will undo any changes and restore the settings to the default values.",
     "liquid_class_selected": "Continuing will undo any changes and restore the settings to the values associated with the {{liquidClassName}} liquid class."
   },
@@ -57,6 +58,7 @@
   "heater_shaker_settings": "Heater-Shaker Settings",
   "in": "in",
   "into": "into",
+  "liquids": "Liquids",
   "magnetic_module": {
     "disengage": "<semiBoldText>{{module}}</semiBoldText><text>disengaged</text>",
     "engage": "<semiBoldText>{{module}}</semiBoldText><text>engaged to</text><tag/>"
