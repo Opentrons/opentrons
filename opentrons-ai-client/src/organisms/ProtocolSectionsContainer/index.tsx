@@ -17,61 +17,80 @@ import { COLUMN } from '@opentrons/shared-data'
 import { Accordion } from '../../molecules/Accordion'
 import { ApplicationSection } from '../../organisms/ApplicationSection'
 import { createProtocolAtom } from '../../resources/atoms'
-import { InstrumentsSection } from '../InstrumentsSection'
+import {
+  InstrumentsSection,
+  OPENTRONS_FLEX,
+  ROBOT_FIELD_NAME,
+} from '../InstrumentsSection'
 import { LabwareLiquidsSection } from '../LabwareLiquidsSection'
-import { ModulesSection } from '../ModulesSection'
+import { ModulesAndFixturesSection } from '../ModulesAndFixturesSection'
 import { ProtocolFormatSection } from '../ProtocolFormatSection'
+import { RuntimeParametersSection } from '../RuntimeParametersSection'
 import { StepsSection } from '../StepsSection'
 
-export const PROTOCOL_FORMAT_STEP = 0
-export const APPLICATION_STEP = 1
-export const INSTRUMENTS_STEP = 2
-export const MODULES_STEP = 3
-export const LABWARE_LIQUIDS_STEP = 4
-export const STEPS_STEP = 5
+const PROTOCOL_FORMAT_SECTION = 0
+const APPLICATION_SECTION = 1
+const INSTRUMENTS_SECTION = 2
+const MODULES_SECTION = 3
+const LABWARE_LIQUIDS_SECTION = 4
+const RUNTIME_PARAMETERS_SECTION = 5
+const STEPS_SECTION = 6
 
-export const sections = [
-  {
-    sectionNumber: PROTOCOL_FORMAT_STEP,
-    title: 'protocol_format_title',
-    Component: ProtocolFormatSection,
-  },
-  {
-    sectionNumber: APPLICATION_STEP,
-    title: 'application_title',
-    Component: ApplicationSection,
-  },
-  {
-    sectionNumber: INSTRUMENTS_STEP,
-    title: 'instruments_title',
-    Component: InstrumentsSection,
-  },
-  {
-    sectionNumber: MODULES_STEP,
-    title: 'modules_title',
-    Component: ModulesSection,
-  },
-  {
-    sectionNumber: LABWARE_LIQUIDS_STEP,
-    title: 'labware_liquids_title',
-    Component: LabwareLiquidsSection,
-  },
-  {
-    sectionNumber: STEPS_STEP,
-    title: 'steps_title',
-    Component: StepsSection,
-  },
-]
+export const TOTAL_STEPS = 7
 
 export function ProtocolSectionsContainer(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const {
     formState: { isValid },
     trigger,
+    watch,
   } = useFormContext()
   const [{ currentSection, focusSection }, setCreateProtocolAtom] = useAtom(
     createProtocolAtom
   )
+
+  const robotType: string = watch(ROBOT_FIELD_NAME)
+
+  const sections = [
+    {
+      sectionNumber: PROTOCOL_FORMAT_SECTION,
+      title: 'protocol_format_title',
+      Component: ProtocolFormatSection,
+    },
+    {
+      sectionNumber: APPLICATION_SECTION,
+      title: 'application_title',
+      Component: ApplicationSection,
+    },
+    {
+      sectionNumber: INSTRUMENTS_SECTION,
+      title: 'instruments_title',
+      Component: InstrumentsSection,
+    },
+    {
+      sectionNumber: MODULES_SECTION,
+      title:
+        robotType === OPENTRONS_FLEX
+          ? 'modules_fixtures_title'
+          : 'modules_title',
+      Component: ModulesAndFixturesSection,
+    },
+    {
+      sectionNumber: LABWARE_LIQUIDS_SECTION,
+      title: 'labware_liquids_title',
+      Component: LabwareLiquidsSection,
+    },
+    {
+      sectionNumber: RUNTIME_PARAMETERS_SECTION,
+      title: 'runtime_parameters_title',
+      Component: RuntimeParametersSection,
+    },
+    {
+      sectionNumber: STEPS_SECTION,
+      title: 'steps_title',
+      Component: StepsSection,
+    },
+  ]
 
   useEffect(() => {
     trigger()

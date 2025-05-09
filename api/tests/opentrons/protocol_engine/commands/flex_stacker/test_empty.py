@@ -15,7 +15,7 @@ from opentrons.protocol_engine.state.module_substates import (
     FlexStackerSubState,
     FlexStackerId,
 )
-from opentrons.protocol_engine.execution import RunControlHandler
+from opentrons.protocol_engine.execution import RunControlHandler, EquipmentHandler
 from opentrons.protocol_engine.commands.flex_stacker.empty import (
     EmptyImpl,
     EmptyParams,
@@ -50,9 +50,13 @@ def _contained_labware(count: int) -> list[StackerStoredLabwareGroup]:
 
 
 @pytest.fixture
-def subject(state_view: StateView, run_control: RunControlHandler) -> EmptyImpl:
+def subject(
+    state_view: StateView, run_control: RunControlHandler, equipment: EquipmentHandler
+) -> EmptyImpl:
     """An EmptyImpl for testing."""
-    return EmptyImpl(state_view=state_view, run_control=run_control)
+    return EmptyImpl(
+        state_view=state_view, run_control=run_control, equipment=equipment
+    )
 
 
 @pytest.mark.parametrize(

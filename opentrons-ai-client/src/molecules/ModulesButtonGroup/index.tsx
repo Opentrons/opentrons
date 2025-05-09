@@ -3,17 +3,17 @@ import styled from 'styled-components'
 
 import { EmptySelectorButton, Flex, SPACING, WRAP } from '@opentrons/components'
 
-import { MODULES_FIELD_NAME } from '../../organisms/ModulesSection'
+import { MODULES_FIELD_NAME } from '../../organisms/ModulesAndFixturesSection'
 
-import type { DisplayModules } from '../../organisms/ModulesSection'
+import type { DisplayModule } from '../../organisms/ModulesAndFixturesSection'
 
-export function ControlledEmptySelectorButtonGroup({
+export function ModulesButtonGroup({
   modules,
 }: {
-  modules: DisplayModules[]
+  modules: DisplayModule[]
 }): JSX.Element | null {
   const { watch } = useFormContext()
-  const modulesWatch: DisplayModules[] = watch(MODULES_FIELD_NAME) ?? []
+  const modulesWatch: DisplayModule[] = watch(MODULES_FIELD_NAME) ?? []
 
   return (
     <Controller

@@ -39,8 +39,8 @@ describe('blowOutInPlace', () => {
     ])
     expect(res.python).toBe(
       `
-mockPythonName.flow_rate.blow_out = 10
-mockPythonName.blow_out()
+mock_pipette.flow_rate.blow_out = 10
+mock_pipette.blow_out()
 `.trim()
     )
   })

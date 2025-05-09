@@ -33,7 +33,7 @@ import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
-import { SelectedItems } from './Selectedtems'
+import { SelectedItems } from './SelectedItems'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
 import { SlotWarning } from './SlotWarning'
 import {
@@ -126,8 +126,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   }, [])
 
   const {
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
     createdModuleForSlot,
     preSelectedFixture,
     slotPosition,
@@ -140,15 +140,15 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   useEffect(() => {
     dispatch(
       editSlotInfo({
-        createdNestedLabwareForSlot,
-        createdLabwareForSlot,
+        createdAdapterForSlot,
+        createdTopLabwareForSlot,
         createdModuleForSlot,
         preSelectedFixture,
       })
     )
   }, [
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
     createdModuleForSlot,
     preSelectedFixture,
   ])
