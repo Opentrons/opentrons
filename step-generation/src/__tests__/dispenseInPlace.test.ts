@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { dispenseInPlace } from '../commandCreators/atomic'
 import {
-  DEFAULT_PIPETTE,
   getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
