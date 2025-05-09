@@ -32,6 +32,9 @@ import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
 import type { MouseEvent, RefObject } from 'react'
 import type { ThunkDispatch } from '../../../types'
 
+const TOP_POSITION = '13.6875rem'
+const LEFT_POSITION = '14.9375rem'
+
 interface LiquidsOverflowMenuProps {
   onClose: () => void
   showLiquidsModal: () => void
@@ -59,8 +62,10 @@ export function LiquidsOverflowMenu(
     <Flex
       position={POSITION_ABSOLUTE}
       zIndex={12}
-      right={right}
-      top={`calc(${NAV_BAR_HEIGHT_REM}rem + 3.1rem)`}
+      // right={right}
+      // top={`calc(${NAV_BAR_HEIGHT_REM}rem + 3.1rem)`}
+      top={TOP_POSITION}
+      left={LEFT_POSITION}
       ref={overflowWrapperRef}
       borderRadius={BORDERS.borderRadius8}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

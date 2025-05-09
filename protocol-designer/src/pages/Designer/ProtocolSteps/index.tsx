@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -16,12 +16,15 @@ import {
   SPACING,
   StyledText,
   ToggleGroup,
+  useOnClickOutside,
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { NAV_BAR_HEIGHT_REM } from '../../../components/atoms'
 import { ExportButton, HotKeyDisplay } from '../../../components/molecules'
 import {
+  DefineLiquidsModal,
+  LiquidsOverflowMenu,
   SlotDetailsContainer,
   TimelineAlerts,
 } from '../../../components/organisms'
@@ -39,6 +42,7 @@ import {
   LIQUID_ID,
   START_TERMINAL_ITEM_ID,
 } from '../../../steplist'
+import { selectTerminalItem } from '../../../ui/steps/actions/actions'
 import {
   getActiveItem,
   getHoveredTerminalItemId,
@@ -57,7 +61,7 @@ import { SubStepsToolbox } from './Timeline'
 import { TimelineEditHardware } from './TimelineEditHardware'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { DeckSlot } from '../../../types'
+import type { DeckSlot, ThunkDispatch } from '../../../types'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 const STEP_SUMMARY_HEIGHT = '18.2rem'
@@ -90,6 +94,15 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
 
   // Note (02/03/25:kk) use DrraggableSidebar's initial width
   const [targetWidth, setTargetWidth] = useState<number>(235)
+  const dispatch = useDispatch<ThunkDispatch<any>>()
+  const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
+  const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
+    onClickOutside: () => {
+      if (!showDefineLiquidModal) {
+        dispatch(selectTerminalItem(START_TERMINAL_ITEM_ID))
+      }
+    },
+  })
 
   let currentStep
   if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
@@ -97,15 +110,10 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId == null) {
     currentStep = null
   } else if (hoveredTerminalItem === LIQUID_ID && selectedStepId == null) {
-    currentStep = undefined
+    currentStep = null
   } else {
     currentStep = activeItem?.id != null ? savedStepForms[activeItem.id] : null
   }
-
-  console.log('activeItem', activeItem)
-  console.log('currentStep', currentStep)
-  console.log('selectedTerminalItemId', selectedTerminalItemId)
-  console.log('hoveredTerminalItem', hoveredTerminalItem)
 
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
@@ -120,155 +128,173 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
     header = i18n.format(currentStep.stepName, 'titleCase')
   } else if (
     hoveredTerminalItem === HARDWARE_ID ||
-    hoveredTerminalItem === LIQUID_ID
+    hoveredTerminalItem === LIQUID_ID ||
+    selectedTerminalItemId === LIQUID_ID
   ) {
-    header = t(selectedTerminalItemId)
+    header = t(START_TERMINAL_ITEM_ID)
   }
 
   return (
-    <Flex
-      backgroundColor={COLORS.grey10}
-      maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
-      width="100%"
-      minHeight={FLEX_MAX_CONTENT}
-    >
+    <>
+      {showDefineLiquidModal ? (
+        <DefineLiquidsModal
+          onClose={() => {
+            setDefineLiquidModal(false)
+          }}
+        />
+      ) : null}
+      {selectedTerminalItemId === LIQUID_ID ? (
+        <LiquidsOverflowMenu
+          overflowWrapperRef={overflowWrapperRef}
+          onClose={() => {
+            showLiquidOverflowMenu(false)
+          }}
+          showLiquidsModal={() => {
+            showLiquidOverflowMenu(false)
+            setDefineLiquidModal(true)
+          }}
+        />
+      ) : null}
       <Flex
-        height="100%"
-        padding={
-          isZoomedIn
-            ? `${SPACING.spacing12} 0 ${SPACING.spacing12} ${SPACING.spacing12}`
-            : SPACING.spacing12
-        }
-      >
-        {/* {selectedTerminalItemId === LIQUID_ID ? (
-          <LiquidsOverflowMenu
-            onClose={() => {}}
-            showLiquidsModal={() => {}}
-            overflowWrapperRef={}
-          />
-        ) : null} */}
-        <DraggableSidebar setTargetWidth={setTargetWidth} />
-      </Flex>
-      <Flex
-        flex="2.85"
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
-        paddingTop={isZoomedIn ? '0' : SPACING.spacing12}
-        height="100%"
-        position={POSITION_RELATIVE}
-        overflowY={OVERFLOW_AUTO}
+        backgroundColor={COLORS.grey10}
+        maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
+        width="100%"
+        minHeight={FLEX_MAX_CONTENT}
       >
         <Flex
-          width="100%"
           height="100%"
-          overflow={OVERFLOW_AUTO}
-          flexDirection={DIRECTION_COLUMN}
+          padding={
+            isZoomedIn
+              ? `${SPACING.spacing12} 0 ${SPACING.spacing12} ${SPACING.spacing12}`
+              : SPACING.spacing12
+          }
         >
-          {isZoomedIn || formData != null ? null : (
-            <Flex justifyContent={JUSTIFY_END}>
-              <ExportButton />
-            </Flex>
-          )}
+          <DraggableSidebar setTargetWidth={setTargetWidth} />
+        </Flex>
+        <Flex
+          flex="2.85"
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing16}
+          paddingTop={isZoomedIn ? '0' : SPACING.spacing12}
+          height="100%"
+          position={POSITION_RELATIVE}
+          overflowY={OVERFLOW_AUTO}
+        >
           <Flex
+            width="100%"
+            height="100%"
+            overflow={OVERFLOW_AUTO}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing24}
-            width={
-              (isZoomedIn && !isOffDeck) ||
-              (selectedTerminalItemId === HARDWARE_ID &&
-                robotType === OT2_ROBOT_TYPE)
-                ? '90%'
-                : isZoomedIn && isOffDeck
-                ? '100%'
-                : CONTENT_MAX_WIDTH
-            }
-            justifyContent={JUSTIFY_CENTER}
-            paddingTop={isZoomedIn ? '0' : SPACING.spacing60}
-            marginX="auto"
           >
-            {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
-              <>
-                {showTimelineAlerts ? (
-                  <TimelineAlerts
-                    justifyContent={JUSTIFY_CENTER}
-                    width="100%"
-                    flexDirection={DIRECTION_COLUMN}
-                    gridGap={SPACING.spacing4}
-                  />
-                ) : null}
-                <Flex
-                  justifyContent={JUSTIFY_SPACE_BETWEEN}
-                  alignItems={ALIGN_CENTER}
-                  height="2.25rem"
-                >
-                  <StyledText desktopStyle="headingSmallBold">
-                    {header}
-                  </StyledText>
-                  <ToggleGroup
-                    selectedValue={deckView}
-                    leftText={leftString}
-                    rightText={rightString}
-                    leftClick={() => {
-                      setDeckView(leftString)
-                    }}
-                    rightClick={() => {
-                      setDeckView(rightString)
-                    }}
-                  />
-                </Flex>
-              </>
+            {isZoomedIn || formData != null ? null : (
+              <Flex justifyContent={JUSTIFY_END}>
+                <ExportButton />
+              </Flex>
             )}
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-              {selectedTerminalItemId === HARDWARE_ID ? (
-                <TimelineEditHardware />
-              ) : deckView === leftString ? (
-                <DeckSetupContainer
-                  hoverSlot={hoverSlot}
-                  setHoverSlot={setHoverSlot}
-                  robotType={robotType}
-                />
-              ) : (
-                <OffDeck setOverflowMenu={showLiquidOverflowMenu} />
-              )}
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing24}
+              width={
+                (isZoomedIn && !isOffDeck) ||
+                (selectedTerminalItemId === HARDWARE_ID &&
+                  robotType === OT2_ROBOT_TYPE)
+                  ? '90%'
+                  : isZoomedIn && isOffDeck
+                  ? '100%'
+                  : CONTENT_MAX_WIDTH
+              }
+              justifyContent={JUSTIFY_CENTER}
+              paddingTop={isZoomedIn ? '0' : SPACING.spacing60}
+              marginX="auto"
+            >
               {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
                 <>
-                  {/* avoid shifting the deck view container */}
+                  {showTimelineAlerts ? (
+                    <TimelineAlerts
+                      justifyContent={JUSTIFY_CENTER}
+                      width="100%"
+                      flexDirection={DIRECTION_COLUMN}
+                      gridGap={SPACING.spacing4}
+                    />
+                  ) : null}
                   <Flex
-                    height={STEP_SUMMARY_HEIGHT}
-                    opacity={formData == null ? 1 : 0}
+                    justifyContent={JUSTIFY_SPACE_BETWEEN}
+                    alignItems={ALIGN_CENTER}
+                    height="2.25rem"
                   >
-                    {activeItem?.id === START_TERMINAL_ITEM_ID ? (
-                      <SlotDetailsContainer
-                        robotType={robotType}
-                        slot={hoverSlot}
-                      />
-                    ) : (
-                      <StepSummary
-                        currentStep={currentStep}
-                        stepDetails={stepDetails}
-                      />
-                    )}
+                    <StyledText desktopStyle="headingSmallBold">
+                      {header}
+                    </StyledText>
+                    <ToggleGroup
+                      selectedValue={deckView}
+                      leftText={leftString}
+                      rightText={rightString}
+                      leftClick={() => {
+                        setDeckView(leftString)
+                      }}
+                      rightClick={() => {
+                        setDeckView(rightString)
+                      }}
+                    />
                   </Flex>
                 </>
               )}
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing16}
+              >
+                {selectedTerminalItemId === HARDWARE_ID ? (
+                  <TimelineEditHardware />
+                ) : deckView === leftString ? (
+                  <DeckSetupContainer
+                    hoverSlot={hoverSlot}
+                    setHoverSlot={setHoverSlot}
+                    robotType={robotType}
+                  />
+                ) : (
+                  <OffDeck setOverflowMenu={showLiquidOverflowMenu} />
+                )}
+                {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
+                  <>
+                    {/* avoid shifting the deck view container */}
+                    <Flex
+                      height={STEP_SUMMARY_HEIGHT}
+                      opacity={formData == null ? 1 : 0}
+                    >
+                      {activeItem?.id === START_TERMINAL_ITEM_ID ? (
+                        <SlotDetailsContainer
+                          robotType={robotType}
+                          slot={hoverSlot}
+                        />
+                      ) : (
+                        <StepSummary
+                          currentStep={currentStep}
+                          stepDetails={stepDetails}
+                        />
+                      )}
+                    </Flex>
+                  </>
+                )}
+              </Flex>
             </Flex>
           </Flex>
+          {enableHotKeyDisplay && !isZoomedIn ? (
+            <HotKeyDisplay targetWidth={targetWidth} />
+          ) : null}
         </Flex>
-        {enableHotKeyDisplay && !isZoomedIn ? (
-          <HotKeyDisplay targetWidth={targetWidth} />
+        {formData == null && selectedSubstep ? (
+          <SubStepsToolbox stepId={selectedSubstep} />
         ) : null}
-      </Flex>
-      {formData == null && selectedSubstep ? (
-        <SubStepsToolbox stepId={selectedSubstep} />
-      ) : null}
-      <Flex
-        padding={
-          formData == null ? `0 ${SPACING.spacing12} 0 0` : SPACING.spacing12
-        }
-      >
-        <StepForm />
-      </Flex>
+        <Flex
+          padding={
+            formData == null ? `0 ${SPACING.spacing12} 0 0` : SPACING.spacing12
+          }
+        >
+          <StepForm />
+        </Flex>
 
-      {isMultiSelectMode ? <BatchEditToolbox /> : null}
-    </Flex>
+        {isMultiSelectMode ? <BatchEditToolbox /> : null}
+      </Flex>
+    </>
   )
 }

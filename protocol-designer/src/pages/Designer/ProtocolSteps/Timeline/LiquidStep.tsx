@@ -16,7 +16,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { LIQUID_ID, START_TERMINAL_ITEM_ID } from '../../../../steplist'
+import { LIQUID_ID } from '../../../../steplist'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
