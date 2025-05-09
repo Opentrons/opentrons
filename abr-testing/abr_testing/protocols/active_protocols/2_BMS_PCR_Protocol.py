@@ -37,7 +37,10 @@ def run(protocol: ProtocolContext) -> None:
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "02")
+    helpers.comment_protocol_version(protocol, "03")
+    if not protocol.is_simulating():
+        slack_bot = helpers.set_up_slack()
+        slack_bot.send_run_started_message(metadata["protocolName"])
 
     rxn_vol = 50
     real_mode = True
@@ -47,8 +50,6 @@ def run(protocol: ProtocolContext) -> None:
         helpers.tc_str
     )  # type: ignore[assignment]
 
-    tc_mod.open_lid()
-    tc_mod.set_lid_temperature(105)
     temp_mod: TemperatureModuleContext = protocol.load_module(
         helpers.temp_str, location="D3"
     )  # type: ignore[assignment]
@@ -80,155 +81,165 @@ def run(protocol: ProtocolContext) -> None:
     )
     p50.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=tiprack_50)
     protocol.load_trash_bin("A3")
-
-    temp_mod.set_temperature(4)
-
-    # LOAD LIQUIDS
-    water: Well = reagent_rack["B1"]
-    mmx_pic: List[Well] = reagent_rack.rows()[0]
-    dna_pic: List[Well] = source_plate_1.wells()
-
-    liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
-        "Water": [{"well": water, "volume": 500.0}],
-        "Mastermix": [{"well": mmx_pic, "volume": 500.0}],
-        "DNA": [{"well": dna_pic, "volume": 100.0}],
-    }
-    if probe_height_bool:
-        helpers.find_liquid_height_of_loaded_liquids(
-            protocol, liquid_vols_and_wells, p50
-        )
-    else:
-        helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
-    # adding water
-    protocol.comment("\n\n----------ADDING WATER----------\n")
-    p50.pick_up_tip()
-    p50.aspirate(40, water)  # prewet
-    p50.dispense(40, water)
-    parsed_csv = parsed_csv[1:]
-    num_of_rows = len(parsed_csv)
-    for row_index in range(num_of_rows):
-        row_values = parsed_csv[row_index]
-        water_vol = row_values[1]
-        if water_vol.lower() == "x":
-            continue
-        water_vol = int(water_vol)
-        dest_well = row_values[0]
-        if water_vol == 0:
-            break
-
-        p50.configure_for_volume(water_vol)
-        p50.aspirate(water_vol, water.meniscus(z=meniscus_z, target="end"))
-        p50.dispense(
-            water_vol,
-            dest_plate_1[dest_well].meniscus(z=2, target="end"),
-            rate=0.5,
-        )
-        p50.configure_for_volume(50)
-        p50.blow_out()
-    p50.drop_tip()
-
-    # adding Mastermix
-    protocol.comment("\n\n----------ADDING MASTERMIX----------\n")
-    for i, row in enumerate(parsed_csv):
-        p50.pick_up_tip()
-        mmx_vol = row[3]
-        if mmx_vol.lower() == "x":
-            continue
-
-        if i == 0:
-            mmx_tube = row[4]
-        mmx_tube_check = mmx_tube
-        mmx_tube = row[4]
-        if mmx_tube_check != mmx_tube:
-
-            p50.drop_tip()
-            p50.pick_up_tip()
-
-        if not p50.has_tip:
-            p50.pick_up_tip()
-
-        mmx_vol = int(row[3])
-        dest_well = row[0]
-
-        if mmx_vol == 0:
-            break
-        p50.configure_for_volume(mmx_vol)
-        p50.aspirate(
-            mmx_vol, reagent_rack[mmx_tube].meniscus(z=meniscus_z, target="end")
-        )
-        p50.dispense(mmx_vol, dest_plate_1[dest_well].meniscus(z=2, target="end"))
-        protocol.delay(seconds=2)
-        p50.blow_out()
-        p50.touch_tip()
-        p50.configure_for_volume(50)
-        p50.drop_tip()
-    if p50.has_tip:
-        p50.drop_tip()
-
-    # adding DNA
-    protocol.comment("\n\n----------ADDING DNA----------\n")
-    for row in parsed_csv:
-        dna_vol = row[2]
-        if dna_vol.lower() == "x":
-            continue
-
-        p50.pick_up_tip()
-
-        dna_vol = int(row[2])
-        dest_and_source_well = row[0]
-
-        if dna_vol == 0:
-            break
-        p50.configure_for_volume(dna_vol)
-        p50.aspirate(
-            dna_vol,
-            source_plate_1[dest_and_source_well].meniscus(z=meniscus_z, target="end"),
-        )
-        p50.dispense(
-            dna_vol,
-            dest_plate_1[dest_and_source_well].meniscus(z=2, target="end"),
-            rate=0.5,
-        )
-
-        p50.mix(
-            10,
-            0.7 * rxn_vol if 0.7 * rxn_vol < 30 else 30,
-            dest_plate_1[dest_and_source_well],
-        )
-        p50.drop_tip()
-        p50.configure_for_volume(50)
-
-    protocol.comment("\n\n-----------Running PCR------------\n")
-
-    if real_mode:
-        if disposable_lid:
-            helpers.use_disposable_lid_with_tc(
-                protocol, unused_lids, dest_plate_1, tc_mod
-            )
-            tc_mod.close_lid()
-        helpers.perform_pcr(
-            protocol,
-            tc_mod,
-            initial_denature_time_sec=120,
-            denaturation_time_sec=10,
-            anneal_time_sec=10,
-            extension_time_sec=30,
-            cycle_repetitions=30,
-            final_extension_time_min=5,
-        )
-
-        tc_mod.set_block_temperature(4)
-
+    try:
         tc_mod.open_lid()
-        if disposable_lid:
-            protocol.move_lid(dest_plate_1, "C2", use_gripper=True)
+        tc_mod.set_lid_temperature(105)
+        temp_mod.set_temperature(4)
+
+        # LOAD LIQUIDS
+        water: Well = reagent_rack["B1"]
+        mmx_pic: List[Well] = reagent_rack.rows()[0]
+        dna_pic: List[Well] = source_plate_1.wells()
+
+        liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
+            "Water": [{"well": water, "volume": 500.0}],
+            "Mastermix": [{"well": mmx_pic, "volume": 500.0}],
+            "DNA": [{"well": dna_pic, "volume": 100.0}],
+        }
+        if probe_height_bool:
+            helpers.find_liquid_height_of_loaded_liquids(
+                protocol, liquid_vols_and_wells, p50
+            )
+        else:
+            helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+        # adding water
+        protocol.comment("\n\n----------ADDING WATER----------\n")
+        p50.pick_up_tip()
+        p50.aspirate(40, water)  # prewet
+        p50.dispense(40, water)
+        parsed_csv = parsed_csv[1:]
+        num_of_rows = len(parsed_csv)
+        for row_index in range(num_of_rows):
+            row_values = parsed_csv[row_index]
+            water_vol = row_values[1]
+            if water_vol.lower() == "x":
+                continue
+            water_vol = int(water_vol)
+            dest_well = row_values[0]
+            if water_vol == 0:
+                break
+
+            p50.configure_for_volume(water_vol)
+            p50.aspirate(water_vol, water.meniscus(z=meniscus_z, target="end"))
+            p50.dispense(
+                water_vol,
+                dest_plate_1[dest_well].meniscus(z=2, target="end"),
+                rate=0.5,
+            )
+            p50.configure_for_volume(50)
+            p50.blow_out()
         p50.drop_tip()
-        p50.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=tiprack_50)
-        mmx_pic.append(water)
-    # Empty plates into liquid waste
-    p50.configure_nozzle_layout(style=ALL, tip_racks=tiprack_50)
-    helpers.clean_up_plates(protocol, p50, [source_plate_1, dest_plate_1], liquid_waste)
-    # Probe liquid waste
-    helpers.find_liquid_height_of_all_wells(protocol, p50, [liquid_waste])
-    if deactivate_modules_bool:
-        helpers.deactivate_modules(protocol)
+
+        # adding Mastermix
+        protocol.comment("\n\n----------ADDING MASTERMIX----------\n")
+        for i, row in enumerate(parsed_csv):
+            p50.pick_up_tip()
+            mmx_vol = row[3]
+            if mmx_vol.lower() == "x":
+                continue
+
+            if i == 0:
+                mmx_tube = row[4]
+            mmx_tube_check = mmx_tube
+            mmx_tube = row[4]
+            if mmx_tube_check != mmx_tube:
+
+                p50.drop_tip()
+                p50.pick_up_tip()
+
+            if not p50.has_tip:
+                p50.pick_up_tip()
+
+            mmx_vol = int(row[3])
+            dest_well = row[0]
+
+            if mmx_vol == 0:
+                break
+            p50.configure_for_volume(mmx_vol)
+            p50.aspirate(
+                mmx_vol, reagent_rack[mmx_tube].meniscus(z=meniscus_z, target="end")
+            )
+            p50.dispense(mmx_vol, dest_plate_1[dest_well].meniscus(z=2, target="end"))
+            protocol.delay(seconds=2)
+            p50.blow_out()
+            p50.touch_tip()
+            p50.configure_for_volume(50)
+            p50.drop_tip()
+        if p50.has_tip:
+            p50.drop_tip()
+
+        # adding DNA
+        protocol.comment("\n\n----------ADDING DNA----------\n")
+        for row in parsed_csv:
+            dna_vol = row[2]
+            if dna_vol.lower() == "x":
+                continue
+
+            p50.pick_up_tip()
+
+            dna_vol = int(row[2])
+            dest_and_source_well = row[0]
+
+            if dna_vol == 0:
+                break
+            p50.configure_for_volume(dna_vol)
+            p50.aspirate(
+                dna_vol,
+                source_plate_1[dest_and_source_well].meniscus(
+                    z=meniscus_z, target="end"
+                ),
+            )
+            p50.dispense(
+                dna_vol,
+                dest_plate_1[dest_and_source_well].meniscus(z=2, target="end"),
+                rate=0.5,
+            )
+
+            p50.mix(
+                10,
+                0.7 * rxn_vol if 0.7 * rxn_vol < 30 else 30,
+                dest_plate_1[dest_and_source_well],
+            )
+            p50.drop_tip()
+            p50.configure_for_volume(50)
+
+        protocol.comment("\n\n-----------Running PCR------------\n")
+
+        if real_mode:
+            if disposable_lid:
+                helpers.use_disposable_lid_with_tc(
+                    protocol, unused_lids, dest_plate_1, tc_mod
+                )
+                tc_mod.close_lid()
+            helpers.perform_pcr(
+                protocol,
+                tc_mod,
+                initial_denature_time_sec=120,
+                denaturation_time_sec=10,
+                anneal_time_sec=10,
+                extension_time_sec=30,
+                cycle_repetitions=30,
+                final_extension_time_min=5,
+            )
+
+            tc_mod.set_block_temperature(4)
+
+            tc_mod.open_lid()
+            if disposable_lid:
+                protocol.move_lid(dest_plate_1, "C2", use_gripper=True)
+            p50.drop_tip()
+            p50.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=tiprack_50)
+            mmx_pic.append(water)
+        # Empty plates into liquid waste
+        p50.configure_nozzle_layout(style=ALL, tip_racks=tiprack_50)
+        helpers.clean_up_plates(
+            protocol, p50, [source_plate_1, dest_plate_1], liquid_waste
+        )
+        # Probe liquid waste
+        helpers.find_liquid_height_of_all_wells(protocol, p50, [liquid_waste])
+        if deactivate_modules_bool:
+            helpers.deactivate_modules(protocol)
+    except Exception as e:
+        if not protocol.is_simulating():
+            slack_bot.send_error_message(metadata["protocolName"], str(e))
+        raise (e)

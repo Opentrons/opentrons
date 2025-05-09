@@ -76,6 +76,9 @@ def run(protocol: ProtocolContext) -> None:
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "02")
+    if not protocol.is_simulating():
+        slack_bot = helpers.set_up_slack()
+        slack_bot.send_run_started_message(metadata["protocolName"])
 
     dry_run = False
     TIP_TRASH = False
@@ -116,7 +119,6 @@ def run(protocol: ProtocolContext) -> None:
         plate_for_plate_reader = h_s.load_labware(
             "corning_96_wellplate_360ul_flat", sample_plate_name
         )
-    h_s.close_labware_latch()
     temp: TemperatureModuleContext = protocol.load_module(
         helpers.temp_str, "D3"
     )  # type: ignore[assignment]
@@ -213,12 +215,6 @@ def run(protocol: ProtocolContext) -> None:
     m1000.flow_rate.aspirate = 300
     m1000.flow_rate.dispense = 300
     m1000.flow_rate.blow_out = 300
-    if probe_height_bool:
-        helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
-    else:
-        helpers.find_liquid_height_of_loaded_liquids(
-            protocol, liquid_vols_and_wells, m1000
-        )
 
     def tiptrack(tipbox: List[Well]) -> None:
         """Track Tips."""
@@ -535,137 +531,151 @@ def run(protocol: ProtocolContext) -> None:
             m1000.air_gap(20)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
-    if plate_reader_bool:
-        # Plate reader steps
-        # 1. Fill plate with water
-        water_well = reservoir_for_plate_reader["A2"].meniscus(
-            z=meniscus_z, target="end"
-        )
-        total_dispensed = 0
-        for well in plate_for_plate_reader.rows()[0]:
+    try:
+        h_s.close_labware_latch()
+        if probe_height_bool:
+            helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+        else:
+            helpers.find_liquid_height_of_loaded_liquids(
+                protocol, liquid_vols_and_wells, m1000
+            )
+        if plate_reader_bool:
+            # Plate reader steps
+            # 1. Fill plate with water
+            water_well = reservoir_for_plate_reader["A2"].meniscus(
+                z=meniscus_z, target="end"
+            )
+            total_dispensed = 0
+            for well in plate_for_plate_reader.rows()[0]:
+                m1000.pick_up_tip()
+                m1000.aspirate(190, water_well)
+                m1000.air_gap(10)
+                m1000.dispense(10, well.top())
+                m1000.dispense(190, well)
+                m1000.blow_out(well.top())
+                protocol.delay(minutes=0.1)
+                m1000.blow_out(well.top())
+                total_dispensed += 190 * m1000.active_channels
+                if total_dispensed > (water_vol_per_well - reservoir_dead_vol):
+                    water_well = reservoir_for_plate_reader["A3"].top()
+                m1000.return_tip()
+            # 2. Mix tartrazine
             m1000.pick_up_tip()
-            m1000.aspirate(190, water_well)
-            m1000.air_gap(10)
-            m1000.dispense(10, well.top())
-            m1000.dispense(190, well)
-            m1000.blow_out(well.top())
-            protocol.delay(minutes=0.1)
-            m1000.blow_out(well.top())
-            total_dispensed += 190 * m1000.active_channels
-            if total_dispensed > (water_vol_per_well - reservoir_dead_vol):
-                water_well = reservoir_for_plate_reader["A3"].top()
+            top_of_tartrazine = 0.1
+            for i in range(20):
+                m1000.aspirate(1, tartrazine_well.bottom(z=1))
+                m1000.dispense(1, tartrazine_well.bottom(z=top_of_tartrazine + 1))
             m1000.return_tip()
-        # 2. Mix tartrazine
-        m1000.pick_up_tip()
-        top_of_tartrazine = 0.1
-        for i in range(20):
-            m1000.aspirate(1, tartrazine_well.bottom(z=1))
-            m1000.dispense(1, tartrazine_well.bottom(z=top_of_tartrazine + 1))
-        m1000.return_tip()
-        # 2. Fill plate with tartrazine
-        for well in plate_for_plate_reader.rows()[0]:
-            m50.pick_up_tip()
-            # height = helpers.find_liquid_height(m50, tartrazine_well)
-            height = 1
-            if height <= 0.0:
-                # If a negative tartrazine height is found,
-                # the protocol will pause, prompt a refill, and reprobe.
-                protocol.pause("Fill tartrazine")
+            # 2. Fill plate with tartrazine
+            for well in plate_for_plate_reader.rows()[0]:
+                m50.pick_up_tip()
                 # height = helpers.find_liquid_height(m50, tartrazine_well)
                 height = 1
-            m50.aspirate(10, tartrazine_well.bottom(z=height), rate=0.15)
-            m50.air_gap(5)
-            m50.dispense(5, well.top())
-            m50.dispense(10, well.bottom(z=0.5), rate=0.15)
-            m50.blow_out()
-            protocol.delay(minutes=0.1)
-            m50.blow_out()
-            m50.return_tip()
-        # 3. Read plate
-        # Move labware to heater shaker to be mixed
-        helpers.set_hs_speed(protocol, h_s, 1500, 2.0, True)
-        h_s.open_labware_latch()
-        # Initialize plate reader
-        plate_reader.close_lid()
-        plate_reader.initialize("single", [450])
-        plate_reader.open_lid()
-        # Move sample plate into plate reader
-        protocol.move_labware(plate_for_plate_reader, plate_reader, use_gripper=True)
-        sample_plate_name = "sample plate_" + str(i + 1)
-        csv_string = sample_plate_name + "_" + str(datetime.now())
-        plate_reader.close_lid()
-        result = plate_reader.read(csv_string)
-        # Calculate CV and % error of expected value.
-        for wavelength in result:
-            dict_of_wells = result[wavelength]
-            readings_and_wells = dict_of_wells.items()
-            readings = dict_of_wells.values()
-            avg = statistics.mean(readings)
-            # Check if every average is within +/- 5% of 2.85
-            percent_error_dict = {}
-            percent_error_sum = 0.0
-            for reading in readings_and_wells:
-                well_name = str(reading[0])
-                measurement = reading[1]
-                percent_error = (measurement - 2.85) / 2.85 * 100
-                percent_error_dict[well_name] = percent_error
-                percent_error_sum += percent_error
-            avg_percent_error = percent_error_sum / 96.0
-            standard_deviation = statistics.stdev(readings)
-            try:
-                cv = standard_deviation / avg
-            except ZeroDivisionError:
-                cv = 0.0
-            cv_percent = cv * 100
-            cv_dict[sample_plate_name] = {
-                "CV": cv_percent,
-                "Mean": avg,
-                "SD": standard_deviation,
-                "Avg Percent Error": avg_percent_error,
-            }
-        # Move Plate back to original location
-        all_percent_error_dict[sample_plate_name] = percent_error_dict
-        plate_reader.open_lid()
-        protocol.comment(
-            f"------plate {plate_for_plate_reader}. {cv_dict[sample_plate_name]}------"
-        )
-    helpers.move_labware_to_hs(protocol, sample_plate, h_s, h_s)
-    if plate_reader_bool:
-        protocol.move_labware(plate_for_plate_reader, "B3", use_gripper=True)
-        i += 1
-        # Print percent error dictionary
-        protocol.comment("Percent Error: " + str(all_percent_error_dict))
-        # Print cv dictionary
-        protocol.comment("Plate Reader Result: " + str(cv_dict))
+                if height <= 0.0:
+                    # If a negative tartrazine height is found,
+                    # the protocol will pause, prompt a refill, and reprobe.
+                    protocol.pause("Fill tartrazine")
+                    # height = helpers.find_liquid_height(m50, tartrazine_well)
+                    height = 1
+                m50.aspirate(10, tartrazine_well.bottom(z=height), rate=0.15)
+                m50.air_gap(5)
+                m50.dispense(5, well.top())
+                m50.dispense(10, well.bottom(z=0.5), rate=0.15)
+                m50.blow_out()
+                protocol.delay(minutes=0.1)
+                m50.blow_out()
+                m50.return_tip()
+            # 3. Read plate
+            # Move labware to heater shaker to be mixed
+            helpers.set_hs_speed(protocol, h_s, 1500, 2.0, True)
+            h_s.open_labware_latch()
+            # Initialize plate reader
+            plate_reader.close_lid()
+            plate_reader.initialize("single", [450])
+            plate_reader.open_lid()
+            # Move sample plate into plate reader
+            protocol.move_labware(
+                plate_for_plate_reader, plate_reader, use_gripper=True
+            )
+            sample_plate_name = "sample plate_" + str(i + 1)
+            csv_string = sample_plate_name + "_" + str(datetime.now())
+            plate_reader.close_lid()
+            result = plate_reader.read(csv_string)
+            # Calculate CV and % error of expected value.
+            for wavelength in result:
+                dict_of_wells = result[wavelength]
+                readings_and_wells = dict_of_wells.items()
+                readings = dict_of_wells.values()
+                avg = statistics.mean(readings)
+                # Check if every average is within +/- 5% of 2.85
+                percent_error_dict = {}
+                percent_error_sum = 0.0
+                for reading in readings_and_wells:
+                    well_name = str(reading[0])
+                    measurement = reading[1]
+                    percent_error = (measurement - 2.85) / 2.85 * 100
+                    percent_error_dict[well_name] = percent_error
+                    percent_error_sum += percent_error
+                avg_percent_error = percent_error_sum / 96.0
+                standard_deviation = statistics.stdev(readings)
+                try:
+                    cv = standard_deviation / avg
+                except ZeroDivisionError:
+                    cv = 0.0
+                cv_percent = cv * 100
+                cv_dict[sample_plate_name] = {
+                    "CV": cv_percent,
+                    "Mean": avg,
+                    "SD": standard_deviation,
+                    "Avg Percent Error": avg_percent_error,
+                }
+            # Move Plate back to original location
+            all_percent_error_dict[sample_plate_name] = percent_error_dict
+            plate_reader.open_lid()
+            protocol.comment(
+                f"------plate {plate_for_plate_reader}. {cv_dict[sample_plate_name]}------"
+            )
+        helpers.move_labware_to_hs(protocol, sample_plate, h_s, h_s)
+        if plate_reader_bool:
+            protocol.move_labware(plate_for_plate_reader, "B3", use_gripper=True)
+            i += 1
+            # Print percent error dictionary
+            protocol.comment("Percent Error: " + str(all_percent_error_dict))
+            # Print cv dictionary
+            protocol.comment("Plate Reader Result: " + str(cv_dict))
 
-    """
-    Here is where you can call the methods defined above to fit your specific
-    protocol. The normal sequence is:
-    """
-    A_lysis(AL_total_vol, AL)
-    bind(binding_buffer_vol)
-    wash(wash1_vol, wash1)
-    wash(wash2_vol, wash2)
-    wash(wash3_vol, wash3)
-    if not dry_run:
-        drybeads = 10.0  # Number of minutes you want to dry for
-    else:
-        drybeads = 0.5
-    for beaddry in np.arange(drybeads, 0, -0.5):
-        protocol.delay(
-            minutes=0.5,
-            msg="There are " + str(beaddry) + " minutes left in the drying step.",
-        )
-    elute(elution_vol)
+        """
+        Here is where you can call the methods defined above to fit your specific
+        protocol. The normal sequence is:
+        """
+        A_lysis(AL_total_vol, AL)
+        bind(binding_buffer_vol)
+        wash(wash1_vol, wash1)
+        wash(wash2_vol, wash2)
+        wash(wash3_vol, wash3)
+        if not dry_run:
+            drybeads = 10.0  # Number of minutes you want to dry for
+        else:
+            drybeads = 0.5
+        for beaddry in np.arange(drybeads, 0, -0.5):
+            protocol.delay(
+                minutes=0.5,
+                msg="There are " + str(beaddry) + " minutes left in the drying step.",
+            )
+        elute(elution_vol)
 
-    # Probe wells
-    end_wells_with_liquid = [
-        waste_reservoir.wells()[0],
-    ]
-    m1000.reset_tipracks()
-    helpers.clean_up_plates(
-        protocol, m1000, [res1, elutionplate], waste_reservoir["A1"]
-    )
-    helpers.find_liquid_height_of_all_wells(protocol, m1000, end_wells_with_liquid)
-    if deactivate_modules_bool:
-        helpers.deactivate_modules(protocol)
+        # Probe wells
+        end_wells_with_liquid = [
+            waste_reservoir.wells()[0],
+        ]
+        m1000.reset_tipracks()
+        helpers.clean_up_plates(
+            protocol, m1000, [res1, elutionplate], waste_reservoir["A1"]
+        )
+        helpers.find_liquid_height_of_all_wells(protocol, m1000, end_wells_with_liquid)
+        if deactivate_modules_bool:
+            helpers.deactivate_modules(protocol)
+    except Exception as e:
+        if not protocol.is_simulating():
+            slack_bot.send_error_message(metadata["protocolName"], str(e))
+        raise (e)
