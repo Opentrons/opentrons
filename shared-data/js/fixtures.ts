@@ -178,6 +178,7 @@ export const transformCutoutFixturesToAaWithFixtures = (cutoutFixtures: CutoutCo
       deckDefinition
     )
     aaPerCutoutFixture?.forEach(item => {
+      console.log("item: ", item)
       switch(obj.cutoutFixtureId){
         case STAGING_AREA_RIGHT_SLOT_FIXTURE:
           if (COLUMN_4_AA.includes(item)){
@@ -186,8 +187,10 @@ export const transformCutoutFixturesToAaWithFixtures = (cutoutFixtures: CutoutCo
           else{
             acc.push({ ...obj, cutoutFixtureId: 'singleCenterSlot' ,addressableAreaId: item });
           }
+          break;
+        default:
+          acc.push({ ...obj, addressableAreaId: item });
       }
-      acc.push({ ...obj, addressableAreaId: item });
     })
     return acc;
   }, []);

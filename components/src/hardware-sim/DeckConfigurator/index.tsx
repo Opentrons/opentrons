@@ -84,6 +84,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   const stagingAreaFixtures = deckConfigWithAA.filter(
     ({ cutoutFixtureId }) => cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
   )
+  console.log("stagingAreaFixtures:", stagingAreaFixtures)
   const wasteChuteFixtures = deckConfig.filter(
     ({ cutoutFixtureId }) =>
       cutoutFixtureId != null &&
@@ -163,7 +164,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           />
         </g>
       ))}
-      {stagingAreaFixtures.map(({ cutoutId, cutoutFixtureId, aa }) => (
+      {stagingAreaFixtures.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
         <StagingAreaConfigFixture
           data-testid={cutoutId}
           key={cutoutId}
@@ -173,15 +174,15 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
-          addressableArea={aa}
+          addressableArea={addressableAreaId}
           selected={cutoutId === selectedCutoutId}
         />
       ))}
-      {emptyCutouts.map(({ cutoutId, aa }) => (
+      {emptyCutouts.map(({ cutoutId, addressableAreaId }) => (
         <EmptyConfigFixture
-          data-testid={aa}
-          key={aa}
-          addressableArea={aa}
+          data-testid={addressableAreaId}
+          key={addressableAreaId}
+          addressableArea={addressableAreaId}
           deckDefinition={deckDef}
           handleClickAdd={handleClickAdd}
           fixtureLocation={cutoutId}
