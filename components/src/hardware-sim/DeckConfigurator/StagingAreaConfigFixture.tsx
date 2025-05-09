@@ -5,7 +5,6 @@ import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_3_X_ADJUSTMENT,
-  COLUMN_4_AA,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
@@ -22,6 +21,8 @@ import type {
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
+
+import {COLUMN_4_AA} from '@opentrons/shared-data'
 
 interface StagingAreaConfigFixtureProps {
   deckDefinition: DeckDefinition

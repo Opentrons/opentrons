@@ -47,6 +47,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  COLUMN_4_AA
 } from './constants'
 import { getCutoutIdForSlotName } from './helpers'
 import { getModuleDisplayName } from './modules'
@@ -61,6 +62,7 @@ import type {
 import type {
   AddressableArea,
   CoordinateTuple,
+  CutoutConfig,
   CutoutFixture,
   DeckDefinition,
   ModuleModel,
@@ -164,6 +166,33 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
+interface CutoutConfigMap extends CutoutConfig{
+  addressableAreaId: AddressableAreaName
+}
+
+export const transformCutoutFixturesToAaWithFixtures = (cutoutFixtures: CutoutConfig[], deckDefinition: DeckDefinition): CutoutConfigMap[] => {
+  return cutoutFixtures.reduce<CutoutConfigMap[]>((acc, obj) => {
+    const aaPerCutoutFixture = getAAFromCutoutId(
+      obj.cutoutId,
+      obj.cutoutFixtureId,
+      deckDefinition
+    )
+    aaPerCutoutFixture?.forEach(item => {
+      switch(obj.cutoutFixtureId){
+        case STAGING_AREA_RIGHT_SLOT_FIXTURE:
+          if (COLUMN_4_AA.includes(item)){
+            acc.push({ ...obj, addressableAreaId: item });
+          }
+          else{
+            acc.push({ ...obj, cutoutFixtureId: 'singleCenterSlot' ,addressableAreaId: item });
+          }
+      }
+      acc.push({ ...obj, addressableAreaId: item });
+    })
+    return acc;
+  }, []);
+}
+
 export const getAAFromCutoutId = (
   inputCutoutId: CutoutId,
   cutoutFixtureId: CutoutFixtureId,
@@ -173,13 +202,8 @@ export const getAAFromCutoutId = (
    * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
    */
   // remove this when implemented in the server
-  console.log(deckDefinition)
-  const cutoutFixture =
-    cutoutFixtureId === 'singleRightSlot'
-      ? 'stagingAreaRightSlot'
-      : cutoutFixtureId
   const fixture = deckDefinition.cutoutFixtures.find(
-    fixture => fixture.id === cutoutFixture
+    fixture => fixture.id === cutoutFixtureId
   )
   return fixture?.providesAddressableAreas[inputCutoutId]
 }

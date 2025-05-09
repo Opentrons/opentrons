@@ -48,7 +48,7 @@ _for_flex = models.DeckConfigurationRequest.model_construct(
         ),
         models.CutoutFixture.model_construct(
             cutoutId="cutoutA3",
-            cutoutFixtureId="trashBinAdapter",
+            cutoutFixtureId="stagingAreaRightSlot",
             opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.model_construct(

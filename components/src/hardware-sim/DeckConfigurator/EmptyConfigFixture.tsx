@@ -15,10 +15,10 @@ import {
   COLUMN_3_X_ADJUSTMENT,
   FIXTURE_HEIGHT,
   Y_ADJUSTMENT,
-  COLUMN_4_AA
 } from './constants'
 
-import type { AddressableArea, AddressableAreaName, CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type { AddressableArea, AddressableAreaName, CutoutId, DeckDefinition} from '@opentrons/shared-data'
+import {COLUMN_4_AA} from '@opentrons/shared-data'
 
 interface EmptyConfigFixtureProps {
   deckDefinition: DeckDefinition

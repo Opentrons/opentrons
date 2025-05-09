@@ -24,8 +24,6 @@ export const STAGING_AREA_DISPLAY_NAME = 'Staging area'
 export const TRASH_BIN_DISPLAY_NAME = 'Trash bin'
 export const WASTE_CHUTE_DISPLAY_NAME = 'Waste chute'
 
-export const COLUMN_4_AA = ['D4', 'C4', 'B4', 'A4']
-
 // common config styles for staging area, trash bin, waste chute
 export const CONFIG_STYLE_READ_ONLY = css`
   display: ${DISPLAY_FLEX};
