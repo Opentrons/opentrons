@@ -22,6 +22,13 @@ export function forAspirate(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { pipetteId, volume, labwareId } = params
+  console.log(
+    'forAspirateInPlace moveToWell information',
+    volume,
+    labwareId,
+    params.wellName,
+    pipetteId
+  )
   const { robotState, warnings } = robotStateAndWarnings
   const { liquidState } = robotState
   const nozzles = robotState.pipettes[pipetteId].nozzles

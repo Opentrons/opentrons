@@ -10,7 +10,6 @@ export function forDispense(
 ): void {
   const { labwareId, pipetteId, volume, wellName } = params
   const { robotState } = robotStateAndWarnings
-  console.log('hit here')
   dispenseUpdateLiquidState({
     invariantContext,
     labwareId,

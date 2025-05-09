@@ -45,10 +45,6 @@ export function dispenseUpdateLiquidState(
     volume,
     wellName,
   } = args
-  console.log(
-    'prev liquid state in dispense',
-    JSON.parse(JSON.stringify(prevLiquidState))
-  )
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
   let channels = pipetteSpec.channels
@@ -113,11 +109,6 @@ export function dispenseUpdateLiquidState(
     (prevTipLiquidState: LocationLiquidState): SourceAndDest => {
       if (useFullVolume) {
         const totalTipVolume = getLocationTotalVolume(prevTipLiquidState)
-        console.log(
-          'totalTipVolume',
-          totalTipVolume,
-          JSON.parse(JSON.stringify(prevTipLiquidState))
-        )
         return totalTipVolume > 0
           ? splitLiquid(totalTipVolume, prevTipLiquidState)
           : {
@@ -129,23 +120,13 @@ export function dispenseUpdateLiquidState(
       return splitLiquid(volume || 0, prevTipLiquidState)
     }
   )
-  console.log(
-    'well liquid labware',
-    well,
-    JSON.parse(JSON.stringify(liquidLabware))
-  )
   let mergeLiquidtoSingleWell = null
   //  a labware will always have a well
   if (well != null && liquidLabware != null) {
-    console.log('should hit here')
     mergeLiquidtoSingleWell = {
       [well]: reduce(
         splitLiquidStates,
         (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) => {
-          console.log(
-            'splitLiquidStateForTip',
-            JSON.parse(JSON.stringify(splitLiquidStateForTip))
-          )
           const res = mergeLiquid(
             wellLiquidStateAcc,
             splitLiquidStateForTip.dest
@@ -158,7 +139,6 @@ export function dispenseUpdateLiquidState(
   }
   //  waste chute and trash bin don't have wells
   if (well == null && liquidTrash != null) {
-    console.log('shouldnt hit here')
     mergeLiquidtoSingleWell = reduce(
       splitLiquidStates,
       (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) => {
@@ -188,10 +168,6 @@ export function dispenseUpdateLiquidState(
         }, {})
       : {}
 
-  console.log(
-    'mergeLiquidtoSingleWell',
-    JSON.parse(JSON.stringify(mergeLiquidtoSingleWell))
-  )
   // add liquid to well(s)
   const labwareLiquidState = allWellsShared
     ? mergeLiquidtoSingleWell
@@ -208,5 +184,4 @@ export function dispenseUpdateLiquidState(
       labwareLiquidState
     )
   }
-  console.log('dispense only', JSON.parse(JSON.stringify(labwareLiquidState)))
 }

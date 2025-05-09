@@ -25,6 +25,7 @@ import {
 } from '../../utils'
 import {
   airGapInPlace,
+  aspirate,
   aspirateInPlace,
   configureForVolume,
   delay,
@@ -591,6 +592,24 @@ export const transfer: CommandCreator<TransferArgs> = (
               volume: subTransferVol,
               flowRate: aspirateFlowRateUlSec,
             }),
+
+            // curryCommandCreator(aspirate, {
+            //   pipetteId: args.pipette,
+            //   volume: subTransferVol,
+            //   labwareId: args.sourceLabware,
+            //   wellName: sourceWell,
+            //   flowRate: aspirateFlowRateUlSec,
+            //   wellLocation: {
+            //     origin: 'bottom',
+            //     offset: {
+            //       z: 0,
+            //       x: aspirateXOffset,
+            //       y: aspirateYOffset,
+            //     },
+            //   },
+            //   tipRack,
+            //   nozzles: args.nozzles,
+            // }),
             ...delayAfterAspirateCommands,
           ]
           const postAspirateRetractCommands = [
@@ -719,7 +738,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...touchTipAfterRetractCommands,
             ...airGapAfterRetractCommands,
             ...dispenseAspirateAirGapCommands,
-            // ...dispenseCommand,
+            ...dispenseCommand,
             ...delayAfterDispenseCommands,
             ...mixInDestinationCommands,
             ...blowoutCommand,

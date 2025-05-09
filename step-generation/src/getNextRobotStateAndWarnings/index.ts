@@ -135,12 +135,10 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'aspirateInPlace':
       if (prevCommand?.commandType === 'moveToWell') {
-        console.log('should hit here once')
-        forAspirateInPlace(
-          command.params,
+        forAspirate(
+          { ...command.params, ...prevCommand.params },
           invariantContext,
-          robotStateAndWarnings,
-          prevCommand.params
+          robotStateAndWarnings
         )
       }
       break

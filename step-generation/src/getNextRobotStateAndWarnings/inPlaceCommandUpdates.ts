@@ -36,7 +36,8 @@ export const forAspirateInPlace = (
     'forAspirateInPlace moveToWell information',
     volume,
     labwareId,
-    wellName
+    wellName,
+    pipetteId
   )
   const { robotState, warnings } = robotStateAndWarnings
   const { liquidState } = robotState
@@ -244,11 +245,11 @@ export const forDropTipInPlace = (
   const { robotState } = robotStateAndWarnings
   robotState.tipState.pipettes[pipetteId] = false
 
-  // dispenseUpdateLiquidState({
-  //   invariantContext,
-  //   prevLiquidState: robotState.liquidState,
-  //   pipetteId,
-  //   useFullVolume: true,
-  //   robotStateAndWarnings,
-  // })
+  dispenseUpdateLiquidState({
+    invariantContext,
+    prevLiquidState: robotState.liquidState,
+    pipetteId,
+    useFullVolume: true,
+    robotStateAndWarnings,
+  })
 }
