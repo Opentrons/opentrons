@@ -71,7 +71,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const navigate = useNavigate()
   const isFlex =
     useRobotType(selectedRobot?.displayName ?? '') === FLEX_ROBOT_TYPE
-  const [shouldApplyOffsets, setShouldApplyOffsets] = useState<boolean>(isFlex)
+  const [shouldApplyOffsets, setShouldApplyOffsets] = useState<boolean>(true)
   const {
     protocolKey,
     srcFileNames,
