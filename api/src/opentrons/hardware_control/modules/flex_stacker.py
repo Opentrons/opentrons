@@ -177,6 +177,7 @@ class FlexStacker(mod_abc.AbstractModule):
         self._stall_detected = False
         self._stacker_status = FlexStackerStatus.IDLE
         self._last_status_bar_event: Optional[StatusBarUpdateEvent] = None
+        self._should_identify = False
 
     async def _initialized_callback(self) -> None:
         """Called by the reader once the module is initialized."""
@@ -243,17 +244,29 @@ class FlexStacker(mod_abc.AbstractModule):
     def is_simulated(self) -> bool:
         return isinstance(self._driver, SimulatingDriver)
 
+    def _get_platform_live_data(self) -> PlatformState:
+        """Get the platform state for live data."""
+        if self.initialized and self.platform_state == PlatformState.UNKNOWN:
+            # If the platform state is unknown, we need to poll it
+            if self.limit_switch_status[StackerAxis.X] != StackerAxisState.UNKNOWN:
+                return PlatformState.MISSING
+        return self.platform_state
+
     @property
     def live_data(self) -> LiveData:
         data: FlexStackerData = {
             "latchState": self.latch_state.value,
-            "platformState": self.platform_state.value,
+            "platformState": self._get_platform_live_data().value,
             "hopperDoorState": self.hopper_door_state.value,
             "axisStateX": self.limit_switch_status[StackerAxis.X].value,
             "axisStateZ": self.limit_switch_status[StackerAxis.Z].value,
             "errorDetails": self._reader.error,
         }
         return {"status": self.status.value, "data": data}
+
+    @property
+    def should_identify(self) -> bool:
+        return self._should_identify
 
     async def prep_for_update(self) -> str:
         await self._poller.stop()
@@ -342,6 +355,7 @@ class FlexStacker(mod_abc.AbstractModule):
         success = await self._driver.move_to_limit_switch(
             axis=axis, direction=direction, params=motion_params
         )
+        await self._reader.get_limit_switch_status()
         if success == MoveResult.STALL_ERROR:
             self._stall_detected = True
             raise FlexStackerStallError(self.device_info["serial"], axis)
@@ -589,7 +603,11 @@ class FlexStacker(mod_abc.AbstractModule):
                 case StatusBarState.RUNNING:
                     await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.STATIC)
                 case StatusBarState.PAUSED:
-                    await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
+                    if self.should_identify:
+                        await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
+                        self.set_stacker_identify(False)
+                    else:
+                        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
                 case StatusBarState.IDLE:
                     await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
                 case StatusBarState.HARDWARE_ERROR:
@@ -610,6 +628,9 @@ class FlexStacker(mod_abc.AbstractModule):
         await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE, reps=10)
         if self._last_status_bar_event:
             await self._handle_status_bar_event(self._last_status_bar_event)
+
+    def set_stacker_identify(self, state: bool) -> None:
+        self._should_identify = state
 
 
 class FlexStackerReader(Reader):

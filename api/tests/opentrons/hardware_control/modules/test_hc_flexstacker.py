@@ -1,6 +1,7 @@
 import asyncio
 import pytest
 import mock
+from decoy import Decoy
 from typing import AsyncGenerator
 from opentrons.drivers.flex_stacker.driver import (
     STACKER_MOTION_CONFIG,
@@ -11,6 +12,8 @@ from opentrons.drivers.flex_stacker.types import (
     LimitSwitchStatus,
     PlatformStatus,
     StackerAxis,
+    LEDColor,
+    LEDPattern,
 )
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -18,7 +21,9 @@ from opentrons.hardware_control.modules.flex_stacker import (
     SIMULATING_POLL_PERIOD,
     FlexStackerReader,
 )
+from opentrons.hardware_control.modules.types import PlatformState
 from opentrons.hardware_control.poller import Poller
+from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
 
 
 @pytest.fixture
@@ -141,3 +146,126 @@ async def test_set_run_hold_current(
     assert motion_params.hold_current == default.hold_current
     mock_driver.set_run_current.reset_mock()
     mock_driver.set_ihold_current.reset_mock()
+
+
+PLATFORM_STATUS_UNKNOWN = PlatformStatus(False, False)
+PLATFORM_STATUS_EXTENDED = PlatformStatus(True, False)
+PLATFORM_STATUS_RETRACTED = PlatformStatus(False, True)
+
+X_UNKNOWN = LimitSwitchStatus(False, False, False, False, False)
+X_EXTENDED = LimitSwitchStatus(True, False, False, False, False)
+X_RETRACTED = LimitSwitchStatus(False, True, False, False, False)
+
+
+@pytest.mark.parametrize("x_status", [X_EXTENDED, X_RETRACTED, X_UNKNOWN])
+@pytest.mark.parametrize(
+    "platform_status,expected",
+    [
+        (PLATFORM_STATUS_RETRACTED, PlatformState.RETRACTED),
+        (PLATFORM_STATUS_EXTENDED, PlatformState.EXTENDED),
+    ],
+)
+async def test_platform_state(
+    subject: modules.FlexStacker,
+    mock_driver: mock.AsyncMock,
+    x_status: LimitSwitchStatus,
+    platform_status: PlatformStatus,
+    expected: PlatformState,
+) -> None:
+    """Test that the platform state is correctly determined."""
+    mock_driver.get_platform_status.return_value = platform_status
+    mock_driver.get_limit_switches_status.return_value = x_status
+
+    # update the cached value
+    await subject._reader.get_limit_switch_status()
+    await subject._reader.get_platform_sensor_state()
+    assert subject._get_platform_live_data() == expected
+
+
+@pytest.mark.parametrize(
+    "x_status,expected",
+    [
+        (X_EXTENDED, PlatformState.MISSING),
+        (X_RETRACTED, PlatformState.MISSING),
+        (X_UNKNOWN, PlatformState.UNKNOWN),
+    ],
+)
+async def test_platform_state_unknown(
+    subject: modules.FlexStacker,
+    mock_driver: mock.AsyncMock,
+    x_status: LimitSwitchStatus,
+    expected: PlatformState,
+) -> None:
+    """Test that the platform state is correctly determined."""
+    mock_driver.get_platform_status.return_value = PLATFORM_STATUS_UNKNOWN
+    mock_driver.get_limit_switches_status.return_value = x_status
+
+    # update the value
+    await subject._reader.get_limit_switch_status()
+    await subject._reader.get_platform_sensor_state()
+    assert subject._get_platform_live_data() == expected
+
+
+@pytest.mark.parametrize(
+    ("door_intervention", "event", "params"),
+    [
+        (
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.RUNNING, enabled=True),
+            (0.5, LEDColor.GREEN, LEDPattern.STATIC),
+        ),
+        (
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.PAUSED, enabled=True),
+            (0.5, LEDColor.WHITE, LEDPattern.PULSE),
+        ),
+        (
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.PAUSED, enabled=True),
+            (0.5, LEDColor.BLUE, LEDPattern.PULSE),
+        ),
+        (
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.IDLE, enabled=True),
+            (0.5, LEDColor.WHITE, LEDPattern.STATIC),
+        ),
+        (
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.HARDWARE_ERROR, enabled=True),
+            (0.5, LEDColor.RED, LEDPattern.FLASH),
+        ),
+        (
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.SOFTWARE_ERROR, enabled=True),
+            (0.5, LEDColor.YELLOW, LEDPattern.STATIC),
+        ),
+        (
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.ERROR_RECOVERY, enabled=True),
+            (0.5, LEDColor.YELLOW, LEDPattern.PULSE),
+        ),
+        (
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.RUN_COMPLETED, enabled=True),
+            (0.5, LEDColor.GREEN, LEDPattern.PULSE),
+        ),
+        (
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.UPDATING, enabled=True),
+            (0.5, LEDColor.WHITE, LEDPattern.PULSE),
+        ),
+    ],
+)
+async def test_stacker_status_bar_event_handler(
+    decoy: Decoy,
+    subject: modules.FlexStacker,
+    mock_driver: mock.AsyncMock,
+    door_intervention: bool,
+    event: StatusBarUpdateEvent,
+    params: tuple[float, LEDColor, LEDPattern],
+) -> None:
+    subject.set_stacker_identify(door_intervention)
+    await subject._handle_status_bar_event(event)
+    mock_driver.set_led.assert_called_with(
+        params[0], color=params[1], pattern=params[2], duration=None, reps=None
+    )

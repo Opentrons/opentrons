@@ -28,6 +28,7 @@ from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
     ThermocyclerMovementFlagger,
 )
+from opentrons.protocol_engine.execution.equipment import EquipmentHandler
 
 
 @pytest.fixture
@@ -43,14 +44,20 @@ def state_store(decoy: Decoy) -> StateStore:
 
 
 @pytest.fixture
+def equipment_handler(decoy: Decoy) -> EquipmentHandler:
+    """Get a mock in the shape of an EquipmentHandler."""
+    return decoy.mock(cls=EquipmentHandler)
+
+
+@pytest.fixture
 def subject(
     state_store: StateStore,
     hardware_api: HardwareAPI,
+    equipment_handler: EquipmentHandler,
 ) -> ThermocyclerMovementFlagger:
     """Return a movement flagger initialized with mocked-out dependencies."""
     return ThermocyclerMovementFlagger(
-        state_store=state_store,
-        hardware_api=hardware_api,
+        state_store=state_store, hardware_api=hardware_api, equipment=equipment_handler
     )
 
 
@@ -72,7 +79,7 @@ async def test_raises_depending_on_thermocycler_substate_lid_status(
     )
 
     with pytest.raises(ThermocyclerNotOpenError):
-        await subject.raise_if_labware_in_non_open_thermocycler(
+        await subject.ensure_labware_in_open_thermocycler(
             labware_parent=ModuleLocation(moduleId="module-id"),
         )
 
@@ -140,9 +147,11 @@ async def test_raises_depending_on_thermocycler_hardware_lid_status(
     decoy.when(thermocycler.device_info).then_return({"serial": "module-serial"})
     decoy.when(thermocycler.lid_status).then_return(lid_status)
     decoy.when(hardware_api.attached_modules).then_return([thermocycler])
-
+    decoy.when(
+        subject._equipment.get_module_hardware_api(ThermocyclerModuleId("module-id"))
+    ).then_return(thermocycler)
     with expected_raise_cm:
-        await subject.raise_if_labware_in_non_open_thermocycler(
+        await subject.ensure_labware_in_open_thermocycler(
             labware_parent=ModuleLocation(moduleId="module-id"),
         )
 
@@ -172,7 +181,7 @@ async def test_raises_if_hardware_module_has_gone_missing(
     decoy.when(hardware_api.attached_modules).then_return([])
 
     with pytest.raises(ThermocyclerNotOpenError):
-        await subject.raise_if_labware_in_non_open_thermocycler(
+        await subject.ensure_labware_in_open_thermocycler(
             labware_parent=ModuleLocation(moduleId="module-id"),
         )
 
@@ -194,7 +203,7 @@ async def test_passes_if_virtual_module_lid_open(
         ),
     )
     decoy.when(state_store.config.use_virtual_modules).then_return(True)
-    await subject.raise_if_labware_in_non_open_thermocycler(
+    await subject.ensure_labware_in_open_thermocycler(
         labware_parent=ModuleLocation(moduleId="module-id")
     )
 
@@ -209,7 +218,7 @@ async def test_passes_if_labware_on_non_thermocycler_module(
     decoy.when(
         state_store.modules.get_thermocycler_module_substate(module_id="module-id")
     ).then_raise(WrongModuleTypeError("Woops"))
-    await subject.raise_if_labware_in_non_open_thermocycler(
+    await subject.ensure_labware_in_open_thermocycler(
         ModuleLocation(moduleId="module-id")
     )
 
@@ -221,6 +230,6 @@ async def test_passes_if_labware_not_on_any_module(
     decoy: Decoy,
 ) -> None:
     """It shouldn't raise if the labware isn't on a module."""
-    await subject.raise_if_labware_in_non_open_thermocycler(
+    await subject.ensure_labware_in_open_thermocycler(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )

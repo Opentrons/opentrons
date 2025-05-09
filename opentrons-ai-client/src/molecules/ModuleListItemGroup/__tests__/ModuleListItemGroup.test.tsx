@@ -6,9 +6,9 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ModuleListItemGroup } from '../index'
 
-import type { DisplayModules } from '../../../organisms/ModulesSection'
+import type { DisplayModule } from '../../../organisms/ModulesAndFixturesSection'
 
-const modulesMock: DisplayModules[] = [
+const modulesMock: DisplayModule[] = [
   {
     type: 'heaterShakerModuleType',
     model: 'heaterShakerModuleV1',

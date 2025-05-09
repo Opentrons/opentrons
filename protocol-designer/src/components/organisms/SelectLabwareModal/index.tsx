@@ -44,8 +44,8 @@ import { getOnlyLatestDefs } from '../../../labware-defs'
 import { createCustomLabwareDef } from '../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import {
-  selectLabware,
-  selectNestedLabware,
+  selectAdapter,
+  selectTopLabware,
 } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import {
@@ -106,12 +106,13 @@ export function SelectLabwareModal(
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
-    selectedLabwareDefUri,
+    selectedTopLabwareDefUri,
     selectedModuleModel,
-    selectedNestedLabwareDefUri,
+    selectedAdapterDefUri,
   } = zoomedInSlotInfo
 
-  const hasNoLabware = selectedLabwareDefUri == null
+  const hasNoLabware =
+    selectedTopLabwareDefUri == null && selectedAdapterDefUri == null
   const createCategoryState = (state: boolean): Record<string, boolean> =>
     Object.fromEntries(ALL_ORDERED_CATEGORIES.map(cat => [cat, state]))
 
@@ -398,9 +399,9 @@ export function SelectLabwareModal(
                         buttonValue={uri}
                         onChange={e => {
                           e.stopPropagation()
-                          dispatch(selectLabware({ labwareDefUri: uri }))
+                          dispatch(selectTopLabware({ labwareDefUri: uri }))
                         }}
-                        isSelected={uri === selectedLabwareDefUri}
+                        isSelected={uri === selectedTopLabwareDefUri}
                       />
                     )
                   )}
@@ -426,6 +427,9 @@ export function SelectLabwareModal(
                       {filteredLabwareByCategory[category]?.map(
                         ({ def, uri }, index) => {
                           const loadName = def.parameters.loadName
+                          const isAdapter = def.allowedRoles?.includes(
+                            'adapter'
+                          )
 
                           return searchFilter(def.metadata.displayName) &&
                             !getIsLabwareFiltered(def) ? (
@@ -436,25 +440,41 @@ export function SelectLabwareModal(
                                 buttonValue={uri}
                                 onChange={e => {
                                   e.stopPropagation()
-                                  dispatch(
-                                    selectLabware({
-                                      labwareDefUri:
-                                        uri === selectedLabwareDefUri
-                                          ? null
-                                          : uri,
-                                    })
-                                  )
-                                  // reset the nested labware def uri in case it is not compatible
-                                  dispatch(
-                                    selectNestedLabware({
-                                      nestedLabwareDefUri: null,
-                                    })
-                                  )
+                                  if (isAdapter) {
+                                    dispatch(
+                                      selectAdapter({
+                                        adapterDefUri:
+                                          uri === selectedAdapterDefUri
+                                            ? null
+                                            : uri,
+                                      })
+                                    )
+                                    dispatch(
+                                      selectTopLabware({
+                                        labwareDefUri: null,
+                                      })
+                                    )
+                                  } else {
+                                    dispatch(
+                                      selectTopLabware({
+                                        labwareDefUri:
+                                          uri === selectedTopLabwareDefUri
+                                            ? null
+                                            : uri,
+                                      })
+                                    )
+                                  }
                                 }}
-                                isSelected={uri === selectedLabwareDefUri}
+                                isSelected={
+                                  (isAdapter &&
+                                    uri === selectedAdapterDefUri) ||
+                                  (!isAdapter &&
+                                    uri === selectedTopLabwareDefUri)
+                                }
                               />
 
-                              {uri === selectedLabwareDefUri &&
+                              {isAdapter &&
+                                uri === selectedAdapterDefUri &&
                                 getLabwareCompatibleWithAdapter(defs, loadName)
                                   ?.length > 0 && (
                                   <ListButtonAccordionContainer
@@ -464,7 +484,7 @@ export function SelectLabwareModal(
                                       key={`${index}_${category}_${loadName}_accordion`}
                                       isNested
                                       mainHeadline={t('adapter_compatible_lab')}
-                                      isExpanded={uri === selectedLabwareDefUri}
+                                      isExpanded={uri === selectedAdapterDefUri}
                                     >
                                       {has96Channel &&
                                       loadName === ADAPTER_96_CHANNEL
@@ -484,14 +504,14 @@ export function SelectLabwareModal(
                                                   onChange={e => {
                                                     e.stopPropagation()
                                                     dispatch(
-                                                      selectNestedLabware({
-                                                        nestedLabwareDefUri: tiprackDefUri,
+                                                      selectTopLabware({
+                                                        labwareDefUri: tiprackDefUri,
                                                       })
                                                     )
                                                   }}
                                                   isSelected={
                                                     tiprackDefUri ===
-                                                    selectedNestedLabwareDefUri
+                                                    selectedTopLabwareDefUri
                                                   }
                                                 />
                                               )
@@ -517,14 +537,14 @@ export function SelectLabwareModal(
                                                 onChange={e => {
                                                   e.stopPropagation()
                                                   dispatch(
-                                                    selectNestedLabware({
-                                                      nestedLabwareDefUri: nestedDefUri,
+                                                    selectTopLabware({
+                                                      labwareDefUri: nestedDefUri,
                                                     })
                                                   )
                                                 }}
                                                 isSelected={
                                                   nestedDefUri ===
-                                                  selectedNestedLabwareDefUri
+                                                  selectedTopLabwareDefUri
                                                 }
                                               />
                                             )

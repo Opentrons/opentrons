@@ -4,12 +4,12 @@ import { describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { MODULES_FIELD_NAME } from '../../../organisms/ModulesSection'
-import { ControlledEmptySelectorButtonGroup } from '../index'
+import { MODULES_FIELD_NAME } from '../../../organisms/ModulesAndFixturesSection'
+import { ModulesButtonGroup } from '../index'
 
-import type { DisplayModules } from '../../../organisms/ModulesSection'
+import type { DisplayModule } from '../../../organisms/ModulesAndFixturesSection'
 
-const modulesMock: DisplayModules[] = [
+const modulesMock: DisplayModule[] = [
   {
     type: 'heaterShakerModuleType',
     model: 'heaterShakerModuleV1',
@@ -29,9 +29,9 @@ const TestFormProviderComponent = () => {
 
   return (
     <FormProvider {...methods}>
-      <ControlledEmptySelectorButtonGroup modules={modulesMock} />
+      <ModulesButtonGroup modules={modulesMock} />
 
-      {'selected values: ' + selectedValue.map((m: DisplayModules) => m.name)}
+      {'selected values: ' + selectedValue.map((m: DisplayModule) => m.name)}
     </FormProvider>
   )
 }
@@ -42,8 +42,8 @@ const render = (): ReturnType<typeof renderWithProviders> => {
   })
 }
 
-describe('ControlledEmptySelectorButtonGroup', () => {
-  it('should render ControlledEmptySelectorButtonGroup component', () => {
+describe('ModulesButtonGroup', () => {
+  it('should render ModulesButtonGroup component', () => {
     render()
 
     screen.getByText('Heater-Shaker Module GEN1')

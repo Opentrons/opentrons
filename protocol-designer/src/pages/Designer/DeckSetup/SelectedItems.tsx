@@ -23,51 +23,42 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 
-interface SelectedHoveredItemsProps {
+interface SelectedItemsProps {
   deckDef: DeckDefinition
   robotType: RobotType
   slotPosition: CoordinateTuple | null
 }
-export const SelectedItems = (
-  props: SelectedHoveredItemsProps
-): JSX.Element => {
+export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
   const { deckDef, robotType, slotPosition } = props
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
     selectedSlot,
     selectedFixture,
-    selectedLabwareDefUri,
+    selectedTopLabwareDefUri,
     selectedModuleModel,
-    selectedNestedLabwareDefUri,
+    selectedAdapterDefUri,
   } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getAllLabwareDefs()
   const deckSetup = useSelector(getInitialDeckSetup)
   const { labware } = deckSetup
-  const matchingSelectedLabwareOnDeck = Object.values(labware).find(labware => {
-    const matchingSlot = getSlotInLocationStack(labware.stack)
-    return (
-      matchingSlot === selectedSlot.slot &&
-      labware.labwareDefURI === selectedLabwareDefUri
-    )
-  })
-  const matchingSelectedNestedLabwareOnDeck = Object.values(labware).find(
-    lw => {
-      const matchingSlot = getSlotInLocationStack(lw.stack)
+  const matchingSelectedTopLabwareOnDeck = Object.values(labware).find(
+    ({ stack, labwareDefURI }) => {
+      const matchingSlot = getSlotInLocationStack(stack)
       return (
-        lw.labwareDefURI === selectedNestedLabwareDefUri &&
+        labwareDefURI === selectedTopLabwareDefUri &&
         matchingSlot === selectedSlot.slot
       )
     }
   )
-  const selectedLabwareDef =
-    selectedLabwareDefUri != null
-      ? defs[selectedLabwareDefUri] ?? customLabwareDefs[selectedLabwareDefUri]
+  const selectedAdapterDef =
+    selectedAdapterDefUri != null
+      ? defs[selectedAdapterDefUri] ?? customLabwareDefs[selectedAdapterDefUri]
       : null
-  const selectedNestedLabwareDef =
-    selectedNestedLabwareDefUri != null
-      ? defs[selectedNestedLabwareDefUri] ??
-        customLabwareDefs[selectedNestedLabwareDefUri]
+  const selectedTopLabwareDef =
+    selectedTopLabwareDefUri != null
+      ? defs[selectedTopLabwareDefUri] ??
+        customLabwareDefs[selectedTopLabwareDefUri]
       : null
 
   const orientation =
@@ -77,25 +68,25 @@ export const SelectedItems = (
 
   const labwareInfos: DeckLabelProps[] = []
 
-  if (selectedNestedLabwareDef != null) {
-    const selectedNestedLabwareLabel = {
-      text: selectedNestedLabwareDef.metadata.displayName,
+  if (selectedTopLabwareDef != null) {
+    const selectedTopLabwareLabel = {
+      text: selectedTopLabwareDef.metadata.displayName,
       isSelected: true,
       isLast: true,
       isZoomed: true,
     }
-    labwareInfos.push(selectedNestedLabwareLabel)
+    labwareInfos.push(selectedTopLabwareLabel)
   }
-  if (selectedLabwareDefUri != null) {
+  if (selectedAdapterDefUri != null) {
     const def =
-      defs[selectedLabwareDefUri] ?? customLabwareDefs[selectedLabwareDefUri]
-    const selectedLabwareLabel = {
+      defs[selectedAdapterDefUri] ?? customLabwareDefs[selectedAdapterDefUri]
+    const selectedAdapterLabel = {
       text: def.metadata.displayName,
       isSelected: true,
-      isLast: selectedNestedLabwareDefUri == null,
+      isLast: selectedTopLabwareDefUri == null,
       isZoomed: true,
     }
-    labwareInfos.push(selectedLabwareLabel)
+    labwareInfos.push(selectedAdapterLabel)
   }
 
   return (
@@ -121,16 +112,15 @@ export const SelectedItems = (
           >
             <>
               <SelectedModuleLabwareRender
-                nestedLabwareDef={selectedNestedLabwareDef}
-                labwareOnDeck={matchingSelectedLabwareOnDeck}
-                labwareDef={selectedLabwareDef}
+                topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
+                adapterDef={selectedAdapterDef}
                 moduleModel={selectedModuleModel}
               />
             </>
           </Module>
           {selectedModuleModel != null ? (
             <ModuleLabel
-              isLast={selectedLabwareDefUri == null}
+              isLast={selectedAdapterDefUri == null}
               moduleModel={selectedModuleModel}
               position={slotPosition}
               orientation={orientation}
@@ -142,25 +132,22 @@ export const SelectedItems = (
         </>
       ) : null}
       <SelectedLabwareRender
-        labwareOnDeck={matchingSelectedLabwareOnDeck}
-        labwareDef={selectedLabwareDef}
+        labwareOnDeck={matchingSelectedTopLabwareOnDeck}
+        labwareDef={selectedTopLabwareDef ?? selectedAdapterDef}
         slotPosition={slotPosition}
         moduleModel={selectedModuleModel}
-        showLabel={selectedNestedLabwareDef == null}
-      />
-      <SelectedLabwareRender
-        labwareOnDeck={matchingSelectedNestedLabwareOnDeck}
-        labwareDef={selectedNestedLabwareDef}
-        slotPosition={slotPosition}
-        moduleModel={selectedModuleModel}
-        nestedLabwareInfo={[
-          {
-            text: selectedLabwareDef?.metadata.displayName ?? 'unknown name',
-            isSelected: true,
-            isLast: true,
-            isZoomed: true,
-          },
-        ]}
+        nestedLabwareInfo={
+          selectedAdapterDef != null && selectedTopLabwareDef != null
+            ? [
+                {
+                  text: selectedAdapterDef?.metadata.displayName,
+                  isSelected: true,
+                  isLast: true,
+                  isZoomed: true,
+                },
+              ]
+            : undefined
+        }
       />
     </>
   )

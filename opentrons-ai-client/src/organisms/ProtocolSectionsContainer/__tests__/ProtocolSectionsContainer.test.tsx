@@ -5,11 +5,13 @@ import { describe, expect, it } from 'vitest'
 import { ProtocolSectionsContainer } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { PROTOCOL_FORMAT, PYTHON } from '../../../resources/constants'
 import { fillProtocolFormatSectionAndClickConfirm } from '../../../resources/utils/createProtocolTestUtils'
+import { OPENTRONS_FLEX, ROBOT_FIELD_NAME } from '../../InstrumentsSection'
 
-const TestFormProviderComponent = () => {
+const TestFormProviderComponent = ({ defaultValues = {} } = {}) => {
   const methods = useForm({
-    defaultValues: {},
+    defaultValues,
   })
 
   return (
@@ -19,10 +21,13 @@ const TestFormProviderComponent = () => {
   )
 }
 
-const render = (): ReturnType<typeof renderWithProviders> => {
-  return renderWithProviders(<TestFormProviderComponent />, {
-    i18nInstance: i18n,
-  })
+const render = (defaultValues = {}): ReturnType<typeof renderWithProviders> => {
+  return renderWithProviders(
+    <TestFormProviderComponent defaultValues={defaultValues} />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 describe('ProtocolSectionsContainer', () => {
@@ -97,5 +102,26 @@ describe('ProtocolSectionsContainer', () => {
     await waitFor(() => {
       expect(instrumentsButton).toHaveAttribute('aria-expanded', 'false')
     })
+  })
+
+  it('should include Runtime Parameters section between Labware & Liquids and Steps', () => {
+    render({
+      [PROTOCOL_FORMAT]: PYTHON,
+      [ROBOT_FIELD_NAME]: OPENTRONS_FLEX,
+    })
+
+    // Get all accordion buttons
+    const buttons = screen.getAllByRole('button', {
+      name: /Protocol Format|Application|Instruments|Modules|Labware & Liquids|Runtime Parameters|Steps/,
+    })
+
+    // Verify order of sections by their headings
+    expect(buttons[0]).toHaveTextContent('Protocol Format')
+    expect(buttons[1]).toHaveTextContent('Application')
+    expect(buttons[2]).toHaveTextContent('Instruments')
+    expect(buttons[3]).toHaveTextContent('Modules')
+    expect(buttons[4]).toHaveTextContent('Labware & Liquids')
+    expect(buttons[5]).toHaveTextContent('Runtime Parameters')
+    expect(buttons[6]).toHaveTextContent('Steps')
   })
 })

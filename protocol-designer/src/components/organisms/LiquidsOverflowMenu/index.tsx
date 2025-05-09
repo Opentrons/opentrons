@@ -54,7 +54,7 @@ export function LiquidsOverflowMenu(
 
   let right: string = SPACING.spacing12
   if (formData != null || location.pathname === '/liquids') {
-    right = '23.4rem'
+    right = '7.4rem'
   } else if (zoomIn?.slot === 'offDeck') {
     right = '24.75rem'
   }
