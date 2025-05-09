@@ -39,10 +39,10 @@ export function useDeckConfigurationEditingTools(
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-  const [targetCutoutId, setTargetCutoutId] = useState<{cutoutId: CutoutId, addressableArea: AddressableAreaName} | null>(null)
+  const [targetCutoutIdAndAA, setTargetCutoutIdAndAA] = useState<{cutoutId: CutoutId, addressableArea: AddressableAreaName} | null>(null)
 
   const addFixtureToCutout = (cutoutId: CutoutId, addressableArea: AddressableAreaName): void => {
-    setTargetCutoutId({cutoutId, addressableArea})
+    setTargetCutoutIdAndAA({cutoutId, addressableArea})
   }
 
   const removeFixtureFromCutout = (
@@ -98,12 +98,12 @@ export function useDeckConfigurationEditingTools(
     addFixtureToCutout,
     removeFixtureFromCutout,
     addFixtureModal:
-      targetCutoutId != null ? (
+    targetCutoutIdAndAA != null ? (
         <AddFixtureModal
-          cutoutId={targetCutoutId.cutoutId}
-          addresableArea={targetCutoutId.addressableArea}
+          cutoutId={targetCutoutIdAndAA.cutoutId}
+          addresableArea={targetCutoutIdAndAA.addressableArea}
           closeModal={() => {
-            setTargetCutoutId(null)
+            setTargetCutoutIdAndAA(null)
           }}
           isOnDevice={isOnDevice}
         />

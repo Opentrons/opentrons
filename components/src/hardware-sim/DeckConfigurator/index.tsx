@@ -42,6 +42,7 @@ import type {
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
+import { COLUMN_4_AA } from '../..'
 
 export * from './constants'
 
@@ -93,8 +94,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     return acc;
   }, []);
 
+  // need to extract column 3 and add it into antoher list
   const stagingAreaFixtures = deckConfigWithAA.filter(
-    ({ cutoutFixtureId }) => cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
+    ({ cutoutFixtureId, aa }) => cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE && COLUMN_4_AA.includes(aa)
   )
   const wasteChuteFixtures = deckConfig.filter(
     ({ cutoutFixtureId }) =>
@@ -185,13 +187,14 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          addressableArea={aa}
           selected={cutoutId === selectedCutoutId}
         />
       ))}
       {emptyCutouts.map(({ cutoutId, aa }) => (
         <EmptyConfigFixture
-          data-testid={cutoutId}
-          key={cutoutId}
+          data-testid={aa}
+          key={aa}
           addressableArea={aa}
           deckDefinition={deckDef}
           handleClickAdd={handleClickAdd}

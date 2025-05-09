@@ -5,6 +5,7 @@ import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_3_X_ADJUSTMENT,
+  COLUMN_4_AA,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
@@ -15,6 +16,8 @@ import {
 } from './constants'
 
 import type {
+  AddressableArea,
+  AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
   DeckDefinition,
@@ -24,6 +27,7 @@ interface StagingAreaConfigFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
+  addressableArea: AddressableAreaName
   handleClickRemove?: (
     fixtureLocation: CutoutId,
     cutoutFixtureId: CutoutFixtureId
@@ -39,13 +43,18 @@ export function StagingAreaConfigFixture(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    addressableArea,
     selected = false,
   } = props
+
+  console.log("addressableArea: ", addressableArea)
 
   const stagingAreaCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
-
+  const OffsetVector = deckDefinition.locations.addressableAreas.find((aaItem: AddressableArea) => aaItem.id === addressableArea)?.offsetFromCutoutFixture ?? [0, 0, 0]
+  const xOffset = COLUMN_4_AA.includes(addressableArea) ? OffsetVector[0]: 0
+  console.log("xOffset: ", xOffset)
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
@@ -53,7 +62,7 @@ export function StagingAreaConfigFixture(
   const [xSlotPosition = 0, ySlotPosition = 0] =
     stagingAreaCutout?.position ?? []
 
-  const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
+  const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT + xOffset
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
