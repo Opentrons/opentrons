@@ -1,5 +1,7 @@
 import { css } from 'styled-components'
 
+import { COLUMN_4_AA } from '@opentrons/shared-data'
+
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
@@ -17,20 +19,32 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
-import type { AddressableArea, AddressableAreaName, CutoutId, DeckDefinition} from '@opentrons/shared-data'
-import {COLUMN_4_AA} from '@opentrons/shared-data'
+import type {
+  AddressableArea,
+  AddressableAreaName,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 interface EmptyConfigFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   addressableArea: AddressableAreaName
-  handleClickAdd: (fixtureLocation: CutoutId, addressableArea: AddressableAreaName) => void
+  handleClickAdd: (
+    fixtureLocation: CutoutId,
+    addressableArea: AddressableAreaName
+  ) => void
 }
 
 export function EmptyConfigFixture(
   props: EmptyConfigFixtureProps
 ): JSX.Element {
-  const { deckDefinition, handleClickAdd, fixtureLocation, addressableArea } = props
+  const {
+    deckDefinition,
+    handleClickAdd,
+    fixtureLocation,
+    addressableArea,
+  } = props
 
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
@@ -43,35 +57,37 @@ export function EmptyConfigFixture(
   const [xSlotPosition = 0, ySlotPosition = 0] =
     standardSlotCutout?.position ?? []
   let x = xSlotPosition
-  const OffsetVector = deckDefinition.locations.addressableAreas.find((aaItem: AddressableArea) => aaItem.id === addressableArea)?.offsetFromCutoutFixture ?? [0, 0, 0]
-  const xOffset = COLUMN_4_AA.includes(addressableArea) ? OffsetVector[0]: 0
+  const OffsetVector = deckDefinition.locations.addressableAreas.find(
+    (aaItem: AddressableArea) => aaItem.id === addressableArea
+  )?.offsetFromCutoutFixture ?? [0, 0, 0]
+  const xOffset = COLUMN_4_AA.includes(addressableArea) ? OffsetVector[0] : 0
   let width = 0
-    switch (fixtureLocation) {
-      case 'cutoutA1':
-      case 'cutoutB1':
-      case 'cutoutC1':
-      case 'cutoutD1': {
-        x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
-        width = COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
-        break
-      }
-      case 'cutoutA2':
-      case 'cutoutB2':
-      case 'cutoutC2':
-      case 'cutoutD2': {
-        x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
-        width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
-        break
-      }
-      case 'cutoutA3':
-      case 'cutoutB3':
-      case 'cutoutC3':
-      case 'cutoutD3': {
-        x = xSlotPosition + COLUMN_3_X_ADJUSTMENT + xOffset
-        width = COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
-        break
-      }
+  switch (fixtureLocation) {
+    case 'cutoutA1':
+    case 'cutoutB1':
+    case 'cutoutC1':
+    case 'cutoutD1': {
+      x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
+      width = COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
+      break
     }
+    case 'cutoutA2':
+    case 'cutoutB2':
+    case 'cutoutC2':
+    case 'cutoutD2': {
+      x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
+      width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
+      break
+    }
+    case 'cutoutA3':
+    case 'cutoutB3':
+    case 'cutoutC3':
+    case 'cutoutD3': {
+      x = xSlotPosition + COLUMN_3_X_ADJUSTMENT + xOffset
+      width = COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
+      break
+    }
+  }
 
   const y = ySlotPosition + Y_ADJUSTMENT
 

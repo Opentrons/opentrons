@@ -35,6 +35,7 @@ import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
+  AddressableAreaName,
   CompletedProtocolAnalysis,
   CutoutFixtureId,
   CutoutId,
@@ -49,6 +50,7 @@ interface FixtureTableProps {
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   setCutoutId: (cutoutId: CutoutId) => void
+  setAddressableAreaId: (addressableAreaId : AddressableAreaName) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
@@ -62,6 +64,7 @@ export function FixtureTable({
   mostRecentAnalysis,
   setSetupScreen,
   setCutoutId,
+  setAddressableAreaId,
   setProvidedFixtureOptions,
 }: FixtureTableProps): JSX.Element | null {
   const requiredFixtureDetails = getSimplestDeckConfigForProtocol(

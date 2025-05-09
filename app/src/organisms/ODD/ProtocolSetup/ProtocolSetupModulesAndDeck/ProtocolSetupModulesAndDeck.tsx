@@ -40,7 +40,7 @@ import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { getUnmatchedModulesForProtocol } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import type { AddressableArea, AddressableAreaName, CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'
 
 const ATTACHED_MODULE_POLL_MS = 5000
@@ -50,6 +50,7 @@ interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   setCutoutId: (cutoutId: CutoutId) => void
+  setAddressableAreaId: (addressableAreaId: AddressableAreaName) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
@@ -60,6 +61,7 @@ export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
   setCutoutId,
+  setAddressableAreaId,
   setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
@@ -194,6 +196,7 @@ export function ProtocolSetupModulesAndDeck({
                   mostRecentAnalysis={mostRecentAnalysis}
                   setSetupScreen={setSetupScreen}
                   setCutoutId={setCutoutId}
+                  setAddressableAreaId={setAddressableAreaId}
                   setProvidedFixtureOptions={setProvidedFixtureOptions}
                 />
               </Flex>

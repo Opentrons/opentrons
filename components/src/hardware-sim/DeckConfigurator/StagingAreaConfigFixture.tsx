@@ -1,3 +1,5 @@
+import { COLUMN_4_AA } from '@opentrons/shared-data'
+
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
@@ -21,8 +23,6 @@ import type {
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
-
-import {COLUMN_4_AA} from '@opentrons/shared-data'
 
 interface StagingAreaConfigFixtureProps {
   deckDefinition: DeckDefinition
@@ -48,14 +48,16 @@ export function StagingAreaConfigFixture(
     selected = false,
   } = props
 
-  console.log("addressableArea: ", addressableArea)
+  console.log('addressableArea: ', addressableArea)
 
   const stagingAreaCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
-  const OffsetVector = deckDefinition.locations.addressableAreas.find((aaItem: AddressableArea) => aaItem.id === addressableArea)?.offsetFromCutoutFixture ?? [0, 0, 0]
-  const xOffset = COLUMN_4_AA.includes(addressableArea) ? OffsetVector[0]: 0
-  console.log("xOffset: ", xOffset)
+  const OffsetVector = deckDefinition.locations.addressableAreas.find(
+    (aaItem: AddressableArea) => aaItem.id === addressableArea
+  )?.offsetFromCutoutFixture ?? [0, 0, 0]
+  const xOffset = COLUMN_4_AA.includes(addressableArea) ? OffsetVector[0] : 0
+  console.log('xOffset: ', xOffset)
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position

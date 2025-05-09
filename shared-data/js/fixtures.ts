@@ -21,6 +21,7 @@ import {
   C1_ADDRESSABLE_AREA,
   C2_ADDRESSABLE_AREA,
   C3_ADDRESSABLE_AREA,
+  COLUMN_4_AA,
   D1_ADDRESSABLE_AREA,
   D2_ADDRESSABLE_AREA,
   D3_ADDRESSABLE_AREA,
@@ -47,7 +48,6 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-  COLUMN_4_AA
 } from './constants'
 import { getCutoutIdForSlotName } from './helpers'
 import { getModuleDisplayName } from './modules'
@@ -166,11 +166,14 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
-interface CutoutConfigMap extends CutoutConfig{
+interface CutoutConfigMap extends CutoutConfig {
   addressableAreaId: AddressableAreaName
 }
 
-export const transformCutoutFixturesToAaWithFixtures = (cutoutFixtures: CutoutConfig[], deckDefinition: DeckDefinition): CutoutConfigMap[] => {
+export const transformCutoutFixturesToAaWithFixtures = (
+  cutoutFixtures: CutoutConfig[],
+  deckDefinition: DeckDefinition
+): CutoutConfigMap[] => {
   return cutoutFixtures.reduce<CutoutConfigMap[]>((acc, obj) => {
     const aaPerCutoutFixture = getAAFromCutoutId(
       obj.cutoutId,
@@ -178,22 +181,25 @@ export const transformCutoutFixturesToAaWithFixtures = (cutoutFixtures: CutoutCo
       deckDefinition
     )
     aaPerCutoutFixture?.forEach(item => {
-      console.log("item: ", item)
-      switch(obj.cutoutFixtureId){
+      switch (obj.cutoutFixtureId) {
         case STAGING_AREA_RIGHT_SLOT_FIXTURE:
-          if (COLUMN_4_AA.includes(item)){
-            acc.push({ ...obj, addressableAreaId: item });
+        case FLEX_STACKER_V1_FIXTURE:
+          if (COLUMN_4_AA.includes(item)) {
+            acc.push({ ...obj, addressableAreaId: item })
+          } else {
+            acc.push({
+              ...obj,
+              cutoutFixtureId: 'singleCenterSlot',
+              addressableAreaId: item,
+            })
           }
-          else{
-            acc.push({ ...obj, cutoutFixtureId: 'singleCenterSlot' ,addressableAreaId: item });
-          }
-          break;
+          break
         default:
-          acc.push({ ...obj, addressableAreaId: item });
+          acc.push({ ...obj, addressableAreaId: item })
       }
     })
-    return acc;
-  }, []);
+    return acc
+  }, [])
 }
 
 export const getAAFromCutoutId = (

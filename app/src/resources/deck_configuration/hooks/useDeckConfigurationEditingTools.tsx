@@ -18,12 +18,19 @@ import { AddFixtureModal } from '/app/organisms/DeviceDetailsDeckConfiguration/A
 import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQuery'
 
 import type { ReactNode } from 'react'
-import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  CutoutFixtureId,
+  CutoutId,
+} from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
 interface DeckConfigurationEditingTools {
-  addFixtureToCutout: (cutoutId: CutoutId, addressableArea: AddressableAreaName) => void
+  addFixtureToCutout: (
+    cutoutId: CutoutId,
+    addressableArea: AddressableAreaName
+  ) => void
   removeFixtureFromCutout: (
     cutoutId: CutoutId,
     cutoutFixtureId: CutoutFixtureId
@@ -39,10 +46,16 @@ export function useDeckConfigurationEditingTools(
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-  const [targetCutoutIdAndAA, setTargetCutoutIdAndAA] = useState<{cutoutId: CutoutId, addressableArea: AddressableAreaName} | null>(null)
+  const [targetCutoutIdAndAA, setTargetCutoutIdAndAA] = useState<{
+    cutoutId: CutoutId
+    addressableArea: AddressableAreaName
+  } | null>(null)
 
-  const addFixtureToCutout = (cutoutId: CutoutId, addressableArea: AddressableAreaName): void => {
-    setTargetCutoutIdAndAA({cutoutId, addressableArea})
+  const addFixtureToCutout = (
+    cutoutId: CutoutId,
+    addressableArea: AddressableAreaName
+  ): void => {
+    setTargetCutoutIdAndAA({ cutoutId, addressableArea })
   }
 
   const removeFixtureFromCutout = (
@@ -98,10 +111,10 @@ export function useDeckConfigurationEditingTools(
     addFixtureToCutout,
     removeFixtureFromCutout,
     addFixtureModal:
-    targetCutoutIdAndAA != null ? (
+      targetCutoutIdAndAA != null ? (
         <AddFixtureModal
           cutoutId={targetCutoutIdAndAA.cutoutId}
-          addresableArea={targetCutoutIdAndAA.addressableArea}
+          addressableArea={targetCutoutIdAndAA.addressableArea}
           closeModal={() => {
             setTargetCutoutIdAndAA(null)
           }}
