@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   fixtureP10SingleV2Specs,
   getLabwareDefURI,
@@ -8,13 +9,15 @@ import {
   fixture_96_plate,
 } from '@opentrons/shared-data/labware/fixtures/2'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
+
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
+import { getOrderedWells } from '../../../utils'
 import {
-  moveLiquidFormToArgs,
   getAirGapData,
   getMixData,
+  moveLiquidFormToArgs,
 } from '../moveLiquidFormToArgs'
-import { getOrderedWells } from '../../../utils'
-import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HydratedMoveLiquidFormData,
@@ -79,7 +82,6 @@ describe('move liquid step form -> command creator args', () => {
       aspirate_mix_times: null,
       aspirate_delay_checkbox: false,
       aspirate_delay_seconds: null,
-      aspirate_delay_mmFromBottom: null,
 
       dispense_labware: {
         id: 'destLabwareId',
@@ -99,7 +101,6 @@ describe('move liquid step form -> command creator args', () => {
       dispense_mix_times: null,
       dispense_delay_checkbox: false,
       dispense_delay_seconds: null,
-      dispense_delay_mmFromBottom: null,
 
       aspirate_wells_grouped: false,
       preWetTip: false,
@@ -140,6 +141,8 @@ describe('move liquid step form -> command creator args', () => {
         id: 'destLabwareId',
         name: 'wasteChute',
         location: 'cutoutD3',
+        isTouchTipAllowed: false,
+        pythonName: 'mockPythonName',
       },
     })
 
@@ -223,7 +226,7 @@ describe('move liquid step form -> command creator args', () => {
       checkboxField: 'aspirate_delay_checkbox',
       formFields: {
         aspirate_delay_seconds: 11,
-        aspirate_delay_mmFromBottom: null, // use default
+        aspirate_mmFromBottom: null, // use default
       },
       expectedArgsUnchecked: { aspirateDelay: null },
       expectedArgsChecked: {
@@ -237,7 +240,7 @@ describe('move liquid step form -> command creator args', () => {
       checkboxField: 'dispense_delay_checkbox',
       formFields: {
         dispense_delay_seconds: 11,
-        dispense_delay_mmFromBottom: 12,
+        dispense_mmFromBottom: 12,
       },
       expectedArgsUnchecked: { dispenseDelay: null },
       expectedArgsChecked: { dispenseDelay: { seconds: 11, mmFromBottom: 12 } },

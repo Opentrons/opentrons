@@ -1,21 +1,23 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
+import { airGapInWasteChute } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
   getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
-import { airGapInWasteChute } from '../commandCreators/compound'
+
 import type { InvariantContext, RobotState } from '../types'
 
 const wasteChuteId = 'wasteChuteId'
 const invariantContext: InvariantContext = {
   ...makeContext(),
-  additionalEquipmentEntities: {
+  wasteChuteEntities: {
     [wasteChuteId]: {
       id: wasteChuteId,
-      name: 'wasteChute',
       pythonName: 'mock_waste_chute_1',
       location: WASTE_CHUTE_CUTOUT,
     },

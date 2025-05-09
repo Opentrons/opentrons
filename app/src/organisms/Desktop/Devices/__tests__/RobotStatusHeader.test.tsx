@@ -1,23 +1,27 @@
 import { MemoryRouter } from 'react-router-dom'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
-import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
 import { getNetworkInterfaces } from '/app/redux/networking'
-import { useIsFlex } from '/app/redux-resources/robots'
+import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
+
 import { RobotStatusHeader } from '../RobotStatusHeader'
-import { useNotifyRunQuery, useCurrentRunId } from '/app/resources/runs'
 
 import type { ComponentProps } from 'react'
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'

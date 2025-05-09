@@ -1,6 +1,7 @@
-import { curryWithoutPython, reduceCommandCreators } from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
+import { curryWithoutPython, reduceCommandCreators } from '../../utils'
 import { blowOutInPlace, moveToAddressableArea } from '../atomic'
+
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface BlowOutInWasteChuteArgs {
@@ -15,10 +16,9 @@ export const blowOutInWasteChute: CommandCreator<BlowOutInWasteChuteArgs> = (
   prevRobotState
 ) => {
   const { pipetteId, flowRate, wasteChuteId } = args
-  const { pipetteEntities, additionalEquipmentEntities } = invariantContext
+  const { pipetteEntities, wasteChuteEntities } = invariantContext
   const pipettePythonName = pipetteEntities[pipetteId].pythonName
-  const wasteChutePythonName =
-    additionalEquipmentEntities[wasteChuteId].pythonName
+  const wasteChutePythonName = wasteChuteEntities[wasteChuteId].pythonName
 
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],

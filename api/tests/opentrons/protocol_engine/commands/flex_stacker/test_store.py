@@ -2,14 +2,16 @@
 
 from datetime import datetime
 from unittest.mock import sentinel
+from typing import Type, Union
 
 import pytest
 from decoy import Decoy, matchers
 
 from opentrons.drivers.flex_stacker.types import StackerAxis
-from opentrons.hardware_control.modules import FlexStacker
+from opentrons.hardware_control.modules import FlexStacker, PlatformState
 from opentrons.protocol_engine.commands.flex_stacker.common import (
     FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
 )
 from opentrons.protocol_engine.resources import ModelUtils
 
@@ -30,9 +32,11 @@ from opentrons.protocol_engine.commands.command import SuccessData, DefinedError
 from opentrons.protocol_engine.commands.flex_stacker.store import StoreImpl
 from opentrons.protocol_engine.types import (
     OnAddressableAreaLocationSequenceComponent,
+    ModuleLocation,
     OnModuleLocationSequenceComponent,
     InStackerHopperLocation,
     OnCutoutFixtureLocationSequenceComponent,
+    StackerStoredLabwareGroup,
 )
 from opentrons.protocol_engine.errors import (
     CannotPerformModuleAction,
@@ -41,7 +45,10 @@ from opentrons.protocol_engine.errors import (
 )
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.errors.exceptions import FlexStackerStallError
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerStallError,
+    FlexStackerShuttleMissingError,
+)
 
 
 @pytest.fixture
@@ -54,6 +61,17 @@ def subject(
     return StoreImpl(
         state_view=state_view, equipment=equipment, model_utils=model_utils
     )
+
+
+def _contained_labware(count: int) -> list[StackerStoredLabwareGroup]:
+    return [
+        StackerStoredLabwareGroup(
+            primaryLabwareId=f"primary-id-{i+1}",
+            adapterLabwareId=None,
+            lidLabwareId=None,
+        )
+        for i in range(count)
+    ]
 
 
 async def test_store_raises_if_full(
@@ -72,15 +90,16 @@ async def test_store_raises_if_full(
         pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
-        pool_count=6,
-        max_pool_count=6,
+        contained_labware_bottom_first=_contained_labware(3),
+        max_pool_count=3,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
     ).then_return(fs_module_substate)
     with pytest.raises(
         CannotPerformModuleAction,
-        match="Cannot store labware in Flex Stacker while it is full",
+        match="Cannot store labware in Flex Stacker in .* because it is full",
     ):
         await subject.execute(data)
 
@@ -101,8 +120,9 @@ async def test_store_raises_if_carriage_logically_empty(
         pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
-        pool_count=1,
+        contained_labware_bottom_first=_contained_labware(1),
         max_pool_count=5,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -112,12 +132,22 @@ async def test_store_raises_if_carriage_logically_empty(
     )
     with pytest.raises(
         CannotPerformModuleAction,
-        match="Cannot store labware if Flex Stacker carriage is empty",
+        match="Flex Stacker in .* cannot store labware because its carriage is empty",
     ):
         await subject.execute(data)
 
 
+@pytest.mark.parametrize(
+    "contained_labware_count,max_pool_count",
+    [
+        (0, 0),
+        (1, 0),
+        (0, 1),
+    ],
+)
 async def test_store_raises_if_not_configured(
+    contained_labware_count: int,
+    max_pool_count: int,
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
@@ -131,19 +161,37 @@ async def test_store_raises_if_not_configured(
         pool_primary_definition=None,
         pool_adapter_definition=None,
         pool_lid_definition=None,
-        pool_count=1,
-        max_pool_count=0,
+        contained_labware_bottom_first=_contained_labware(contained_labware_count),
+        max_pool_count=max_pool_count,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
     ).then_return(fs_module_substate)
     with pytest.raises(
         FlexStackerLabwarePoolNotYetDefinedError,
-        match="The Flex Stacker has not been configured yet and cannot be filled.",
+        match="The Flex Stacker in .* has not been configured yet and cannot be filled.",
     ):
         await subject.execute(data)
 
 
+@pytest.mark.parametrize(
+    "shared_data_error,protocol_engine_error",
+    [
+        (
+            FlexStackerStallError(serial="123", axis=StackerAxis.Z),
+            FlexStackerStallOrCollisionError,
+        ),
+        (
+            FlexStackerShuttleMissingError(
+                serial="123",
+                expected_state=PlatformState.EXTENDED,
+                shuttle_state=PlatformState.UNKNOWN,
+            ),
+            FlexStackerShuttleError,
+        ),
+    ],
+)
 async def test_store_raises_if_stall(
     decoy: Decoy,
     equipment: EquipmentHandler,
@@ -153,6 +201,10 @@ async def test_store_raises_if_stall(
     stacker_id: FlexStackerId,
     flex_50uL_tiprack: LabwareDefinition,
     stacker_hardware: FlexStacker,
+    shared_data_error: Exception,
+    protocol_engine_error: Type[
+        Union[FlexStackerStallOrCollisionError, FlexStackerShuttleError]
+    ],
 ) -> None:
     """It should raise a stall error."""
     data = flex_stacker.StoreParams(moduleId=stacker_id)
@@ -164,8 +216,9 @@ async def test_store_raises_if_stall(
         pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
-        pool_count=0,
+        contained_labware_bottom_first=[],
         max_pool_count=999,
+        pool_overlap=0,
     )
 
     decoy.when(
@@ -191,15 +244,21 @@ async def test_store_raises_if_stall(
             OnAddressableAreaLocationSequenceComponent(
                 addressableAreaName="flexStackerV1B4",
             ),
+            OnCutoutFixtureLocationSequenceComponent(
+                cutoutId="cutoutA3", possibleCutoutFixtureIds=["flexStackerModuleV1"]
+            ),
         ]
     )
     decoy.when(
         state_view.geometry.get_predicted_location_sequence(
-            InStackerHopperLocation(moduleId=stacker_id)
+            ModuleLocation(moduleId=stacker_id)
         )
     ).then_return(
         [
-            InStackerHopperLocation(moduleId=stacker_id),
+            OnModuleLocationSequenceComponent(moduleId=stacker_id),
+            OnAddressableAreaLocationSequenceComponent(
+                addressableAreaName="flexStackerV1B4",
+            ),
             OnCutoutFixtureLocationSequenceComponent(
                 cutoutId="cutoutA3", possibleCutoutFixtureIds=["flexStackerModuleV1"]
             ),
@@ -210,16 +269,17 @@ async def test_store_raises_if_stall(
     decoy.when(model_utils.get_timestamp()).then_return(error_timestamp)
 
     decoy.when(await stacker_hardware.store_labware(labware_height=4)).then_raise(
-        FlexStackerStallError(serial="123", axis=StackerAxis.Z)
+        shared_data_error
     )
 
     result = await subject.execute(data)
 
     assert result == DefinedErrorData(
-        public=FlexStackerStallOrCollisionError.model_construct(
+        public=protocol_engine_error.model_construct(
             id=error_id,
             createdAt=error_timestamp,
             wrappedErrors=[matchers.Anything()],
+            errorInfo={"labwareId": "labware-id"},
         ),
         state_update=StateUpdate(),
     )
@@ -331,8 +391,9 @@ async def test_store_raises_if_labware_does_not_match(
         pool_primary_definition=sentinel.primary,
         pool_adapter_definition=pool_adapter,
         pool_lid_definition=pool_lid,
-        pool_count=0,
+        contained_labware_bottom_first=[],
         max_pool_count=5,
+        pool_overlap=0,
     )
 
     decoy.when(
@@ -376,7 +437,7 @@ async def test_store_raises_if_labware_does_not_match(
 
     with pytest.raises(
         CannotPerformModuleAction,
-        match="Cannot store labware stack that does not correspond with Flex Stacker configuration",
+        match="Cannot store labware stack that does not correspond with the configuration of Flex Stacker",
     ):
         await subject.execute(data)
 
@@ -390,7 +451,7 @@ async def test_store(
     stacker_hardware: FlexStacker,
     flex_50uL_tiprack: LabwareDefinition,
 ) -> None:
-    """It should stroe the labware on the stack."""
+    """It should store the labware on the stack."""
     data = flex_stacker.StoreParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
@@ -398,8 +459,9 @@ async def test_store(
         pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
-        pool_count=0,
+        contained_labware_bottom_first=_contained_labware(1),
         max_pool_count=5,
+        pool_overlap=0,
     )
 
     decoy.when(
@@ -425,20 +487,30 @@ async def test_store(
             OnAddressableAreaLocationSequenceComponent(
                 addressableAreaName="flexStackerV1B4",
             ),
-        ]
-    )
-    decoy.when(
-        state_view.geometry.get_predicted_location_sequence(
-            InStackerHopperLocation(moduleId=stacker_id)
-        )
-    ).then_return(
-        [
-            InStackerHopperLocation(moduleId=stacker_id),
             OnCutoutFixtureLocationSequenceComponent(
                 cutoutId="cutoutA3", possibleCutoutFixtureIds=["flexStackerModuleV1"]
             ),
         ]
     )
+    decoy.when(
+        state_view.geometry.get_predicted_location_sequence(
+            ModuleLocation(moduleId=stacker_id)
+        )
+    ).then_return(
+        [
+            OnModuleLocationSequenceComponent(moduleId=stacker_id),
+            OnAddressableAreaLocationSequenceComponent(
+                addressableAreaName="flexStackerV1B4",
+            ),
+            OnCutoutFixtureLocationSequenceComponent(
+                cutoutId="cutoutA3", possibleCutoutFixtureIds=["flexStackerModuleV1"]
+            ),
+        ]
+    )
+
+    decoy.when(
+        state_view.labware.get_uri_from_definition_unless_none(flex_50uL_tiprack)
+    ).then_return("opentrons/opentrons_flex_96_filtertiprack_50ul/1")
 
     result = await subject.execute(data)
 
@@ -450,14 +522,14 @@ async def test_store(
                 OnAddressableAreaLocationSequenceComponent(
                     addressableAreaName="flexStackerV1B4",
                 ),
-            ],
-            primaryLabwareId="labware-id",
-            eventualDestinationLocationSequence=[
-                InStackerHopperLocation(moduleId=stacker_id),
                 OnCutoutFixtureLocationSequenceComponent(
                     cutoutId="cutoutA3",
                     possibleCutoutFixtureIds=["flexStackerModuleV1"],
                 ),
+            ],
+            primaryLabwareId="labware-id",
+            eventualDestinationLocationSequence=[
+                InStackerHopperLocation(moduleId=stacker_id),
             ],
             primaryLabwareURI="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
         ),
@@ -470,7 +542,16 @@ async def test_store(
             ),
             flex_stacker_state_update=FlexStackerStateUpdate(
                 module_id=stacker_id,
-                pool_count=1,
+                contained_labware_bottom_first=(
+                    [
+                        StackerStoredLabwareGroup(
+                            primaryLabwareId="labware-id",
+                            adapterLabwareId=None,
+                            lidLabwareId=None,
+                        ),
+                    ]
+                    + _contained_labware(1)
+                ),
             ),
         ),
     )

@@ -7,7 +7,9 @@ import {
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
 } from '../../constants'
-import type { StepType, StepFieldName } from '../../form-types'
+
+import type { StepFieldName, StepType } from '../../form-types'
+
 export function getDefaultsForStepType(
   stepType: StepType
 ): Record<StepFieldName, any> {
@@ -32,17 +34,21 @@ export function getDefaultsForStepType(
         dropTip_wellNames: undefined,
         labware: null,
         liquidClassesSupported: true,
+        liquidClass: 'none',
         mix_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
         mix_touchTip_checkbox: false,
         mix_touchTip_mmFromTop: null,
         mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
         mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        mix_position_reference: null,
         mix_x_position: 0,
         mix_y_position: 0,
         nozzles: null,
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
         pipette: null,
+        pushOut_checkbox: null,
+        pushOut_volume: null,
         times: null,
         tipRack: null,
         volume: undefined,
@@ -90,6 +96,8 @@ export function getDefaultsForStepType(
         blowout_location: null,
         blowout_z_offset: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
+        conditioning_checkbox: false,
+        conditioning_volume: null,
         dispense_airGap_checkbox: false,
         dispense_airGap_volume: null,
         dispense_delay_checkbox: false,
@@ -128,7 +136,7 @@ export function getDefaultsForStepType(
         dropTip_location: null,
         dropTip_wellNames: undefined,
         liquidClassesSupported: true,
-        liquidClass: null,
+        liquidClass: 'none',
         nozzles: null,
         path: 'single',
         pickUpTip_location: undefined,

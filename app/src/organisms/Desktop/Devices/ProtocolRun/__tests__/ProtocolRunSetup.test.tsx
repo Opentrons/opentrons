@@ -1,54 +1,53 @@
-import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   getSimplestDeckConfigForProtocol,
+  simple_v4 as noModulesProtocol,
   parseAllRequiredModuleModels,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-  simple_v4 as noModulesProtocol,
   test_modules_protocol as withModulesProtocol,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import {
+  getMissingSetupSteps,
+  selectAreOffsetsApplied,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+  selectTotalCountLocationSpecificOffsets,
+} from '/app/redux/protocol-runs'
+import * as ReduxRuns from '/app/redux/protocol-runs'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
 import {
-  useMostRecentCompletedAnalysis,
-  useRunCalibrationStatus,
-  useRunPipetteInfoByMount,
-  useNotifyRunQuery,
-  useRunHasStarted,
-  useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
+  useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
   useProtocolAnalysisErrors,
+  useRunCalibrationStatus,
+  useRunHasStarted,
+  useRunPipetteInfoByMount,
+  useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
-import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import {
-  getMissingSetupSteps,
-  selectIsAnyNecessaryDefaultOffsetMissing,
-  selectAreOffsetsApplied,
-  selectTotalCountLocationSpecificOffsets,
-} from '/app/redux/protocol-runs'
-import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 
-import { SetupLabware } from '../SetupLabware'
-import { SetupRobotCalibration } from '../SetupRobotCalibration'
-import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
-import * as ReduxRuns from '/app/redux/protocol-runs'
-
-import type { State } from '/app/redux/types'
+import { SetupLabware } from '../SetupLabware'
+import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
+import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
 import type * as SharedData from '@opentrons/shared-data'
+import type { State } from '/app/redux/types'
 
 vi.mock('../SetupLabware')
 vi.mock('../SetupRobotCalibration')

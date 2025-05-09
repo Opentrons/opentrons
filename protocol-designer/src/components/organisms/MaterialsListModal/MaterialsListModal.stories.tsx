@@ -1,15 +1,15 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 
+import { MaterialsListModal as MaterialsListModalComponent } from '.'
 import { i18n } from '../../../assets/localization'
 import { configureStore } from '../../../configureStore'
-import { MaterialsListModal as MaterialsListModalComponent } from '.'
 
+import type { Meta, StoryObj } from '@storybook/react'
 import type {
   AdditionalEquipmentEntity,
   LiquidEntities,
 } from '@opentrons/step-generation'
-import type { Meta, StoryObj } from '@storybook/react'
 import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
 
 const mockStore = configureStore()
@@ -44,7 +44,7 @@ const mockLabware = [
     },
     id: 'mockLabware',
     labwareDefURI: 'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
-    slot: 'D3',
+    stack: ['mockLabware', 'D3'],
   },
 ] as LabwareOnDeck[]
 

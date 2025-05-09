@@ -1,10 +1,11 @@
-import { Route, Navigate, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
+
+import { Chat } from './pages/Chat'
+import { CreateProtocol } from './pages/CreateProtocol'
 import { Landing } from './pages/Landing'
 import { UpdateProtocol } from './pages/UpdateProtocol'
 
 import type { RouteProps } from './resources/types'
-import { Chat } from './pages/Chat'
-import { CreateProtocol } from './pages/CreateProtocol'
 
 const opentronsAIRoutes: RouteProps[] = [
   {

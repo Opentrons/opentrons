@@ -1,5 +1,6 @@
-import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+
 import {
   Flex,
   JUSTIFY_END,
@@ -9,6 +10,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { setFeatureFlags } from '../../../feature-flags/actions'
 import { HandleEnter } from '../../atoms'
 
@@ -23,7 +25,7 @@ export function IncompatibleTipsModal(
 ): JSX.Element {
   const { onClose } = props
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { t } = useTranslation(['onboarding', 'shared'])
 
   const handleShowAllTips = (): void => {
     onClose()

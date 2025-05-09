@@ -1,5 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
+import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
+
 import { _castForm } from '../index'
+
 import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
 import type {
   HydratedMagnetFormData,
@@ -8,6 +12,7 @@ import type {
   HydratedPauseFormData,
   HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
+  LabwareEntityWithTouchTip,
 } from '../../../../form-types'
 
 describe('form casting', () => {
@@ -40,7 +45,7 @@ describe('form casting', () => {
       dispense_delay_mmFromBottom: 0.5,
       dispense_delay_seconds: 1,
       dispense_flowRate: null,
-      dispense_labware: {} as LabwareEntity,
+      dispense_labware: {} as LabwareEntityWithTouchTip,
       dispense_mix_checkbox: false,
       dispense_mix_times: 0,
       dispense_mix_volume: 0,
@@ -60,16 +65,22 @@ describe('form casting', () => {
       nozzles: null,
       tipRack: 'some tiprack',
       liquidClassesSupported: true,
-      aspirate_retract_position_reference: 'well-bottom',
+      aspirate_retract_position_reference: POSITION_REFERENCE_BOTTOM,
       aspirate_submerge_mmFromBottom: 1,
       aspirate_submerge_x_position: 0,
       aspirate_submerge_y_position: 0,
       aspirate_position_reference: 'well-top',
-      dispense_retract_position_reference: 'well-bottom',
+      dispense_retract_position_reference: POSITION_REFERENCE_BOTTOM,
       dispense_submerge_mmFromBottom: 4,
       dispense_submerge_x_position: 1,
       dispense_submerge_y_position: -1,
-      dispense_position_reference: 'well-bottom',
+      dispense_position_reference: POSITION_REFERENCE_BOTTOM,
+      pushOut_volume: null,
+      pushOut_checkbox: false,
+      conditioning_checkbox: false,
+      conditioning_volume: null,
+      aspirate_submerge_position_reference: POSITION_REFERENCE_BOTTOM,
+      dispense_submerge_position_reference: POSITION_REFERENCE_BOTTOM,
     }
     expect(_castForm(input)).toEqual({
       ...input,
@@ -87,7 +98,7 @@ describe('form casting', () => {
       stepName: 'mix',
       stepDetails: '',
       changeTip: 'always',
-      labware: {} as LabwareEntity,
+      labware: {} as LabwareEntityWithTouchTip,
       mix_wellOrder_first: 't2b',
       mix_wellOrder_second: 'l2r',
       blowout_checkbox: false,
@@ -106,6 +117,9 @@ describe('form casting', () => {
       nozzles: null,
       tipRack: 'some tiprack',
       liquidClassesSupported: true,
+      pushOut_checkbox: false,
+      pushOut_volume: null,
+      mix_position_reference: POSITION_REFERENCE_BOTTOM,
     }
 
     expect(_castForm(input)).toEqual({

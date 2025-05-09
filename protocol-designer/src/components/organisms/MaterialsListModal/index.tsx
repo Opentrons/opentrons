@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import sum from 'lodash/sum'
 
@@ -25,16 +25,16 @@ import {
   getModuleDisplayName,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getRobotType } from '../../../file-data/selectors'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
 
 import type {
-  LiquidEntities,
   AdditionalEquipmentEntity,
+  LiquidEntities,
 } from '@opentrons/step-generation'
 import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
 
@@ -58,8 +58,6 @@ export function MaterialsListModal({
 }: MaterialsListModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const robotType = useSelector(getRobotType)
-  const deckSetup = useSelector(getInitialDeckSetup)
-  const { modules: modulesOnDeck, labware: labwareOnDeck } = deckSetup
   const allLabwareWellContents = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId
   )
@@ -155,28 +153,8 @@ export function MaterialsListModal({
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               {labware.length > 0 ? (
                 labware.map(lw => {
-                  const labwareOnModuleEntity = Object.values(
-                    modulesOnDeck
-                  ).find(mod => mod.id === lw.slot)
-                  const labwareOnLabwareEntity = Object.values(
-                    labwareOnDeck
-                  ).find(labware => labware.id === lw.slot)
-                  const labwareOnLabwareOnModuleSlot = Object.values(
-                    modulesOnDeck
-                  ).find(mod => mod.id === labwareOnLabwareEntity?.slot)?.slot
-                  const labwareOnLabwareOnSlot = labwareOnLabwareEntity?.slot
-
-                  let deckLabelSlot = lw.slot
-                  if (labwareOnModuleEntity != null) {
-                    deckLabelSlot =
-                      labwareOnModuleEntity.type === THERMOCYCLER_MODULE_TYPE
-                        ? tCSlot
-                        : labwareOnModuleEntity.slot
-                  } else if (labwareOnLabwareOnModuleSlot != null) {
-                    deckLabelSlot = labwareOnLabwareOnModuleSlot
-                  } else if (labwareOnLabwareOnSlot != null) {
-                    deckLabelSlot = labwareOnLabwareOnSlot
-                  } else if (deckLabelSlot === 'offDeck') {
+                  let deckLabelSlot = getSlotInLocationStack(lw.stack)
+                  if (deckLabelSlot === 'offDeck') {
                     deckLabelSlot = 'Off-deck'
                   }
                   return (

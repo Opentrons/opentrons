@@ -1,11 +1,12 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { updateConfigValue } from '/app/redux/config'
+
 import { WelcomeModal } from '../WelcomeModal'
 
 import type { ComponentProps } from 'react'

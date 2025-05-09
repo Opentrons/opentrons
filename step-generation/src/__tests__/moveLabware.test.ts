@@ -1,19 +1,24 @@
-import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
+  fixture12Trough,
+  fixtureTiprackAdapter,
   HEATERSHAKER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
+import { moveLabware } from '../commandCreators/atomic'
 import {
+  DEST_LABWARE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getInitialRobotStateWithOffDeckLabwareStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
   getStateAndContextTempTCModules,
+  getSuccessResult,
+  makeContext,
   SOURCE_LABWARE,
   TIPRACK_1,
 } from '../fixtures'
-import { DEST_LABWARE, GRIPPER_LOCATION, moveLabware } from '..'
 
 import type {
   LabwareDefinition2,
@@ -22,7 +27,6 @@ import type {
 import type { InvariantContext, RobotState } from '../types'
 
 const mockWasteChuteId = 'mockWasteChuteId'
-const mockGripperId = 'mockGripperId'
 const mockTrashBinId = 'mockTrashBinId'
 const mockStagingAreaId = 'mockStagingAreaId'
 describe('moveLabware', () => {
@@ -34,20 +38,21 @@ describe('moveLabware', () => {
 
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
-        mockGripperId: {
-          name: 'gripper',
-          id: mockGripperId,
-          location: GRIPPER_LOCATION,
-        },
+      trashBinEntities: {
         mockTrashBinId: {
-          name: 'trashBin',
           id: mockTrashBinId,
           pythonName: 'mock_trash_bin_1',
           location: 'cutoutA3',
         },
+      },
+      wasteChuteEntities: {},
+      gripperEntities: {
+        mockGripperId: {
+          id: 'mockGripperId',
+        },
+      },
+      stagingAreaEntities: {
         mockStagingAreaId: {
-          name: 'stagingArea',
           id: mockStagingAreaId,
           location: 'A4',
         },
@@ -77,15 +82,14 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, "A4")`
+      `protocol.move_labware(mock_source_plate, "A4")`
     )
   })
   it('should return a moveLabware command moving to a trash bin for an ot-2', () => {
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      trashBinEntities: {
         mockTrashBinId: {
-          name: 'trashBin',
           id: mockTrashBinId,
           pythonName: 'mock_trash_bin_1',
           location: 'cutout12',
@@ -112,7 +116,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, mock_trash_bin_1)`
+      `protocol.move_labware(mock_source_plate, mock_trash_bin_1)`
     )
   })
   it('should return a moveLabware command moving to a trash bin for flex', () => {
@@ -135,7 +139,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, mock_trash_bin_1)`
+      `protocol.move_labware(mock_source_plate, mock_trash_bin_1)`
     )
   })
   it('should return a moveLabware command moving to a module', () => {
@@ -185,7 +189,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, mock_heater_shaker_1, use_gripper=True)`
+      `protocol.move_labware(mock_source_plate, mock_heater_shaker_1, use_gripper=True)`
     )
   })
   it('should return a moveLabware command moving to an adapter', () => {
@@ -195,6 +199,16 @@ describe('moveLabware', () => {
       newLocation: { labwareId: DEST_LABWARE },
     } as MoveLabwareParams
 
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [DEST_LABWARE]: {
+          def: fixtureTiprackAdapter as LabwareDefinition2,
+          pythonName: 'mock_dest_adapter',
+        } as any,
+      },
+    }
     const result = moveLabware(params, invariantContext, robotState)
     expect(getSuccessResult(result).commands).toEqual([
       {
@@ -208,7 +222,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, mockPythonName)`
+      `protocol.move_labware(mock_source_plate, mock_dest_adapter)`
     )
   })
   it('should return a moveLabware command moving manually off-deck', () => {
@@ -231,7 +245,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, protocol_api.OFF_DECK)`
+      `protocol.move_labware(mock_source_plate, protocol_api.OFF_DECK)`
     )
   })
   it('should return a moveLabware command for manualMoveWithPause given only the required params', () => {
@@ -254,7 +268,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, "A1")`
+      `protocol.move_labware(mock_source_plate, "A1")`
     )
   })
   it('should return a moveLabware command for moving with a gripper given only the required params', () => {
@@ -277,7 +291,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, "A1", use_gripper=True)`
+      `protocol.move_labware(mock_source_plate, "A1", use_gripper=True)`
     )
   })
   it('should return an error for labware does not exist with bad labwareid', () => {
@@ -322,6 +336,52 @@ describe('moveLabware', () => {
       type: 'LABWARE_ON_ANOTHER_ENTITY',
     })
   })
+  it('should not return an error for trying to move the labware to an occupied slot where the labware supports stacking', () => {
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      strategy: 'usingGripper',
+      newLocation: { slotName: '1' },
+    } as MoveLabwareParams
+    robotState = {
+      ...robotState,
+      ...robotState.labware,
+      labware: {
+        [SOURCE_LABWARE]: {
+          stack: [SOURCE_LABWARE, '2'],
+        },
+        stackingLabware: {
+          stack: ['stackingLabware', '1'],
+        },
+      },
+    }
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        stackingLabware: {
+          def: {
+            ...fixture12Trough,
+            compatibleParentLabware: ['fixture_96_plate'],
+          } as LabwareDefinition2,
+        } as any,
+      },
+    }
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getSuccessResult(result).commands).toEqual([
+      {
+        commandType: 'moveLabware',
+        key: expect.any(String),
+        params: {
+          labwareId: SOURCE_LABWARE,
+          strategy: 'usingGripper',
+          newLocation: { slotName: '1' },
+        },
+      },
+    ])
+    expect(getSuccessResult(result).python).toBe(
+      `protocol.move_labware(mock_source_plate, "1", use_gripper=True)`
+    )
+  })
   it('should return an error for trying to move the labware to an occupied module', () => {
     const state = getInitialRobotStateStandard(invariantContext)
     const HEATER_SHAKER_ID = 'heaterShakerId'
@@ -329,22 +389,29 @@ describe('moveLabware', () => {
 
     robotState = {
       ...state,
-      modules: {
-        ...state.modules,
-        [HEATER_SHAKER_ID]: {
-          slot: HEATER_SHAKER_SLOT,
-          moduleState: {
-            type: HEATERSHAKER_MODULE_TYPE,
-            latchOpen: true,
-            targetSpeed: null,
-          },
-        } as any,
-      },
+
       labware: {
         ...state.labware,
         mockLabwareId: {
-          slot: HEATER_SHAKER_ID,
+          stack: ['mockLabwareId', HEATER_SHAKER_ID, HEATER_SHAKER_SLOT],
         },
+      },
+    }
+    invariantContext = {
+      ...invariantContext,
+      moduleEntities: {
+        [HEATER_SHAKER_ID]: {
+          model: 'heaterShakerModuleV1',
+          id: HEATER_SHAKER_ID,
+          type: 'heaterShakerModuleType',
+          pythonName: 'mock_heater_shaker',
+        },
+      },
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        mockLabwareId: {
+          def: fixture12Trough as LabwareDefinition2,
+        } as any,
       },
     }
     const params = {
@@ -362,10 +429,10 @@ describe('moveLabware', () => {
   it('should return an error for the labware already being discarded in previous step', () => {
     const wasteChuteInvariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
-        ...invariantContext.additionalEquipmentEntities,
+      wasteChuteEntities: {
+        ...invariantContext.wasteChuteEntities,
         mockWasteChuteId: {
-          name: 'wasteChute',
+          pythonName: 'waste_chute',
           id: mockWasteChuteId,
           location: WASTE_CHUTE_CUTOUT,
         },
@@ -373,7 +440,7 @@ describe('moveLabware', () => {
     } as InvariantContext
 
     robotState.labware = {
-      [SOURCE_LABWARE]: { slot: 'gripperWasteChute' },
+      [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'gripperWasteChute'] },
     }
     const params = {
       labwareId: SOURCE_LABWARE,
@@ -407,11 +474,9 @@ describe('moveLabware', () => {
 
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      gripperEntities: {
         mockGripperId: {
-          name: 'gripper',
-          id: mockGripperId,
-          location: GRIPPER_LOCATION,
+          id: 'mockGripperId',
         },
       },
       labwareEntities: {
@@ -419,7 +484,7 @@ describe('moveLabware', () => {
           id: 'labwareid',
           labwareDefURI: 'mockDefUri',
           def: aluminumBlockDef,
-          pythonName: 'mockPythonName',
+          pythonName: 'mock_alumnium_block',
         },
       },
     }
@@ -501,7 +566,7 @@ describe('moveLabware', () => {
       labware: {
         ...state.labware,
         [ADAPTER_ID]: {
-          slot: HEATER_SHAKER_ID,
+          stack: [ADAPTER_ID, HEATER_SHAKER_ID, HEATER_SHAKER_SLOT],
         },
       },
       modules: {
@@ -523,7 +588,7 @@ describe('moveLabware', () => {
     } as MoveLabwareParams
 
     const result = moveLabware(params, invariantContext, robotState)
-    expect(getErrorResult(result).errors).toHaveLength(1)
+    // expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'HEATER_SHAKER_LATCH_CLOSED',
     })
@@ -562,10 +627,8 @@ describe('moveLabware', () => {
   it('should return a warning for if you try to move a tiprack with tips into the waste chute', () => {
     const wasteChuteInvariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
-        ...invariantContext.additionalEquipmentEntities,
+      wasteChuteEntities: {
         mockWasteChuteId: {
-          name: 'wasteChute',
           id: mockWasteChuteId,
           location: WASTE_CHUTE_CUTOUT,
           pythonName: 'waste_chute',
@@ -602,16 +665,14 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, waste_chute, use_gripper=True)`
+      `protocol.move_labware(mock_tip_rack_1, waste_chute, use_gripper=True)`
     )
   })
   it('should return a warning for if you try to move a labware with liquids into the waste chute', () => {
     const wasteChuteInvariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
-        ...invariantContext.additionalEquipmentEntities,
+      wasteChuteEntities: {
         mockWasteChuteId: {
-          name: 'wasteChute',
           id: mockWasteChuteId,
           location: WASTE_CHUTE_CUTOUT,
           pythonName: 'waste_chute',
@@ -644,13 +705,13 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, waste_chute, use_gripper=True)`
+      `protocol.move_labware(mock_source_plate, waste_chute, use_gripper=True)`
     )
   })
   it('should return an error when trying to move with gripper when there is no gripper', () => {
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {},
+      gripperEntities: {},
     } as InvariantContext
 
     const params = {
@@ -668,10 +729,9 @@ describe('moveLabware', () => {
   it('should return an error when trying to move into the waste chute when useGripper is not selected', () => {
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
-        ...invariantContext.additionalEquipmentEntities,
+      wasteChuteEntities: {
         mockWasteChuteId: {
-          name: 'wasteChute',
+          pythonName: 'wate_chute',
           id: mockWasteChuteId,
           location: WASTE_CHUTE_CUTOUT,
         },

@@ -1,31 +1,35 @@
 import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
   absorbanceReaderCollision,
-  modulePipetteCollision,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getLabwareSlot,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  uuid,
-  getIsSafePipetteMovement,
   formatPyStr,
   formatPyWellLocation,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getIsSafePipetteMovement,
+  getLabwareSlot,
+  getSlotInLocationStack,
   indentPyLines,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+  uuid,
 } from '../../utils'
-import { COLUMN_4_SLOTS } from '../../constants'
+
 import type {
+  AspDispAirgapParams,
   CreateCommand,
   NozzleConfigurationStyle,
-  AspDispAirgapParams,
 } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { Point } from '../../utils'
+
 export interface ExtendedAspirateParams extends AspDispAirgapParams {
   tipRack: string
   nozzles: NozzleConfigurationStyle | null
@@ -56,11 +60,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
 
-  const slotName = getLabwareSlot(
-    labwareId,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(labwareId, prevRobotState.labware)
 
   if (!pipetteSpec) {
     errors.push(
@@ -69,7 +69,6 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
       })
     )
   }
-
   if (!labwareId || !prevRobotState.labware[labwareId]) {
     errors.push(
       errorCreators.labwareDoesNotExist({
@@ -77,14 +76,16 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
         labware: labwareId,
       })
     )
-  } else if (prevRobotState.labware[labwareId].slot === 'offDeck') {
+  } else if (
+    getSlotInLocationStack(prevRobotState.labware[labwareId].stack) ===
+    'offDeck'
+  ) {
     errors.push(errorCreators.labwareOffDeck())
   }
-
   if (COLUMN_4_SLOTS.includes(slotName)) {
     errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
   } else if (labwareState[slotName] != null) {
-    const adapterSlot = labwareState[slotName].slot
+    const adapterSlot = getSlotInLocationStack(labwareState[slotName].stack)
     if (COLUMN_4_SLOTS.includes(adapterSlot)) {
       errors.push(
         errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })

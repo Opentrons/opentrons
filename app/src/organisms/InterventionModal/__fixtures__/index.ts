@@ -1,13 +1,13 @@
 import {
+  getModuleDef2,
   SPAN7_8_10_11_SLOT,
   THERMOCYCLER_MODULE_V1,
-  getModuleDef2,
 } from '@opentrons/shared-data'
 
 import type { RunData } from '@opentrons/api-client'
 import type {
-  LabwareDefinitionsByUri,
   LabwareDefinition2,
+  LabwareDefinitionsByUri,
   Liquid,
   LoadedLabware,
   LoadedModule,
@@ -98,7 +98,21 @@ export const mockMoveLabwareCommandToOffDeck = {
     labwareId: 'offDeckMove',
     newLocation: 'offDeck',
   },
-  strategy: 'manualMoveWithPause',
+} as any
+
+export const mockEmptyStackerCommand = {
+  commandType: 'flexStacker/empty',
+  params: {
+    moduleId: 'mockModuleID',
+  },
+} as any
+
+export const mockFillStackerCommand = {
+  commandType: 'flexStacker/fill',
+  params: {
+    moduleId: 'mockModuleID',
+    quantity: 4,
+  },
 } as any
 
 export const mockLabwareOnModule: LoadedLabware = {

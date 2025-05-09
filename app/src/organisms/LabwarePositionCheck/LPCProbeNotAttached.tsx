@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -14,8 +14,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { getIsOnDevice } from '/app/redux/config'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
+import { getIsOnDevice } from '/app/redux/config'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 

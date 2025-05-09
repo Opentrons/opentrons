@@ -1,10 +1,14 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
+import { getTopLocationInStack } from '@opentrons/step-generation'
+
 import { getLiquidEntities } from '../../../step-forms/selectors'
-import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import * as wellContentsSelectors from '../../../top-selectors/well-contents'
+import { selectors as uiLabwareSelectors } from '../../../ui/labware'
+import { getFullStackFromLabwaresOnDeck } from '../../../utils'
 import { SlotInformation } from '../SlotInformation'
 
 import type { DeckSlotId, RobotType } from '@opentrons/shared-data'
@@ -44,12 +48,14 @@ export function SlotDetailsContainer(
   const moduleOnSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
   )
-  const labwareOnSlot = Object.values(deckSetupLabwares).find(
-    lw => lw.slot === slot || lw.slot === moduleOnSlot?.id
+  const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
+    Object.values(deckSetupLabwares),
+    slot
   )
-  const nestedLabwareOnSlot = Object.values(deckSetupLabwares).find(
-    lw => lw.slot === labwareOnSlot?.id
-  )
+  const topLocationLabwareId =
+    fullStackFromLabwares?.length > 0
+      ? getTopLocationInStack(fullStackFromLabwares)
+      : null
   const fixturesOnSlot = Object.values(additionalEquipmentOnDeck).filter(
     ae => ae.location?.split('cutout')[1] === slot
   )
@@ -59,14 +65,14 @@ export function SlotDetailsContainer(
   const moduleDisplayName =
     moduleOnSlot != null ? getModuleDisplayName(moduleOnSlot.model) : null
 
-  const liquidsLabware =
-    nestedLabwareOnSlot != null ? nestedLabwareOnSlot : labwareOnSlot
-
   let wellContents: ContentsByWell | null = null
   if (offDeckLabwareId != null && allWellContentsForActiveItem != null) {
     wellContents = allWellContentsForActiveItem[offDeckLabwareId]
-  } else if (allWellContentsForActiveItem != null && liquidsLabware != null) {
-    wellContents = allWellContentsForActiveItem[liquidsLabware.id]
+  } else if (
+    allWellContentsForActiveItem != null &&
+    topLocationLabwareId != null
+  ) {
+    wellContents = allWellContentsForActiveItem[topLocationLabwareId]
   }
 
   const liquids =
@@ -86,16 +92,14 @@ export function SlotDetailsContainer(
     .filter(Boolean)
 
   const labwares: string[] = []
-  const adapters: string[] = []
   if (offDeckLabwareNickName != null) {
     labwares.push(offDeckLabwareNickName)
-  } else {
-    if (nestedLabwareOnSlot != null && labwareOnSlot != null) {
-      adapters.push(nickNames[labwareOnSlot.id])
-      labwares.push(nickNames[nestedLabwareOnSlot.id])
-    } else if (nestedLabwareOnSlot == null && labwareOnSlot != null) {
-      labwares.push(nickNames[labwareOnSlot.id])
-    }
+  } else if (fullStackFromLabwares?.length > 0) {
+    fullStackFromLabwares.forEach(id => {
+      if (deckSetupLabwares[id] != null) {
+        labwares.push(nickNames[id])
+      }
+    })
   }
 
   return (
@@ -104,7 +108,6 @@ export function SlotDetailsContainer(
       robotType={robotType}
       modules={moduleDisplayName != null ? [moduleDisplayName] : []}
       labwares={labwares}
-      adapters={adapters}
       fixtures={fixtureDisplayNames}
       liquids={liquidNamesOnLabware}
     />

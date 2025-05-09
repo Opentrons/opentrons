@@ -1,4 +1,5 @@
 import some from 'lodash/some'
+
 import {
   getAreFlexSlotsAdjacent,
   getAreSlotsAdjacent,
@@ -10,13 +11,14 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import type { PipetteV2Specs, RobotType } from '@opentrons/shared-data'
+import { getModuleIdFromRobotStateStack, getSlotInLocationStack } from './misc'
 
+import type { PipetteV2Specs, RobotType } from '@opentrons/shared-data'
 import type {
-  LabwareEntities,
-  RobotState,
   DeckSlot,
+  LabwareEntities,
   LabwareEntity,
+  RobotState,
 } from '../types'
 
 export const getIsHeaterShakerEastWestWithLatchOpen = (
@@ -69,7 +71,7 @@ export const getIsTallLabwareEastWestOfHeaterShaker = (
     (labwareProperties, labwareId) =>
       getAreSlotsHorizontallyAdjacent(
         heaterShakerSlot,
-        labwareProperties.slot
+        getSlotInLocationStack(labwareProperties.stack)
       ) &&
       getIsLabwareAboveHeight(
         labwareEntities[labwareId].def,
@@ -84,14 +86,11 @@ export const pipetteIntoHeaterShakerLatchOpen = (
   labware: RobotState['labware'],
   labwareId: string
 ): boolean => {
-  const labwareSlot: string = labware[labwareId]?.slot
-  const adapterSlot: string = labware[labwareSlot]?.slot
-  const moduleUnderLabware: string | null | undefined =
-    modules &&
-    adapterSlot &&
-    Object.keys(modules).find((moduleId: string) => moduleId === adapterSlot)
-  const moduleState =
-    moduleUnderLabware && modules[moduleUnderLabware].moduleState
+  const moduleId = getModuleIdFromRobotStateStack(
+    modules,
+    labware[labwareId]?.stack
+  )
+  const moduleState = moduleId != null ? modules[moduleId].moduleState : null
   const isHSLatchOpen: boolean = Boolean(
     moduleState &&
       moduleState.type === HEATERSHAKER_MODULE_TYPE &&
@@ -122,14 +121,11 @@ export const pipetteIntoHeaterShakerWhileShaking = (
   labware: RobotState['labware'],
   labwareId: string
 ): boolean => {
-  const labwareSlot: string = labware[labwareId]?.slot
-  const adapterSlot: string = labware[labwareSlot]?.slot
-  const moduleUnderLabware: string | null | undefined =
-    modules &&
-    adapterSlot &&
-    Object.keys(modules).find((moduleId: string) => moduleId === adapterSlot)
-  const moduleState =
-    moduleUnderLabware && modules[moduleUnderLabware].moduleState
+  const moduleId = getModuleIdFromRobotStateStack(
+    modules,
+    labware[labwareId]?.stack
+  )
+  const moduleState = moduleId != null ? modules[moduleId].moduleState : null
   const isShaking: boolean = Boolean(
     moduleState &&
       moduleState.type === HEATERSHAKER_MODULE_TYPE &&

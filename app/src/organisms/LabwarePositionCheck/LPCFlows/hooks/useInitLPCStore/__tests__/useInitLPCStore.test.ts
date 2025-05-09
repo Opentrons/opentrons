@@ -1,15 +1,18 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useInitLPCStore } from '..'
+import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { sortRunRecordOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore/sortRunRecordOffsets'
+import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
 import {
-  updateLPC,
   LPC_STEPS,
   OFFSETS_SOURCE_INITIALIZING,
+  updateLPC,
 } from '/app/redux/protocol-runs'
-import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
-import { sortRunRecordOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore/sortRunRecordOffsets'
+
+import { useInitLPCStore } from '..'
 
 vi.mock('react-redux')
 vi.mock('/app/redux/protocol-runs')

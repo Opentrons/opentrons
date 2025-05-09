@@ -2,9 +2,6 @@
 
 exports[`snapshot tests > createEmptyLiquidState 1`] = `
 {
-  "additionalEquipment": {
-    "fixedTrash": {},
-  },
   "labware": {
     "destPlateId": {
       "A1": {},
@@ -835,21 +832,19 @@ exports[`snapshot tests > createEmptyLiquidState 1`] = `
       "0": {},
     },
   },
+  "trashBins": {
+    "fixedTrash": {},
+  },
+  "wasteChute": {},
 }
 `;
 
 exports[`snapshot tests > makeContext 1`] = `
 {
-  "additionalEquipmentEntities": {
-    "fixedTrash": {
-      "id": "fixedTrash",
-      "location": "cutoutA3",
-      "name": "trashBin",
-    },
-  },
   "config": {
     "OT_PD_DISABLE_MODULE_RESTRICTIONS": false,
   },
+  "gripperEntities": {},
   "labwareEntities": {
     "destPlateId": {
       "def": {
@@ -1983,7 +1978,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "destPlateId",
       "labwareDefURI": "fixture/fixture_96_plate/1",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_dest_plate",
     },
     "sourcePlateId": {
       "def": {
@@ -3117,7 +3112,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "sourcePlateId",
       "labwareDefURI": "fixture/fixture_96_plate/1",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_source_plate",
     },
     "tiprack1Id": {
       "def": {
@@ -4244,7 +4239,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack1Id",
       "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_tip_rack_1",
     },
     "tiprack2Id": {
       "def": {
@@ -5371,7 +5366,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack2Id",
       "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_tip_rack_2",
     },
     "tiprack3Id": {
       "def": {
@@ -6498,7 +6493,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack3Id",
       "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_tip_rack_3",
     },
     "tiprack4AdapterId": {
       "def": {
@@ -6546,7 +6541,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack4AdapterId",
       "labwareDefURI": "fixture/fixture_flex_96_tiprack_adapter/1",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_adapter_4",
     },
     "tiprack4Id": {
       "def": {
@@ -7685,7 +7680,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack4Id",
       "labwareDefURI": "fixture/fixture_flex_96_tiprack_1000ul/1",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_tip_rack_4",
     },
     "tiprack5AdapterId": {
       "def": {
@@ -7733,7 +7728,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack5AdapterId",
       "labwareDefURI": "fixture/fixture_flex_96_tiprack_adapter/1",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_adapter_5",
     },
     "tiprack5Id": {
       "def": {
@@ -8872,7 +8867,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack5Id",
       "labwareDefURI": "fixture/fixture_flex_96_tiprack_1000ul/1",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_tip_rack_5",
     },
     "troughId": {
       "def": {
@@ -9094,7 +9089,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "troughId",
       "labwareDefURI": "fixture/fixture_12_trough/1",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_trough",
     },
   },
   "liquidEntities": {},
@@ -9103,7 +9098,7 @@ exports[`snapshot tests > makeContext 1`] = `
     "p100096Id": {
       "id": "p100096Id",
       "name": "p1000_96",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_pipette_p1000_96",
       "spec": {
         "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
         "availableSensors": {
@@ -12297,7 +12292,7 @@ exports[`snapshot tests > makeContext 1`] = `
     "p10MultiId": {
       "id": "p10MultiId",
       "name": "p10_multi",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_pipette_p10_multi",
       "spec": {
         "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
         "availableSensors": {
@@ -13931,7 +13926,7 @@ exports[`snapshot tests > makeContext 1`] = `
     "p10SingleId": {
       "id": "p10SingleId",
       "name": "p10_single",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_pipette_p10",
       "spec": {
         "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
         "availableSensors": {
@@ -15297,7 +15292,7 @@ exports[`snapshot tests > makeContext 1`] = `
     "p300MultiId": {
       "id": "p300MultiId",
       "name": "p300_multi",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_pipette_p300_multi",
       "spec": {
         "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
         "availableSensors": {
@@ -16920,7 +16915,7 @@ exports[`snapshot tests > makeContext 1`] = `
     "p300SingleId": {
       "id": "p300SingleId",
       "name": "p300_single",
-      "pythonName": "mockPythonName",
+      "pythonName": "mock_pipette",
       "spec": {
         "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
         "availableSensors": {
@@ -18384,6 +18379,15 @@ exports[`snapshot tests > makeContext 1`] = `
       ],
     },
   },
+  "stagingAreaEntities": {},
+  "trashBinEntities": {
+    "fixedTrash": {
+      "id": "fixedTrash",
+      "location": "cutoutA3",
+      "pythonName": "trash_bin_1",
+    },
+  },
+  "wasteChuteEntities": {},
 }
 `;
 
@@ -18391,31 +18395,51 @@ exports[`snapshot tests > makeState 1`] = `
 {
   "labware": {
     "sourcePlateId": {
-      "slot": "4",
+      "stack": [
+        "sourcePlateId",
+        "4",
+      ],
     },
     "tiprack1Id": {
-      "slot": "1",
+      "stack": [
+        "tiprack1Id",
+        "1",
+      ],
     },
     "tiprack2Id": {
-      "slot": "2",
+      "stack": [
+        "tiprack2Id",
+        "2",
+      ],
     },
     "tiprack4AdapterId": {
-      "slot": "7",
+      "stack": [
+        "tiprack4AdapterId",
+        "7",
+      ],
     },
     "tiprack4Id": {
-      "slot": "tiprack4AdapterId",
+      "stack": [
+        "tiprack4Id",
+        "tiprack4AdapterId",
+        "7",
+      ],
     },
     "tiprack5AdapterId": {
-      "slot": "8",
+      "stack": [
+        "tiprack5AdapterId",
+        "8",
+      ],
     },
     "tiprack5Id": {
-      "slot": "tiprack5AdapterId",
+      "stack": [
+        "tiprack5Id",
+        "tiprack5AdapterId",
+        "8",
+      ],
     },
   },
   "liquidState": {
-    "additionalEquipment": {
-      "fixedTrash": {},
-    },
     "labware": {
       "destPlateId": {
         "A1": {},
@@ -19246,6 +19270,10 @@ exports[`snapshot tests > makeState 1`] = `
         "0": {},
       },
     },
+    "trashBins": {
+      "fixedTrash": {},
+    },
+    "wasteChute": {},
   },
   "modules": {},
   "pipettes": {

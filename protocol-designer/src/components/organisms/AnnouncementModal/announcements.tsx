@@ -1,5 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -13,18 +14,20 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import magTempCombined from '../../../assets/images/modules/magdeck_tempdeck_combined.png'
-import thermocycler from '../../../assets/images/modules/thermocycler.png'
-import multiSelect from '../../../assets/images/announcements/multi_select.gif'
-import batchEdit from '../../../assets/images/announcements/batch_edit.gif'
-import heaterShaker from '../../../assets/images/modules/heatershaker.png'
-import thermocyclerGen2 from '../../../assets/images/modules/thermocycler_gen2.png'
-import liquidEnhancements from '../../../assets/images/announcements/liquid-enhancements.gif'
-import opentronsFlex from '../../../assets/images/OpentronsFlex.png'
-import deckConfiguration from '../../../assets/images/deck_configuration.png'
-import absorbancePlateReaderImage from '../../../assets/images/opentrons_absorbance_plate_reader.png'
 import { DOC_URL, RELEASE_NOTES_URL } from '../KnowledgeLink'
+
 import type { ReactNode } from 'react'
+
+import batchEdit from '../../../assets/images/announcements/batch_edit.gif'
+import liquidEnhancements from '../../../assets/images/announcements/liquid-enhancements.gif'
+import multiSelect from '../../../assets/images/announcements/multi_select.gif'
+import deckConfiguration from '../../../assets/images/deck_configuration.png'
+import heaterShaker from '../../../assets/images/modules/heatershaker.png'
+import magTempCombined from '../../../assets/images/modules/magdeck_tempdeck_combined.png'
+import thermocyclerGen2 from '../../../assets/images/modules/thermocycler_gen2.png'
+import thermocycler from '../../../assets/images/modules/thermocycler.png'
+import absorbancePlateReaderImage from '../../../assets/images/opentrons_absorbance_plate_reader.png'
+import opentronsFlex from '../../../assets/images/OpentronsFlex.png'
 
 export interface Announcement {
   announcementKey: string
@@ -84,7 +87,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.modulesRequireRunAppUpdate.body2'}
+              i18nKey="announcements.modulesRequireRunAppUpdate.body2"
               components={{ bold: <strong /> }}
               values={{ app: APP }}
             />
@@ -114,7 +117,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.thermocyclerSupport.body2'}
+              i18nKey="announcements.thermocyclerSupport.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -132,7 +135,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.airGapDelaySettings.body2'}
+              i18nKey="announcements.airGapDelaySettings.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -161,7 +164,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.batchEditTransfer.body4'}
+              i18nKey="announcements.batchEditTransfer.body4"
               components={{ strong: <strong /> }}
             />
           </p>
@@ -188,7 +191,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.heaterShakerSupport.body2'}
+              i18nKey="announcements.heaterShakerSupport.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -218,7 +221,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.thermocyclerGen2Support.body2'}
+              i18nKey="announcements.thermocyclerGen2Support.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -255,7 +258,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.liquidColorEnhancements.body2'}
+              i18nKey="announcements.liquidColorEnhancements.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -287,7 +290,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.flexSupport.body2'}
+              i18nKey="announcements.flexSupport.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -313,7 +316,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.deckConfigAnd96Channel.body2'}
+              i18nKey="announcements.deckConfigAnd96Channel.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -337,7 +340,7 @@ export const useAnnouncements = (): Announcement[] => {
             <li>
               <Trans
                 t={t}
-                i18nKey={'announcements.customParamsAndMultiTipAndModule.body3'}
+                i18nKey="announcements.customParamsAndMultiTipAndModule.body3"
                 components={{ i: <em /> }}
               />
             </li>
@@ -347,7 +350,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.customParamsAndMultiTipAndModule.body6'}
+              i18nKey="announcements.customParamsAndMultiTipAndModule.body6"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />

@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react'
-import { css } from 'styled-components'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
-  DISPLAY_FLEX,
-  TEXT_ALIGN_CENTER,
   RESPONSIVENESS,
+  SPACING,
   StyledText,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
 import {

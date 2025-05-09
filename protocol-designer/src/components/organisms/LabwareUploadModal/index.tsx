@@ -1,18 +1,20 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   Flex,
   JUSTIFY_END,
   Modal,
   PrimaryButton,
-  SPACING,
   SecondaryButton,
+  SPACING,
 } from '@opentrons/components'
-import { getLabwareUploadMessage } from '../../../labware-defs/selectors'
+
 import {
   dismissLabwareUploadMessage,
   replaceCustomLabwareDef,
 } from '../../../labware-defs/actions'
+import { getLabwareUploadMessage } from '../../../labware-defs/selectors'
 import { LabwareUploadModalBody } from './LabwareUploadModalBody'
 
 export function LabwareUploadModal(): JSX.Element | null {

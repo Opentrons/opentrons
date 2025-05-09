@@ -1,15 +1,17 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { airGapInWell } from '../commandCreators/compound'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../constants'
 import {
-  makeContext,
+  DEST_LABWARE,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeContext,
   SOURCE_LABWARE,
-  DEST_LABWARE,
 } from '../fixtures'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../constants'
-import { airGapInWell } from '../commandCreators/compound'
-import type { RobotState, InvariantContext } from '../types'
+
 import type { AirGapInWellType } from '../commandCreators/compound/airGapInWell'
+import type { InvariantContext, RobotState } from '../types'
 
 describe('airGapInWell', () => {
   let invariantContext: InvariantContext
@@ -66,6 +68,9 @@ describe('airGapInWell', () => {
         },
       },
     ])
+    expect(res.python).toBe(
+      'mock_pipette_p10.air_gap(volume=10, height=1, flow_rate=10)'
+    )
   })
   it('air gap for multi wells for consolidate dispense', () => {
     const args = {
@@ -114,6 +119,9 @@ describe('airGapInWell', () => {
         },
       },
     ])
+    expect(res.python).toBe(
+      'mock_pipette_p10.air_gap(volume=10, height=1, flow_rate=10)'
+    )
   })
   it('air gap after aspirate', () => {
     const args = {
@@ -155,5 +163,8 @@ describe('airGapInWell', () => {
         },
       },
     ])
+    expect(res.python).toBe(
+      'mock_pipette_p10.air_gap(volume=10, height=1, flow_rate=10)'
+    )
   })
 })

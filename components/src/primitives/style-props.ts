@@ -3,9 +3,8 @@
 
 import pick from 'lodash/pick'
 
-import type * as Types from './types'
-
 import type { CSSObject } from 'styled-components'
+import type * as Types from './types'
 
 type Text = string | number
 

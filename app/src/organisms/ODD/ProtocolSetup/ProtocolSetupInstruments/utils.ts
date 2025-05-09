@@ -1,11 +1,11 @@
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { Instruments } from '@opentrons/api-client'
-
-import { getProtocolUsesGripper } from '/app/transformations/commands'
 import {
   getAttachedGripper,
   getPipetteMatch,
 } from '/app/local-resources/instruments'
+import { getProtocolUsesGripper } from '/app/transformations/commands'
+
+import type { Instruments } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 export function getAreInstrumentsReady(
   analysis: CompletedProtocolAnalysis,

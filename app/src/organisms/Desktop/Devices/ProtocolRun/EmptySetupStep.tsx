@@ -1,12 +1,12 @@
 import {
   COLORS,
   DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'

@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -9,14 +10,15 @@ import {
   WasteChute,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getHasWasteChute } from '@opentrons/step-generation'
+
 import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 import { SlotOverlay } from './SlotOverlay'
+
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 
 interface BlockedSlotProps {
@@ -31,7 +33,10 @@ export function BlockedSlot(props: BlockedSlotProps): JSX.Element | null {
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+  const hasWasteChute =
+    Object.values(additionalEquipmentEntities).find(
+      ae => ae.name === 'wasteChute'
+    ) != null
 
   return cutoutId === WASTE_CHUTE_CUTOUT && hasWasteChute ? (
     <WasteChute

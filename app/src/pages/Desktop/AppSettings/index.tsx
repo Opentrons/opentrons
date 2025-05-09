@@ -8,21 +8,22 @@ import {
   Box,
   COLORS,
   DIRECTION_ROW,
+  Divider,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { NavTab } from '/app/molecules/NavTab'
+import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
 import * as Config from '/app/redux/config'
+
+import { AdvancedSettings } from './AdvancedSettings'
 import { GeneralSettings } from './GeneralSettings'
 import { PrivacySettings } from './PrivacySettings'
-import { AdvancedSettings } from './AdvancedSettings'
-import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
-import { NavTab } from '/app/molecules/NavTab'
-import { Line } from '/app/atoms/structure'
 
-import type { DesktopRouteParams, AppSettingsTab } from '/app/App/types'
+import type { AppSettingsTab, DesktopRouteParams } from '/app/App/types'
 
 export function AppSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
@@ -77,7 +78,7 @@ export function AppSettings(): JSX.Element {
             )}
           </Flex>
         </Box>
-        <Line />
+        <Divider marginY="0" />
         {appSettingsContent}
       </Box>
     </Flex>

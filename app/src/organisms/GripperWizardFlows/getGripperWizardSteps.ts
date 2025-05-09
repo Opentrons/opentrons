@@ -1,15 +1,16 @@
 import {
   GRIPPER_FLOW_TYPES,
-  SECTIONS,
+  MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
   MOVE_PIN_TO_FRONT_JAW,
   REMOVE_PIN_FROM_REAR_JAW,
-  MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
+  SECTIONS,
   SUCCESSFULLY_ATTACHED,
   SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
-  SUCCESSFULLY_DETACHED,
   SUCCESSFULLY_CALIBRATED,
+  SUCCESSFULLY_DETACHED,
 } from './constants'
-import type { GripperWizardStep, GripperWizardFlowType } from './types'
+
+import type { GripperWizardFlowType, GripperWizardStep } from './types'
 
 export const getGripperWizardSteps = (
   flowType: GripperWizardFlowType

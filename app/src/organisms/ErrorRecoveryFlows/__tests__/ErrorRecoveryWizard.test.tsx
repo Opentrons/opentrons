@@ -1,38 +1,39 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { renderHook, act, screen } from '@testing-library/react'
+import { act, renderHook, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { mockRecoveryContentProps } from '../__fixtures__'
-import {
-  ErrorRecoveryContent,
-  useERWizard,
-  ErrorRecoveryComponent,
-} from '../ErrorRecoveryWizard'
 import { RECOVERY_MAP } from '../constants'
 import {
-  SelectRecoveryOption,
-  RetryStep,
-  RetryNewTips,
+  ErrorRecoveryComponent,
+  ErrorRecoveryContent,
+  useERWizard,
+} from '../ErrorRecoveryWizard'
+import { RecoveryDoorOpen } from '../RecoveryDoorOpen'
+import { RecoveryError } from '../RecoveryError'
+import { RecoveryInProgress } from '../RecoveryInProgress'
+import {
   CancelRun,
-  ManageTips,
-  RetrySameTips,
-  FillWellAndRetrySameTips,
   FillWellAndRetryNewTips,
+  FillWellAndRetrySameTips,
+  HomeAndRetry,
+  IgnoreErrorSkipStep,
+  ManageTips,
+  ManualMoveLwAndSkip,
+  ManualReplaceLwAndRetry,
+  RetryNewTips,
+  RetrySameTips,
+  RetryStep,
+  SelectRecoveryOption,
   SkipStepNewTips,
   SkipStepSameTips,
-  IgnoreErrorSkipStep,
-  ManualReplaceLwAndRetry,
-  ManualMoveLwAndSkip,
-  HomeAndRetry,
 } from '../RecoveryOptions'
-import { RecoveryInProgress } from '../RecoveryInProgress'
-import { RecoveryError } from '../RecoveryError'
-import { RecoveryDoorOpen } from '../RecoveryDoorOpen'
 import {
-  useErrorDetailsModal,
   ErrorDetailsModal,
   RecoveryDoorOpenSpecial,
+  useErrorDetailsModal,
 } from '../shared'
 
 import type { ComponentProps } from 'react'
@@ -193,6 +194,13 @@ describe('ErrorRecoveryContent', () => {
     MANUAL_REPLACE_AND_RETRY,
     MANUAL_MOVE_AND_SKIP,
     HOME_AND_RETRY,
+    HOPPER_MANUAL_LOAD_AND_RETRY,
+    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    MANUAL_REPLACE_STACKER_AND_RETRY,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
 
   let props: ComponentProps<typeof ErrorRecoveryContent>
@@ -385,6 +393,84 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_MOVE_LW_AND_SKIP')
   })
 
+  it(`returns appropriate view when the route is ${HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+  })
+
   it(`returns appropriate view when the route is ${MANUAL_REPLACE_AND_RETRY.ROUTE}`, () => {
     props = {
       ...props,
@@ -397,6 +483,25 @@ describe('ErrorRecoveryContent', () => {
 
     screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
   })
+
+  it.each([
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+  ])(
+    'returns appropriate view when the route is $recoveryOption',
+    recoveryOption => {
+      props = {
+        ...props,
+        recoveryMap: {
+          ...props.recoveryMap,
+          route: recoveryOption,
+        },
+      }
+      renderRecoveryContent(props)
+
+      screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+    }
+  )
 
   it(`returns RecoveryError when the route is ${ERROR_WHILE_RECOVERING.ROUTE}`, () => {
     props = {

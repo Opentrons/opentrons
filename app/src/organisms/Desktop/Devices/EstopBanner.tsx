@@ -1,18 +1,19 @@
 import { useTranslation } from 'react-i18next'
+
 import {
-  Btn,
   Banner,
+  Btn,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import {
+  LOGICALLY_ENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
-  LOGICALLY_ENGAGED,
   useEstopContext,
 } from '/app/organisms/EmergencyStop'
 

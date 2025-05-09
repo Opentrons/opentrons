@@ -5,9 +5,9 @@ import {
   OT2_ROBOT_TYPE,
   SINGLE,
 } from '@opentrons/shared-data'
-import { getNextTiprack } from '../../robotStateSelectors'
+
 import * as errorCreators from '../../errorCreators'
-import { dropTipInTrash } from './dropTipInTrash'
+import { getNextTiprack } from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   getIsHeaterShakerEastWestMultiChannelPipette,
@@ -15,13 +15,14 @@ import {
   getLabwareSlot,
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
-  reduceCommandCreators,
   PRIMARY_NOZZLE,
+  reduceCommandCreators,
 } from '../../utils'
-import { dropTipInWasteChute } from './dropTipInWasteChute'
+import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
 import { dropTip } from '../atomic/dropTip'
 import { pickUpTip } from '../atomic/pickUpTip'
-import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
+import { dropTipInTrash } from './dropTipInTrash'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 
 import type { CutoutId, NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
@@ -98,10 +99,10 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const labwareDef =
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 
-  const dropTipEntity =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  const isWasteChute = dropTipEntity?.name === 'wasteChute'
-  const isTrashBin = dropTipEntity?.name === 'trashBin'
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
 
   if (!labwareDef) {
     return {
@@ -113,10 +114,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       ],
     }
   }
-  if (
-    !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  ) {
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
@@ -133,11 +131,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const slotName = getLabwareSlot(
-    nextTiprack.tiprackId,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(nextTiprack.tiprackId, prevRobotState.labware)
   if (
     pipetteAdjacentHeaterShakerWhileShaking(
       prevRobotState.modules,
@@ -211,7 +205,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     commandCreators = [
       curryCommandCreator(dropTipInWasteChute, {
         pipetteId: args.pipette,
-        wasteChuteId: dropTipEntity.id,
+        wasteChuteId:
+          invariantContext.wasteChuteEntities[args.dropTipLocation].id,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {
@@ -226,7 +221,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     commandCreators = [
       curryCommandCreator(dropTipInTrash, {
         pipetteId: pipette,
-        trashLocation: dropTipEntity.location as CutoutId,
+        trashLocation: invariantContext.trashBinEntities[args.dropTipLocation]
+          .location as CutoutId,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {

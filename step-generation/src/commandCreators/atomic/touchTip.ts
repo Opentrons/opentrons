@@ -1,5 +1,8 @@
-import { formatPyStr, uuid } from '../../utils'
+import { WELL_ORIGIN_TOP } from '@opentrons/shared-data'
+
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
+import { formatPyStr, uuid } from '../../utils'
+
 import type { CreateCommand, TouchTipParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
@@ -62,7 +65,6 @@ export const touchTip: CommandCreator<TouchTipAtomicParams> = (
     ...(mmFromEdge != null ? [`mm_from_edge=${mmFromEdge}`] : []),
   ]
 
-  //  TODO: add mmFromEdge to python and commandCreator
   const python = `${pipettePythonName}.touch_tip(${pythonArgs.join(', ')})`
 
   const commands: CreateCommand[] = [
@@ -74,7 +76,7 @@ export const touchTip: CommandCreator<TouchTipAtomicParams> = (
         labwareId,
         wellName,
         wellLocation: {
-          origin: 'top',
+          origin: WELL_ORIGIN_TOP,
           offset: {
             z: zOffsetFromTop,
           },

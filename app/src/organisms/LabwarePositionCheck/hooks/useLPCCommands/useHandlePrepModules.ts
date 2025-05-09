@@ -2,8 +2,8 @@ import { modulePrepCommands } from './commands'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 export interface UseHandlePrepModulesResult {
   handleCheckItemsPrepModules: (

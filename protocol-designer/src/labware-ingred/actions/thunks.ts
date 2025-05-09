@@ -1,36 +1,40 @@
 import { getIsTiprack } from '@opentrons/shared-data'
-import { getLabwarePythonName, uuid } from '../../utils'
-import { getLabwareEntities } from '../../step-forms/selectors'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
+
+import { getRobotType } from '../../file-data/selectors'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { getLabwareEntities } from '../../step-forms/selectors'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { getLabwarePythonName, uuid } from '../../utils'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import { getRobotType } from '../../file-data/selectors'
-import type { LabwareEntities } from '@opentrons/step-generation'
 import {
-  selectNestedLabware,
-  selectLabware,
-  selectModule,
+  selectAdapter,
   selectFixture,
+  selectModule,
+  selectTopLabware,
 } from './actions'
+
+import type { LabwareEntities } from '@opentrons/step-generation'
 import type {
   LabwareOnDeck,
   ModuleOnDeck,
   NormalizedLabware,
   NormalizedLabwareById,
 } from '../../step-forms'
-import type {
-  CreateContainerArgs,
-  CreateContainerAction,
-  DuplicateLabwareAction,
-  SelectNestedLabwareAction,
-  SelectLabwareAction,
-  SelectModuleAction,
-  SelectFixtureAction,
-  DeleteContainerAction,
-} from './actions'
 import type { ThunkAction } from '../../types'
 import type { Fixture } from '../types'
+import type {
+  CreateContainerAction,
+  CreateContainerArgs,
+  DeleteContainerAction,
+  DuplicateLabwareAction,
+  SelectAdapterAction,
+  SelectFixtureAction,
+  SelectModuleAction,
+  SelectTopLabwareAction,
+  ZoomedIntoSlotAction,
+} from './actions'
 
 export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'
@@ -41,10 +45,9 @@ export interface RenameLabwareAction {
 }
 export const renameLabware: (
   args: RenameLabwareAction['payload']
-) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
-  dispatch,
-  getState
-) => {
+) => ThunkAction<
+  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+> = args => (dispatch, getState) => {
   const { labwareId } = args
   const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(
     getState()
@@ -67,10 +70,9 @@ export const renameLabware: (
 }
 export const createContainer: (
   args: CreateContainerArgs
-) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
-  dispatch,
-  getState
-) => {
+) => ThunkAction<
+  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+> = args => (dispatch, getState) => {
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
@@ -126,6 +128,12 @@ export const createContainer: (
         labwareId: id,
       })(dispatch, getState)
     }
+    if (slot === 'offDeck') {
+      dispatch({
+        type: 'ZOOMED_INTO_SLOT',
+        payload: { slot: id, cutout: null },
+      })
+    }
   } else {
     console.warn('no slots available, cannot create labware')
   }
@@ -148,7 +156,9 @@ export const duplicateLabware: (
   )
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const templateLabwareIdIsOffDeck =
-    initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
+    getSlotInLocationStack(
+      initialDeckSetup.labware[templateLabwareId].stack
+    ) === 'offDeck'
   const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
     templateLabwareDefURI
   ]
@@ -198,35 +208,35 @@ export const duplicateLabware: (
 }
 
 interface EditSlotInfo {
+  createdTopLabwareForSlot?: LabwareOnDeck | null
+  createdAdapterForSlot?: LabwareOnDeck | null
   createdModuleForSlot?: ModuleOnDeck | null
-  createdLabwareForSlot?: LabwareOnDeck | null
-  createdNestedLabwareForSlot?: LabwareOnDeck | null
   preSelectedFixture?: Fixture | null
 }
 
 export const editSlotInfo: (
   args: EditSlotInfo
 ) => ThunkAction<
-  | SelectNestedLabwareAction
-  | SelectLabwareAction
+  | SelectTopLabwareAction
+  | SelectAdapterAction
   | SelectModuleAction
   | SelectFixtureAction
 > = args => dispatch => {
   const {
     createdModuleForSlot,
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
     preSelectedFixture,
   } = args
 
   dispatch(
-    selectNestedLabware({
-      nestedLabwareDefUri: createdNestedLabwareForSlot?.labwareDefURI ?? null,
+    selectTopLabware({
+      labwareDefUri: createdTopLabwareForSlot?.labwareDefURI ?? null,
     })
   )
   dispatch(
-    selectLabware({
-      labwareDefUri: createdLabwareForSlot?.labwareDefURI ?? null,
+    selectAdapter({
+      adapterDefUri: createdAdapterForSlot?.labwareDefURI ?? null,
     })
   )
   dispatch(selectModule({ moduleModel: createdModuleForSlot?.model ?? null }))

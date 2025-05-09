@@ -1,17 +1,19 @@
-import { createSelector } from 'reselect'
 import forEach from 'lodash/forEach'
 import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
 import reduce from 'lodash/reduce'
+import { createSelector } from 'reselect'
+
 import type { Selector } from 'reselect'
 import type { DropdownOption } from '@opentrons/components'
-import type { Ingredient, LabwareLiquidState } from '@opentrons/step-generation'
 import type { CutoutId } from '@opentrons/shared-data'
+import type { Ingredient, LabwareLiquidState } from '@opentrons/step-generation'
+import type { BaseState, DeckSlot } from './../types'
 import type {
-  RootState,
   ContainersState,
   DrillDownLabwareId,
   IngredientsState,
+  RootState,
   SelectedContainerId,
   SelectedLiquidGroupState,
 } from './reducers'
@@ -20,7 +22,6 @@ import type {
   IngredInputs,
   ZoomedIntoSlotInfoState,
 } from './types'
-import type { BaseState, DeckSlot } from './../types'
 
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 interface RootSlice {
@@ -73,10 +74,6 @@ const getLiquidSelectionOptions: Selector<
 // false or selected slot to add labware to, eg 'A2'
 const selectedAddLabwareSlot = (state: BaseState): DeckSlot | false =>
   rootSelector(state).modeLabwareSelection
-
-// TODO(mc, 2020-06-04): move SavedLabwareState to common location and import here
-const getSavedLabware = (state: BaseState): Record<string, boolean> =>
-  rootSelector(state).savedLabware
 
 const getSelectedLabwareId: Selector<
   RootSlice,
@@ -177,7 +174,6 @@ export const selectors = {
   getLiquidSelectionOptions,
   getLiquidGroupsOnDeck,
   getNextLiquidGroupId,
-  getSavedLabware,
   getSelectedLabwareId,
   getSelectedLiquidGroupState,
   getDrillDownLabwareId,

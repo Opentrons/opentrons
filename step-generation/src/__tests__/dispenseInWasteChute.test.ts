@@ -1,10 +1,12 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+import { dispenseInWasteChute } from '../commandCreators/compound'
 import {
   getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
-import { dispenseInWasteChute } from '../commandCreators/compound'
+
 import type { InvariantContext, PipetteEntities, RobotState } from '../types'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
@@ -23,10 +25,9 @@ const mockPipEntities: PipetteEntities = {
 const invariantContext: InvariantContext = {
   ...makeContext(),
   pipetteEntities: mockPipEntities,
-  additionalEquipmentEntities: {
+  wasteChuteEntities: {
     [mockWasteChuteId]: {
       id: mockWasteChuteId,
-      name: 'wasteChute',
       pythonName: 'mock_waste_chute_1',
       location: mockWasteChuteId,
     },

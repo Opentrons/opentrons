@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
@@ -11,10 +13,11 @@ import {
   StyledText,
   TYPOGRAPHY,
   WRAP,
-  DIRECTION_COLUMN,
 } from '@opentrons/components'
+import { getLabwareDefIsStandard } from '@opentrons/shared-data'
 
 import { useRequiredProtocolLabware } from '/app/resources/protocols'
+
 import { EmptySection } from './EmptySection'
 
 const Table = styled('table')`
@@ -95,7 +98,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                   paddingLeft={SPACING.spacing24}
                   alignItems={ALIGN_CENTER}
                 >
-                  {labware.labwareDef.namespace === 'opentrons' ? (
+                  {getLabwareDefIsStandard(labware.labwareDef) ? (
                     <Icon
                       color={COLORS.blue50}
                       name="check-decagram"

@@ -1,22 +1,46 @@
-import { getPositionFromSlotId } from '@opentrons/shared-data'
-import { getStagingAreaAddressableAreas } from '../../utils'
-import type {
-  AdditionalEquipmentName,
-  DeckSlot,
-} from '@opentrons/step-generation'
+import { useSelector } from 'react-redux'
+import { reduce } from 'lodash'
+
+import {
+  FLEX_ROBOT_TYPE,
+  getIsTiprack,
+  getPositionFromSlotId,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
+
+import { getRobotType } from '../../file-data/selectors'
+import { getLabwareEntities } from '../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
+import { getLabwareNicknamesById } from '../../ui/labware/selectors'
+import {
+  getFullStackFromLabwaresOnDeck,
+  getStagingAreaAddressableAreas,
+} from '../../utils'
+
+import type { DropdownOption } from '@opentrons/components'
 import type {
   CoordinateTuple,
   CutoutId,
   DeckDefinition,
+  RobotType,
 } from '@opentrons/shared-data'
 import type {
+  AdditionalEquipmentName,
+  DeckSlot,
+  LabwareEntity,
+} from '@opentrons/step-generation'
+import type {
   AllTemporalPropertiesForTimelineFrame,
+  InitialDeckSetup,
   LabwareOnDeck,
   ModuleOnDeck,
 } from '../../step-forms'
 import type { Fixture } from './DeckSetup/constants'
 
-interface AdditionalEquipment {
+export interface AdditionalEquipment {
   name: AdditionalEquipmentName
   id: string
   location?: string
@@ -26,9 +50,9 @@ interface SlotInformation {
   matchingLabwareFor4thColumn: LabwareOnDeck | null
   slotPosition: CoordinateTuple | null
   createdModuleForSlot?: ModuleOnDeck
-  createdLabwareForSlot?: LabwareOnDeck
-  createdNestedLabwareForSlot?: LabwareOnDeck
-  createFixtureForSlots?: AdditionalEquipment[]
+  createdTopLabwareForSlot?: LabwareOnDeck
+  createdAdapterForSlot?: LabwareOnDeck
+  createdFixtureForSlots?: AdditionalEquipment[]
   preSelectedFixture?: Fixture
 }
 
@@ -45,32 +69,53 @@ export const getSlotInformation = (
   props: SlotInformationProps
 ): SlotInformation => {
   const { slot, deckSetup, deckDef } = props
-  const slotPosition =
-    deckDef != null ? getPositionFromSlotId(slot, deckDef) ?? null : null
   const {
     labware: deckSetupLabware,
     modules: deckSetupModules,
     additionalEquipmentOnDeck,
   } = deckSetup
+  const offDeckLabware = deckSetupLabware[slot]
+  const slotPosition =
+    deckDef != null && offDeckLabware == null
+      ? getPositionFromSlotId(slot, deckDef) ?? null
+      : null
   const createdModuleForSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
   )
-  const createdLabwareForSlot = Object.values(deckSetupLabware).find(
-    lw => lw.slot === slot || lw.slot === createdModuleForSlot?.id
+
+  const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
+    Object.values(deckSetupLabware),
+    slot
   )
-  const createdNestedLabwareForSlot = Object.values(deckSetupLabware).find(
-    lw => lw.slot === createdLabwareForSlot?.id
-  )
-  const createFixtureForSlots = Object.values(additionalEquipmentOnDeck).filter(
-    ae => {
-      const slotKey = FOURTH_COLUMN_SLOTS.includes(slot)
-        ? FOURTH_COLUMN_CONVERSION[
-            slot as keyof typeof FOURTH_COLUMN_CONVERSION
-          ]
-        : slot
-      return ae.location?.split('cutout')[1] === slotKey
-    }
-  )
+  const labwareIdsFromFullStack =
+    fullStackFromLabwares?.filter(id => deckSetupLabware[id] != null) ?? []
+  const bottomMostLabware =
+    deckSetupLabware[
+      labwareIdsFromFullStack[labwareIdsFromFullStack.length - 1]
+    ]
+  const createdAdapterForSlot =
+    bottomMostLabware != null &&
+    bottomMostLabware.def.allowedRoles?.includes('adapter')
+      ? bottomMostLabware
+      : undefined
+
+  //  top most labware
+  const createdTopLabwareForSlot =
+    labwareIdsFromFullStack.length >= 1 &&
+    !deckSetupLabware[labwareIdsFromFullStack[0]].def.allowedRoles?.includes(
+      'adapter'
+    )
+      ? deckSetupLabware[labwareIdsFromFullStack[0]]
+      : undefined
+
+  const createdFixtureForSlots = Object.values(
+    additionalEquipmentOnDeck
+  ).filter(ae => {
+    const slotKey = FOURTH_COLUMN_SLOTS.includes(slot)
+      ? FOURTH_COLUMN_CONVERSION[slot as keyof typeof FOURTH_COLUMN_CONVERSION]
+      : slot
+    return ae.location?.split('cutout')[1] === slotKey
+  })
 
   const fixturesOnSlot = Object.values(additionalEquipmentOnDeck).filter(
     ae => ae.location?.split('cutout')[1] === slot
@@ -86,20 +131,26 @@ export const getSlotInformation = (
     ] as CutoutId[])
     matchingLabware =
       Object.values(deckSetupLabware).find(
-        lw => lw.slot === stagingAreaAddressableAreaName[0]
+        lw =>
+          getSlotInLocationStack(lw.stack) === stagingAreaAddressableAreaName[0]
       ) ?? null
   }
 
   const preSelectedFixture =
-    createFixtureForSlots != null && createFixtureForSlots.length === 2
+    createdFixtureForSlots != null && createdFixtureForSlots.length === 2
       ? ('wasteChuteAndStagingArea' as Fixture)
-      : (createFixtureForSlots[0]?.name as Fixture)
+      : (createdFixtureForSlots[0]?.name as Fixture)
 
   return {
     createdModuleForSlot,
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
-    createFixtureForSlots,
+    createdTopLabwareForSlot:
+      slot === 'offDeck'
+        ? undefined
+        : offDeckLabware != null
+        ? offDeckLabware
+        : createdTopLabwareForSlot,
+    createdAdapterForSlot,
+    createdFixtureForSlots,
     preSelectedFixture,
     slotPosition: slotPosition,
     matchingLabwareFor4thColumn: matchingLabware,
@@ -122,4 +173,100 @@ export const formatTime = (input: string): string => {
       seconds.toString().padStart(2, '0'),
     ].join(':')
   }
+}
+
+export const _sortLabwareDropdownOptions = (
+  options: DropdownOption[]
+): DropdownOption[] =>
+  options.sort((a, b) => {
+    return a.name.localeCompare(b.name)
+  })
+
+function resolveSlotLocation(
+  modules: InitialDeckSetup['modules'],
+  locationStack: string[],
+  robotType: RobotType
+): string {
+  const TCSlot =
+    robotType === FLEX_ROBOT_TYPE
+      ? TC_MODULE_LOCATION_OT3
+      : TC_MODULE_LOCATION_OT2
+  const location = getSlotInLocationStack(locationStack)
+  const stackHasThermocycler = locationStack.some(
+    item =>
+      modules[item] != null && modules[item].type === THERMOCYCLER_MODULE_TYPE
+  )
+  if (stackHasThermocycler) {
+    return TCSlot
+  } else {
+    return location
+  }
+}
+
+const getNickname = (
+  nicknamesById: Record<string, string>,
+  activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
+  labwareId: string,
+  robotType: RobotType
+): string => {
+  const { modules } = activeDeckSetup
+  const stack = activeDeckSetup.labware[labwareId].stack
+  const latestSlot = resolveSlotLocation(modules, stack, robotType)
+
+  let nickName: string = nicknamesById[labwareId]
+  if (latestSlot != null && latestSlot !== 'offDeck') {
+    nickName = `${nicknamesById[labwareId]} in ${latestSlot}`
+  }
+  return nickName
+}
+
+export const useLabwareDropdownOptions = (
+  type: 'moveLabware' | 'labware'
+): DropdownOption[] => {
+  const labwareEntities = useSelector(getLabwareEntities)
+  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+  const nicknamesById = useSelector(getLabwareNicknamesById)
+  const robotType = useSelector(getRobotType)
+  const moveLabwareOptions = reduce(
+    labwareEntities,
+    (
+      acc: DropdownOption[],
+      labwareEntity: LabwareEntity,
+      labwareId: string
+    ): DropdownOption[] => {
+      const deckSlot = getSlotInLocationStack(
+        activeDeckSetup.labware[labwareId].stack
+      )
+      const isLabwareInWasteChute = deckSlot === 'gripperWasteChute'
+
+      const isAdapter =
+        labwareEntity.def.allowedRoles?.includes('adapter') ?? false
+      const nickName = getNickname(
+        nicknamesById,
+        activeDeckSetup,
+        labwareId,
+        robotType
+      )
+      const isTiprack = getIsTiprack(labwareEntity.def)
+      const isOffDeck = deckSlot === 'offDeck'
+
+      //  filter out moving adapters, and labware in
+      //  waste chute for moveLabware, labware off-deck and
+      //  labware that is a tiprack for the labware dropdown only
+      return isAdapter ||
+        isLabwareInWasteChute ||
+        (type === 'labware' && isTiprack) ||
+        isOffDeck
+        ? acc
+        : [
+            ...acc,
+            {
+              name: nickName,
+              value: labwareId,
+            },
+          ]
+    },
+    []
+  )
+  return _sortLabwareDropdownOptions(moveLabwareOptions)
 }

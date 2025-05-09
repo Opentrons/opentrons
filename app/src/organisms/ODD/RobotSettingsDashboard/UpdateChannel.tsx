@@ -6,12 +6,12 @@ import styled from 'styled-components'
 import {
   BORDERS,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
-  CURSOR_POINTER,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'

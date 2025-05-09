@@ -7,23 +7,24 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
+import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   useCreateTargetedMaintenanceRunMutation,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
 } from '/app/resources/runs'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
+
 import {
-  useLPCLabwareInfo,
   useCompatibleAnalysis,
-  useUpdateDeckConfig,
   useHandleClientAppliedOffsets,
-  useOffsetConflictTimestamp,
-  useUpdateLabware,
+  useLPCLabwareInfo,
   useMonitorMaintenanceRunForDeletion,
+  useOffsetConflictTimestamp,
+  useUpdateDeckConfig,
+  useUpdateLabware,
 } from './hooks'
-import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type {

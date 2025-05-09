@@ -1,14 +1,16 @@
-import { fireEvent, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  useTrackEvent,
   ANALYTICS_IMPORT_PROTOCOL_TO_APP,
+  useTrackEvent,
 } from '/app/redux/analytics'
-import { ProtocolUploadInput } from '../ProtocolUploadInput'
 import { remote } from '/app/redux/shell/remote'
+
+import { ProtocolUploadInput } from '../ProtocolUploadInput'
 
 import type { Mock } from 'vitest'
 

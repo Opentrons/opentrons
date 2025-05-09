@@ -1,4 +1,5 @@
 import { I18nextProvider } from 'react-i18next'
+
 import { GlobalStyle } from '../app/src/atoms/GlobalStyle'
 import { i18n } from '../app/src/i18n'
 
@@ -46,8 +47,17 @@ export const customViewports = {
     name: 'Protocol Designer Base',
     type: 'desktop',
     styles: {
-      width: '14402px',
+      width: '1440px',
       height: '1024px',
+    },
+  },
+  protocolDesignerSmallHeight: {
+    // The small height for Protocol Designer. This might be the base size for web
+    name: 'Protocol Designer Small Height',
+    type: 'desktop',
+    styles: {
+      width: '1440px',
+      height: '664px',
     },
   },
 }

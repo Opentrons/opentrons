@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
@@ -11,33 +11,34 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
+  Modal,
   NewPrimaryBtn,
   SPACING,
-  Modal,
-  LegacyStyledText,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
+import successIcon from '/app/assets/images/icon_success.png'
 import { ProgressBar } from '/app/atoms/ProgressBar'
-import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import {
-  startRobotUpdate,
   clearRobotUpdateSession,
   getRobotUpdateDownloadError,
+  startRobotUpdate,
 } from '/app/redux/robot-update'
-import { useRobotUpdateInfo } from './useRobotUpdateInfo'
-import successIcon from '/app/assets/images/icon_success.png'
 import {
-  useRobotInitializationStatus,
   INIT_STATUS,
+  useRobotInitializationStatus,
 } from '/app/resources/health/hooks'
 
+import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
+import { useRobotUpdateInfo } from './useRobotUpdateInfo'
+
 import type { ChangeEventHandler } from 'react'
-import type { State } from '/app/redux/types'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
-import type { UpdateStep } from './useRobotUpdateInfo'
+import type { State } from '/app/redux/types'
 import type { RobotInitializationStatus } from '/app/resources/health/hooks'
+import type { UpdateStep } from './useRobotUpdateInfo'
 
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};

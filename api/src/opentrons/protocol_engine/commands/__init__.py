@@ -419,6 +419,14 @@ from .pressure_dispense import (
     PressureDispenseCommandType,
 )
 
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleParams,
+    IdentifyModuleCreate,
+    IdentifyModuleResult,
+    IdentifyModuleCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -536,6 +544,12 @@ __all__ = [
     "LoadModuleParams",
     "LoadModuleResult",
     "LoadModuleCommandType",
+    # identify module command models
+    "IdentifyModule",
+    "IdentifyModuleParams",
+    "IdentifyModuleCreate",
+    "IdentifyModuleResult",
+    "IdentifyModuleCommandType",
     # load pipette command models
     "LoadPipette",
     "LoadPipetteCreate",

@@ -4,6 +4,7 @@ import type {
   Ingredient,
   LocationLiquidState,
 } from '@opentrons/step-generation'
+
 // TODO Ian 2018-02-19 make these shared in component library, standardize with Run App
 //  ===== LABWARE ===========
 export interface DisplayLabware {
@@ -38,8 +39,8 @@ export type Fixture =
   | 'wasteChuteAndStagingArea'
 
 export interface ZoomedIntoSlotInfoState {
-  selectedLabwareDefUri: string | null
-  selectedNestedLabwareDefUri: string | null
+  selectedTopLabwareDefUri: string | null
+  selectedAdapterDefUri: string | null
   selectedModuleModel: ModuleModel | null
   selectedFixture: Fixture | null
   selectedSlot: { slot: DeckSlot | null; cutout: CutoutId | null }

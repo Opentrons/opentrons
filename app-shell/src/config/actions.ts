@@ -1,41 +1,3 @@
-import type {
-  AddCustomLabwareAction,
-  AddCustomLabwareFailureAction,
-  AddCustomLabwareFileAction,
-  AddNewLabwareNameAction,
-  ChangeCustomLabwareDirectoryAction,
-  CheckedLabwareFile,
-  ClearAddCustomLabwareFailureAction,
-  ClearNewLabwareNameAction,
-  CustomLabwareListAction,
-  CustomLabwareListActionSource,
-  CustomLabwareListFailureAction,
-  DeleteCustomLabwareFileAction,
-  DuplicateLabwareFile,
-  FailedLabwareFile,
-  OpenCustomLabwareDirectoryAction,
-} from '@opentrons/app/src/redux/custom-labware/types'
-import type {
-  ResetConfigValueAction,
-  UpdateConfigValueAction,
-} from '@opentrons/app/src/redux/config'
-import type {
-  AddProtocolAction,
-  AddProtocolFailureAction,
-  AnalyzeProtocolAction,
-  AnalyzeProtocolFailureAction,
-  AnalyzeProtocolSuccessAction,
-  ClearAddProtocolFailureAction,
-  FetchProtocolsAction,
-  OpenProtocolDirectoryAction,
-  ProtocolListActionSource,
-  RemoveProtocolAction,
-  StoredProtocolData,
-  StoredProtocolDir,
-  UpdateProtocolListAction,
-  UpdateProtocolListFailureAction,
-  ViewProtocolSourceFolder,
-} from '@opentrons/app/src/redux/protocol-storage'
 import {
   ADD_CUSTOM_LABWARE,
   ADD_CUSTOM_LABWARE_FAILURE,
@@ -58,14 +20,19 @@ import {
   FETCH_PROTOCOLS,
   LABWARE_DIRECTORY_CONFIG_PATH,
   NETWORK_INTERFACES_CHANGED,
+  NOTIFY_SUBSCRIBE,
   OPEN_CUSTOM_LABWARE_DIRECTORY,
   OPEN_PROTOCOL_DIRECTORY,
   POLL,
   RELOAD_UI,
   REMOVE_PROTOCOL,
   RESET_VALUE,
+  ROBOT_MASS_STORAGE_DEVICE_ADDED,
+  ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
+  ROBOT_MASS_STORAGE_DEVICE_REMOVED,
   SEND_LOG,
   SYSTEM_INFO_INITIALIZED,
+  UPDATE_BRIGHTNESS,
   UPDATE_PROTOCOL_LIST,
   UPDATE_PROTOCOL_LIST_FAILURE,
   UPDATE_VALUE,
@@ -75,12 +42,58 @@ import {
   USB_HTTP_REQUESTS_STOP,
   VALUE_UPDATED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
-  NOTIFY_SUBSCRIBE,
-  ROBOT_MASS_STORAGE_DEVICE_ADDED,
-  ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
-  ROBOT_MASS_STORAGE_DEVICE_REMOVED,
-  UPDATE_BRIGHTNESS,
 } from '../constants'
+
+import type {
+  ResetConfigValueAction,
+  UpdateConfigValueAction,
+} from '@opentrons/app/src/redux/config'
+import type {
+  AddCustomLabwareAction,
+  AddCustomLabwareFailureAction,
+  AddCustomLabwareFileAction,
+  AddNewLabwareNameAction,
+  ChangeCustomLabwareDirectoryAction,
+  CheckedLabwareFile,
+  ClearAddCustomLabwareFailureAction,
+  ClearNewLabwareNameAction,
+  CustomLabwareListAction,
+  CustomLabwareListActionSource,
+  CustomLabwareListFailureAction,
+  DeleteCustomLabwareFileAction,
+  DuplicateLabwareFile,
+  FailedLabwareFile,
+  OpenCustomLabwareDirectoryAction,
+} from '@opentrons/app/src/redux/custom-labware/types'
+import type {
+  AddProtocolAction,
+  AddProtocolFailureAction,
+  AnalyzeProtocolAction,
+  AnalyzeProtocolFailureAction,
+  AnalyzeProtocolSuccessAction,
+  ClearAddProtocolFailureAction,
+  FetchProtocolsAction,
+  OpenProtocolDirectoryAction,
+  ProtocolListActionSource,
+  RemoveProtocolAction,
+  StoredProtocolData,
+  StoredProtocolDir,
+  UpdateProtocolListAction,
+  UpdateProtocolListFailureAction,
+  ViewProtocolSourceFolder,
+} from '@opentrons/app/src/redux/protocol-storage'
+import type {
+  AppRestartAction,
+  NotifySubscribeAction,
+  NotifyTopic,
+  ReloadUiAction,
+  RobotMassStorageDeviceAdded,
+  RobotMassStorageDeviceEnumerated,
+  RobotMassStorageDeviceRemoved,
+  SendLogAction,
+  UpdateBrightnessAction,
+  UsbRequestsAction,
+} from '@opentrons/app/src/redux/shell/types'
 import type {
   InitializedAction,
   NetworkInterface,
@@ -94,18 +107,6 @@ import type {
   ConfigValueUpdatedAction,
 } from '../types'
 import type { Config } from './types'
-import type {
-  AppRestartAction,
-  NotifySubscribeAction,
-  NotifyTopic,
-  ReloadUiAction,
-  RobotMassStorageDeviceAdded,
-  RobotMassStorageDeviceEnumerated,
-  RobotMassStorageDeviceRemoved,
-  SendLogAction,
-  UpdateBrightnessAction,
-  UsbRequestsAction,
-} from '@opentrons/app/src/redux/shell/types'
 
 // config file has been initialized
 export const configInitialized = (config: Config): ConfigInitializedAction => ({

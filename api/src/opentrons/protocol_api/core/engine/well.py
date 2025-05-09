@@ -223,3 +223,19 @@ class WellCore(AbstractWellCore):
         return self._engine_client.state.geometry.get_current_well_volume(
             labware_id=labware_id, well_name=well_name
         )
+
+    def height_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the height in a well corresponding to a given volume."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_well_height_at_volume(
+            labware_id=labware_id, well_name=well_name, volume=volume
+        )
+
+    def volume_from_height(self, height: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the volume contained in a well at any height."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_well_volume_at_height(
+            labware_id=labware_id, well_name=well_name, height=height
+        )

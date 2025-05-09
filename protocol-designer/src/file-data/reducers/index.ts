@@ -1,22 +1,18 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
+
 import type { Reducer } from 'redux'
-import type { Timeline } from '@opentrons/step-generation'
 import type { RobotType } from '@opentrons/shared-data'
-import type { Action } from '../../types'
+import type { Timeline } from '@opentrons/step-generation'
 import type { LoadFileAction, NewProtocolFields } from '../../load-file'
 import type { Substeps } from '../../steplist/types'
-import type {
-  ComputeRobotStateTimelineSuccessAction,
-  DesignerTabPayload,
-} from '../actions'
-import type {
-  FileMetadataFields,
-  SaveFileMetadataAction,
-  SelectDesignerTabAction,
-} from '../types'
+import type { Action } from '../../types'
+import type { ComputeRobotStateTimelineSuccessAction } from '../actions'
+import type { FileMetadataFields, SaveFileMetadataAction } from '../types'
 
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {
@@ -123,17 +119,6 @@ const robotTypeReducer = (
   return state
 }
 
-const designerTabReducer = (
-  state: DesignerTabPayload['tab'] = 'startingDeck',
-  action: SelectDesignerTabAction
-): DesignerTabPayload['tab'] => {
-  if (action.type === 'SELECT_DESIGNER_TAB') {
-    return action.payload.tab
-  } else {
-    return state
-  }
-}
-
 export interface RootState {
   computedRobotStateTimeline: Timeline
   computedSubsteps: Substeps
@@ -141,7 +126,6 @@ export interface RootState {
   fileMetadata: FileMetadataFields
   timelineIsBeingComputed: boolean
   robotType: RobotType
-  designerTab: DesignerTabPayload['tab']
 }
 const _allReducers = {
   computedRobotStateTimeline,
@@ -150,7 +134,6 @@ const _allReducers = {
   fileMetadata,
   timelineIsBeingComputed,
   robotType: robotTypeReducer,
-  designerTab: designerTabReducer,
 }
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers

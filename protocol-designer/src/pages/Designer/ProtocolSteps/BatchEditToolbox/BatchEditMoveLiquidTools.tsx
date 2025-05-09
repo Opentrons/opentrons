@@ -1,5 +1,6 @@
-import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   Divider,
@@ -8,14 +9,11 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
+
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
 } from '../../../../components/molecules'
-import {
-  getBlowoutLocationOptionsForForm,
-  getLabwareFieldForPositioningField,
-} from '../StepForm/utils'
 import {
   BlowoutLocationField,
   BlowoutOffsetField,
@@ -23,6 +21,11 @@ import {
   PositionField,
   WellsOrderField,
 } from '../StepForm/PipetteFields'
+import {
+  getBlowoutLocationOptionsForForm,
+  getLabwareFieldForPositioningField,
+} from '../StepForm/utils'
+
 import type { WellOrderOption } from '../../../../form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../StepForm/types'
 
@@ -125,9 +128,7 @@ export function BatchEditMoveLiquidTools(
               t('form:step_edit_form.field.preWetTip.label'),
               'capitalize'
             )}
-            checkboxValue={propsForFields.preWetTip.value}
-            isChecked={propsForFields.preWetTip.value === true}
-            checkboxUpdateValue={propsForFields.preWetTip.updateValue}
+            fieldProps={propsForFields.preWetTip}
           />
         ) : null}
         <CheckboxExpandStepFormField
@@ -135,11 +136,7 @@ export function BatchEditMoveLiquidTools(
             t('form:step_edit_form.field.mix.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_mix_checkbox`].value}
-          isChecked={propsForFields[`${tab}_mix_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_mix_checkbox`].updateValue
-          }
+          fieldProps={propsForFields[`${tab}_mix_checkbox`]}
         >
           {propsForFields[`${tab}_mix_checkbox`].value === true ? (
             <Flex
@@ -169,11 +166,7 @@ export function BatchEditMoveLiquidTools(
             t('form:step_edit_form.field.delay.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_delay_checkbox`].value}
-          isChecked={propsForFields[`${tab}_delay_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_delay_checkbox`].updateValue
-          }
+          fieldProps={propsForFields[`${tab}_delay_checkbox`]}
         >
           {propsForFields[`${tab}_delay_checkbox`].value === true ? (
             <Flex
@@ -205,9 +198,7 @@ export function BatchEditMoveLiquidTools(
               t('form:step_edit_form.field.blowout.label'),
               'capitalize'
             )}
-            checkboxValue={propsForFields.blowout_checkbox.value}
-            isChecked={propsForFields.blowout_checkbox.value === true}
-            checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
+            fieldProps={propsForFields.blowout_checkbox}
           >
             {propsForFields.blowout_checkbox.value === true ? (
               <Flex

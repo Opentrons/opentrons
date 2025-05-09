@@ -1,19 +1,21 @@
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
+
 import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
+import { getMatchingTipLiquidSpecs } from '../../../utils'
 import { getOrderedWells } from '../../utils'
 import { getMoveLiquidDelayData } from './getDelayData'
-import { getMatchingTipLiquidSpecs } from '../../../utils'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   ConsolidateArgs,
   DistributeArgs,
-  TransferArgs,
   InnerMixArgs,
+  TransferArgs,
 } from '@opentrons/step-generation'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HydratedMoveLiquidFormData } from '../../../form-types'
 
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
@@ -80,6 +82,8 @@ export const moveLiquidFormToArgs = (
     aspirate_y_position,
     dispense_y_position,
     blowout_z_offset,
+    pushOut_checkbox,
+    pushOut_volume,
   } = hydratedFormData
   let sourceWells = getOrderedWells(
     hydratedFormData.aspirate_wells,
@@ -157,18 +161,38 @@ export const moveLiquidFormToArgs = (
     'dispense_mix_volume',
     'dispense_mix_times'
   )
-  const aspirateDelay = getMoveLiquidDelayData(
+  const aspirateDelay = getMoveLiquidDelayData({
     hydratedFormData,
-    'aspirate_delay_checkbox',
-    'aspirate_delay_seconds',
-    'aspirate_delay_mmFromBottom'
-  )
-  const dispenseDelay = getMoveLiquidDelayData(
+    secondsField: 'aspirate_delay_seconds',
+    zPositionField: 'aspirate_mmFromBottom',
+    checkboxField: 'aspirate_delay_checkbox',
+  })
+  const dispenseDelay = getMoveLiquidDelayData({
     hydratedFormData,
-    'dispense_delay_checkbox',
-    'dispense_delay_seconds',
-    'dispense_delay_mmFromBottom'
-  )
+    secondsField: 'dispense_delay_seconds',
+    zPositionField: 'dispense_mmFromBottom',
+    checkboxField: 'dispense_delay_checkbox',
+  })
+  const aspirateSubmergeDelay = getMoveLiquidDelayData({
+    hydratedFormData,
+    secondsField: 'aspirate_submerge_delay_seconds',
+    zPositionField: 'aspirate_submerge_mmFromBottom',
+  })
+  const dispenseSubmergeDelay = getMoveLiquidDelayData({
+    hydratedFormData,
+    secondsField: 'dispense_submerge_delay_seconds',
+    zPositionField: 'dispense_submerge_mmFromBottom',
+  })
+  const aspirateRetractDelay = getMoveLiquidDelayData({
+    hydratedFormData,
+    secondsField: 'aspirate_retract_delay_seconds',
+    zPositionField: 'aspirate_retract_mmFromBottom',
+  })
+  const dispenseRetractDelay = getMoveLiquidDelayData({
+    hydratedFormData,
+    secondsField: 'dispense_retract_delay_seconds',
+    zPositionField: 'dispense_retract_mmFromBottom',
+  })
   const blowoutLocation =
     (hydratedFormData.blowout_checkbox && hydratedFormData.blowout_location) ||
     (hydratedFormData.disposalVolume_checkbox &&
@@ -220,6 +244,10 @@ export const moveLiquidFormToArgs = (
     preWetTip: Boolean(hydratedFormData.preWetTip),
     aspirateDelay,
     dispenseDelay,
+    aspirateSubmergeDelay,
+    dispenseSubmergeDelay,
+    aspirateRetractDelay,
+    dispenseRetractDelay,
     aspirateAirGapVolume,
     dispenseAirGapVolume,
     touchTipAfterAspirate,
@@ -237,15 +265,38 @@ export const moveLiquidFormToArgs = (
     nozzles,
     aspirateXOffset: aspirate_x_position ?? 0,
     aspirateYOffset: aspirate_y_position ?? 0,
+    aspirateZOffset: hydratedFormData.aspirate_mmFromBottom ?? 0,
     dispenseXOffset: dispense_x_position ?? 0,
     dispenseYOffset: dispense_y_position ?? 0,
-    aspirateSubmergeSpeed: hydratedFormData.aspirate_submerge_speed,
-    aspirateRetractSpeed: hydratedFormData.aspirate_submerge_speed,
-    dispenseSubmergeSpeed: hydratedFormData.dispense_submerge_speed,
-    dispenseRetractSpeed: hydratedFormData.dispense_submerge_speed,
-    aspirateRetractXOffset: hydratedFormData.aspirate_retract_x_position,
-    aspirateRetractYOffset: hydratedFormData.aspirate_retract_y_position,
-    aspirateRetractZOffset: hydratedFormData.aspirate_retract_mmFromBottom,
+    aspiratePositionReference: hydratedFormData.aspirate_position_reference,
+    aspirateSubmergeSpeed: hydratedFormData.aspirate_submerge_speed ?? null,
+    aspirateSubmergeXOffset: hydratedFormData.aspirate_submerge_x_position ?? 0,
+    aspirateSubmergeYOffset: hydratedFormData.aspirate_submerge_y_position ?? 0,
+    aspirateSubmergeZOffset:
+      hydratedFormData.aspirate_submerge_mmFromBottom ?? 0,
+    aspirateSubmergePositionReference:
+      hydratedFormData.aspirate_submerge_position_reference,
+    aspirateRetractSpeed: hydratedFormData.aspirate_retract_speed ?? null,
+    aspirateRetractXOffset: hydratedFormData.aspirate_retract_x_position ?? 0,
+    aspirateRetractYOffset: hydratedFormData.aspirate_retract_y_position ?? 0,
+    aspirateRetractZOffset: hydratedFormData.aspirate_retract_mmFromBottom ?? 0,
+    aspirateRetractPositionReference:
+      hydratedFormData.aspirate_retract_position_reference,
+    dispenseSubmergeSpeed: hydratedFormData.dispense_submerge_speed ?? null,
+    dispenseSubmergeXOffset: hydratedFormData.dispense_submerge_x_position ?? 0,
+    dispenseSubmergeYOffset: hydratedFormData.dispense_submerge_y_position ?? 0,
+    dispenseSubmergeZOffset:
+      hydratedFormData.dispense_submerge_mmFromBottom ?? 0,
+    dispenseSubmergePositionReference:
+      hydratedFormData.dispense_submerge_position_reference,
+    dispenseRetractSpeed: hydratedFormData.dispense_retract_speed ?? null,
+    dispenseRetractYOffset: hydratedFormData.dispense_retract_y_position ?? 0,
+    dispenseRetractZOffset: hydratedFormData.dispense_retract_mmFromBottom ?? 0,
+    dispenseRetractPositionReference:
+      hydratedFormData.dispense_position_reference,
+    dispenseRetractXOffset: hydratedFormData.dispense_retract_x_position ?? 0,
+    pushOut: pushOut_checkbox ? pushOut_volume : 0,
+    liquidClass: hydratedFormData.liquidClass ?? null,
   }
   console.assert(
     sourceWellsUnordered.length > 0,

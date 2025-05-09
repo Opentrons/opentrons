@@ -1,10 +1,10 @@
-import { useState, useEffect, useReducer, useMemo } from 'react'
+import { useEffect, useMemo, useReducer, useState } from 'react'
 import { createPortal } from 'react-dom'
-import isEqual from 'lodash/isEqual'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import isEqual from 'lodash/isEqual'
 
-import { useConditionalConfirm, ModalShell } from '@opentrons/components'
+import { ModalShell, useConditionalConfirm } from '@opentrons/components'
 import {
   useAddLabwareOffsetToRunMutation,
   useCreateMaintenanceCommandMutation,
@@ -18,39 +18,40 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-// import { useTrackEvent } from '/app/redux/analytics'
-import { IntroScreen } from './IntroScreen'
-import { ExitConfirmation } from './ExitConfirmation'
-import { CheckItem } from './CheckItem'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getIsOnDevice } from '/app/redux/config'
-import { AttachProbe } from './AttachProbe'
-import { DetachProbe } from './DetachProbe'
-import { PickUpTip } from './PickUpTip'
-import { ReturnTip } from './ReturnTip'
-import { ResultsSummary } from './ResultsSummary'
-import { FatalError } from './FatalErrorModal'
-import { RobotMotionLoader } from './RobotMotionLoader'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
-import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
 
+import { AttachProbe } from './AttachProbe'
+import { CheckItem } from './CheckItem'
+import { DetachProbe } from './DetachProbe'
+import { ExitConfirmation } from './ExitConfirmation'
+import { FatalError } from './FatalErrorModal'
+import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
+// import { useTrackEvent } from '/app/redux/analytics'
+import { IntroScreen } from './IntroScreen'
+import { PickUpTip } from './PickUpTip'
+import { ResultsSummary } from './ResultsSummary'
+import { ReturnTip } from './ReturnTip'
+import { RobotMotionLoader } from './RobotMotionLoader'
+
+import type {
+  CommandData,
+  LabwareOffset,
+  LegacyLabwareOffsetCreateData,
+  LegacyLabwareOffsetLocation,
+} from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
-  Coordinates,
   CreateCommand,
   DropTipCreateCommand,
   RobotType,
+  Vector3D,
 } from '@opentrons/shared-data'
-import type {
-  LegacyLabwareOffsetCreateData,
-  LabwareOffset,
-  CommandData,
-  LegacyLabwareOffsetLocation,
-} from '@opentrons/api-client'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 
@@ -128,7 +129,7 @@ export const LegacyLabwarePositionCheckComponent = (
     (
       state: {
         workingOffsets: WorkingOffset[]
-        tipPickUpOffset: Coordinates | null
+        tipPickUpOffset: Vector3D | null
       },
       action: RegisterPositionAction
     ) => {
@@ -218,8 +219,8 @@ export const LegacyLabwarePositionCheckComponent = (
 
   const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
   const calculateAndApplyOffset = (
-    initialPosition: Coordinates | null,
-    finalPosition: Coordinates | null,
+    initialPosition: Vector3D | null,
+    finalPosition: Vector3D | null,
     labwareId: string,
     location: LegacyLabwareOffsetLocation
   ): Promise<void> => {
@@ -340,7 +341,7 @@ export const LegacyLabwarePositionCheckComponent = (
     axis: Axis,
     dir: Sign,
     step: StepSize,
-    onSuccess?: (position: Coordinates | null) => void
+    onSuccess?: (position: Vector3D | null) => void
   ): void => {
     const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
     if (pipetteId != null) {
@@ -354,9 +355,7 @@ export const LegacyLabwarePositionCheckComponent = (
         timeout: JOG_COMMAND_TIMEOUT,
       })
         .then(data => {
-          onSuccess?.(
-            (data?.data?.result?.position ?? null) as Coordinates | null
-          )
+          onSuccess?.((data?.data?.result?.position ?? null) as Vector3D | null)
         })
         .catch((e: Error) => {
           setFatalError(`error issuing jog command: ${e.message}`)

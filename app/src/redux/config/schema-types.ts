@@ -1,6 +1,6 @@
-import type { LogLevel } from '../../logger'
 import type { Language } from '/app/i18n'
 import type { ProtocolSort } from '/app/redux/protocol-storage'
+import type { LogLevel } from '../../logger'
 
 export type UrlProtocol = 'file:' | 'http:'
 
@@ -17,6 +17,7 @@ export type DevInternalFlag =
   | 'reactQueryDevtools'
   | 'reactScan'
   | 'quickTransferExportPython'
+  | 'liquidClassesForQuickTransfer'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

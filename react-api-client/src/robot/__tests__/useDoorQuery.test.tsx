@@ -1,13 +1,14 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getDoorStatus } from '@opentrons/api-client'
-import { useHost } from '../../api'
-import { useDoorQuery } from '..'
 
-import type { HostConfig, Response, DoorStatus } from '@opentrons/api-client'
+import { useDoorQuery } from '..'
+import { useHost } from '../../api'
+
+import type * as React from 'react'
+import type { DoorStatus, HostConfig, Response } from '@opentrons/api-client'
 import type { UseDoorQueryOptions } from '../useDoorQuery'
 
 vi.mock('@opentrons/api-client')
@@ -15,7 +16,11 @@ vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const DOOR_RESPONSE: DoorStatus = {
-  data: { status: 'open', doorRequiredClosedForProtocol: true },
+  data: {
+    status: 'open',
+    doorRequiredClosedForProtocol: true,
+    moduleSerial: null,
+  },
 } as DoorStatus
 
 describe('useDoorQuery hook', () => {

@@ -1,6 +1,5 @@
 import { BACK_TO_LABWARE_LIBRARY } from '../../localization'
 import { Link } from '../ui'
-
 import styles from './styles.module.css'
 
 interface BreadcrumbsProps {

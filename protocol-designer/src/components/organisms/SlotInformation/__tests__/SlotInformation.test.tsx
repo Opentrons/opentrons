@@ -1,10 +1,11 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
 
 import { SlotInformation } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
@@ -39,7 +40,6 @@ describe('SlotInformation', () => {
       location: 'A1',
       liquids: [],
       labwares: [],
-      adapters: [],
       modules: [],
       fixtures: [],
     }
@@ -64,12 +64,10 @@ describe('SlotInformation', () => {
     props = {
       ...props,
       liquids: mockLiquids,
-      labwares: mockLabwares,
-      adapters: mockAdapters,
+      labwares: [...mockLabwares, ...mockAdapters],
       modules: mockModules,
     }
     render(props)
-    screen.debug()
 
     expect(screen.getAllByText('Liquid').length).toBe(1)
     expect(screen.getAllByText('Labware').length).toBe(

@@ -1,11 +1,14 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+
 import { thermocyclerProfileStep } from '../commandCreators/compound/thermocyclerProfileStep'
 import {
   getErrorResult,
   getStateAndContextTempTCModules,
   getSuccessResult,
 } from '../fixtures'
+
 import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   ThermocyclerModuleState,

@@ -1,33 +1,36 @@
 import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
-import without from 'lodash/without'
 import startCase from 'lodash/startCase'
-import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '@opentrons/step-generation'
+import without from 'lodash/without'
+
 import { SINGLE } from '@opentrons/shared-data'
-import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import {
-  getDisabledFields,
-  getDefaultsForStepType,
-} from '../../../../steplist/formLevel'
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '@opentrons/step-generation'
+
 import { i18n } from '../../../../assets/localization'
 import { PROFILE_CYCLE } from '../../../../form-types'
-import type { PipetteEntity } from '@opentrons/step-generation'
+import { getFieldErrors } from '../../../../steplist/fieldLevel'
+import {
+  getDefaultsForStepType,
+  getDisabledFields,
+} from '../../../../steplist/formLevel'
+
 import type { DropdownOption } from '@opentrons/components'
-import type { ProfileFormError } from '../../../../steplist/formLevel/profileErrors'
-import type { FormWarning } from '../../../../steplist/formLevel/warnings'
-import type { StepFormErrors } from '../../../../steplist/types'
+import type { PipetteEntity } from '@opentrons/step-generation'
 import type {
   FormData,
+  HydratedFormData,
+  PathOption,
   ProfileItem,
   StepFieldName,
   StepType,
-  PathOption,
-  HydratedFormData,
 } from '../../../../form-types'
 import type { FormError } from '../../../../steplist/formLevel'
+import type { ProfileFormError } from '../../../../steplist/formLevel/profileErrors'
+import type { FormWarning } from '../../../../steplist/formLevel/warnings'
+import type { StepFormErrors } from '../../../../steplist/types'
 import type { NozzleType } from '../../../../types'
 import type { FieldProps, FieldPropsByName, FocusHandlers } from './types'
 
@@ -389,4 +392,32 @@ export const getFormLevelError = (
     mappedErrorsToField[fieldName].showAtField
     ? mappedErrorsToField[fieldName].title
     : null
+}
+
+export const getShouldUpdateForLiquidClass = (
+  changedFields: string[],
+  formType: string
+): boolean => {
+  switch (formType) {
+    case 'moveLiquid':
+      return [
+        'aspirate_labware',
+        'aspirate_wells',
+        'pipette',
+        'tipRack',
+        'path',
+        'liquidClass',
+      ].some(field => changedFields.includes(field))
+    case 'mix':
+      return [
+        'labware',
+        'wells',
+        'pipette',
+        'tipRack',
+        'path',
+        'liquidClass',
+      ].some(field => changedFields.includes(field))
+    default:
+      return false
+  }
 }

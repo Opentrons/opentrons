@@ -1,24 +1,25 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import last from 'lodash/last'
+
 import {
-  LOW_VOLUME_PIPETTES,
-  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   ALL,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
+
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { dropTipInTrash } from './dropTipInTrash'
 import {
-  curryCommandCreator,
-  reduceCommandCreators,
+  airGapLocationHelper,
   blowoutLocationHelper,
+  curryCommandCreator,
+  delayLocationHelper,
   getDispenseAirGapLocation,
   getIsSafePipetteMovement,
-  getHasWasteChute,
-  airGapLocationHelper,
-  delayLocationHelper,
+  getSlotInLocationStack,
+  reduceCommandCreators,
 } from '../../utils'
 import {
   aspirate,
@@ -28,17 +29,20 @@ import {
   dropTip,
   touchTip,
 } from '../atomic'
+import { airGapInWell } from './airGapInWell'
+import { dropTipInTrash } from './dropTipInTrash'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
-import { dropTipInWasteChute } from './dropTipInWasteChute'
+
 import type { CutoutId } from '@opentrons/shared-data'
 import type {
-  DistributeArgs,
   CommandCreator,
-  CurriedCommandCreator,
   CommandCreatorError,
+  CurriedCommandCreator,
+  DistributeArgs,
 } from '../../types'
-import { airGapInWell } from './airGapInWell'
+
 export const distribute: CommandCreator<DistributeArgs> = (
   args,
   invariantContext,
@@ -74,6 +78,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     dispenseXOffset,
     dispenseYOffset,
     nozzles,
+    pushOut,
   } = args
 
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
@@ -103,12 +108,14 @@ export const distribute: CommandCreator<DistributeArgs> = (
     )
   }
 
-  const initialDestLabwareSlot = prevRobotState.labware[args.destLabware]?.slot
-  const initialSourceLabwareSlot =
-    prevRobotState.labware[args.sourceLabware]?.slot
-  const hasWasteChute = getHasWasteChute(
-    invariantContext.additionalEquipmentEntities
+  const initialDestLabwareSlot = getSlotInLocationStack(
+    prevRobotState.labware[args.destLabware]?.stack
   )
+  const initialSourceLabwareSlot = getSlotInLocationStack(
+    prevRobotState.labware[args.sourceLabware]?.stack
+  )
+  const hasWasteChute =
+    Object.keys(invariantContext.wasteChuteEntities).length > 0
 
   if (
     hasWasteChute &&
@@ -118,10 +125,12 @@ export const distribute: CommandCreator<DistributeArgs> = (
     errors.push(errorCreators.labwareDiscarded())
   }
 
-  if (
-    !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  ) {
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
+
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
@@ -166,11 +175,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
     (maxVolume - disposalVolume) / args.volume
   )
   const { pipette } = args
-
-  const dropTipEntity =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  const isWasteChute = dropTipEntity?.name === 'wasteChute'
-  const isTrashBin = dropTipEntity?.name === 'trashBin'
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol
@@ -343,7 +347,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
         dropTipCommand = [
           curryCommandCreator(dropTipInWasteChute, {
             pipetteId: args.pipette,
-            wasteChuteId: dropTipEntity.id,
+            wasteChuteId:
+              invariantContext.wasteChuteEntities[args.dropTipLocation].id,
           }),
         ]
       }
@@ -351,7 +356,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
         dropTipCommand = [
           curryCommandCreator(dropTipInTrash, {
             pipetteId: args.pipette,
-            trashLocation: dropTipEntity.location as CutoutId,
+            trashLocation: invariantContext.trashBinEntities[
+              args.dropTipLocation
+            ].location as CutoutId,
           }),
         ]
       }
@@ -413,6 +420,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               yOffset: aspirateYOffset,
               nozzles,
               invariantContext,
+              finalPushOut: pushOut,
             })
           : []
 
@@ -452,6 +460,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               yOffset: aspirateYOffset,
               nozzles,
               invariantContext,
+              finalPushOut: pushOut,
             })
           : []
       return [

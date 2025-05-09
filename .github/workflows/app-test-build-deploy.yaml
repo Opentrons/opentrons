@@ -6,14 +6,14 @@ on:
   push:
     paths:
       - 'Makefile'
-      - 'app/**/*'
-      - 'app-shell/**/*'
-      - 'app-shell-odd/**/*'
-      - 'components/**/*'
-      - 'shared-data/**/*'
-      - 'discovery-client/**/*'
+      - 'app/**'
+      - 'app-shell/**'
+      - 'app-shell-odd/**'
+      - 'components/**'
+      - 'shared-data/**'
+      - 'discovery-client/**'
       - '*.js'
-      - 'scripts/**/*'
+      - 'scripts/**'
       - '*.json'
       - 'yarn.lock'
       - '.github/workflows/app-test-build-deploy.yaml'
@@ -26,16 +26,16 @@ on:
   pull_request:
     paths:
       - 'Makefile'
-      - 'app/**/*'
-      - 'app-shell/**/*'
-      - 'app-shell-odd/**/*'
-      - 'components/**/*'
-      - 'shared-data/**/*'
-      - 'discovery-client/**/*'
+      - 'app/**'
+      - 'app-shell/**'
+      - 'app-shell-odd/**'
+      - 'components/**'
+      - 'shared-data/**'
+      - 'discovery-client/**'
       - '*.js'
       - '*.json'
       - 'yarn.lock'
-      - 'scripts/**/*'
+      - 'scripts/**'
   workflow_dispatch:
 
 concurrency:

@@ -8,8 +8,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

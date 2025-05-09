@@ -1,10 +1,15 @@
+import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useDeleteRunMutation,
   useDismissCurrentRunMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
-import { fireEvent, screen } from '@testing-library/react'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
@@ -12,13 +17,12 @@ import { useTrackEvent } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { useNotifyRunQuery } from '/app/resources/runs'
-import type { ComponentProps } from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import type { NavigateFunction } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
+
 import { CancelingRunModal } from '../CancelingRunModal'
 import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
+
+import type { ComponentProps } from 'react'
+import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')

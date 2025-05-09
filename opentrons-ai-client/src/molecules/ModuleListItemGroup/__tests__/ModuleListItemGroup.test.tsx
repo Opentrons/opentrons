@@ -1,12 +1,14 @@
+import { FormProvider, useForm } from 'react-hook-form'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ModuleListItemGroup } from '../index'
-import { describe, it, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
-import { FormProvider, useForm } from 'react-hook-form'
-import type { DisplayModules } from '../../../organisms/ModulesSection'
 
-const modulesMock: DisplayModules[] = [
+import type { DisplayModule } from '../../../organisms/ModulesAndFixturesSection'
+
+const modulesMock: DisplayModule[] = [
   {
     type: 'heaterShakerModuleType',
     model: 'heaterShakerModuleV1',

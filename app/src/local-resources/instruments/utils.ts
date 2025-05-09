@@ -1,15 +1,15 @@
 import { getProtocolUsesGripper } from '/app/transformations/commands'
 
 import type {
-  CompletedProtocolAnalysis,
-  LoadedPipette,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
-import type {
   GripperData,
   Instruments,
   PipetteData,
 } from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  LoadedPipette,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 
 export interface IsPartialTipConfigParams {
   channel: 1 | 8 | 96

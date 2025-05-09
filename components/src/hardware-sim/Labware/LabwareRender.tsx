@@ -1,24 +1,23 @@
-import {
-  WellLabels,
-  StyledWells,
-  FilledWells,
-  StrokedWells,
-  StaticLabware,
-} from './labwareInternals'
 import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
+import {
+  FilledWells,
+  StaticLabware,
+  StrokedWells,
+  StyledWells,
+  WellLabels,
+} from './labwareInternals'
 
 import type { CSSProperties } from 'styled-components'
+import type { RefObject } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {
   HighlightedWellLabels,
-  WellMouseEvent,
   WellFill,
-  WellStroke,
   WellGroup,
+  WellMouseEvent,
+  WellStroke,
 } from './labwareInternals/types'
-
-import type { RefObject } from 'react'
-import type { LabwareAdapterLoadName } from './LabwareAdapter'
 
 export const WELL_LABEL_OPTIONS = {
   SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',

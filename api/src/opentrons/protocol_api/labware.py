@@ -25,6 +25,7 @@ from typing import (
     Mapping,
     Union,
     Literal,
+    Callable,
 )
 
 from opentrons_shared_data.labware.types import (
@@ -346,6 +347,16 @@ class Well:
         """Get the current liquid volume in a well."""
         return self._core.get_liquid_volume()
 
+    @requires_version(2, 24)
+    def volume_from_height(self, height: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the volume contained in a well at any height."""
+        return self._core.volume_from_height(height)
+
+    @requires_version(2, 24)
+    def height_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the height in a well corresponding to a given volume."""
+        return self._core.height_from_volume(volume)
+
     @requires_version(2, 21)
     def estimate_liquid_height_after_pipetting(
         self,
@@ -461,6 +472,23 @@ class Labware:
             " It no longer has meaning, but will always return `False`"
         )
         return False
+
+    @classmethod
+    def _builder_for_core_map(
+        cls,
+        api_version: APIVersion,
+        protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
+    ) -> Callable[[AbstractLabware[Any]], Labware]:
+        def _do_build(core: AbstractLabware[Any]) -> Labware:
+            return Labware(
+                core=core,
+                api_version=api_version,
+                protocol_core=protocol_core,
+                core_map=core_map,
+            )
+
+        return _do_build
 
     @property
     @requires_version(2, 0)

@@ -1,34 +1,35 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+
+import { getMockMixStep, getMockMoveLiquidStep } from '../__fixtures__'
 import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
   START_TERMINAL_ITEM_ID,
 } from '../../../steplist/types'
+import * as utils from '../../modules/utils'
 import {
-  SINGLE_STEP_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
+  SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
 } from '../reducers'
 import {
-  getHoveredStepLabware,
-  getSelectedStepTitleInfo,
-  getActiveItem,
-  getMultiSelectLastSelected,
   _getSavedMultiSelectFieldValues,
-  getMultiSelectFieldValues,
-  getMultiSelectDisabledFields,
-  getCountPerStepType,
+  getActiveItem,
   getBatchEditSelectedStepTypes,
+  getCountPerStepType,
+  getHoveredStepLabware,
+  getMultiSelectDisabledFields,
+  getMultiSelectFieldValues,
+  getMultiSelectLastSelected,
+  getSelectedStepTitleInfo,
 } from '../selectors'
-import { getMockMoveLiquidStep, getMockMixStep } from '../__fixtures__'
-
-import * as utils from '../../modules/utils'
 
 import type { MoveLabwareArgs } from '@opentrons/step-generation'
 import type { FormData } from '../../../form-types'
-import type { StepArgsAndErrorsById } from '../../../steplist/types'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
+import type { StepArgsAndErrorsById } from '../../../steplist/types'
 
 vi.mock('../../modules/utils')
 
@@ -485,6 +486,14 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        conditioning_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        conditioning_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         aspirate_mix_checkbox: {
           value: true,
           isIndeterminate: false,
@@ -881,6 +890,14 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        conditioning_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        conditioning_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         aspirate_mix_checkbox: {
           isIndeterminate: true,
         },
@@ -1225,6 +1242,22 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
         },
         liquidClassesSupported: { isIndeterminate: false },
+        liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        mix_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })
@@ -1317,6 +1350,22 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
         },
         liquidClassesSupported: { isIndeterminate: false },
+        liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        mix_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })

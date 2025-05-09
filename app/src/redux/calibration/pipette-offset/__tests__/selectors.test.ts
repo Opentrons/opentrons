@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import * as Selectors from '../selectors'
 import * as Fixtures from '../__fixtures__'
+import * as Selectors from '../selectors'
 
 import type { State } from '../../../types'
 

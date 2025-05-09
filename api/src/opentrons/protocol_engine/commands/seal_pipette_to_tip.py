@@ -273,7 +273,7 @@ class SealPipetteToTipImplementation(
 
         # Begin relative pickup steps for the resin tips
 
-        channels = self._state_view.tips.get_pipette_active_channels(pipette_id)
+        channels = self._state_view.pipettes.get_active_channels(pipette_id)
         mount = self._state_view.pipettes.get_mount(pipette_id)
         tip_pick_up_params = params.tipPickUpParams
 

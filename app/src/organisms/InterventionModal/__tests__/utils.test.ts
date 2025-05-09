@@ -1,5 +1,6 @@
 import deepClone from 'lodash/cloneDeep'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   getSlotHasMatingSurfaceUnitVector,
   ot2DeckDefV5,
@@ -14,12 +15,13 @@ import {
   mockThermocyclerModule,
 } from '../__fixtures__'
 import {
-  getRunLabwareRenderInfo,
-  getRunModuleRenderInfo,
   getLabwareNameFromRunData,
   getModuleDisplayLocationFromRunData,
   getModuleModelFromRunData,
+  getRunLabwareRenderInfo,
+  getRunModuleRenderInfo,
 } from '../utils'
+
 import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {

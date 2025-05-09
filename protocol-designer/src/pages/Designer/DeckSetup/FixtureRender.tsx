@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { useSelector } from 'react-redux'
+
 import {
   COLORS,
   FixedTrash,
@@ -11,19 +12,24 @@ import {
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
 import {
-  OT2_ROBOT_TYPE,
   getModuleDef2,
   getPositionFromSlotId,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { getLabwareSlot } from '@opentrons/step-generation'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import {
+  getLabwareSlot,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
+
 import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
-import { lightFill, darkFill } from './DeckSetupContainer'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import { darkFill, lightFill } from './DeckSetupContainer'
 import { getAdjacentSlots } from './utils'
+
 import type {
-  TrashCutoutId,
-  StagingAreaLocation,
   DeckLabelProps,
+  StagingAreaLocation,
+  TrashCutoutId,
 } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -55,15 +61,17 @@ export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
 
   // labware in column 3 or 4, possibly on a magnetic block in column 3
   const adjacentLabwares = Object.values(labware).filter(
-    ({ slot }) =>
-      adjacentSlots?.includes(slot as AddressableAreaName) ||
-      slot === adjacentModule?.id
+    ({ stack }) =>
+      adjacentSlots?.includes(
+        getSlotInLocationStack(stack) as AddressableAreaName
+      ) ||
+      (adjacentModule != null && stack.includes(adjacentModule?.id))
   )
   const renderLabwareOnDeck = (): JSX.Element | null => {
     return (
       <>
         {adjacentLabwares.map(adjacentLabware => {
-          const slot = getLabwareSlot(adjacentLabware.id, labware, modules)
+          const slot = getLabwareSlot(adjacentLabware.id, labware)
           const slotPosition = getPositionFromSlotId(slot, deckDef)
           return (
             <LabwareOnDeckComponent

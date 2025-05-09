@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -12,6 +13,7 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
+import { getLabwareDefIsStandard } from '@opentrons/shared-data'
 
 import { useRequiredProtocolLabware } from '/app/resources/protocols'
 
@@ -89,7 +91,7 @@ export const Labware = (props: { transferId: string }): JSX.Element => {
                   flexDirection={DIRECTION_ROW}
                   paddingLeft={SPACING.spacing24}
                 >
-                  {labware.labwareDef.namespace === 'opentrons' ? (
+                  {getLabwareDefIsStandard(labware.labwareDef) ? (
                     <Icon
                       color={COLORS.blue50}
                       name="check-decagram"

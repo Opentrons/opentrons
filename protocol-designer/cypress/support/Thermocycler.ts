@@ -81,7 +81,7 @@ export const ThermocyclerEditor = {
    */
   BackButton: (): StepThunk => ({
     call: () => {
-      cy.get(ThermoLocators.Back).should('be.visible').click()
+      cy.get(ThermoLocators.Back).eq(1).should('be.visible').click()
     },
   }),
 

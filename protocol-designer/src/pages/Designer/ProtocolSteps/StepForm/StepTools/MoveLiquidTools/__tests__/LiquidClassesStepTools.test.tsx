@@ -1,7 +1,8 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../../../../assets/localization'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { i18n } from '../../../../../../../assets/localization'
 import { getLiquidEntities } from '../../../../../../../step-forms/selectors'
 import { LiquidClassesStepTools } from '../LiquidClassesStepTools'
 
@@ -31,39 +32,18 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
           value: null,
         },
       },
+      formData: { liquidClass: 'none' } as any,
+      orderedLiquidClassOptions: [
+        { name: 'mockname', value: 'waterV1', subButtonLabel: '' },
+      ],
+      type: 'transfer',
     }
     vi.mocked(getLiquidEntities).mockReturnValue({})
   })
 
-  it('renders fields and buttons', () => {
+  it('renders subtext for mix when mix is true', () => {
+    props.type = 'mix'
     render(props)
-    screen.getByText('Apply liquid class settings for this transfer')
-    screen.getByText("Don't use a liquid class")
-    screen.getByText('Aqueous')
-    screen.getByText('Deionized water')
-    screen.getByText('Viscous')
-    screen.getByText('50% glycerol')
-    screen.getByText('Volatile')
-    screen.getByText('80% ethanol')
-
-    fireEvent.click(
-      screen.getByRole('label', { name: 'Aqueous Deionized water' })
-    )
-    expect(props.propsForFields.liquidClass.updateValue).toHaveBeenCalled()
-  })
-
-  it('renders associated liquid in the subtext', () => {
-    vi.mocked(getLiquidEntities).mockReturnValue({
-      '0': {
-        displayColor: 'mockColor',
-        displayName: 'mockname',
-        liquidClass: 'waterV1',
-        description: null,
-        pythonName: 'liquid_1',
-        liquidGroupId: '0',
-      },
-    })
-    render(props)
-    screen.getByText('Assigned to mockname')
+    screen.getByText('Apply liquid class settings for this mix')
   })
 })

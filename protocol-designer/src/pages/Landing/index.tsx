@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { NavLink, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -16,24 +17,26 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import { getHasOptedIn } from '../../analytics/selectors'
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 import { EndUserAgreementFooter } from '../../components/molecules'
 import { AnnouncementModal } from '../../components/organisms'
-import { actions as loadFileActions } from '../../load-file'
-import { getFileMetadata } from '../../file-data/selectors'
-import { toggleNewProtocolModal } from '../../navigation/actions'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
-import { getHasOptedIn } from '../../analytics/selectors'
 import { useAnnouncements } from '../../components/organisms/AnnouncementModal/announcements'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import { getFileMetadata } from '../../file-data/selectors'
+import { actions as loadFileActions } from '../../load-file'
+import { toggleNewProtocolModal } from '../../navigation/actions'
 import {
   getLocalStorageItem,
   localStorageAnnouncementKey,
   setLocalStorageItem,
 } from '../../persist'
-import welcomeImage from '../../assets/images/welcome_page.png'
 
 import type { ChangeEvent, ComponentProps } from 'react'
 import type { ThunkDispatch } from '../../types'
+
+import welcomeImage from '../../assets/images/welcome_page.png'
 
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')

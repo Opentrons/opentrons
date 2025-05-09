@@ -1,24 +1,24 @@
-import { ipcMain } from 'electron'
 import axios from 'axios'
+import { ipcMain } from 'electron'
 import FormData from 'form-data'
 
 import {
-  fetchSerialPortList,
-  SerialPortHttpAgent,
   DEFAULT_PRODUCT_ID,
   DEFAULT_VENDOR_ID,
+  fetchSerialPortList,
+  SerialPortHttpAgent,
 } from '@opentrons/usb-bridge/node-client'
 
-import { createLogger } from './log'
 import { usbRequestsStart, usbRequestsStop } from './config/actions'
 import {
   SYSTEM_INFO_INITIALIZED,
   USB_DEVICE_ADDED,
   USB_DEVICE_REMOVED,
 } from './constants'
+import { createLogger } from './log'
 
-import type { IpcMainInvokeEvent } from 'electron'
 import type { AxiosRequestConfig } from 'axios'
+import type { IpcMainInvokeEvent } from 'electron'
 import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'

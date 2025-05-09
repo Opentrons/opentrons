@@ -1,11 +1,13 @@
-import {
-  Flex,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  COLORS,
-} from '@opentrons/components'
-import { Header } from '../Header'
 import styled from 'styled-components'
+
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+} from '@opentrons/components'
+
+import { Header } from '../Header'
 
 const SquareProgressBar = styled.progress`
   width: 100%;

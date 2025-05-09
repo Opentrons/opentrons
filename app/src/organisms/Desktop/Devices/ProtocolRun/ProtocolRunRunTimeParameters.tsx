@@ -7,10 +7,6 @@ import {
   RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 import {
-  formatRunTimeParameterValue,
-  sortRuntimeParameters,
-} from '@opentrons/shared-data'
-import {
   ALIGN_CENTER,
   Banner,
   BORDERS,
@@ -30,6 +26,10 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
+import {
+  formatRunTimeParameterValue,
+  sortRuntimeParameters,
+} from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
 import {
@@ -38,8 +38,8 @@ import {
   useRunStatus,
 } from '/app/resources/runs'
 
-import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 interface ProtocolRunRuntimeParametersProps {
   runId: string

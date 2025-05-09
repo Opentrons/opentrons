@@ -1,9 +1,9 @@
 import net from 'net'
-import fetch from 'node-fetch'
 import intersectionBy from 'lodash/intersectionBy'
 import isEqual from 'lodash/isEqual'
 import unionBy from 'lodash/unionBy'
 import xorWith from 'lodash/xorWith'
+import fetch from 'node-fetch'
 
 import {
   ROBOT_SERVER_HEALTH_PATH,
@@ -14,13 +14,13 @@ import type { Agent } from 'http'
 import type { RequestInit } from 'node-fetch'
 import type {
   HealthPoller,
-  HealthPollerTarget,
   HealthPollerConfig,
   HealthPollerOptions,
   HealthPollerResult,
+  HealthPollerTarget,
   HealthResponse,
-  ServerHealthResponse,
   LogLevel,
+  ServerHealthResponse,
 } from './types'
 
 const DEFAULT_REQUEST_OPTS: RequestInit = {

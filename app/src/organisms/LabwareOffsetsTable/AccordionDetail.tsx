@@ -2,16 +2,16 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Flex,
-  RESPONSIVENESS,
-  COLORS,
   BORDERS,
+  COLORS,
+  Flex,
   NO_WRAP,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck'
 import { DeckInfoLabelTextTag } from '/app/molecules/DeckInfoLabelTextTag'
 import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckInfoLabels'
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck'

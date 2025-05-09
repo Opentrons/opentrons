@@ -1,19 +1,19 @@
-import { describe, it, expect, vi } from 'vitest'
-import { screen, renderHook } from '@testing-library/react'
+import { renderHook } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
+import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
+
+import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
 import {
-  getRelevantWellName,
+  getFailedLabwareQuantity,
+  getLabwareDisplayNamesFromFailedCmd,
   getRelevantFailedLabwareCmdFrom,
-  useRelevantFailedLwLocations,
+  getRelevantWellName,
   useFailedLabwareUtils,
-  getFailedCmdRelevantLabware,
+  useRelevantFailedLwLocations,
 } from '../useFailedLabwareUtils'
-import { DEFINED_ERROR_TYPES } from '../../constants'
 
-import type { ComponentProps } from 'react'
-import type { GetRelevantLwLocationsParams } from '../useFailedLabwareUtils'
+import type { RunCommandSummary } from '@opentrons/api-client'
 
 vi.mock('@opentrons/shared-data', async () => {
   const actual = await vi.importActual('@opentrons/shared-data')
@@ -41,7 +41,32 @@ vi.mock('@opentrons/components', async () => {
     getLoadedLabware: vi.fn(() => ({ displayName: 'Mock Nickname' })),
   }
 })
+vi.mock('@opentrons/shared-data', async () => {
+  const actual = await vi.importActual('@opentrons/shared-data')
+  return {
+    ...actual,
+    getLabwareDisplayName: vi.fn(() => 'Mock Labware Name'),
+    getAllLabwareDefs: vi.fn(() => ({
+      'opentrons/thermoscientificnunc_96_wellplate_1300ul/1': {
+        some: 'definition',
+      },
+    })),
+    getLoadedLabwareDefinitionsByUri: vi.fn(() => ({
+      'some/uri': { some: 'definition' },
+    })),
+  }
+})
 
+vi.mock('@opentrons/components', async () => {
+  const actual = await vi.importActual('@opentrons/components')
+  return {
+    ...actual,
+    getLabwareDisplayLocation: vi.fn(params =>
+      params.location ? `Slot ${params.location.slotName}` : ''
+    ),
+    getLoadedLabware: vi.fn(() => ({ displayName: 'Mock Nickname' })),
+  }
+})
 describe('getRelevantWellName', () => {
   const failedPipetteInfo = {
     data: {
@@ -159,6 +184,48 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
     })
   })
 
+  it('should return the relevant retrieve command for stacker error kinds', () => {
+    const retrieveCommand = {
+      commandType: 'flexStacker/retrieve',
+      params: {
+        moduleId: 'module-id',
+      },
+    } as any
+
+    const retrieveErrorKinds = [
+      ['flexStacker/retrieve', DEFINED_ERROR_TYPES.HOPPER_LABWARE_MISSING],
+      ['flexStacker/retrieve', DEFINED_ERROR_TYPES.SHUTTLE_MISSING],
+      ['flexStacker/retrieve', DEFINED_ERROR_TYPES.STACKER_STALL],
+    ]
+
+    retrieveErrorKinds.forEach(([commandType, errorType]) => {
+      const failedRetrieveCommand = {
+        commandType: 'flexStacker/retrieve',
+        params: {
+          moduleId: 'module-id',
+        },
+        error: {
+          isDefined: true,
+          errorType,
+        },
+      }
+      const runCommands = {
+        data: [retrieveCommand, failedRetrieveCommand],
+      } as any
+      const result = getRelevantFailedLabwareCmdFrom({
+        failedCommand: {
+          byRunRecord: {
+            ...failedRetrieveCommand,
+            commandType,
+            error: { isDefined: true, errorType },
+          },
+        } as any,
+        runCommands,
+      })
+      expect(result).toStrictEqual(failedRetrieveCommand)
+    })
+  })
+
   it('should return the failedCommand for GRIPPER_ERROR error kind', () => {
     const failedGripperCommand = {
       ...failedCommand,
@@ -201,24 +268,271 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
   })
 })
 
-const TestWrapper = (props: GetRelevantLwLocationsParams) => {
-  const displayLocation = useRelevantFailedLwLocations(props)
-  return (
-    <>
-      <div>{`Current Loc: ${displayLocation.displayNameCurrentLoc}`}</div>
-      <div>{`New Loc: ${displayLocation.displayNameNewLoc}`}</div>
-    </>
-  )
-}
+describe('getFailedLabwareQuantity', () => {
+  const failedCommand = {
+    id: 'failed-command-id',
+    error: {
+      errorType: DEFINED_ERROR_TYPES.STACKER_STALL,
+    },
+    params: {
+      moduleId: 'module-id',
+    },
+  } as any
 
-const render = (props: ComponentProps<typeof TestWrapper>) => {
-  return renderWithProviders(<TestWrapper {...props} />, {
-    i18nInstance: i18n,
-  })[0]
-}
+  const failedRetriveCommand = {
+    ...failedCommand,
+    commandType: 'flexStacker/retrieve',
+    error: {
+      isDefined: true,
+      errorType: DEFINED_ERROR_TYPES.STACKER_STALL,
+    },
+  }
+
+  const runCommands = {
+    data: [
+      {
+        id: 'set-stored-labware-1',
+        commandType: 'flexStacker/setStoredLabware',
+        params: {
+          initialCount: 2,
+        },
+      } as any,
+      {
+        id: 'retrive-id-1',
+        commandType: 'flexStacker/retrieve',
+        params: {
+          moduleId: 'module-id',
+        },
+      } as any,
+      {
+        id: 'retrive-id-2',
+        commandType: 'flexStacker/retrieve',
+        params: {
+          moduleId: 'module-id',
+        },
+      } as any,
+      {
+        id: 'set-stored-labware',
+        commandType: 'flexStacker/setStoredLabware',
+        params: {
+          initialCount: 5,
+        },
+      } as any,
+      {
+        id: 'retrive-id',
+        commandType: 'flexStacker/retrieve',
+        params: {
+          moduleId: 'module-id',
+        },
+      } as any,
+      { ...failedRetriveCommand },
+    ] as RunCommandSummary[],
+    meta: {
+      totalLength: 10,
+      pageLength: 1,
+    },
+    links: {},
+  }
+
+  it('should return the quantity for stacker error kinds', () => {
+    const errors = [
+      ERROR_KINDS.SHUTTLE_MISSING,
+      ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
+      ERROR_KINDS.STALL_WHILE_STACKING,
+    ]
+    errors.forEach(errorType => {
+      const failedLocalRetriveCommand = {
+        ...failedCommand,
+        commandType: 'flexStacker/retrieve',
+        error: {
+          isDefined: true,
+          errorType,
+        },
+      }
+      const localRunCommands = {
+        data: [
+          {
+            id: 'set-stored-labware-1',
+            commandType: 'flexStacker/setStoredLabware',
+            params: {
+              initialCount: 2,
+            },
+          } as any,
+          {
+            id: 'retrive-id-1',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          {
+            id: 'retrive-id-2',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          {
+            id: 'set-stored-labware',
+            commandType: 'flexStacker/setStoredLabware',
+            params: {
+              initialCount: 5,
+            },
+          } as any,
+          {
+            id: 'retrive-id',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          { ...failedLocalRetriveCommand },
+        ] as RunCommandSummary[],
+        meta: {
+          totalLength: 10,
+          pageLength: 1,
+        },
+        links: {},
+      }
+      const result = getFailedLabwareQuantity(
+        localRunCommands,
+        failedLocalRetriveCommand,
+        errorType
+      )
+      expect(result).toEqual(4)
+    })
+  })
+
+  it('should return the quantity for stacker error kinds based on result property', () => {
+    const errors = [
+      ERROR_KINDS.SHUTTLE_MISSING,
+      ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
+      ERROR_KINDS.STALL_WHILE_STACKING,
+    ]
+    errors.forEach(errorType => {
+      const failedLocalRetriveCommand = {
+        ...failedCommand,
+        commandType: 'flexStacker/retrieve',
+        error: {
+          isDefined: true,
+          errorType,
+        },
+      }
+      const localRunCommands = {
+        data: [
+          {
+            id: 'set-stored-labware-1',
+            commandType: 'flexStacker/setStoredLabware',
+            params: {
+              initialCount: 2,
+            },
+          } as any,
+          {
+            id: 'retrive-id-1',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          {
+            id: 'retrive-id-2',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          {
+            id: 'set-stored-labware',
+            commandType: 'flexStacker/setStoredLabware',
+            params: {
+              initialCount: 5,
+            },
+          } as any,
+          {
+            id: 'retrive-id',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+            result: {
+              primaryLocationSequence: [1, 2, 3, 4],
+            },
+          } as any,
+          { ...failedLocalRetriveCommand },
+        ] as RunCommandSummary[],
+        meta: {
+          totalLength: 10,
+          pageLength: 1,
+        },
+        links: {},
+      }
+      const result = getFailedLabwareQuantity(
+        localRunCommands,
+        failedLocalRetriveCommand,
+        errorType
+      )
+      expect(result).toEqual(4)
+    })
+  })
+
+  it('should return 0 if there is no commands in list', () => {
+    const emptyRunCommands = {
+      data: [{ ...failedRetriveCommand }] as RunCommandSummary[],
+      meta: {
+        totalLength: 10,
+        pageLength: 1,
+      },
+      links: {},
+    }
+    const result = getFailedLabwareQuantity(
+      emptyRunCommands,
+      failedRetriveCommand,
+      ERROR_KINDS.STALL_WHILE_STACKING
+    )
+    expect(result).toEqual(0)
+  })
+
+  it('should return null if there is no runCommands', () => {
+    const result = getFailedLabwareQuantity(
+      undefined,
+      failedRetriveCommand,
+      ERROR_KINDS.STALL_WHILE_STACKING
+    )
+    expect(result).toBeNull()
+  })
+
+  it('should return null for unhandled error kinds', () => {
+    const failedMoveLabwareCommand = {
+      ...failedCommand,
+      commandType: 'flexStacker/moveLabware',
+      error: {
+        isDefined: true,
+        errorType: DEFINED_ERROR_TYPES.GRIPPER_MOVEMENT,
+      },
+    }
+
+    const result = getFailedLabwareQuantity(
+      runCommands,
+      failedMoveLabwareCommand,
+      ERROR_KINDS.GRIPPER_ERROR
+    )
+    expect(result).toBeNull()
+  })
+})
 
 describe('useRelevantFailedLwLocations', () => {
-  const mockRunRecord = { data: { modules: [], labware: [] } } as any
+  const mockRunRecord = {
+    data: {
+      modules: [
+        {
+          id: 'module-id',
+          model: FLEX_STACKER_MODULE_V1,
+          location: { slotName: 'D1' },
+        },
+      ],
+      labware: [],
+    },
+  } as any
   const mockFailedLabware = {
     location: { slotName: 'D1' },
   } as any
@@ -228,25 +542,39 @@ describe('useRelevantFailedLwLocations', () => {
       commandType: 'aspirate',
     } as any
 
-    render({
-      failedLabware: mockFailedLabware,
-      failedCommandByRunRecord: mockFailedCommand,
-      runRecord: mockRunRecord,
-    })
+    const { result } = renderHook(() =>
+      useRelevantFailedLwLocations({
+        failedLabware: mockFailedLabware,
+        failedCommandByRunRecord: mockFailedCommand,
+        runRecord: mockRunRecord,
+        errorKind: ERROR_KINDS.GENERAL_ERROR,
+      })
+    )
 
-    screen.getByText('Current Loc: Slot D1')
-    screen.getByText('New Loc: null')
+    expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
+    expect(result.current.newLoc).toBeNull()
+  })
+
+  it('should return current location for flex stacker commands', () => {
+    const mockFailedCommand = {
+      commandType: 'flexStacker/retrieve',
+      location: { slotName: 'D3' },
+      params: {
+        moduleId: 'module-id',
+      },
+    } as any
 
     const { result } = renderHook(() =>
       useRelevantFailedLwLocations({
         failedLabware: mockFailedLabware,
         failedCommandByRunRecord: mockFailedCommand,
         runRecord: mockRunRecord,
+        errorKind: ERROR_KINDS.STALL_WHILE_STACKING,
       })
     )
 
     expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
-    expect(result.current.newLoc).toBeNull()
+    expect(result.current.newLoc).toStrictEqual({ moduleId: 'module-id' })
   })
 
   it('should return current and new locations for moveLabware commands', () => {
@@ -257,20 +585,12 @@ describe('useRelevantFailedLwLocations', () => {
       },
     } as any
 
-    render({
-      failedLabware: mockFailedLabware,
-      failedCommandByRunRecord: mockFailedCommand,
-      runRecord: mockRunRecord,
-    })
-
-    screen.getByText('Current Loc: Slot D1')
-    screen.getByText('New Loc: Slot C2')
-
     const { result } = renderHook(() =>
       useRelevantFailedLwLocations({
         failedLabware: mockFailedLabware,
         failedCommandByRunRecord: mockFailedCommand,
         runRecord: mockRunRecord,
+        errorKind: ERROR_KINDS.GENERAL_ERROR,
       })
     )
 
@@ -303,7 +623,7 @@ describe('getFailedCmdRelevantLabware', () => {
       },
     } as any
 
-    const result = getFailedCmdRelevantLabware(
+    const result = getLabwareDisplayNamesFromFailedCmd(
       mockProtocolAnalysis,
       mockCommand,
       mockRunRecord
@@ -322,7 +642,7 @@ describe('getFailedCmdRelevantLabware', () => {
       },
     } as any
 
-    const result = getFailedCmdRelevantLabware(
+    const result = getLabwareDisplayNamesFromFailedCmd(
       mockProtocolAnalysis,
       mockCommand,
       mockRunRecord
@@ -332,7 +652,7 @@ describe('getFailedCmdRelevantLabware', () => {
   })
 
   it('should return null when command is null', () => {
-    const result = getFailedCmdRelevantLabware(
+    const result = getLabwareDisplayNamesFromFailedCmd(
       mockProtocolAnalysis,
       null,
       mockRunRecord

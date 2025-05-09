@@ -1,15 +1,22 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
 import {
-  getInitialRobotStateStandard,
-  makeContext,
+  fixtureTiprack300ul,
+  getLabwareDefURI,
+  POSITION_REFERENCE_BOTTOM,
+} from '@opentrons/shared-data'
+import {
   DEFAULT_PIPETTE,
-  MULTI_PIPETTE,
-  SOURCE_LABWARE,
   DEST_LABWARE,
   FIXED_TRASH_ID,
+  getInitialRobotStateStandard,
+  makeContext,
+  MULTI_PIPETTE,
+  SOURCE_LABWARE,
 } from '@opentrons/step-generation'
-import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
+
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StepArgsAndErrorsById } from '../../steplist'
 
@@ -25,6 +32,32 @@ describe('generateRobotStateTimeline', () => {
           pipette: DEFAULT_PIPETTE,
           volume: 5,
           sourceLabware: SOURCE_LABWARE,
+          touchTipAfterAspirateMmFromEdge: null,
+          liquidClass: null,
+          aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateZOffset: 0,
+          aspirateSubmergeSpeed: null,
+          aspirateSubmergeXOffset: 0,
+          aspirateSubmergeYOffset: 0,
+          aspirateSubmergeZOffset: 0,
+          aspirateSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateSubmergeDelay: null,
+          aspirateRetractSpeed: null,
+          aspirateRetractXOffset: 0,
+          aspirateRetractYOffset: 0,
+          aspirateRetractZOffset: 0,
+          aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateRetractDelay: null,
+          dispenseSubmergeSpeed: null,
+          dispenseSubmergeXOffset: 0,
+          dispenseSubmergeYOffset: 0,
+          dispenseSubmergeZOffset: 0,
+          dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+          dispenseRetractSpeed: null,
+          dispenseRetractXOffset: 0,
+          dispenseRetractYOffset: 0,
+          dispenseRetractZOffset: 0,
+          dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
           destLabware: DEST_LABWARE,
           aspirateFlowRateUlSec: 3.78,
           dispenseFlowRateUlSec: 3.78,
@@ -58,6 +91,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateYOffset: 0,
           dispenseXOffset: 0,
           dispenseYOffset: 0,
+          pushOut: null,
         },
       },
       b: {
@@ -100,6 +134,33 @@ describe('generateRobotStateTimeline', () => {
           aspirateYOffset: 0,
           dispenseXOffset: 0,
           dispenseYOffset: 0,
+          pushOut: null,
+          touchTipAfterAspirateMmFromEdge: null,
+          liquidClass: null,
+          aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateZOffset: 0,
+          aspirateSubmergeSpeed: null,
+          aspirateSubmergeXOffset: 0,
+          aspirateSubmergeYOffset: 0,
+          aspirateSubmergeZOffset: 0,
+          aspirateSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateSubmergeDelay: null,
+          aspirateRetractSpeed: null,
+          aspirateRetractXOffset: 0,
+          aspirateRetractYOffset: 0,
+          aspirateRetractZOffset: 0,
+          aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+          aspirateRetractDelay: null,
+          dispenseSubmergeSpeed: null,
+          dispenseSubmergeXOffset: 0,
+          dispenseSubmergeYOffset: 0,
+          dispenseSubmergeZOffset: 0,
+          dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+          dispenseRetractSpeed: null,
+          dispenseRetractXOffset: 0,
+          dispenseRetractYOffset: 0,
+          dispenseRetractZOffset: 0,
+          dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
         },
       },
       c: {
@@ -129,6 +190,9 @@ describe('generateRobotStateTimeline', () => {
           tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
           xOffset: 0,
           yOffset: 0,
+          finalPushOut: 0,
+          zOffset: 0,
+          positionReference: POSITION_REFERENCE_BOTTOM,
         },
       },
     }
@@ -151,16 +215,33 @@ describe('generateRobotStateTimeline', () => {
       [
         [
           "pickUpTip",
-          "aspirate",
+          "moveToWell",
+          "liquidProbe",
+          "prepareToAspirate",
+          "moveToWell",
+          "moveToWell",
+          "aspirateInPlace",
+          "moveToWell",
           "dispense",
-          "aspirate",
+          "moveToWell",
+          "prepareToAspirate",
+          "moveToWell",
+          "moveToWell",
+          "aspirateInPlace",
+          "moveToWell",
           "dispense",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
         ],
         [
           "pickUpTip",
-          "aspirate",
+          "moveToWell",
+          "liquidProbe",
+          "prepareToAspirate",
+          "moveToWell",
+          "moveToWell",
+          "aspirateInPlace",
+          "moveToWell",
           "dispense",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
@@ -191,32 +272,47 @@ describe('generateRobotStateTimeline', () => {
     expect(pythonCommandsOverview).toEqual([
       // Step a:
       `
-mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.aspirate(...)
-mockPythonName.dispense(...)
-mockPythonName.aspirate(...)
-mockPythonName.dispense(...)
-mockPythonName.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.move_to(mock_source_plate["A1"].top(z=2))
+mock_pipette.prepare_to_aspirate()
+mock_pipette.move_to(mock_source_plate["A1"].bottom())
+mock_pipette.move_to(mock_source_plate["A1"].bottom())
+mock_pipette.aspirate(...)
+mock_pipette.move_to(mock_source_plate["A1"].bottom())
+mock_pipette.dispense(...)
+mock_pipette.move_to(mock_source_plate["A2"].top(z=2))
+mock_pipette.prepare_to_aspirate()
+mock_pipette.move_to(mock_source_plate["A2"].bottom())
+mock_pipette.move_to(mock_source_plate["A2"].bottom())
+mock_pipette.aspirate(...)
+mock_pipette.move_to(mock_source_plate["A2"].bottom())
+mock_pipette.dispense(...)
+mock_pipette.drop_tip()
 `.trim(),
       // Step b:
       `
-mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.aspirate(...)
-mockPythonName.dispense(...)
-mockPythonName.drop_tip()
+mock_pipette_p300_multi.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette_p300_multi.move_to(mock_source_plate["A1"].top(z=2))
+mock_pipette_p300_multi.prepare_to_aspirate()
+mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
+mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
+mock_pipette_p300_multi.aspirate(...)
+mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
+mock_pipette_p300_multi.dispense(...)
+mock_pipette_p300_multi.drop_tip()
 `.trim(),
       // Step c:
       `
-mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.flow_rate.aspirate = 3.78
-mockPythonName.flow_rate.dispense = 3.78
-mockPythonName.mix(...)
-mockPythonName.drop_tip()
-mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.flow_rate.aspirate = 3.78
-mockPythonName.flow_rate.dispense = 3.78
-mockPythonName.mix(...)
-mockPythonName.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.flow_rate.aspirate = 3.78
+mock_pipette.flow_rate.dispense = 3.78
+mock_pipette.mix(...)
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.flow_rate.aspirate = 3.78
+mock_pipette.flow_rate.dispense = 3.78
+mock_pipette.mix(...)
+mock_pipette.drop_tip()
 `.trim(),
     ])
   })

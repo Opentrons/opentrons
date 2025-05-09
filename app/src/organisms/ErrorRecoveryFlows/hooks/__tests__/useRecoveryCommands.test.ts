@@ -1,27 +1,29 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  useErrorRecoveryPolicy,
+  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
-  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
 } from '@opentrons/react-api-client'
 
+import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {
   useChainRunCommands,
   useUpdateRecoveryPolicyWithStrategy,
 } from '/app/resources/runs'
+
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 import {
-  useRecoveryCommands,
-  HOME_PIPETTE_Z_AXES,
-  RELEASE_GRIPPER_JAW,
-  buildPickUpTips,
   buildIgnorePolicyRules,
-  isAssumeFalsePositiveResumeKind,
+  buildPickUpTips,
   HOME_EXCEPT_PLUNGERS,
+  HOME_PIPETTE_Z_AXES,
+  isAssumeFalsePositiveResumeKind,
+  RELEASE_GRIPPER_JAW,
+  useRecoveryCommands,
 } from '../useRecoveryCommands'
-import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
-import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
@@ -90,6 +92,7 @@ describe('useRecoveryCommands', () => {
     ).mockReturnValue({
       mutateAsync: mockResumeRunFromRecoveryAssumingFalsePositive,
     } as any)
+    vi.mocked(useErrorRecoveryPolicy).mockReturnValue({} as any)
   })
 
   it('should call chainRunRecoveryCommands with continuePastCommandFailure set to false', async () => {
@@ -292,7 +295,6 @@ describe('useRecoveryCommands', () => {
       false
     )
   })
-
   it('should reject with error and call proceedToRouteAndStep when pickUpTips has invalid input', async () => {
     const testProps = {
       ...props,
@@ -319,7 +321,6 @@ describe('useRecoveryCommands', () => {
       'failed'
     )
   })
-
   it('should call releaseGripperJaws and resolve the promise', async () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 
@@ -329,6 +330,105 @@ describe('useRecoveryCommands', () => {
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [RELEASE_GRIPPER_JAW],
+      false
+    )
+  })
+
+  it('should call flexStacker/perpareShuttle and resolve the promise', async () => {
+    const mockFailedCommandWithError = {
+      ...mockFailedCommand,
+      commandType: 'unsafe/flexStacker/prepareShuttle',
+      params: {
+        moduleId: '123',
+      },
+      error: {
+        errorType: 'mockErrorType',
+      },
+    }
+
+    const testProps = {
+      ...props,
+      unvalidatedFailedCommand: mockFailedCommandWithError,
+    }
+    const { result } = renderHook(() => useRecoveryCommands(testProps))
+
+    await act(async () => {
+      await result.current.homeShuttle()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'unsafe/flexStacker/prepareShuttle',
+          params: {
+            moduleId: '123',
+          },
+          intent: 'fixit',
+        },
+      ],
+      false
+    )
+  })
+
+  it('should call flexStacker/perpareShuttle without moduleId', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
+
+    await act(async () => {
+      await result.current.homeShuttle()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'unsafe/flexStacker/prepareShuttle',
+          params: {
+            moduleId: '',
+          },
+          intent: 'fixit',
+        },
+      ],
+      false
+    )
+  })
+
+  it('should call flexStacker/openLatch with moduleId', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
+
+    await act(async () => {
+      await result.current.releaseLabwareLatch()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'flexStacker/openLatch',
+          params: {
+            moduleId: '',
+          },
+          intent: 'fixit',
+        },
+      ],
+      false
+    )
+  })
+
+  it('should call flexStacker/closeLatch with moduleId', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
+
+    await act(async () => {
+      await result.current.closeLabwareLatch()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'flexStacker/closeLatch',
+          params: {
+            moduleId: '',
+          },
+          intent: 'fixit',
+        },
+      ],
       false
     )
   })

@@ -1,26 +1,26 @@
-import { useState, useEffect } from 'react'
-import head from 'lodash/head'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import head from 'lodash/head'
 import { css } from 'styled-components'
 
 import {
-  RESPONSIVENESS,
   DIRECTION_COLUMN,
   Flex,
+  RadioButton,
+  RESPONSIVENESS,
   SPACING,
   StyledText,
-  RadioButton,
 } from '@opentrons/components'
 
 import {
-  RECOVERY_MAP,
   ERROR_KINDS,
   ODD_SECTION_TITLE_STYLE,
+  RECOVERY_MAP,
 } from '../constants'
 import { RecoverySingleColumnContentWrapper } from '../shared'
 
-import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 import type { PipetteWithTip } from '/app/resources/instruments'
+import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 
 // The "home" route within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough
 // to escape the boundaries of any route, they will be redirected here.
@@ -189,8 +189,39 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
       return GENERAL_ERROR_OPTIONS
     case ERROR_KINDS.STALL_OR_COLLISION:
       return STALL_OR_COLLISION_OPTIONS
+    case ERROR_KINDS.STALL_WHILE_STACKING:
+      return STALL_WHILE_STACKING_OPTIONS
+    case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
+      return LABWARE_MISSING_IN_HOPPER_OPTIONS
+    case ERROR_KINDS.SHUTTLE_MISSING:
+      return SHUTTLE_MISSING_OPTIONS
+    case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
+      return LABWARE_MISSING_IN_SHUTTLE_OPTIONS
   }
 }
+
+export const LABWARE_MISSING_IN_SHUTTLE_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+  RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const SHUTTLE_MISSING_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const LABWARE_MISSING_IN_HOPPER_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE,
+  RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const STALL_WHILE_STACKING_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+  RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
 
 export const STALL_OR_COLLISION_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.HOME_AND_RETRY.ROUTE,

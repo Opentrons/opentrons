@@ -112,7 +112,7 @@ class ProtocolCore(
         self._engine_client = engine_client
         self._api_version = api_version
         self._sync_hardware = sync_hardware
-        self._last_location: Optional[Location] = None
+        self._last_location: Optional[Union[Location, TrashBin, WasteChute]] = None
         self._last_mount: Optional[Mount] = None
         self._labware_cores_by_id: Dict[str, LabwareCore] = {}
         self._module_cores_by_id: Dict[
@@ -376,34 +376,6 @@ class ProtocolCore(
 
         self._labware_cores_by_id[labware_core.labware_id] = labware_core
         return labware_core
-
-    def load_labware_to_flex_stacker_hopper(
-        self,
-        module_core: Union[ModuleCore, NonConnectedModuleCore],
-        load_name: str,
-        quantity: int,
-        label: Optional[str],
-        namespace: Optional[str],
-        version: Optional[int],
-        lid: Optional[str],
-    ) -> None:
-        """Load one or more labware with or without a lid to the flex stacker hopper."""
-        assert isinstance(module_core, FlexStackerCore)
-        for _ in range(quantity):
-            labware_core = self.load_labware(
-                load_name=load_name,
-                location=module_core,
-                label=label,
-                namespace=namespace,
-                version=version,
-            )
-            if lid is not None:
-                self.load_lid(
-                    load_name=lid,
-                    location=labware_core,
-                    namespace=namespace,
-                    version=version,
-                )
 
     def move_labware(
         self,
@@ -745,6 +717,7 @@ class ProtocolCore(
             module_id=load_module_result.moduleId,
             engine_client=self._engine_client,
             api_version=self.api_version,
+            protocol_core=self,
         )
 
     def _create_module_core(
@@ -777,6 +750,7 @@ class ProtocolCore(
             engine_client=self._engine_client,
             api_version=self.api_version,
             sync_module_hardware=SynchronousAdapter(selected_hardware),
+            protocol_core=self,
         )
 
     def _get_module_core(
@@ -918,7 +892,7 @@ class ProtocolCore(
     def get_last_location(
         self,
         mount: Optional[Mount] = None,
-    ) -> Optional[Location]:
+    ) -> Optional[Union[Location, TrashBin, WasteChute]]:
         """Get the last accessed location."""
         if mount is None or mount == self._last_mount:
             return self._last_location
@@ -927,7 +901,7 @@ class ProtocolCore(
 
     def set_last_location(
         self,
-        location: Optional[Location],
+        location: Optional[Union[Location, TrashBin, WasteChute]],
         mount: Optional[Mount] = None,
     ) -> None:
         """Set the last accessed location."""

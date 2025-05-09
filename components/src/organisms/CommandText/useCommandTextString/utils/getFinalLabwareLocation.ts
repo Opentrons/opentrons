@@ -2,10 +2,10 @@ import { findLastAt } from './helpers'
 
 import type {
   LabwareLocation,
-  RunTimeCommand,
+  LabwareLocationSequence,
   LoadLabwareRunTimeCommand,
   MoveLabwareRunTimeCommand,
-  LabwareLocationSequence,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 
 /**

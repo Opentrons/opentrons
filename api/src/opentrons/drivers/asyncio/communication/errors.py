@@ -42,6 +42,16 @@ class UnhandledGcode(ErrorResponse):
         super().__init__(port, response, command)
 
 
+class GCodeCacheFull(ErrorResponse):
+    def __init__(self, port: str, response: str, command: str) -> None:
+        super().__init__(port, response, command)
+
+
+class TaskNotReady(ErrorResponse):
+    def __init__(self, port: str, response: str, command: str) -> None:
+        super().__init__(port, response, command)
+
+
 class BaseErrorCode(Enum):
     """Base class for error code enums.
 

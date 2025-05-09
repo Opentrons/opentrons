@@ -1,4 +1,5 @@
 import { Trans, useTranslation } from 'react-i18next'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -20,26 +21,47 @@ interface ModalProps {
   errorMessage?: string | null
 }
 
-const getInvalidFileType = (props: ModalProps): ModalContents => {
-  const { t } = props
+interface InvalidModalProps {
+  t: any
+  type: 'general' | 'python'
+  errorMessage?: string | null
+  enableExportPython?: boolean
+}
+
+const getInvalidFileType = (props: InvalidModalProps): ModalContents => {
+  const { t, type, enableExportPython } = props
   return {
-    title: t('incorrect_file_header'),
+    title:
+      type === 'general'
+        ? t('incorrect_file_header')
+        : t('incorrect_python_file_header'),
     body: (
       <StyledText desktopStyle="bodyDefaultRegular">
-        {t('incorrect_file_type_body')}
+        {type === 'general'
+          ? t(
+              enableExportPython
+                ? 'incorrect_file_type_body_ff'
+                : 'incorrect_file_type_body'
+            )
+          : t('incorrect_python_file_type_body')}
       </StyledText>
     ),
   }
 }
 
-const invalidJsonModal = (props: ModalProps): ModalContents => {
-  const { t, errorMessage } = props
+const invalidJsonModal = (props: InvalidModalProps): ModalContents => {
+  const { t, errorMessage, type } = props
   return {
-    title: t('invalid_json_file'),
+    title:
+      type === 'general'
+        ? t('invalid_json_file')
+        : t('incorrect_python_file_header'),
     body: (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('invalid_json_file_body')}
+          {type === 'general'
+            ? t('invalid_json_file_body')
+            : t('invalid_python_body')}
         </StyledText>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -47,7 +69,7 @@ const invalidJsonModal = (props: ModalProps): ModalContents => {
           marginTop={SPACING.spacing8}
         >
           <StyledText desktopStyle="bodyDefaultSemiBold">
-            {t('invalid_json_file_error')}
+            {t('invalid_file_error')}
           </StyledText>
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
             {errorMessage}
@@ -219,12 +241,13 @@ export const getMigrationMessage = (
 }
 
 interface FileUploadModalContentsProps {
+  enableExportPython: boolean
   uploadResponse?: FileUploadMessage | null
 }
 export function useFileUploadModalContents(
   props: FileUploadModalContentsProps
 ): ModalContents | null {
-  const { uploadResponse } = props
+  const { uploadResponse, enableExportPython } = props
   const { t } = useTranslation('shared')
 
   if (uploadResponse == null) return null
@@ -232,12 +255,23 @@ export function useFileUploadModalContents(
   if (uploadResponse.isError) {
     switch (uploadResponse.errorType) {
       case 'INVALID_FILE_TYPE':
-        return getInvalidFileType({ t })
+        return getInvalidFileType({ t, type: 'general', enableExportPython })
       case 'INVALID_JSON_FILE':
         return invalidJsonModal({
           errorMessage: uploadResponse.errorMessage,
+          type: 'general',
           t,
         })
+      case 'INVALID_PYTHON_FILE':
+        if (uploadResponse.errorMessage != null) {
+          return invalidJsonModal({
+            errorMessage: uploadResponse.errorMessage,
+            type: 'python',
+            t,
+          })
+        } else {
+          return getInvalidFileType({ t, type: 'python' })
+        }
       default: {
         console.error('Invalid error type specified for modal')
         return null

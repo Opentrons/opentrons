@@ -2,16 +2,17 @@ import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
-import { useToaster } from '/app/organisms/ToasterOven'
 import { FloatingActionButton } from '/app/atoms/buttons'
-import { SetupOffsetsTable } from './SetupOffsetsTable'
-import { SetupOffsetsHeader } from './SetupOffsetsHeader'
 import { LPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useToaster } from '/app/organisms/ToasterOven'
+
+import { SetupOffsetsHeader } from './SetupOffsetsHeader'
+import { SetupOffsetsTable } from './SetupOffsetsTable'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { Run } from '@opentrons/api-client'
-import type { SetupScreens } from '../types'
 import type { UseLPCFlowsResult } from '/app/organisms/LabwarePositionCheck'
+import type { SetupScreens } from '../types'
 
 export interface ProtocolSetupOffsetsProps {
   lpcLaunchProps: UseLPCFlowsResult
