@@ -36,6 +36,8 @@ from .constants import (
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
 RECURSIVE_SEARCH_VOLUME_TOLERANCE = 0.001
 
+# TODO(jh, 2025-05-09): We need to handle both positive numbers (by schema 2 convention)
+#  and negative numbers (by schema 3 convention) no matter what, so we can just not enforce signage at the schema level.
 
 _StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
 _StrictNonNegativeFloat = Annotated[float, Field(strict=True, ge=0.0)]
@@ -151,11 +153,11 @@ class _WellCommonMixin(BaseModel):
     geometryDefinitionId: str | None = None
 
 
-class _WellCommon2Mixin(_WellCommonMixin):
+class _WellCommon2(_WellCommonMixin):
     y: _NonNegativeNumber
 
 
-class _WellCommon3Mixin(_WellCommonMixin):
+class _WellCommon3(_WellCommonMixin):
     y: _NonPositiveNumber
 
 
@@ -168,14 +170,6 @@ class _RectangularWellMixin(BaseModel):
     shape: Literal["rectangular"]
     xDimension: _NonNegativeNumber
     yDimension: _NonNegativeNumber
-
-
-class _WellCommon2(_WellCommon2Mixin, BaseModel):
-    pass
-
-
-class _WellCommon3(_WellCommon3Mixin, BaseModel):
-    pass
 
 
 class CircularWellDefinition2(_WellCommon2, _CircularWellMixin):
