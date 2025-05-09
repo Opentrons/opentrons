@@ -46,6 +46,9 @@ def run(protocol: ProtocolContext) -> None:
     column_tip_pick_up = protocol.params.column_tip_pickup  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
+    if not protocol.is_simulating():
+        slack_bot = helpers.set_up_slack()
+        slack_bot.send_run_started_message(metadata["protocolName"])
 
     def transfer(
         pipette: InstrumentContext,
@@ -160,179 +163,192 @@ def run(protocol: ProtocolContext) -> None:
 
     pcr_mm1 = pcr_reagents_plate["A1"]
     pcr_mm2 = pcr_reagents_plate["A2"]
-    if probe_height_bool:
-        helpers.find_liquid_height_of_loaded_liquids(
-            protocol, liquid_vols_and_wells=liquid_vols_and_wells, pipette=p96
+    try:
+        if probe_height_bool:
+            helpers.find_liquid_height_of_loaded_liquids(
+                protocol, liquid_vols_and_wells=liquid_vols_and_wells, pipette=p96
+            )
+        else:
+            helpers.load_wells_with_custom_liquids(
+                protocol, liquid_vols_and_wells=liquid_vols_and_wells
+            )
+        # Protocol steps
+        protocol.comment("Starting MiSeq library preparation protocol")
+
+        # Step 1-2: Set temperatures
+        thermocycler.open_lid()
+        temp_module.set_temperature(8)
+        thermocycler.set_block_temperature(8)
+
+        column_tips = partial_tiprack.rows()[0][::-1]
+        if column_tip_pick_up:
+            # Step 3: Dispense PCR1 master mix (avoiding multidispense to maintian accuracy)
+            column()
+            protocol.comment("Dispensing PCR1 master mix")
+            p96.pick_up_tip(column_tips.pop(0))
+            for col in range(12):
+                transfer(p96, 7.5, pcr_mm1, pcr1_plate.rows()[0][col])
+            p96.drop_tip()
+
+        # Step 4: Transfer DNA samples
+        all()
+        protocol.comment("Transferring DNA samples")
+        p96.pick_up_tip(tiprack_1["A1"])
+        transfer(p96, 5, dna_plate["A1"], pcr1_plate["A1"])
+        p96.return_tip()
+
+        # Step 5: Shake
+        protocol.comment("Shaking PCR1 plate")
+        heater_shaker.open_labware_latch()
+        protocol.move_labware(pcr1_plate, hs_adapter, use_gripper=True)
+        heater_shaker.close_labware_latch()
+        heater_shaker.set_and_wait_for_shake_speed(500)
+        protocol.delay(seconds=30)
+        heater_shaker.deactivate_shaker()
+        heater_shaker.open_labware_latch()
+
+        # Step 6: PCR1 thermal cycling
+        protocol.comment("Starting PCR1 thermal cycling")
+        protocol.move_labware(pcr1_plate, thermocycler, use_gripper=True)
+        heater_shaker.close_labware_latch()
+        thermocycler.close_lid()
+        thermocycler.set_lid_temperature(105)
+
+        # Initial denaturation
+        thermocycler.execute_profile(
+            steps=[{"temperature": 95, "hold_time_seconds": 180}], repetitions=1
         )
-    else:
-        helpers.load_wells_with_custom_liquids(
-            protocol, liquid_vols_and_wells=liquid_vols_and_wells
+
+        # 35 cycles
+        thermocycler.execute_profile(
+            steps=[
+                {"temperature": 95, "hold_time_seconds": 30},
+                {"temperature": 60, "hold_time_seconds": 15},
+                {"temperature": 72, "hold_time_seconds": 15},
+            ],
+            repetitions=35,
         )
-    # Protocol steps
-    protocol.comment("Starting MiSeq library preparation protocol")
 
-    # Step 1-2: Set temperatures
-    thermocycler.open_lid()
-    temp_module.set_temperature(8)
-    thermocycler.set_block_temperature(8)
+        # Final extension
+        thermocycler.execute_profile(
+            steps=[
+                {"temperature": 72, "hold_time_seconds": 300},
+                {"temperature": 20, "hold_time_seconds": 60},
+            ],
+            repetitions=1,
+        )
 
-    column_tips = partial_tiprack.rows()[0][::-1]
-    if column_tip_pick_up:
-        # Step 3: Dispense PCR1 master mix (avoiding multidispense to maintian accuracy)
-        column()
-        protocol.comment("Dispensing PCR1 master mix")
-        p96.pick_up_tip(column_tips.pop(0))
-        for col in range(12):
-            transfer(p96, 7.5, pcr_mm1, pcr1_plate.rows()[0][col])
-        p96.drop_tip()
+        thermocycler.set_block_temperature(8)
+        thermocycler.open_lid()
+        # Steps 7-8: Move plates
+        protocol.comment("Setting up PCR2")
+        protocol.move_labware(pcr1_plate, "B2", use_gripper=True)
 
-    # Step 4: Transfer DNA samples
-    all()
-    protocol.comment("Transferring DNA samples")
-    p96.pick_up_tip(tiprack_1["A1"])
-    transfer(p96, 5, dna_plate["A1"], pcr1_plate["A1"])
-    p96.return_tip()
+        protocol.move_labware(pcr2_plate, thermocycler, use_gripper=True)
+        # Step 9: Dispense PCR2 master mix
+        protocol.comment("Dispensing PCR2 master mix")
+        if column_tip_pick_up:
+            column()
+            p96.pick_up_tip(column_tips.pop(0))
+            for col in range(12):
+                transfer(p96, 6, pcr_mm2, pcr2_plate.rows()[0][col])
+            p96.drop_tip()
 
-    # Step 5: Shake
-    protocol.comment("Shaking PCR1 plate")
-    heater_shaker.open_labware_latch()
-    protocol.move_labware(pcr1_plate, hs_adapter, use_gripper=True)
-    heater_shaker.close_labware_latch()
-    heater_shaker.set_and_wait_for_shake_speed(500)
-    protocol.delay(seconds=30)
-    heater_shaker.deactivate_shaker()
-    heater_shaker.open_labware_latch()
+        protocol.comment("Rearranging Deck for Dilutions")
+        heater_shaker.open_labware_latch()
+        protocol.move_labware(pcr_reagents_plate, hs_adapter, use_gripper=True)
+        protocol.move_labware(partial_tiprack, "D4", use_gripper=True)
+        protocol.move_labware(pcr1_dilution_plate, reagent_block, use_gripper=True)
+        protocol.move_labware(pcr2_dilution_plate, "C2", use_gripper=True)
+        heater_shaker.close_labware_latch()
+        # Step 10: Transfer indices
+        protocol.comment("Transferring indices")
+        all()
+        p96.pick_up_tip(tiprack_1["A1"])
+        transfer(p96, 5, indices_plate["A1"], pcr2_plate["A1"])
+        p96.return_tip()
+        # Steps 11-12: PCR1 dilution setup
+        protocol.comment("Setting up PCR1 dilution")
+        p96.pick_up_tip(tiprack_1["A1"])
+        transfer(p96, 40.0, reservoir["A1"], pcr1_dilution_plate["A1"])
+        transfer(
+            p96, 5.0, pcr1_plate["A1"], pcr1_dilution_plate["A1"], mix_after=(10, 45)
+        )
 
-    # Step 6: PCR1 thermal cycling
-    protocol.comment("Starting PCR1 thermal cycling")
-    protocol.move_labware(pcr1_plate, thermocycler, use_gripper=True)
-    heater_shaker.close_labware_latch()
-    thermocycler.close_lid()
-    thermocycler.set_lid_temperature(105)
+        # Step 13: Transfer diluted PCR1 to PCR2
+        protocol.comment("Transferring diluted PCR1 to PCR2")
+        transfer(
+            p96, 5.0, pcr1_dilution_plate["A1"], pcr2_plate["A1"], mix_after=(10, 45)
+        )
+        p96.return_tip()
 
-    # Initial denaturation
-    thermocycler.execute_profile(
-        steps=[{"temperature": 95, "hold_time_seconds": 180}], repetitions=1
-    )
+        # Step 14: PCR2 thermal cycling
+        protocol.comment("Starting PCR2 thermal cycling")
+        thermocycler.close_lid()
+        thermocycler.set_lid_temperature(105)
+        # Initial denaturation
+        thermocycler.execute_profile(
+            steps=[{"temperature": 95, "hold_time_seconds": 180}], repetitions=1
+        )
 
-    # 35 cycles
-    thermocycler.execute_profile(
-        steps=[
-            {"temperature": 95, "hold_time_seconds": 30},
-            {"temperature": 60, "hold_time_seconds": 15},
-            {"temperature": 72, "hold_time_seconds": 15},
-        ],
-        repetitions=35,
-    )
+        # 12 cycles
+        thermocycler.execute_profile(
+            steps=[
+                {"temperature": 95, "hold_time_seconds": 20},
+                {"temperature": 72, "hold_time_seconds": 15},
+            ],
+            repetitions=12,
+        )
 
-    # Final extension
-    thermocycler.execute_profile(
-        steps=[
-            {"temperature": 72, "hold_time_seconds": 300},
-            {"temperature": 20, "hold_time_seconds": 60},
-        ],
-        repetitions=1,
-    )
+        # Final extension
+        thermocycler.execute_profile(
+            steps=[
+                {"temperature": 72, "hold_time_seconds": 300},
+                {"temperature": 20, "hold_time_seconds": 60},
+            ],
+            repetitions=1,
+        )
 
-    thermocycler.set_block_temperature(8)
-    thermocycler.open_lid()
-    # Steps 7-8: Move plates
-    protocol.comment("Setting up PCR2")
-    protocol.move_labware(pcr1_plate, "B2", use_gripper=True)
+        thermocycler.open_lid()
 
-    protocol.move_labware(pcr2_plate, thermocycler, use_gripper=True)
-    # Step 9: Dispense PCR2 master mix
-    protocol.comment("Dispensing PCR2 master mix")
-    if column_tip_pick_up:
-        column()
-        p96.pick_up_tip(column_tips.pop(0))
-        for col in range(12):
-            transfer(p96, 6, pcr_mm2, pcr2_plate.rows()[0][col])
-        p96.drop_tip()
+        # Step 15: Move PCR2 plate
+        protocol.comment("Moving PCR2 plate")
+        protocol.move_labware(pcr1_dilution_plate, "A4", use_gripper=True)
+        protocol.move_labware(pcr2_plate, reagent_block, use_gripper=True)
 
-    protocol.comment("Rearranging Deck for Dilutions")
-    heater_shaker.open_labware_latch()
-    protocol.move_labware(pcr_reagents_plate, hs_adapter, use_gripper=True)
-    protocol.move_labware(partial_tiprack, "D4", use_gripper=True)
-    protocol.move_labware(pcr1_dilution_plate, reagent_block, use_gripper=True)
-    protocol.move_labware(pcr2_dilution_plate, "C2", use_gripper=True)
-    heater_shaker.close_labware_latch()
-    # Step 10: Transfer indices
-    protocol.comment("Transferring indices")
-    all()
-    p96.pick_up_tip(tiprack_1["A1"])
-    transfer(p96, 5, indices_plate["A1"], pcr2_plate["A1"])
-    p96.return_tip()
-    # Steps 11-12: PCR1 dilution setup
-    protocol.comment("Setting up PCR1 dilution")
-    p96.pick_up_tip(tiprack_1["A1"])
-    transfer(p96, 40.0, reservoir["A1"], pcr1_dilution_plate["A1"])
-    transfer(p96, 5.0, pcr1_plate["A1"], pcr1_dilution_plate["A1"], mix_after=(10, 45))
+        # Steps 16-17: PCR2 dilution
+        protocol.comment("Setting up PCR2 dilution")
+        p96.pick_up_tip(tiprack_1["A1"])
+        transfer(p96, 25, reservoir["A1"], pcr2_dilution_plate["A1"])
+        transfer(
+            p96, 5, pcr2_plate["A1"], pcr2_dilution_plate["A1"], mix_after=(10, 45)
+        )
+        p96.return_tip()
+        protocol.move_labware(reservoir, "C4", use_gripper=True)
+        protocol.move_labware(eppendorf_384, "D2", use_gripper=True)
 
-    # Step 13: Transfer diluted PCR1 to PCR2
-    protocol.comment("Transferring diluted PCR1 to PCR2")
-    transfer(p96, 5.0, pcr1_dilution_plate["A1"], pcr2_plate["A1"], mix_after=(10, 45))
-    p96.return_tip()
+        # Step 18: Optional transfer to 384-well plate
+        protocol.comment("Optional: Transferring to 384-well plate")
+        p96.pick_up_tip(tiprack_1["A1"])
+        for well_name in ["A1", "A2", "B1", "B2"]:
+            transfer(p96, 15, pcr2_dilution_plate["A1"], eppendorf_384[well_name])
+        p96.return_tip()
 
-    # Step 14: PCR2 thermal cycling
-    protocol.comment("Starting PCR2 thermal cycling")
-    thermocycler.close_lid()
-    thermocycler.set_lid_temperature(105)
-    # Initial denaturation
-    thermocycler.execute_profile(
-        steps=[{"temperature": 95, "hold_time_seconds": 180}], repetitions=1
-    )
+        # Final steps
+        protocol.comment("Protocol complete through PCR2 dilution")
+        protocol.comment("Please remove plates for quantification")
+        protocol.comment("Keep PCR2 dilution plate on deck if continuing with pooling")
 
-    # 12 cycles
-    thermocycler.execute_profile(
-        steps=[
-            {"temperature": 95, "hold_time_seconds": 20},
-            {"temperature": 72, "hold_time_seconds": 15},
-        ],
-        repetitions=12,
-    )
-
-    # Final extension
-    thermocycler.execute_profile(
-        steps=[
-            {"temperature": 72, "hold_time_seconds": 300},
-            {"temperature": 20, "hold_time_seconds": 60},
-        ],
-        repetitions=1,
-    )
-
-    thermocycler.open_lid()
-
-    # Step 15: Move PCR2 plate
-    protocol.comment("Moving PCR2 plate")
-    protocol.move_labware(pcr1_dilution_plate, "A4", use_gripper=True)
-    protocol.move_labware(pcr2_plate, reagent_block, use_gripper=True)
-
-    # Steps 16-17: PCR2 dilution
-    protocol.comment("Setting up PCR2 dilution")
-    p96.pick_up_tip(tiprack_1["A1"])
-    transfer(p96, 25, reservoir["A1"], pcr2_dilution_plate["A1"])
-    transfer(p96, 5, pcr2_plate["A1"], pcr2_dilution_plate["A1"], mix_after=(10, 45))
-    p96.return_tip()
-    protocol.move_labware(reservoir, "C4", use_gripper=True)
-    protocol.move_labware(eppendorf_384, "D2", use_gripper=True)
-
-    # Step 18: Optional transfer to 384-well plate
-    protocol.comment("Optional: Transferring to 384-well plate")
-    p96.pick_up_tip(tiprack_1["A1"])
-    for well_name in ["A1", "A2", "B1", "B2"]:
-        transfer(p96, 15, pcr2_dilution_plate["A1"], eppendorf_384[well_name])
-    p96.return_tip()
-
-    # Final steps
-    protocol.comment("Protocol complete through PCR2 dilution")
-    protocol.comment("Please remove plates for quantification")
-    protocol.comment("Keep PCR2 dilution plate on deck if continuing with pooling")
-
-    # Deactivate temperature modules
-    if deactivate_modules_bool:
-        temp_module.deactivate()
-        thermocycler.deactivate_lid()
-        thermocycler.deactivate_block()
-    # Pause for plate removal
-    protocol.comment("Protocol complete!")
+        # Deactivate temperature modules
+        if deactivate_modules_bool:
+            temp_module.deactivate()
+            thermocycler.deactivate_lid()
+            thermocycler.deactivate_block()
+        # Pause for plate removal
+        protocol.comment("Protocol complete!")
+        if not protocol.is_simulating():
+            slack_bot.send_run_completed_message(metadata["protocolName"])
+    except Exception as e:
+        if not protocol.is_simulating():
+            slack_bot.send_error_message(metadata["protocolName"], str(e))
+        raise (e)

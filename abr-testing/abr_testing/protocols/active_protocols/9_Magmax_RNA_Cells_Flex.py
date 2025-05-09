@@ -95,6 +95,10 @@ def run(protocol: ProtocolContext) -> None:
     plate_orientation = protocol.params.plate_orientation  # type: ignore[attr-defined]
     probe_liquid_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
+    if not protocol.is_simulating():
+        slack_bot = helpers.set_up_slack()
+        slack_bot.send_run_started_message(metadata["protocolName"])
+
     helpers.comment_protocol_version(protocol, "02")
     plate_name_str = "hellma_plate_" + str(plate_orientation)
 
@@ -184,37 +188,6 @@ def run(protocol: ProtocolContext) -> None:
     beads_ = sample_plate.wells()[: (8 * num_cols)]
     elution_samps = elutionplate.wells()[: (8 * num_cols)]
     dnase1_ = elutionplate.wells()[(8 * num_cols) : (16 * num_cols)]
-
-    # Add liquids to non-reservoir labware
-    liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
-        "Beads": [{"well": beads_, "volume": bead_vol}],
-        "Sample": [{"well": sample_plate.wells(), "volume": 100.0}],
-        "DNAse": [{"well": dnase1_, "volume": 200}],
-        "Elution Buffer": [{"well": elution_samps, "volume": elution_vol}],
-        "Lysis": [{"well": lysis_, "volume": 8400.0}],
-        "Stop": [{"well": stopreaction, "volume": 6400.0}],
-        "Wash 1": [{"well": wash1, "volume": 9500.0}],
-        "Wash 2": [{"well": wash2, "volume": 9500.0}],
-        "Wash 3": [{"well": wash3, "volume": 9500.0}],
-        "Wash 4": [{"well": wash4, "volume": 9500.0}],
-        "Wash 5": [{"well": wash5, "volume": 9500.0}],
-        "Wash 6": [{"well": wash6, "volume": 9500.0}],
-        "Wash 7": [{"well": wash7, "volume": 9500.0}],
-        "Wash 8": [{"well": wash8, "volume": 9500.0}],
-        "Wash 9": [{"well": wash9, "volume": 9500.0}],
-    }
-    if probe_liquid_height_bool:
-        helpers.find_liquid_height_of_loaded_liquids(
-            protocol, liquid_vols_and_wells, m1000
-        )
-    else:
-        helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
-    # run plate reader
-    helpers.plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)
-
-    m1000.flow_rate.aspirate = 50
-    m1000.flow_rate.dispense = 150
-    m1000.flow_rate.blow_out = 300
 
     def tiptrack(pip: InstrumentContext) -> None:
         """Tip Track."""
@@ -589,37 +562,81 @@ def run(protocol: ProtocolContext) -> None:
             m1000.air_gap(20)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
-    """
-    Here is where you can call the methods defined above to fit your specific
-    protocol. The normal sequence is:
-    """
-    if inc_lysis:
-        lysis(lysis_vol, lysis_)
-    bind()
-    wash(wash_vol, all_washes)
-    wash(wash_vol, all_washes)
-    wash(wash_vol, all_washes)
-    # dnase1 treatment
-    dnase(30, dnase1)
-    stop_reaction(stop_vol, stopreaction)
-    # Resume washes
-    wash(wash_vol, all_washes)
-    wash(wash_vol, all_washes)
-    wash(wash_vol, all_washes)
-
-    for beaddry in np.arange(drybeads, 0, -0.5):
-        protocol.delay(
-            minutes=0.5,
-            msg="There are " + str(beaddry) + " minutes left in the drying step.",
+    # Add liquids to non-reservoir labware
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
+        "Beads": [{"well": beads_, "volume": bead_vol}],
+        "Sample": [{"well": sample_plate.wells(), "volume": 100.0}],
+        "DNAse": [{"well": dnase1_, "volume": 200}],
+        "Elution Buffer": [{"well": elution_samps, "volume": elution_vol}],
+        "Lysis": [{"well": lysis_, "volume": 8400.0}],
+        "Stop": [{"well": stopreaction, "volume": 6400.0}],
+        "Wash 1": [{"well": wash1, "volume": 9500.0}],
+        "Wash 2": [{"well": wash2, "volume": 9500.0}],
+        "Wash 3": [{"well": wash3, "volume": 9500.0}],
+        "Wash 4": [{"well": wash4, "volume": 9500.0}],
+        "Wash 5": [{"well": wash5, "volume": 9500.0}],
+        "Wash 6": [{"well": wash6, "volume": 9500.0}],
+        "Wash 7": [{"well": wash7, "volume": 9500.0}],
+        "Wash 8": [{"well": wash8, "volume": 9500.0}],
+        "Wash 9": [{"well": wash9, "volume": 9500.0}],
+    }
+    try:
+        if probe_liquid_height_bool:
+            helpers.find_liquid_height_of_loaded_liquids(
+                protocol, liquid_vols_and_wells, m1000
+            )
+        else:
+            helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+        # run plate reader
+        helpers.plate_reader_actions(
+            protocol, plate_reader, hellma_plate, plate_name_str
         )
-    elute(elution_vol)
-    end_list_of_wells_to_probe = [waste_reservoir["A1"]]
-    helpers.clean_up_plates(
-        protocol, m1000, [elutionplate, sample_plate], waste_reservoir["A1"]
-    )
-    helpers.find_liquid_height_of_all_wells(protocol, m1000, end_list_of_wells_to_probe)
-    # Run plate reader
-    helpers.plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)
 
-    if deactivate_modules_bool:
-        helpers.deactivate_modules(protocol)
+        m1000.flow_rate.aspirate = 50
+        m1000.flow_rate.dispense = 150
+        m1000.flow_rate.blow_out = 300
+
+        """
+        Here is where you can call the methods defined above to fit your specific
+        protocol. The normal sequence is:
+        """
+        if inc_lysis:
+            lysis(lysis_vol, lysis_)
+        bind()
+        wash(wash_vol, all_washes)
+        wash(wash_vol, all_washes)
+        wash(wash_vol, all_washes)
+        # dnase1 treatment
+        dnase(30, dnase1)
+        stop_reaction(stop_vol, stopreaction)
+        # Resume washes
+        wash(wash_vol, all_washes)
+        wash(wash_vol, all_washes)
+        wash(wash_vol, all_washes)
+
+        for beaddry in np.arange(drybeads, 0, -0.5):
+            protocol.delay(
+                minutes=0.5,
+                msg="There are " + str(beaddry) + " minutes left in the drying step.",
+            )
+        elute(elution_vol)
+        end_list_of_wells_to_probe = [waste_reservoir["A1"]]
+        helpers.clean_up_plates(
+            protocol, m1000, [elutionplate, sample_plate], waste_reservoir["A1"]
+        )
+        helpers.find_liquid_height_of_all_wells(
+            protocol, m1000, end_list_of_wells_to_probe
+        )
+        # Run plate reader
+        helpers.plate_reader_actions(
+            protocol, plate_reader, hellma_plate, plate_name_str
+        )
+
+        if deactivate_modules_bool:
+            helpers.deactivate_modules(protocol)
+        if not protocol.is_simulating():
+            slack_bot.send_run_completed_message(metadata["protocolName"])
+    except Exception as e:
+        if not protocol.is_simulating():
+            slack_bot.send_error_message(metadata["protocolName"], str(e))
+        raise (e)

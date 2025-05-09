@@ -15,6 +15,10 @@ from opentrons.protocol_api.module_contexts import (
     MagneticModuleContext,
     AbsorbanceReaderContext,
 )
+import configparser
+from pathlib import Path
+import json
+from abr_testing.automation import slack
 from typing import List, Union, Dict, Tuple
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from datetime import datetime
@@ -567,6 +571,37 @@ def load_wells_with_custom_liquids(
             # Load liquid into each well
             for well in wells:
                 well.load_liquid(liquid, volume)
+
+
+def set_up_slack() -> slack.Slack:
+    """Set up slack channel connection."""
+    configs_file = "/var/lib/jupyter/notebooks/config.ini"
+    configs_file_path = Path(configs_file)
+    try:
+        configurations = configparser.ConfigParser()
+        configurations.read(configs_file_path)
+    except configparser.ParsingError as e:
+        print(f"Cannot read configuration file\n {e}")
+    discovery_file = "/data/ODD/discovery.json"
+    try:
+        with open(discovery_file, "r") as file:
+            discovery_data = json.load(file)
+    except FileNotFoundError:
+        print(f"ERROR: file not found at {discovery_file}")
+        discovery_data = {}
+    except json.JSONDecodeError:
+        print(f"ERROR: Invalid json format in {discovery_file}")
+        discovery_data = {}
+    try:
+        robot_name = discovery_data["robots"][0]["name"]
+    except KeyError:
+        print("Can't simulate slack, run on robot")
+        robot_name = "test"
+    return slack.Slack(
+        configuration=configurations,
+        channel_name="abr-robot-alerts",
+        user_name=robot_name,
+    )
 
 
 def comment_height_of_specific_labware(

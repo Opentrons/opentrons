@@ -66,6 +66,9 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "01")
+    if not protocol.is_simulating():
+        slack_bot = helpers.set_up_slack()
+        slack_bot.send_run_started_message(metadata["protocolName"])
 
     dry_run = False
     TIP_TRASH = (
@@ -149,39 +152,6 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     m1000 = protocol.load_instrument(
         "flex_8channel_1000", mount, tip_racks=[tips1000, tips1001, tips1002]
     )
-
-    """
-    Here is where you can define the locations of your reagents.
-    """
-    lysis_ = res1.wells()[0]
-    binding_buffer = res1.wells()[1:8]
-    bind2_res = res1.wells()[8:12]
-    all_washes = res2.wells()[1:]
-    elution_solution = res2.wells()[0]
-    all_washes.extend(res3.wells()[:2])
-    samples_m = sample_plate.rows()[0][:num_cols]
-    elution_samples_m = elutionplate.rows()[0][:num_cols]
-    # Redefine per well for liquid definitions
-    samps = sample_plate.wells()[: (8 * num_cols)]
-    liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
-        "Lysis and PK": [{"well": lysis_, "volume": 12320.0}],
-        "Beads and Binding": [{"well": binding_buffer, "volume": 11875.0}],
-        "Binding 2": [{"well": bind2_res, "volume": 13500.0}],
-        "Final Elution": [{"well": elution_solution, "volume": 7500.0}],
-        "Samples": [{"well": samps, "volume": 0.0}],
-        "Reagents": [{"well": all_washes, "volume": 9800.0}],
-    }
-    elutionplate.load_empty(elutionplate.wells())
-    if probe_height_bool:
-        helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
-    else:
-        helpers.find_liquid_height_of_loaded_liquids(
-            protocol, liquid_vols_and_wells, m1000
-        )
-
-    m1000.flow_rate.aspirate = 300
-    m1000.flow_rate.dispense = 300
-    m1000.flow_rate.blow_out = 300
 
     def remove_supernatant(vol: float) -> None:
         """Remove supernatant."""
@@ -516,28 +486,70 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         m1000.flow_rate.aspirate = 150
 
     """
-    Here is where you can call the methods defined above to fit your specific
-    protocol. The normal sequence is:
+    Here is where you can define the locations of your reagents.
     """
-    lysis(lysis_vol, lysis_)
-    bind(binding_buffer_vol, bind2_vol)
-    wash(wash1_vol, all_washes)
-    wash(wash2_vol, all_washes)
-    wash(wash3_vol, all_washes)
-    h_s.set_and_wait_for_temperature(55)
-    for beaddry in np.arange(drybeads, 0, -0.5):
-        protocol.delay(
-            minutes=0.5,
-            msg="There are " + str(beaddry) + " minutes left in the drying step.",
+    lysis_ = res1.wells()[0]
+    binding_buffer = res1.wells()[1:8]
+    bind2_res = res1.wells()[8:12]
+    all_washes = res2.wells()[1:]
+    elution_solution = res2.wells()[0]
+    all_washes.extend(res3.wells()[:2])
+    samples_m = sample_plate.rows()[0][:num_cols]
+    elution_samples_m = elutionplate.rows()[0][:num_cols]
+    # Redefine per well for liquid definitions
+    samps = sample_plate.wells()[: (8 * num_cols)]
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
+        "Lysis and PK": [{"well": lysis_, "volume": 12320.0}],
+        "Beads and Binding": [{"well": binding_buffer, "volume": 11875.0}],
+        "Binding 2": [{"well": bind2_res, "volume": 13500.0}],
+        "Final Elution": [{"well": elution_solution, "volume": 7500.0}],
+        "Samples": [{"well": samps, "volume": 0.0}],
+        "Reagents": [{"well": all_washes, "volume": 9800.0}],
+    }
+    try:
+        elutionplate.load_empty(elutionplate.wells())
+        if probe_height_bool:
+            helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+        else:
+            helpers.find_liquid_height_of_loaded_liquids(
+                protocol, liquid_vols_and_wells, m1000
+            )
+
+        m1000.flow_rate.aspirate = 300
+        m1000.flow_rate.dispense = 300
+        m1000.flow_rate.blow_out = 300
+
+        """
+        Here is where you can call the methods defined above to fit your specific
+        protocol. The normal sequence is:
+        """
+        lysis(lysis_vol, lysis_)
+        bind(binding_buffer_vol, bind2_vol)
+        wash(wash1_vol, all_washes)
+        wash(wash2_vol, all_washes)
+        wash(wash3_vol, all_washes)
+        h_s.set_and_wait_for_temperature(55)
+        for beaddry in np.arange(drybeads, 0, -0.5):
+            protocol.delay(
+                minutes=0.5,
+                msg="There are " + str(beaddry) + " minutes left in the drying step.",
+            )
+        elute(elution_vol)
+        h_s.deactivate_heater()
+        helpers.clean_up_plates(
+            protocol,
+            m1000,
+            [elutionplate, sample_plate, res1, res3, res2],
+            waste_reservoir["A1"],
         )
-    elute(elution_vol)
-    h_s.deactivate_heater()
-    helpers.clean_up_plates(
-        protocol,
-        m1000,
-        [elutionplate, sample_plate, res1, res3, res2],
-        waste_reservoir["A1"],
-    )
-    helpers.find_liquid_height_of_all_wells(protocol, m1000, [waste_reservoir["A1"]])
-    if deactivate_modules_bool:
-        helpers.deactivate_modules(protocol)
+        helpers.find_liquid_height_of_all_wells(
+            protocol, m1000, [waste_reservoir["A1"]]
+        )
+        if deactivate_modules_bool:
+            helpers.deactivate_modules(protocol)
+        if not protocol.is_simulating():
+            slack_bot.send_run_completed_message(metadata["protocolName"])
+    except Exception as e:
+        if not protocol.is_simulating():
+            slack_bot.send_error_message(metadata["protocolName"], str(e))
+        raise (e)
