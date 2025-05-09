@@ -69,7 +69,6 @@ describe('airGapInTrash', () => {
     expect(getSuccessResult(result).python).toBe(
       `
 mock_pipette.move_to(mock_trash_bin_1)
-mock_pipette.prepare_to_aspirate()
 mock_pipette.air_gap(volume=10, in_place=True, flow_rate=10)
 `.trim()
     )
