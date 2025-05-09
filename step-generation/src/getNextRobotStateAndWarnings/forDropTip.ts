@@ -14,14 +14,14 @@ export function forDropTip(
 ): void {
   const { pipetteId, wellName, labwareId } = params
   const { robotState } = robotStateAndWarnings
-  dispenseUpdateLiquidState({
-    invariantContext,
-    prevLiquidState: robotState.liquidState,
-    pipetteId,
-    labwareId,
-    useFullVolume: true,
-    wellName,
-    robotStateAndWarnings,
-  })
-  robotState.tipState.pipettes[pipetteId] = false
+  // dispenseUpdateLiquidState({
+  //   invariantContext,
+  //   prevLiquidState: robotState.liquidState,
+  //   pipetteId,
+  //   labwareId,
+  //   useFullVolume: true,
+  //   wellName,
+  //   robotStateAndWarnings,
+  // })
+  // robotState.tipState.pipettes[pipetteId] = false
 }

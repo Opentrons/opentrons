@@ -135,6 +135,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'aspirateInPlace':
       if (prevCommand?.commandType === 'moveToWell') {
+        console.log('should hit here once')
         forAspirateInPlace(
           command.params,
           invariantContext,

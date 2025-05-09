@@ -208,5 +208,5 @@ export function dispenseUpdateLiquidState(
       labwareLiquidState
     )
   }
-  console.log('dispense', JSON.parse(JSON.stringify(labwareLiquidState)))
+  console.log('dispense only', JSON.parse(JSON.stringify(labwareLiquidState)))
 }

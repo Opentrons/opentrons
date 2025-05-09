@@ -175,7 +175,10 @@ export const forAspirateInPlace = (
       JSON.parse(JSON.stringify(tipLiquidState)),
       JSON.parse(JSON.stringify(newLiquidFromWell))
     )
-
+    console.log(
+      'mergeLiquid(tipLiquidState, newLiquidFromWell)',
+      mergeLiquid(tipLiquidState, newLiquidFromWell)
+    )
     pipette[indexToString] = mergeLiquid(tipLiquidState, newLiquidFromWell)
     console.log('pipette', JSON.parse(JSON.stringify(pipette)))
   })
@@ -192,6 +195,10 @@ export const forAspirateInPlace = (
       labwareLiquidState[well]
     ).source
   })
+  console.log(
+    'liquidState.pipettes',
+    JSON.parse(JSON.stringify(liquidState.pipettes))
+  )
   console.log('wellsForTips', wellsForTips)
 }
 
@@ -237,11 +244,11 @@ export const forDropTipInPlace = (
   const { robotState } = robotStateAndWarnings
   robotState.tipState.pipettes[pipetteId] = false
 
-  dispenseUpdateLiquidState({
-    invariantContext,
-    prevLiquidState: robotState.liquidState,
-    pipetteId,
-    useFullVolume: true,
-    robotStateAndWarnings,
-  })
+  // dispenseUpdateLiquidState({
+  //   invariantContext,
+  //   prevLiquidState: robotState.liquidState,
+  //   pipetteId,
+  //   useFullVolume: true,
+  //   robotStateAndWarnings,
+  // })
 }

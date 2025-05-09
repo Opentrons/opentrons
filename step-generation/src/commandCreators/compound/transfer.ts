@@ -719,7 +719,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...touchTipAfterRetractCommands,
             ...airGapAfterRetractCommands,
             ...dispenseAspirateAirGapCommands,
-            ...dispenseCommand,
+            // ...dispenseCommand,
             ...delayAfterDispenseCommands,
             ...mixInDestinationCommands,
             ...blowoutCommand,
