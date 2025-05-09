@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 
 import { SlotDetailModal } from '../../../components/organisms/SlotDetailModal'
-import { END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID } from '../../../steplist'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
 
 import type { Dispatch, SetStateAction } from 'react'
