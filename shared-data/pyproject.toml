@@ -65,35 +65,55 @@ local_scheme='no-local-version'
 include = [
    'python/opentrons_shared_data',
    'python_tests',
-   'command',
-   'commandAnnotation',
-   'errors',
-   'deck',
+   'command/schemas',
+   'commandAnnotation/schemas',
+   'errors/schemas',
+   'errors/definitions',
+   'deck/schemas',
+   'deck/definitions',
    'gripper',
-   'labware',
-   'liquid',
-   'liquid-class',
-   'module',
-   'pipette',
-   'protocol',
-   'robot']
-
-[tool.hatch.build.targets.sdist.force-include]
-'../LICENSE' = '../LICENSE'
+   'labware/schemas',
+   'labware/definitions',
+   'labware/repository/schemas',
+   'liquid/schemas',
+   'liquid-class/schemas',
+   'liquid-class/definitions',
+   'module/schemas',
+   'module/definitions',
+   'pipette/schemas',
+   'pipette/definitions',
+   'protocol/schemas',
+   'robot/schemas',
+   'robot/definitions',
+   'LICENSE',
+   'mypy.ini',
+   'pytest.ini',
+   '.flake8',
+   'Pipfile',
+   'Pipfile.lock',
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ['python/opentrons_shared_data']
 [tool.hatch.build.targets.wheel.force-include]
-'command' = 'opentrons_shared_data/data/command'
-'commandAnnotation' = 'opentrons_shared_data/data/commandAnnotation'
-'errors' = 'opentrons_shared_data/data/errors'
-'deck' = 'opentrons_shared_data/data/deck'
+'command/schemas' = 'opentrons_shared_data/data/command/schemas'
+'commandAnnotation/schemas' = 'opentrons_shared_data/data/commandAnnotation/schemas'
+'errors/schemas' = 'opentrons_shared_data/data/errors/schemas'
+'errors/definitions' = 'opentrons_shared_data/data/errors/definitions'
+'deck/schemas' = 'opentrons_shared_data/data/deck/schemas'
+'deck/definitions' = 'opentrons_shared_data/data/deck/definitions'
 'gripper' = 'opentrons_shared_data/data/gripper'
-'labware' = 'opentrons_shared_data/data/labware'
-'liquid' = 'opentrons_shared_data/data/liquid'
-'liquid-class' = 'opentrons_shared_data/data/liquid-class'
-'module' = 'opentrons_shared_data/data/module'
-'pipette' = 'opentrons_shared_data/data/pipette'
-'protocol' = 'opentrons_shared_data/data/protocol'
-'robot' = 'opentrons_shared_data/data/robot'
-'../LICENSE' = 'LICENSE'
+'labware/schemas' = 'opentrons_shared_data/data/labware/schemas'
+'labware/definitions' = 'opentrons_shared_data/data/labware/definitions'
+'labware/repository/schemas' = 'opentrons_shared_data/data/labware/repository/schemas'
+'liquid/schemas' = 'opentrons_shared_data/data/liquid/schemas'
+'liquid-class/schemas' = 'opentrons_shared_data/data/liquid-class/schemas'
+'liquid-class/definitions' = 'opentrons_shared_data/data/liquid-class/definitions'
+'module/schemas' = 'opentrons_shared_data/data/module/schemas'
+'module/definitions' = 'opentrons_shared_data/data/module/definitions'
+'pipette/schemas' = 'opentrons_shared_data/data/pipette/schemas'
+'pipette/definitions' = 'opentrons_shared_data/data/pipette/definitions'
+'protocol/schemas' = 'opentrons_shared_data/data/protocol/schemas'
+'robot/schemas' = 'opentrons_shared_data/data/robot/schemas'
+'robot/definitions' = 'opentrons_shared_data/data/robot/definitions'
+'LICENSE' = 'LICENSE'

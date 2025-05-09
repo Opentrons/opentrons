@@ -19,14 +19,11 @@ docstring-convention = google
 
 noqa-require-code = true
 
-# TODO(mc, 2021-04-12): this config ignores type annotation and doc
-# string lints in these modules; remove entries as they are fixed
 per-file-ignores =
-    setup.py:ANN,D
-    opentrons_shared_data/load.py:ANN,D
-    opentrons_shared_data/deck/*:ANN,D
-    opentrons_shared_data/labware/*:ANN,D
-    opentrons_shared_data/module/*:ANN,D
-    opentrons_shared_data/pipette/*:ANN,D
-    opentrons_shared_data/protocol/*:ANN,D
-    tests/*:ANN,D
+    python/opentrons_shared_data/load.py:D
+    python/opentrons_shared_data/deck/*:D
+    python/opentrons_shared_data/labware/*:D
+    python/opentrons_shared_data/module/*:D
+    python/opentrons_shared_data/pipette/*:D
+    python/opentrons_shared_data/protocol/*:D
+    python_tests/*:ANN,D

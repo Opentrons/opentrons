@@ -1,7 +1,7 @@
 # shared-data python code makefile
 
-include ../../scripts/python.mk
-include ../../scripts/push.mk
+include ../scripts/python.mk
+include ../scripts/push.mk
 
 # Host key location for robot
 ssh_key ?= $(default_ssh_key)
@@ -35,13 +35,13 @@ BUILD_DIR := dist
 wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,$(project_rs_default),opentrons_shared_data,$(BUILD_NUMBER),../../scripts/python_build_utils.py)
 sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,$(project_rs_default),opentrons_shared_data,,../../scripts/python_build_utils.py)
 
-py_sources = $(filter %.py,$(shell $(SHX) find opentrons_shared_data)) opentrons_shared_data/py.typed
-deck_sources = $(wildcard ../deck/definitions/*/*.json) $(wildcard ../deck/schemas/*.json)
-labware_sources = $(wildcard ../labware/definitions/*/*.json) $(wildcard ../labware/schemas/*.json)
-module_sources = $(wildcard ../module/definitions/*.json) $(wildcard ../module/definitions/*/*.json) $(wildcard ../module/schemas/*.json)
-pipette_sources = $(wildcard ../pipette/definitions/*.json) $(wildcard ../pipette/schemas/*.json)
-protocol_sources = $(wildcard ../protocol/schemas/*.json)
-gripper_sources = $(wildcard ../gripper/definitions/*.json) $(wildcard ../gripper/schemas/*.json)
+py_sources = $(filter %.py,$(shell $(SHX) find python/opentrons_shared_data)) python/opentrons_shared_data/py.typed
+deck_sources = $(wildcard deck/definitions/*/*.json) $(wildcard deck/schemas/*.json)
+labware_sources = $(wildcard labware/definitions/*/*.json) $(wildcard labware/schemas/*.json)
+module_sources = $(wildcard module/definitions/*.json) $(wildcard module/definitions/*/*.json) $(wildcard module/schemas/*.json)
+pipette_sources = $(wildcard pipette/definitions/*.json) $(wildcard pipette/schemas/*.json)
+protocol_sources = $(wildcard protocol/schemas/*.json)
+gripper_sources = $(wildcard gripper/definitions/*.json) $(wildcard gripper/schemas/*.json)
 
 json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_sources) $(protocol_sources) $(gripper_sources)
 
@@ -79,25 +79,23 @@ clean:
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)
-wheel: setup.py $(py_sources) $(json_sources)
-	$(SHX) mkdir -p build
-	$(python) setup.py $(wheel_opts) bdist_wheel
+wheel: $(py_sources) $(json_sources)
+	$(python) -m build --wheel $(build_wheel_opts) .
 	$(SHX) ls $(BUILD_DIR)
 
 
 .PHONY: sdist
 sdist: export OPENTRONS_PROJECT=$(project_rs_default)
-sdist: setup.py $(py_sources) $(json_sources)
-	$(SHX) mkdir -p build
-	$(python) setup.py sdist
+sdist: $(py_sources) $(json_sources)
+	$(python) -m build --sdist .
 	$(SHX) ls $(BUILD_DIR)
 
 
 .PHONY: lint
 lint: $(py_sources)
 	$(python) -m mypy python/opentrons_shared_data python_tests
-	$(python) -m black --check python/opentrons_shared_data python_tests setup.py
-	$(python) -m flake8 python/opentrons_shared_data python_tests setup.py
+	$(python) -m black --check python/opentrons_shared_data python_tests
+	$(python) -m flake8 python/opentrons_shared_data python_tests
 
 .PHONY: format
 format:

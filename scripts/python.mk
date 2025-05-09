@@ -22,6 +22,7 @@ pytest := $(pipenv) run py.test
 pipenv_opts := --dev $(and $(OT_VIRTUALENV_VERSION),--python $(OT_VIRTUALENV_VERSION))
 pipenv_opts += $(and $(CI),--clear)
 wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
+build_wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),--verbose,)
 
 poetry := poetry
 poetry_run := $(poetry) run
