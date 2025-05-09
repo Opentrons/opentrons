@@ -70,7 +70,11 @@ def run(protocol: ProtocolContext) -> None:
         original_disp_rate = pipette.flow_rate.dispense
 
         # Perform transfer
-        pipette.aspirate(volume, source.bottom(z=dot_bottom))
+        if source.current_liquid_volume() < volume:
+            src_location = source.meniscus(z=meniscus_z, target="end")
+        else:
+            src_location = source.bottom(z=dot_bottom)
+        pipette.aspirate(volume, src_location)
         pipette.move_to(source.top(), speed=5)
         pipette.dispense(volume, dest.bottom(z=dot_bottom))
         pipette.move_to(dest.top(), speed=5)
@@ -129,7 +133,7 @@ def run(protocol: ProtocolContext) -> None:
     pcr2_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "D4", label="PCR2 Plate"
     )
-
+    pcr2_plate.load_empty(pcr2_plate.wells())
     # Load tips
     tiprack_adapter = protocol.load_adapter("opentrons_flex_96_tiprack_adapter", "B3")
     tiprack_1 = tiprack_adapter.load_labware("opentrons_flex_96_tiprack_50ul")
@@ -146,15 +150,16 @@ def run(protocol: ProtocolContext) -> None:
 
     # Load liquids and probe.
     liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
-        "Water": [{"well": reservoir.wells(), "volume": 150}],
-        "pcr_mm1": [{"well": pcr_reagents_plate.wells(), "volume": 100}],
-        "pcr_mm2": [{"well": pcr_reagents_plate.wells(), "volume": 100}],
-        "Index": [{"well": indices_plate.wells(), "volume": 100}],
-        "DNA": [{"well": dna_plate.wells(), "volume": 100}],
+        "Water": [{"well": reservoir.wells(), "volume": 200.0}],
+        "pcr_mm1": [{"well": pcr_reagents_plate.wells(), "volume": 200.0}],
+        "pcr_dilution": [{"well": pcr1_dilution_plate.wells(), "volume": 200.0}],
+        "pcr_dilution2": [{"well": pcr2_dilution_plate.wells(), "volume": 200.0}],
+        "Index": [{"well": indices_plate.wells(), "volume": 100.0}],
+        "DNA": [{"well": dna_plate.wells(), "volume": 100.0}],
     }
+
     pcr_mm1 = pcr_reagents_plate["A1"]
     pcr_mm2 = pcr_reagents_plate["A2"]
-
     if probe_height_bool:
         helpers.find_liquid_height_of_loaded_liquids(
             protocol, liquid_vols_and_wells=liquid_vols_and_wells, pipette=p96
@@ -261,12 +266,12 @@ def run(protocol: ProtocolContext) -> None:
     # Steps 11-12: PCR1 dilution setup
     protocol.comment("Setting up PCR1 dilution")
     p96.pick_up_tip(tiprack_1["A1"])
-    transfer(p96, 40, reservoir["A1"], pcr1_dilution_plate["A1"])
-    transfer(p96, 5, pcr1_plate["A1"], pcr1_dilution_plate["A1"], mix_after=(10, 45))
+    transfer(p96, 40.0, reservoir["A1"], pcr1_dilution_plate["A1"])
+    transfer(p96, 5.0, pcr1_plate["A1"], pcr1_dilution_plate["A1"], mix_after=(10, 45))
 
     # Step 13: Transfer diluted PCR1 to PCR2
     protocol.comment("Transferring diluted PCR1 to PCR2")
-    transfer(p96, 5, pcr1_dilution_plate["A1"], pcr2_plate["A1"], mix_after=(10, 45))
+    transfer(p96, 5.0, pcr1_dilution_plate["A1"], pcr2_plate["A1"], mix_after=(10, 45))
     p96.return_tip()
 
     # Step 14: PCR2 thermal cycling

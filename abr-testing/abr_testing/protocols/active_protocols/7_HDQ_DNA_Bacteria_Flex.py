@@ -59,7 +59,6 @@ def add_parameters(parameters: ParameterContext) -> None:
     """Define Parameters."""
     helpers.create_single_pipette_mount_parameter(parameters)
     helpers.create_hs_speed_parameter(parameters)
-    helpers.create_dot_bottom_parameter(parameters)
     helpers.create_deactivate_modules_parameter(parameters)
     parameters.add_bool(
         variable_name="plate_reader", display_name="Plate Reader Use", default=False
@@ -72,11 +71,10 @@ def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
-    dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     plate_reader_bool = protocol.params.plate_reader  # type: ignore[attr-defined]
-    probe_height_bool = protocol.params.probe_liquid_height # type: ignore[attr-defined]
-    meniscus_z = protocol.params.meniscus_z # type: ignore[attr-defined]
+    probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
+    meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "02")
 
     dry_run = False
@@ -218,7 +216,9 @@ def run(protocol: ProtocolContext) -> None:
     if probe_height_bool:
         helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
     else:
-        helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, m1000)
+        helpers.find_liquid_height_of_loaded_liquids(
+            protocol, liquid_vols_and_wells, m1000
+        )
 
     def tiptrack(tipbox: List[Well]) -> None:
         """Track Tips."""
@@ -247,7 +247,6 @@ def run(protocol: ProtocolContext) -> None:
                 m1000.move_to(m.center())
                 m1000.transfer(vol_per_trans, loc, waste, new_tip="never", air_gap=20)
                 m1000.blow_out(waste)
-                m1000.prepare_to_aspirate()
                 m1000.air_gap(20)
             m1000.drop_tip(tips_sn[8 * i]) if TIP_TRASH else m1000.return_tip()
         m1000.flow_rate.aspirate = 300
@@ -346,15 +345,7 @@ def run(protocol: ProtocolContext) -> None:
         protocol.comment("-----Mixing then transferring AL buffer-----")
         num_transfers = math.ceil(vol / 980)
         tiptrack(tips)
-        m1000.prepare_to_aspirate()
         for i in range(num_cols):
-            if num_cols >= 5:
-                if i == 0:
-                    height = 10
-                else:
-                    height = 1
-            else:
-                height = 1
             src = source
             tvol = vol / num_transfers
             for t in range(num_transfers):
@@ -365,18 +356,15 @@ def run(protocol: ProtocolContext) -> None:
                 m1000.aspirate(tvol, src.meniscus(z=meniscus_z, target="end"))
                 m1000.air_gap(10)
                 m1000.dispense(m1000.current_volume, samples_m[i].top())
-                m1000.prepare_to_aspirate()
                 m1000.air_gap(20)
 
         for i in range(num_cols):
             if i != 0:
                 tiptrack(tips)
-                m1000.prepare_to_aspirate()
             mixing(
                 samples_m[i], m1000, tvol - 40, reps=10 if not dry_run else 1
             )  # vol is 250 AL + 180 sample
             m1000.dispense(m1000.current_volume, waste)
-            m1000.prepare_to_aspirate()
             m1000.air_gap(20)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
@@ -430,7 +418,6 @@ def run(protocol: ProtocolContext) -> None:
                     vol_per_trans, source, well.top(), air_gap=20, new_tip="never"
                 )
                 if t < num_trans - 1:
-                    m1000.prepare_to_aspirate()
                     m1000.air_gap(20)
 
         protocol.comment("-----Mixing Beads in Plate-----")
@@ -538,7 +525,11 @@ def run(protocol: ProtocolContext) -> None:
             m1000.flow_rate.dispense = 100
             m1000.flow_rate.aspirate = 150
             m1000.transfer(
-                vol, m.meniscus(z=meniscus_z, target="end"), e.bottom(5), air_gap=20, new_tip="never"
+                vol,
+                m.meniscus(z=meniscus_z, target="end"),
+                e.bottom(5),
+                air_gap=20,
+                new_tip="never",
             )
             m1000.blow_out(e.top(-2))
             m1000.air_gap(20)
@@ -547,11 +538,12 @@ def run(protocol: ProtocolContext) -> None:
     if plate_reader_bool:
         # Plate reader steps
         # 1. Fill plate with water
-        water_well = reservoir_for_plate_reader["A2"].meniscus(z = meniscus_z, target="end")
+        water_well = reservoir_for_plate_reader["A2"].meniscus(
+            z=meniscus_z, target="end"
+        )
         total_dispensed = 0
         for well in plate_for_plate_reader.rows()[0]:
             m1000.pick_up_tip()
-            m1000.prepare_to_aspirate()
             m1000.aspirate(190, water_well)
             m1000.air_gap(10)
             m1000.dispense(10, well.top())
@@ -559,10 +551,9 @@ def run(protocol: ProtocolContext) -> None:
             m1000.blow_out(well.top())
             protocol.delay(minutes=0.1)
             m1000.blow_out(well.top())
-            m1000.prepare_to_aspirate()
             total_dispensed += 190 * m1000.active_channels
             if total_dispensed > (water_vol_per_well - reservoir_dead_vol):
-                water_well = reservoir_for_plate_reader["A3"]
+                water_well = reservoir_for_plate_reader["A3"].top()
             m1000.return_tip()
         # 2. Mix tartrazine
         m1000.pick_up_tip()
@@ -576,7 +567,6 @@ def run(protocol: ProtocolContext) -> None:
             m50.pick_up_tip()
             # height = helpers.find_liquid_height(m50, tartrazine_well)
             height = 1
-            m50.prepare_to_aspirate()
             if height <= 0.0:
                 # If a negative tartrazine height is found,
                 # the protocol will pause, prompt a refill, and reprobe.
@@ -590,7 +580,6 @@ def run(protocol: ProtocolContext) -> None:
             m50.blow_out()
             protocol.delay(minutes=0.1)
             m50.blow_out()
-            m1000.prepare_to_aspirate()
             m50.return_tip()
         # 3. Read plate
         # Move labware to heater shaker to be mixed

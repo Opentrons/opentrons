@@ -214,8 +214,8 @@ def run(protocol: ProtocolContext) -> None:
         ],
         "Samples": [{"well": sample_plate_1.wells(), "volume": 150.0}],
     }
-    wells_col_1_to_7 = [well for col in sample_plate_2.columns()[:7] for well in col]
-    sample_plate_2.load_empty(wells_col_1_to_7)
+    # wells_col_1_to_7 = [well for col in sample_plate_2.columns()[:7] for well in col]
+    # sample_plate_2.load_empty(wells_col_1_to_7)
     if probe_liquid_height_bool:
         helpers.find_liquid_height_of_loaded_liquids(
             protocol, liquid_vols_and_wells, p50

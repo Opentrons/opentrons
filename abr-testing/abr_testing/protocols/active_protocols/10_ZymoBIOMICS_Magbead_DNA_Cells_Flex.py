@@ -53,7 +53,6 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
     """Define parameters."""
     helpers.create_hs_speed_parameter(parameters)
     helpers.create_single_pipette_mount_parameter(parameters)
-    helpers.create_dot_bottom_parameter(parameters)
     helpers.create_deactivate_modules_parameter(parameters)
     helpers.create_meniscus_z_parameter(parameters)
     helpers.create_probe_liquid_height_parameter(parameters)
@@ -63,15 +62,14 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     """Protocol Set Up."""
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
-    dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
-    probe_height_bool = protocol.params.probe_liquid_height # type: ignore[attr-defined]
-    meniscus_z = protocol.params.meniscus_z # type: ignore[attr-defined]
+    probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
+    meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "01")
 
     dry_run = False
     TIP_TRASH = (
-        False  # True = Used tips go in Trash, False = Used tips go back into rack
+        False  # True = Used tips go i n Trash, False = Used tips go back into rack
     )
     res_type = "nest_12_reservoir_15ml"
     global m1000_tips
@@ -173,10 +171,13 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         "Samples": [{"well": samps, "volume": 0.0}],
         "Reagents": [{"well": all_washes, "volume": 9800.0}],
     }
+    elutionplate.load_empty(elutionplate.wells())
     if probe_height_bool:
         helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
     else:
-        helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, m1000)
+        helpers.find_liquid_height_of_loaded_liquids(
+            protocol, liquid_vols_and_wells, m1000
+        )
 
     m1000.flow_rate.aspirate = 300
     m1000.flow_rate.dispense = 300
@@ -194,6 +195,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
             loc = m.meniscus(z=meniscus_z, target="end")
             for _ in range(num_trans):
                 m1000.move_to(m.center())
+                if vol_per_trans > m.current_liquid_volume():
+                    vol_per_trans = m.current_liquid_volume() - 100  # type: ignore
                 m1000.transfer(vol_per_trans, loc, waste, new_tip="never", air_gap=20)
                 m1000.blow_out(waste)
                 m1000.air_gap(20)
@@ -264,9 +267,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         dispensing at the top and 2 cycles of aspirating from middle,
         dispensing at the bottom
         """
-        pip.liquid_presence_detection = False
         center = well.top(5)
-        asp = well.bottom(1)
+        asp = well.bottom(z=1)
         disp = well.top(-8)
 
         if mvol > 1000:
@@ -303,15 +305,11 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
             tvol = vol / num_transfers
             # Mix Shield and PK before transferring first time
             if i == 0:
-                m1000.liquid_presence_detection = (
-                    False  # turn off liquid detection during mixing
-                )
                 for x in range(lysis_rep_1):
                     m1000.aspirate(vol, src.bottom(1))
                     m1000.dispense(vol, src.bottom(8))
             # Transfer Shield and PK
             for t in range(num_transfers):
-                m1000.require_liquid_presence(src)
                 m1000.aspirate(tvol, src.bottom(1))
                 m1000.air_gap(10)
                 m1000.dispense(m1000.current_volume, samples_m[i].top())
@@ -356,7 +354,6 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
                 if m1000.current_volume > 0:
                     # void air gap if necessary
                     m1000.dispense(m1000.current_volume, source.top())
-                m1000.require_liquid_presence(source)
                 m1000.transfer(
                     vol_per_trans, source, well.top(), air_gap=20, new_tip="never"
                 )
@@ -392,10 +389,6 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
             num_trans = math.ceil(vol2 / 980)
             vol_per_trans = vol2 / num_trans
             source = bind2_res[i // 3]
-            if i == 0 or i == 3:
-                height = 10
-            else:
-                height = 1
             # Transfer beads and binding from source to H-S plate
             for t in range(num_trans):
                 if m1000.current_volume > 0:
@@ -403,7 +396,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
                     m1000.dispense(m1000.current_volume, source.top())
                 m1000.transfer(
                     vol_per_trans,
-                    source.bottom(height),
+                    source.meniscus(z=meniscus_z, target="end"),
                     well.top(),
                     air_gap=20,
                     new_tip="never",
@@ -450,10 +443,9 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
             for n in range(num_trans):
                 if m1000.current_volume > 0:
                     m1000.dispense(m1000.current_volume, src.top())
-                m1000.require_liquid_presence(src)
                 m1000.transfer(
                     vol_per_trans,
-                    src.bottom(dot_bottom),
+                    src.meniscus(z=meniscus_z, target="end"),
                     m.top(),
                     air_gap=20,
                     new_tip="never",
@@ -489,7 +481,6 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tipcheck(m1000)
         total_elution_vol = 0.0
         for i, m in enumerate(samples_m):
-            m1000.require_liquid_presence(elution_solution)
             m1000.aspirate(vol, elution_solution)
             m1000.air_gap(20)
             m1000.dispense(m1000.current_volume, m.top(-3))
@@ -507,13 +498,16 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
                 minutes=0.5,
                 msg="Incubating on MagDeck for " + str(elutei) + " more minutes.",
             )
-
         for i, (m, e) in enumerate(zip(samples_m, elution_samples_m)):
             tipcheck(m1000)
             m1000.flow_rate.dispense = 100
             m1000.flow_rate.aspirate = 25
             m1000.transfer(
-                vol, m.bottom(dot_bottom), e.bottom(5), air_gap=20, new_tip="never"
+                vol,
+                m.meniscus(z=meniscus_z, target="end"),
+                e.meniscus(z=5, target="end"),
+                air_gap=20,
+                new_tip="never",
             )
             m1000.blow_out(e.top(-2))
             m1000.air_gap(20)

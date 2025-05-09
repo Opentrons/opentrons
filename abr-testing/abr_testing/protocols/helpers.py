@@ -387,7 +387,6 @@ def create_deactivate_modules_parameter(parameters: ParameterContext) -> None:
 # FUNCTIONS FOR COMMON MODULE SEQUENCES
 def deactivate_modules(protocol: ProtocolContext) -> None:
     """Deactivate all loaded modules."""
-    print("Deactivating Modules")
     modules = protocol.loaded_modules
 
     if modules:
@@ -517,7 +516,9 @@ def clean_up_plates(
                 vol_transfer = well.max_volume
             else:
                 vol_transfer = well.current_liquid_volume()  # type: ignore
-            pipette.transfer(vol_transfer, well, liquid_waste.top(), new_tip="never")
+                pipette.transfer(
+                    vol_transfer, well, liquid_waste.top(), new_tip="never"
+                )
     if pipette.channels != num_of_active_channels:
         pipette.drop_tip()
     else:
@@ -561,7 +562,7 @@ def load_wells_with_custom_liquids(
                 wells = [well_info["well"]]
             else:
                 wells = []
-            if isinstance(well_info["volume"], float):
+            if isinstance(well_info["volume"], (float, int)):
                 volume = well_info["volume"]
             # Load liquid into each well
             for well in wells:
@@ -598,19 +599,11 @@ def find_liquid_height_of_all_wells(
             and total_number_of_wells_in_plate > 12
             and well.well_name.startswith("A")
         ):
-            try:
-                pipette.require_liquid_presence(well)
-            except Exception as e:
-                protocol.comment(f"Error: {e}")
-                continue
-            dict_of_labware_heights[labware_name, well] = well.current_liquid_height()
+            height = pipette.measure_liquid_height(well)
+            dict_of_labware_heights[labware_name, well] = height
         elif total_number_of_wells_in_plate <= 12:
-            try:
-                pipette.require_liquid_presence(well)
-            except Exception as e:
-                protocol.comment(f"Error: {e}")
-                continue
-            dict_of_labware_heights[labware_name, well] = well.current_liquid_height()
+            height = pipette.measure_liquid_height(well)
+            dict_of_labware_heights[labware_name, well] = height
     if pip_channels != pipette.channels:
         pipette.drop_tip()
     else:
