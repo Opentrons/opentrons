@@ -131,7 +131,7 @@ export function LabwareCardOverflowMenu(
     e.preventDefault()
     e.stopPropagation()
   }
-  console.log('showNotCompatibleModal', showNotCompatibleModal)
+
   return (
     <>
       {isLabwareOnSlotInUse && showDeleteEntityInUseModal ? (
