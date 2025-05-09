@@ -26,6 +26,7 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX,
   FLEX_STACKER_MODULE_TYPE,
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
@@ -83,6 +84,11 @@ import type {
 } from '/app/redux/modules/types'
 import type { RequestState } from '/app/redux/robot-api/types'
 import type { Dispatch, State } from '/app/redux/types'
+
+const HAS_SETUP_INSTRUCTIONS_TYPE: ModuleType[] = [
+  FLEX_STACKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+]
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -287,8 +293,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         />
       ) : null}
       {showSetupWizard &&
-        (module.moduleType === HEATERSHAKER_MODULE_TYPE ||
-          module.moduleType === FLEX_STACKER_MODULE_TYPE) && (
+        HAS_SETUP_INSTRUCTIONS_TYPE.includes(module.moduleType) && (
           <ModuleSetupModal
             close={() => {
               setShowSetupWizard(false)
