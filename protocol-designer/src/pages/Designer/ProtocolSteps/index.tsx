@@ -243,25 +243,26 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
           >
             {isZoomedIn || formData != null ? null : (
               <Flex justifyContent={JUSTIFY_END}>
-                <ExportButton />
+                {/* ToDo (kk 05/09/2025): add export function */}
+                <ExportButton setShowExportWarningModal={() => {}} />
               </Flex>
             )}
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-              {selectedTerminalItemId === HARDWARE_ID ? (
-                <TimelineEditHardware />
-              ) : deckView === leftString ? (
-                <DeckSetupContainer
-                  viewBox={viewBox}
-                  setViewBox={setViewBox}
-                  deckDef={deckDef}
-                  initialViewBox={initialViewBox}
-                  hoverSlot={hoverSlot}
-                  setHoverSlot={setHoverSlot}
-                  robotType={robotType}
-                />
-              ) : (
-                <OffDeck setOverflowMenu={showLiquidOverflowMenu} />
-              )}
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing24}
+              width={
+                (isZoomedIn && !isOffDeck) ||
+                (selectedTerminalItemId === HARDWARE_ID &&
+                  robotType === OT2_ROBOT_TYPE)
+                  ? '90%'
+                  : isZoomedIn && isOffDeck
+                  ? '100%'
+                  : CONTENT_MAX_WIDTH
+              }
+              justifyContent={JUSTIFY_CENTER}
+              paddingTop={isZoomedIn ? '0' : SPACING.spacing60}
+              marginX="auto"
+            >
               {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
                 <>
                   {showTimelineAlerts ? (
@@ -302,6 +303,10 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
                   <TimelineEditHardware />
                 ) : deckView === leftString ? (
                   <DeckSetupContainer
+                    viewBox={viewBox}
+                    setViewBox={setViewBox}
+                    deckDef={deckDef}
+                    initialViewBox={initialViewBox}
                     hoverSlot={hoverSlot}
                     setHoverSlot={setHoverSlot}
                     robotType={robotType}
