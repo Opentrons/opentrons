@@ -15,6 +15,10 @@ import {
   StyledText,
   useOnClickOutside,
 } from '@opentrons/components'
+import {
+  getFullStackFromLabwares,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import {
   ConfirmDeleteEntityInUseModal,
@@ -24,22 +28,28 @@ import { deleteContainer } from '../../../labware-ingred/actions'
 import { getIsLabwareOnSlotInUse } from '../../../pages/Designer/DeckSetup/utils'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { getModuleIdFromStack } from '../../../utils'
+import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../../utils/labwareModuleCompatibility'
+import { LabwareNotCompatibleModal } from '../LabwareNotCompatibleModal'
 
 import type { Dispatch, MouseEvent, SetStateAction } from 'react'
 import type { ThunkDispatch } from '../../../types'
 
 interface LabwareCardOverflowMenuProps {
-  labwareIds: string[]
+  labwareId: string
   setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
 }
 export function LabwareCardOverflowMenu(
   props: LabwareCardOverflowMenuProps
 ): JSX.Element | null {
-  const { labwareIds, setShowOverflowMenu } = props
+  const { labwareId, setShowOverflowMenu } = props
   const { t } = useTranslation('starting_deck_state')
   const savedSteps = useSelector(getSavedStepForms)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
-  const { labware: deckSetupLabware } = deckSetup
+  const [showNotCompatibleModal, setShowNotCompatibleModal] = useState<boolean>(
+    false
+  )
+  const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const [
     showDeleteEntityInUseModal,
@@ -48,33 +58,50 @@ export function LabwareCardOverflowMenu(
   const [showNickNameModal, setShowNickNameModal] = useState<boolean>(false)
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
-      if (!showNickNameModal && !showDeleteEntityInUseModal) {
+      if (
+        !showNickNameModal &&
+        !showDeleteEntityInUseModal &&
+        !showNotCompatibleModal
+      ) {
         setShowOverflowMenu(false)
       }
     },
   })
-  const topLabwareId = labwareIds[0]
+  const isAdapter = deckSetupLabware[labwareId].def.allowedRoles?.includes(
+    'adapter'
+  )
+  const slotName = getSlotInLocationStack(deckSetupLabware[labwareId].stack)
+  const fullStack = getFullStackFromLabwares(deckSetupLabware, slotName)
+  const moduleId = getModuleIdFromStack(fullStack, deckSetupModules)
+  const moduleType = moduleId != null ? deckSetupModules[moduleId].type : null
+  const labwareAboveAdapter = fullStack[fullStack.indexOf(labwareId) - 1]
+  const loadNameAboveAdapter = Object.values(deckSetupLabware).find(
+    lw => lw.labwareDefURI === labwareAboveAdapter
+  )?.def.parameters.loadName
+  const isLabwareCompatible =
+    loadNameAboveAdapter != null &&
+    moduleType != null &&
+    COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType].includes(
+      loadNameAboveAdapter
+    )
   const disallowNickname =
-    labwareIds.length > 1 ||
-    deckSetupLabware[topLabwareId].def.allowedRoles?.includes('adapter') ||
-    deckSetupLabware[topLabwareId].def.parameters.isTiprack ||
-    deckSetupLabware[topLabwareId].def.parameters.quirks?.includes(
+    isAdapter ||
+    deckSetupLabware[labwareId].def.parameters.isTiprack ||
+    deckSetupLabware[labwareId].def.parameters.quirks?.includes(
       'tiprackAdapterFor96Channel'
     )
 
-  const isLabwareOnSlotInUse =
-    topLabwareId != null
-      ? getIsLabwareOnSlotInUse(savedSteps, deckSetupLabware[topLabwareId])
-      : false
+  const isLabwareOnSlotInUse = getIsLabwareOnSlotInUse(
+    savedSteps,
+    deckSetupLabware[labwareId]
+  )
 
   const handleClear = (): void => {
-    labwareIds.forEach(id => {
-      dispatch(deleteContainer({ labwareId: deckSetupLabware[id].id }))
-    })
+    dispatch(deleteContainer({ labwareId }))
   }
 
   const handleConfirmDeleteEntityInUseModal = (): void => {
-    handleClear()
+    dispatch(deleteContainer({ labwareId }))
     setShowOverflowMenu(false)
     setShowDeleteEntityInUseModal(false)
   }
@@ -82,6 +109,15 @@ export function LabwareCardOverflowMenu(
   const handleClearLabware = (e: MouseEvent): void => {
     if (isLabwareOnSlotInUse) {
       setShowDeleteEntityInUseModal(true)
+      e.preventDefault()
+      e.stopPropagation()
+    } else if (
+      isAdapter &&
+      moduleType != null &&
+      labwareAboveAdapter != null &&
+      !isLabwareCompatible
+    ) {
+      setShowNotCompatibleModal(true)
       e.preventDefault()
       e.stopPropagation()
     } else {
@@ -95,7 +131,7 @@ export function LabwareCardOverflowMenu(
     e.preventDefault()
     e.stopPropagation()
   }
-
+  console.log('showNotCompatibleModal', showNotCompatibleModal)
   return (
     <>
       {isLabwareOnSlotInUse && showDeleteEntityInUseModal ? (
@@ -108,11 +144,26 @@ export function LabwareCardOverflowMenu(
       ) : null}
       {showNickNameModal ? (
         <EditNickNameModal
-          labwareId={labwareIds[0]}
+          labwareId={labwareId}
           onClose={() => {
             setShowNickNameModal(false)
             setShowOverflowMenu(false)
           }}
+        />
+      ) : null}
+      {showNotCompatibleModal ? (
+        <LabwareNotCompatibleModal
+          onDone={() => {
+            dispatch(deleteContainer({ labwareId }))
+            dispatch(deleteContainer({ labwareId: labwareAboveAdapter }))
+            setShowNotCompatibleModal(false)
+          }}
+          onClose={() => {
+            setShowNotCompatibleModal(false)
+          }}
+          labwareDisplayName={
+            deckSetupLabware[labwareAboveAdapter].def.metadata.displayName
+          }
         />
       ) : null}
       <Flex

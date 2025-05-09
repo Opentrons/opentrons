@@ -50,8 +50,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       {showOverflowMenu ? (
         <LabwareCardOverflowMenu
           setShowOverflowMenu={setShowOverflowMenu}
-          //  TODO: refactor when we know how stacking labware works for this overflow menu
-          labwareIds={[labware.id]}
+          labwareId={labware.id}
         />
       ) : null}
       <ListItem type="default" backgroundColor={COLORS.grey30}>

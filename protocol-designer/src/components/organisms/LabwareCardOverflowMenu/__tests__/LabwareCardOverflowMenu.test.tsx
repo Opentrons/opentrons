@@ -34,7 +34,7 @@ describe('LabwareCardOverflowMenu', () => {
   beforeEach(() => {
     props = {
       setShowOverflowMenu: vi.fn(),
-      labwareIds: ['mockLabwareId'],
+      labwareId: 'mockLabwareId',
     }
     vi.mocked(EditNickNameModal).mockReturnValue(
       <div>mock EditNickNameModal</div>

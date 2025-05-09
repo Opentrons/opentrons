@@ -620,10 +620,9 @@ export const savedStepForms = (
         if (savedForm.stepType === 'manualIntervention') {
           // remove instances of labware from all manualIntervention steps
           const updatedLabwareLocation = Object.entries(
-            savedForm.labwareLocationUpdate
-          ).reduce((acc, [labwareId, locationId]) => {
+            savedForm.labwareLocationUpdate as Record<string, string>
+          ).reduce((acc: Record<string, string>, [labwareId, locationId]) => {
             if (labwareId === labwareIdToDelete) {
-              // Skip this entry (i.e., delete it)
               return acc
             }
 
@@ -635,7 +634,7 @@ export const savedStepForms = (
 
             acc[labwareId] = newLocationId
             return acc
-          }, {} as typeof savedForm.labwareLocationUpdate)
+          }, {})
 
           return {
             ...savedForm,

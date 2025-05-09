@@ -151,7 +151,7 @@ describe('DeckSetupToolbox', () => {
       },
     })
     render(props)
-    screen.getAllByText('ANSI 96 Standard Microplate')
+    screen.getAllByText('mock nickName')
     screen.getByText('Add liquid')
     screen.getByText('Bottom of slot')
     screen.getByText('Top of slot')
