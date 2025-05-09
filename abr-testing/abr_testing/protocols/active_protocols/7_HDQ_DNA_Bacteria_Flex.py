@@ -675,6 +675,8 @@ def run(protocol: ProtocolContext) -> None:
         helpers.find_liquid_height_of_all_wells(protocol, m1000, end_wells_with_liquid)
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)
+        if not protocol.is_simulating():
+            slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
             slack_bot.send_error_message(metadata["protocolName"], str(e))

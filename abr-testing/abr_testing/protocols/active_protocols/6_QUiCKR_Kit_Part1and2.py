@@ -254,6 +254,8 @@ def run(protocol: ProtocolContext) -> None:
                 p.reset_tipracks()
         all_plates = plate_384 + plate_96 + [reagent_res]
         helpers.clean_up_plates(protocol, p, all_plates, liquid_waste["A1"])
+        if not protocol.is_simulating():
+            slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
             slack_bot.send_error_message(metadata["protocolName"], str(e))

@@ -1460,6 +1460,8 @@ def run(protocol: ProtocolContext) -> None:
             #         sample_plate_3.wells_by_name()[row + col].load_liquid(
             #             liquid=Final_Sample, volume=0
             #         )
+        if not protocol.is_simulating():
+            slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
             slack_bot.send_error_message(metadata["protocolName"], str(e))

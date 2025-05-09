@@ -2784,6 +2784,8 @@ def run(protocol: ProtocolContext) -> None:
             p1000.dispense(TransferSup + 1, sample_plate_3["A3"].bottom(z=1))
             p1000.drop_tip()
             # ===============================================
+        if not protocol.is_simulating():
+            slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
             slack_bot.send_error_message(metadata["protocolName"], str(e))
