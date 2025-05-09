@@ -2,15 +2,7 @@ import isEmpty from 'lodash/isEmpty'
 import range from 'lodash/range'
 import uniq from 'lodash/uniq'
 
-import {
-  AspirateInPlaceParams,
-  BlowoutInPlaceParams,
-  COLUMN,
-  DispenseInPlaceParams,
-  DropTipInPlaceParams,
-  MoveToWellParams,
-  SINGLE,
-} from '@opentrons/shared-data'
+import { COLUMN, SINGLE } from '@opentrons/shared-data'
 
 import {
   AIR,
@@ -22,25 +14,27 @@ import {
 import * as warningCreators from '../warningCreators'
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 
+import type {
+  AspirateInPlaceParams,
+  BlowoutInPlaceParams,
+  DispenseInPlaceParams,
+  DropTipInPlaceParams,
+} from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export const forAspirateInPlace = (
   params: AspirateInPlaceParams,
   invariantContext: InvariantContext,
-  robotStateAndWarnings: RobotStateAndWarnings,
-  moveToWellParams: MoveToWellParams
+  robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { pipetteId, volume } = params
-  const { labwareId, wellName } = moveToWellParams
-  console.log(
-    'forAspirateInPlace moveToWell information',
-    volume,
-    labwareId,
-    wellName,
-    pipetteId
-  )
   const { robotState, warnings } = robotStateAndWarnings
+  const { labwareId, wellName } = robotState.pipettes[pipetteId]
   const { liquidState } = robotState
+
+  if (labwareId == null || wellName == null) {
+    return
+  }
   const nozzles = robotState.pipettes[pipetteId].nozzles
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
