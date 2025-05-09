@@ -5,13 +5,7 @@ from pathlib import Path
 
 def get_ot_defs(schema: int) -> List[Tuple[str, int]]:
     def_files = (
-        Path(__file__).parent
-        / ".."
-        / ".."
-        / ".."
-        / "labware"
-        / "definitions"
-        / str(schema)
+        Path(__file__).parent / ".." / ".." / "labware" / "definitions" / str(schema)
     ).glob("**/*.json")
 
     # example filename
