@@ -310,8 +310,6 @@ export function generateChatPrompt(
   ) => void,
   isPdProtocolGenerationEnabled: boolean = false
 ): string {
-  const protocolFormat = `- ${startCase(values.protocol_format)}`
-
   const robotType = t(values.instruments.robot)
   const scientificApplication = `- ${t(
     values.application.scientificApplication
@@ -425,7 +423,10 @@ export function generateChatPrompt(
   const prompt = `${
     values.protocol_format === PYTHON
       ? t('create_protocol_prompt_robot', { robotType }) + '\n'
-      : t('create_protocol_pd_prompt_robot', { format: startCase(values.protocol_format), robotType }) + '\n'
+      : t('create_protocol_pd_prompt_robot', {
+          format: startCase(values.protocol_format),
+          robotType,
+        }) + '\n'
   }
 
 

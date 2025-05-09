@@ -3,7 +3,7 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, Optional, cast
+from typing import Any, Dict, Iterable, List, Literal, cast
 
 import requests
 import structlog
@@ -374,9 +374,7 @@ class AnthropicPredict:
         """
         original_saved_forms = data.get("designerApplication", {}).get("data", {}).get("savedStepForms", {})
         # Make a copy to modify, or ensure original_steps is a new dict
-        original_steps_without_initial = {
-            k: v for k, v in original_saved_forms.items() if k != "__INITIAL_DECK_SETUP_STEP__"
-        }
+        original_steps_without_initial = {k: v for k, v in original_saved_forms.items() if k != "__INITIAL_DECK_SETUP_STEP__"}
         original_ordered_ids = data.get("designerApplication", {}).get("data", {}).get("orderedStepIds", [])
 
         standard = {
@@ -453,14 +451,7 @@ class AnthropicPredict:
                 },
             },
             "robot": data.get("robot", {}),
-            # "labwareDefinitionSchemaId": data.get("labwareDefinitionSchemaId", ""),
             "labwareDefinitions": {},
-            # "liquidSchemaId": data.get("liquidSchemaId", ""),
-            # "liquids": data.get("liquids", {}),
-            # "commandSchemaId": data.get("commandSchemaId", ""),
-            # "commands": data.get("commands", []),
-            # "commandAnnotationSchemaId": data.get("commandAnnotationSchemaId", "opentronsCommandAnnotationSchemaV1"),
-            # "commandAnnotations": data.get("commandAnnotations", []),
         }
 
         return standard

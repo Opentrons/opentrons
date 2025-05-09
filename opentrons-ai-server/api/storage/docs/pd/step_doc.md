@@ -3,11 +3,11 @@
 **Schema Version: 8**
 
 This document outlines the JSON structure used by Opentrons Protocol Designer. For a successful import, a protocol file must adhere to a minimal structure. Key top-level fields include:
+
 - `"metadata"`: Contains protocol metadata like name and description.
-- `"robot"`: Defines the robot model (`"OT-2 Standard"` or `"OT-3 Standard"`) and `deckId`. 
+- `"robot"`: Defines the robot model (`"OT-2 Standard"` or `"OT-3 Standard"`) and `deckId`.
 - `"designerApplication"`: Contains Protocol Designer specific data, including its version and the core `data` object.
   - `data`: Holds `savedStepForms` (including `__INITIAL_DECK_SETUP_STEP__`), `orderedStepIds`, and definitions for `pipettes`, `modules`, `labware`, etc.
-
 
 ## Overall structure
 
@@ -40,7 +40,7 @@ This document outlines the JSON structure used by Opentrons Protocol Designer. F
       "labware": {}
     }
   },
-  "robot": {},
+  "robot": {}
 }
 ```
 
@@ -106,7 +106,6 @@ Note that pipette ID `pipette_left` must be consistent across different fields:
 }
 ```
 
-
 #### Add labware
 
 - Define labware:
@@ -128,7 +127,6 @@ Note that pipette ID `pipette_left` must be consistent across different fields:
 }
 ```
 
-
 #### Add liquid
 
 Define liquid by filling out these fields:
@@ -144,7 +142,6 @@ Define liquid by filling out these fields:
 }
 ```
 
-
 #### Common step types (both OT-2 and Flex)
 
 - 'thermocycler'
@@ -159,7 +156,8 @@ Define liquid by filling out these fields:
 
 #### Add a gripper (Flex only)
 
-With 
+With
+
 ```json
 "gripperLocationUpdate": {"gripper-1": "mounted"}
 ```
@@ -256,7 +254,6 @@ else:
    - Labware IDs: Use format like "labware-1", "labware-2"
    - Liquid IDs: Use sequential numbers starting from "0"
 
-
 3. Identifier Consistency:
 
    - **Pipette Identifiers** must be consistent across:
@@ -273,7 +270,6 @@ else:
    - **Module Identifiers** must be consistent across:
      - `savedStepForms.__INITIAL_DECK_SETUP_STEP__.moduleLocationUpdate` (e.g., "hs-1")
      - `data.modules`
-
 
 ## Case 1: Basic Pipette and Tiprack Setup
 
@@ -311,9 +307,7 @@ Labware:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -398,9 +392,7 @@ Labware:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -451,7 +443,6 @@ Labware:
 }
 ```
 
-
 ## Case 3: Load thermocycler module
 
 ### Input
@@ -491,9 +482,7 @@ Labware:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -540,7 +529,7 @@ Labware:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
+  }
 }
 ```
 
@@ -583,9 +572,7 @@ Labware:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -634,7 +621,7 @@ Labware:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
+  }
 }
 ```
 
@@ -676,12 +663,8 @@ Labware:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        ],
-        "pipette_right": [
-          "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"],
+        "pipette_right": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -743,7 +726,7 @@ Labware:
 
 ```text
 Metadata:
-- ProtocolName: Basic protocol with liquid 
+- ProtocolName: Basic protocol with liquid
 - Description: protocol with a pipette and tips and a tiprack. No steps.
 
 Robot:
@@ -777,9 +760,7 @@ Liquid
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_tiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_50ul/1"]
       },
       "ingredients": {
         "0": {
@@ -829,7 +810,6 @@ Liquid
 }
 ```
 
-
 ## Case 7: Add liquid
 
 ### Input
@@ -866,9 +846,7 @@ Liquid
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
       },
       "ingredients": {
         "0": {
@@ -967,12 +945,15 @@ Placing labware on heater shaker module requires adapter. The list of adapters a
 <Adapters>
 
 - Opentrons 96 Deep Well Heater-Shaker Adapter
+
   - NEST 96 Deep Well Plate 2mL
 
 - Opentrons 96 Flat Bottom Heater-Shaker Adapter
+
   - NEST 96 Well Plate 200 uL Flat
 
 - Opentrons 96 PCR Heater-Shaker Adapter
+
   - Armadillo 96 Well Plate 200 uL PCR Full Skirt
   - Bio-Rad 96 Well Plate 200 uL PCR
   - NEST 96 Well Plate 100 uL PCR Full Skirt
@@ -981,7 +962,7 @@ Placing labware on heater shaker module requires adapter. The list of adapters a
 - Opentrons Universal Flat Heater-Shaker Adapter
   - Corning 384 Well Plate 112 uL Flat
   - Corning 96 Well Plate 360 uL Flat
-  
+
 </Adapters>
 
 ### Output
@@ -995,9 +976,7 @@ Placing labware on heater shaker module requires adapter. The list of adapters a
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -1114,9 +1093,7 @@ Labware:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -1166,14 +1143,14 @@ Labware:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
+  }
 }
 ```
 
 **Note**
+
 - For Flex robot, note that thermocycler is always in slot B1 (covering B1 and A1 slots in practice).
 - For OT-2 robot, note that thermocycler is always in slot 7 (covering 7, 8, 10, 11) slots in practice).
-
 
 ## Case 10: Temperature with plate
 
@@ -1252,9 +1229,7 @@ Placing labware on temperature module requires Aluminum blocks and/or adapters. 
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_tiprack_1000ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_1000ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -1362,9 +1337,7 @@ Labware:
     "data": {
       "_internalAppBuildDate": "Mon, 05 May 2025 20:38:07 GMT",
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -1449,8 +1422,6 @@ This Magnetic Block allows the following plates
 - NEST 96 Deep Well Plate 2mL
 - Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt
 
-
-
 ### Output
 
 ```json
@@ -1462,9 +1433,7 @@ This Magnetic Block allows the following plates
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_tiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_50ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -1551,9 +1520,7 @@ Labware:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_96_tiprack_300ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_96_tiprack_300ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -1665,9 +1632,7 @@ Steps:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -1694,7 +1659,7 @@ Steps:
           "stepType": "heaterShaker",
           "stepName": "heater-shaker",
           "stepDetails": "",
-          "heaterShakerSetTimer": null, 
+          "heaterShakerSetTimer": null,
           "heaterShakerTimer": null,
           "latchOpen": false,
           "moduleId": "hs-1",
@@ -1704,9 +1669,7 @@ Steps:
           "targetSpeed": null
         }
       },
-      "orderedStepIds": [
-        "step-1"
-      ],
+      "orderedStepIds": ["step-1"],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p50_single_flex"
@@ -1808,9 +1771,7 @@ Steps:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_tiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_50ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -1842,9 +1803,7 @@ Steps:
           "targetTemperature": null
         }
       },
-      "orderedStepIds": [
-        "step-1"
-      ],
+      "orderedStepIds": ["step-1"],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p50_multi_flex"
@@ -2015,9 +1974,7 @@ Steps:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_200ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_200ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -2063,9 +2020,7 @@ Steps:
           "thermocyclerFormType": "thermocyclerState"
         }
       },
-      "orderedStepIds": [
-        "step-1"
-      ],
+      "orderedStepIds": ["step-1"],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p1000_single_flex"
@@ -2243,7 +2198,6 @@ Absorbance Plate Reader has the following parameters:
 
 Note that for absorbance plate reader, gripper is always ussed.
 
-
 with `mode='single'`
 
 ```json
@@ -2255,9 +2209,7 @@ with `mode='single'`
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -2293,14 +2245,10 @@ with `mode='single'`
           "moduleId": "apr-1",
           "referenceWavelength": null,
           "referenceWavelengthActive": false,
-          "wavelengths": [
-            "450"
-          ]
+          "wavelengths": ["450"]
         }
       },
-      "orderedStepIds": [
-        "step-1"
-      ],
+      "orderedStepIds": ["step-1"],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p50_multi_flex"
@@ -2325,8 +2273,6 @@ with `mode='single'`
   }
 }
 ```
-
-
 
 with `mode="multi"`
 
@@ -2427,7 +2373,6 @@ Additional notes:
 8. Optional delays can be added after aspiration or dispensing for certain liquids that benefit from settling time
 9. Blowout is an optional step to expel any remaining liquid after the final dispense
 
-
 ### Input
 
 ```text
@@ -2460,9 +2405,7 @@ Steps:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -2513,18 +2456,10 @@ Steps:
           "times": "5",
           "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
           "volume": "30",
-          "wells": [
-            "A1",
-            "B1",
-            "C1",
-            "D1",
-            "E1"
-          ]
+          "wells": ["A1", "B1", "C1", "D1", "E1"]
         }
       },
-      "orderedStepIds": [
-        "step-1"
-      ],
+      "orderedStepIds": ["step-1"],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p1000_single_flex"
@@ -2551,9 +2486,8 @@ Steps:
 ```
 
 ### Remarks
+
 For `changeTip`, `always` is the default.
-
-
 
 ## Case 19: Steptype: moveLabware (move)
 
@@ -2619,9 +2553,7 @@ Steps:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -2653,9 +2585,7 @@ Steps:
           "useGripper": true
         }
       },
-      "orderedStepIds": [
-        "step-1"
-      ],
+      "orderedStepIds": ["step-1"],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p50_multi_flex"
@@ -2764,9 +2694,7 @@ Steps:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -2798,9 +2726,7 @@ Steps:
           "pauseTime": "00:00:21"
         }
       },
-      "orderedStepIds": [
-        "step-1"
-      ],
+      "orderedStepIds": ["step-1"],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p1000_multi_flex"
@@ -2823,6 +2749,122 @@ Steps:
 ```
 
 ## Case 21: Steptype: moveLiquid (transfer)
+
+`moveLiquid` step accepts the following parameters:
+
+```json
+{
+  // GENERAL STEP INFORMATION
+  "id": "string", // Required - Unique ID for this step. (System-generated, not directly set by user in UI form)
+  "stepType": "moveLiquid", // Required - Type of the step. (Fixed for this form) UI: it is named "Transfer"
+  "stepName": "string", // Optional - Display name for this step. UI: "Name" input field.
+  "stepDetails": "string", // Optional - Description/notes for this step. UI: "Notes" text area.
+
+  // PATH, PIPETTE, AND NOZZLE CONFIGURATION
+  "path": "single" | "multiAspirate" | "multiDispense", // Required - Defines the aspiration/dispensing pattern. UI: "Path" or "Transfer Type" radio buttons/dropdown (e.g., "Single", "Consolidate (Multi-Aspirate)", "Distribute (Multi-Dispense)").
+  "pipette": "PipetteEntity_ID", // Required - ID of the pipette to use. e.g., "pipette_left", "pipette_right"
+  "tipRack": "string", // Required - ID or URI of the tip rack to use. UI: "Tip Rack" dropdown, often filtered by selected pipette. (e.g., "opentrons/opentrons_flex_96_tiprack_200ul/1")
+  "nozzles": "NozzleConfigurationStyle" | null, // Optional - Setting for 96-channel pipette configuration. UI: "Nozzles" / "Active Nozzles" selection (e.g., "ALL" for full block, "COLUMN_1" for first column, or a specific pattern string like "A1_B1_C1"). Default is null if not a 96-channel or if full configuration is used.
+
+  // VOLUME
+  "volume": "number", // Required - Volume to transfer per operation (µL). Must not exceed pipette/tip capacity. UI: "Volume" number input.
+
+  // SOURCE (ASPIRATE) PARAMETERS
+  "aspirate_labware": "LabwareEntity_ID", // Required - ID of the labware to aspirate from - e.g., "labware-1". UI: "Source Labware" dropdown.
+  "aspirate_wells": ["string"], // Required - Array of well names to aspirate from. UI: Well selection component (visual or list-based) for source labware. (e.g., ["A1", "B1"])
+  "aspirate_wells_grouped": "boolean" | null, // Optional (becomes relevant for multi-channel pipettes) - If true, selected wells are treated as a group (e.g., a column for an 8-channel). If false or null, wells might be iterated individually by a single channel of a multi-channel pipette. UI: This might be implicit in the well selection mode or a specific checkbox like "Process wells as groups" or "Use all channels for selection".
+  "aspirate_wellOrder_first": "t2b" | "b2t" | "l2r" | "r2l", // Required - Primary well traversal direction for aspiration. UI: "Well Order (Aspirate)" > "Primary Axis" dropdown.
+  "aspirate_wellOrder_second": "t2b" | "b2t" | "l2r" | "r2l", // Required - Secondary well traversal direction for aspiration. UI: "Well Order (Aspirate)" > "Secondary Axis" dropdown.
+  "aspirate_mmFromBottom": "number" | null, // Optional - Distance from well bottom for aspiration (mm). UI: "Aspirate Height" input field. (Default: e.g., 1 mm)
+  "aspirate_x_position": "number" | null, // Optional - X-offset from the center of the well for aspiration (mm). UI: Advanced Settings > "X-Offset (Aspirate)" input. (Default: 0)
+  "aspirate_y_position": "number" | null, // Optional - Y-offset from the center of the well for aspiration (mm). UI: Advanced Settings > "Y-Offset (Aspirate)" input. (Default: 0)
+
+  "preWetTip": "boolean" | null, // Optional - Whether to pre-wet the tip before the first aspiration. UI: "Pre-wet tip" checkbox. (Default: false)
+
+  "aspirate_mix_checkbox": "boolean", // Required - Whether to mix in the source well(s) before aspiration. UI: "Mix before aspirating" checkbox. (Default: false)
+  "aspirate_mix_times": "number" | null, // Optional - Number of mix repetitions if aspirate_mix_checkbox is true. UI: "Repetitions" input under "Mix before aspirating". (e.g., 1-10)
+  "aspirate_mix_volume": "number" | null, // Optional - Volume for each mix cycle if aspirate_mix_checkbox is true (µL). UI: "Mix Volume" input under "Mix before aspirating".
+
+  "aspirate_airGap_checkbox": "boolean", // Required - Whether to aspirate an air gap after the liquid. UI: "Air Gap (Aspirate)" checkbox. (Default: false)
+  "aspirate_airGap_volume": "number" | null, // Optional - Volume of the air gap if aspirate_airGap_checkbox is true (µL). UI: "Volume" input under "Air Gap (Aspirate)".
+
+  "aspirate_touchTip_checkbox": "boolean", // Required - Whether to perform a touch tip after aspiration. UI: "Touch Tip (Aspirate)" checkbox. (Default: false)
+  "aspirate_touchTip_mmFromBottom": "number" | null, // Optional - Distance from well bottom for touch tip if aspirate_touchTip_checkbox is true (mm). UI: "Height" input under "Touch Tip (Aspirate)".
+
+  "aspirate_flowRate": "number" | null, // Optional - Flow rate for aspiration in µL/sec. UI: "Aspirate Flow Rate" input (often under "Advanced Settings"). (Default: pipette's default)
+
+  "aspirate_delay_checkbox": "boolean", // Required - Whether to add a delay after aspiration. UI: "Delay (Aspirate)" checkbox. (Default: false)
+  "aspirate_delay_seconds": "number" | null, // Optional - Duration of delay in seconds if aspirate_delay_checkbox is true. UI: "Time" input under "Delay (Aspirate)". (e.g., 0-60)
+  "aspirate_delay_mmFromBottom": "number" | null, // Optional - Tip height from well bottom during delay, if aspirate_delay_checkbox is true (mm). UI: "Tip Height During Delay" input under "Delay (Aspirate)".
+
+  // DESTINATION (DISPENSE) PARAMETERS
+  "dispense_labware": "LabwareEntity_ID", // Required - ID of the labware or equipment (e.g., waste chute) to dispense into. UI: "Destination Labware" dropdown. (e.g., "labware-2", "labware-1")
+  "dispense_wells": ["string"], // Required - Array of well names to dispense into. UI: Well selection component for destination labware. (e.g., ["H1", "G1"])
+  "dispense_wellOrder_first": "t2b" | "b2t" | "l2r" | "r2l", // Required - Primary well traversal direction for dispensing. UI: "Well Order (Dispense)" > "Primary Axis" dropdown.
+  "dispense_wellOrder_second": "t2b" | "b2t" | "l2r" | "r2l", // Required - Secondary well traversal direction for dispensing. UI: "Well Order (Dispense)" > "Secondary Axis" dropdown.
+  "dispense_mmFromBottom": "number" | null, // Optional - Distance from well bottom for dispensing (mm). UI: "Dispense Height" input field. (Default: e.g., 1 mm or 0.5mm)
+  "dispense_x_position": "number" | null, // Optional - X-offset from the center of the well for dispensing (mm). UI: Advanced Settings > "X-Offset (Dispense)" input. (Default: 0)
+  "dispense_y_position": "number" | null, // Optional - Y-offset from the center of the well for dispensing (mm). UI: Advanced Settings > "Y-Offset (Dispense)" input. (Default: 0)
+
+  "dispense_mix_checkbox": "boolean", // Required - Whether to mix in the destination well(s) after dispensing. UI: "Mix after dispensing" checkbox. (Default: false)
+  "dispense_mix_times": "number" | null, // Optional - Number of mix repetitions if dispense_mix_checkbox is true. UI: "Repetitions" input under "Mix after dispensing". (e.g., 1-10)
+  "dispense_mix_volume": "number" | null, // Optional - Volume for each mix cycle if dispense_mix_checkbox is true (µL). UI: "Mix Volume" input under "Mix after dispensing".
+
+  "dispense_airGap_checkbox": "boolean", // Required - Whether to dispense the previously aspirated air gap. UI: "Dispense Air Gap" checkbox (often linked to aspirate air gap setting). (Default: false)
+  "dispense_airGap_volume": "number" | null, // Optional - Volume of air gap to dispense (µL). Typically matches aspirate_airGap_volume. UI: Often read-only or linked if aspirate air gap is used.
+
+  "dispense_touchTip_checkbox": "boolean", // Required - Whether to perform a touch tip after dispensing. UI: "Touch Tip (Dispense)" checkbox. (Default: false)
+  "dispense_touchTip_mmFromBottom": "number" | null, // Optional - Distance from well bottom for touch tip if dispense_touchTip_checkbox is true (mm). UI: "Height" input under "Touch Tip (Dispense)".
+
+  "dispense_flowRate": "number" | null, // Optional - Flow rate for dispensing in µL/sec. UI: "Dispense Flow Rate" input (often under "Advanced Settings"). (Default: pipette's default)
+
+  "dispense_delay_checkbox": "boolean", // Required - Whether to add a delay after dispensing. UI: "Delay (Dispense)" checkbox. (Default: false)
+  "dispense_delay_seconds": "number" | null, // Optional - Duration of delay in seconds if dispense_delay_checkbox is true. UI: "Time" input under "Delay (Dispense)". (e.g., 0-60)
+  "dispense_delay_mmFromBottom": "number" | null, // Optional - Tip height from well bottom during delay, if dispense_delay_checkbox is true (mm). UI: "Tip Height During Delay" input under "Delay (Dispense)".
+
+  // TIP HANDLING
+  "changeTip": "always" | "once" | "never" | "perSource" | "perDest", // Required - When to use a new tip. UI: "Change Tip" dropdown.
+  "pickUpTip_location": "string" | null, // Optional - ID of a specific tip rack to pick up tips from. UI: Advanced Settings > "Pick up tip from" dropdown (specific rack). (Default: any suitable rack)
+  "pickUpTip_wellNames": ["string"] | null, // Optional - Array of specific well names within pickUpTip_location to pick up tips from. UI: Advanced Settings > Well selection for specific tip pickup.
+  "dropTip_location": "string", // Required - ID of the location to drop the tip (e.g., "trashBinId", specific waste chute ID). UI: "Drop Tip In" dropdown.
+  "dropTip_wellNames": ["string"] | null, // Optional - Array of specific well names within dropTip_location labware (if applicable, e.g., dropping back into a tip rack). UI: Advanced Settings > Well selection for specific tip drop-off.
+
+  // BLOWOUT & DISPOSAL VOLUME (Primarily for ensuring full dispense or for multi-dispense accuracy)
+  "blowout_checkbox": "boolean", // Required - Whether to perform a blowout after the final dispense in a series. UI: "Blow out" checkbox. (Default: false)
+  "blowout_location": "string" | null, // Optional - ID of the labware/location for blowout if blowout_checkbox is true (e.g., "sourceWellId", "destWellId", "trashBinId"). UI: "Blow out into" dropdown.
+  "blowout_flowRate": "number" | null, // Optional - Flow rate for blowout in µL/sec if blowout_checkbox is true. UI: "Flow Rate" input under "Blow out".
+  "blowout_z_offset": "number" | null, // Optional - Z-offset from the top of the labware for blowout, if blowout_checkbox is true (mm). UI: "Z-Offset" input under "Blow out". (Default: 0)
+
+  "disposalVolume_checkbox": "boolean", // Required - Whether to aspirate an additional volume for disposal (useful in 'multiDispense' path). UI: "Disposal Volume" checkbox (often shown in 'multiDispense' path). (Default: false)
+  "disposalVolume_volume": "number" | null // Optional - Volume to aspirate for disposal if disposalVolume_checkbox is true (µL). UI: "Volume" input under "Disposal Volume".
+}
+```
+
+Additional Notes on Fields and UI Mapping:
+
+- LabwareEntity_ID, PipetteEntity_ID: These are string identifiers (e.g., "pipette_left", "pipette_right", "labware-1"). The UI presents human-readable names in dropdowns, which map to these IDs.
+- NozzleConfigurationStyle: For 96-channel pipettes. Can be predefined strings like "COLUMN_1", "ALL", or a custom pattern. The UI usually provides a visual selection tool or specific named options.
+- Well Order (_\_wellOrder_first, _\_wellOrder_second):
+  - t2b: Top to bottom
+  - b2t: Bottom to top
+  - l2r: Left to right
+  - r2l: Right to left
+    UI typically has dropdowns for "Primary Direction" and "Secondary Direction".
+- changeTip Options:
+  - always: New tip for each transfer (or each well in a multi-well selection if not grouped).
+  - once: Single tip for the entire step.
+  - never: Reuse tip from previous step.
+  - perSource: (For multi-dispense) New tip for each new source labware/well.
+  - perDest: (For multi-aspirate) New tip for each new destination labware/well.
+- Flow Rates (aspirate_flowRate, dispense_flowRate, blowout_flowRate): Usually expressed in µL/second. The UI might offer default values based on the pipette and allow customization, sometimes as a percentage of the pipette's maximum flow rate or as an absolute value. These are often in an "Advanced Settings" panel.
+- Positional Offsets (_\_mmFromBottom, _\_x_position, \*\_y_position, blowout_z_offset): Provide fine control over tip placement. mmFromBottom is relative to the well bottom. x_position and y_position are relative to the well center. blowout_z_offset is often relative to the labware top or well top. Defaults are usually sensible (e.g., 1mm from bottom, center of well).
+- Boolean Checkboxes (\*\_checkbox): These fields (true/false) typically toggle the visibility/applicability of related optional fields in the UI. For instance, if aspirate_mix_checkbox is false, then aspirate_mix_times and aspirate_mix_volume are irrelevant and likely hidden or disabled.
+- Defaults: Many optional fields have default behaviors or values if not specified (e.g., a default height from bottom, default flow rates). The UI often pre-fills these.
+- Ranges and Constraints:
+  - volume, aspirate_mix_volume, aspirate_airGap_volume, disposalVolume_volume must be positive and within pipette/tip operational limits.
+  - mix_times are typically small integers (e.g., 1-20).
+  - delay_seconds are non-negative.
+  - Positional offsets have practical limits based on labware geometry.
 
 This step type is applicable for both robots, so all fields must be present. For example, the field `"dropTip_location": "trashbin-1"` must be included, where "dropTip_location" is the field name and "trashbin-1" must be consistent with the value used in `trashBinLocationUpdate['trashbin-1']`.
 
@@ -2859,9 +2901,7 @@ Steps:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_tiprack_1000ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_1000ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
@@ -2904,9 +2944,7 @@ Steps:
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
           "aspirate_wells_grouped": false,
-          "aspirate_wells": [
-            "A1"
-          ],
+          "aspirate_wells": ["A1"],
           "aspirate_x_position": 0,
           "aspirate_y_position": 0,
           "blowout_checkbox": false,
@@ -2929,16 +2967,7 @@ Steps:
           "dispense_touchTip_mmFromBottom": null,
           "dispense_wellOrder_first": "t2b",
           "dispense_wellOrder_second": "l2r",
-          "dispense_wells": [
-            "A1",
-            "B1",
-            "C1",
-            "D1",
-            "E1",
-            "F1",
-            "G1",
-            "H1"
-          ],
+          "dispense_wells": ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
           "dispense_x_position": 0,
           "dispense_y_position": 0,
           "disposalVolume_checkbox": true,
@@ -2949,12 +2978,13 @@ Steps:
           "pipette": "pipette_left",
           "preWetTip": false,
           "tipRack": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
-          "volume": "20"
+          "volume": "20",
+          "pickUpTip_location": null,
+          "pickUpTip_wellNames": null,
+          "dropTip_wellNames": null
         }
       },
-      "orderedStepIds": [
-        "step-1"
-      ],
+      "orderedStepIds": ["step-1"],
       "pipettes": {
         "pipette_left": {
           "pipetteName": "p1000_single_flex"
@@ -3022,7 +3052,7 @@ Depending on a single or multi-channel, a well selection behaves differently.
 ### Input
 
 ```text
-Robot: 
+Robot:
 - Flex
 
 Steps:
@@ -3034,22 +3064,23 @@ Steps:
 ```json
 {
   "metadata": {
-    "protocolName": "multi-channel",
-    "description": "multi-channel"
+    "protocolName": "moveLiquid step",
+    "description": "moveLiquid step example"
   },
   "designerApplication": {
     "data": {
+      "_internalAppBuildDate": "Mon, 05 May 2025 20:38:07 GMT",
       "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_200ul/1"]
+        "pipette_left": ["opentrons/opentrons_flex_96_tiprack_200ul/1"]
       },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-tiprack-1": "C2",
-            "lw-reservoir-1": "C1",
-            "lw-wellpalte-1": "D1"
+            "labware-1": "C1",
+            "labware-2": "D1",
+            "labware-3": "D2"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
@@ -3073,67 +3104,37 @@ Steps:
           "aspirate_delay_mmFromBottom": null,
           "aspirate_delay_seconds": "1",
           "aspirate_flowRate": "716",
-          "aspirate_labware": "lw-reservoir-1",
+          "aspirate_labware": "labware-1",
           "aspirate_mix_checkbox": false,
           "aspirate_mix_times": null,
           "aspirate_mix_volume": null,
           "aspirate_mmFromBottom": null,
-          "aspirate_position_reference": null,
-          "aspirate_retract_delay_seconds": null,
-          "aspirate_retract_mmFromBottom": null,
-          "aspirate_retract_speed": null,
-          "aspirate_retract_x_position": 0,
-          "aspirate_retract_y_position": 0,
-          "aspirate_retract_position_reference": null,
-          "aspirate_submerge_delay_seconds": null,
-          "aspirate_submerge_speed": null,
-          "aspirate_submerge_mmFromBottom": null,
-          "aspirate_submerge_x_position": 0,
-          "aspirate_submerge_y_position": 0,
-          "aspirate_submerge_position_reference": null,
           "aspirate_touchTip_checkbox": false,
-          "aspirate_touchTip_mmFromTop": null,
-          "aspirate_touchTip_speed": null,
-          "aspirate_touchTip_mmFromEdge": null,
+          "aspirate_touchTip_mmFromBottom": null,
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
           "aspirate_wells_grouped": false,
-          "aspirate_wells": ["A3"],
+          "aspirate_wells": ["A1"],
           "aspirate_x_position": 0,
           "aspirate_y_position": 0,
           "blowout_checkbox": false,
           "blowout_flowRate": null,
           "blowout_location": null,
           "blowout_z_offset": 0,
-          "changeTip": "once",
+          "changeTip": "always",
           "dispense_airGap_checkbox": false,
           "dispense_airGap_volume": null,
           "dispense_delay_checkbox": false,
           "dispense_delay_mmFromBottom": null,
           "dispense_delay_seconds": "1",
           "dispense_flowRate": null,
-          "dispense_labware": "lw-wellpalte-1",
+          "dispense_labware": "labware-2",
           "dispense_mix_checkbox": false,
           "dispense_mix_times": null,
           "dispense_mix_volume": null,
           "dispense_mmFromBottom": null,
-          "dispense_position_reference": null,
-          "dispense_retract_delay_seconds": null,
-          "dispense_retract_mmFromBottom": null,
-          "dispense_retract_speed": null,
-          "dispense_retract_x_position": 0,
-          "dispense_retract_y_position": 0,
-          "dispense_retract_position_reference": null,
-          "dispense_submerge_delay_seconds": null,
-          "dispense_submerge_speed": null,
-          "dispense_submerge_mmFromBottom": null,
-          "dispense_submerge_x_position": 0,
-          "dispense_submerge_y_position": 0,
-          "dispense_submerge_position_reference": null,
           "dispense_touchTip_checkbox": false,
-          "dispense_touchTip_mmFromTop": null,
-          "dispense_touchTip_speed": null,
-          "dispense_touchTip_mmFromEdge": null,
+          "dispense_touchTip_mmFromBottom": null,
           "dispense_wellOrder_first": "t2b",
           "dispense_wellOrder_second": "l2r",
           "dispense_wells": ["A1"],
@@ -3142,16 +3143,15 @@ Steps:
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": null,
           "dropTip_location": "trashbin-1",
-          "liquidClassesSupported": true,
-          "liquidClass": null,
-          "nozzles": "ALL",
+          "nozzles": null,
           "path": "single",
           "pipette": "pipette_left",
           "preWetTip": false,
-          "pushOut_checkbox": null,
-          "pushOut_volume": null,
-          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
-          "volume": "54"
+          "tipRack": "opentrons/opentrons_flex_96_tiprack_200ul/1",
+          "volume": "20",
+          "pickUpTip_location": null,
+          "pickUpTip_wellNames": null,
+          "dropTip_wellNames": null
         }
       },
       "orderedStepIds": ["step-1"],
@@ -3162,17 +3162,17 @@ Steps:
       },
       "modules": {},
       "labware": {
-        "lw-tiprack-1": {
-          "displayName": "Opentrons Flex 96 Filter Tip Rack 200 µL",
-          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_200ul/1"
+        "labware-1": {
+          "displayName": "NEST 12 Well Reservoir 15 mL",
+          "labwareDefURI": "opentrons/nest_12_reservoir_15ml/1"
         },
-        "lw-reservoir-1": {
-          "displayName": "USA Scientific 12 Well Reservoir 22 mL",
-          "labwareDefURI": "opentrons/usascientific_12_reservoir_22ml/2"
-        },
-        "lw-wellpalte-1": {
+        "labware-2": {
           "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
-          "labwareDefURI": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/3"
+          "labwareDefURI": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2"
+        },
+        "labware-3": {
+          "displayName": "Opentrons Flex 96 Tip Rack 200 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_tiprack_200ul/1"
         }
       }
     }
@@ -3180,56 +3180,7 @@ Steps:
   "robot": {
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
-  },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p1000_multi_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 200 µL",
-        "labwareId": "lw-tiprack-1",
-        "loadName": "opentrons_flex_96_filtertiprack_200ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "C2"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "USA Scientific 12 Well Reservoir 22 mL",
-        "labwareId": "lw-reservoir-1",
-        "loadName": "usascientific_12_reservoir_22ml",
-        "namespace": "opentrons",
-        "version": 2,
-        "location": {
-          "slotName": "C1"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
-        "labwareId": "lw-wellpalte-1",
-        "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "namespace": "opentrons",
-        "version": 3,
-        "location": {
-          "slotName": "D1"
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
@@ -3248,35 +3199,88 @@ Steps:
 
 ### Output
 
-Note that remaining parts are removed for brevity
-
 ```json
-"step-1": {
-  "id": "step-1",
-  "stepType": "temperature",
-  "stepName": "temperature",
-  "stepDetails": "",
-  "moduleId": "t-1",
-  "setTemperature": "true",
-  "targetTemperature": "7"
-},
-"step-2": {
-  "id": "step-2",
-  "stepType": "pause",
-  "stepName": "pause",
-  "stepDetails": "",
-  "moduleId": "t-1",
-  "pauseAction": "untilTemperature",
-  "pauseMessage": "wait please",
-  "pauseTemperature": "7",
-  "pauseTime": null
+{
+  "metadata": {
+    "protocolName": "Temperature and pause steps together",
+    "description": "Temperature and pause steps together"
+  },
+  "designerApplication": {
+    "data": {
+      "pipetteTiprackAssignments": {
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
+      },
+      "ingredients": {},
+      "ingredLocations": {},
+      "savedStepForms": {
+        "__INITIAL_DECK_SETUP_STEP__": {
+          "labwareLocationUpdate": {
+            "labware-1": "C2"
+          },
+          "pipetteLocationUpdate": {
+            "pipette_left": "left"
+          },
+          "moduleLocationUpdate": {
+            "t-1": "C1"
+          },
+          "trashBinLocationUpdate": {
+            "trashbin-1": "cutoutA3"
+          },
+          "wasteChuteLocationUpdate": {},
+          "stagingAreaLocationUpdate": {},
+          "gripperLocationUpdate": {}
+        },
+        "step-1": {
+          "id": "step-1",
+          "stepType": "temperature",
+          "stepName": "temperature",
+          "stepDetails": "",
+          "moduleId": "t-1",
+          "setTemperature": "true",
+          "targetTemperature": "7"
+        },
+        "step-2": {
+          "id": "step-2",
+          "stepType": "pause",
+          "stepName": "pause",
+          "stepDetails": "",
+          "moduleId": "t-1",
+          "pauseAction": "untilTemperature",
+          "pauseMessage": "Wait until temperature is reached",
+          "pauseTemperature": "7",
+          "pauseTime": null
+        }
+      },
+      "orderedStepIds": ["step-1", "step-2"],
+      "pipettes": {
+        "pipette_left": {
+          "pipetteName": "p1000_single_flex"
+        }
+      },
+      "modules": {
+        "t-1": {
+          "model": "temperatureModuleV2"
+        }
+      },
+      "labware": {
+        "labware-1": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        }
+      }
+    }
+  },
+  "robot": {
+    "model": "OT-3 Standard",
+    "deckId": "ot3_standard"
+  }
 }
 ```
 
 ### Remarks
 
 - It is recommended that after temperature step, one needs to use `pause` step.
-- When we initiate the temperature module, be default it is deactivated.
+- Temperature module's default: deactivated.
 
 ## Examples for OT-2 and Flex
 
@@ -3291,290 +3295,233 @@ All OT-2 modules involved
   },
   "designerApplication": {
     "data": {
-      "pipetteTiprackAssignments": {
-        "pipette_left": ["opentrons/opentrons_96_tiprack_300ul/1"]
+      "pipette_left": ["opentrons/opentrons_96_tiprack_300ul/1"]
+    },
+    "dismissedWarnings": {
+      "form": [],
+      "timeline": []
+    },
+    "ingredients": {},
+    "ingredLocations": {},
+    "savedStepForms": {
+      "__INITIAL_DECK_SETUP_STEP__": {
+        "labwareLocationUpdate": {
+          "labware-1": "5"
+        },
+        "moduleLocationUpdate": {
+          "hs-1": "1",
+          "magnetic-module-1": "9",
+          "t-1": "3",
+          "tc-1": "7"
+        },
+        "pipetteLocationUpdate": {
+          "pipette_left": "left"
+        },
+        "trashBinLocationUpdate": {
+          "trashbin-1": "cutout12"
+        },
+        "wasteChuteLocationUpdate": {},
+        "stagingAreaLocationUpdate": {},
+        "gripperLocationUpdate": {}
       },
-      "ingredients": {},
-      "ingredLocations": {},
-      "savedStepForms": {
-        "__INITIAL_DECK_SETUP_STEP__": {
-          "labwareLocationUpdate": {
-            "lw-tiprack--1": "5"
-          },
-          "pipetteLocationUpdate": {
-            "pipette_left": "left"
-          },
-          "moduleLocationUpdate": {
-            "hs-1": "1",
-            "mm-1": "9",
-            "t-1": "3",
-            "tc-1": "7"
-          },
-          "trashBinLocationUpdate": {
-            "trashbin-1": "cutout12"
-          },
-          "wasteChuteLocationUpdate": {},
-          "stagingAreaLocationUpdate": {},
-          "gripperLocationUpdate": {}
-        },
-        "step-1": {
-          "id": "step-1",
-          "stepType": "heaterShaker",
-          "stepName": "heater-shaker",
-          "stepDetails": "",
-          "heaterShakerSetTimer": true,
-          "heaterShakerTimer": "10:10",
-          "latchOpen": false,
-          "moduleId": "hs-1",
-          "setHeaterShakerTemperature": true,
-          "setShake": true,
-          "targetHeaterShakerTemperature": "40",
-          "targetSpeed": "500"
-        },
-        "step-2": {
-          "id": "step-2",
-          "stepType": "heaterShaker",
-          "stepName": "heater-shaker",
-          "stepDetails": "",
-          "heaterShakerSetTimer": null,
-          "heaterShakerTimer": null,
-          "latchOpen": false,
-          "moduleId": "hs-1",
-          "setHeaterShakerTemperature": null,
-          "setShake": null,
-          "targetHeaterShakerTemperature": null,
-          "targetSpeed": null
-        },
-        "step-3": {
-          "id": "step-3",
-          "stepType": "magnet",
-          "stepName": "magnet",
-          "stepDetails": "",
-          "engageHeight": "10",
-          "magnetAction": "engage",
-          "moduleId": "mm-1"
-        },
-        "step-5": {
-          "id": "step-5",
-          "stepType": "magnet",
-          "stepName": "magnet",
-          "stepDetails": "",
-          "engageHeight": "10",
-          "magnetAction": "disengage",
-          "moduleId": "mm-1"
-        },
-        "step-4": {
-          "id": "step-4",
-          "stepType": "pause",
-          "stepName": "pause",
-          "stepDetails": "",
-          "moduleId": null,
-          "pauseAction": "untilTime",
-          "pauseMessage": "",
-          "pauseTemperature": null,
-          "pauseTime": "00:01:00"
-        },
-        "step-6": {
-          "id": "step-6",
-          "stepType": "temperature",
-          "stepName": "temperature",
-          "stepDetails": "",
-          "moduleId": "t-1",
-          "setTemperature": "true",
-          "targetTemperature": "20"
-        },
-        "step-7": {
-          "id": "step-7",
-          "stepType": "pause",
-          "stepName": "pause",
-          "stepDetails": "",
-          "moduleId": "t-1",
-          "pauseAction": "untilTemperature",
-          "pauseMessage": "",
-          "pauseTemperature": "20",
-          "pauseTime": null
-        },
-        "step-8": {
-          "id": "step-8",
-          "stepType": "temperature",
-          "stepName": "temperature",
-          "stepDetails": "",
-          "moduleId": "t-1",
-          "setTemperature": null,
-          "targetTemperature": null
-        },
-        "step-9": {
-          "id": "step-9",
-          "stepType": "thermocycler",
-          "stepName": "thermocycler",
-          "stepDetails": "",
-          "blockIsActive": false,
-          "blockIsActiveHold": false,
-          "blockTargetTemp": null,
-          "blockTargetTempHold": null,
-          "lidIsActive": false,
-          "lidIsActiveHold": false,
-          "lidOpen": false,
-          "lidOpenHold": null,
-          "lidTargetTemp": null,
-          "lidTargetTempHold": null,
-          "moduleId": "tc-1",
-          "orderedProfileItems": [],
-          "profileItemsById": {},
-          "profileTargetLidTemp": null,
-          "profileVolume": null,
-          "thermocyclerFormType": "thermocyclerState"
-        },
-        "step-10": {
-          "id": "step-10",
-          "stepType": "thermocycler",
-          "stepName": "thermocycler",
-          "stepDetails": "",
-          "blockIsActive": false,
-          "blockIsActiveHold": true,
-          "blockTargetTemp": null,
-          "blockTargetTempHold": "4",
-          "lidIsActive": false,
-          "lidIsActiveHold": false,
-          "lidOpen": false,
-          "lidOpenHold": null,
-          "lidTargetTemp": null,
-          "lidTargetTempHold": null,
-          "moduleId": "tc-1",
-          "orderedProfileItems": ["ae049fa3-37f2-4764-8a42-ff56c3c22916"],
-          "profileItemsById": {
-            "ae049fa3-37f2-4764-8a42-ff56c3c22916": {
-              "id": "ae049fa3-37f2-4764-8a42-ff56c3c22916",
-              "title": "",
-              "steps": [
-                {
-                  "durationMinutes": "00",
-                  "durationSeconds": "30",
-                  "id": "50e4b4c7-5f28-4dba-a5be-96868753e782",
-                  "temperature": "60",
-                  "title": "tagmentation",
-                  "type": "profileStep"
-                },
-                {
-                  "durationMinutes": "55",
-                  "durationSeconds": "00",
-                  "id": "4b509fb5-938a-40a9-aacd-e30f497698fc",
-                  "temperature": "80",
-                  "title": "hold",
-                  "type": "profileStep"
-                }
-              ],
-              "type": "profileCycle",
-              "repetitions": "5"
-            }
-          },
-          "profileTargetLidTemp": "40",
-          "profileVolume": "10",
-          "thermocyclerFormType": "thermocyclerProfile"
-        }
+      "step-1": {
+        "heaterShakerSetTimer": true,
+        "heaterShakerTimer": "10:10",
+        "latchOpen": false,
+        "moduleId": "hs-1",
+        "setHeaterShakerTemperature": true,
+        "setShake": true,
+        "targetHeaterShakerTemperature": "40",
+        "targetSpeed": "500",
+        "id": "step-1",
+        "stepType": "heaterShaker",
+        "stepName": "heater-shaker",
+        "stepDetails": ""
       },
-      "orderedStepIds": [
-        "step-1",
-        "step-2",
-        "step-3",
-        "step-4",
-        "step-5",
-        "step-6",
-        "step-7",
-        "step-8",
-        "step-9",
-        "step-10"
-      ],
-      "pipettes": {
-        "pipette_left": {
-          "pipetteName": "p300_single"
-        }
+      "step-2": {
+        "heaterShakerSetTimer": null,
+        "heaterShakerTimer": null,
+        "latchOpen": false,
+        "moduleId": "hs-1",
+        "setHeaterShakerTemperature": null,
+        "setShake": null,
+        "targetHeaterShakerTemperature": null,
+        "targetSpeed": null,
+        "id": "step-2",
+        "stepType": "heaterShaker",
+        "stepName": "heater-shaker",
+        "stepDetails": ""
       },
-      "modules": {
-        "hs-1": {
-          "model": "heaterShakerModuleV1"
-        },
-        "mm-1": {
-          "model": "magneticModuleV2"
-        },
-        "t-1": {
-          "model": "temperatureModuleV2"
-        },
-        "tc-1": {
-          "model": "thermocyclerModuleV2"
-        }
+      "step-3": {
+        "engageHeight": "10",
+        "magnetAction": "engage",
+        "moduleId": "magnetic-module-1",
+        "id": "step-3",
+        "stepType": "magnet",
+        "stepName": "magnet",
+        "stepDetails": ""
       },
-      "labware": {
-        "lw-tiprack--1": {
-          "displayName": "Opentrons OT-2 96 Tip Rack 300 µL",
-          "labwareDefURI": "opentrons/opentrons_96_tiprack_300ul/1"
-        }
+      "step-5": {
+        "engageHeight": "10",
+        "magnetAction": "disengage",
+        "moduleId": "magnetic-module-1",
+        "id": "step-5",
+        "stepType": "magnet",
+        "stepName": "magnet",
+        "stepDetails": ""
+      },
+      "step-4": {
+        "moduleId": null,
+        "pauseAction": "untilTime",
+        "pauseMessage": "",
+        "pauseTemperature": null,
+        "pauseTime": "00:01:00",
+        "id": "step-4",
+        "stepType": "pause",
+        "stepName": "pause",
+        "stepDetails": ""
+      },
+      "step-6": {
+        "moduleId": "t-1",
+        "setTemperature": "true",
+        "targetTemperature": "20",
+        "id": "step-6",
+        "stepType": "temperature",
+        "stepName": "temperature",
+        "stepDetails": ""
+      },
+      "step-7": {
+        "moduleId": "t-1",
+        "pauseAction": "untilTemperature",
+        "pauseMessage": "",
+        "pauseTemperature": "20",
+        "pauseTime": null,
+        "id": "step-7",
+        "stepType": "pause",
+        "stepName": "pause",
+        "stepDetails": ""
+      },
+      "step-8": {
+        "moduleId": "t-1",
+        "setTemperature": null,
+        "targetTemperature": null,
+        "id": "step-8",
+        "stepType": "temperature",
+        "stepName": "temperature",
+        "stepDetails": ""
+      },
+      "step-9": {
+        "blockIsActive": false,
+        "blockIsActiveHold": false,
+        "blockTargetTemp": null,
+        "blockTargetTempHold": null,
+        "lidIsActive": false,
+        "lidIsActiveHold": false,
+        "lidOpen": false,
+        "lidOpenHold": null,
+        "lidTargetTemp": null,
+        "lidTargetTempHold": null,
+        "moduleId": "tc-1",
+        "orderedProfileItems": [],
+        "profileItemsById": {},
+        "profileTargetLidTemp": null,
+        "profileVolume": null,
+        "thermocyclerFormType": "thermocyclerState",
+        "id": "step-9",
+        "stepType": "thermocycler",
+        "stepName": "thermocycler",
+        "stepDetails": ""
+      },
+      "step-10": {
+        "blockIsActive": false,
+        "blockIsActiveHold": true,
+        "blockTargetTemp": null,
+        "blockTargetTempHold": "4",
+        "lidIsActive": false,
+        "lidIsActiveHold": false,
+        "lidOpen": false,
+        "lidOpenHold": null,
+        "lidTargetTemp": null,
+        "lidTargetTempHold": null,
+        "moduleId": "tc-1",
+        "orderedProfileItems": ["cycle-1"],
+        "profileItemsById": {
+          "cycle-1": {
+            "id": "cycle-1",
+            "title": "",
+            "steps": [
+              {
+                "durationMinutes": "00",
+                "durationSeconds": "30",
+                "id": "50e4b4c7-5f28-4dba-a5be-96868753e782",
+                "temperature": "60",
+                "title": "tagmentation",
+                "type": "profileStep"
+              },
+              {
+                "durationMinutes": "55",
+                "durationSeconds": "00",
+                "id": "4b509fb5-938a-40a9-aacd-e30f497698fc",
+                "temperature": "80",
+                "title": "hold",
+                "type": "profileStep"
+              }
+            ],
+            "type": "profileCycle",
+            "repetitions": "5"
+          }
+        },
+        "profileTargetLidTemp": "40",
+        "profileVolume": "10",
+        "thermocyclerFormType": "thermocyclerProfile",
+        "id": "step-10",
+        "stepType": "thermocycler",
+        "stepName": "thermocycler",
+        "stepDetails": ""
+      }
+    },
+    "orderedStepIds": [
+      "step-1",
+      "step-2",
+      "step-3",
+      "step-4",
+      "step-5",
+      "step-6",
+      "step-7",
+      "step-8",
+      "step-9",
+      "step-10"
+    ],
+    "pipettes": {
+      "pipette_left": {
+        "pipetteName": "p300_single"
+      }
+    },
+    "modules": {
+      "hs-1": {
+        "model": "heaterShakerModuleV1"
+      },
+      "magnetic-module-1": {
+        "model": "magneticModuleV2"
+      },
+      "t-1": {
+        "model": "temperatureModuleV2"
+      },
+      "tc-1": {
+        "model": "thermocyclerModuleV2"
+      }
+    },
+    "labware": {
+      "labware-1": {
+        "displayName": "Opentrons OT-2 96 Tip Rack 300 µL",
+        "labwareDefURI": "opentrons/opentrons_96_tiprack_300ul/1"
       }
     }
   },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p300_single",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "heaterShakerModuleV1",
-        "location": {
-          "slotName": "1"
-        },
-        "moduleId": "hs-1"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "magneticModuleV2",
-        "location": {
-          "slotName": "9"
-        },
-        "moduleId": "mm-1"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "temperatureModuleV2",
-        "location": {
-          "slotName": "3"
-        },
-        "moduleId": "t-1"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "thermocyclerModuleV2",
-        "location": {
-          "slotName": "7"
-        },
-        "moduleId": "tc-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons OT-2 96 Tip Rack 300 µL",
-        "labwareId": "lw-tiprack--1",
-        "loadName": "opentrons_96_tiprack_300ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "5"
-        }
-      }
-    }
-  ]
+  "robot": {
+    "model": "OT-2 Standard",
+    "deckId": "ot2_standard"
+  }
 }
 ```
 
@@ -3587,7 +3534,7 @@ All Flex modules involved
 {
   "metadata": {
     "protocolName": "AllModuleFlex",
-    "description": ""
+    "description": "AllModuleFlex"
   },
   "designerApplication": {
     "data": {
@@ -3599,18 +3546,18 @@ All Flex modules involved
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
           "labwareLocationUpdate": {
-            "lw-tiprack-1": "D3",
-            "lw-wellplate-1": "C3"
+            "labware-1": "D3",
+            "labware-2": "C3"
+          },
+          "moduleLocationUpdate": {
+            "apr-1": "B3",
+            "hs-1": "D1",
+            "t-1": "C1",
+            "magnetic-block-1": "D2",
+            "tc-1": "B1"
           },
           "pipetteLocationUpdate": {
             "pipette_left": "left"
-          },
-          "moduleLocationUpdate": {
-            "arp-1": "B3",
-            "hs-1": "D1",
-            "t-1": "C1",
-            "mb-1": "D2",
-            "tc-1": "B1"
           },
           "trashBinLocationUpdate": {
             "trashbin-1": "cutoutA3"
@@ -3622,10 +3569,6 @@ All Flex modules involved
           }
         },
         "step-1": {
-          "id": "step-1",
-          "stepType": "heaterShaker",
-          "stepName": "heater-shaker",
-          "stepDetails": "",
           "heaterShakerSetTimer": true,
           "heaterShakerTimer": "00:30",
           "latchOpen": false,
@@ -3633,13 +3576,13 @@ All Flex modules involved
           "setHeaterShakerTemperature": true,
           "setShake": true,
           "targetHeaterShakerTemperature": "50",
-          "targetSpeed": "500"
-        },
-        "step-2": {
-          "id": "step-2",
+          "targetSpeed": "500",
+          "id": "step-1",
           "stepType": "heaterShaker",
           "stepName": "heater-shaker",
-          "stepDetails": "",
+          "stepDetails": ""
+        },
+        "step-2": {
           "heaterShakerSetTimer": null,
           "heaterShakerTimer": null,
           "latchOpen": false,
@@ -3647,42 +3590,42 @@ All Flex modules involved
           "setHeaterShakerTemperature": null,
           "setShake": null,
           "targetHeaterShakerTemperature": null,
-          "targetSpeed": null
+          "targetSpeed": null,
+          "id": "step-2",
+          "stepType": "heaterShaker",
+          "stepName": "heater-shaker",
+          "stepDetails": ""
         },
         "step-3": {
+          "moduleId": "t-1",
+          "setTemperature": "true",
+          "targetTemperature": "30",
           "id": "step-3",
           "stepType": "temperature",
           "stepName": "temperature",
-          "stepDetails": "",
-          "moduleId": "t-1",
-          "setTemperature": "true",
-          "targetTemperature": "30"
+          "stepDetails": ""
         },
         "step-4": {
-          "id": "step-4",
-          "stepType": "pause",
-          "stepName": "pause",
-          "stepDetails": "",
           "moduleId": "t-1",
           "pauseAction": "untilTemperature",
           "pauseMessage": "",
           "pauseTemperature": "30",
-          "pauseTime": null
+          "pauseTime": null,
+          "id": "step-4",
+          "stepType": "pause",
+          "stepName": "pause",
+          "stepDetails": ""
         },
         "step-5": {
+          "moduleId": "t-1",
+          "setTemperature": null,
+          "targetTemperature": null,
           "id": "step-5",
           "stepType": "temperature",
           "stepName": "temperature",
-          "stepDetails": "",
-          "moduleId": "t-1",
-          "setTemperature": null,
-          "targetTemperature": null
+          "stepDetails": ""
         },
         "step-6": {
-          "id": "step-6",
-          "stepType": "thermocycler",
-          "stepName": "thermocycler",
-          "stepDetails": "",
           "blockIsActive": false,
           "blockIsActiveHold": false,
           "blockTargetTemp": null,
@@ -3698,13 +3641,13 @@ All Flex modules involved
           "profileItemsById": {},
           "profileTargetLidTemp": null,
           "profileVolume": null,
-          "thermocyclerFormType": "thermocyclerState"
-        },
-        "step-7": {
-          "id": "step-7",
+          "thermocyclerFormType": "thermocyclerState",
+          "id": "step-6",
           "stepType": "thermocycler",
           "stepName": "thermocycler",
-          "stepDetails": "",
+          "stepDetails": ""
+        },
+        "step-7": {
           "blockIsActive": false,
           "blockIsActiveHold": true,
           "blockTargetTemp": null,
@@ -3716,10 +3659,10 @@ All Flex modules involved
           "lidTargetTemp": null,
           "lidTargetTempHold": null,
           "moduleId": "tc-1",
-          "orderedProfileItems": ["316e8ede-372a-46f5-aa66-4c16b6cb019b"],
+          "orderedProfileItems": ["cycle-1"],
           "profileItemsById": {
-            "316e8ede-372a-46f5-aa66-4c16b6cb019b": {
-              "id": "316e8ede-372a-46f5-aa66-4c16b6cb019b",
+            "cycle-1": {
+              "id": "cycle-1",
               "title": "",
               "steps": [
                 {
@@ -3745,58 +3688,62 @@ All Flex modules involved
           },
           "profileTargetLidTemp": "40",
           "profileVolume": "10",
-          "thermocyclerFormType": "thermocyclerProfile"
+          "thermocyclerFormType": "thermocyclerProfile",
+          "id": "step-7",
+          "stepType": "thermocycler",
+          "stepName": "thermocycler",
+          "stepDetails": ""
         },
         "step-8": {
-          "id": "step-8",
-          "stepType": "absorbanceReader",
-          "stepName": "absorbance plate reader",
-          "stepDetails": "",
           "absorbanceReaderFormType": "absorbanceReaderInitialize",
           "fileName": null,
           "lidOpen": null,
           "mode": "single",
-          "moduleId": "arp-1",
+          "moduleId": "apr-1",
           "referenceWavelength": null,
           "referenceWavelengthActive": false,
-          "wavelengths": ["450"]
+          "wavelengths": ["450"],
+          "id": "step-8",
+          "stepType": "absorbanceReader",
+          "stepName": "absorbance plate reader",
+          "stepDetails": ""
         },
         "step-10": {
+          "labware": "labware-2",
+          "newLocation": "apr-1",
+          "useGripper": true,
           "id": "step-10",
           "stepType": "moveLabware",
           "stepName": "move",
-          "stepDetails": "",
-          "labware": "lw-wellplate-1",
-          "newLocation": "arp-1",
-          "useGripper": true
+          "stepDetails": ""
         },
         "step-9": {
-          "id": "step-9",
-          "stepType": "absorbanceReader",
-          "stepName": "absorbance plate reader",
-          "stepDetails": "",
           "absorbanceReaderFormType": "absorbanceReaderLid",
           "fileName": null,
           "lidOpen": true,
           "mode": "single",
-          "moduleId": "arp-1",
+          "moduleId": "apr-1",
           "referenceWavelength": null,
           "referenceWavelengthActive": false,
-          "wavelengths": ["450"]
-        },
-        "step-11": {
-          "id": "step-11",
+          "wavelengths": ["450"],
+          "id": "step-9",
           "stepType": "absorbanceReader",
           "stepName": "absorbance plate reader",
-          "stepDetails": "",
+          "stepDetails": ""
+        },
+        "step-11": {
           "absorbanceReaderFormType": "absorbanceReaderRead",
           "fileName": "plate_reader_results",
           "lidOpen": null,
           "mode": "single",
-          "moduleId": "arp-1",
+          "moduleId": "apr-1",
           "referenceWavelength": null,
           "referenceWavelengthActive": false,
-          "wavelengths": ["450"]
+          "wavelengths": ["450"],
+          "id": "step-11",
+          "stepType": "absorbanceReader",
+          "stepName": "absorbance plate reader",
+          "stepDetails": ""
         }
       },
       "orderedStepIds": [
@@ -3818,7 +3765,7 @@ All Flex modules involved
         }
       },
       "modules": {
-        "arp-1": {
+        "apr-1": {
           "model": "absorbanceReaderV1"
         },
         "hs-1": {
@@ -3827,7 +3774,7 @@ All Flex modules involved
         "t-1": {
           "model": "temperatureModuleV2"
         },
-        "mb-1": {
+        "magnetic-block-1": {
           "model": "magneticBlockV1"
         },
         "tc-1": {
@@ -3835,104 +3782,1043 @@ All Flex modules involved
         }
       },
       "labware": {
-        "lw-tiprack-1": {
+        "labware-1": {
           "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
           "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
         },
-        "lw-wellplate-1": {
+        "labware-2": {
           "displayName": "Corning 96 Well Plate 360 µL Flat",
           "labwareDefURI": "opentrons/corning_96_wellplate_360ul_flat/2"
         }
       }
     }
   },
-  "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteName": "p50_single_flex",
-        "mount": "left",
-        "pipetteId": "pipette_left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "absorbanceReaderV1",
-        "location": {
-          "slotName": "B3"
-        },
-        "moduleId": "arp-1"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "heaterShakerModuleV1",
-        "location": {
-          "slotName": "D1"
-        },
-        "moduleId": "hs-1"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "temperatureModuleV2",
-        "location": {
-          "slotName": "C1"
-        },
-        "moduleId": "t-1"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "magneticBlockV1",
-        "location": {
-          "slotName": "D2"
-        },
-        "moduleId": "mb-1"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "model": "thermocyclerModuleV2",
-        "location": {
-          "slotName": "B1"
-        },
-        "moduleId": "tc-1"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
-        "labwareId": "lw-tiprack-1",
-        "loadName": "opentrons_flex_96_filtertiprack_50ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "slotName": "D3"
-        }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "displayName": "Corning 96 Well Plate 360 µL Flat",
-        "labwareId": "lw-wellplate-1",
-        "loadName": "corning_96_wellplate_360ul_flat",
-        "namespace": "opentrons",
-        "version": 2,
-        "location": {
-          "slotName": "C3"
-        }
-      }
-    }
-  ]
+  "robot": {
+    "model": "OT-3 Standard",
+    "deckId": "ot3_standard"
+  }
 }
 ```
 
 </Example2-for-Flex-with-all-modules>
+
+<Example-serial-dilution>
+
+Input:
+
+```text
+Robot:
+- Flex
+
+Pipette:
+- Left mount: p1000 single channel Flex pipette
+
+Labware:
+- Tiprack-1: Opentrons Flex 96 Filter Tip Rack 1000 μL (Slot D1)
+- Tiprack-2: Opentrons Flex 96 Filter Tip Rack 1000 μL (Slot C1)
+- Plate: NEST 96 Well Plate 200 μL Flat (Slot D3)
+- Reservoir: NEST 12 Well Reservoir 15 mL (Slot D2)
+
+
+Liquids:
+- Diluent liquid (green, 12 mL in reservoir well A1)
+- Sample liquid (red, 150 μL in each well of column 1 of the plate)
+
+Steps:
+1. Distribute 100 μL of diluent from reservoir well A1 to all wells in columns 2-11 of the plate (with 10 μL air gap during aspiration and 5 μL disposal volume)
+
+2. Perform serial dilutions for Row A:
+ - Transfer 50 μL from A1 to A2, mix 5× with 75 μL
+ - Transfer 50 μL from A2 to A3, mix 5× with 75 μL
+ - Continue this pattern through A10 to A11
+ - Use 10 μL air gap during aspiration
+ - Change tip once for the entire row
+
+3-9. Repeat the same serial dilution pattern for Rows B through H (one row at a time)
+
+10. Add 100 μL blank (diluent) to the last column (column 12) of the plate
+```
+
+Output protocol:
+
+```json
+{
+  "metadata": {
+    "protocolName": "Serial Dilution",
+    "description": ""
+  },
+  "designerApplication": {
+    "data": {
+      "pipetteTiprackAssignments": {
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
+      },
+      "ingredients": {
+        "0": {
+          "displayName": "Diluent liquid",
+          "description": null,
+          "displayColor": "#33ff33ff",
+          "liquidGroupId": "0",
+          "liquidClass": null
+        },
+        "1": {
+          "displayName": "Sample liquid",
+          "description": null,
+          "displayColor": "#ff0000ff",
+          "liquidGroupId": "1",
+          "liquidClass": null
+        }
+      },
+      "ingredLocations": {
+        "labware-4": {},
+        "labware-1": {
+          "A1": {
+            "0": {
+              "volume": 12000
+            }
+          }
+        },
+        "labware-2": {
+          "A1": {
+            "1": {
+              "volume": 150
+            }
+          },
+          "B1": {
+            "1": {
+              "volume": 150
+            }
+          },
+          "C1": {
+            "1": {
+              "volume": 150
+            }
+          },
+          "D1": {
+            "1": {
+              "volume": 150
+            }
+          },
+          "E1": {
+            "1": {
+              "volume": 150
+            }
+          },
+          "F1": {
+            "1": {
+              "volume": 150
+            }
+          },
+          "G1": {
+            "1": {
+              "volume": 150
+            }
+          },
+          "H1": {
+            "1": {
+              "volume": 150
+            }
+          }
+        }
+      },
+      "savedStepForms": {
+        "__INITIAL_DECK_SETUP_STEP__": {
+          "labwareLocationUpdate": {
+            "labware-1": "D2",
+            "labware-2": "D3",
+            "labware-3": "D1",
+            "labware-4": "C1"
+          },
+          "moduleLocationUpdate": {},
+          "pipetteLocationUpdate": {
+            "pipette_left": "left"
+          },
+          "trashBinLocationUpdate": {
+            "trashbin-1": "cutoutA3"
+          },
+          "wasteChuteLocationUpdate": {},
+          "stagingAreaLocationUpdate": {},
+          "gripperLocationUpdate": {}
+        },
+        "step-1": {
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-1",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": ["A1"],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": null,
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": false,
+          "dispense_mix_times": null,
+          "dispense_mix_volume": null,
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "A2",
+            "B2",
+            "C2",
+            "D2",
+            "E2",
+            "F2",
+            "G2",
+            "H2",
+            "A3",
+            "B3",
+            "C3",
+            "D3",
+            "E3",
+            "F3",
+            "G3",
+            "H3",
+            "A4",
+            "B4",
+            "C4",
+            "D4",
+            "E4",
+            "F4",
+            "G4",
+            "H4",
+            "A5",
+            "B5",
+            "C5",
+            "D5",
+            "E5",
+            "F5",
+            "G5",
+            "H5",
+            "A6",
+            "B6",
+            "C6",
+            "D6",
+            "E6",
+            "F6",
+            "G6",
+            "H6",
+            "A7",
+            "B7",
+            "C7",
+            "D7",
+            "E7",
+            "F7",
+            "G7",
+            "H7",
+            "A8",
+            "B8",
+            "C8",
+            "D8",
+            "E8",
+            "F8",
+            "G8",
+            "H8",
+            "A9",
+            "B9",
+            "C9",
+            "D9",
+            "E9",
+            "F9",
+            "G9",
+            "H9",
+            "A10",
+            "B10",
+            "C10",
+            "D10",
+            "E10",
+            "F10",
+            "G10",
+            "H10",
+            "A11",
+            "B11",
+            "C11",
+            "D11",
+            "E11",
+            "F11",
+            "G11",
+            "H11"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": "5",
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "multiDispense",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "100",
+          "id": "step-1",
+          "stepType": "moveLiquid",
+          "stepName": "Distribute diluent to dilution plate",
+          "stepDetails": ""
+        },
+        "step-2": {
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-2",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "A1",
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9",
+            "A10"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": "716",
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": true,
+          "dispense_mix_times": "5",
+          "dispense_mix_volume": "75",
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9",
+            "A10",
+            "A11"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "50",
+          "id": "step-2",
+          "stepType": "moveLiquid",
+          "stepName": "Serial Dilutions: Row 1",
+          "stepDetails": ""
+        },
+        "step-3": {
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-2",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "B1",
+            "B2",
+            "B3",
+            "B4",
+            "B5",
+            "B6",
+            "B7",
+            "B8",
+            "B9",
+            "B10"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": "716",
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": true,
+          "dispense_mix_times": "5",
+          "dispense_mix_volume": "75",
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "B2",
+            "B3",
+            "B4",
+            "B5",
+            "B6",
+            "B7",
+            "B8",
+            "B9",
+            "B10",
+            "B11"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "50",
+          "id": "step-3",
+          "stepType": "moveLiquid",
+          "stepName": "Serial dilutions: Row 2",
+          "stepDetails": ""
+        },
+        "step-4": {
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-2",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6",
+            "C7",
+            "C8",
+            "C9",
+            "C10"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": "716",
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": true,
+          "dispense_mix_times": "5",
+          "dispense_mix_volume": "75",
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6",
+            "C7",
+            "C8",
+            "C9",
+            "C10",
+            "C11"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "50",
+          "id": "step-4",
+          "stepType": "moveLiquid",
+          "stepName": "Serial dilutions: Row 3",
+          "stepDetails": ""
+        },
+        "step-5": {
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-2",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": "716",
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": true,
+          "dispense_mix_times": "5",
+          "dispense_mix_volume": "75",
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "50",
+          "id": "step-5",
+          "stepType": "moveLiquid",
+          "stepName": "Serial dilutions: Row 4",
+          "stepDetails": ""
+        },
+        "step-6": {
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-2",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "E1",
+            "E2",
+            "E3",
+            "E4",
+            "E5",
+            "E6",
+            "E7",
+            "E8",
+            "E9",
+            "E10"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": "716",
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": true,
+          "dispense_mix_times": "5",
+          "dispense_mix_volume": "75",
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "E2",
+            "E3",
+            "E4",
+            "E5",
+            "E6",
+            "E7",
+            "E8",
+            "E9",
+            "E10",
+            "E11"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "50",
+          "id": "step-6",
+          "stepType": "moveLiquid",
+          "stepName": "Serial dilutions: Row 5",
+          "stepDetails": ""
+        },
+        "step-7": {
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-2",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "F1",
+            "F2",
+            "F3",
+            "F4",
+            "F5",
+            "F6",
+            "F7",
+            "F8",
+            "F9",
+            "F10"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": "716",
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": true,
+          "dispense_mix_times": "5",
+          "dispense_mix_volume": "75",
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "F2",
+            "F3",
+            "F4",
+            "F5",
+            "F6",
+            "F7",
+            "F8",
+            "F9",
+            "F10",
+            "F11"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "50",
+          "id": "step-7",
+          "stepType": "moveLiquid",
+          "stepName": "Serial dilutions: Row 6",
+          "stepDetails": ""
+        },
+        "step-8": {
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-2",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "G1",
+            "G2",
+            "G3",
+            "G4",
+            "G5",
+            "G6",
+            "G7",
+            "G8",
+            "G9",
+            "G10"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": "716",
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": true,
+          "dispense_mix_times": "5",
+          "dispense_mix_volume": "75",
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "G2",
+            "G3",
+            "G4",
+            "G5",
+            "G6",
+            "G7",
+            "G8",
+            "G9",
+            "G10",
+            "G11"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "50",
+          "id": "step-8",
+          "stepType": "moveLiquid",
+          "stepName": "Serial dilutions: Row 7",
+          "stepDetails": ""
+        },
+        "step-9": {
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-2",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "H1",
+            "H2",
+            "H3",
+            "H4",
+            "H5",
+            "H6",
+            "H7",
+            "H8",
+            "H9",
+            "H10"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": "716",
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": true,
+          "dispense_mix_times": "5",
+          "dispense_mix_volume": "75",
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "H2",
+            "H3",
+            "H4",
+            "H5",
+            "H6",
+            "H7",
+            "H8",
+            "H9",
+            "H10",
+            "H11"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "50",
+          "id": "step-9",
+          "stepType": "moveLiquid",
+          "stepName": "Serial dilutions: Row 8",
+          "stepDetails": ""
+        },
+        "step-10": {
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-1",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": ["A1"],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": null,
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": false,
+          "dispense_mix_times": null,
+          "dispense_mix_volume": null,
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "A12",
+            "B12",
+            "C12",
+            "D12",
+            "E12",
+            "F12",
+            "G12",
+            "H12"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": "5",
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "multiDispense",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "100",
+          "id": "step-10",
+          "stepType": "moveLiquid",
+          "stepName": "Add blank to last column",
+          "stepDetails": ""
+        }
+      },
+      "orderedStepIds": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4",
+        "step-5",
+        "step-6",
+        "step-7",
+        "step-8",
+        "step-9",
+        "step-10"
+      ],
+      "pipettes": {
+        "pipette_left": {
+          "pipetteName": "p1000_single_flex"
+        }
+      },
+      "modules": {},
+      "labware": {
+        "labware-1": {
+          "displayName": "NEST 12 Well Reservoir 15 mL",
+          "labwareDefURI": "opentrons/nest_12_reservoir_15ml/1"
+        },
+        "labware-2": {
+          "displayName": "NEST 96 Well Plate 200 µL Flat",
+          "labwareDefURI": "opentrons/nest_96_wellplate_200ul_flat/2"
+        },
+        "labware-3": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        },
+        "labware-4": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL (1)",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        }
+      }
+    }
+  },
+  "robot": {
+    "model": "OT-3 Standard",
+    "deckId": "ot3_standard"
+  }
+}
+```
+
+</Example-serial-dilution>

@@ -343,8 +343,6 @@ async def create_protocol(
         protocol_format = body.protocol_format
         logger.debug(f"Received protocol_format: {protocol_format.value}")
 
-        # import code
-        # code.interact(local=dict(globals(), **locals()))
         response = _generate_llm_response(
             model_type=settings.model, user_id=str(user.sub), prompt=body.prompt, protocol_format=protocol_format, protocol_action="create"
         )
@@ -359,8 +357,10 @@ async def create_protocol(
         return _format_response(response, protocol_format, bool(body.fake))
 
     except Exception as e:
-        logger.error(f"Unhandled error in create_protocol: {str(e)}", extra={"error_details": str(e), "exception_type": e.__class__.__name__})
-        
+        logger.error(
+            f"Unhandled error in create_protocol: {str(e)}", extra={"error_details": str(e), "exception_type": e.__class__.__name__}
+        )
+
         # Prepare a serializable representation of the caught error 'e'
         # This will be the content of the "detail" field of the HTTPException we raise.
         error_payload_for_detail: dict[str, Any] = {"message": "Internal server error"}
@@ -395,8 +395,8 @@ async def create_protocol(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=error_payload_for_detail # This 'detail' is now guaranteed to be serializable
-        )
+            detail=error_payload_for_detail,  # This 'detail' is now guaranteed to be serializable
+        ) from e
 
 
 @tracer.wrap()
@@ -561,7 +561,7 @@ async def custom_404_middleware(request: Request, call_next: Callable[[Request],
         return response
     except Exception as exc:
         logger.error(f"Error processing request: {exc}", exc_info=True)
-        raise exc
+        raise exc from None
 
 
 # Catch-all handler for any other uncaught exceptions
