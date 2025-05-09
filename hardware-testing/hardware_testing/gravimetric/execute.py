@@ -1,5 +1,5 @@
 """Gravimetric."""
-from time import sleep, time
+from time import sleep
 from typing import Optional, Tuple, List, Dict, Callable
 
 from opentrons.protocol_api import (
@@ -17,7 +17,6 @@ from opentrons.protocol_api.core.engine.transfer_components_executor import (
 )
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
-    Coordinate,
 )
 from opentrons.types import Location, Point
 from hardware_testing.data import ui, dump_data_to_file
@@ -435,62 +434,50 @@ def _run_trial(
     def _calculate_meniscus_relative_offsets(
         is_aspirate: bool,
     ) -> Tuple[Callable, Callable]:
-        _attr_name = "aspirate" if is_aspirate else "dispense"
-        _asp_or_disp = getattr(transfer_properties, _attr_name)
-        _original_submerge_position_reference = _asp_or_disp.submerge.position_reference
-        _original_position_reference = _asp_or_disp.position_reference
-        _original_retract_position_reference = _asp_or_disp.retract.position_reference
-        _original_submerge_offset_z = _asp_or_disp.submerge.offset.z
-        _original_offset_z = _asp_or_disp.offset.z
-        _original_retract_offset_z = _asp_or_disp.retract.offset.z
-
-        assert _original_position_reference == PositionReference.LIQUID_MENISCUS, \
-            f"position reference must be liquid-meniscus, not {_original_position_reference.value}"
-
-        _retract_mm = max(
-            0.0, _asp_or_disp.submerge.offset.z, _asp_or_disp.retract.offset.z
-        )
-        approach, submerge, retract = _get_approach_submerge_retract_heights(
-            trial.well,
-            trial.liquid_tracker,
-            submerge_mm=_original_offset_z,
-            retract_mm=_retract_mm,
-            mix=None,
-            aspirate=trial.volume if is_aspirate else None,
-            dispense=trial.volume if not is_aspirate else None,
-            blank=trial.blank,
-            channel_count=trial.channel_count,
-        )
+        if is_aspirate:
+            assert (
+                transfer_properties.aspirate.aspirate_position.position_reference
+                == PositionReference.LIQUID_MENISCUS
+            )
+            _liq_mm = trial.liquid_tracker.get_liquid_height(
+                trial.well, after_aspirate=trial.volume
+            )
+            _submerge_mm = (
+                _liq_mm + transfer_properties.aspirate.aspirate_position.offset.z
+            )
+        else:
+            assert (
+                transfer_properties.dispense.dispense_position.position_reference
+                == PositionReference.LIQUID_MENISCUS
+            )
+            _liq_mm = trial.liquid_tracker.get_liquid_height(
+                trial.well, after_dispense=trial.volume
+            )
+            _submerge_mm = (
+                _liq_mm + transfer_properties.dispense.dispense_position.offset.z
+            )
 
         print("\n\n\n")
-        print(f"Liquid Height = {trial.liquid_tracker.get_liquid_height(trial.well)}")
-        print(f"Approach = {approach}")
-        print(f"Submerge = {submerge}")
-        print(f"Retract = {retract}")
+        print(
+            f"Liquid Height (from BOTTOM) = {trial.liquid_tracker.get_liquid_height(trial.well)} mm"
+        )
+        print(f"Submerge Height (from BOTTOM) = {_submerge_mm} mm")
         print("\n\n\n")
 
         def _enable() -> None:
-            # NOTE: setting all position references to BOTTOM
-            _asp_or_disp.submerge.position_reference = PositionReference.WELL_TOP
-            _asp_or_disp.retract.position_reference = PositionReference.WELL_TOP
-            _asp_or_disp.position_reference = PositionReference.WELL_BOTTOM
-            # update liquid-class offsets based on CALCULATED meniscus height
-            _asp_or_disp.submerge.offset.z = 0.0
-            _asp_or_disp.retract.offset.z = 0.0
-            _asp_or_disp.offset.z = submerge
+            if is_aspirate:
+                transfer_properties.aspirate.aspirate_position.position_reference = (
+                    PositionReference.WELL_BOTTOM
+                )
+                transfer_properties.aspirate.aspirate_position.offset.z = _submerge_mm
+            else:
+                transfer_properties.dispense.dispense_position.position_reference = (
+                    PositionReference.WELL_BOTTOM
+                )
+                transfer_properties.dispense.dispense_position.offset.z = _submerge_mm
 
         def _disable() -> None:
-            _asp_or_disp.submerge.position_reference = (
-                _original_submerge_position_reference
-            )
-            _asp_or_disp.position_reference = _original_position_reference
-            _asp_or_disp.retract.position_reference = (
-                _original_retract_position_reference
-            )
-            # update liquid-class offsets based on CALCULATED meniscus height
-            _asp_or_disp.submerge.offset.z = _original_submerge_offset_z
-            _asp_or_disp.offset.z = _original_offset_z
-            _asp_or_disp.retract.offset.z = _original_retract_offset_z
+            pass
 
         return _enable, _disable
 
@@ -1012,8 +999,12 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 trial: [] for trial in range(cfg.trials)
             }
             # CREATE new line entry for this volume to be tested (line includes all trials)
-            simplified_results_for_calibration_test_asp.append(meta_data + [str(volume)])
-            simplified_results_for_calibration_test_disp.append(meta_data + [str(volume)])
+            simplified_results_for_calibration_test_asp.append(
+                meta_data + [str(volume)]
+            )
+            simplified_results_for_calibration_test_disp.append(
+                meta_data + [str(volume)]
+            )
             for channel in trials[volume].keys():
                 channel_offset = _get_channel_offset(cfg, channel)
                 actual_asp_list_channel = []
@@ -1268,10 +1259,16 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         test_report=resources.test_report,
     )
     csv_data_str_asp = "\n".join(
-        ["\t".join(csv_line) for csv_line in simplified_results_for_calibration_test_asp]
+        [
+            "\t".join(csv_line)
+            for csv_line in simplified_results_for_calibration_test_asp
+        ]
     )
     csv_data_str_disp = "\n".join(
-        ["\t".join(csv_line) for csv_line in simplified_results_for_calibration_test_disp]
+        [
+            "\t".join(csv_line)
+            for csv_line in simplified_results_for_calibration_test_disp
+        ]
     )
     print(csv_data_str_asp)
     print(csv_data_str_disp)
