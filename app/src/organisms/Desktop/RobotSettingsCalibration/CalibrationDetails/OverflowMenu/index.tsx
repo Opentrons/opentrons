@@ -35,6 +35,8 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { useRunStatuses } from '/app/resources/runs'
 
+import { ConfirmDeleteCalibrationModal } from './ConfirmDeleteCalibrationModal'
+
 import type { MouseEvent } from 'react'
 import type { DeleteCalRequestParams } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
@@ -65,6 +67,15 @@ export function OverflowMenu({
     'shared',
     'robot_calibration',
   ])
+
+  const [showDeleteCalModal, setShowDeleteCalModal] = useState(false)
+  const [showPipetteWizardFlows, setShowPipetteWizardFlows] = useState<boolean>(
+    false
+  )
+  const [selectedPipette, setSelectedPipette] = useState<SelectablePipettes>(
+    SINGLE_MOUNT_PIPETTES
+  )
+
   const doTrackEvent = useTrackEvent()
   const {
     menuOverlay,
@@ -83,9 +94,6 @@ export function OverflowMenu({
 
   const tipLengthCalibrations = useAllTipLengthCalibrationsQuery().data?.data
   const { isRunRunning: isRunning } = useRunStatuses()
-  const [showPipetteWizardFlows, setShowPipetteWizardFlows] = useState<boolean>(
-    false
-  )
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const isPipetteForFlex = isFlexPipette(pipetteName as PipetteName)
   const ot3PipCal =
@@ -144,12 +152,8 @@ export function OverflowMenu({
   }, [isRunning, updateRobotStatus])
 
   const { deleteCalibration } = useDeleteCalibrationMutation()
-  const [selectedPipette, setSelectedPipette] = useState<SelectablePipettes>(
-    SINGLE_MOUNT_PIPETTES
-  )
 
-  const handleDeleteCalibration = (e: MouseEvent): void => {
-    e.preventDefault()
+  const handleDeleteCalibration = (): void => {
     let params: DeleteCalRequestParams
     if (calType === 'pipetteOffset') {
       if (applicablePipetteOffsetCal == null) return
@@ -168,12 +172,19 @@ export function OverflowMenu({
     }
 
     deleteCalibration(params)
-
-    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
+    setShowDeleteCalModal(false)
   }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
+      {showDeleteCalModal && (
+        <ConfirmDeleteCalibrationModal
+          onDelete={handleDeleteCalibration}
+          toggleModal={() => {
+            setShowDeleteCalModal(!showDeleteCalModal)
+          }}
+        />
+      )}
       <OverflowBtn
         alignSelf={ALIGN_FLEX_END}
         aria-label={`CalibrationOverflowMenu_button_${calType}`}
@@ -235,7 +246,12 @@ export function OverflowMenu({
               </MenuItem>
               <Divider />
               <MenuItem
-                onClick={handleDeleteCalibration}
+                onClick={() => {
+                  setShowDeleteCalModal(true)
+                  setShowOverflowMenu(
+                    currentShowOverflowMenu => !currentShowOverflowMenu
+                  )
+                }}
                 disabled={!calibrationPresent}
                 css={css`
                   border-radius: 0 0 ${BORDERS.borderRadius8}
