@@ -756,6 +756,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self,
         volume: Optional[float] = None,
         height: Optional[float] = None,
+        in_place: Optional[bool] = None,
         rate: Optional[float] = None,
         flow_rate: Optional[float] = None,
     ) -> InstrumentContext:
@@ -772,6 +773,11 @@ class InstrumentContext(publisher.CommandPublisher):
                        the air gap. The default is 5 mm above the current well.
         :type height: float
 
+        :param in_place: Air gap at the pipette's current position, without moving to
+                         some height above the well. If ``in_place`` is specified,
+                         ``height`` must be unset.
+        :type in_place: bool
+
         :param rate: A multiplier for the default flow rate of the pipette. Calculated
                      as ``rate`` multiplied by :py:attr:`flow_rate.aspirate
                      <flow_rate>`. If neither rate nor flow_rate is specified, the pipette
@@ -784,10 +790,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
 
-        :raises RuntimeError: If location cache is ``None``. This should happen if
-                              ``air_gap()`` is called without first calling a method
-                              that takes a location (e.g., :py:meth:`.aspirate`,
-                              :py:meth:`dispense`)
+        :raises RuntimeError: If location cache is ``None`` and the air gap is not
+                              ``in_place``. This would happen if ``air_gap()`` is called
+                              without first calling a method that takes a location (e.g.,
+                              :py:meth:`.aspirate`, :py:meth:`dispense`)
 
         :returns: This instance.
 
@@ -805,6 +811,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.22
             No longer implemented as an aspirate.
+        .. versionchanged:: 2.24
+            Added the ``in_place`` option.
         .. versionchanged:: 2.24
             Adds the ``rate`` and ``flow_rate`` parameter. You can only define one or the other. If
             both are unspecified then ``rate`` is by default set to 1.0.
@@ -830,26 +838,37 @@ class InstrumentContext(publisher.CommandPublisher):
         if flow_rate is not None and rate is not None:
             raise ValueError("Cannot define both flow_rate and rate.")
 
-        if height is None:
-            height = 5
-        last_location = self._protocol_core.get_last_location()
-        if self.api_version < APIVersion(2, 24) and isinstance(
-            last_location, (TrashBin, WasteChute)
-        ):
-            last_location = None
-        if last_location is None or (
-            isinstance(last_location, types.Location)
-            and not last_location.labware.is_well
-        ):
-            raise RuntimeError(
-                f"Cached location of {last_location} is not valid for air gap."
-            )
-        target: Union[types.Location, TrashBin, WasteChute]
-        if isinstance(last_location, types.Location):
-            target = last_location.labware.as_well().top(height)
+        if in_place:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="in_place",
+                    until_version="2.24",
+                    current_version=f"{self._api_version}",
+                )
+            if height is not None:
+                raise ValueError("height must be unset if air gapping in_place")
         else:
-            target = last_location.top(height)
-        self.move_to(target, publish=False)
+            if height is None:
+                height = 5
+            last_location = self._protocol_core.get_last_location()
+            if self.api_version < APIVersion(2, 24) and isinstance(
+                last_location, (TrashBin, WasteChute)
+            ):
+                last_location = None
+            if last_location is None or (
+                isinstance(last_location, types.Location)
+                and not last_location.labware.is_well
+            ):
+                raise RuntimeError(
+                    f"Cached location of {last_location} is not valid for air gap."
+                )
+            target: Union[types.Location, TrashBin, WasteChute]
+            if isinstance(last_location, types.Location):
+                target = last_location.labware.as_well().top(height)
+            else:
+                target = last_location.top(height)
+            self.move_to(target, publish=False)
+
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
             self._core.prepare_to_aspirate()
             c_vol = self._core.get_available_volume() if volume is None else volume
