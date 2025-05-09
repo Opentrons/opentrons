@@ -120,6 +120,7 @@ export function dispenseUpdateLiquidState(
       return splitLiquid(volume || 0, prevTipLiquidState)
     }
   )
+
   let mergeLiquidtoSingleWell = null
   //  a labware will always have a well
   if (well != null && liquidLabware != null) {

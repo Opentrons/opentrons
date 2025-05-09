@@ -192,6 +192,7 @@ export function splitLiquid(
   sourceLiquidState: LocationLiquidState
 ): SourceAndDest {
   const totalSourceVolume = getLocationTotalVolume(sourceLiquidState)
+
   if (totalSourceVolume === 0) {
     // Splitting from empty source
     return {
@@ -270,7 +271,6 @@ export function mergeLiquid(
           ? ingredState.volume + dest[ingredId].volume // include all ingreds exclusive to 'source'
           : ingredState.volume
 
-        console.log('ingredId', ingredId)
         return {
           ...acc,
           [ingredId]: {
