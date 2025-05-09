@@ -21,6 +21,7 @@ export function forAspirate(
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
+  console.log(params)
   const { pipetteId, volume, labwareId } = params
   const { robotState, warnings } = robotStateAndWarnings
   const { liquidState } = robotState

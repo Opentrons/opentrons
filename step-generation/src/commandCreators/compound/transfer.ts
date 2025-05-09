@@ -27,7 +27,6 @@ import {
   configureForVolume,
   delay,
   dispenseInPlace,
-  dropTip,
   liquidProbe,
   moveToAddressableArea,
   moveToWell,
@@ -36,12 +35,10 @@ import {
 } from '../atomic'
 import { blowOutInTrash } from './blowOutInTrash'
 import { blowOutInWasteChute } from './blowOutInWasteChute'
-import { dropTipInTrash } from './dropTipInTrash'
-import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { mixInPlaceUtil } from './mix'
 import { replaceTip } from './replaceTip'
 
-import type { CutoutId, WellLocation } from '@opentrons/shared-data'
+import type { WellLocation } from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CommandCreatorError,
@@ -756,7 +753,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                 }),
                 blowoutInPlaceCommand,
                 // touch tip at source well with dispense touch tip parameters
-                curryCommandCreator(touchTip, {
+                ...(args.touchTipAfterDispense ? [curryCommandCreator(touchTip, {
                   pipetteId: args.pipette,
                   labwareId: args.sourceLabware,
                   wellName: sourceWell,
@@ -767,7 +764,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   ...(args.touchTipAfterDispenseSpeed != null
                     ? { speed: args.touchTipAfterDispenseSpeed }
                     : {}),
-                }),
+                  })] : []),
                 ...(getAirGapAfterDispenseCommands(true).length > 0
                   ? [
                       curryCommandCreator(moveToWell, {
@@ -807,32 +804,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                 ]
               }
               break
-          }
-
-          let dropTipCommand = [
-            curryCommandCreator(dropTip, {
-              pipette: args.pipette,
-              dropTipLocation: args.dropTipLocation,
-            }),
-          ]
-          if (isWasteChute) {
-            dropTipCommand = [
-              curryCommandCreator(dropTipInWasteChute, {
-                pipetteId: args.pipette,
-                wasteChuteId:
-                  invariantContext.wasteChuteEntities[args.dropTipLocation].id,
-              }),
-            ]
-          }
-          if (isTrashBin) {
-            dropTipCommand = [
-              curryCommandCreator(dropTipInTrash, {
-                pipetteId: args.pipette,
-                trashLocation: invariantContext.trashBinEntities[
-                  args.dropTipLocation
-                ].location as CutoutId,
-              }),
-            ]
           }
 
           // if using dispense > air gap, drop or change the tip at the end

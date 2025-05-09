@@ -16,12 +16,9 @@ import {
 import { transfer } from '../commandCreators/compound/transfer'
 import { FIXED_TRASH_ID } from '../constants'
 import {
-  AIR_GAP_META,
   blowoutInTrashCommands,
   DEFAULT_PIPETTE,
-  delayWithOffset,
   DEST_LABWARE,
-  DISPENSE_OFFSET_FROM_BOTTOM_MM,
   dispenseHelperLiquidClass,
   dropTipHelper,
   getErrorResult,
@@ -29,7 +26,6 @@ import {
   getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
-  makeDispenseHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
   submergeWithAspirateHelper,
@@ -41,8 +37,6 @@ import {
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState, TransferArgs } from '../types'
-
-const dispenseHelper = makeDispenseHelper()
 
 let invariantContext: InvariantContext
 let robotStateWithTip: RobotState
@@ -252,28 +246,6 @@ describe('pick up tip if no tip on pipette', () => {
           },
         },
       }),
-      //   drop tip at end
-      {
-        commandType: 'moveToAddressableArea',
-        key: expect.any(String),
-        params: {
-          addressableAreaName: '1ChannelWasteChute',
-          offset: {
-            x: 0,
-            y: 0,
-            z: 0,
-          },
-          pipetteId: 'p300SingleId',
-        },
-      },
-      {
-        commandType: 'dropTipInPlace',
-        key: expect.any(String),
-
-        params: {
-          pipetteId: 'p300SingleId',
-        },
-      },
     ])
   })
 

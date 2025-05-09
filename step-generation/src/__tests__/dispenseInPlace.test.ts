@@ -14,7 +14,7 @@ describe('dispenseInPlace', () => {
   let invariantContext: InvariantContext
   let robotStateWithTip: RobotState
 
-  const mockId = 'mockId'
+  const mockId = 'p300SingleId'
   const mockFlowRate = 10
   const mockVolume = 10
   beforeEach(() => {
