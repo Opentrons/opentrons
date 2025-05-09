@@ -592,24 +592,49 @@ class FlexStacker(mod_abc.AbstractModule):
         if event.enabled and self.initialized:
             match event.state:
                 case StatusBarState.RUNNING:
+                    if self.should_identify:
+                        self.set_stacker_identify(False)
                     await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.STATIC)
                 case StatusBarState.PAUSED:
                     if self.should_identify:
-                        await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
+                        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
                         self.set_stacker_identify(False)
                     else:
-                        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
+                        if self.hopper_door_state == HopperDoorState.OPENED:
+                            await self.set_led_state(
+                                0.5, LEDColor.BLUE, LEDPattern.PULSE
+                            )
+                        else:
+                            await self.set_led_state(
+                                0.5, LEDColor.WHITE, LEDPattern.STATIC
+                            )
                 case StatusBarState.IDLE:
+                    if self.should_identify:
+                        self.set_stacker_identify(False)
                     await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
                 case StatusBarState.HARDWARE_ERROR:
-                    await self.set_led_state(0.5, LEDColor.RED, LEDPattern.FLASH)
+                    if self.should_identify:
+                        await self.set_led_state(0.5, LEDColor.RED, LEDPattern.FLASH)
+                        self.set_stacker_identify(False)
+                    else:
+                        await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
                 case StatusBarState.SOFTWARE_ERROR:
+                    if self.should_identify:
+                        self.set_stacker_identify(False)
                     await self.set_led_state(0.5, LEDColor.YELLOW, LEDPattern.STATIC)
                 case StatusBarState.ERROR_RECOVERY:
-                    await self.set_led_state(0.5, LEDColor.YELLOW, LEDPattern.PULSE)
+                    if self.should_identify:
+                        await self.set_led_state(0.5, LEDColor.YELLOW, LEDPattern.PULSE)
+                        self.set_stacker_identify(False)
+                    else:
+                        await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
                 case StatusBarState.RUN_COMPLETED:
+                    if self.should_identify:
+                        self.set_stacker_identify(False)
                     await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.PULSE)
                 case StatusBarState.UPDATING:
+                    if self.should_identify:
+                        self.set_stacker_identify(False)
                     await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
                 case _:
                     await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
