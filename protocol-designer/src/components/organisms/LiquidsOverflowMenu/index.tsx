@@ -22,7 +22,6 @@ import {
 } from '@opentrons/components'
 
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { selectors } from '../../../labware-ingred/selectors'
 import {
   getLiquidEntities,
   getUnsavedForm,
@@ -50,22 +49,22 @@ export function LiquidsOverflowMenu(
   const { t } = useTranslation(['starting_deck_state'])
   const liquids = useSelector(getLiquidEntities)
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const zoomIn = useSelector(selectors.getZoomedInSlot)
 
   let right: string = SPACING.spacing12
+  let top: string = TOP_POSITION
+  let left: string | undefined = LEFT_POSITION
   if (formData != null || location.pathname === '/liquids') {
     right = '7.4rem'
-  } else if (zoomIn?.slot === 'offDeck') {
-    right = '24.75rem'
+    top = `${NAV_BAR_HEIGHT_REM + 3.1}rem`
+    left = undefined
   }
   return (
     <Flex
       position={POSITION_ABSOLUTE}
       zIndex={12}
-      // right={right}
-      // top={`calc(${NAV_BAR_HEIGHT_REM}rem + 3.1rem)`}
-      top={TOP_POSITION}
-      left={LEFT_POSITION}
+      right={right}
+      top={top}
+      left={left}
       ref={overflowWrapperRef}
       borderRadius={BORDERS.borderRadius8}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
