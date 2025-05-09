@@ -1,4 +1,5 @@
 import { Controller, useFormContext } from 'react-hook-form'
+import styled from 'styled-components'
 
 import { EmptySelectorButton, Flex, SPACING, WRAP } from '@opentrons/components'
 
@@ -22,18 +23,20 @@ export function FixturesButtonGroup({
         return (
           <Flex flexWrap={WRAP} gap={SPACING.spacing8}>
             {fixtures.map(fixture => (
-              <EmptySelectorButton
-                key={fixture.type}
-                iconName="plus"
-                onClick={() => {
-                  if (fixturesWatch.some(m => m.type === fixture.type)) {
-                    return
-                  }
-                  field.onChange([...fixturesWatch, fixture])
-                }}
-                text={fixture.name}
-                textAlignment="left"
-              />
+              <ButtonWrapper key={fixture.type}>
+                <EmptySelectorButton
+                  key={fixture.type}
+                  iconName="plus"
+                  onClick={() => {
+                    if (fixturesWatch.some(m => m.type === fixture.type)) {
+                      return
+                    }
+                    field.onChange([...fixturesWatch, fixture])
+                  }}
+                  text={fixture.name}
+                  textAlignment="left"
+                />
+              </ButtonWrapper>
             ))}
           </Flex>
         )
@@ -41,3 +44,9 @@ export function FixturesButtonGroup({
     />
   )
 }
+
+const ButtonWrapper = styled.div`
+  display: inline-block;
+  flex-grow: 0;
+  flex-shrink: 1;
+`
