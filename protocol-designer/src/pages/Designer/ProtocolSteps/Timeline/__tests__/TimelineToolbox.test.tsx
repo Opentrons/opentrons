@@ -16,6 +16,7 @@ import {
 import { AddStepButton } from '../AddStepButton'
 import { DraggableSteps } from '../DraggableSteps'
 import { HardwareStep } from '../HardwareStep'
+import { LiquidStep } from '../LiquidStep'
 import { PresavedStep } from '../PresavedStep'
 import { TerminalItemStep } from '../TerminalItemStep'
 import { TimelineToolbox } from '../TimelineToolbox'
@@ -26,6 +27,7 @@ import type { NavigateFunction } from 'react-router-dom'
 const mockNavigate = vi.fn()
 
 vi.mock('../HardwareStep')
+vi.mock('../LiquidStep')
 vi.mock('../AddStepButton')
 vi.mock('../DraggableSteps')
 vi.mock('../PresavedStep')
@@ -74,12 +76,14 @@ describe('TimelineToolbox', () => {
       pipettes: {},
     })
     vi.mocked(HardwareStep).mockReturnValue(<div>mock HardwareStep</div>)
+    vi.mocked(LiquidStep).mockReturnValue(<div>mock LiquidStep</div>)
   })
 
   it('renders hardware step, 2 terminal item steps, a draggable step and presaved step with toolbox title and back button', () => {
     render(props)
     screen.getByText('mock protocolName')
     screen.getByText('mock HardwareStep')
+    screen.getByText('mock LiquidStep')
     screen.getByText('Timeline')
     screen.getByText('mock AddStepButton')
     screen.getByText('mock PresavedStep')

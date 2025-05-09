@@ -7,7 +7,6 @@ import { fireEvent, screen } from '@testing-library/react'
 import { ProtocolSteps } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { LiquidButton } from '../../../../components/molecules/LiquidButton'
 import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
 import {
@@ -39,7 +38,6 @@ vi.mock('../DraggableSidebar')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../components/organisms/Alerts')
-vi.mock('../../../../components/molecules/LiquidButton')
 vi.mock('../Timeline/utils')
 const render = () => {
   return renderWithProviders(
@@ -84,7 +82,6 @@ describe('ProtocolSteps', () => {
       selectionType: 'SINGLE_STEP_SELECTION_TYPE',
       id: '0522fde8-25a3-4840-b84a-af7282bd80d5',
     })
-    vi.mocked(LiquidButton).mockReturnValue(<div>mock LiquidButton</div>)
     vi.mocked(OffDeck).mockReturnValue(<div>mock OffDeck</div>)
     vi.mocked(getUnsavedForm).mockReturnValue(null)
     vi.mocked(getSelectedSubstep).mockReturnValue(null)
@@ -134,9 +131,5 @@ describe('ProtocolSteps', () => {
   it('renders the current step name', () => {
     render()
     screen.getByText('Custom Pause')
-  })
-  it('renders the liquids button', () => {
-    render()
-    screen.getByText('mock LiquidButton')
   })
 })
