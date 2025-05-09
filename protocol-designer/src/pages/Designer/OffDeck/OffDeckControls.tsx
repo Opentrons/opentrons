@@ -50,12 +50,7 @@ export function OffDeckControls(
   const { t } = useTranslation('starting_deck_state')
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
 
-  if (
-    terminalItemId === END_TERMINAL_ITEM_ID ||
-    slotPosition === null ||
-    isSelected
-  )
-    return null
+  if (slotPosition === null || isSelected) return null
 
   const hoverOpacity =
     (hover != null && hover === labwareId) || menuListId === labwareId

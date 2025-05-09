@@ -11,6 +11,7 @@ import {
 } from '@opentrons/components'
 
 import { SlotDetailModal } from '../../../../components/organisms/SlotDetailModal'
+import { END_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { DECK_CONTROLS_STYLE } from '../constants'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -38,7 +39,10 @@ export function ActiveLabwareControls(
   } = props
   const { t } = useTranslation('starting_deck_state')
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
-  if (terminalItemId != null || slotPosition == null) {
+  if (
+    (terminalItemId != null && terminalItemId !== END_TERMINAL_ITEM_ID) ||
+    slotPosition == null
+  ) {
     return null
   }
   const hoverOpacity = hover != null && hover === itemId ? 1 : 0
