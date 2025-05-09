@@ -1,7 +1,12 @@
 import { Controller, useFormContext } from 'react-hook-form'
-import styled from 'styled-components'
 
-import { EmptySelectorButton, Flex, SPACING, WRAP } from '@opentrons/components'
+import {
+  EmptySelectorButton,
+  Flex,
+  FLEX_MAX_CONTENT,
+  SPACING,
+  WRAP,
+} from '@opentrons/components'
 
 import { FIXTURES_FIELD_NAME } from '../../organisms/ModulesAndFixturesSection'
 
@@ -23,7 +28,7 @@ export function FixturesButtonGroup({
         return (
           <Flex flexWrap={WRAP} gap={SPACING.spacing8}>
             {fixtures.map(fixture => (
-              <ButtonWrapper key={fixture.type}>
+              <Flex width={FLEX_MAX_CONTENT} key={fixture.type}>
                 <EmptySelectorButton
                   key={fixture.type}
                   iconName="plus"
@@ -36,7 +41,7 @@ export function FixturesButtonGroup({
                   text={fixture.name}
                   textAlignment="left"
                 />
-              </ButtonWrapper>
+              </Flex>
             ))}
           </Flex>
         )
@@ -44,9 +49,3 @@ export function FixturesButtonGroup({
     />
   )
 }
-
-const ButtonWrapper = styled.div`
-  display: inline-block;
-  flex-grow: 0;
-  flex-shrink: 1;
-`
