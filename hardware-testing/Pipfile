@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 opentrons = {editable = true, path = "./../api", extras=['flex-hardware']}
-opentrons-shared-data = {editable = true, path = "./../shared-data/python"}
+opentrons-shared-data = {editable = true, path = "./../shared-data"}
 opentrons-hardware = {editable = true, path = "./../hardware", extras=['FLEX']}
 hardware-testing = { editable = true, path = "." }
 abr-testing = { editable = true, path = "./../abr-testing" }
