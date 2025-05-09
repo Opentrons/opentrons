@@ -270,6 +270,8 @@ export function mergeLiquid(
         const ingredVolume = isCommonIngred // sum volumes of ingredients common to 'source' and 'dest'
           ? ingredState.volume + dest[ingredId].volume // include all ingreds exclusive to 'source'
           : ingredState.volume
+
+        console.log('ingredId', ingredId)
         return {
           ...acc,
           [ingredId]: {

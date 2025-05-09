@@ -170,6 +170,11 @@ export const forAspirateInPlace = (
     } else if (volume > getLocationTotalVolume(sourceLiquidState)) {
       warnings.push(warningCreators.aspirateMoreThanWellContents())
     }
+    console.log(
+      'newLiquidFromWell',
+      JSON.parse(JSON.stringify(tipLiquidState)),
+      JSON.parse(JSON.stringify(newLiquidFromWell))
+    )
 
     pipette[indexToString] = mergeLiquid(tipLiquidState, newLiquidFromWell)
     console.log('pipette', JSON.parse(JSON.stringify(pipette)))
