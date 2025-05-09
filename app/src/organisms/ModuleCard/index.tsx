@@ -81,6 +81,7 @@ import type {
   AttachedModule,
   HeaterShakerModule,
 } from '/app/redux/modules/types'
+import type { ModuleType } from '@opentrons/shared-data'
 import type { RequestState } from '/app/redux/robot-api/types'
 import type { Dispatch, State } from '/app/redux/types'
 
