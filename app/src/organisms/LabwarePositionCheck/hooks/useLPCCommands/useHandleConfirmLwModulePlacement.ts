@@ -6,10 +6,10 @@ import {
 
 import type { VectorOffset } from '@opentrons/api-client'
 import type {
+  Coordinates,
   CreateCommand,
   LabwareLocation,
   MoveLabwareCreateCommand,
-  Vector3D,
 } from '@opentrons/shared-data'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
@@ -26,7 +26,12 @@ export interface UseHandleConfirmPlacementResult {
     offsetLocationDetails: OffsetLocationDetails,
     pipetteId: string,
     initialVectorOffset?: VectorOffset | null
-  ) => Promise<Vector3D>
+  ) => Promise<Coordinates>
+  handleMoveToInitialOffsetPosition: (
+    offsetLocationDetails: OffsetLocationDetails,
+    pipetteId: string,
+    initialVectorOffset: VectorOffset | null
+  ) => Promise<Coordinates>
 }
 
 export function useHandleConfirmLwModulePlacement({
@@ -38,7 +43,7 @@ export function useHandleConfirmLwModulePlacement({
     offsetLocationDetails: OffsetLocationDetails,
     pipetteId: string,
     initialVectorOffset?: VectorOffset | null
-  ): Promise<Vector3D> => {
+  ): Promise<Coordinates> => {
     const confirmCommands: CreateCommand[] = [
       ...buildMoveLabwareCommand(offsetLocationDetails),
       ...moduleInitDuringLPCCommands(analysis),
@@ -70,7 +75,41 @@ export function useHandleConfirmLwModulePlacement({
     })
   }
 
-  return { handleConfirmLwModulePlacement }
+  const handleMoveToInitialOffsetPosition = (
+    offsetLocationDetails: OffsetLocationDetails,
+    pipetteId: string,
+    initialVectorOffset: VectorOffset | null
+  ): Promise<Coordinates> => {
+    const moveCommands: CreateCommand[] = [
+      ...moveToWellCommands(
+        offsetLocationDetails,
+        pipetteId,
+        initialVectorOffset
+      ),
+      ...savePositionCommands(pipetteId),
+    ]
+
+    return chainLPCCommands(moveCommands, false).then(responses => {
+      const finalResponse = responses[responses.length - 1]
+      if (
+        finalResponse.data.commandType === 'savePosition' &&
+        finalResponse.data.result != null
+      ) {
+        const { position } = finalResponse.data.result
+
+        return Promise.resolve(position)
+      } else {
+        setErrorMessage(
+          'CheckItem failed to save position for initial placement.'
+        )
+        return Promise.reject(
+          new Error('CheckItem failed to save position for initial placement.')
+        )
+      }
+    })
+  }
+
+  return { handleConfirmLwModulePlacement, handleMoveToInitialOffsetPosition }
 }
 
 function buildMoveLabwareCommand(
