@@ -1,48 +1,46 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-import '@testing-library/jest-dom/vitest'
-
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'
-import { START_TERMINAL_ITEM_ID } from '../../../../../steplist'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
 } from '../../../../../ui/steps'
 import { selectTerminalItem } from '../../../../../ui/steps/actions/actions'
-import { HardwareStep } from '../HardwareStep'
+import { LiquidStep } from '../LiquidStep'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('../../../../../ui/steps')
+vi.mock('../../../../../file-data/selectors')
 vi.mock('../../../../../ui/steps/actions/actions')
-const render = (props: ComponentProps<typeof HardwareStep>) => {
-  return renderWithProviders(<HardwareStep {...props} />, {
+const render = (props: ComponentProps<typeof LiquidStep>) => {
+  return renderWithProviders(<LiquidStep {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('HardwareStep', () => {
-  let props: ComponentProps<typeof HardwareStep>
+describe('LiquidStep', () => {
+  let props: ComponentProps<typeof LiquidStep>
 
   beforeEach(() => {
     props = {
       sidebarWidth: 190,
     }
-    vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
+    vi.mocked(getSelectedTerminalItemId).mockReturnValue(null)
     vi.mocked(getHoveredTerminalItemId).mockReturnValue(null)
   })
-  it('renders the button and copy for a flex/ot-2', () => {
+  it('renders the button and text', () => {
     render(props)
-    screen.getByText('Deck hardware')
-    fireEvent.click(screen.getByText('Deck hardware'))
+    expect(screen.getByText('Liquids')).toBeInTheDocument()
+    fireEvent.click(screen.getByText('Liquids'))
     expect(vi.mocked(selectTerminalItem)).toHaveBeenCalled()
   })
+
   it('renders the button and copy for a flex with small sidebar width', () => {
     props.sidebarWidth = 160
     render(props)
-    expect(screen.queryByText('Deck hardware')).not.toBeInTheDocument()
+    expect(screen.queryByText('Liquids')).not.toBeInTheDocument()
   })
 })
