@@ -503,7 +503,7 @@ class GeometryView:
             )
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
-        """Get the calibrated position of the labware's parent slot (deck or module)."""
+        """Get the calibrated position of the labware's parent slot (deck slot, module, or another labware)."""
         parent_pos = self.get_labware_parent_nominal_position(labware_id)
         labware_data = self._labware.get(labware_id)
         cal_offset = self._get_calibrated_module_offset(labware_data.location)
@@ -531,13 +531,21 @@ class GeometryView:
             return slot_front_left + slot_front_left_to_labware_front_left
         else:
             assert_type(definition, LabwareDefinition3)
-            # todo(mm, 2025-03-03): This needs more work to correctly handle labware schema 3.
-            # This is currently assuming the labware's wells are in quadrant I and the
-            # labware sits as far in the -x, -y direction as the slot allows. We instead
-            # need to have the labware sit in the -x, +y direction (depending on the slot
-            # and labware's locating features) and allow for the labware's wells to be
-            # in quadrant IV.
-            return slot_front_left
+
+            labware_footprint_left_x = definition.extents.footprint.backLeft.x
+            labware_footprint_front_y = definition.extents.footprint.frontRight.y
+            labware_footprint_bottom_z = definition.extents.total.backLeftBottom.z
+
+            labware_origin_to_labware_front_left_bottom = Point(
+                labware_footprint_left_x,
+                labware_footprint_front_y,
+                labware_footprint_bottom_z,
+            )
+            labware_front_left_bottom_to_labware_origin = (
+                -1 * labware_origin_to_labware_front_left_bottom
+            )
+
+            return slot_front_left + labware_front_left_bottom_to_labware_origin
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""

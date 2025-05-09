@@ -36,9 +36,13 @@ from .constants import (
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
 RECURSIVE_SEARCH_VOLUME_TOLERANCE = 0.001
 
+# TODO(jh, 2025-05-09): We need to handle both positive numbers (by schema 2 convention)
+#  and negative numbers (by schema 3 convention) no matter what, so we can just not enforce signage at the schema level.
 
 _StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
 _StrictNonNegativeFloat = Annotated[float, Field(strict=True, ge=0.0)]
+_StrictNonPositiveInt = Annotated[int, Field(strict=True, le=0)]
+_StrictNonPositiveFloat = Annotated[float, Field(strict=True, le=0.0)]
 
 
 _Number = StrictInt | StrictFloat
@@ -51,6 +55,9 @@ this ensures that Pydantic won't change `"someFloatField: 0` to
 
 _NonNegativeNumber = _StrictNonNegativeInt | _StrictNonNegativeFloat
 """Non-negative JSON number type, written to preserve lack of decimal point."""
+
+_NonPositiveNumber = _StrictNonPositiveInt | _StrictNonPositiveFloat
+"""Non-positive JSON number type, written to preserve lack of decimal point."""
 
 
 class Vector2D(BaseModel):
@@ -136,26 +143,41 @@ class Dimensions(BaseModel):
     xDimension: _NonNegativeNumber
 
 
-class _WellCommon2(BaseModel):
+class _WellCommonMixin(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     depth: _NonNegativeNumber
     totalLiquidVolume: _NonNegativeNumber
     x: _NonNegativeNumber
-    y: _NonNegativeNumber
     z: _NonNegativeNumber
     geometryDefinitionId: str | None = None
 
 
-class CircularWellDefinition2(_WellCommon2, BaseModel):
+class _WellCommon2(_WellCommonMixin):
+    y: _NonNegativeNumber
+
+
+class _WellCommon3(_WellCommonMixin):
+    y: _NonPositiveNumber
+
+
+class _CircularWellMixin(BaseModel):
     shape: Literal["circular"]
     diameter: _NonNegativeNumber
 
 
-class RectangularWellDefinition2(_WellCommon2, BaseModel):
+class _RectangularWellMixin(BaseModel):
     shape: Literal["rectangular"]
     xDimension: _NonNegativeNumber
     yDimension: _NonNegativeNumber
+
+
+class CircularWellDefinition2(_WellCommon2, _CircularWellMixin):
+    pass
+
+
+class RectangularWellDefinition2(_WellCommon2, _RectangularWellMixin):
+    pass
 
 
 WellDefinition2 = Annotated[
@@ -163,13 +185,11 @@ WellDefinition2 = Annotated[
 ]
 
 
-class CircularWellDefinition3(CircularWellDefinition2):
-    # Currently equivalent to CircularWellDefinition2.
+class CircularWellDefinition3(_WellCommon3, _CircularWellMixin):
     pass
 
 
-class RectangularWellDefinition3(RectangularWellDefinition2):
-    # Currently equivalent to RectangularWellDefinition2.
+class RectangularWellDefinition3(_WellCommon3, _RectangularWellMixin):
     pass
 
 
