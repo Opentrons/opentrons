@@ -58,9 +58,9 @@ jobs:
 
       - uses: './.github/actions/python/setup'
         with:
-          project: 'shared-data/python'
+          project: 'shared-data'
       - name: Lint
-        run: make -C shared-data/python lint
+        run: make -C shared-data lint-py
 
   python-test:
     name: 'shared-data package python ${{ matrix.python }} tests on ${{ matrix.os }}'
@@ -92,7 +92,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - uses: './.github/actions/python/setup'
         with:
-          project: 'shared-data/python'
+          project: 'shared-data'
           python-version: ${{ matrix.python }}
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
@@ -101,13 +101,13 @@ jobs:
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: Test
-        run: make -C shared-data/python test
+        run: make -C shared-data test-py
       - name: Ensure assets build
-        run: make -C shared-data/python sdist wheel
+        run: make -C shared-data dist-py
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
-          files: ./shared-data/python/coverage.xml
+          files: ./shared-data/coverage.xml
           flags: shared-data
 
   js-test:
@@ -174,7 +174,7 @@ jobs:
           python-version: '3.10'
       - uses: './.github/actions/python/setup'
         with:
-          project: 'shared-data/python'
+          project: 'shared-data'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:
@@ -186,14 +186,14 @@ jobs:
         name: 'upload to test pypi'
         uses: './.github/actions/python/pypi-deploy'
         with:
-          project: 'shared-data/python'
+          project: 'shared-data'
           repository_url: 'https://test.pypi.org/legacy/'
           password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS_SHARED_DATA }}'
       - if: startsWith(env.OT_TAG, 'v')
         name: 'upload to pypi'
         uses: './.github/actions/python/pypi-deploy'
         with:
-          project: 'shared-data/python'
+          project: 'shared-data'
           repository_url: 'https://upload.pypi.org/legacy/'
           password: '${{ secrets.PYPI_DEPLOY_TOKEN_OPENTRONS_SHARED_DATA }}'
 
