@@ -13,7 +13,7 @@ flake8-annotations = "~=3.0.1"
 flake8-docstrings = "~=1.7.0"
 flake8-noqa = "~=1.4.0"
 hypothesis = "==6.96.1"
-opentrons-shared-data = {file = "../shared-data/python", editable = true}
+opentrons-shared-data = {file = "../shared-data", editable = true}
 opentrons = { editable = true, path = "../api"}
 test-data-generation = {file = ".", editable = true}
 astor = "0.8.1"
