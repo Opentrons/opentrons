@@ -38,6 +38,28 @@ from opentrons_shared_data.robot.types import RobotType
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 
 
+def _run_app(config: Settings):
+    async def _async_entry():
+        await asyncio.gather(
+            run_smoothie.run(config),
+            run_app.run(config, modules=[m.value for m in config.modules]),
+        )
+
+    asyncio.run(_async_entry())
+
+
+def _run_wait_ready(config: Settings):
+    # Entry point for process that waits for emulation to be ready.
+    async def _wait_ready() -> None:
+        c = await ModuleStatusClient.connect(
+            host="localhost", port=config.module_server.port
+        )
+        await wait_emulators(client=c, modules=config.modules, timeout=5)
+        c.close()
+
+    asyncio.run(_wait_ready())
+
+
 class GCodeEngine:
     """
     Class for running a thing against the emulator.
@@ -63,30 +85,9 @@ class GCodeEngine:
         hardware controller is returned."""
         modules = self._config.modules
 
-        # Entry point for the emulator app process
-        def _run_app():
-            async def _async_entry():
-                await asyncio.gather(
-                    run_smoothie.run(self._config),
-                    run_app.run(self._config, modules=[m.value for m in modules]),
-                )
-
-            asyncio.run(_async_entry())
-
-        proc = Process(target=_run_app)
+        proc = Process(target=_run_app, args=(self._config,))
         proc.daemon = True
         proc.start()
-
-        # Entry point for process that waits for emulation to be ready.
-        async def _wait_ready() -> None:
-            c = await ModuleStatusClient.connect(
-                host="localhost", port=self._config.module_server.port
-            )
-            await wait_emulators(client=c, modules=modules, timeout=5)
-            c.close()
-
-        def _run_wait_ready():
-            asyncio.run(_wait_ready())
 
         ready_proc = Process(target=_run_wait_ready)
         ready_proc.daemon = True
