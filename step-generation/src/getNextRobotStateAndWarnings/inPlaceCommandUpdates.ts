@@ -165,36 +165,16 @@ export const forAspirateInPlace = (
     } else if (volume > getLocationTotalVolume(sourceLiquidState)) {
       warnings.push(warningCreators.aspirateMoreThanWellContents())
     }
-    console.log(
-      'newLiquidFromWell',
-      JSON.parse(JSON.stringify(tipLiquidState)),
-      JSON.parse(JSON.stringify(newLiquidFromWell))
-    )
-    console.log(
-      'mergeLiquid(tipLiquidState, newLiquidFromWell)',
-      mergeLiquid(tipLiquidState, newLiquidFromWell)
-    )
     pipette[indexToString] = mergeLiquid(tipLiquidState, newLiquidFromWell)
-    console.log('pipette', JSON.parse(JSON.stringify(pipette)))
   })
   // Remove liquid from source well(s)
   const labwareLiquidState = liquidState.labware[labwareId]
-  console.log(
-    'labwareLiquidState',
-    JSON.parse(JSON.stringify(labwareLiquidState)),
-    JSON.parse(JSON.stringify(liquidState.labware[labwareId]))
-  )
   wellsForTips.forEach(well => {
     labwareLiquidState[well] = splitLiquid(
       volume,
       labwareLiquidState[well]
     ).source
   })
-  console.log(
-    'liquidState.pipettes',
-    JSON.parse(JSON.stringify(liquidState.pipettes))
-  )
-  console.log('wellsForTips', wellsForTips)
 }
 
 export const forDispenseInPlace = (
