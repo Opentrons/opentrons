@@ -29,7 +29,8 @@ import type { Dispatch } from '/app/redux/types'
 
 const UPDATE_RECHECK_INTERVAL_MS = 60000
 const PROTOCOL_IDS_RECHECK_INTERVAL_MS = 3000
-const ATTACHED_MODULE_POLL_MS = 3000
+const ATTACHED_MODULE_POLL_MS = 5000
+const DECK_CONFIG_POLL_MS = 5000
 
 export function useSoftwareUpdatePoll(): void {
   const dispatch = useDispatch<Dispatch>()
@@ -134,6 +135,7 @@ export function useModuleAttachedToast(launchModuleSetupCallback: () => void) {
   const attachedPipettes = useAttachedPipettes(attachedModules.length > 0)
   const deckConfig = useNotifyDeckConfigurationQuery({
     enabled: attachedModules.length > 0,
+    refetchInterval: DECK_CONFIG_POLL_MS,
   }).data
   const moduleSerials = attachedModules
     .filter(m => m.moduleOffset === undefined)
