@@ -30,7 +30,6 @@ export function FixturesButtonGroup({
             {fixtures.map(fixture => (
               <Flex width={FLEX_MAX_CONTENT} key={fixture.type}>
                 <EmptySelectorButton
-                  key={fixture.type}
                   iconName="plus"
                   onClick={() => {
                     if (fixturesWatch.some(m => m.type === fixture.type)) {
