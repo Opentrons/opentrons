@@ -77,7 +77,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing4}
-            maxWidth="95%"
+            paddingRight={SPACING.spacing16}
           >
             <StyledText desktopStyle="bodyDefaultSemiBold">
               {displayName}
