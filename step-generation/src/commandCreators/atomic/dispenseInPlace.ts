@@ -40,7 +40,7 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceParams> = (
     // rate= is a ratio in the PAPI, and we have no good way to figure out what
     // flowrate the PAPI has set the pipette to, so we just have to do a division:
     `rate=${flowRate} / ${pipettePythonName}.flow_rate.dispense`,
-    ...(pushOut != null ? [`pushOut=${pushOut}`] : []),
+    ...(pushOut != null ? [`push_out=${pushOut}`] : []),
   ]
   const python = `${pipettePythonName}.dispense(\n${indentPyLines(
     pythonArgs.join(',\n')
