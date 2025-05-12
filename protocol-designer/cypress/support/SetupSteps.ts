@@ -720,7 +720,7 @@ export const SetupSteps = {
     call: () => {
       cy.get('input[name="aspirate_wells"]')
         .should('have.value', 'Choose wells')
-        .click()
+        .click({ force: true })
     },
   }),
 
@@ -729,7 +729,7 @@ export const SetupSteps = {
     call: () => {
       cy.get('input[name="dispense_wells"]')
         .should('have.value', 'Choose wells')
-        .click()
+        .click({ force: true })
     },
   }),
   // Save selected wells

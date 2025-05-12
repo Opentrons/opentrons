@@ -59,9 +59,9 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
 
           steps.add(
             CompositeSetupSteps.Test_LC(
-              'Bio-Rad 96 Well Plate', // sourceLabware
+              'Thermo Scientific Nunc 96 Well Plate 1300 µL', // sourceLabware
               sourceWell,
-              'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt', // destinationLabware
+              'Thermo Scientific Nunc 96 Well Plate 2000 µL', // destinationLabware
               destWell,
               volume,
               liquidClass,
@@ -100,7 +100,10 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.EditProtocolA())
     steps.add(
-      CompositeSetupSteps.AddLabwareToDeckSlot('C1', 'Bio-Rad 96 Well Plate')
+      CompositeSetupSteps.AddLabwareToDeckSlot(
+        'C1',
+        'Thermo Scientific Nunc 96 Well Plate 1300 µL'
+      )
     )
     steps.add(SetupSteps.ChoseDeckSlotC1Labware())
     steps.add(SetupSteps.AddLiquid())
@@ -113,11 +116,11 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
     steps.add(SetupVerifications.LiquidPage())
     steps.add(UniversalSteps.Snapshot())
     steps.add(SetupSteps.SelectLiquidWells())
-    steps.add(SetupSteps.SetVolumeAndSaveForWells('150'))
+    steps.add(SetupSteps.SetVolumeAndSaveForWells('1200'))
     steps.add(
       CompositeSetupSteps.AddLabwareToDeckSlot(
         'C3',
-        'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
+        'Thermo Scientific Nunc 96 Well Plate 2000 µL'
       )
     )
     GenerateMultipleTransferSteps(steps)
