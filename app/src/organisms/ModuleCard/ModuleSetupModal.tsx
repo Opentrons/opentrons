@@ -47,28 +47,39 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
     'device_details',
   ])
 
-  let instructionText
-  let instructionURL
-  let instructionQRCode
-  switch (moduleModel) {
-    case ABSORBANCE_READER_V1:
-      instructionText = t('module_instructions_manual')
-      instructionURL = ABSORBANCE_READER_MANUAL_URL
-      instructionQRCode = absorbanceReaderManualQRCode
-      break
-    case FLEX_STACKER_MODULE_V1:
-      instructionText = t('branded:module_instructions_quickstart', {
-        moduleName: t('device_details:stacker'),
-      })
-      instructionURL = FLEX_STACKER_QUICKSTART_GUIDE_URL
-      instructionQRCode = stackerQuickstartQRCode
-      break
-    default:
-      // Legacy module instructions direct user to the help center instead of the quickstart guide
-      instructionText = t('branded:modal_instructions')
-      instructionURL = MODULE_SETUP_URL
-      instructionQRCode = helpCenterQRCode
-      break
+  const instructionText = (): string => {
+    switch (moduleModel) {
+      case ABSORBANCE_READER_V1:
+        return t('module_instructions_manual')
+      case FLEX_STACKER_MODULE_V1:
+        return t('module_instructions_quickstart', {
+          moduleName: t('device_details:stacker'),
+        })
+      default:
+        // Legacy module instructions direct user to the help center instead of the quickstart guide
+        return t('branded:modal_instructions')
+    }
+  }
+
+  const instructionURL = (): string => {
+    switch (moduleModel) {
+      case ABSORBANCE_READER_V1:
+        return ABSORBANCE_READER_MANUAL_URL
+      case FLEX_STACKER_MODULE_V1:
+        return FLEX_STACKER_QUICKSTART_GUIDE_URL
+      default:
+        return MODULE_SETUP_URL
+    }
+  }
+  const instructionQRCode = (): string => {
+    switch (moduleModel) {
+      case ABSORBANCE_READER_V1:
+        return absorbanceReaderManualQRCode
+      case FLEX_STACKER_MODULE_V1:
+        return stackerQuickstartQRCode
+      default:
+        return helpCenterQRCode
+    }
   }
 
   return createPortal(
@@ -85,12 +96,12 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
             width="50%"
           >
             <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
-              {instructionText}
+              {instructionText()}
             </LegacyStyledText>
             <Link
               external
               css={TYPOGRAPHY.linkPSemiBold}
-              href={instructionURL}
+              href={instructionURL()}
               target="_blank"
               rel="noopener noreferrer"
               marginBottom={SPACING.spacing16}
@@ -105,7 +116,7 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
               />
             </Link>
           </Flex>
-          <img width="192px" height="194px" src={instructionQRCode} />
+          <img width="192px" height="194px" src={instructionQRCode()} />
         </Flex>
         <PrimaryButton onClick={props.close} alignSelf={ALIGN_FLEX_END}>
           {i18n.format(t('shared:close'), 'capitalize')}

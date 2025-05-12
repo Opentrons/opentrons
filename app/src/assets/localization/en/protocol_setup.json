@@ -180,6 +180,7 @@
   "module_disconnected": "Disconnected",
   "module_instructions_link": "{{moduleName}} setup instructions",
   "module_instructions_manual": "For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to read the module Instruction Manual.",
+  "module_instructions_quickstart": "For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to see the {{moduleName}} Quickstart guide.",
   "module_mismatch_body": "Check that the modules connected to this robot are of the right type and generation",
   "module_name": "Module",
   "module_not_connected": "Not connected",

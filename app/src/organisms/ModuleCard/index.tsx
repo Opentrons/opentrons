@@ -77,11 +77,11 @@ import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 import { getModuleCardImage } from './utils'
 
 import type { IconProps } from '@opentrons/components'
+import type { ModuleType } from '@opentrons/shared-data'
 import type {
   AttachedModule,
   HeaterShakerModule,
 } from '/app/redux/modules/types'
-import type { ModuleType } from '@opentrons/shared-data'
 import type { RequestState } from '/app/redux/robot-api/types'
 import type { Dispatch, State } from '/app/redux/types'
 
@@ -359,10 +359,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               />
             )}
             {attachPipetteRequired != null &&
-              calibratePipetteRequired != null &&
-              updatePipetteFWRequired != null &&
-              requireModuleCalibration &&
-              !isPending ? (
+            calibratePipetteRequired != null &&
+            updatePipetteFWRequired != null &&
+            requireModuleCalibration &&
+            !isPending ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType="calibration"
@@ -377,9 +377,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             ) : null}
             {/* Calibration performs firmware updates, so only show calibration if both true. */}
             {!requireModuleCalibration &&
-              module.hasAvailableUpdate &&
-              showFWBanner &&
-              !isPending ? (
+            module.hasAvailableUpdate &&
+            showFWBanner &&
+            !isPending ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType="firmware"
@@ -433,17 +433,17 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
-                    slotName != null
+                  slotName != null
                     ? t('deck_slot', { slot: slotName }) + ' - '
                     : null}
                   {module?.usbPort !== null
                     ? t('usb_port', {
-                      port: module?.usbPort?.port,
-                      hubPort:
-                        module?.usbPort?.hubPort != null
-                          ? `.${module.usbPort.hubPort}`
-                          : '',
-                    })
+                        port: module?.usbPort?.port,
+                        hubPort:
+                          module?.usbPort?.hubPort != null
+                            ? `.${module.usbPort.hubPort}`
+                            : '',
+                      })
                     : t('usb_port_not_connected')}
                 </StyledText>
                 <Flex
