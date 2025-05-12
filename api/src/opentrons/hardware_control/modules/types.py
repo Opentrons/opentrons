@@ -360,6 +360,7 @@ class PlatformState(str, Enum):
     UNKNOWN = "unknown"
     EXTENDED = "extended"
     RETRACTED = "retracted"
+    MISSING = "missing"
 
     @classmethod
     def from_status(cls, status: PlatformStatus) -> "PlatformState":

@@ -13,6 +13,7 @@ import {
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { SelectLabwareModal } from '../../../../components/organisms'
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import { getRobotType } from '../../../../file-data/selectors'
 import {
   deleteContainer,
@@ -25,6 +26,7 @@ import {
 } from '../../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import { getDismissedHints } from '../../../../tutorial/selectors'
+import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
 import { DeckSetupToolbox } from '../DeckSetupToolbox'
 
 import type { ComponentProps } from 'react'
@@ -32,6 +34,7 @@ import type { NavigateFunction } from 'react-router-dom'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
+const mockMakeSnackbar = vi.fn()
 
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
@@ -42,6 +45,7 @@ vi.mock('../../../../tutorial/selectors')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../components/organisms/Kitchen/hooks')
 vi.mock('../../../../components/organisms/SelectLabwareModal')
+vi.mock('../../../../ui/labware/selectors')
 const render = (props: ComponentProps<typeof DeckSetupToolbox>) => {
   return renderWithProviders(<DeckSetupToolbox {...props} />, {
     i18nInstance: i18n,
@@ -82,6 +86,12 @@ describe('DeckSetupToolbox', () => {
     vi.mocked(getSavedStepForms).mockReturnValue({})
     vi.mocked(getDismissedHints).mockReturnValue([])
     vi.mocked(getAdditionalEquipment).mockReturnValue({})
+    vi.mocked(useKitchen).mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
+      bakeToast: vi.fn(),
+      eatToast: vi.fn(),
+    })
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({})
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -96,6 +106,9 @@ describe('DeckSetupToolbox', () => {
     screen.getByText('mock SelectLabwareModal')
   })
   it('should clear the slot from all items when the clear cta is called', () => {
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({
+      labId: 'mock nickName',
+    })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedAdapterDefUri: 'mockUri',
       selectedTopLabwareDefUri: 'mockUri',
@@ -137,7 +150,7 @@ describe('DeckSetupToolbox', () => {
       },
     })
     render(props)
-    screen.getAllByText('ANSI 96 Standard Microplate')
+    screen.getAllByText('mock nickName')
     screen.getByText('Add liquid')
     screen.getByText('Bottom of slot')
     screen.getByText('Top of slot')

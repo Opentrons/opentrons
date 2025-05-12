@@ -57,6 +57,7 @@
   "heater_shaker_settings": "Heater-Shaker Settings",
   "in": "in",
   "into": "into",
+  "labware_in": "Labware in",
   "magnetic_module": {
     "disengage": "<semiBoldText>{{module}}</semiBoldText><text>disengaged</text>",
     "engage": "<semiBoldText>{{module}}</semiBoldText><text>engaged to</text><tag/>"

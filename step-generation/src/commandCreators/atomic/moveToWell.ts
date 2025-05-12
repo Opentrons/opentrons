@@ -196,11 +196,16 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
       },
     },
   ]
-  //  NOTE: forceDirect and minimumZHeight were never wired up in the form or stepArgs
+  const pythonArgs = [
+    `${labwarePythonName}[${formatPyStr(wellName)}]${formatPyWellLocation(
+      wellLocation
+    )}`,
+    ...(forceDirect ? [`force_direct=True`] : []),
+    ...(minimumZHeight ? [`minimum_z_height=${minimumZHeight}`] : []),
+    ...(speed ? [`speed=${speed}`] : []),
+  ]
   return {
     commands,
-    python: `${pipettePythonName}.move_to(${labwarePythonName}[${formatPyStr(
-      wellName
-    )}]${formatPyWellLocation(wellLocation)})`,
+    python: `${pipettePythonName}.move_to(${pythonArgs.join(', ')})`,
   }
 }

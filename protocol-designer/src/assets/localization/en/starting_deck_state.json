@@ -26,6 +26,8 @@
   "deck_hardware": "Deck hardware",
   "deck_slots_full": "Deck slots are full",
   "define_liquid": "Define a liquid",
+  "delete_labware": "Delete labware",
+  "this_adapter_is_required": "This adapter is required for the {{name}} currently on the slot. If you remove the adapter, the {{name}} will be deleted too.",
   "done": "Done",
   "double_click_to_edit": "Double-click to edit",
   "duplicate": "Duplicate labware",
@@ -77,5 +79,6 @@
   "upload_custom_labware": "Upload custom labware",
   "waste_chute_no_labware": "Cannot load labware into Waste Chute",
   "we_added_hardware": "We've added your deck hardware!",
-  "wellPlate": "Well plates"
+  "wellPlate": "Well plates",
+  "view_labware": "View labware"
 }
