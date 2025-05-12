@@ -64,8 +64,7 @@ setup-py-toolchain:
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
-setup-js:
-setup-js: setup-py-toolchain
+setup-js: setup-py-toolchain $(addsuffix -py-setup, $(USB_BRIDGE_DIR))
 	yarn config set network-timeout 60000
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
