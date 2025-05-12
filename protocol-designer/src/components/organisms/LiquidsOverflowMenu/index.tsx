@@ -21,6 +21,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '../../../constants'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import {
   getLiquidEntities,
@@ -33,7 +34,6 @@ import type { ThunkDispatch } from '../../../types'
 
 const TOP_POSITION = '13.6875rem'
 const RIGHT_POSITION_FOR_LIQUIDS_PAGE = '7.4rem'
-const POSITION_ADJUSTMENT = 4
 
 interface LiquidsOverflowMenuProps {
   onClose: () => void
@@ -63,7 +63,7 @@ export function LiquidsOverflowMenu(
     right = undefined
     left =
       targetWidth !== undefined
-        ? `${targetWidth - POSITION_ADJUSTMENT}px`
+        ? `${targetWidth - OVERFLOW_MENU_POSITION_ADJUSTMENT}px`
         : undefined
   }
 
@@ -106,10 +106,8 @@ export function LiquidsOverflowMenu(
                 <LiquidIcon color={displayColor ?? ''} />
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
-                  css={`
-                    ${LINE_CLAMP_TEXT_STYLE(3)}
-                    text-align: ${TYPOGRAPHY.textAlignLeft}
-                  `}
+                  css={LINE_CLAMP_TEXT_STYLE(3)}
+                  textAlign={TYPOGRAPHY.textAlignLeft}
                 >
                   {displayName}
                 </StyledText>
