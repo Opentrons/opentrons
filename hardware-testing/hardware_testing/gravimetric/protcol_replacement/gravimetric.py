@@ -98,6 +98,7 @@ class FixtureSettings:
     pipette_channels: int
     tip_sizes: List[int]
     trials: int
+    channels: list[int]
     return_tip: bool
     touch_tip: bool
     liquid_name: str
@@ -116,6 +117,7 @@ class FixtureSettings:
     test_report: report.CSVReport
     scale_delay: int
     blank_trials: int
+    isolate_volumes: bool
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -135,6 +137,10 @@ class FixtureSettings:
         mount = lookup_key("mount", csv_params)[0]
         pipette_volume = int(lookup_key("pipette", csv_params)[0])
         pipette_channels = int(lookup_key("pipette", csv_params)[1])
+        if pipette_channels == 8:
+            channels = [1, 2, 3, 4, 5, 6, 7, 8]
+        else:
+            channels = [1]
         tip_sizes = [int(tip) for tip in lookup_key("tips", csv_params)]
         trials = int(lookup_key("trials", csv_params)[0])
         return_tip = bool(lookup_key("return_tip", csv_params)[0] == "TRUE")
@@ -276,6 +282,7 @@ class FixtureSettings:
             pipette_channels=pipette_channels,
             tip_sizes=tip_sizes,
             trials=trials,
+            channels=channels,
             return_tip=return_tip,
             touch_tip=touch_tip,
             liquid_name=liquid_name,
@@ -294,6 +301,7 @@ class FixtureSettings:
             test_report=test_report,
             scale_delay=10,
             blank_trials=10,
+            isolate_volumes=False,
         )
 
     def validate_settings(self) -> bool:
@@ -355,6 +363,14 @@ def remove_tip(fixture_settings: FixtureSettings) -> None:
         fixture_settings.pipette.drop_tip()
 
 
+def pick_up_tip_for_channel(
+    fixture_settings: FixtureSettings, tip: Well, channel: int
+) -> None:
+    """Do channel offset if needed."""
+    # TODO handle 8 channel
+    fixture_settings.pipette.pick_up_tip(tip)
+
+
 """
 def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
     # update this regularly, because the script may exit early
@@ -410,11 +426,11 @@ def aspirate_with_liquid_class(
     tip: int,
     volume: float,
     trial: int,
+    channel: int,
     transfer_properties: TransferProperties,
     submerge_depth_override: Optional[float] = None,
 ) -> None:
     """Aspirate with liquid class."""
-    channel = 1
     fixture_settings.recorder.set_sample_tag(
         create_measurement_tag("aspirate", volume, channel, trial)
     )
@@ -438,11 +454,11 @@ def dispense_with_liquid_class(
     tip: int,
     volume: float,
     trial: int,
+    channel: int,
     transfer_properties: TransferProperties,
     submerge_depth_override: Optional[float] = None,
 ) -> None:
     """Dispense with Liquid Class."""
-    channel = 1
     fixture_settings.recorder.set_sample_tag(
         create_measurement_tag("dispense", volume, channel, trial)
     )
@@ -466,6 +482,7 @@ def run_blank_test(
     fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
 ) -> List[MeasurementData]:
     """Run a "blank" trial to measure the evaporation."""
+    channel = 1
     next_tip = fixture_settings.tips[tip][
         0
     ]  # this is the next tip we're gonna use we just need the uri
@@ -487,6 +504,7 @@ def run_blank_test(
         tip,
         volume,
         trial,
+        channel,
         transfer_properties=transfer_properties,
         submerge_depth_override=15,
     )
@@ -498,6 +516,7 @@ def run_blank_test(
         tip,
         volume,
         trial,
+        channel,
         transfer_properties=transfer_properties,
         submerge_depth_override=15,
     )
@@ -512,6 +531,7 @@ def run_one_test(
     tip: int,
     volume: float,
     trial: int,
+    channel: int,
     last_measurement: MeasurementData,
 ) -> List[MeasurementData]:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
@@ -525,7 +545,7 @@ def run_one_test(
         transfer_properties=transfer_properties,
         tiprack_uri=tiprack_uri,
     )
-    fixture_settings.pipette.pick_up_tip(tip_well)
+    pick_up_tip_for_channel(fixture_settings, tip_well, channel)
     pre_aspriate = retract_and_wait(
         fixture_settings,
         MeasurementType.INIT,
@@ -534,13 +554,13 @@ def run_one_test(
         trial,
     )
     aspirate_with_liquid_class(
-        fixture_settings, tip, volume, trial, transfer_properties
+        fixture_settings, tip, volume, trial, channel, transfer_properties
     )
     post_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial
     )
     dispense_with_liquid_class(
-        fixture_settings, tip, volume, trial, transfer_properties
+        fixture_settings, tip, volume, trial, channel, transfer_properties
     )
     post_dispense = retract_and_wait(
         fixture_settings, MeasurementType.DISPENSE, tip, volume, trial
@@ -553,10 +573,10 @@ def run(ctx: ProtocolContext) -> None:
     """Run."""
     fixture_settings = FixtureSettings.build(ctx)
     first_tip = fixture_settings.tips[list(fixture_settings.tips)[0]].pop(0)
-    fixture_settings.pipette.pick_up_tip(first_tip)
+    pick_up_tip_for_channel(fixture_settings, first_tip, 1)
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
     blank_measurments: List[List[MeasurementData]] = []
-    measurements: List[List[MeasurementData]] = []
+    measurements: Dict[float, List[List[MeasurementData]]] = {}
     ctx.delay(
         seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
         msg=f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} for scale to stabalize",
@@ -598,32 +618,133 @@ def run(ctx: ProtocolContext) -> None:
     remove_tip(fixture_settings)
 
     last_measurement = blank_measurments[-1][-1]
+
     for tip in fixture_settings.tips:
         for volume in fixture_settings.volumes[tip]:
+            trial_asp_dict: Dict[int, List[float]] = {
+                t: [] for t in range(fixture_settings.trials)
+            }
+            trial_disp_dict: Dict[int, List[float]] = {
+                t: [] for t in range(fixture_settings.trials)
+            }
+            actual_asp_list_channel: List[float] = []
+            actual_disp_list_channel: List[float] = []
+            measurements[volume] = []
+            for channel in fixture_settings.channels:
+                channel_aspriate_dict: Dict[int, List[float]]
+                for trial in range(fixture_settings.trials):
+                    measurements[volume].append(
+                        run_one_test(
+                            fixture_settings,
+                            tip,
+                            volume,
+                            trial,
+                            channel,
+                            last_measurement,
+                        )
+                    )
+                    asp_with_evap = (
+                        calculate_change_in_volume(
+                            measurements[volume][-1][0],
+                            measurements[volume][-1][1],
+                            liq,
+                        )
+                        - avg_asp_evap
+                    )
+                    disp_with_evap = (
+                        calculate_change_in_volume(
+                            measurements[volume][-1][1],
+                            measurements[volume][-1][2],
+                            liq,
+                        )
+                        + avg_disp_evap
+                    )
+                    cur_height = fixture_settings.liquid_source.current_liquid_height()
+                    report.store_trial(
+                        fixture_settings.test_report,
+                        trial,
+                        volume,
+                        channel,
+                        asp_with_evap,
+                        disp_with_evap,
+                        cur_height,  # type: ignore[arg-type]
+                    )
+                    actual_asp_list_channel.append(asp_with_evap)
+                    actual_disp_list_channel.append(disp_with_evap)
+                    trial_asp_dict[trial].append(asp_with_evap)
+                    trial_disp_dict[trial].append(disp_with_evap)
+                    last_measurement = measurements[volume][-1][-1]
+            aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
+                actual_asp_list_channel, volume
+            )
+            dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
+                actual_disp_list_channel, volume
+            )
+            aspirate_data_list = [elem[1] for elem in measurements[volume]]
+            dispense_data_list = [elem[2] for elem in measurements[volume]]
+            # Average Celsius
+            aspirate_celsius_avg = sum(
+                a_data.environment.celsius_pipette for a_data in aspirate_data_list
+            ) / len(aspirate_data_list)
+            dispense_celsius_avg = sum(
+                d_data.environment.celsius_pipette for d_data in dispense_data_list
+            ) / len(dispense_data_list)
+            # Average humidity
+            aspirate_humidity_avg = sum(
+                a_data.environment.humidity_pipette for a_data in aspirate_data_list
+            ) / len(aspirate_data_list)
+            dispense_humidity_avg = sum(
+                d_data.environment.humidity_pipette for d_data in dispense_data_list
+            ) / len(dispense_data_list)
+
+            report.store_volume_per_channel(
+                report=fixture_settings.test_report,
+                mode="aspirate",
+                volume=volume,
+                channel=channel,
+                average=aspirate_average,
+                cv=aspirate_cv,
+                d=aspirate_d,
+                celsius=aspirate_celsius_avg,
+                humidity=aspirate_humidity_avg,
+                flag="isolated" if fixture_settings.isolate_volumes else "",
+            )
+            report.store_volume_per_channel(
+                report=fixture_settings.test_report,
+                mode="dispense",
+                volume=volume,
+                channel=channel,
+                average=dispense_average,
+                cv=dispense_cv,
+                d=dispense_d,
+                celsius=dispense_celsius_avg,
+                humidity=dispense_humidity_avg,
+                flag="isolated" if fixture_settings.isolate_volumes else "",
+            )
             for trial in range(fixture_settings.trials):
-                measurements.append(
-                    run_one_test(fixture_settings, tip, volume, trial, last_measurement)
+                aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
+                    trial_asp_dict[trial], volume
                 )
-                asp_with_evap = (
-                    calculate_change_in_volume(
-                        measurements[-1][0], measurements[-1][1], liq
-                    )
-                    - avg_asp_evap
+                dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
+                    trial_disp_dict[trial], volume
                 )
-                disp_with_evap = (
-                    calculate_change_in_volume(
-                        measurements[-1][1], measurements[-1][2], liq
-                    )
-                    + avg_disp_evap
+                report.store_volume_per_trial(
+                    report=fixture_settings.test_report,
+                    mode="aspirate",
+                    volume=volume,
+                    trial=trial,
+                    average=aspirate_average,
+                    cv=aspirate_cv,
+                    d=aspirate_d,
+                    flag="isolated" if fixture_settings.isolate_volumes else "",
                 )
-                cur_height = fixture_settings.liquid_source.current_liquid_height()
-                report.store_trial(
-                    fixture_settings.test_report,
-                    trial,
-                    volume,
-                    1,  # channel
-                    asp_with_evap,
-                    disp_with_evap,
-                    cur_height,  # type: ignore[arg-type]
+                report.store_volume_per_trial(
+                    report=fixture_settings.test_report,
+                    mode="dispense",
+                    volume=volume,
+                    trial=trial,
+                    average=dispense_average,
+                    cv=dispense_cv,
+                    d=dispense_d,
+                    flag="isolated" if fixture_settings.isolate_volumes else "",
                 )
-                last_measurement = measurements[-1][-1]
