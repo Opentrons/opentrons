@@ -26,7 +26,7 @@ export function FixturesButtonGroup({
       name={FIXTURES_FIELD_NAME}
       render={({ field }) => {
         return (
-          <Flex flexWrap={WRAP} gap={SPACING.spacing8}>
+          <Flex flexWrap={WRAP} gap={SPACING.spacing8} flexDirection="row">
             {fixtures.map(fixture => (
               <Flex width={FLEX_MAX_CONTENT} key={fixture.type}>
                 <EmptySelectorButton
