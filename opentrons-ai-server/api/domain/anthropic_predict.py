@@ -464,6 +464,7 @@ class AnthropicPredict:
 
         try:
             data = json.loads(json_str)
+            now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
 
             # Add schema version and shared schema
             data["$otSharedSchema"] = "#/protocol/schemas/8"
@@ -473,8 +474,8 @@ class AnthropicPredict:
             data["metadata"].update(
                 {
                     "author": "OpentronsAI",
-                    "created": 1737373264166,
-                    "lastModified": 1737373536793,
+                    "created": now_ms,
+                    "lastModified": now_ms,
                     "source": "OpentronsAI",
                     "category": None,
                     "subcategory": None,
