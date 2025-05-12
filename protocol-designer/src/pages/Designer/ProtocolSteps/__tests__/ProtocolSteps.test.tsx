@@ -34,7 +34,6 @@ vi.mock('../../../../ui/steps/selectors')
 vi.mock('../../../../ui/labware/selectors')
 vi.mock('../StepForm')
 vi.mock('../../DeckSetup')
-vi.mock('../StepSummary.tsx')
 vi.mock('../Timeline')
 vi.mock('../DraggableSidebar')
 vi.mock('../../../../feature-flags/selectors')
@@ -43,6 +42,7 @@ vi.mock('../../../../components/organisms/Alerts')
 vi.mock('../../../../components/molecules/LiquidButton')
 vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../Timeline/utils')
+vi.mock('../../../../components/organisms/StepSummary')
 const render = () => {
   return renderWithProviders(
     <ProtocolSteps zoomedInSlot={null} showLiquidOverflowMenu={vi.fn()} />,
