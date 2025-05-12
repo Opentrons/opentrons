@@ -29,7 +29,6 @@ import {
   LabwareCard,
   SelectLabwareModal,
 } from '../../../components/organisms'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import {
   createContainer,
@@ -58,7 +57,6 @@ export function DeckSetupToolbox(
   props: DeckSetupToolsProps
 ): JSX.Element | null {
   const { onCloseClick, position = POSITION_FIXED } = props
-  const { makeSnackbar } = useKitchen()
   const { t, i18n } = useTranslation(['starting_deck_state', 'shared'])
   const [
     showDeleteEntityInUseModal,
@@ -230,6 +228,7 @@ export function DeckSetupToolbox(
             setShowSelectLabwareModal(false)
           }}
           onConfirm={handleConfirmSelection}
+          slotFull={slotFull}
         />
       ) : null}
       {isLabwareOnSlotInUse && showDeleteEntityInUseModal ? (
@@ -282,11 +281,7 @@ export function DeckSetupToolbox(
               text={t('add_labware')}
               iconName="plus"
               onClick={() => {
-                if (slotFull) {
-                  makeSnackbar(t('no_space') as string)
-                } else {
-                  setShowSelectLabwareModal(true)
-                }
+                setShowSelectLabwareModal(true)
               }}
             />
           </Flex>

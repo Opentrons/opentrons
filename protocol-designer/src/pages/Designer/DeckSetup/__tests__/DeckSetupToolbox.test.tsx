@@ -34,6 +34,7 @@ import type { NavigateFunction } from 'react-router-dom'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
+const mockMakeSnackbar = vi.fn()
 
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
@@ -57,8 +58,6 @@ vi.mock('react-router-dom', async importOriginal => {
     useNavigate: () => mockNavigate,
   }
 })
-
-const mockMakeSnackbar = vi.fn()
 
 describe('DeckSetupToolbox', () => {
   let props: ComponentProps<typeof DeckSetupToolbox>
@@ -163,7 +162,7 @@ describe('DeckSetupToolbox', () => {
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
     // add labware when there is no space
     fireEvent.click(screen.getAllByText('Add labware')[0])
-    expect(mockMakeSnackbar).toHaveBeenCalledWith('No space on slot')
+    screen.getByText('mock SelectLabwareModal')
     // click done
     fireEvent.click(screen.getByText('Done'))
     expect(props.onCloseClick).toHaveBeenCalled()

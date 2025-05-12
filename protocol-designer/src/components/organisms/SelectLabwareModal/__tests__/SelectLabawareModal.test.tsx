@@ -27,6 +27,7 @@ import { getHas96Channel } from '../../../../utils'
 import { SelectLabwareModal } from '../index'
 
 import type { ComponentProps } from 'react'
+import type { InfoScreen } from '@opentrons/components'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 
 vi.mock('../../../../step-forms/selectors')
@@ -36,6 +37,14 @@ vi.mock('../../../../labware-defs/selectors')
 vi.mock('../../../../labware-defs/actions')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../labware-ingred/actions')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InfoScreen>()
+  return {
+    ...actual,
+    InfoScreen: vi.fn(() => <div>mock InfoScreen</div>),
+  }
+})
+
 const render = (props: ComponentProps<typeof SelectLabwareModal>) => {
   return renderWithProviders(<SelectLabwareModal {...props} />, {
     i18nInstance: i18n,
@@ -50,6 +59,7 @@ describe('SelectLabwareModal', () => {
       slot: 'D3',
       onClose: vi.fn(),
       onConfirm: vi.fn(),
+      slotFull: false,
     }
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
@@ -132,5 +142,12 @@ describe('SelectLabwareModal', () => {
     render(props)
     screen.getByText('Only display recommended labware')
     expect(screen.getByRole('checkbox')).toBeChecked()
+  })
+
+  it('renders infoscreen component if slot is full', () => {
+    props.slotFull = true
+    render(props)
+    screen.getByText('mock InfoScreen')
+    expect(screen.queryByText('Upload custom labware')).not.toBeInTheDocument()
   })
 })
