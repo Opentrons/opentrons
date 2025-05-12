@@ -4822,3 +4822,1114 @@ Output protocol:
 ```
 
 </Example-serial-dilution>
+
+<Example-PCR>
+
+Input:
+
+```text
+Robot:
+- Flex
+
+Pipette mount:
+- Left: Flex 8-Channel 1000 uL Pipette
+- Right: Flex 8-channel 50 ul pipette
+
+Modules:
+- Thermocycler module
+- Sample temperature module with Opentrons 96 Well Aluminum Block adapter
+- Mastermix temperature module with Opentrons 96 Well Aluminum Block adapter
+
+Labware:
+- Source sample: Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt placed on the sample temperature module
+- Source mastermix: Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt placed on the mastermix temperature module
+- Destination: Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt placed on thermocycler
+- Opentrons Flex 96 Filter Tip Rack 1000 uL (left pipette)
+- Opentrons Flex 96 Filter Tip Rack 50 uL (right pipette)
+
+Liquids:
+- Source sample: Add 200ul to each well of the first 9 columns
+- Source mastermix: Add 200ul to each well of the first 9 columns
+
+Steps:
+1. Thermocycler:
+  - Set the block temperature to 6 degree C.
+  - Set the lid temperature to 55 degree C.
+  - Open the lid.
+2. Set the sample temperature module to 37 degree C.
+3. Pause until temperature reached.
+4. Set the mastermix temperature module to 10 C
+5. Pause the protocol until temperature reached
+6. Use right pipette to transfer 15 uL  of mastermix from source plate to destination plate. Wells are first 9 columns. Use the same tip for all transfers.
+7. Use left pipette to transfer 10 ul of sample from the source to destination plate. Wells are first 9 columns. Mix the sample and mastermix of
+25 ul total volume 9 times. Blow out to destination well. Use a new tip for each transfer.
+```
+
+Output:
+
+```json
+{
+  "metadata": {
+    "protocolName": "PCR-4-7-steps",
+    "description": "PCR-4 with seven steps"
+  },
+  "designerApplication": {
+    "data": {
+      "pipetteTiprackAssignments": {
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"],
+        "pipette_right": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
+      },
+      "ingredients": {
+        "0": {
+          "displayName": "sample",
+          "description": "sample liquid",
+          "displayColor": "#b925ff",
+          "liquidGroupId": "0"
+        },
+        "1": {
+          "displayName": "mastermix liquid",
+          "description": "mastermix liquid",
+          "displayColor": "#ffd600",
+          "liquidGroupId": "1"
+        }
+      },
+      "ingredLocations": {
+        "labware-4": {
+          "A1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "B1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "C1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "D1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "E1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "F1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "G1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "H1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "A2": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "B2": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "C2": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "D2": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "E2": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "F2": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "G2": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "H2": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "A3": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "B3": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "C3": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "D3": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "E3": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "F3": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "G3": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "H3": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "A4": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "B4": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "C4": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "D4": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "E4": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "F4": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "G4": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "H4": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "A5": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "B5": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "C5": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "D5": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "E5": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "F5": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "G5": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "H5": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "A6": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "B6": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "C6": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "D6": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "E6": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "F6": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "G6": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "H6": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "A7": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "B7": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "C7": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "D7": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "E7": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "F7": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "G7": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "H7": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "A8": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "B8": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "C8": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "D8": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "E8": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "F8": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "G8": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "H8": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "A9": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "B9": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "C9": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "D9": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "E9": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "F9": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "G9": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "H9": {
+            "1": {
+              "volume": 200
+            }
+          }
+        },
+        "labware-6": {
+          "A1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "D1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "E1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "F1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "G1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "H1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "D2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "E2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "F2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "G2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "H2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "D3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "E3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "F3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "G3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "H3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "D4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "E4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "F4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "G4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "H4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "D5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "E5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "F5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "G5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "H5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A6": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B6": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C6": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "D6": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "E6": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "F6": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "G6": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "H6": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A7": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B7": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C7": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "D7": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "E7": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "F7": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "G7": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "H7": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A8": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B8": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C8": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "D8": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "E8": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "F8": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "G8": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "H8": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A9": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B9": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C9": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "D9": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "E9": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "F9": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "G9": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "H9": {
+            "0": {
+              "volume": 200
+            }
+          }
+        }
+      },
+      "savedStepForms": {
+        "__INITIAL_DECK_SETUP_STEP__": {
+          "stepType": "manualIntervention",
+          "id": "__INITIAL_DECK_SETUP_STEP__",
+          "labwareLocationUpdate": {
+            "labware-1": "C2",
+            "labware-2": "B2",
+            "labware-3": "t-1",
+            "labware-4": "labware-3",
+            "labware-5": "t-2",
+            "labware-6": "labware-5",
+            "labware-7": "t-3"
+          },
+          "pipetteLocationUpdate": {
+            "pipette_left": "left",
+            "pipette_right": "right"
+          },
+          "moduleLocationUpdate": {
+            "t-1": "C1",
+            "t-2": "D1",
+            "t-3": "B1"
+          },
+          "trashBinLocationUpdate": {
+            "trashbin-1": "cutoutA3"
+          },
+          "wasteChuteLocationUpdate": {},
+          "stagingAreaLocationUpdate": {},
+          "gripperLocationUpdate": {}
+        },
+        "step-1": {
+          "id": "step-1",
+          "stepType": "thermocycler",
+          "stepName": "thermocycler",
+          "stepDetails": "",
+          "blockIsActive": true,
+          "blockIsActiveHold": false,
+          "blockTargetTemp": "6",
+          "blockTargetTempHold": null,
+          "lidIsActive": true,
+          "lidIsActiveHold": false,
+          "lidOpen": true,
+          "lidOpenHold": null,
+          "lidTargetTemp": "55",
+          "lidTargetTempHold": null,
+          "moduleId": "t-3",
+          "orderedProfileItems": [],
+          "profileItemsById": {},
+          "profileTargetLidTemp": null,
+          "profileVolume": null,
+          "thermocyclerFormType": "thermocyclerState"
+        },
+        "step-2": {
+          "id": "step-2",
+          "stepType": "temperature",
+          "stepName": "temperature",
+          "stepDetails": "",
+          "moduleId": "t-1",
+          "setTemperature": "true",
+          "targetTemperature": "37"
+        },
+        "step-3": {
+          "id": "step-3",
+          "stepType": "pause",
+          "stepName": "pause",
+          "stepDetails": "",
+          "moduleId": "t-1",
+          "pauseAction": "untilTemperature",
+          "pauseMessage": "",
+          "pauseTemperature": "37",
+          "pauseTime": null
+        },
+        "step-4": {
+          "id": "step-4",
+          "stepType": "temperature",
+          "stepName": "temperature",
+          "stepDetails": "",
+          "moduleId": "t-2",
+          "setTemperature": "true",
+          "targetTemperature": "10"
+        },
+        "step-5": {
+          "id": "step-5",
+          "stepType": "pause",
+          "stepName": "pause",
+          "stepDetails": "",
+          "moduleId": "t-2",
+          "pauseAction": "untilTemperature",
+          "pauseMessage": "",
+          "pauseTemperature": "10",
+          "pauseTime": null
+        },
+        "step-6": {
+          "id": "step-6",
+          "stepType": "moveLiquid",
+          "stepName": "transfer",
+          "stepDetails": "",
+          "aspirate_airGap_checkbox": false,
+          "aspirate_airGap_volume": null,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "35",
+          "aspirate_labware": "labware-4",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "A1",
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": null,
+          "dispense_labware": "labware-7",
+          "dispense_mix_checkbox": false,
+          "dispense_mix_times": null,
+          "dispense_mix_volume": null,
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "A1",
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_right",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+          "volume": "15"
+        },
+        "step-7": {
+          "id": "step-7",
+          "stepType": "moveLiquid",
+          "stepName": "transfer",
+          "stepDetails": "",
+          "aspirate_airGap_checkbox": false,
+          "aspirate_airGap_volume": null,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-6",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "A1",
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": true,
+          "blowout_flowRate": 716,
+          "blowout_location": "dest_well",
+          "blowout_z_offset": 0,
+          "changeTip": "always",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": "716",
+          "dispense_labware": "labware-7",
+          "dispense_mix_checkbox": true,
+          "dispense_mix_times": "9",
+          "dispense_mix_volume": "25",
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "A1",
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "10"
+        }
+      },
+      "orderedStepIds": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4",
+        "step-5",
+        "step-6",
+        "step-7"
+      ],
+      "pipettes": {
+        "pipette_left": {
+          "pipetteName": "p1000_multi_flex"
+        },
+        "pipette_right": {
+          "pipetteName": "p50_multi_flex"
+        }
+      },
+      "modules": {
+        "t-1": {
+          "model": "temperatureModuleV2"
+        },
+        "t-2": {
+          "model": "temperatureModuleV2"
+        },
+        "t-3": {
+          "model": "thermocyclerModuleV2"
+        }
+      },
+      "labware": {
+        "labware-1": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        },
+        "labware-2": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        },
+        "labware-3": {
+          "displayName": "Opentrons 96 Well Aluminum Block",
+          "labwareDefURI": "opentrons/opentrons_96_well_aluminum_block/1"
+        },
+        "labware-4": {
+          "displayName": "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
+          "labwareDefURI": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2"
+        },
+        "labware-5": {
+          "displayName": "Opentrons 96 Well Aluminum Block",
+          "labwareDefURI": "opentrons/opentrons_96_well_aluminum_block/1"
+        },
+        "labware-6": {
+          "displayName": "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
+          "labwareDefURI": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2"
+        },
+        "labware-7": {
+          "displayName": "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
+          "labwareDefURI": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2"
+        }
+      }
+    }
+  },
+  "robot": {
+    "model": "OT-3 Standard",
+    "deckId": "ot3_standard"
+  }
+}
+```
+
+</Example-PCR>

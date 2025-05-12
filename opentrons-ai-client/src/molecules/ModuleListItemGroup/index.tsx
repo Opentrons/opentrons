@@ -89,15 +89,15 @@ export function ModuleListItemGroup(): JSX.Element | null {
 
         return (
           <Controller
-            key={module.type}
+            key={module.id}
             name={MODULES_FIELD_NAME}
             render={({ field }) => {
               const currentModule = field.value.find(
-                (m: DisplayModule) => m.type === module.type
+                (m: DisplayModule) => m.id === module.id
               )
 
               return (
-                <ListItem type="default" key={module.type}>
+                <ListItem type="default" key={module.id}>
                   <ListItemCustomize
                     label={
                       adapters != null && adapters.length > 0
@@ -120,7 +120,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                             onClick: (value: string) => {
                               field.onChange(
                                 field.value.map((m: DisplayModule) =>
-                                  m.type === module.type
+                                  m.id === module.id
                                     ? {
                                         ...m,
                                         adapter: {
@@ -143,7 +143,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                     onClick={() => {
                       setValue(
                         MODULES_FIELD_NAME,
-                        modulesWatch.filter(m => m.type !== module.type),
+                        modulesWatch.filter(m => m.id !== module.id),
                         { shouldValidate: true }
                       )
                     }}
