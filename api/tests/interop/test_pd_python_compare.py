@@ -6,6 +6,7 @@ and compare their commands.
 
 from copy import deepcopy
 from decimal import Decimal
+import itertools
 from pathlib import Path
 from typing import Any, Tuple
 
@@ -52,6 +53,7 @@ async def _get_engine_commands_for_protocol(
     _sort_load_commands(commands)
     _expand_load_liquid(commands)
     _sort_load_liquid(commands)
+    _make_aspirate_in_place(commands)
     _expand_thermocycler_profiles(commands)
     return commands
 
@@ -234,6 +236,27 @@ def _expand_load_liquid(commands: list[dict[str, Any]]) -> None:
         else:
             expanded_commands.append(command)
     commands[:] = expanded_commands
+
+
+def _make_aspirate_in_place(commands: list[dict[str, Any]]) -> None:
+    """Change (moveToWell + aspirate) to aspirateInPlace."""
+    # In the API, you can call aspirate() with no location to aspirate in place. But the
+    # API still emits an `aspirate` engine command, with the location set explicitly to
+    # the last location of the pipette. This transformation changes the adjacent commands
+    # (moveToWell + aspirate) to aspirateInPlace if they have the same location.
+    for cmd1, cmd2 in itertools.pairwise(commands):
+        if (
+            cmd1["commandType"] == "moveToWell"
+            and cmd2["commandType"] == "aspirate"
+            and all(
+                cmd1["params"][param] == cmd2["params"][param]
+                for param in ["pipetteId", "labwareId", "wellName", "wellLocation"]
+            )
+        ):
+            cmd2["commandType"] = "aspirateInPlace"
+            cmd2["params"].pop("labwareId")
+            cmd2["params"].pop("wellName")
+            cmd2["params"].pop("wellLocation")
 
 
 def _expand_thermocycler_profiles(commands: list[dict[str, Any]]) -> None:
