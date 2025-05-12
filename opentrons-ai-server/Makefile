@@ -9,7 +9,8 @@ setup: install-pipenv
 
 .PHONY: teardown
 teardown:
-	python -m pipenv --rm
+# `|| true` to ignore errors if the virtualenv has already been removed.
+	python -m pipenv --rm || true
 
 .PHONY: black
 black:

@@ -16,7 +16,8 @@ setup:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+# `|| true` to ignore errors if the virtualenv has already been removed.
+	$(pipenv) --rm || true
 
 .PHONY: clean
 clean:

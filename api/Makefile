@@ -90,7 +90,8 @@ clean: docs-clean
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+# `|| true` to ignore errors if the virtualenv has already been removed.
+	$(pipenv) --rm || true
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)

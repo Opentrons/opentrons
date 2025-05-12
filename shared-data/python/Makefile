@@ -69,7 +69,8 @@ teardown: teardown-py
 
 .PHONY: teardown-py
 teardown-py:
-	$(pipenv) --rm
+# `|| true` to ignore errors if the virtualenv has already been removed.
+	$(pipenv) --rm || true
 
 
 .PHONY: clean
