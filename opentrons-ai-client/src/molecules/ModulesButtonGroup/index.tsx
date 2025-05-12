@@ -1,5 +1,6 @@
 import { Controller, useFormContext } from 'react-hook-form'
 import styled from 'styled-components'
+import { v4 as uuid } from 'uuid'
 
 import { EmptySelectorButton, Flex, SPACING, WRAP } from '@opentrons/components'
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
@@ -49,7 +50,7 @@ export function ModulesButtonGroup({
                     }
                     const moduleWithId = {
                       ...module,
-                      id: Date.now().toString(),
+                      id: uuid(),
                     }
                     field.onChange([...modulesWatch, moduleWithId])
                   }}
