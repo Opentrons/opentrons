@@ -50,8 +50,7 @@ setup:
 
 .PHONY: teardown
 teardown:
-# `|| true` to ignore errors if the virtualenv has already been removed.
-	$(pipenv) --rm || true
+	-$(pipenv) --rm
 
 .PHONY: clean
 clean:
