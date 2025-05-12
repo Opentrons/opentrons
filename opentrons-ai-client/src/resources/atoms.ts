@@ -85,7 +85,7 @@ export const displayFeatureFlagsModalAtom = atom<boolean>(false)
 
 const DEFAULT_FEATURE_FLAG_STATE = {
   enablePrereleaseMode: false,
-  enablePDProtocolGeneration: false,
+  enablePDProtocolGeneration: true,
 }
 
 const rawFeatureFlagsAtom = atomWithStorage<FeatureFlags>(

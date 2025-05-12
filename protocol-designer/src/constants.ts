@@ -3,6 +3,7 @@ import mapValues from 'lodash/mapValues'
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
+  FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
@@ -10,6 +11,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
@@ -24,6 +26,7 @@ import type {
   LabwareDefinition2,
   ModuleModel,
   ModuleType,
+  RobotType,
 } from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
 
@@ -203,3 +206,54 @@ export const PROTOCOL_DESIGNER_SOURCE: 'Protocol Designer' = 'Protocol Designer'
 
 export const DECK_SETUP_TOOLS_WIDTH_REM = 21.875
 export const OVERFLOW_MENU_POSITION_ADJUSTMENT = 4
+
+// Below values copied from opentrons/api/src/opentrons/config/defaults_ot[2/3].py
+export const FLEX_X_Y_MAX_SPEED = 300
+export const FLEX_LOW_THROUGHPUT_Z_MAX_SPEED = 100
+export const FLEX_HIGH_THROUGHPUT_Z_MAX_SPEED = 35
+export const FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED = 70
+export const FLEX_HIGH_THROUGHPUT_PLUNGER_MAX_SPEED = 15
+export const OT2_X_MAX_SPEED = 600
+export const OT2_Y_MAX_SPEED = 400
+export const OT2_Z_MAX_SPEED = 125
+export const OT2_PLUNGER_MAX_SPEED = 40
+
+export const CHANNELS_MAPPED_TO_MAX_SPEED: Record<
+  RobotType,
+  Record<number, { plunger: number; x: number; y: number; z: number }>
+> = {
+  [FLEX_ROBOT_TYPE]: {
+    1: {
+      plunger: FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED,
+      x: FLEX_X_Y_MAX_SPEED,
+      y: FLEX_X_Y_MAX_SPEED,
+      z: FLEX_LOW_THROUGHPUT_Z_MAX_SPEED,
+    },
+    8: {
+      plunger: FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED,
+      x: FLEX_X_Y_MAX_SPEED,
+      y: FLEX_X_Y_MAX_SPEED,
+      z: FLEX_LOW_THROUGHPUT_Z_MAX_SPEED,
+    },
+    96: {
+      plunger: FLEX_HIGH_THROUGHPUT_PLUNGER_MAX_SPEED,
+      x: FLEX_X_Y_MAX_SPEED,
+      y: FLEX_X_Y_MAX_SPEED,
+      z: FLEX_HIGH_THROUGHPUT_Z_MAX_SPEED,
+    },
+  },
+  [OT2_ROBOT_TYPE]: {
+    1: {
+      plunger: OT2_PLUNGER_MAX_SPEED,
+      x: OT2_X_MAX_SPEED,
+      y: OT2_Y_MAX_SPEED,
+      z: OT2_Z_MAX_SPEED,
+    },
+    8: {
+      plunger: OT2_PLUNGER_MAX_SPEED,
+      x: OT2_X_MAX_SPEED,
+      y: OT2_Y_MAX_SPEED,
+      z: OT2_Z_MAX_SPEED,
+    },
+  },
+}

@@ -180,16 +180,15 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
           </LabwareWrapper>
         </Flex>
       </Flex>
-
-      <Flex width="100%" height="8rem">
-        {hoverSlot != null ? (
+      {hoverSlot != null && terminalItemId === START_TERMINAL_ITEM_ID ? (
+        <Flex width="100%" height="8rem">
           <SlotDetailsContainer
             robotType={robotType}
             slot="offDeck"
             offDeckLabwareId={hoverSlot}
           />
-        ) : null}
-      </Flex>
+        </Flex>
+      ) : null}
     </Flex>
   )
 }

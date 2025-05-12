@@ -6,6 +6,8 @@ import { fixture96Plate } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { openIngredientSelector } from '../../../../labware-ingred/actions'
+import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
+import { LabwareCardOverflowMenu } from '../../LabwareCardOverflowMenu'
 import { LabwareCard } from '../index'
 
 import type { ComponentProps } from 'react'
@@ -15,6 +17,8 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const mockNavigate = vi.fn()
 
 vi.mock('../../../../labware-ingred/actions')
+vi.mock('../../LabwareCardOverflowMenu')
+vi.mock('../../../../ui/labware/selectors')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
@@ -43,15 +47,22 @@ describe('LabwareCard', () => {
       },
       lidDisplayName: 'mock lid',
     }
+    vi.mocked(LabwareCardOverflowMenu).mockReturnValue(
+      <div>mock LabwareCardOverflowMenu</div>
+    )
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({
+      labwareId: 'mock NickName',
+    })
   })
 
   it('renders a labware card with the liquids button and overflow menu', () => {
     render(props)
-    screen.getByText('ANSI 96 Standard Microplate')
+    screen.getByText('mock NickName')
     screen.getByText('mock lid')
     fireEvent.click(screen.getByText('Add liquid'))
     expect(mockNavigate).toHaveBeenCalledWith('/liquids')
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
     fireEvent.click(screen.getByTestId('LabwareCard_overflowBtn'))
+    screen.getByText('mock LabwareCardOverflowMenu')
   })
 })

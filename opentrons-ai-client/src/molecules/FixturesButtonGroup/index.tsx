@@ -1,6 +1,12 @@
 import { Controller, useFormContext } from 'react-hook-form'
 
-import { EmptySelectorButton, Flex, SPACING, WRAP } from '@opentrons/components'
+import {
+  EmptySelectorButton,
+  Flex,
+  FLEX_MAX_CONTENT,
+  SPACING,
+  WRAP,
+} from '@opentrons/components'
 
 import { FIXTURES_FIELD_NAME } from '../../organisms/ModulesAndFixturesSection'
 
@@ -20,20 +26,21 @@ export function FixturesButtonGroup({
       name={FIXTURES_FIELD_NAME}
       render={({ field }) => {
         return (
-          <Flex flexWrap={WRAP} gap={SPACING.spacing8}>
+          <Flex flexWrap={WRAP} gap={SPACING.spacing8} flexDirection="row">
             {fixtures.map(fixture => (
-              <EmptySelectorButton
-                key={fixture.type}
-                iconName="plus"
-                onClick={() => {
-                  if (fixturesWatch.some(m => m.type === fixture.type)) {
-                    return
-                  }
-                  field.onChange([...fixturesWatch, fixture])
-                }}
-                text={fixture.name}
-                textAlignment="left"
-              />
+              <Flex width={FLEX_MAX_CONTENT} key={fixture.type}>
+                <EmptySelectorButton
+                  iconName="plus"
+                  onClick={() => {
+                    if (fixturesWatch.some(m => m.type === fixture.type)) {
+                      return
+                    }
+                    field.onChange([...fixturesWatch, fixture])
+                  }}
+                  text={fixture.name}
+                  textAlignment="left"
+                />
+              </Flex>
             ))}
           </Flex>
         )
