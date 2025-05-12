@@ -173,7 +173,6 @@ export function dispenseUpdateLiquidState(
   const labwareLiquidState = allWellsShared
     ? mergeLiquidtoSingleWell
     : mergeTipLiquidToOwnWell
-
   prevLiquidState.pipettes[pipetteId] = mapValues(splitLiquidStates, 'source')
   if (liquidTrash != null && labwareLiquidState != null) {
     liquidTrash = Object.assign(labwareLiquidState)
