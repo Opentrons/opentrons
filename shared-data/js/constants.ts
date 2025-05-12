@@ -399,7 +399,7 @@ export const FLEX_STACKER_C4_ADDRESSABLE_AREA: 'flexStackerModuleV1C4' =
 export const FLEX_STACKER_D4_ADDRESSABLE_AREA: 'flexStackerModuleV1D4' =
   'flexStackerModuleV1D4'
 
-export const COLUMN_4_AA : AddressableAreaName[] = [
+export const COLUMN_4_AA: AddressableAreaName[] = [
   D4_ADDRESSABLE_AREA,
   C4_ADDRESSABLE_AREA,
   B4_ADDRESSABLE_AREA,

@@ -414,13 +414,19 @@ export interface CutoutFixture {
   height: number
 }
 
-type AreaType =
+export type AreaType =
   | 'slot'
   | 'movableTrash'
   | 'wasteChute'
   | 'fixedTrash'
   | 'stagingSlot'
   | 'lidDock'
+  | 'thermocycler'
+  | 'heaterShaker'
+  | 'temperatureModule'
+  | 'magneticBlock'
+  | 'absorbanceReader'
+  | 'flexStacker'
 
 export interface AddressableArea {
   id: AddressableAreaName

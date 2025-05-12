@@ -21,7 +21,6 @@ import {
   C1_ADDRESSABLE_AREA,
   C2_ADDRESSABLE_AREA,
   C3_ADDRESSABLE_AREA,
-  COLUMN_4_AA,
   D1_ADDRESSABLE_AREA,
   D2_ADDRESSABLE_AREA,
   D3_ADDRESSABLE_AREA,
@@ -61,6 +60,7 @@ import type {
 } from '../deck'
 import type {
   AddressableArea,
+  AreaType,
   CoordinateTuple,
   CutoutConfig,
   CutoutFixture,
@@ -181,25 +181,22 @@ export const transformCutoutFixturesToAaWithFixtures = (
       deckDefinition
     )
     aaPerCutoutFixture?.forEach(item => {
-      switch (obj.cutoutFixtureId) {
-        case STAGING_AREA_RIGHT_SLOT_FIXTURE:
-        case FLEX_STACKER_V1_FIXTURE:
-          if (COLUMN_4_AA.includes(item)) {
-            acc.push({ ...obj, addressableAreaId: item })
-          } else {
-            acc.push({
-              ...obj,
-              cutoutFixtureId: 'singleCenterSlot',
-              addressableAreaId: item,
-            })
-          }
-          break
-        default:
-          acc.push({ ...obj, addressableAreaId: item })
-      }
+      acc.push({ ...obj, addressableAreaId: item })
     })
     return acc
   }, [])
+}
+
+export const filterAaByAreaType = (
+  cutoutFixtures: CutoutConfigMap[],
+  deckDef: DeckDefinition,
+  areaType: AreaType
+): CutoutConfigMap[] => {
+  return cutoutFixtures.filter(({ addressableAreaId }) =>
+    deckDef.locations.addressableAreas.find(
+      aa => aa.id === addressableAreaId && aa.areaType === areaType
+    )
+  )
 }
 
 export const getAAFromCutoutId = (

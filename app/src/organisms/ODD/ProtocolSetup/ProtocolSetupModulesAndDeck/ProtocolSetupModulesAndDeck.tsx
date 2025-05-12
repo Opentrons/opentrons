@@ -40,7 +40,12 @@ import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { getUnmatchedModulesForProtocol } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { AddressableArea, AddressableAreaName, CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import type {
+  AddressableArea,
+  AddressableAreaName,
+  CutoutFixtureId,
+  CutoutId,
+} from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'
 
 const ATTACHED_MODULE_POLL_MS = 5000
