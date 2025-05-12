@@ -28,6 +28,7 @@ import { NAV_BAR_HEIGHT_REM } from '../../../components/atoms'
 import { HotKeyDisplay, LiquidButton } from '../../../components/molecules'
 import {
   SlotDetailsContainer,
+  StepSummary,
   TimelineAlerts,
 } from '../../../components/organisms'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
@@ -56,7 +57,6 @@ import { OffDeck } from '../OffDeck'
 import { BatchEditToolbox } from './BatchEditToolbox'
 import { DraggableSidebar } from './DraggableSidebar'
 import { StepForm } from './StepForm'
-import { StepSummary } from './StepSummary'
 import { SubStepsToolbox } from './Timeline'
 import { TimelineEditHardware } from './TimelineEditHardware'
 

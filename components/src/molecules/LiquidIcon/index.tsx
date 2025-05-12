@@ -6,9 +6,9 @@ import { Btn, Flex } from '../../primitives'
 import { FLEX_MAX_CONTENT } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
-type LiquidIconSize = 'small' | 'medium'
+type LiquidIconSize = 'xSmall' | 'small' | 'medium'
 
-interface LiquidIconProps {
+export interface LiquidIconProps {
   color: string
   size?: LiquidIconSize
   onClick?: () => void
@@ -34,18 +34,23 @@ export function LiquidIcon(props: LiquidIconProps): JSX.Element {
       border-color: ${onClick != null ? COLORS.grey40 : COLORS.grey30};
     }
   `
+  let iconSize = '0.5rem'
+  let padding: string = SPACING.spacing8
+  if (size === 'medium') {
+    iconSize = '1rem'
+    padding = SPACING.spacing12
+  } else if (size === 'xSmall') {
+    iconSize = '0.375rem'
+    padding = '0.375rem'
+  }
 
   const liquid = (
     <Flex
       css={LIQUID_ICON_CONTAINER_STYLE}
-      padding={size === 'medium' ? SPACING.spacing12 : SPACING.spacing8}
+      padding={padding}
       data-testid={`LiquidIcon_${color}`}
     >
-      <Icon
-        name="circle"
-        color={color}
-        size={size === 'medium' ? '1rem' : '0.5rem'}
-      />
+      <Icon name="circle" color={color} size={iconSize} />
     </Flex>
   )
 
