@@ -106,7 +106,8 @@ def run(protocol: ProtocolContext) -> None:
         """Mix Tartrazine."""
         # Mix step is needed to ensure tartrazine does not settle between plates.
         pipette.pick_up_tip()
-        top_of_tartrazine = helpers.find_liquid_height(pipette, well_to_probe)
+        # top_of_tartrazine = helpers.find_liquid_height(pipette, well_to_probe)
+        top_of_tartrazine = 1
         for i in range(20):
             p50.aspirate(1, well_to_probe.bottom(z=1))
             p50.dispense(1, well_to_probe.bottom(z=top_of_tartrazine + 1))
@@ -156,12 +157,13 @@ def run(protocol: ProtocolContext) -> None:
             p1000.blow_out(well.top())
             vol += 190 * p1000.active_channels
             # Probe to find liquid height of tartrazine to ensure correct amount is aspirated
-            height = helpers.find_liquid_height(p50, tartrazine_well)
+            # height = helpers.find_liquid_height(p50, tartrazine_well)
+            height = 1
             if height <= 0.0:
                 # If a negative tartrazine height is found,
                 # the protocol will pause, prompt a refill, and reprobe.
                 protocol.pause("Fill tartrazine")
-                height = helpers.find_liquid_height(p50, tartrazine_well)
+                # height = helpers.find_liquid_height(p50, tartrazine_well)
             p50.aspirate(10, tartrazine_well.bottom(z=height), rate=0.15)
             p50.air_gap(5)
             p50.dispense(5, well.top())

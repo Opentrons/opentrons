@@ -1,6 +1,7 @@
 """Evotips Clean-up with 96-channel Pipette."""
 from opentrons.types import Point
 from opentrons.protocol_api import ProtocolContext, ParameterContext
+from abr_testing.protocols import helpers
 
 metadata = {
     "protocolName": "Sample Clean-up by Evotips with 96-ch Pipette",
@@ -131,16 +132,6 @@ DELAY = 30
 
 def run(protocol: ProtocolContext) -> None:
     """Main function to run the protocol."""
-    # global test
-    # global labware_sample
-    # global slot_sample
-    # global labware_solvent
-    # global slot_solvent
-    # global slot_soaking
-    # global type_dumpster
-    # global vol_extra
-    # global h_tip_in_well
-
     test = protocol.params.test  # type: ignore[attr-defined]
     labware_sample = protocol.params.labware_sample  # type: ignore[attr-defined]
     slot_sample = protocol.params.slot_sample  # type: ignore[attr-defined]
@@ -149,6 +140,9 @@ def run(protocol: ProtocolContext) -> None:
     slot_soaking = protocol.params.slot_soaking  # type: ignore[attr-defined]
     type_dumpster = protocol.params.type_dumpster  # type: ignore[attr-defined]
     vol_extra = protocol.params.vol_extra  # type: ignore[attr-defined]
+    if not protocol.is_simulating():
+        slack_bot = helpers.set_up_slack()
+        slack_bot.send_run_started_message(metadata["protocolName"])
 
     if test:
         h_tip_in_well = -10
@@ -201,163 +195,177 @@ def run(protocol: ProtocolContext) -> None:
     ]
 
     p1k_96 = protocol.load_instrument("flex_96channel_1000")
+    try:
+        # adding 15 uL and then 20 uL
 
-    # adding 15 uL and then 20 uL
+        p1k_96.tip_racks = tips_50
+        p1k_96.pick_up_tip()
 
-    p1k_96.tip_racks = tips_50
-    p1k_96.pick_up_tip()
+        p1k_96.flow_rate.aspirate = 6
+        p1k_96.flow_rate.dispense = 6
 
-    p1k_96.flow_rate.aspirate = 6
-    p1k_96.flow_rate.dispense = 6
+        p1k_96.aspirate(15 + 2, sol_a.bottom(z=2))
+        protocol.delay(seconds=1)
 
-    p1k_96.aspirate(15 + 2, sol_a.bottom(z=2))
-    protocol.delay(seconds=1)
+        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
 
-    p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
+        if test:
+            protocol.pause("")
 
-    if test:
-        protocol.pause("")
+        p1k_96.dispense(15, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 39))  # -36
+        protocol.delay(seconds=1)
+        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 34), speed=0.5)  # -31
+        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET + 5))
 
-    p1k_96.dispense(15, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 39))  # -36
-    protocol.delay(seconds=1)
-    p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 34), speed=0.5)  # -31
-    p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET + 5))
-
-    if type_dumpster == 3:
-        p1k_96.return_tip()
-    else:
-        p1k_96.drop_tip()
-
-    p1k_96.pick_up_tip()
-
-    p1k_96.aspirate(20, sample.bottom(z=1))
-    protocol.delay(seconds=1)
-
-    p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
-
-    p1k_96.dispense(20, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 30), push_out=0)  # -27
-    protocol.delay(seconds=1)
-    p1k_96.move_to(evotip.top(EVOSEP_TEMPORARY_OFFSET - 25), speed=2)  # -22
-    p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET + 5))
-
-    if type_dumpster == 3:
-        p1k_96.return_tip()
-    else:
-        p1k_96.drop_tip()
-
-    if test:
-        protocol.pause("")
-
-    # adding 150 uL
-
-    H = 20
-    D = 1
-
-    p1k_96.tip_racks = [tips_200]
-    p1k_96.pick_up_tip()
-
-    p1k_96.flow_rate.aspirate = 80
-    p1k_96.aspirate(150, sol_a.bottom(z=2))
-    protocol.delay(seconds=1)
-
-    p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
-
-    p1k_96.flow_rate.dispense = 2
-    p1k_96.dispense(50, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H).move(Point(x=D)))
-    p1k_96.flow_rate.dispense = 8
-    p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H).move(Point(x=0)), speed=5)
-    p1k_96.move_to(
-        evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H + 5).move(Point(x=0)), speed=5
-    )
-    p1k_96.dispense(100, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H + 5).move(Point(x=0)))
-    protocol.delay(seconds=1)
-
-    p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
-
-    if vol_extra == 0:
         if type_dumpster == 3:
             p1k_96.return_tip()
         else:
             p1k_96.drop_tip()
-    else:
-        p1k_96.return_tip()
-        p1k_96.reset_tipracks()
 
-    if test:
-        protocol.pause("")
+        p1k_96.pick_up_tip()
 
-    # soaking tips
+        p1k_96.aspirate(20, sample.bottom(z=1))
+        protocol.delay(seconds=1)
 
-    protocol.move_labware(
-        labware=evosep_tips_labware,
-        new_location=soak_plate,
-        use_gripper=True,
-        pick_up_offset={"x": 0, "y": 0, "z": 0},
-        drop_offset={"x": 0, "y": 0, "z": 0},
-    )
+        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
 
-    if test:
-        protocol.pause(" ")
-    else:
-        protocol.delay(seconds=SEC_SOAK)
+        p1k_96.dispense(
+            20, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 30), push_out=0
+        )  # -27
+        protocol.delay(seconds=1)
+        p1k_96.move_to(evotip.top(EVOSEP_TEMPORARY_OFFSET - 25), speed=2)  # -22
+        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET + 5))
 
-    protocol.move_labware(
-        labware=evosep_tips_labware,
-        new_location=evotips_adapter,
-        use_gripper=True,
-        pick_up_offset={"x": 0, "y": 0, "z": 0},
-        drop_offset={"x": 0, "y": 0, "z": 0},
-    )
-
-    # sealing tips
-
-    # Seal the pipette to the evotips
-    p1k_96.resin_tip_seal(location=evosep_tips_labware)
-
-    # Dispense
-    p1k_96.resin_tip_dispense(
-        location=evotip.top(z=h_tip_in_well), volume=400.0, rate=RATE
-    )
-    p1k_96.resin_tip_dispense(
-        location=evotip.top(z=h_tip_in_well), volume=100.0, rate=1.0
-    )
-    protocol.delay(seconds=DELAY)
-
-    # Unseal/eject the Evo Tips
-    p1k_96.resin_tip_unseal(evosep_tips_labware)
-
-    # adding extra
-
-    if vol_extra > 0:
+        if type_dumpster == 3:
+            p1k_96.return_tip()
+        else:
+            p1k_96.drop_tip()
 
         if test:
-            protocol.pause(" ")
+            protocol.pause("")
+
+        # adding 150 uL
+
+        H = 20
+        D = 1
 
         p1k_96.tip_racks = [tips_200]
         p1k_96.pick_up_tip()
 
         p1k_96.flow_rate.aspirate = 80
-        p1k_96.flow_rate.dispense = 80
+        p1k_96.aspirate(150, sol_a.bottom(z=2))
+        protocol.delay(seconds=1)
 
-        if vol_extra < 200:
-            p1k_96.aspirate(vol_extra, sol_a.bottom(z=2))
-            protocol.delay(seconds=1)
-            p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
-            p1k_96.dispense(vol_extra, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 2))
-            protocol.delay(seconds=1)
+        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
+
+        p1k_96.flow_rate.dispense = 2
+        p1k_96.dispense(50, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H).move(Point(x=D)))
+        p1k_96.flow_rate.dispense = 8
+        p1k_96.move_to(
+            evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H).move(Point(x=0)), speed=5
+        )
+        p1k_96.move_to(
+            evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H + 5).move(Point(x=0)), speed=5
+        )
+        p1k_96.dispense(
+            100, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H + 5).move(Point(x=0))
+        )
+        protocol.delay(seconds=1)
+
+        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
+
+        if vol_extra == 0:
+            if type_dumpster == 3:
+                p1k_96.return_tip()
+            else:
+                p1k_96.drop_tip()
         else:
-            p1k_96.aspirate(200, sol_a.bottom(z=2))
-            protocol.delay(seconds=1)
-            p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
-            p1k_96.dispense(200, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 2))
-            protocol.delay(seconds=1)
-            p1k_96.aspirate(vol_extra - 200, sol_a.bottom(z=2))
-            protocol.delay(seconds=1)
-            p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
-            p1k_96.dispense(vol_extra - 200, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 2))
-            protocol.delay(seconds=1)
-
-        if type_dumpster == 3:
             p1k_96.return_tip()
+            p1k_96.reset_tipracks()
+
+        if test:
+            protocol.pause("")
+
+        # soaking tips
+
+        protocol.move_labware(
+            labware=evosep_tips_labware,
+            new_location=soak_plate,
+            use_gripper=True,
+            pick_up_offset={"x": 0, "y": 0, "z": 0},
+            drop_offset={"x": 0, "y": 0, "z": 0},
+        )
+
+        if test:
+            protocol.pause(" ")
         else:
-            p1k_96.drop_tip()
+            protocol.delay(seconds=SEC_SOAK)
+
+        protocol.move_labware(
+            labware=evosep_tips_labware,
+            new_location=evotips_adapter,
+            use_gripper=True,
+            pick_up_offset={"x": 0, "y": 0, "z": 0},
+            drop_offset={"x": 0, "y": 0, "z": 0},
+        )
+
+        # sealing tips
+
+        # Seal the pipette to the evotips
+        p1k_96.resin_tip_seal(location=evosep_tips_labware)
+
+        # Dispense
+        p1k_96.resin_tip_dispense(
+            location=evotip.top(z=h_tip_in_well), volume=400.0, rate=RATE
+        )
+        p1k_96.resin_tip_dispense(
+            location=evotip.top(z=h_tip_in_well), volume=100.0, rate=1.0
+        )
+        protocol.delay(seconds=DELAY)
+
+        # Unseal/eject the Evo Tips
+        p1k_96.resin_tip_unseal(evosep_tips_labware)
+
+        # adding extra
+
+        if vol_extra > 0:
+
+            if test:
+                protocol.pause(" ")
+
+            p1k_96.tip_racks = [tips_200]
+            p1k_96.pick_up_tip()
+
+            p1k_96.flow_rate.aspirate = 80
+            p1k_96.flow_rate.dispense = 80
+
+            if vol_extra < 200:
+                p1k_96.aspirate(vol_extra, sol_a.bottom(z=2))
+                protocol.delay(seconds=1)
+                p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
+                p1k_96.dispense(vol_extra, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 2))
+                protocol.delay(seconds=1)
+            else:
+                p1k_96.aspirate(200, sol_a.bottom(z=2))
+                protocol.delay(seconds=1)
+                p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
+                p1k_96.dispense(200, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 2))
+                protocol.delay(seconds=1)
+                p1k_96.aspirate(vol_extra - 200, sol_a.bottom(z=2))
+                protocol.delay(seconds=1)
+                p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
+                p1k_96.dispense(
+                    vol_extra - 200, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 2)
+                )
+                protocol.delay(seconds=1)
+
+            if type_dumpster == 3:
+                p1k_96.return_tip()
+            else:
+                p1k_96.drop_tip()
+        if not protocol.is_simulating():
+            slack_bot.send_run_completed_message(metadata["protocolName"])
+    except Exception as e:
+        if not protocol.is_simulating():
+            slack_bot.send_error_message(metadata["protocolName"], str(e))
+        raise (e)
