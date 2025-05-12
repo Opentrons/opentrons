@@ -39,15 +39,14 @@ export function ModulesButtonGroup({
                       m => m.type === TEMPERATURE_MODULE_TYPE
                     ).length
 
-                    if (isTempModule) {
-                      if (tempModuleCount >= 2) {
-                        return
-                      }
-                    } else {
-                      if (modulesWatch.some(m => m.type === module.type)) {
-                        return
-                      }
+                    if (
+                      (isTempModule && tempModuleCount >= 2) ||
+                      (!isTempModule &&
+                        modulesWatch.some(m => m.type === module.type))
+                    ) {
+                      return
                     }
+
                     const moduleWithId = {
                       ...module,
                       id: uuid(),
