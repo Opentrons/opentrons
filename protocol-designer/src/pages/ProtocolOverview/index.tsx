@@ -213,7 +213,6 @@ export function ProtocolOverview(): JSX.Element {
           }}
         />
       ) : null}
-      {/* {exportWarningModal} */}
       {exportWarningModalElement}
       {showMaterialsListModal ? (
         <MaterialsListModal
