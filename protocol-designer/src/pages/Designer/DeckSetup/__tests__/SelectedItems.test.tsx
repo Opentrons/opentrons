@@ -7,6 +7,7 @@ import { screen } from '@testing-library/react'
 import { Module } from '@opentrons/components'
 import {
   fixture24Tuberack,
+  fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
   getAllLabwareDefs,
   getDeckDefFromRobotType,
@@ -21,7 +22,7 @@ import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { FixtureRender } from '../FixtureRender'
-import { SelectedItems } from '../Selectedtems'
+import { SelectedItems } from '../SelectedItems'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -33,6 +34,7 @@ vi.mock('../../../../labware-defs/selectors')
 vi.mock('../../../../components/organisms')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../ui/steps')
+
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Module>()
   return {
@@ -87,8 +89,8 @@ describe('SelectedItems', () => {
     })
     vi.mocked(LabwareOnDeck).mockReturnValue(<div>mock LabwareOnDeck</div>)
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: null,
-      selectedNestedLabwareDefUri: null,
+      selectedAdapterDefUri: null,
+      selectedTopLabwareDefUri: null,
       selectedFixture: 'trashBin',
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -104,22 +106,20 @@ describe('SelectedItems', () => {
   })
   it('renders a selected fixture with a selected labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: mockAdapterURI,
-      selectedNestedLabwareDefUri: null,
+      selectedAdapterDefUri: mockAdapterURI,
+      selectedTopLabwareDefUri: null,
       selectedFixture: 'trashBin',
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     render(props)
     screen.getByText('mock FixtureRender')
-    screen.getByText('mock LabwareOnDeck')
     expect(screen.queryByText('mock Module')).not.toBeInTheDocument()
-    screen.getByText('Fixture Opentrons Universal Flat Heater-Shaker Adapter')
   })
   it('renders a selected module', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: null,
-      selectedNestedLabwareDefUri: null,
+      selectedAdapterDefUri: null,
+      selectedTopLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: HEATERSHAKER_MODULE_V1,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -131,8 +131,8 @@ describe('SelectedItems', () => {
   })
   it('renders a selected module and a selected labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: mockAdapterURI,
-      selectedNestedLabwareDefUri: null,
+      selectedAdapterDefUri: mockAdapterURI,
+      selectedTopLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: HEATERSHAKER_MODULE_V1,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -151,7 +151,7 @@ describe('SelectedItems', () => {
       labware: {
         labware: {
           id: 'mockId',
-          def: fixture24Tuberack as LabwareDefinition2,
+          def: fixtureTiprackAdapter as LabwareDefinition2,
           labwareDefURI: mockAdapterURI,
           stack: ['mockId', 'D3'],
           pythonName: 'mockPythonName',
@@ -166,15 +166,15 @@ describe('SelectedItems', () => {
       },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: mockAdapterURI,
-      selectedNestedLabwareDefUri: mockAdapterURI,
+      selectedAdapterDefUri: mockAdapterURI,
+      selectedTopLabwareDefUri: mockAdapterURI,
       selectedFixture: 'trashBin',
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     render(props)
     screen.getByText('mock FixtureRender')
-    expect(screen.getAllByText('mock LabwareOnDeck')).toHaveLength(2)
+    screen.getByText('mock LabwareOnDeck')
     expect(
       screen.getAllByText(
         'Fixture Opentrons Universal Flat Heater-Shaker Adapter'

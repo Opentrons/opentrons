@@ -545,6 +545,11 @@ class PointTarget(NamedTuple):
     in_place: bool
 
 
+class DisposalTarget(NamedTuple):
+    location: Union[TrashBin, WasteChute]
+    in_place: bool
+
+
 class NoLocationError(ValueError):
     """Error representing that no location was supplied."""
 
@@ -553,12 +558,12 @@ class LocationTypeError(TypeError):
     """Error representing that the location supplied is of different expected type."""
 
 
-ValidTarget = Union[WellTarget, PointTarget, TrashBin, WasteChute]
+ValidTarget = Union[WellTarget, PointTarget, DisposalTarget]
 
 
 def validate_location(
-    location: Union[Location, Well, TrashBin, WasteChute, None],
-    last_location: Optional[Location],
+    location: Optional[Union[Location, Well, TrashBin, WasteChute]],
+    last_location: Optional[Union[Location, TrashBin, WasteChute]],
 ) -> ValidTarget:
     """Validate a given location for a liquid handling command.
 
@@ -569,9 +574,11 @@ def validate_location(
     Returns:
         A `WellTarget` if the input location represents a well.
         A `PointTarget` if the input location is an x, y, z coordinate.
+        A `TrashBin` if the input location is a trash bin
+        A `WasteChute` if the input location is a waste chute
 
     Raises:
-        NoLocationError: The is no input location and no cached loaction.
+        NoLocationError: There is no input location and no cached location.
         LocationTypeError: The location supplied is of unexpected type.
     """
     from .labware import Well
@@ -586,10 +593,10 @@ def validate_location(
             f"location should be a Well, Location, TrashBin or WasteChute, but it is {location}"
         )
 
-    if isinstance(target_location, (TrashBin, WasteChute)):
-        return target_location
-
     in_place = target_location == last_location
+
+    if isinstance(target_location, (TrashBin, WasteChute)):
+        return DisposalTarget(location=target_location, in_place=in_place)
 
     if isinstance(target_location, Well):
         return WellTarget(well=target_location, location=None, in_place=in_place)
@@ -662,7 +669,7 @@ def ensure_new_tip_policy(value: str) -> TransferTipPolicyV2:
     except ValueError:
         raise ValueError(
             f"'{value}' is invalid value for 'new_tip'."
-            f" Acceptable value is either 'never', 'once', 'always' or 'per source'."
+            f" Acceptable value is either 'never', 'once', 'always', 'per source' or 'per destination'."
         )
 
 

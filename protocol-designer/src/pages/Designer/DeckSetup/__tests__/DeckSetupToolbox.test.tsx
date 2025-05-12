@@ -4,7 +4,11 @@ import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
 
-import { fixture96Plate, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  fixtureTiprackAdapter,
+  FLEX_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
@@ -62,8 +66,8 @@ describe('DeckSetupToolbox', () => {
       onCloseClick: vi.fn(),
     }
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: null,
-      selectedNestedLabwareDefUri: null,
+      selectedAdapterDefUri: null,
+      selectedTopLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -101,8 +105,8 @@ describe('DeckSetupToolbox', () => {
   })
   it('should clear the slot from all items when the clear cta is called', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: 'mockUri',
-      selectedNestedLabwareDefUri: 'mockUri',
+      selectedAdapterDefUri: 'mockUri',
+      selectedTopLabwareDefUri: 'mockUri',
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -114,7 +118,7 @@ describe('DeckSetupToolbox', () => {
           stack: ['labId', 'D3'],
           id: 'labId',
           labwareDefURI: 'mockUri',
-          def: fixture96Plate as LabwareDefinition2,
+          def: fixtureTiprackAdapter as LabwareDefinition2,
           pythonName: 'mockPythonName',
         },
         labId2: {
@@ -142,13 +146,13 @@ describe('DeckSetupToolbox', () => {
     })
     render(props)
     screen.getAllByText('ANSI 96 Standard Microplate')
-    screen.getAllByText('Add liquid')
+    screen.getByText('Add liquid')
     screen.getByText('Bottom of slot')
     screen.getByText('Top of slot')
     fireEvent.click(screen.getByText('Clear'))
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     //  add a liquid
-    fireEvent.click(screen.getAllByText('Add liquid')[1])
+    fireEvent.click(screen.getByText('Add liquid'))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
     // add labware when there is no space

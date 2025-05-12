@@ -639,12 +639,12 @@ export const getIsLabwareInUse = (
 
 export function getIsLabwareOnSlotInUse(
   savedSteps: SavedStepFormState,
-  createdLabwareForSlot?: LabwareOnDeck,
-  createdNestedLabwareForSlot?: LabwareOnDeck
+  createdAdapterForSlot?: LabwareOnDeck,
+  createdTopLabwareForSlot?: LabwareOnDeck
 ): boolean {
   const isCurrentLabwareInUse = [
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
   ]
     .map(lw => getIsLabwareInUse(savedSteps, lw))
     .includes(true)
