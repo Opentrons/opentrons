@@ -4,12 +4,15 @@ import { useTranslation } from 'react-i18next'
 import { useBlockingHint } from '../../components/organisms'
 import { getWarningContent } from '../../pages/ProtocolOverview/UnusedModalContent'
 
+import type { Fixture } from '../../pages/ProtocolOverview'
+import type { ModuleOnDeck, PipetteOnDeck } from '../../step-forms'
+
 interface ProtocolExportHandlerProps {
-  noCommands: any
-  modulesWithoutStep: any
-  pipettesWithoutStep: any
-  gripperWithoutStep: any
-  fixtureWithoutStep: any
+  noCommands: boolean
+  modulesWithoutStep: ModuleOnDeck[]
+  pipettesWithoutStep: PipetteOnDeck[]
+  gripperWithoutStep: boolean
+  fixtureWithoutStep: Fixture
   onConfirmExport: () => void
 }
 

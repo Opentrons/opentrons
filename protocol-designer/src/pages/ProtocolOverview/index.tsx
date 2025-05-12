@@ -26,7 +26,6 @@ import {
   EditInstrumentsModal,
   EditProtocolMetadataModal,
 } from '../../components/organisms'
-import { useBlockingHint } from '../../components/organisms/BlockingHintModal/useBlockingHint'
 import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
 import {
   getEnablePythonExport,
@@ -49,7 +48,6 @@ import { ProtocolMetadata } from './ProtocolMetadata'
 import { ScrubberContainer } from './ScrubberContainer'
 import { StartingDeck } from './StartingDeck'
 import { StepsInfo } from './StepsInfo'
-import { getWarningContent } from './UnusedModalContent'
 import {
   getUnusedEntities,
   getUnusedStagingAreas,
@@ -91,9 +89,6 @@ export function ProtocolOverview(): JSX.Element {
   const enablePythonExport = useSelector(getEnablePythonExport)
   const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
   const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
-    false
-  )
-  const [showExportWarningModal, setShowExportWarningModal] = useState<boolean>(
     false
   )
   const formValues = useSelector(fileSelectors.getFileMetadata)
@@ -170,6 +165,20 @@ export function ProtocolOverview(): JSX.Element {
     ),
   }
 
+  const {
+    handleExportClick,
+    exportWarningModalElement,
+  } = useProtocolExportHandler({
+    noCommands,
+    modulesWithoutStep,
+    pipettesWithoutStep,
+    gripperWithoutStep,
+    fixtureWithoutStep,
+    onConfirmExport: () => {
+      dispatch(loadFileActions.saveProtocolFile())
+    },
+  })
+
   const pipettesOnDeck = Object.values(pipettes)
   const {
     protocolName,
@@ -187,53 +196,6 @@ export function ProtocolOverview(): JSX.Element {
         lastModified != null ? format(lastModified, DATETIME_FORMAT) : t('na'),
     },
   ]
-
-  const {
-    handleExportClick,
-    exportWarningModalElement,
-  } = useProtocolExportHandler({
-    noCommands,
-    modulesWithoutStep,
-    pipettesWithoutStep,
-    gripperWithoutStep,
-    fixtureWithoutStep,
-    onConfirmExport: () => {
-      dispatch(loadFileActions.saveProtocolFile())
-    },
-  })
-
-  // const hasWarning =
-  //   noCommands ||
-  //   modulesWithoutStep.length > 0 ||
-  //   pipettesWithoutStep.length > 0 ||
-  //   gripperWithoutStep ||
-  //   fixtureWithoutStep.trashBin ||
-  //   fixtureWithoutStep.wasteChute ||
-  //   fixtureWithoutStep.stagingAreaSlots.length > 0
-
-  // const warning = hasWarning
-  //   ? getWarningContent({
-  //       noCommands,
-  //       pipettesWithoutStep,
-  //       modulesWithoutStep,
-  //       gripperWithoutStep,
-  //       fixtureWithoutStep,
-  //       t,
-  //     })
-  //   : null
-
-  // const exportWarningModal = useBlockingHint({
-  //   hintKey: warning?.hintKey ?? null,
-  //   enabled: showExportWarningModal,
-  //   content: warning?.content,
-  //   handleCancel: () => {
-  //     setShowExportWarningModal(false)
-  //   },
-  //   handleContinue: () => {
-  //     setShowExportWarningModal(false)
-  //     dispatch(loadFileActions.saveProtocolFile())
-  //   },
-  // })
 
   return (
     <Fragment>
