@@ -181,6 +181,13 @@ function selectWells(wells: string[]): void {
  * Add a comment to all records
  */
 export const SetupSteps = {
+  SelectLiquidClassT: (LiquidClass: string): StepThunk => ({
+    call: () => {
+      // eslint-disable-next-line no-template-curly-in-string
+      cy.get(`#${LiquidClass}`).click({ force: true })
+    },
+  }),
+
   /**
    * Select a labware by display name, then click "Done".
    */
@@ -1186,6 +1193,72 @@ export const CompositeSetupSteps = {
       SetupSteps.OpenSelectLabwareModal().call()
       SetupSteps.ClickWellPlatesSection().call()
       SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()
+    },
+  }),
+
+  /**
+   * @function Test_LC
+   * @description Creates a StepThunk to perform a liquid handling transfer operation.
+   * It takes optional parameters for source and destination labware and wells,
+   * transfer volume, and liquid class, and orchestrates the necessary SetupSteps
+   * to configure the transfer in the application UI.
+   *
+   * @param {string | undefined} sourceLabware - The name or identifier of the source labware.
+   * @param {string | undefined} sourcewell - The identifier of the source well (e.g., 'A1').
+   * @param {string | undefined} destinationLabware - The name or identifier of the destination labware.
+   * @param {string | undefined} destWell - The identifier of the destination well (e.g., 'B2').
+   * @param {string | undefined} volume - The volume to transfer as a string (e.g., '50').
+   * @param {string | undefined} liquidClass - The name or identifier of the liquid class to use.
+   * @returns {StepThunk} A StepThunk object containing the 'call' function that executes the transfer setup steps.
+   */
+
+  Test_LC: (
+    sourceLabware?: string | undefined,
+    sourceWell?: string | undefined,
+    destinationLabware?: string | undefined,
+    destWell?: string | undefined,
+    volume?: string | undefined,
+    liquidClass?: string | undefined
+  ): StepThunk => ({
+    call: () => {
+      const volumeToUse = volume ?? '1'
+      const sourceLabwareToUse = sourceLabware ?? 'Bio-Rad 96 Well Plate'
+      const sourceWellToUse = sourceWell ?? 'A1'
+      const destinationLabwareToUse =
+        destinationLabware ??
+        'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
+      const destWellToUse = destWell ?? 'A1'
+      const liquidClassToUse = liquidClass ?? 'Aqueous'
+
+      cy.log('Executing Test_LC step with the following parameters:')
+      cy.log(`  Source Labware: ${sourceLabwareToUse}`)
+      cy.log(`  Source Well: ${sourceWellToUse}`)
+      cy.log(`  Destination Labware: ${destinationLabwareToUse}`)
+      cy.log(`  Destination Well: ${destWellToUse}`)
+      cy.log(`  Volume: ${volumeToUse}`)
+      cy.log(`  Liquid Class: ${liquidClassToUse}`)
+
+      SetupVerifications.TransferPopOut()
+      UniversalSteps.Snapshot()
+
+      SetupSteps.InputTransferVolume(volumeToUse).call()
+      SetupSteps.ChoseSourceLabware().call()
+      SetupSteps.selectDropdownLabware(sourceLabwareToUse).call()
+      SetupSteps.SelectSourceWells().call()
+      SetupSteps.WellSelector([sourceWellToUse]).call()
+      SetupSteps.WellSelector([sourceWellToUse]).call()
+      SetupSteps.Save().call()
+      SetupSteps.ChoseDestinationLabware().call()
+      SetupSteps.selectDropdownLabware(destinationLabwareToUse).call()
+      SetupSteps.SelectDestinationWells().call()
+      SetupSteps.WellSelector([destWellToUse]).call()
+      // ToDo fix this bug please
+      SetupSteps.WellSelector([destWellToUse]).call()
+      SetupSteps.Save().call()
+      SetupSteps.Continue().call()
+      SetupSteps.SelectLiquidClassT(liquidClassToUse).call()
+      SetupSteps.Continue().call()
+      SetupSteps.Save().call()
     },
   }),
 }

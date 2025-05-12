@@ -1,15 +1,33 @@
-import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
+import {
+  CompositeSetupSteps,
+  SetupSteps,
+  SetupVerifications,
+} from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
 import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Transfer stepform testing Single Channel - Happy Path', () => {
   beforeEach(() => {
+    console.log('enablePrereleaseMode()')
     cy.visit('/')
     cy.verifyHomePage()
     cy.closeAnalyticsModal()
+    cy.window().then(win => {
+      if (typeof win.enablePrereleaseMode === 'function') {
+        console.log('Calling enablePrereleaseMode()') // Optional: Keep the console log for visual confirmation in the test runner
+        win.enablePrereleaseMode()
+      } else {
+        console.warn(
+          'Warning: enablePrereleaseMode function not found on the window object.'
+        )
+      }
+    })
   })
 
   it('Goes through onboarding flow and then single-channel one-to-one transfer', () => {
+    cy.openSettingsPage()
+    cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
+    cy.openSettingsPage()
     cy.clickCreateNew()
     cy.verifyCreateNewHeader()
     const steps = new StepBuilder()
@@ -52,20 +70,40 @@ describe('Transfer stepform testing Single Channel - Happy Path', () => {
     steps.add(SetupSteps.ClickLiquidButton())
     steps.add(SetupSteps.DefineLiquid())
     steps.add(SetupSteps.LiquidSaveWIP())
-    steps.add(SetupSteps.WellSelector(['A1', 'A2']))
+    const allWells: string[] = []
+    const rows = 'ABCDEFGH'
+    for (let i = 0; i < rows.length; i++) {
+      for (let j = 1; j <= 12; j++) {
+        allWells.push(`${rows[i]}${j}`)
+      }
+    }
+    steps.add(SetupSteps.WellSelector(allWells))
     steps.add(SetupSteps.LiquidDropdown())
     steps.add(SetupVerifications.LiquidPage())
     steps.add(UniversalSteps.Snapshot())
     steps.add(SetupSteps.SelectLiquidWells())
     steps.add(SetupSteps.SetVolumeAndSaveForWells('150'))
-    steps.add(SetupSteps.ChoseDeckSlot('C3'))
-    steps.add(SetupSteps.AddHardwareLabware())
-    steps.add(SetupSteps.OpenSelectLabwareModal())
-    steps.add(SetupSteps.ClickWellPlatesSection())
-    steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
+    steps.add(
+      CompositeSetupSteps.AddLabwareToDeckSlot(
+        'C3',
+        'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
+      )
+    )
     steps.add(SetupSteps.AddStep())
     steps.add(SetupVerifications.TransferPopOut())
     steps.add(UniversalSteps.Snapshot())
+    // I am going to eventually get to 1,20,50
+    steps.add(
+      CompositeSetupSteps.Test_LC(
+        'Bio-Rad 96 Well Plate',
+        'A1',
+        'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt',
+        'A1',
+        '1',
+        'Aqueous'
+      )
+    )
+
     steps.execute()
   })
 })
