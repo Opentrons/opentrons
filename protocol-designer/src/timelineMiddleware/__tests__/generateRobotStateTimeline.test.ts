@@ -96,7 +96,7 @@ describe('generateRobotStateTimeline', () => {
           dispensePositionReference: POSITION_REFERENCE_BOTTOM,
           touchTipAfterDispenseMmFromEdge: 0,
           dispenseSubmergeDelay: null,
-          dispenseRetractDelay: null
+          dispenseRetractDelay: null,
         },
       },
       b: {
@@ -170,7 +170,7 @@ describe('generateRobotStateTimeline', () => {
           dispensePositionReference: POSITION_REFERENCE_BOTTOM,
           touchTipAfterDispenseMmFromEdge: 0,
           dispenseSubmergeDelay: null,
-          dispenseRetractDelay: null
+          dispenseRetractDelay: null,
         },
       },
       c: {

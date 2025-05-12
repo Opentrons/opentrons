@@ -753,18 +753,23 @@ export const transfer: CommandCreator<TransferArgs> = (
                 }),
                 blowoutInPlaceCommand,
                 // touch tip at source well with dispense touch tip parameters
-                ...(args.touchTipAfterDispense ? [curryCommandCreator(touchTip, {
-                  pipetteId: args.pipette,
-                  labwareId: args.sourceLabware,
-                  wellName: sourceWell,
-                  ...(args.touchTipAfterDispenseMmFromEdge != null
-                    ? { mmFromEdge: args.touchTipAfterDispenseMmFromEdge }
-                    : {}),
-                  zOffsetFromTop: args.touchTipAfterDispenseOffsetMmFromTop,
-                  ...(args.touchTipAfterDispenseSpeed != null
-                    ? { speed: args.touchTipAfterDispenseSpeed }
-                    : {}),
-                  })] : []),
+                ...(args.touchTipAfterDispense
+                  ? [
+                      curryCommandCreator(touchTip, {
+                        pipetteId: args.pipette,
+                        labwareId: args.sourceLabware,
+                        wellName: sourceWell,
+                        ...(args.touchTipAfterDispenseMmFromEdge != null
+                          ? { mmFromEdge: args.touchTipAfterDispenseMmFromEdge }
+                          : {}),
+                        zOffsetFromTop:
+                          args.touchTipAfterDispenseOffsetMmFromTop,
+                        ...(args.touchTipAfterDispenseSpeed != null
+                          ? { speed: args.touchTipAfterDispenseSpeed }
+                          : {}),
+                      }),
+                    ]
+                  : []),
                 ...(getAirGapAfterDispenseCommands(true).length > 0
                   ? [
                       curryCommandCreator(moveToWell, {

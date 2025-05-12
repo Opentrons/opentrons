@@ -758,19 +758,20 @@ export const dispenseHelperLiquidClass = (params: {
               speed: touchTipSpeed,
             },
           },
-          ...(dispenseAirGap > 0 ? [
-            {
-              commandType: 'moveToWell',
-              key: expect.any(String),
-              params: {
-                pipetteId: 'p300SingleId',
-                labwareId,
-                wellName,
-                wellLocation: retractLocation,
-              },
-            },
-  
-          ] : [])
+          ...(dispenseAirGap > 0
+            ? [
+                {
+                  commandType: 'moveToWell',
+                  key: expect.any(String),
+                  params: {
+                    pipetteId: 'p300SingleId',
+                    labwareId,
+                    wellName,
+                    wellLocation: retractLocation,
+                  },
+                },
+              ]
+            : []),
         ]
       : []),
     ...(dispenseAirGap > 0
