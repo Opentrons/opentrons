@@ -47,7 +47,10 @@ export function ModulesButtonGroup({
                         return
                       }
                     }
-                    const moduleWithId = { ...module, id: Date.now().toString() }
+                    const moduleWithId = {
+                      ...module,
+                      id: Date.now().toString(),
+                    }
                     field.onChange([...modulesWatch, moduleWithId])
                   }}
                   text={module.name}

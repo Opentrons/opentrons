@@ -4823,10 +4823,10 @@ Output protocol:
 
 </Example-serial-dilution>
 
-
 <Example-PCR>
 
 Input:
+
 ```text
 Robot:
 - Flex
@@ -4843,7 +4843,7 @@ Modules:
 Labware:
 - Source sample: Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt placed on the sample temperature module
 - Source mastermix: Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt placed on the mastermix temperature module
-- Destination: Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt placed on thermocycler 
+- Destination: Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt placed on thermocycler
 - Opentrons Flex 96 Filter Tip Rack 1000 uL (left pipette)
 - Opentrons Flex 96 Filter Tip Rack 50 uL (right pipette)
 
@@ -4876,12 +4876,8 @@ Output:
   "designerApplication": {
     "data": {
       "pipetteTiprackAssignments": {
-        "pipette_left": [
-          "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
-        ],
-        "pipette_right": [
-          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
-        ]
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"],
+        "pipette_right": ["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]
       },
       "ingredients": {
         "0": {
@@ -5935,4 +5931,5 @@ Output:
   }
 }
 ```
+
 </Example-PCR>
