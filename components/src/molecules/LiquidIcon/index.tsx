@@ -18,6 +18,15 @@ export interface LiquidIconProps {
 export function LiquidIcon(props: LiquidIconProps): JSX.Element {
   const { color, size = 'small', onClick, hasError = false } = props
 
+  const sizeStylesMap: Record<
+    LiquidIconSize,
+    { iconSize: string; padding: string }
+  > = {
+    xSmall: { iconSize: '0.333125rem', padding: '0.333125rem' },
+    small: { iconSize: '0.5rem', padding: SPACING.spacing8 },
+    medium: { iconSize: '1rem', padding: SPACING.spacing12 },
+  }
+
   const LIQUID_ICON_CONTAINER_STYLE = css`
     height: max-content;
     width: max-content;
@@ -34,23 +43,14 @@ export function LiquidIcon(props: LiquidIconProps): JSX.Element {
       border-color: ${onClick != null ? COLORS.grey40 : COLORS.grey30};
     }
   `
-  let iconSize = '0.5rem'
-  let padding: string = SPACING.spacing8
-  if (size === 'medium') {
-    iconSize = '1rem'
-    padding = SPACING.spacing12
-  } else if (size === 'xSmall') {
-    iconSize = '0.375rem'
-    padding = '0.375rem'
-  }
 
   const liquid = (
     <Flex
       css={LIQUID_ICON_CONTAINER_STYLE}
-      padding={padding}
+      padding={sizeStylesMap[size].padding}
       data-testid={`LiquidIcon_${color}`}
     >
-      <Icon name="circle" color={color} size={iconSize} />
+      <Icon name="circle" color={color} size={sizeStylesMap[size].iconSize} />
     </Flex>
   )
 
