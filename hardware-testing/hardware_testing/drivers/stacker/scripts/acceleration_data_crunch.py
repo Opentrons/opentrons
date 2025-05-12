@@ -14,8 +14,8 @@ def print_to_string(list):
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='Flex Stacker Axis Accelerated Lifetime Test')
-    arg_parser.add_argument('-c', '--current', type=float, required=True, help='Current', default=1.0)
-    arg_parser.add_argument('-s', '--speed', type=int, required=True, help='speed', default=50)
+    arg_parser.add_argument('-c', '--current', type=float, required=False, help='Current', default=1.0)
+    arg_parser.add_argument('-s', '--speed', type=int, required=False, help='speed', default=50)
     return arg_parser
 
 if __name__ == '__main__':
@@ -23,9 +23,10 @@ if __name__ == '__main__':
     args = arg_parser.parse_args()
     working_dir = os.getcwd()
     detail_row = 0
-    file_name = working_dir + '/EVT Motion Parameter Test - 5 Tiprack Load Z Axis RAW-Unit 1.csv'
-
+    file_name = working_dir + '/data/DVT Motion Parameter Test - no Load X Axis-Unit 2.csv'
+    # print(f'file_name: {file_name}')
     df = pd.read_csv(file_name, skiprows=detail_row)
+    print(df)
     new_df = df[
                 [
                 'MOTOR_CURRENT',
@@ -48,19 +49,27 @@ if __name__ == '__main__':
     bigger_list = []
     list = []
     count = 0
-    print(f'current: {current}, velocity: {speed}')
+    # print(f'current: {current}, velocity: {speed}')
+    current_list = [0.1,0.2,0.3,0.4,0.5,0.6, 0.7, 0.8, 0.9]#, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
+    speed_list = [50, 100, 150, 200, 250, 300]
+    # speed_list = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200]
     for index, row in df.iterrows():
-        if row['MOTOR_CURRENT'] == current:
-            if row['VELOCITY'] == speed:
+        if row['VELOCITY'] == 50:
+            print(f'current: {row["MOTOR_CURRENT"]}, velocity: {row["VELOCITY"]}, accel: {row["ACCELERATION"]}')
+        # if row['MOTOR_CURRENT'] == current:
+        if row['MOTOR_CURRENT'] in current_list:
+            if row['VELOCITY'] in speed_list:
+            # if row['VELOCITY'] == speed:
                 count += 1
-                # print(f'index: {index}, Velocity: {row["VELOCITY"]}, Accel: {row["ACCELERATION"]}, P/F: {row["PASS/FAIL"]}')
                 list.append(row["PASS/FAIL"])
                 if count == 10:
+                    # print(f'current: {row["MOTOR_CURRENT"]}, Velocity: {row["VELOCITY"]}, Accel: {row["ACCELERATION"]}')
                     d = print_to_string(list)
                     print(d)
                     bigger_list.append(list)
                     count = 0
                     list=[]
+                    
                 # print(index)
                 # if (index) == 381:
                 #     list.append(row["PASS/FAIL"])

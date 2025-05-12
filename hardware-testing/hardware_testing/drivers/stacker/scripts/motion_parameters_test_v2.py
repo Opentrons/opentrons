@@ -35,8 +35,8 @@ STACKER_STATES: Dict[FlexStackerDriver, Dict[str, bool]] = {}
 
 # StallGuard configuration
 STALLGUARD_CONFIG = {
-    StackerAxis.X: StallGuardParams(StackerAxis.X, True, 2),
-    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 2)
+    StackerAxis.X: StallGuardParams(StackerAxis.X, True, 3),
+    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 3)
 }
 
 TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
@@ -44,7 +44,7 @@ TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
         StackerAxis.X: {
             "SPEED": {"MIN": 50, "MAX": 300, "INC": 50},
             "ACCEL": {"MIN": 1500, "MAX": 1500, "INC": 500},
-            "CURRENT": {"MIN": 1.0, "MAX": 1.5, "INC": 0.1}
+            "CURRENT": {"MIN": 0.4, "MAX": 0.9, "INC": 0.1}
         },
         StackerAxis.Z: {
             "SPEED": {"MIN": 50, "MAX": 300, "INC": 50},
@@ -52,9 +52,9 @@ TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
             "CURRENT": {"MIN": 0.7, "MAX": 1.5, "INC": 0.1}
         },
         StackerAxis.L: {
-            "SPEED": {"MIN": 100, "MAX": 100, "INC": 10},
+            "SPEED": {"MIN": 10, "MAX": 200, "INC": 10},
             "ACCEL": {"MIN": 800, "MAX": 800, "INC": 50},
-            "CURRENT": {"MIN": 0.8, "MAX": 0.8, "INC": 0.1}
+            "CURRENT": {"MIN": 0.1, "MAX": 1.5, "INC": 0.1}
         },
     },
 }
@@ -63,7 +63,7 @@ TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description="FlexStacker Motion Parameter Test Script")
     arg_parser.add_argument("-c", "--cycles", default = 10, help = "number of cycles to execute")
-    arg_parser.add_argument("-a", "--axis", default = 'X', help = "Choose a Axis to test: X, Y, or L")
+    arg_parser.add_argument("-a", "--axis", default = 'Z', help = "Choose a Axis to test: X, Z, or L")
     arg_parser.add_argument("-g", "--gauge", default = True, type=bool,  help = "if a dial gauge is connected")
     return arg_parser
 
@@ -170,6 +170,7 @@ async def move_axis(
         res = await stacker.move_in_mm(axis, distance, params=motion_params)
         if res == MoveResult.STALL_ERROR:
             STACKER_STATES[stacker]["stall_detected"] = True
+
             # raise FlexStackerStallError(
             #     STACKER_STATES[stacker]["device_info"]["serial"], axis
             # )
@@ -182,19 +183,13 @@ async def open_latch(
     stacker: FlexStackerDriver,
     velocity: Optional[float] = None,
     acceleration: Optional[float] = None,
-) -> bool:
+):
     """Open the latch."""
     MAX_TRAVEL = {
         StackerAxis.X: 194.0,
         StackerAxis.Z: 139.5,
         StackerAxis.L: 22.0,
     }
-    # Dont move the latch if its already opened.
-    if (
-        STACKER_STATES[stacker]["limit_switch_status"][StackerAxis.L]
-        == StackerAxisState.RETRACTED
-    ):
-        return True
     # The latch only has one limit switch, so we have to travel a fixed distance
     # to open the latch.
     success = await move_axis(
@@ -207,8 +202,6 @@ async def open_latch(
     )
     # Check that the latch is opened.
     await get_limit_switch_status(stacker)
-    axis_state = STACKER_STATES[stacker]["limit_switch_status"][StackerAxis.L]
-    return success and axis_state == StackerAxisState.RETRACTED
 
 
 async def close_latch(
@@ -231,13 +224,8 @@ async def close_latch(
         speed=velocity,
         acceleration=acceleration,
     )
-    # Check that the latch is closed.
-    await get_limit_switch_status(stacker)
-    return (
-        success
-        and STACKER_STATES[stacker]["limit_switch_status"][StackerAxis.L]
-        == StackerAxisState.EXTENDED
-    )
+    # return sw_states.get(StackerAxis.L, Direction.RETRACT) == True
+    return await get_limit_switch_status(stacker)
 
 async def home_axis(
     stacker: FlexStackerDriver,
@@ -315,7 +303,10 @@ async def main(args: argparse.Namespace, gauge, test_axis) -> None:
     # await home_axis(s, StackerAxis.Z, Direction.EXTEND)
     await home_axis(s, StackerAxis.X, Direction.RETRACT)
     await home_axis(s, StackerAxis.Z, Direction.RETRACT)
-    await home_axis(s, StackerAxis.L, Direction.RETRACT)
+    # await home_axis(s, StackerAxis.L, Direction.RETRACT)
+    if test_axis == StackerAxis.L:
+        await close_latch(s)
+        await open_latch(s)
     msd = 40
     directory = f'/data/motion_parameters_test_{datetime.now().strftime("%m_%d_%y")}'
     if not os.path.exists(directory):
@@ -329,6 +320,10 @@ async def main(args: argparse.Namespace, gauge, test_axis) -> None:
         writer.writerow(fields)
         # Settings for current, speed, acceleration 
         # Loop through the settings
+        if test_axis == StackerAxis.L:
+            direction = Direction.RETRACT
+        else:
+            direction = Direction.EXTEND
         for settings in list_1[axis_str]:
             for c in range(1, args.cycles+1):
                 print(f'Cycle Count: {c}')
@@ -342,15 +337,15 @@ async def main(args: argparse.Namespace, gauge, test_axis) -> None:
                     time.sleep(1)
                     t0 = time.time()
                     if args.gauge == True:
-                        home_reading = gauge.read_stable()
+                        home_reading = gauge.read_stable(10)
                         print(f'home reading: {home_reading}')
                         t0 = time.time()
                 else:
-                    # input("Press Enter to continue...")
-                    await home_axis(s, test_axis, Direction.RETRACT)
+                    if test_axis != StackerAxis.L:
+                        await home_axis(s, test_axis, Direction.RETRACT)
                     t0 = time.time()
                     if args.gauge == True:
-                        home_reading = gauge.read_stable()
+                        home_reading = gauge.read_stable(10)
                         t0 = time.time()
                         print(f'home reading: {home_reading}')
                         sw_state_1 = await get_limit_switch_status(s)
@@ -361,20 +356,26 @@ async def main(args: argparse.Namespace, gauge, test_axis) -> None:
                 delta_1 = t1 - t0
                 print(f'time: {delta_1}')
                 # Swap this for move_axis
+                if test_axis == StackerAxis.L:
+                    offset = 5
+                else:
+                    offset = 10
                 await move_axis(s, 
                                 test_axis, 
-                                Direction.EXTEND, 
-                                TOTAL_TRAVEL-10,
+                                # Direction.RETRACT,
+                                direction,
+                                TOTAL_TRAVEL-offset,
                                 speed = settings['SPEED'],
                                 acceleration = settings['ACCEL'],
                                 current = settings['CURRENT']
                                 )
                 sw_state_2 = await get_limit_switch_status(s)
-                sw_state_2 = sw_state_2.get(test_axis, Direction.EXTEND)
+                # sw_state_2 = sw_state_2.get(test_axis, Direction.RETRACT)
+                sw_state_2 = sw_state_2.get(test_axis, direction)
                 print(f'SW State 2: {sw_state_2}')
                 time.sleep(1)
                 if args.gauge == True:
-                    position_2 = gauge.read_stable()
+                    position_2 = gauge.read_stable(10)
                     print(f'position_2: {position_2}')
                 t2 = time.time()
                 delta_2 = t2 - t1
@@ -382,7 +383,8 @@ async def main(args: argparse.Namespace, gauge, test_axis) -> None:
                 # Let's ignore this error for now
                 await move_axis(s, 
                                 test_axis, 
-                                Direction.EXTEND, 
+                                # Direction.RETRACT,
+                                direction,
                                 5,
                                 speed = settings['SPEED'],
                                 acceleration = settings['ACCEL'],
@@ -392,36 +394,45 @@ async def main(args: argparse.Namespace, gauge, test_axis) -> None:
                 delta_3 = t3 - t2
                 print(f'time: {delta_3}')
                 sw_state_3 = await get_limit_switch_status(s)
-                sw_state_3 = sw_state_3.get(test_axis, Direction.EXTEND)
+                print(sw_state_3)
+                # sw_state_3 = sw_state_3.get(test_axis, Direction.RETRACT)
+                sw_state_3 = sw_state_3.get(test_axis, direction)
                 print(f'SW State 3: {sw_state_3}')
                 time.sleep(1)
                 if args.gauge == True:
-                    position_3 = gauge.read_stable()
+                    position_3 = gauge.read_stable(10)
                     print(f'position_3: {position_3}')
-                await home_axis(s, test_axis, Direction.EXTEND)
+                if test_axis != StackerAxis.L:
+                    await home_axis(s, test_axis, direction)
+                else:
+                    await close_latch(s)
                 t4 = time.time()
                 delta_4 = t4 - t3
                 print(f'time: {delta_4}')
                 sw_state_4 = await get_limit_switch_status(s)
-                sw_state_4 = sw_state_4.get(test_axis, Direction.EXTEND)
+                # sw_state_4 = sw_state_4.get(test_axis, Direction.RETRACT)
+                sw_state_4 = sw_state_4.get(test_axis, direction)
                 print(f'SW State 4: {sw_state_4}')
                 time.sleep(1)
                 if args.gauge == True:
-                    position_4 = gauge.read_stable()
+                    position_4 = gauge.read_stable(10)
                     print(f'position_4: {position_4}')
                     data = [c, home_reading, position_2, position_3, position_4, sw_state_1, sw_state_2, sw_state_3, sw_state_4,
                             settings['CURRENT'], settings['SPEED'], settings['ACCEL'],
                             msd, t0, t1, t2, t3, t4]
                     writer.writerow(data)
                     file.flush()
-                await move_axis(s, 
-                                test_axis, 
-                                Direction.RETRACT, 
-                                TOTAL_TRAVEL-10,
-                                speed = settings['SPEED'],
-                                acceleration = settings['ACCEL'],
-                                current = settings['CURRENT']
-                                )
+                if test_axis == StackerAxis.L:
+                    await open_latch(s)
+                else:
+                    await move_axis(s, 
+                                    test_axis, 
+                                    Direction.RETRACT, 
+                                    TOTAL_TRAVEL-10,
+                                    speed = settings['SPEED'],
+                                    acceleration = settings['ACCEL'],
+                                    current = settings['CURRENT']
+                                    )
 
 if __name__ == '__main__':
     arg_parser = build_arg_parser()
