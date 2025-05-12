@@ -59,6 +59,3 @@ markdown_extensions:
 
 extra:
   apiLevel: 2.23
-  
-extra_css:
-  - stylesheets/extra.css
