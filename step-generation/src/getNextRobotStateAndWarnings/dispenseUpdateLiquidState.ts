@@ -93,6 +93,7 @@ export function dispenseUpdateLiquidState(
     prevLiquidState.labware[sourceId] != null
       ? prevLiquidState.labware[sourceId]
       : null
+
   let liquidTrash: LocationLiquidState | null = null
   if (prevLiquidState.trashBins[sourceId] != null) {
     liquidTrash = prevLiquidState.trashBins[sourceId]
@@ -119,6 +120,7 @@ export function dispenseUpdateLiquidState(
       return splitLiquid(volume || 0, prevTipLiquidState)
     }
   )
+
   let mergeLiquidtoSingleWell = null
   //  a labware will always have a well
   if (well != null && liquidLabware != null) {
@@ -166,6 +168,7 @@ export function dispenseUpdateLiquidState(
           }
         }, {})
       : {}
+
   // add liquid to well(s)
   const labwareLiquidState = allWellsShared
     ? mergeLiquidtoSingleWell
