@@ -63,6 +63,7 @@
   "into": "into",
   "labware_to": "{{labware}} to",
   "liquids": "{{num}} liquids",
+  "labware_in": "Labware in",
   "magnetic_module": {
     "disengage": "<semiBoldText>{{module}}</semiBoldText><text>disengaged</text>",
     "engage": "<semiBoldText>{{module}}</semiBoldText><text>engaged to</text><tag/>"

@@ -75,5 +75,6 @@
   "upload_custom_labware": "Upload custom labware",
   "waste_chute_no_labware": "Cannot load labware into Waste Chute",
   "we_added_hardware": "We've added your deck hardware!",
-  "wellPlate": "Well plates"
+  "wellPlate": "Well plates",
+  "view_labware": "View labware"
 }
