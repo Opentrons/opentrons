@@ -159,13 +159,23 @@ export const forAspirateInPlace = (
     const tipLiquidState = pipette[indexToString]
     const sourceLiquidState =
       liquidState.labware[labwareId][wellsForTips[tipIndex]]
+    const isOveraspirate = volume > getLocationTotalVolume(sourceLiquidState)
     const newLiquidFromWell = splitLiquid(volume, sourceLiquidState).dest
     if (isEmpty(sourceLiquidState)) {
       warnings.push(warningCreators.aspirateFromPristineWell())
     } else if (volume > getLocationTotalVolume(sourceLiquidState)) {
       warnings.push(warningCreators.aspirateMoreThanWellContents())
     }
-    pipette[indexToString] = mergeLiquid(tipLiquidState, newLiquidFromWell)
+    const nextTipLiquidState = isOveraspirate
+      ? mergeLiquid(tipLiquidState, {
+          ...newLiquidFromWell,
+          [AIR]: {
+            volume,
+          },
+        })
+      : mergeLiquid(tipLiquidState, newLiquidFromWell)
+
+    pipette[indexToString] = nextTipLiquidState
   })
   // Remove liquid from source well(s)
   const labwareLiquidState = liquidState.labware[labwareId]

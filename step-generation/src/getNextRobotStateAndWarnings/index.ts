@@ -24,12 +24,7 @@ import {
   forHeaterShakerSetTargetTemperature,
   forHeaterShakerStopShake,
 } from './heaterShakerUpdates'
-import {
-  forAspirateInPlace,
-  forBlowOutInPlace,
-  forDispenseInPlace,
-  forDropTipInPlace,
-} from './inPlaceCommandUpdates'
+import { forBlowOutInPlace, forDropTipInPlace } from './inPlaceCommandUpdates'
 import { forDisengageMagnet, forEngageMagnet } from './magnetUpdates'
 import {
   forAwaitTemperature,
@@ -65,6 +60,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
   switch (command.commandType) {
     case 'aspirate':
+    case 'aspirateInPlace':
       if (command.meta?.isAirGap === true) {
         break
       } else {
@@ -73,6 +69,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
 
     case 'dispense':
+    case 'dispenseInPlace':
       if (command.meta?.isAirGap === true) {
         break
       } else {
@@ -140,28 +137,12 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forLoadLiquid(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    case 'aspirateInPlace':
-      forAspirateInPlace(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
-      break
-
     case 'dropTipInPlace':
       forDropTipInPlace(command.params, invariantContext, robotStateAndWarnings)
       break
 
     case 'blowOutInPlace':
       forBlowOutInPlace(command.params, invariantContext, robotStateAndWarnings)
-      break
-
-    case 'dispenseInPlace':
-      forDispenseInPlace(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
       break
 
     case 'configureNozzleLayout':
