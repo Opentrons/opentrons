@@ -1237,10 +1237,9 @@ export const CompositeSetupSteps = {
       cy.log(`  Destination Well: ${destWellToUse}`)
       cy.log(`  Volume: ${volumeToUse}`)
       cy.log(`  Liquid Class: ${liquidClassToUse}`)
-
-      SetupVerifications.TransferPopOut()
+      SetupSteps.AddStep().call()
+      SetupVerifications.TransferPopOut().call()
       UniversalSteps.Snapshot()
-
       SetupSteps.InputTransferVolume(volumeToUse).call()
       SetupSteps.ChoseSourceLabware().call()
       SetupSteps.selectDropdownLabware(sourceLabwareToUse).call()

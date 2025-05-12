@@ -6,7 +6,7 @@ import {
 import { StepBuilder } from '../support/StepBuilder'
 import { UniversalSteps } from '../support/UniversalSteps'
 
-describe('Transfer stepform testing Single Channel - Happy Path', () => {
+describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', () => {
   beforeEach(() => {
     console.log('enablePrereleaseMode()')
     cy.visit('/')
@@ -24,7 +24,45 @@ describe('Transfer stepform testing Single Channel - Happy Path', () => {
     })
   })
 
-  it('Goes through onboarding flow and then single-channel one-to-one transfer', () => {
+  const getAllWells = (): string[] => {
+    const allWells: string[] = []
+    const rows = 'ABCDEFGH'
+    const cols = Array.from({ length: 12 }, (_, i) => i + 1)
+    for (const row of rows) {
+      for (const col of cols) {
+        allWells.push(`${row}${col}`)
+      }
+    }
+    return allWells
+  }
+
+  const GenerateMultipleTransferSteps = (steps: StepBuilder) => {
+    const volumes = ['1', '20', '50']
+    const liquidClasses = ['Aqueous', 'Viscous', 'Volatile']
+    const allWells = getAllWells()
+    let wellIndex = 0
+
+    for (const liquidClass of liquidClasses) {
+      for (const volume of volumes) {
+        const sourceWell = allWells[wellIndex % allWells.length]
+        const destWell = allWells[(wellIndex + 1) % allWells.length]
+
+        steps.add(
+          CompositeSetupSteps.Test_LC(
+            'Bio-Rad 96 Well Plate', // sourceLabware
+            sourceWell,
+            'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt', // destinationLabware
+            destWell,
+            volume,
+            liquidClass
+          )
+        )
+        wellIndex += 2
+      }
+    }
+  }
+
+  it('Goes through onboarding flow and then runs multiple transfer steps with sequential well changes', () => {
     cy.openSettingsPage()
     cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
     cy.openSettingsPage()
@@ -70,14 +108,8 @@ describe('Transfer stepform testing Single Channel - Happy Path', () => {
     steps.add(SetupSteps.ClickLiquidButton())
     steps.add(SetupSteps.DefineLiquid())
     steps.add(SetupSteps.LiquidSaveWIP())
-    const allWells: string[] = []
-    const rows = 'ABCDEFGH'
-    for (let i = 0; i < rows.length; i++) {
-      for (let j = 1; j <= 12; j++) {
-        allWells.push(`${rows[i]}${j}`)
-      }
-    }
-    steps.add(SetupSteps.WellSelector(allWells))
+    const allWellsForLiquid: string[] = getAllWells()
+    steps.add(SetupSteps.WellSelector(allWellsForLiquid))
     steps.add(SetupSteps.LiquidDropdown())
     steps.add(SetupVerifications.LiquidPage())
     steps.add(UniversalSteps.Snapshot())
@@ -89,20 +121,9 @@ describe('Transfer stepform testing Single Channel - Happy Path', () => {
         'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
       )
     )
-    steps.add(SetupSteps.AddStep())
-    steps.add(SetupVerifications.TransferPopOut())
-    steps.add(UniversalSteps.Snapshot())
-    // I am going to eventually get to 1,20,50
-    steps.add(
-      CompositeSetupSteps.Test_LC(
-        'Bio-Rad 96 Well Plate',
-        'A1',
-        'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt',
-        'A1',
-        '1',
-        'Aqueous'
-      )
-    )
+
+    // Add the multiple transfer steps using the custom function with sequential wells
+    GenerateMultipleTransferSteps(steps)
 
     steps.execute()
   })
