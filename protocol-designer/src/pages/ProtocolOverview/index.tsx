@@ -35,6 +35,7 @@ import {
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { actions as loadFileActions } from '../../load-file'
+import { useProtocolExportHandler } from '../../resources/hooks'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getAdditionalEquipmentEntities,
@@ -187,38 +188,52 @@ export function ProtocolOverview(): JSX.Element {
     },
   ]
 
-  const hasWarning =
-    noCommands ||
-    modulesWithoutStep.length > 0 ||
-    pipettesWithoutStep.length > 0 ||
-    gripperWithoutStep ||
-    fixtureWithoutStep.trashBin ||
-    fixtureWithoutStep.wasteChute ||
-    fixtureWithoutStep.stagingAreaSlots.length > 0
-
-  const warning = hasWarning
-    ? getWarningContent({
-        noCommands,
-        pipettesWithoutStep,
-        modulesWithoutStep,
-        gripperWithoutStep,
-        fixtureWithoutStep,
-        t,
-      })
-    : null
-
-  const exportWarningModal = useBlockingHint({
-    hintKey: warning?.hintKey ?? null,
-    enabled: showExportWarningModal,
-    content: warning?.content,
-    handleCancel: () => {
-      setShowExportWarningModal(false)
-    },
-    handleContinue: () => {
-      setShowExportWarningModal(false)
+  const {
+    handleExportClick,
+    exportWarningModalElement,
+  } = useProtocolExportHandler({
+    noCommands,
+    modulesWithoutStep,
+    pipettesWithoutStep,
+    gripperWithoutStep,
+    fixtureWithoutStep,
+    onConfirmExport: () => {
       dispatch(loadFileActions.saveProtocolFile())
     },
   })
+
+  // const hasWarning =
+  //   noCommands ||
+  //   modulesWithoutStep.length > 0 ||
+  //   pipettesWithoutStep.length > 0 ||
+  //   gripperWithoutStep ||
+  //   fixtureWithoutStep.trashBin ||
+  //   fixtureWithoutStep.wasteChute ||
+  //   fixtureWithoutStep.stagingAreaSlots.length > 0
+
+  // const warning = hasWarning
+  //   ? getWarningContent({
+  //       noCommands,
+  //       pipettesWithoutStep,
+  //       modulesWithoutStep,
+  //       gripperWithoutStep,
+  //       fixtureWithoutStep,
+  //       t,
+  //     })
+  //   : null
+
+  // const exportWarningModal = useBlockingHint({
+  //   hintKey: warning?.hintKey ?? null,
+  //   enabled: showExportWarningModal,
+  //   content: warning?.content,
+  //   handleCancel: () => {
+  //     setShowExportWarningModal(false)
+  //   },
+  //   handleContinue: () => {
+  //     setShowExportWarningModal(false)
+  //     dispatch(loadFileActions.saveProtocolFile())
+  //   },
+  // })
 
   return (
     <Fragment>
@@ -236,7 +251,8 @@ export function ProtocolOverview(): JSX.Element {
           }}
         />
       ) : null}
-      {exportWarningModal}
+      {/* {exportWarningModal} */}
+      {exportWarningModalElement}
       {showMaterialsListModal ? (
         <MaterialsListModal
           hardware={Object.values(modulesOnDeck)}
@@ -293,9 +309,10 @@ export function ProtocolOverview(): JSX.Element {
             />
             <LargeButton
               buttonText={t('export_protocol')}
-              onClick={() => {
-                setShowExportWarningModal(true)
-              }}
+              // onClick={() => {
+              //   setShowExportWarningModal(true)
+              // }}
+              onClick={handleExportClick}
               iconName="arrow-right"
               whiteSpace={NO_WRAP}
               height="3.5rem"
