@@ -270,9 +270,6 @@ export function ProtocolOverview(): JSX.Element {
             />
             <LargeButton
               buttonText={t('export_protocol')}
-              // onClick={() => {
-              //   setShowExportWarningModal(true)
-              // }}
               onClick={handleExportClick}
               iconName="arrow-right"
               whiteSpace={NO_WRAP}
