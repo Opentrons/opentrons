@@ -258,7 +258,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             ) from e
 
-        if isinstance(target, (TrashBin, WasteChute)):
+        if isinstance(target, validation.DisposalTarget):
             raise ValueError(
                 "Trash Bin and Waste Chute are not acceptable location parameters for Aspirate commands."
             )
@@ -399,6 +399,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.17
             Behavior of the ``volume`` parameter.
+
+        .. versionchanged:: 2.24
+            ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
+            into a trash bin or waste chute.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
@@ -432,13 +436,13 @@ class InstrumentContext(publisher.CommandPublisher):
 
         flow_rate = self._core.get_dispense_flow_rate(rate)
 
-        if isinstance(target, (TrashBin, WasteChute)):
+        if isinstance(target, validation.DisposalTarget):
             with publisher.publish_context(
                 broker=self.broker,
                 command=cmds.dispense_in_disposal_location(
                     instrument=self,
                     volume=c_vol,
-                    location=target,
+                    location=target.location,
                     rate=rate,
                     flow_rate=flow_rate,
                 ),
@@ -446,10 +450,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 self._core.dispense(
                     volume=c_vol,
                     rate=rate,
-                    location=target,
+                    location=target.location,
                     well_core=None,
                     flow_rate=flow_rate,
-                    in_place=False,
+                    in_place=target.in_place,
                     push_out=push_out,
                     meniscus_tracking=None,
                 )
@@ -656,6 +660,10 @@ class InstrumentContext(publisher.CommandPublisher):
                               without first calling a method that takes a location, like
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
         :returns: This instance.
+
+        .. versionchanged:: 2.24
+            ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
+            into a trash bin or waste chute.
         """
         well: Optional[labware.Well] = None
         move_to_location: types.Location
@@ -696,17 +704,17 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
-        elif isinstance(target, (TrashBin, WasteChute)):
+        elif isinstance(target, validation.DisposalTarget):
             with publisher.publish_context(
                 broker=self.broker,
                 command=cmds.blow_out_in_disposal_location(
-                    instrument=self, location=target
+                    instrument=self, location=target.location
                 ),
             ):
                 self._core.blow_out(
-                    location=target,
+                    location=target.location,
                     well_core=None,
-                    in_place=False,
+                    in_place=target.in_place,
                 )
             return self
 
@@ -793,8 +801,12 @@ class InstrumentContext(publisher.CommandPublisher):
         # If location is a valid well, move to the well first
         if location is None:
             last_location = self._protocol_core.get_last_location()
-            if not last_location:
-                raise RuntimeError("No valid current location cache present")
+            if last_location is None or isinstance(
+                last_location, (TrashBin, WasteChute)
+            ):
+                raise RuntimeError(
+                    f"Cached location of {last_location} is not valid for touch tip."
+                )
             parent_labware, well = last_location.labware.get_parent_labware_and_well()
             if not well or not parent_labware:
                 raise RuntimeError(
@@ -847,6 +859,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self,
         volume: Optional[float] = None,
         height: Optional[float] = None,
+        in_place: Optional[bool] = None,
         rate: Optional[float] = None,
         flow_rate: Optional[float] = None,
     ) -> InstrumentContext:
@@ -863,6 +876,11 @@ class InstrumentContext(publisher.CommandPublisher):
                        the air gap. The default is 5 mm above the current well.
         :type height: float
 
+        :param in_place: Air gap at the pipette's current position, without moving to
+                         some height above the well. If ``in_place`` is specified,
+                         ``height`` must be unset.
+        :type in_place: bool
+
         :param rate: A multiplier for the default flow rate of the pipette. Calculated
                      as ``rate`` multiplied by :py:attr:`flow_rate.aspirate
                      <flow_rate>`. If neither rate nor flow_rate is specified, the pipette
@@ -875,10 +893,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
 
-        :raises RuntimeError: If location cache is ``None``. This should happen if
-                              ``air_gap()`` is called without first calling a method
-                              that takes a location (e.g., :py:meth:`.aspirate`,
-                              :py:meth:`dispense`)
+        :raises RuntimeError: If location cache is ``None`` and the air gap is not
+                              ``in_place``. This would happen if ``air_gap()`` is called
+                              without first calling a method that takes a location (e.g.,
+                              :py:meth:`.aspirate`, :py:meth:`dispense`)
 
         :returns: This instance.
 
@@ -896,10 +914,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.22
             No longer implemented as an aspirate.
-
+        .. versionchanged:: 2.24
+            Added the ``in_place`` option.
         .. versionchanged:: 2.24
             Adds the ``rate`` and ``flow_rate`` parameter. You can only define one or the other. If
             both are unspecified then ``rate`` is by default set to 1.0.
+            Can air gap over a trash bin or waste chute.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
@@ -921,13 +941,37 @@ class InstrumentContext(publisher.CommandPublisher):
         if flow_rate is not None and rate is not None:
             raise ValueError("Cannot define both flow_rate and rate.")
 
-        if height is None:
-            height = 5
-        loc = self._protocol_core.get_last_location()
-        if not loc or not loc.labware.is_well:
-            raise RuntimeError("No previous Well cached to perform air gap")
-        target = loc.labware.as_well().top(height)
-        self.move_to(target, publish=False)
+        if in_place:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="in_place",
+                    until_version="2.24",
+                    current_version=f"{self._api_version}",
+                )
+            if height is not None:
+                raise ValueError("height must be unset if air gapping in_place")
+        else:
+            if height is None:
+                height = 5
+            last_location = self._protocol_core.get_last_location()
+            if self.api_version < APIVersion(2, 24) and isinstance(
+                last_location, (TrashBin, WasteChute)
+            ):
+                last_location = None
+            if last_location is None or (
+                isinstance(last_location, types.Location)
+                and not last_location.labware.is_well
+            ):
+                raise RuntimeError(
+                    f"Cached location of {last_location} is not valid for air gap."
+                )
+            target: Union[types.Location, TrashBin, WasteChute]
+            if isinstance(last_location, types.Location):
+                target = last_location.labware.as_well().top(height)
+            else:
+                target = last_location.top(height)
+            self.move_to(target, publish=False)
+
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
             self._core.prepare_to_aspirate()
             c_vol = self._core.get_available_volume() if volume is None else volume
@@ -1707,6 +1751,8 @@ class InstrumentContext(publisher.CommandPublisher):
               - ``"once"``: Use one tip for the entire command.
               - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
               - ``"per source"``: Use one tip for each source well, even if
+                :ref:`tip refilling <complex-tip-refilling>` is required.
+              - ``"per destination"``: Use one tip for each destination well, even if
                 :ref:`tip refilling <complex-tip-refilling>` is required.
               - ``"never"``: Do not pick up or drop tips at all.
 
@@ -2583,14 +2629,22 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._well_bottom_clearances
 
-    def _get_last_location_by_api_version(self) -> Optional[types.Location]:
+    def _get_last_location_by_api_version(
+        self,
+    ) -> Optional[Union[types.Location, TrashBin, WasteChute]]:
         """Get the last location accessed by this pipette, if any.
 
         In pre-engine Protocol API versions, this call omits the pipette mount.
+        Between 2.14 (first engine PAPI version) and 2.23 this only returns None or a Location object.
         This is to preserve pre-existing, potentially buggy behavior.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
+        if self._api_version >= APIVersion(2, 24):
             return self._protocol_core.get_last_location(mount=self._core.get_mount())
+        elif self._api_version >= ENGINE_CORE_API_VERSION:
+            last_location = self._protocol_core.get_last_location(
+                mount=self._core.get_mount()
+            )
+            return last_location if isinstance(last_location, types.Location) else None
         else:
             return self._protocol_core.get_last_location()
 
@@ -2646,7 +2700,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 actual_value=str(volume),
             )
         last_location = self._get_last_location_by_api_version()
-        if last_location and isinstance(last_location.labware, labware.Well):
+        if (
+            last_location
+            and isinstance(last_location, types.Location)
+            and isinstance(last_location.labware, labware.Well)
+        ):
             self.move_to(last_location.labware.top())
         self._core.configure_for_volume(volume)
 

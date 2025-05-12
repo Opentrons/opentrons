@@ -84,7 +84,7 @@ Please refer to <TIP_HANDLING> in <DOCUMENTS>
 8. To use correct load names, pipettes, modules, please look at <PD-LOAD-NAMES> tags in <DOCUMENTS>
 
 9. Common errors to avoid
-    - If the prompt does not contain liquid definition, please keep `ingredients`, `ingredLocations` and `liquids` empty.
+    - If the prompt does not contain liquid definition, please keep `ingredients` and `ingredLocations` empty.
     - If user specifies the number of steps explicitly, please generate such number of steps - not more.
     - Use V2 not V1 for the following thermocyclerModuleV2, temperatureModuleV2.
     - For PCR protocols, follow the profile steps strictly as mentioned in the description
@@ -100,7 +100,8 @@ Please refer to <TIP_HANDLING> in <DOCUMENTS>
     - Unless otherwise specified, when a moveLiquid step is used, the trash bin should be specified as
       `"trashBinLocationUpdate": "trashbin-1": "cutout12" ` in the `__INITIAL_DECK_SETUP_STEP__`.
       Correspondingly, in the moveLiquid step, the `"dropTip_location"` field must be specified as
-      `"dropTip_location": "trashbin-1"`, not `"dropTip_location": "trashId"`.
+      `"dropTip_location": "trashbin-1"` where `trashbin-1` is the ID of the trash bin,
+      not random name like`"dropTip_location": "trashId"`.
 
 10. Steptype rules
     - if thermocycler is used, then it must be opened before transfer liquid.

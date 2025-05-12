@@ -15,6 +15,7 @@ import { isFlexPipette, OT3_PIPETTES } from '@opentrons/shared-data'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useCalibratePipetteOffset } from '/app/organisms/Desktop/CalibratePipetteOffset/useCalibratePipetteOffset'
+import { useDeckCalibrationData } from '/app/organisms/Desktop/Devices/hooks'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
@@ -22,12 +23,11 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { useRunStatuses } from '/app/resources/runs'
 
+import { OverflowMenu } from '..'
 import {
   mockPipetteOffsetCalibrationsResponse,
   mockTipLengthCalibrationResponse,
-} from '../__fixtures__'
-import { useDeckCalibrationData } from '../../../Devices/hooks'
-import { OverflowMenu } from '../OverflowMenu'
+} from '../../__fixtures__'
 
 import type { ComponentProps } from 'react'
 import type { Mount } from '@opentrons/components'
@@ -69,7 +69,7 @@ vi.mock('/app/redux/robot-api/selectors')
 vi.mock(
   '/app/organisms/Desktop/CalibratePipetteOffset/useCalibratePipetteOffset'
 )
-vi.mock('../../../Devices/hooks')
+vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/resources/devices')
 vi.mock('/app/resources/instruments')
@@ -250,6 +250,7 @@ describe('OverflowMenu', () => {
     fireEvent.click(button)
     const deleteBtn = screen.getByText('Delete calibration data')
     fireEvent.click(deleteBtn)
+    fireEvent.click(screen.getByText('Delete calibration data'))
     expect(mockDeleteCalibration).toHaveBeenCalledWith(expectedCallParams)
   })
 
@@ -271,6 +272,7 @@ describe('OverflowMenu', () => {
     fireEvent.click(button)
     const deleteBtn = screen.getByText('Delete calibration data')
     fireEvent.click(deleteBtn)
+    fireEvent.click(screen.getByText('Delete calibration data'))
     expect(mockDeleteCalibration).toHaveBeenCalledWith(expectedCallParams)
   })
 
@@ -287,6 +289,7 @@ describe('OverflowMenu', () => {
     fireEvent.click(button)
     const deleteBtn = screen.getByText('Delete calibration data')
     fireEvent.click(deleteBtn)
+    fireEvent.click(screen.getByText('Delete calibration data'))
     expect(mockDeleteCalibration).toHaveBeenCalled()
   })
 
@@ -307,6 +310,7 @@ describe('OverflowMenu', () => {
     fireEvent.click(button)
     const deleteBtn = screen.getByText('Delete calibration data')
     fireEvent.click(deleteBtn)
+    fireEvent.click(screen.getByText('Delete calibration data'))
     expect(mockDeleteCalibration).toHaveBeenCalled()
   })
 

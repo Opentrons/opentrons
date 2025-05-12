@@ -12,7 +12,6 @@ export const airGapInPlace: CommandCreator<AirGapInPlaceParams> = (
   const { flowRate, pipetteId, volume } = args
   const errors: CommandCreatorError[] = []
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
-
   if (!pipetteSpec) {
     errors.push(
       pipetteDoesNotExist({
@@ -20,6 +19,8 @@ export const airGapInPlace: CommandCreator<AirGapInPlaceParams> = (
       })
     )
   }
+  const pipettePythonName =
+    invariantContext.pipetteEntities[pipetteId].pythonName
 
   const commands = [
     {
@@ -34,5 +35,10 @@ export const airGapInPlace: CommandCreator<AirGapInPlaceParams> = (
   ]
   return {
     commands,
+    python: `${pipettePythonName}.air_gap(${[
+      `volume=${volume}`,
+      `in_place=True`,
+      `flow_rate=${flowRate}`,
+    ].join(', ')})`,
   }
 }
