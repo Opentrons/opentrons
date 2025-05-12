@@ -157,121 +157,121 @@ describe('generateSubstepItem', () => {
       }
     })
     ;[
-      // {
-      //   testName: 'consolidate command returns substep data',
-      //   stepArgs: {
-      //     commandCreatorFnName: 'consolidate',
-      //     sourceWells: ['A1', 'A2'],
-      //     destWell: 'C1',
-      //     blowoutLocation: null,
-      //     blowoutFlowRateUlSec: 10,
-      //     blowoutOffsetFromTopMm: 5,
-      //     mixFirstAspirate: null,
-      //     mixInDestination: null,
-      //     dropTipLocation: FIXED_TRASH_ID,
-      //   },
-      //   expected: {
-      //     substepType: 'sourceDest',
-      //     multichannel: false,
-      //     commandCreatorFnName: 'consolidate',
-      //     parentStepId: stepId,
-      //     rows: [
-      //       {
-      //         activeTips: {
-      //           pipetteId: pipetteId,
-      //           labwareId: tiprackId,
-      //           wellName: 'A1',
-      //         },
-      //         source: { well: 'A1', preIngreds: {}, postIngreds: {} },
-      //         dest: undefined,
-      //         volume: 50,
-      //       },
-      //       {
-      //         volume: 50,
-      //         source: { well: 'A2', preIngreds: {}, postIngreds: {} },
-      //         activeTips: {
-      //           pipetteId: pipetteId,
-      //           labwareId: tiprackId,
-      //           wellName: 'A1',
-      //         },
-      //         dest: {
-      //           postIngreds: {
-      //             __air__: {
-      //               volume: 100,
-      //             },
-      //           },
-      //           preIngreds: {},
-      //           well: 'C1',
-      //         },
-      //         isAirGap: false,
-      //       },
-      //     ],
-      //   },
-      // },
-      // {
-      //   testName: 'distribute command returns substep data',
-      //   stepArgs: {
-      //     commandCreatorFnName: 'distribute',
-      //     sourceWell: 'A1',
-      //     destWells: ['A1', 'A2'],
-      //     disposalVolume: null,
-      //     disposalLabware: null,
-      //     disposalWell: null,
-      //     blowoutFlowRateUlSec: 10,
-      //     blowoutOffsetFromTopMm: 5,
-      //     mixBeforeAspirate: null,
-      //     dropTipLocation: FIXED_TRASH_ID,
-      //   },
-      //   expected: {
-      //     commandCreatorFnName: 'distribute',
-      //     multichannel: false,
-      //     parentStepId: stepId,
-      //     rows: [
-      //       {
-      //         activeTips: {
-      //           labwareId: tiprackId,
-      //           pipetteId: pipetteId,
-      //           wellName: 'A1',
-      //         },
-      //         dest: {
-      //           postIngreds: {
-      //             __air__: {
-      //               volume: 50,
-      //             },
-      //           },
-      //           preIngreds: {},
-      //           well: 'A1',
-      //         },
-      //         isAirGap: false,
-      //         source: {
-      //           postIngreds: {},
-      //           preIngreds: {},
-      //           well: 'A1',
-      //         },
-      //         volume: 50,
-      //       },
-      //       {
-      //         activeTips: {
-      //           labwareId: tiprackId,
-      //           pipetteId: pipetteId,
-      //           wellName: 'A1',
-      //         },
-      //         dest: {
-      //           postIngreds: {
-      //             __air__: {
-      //               volume: 50,
-      //             },
-      //           },
-      //           preIngreds: {},
-      //           well: 'A2',
-      //         },
-      //         source: undefined,
-      //         volume: 50,
-      //       },
-      //     ],
-      //     substepType: 'sourceDest',
-      //   },
-      // },
+      {
+        testName: 'consolidate command returns substep data',
+        stepArgs: {
+          commandCreatorFnName: 'consolidate',
+          sourceWells: ['A1', 'A2'],
+          destWell: 'C1',
+          blowoutLocation: null,
+          blowoutFlowRateUlSec: 10,
+          blowoutOffsetFromTopMm: 5,
+          mixFirstAspirate: null,
+          mixInDestination: null,
+          dropTipLocation: FIXED_TRASH_ID,
+        },
+        expected: {
+          substepType: 'sourceDest',
+          multichannel: false,
+          commandCreatorFnName: 'consolidate',
+          parentStepId: stepId,
+          rows: [
+            {
+              activeTips: {
+                pipetteId: pipetteId,
+                labwareId: tiprackId,
+                wellName: 'A1',
+              },
+              source: { well: 'A1', preIngreds: {}, postIngreds: {} },
+              dest: undefined,
+              volume: 50,
+            },
+            {
+              volume: 50,
+              source: { well: 'A2', preIngreds: {}, postIngreds: {} },
+              activeTips: {
+                pipetteId: pipetteId,
+                labwareId: tiprackId,
+                wellName: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 100,
+                  },
+                },
+                preIngreds: {},
+                well: 'C1',
+              },
+              isAirGap: false,
+            },
+          ],
+        },
+      },
+      {
+        testName: 'distribute command returns substep data',
+        stepArgs: {
+          commandCreatorFnName: 'distribute',
+          sourceWell: 'A1',
+          destWells: ['A1', 'A2'],
+          disposalVolume: null,
+          disposalLabware: null,
+          disposalWell: null,
+          blowoutFlowRateUlSec: 10,
+          blowoutOffsetFromTopMm: 5,
+          mixBeforeAspirate: null,
+          dropTipLocation: FIXED_TRASH_ID,
+        },
+        expected: {
+          commandCreatorFnName: 'distribute',
+          multichannel: false,
+          parentStepId: stepId,
+          rows: [
+            {
+              activeTips: {
+                labwareId: tiprackId,
+                pipetteId: pipetteId,
+                wellName: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                preIngreds: {},
+                well: 'A1',
+              },
+              isAirGap: false,
+              source: {
+                postIngreds: {},
+                preIngreds: {},
+                well: 'A1',
+              },
+              volume: 50,
+            },
+            {
+              activeTips: {
+                labwareId: tiprackId,
+                pipetteId: pipetteId,
+                wellName: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                preIngreds: {},
+                well: 'A2',
+              },
+              source: undefined,
+              volume: 50,
+            },
+          ],
+          substepType: 'sourceDest',
+        },
+      },
       {
         testName: 'transfer command returns substep data',
         stepArgs: {
