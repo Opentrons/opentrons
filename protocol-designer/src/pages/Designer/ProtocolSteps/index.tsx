@@ -208,6 +208,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
             showLiquidOverflowMenu(false)
             setDefineLiquidModal(true)
           }}
+          targetWidth={targetWidth}
         />
       ) : null}
       <Flex

@@ -32,32 +32,41 @@ import type { MouseEvent, RefObject } from 'react'
 import type { ThunkDispatch } from '../../../types'
 
 const TOP_POSITION = '13.6875rem'
-const LEFT_POSITION = '14.9375rem'
+const RIGHT_POSITION_FOR_LIQUIDS_PAGE = '7.4rem'
+const POSITION_ADJUSTMENT = 4
 
 interface LiquidsOverflowMenuProps {
   onClose: () => void
   showLiquidsModal: () => void
   overflowWrapperRef: RefObject<HTMLDivElement>
+  targetWidth?: number
 }
 
 export function LiquidsOverflowMenu(
   props: LiquidsOverflowMenuProps
 ): JSX.Element {
-  const { onClose, showLiquidsModal, overflowWrapperRef } = props
+  const { onClose, showLiquidsModal, overflowWrapperRef, targetWidth } = props
   const formData = useSelector(getUnsavedForm)
   const location = useLocation()
   const { t } = useTranslation(['starting_deck_state'])
   const liquids = useSelector(getLiquidEntities)
   const dispatch: ThunkDispatch<any> = useDispatch()
 
-  let right: string = SPACING.spacing12
+  let right: string | undefined
   let top: string = TOP_POSITION
-  let left: string | undefined = LEFT_POSITION
+  let left: string | undefined
   if (formData != null || location.pathname === '/liquids') {
-    right = '7.4rem'
+    right = RIGHT_POSITION_FOR_LIQUIDS_PAGE
     top = `${NAV_BAR_HEIGHT_REM + 3.1}rem`
     left = undefined
+  } else {
+    right = undefined
+    left =
+      targetWidth !== undefined
+        ? `${targetWidth - POSITION_ADJUSTMENT}px`
+        : undefined
   }
+
   return (
     <Flex
       position={POSITION_ABSOLUTE}
