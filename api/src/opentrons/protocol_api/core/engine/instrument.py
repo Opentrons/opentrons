@@ -2357,6 +2357,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         well_location = WellLocation(
             origin=WellOrigin.TOP, offset=WellOffset(x=offset.x, y=offset.y, z=offset.z)
         )
+        pipette_movement_conflict.check_safe_for_pipette_movement(
+            engine_state=self._engine_client.state,
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
         self._engine_client.execute_command(
             cmd.LiquidProbeParams(
                 labwareId=labware_id,
@@ -2376,6 +2383,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         well_name = well_core.get_name()
         well_location = WellLocation(
             origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+        )
+        pipette_movement_conflict.check_safe_for_pipette_movement(
+            engine_state=self._engine_client.state,
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
         )
         result = self._engine_client.execute_command_without_recovery(
             cmd.LiquidProbeParams(

@@ -14,6 +14,7 @@ import { forDispense } from './forDispense'
 import { forDropTip } from './forDropTip'
 import { forLoadLiquid } from './forLoadLiquid'
 import { forMoveLabware } from './forMoveLabware'
+import { forMoveToWell } from './forMoveToWell'
 import { forPickUpTip } from './forPickUpTip'
 import {
   forHeaterShakerCloseLatch,
@@ -119,7 +120,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'moveToAddressableAreaForDropTip':
     case 'moveToSlot':
     case 'moveToCoordinates':
-    case 'moveToWell':
     case 'savePosition':
     case 'waitForResume': // timing VVV
     case 'waitForDuration':
@@ -130,6 +130,10 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'airGapInPlace':
     case 'prepareToAspirate':
     case 'liquidProbe':
+      break
+
+    case 'moveToWell':
+      forMoveToWell(command.params, invariantContext, robotStateAndWarnings)
       break
 
     case 'loadLiquid':
@@ -362,11 +366,12 @@ export function getNextRobotStateAndWarnings(
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): RobotStateAndWarnings {
+  const strippedCommands = stripNoOpCommands(commands)
+
   const prevState = {
     warnings: [],
     robotState: initialRobotState,
   }
-  const strippedCommands = stripNoOpCommands(commands)
   return produce(prevState, draft => {
     strippedCommands.forEach(command => {
       _getNextRobotStateAndWarningsSingleCommand(

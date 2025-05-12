@@ -118,11 +118,11 @@ Commands:
 8. Use left pipette to transfer 10 ul of sample from the source to destination well. Mix the sample and mastermix of
 25 ul total volume 9 times. Blow out to \`destination well\`. Use a new tip for each transfer.
 9. Close the thermocycler lid.
-10. Execute the thermocycle with the following profile:
+10. Execute the thermocycler with the following profile:
    - 74 degree C for 65 seconds for 1 cycle, block max volume is sample and mastermix volume
-11. Execute the thermocycle with the following profile:
+11. Execute the thermocycler with the following profile:
    - 60 degree C for 7 seconds, 84 degree C for 19 seconds, 57 degree C for 44 seconds for 25 cycles, block max volume is sample and mastermix volume
-12. Execute the thermocycle with the following profile:
+12. Execute the thermocycler with the following profile:
    - 75 degree C for 480 seconds for 1 cycle, block max volume is sample and mastermix volume
 13. Hold thermocycler block at 4 C.
 14. Open thermocycler lid.
