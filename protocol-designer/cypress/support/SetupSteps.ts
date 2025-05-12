@@ -1,4 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import { SelectTipDropLocation } from '../../../app/src/organisms/ODD/QuickTransferFlow/SelectTipDropLocation'
 import { StepThunk } from './StepBuilder'
 import { UniversalSteps } from './UniversalSteps' // Adjust the path
 
@@ -26,6 +27,7 @@ export enum SetupContent {
   PipetteVolume = 'Pipette volume',
   FullP50SingleName = 'Flex 1-Channel 50 µL',
   FullP50TiprackName = 'Opentrons Flex 96 Filter Tip Rack 50 µL',
+  FullP1000SingleName = 'Flex 1-Channel 1000 µL',
   GoBack = 'Go back',
   Confirm = 'Confirm',
   OpentronsFlex = 'Opentrons Flex',
@@ -33,9 +35,14 @@ export enum SetupContent {
   LetsGetStarted = 'Let’s start with the basics',
   WhatKindOfRobot = 'What kind of robot do you have?',
   Volume50 = '50 µL',
+  Volume200 = '200 µL',
   Volume1000 = '1000 µL',
   FilterTiprack50 = 'Filter Tip Rack 50 µL',
   Tiprack50 = 'Tip Rack 50 µL',
+  FilterTiprack1000 = 'Filter Tip Rack 1000 µL',
+  Tiprack1000 = 'Tip Rack 1000 µL',
+  FilterTiprack200 = 'Filter Tip Rack 200 µL',
+  Tiprack200 = 'Tip Rack 200 µL',
   Yes = 'Yes',
   No = 'No',
   Thermocycler = 'Thermocycler Module GEN2',
@@ -181,6 +188,14 @@ function selectWells(wells: string[]): void {
  * Add a comment to all records
  */
 export const SetupSteps = {
+  SelecTip: (tip: string): StepThunk => ({
+    call: () => {
+      cy.contains('Opentrons Flex 96 Filter Tip Rack').click()
+      const slotToUse = 'Tip Rack '
+      cy.contains(slotToUse + tip).click()
+    },
+  }),
+
   SelectLiquidClassT: (LiquidClass: string): StepThunk => ({
     call: () => {
       // eslint-disable-next-line no-template-curly-in-string
@@ -253,6 +268,21 @@ export const SetupSteps = {
         .click()
       cy.contains(SetupContent.Volume50).click()
       cy.contains(SetupContent.Tiprack50).click()
+      // optional: cy.contains(SetupContent.FilterTiprack50).click()
+    },
+  }),
+
+  SinglePipette1000: (): StepThunk => ({
+    call: () => {
+      cy.contains(SetupContent.AddPipette).click()
+      cy.contains('label', SetupContent.SingleChannel)
+        .should('exist')
+        .and('be.visible')
+        .click()
+      cy.contains(SetupContent.Volume1000).click()
+      cy.contains(SetupContent.Tiprack50).click()
+      cy.contains(SetupContent.Tiprack200).click()
+      cy.contains(SetupContent.Tiprack1000).click()
       // optional: cy.contains(SetupContent.FilterTiprack50).click()
     },
   }),
@@ -385,9 +415,9 @@ export const SetupSteps = {
     },
   }),
 
-  ChoseDeckSlotC2Labware: (): StepThunk => ({
+  ChoseDeckSlotC1Labware: (): StepThunk => ({
     call: () => {
-      chooseDeckSlot('C2')
+      chooseDeckSlot('C1')
         .find('.Box-sc-8ozbhb-0.kIDovv')
         .find('a[role="button"]')
         .contains(RegexSetupContent.slotText)
@@ -471,7 +501,7 @@ export const SetupSteps = {
    */
   AddLiquid: (): StepThunk => ({
     call: () => {
-      cy.contains('button', SetupContent.AddLiquid).click()
+      cy.contains('button', SetupContent.AddLiquid).click({ force: true })
     },
   }),
   /**
@@ -724,7 +754,7 @@ export const SetupSteps = {
   // Continue to the next part of the transfer form
   Continue: (): StepThunk => ({
     call: () => {
-      cy.contains('Continue').click()
+      cy.contains('Continue').click({ force: true })
     },
   }),
 
@@ -1218,9 +1248,11 @@ export const CompositeSetupSteps = {
     destinationLabware?: string | undefined,
     destWell?: string | undefined,
     volume?: string | undefined,
-    liquidClass?: string | undefined
+    liquidClass?: string | undefined,
+    tip?: string | undefined
   ): StepThunk => ({
     call: () => {
+      const Tip = tip ?? '50'
       const volumeToUse = volume ?? '1'
       const sourceLabwareToUse = sourceLabware ?? 'Bio-Rad 96 Well Plate'
       const sourceWellToUse = sourceWell ?? 'A1'
@@ -1231,6 +1263,7 @@ export const CompositeSetupSteps = {
       const liquidClassToUse = liquidClass ?? 'Aqueous'
 
       cy.log('Executing Test_LC step with the following parameters:')
+      cy.log(`  tip: ${tip}`)
       cy.log(`  Source Labware: ${sourceLabwareToUse}`)
       cy.log(`  Source Well: ${sourceWellToUse}`)
       cy.log(`  Destination Labware: ${destinationLabwareToUse}`)
@@ -1240,6 +1273,7 @@ export const CompositeSetupSteps = {
       SetupSteps.AddStep().call()
       SetupVerifications.TransferPopOut().call()
       UniversalSteps.Snapshot()
+      SetupSteps.SelecTip(Tip)
       SetupSteps.InputTransferVolume(volumeToUse).call()
       SetupSteps.ChoseSourceLabware().call()
       SetupSteps.selectDropdownLabware(sourceLabwareToUse).call()

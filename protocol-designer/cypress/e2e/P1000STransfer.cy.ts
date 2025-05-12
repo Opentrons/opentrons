@@ -6,7 +6,7 @@ import {
 import { StepBuilder } from '../support/StepBuilder'
 import { UniversalSteps } from '../support/UniversalSteps'
 
-describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', () => {
+describe('Transfer stepform testing Single Channel P1000uL', () => {
   beforeEach(() => {
     console.log('enablePrereleaseMode()')
     cy.visit('/')
@@ -37,29 +37,39 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
   }
 
   const GenerateMultipleTransferSteps = (steps: StepBuilder) => {
-    const tip = '50'
-    const volumes = ['1', '20', '50']
     const liquidClasses = ['Aqueous', 'Viscous', 'Volatile']
+    const tips = ['50', '200', '1000']
     const allWells = getAllWells()
     let wellIndex = 0
 
     for (const liquidClass of liquidClasses) {
-      for (const volume of volumes) {
-        const sourceWell = allWells[wellIndex % allWells.length]
-        const destWell = allWells[(wellIndex + 1) % allWells.length]
+      for (const tip of tips) {
+        let volumes: string[] = []
+        if (tip === '50') {
+          volumes = ['5', '10', '50']
+        } else if (tip === '200') {
+          volumes = ['5', '50', '200']
+        } else if (tip === '1000') {
+          volumes = ['10', '100', '1000']
+        }
 
-        steps.add(
-          CompositeSetupSteps.Test_LC(
-            tip,
-            'Bio-Rad 96 Well Plate', // sourceLabware
-            sourceWell,
-            'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt', // destinationLabware
-            destWell,
-            volume,
-            liquidClass
+        for (const volume of volumes) {
+          const sourceWell = allWells[wellIndex % allWells.length]
+          const destWell = allWells[(wellIndex + 1) % allWells.length]
+
+          steps.add(
+            CompositeSetupSteps.Test_LC(
+              'Bio-Rad 96 Well Plate', // sourceLabware
+              sourceWell,
+              'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt', // destinationLabware
+              destWell,
+              volume,
+              liquidClass,
+              tip // Using the current tip value
+            )
           )
-        )
-        wellIndex += 2
+          wellIndex += 2
+        }
       }
     }
   }
@@ -74,9 +84,6 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     steps.add(SetupVerifications.OnStep1())
     steps.add(SetupVerifications.FlexSelected())
     steps.add(SetupVerifications.OnStep2())
-
-    steps.add(SetupSteps.SingleChannelPipette50())
-    steps.add(SetupSteps.Save())
     steps.add(SetupSteps.SinglePipette1000())
     // steps.add(SetupVerifications.StepTwo50uL())
     // steps.add(SetupSteps.SinglePipette1000())
@@ -113,10 +120,13 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
         'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
       )
     )
-
-    // Add the multiple transfer steps using the custom function with sequential wells
     GenerateMultipleTransferSteps(steps)
-
     steps.execute()
+    // ToDo fix typo Tiprack -> Tip rack
+    /*
+    cy.contains('Opentrons Flex 96 Filter Tip Rack').click()
+    const slotToUse = 'Tip Rack '
+    cy.contains(slotToUse + '200').click()
+    */
   })
 })
