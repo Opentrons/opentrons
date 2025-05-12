@@ -7,7 +7,7 @@ import { getWarningContent } from '../../pages/ProtocolOverview/UnusedModalConte
 import type { Fixture } from '../../pages/ProtocolOverview'
 import type { ModuleOnDeck, PipetteOnDeck } from '../../step-forms'
 
-interface ProtocolExportHandlerProps {
+export interface USeProtocolExportHandlerProps {
   noCommands: boolean
   modulesWithoutStep: ModuleOnDeck[]
   pipettesWithoutStep: PipetteOnDeck[]
@@ -16,7 +16,7 @@ interface ProtocolExportHandlerProps {
   onConfirmExport: () => void
 }
 
-interface ProtocolExportHandlerResult {
+interface UseProtocolExportHandlerResult {
   handleExportClick: () => void
   exportWarningModalElement: JSX.Element | null
 }
@@ -28,7 +28,7 @@ export const useProtocolExportHandler = ({
   gripperWithoutStep,
   fixtureWithoutStep,
   onConfirmExport,
-}: ProtocolExportHandlerProps): ProtocolExportHandlerResult => {
+}: USeProtocolExportHandlerProps): UseProtocolExportHandlerResult => {
   const { t } = useTranslation(['protocol_overview', 'alert'])
   const [showModalWithWarning, setShowModalWithWarning] = useState<boolean>(
     false
