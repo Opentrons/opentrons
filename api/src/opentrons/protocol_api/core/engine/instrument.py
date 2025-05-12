@@ -1252,18 +1252,23 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             target_destinations = [dest] * len(source)
         else:
             target_destinations = dest
+
+        max_volume = min(
+            self.get_max_volume(),
+            self._engine_client.state.geometry.get_nominal_tip_geometry(
+                pipette_id=self.pipette_id,
+                labware_id=tip_racks[0][1].labware_id,
+                well_name=None,
+            ).volume,
+        )
+
+        aspirate_air_gap_by_volume = transfer_props.aspirate.retract.air_gap_by_volume
         source_dest_per_volume_step = (
             tx_commons.expand_for_volume_constraints_for_liquid_classes(
                 volumes=[volume for _ in range(len(source))],
                 targets=zip(source, target_destinations),
-                max_volume=min(
-                    self.get_max_volume(),
-                    self._engine_client.state.geometry.get_nominal_tip_geometry(
-                        pipette_id=self.pipette_id,
-                        labware_id=tip_racks[0][1].labware_id,
-                        well_name=None,
-                    ).volume,
-                ),
+                max_volume=max_volume,
+                air_gap=aspirate_air_gap_by_volume,
             )
         )
 
@@ -1515,6 +1520,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             tiprack_uri=tiprack_uri_for_transfer_props,
         )
 
+        aspirate_air_gap_by_volume = transfer_props.aspirate.retract.air_gap_by_volume
+        disposal_vol_by_volume = transfer_props.multi_dispense.disposal_by_volume
+        conditioning_vol_by_volume = (
+            transfer_props.multi_dispense.conditioning_by_volume
+        )
         # This will return a generator that provides pairs of destination well and
         # the volume to dispense into it
         dest_per_volume_step = (
@@ -1522,6 +1532,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 volumes=[volume for _ in range(len(dest))],
                 targets=dest,
                 max_volume=working_volume,
+                air_gap=aspirate_air_gap_by_volume,
+                disposal_vol=disposal_vol_by_volume,
+                conditioning_vol=conditioning_vol_by_volume,
             )
         )
 
@@ -1784,11 +1797,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             ).volume,
         )
 
+        aspirate_air_gap_by_volume = transfer_props.aspirate.retract.air_gap_by_volume
         source_per_volume_step = (
             tx_commons.expand_for_volume_constraints_for_liquid_classes(
                 volumes=[volume for _ in range(len(source))],
                 targets=source,
                 max_volume=max_volume,
+                air_gap=aspirate_air_gap_by_volume,
             )
         )
 

@@ -1,7 +1,9 @@
 """Common functions between v1 transfer and liquid-class-based transfer."""
 import enum
 import math
-from typing import Iterable, Generator, Tuple, TypeVar, Literal, List
+from typing import Iterable, Generator, Tuple, TypeVar, Literal, List, Union
+
+from opentrons.protocol_api._liquid_properties import LiquidHandlingPropertyByVolume
 
 
 class NoLiquidClassPropertyError(ValueError):
@@ -98,9 +100,32 @@ def expand_for_volume_constraints_for_liquid_classes(
     volumes: Iterable[float],
     targets: Iterable[Target],
     max_volume: float,
+    air_gap: Union[LiquidHandlingPropertyByVolume, float],
+    disposal_vol: Union[LiquidHandlingPropertyByVolume, float] = 0.0,
+    conditioning_vol: Union[LiquidHandlingPropertyByVolume, float] = 0.0,
 ) -> Generator[Tuple[float, "Target"], None, None]:
     """Split a sequence of proposed transfers to keep each under the max volume, splitting larger ones equally."""
     assert max_volume > 0
     for volume, target in zip(volumes, targets):
-        for split_volume in _split_volume_equally(volume, max_volume):
+        air_gap_volume = (
+            air_gap if isinstance(air_gap, float) else air_gap.get_for_volume(volume)
+        )
+        disposal_volume = (
+            disposal_vol
+            if isinstance(disposal_vol, float)
+            else disposal_vol.get_for_volume(volume)
+        )
+        conditioning_volume = (
+            conditioning_vol
+            if isinstance(conditioning_vol, float)
+            else conditioning_vol.get_for_volume(volume)
+        )
+        # If there is conditioning volume in a multi-aspirate, it will negate the air gap
+        if conditioning_volume > 0:
+            air_gap_volume = 0
+        adjusted_max_volume = (
+            max_volume - air_gap_volume - disposal_volume - conditioning_volume
+        )
+        assert adjusted_max_volume > 0
+        for split_volume in _split_volume_equally(volume, adjusted_max_volume):
             yield split_volume, target
