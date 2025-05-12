@@ -284,7 +284,7 @@ def run(protocol: ProtocolContext) -> None:
             protocol.delay(minutes=MAG_DELAY_MIN)
             transfer_plate_to_plate(ELUTION_VOL * 1.1, working_cols, final_cols, 6)
             temp.deactivate()
-        helpers.clean_up_plates(p1000_single, [sample_plate], waste, 1000)
+        helpers.clean_up_plates(protocol, p1000_single, [sample_plate], waste)
         helpers.move_labware_to_hs(protocol, working_plate, h_s, h_s_adapter)
 
     run(sample_plate_1)
@@ -293,7 +293,7 @@ def run(protocol: ProtocolContext) -> None:
     protocol.move_labware(sample_plate_2, "B2", True)
     run(sample_plate_2)
 
-    helpers.clean_up_plates(p1000_single, [wash_res], waste, 1000)
+    helpers.clean_up_plates(protocol, p1000_single, [wash_res], waste)
     helpers.find_liquid_height_of_all_wells(protocol, p1000_single, [waste_res["A1"]])
     if deactivate_modules_bool:
         helpers.deactivate_modules(protocol)
