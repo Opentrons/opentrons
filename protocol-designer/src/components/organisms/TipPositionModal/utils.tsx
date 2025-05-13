@@ -1,6 +1,11 @@
 import floor from 'lodash/floor'
 import round from 'lodash/round'
-import { WELL_BOTTOM, WELL_CENTER, WELL_TOP } from '@opentrons/shared-data'
+
+import {
+  POSITION_REFERENCE_CENTER,
+  POSITION_REFERENCE_TOP,
+} from '@opentrons/shared-data'
+
 import {
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
@@ -116,23 +121,6 @@ export const getMinMaxWidth = (width: number): MinMaxValues => {
   }
 }
 
-export const getMmFromBottom = (
-  zValue: number,
-  reference: PositionReference,
-  wellDepth: number
-): number => {
-  switch (reference) {
-    case WELL_BOTTOM:
-      return zValue
-    case WELL_CENTER:
-      return wellDepth / 2 + zValue
-    case WELL_TOP:
-      return wellDepth + zValue
-    default:
-      return zValue
-  }
-}
-
 export const getIsZValueAtBottom = (
   zValue: string,
   wellDepth: number,
@@ -140,10 +128,10 @@ export const getIsZValueAtBottom = (
 ): boolean => {
   let minZValue = 0
   switch (reference) {
-    case WELL_CENTER:
+    case POSITION_REFERENCE_CENTER:
       minZValue = -wellDepth / 2
       break
-    case WELL_TOP:
+    case POSITION_REFERENCE_TOP:
       minZValue = -wellDepth
       break
     default:

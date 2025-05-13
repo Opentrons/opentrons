@@ -1,13 +1,14 @@
 import { useMemo } from 'react'
 
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { getUniqueValidLwLocationInfoByAnalysis } from './getUniqueValidLwLocationInfoByAnalysis'
-import { getLPCLabwareInfoFrom } from './getLPCLabwareInfoFrom'
-import { getLPCSearchParams } from './getLPCSearchParams'
 import { useNotifySearchLabwareOffsets } from '/app/resources/labware_offsets'
 import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
+
+import { getLPCLabwareInfoFrom } from './getLPCLabwareInfoFrom'
+import { getLPCSearchParams } from './getLPCSearchParams'
+import { getUniqueValidLwLocationInfoByAnalysis } from './getUniqueValidLwLocationInfoByAnalysis'
 
 import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'

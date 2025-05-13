@@ -1,13 +1,14 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import * as RobotApi from '/app/redux/robot-api'
-import * as Fixtures from '/app/redux/networking/__fixtures__'
-import { useWifiList } from '/app/resources/networking/hooks'
 import * as Networking from '/app/redux/networking'
+import * as Fixtures from '/app/redux/networking/__fixtures__'
+import * as RobotApi from '/app/redux/robot-api'
+import { useWifiList } from '/app/resources/networking/hooks'
+
 import { ConnectViaWifi } from '../'
 
 vi.mock('/app/redux/discovery')

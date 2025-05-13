@@ -1,29 +1,31 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockRecoveryContentProps } from '../../__fixtures__'
-import {
-  SelectRecoveryOption,
-  RecoveryOptions,
-  getRecoveryOptions,
-  GENERAL_ERROR_OPTIONS,
-  OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
-  OVERPRESSURE_PREPARE_TO_ASPIRATE,
-  OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
-  NO_LIQUID_DETECTED_OPTIONS,
-  TIP_NOT_DETECTED_OPTIONS,
-  TIP_DROP_FAILED_OPTIONS,
-  GRIPPER_ERROR_OPTIONS,
-  STALL_OR_COLLISION_OPTIONS,
-} from '../SelectRecoveryOption'
-import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
-import { clickButtonLabeled } from '../../__tests__/util'
 
-import type { ComponentProps } from 'react'
+import { mockRecoveryContentProps } from '../../__fixtures__'
+import { clickButtonLabeled } from '../../__tests__/util'
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
+import {
+  GENERAL_ERROR_OPTIONS,
+  getRecoveryOptions,
+  GRIPPER_ERROR_OPTIONS,
+  LABWARE_MISSING_IN_SHUTTLE_OPTIONS,
+  NO_LIQUID_DETECTED_OPTIONS,
+  OVERPRESSURE_PREPARE_TO_ASPIRATE,
+  OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
+  OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
+  RecoveryOptions,
+  SelectRecoveryOption,
+  STALL_OR_COLLISION_OPTIONS,
+  TIP_DROP_FAILED_OPTIONS,
+  TIP_NOT_DETECTED_OPTIONS,
+} from '../SelectRecoveryOption'
+
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 const renderSelectRecoveryOption = (
   props: ComponentProps<typeof SelectRecoveryOption>
@@ -85,7 +87,10 @@ describe('SelectRecoveryOption', () => {
       .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE, expect.any(String))
       .thenReturn('Retry with new tips')
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE, expect.any(String))
+      .calledWith(
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+        expect.any(String)
+      )
       .thenReturn('Manually fill well and skip to next step')
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE, expect.any(String))
@@ -166,7 +171,7 @@ describe('SelectRecoveryOption', () => {
     clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-      RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE
+      RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE
     )
   })
 
@@ -283,7 +288,10 @@ describe('RecoveryOptions', () => {
       .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE, expect.any(String))
       .thenReturn('Retry with new tips')
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE, expect.any(String))
+      .calledWith(
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+        expect.any(String)
+      )
       .thenReturn('Manually fill well and skip to next step')
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE, expect.any(String))
@@ -315,6 +323,18 @@ describe('RecoveryOptions', () => {
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.HOME_AND_RETRY.ROUTE, expect.any(String))
       .thenReturn('Home gantry and retry')
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(
+        RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+        expect.any(String)
+      )
+      .thenReturn('manually_load_labware_into_shuttle_and_skips')
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+        expect.any(String)
+      )
+      .thenReturn('replace_labware_in_stacker_and_retry')
   })
 
   it('renders valid recovery options for a general error errorKind', () => {
@@ -384,6 +404,21 @@ describe('RecoveryOptions', () => {
 
     screen.getByRole('label', { name: 'Skip to next step with same tips' })
     screen.getByRole('label', { name: 'Skip to next step with new tips' })
+    screen.getByRole('label', { name: 'Cancel run' })
+  })
+
+  it(`renders valid recovery options for a ${ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE} errorKind`, () => {
+    props = {
+      ...props,
+      validRecoveryOptions: LABWARE_MISSING_IN_SHUTTLE_OPTIONS,
+    }
+
+    renderRecoveryOptions(props)
+
+    screen.getByRole('label', { name: 'replace_labware_in_stacker_and_retry' })
+    screen.getByRole('label', {
+      name: 'manually_load_labware_into_shuttle_and_skips',
+    })
     screen.getByRole('label', { name: 'Cancel run' })
   })
 
@@ -515,5 +550,14 @@ describe('getRecoveryOptions', () => {
       ERROR_KINDS.STALL_OR_COLLISION
     )
     expect(stallOrCollisionOptions).toBe(STALL_OR_COLLISION_OPTIONS)
+  })
+
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE}`, () => {
+    const labwareMissingInShuttleOptions = getRecoveryOptions(
+      ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE
+    )
+    expect(labwareMissingInShuttleOptions).toBe(
+      LABWARE_MISSING_IN_SHUTTLE_OPTIONS
+    )
   })
 })

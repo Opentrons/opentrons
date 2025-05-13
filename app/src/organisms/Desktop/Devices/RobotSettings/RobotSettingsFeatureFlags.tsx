@@ -1,29 +1,29 @@
 import { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ToggleButton } from '/app/atoms/buttons'
 import {
-  updateSetting,
-  getRobotSettings,
   fetchSettings,
+  getRobotSettings,
+  updateSetting,
 } from '/app/redux/robot-settings'
 
 import type { MouseEventHandler } from 'react'
-import type { State, Dispatch } from '/app/redux/types'
 import type {
   RobotSettings,
   RobotSettingsField,
 } from '/app/redux/robot-settings/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface RobotSettingsFeatureFlagsProps {
   robotName: string

@@ -1,18 +1,21 @@
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-  ListItem,
-  StyledText,
-  InfoScreen,
   ALIGN_CENTER,
-  Icon,
-  useHoverTooltip,
-  Tooltip,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  InfoScreen,
+  ListItem,
+  SPACING,
+  StyledText,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
+
 import { ABSORBANCE_READER_COLOR_BY_WAVELENGTH } from '../../../../../../constants'
+
 import type { Initialization } from '../../../../../../step-forms/types'
 
 const getWavelengthDisplay = (

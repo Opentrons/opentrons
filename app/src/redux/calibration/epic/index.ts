@@ -1,7 +1,8 @@
 import { combineEpics } from 'redux-observable'
-import { fetchCalibrationStatusEpic } from './fetchCalibrationStatusEpic'
+
 import { pipetteOffsetCalibrationsEpic } from '../pipette-offset/epic'
 import { tipLengthCalibrationsEpic } from '../tip-length/epic'
+import { fetchCalibrationStatusEpic } from './fetchCalibrationStatusEpic'
 
 import type { Epic } from '../../types'
 

@@ -1,7 +1,9 @@
 import styled from 'styled-components'
+
 import { COLORS } from '../../helix-design-system'
+import { ALIGN_CENTER, CURSOR_POINTER } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { ALIGN_CENTER } from '../../styles'
+
 import type { StyleProps } from '../../primitives'
 
 interface ButtonProps extends StyleProps {
@@ -9,6 +11,7 @@ interface ButtonProps extends StyleProps {
   isAlert?: boolean
 }
 export const MenuItem = styled.button<ButtonProps>`
+  cursor: ${CURSOR_POINTER};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSizeP};
   background-color: ${COLORS.transparent};

@@ -1,6 +1,7 @@
-import { useMemo, useState, Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import round from 'lodash/round'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -19,7 +20,6 @@ import {
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
 import {
-  getDeckDefFromRobotType,
   getPositionFromSlotId,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
@@ -27,15 +27,17 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
-import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
+
 import { FixedTrashText } from '../../../components/molecules'
-import { getSelectedTerminalItemId } from '../../../ui/steps'
+import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
+import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
+import { getHasGen1MultiChannelPipette } from '../../../step-forms'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { getSelectedTerminalItemId } from '../../../ui/steps'
 import { DeckSetupDetails } from './DeckSetupDetails'
-import { DECK_SETUP_TOOLS_WIDTH_REM, DeckSetupTools } from './DeckSetupTools'
+import { DeckSetupToolbox } from './DeckSetupToolbox'
 import {
   animateZoom,
   getCutoutIdForAddressableArea,
@@ -48,15 +50,12 @@ import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   AddressableAreaName,
   CutoutId,
-  ModuleModel,
+  DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
-import type { Fixture } from './constants'
 
-const WASTE_CHUTE_SPACE = 30
-const DETAILS_HOVER_SPACE = 60
-const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem' // for Protocol Steps
+const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem'
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
@@ -75,17 +74,28 @@ interface DeckSetupContainerProps {
   setHoverSlot: Dispatch<SetStateAction<string | null>>
   hoverSlot: string | null
   robotType: RobotType
+  deckDef: DeckDefinition
+  setViewBox: Dispatch<SetStateAction<string>>
+  viewBox: string
+  initialViewBox: string
 }
 export function DeckSetupContainer(
   props: DeckSetupContainerProps
 ): JSX.Element {
-  const { robotType, hoverSlot, setHoverSlot } = props
+  const {
+    robotType,
+    hoverSlot,
+    setHoverSlot,
+    deckDef,
+    initialViewBox,
+    viewBox,
+    setViewBox,
+  } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch<any>()
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const terminalItemId = useSelector(getSelectedTerminalItemId)
-  const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
@@ -106,26 +116,11 @@ export function DeckSetupContainer(
       wasteChuteFixtures.length > 0
   )
 
-  const hasWasteChute =
-    wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
-
   const windowInnerWidthRem = window.innerWidth / 16
   const deckMapRatio = round(
     (windowInnerWidthRem - DECK_SETUP_TOOLS_WIDTH_REM) / windowInnerWidthRem,
     2
   )
-
-  const viewBoxX = deckDef.cornerOffsetFromOrigin[0]
-  const viewBoxY = hasWasteChute
-    ? deckDef.cornerOffsetFromOrigin[1] -
-      WASTE_CHUTE_SPACE -
-      DETAILS_HOVER_SPACE
-    : deckDef.cornerOffsetFromOrigin[1]
-  const viewBoxWidth = deckDef.dimensions[0] / deckMapRatio
-  const viewBoxHeight = deckDef.dimensions[1] + DETAILS_HOVER_SPACE
-  const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
-
-  const [viewBox, setViewBox] = useState<string>(initialViewBox)
 
   const isZoomed = Object.values(zoomIn).some(val => val != null)
   const viewBoxNumerical = viewBox?.split(' ').map(val => Number(val)) ?? []
@@ -138,10 +133,6 @@ export function DeckSetupContainer(
   const viewBoxAdjusted = viewBoxAdjustedNumerical.reduce((acc, num, i) => {
     return i < viewBoxNumerical.length - 1 ? acc + `${num} ` : acc + `${num}`
   }, '')
-
-  const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
-  const [hoveredModule, setHoveredModule] = useState<ModuleModel | null>(null)
-  const [hoveredFixture, setHoveredFixture] = useState<Fixture | null>(null)
 
   const addEquipment = (slotId: string): void => {
     const cutoutId =
@@ -343,9 +334,6 @@ export function DeckSetupContainer(
                   )}
                   <DeckSetupDetails
                     selectedZoomInSlot={zoomIn.slot ?? undefined}
-                    hoveredLabware={hoveredLabware}
-                    hoveredModule={hoveredModule}
-                    hoveredFixture={hoveredFixture}
                     hover={hoverSlot}
                     terminalItemId={terminalItemId}
                     setHover={setHoverSlot}
@@ -369,11 +357,7 @@ export function DeckSetupContainer(
           </Flex>
         </Flex>
         {zoomIn.slot != null && zoomIn.cutout != null ? (
-          <DeckSetupTools
-            onDeckProps={{
-              setHoveredFixture,
-              setHoveredModule,
-            }}
+          <DeckSetupToolbox
             onCloseClick={() => {
               dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
               animateZoom({
@@ -382,7 +366,6 @@ export function DeckSetupContainer(
                 setViewBox,
               })
             }}
-            setHoveredLabware={setHoveredLabware}
           />
         ) : null}
       </Flex>

@@ -7,15 +7,15 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import imgSrc from '/app/assets/images/on-device-display/setup_instructions_qr_code.png'
 import { OddModal } from '/app/molecules/OddModal'
 
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-
-import imgSrc from '/app/assets/images/on-device-display/setup_instructions_qr_code.png'
 
 const INSTRUCTIONS_URL = 'support.opentrons.com/s/modules'
 

@@ -6,69 +6,74 @@ import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  NO_WRAP,
   DIRECTION_ROW,
-  FLEX_MAX_CONTENT,
+  Divider,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
-  StyledText,
   LegacyStyledText,
+  NO_WRAP,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  useInstrumentsQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   parseAllRequiredModuleModels,
 } from '@opentrons/shared-data'
-import { useProtocolQuery } from '@opentrons/react-api-client'
 
-import { Line } from '/app/atoms/structure'
+import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import { InfoMessage } from '/app/molecules/InfoMessage'
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
+import {
+  appliedOffsetsToRun,
+  getMissingSetupSteps,
+  LABWARE_SETUP_STEP_KEY,
+  LPC_STEP_KEY,
+  MODULE_SETUP_STEP_KEY,
+  ROBOT_CALIBRATION_STEP_KEY,
+  selectAreOffsetsApplied,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+  selectTotalCountLocationSpecificOffsets,
+  updateRunSetupStepsComplete,
+} from '/app/redux/protocol-runs'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useUpdateClientLPC } from '/app/resources/client_data'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
-import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
+  useModuleCalibrationStatus,
   useMostRecentCompletedAnalysis,
-  useRunPipetteInfoByMount,
+  useNotifyRunQuery,
+  useProtocolAnalysisErrors,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useRunPipetteInfoByMount,
   useUnmatchedModulesForProtocol,
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
-  useNotifyRunQuery,
 } from '/app/resources/runs'
-import {
-  ROBOT_CALIBRATION_STEP_KEY,
-  MODULE_SETUP_STEP_KEY,
-  LPC_STEP_KEY,
-  LABWARE_SETUP_STEP_KEY,
-  updateRunSetupStepsComplete,
-  getMissingSetupSteps,
-  selectIsAnyNecessaryDefaultOffsetMissing,
-  appliedOffsetsToRun,
-  selectAreOffsetsApplied,
-  selectTotalCountLocationSpecificOffsets,
-} from '/app/redux/protocol-runs'
-import { SetupLabware } from './SetupLabware'
-import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
-import { SetupRobotCalibration } from './SetupRobotCalibration'
-import { SetupModuleAndDeck } from './SetupModuleAndDeck'
-import { SetupStep } from './SetupStep'
+
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
-import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
-import { useUpdateClientLPC } from '/app/resources/client_data'
+import { SetupLabware } from './SetupLabware'
+import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
+import { SetupModuleAndDeck } from './SetupModuleAndDeck'
+import { SetupRobotCalibration } from './SetupRobotCalibration'
+import { SetupStep } from './SetupStep'
 
 import type { RefObject } from 'react'
-import type { Dispatch, State } from '/app/redux/types'
 import type { StepKey } from '/app/redux/protocol-runs'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface ProtocolRunSetupProps {
   protocolRunHeaderRef: RefObject<HTMLDivElement> | null
@@ -143,7 +148,8 @@ export function ProtocolRunSetup({
   }, [flexOffsetsApplied])
 
   const offsetsConfirmed = isFlex
-    ? flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY)
+    ? runHasStarted ||
+      (flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY))
     : !missingSteps.includes(LPC_STEP_KEY)
   const buildLPCIncompleteText = (): string | null => {
     if (isFlex) {
@@ -179,6 +185,13 @@ export function ProtocolRunSetup({
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
 
   const isMissingModule = missingModuleIds.length > 0
+
+  const { data: attachedInstruments } = useInstrumentsQuery()
+
+  const incompleteInstrumentCount: number | null =
+    protocolAnalysis != null && attachedInstruments != null
+      ? getIncompleteInstrumentCount(protocolAnalysis, attachedInstruments)
+      : null
 
   const hasModules = protocolAnalysis != null && modules.length > 0
   // need config compatibility (including check for single slot conflicts)
@@ -230,7 +243,9 @@ export function ProtocolRunSetup({
       rightElProps: {
         stepKey: ROBOT_CALIBRATION_STEP_KEY,
         complete: calibrationStatusRobot.complete,
-        completeText: t('calibration_ready'),
+        completeText: isFlex
+          ? t('instruments_attached')
+          : t('calibration_ready'),
         missingHardware: isMissingPipette,
         incompleteText: t('calibration_needed'),
         missingHardwareText: t('action_needed'),
@@ -259,10 +274,9 @@ export function ProtocolRunSetup({
           calibrationStatusModules.complete &&
           !isMissingModule &&
           !isFixtureMismatch,
-        completeText:
-          isFlex && hasModules
-            ? t('calibration_ready')
-            : t('deck_hardware_ready'),
+        completeText: isFlex
+          ? t('modules_and_fixtures_ready')
+          : t('modules_ready'),
         incompleteText:
           isFlex && hasModules ? t('calibration_needed') : t('action_needed'),
         missingHardware: isMissingModule || isFixtureMismatch,
@@ -283,6 +297,10 @@ export function ProtocolRunSetup({
             }
           }}
           offsetsConfirmed={offsetsConfirmed}
+          hasMissingModulesForFlex={isMissingModule}
+          hasMissingCalForFlex={
+            incompleteInstrumentCount != null && incompleteInstrumentCount > 0
+          }
           lpcUtils={lpcUtils}
         />
       ),
@@ -396,7 +414,7 @@ export function ProtocolRunSetup({
                     </SetupStep>
                   )}
                   {index !== orderedSteps.length - 1 ? (
-                    <Line marginTop={SPACING.spacing24} />
+                    <Divider marginTop={SPACING.spacing24} marginBottom={0} />
                   ) : null}
                 </Flex>
               )

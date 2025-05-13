@@ -7,18 +7,22 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
+
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
-import * as warningCreators from '../../warningCreators'
 import {
   formatPyStr,
   getCutoutIdByAddressableArea,
+  getFullStackFromLabwares,
   getLabwareHasLiquid,
+  getSlotInLocationStack,
   getTiprackHasTips,
   OFF_DECK,
   PROTOCOL_CONTEXT_NAME,
   uuid,
 } from '../../utils'
+import * as warningCreators from '../../warningCreators'
+
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -74,14 +78,40 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       ? Object.values(newLocation)[0]
       : null
 
-  const multipleObjectsInSameSlotLabware =
-    Object.values(prevRobotState.labware).find(
-      labware => labware.slot === newLocationSlot
-    ) != null
+  const largestStack =
+    newLocationSlot != null
+      ? getFullStackFromLabwares(prevRobotState.labware, newLocationSlot)
+      : []
+  const largestStackLoadnames = largestStack?.reduce<string[]>(
+    (acc: string[], itemId: string) => {
+      const labware = labwareEntities[itemId]
+      const loadName = labware?.def.parameters.loadName
+      const isAdapter = labware?.def.allowedRoles?.includes('adapter')
 
-  const multipleObjectsInSameSlotModule = Object.values(
-    prevRobotState.modules
-  ).find(module => module.slot === newLocationSlot)
+      if (loadName !== undefined && !isAdapter) {
+        acc.push(loadName)
+      }
+
+      return acc
+    },
+    []
+  )
+  const labwareIdLoadname = Object.values(labwareEntities).find(
+    lw => lw.id === labwareId
+  )?.def.parameters.loadName
+  const isStackingAllowed = largestStackLoadnames?.some(loadName =>
+    Object.values(labwareEntities).some(lw => {
+      return (
+        lw.def.parameters.loadName === loadName &&
+        labwareIdLoadname != null &&
+        lw.def.compatibleParentLabware?.includes(labwareIdLoadname)
+      )
+    })
+  )
+  const hasMultipleObjectsInSameSlot =
+    largestStackLoadnames?.length > 0 &&
+    !isStackingAllowed &&
+    !newLocationInWasteChute
 
   if (!labwareId || !prevRobotState.labware[labwareId]) {
     errors.push(
@@ -91,14 +121,12 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       })
     )
   } else if (
-    prevRobotState.labware[labwareId].slot === 'offDeck' &&
+    getSlotInLocationStack(prevRobotState.labware[labwareId].stack) ===
+      'offDeck' &&
     useGripper
   ) {
     errors.push(errorCreators.labwareOffDeck())
-  } else if (
-    multipleObjectsInSameSlotLabware ||
-    multipleObjectsInSameSlotModule
-  ) {
+  } else if (hasMultipleObjectsInSameSlot) {
     errors.push(errorCreators.multipleEntitiesOnSameSlotName())
   }
 
@@ -120,17 +148,26 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     errors.push(errorCreators.pipetteHasTip())
   }
 
-  const initialLabwareSlot = prevRobotState.labware[labwareId]?.slot
+  const initialLabwareSlot =
+    prevRobotState.labware[labwareId] != null
+      ? getSlotInLocationStack(prevRobotState.labware[labwareId].stack)
+      : null
 
   if (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') {
     errors.push(errorCreators.labwareDiscarded())
   }
-  const initialAdapterSlot = prevRobotState.labware[initialLabwareSlot]?.slot
+  const initialAdapterSlot =
+    initialLabwareSlot != null &&
+    prevRobotState.labware[initialLabwareSlot] != null
+      ? getSlotInLocationStack(prevRobotState.labware[initialLabwareSlot].stack)
+      : null
   const initialSlot =
     initialAdapterSlot != null ? initialAdapterSlot : initialLabwareSlot
 
   const initialModuleState =
-    prevRobotState.modules[initialSlot]?.moduleState ?? null
+    initialSlot != null
+      ? prevRobotState.modules[initialSlot]?.moduleState
+      : null
   if (initialModuleState != null) {
     if (
       initialModuleState.type === THERMOCYCLER_MODULE_TYPE &&
@@ -165,7 +202,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       : null
 
   const destModuleOrSlotUnderAdapterId =
-    destAdapterId != null ? prevRobotState.labware[destAdapterId].slot : null
+    destAdapterId != null
+      ? prevRobotState.labware[destAdapterId].stack[1]
+      : null
   const destinationModuleIdOrSlot =
     destModuleOrSlotUnderAdapterId != null
       ? destModuleOrSlotUnderAdapterId

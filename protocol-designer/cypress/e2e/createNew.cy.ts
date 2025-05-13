@@ -1,6 +1,6 @@
-import { UniversalSteps } from '../support/UniversalSteps'
 import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
+import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('The Redesigned Create Protocol Landing Page', () => {
   beforeEach(() => {

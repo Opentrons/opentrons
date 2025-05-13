@@ -1,10 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import { useToaster } from '/app/organisms/ToasterOven'
 
 import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
+
+import { useToaster } from '/app/organisms/ToasterOven'
+
+import { DISPENSE_SETTING_OPTIONS as SETTING_OPTIONS } from '../../constants'
 
 import type {
   DispenseSettingOption,
@@ -64,15 +67,19 @@ export function useDispenseSettingsConfig({
         setSelectedSetting('dispense_tip_position')
       },
     },
-    // ToDo replace dummy configs for submerge
     {
       option: 'dispense_submerge',
       copy: t('submerge'),
-      value: 'dummy Submerge',
-      enabled: false,
+      value:
+        state.submergeDispense !== undefined
+          ? t('submerge_value', {
+              speed: state.submergeDispense.speed,
+              position: state.submergeDispense.positionFromBottom,
+            })
+          : '',
+      enabled: true,
       onClick: () => {
-        // (kk: 04/07/2025)ToDo add submerge setting
-        // setSelectedSetting('submerge')
+        setSelectedSetting(SETTING_OPTIONS.DISPENSE_SUBMERGE)
       },
     },
     {

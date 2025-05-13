@@ -1,12 +1,13 @@
 import {
-  fixtureTiprack300ul,
   fixtureCalibrationBlock,
+  fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import type {
-  TipLengthCalibrationSessionDetails,
-  CalibrationLabware,
-} from '../types'
+
 import type { TipLengthCalibrationSessionParams } from '../tip-length-calibration/types'
+import type {
+  CalibrationLabware,
+  TipLengthCalibrationSessionDetails,
+} from '../types'
 
 export const mockTipLengthTipRack: CalibrationLabware = {
   slot: '8',

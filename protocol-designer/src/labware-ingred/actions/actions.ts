@@ -1,15 +1,17 @@
 import { createAction } from 'redux-actions'
+
 import { getLiquidEntities } from '../../step-forms/selectors'
 import { selectors } from '../selectors'
-import type { StepFieldName } from '../../form-types'
-import type { DeckSlot, ThunkAction } from '../../types'
-import type { Fixture, IngredInputs } from '../types'
+
 import type {
   CutoutId,
   LabwareDisplayCategory,
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { LiquidEntities, LiquidEntity } from '@opentrons/step-generation'
+import type { StepFieldName } from '../../form-types'
+import type { DeckSlot, ThunkAction } from '../../types'
+import type { Fixture, IngredInputs } from '../types'
 
 // ===== Labware selector actions =====
 export interface OpenAddLabwareModalAction {
@@ -251,28 +253,28 @@ export const editLiquidGroup: (
 }
 
 //  NOTE: the following actions are for selecting labware/hardware for the zoomed in slot
-export interface SelectLabwareAction {
-  type: 'SELECT_LABWARE'
+export interface SelectTopLabwareAction {
+  type: 'SELECT_TOP_LABWARE'
   payload: {
     labwareDefUri: string | null
   }
 }
-export const selectLabware: (
-  payload: SelectLabwareAction['payload']
-) => SelectLabwareAction = payload => ({
-  type: 'SELECT_LABWARE',
+export const selectTopLabware: (
+  payload: SelectTopLabwareAction['payload']
+) => SelectTopLabwareAction = payload => ({
+  type: 'SELECT_TOP_LABWARE',
   payload,
 })
-export interface SelectNestedLabwareAction {
-  type: 'SELECT_NESTED_LABWARE'
+export interface SelectAdapterAction {
+  type: 'SELECT_ADAPTER'
   payload: {
-    nestedLabwareDefUri: string | null
+    adapterDefUri: string | null
   }
 }
-export const selectNestedLabware: (
-  payload: SelectNestedLabwareAction['payload']
-) => SelectNestedLabwareAction = payload => ({
-  type: 'SELECT_NESTED_LABWARE',
+export const selectAdapter: (
+  payload: SelectAdapterAction['payload']
+) => SelectAdapterAction = payload => ({
+  type: 'SELECT_ADAPTER',
   payload,
 })
 

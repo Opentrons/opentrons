@@ -1,5 +1,5 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -53,7 +53,7 @@ describe('SelectPipettePath', () => {
     screen.getByText('Single transfers')
   })
 
-  it('should render sinle transfer when transfer is 1:n', () => {
+  it('should render single transfer when transfer is 1:n', () => {
     props.state.sourceWells = ['A1']
     props.state.destinationWells = ['A1', 'A2']
     render(props)
@@ -61,7 +61,7 @@ describe('SelectPipettePath', () => {
     screen.getByText('Multi-dispense')
   })
 
-  it('should render sinle transfer when transfer is n:1', () => {
+  it('should render single transfer when transfer is n:1', () => {
     props.state.sourceWells = ['A1', 'A2']
     props.state.destinationWells = ['A1']
     render(props)
@@ -69,7 +69,7 @@ describe('SelectPipettePath', () => {
     screen.getByText('Multi-aspirate')
   })
 
-  it('should call mock function when tappin exit button', () => {
+  it('should call mock function when tapping exit button', () => {
     render(props)
     fireEvent.click(screen.getByText('Exit'))
     expect(props.exitButtonProps.onClick).toHaveBeenCalled()
@@ -79,7 +79,10 @@ describe('SelectPipettePath', () => {
     render(props)
     fireEvent.click(screen.getByText('Single transfers'))
     fireEvent.click(screen.getByText('Continue'))
-    expect(props.dispatch).toHaveBeenCalled()
+    expect(props.dispatch).toHaveBeenCalledWith({
+      type: 'SET_PIPETTE_PATH',
+      path: 'single',
+    })
     expect(props.onNext).toHaveBeenCalled()
   })
 })

@@ -43,12 +43,12 @@ export enum SetupContent {
   Tempdeck2 = 'Temperature Module GEN2',
   MagBlock = 'Magnetic Block GEN1',
   PlateReader = 'Absorbance Plate Reader Module GEN1',
-  ModulePageH = 'Add your modules',
-  ModulePageB = 'Select modules to use in your protocol.',
+  ModulePageH = 'Configure your deck hardware',
+  ModulePageB = 'Place the modules and fixtures that you are using for this protocol onto the deck.',
   EditProtocol = 'Edit protocol',
   EditSlot = 'Edit slot',
-  AddLabwareToDeck = 'Add hardware/labware',
-  EditHardwareLabwareOnDeck = 'Edit hardware/labware',
+  AddLabwareToDeck = 'Add labware',
+  EditHardwareLabwareOnDeck = 'Edit labware',
   LabwareH = 'Labware',
   WellPlatesCat = 'Well plates',
   AddLiquid = 'Add liquid',
@@ -187,7 +187,7 @@ export const SetupSteps = {
   SelectLabwareByDisplayName: (displayName: string): StepThunk => ({
     call: () => {
       selectLabwareByDisplayName(displayName)
-
+      cy.get('button[data-testid="SelectLabwareModal_confirm"]').click()
       cy.get(SetupLocators.DoneButtonLabwareSelection).click({ force: true })
     },
   }),
@@ -255,7 +255,8 @@ export const SetupSteps = {
    */
   AddThermocycler: (): StepThunk => ({
     call: () => {
-      cy.contains(SetupContent.Thermocycler).click()
+      cy.contains(SetupContent.Thermocycler)
+      cy.get('button[data-testid="Thermocycler Module GEN2"]').click()
     },
   }),
 
@@ -264,7 +265,10 @@ export const SetupSteps = {
    */
   AddHeaterShaker: (): StepThunk => ({
     call: () => {
+      cy.get('button[data-testid="cutoutD1"]').click()
+      cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.HeaterShaker).click()
+      cy.get('button[data-testid="Heater-Shaker Module GEN1"]').click()
     },
   }),
 
@@ -273,7 +277,10 @@ export const SetupSteps = {
    */
   AddTempdeck2: (): StepThunk => ({
     call: () => {
+      cy.get('button[data-testid="cutoutC1"]').click()
+      cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.Tempdeck2).click()
+      cy.get('button[data-testid="Temperature Module GEN2"]').click()
     },
   }),
 
@@ -282,7 +289,9 @@ export const SetupSteps = {
    */
   AddMagBlock: (): StepThunk => ({
     call: () => {
+      cy.get('button[data-testid="cutoutB2"]').click()
       cy.contains(SetupContent.MagBlock).click()
+      cy.get('button[data-testid="Magnetic Block GEN1"]').click()
     },
   }),
 
@@ -304,9 +313,32 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Click "No" for thermocycler.
+   */
+  NoThermocycler: (): StepThunk => ({
+    call: () => {
+      cy.get('[data-testid="BasicsButtons_thermocycler_no"]').click()
+    },
+  }),
+
+  /**
+   * Click "No" for wasteChute.
+   */
+  NoWasteChute: (): StepThunk => ({
+    call: () => {
+      cy.get('[data-testid="BasicsButtons_wasteChute_no"]').click()
+    },
+  }),
+
   AddPlateReader: (): StepThunk => ({
     call: () => {
+      cy.get('button[data-testid="cutoutD3"]').click()
+      cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.PlateReader).click()
+      cy.get(
+        'button[data-testid="Absorbance Plate Reader Module GEN1"]'
+      ).click()
     },
   }),
 
@@ -369,7 +401,7 @@ export const SetupSteps = {
    */
   AddHardwareLabware: (): StepThunk => ({
     call: () => {
-      cy.contains(SetupContent.AddLabwareToDeck).click({ force: true })
+      cy.get('button[data-testid="SlotOverflowMenu_openTools"]').click()
     },
   }),
 
@@ -378,7 +410,7 @@ export const SetupSteps = {
    */
   EditHardwareLabwareOnDeck: (): StepThunk => ({
     call: () => {
-      cy.contains(SetupContent.EditHardwareLabwareOnDeck).click()
+      cy.get('button[data-testid="SlotOverflowMenu_openTools"]').click()
     },
   }),
 
@@ -401,6 +433,15 @@ export const SetupSteps = {
   }),
 
   /**
+   * Open SelectLabwareModal to a deck slot.
+   */
+  OpenSelectLabwareModal: (): StepThunk => ({
+    call: () => {
+      cy.get('button[data-testid="EmptySelectorButton_click"]').click()
+    },
+  }),
+
+  /**
    * Choose deck slot C2 with a labware-locating approach.
    */
 
@@ -413,8 +454,6 @@ export const SetupSteps = {
   ChoseDeckSlotWithLabware: (deckslot: string): StepThunk => ({
     call: () => {
       chooseDeckSlot(deckslot)
-        .find('.Box-sc-8ozbhb-0.kIDovv')
-        .find('a[role="button"]')
         .contains(RegexSetupContent.slotText)
         .click({ force: true })
     },
@@ -912,6 +951,8 @@ export const SetupVerifications = {
     call: () => {
       cy.contains(SetupContent.ModulePageH).should('be.visible')
       cy.contains(SetupContent.ModulePageB).should('be.visible')
+      cy.get('button[data-testid="cutoutB1"]').click()
+      cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.Thermocycler).should('be.visible')
       cy.contains(SetupContent.HeaterShaker).should('be.visible')
       cy.contains(SetupContent.MagBlock).should('be.visible')
@@ -960,7 +1001,10 @@ export const SetupVerifications = {
 
   AbsorbanceNotSelectable: (): StepThunk => ({
     call: () => {
-      cy.contains('button', SetupContent.PlateReader).should('be.disabled')
+      cy.get('button[data-testid="cutoutD3"]').click()
+      cy.get('button[data-testid="Modules"]').click()
+      cy.contains(SetupContent.PlateReader)
+      cy.get('[data-testid="ModalHeader_icon_close_Add to slot D3"]').click()
     },
   }),
 
@@ -974,7 +1018,7 @@ export const SetupVerifications = {
       cy.contains('Select source wells')
       cy.contains('Destination labware')
       cy.contains('Volume per well')
-      cy.contains('Tip handling')
+      cy.contains('Tip management')
       cy.contains('Tip drop location')
     },
   }),
@@ -1094,34 +1138,31 @@ export const CompositeSetupSteps = {
       UniversalSteps.Snapshot().call()
       SetupVerifications.OnStep3().call()
       SetupSteps.YesGripper().call()
+      SetupSteps.NoThermocycler().call()
+      SetupSteps.NoWasteChute().call()
       SetupSteps.Confirm().call()
       SetupVerifications.Step4Verification().call()
 
       if (thermocycler) {
         SetupSteps.AddThermocycler().call()
-        SetupVerifications.ThermocyclerImg().call()
       }
 
       if (heatershaker) {
         SetupSteps.AddHeaterShaker().call()
-        SetupVerifications.HeaterShakerImg().call()
       }
 
       if (magblock) {
         SetupSteps.AddMagBlock().call()
-        SetupVerifications.MagBlockImg().call()
       }
 
       if (tempdeck) {
         SetupSteps.AddTempdeck2().call()
-        SetupVerifications.Tempdeck2Img().call()
       }
 
       if (platereader) {
         SetupSteps.AddPlateReader().call()
       }
 
-      SetupSteps.Confirm().call()
       SetupSteps.Confirm().call()
       SetupSteps.Confirm().call()
       SetupSteps.EditProtocolA().call()
@@ -1142,7 +1183,7 @@ export const CompositeSetupSteps = {
       )
       SetupSteps.ChoseDeckSlotWithLabware(slotToUse).call()
       SetupSteps.AddHardwareLabware().call()
-      SetupSteps.ClickLabwareHeader().call()
+      SetupSteps.OpenSelectLabwareModal().call()
       SetupSteps.ClickWellPlatesSection().call()
       SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()
     },

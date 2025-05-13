@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react'
-import isEqual from 'lodash/isEqual'
-import { useTranslation } from 'react-i18next'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import isEqual from 'lodash/isEqual'
 
 import {
   ALIGN_CENTER,
@@ -14,23 +14,23 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { getTopPortalEl } from '/app/App/portal'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { useBlowOutLocationOptions } from './BlowOut'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { ACTIONS } from '../constants'
-import { i18n } from '/app/i18n'
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { useBlowOutLocationOptions } from './BlowOut'
 
 import type { Dispatch } from 'react'
 import type {
-  PathOption,
-  QuickTransferSummaryState,
-  QuickTransferSummaryAction,
   BlowOutLocation,
+  PathOption,
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
 } from '../types'
 
 interface PipettePathProps {

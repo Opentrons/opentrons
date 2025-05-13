@@ -8,7 +8,6 @@ import { ApiClientProvider } from '@opentrons/react-api-client'
 
 import { App } from './App'
 import { createLogger } from './logger'
-
 import { uiInitialized } from './redux/shell'
 import { store } from './redux/store'
 

@@ -1,31 +1,34 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import pick from 'lodash/pick'
-import { Trans, useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   CheckboxField,
   DIRECTION_COLUMN,
   Flex,
+  getLabwareDefinitionsFromCommands,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  Link,
-  SIZE_1,
-  SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
+  Link,
   ModalHeader,
   ModalShell,
-  getLabwareDefinitionsFromCommands,
+  SIZE_1,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
-import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
+
+import { LegacyLabwareOffsetTable } from './LegacyLabwareOffsetTable'
 
 import type { ChangeEvent } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -36,7 +39,7 @@ import type {
 } from '@opentrons/shared-data'
 
 const HOW_OFFSETS_WORK_SUPPORT_URL =
-  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
+  'https://support.opentrons.com/s/article/creating-labware-offsets'
 export interface OffsetCandidate extends LabwareOffset {
   runCreatedAt: string
   labwareDisplayName: string
@@ -166,7 +169,7 @@ export function LegacyApplyHistoricOffsets(
                   isLabwareOffsetCodeSnippetsOn ? (
                     <LegacyLabwareOffsetTabs
                       TableComponent={
-                        <LabwareOffsetTable
+                        <LegacyLabwareOffsetTable
                           offsetCandidates={offsetCandidates}
                           labwareDefinitions={getLabwareDefinitionsFromCommands(
                             commands
@@ -177,7 +180,7 @@ export function LegacyApplyHistoricOffsets(
                       CommandLineComponent={CommandLineSnippet}
                     />
                   ) : (
-                    <LabwareOffsetTable
+                    <LegacyLabwareOffsetTable
                       offsetCandidates={offsetCandidates}
                       labwareDefinitions={getLabwareDefinitionsFromCommands(
                         commands

@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   Flex,
   JUSTIFY_CENTER,
@@ -7,6 +9,9 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
+
+import { SlotDetailModal } from '../../../components/organisms/SlotDetailModal'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -43,12 +48,9 @@ export function OffDeckControls(
     isSelected = false,
   } = props
   const { t } = useTranslation('starting_deck_state')
-  if (
-    terminalItemId !== '__initial_setup__' ||
-    slotPosition === null ||
-    isSelected
-  )
-    return null
+  const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
+
+  if (slotPosition === null || isSelected) return null
 
   const hoverOpacity =
     (hover != null && hover === labwareId) || menuListId === labwareId
@@ -56,45 +58,56 @@ export function OffDeckControls(
       : '0'
 
   return (
-    <RobotCoordsForeignDiv
-      x={slotPosition[0]}
-      y={slotPosition[1]}
-      width={slotBoundingBox.xDimension}
-      height={slotBoundingBox.yDimension}
-      innerDivProps={{
-        style: {
-          opacity: hoverOpacity,
-          ...DECK_CONTROLS_STYLE,
-        },
-        onMouseEnter: () => {
-          setHover(labwareId)
-        },
-        onMouseLeave: () => {
-          setHover(null)
-        },
-        onClick: () => {
-          setShowMenuListForId(labwareId)
-        },
-      }}
-    >
-      <Flex
-        css={css`
-          justify-content: ${JUSTIFY_CENTER};
-          width: 100%;
-          opacity: ${hoverOpacity};
-        `}
-      >
-        <Link
-          role="button"
-          onClick={() => {
-            setShowMenuListForId(labwareId)
+    <>
+      {showSlotDetailModal ? (
+        <SlotDetailModal
+          closeModal={() => {
+            setShowSlotDetailModal(false)
           }}
+          itemId={labwareId}
+        />
+      ) : null}
+      <RobotCoordsForeignDiv
+        x={slotPosition[0]}
+        y={slotPosition[1]}
+        width={slotBoundingBox.xDimension}
+        height={slotBoundingBox.yDimension}
+        innerDivProps={{
+          style: {
+            opacity: hoverOpacity,
+            ...DECK_CONTROLS_STYLE,
+          },
+          onMouseEnter: () => {
+            setHover(labwareId)
+          },
+          onMouseLeave: () => {
+            setHover(null)
+          },
+          onClick: () => {
+            if (terminalItemId === START_TERMINAL_ITEM_ID) {
+              setShowMenuListForId(labwareId)
+            } else {
+              setShowSlotDetailModal(true)
+            }
+          },
+        }}
+      >
+        <Flex
+          css={css`
+            justify-content: ${JUSTIFY_CENTER};
+            width: 100%;
+            opacity: ${hoverOpacity};
+          `}
         >
-          <StyledText desktopStyle="bodyDefaultSemiBold">
-            {t('edit_labware')}
-          </StyledText>
-        </Link>
-      </Flex>
-    </RobotCoordsForeignDiv>
+          <Link role="button">
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {terminalItemId === START_TERMINAL_ITEM_ID
+                ? t('edit_labware')
+                : t('view_labware')}
+            </StyledText>
+          </Link>
+        </Flex>
+      </RobotCoordsForeignDiv>
+    </>
   )
 }

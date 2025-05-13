@@ -1,8 +1,10 @@
+import { initReactI18next } from 'react-i18next'
 import i18n from 'i18next'
 import capitalize from 'lodash/capitalize'
 import startCase from 'lodash/startCase'
-import { initReactI18next } from 'react-i18next'
+
 import { titleCase } from '@opentrons/shared-data'
+
 import { en } from './en'
 
 i18n.use(initReactI18next).init(
@@ -11,7 +13,6 @@ i18n.use(initReactI18next).init(
     fallbackLng: 'en',
     resources: { en },
     ns: [
-      'shared',
       'alert',
       'button',
       'card',
@@ -19,15 +20,17 @@ i18n.use(initReactI18next).init(
       'deck',
       'feature_flags',
       'form',
+      'liquids',
       'modal',
       'modules',
       'nav',
-      'tooltip',
-      'well_selection',
-      'liquids',
+      'onboarding',
       'protocol_overview',
       'protocol_steps',
+      'shared',
       'starting_deck_state',
+      'tooltip',
+      'well_selection',
     ],
     defaultNS: 'shared',
     interpolation: {

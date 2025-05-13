@@ -1,11 +1,13 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
+import { airGapInTrash } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
   getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
-import { airGapInTrash } from '../commandCreators/compound'
+
 import type { CutoutId } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
@@ -64,5 +66,11 @@ describe('airGapInTrash', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mock_pipette.move_to(mock_trash_bin_1)
+mock_pipette.air_gap(volume=10, in_place=True, flow_rate=10)
+`.trim()
+    )
   })
 })

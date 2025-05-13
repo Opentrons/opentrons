@@ -1,6 +1,6 @@
+import { useTranslation } from 'react-i18next'
 import { Link as InternalLink } from 'react-router-dom'
 import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
 
 import {
   AlertModal,
@@ -8,12 +8,14 @@ import {
   Link,
   useToggle,
 } from '@opentrons/components'
+
 import {
-  useTrackEvent,
   ANALYTICS_U2E_DRIVE_ALERT_DISMISSED,
   ANALYTICS_U2E_DRIVE_LINK_CLICKED,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { U2E_DRIVER_UPDATE_URL } from '/app/redux/system-info'
+
 import type { AlertProps } from './types'
 
 const ADAPTER_INFO_URL = '/more/network-and-system'

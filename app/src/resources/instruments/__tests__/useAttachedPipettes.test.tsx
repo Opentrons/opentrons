@@ -1,13 +1,15 @@
-import { vi, it, expect, describe, beforeEach } from 'vitest'
-import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
-import { usePipettesQuery } from '@opentrons/react-api-client'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useAttachedPipettes } from '../useAttachedPipettes'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import {
   pipetteResponseFixtureLeft,
   pipetteResponseFixtureRight,
 } from '@opentrons/api-client'
+import { usePipettesQuery } from '@opentrons/react-api-client'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+
+import { useAttachedPipettes } from '../useAttachedPipettes'
 
 import type { FunctionComponent, ReactNode } from 'react'
 import type { UseQueryResult } from 'react-query'

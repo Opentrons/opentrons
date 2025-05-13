@@ -1,7 +1,8 @@
 import styled from 'styled-components'
-import { TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { NewPrimaryBtn, styleProps } from '../../primitives'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue50};
@@ -11,7 +12,9 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   padding-right: ${SPACING.spacing16};
   line-height: ${TYPOGRAPHY.lineHeight20};
   text-transform: ${TYPOGRAPHY.textTransformNone};
-  ${TYPOGRAPHY.pSemiBold}
+  font-size: ${TYPOGRAPHY.fontSizeH3};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  line-height: ${TYPOGRAPHY.lineHeight20};
 
   ${styleProps}
 
@@ -22,7 +25,8 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.yellow50};
+    outline: 2px solid ${COLORS.blue50};
+    outline-offset: 0.25rem;
   }
 
   &:active {

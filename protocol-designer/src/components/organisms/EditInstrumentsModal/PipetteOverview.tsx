@@ -9,8 +9,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   EmptySelectorButton,
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
@@ -20,24 +20,24 @@ import {
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { PipetteInfoItem } from '../PipetteInfoItem'
-import { changeSavedStepForm } from '../../../steplist/actions'
-import { deletePipettes } from '../../../step-forms/actions'
-import { deleteContainer } from '../../../labware-ingred/actions'
-import { toggleIsGripperRequired } from '../../../step-forms/actions/additionalItems'
-import { getSectionsFromPipetteName } from './utils'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
+import { deleteContainer } from '../../../labware-ingred/actions'
+import { deletePipettes } from '../../../step-forms/actions'
+import { toggleIsGripperRequired } from '../../../step-forms/actions/additionalItems'
+import { getAdditionalEquipmentEntities } from '../../../step-forms/selectors'
+import { changeSavedStepForm } from '../../../steplist/actions'
 import { LINK_BUTTON_STYLE } from '../../atoms'
+import { PipetteInfoItem } from '../PipetteInfoItem'
+import { getSectionsFromPipetteName } from './utils'
 
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type { RobotType } from '@opentrons/shared-data'
+import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   PipetteOnDeck,
 } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 import type { PipetteConfig } from './usePipetteConfig'
-import { getAdditionalEquipmentEntities } from '../../../step-forms/selectors'
 
 interface Gripper {
   name: AdditionalEquipmentName
@@ -66,7 +66,7 @@ export function PipetteOverview({
   rightPipette,
   gripper,
 }: PipetteOverviewProps): JSX.Element {
-  const { t } = useTranslation(['create_new_protocol', 'protocol_overview'])
+  const { t } = useTranslation(['onboarding', 'protocol_overview'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities

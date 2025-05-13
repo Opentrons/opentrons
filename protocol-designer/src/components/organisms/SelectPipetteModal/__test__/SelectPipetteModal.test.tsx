@@ -1,22 +1,24 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { fireEvent, screen } from '@testing-library/react'
-import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
+
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { SelectPipetteModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
-import { getTiprackOptions } from '../../../../pages/Onboarding/utils'
 import { createCustomTiprackDef } from '../../../../labware-defs/actions'
+import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
+import { getTiprackOptions } from '../../../../pages/Onboarding/utils'
 import { IncompatibleTipsModal } from '../../IncompatibleTipsModal'
-import { SelectPipetteModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
-import type {
-  WizardFormState,
-  WizardTileProps,
-} from '../../../../pages/Onboarding/types'
+import type { WizardTileProps } from '../../../../pages/Onboarding/types'
+import type { WizardFormState } from '../../types'
 
 vi.mock('../../../../labware-defs/actions')
 vi.mock('../../../../pages/Onboarding/utils')
@@ -41,7 +43,10 @@ const render = (props: ComponentProps<typeof SelectPipetteModal>) => {
 }
 
 const values = {
-  additionalEquipment: [],
+  fixtures: {},
+  hasGripper: false,
+  hasThermocycler: false,
+  hasWasteChute: false,
   fields: {
     name: '',
     description: '',
@@ -52,7 +57,7 @@ const values = {
     left: { pipetteName: 'p1000_single_flex', tiprackDefURI: ['mockDefUri'] },
     right: {},
   },
-  modules: null,
+  modules: {},
 } as WizardFormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {
@@ -117,7 +122,8 @@ describe('SelectPipetteModal', () => {
     })
 
     const values = {
-      additionalEquipment: [],
+      fixtures: {},
+      hasGripper: false,
       fields: {
         name: '',
         description: '',
@@ -131,7 +137,7 @@ describe('SelectPipetteModal', () => {
           tiprackDefURI: ['mockDefUri'],
         },
       },
-      modules: null,
+      modules: {},
     } as WizardFormState
 
     props = {

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 
+import { getLabwareLocation } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -10,7 +11,8 @@ import {
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { getLabwareLocation } from '@opentrons/components'
+
+import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 import {
   getRunLabwareRenderInfo,
   getRunModuleRenderInfo,
@@ -18,24 +20,24 @@ import {
 
 import type { Run } from '@opentrons/api-client'
 import type {
-  DeckDefinition,
-  ModuleDefinition,
-  LabwareDefinition2,
-  ModuleModel,
-  LabwareLocation,
   CutoutConfigProtocolSpec,
-  LoadedLabware,
-  RobotType,
+  DeckDefinition,
+  LabwareDefinition2,
   LabwareDefinitionsByUri,
+  LabwareLocation,
+  LoadedLabware,
   LoadedModule,
+  ModuleDefinition,
+  ModuleModel,
+  RobotType,
 } from '@opentrons/shared-data'
-import type { ErrorRecoveryFlowsProps } from '..'
-import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type {
   RunLabwareInfo,
   RunModuleInfo,
 } from '/app/organisms/InterventionModal/utils'
-import type { ERUtilsProps } from './useERUtils'
+import type { ErrorRecoveryFlowsProps } from '..'
+import type { ERUtilsProps, ERUtilsResults } from './useERUtils'
+import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 
 interface UseDeckMapUtilsProps {
   runId: ErrorRecoveryFlowsProps['runId']
@@ -43,6 +45,7 @@ interface UseDeckMapUtilsProps {
   failedLabwareUtils: UseFailedLabwareUtilsResult
   runLwDefsByUri: ERUtilsProps['runLwDefsByUri']
   runRecord: Run | undefined
+  recoveryMap: ERUtilsResults['recoveryMap']
 }
 
 export interface UseDeckMapUtilsResult {
@@ -65,6 +68,7 @@ export function useDeckMapUtils({
   runId,
   failedLabwareUtils,
   runLwDefsByUri,
+  recoveryMap,
 }: UseDeckMapUtilsProps): UseDeckMapUtilsResult {
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
@@ -108,6 +112,7 @@ export function useDeckMapUtils({
         failedLabwareUtils,
         runRecord,
         currentLabwareInfo: remainingLabware,
+        recoveryMap,
       }),
     [failedLabwareUtils, currentLabwareInfo]
   )
@@ -219,18 +224,32 @@ export function getRunCurrentLabwareOnDeck({
   currentLabwareInfo,
   runRecord,
   failedLabwareUtils,
+  recoveryMap,
 }: {
   failedLabwareUtils: UseDeckMapUtilsProps['failedLabwareUtils']
   runRecord: UseDeckMapUtilsProps['runRecord']
   currentLabwareInfo: RunCurrentLabwareInfo[]
+  recoveryMap: ERUtilsResults['recoveryMap']
 }): Array<RunCurrentLabwareOnDeck & { highlight: string | null }> {
-  const { failedLabware } = failedLabwareUtils
+  const { route, step } = recoveryMap
+  const { failedLabware, relevantPickUpTipLabware } = failedLabwareUtils
+
+  const labwareToMatch = (): LoadedLabware | null => {
+    if (
+      route === RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE &&
+      step === RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+    ) {
+      return relevantPickUpTipLabware
+    } else {
+      return failedLabware
+    }
+  }
 
   return currentLabwareInfo.map(
     ({ slotName, labwareDef, labwareLocation }) => ({
       labwareLocation,
       definition: labwareDef,
-      highlight: getIsLabwareMatch(slotName, runRecord, failedLabware)
+      highlight: getIsLabwareMatch(slotName, runRecord, labwareToMatch())
         ? slotName
         : null,
     })

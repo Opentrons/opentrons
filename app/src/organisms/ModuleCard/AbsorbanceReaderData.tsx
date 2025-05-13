@@ -1,7 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import { StyledText, COLORS } from '@opentrons/components'
-import { StatusLabel } from '/app/atoms/StatusLabel'
 
+import { Chip, Flex, StyledText } from '@opentrons/components'
+
+import {
+  MODULE_INFO_DETAIL_CONTAINER_STYLE,
+  MODULE_INFO_DETAIL_TEXT_STYLE,
+} from './constants'
+
+import type { ChipType } from '@opentrons/components'
 import type { AbsorbanceReaderModule } from '/app/redux/modules/types'
 
 interface AbsorbanceReaderProps {
@@ -14,26 +20,22 @@ export const AbsorbanceReaderData = (
   const { moduleData } = props
   const { t, i18n } = useTranslation(['device_details', 'shared'])
 
-  const StatusLabelProps = {
-    status: 'Idle',
-    backgroundColor: COLORS.grey30,
-    iconColor: COLORS.grey60,
-    textColor: COLORS.grey60,
-    pulse: false,
-  }
+  let statusText: string
+  let statusChipType: ChipType
   switch (moduleData.status) {
+    case 'idle': {
+      statusText = 'Idle'
+      statusChipType = 'neutral'
+      break
+    }
     case 'measuring': {
-      StatusLabelProps.status = 'Reading'
-      StatusLabelProps.backgroundColor = COLORS.blue30
-      StatusLabelProps.iconColor = COLORS.blue60
-      StatusLabelProps.textColor = COLORS.blue60
+      statusText = 'Reading'
+      statusChipType = 'info'
       break
     }
     case 'error': {
-      StatusLabelProps.status = 'Error'
-      StatusLabelProps.backgroundColor = COLORS.yellow30
-      StatusLabelProps.iconColor = COLORS.yellow60
-      StatusLabelProps.textColor = COLORS.yellow60
+      statusText = 'Error'
+      statusChipType = 'warning'
       break
     }
   }
@@ -43,16 +45,24 @@ export const AbsorbanceReaderData = (
       : i18n.format(t('shared:open'), 'capitalize')
 
   return (
-    <>
-      <StatusLabel {...StatusLabelProps} />
+    <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
+      <Chip
+        text={statusText}
+        chipSize="small"
+        type={statusChipType}
+        hasIcon={true}
+        iconName="connection-status"
+        textTransform="capitalize"
+        data-testid="abs_module_status"
+      />
       <StyledText
-        desktopStyle="bodyDefaultRegular"
+        css={MODULE_INFO_DETAIL_TEXT_STYLE}
         data-testid="abs_module_data"
       >
         {t('abs_reader_lid_status', {
           status: lidDisplayStatus,
         })}
       </StyledText>
-    </>
+    </Flex>
   )
 }

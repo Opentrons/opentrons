@@ -1,14 +1,15 @@
 import {
+  FLEX_STACKER_MODULE_V1,
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  FLEX_STACKER_MODULE_V1,
   TRASH_BIN_FIXTURE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
-  MOVABLE_TRASH_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
+
 import {
   getLabwareLocation,
   getLabwareLocationFromSequence,
@@ -16,14 +17,14 @@ import {
 
 import type { TFunction } from 'i18next'
 import type {
-  LocationFullParams,
-  LocationSlotOnlyParams,
-} from './getLabwareLocation'
-import type {
   AddressableAreaName,
   LabwareLocation,
   LabwareLocationSequence,
 } from '@opentrons/shared-data'
+import type {
+  LocationFullParams,
+  LocationSlotOnlyParams,
+} from './getLabwareLocation'
 
 export interface DisplayLocationSlotOnlyParams
   extends Omit<LocationSlotOnlyParams, 'location'> {
@@ -88,28 +89,30 @@ export function getLabwareDisplayLocation(
         case THERMOCYCLER_MODULE_V2:
           return t('slot', { slot_name: 'A1+B1' })
         case FLEX_STACKER_MODULE_V1:
-          if (slotName === 'D3') {
-            return t('stacker_display_name', { stacker_slot: 'A' })
-          } else if (slotName === 'C3') {
-            return t('stacker_display_name', { stacker_slot: 'B' })
-          } else if (slotName === 'B3') {
-            return t('stacker_display_name', { stacker_slot: 'C' })
-          } else return t('stacker_display_name', { stacker_slot: 'D' })
-
+          return t('stacker_display_name', {
+            stacker_slot: getSlotColumn(slotName),
+          })
         default:
           return t('slot', { slot_name: slotName })
       }
     } else {
-      return isOnDevice
-        ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
-        : t('module_in_slot', {
-            count: getOccludedSlotCountForModule(
-              getModuleType(moduleModel),
-              params.robotType
-            ),
-            module: getModuleDisplayName(moduleModel),
-            slot_name: slotName,
+      switch (moduleModel) {
+        case FLEX_STACKER_MODULE_V1:
+          return t('stacker_column_display_name', {
+            stacker_slot: getSlotColumn(slotName),
           })
+        default:
+          return isOnDevice
+            ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
+            : t('module_in_slot', {
+                count: getOccludedSlotCountForModule(
+                  getModuleType(moduleModel),
+                  params.robotType
+                ),
+                module: getModuleDisplayName(moduleModel),
+                slot_name: slotName,
+              })
+      }
     }
   }
   // Adapter locations
@@ -133,6 +136,10 @@ export function getLabwareDisplayLocation(
   } else {
     return ''
   }
+}
+
+function getSlotColumn(slotName: string): string {
+  return slotName.charAt(0)
 }
 
 // Sometimes we don't want to show the actual slotName, so we special case the text here.

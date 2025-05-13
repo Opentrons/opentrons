@@ -1,6 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { createEmptyLiquidState } from '../utils'
+import { describe, expect, it } from 'vitest'
+
 import { makeContext, makeState } from '../fixtures'
+import { createEmptyLiquidState } from '../utils'
+
 describe('snapshot tests', () => {
   it('makeContext', () => {
     expect(makeContext()).toMatchSnapshot()
@@ -11,25 +13,25 @@ describe('snapshot tests', () => {
         invariantContext: makeContext(),
         labwareLocations: {
           tiprack1Id: {
-            slot: '1',
+            stack: ['tiprack1Id', '1'],
           },
           tiprack2Id: {
-            slot: '2',
+            stack: ['tiprack2Id', '2'],
           },
           sourcePlateId: {
-            slot: '4',
+            stack: ['sourcePlateId', '4'],
           },
           tiprack4AdapterId: {
-            slot: '7',
+            stack: ['tiprack4AdapterId', '7'],
           },
           tiprack5AdapterId: {
-            slot: '8',
+            stack: ['tiprack5AdapterId', '8'],
           },
           tiprack4Id: {
-            slot: 'tiprack4AdapterId',
+            stack: ['tiprack4Id', 'tiprack4AdapterId', '7'],
           },
           tiprack5Id: {
-            slot: 'tiprack5AdapterId',
+            stack: ['tiprack5Id', 'tiprack5AdapterId', '8'],
           },
         },
         pipetteLocations: {

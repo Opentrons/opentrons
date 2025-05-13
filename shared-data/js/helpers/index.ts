@@ -1,8 +1,11 @@
 import uniq from 'lodash/uniq'
 
-import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
 import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
+import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
+import { getAllLiquidClassDefs } from '../liquidClasses'
+
+import type { AddressableAreaName, CutoutId } from '../../deck/types/schemaV5'
 import type {
   DeckDefinition,
   LabwareDefinition2,
@@ -12,8 +15,6 @@ import type {
   RobotType,
   ThermalAdapterName,
 } from '../types'
-import { getAllLiquidClassDefs } from '../liquidClasses'
-import type { AddressableAreaName, CutoutId } from '../../deck/types/schemaV5'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
@@ -28,6 +29,7 @@ export * from './parseProtocolData'
 export * from './volume'
 export * from './wellSets'
 export * from './getAreFlexSlotsAdjacent'
+export * from './getMmFromBottom'
 export * from './getModuleVizDims'
 export * from './getVectorDifference'
 export * from './getVectorSum'
@@ -46,6 +48,7 @@ export * from './orderRuntimeParameterRangeOptions'
 export * from './sortRunTimeParameters'
 export * from './parseAddressableArea'
 export * from './validateCustomLabwareHelper'
+export * from './getWellRangeForLiquidLabwarePair'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -107,6 +110,12 @@ export const RETIRED_LABWARE = [
   // Replaced by opentrons_96_wellplate_200ul_pcr_full_skirt
   // https://opentrons.atlassian.net/browse/RLAB-230
   'armadillo_96_wellplate_200ul_pcr_full_skirt',
+  // adapter/labware combo defs
+  'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+  'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
+  'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
+  'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
+  'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
 ]
 
 export const getLabwareDisplayName = (

@@ -16,7 +16,8 @@ import {
   WRAP,
 } from '@opentrons/components'
 
-import { useResponsiveBreakpoints } from '../../resources/hooks/useResponsiveBreakpoints'
+import { useResponsiveBreakpoints } from '../../resources/hooks'
+
 import type { DropdownMenuProps, TagProps } from '@opentrons/components'
 
 interface PDListItemCustomizeProps {

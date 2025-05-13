@@ -1,25 +1,28 @@
 import { fireEvent, renderHook, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RUN_STATUS_RUNNING, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { i18n } from '/app/i18n'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
+
+import { InterventionModal, useInterventionModal } from '..'
 import {
+  mockEmptyStackerCommand,
+  mockFillStackerCommand,
+  mockMoveLabwareCommandFromModule,
+  mockMoveLabwareCommandFromSlot,
   mockPauseCommandWithoutStartTime,
   mockPauseCommandWithStartTime,
-  mockMoveLabwareCommandFromSlot,
-  mockMoveLabwareCommandFromModule,
   truncatedCommandMessage,
 } from '../__fixtures__'
-import { InterventionModal, useInterventionModal } from '..'
-import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { ComponentProps } from 'react'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const ROBOT_NAME = 'Otie'
 
@@ -244,5 +247,45 @@ describe('InterventionModal', () => {
     screen.getByText('mockLabware')
     screen.queryAllByText('A1')
     screen.queryAllByText('C1')
+  })
+
+  it('renders an empty stacker modal', () => {
+    props = {
+      ...props,
+      command: mockEmptyStackerCommand,
+      run: {
+        labware: [],
+        modules: [
+          {
+            id: mockEmptyStackerCommand.params.moduleId,
+            model: 'flexStackerModuleV1',
+            location: { slotName: 'C3' },
+          },
+        ],
+      } as any,
+    }
+    render(props)
+    screen.getByText('Empty Stacker')
+    screen.queryAllByText('STACKER C3')
+  })
+
+  it('renders a fill stacker modal', () => {
+    props = {
+      ...props,
+      command: mockFillStackerCommand,
+      run: {
+        labware: [],
+        modules: [
+          {
+            id: mockFillStackerCommand.params.moduleId,
+            model: 'flexStackerModuleV1',
+            location: { slotName: 'C3' },
+          },
+        ],
+      } as any,
+    }
+    render(props)
+    screen.getByText('Refill Stacker')
+    screen.queryAllByText('STACKER C3')
   })
 })

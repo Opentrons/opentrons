@@ -1,21 +1,24 @@
 import * as React from 'react'
+
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   useLongPress,
 } from '@opentrons/components'
+
 import {
-  TertiaryButton,
   QuaternaryButton,
   SubmitPrimaryButton,
-  ToggleButton,
+  TertiaryButton,
   TextOnlyButton,
+  ToggleButton,
 } from './index'
-import type { Story, Meta } from '@storybook/react'
+
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/Buttons',

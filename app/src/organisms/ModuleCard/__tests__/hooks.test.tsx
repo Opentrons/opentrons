@@ -1,14 +1,16 @@
-import { Provider } from 'react-redux'
-import { when } from 'vitest-when'
-import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
 import { act, renderHook } from '@testing-library/react'
+import { createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { heater_shaker_commands_with_results_key } from '@opentrons/shared-data'
 
 import { i18n } from '/app/i18n'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   mockHeaterShaker,
   mockMagneticModuleGen2,
@@ -16,26 +18,26 @@ import {
   mockThermocycler,
   mockThermocyclerGen2,
 } from '/app/redux/modules/__fixtures__'
-import { useIsRobotBusy } from '/app/redux-resources/robots'
-
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
   useRunStatuses,
 } from '/app/resources/runs'
+
 import {
+  useIsHeaterShakerInProtocol,
   useLatchControls,
   useModuleOverflowMenu,
-  useIsHeaterShakerInProtocol,
 } from '../hooks'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/redux-resources/analytics')
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',
@@ -196,6 +198,9 @@ describe('useLatchControls', () => {
       createLiveCommand: mockCreateLiveCommand,
     } as any)
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
+    } as any)
   })
 
   afterEach(() => {
@@ -271,6 +276,9 @@ describe('useModuleOverflowMenu', () => {
     })
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
+    } as any)
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
     } as any)
   })
 
@@ -657,7 +665,7 @@ describe('useModuleOverflowMenu', () => {
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'flexStacker/prepareShuttle',
+        commandType: 'unsafe/flexStacker/prepareShuttle',
         params: {
           moduleId: mockFlexStacker.id,
         },

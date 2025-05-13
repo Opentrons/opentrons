@@ -1,16 +1,18 @@
-import { useState, Fragment } from 'react'
-import isEqual from 'lodash/isEqual'
+import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import isEqual from 'lodash/isEqual'
+
 import {
   FLEX_CUTOUT_BY_SLOT_ID,
-  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   FLEX_ROBOT_TYPE,
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   getDeckDefFromRobotType,
-  getPositionFromSlotId,
   getFixtureDisplayName,
+  getPositionFromSlotId,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+
 import {
   DeckFromLayers,
   LegacyDeckSlotLocation,
@@ -21,16 +23,16 @@ import {
   SingleSlotFixture,
   SlotLabels,
 } from '../../hardware-sim'
+import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
 
 import type {
-  CutoutConfig,
   AddressableArea,
   CoordinateTuple,
+  CutoutConfig,
   CutoutFixtureId,
   DeckDefinition,
   ModuleLocation,

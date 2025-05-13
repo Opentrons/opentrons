@@ -1,15 +1,17 @@
-import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { DIRECTION_COLUMN } from '../../styles'
+import { ListItem as ListItemComponent, ListItemCustomize } from '.'
 import { Flex } from '../../primitives'
+import { DIRECTION_COLUMN } from '../../styles'
+import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 import { ListItemDescriptor } from './ListItemChildren/ListItemDescriptor'
-import { ListItem as ListItemComponent, ListItemCustomize } from '.'
-import exampleImage from '../../images/labware/measurement-guide/images/spacing/spacing-well-rectangular@3x.png'
+
 import type { Meta, StoryObj } from '@storybook/react'
 import type { DropdownMenuProps } from '../../molecules'
 
+import exampleImage from '../../images/labware/measurement-guide/images/spacing/spacing-well-rectangular@3x.png'
+
 const meta: Meta<typeof ListItemComponent> = {
-  title: 'ListItem',
+  title: 'Helix/Atoms/ListItem',
   component: ListItemComponent,
   argTypes: {
     type: {

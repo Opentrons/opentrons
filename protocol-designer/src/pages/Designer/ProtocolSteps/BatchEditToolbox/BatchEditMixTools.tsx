@@ -1,5 +1,6 @@
-import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   Divider,
@@ -8,6 +9,7 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
+
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,

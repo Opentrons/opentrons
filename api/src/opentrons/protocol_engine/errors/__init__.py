@@ -88,6 +88,7 @@ from .exceptions import (
     OffsetLocationInvalidError,
     FlexStackerLabwarePoolNotYetDefinedError,
     FlexStackerNotLogicallyEmptyError,
+    InvalidLabwarePositionError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -171,6 +172,7 @@ __all__ = [
     "OffsetLocationInvalidError",
     "FlexStackerLabwarePoolNotYetDefinedError",
     "FlexStackerNotLogicallyEmptyError",
+    "InvalidLabwarePositionError",
     # error occurrence models
     "ErrorOccurrence",
     "CommandNotAllowedError",

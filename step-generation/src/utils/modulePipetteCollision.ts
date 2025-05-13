@@ -1,11 +1,15 @@
 import { GEN_ONE_MULTI_PIPETTES } from '@opentrons/shared-data'
+
 import { MODULES_WITH_COLLISION_ISSUES } from '../constants'
+import { getSlotInLocationStack } from './misc'
+
 import type {
   DeckSlot,
-  PipetteEntity,
   InvariantContext,
+  PipetteEntity,
   RobotState,
 } from '../types'
+
 export const modulePipetteCollision = (args: {
   pipette: string | null | undefined
   labware: string | null | undefined
@@ -23,7 +27,7 @@ export const modulePipetteCollision = (args: {
     ? invariantContext.pipetteEntities[pipette]
     : null
   const labwareSlot: DeckSlot | null | undefined = labware
-    ? prevRobotState.labware[labware]?.slot
+    ? getSlotInLocationStack(prevRobotState.labware[labware]?.stack)
     : null
 
   if (!pipette || !labware || !pipetteEntity || !labwareSlot) {

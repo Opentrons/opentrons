@@ -199,6 +199,7 @@ class HardwarePipettingHandler(PipettingHandler):
             labware_id=labware_id,
             well_name=well_name,
             operation_volume=volume * -1,
+            pipette_id=pipette_id,
         )
         if isinstance(aspirate_z_distance, SimulatedProbeResult):
             raise InvalidLiquidHeightFound(
@@ -234,6 +235,7 @@ class HardwarePipettingHandler(PipettingHandler):
             labware_id=labware_id,
             well_name=well_name,
             operation_volume=volume,
+            pipette_id=pipette_id,
         )
         if isinstance(dispense_z_distance, SimulatedProbeResult):
             raise InvalidLiquidHeightFound(
@@ -246,6 +248,7 @@ class HardwarePipettingHandler(PipettingHandler):
                 flow_rate=flow_rate,
                 volume=adjusted_volume,
                 push_out=push_out,
+                is_full_dispense=is_full_dispense,
             )
         return adjusted_volume
 
@@ -323,7 +326,7 @@ class HardwarePipettingHandler(PipettingHandler):
         well_name: str,
         well_location: WellLocation,
     ) -> LiquidTrackingType:
-        """Detect liquid level."""
+        """Return liquid level relative to the bottom of the well."""
         hw_pipette = self._state_view.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
             attached_pipettes=self._hardware_api.attached_instruments,

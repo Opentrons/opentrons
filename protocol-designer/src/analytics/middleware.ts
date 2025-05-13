@@ -1,35 +1,30 @@
-import uniq from 'lodash/uniq'
 import omit from 'lodash/omit'
+import uniq from 'lodash/uniq'
+
 import {
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
-  MOVABLE_TRASH_ADDRESSABLE_AREAS,
-  WASTE_CHUTE_ADDRESSABLE_AREAS,
   getModuleDisplayName,
   getPipetteSpecsV2,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import {
-  getArgsAndErrorsByStepId,
-  getPipetteEntities,
-  getSavedStepForms,
-} from '../step-forms/selectors'
+
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM, FIXED_TRASH_ID } from '../constants'
 import {
   createFile,
   getFileMetadata,
   getRobotStateTimeline,
 } from '../file-data/selectors'
-import { DEFAULT_MM_OFFSET_FROM_BOTTOM, FIXED_TRASH_ID } from '../constants'
+import {
+  getArgsAndErrorsByStepId,
+  getPipetteEntities,
+  getSavedStepForms,
+} from '../step-forms/selectors'
 import { trackEvent } from './mixpanel'
 import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
 
 import type { Middleware } from 'redux'
-import type {
-  ConsolidateArgs,
-  DistributeArgs,
-  MixArgs,
-  NormalizedPipetteById,
-  TransferArgs,
-} from '@opentrons/step-generation'
 import type {
   AddressableAreaName,
   LoadLabwareCreateCommand,
@@ -37,13 +32,20 @@ import type {
   LoadPipetteCreateCommand,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { BaseState } from '../types'
-import type { FormData, StepIdType, StepType } from '../form-types'
-import type { StepArgsAndErrors } from '../steplist'
-import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
-import type { RenameStepAction } from '../labware-ingred/actions'
+import type {
+  ConsolidateArgs,
+  DistributeArgs,
+  MixArgs,
+  NormalizedPipetteById,
+  TransferArgs,
+} from '@opentrons/step-generation'
 import type { SetFeatureFlagAction } from '../feature-flags/actions'
+import type { FormData, StepIdType, StepType } from '../form-types'
+import type { RenameStepAction } from '../labware-ingred/actions'
 import type { CreatePipettesAction } from '../step-forms/actions'
+import type { StepArgsAndErrors } from '../steplist'
+import type { BaseState } from '../types'
+import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
 import type { AnalyticsEventAction } from './actions'
 import type { AnalyticsEvent } from './mixpanel'
 

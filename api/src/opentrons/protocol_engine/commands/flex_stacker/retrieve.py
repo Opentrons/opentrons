@@ -1,11 +1,18 @@
 """Command models to retrieve a labware from a Flex Stacker."""
 
 from __future__ import annotations
-from typing import Literal, TYPE_CHECKING, Any, Union, Optional
+from typing import Literal, TYPE_CHECKING, Any, Union
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerStallError,
+    FlexStackerShuttleMissingError,
+    FlexStackerHopperLabwareError,
+    FlexStackerShuttleLabwareError,
+)
 
 from ..command import (
     AbstractCommandImpl,
@@ -13,11 +20,6 @@ from ..command import (
     BaseCommandCreate,
     SuccessData,
     DefinedErrorData,
-)
-from ..flex_stacker.common import (
-    FlexStackerStallOrCollisionError,
-    FlexStackerShuttleError,
-    FlexStackerHopperError,
 )
 from ...errors import (
     ErrorOccurrence,
@@ -30,19 +32,22 @@ from ...state import update_types
 from ...types import (
     ModuleLocation,
     LabwareLocationSequence,
-    LabwareLocation,
-    LoadedLabware,
+    InStackerHopperLocation,
 )
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.errors.exceptions import (
-    FlexStackerStallError,
-    FlexStackerShuttleMissingError,
-    FlexStackerHopperLabwareError,
+from .common import (
+    labware_locations_for_group,
+    build_retrieve_labware_move_updates,
+    FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
+    FlexStackerHopperError,
+    FlexStackerLabwareRetrieveError,
+    primary_location_sequence,
+    adapter_location_sequence,
+    lid_location_sequence,
 )
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
-    from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 RetrieveCommandType = Literal["flexStacker/retrieve"]
@@ -51,6 +56,7 @@ RecoverableExceptions = Union[
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
+    FlexStackerShuttleLabwareError,
 ]
 
 
@@ -67,26 +73,22 @@ class RetrieveParams(BaseModel):
     )
     labwareId: str | SkipJsonSchema[None] = Field(
         None,
-        description="An optional ID to assign to this labware. If None, an ID "
-        "will be generated.",
+        description="Do not use. Present for internal backward compatibility.",
         json_schema_extra=_remove_default,
     )
     displayName: str | SkipJsonSchema[None] = Field(
         None,
-        description="An optional user-specified display name "
-        "or label for this labware.",
+        description="Do not use. Present for internal backward compatibility.",
         json_schema_extra=_remove_default,
     )
     adapterId: str | SkipJsonSchema[None] = Field(
         None,
-        description="An optional ID to assign to an adapter. If None, an ID "
-        "will be generated.",
+        description="Do not use. Present for internal backward compatibility.",
         json_schema_extra=_remove_default,
     )
     lidId: str | SkipJsonSchema[None] = Field(
         None,
-        description="An optional ID to assign to a lid. If None, an ID "
-        "will be generated.",
+        description="Do not use. Present for internal backward compatibility.",
         json_schema_extra=_remove_default,
     )
 
@@ -107,14 +109,24 @@ class RetrieveResult(BaseModel):
         description="The optional Lid Labware ID of the lid on a primary labware.",
     )
     primaryLocationSequence: LabwareLocationSequence = Field(
-        ..., description="The origin location of the primary labware."
+        ..., description="The new location of the just-retrieved."
     )
     lidLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = Field(
         None,
-        description="The origin location of the adapter labware under a primary labware.",
+        description="The new location of the just-retrieved adapter labware under a primary labware.",
     )
     adapterLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = Field(
-        None, description="The origin location of the lid labware on a primary labware."
+        None,
+        description="The new location of the just-retrieved lid labware on a primary labware.",
+    )
+    originalPrimaryLocationSequence: LabwareLocationSequence = Field(
+        ..., description="The original location of the just-retrieved primary labware"
+    )
+    originalAdapterLocationSequence: LabwareLocationSequence | SkipJsonSchema[
+        None
+    ] = Field(None, description="The original location of an adapter labware if any")
+    originalLidLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = Field(
+        None, description="The original location of a lid labware if any"
     )
     primaryLabwareURI: str = Field(
         ...,
@@ -134,7 +146,8 @@ _ExecuteReturn = Union[
     SuccessData[RetrieveResult],
     DefinedErrorData[FlexStackerStallOrCollisionError]
     | DefinedErrorData[FlexStackerShuttleError]
-    | DefinedErrorData[FlexStackerHopperError],
+    | DefinedErrorData[FlexStackerHopperError]
+    | DefinedErrorData[FlexStackerLabwareRetrieveError],
 ]
 
 
@@ -152,137 +165,23 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         self._equipment = equipment
         self._model_utils = model_utils
 
-    async def _load_labware_from_pool(
-        self, params: RetrieveParams, stacker_state: FlexStackerSubState
-    ) -> tuple[RetrieveResult, update_types.StateUpdate]:
-        state_update = update_types.StateUpdate()
-
-        # Always load the primary labware
-        if stacker_state.pool_primary_definition is None:
-            raise CannotPerformModuleAction(
-                f"Flex Stacker {params.moduleId} has no labware to retrieve"
-            )
-
-        # Load the Stacker Pool Labwares
-        loaded_labware_pool = await self._equipment.load_labware_pool_from_definitions(
-            pool_primary_definition=stacker_state.pool_primary_definition,
-            pool_adapter_definition=stacker_state.pool_adapter_definition,
-            pool_lid_definition=stacker_state.pool_lid_definition,
-            location=ModuleLocation(moduleId=params.moduleId),
-            primary_id=params.labwareId,
-            adapter_id=params.labwareId,
-            lid_id=params.lidId,
-        )
-
-        # Dictionaries for state updates and location sequencing
-        definitions_by_id: dict[str, LabwareDefinition] = {}
-        definitions_by_id[
-            loaded_labware_pool.primary_labware.id
-        ] = stacker_state.pool_primary_definition
-        offset_ids_by_id: dict[str, Optional[str]] = {}
-        display_names_by_id: dict[str, str | None] = {}
-        new_locations_by_id: dict[str, LabwareLocation] = {}
-        labware_by_id: dict[str, LoadedLabware] = {}
-
-        for loaded_labware in (
-            loaded_labware_pool.primary_labware,
-            loaded_labware_pool.adapter_labware,
-            loaded_labware_pool.lid_labware,
-        ):
-            if loaded_labware:
-                offset_ids_by_id[loaded_labware.id] = loaded_labware.offsetId
-                display_names_by_id[loaded_labware.id] = loaded_labware.displayName
-                new_locations_by_id[loaded_labware.id] = loaded_labware.location
-                labware_by_id[loaded_labware.id] = loaded_labware
-        if (
-            loaded_labware_pool.adapter_labware
-            and stacker_state.pool_adapter_definition is not None
-        ):
-            definitions_by_id[
-                loaded_labware_pool.adapter_labware.id
-            ] = stacker_state.pool_adapter_definition
-        if (
-            loaded_labware_pool.lid_labware
-            and stacker_state.pool_lid_definition is not None
-        ):
-            definitions_by_id[
-                loaded_labware_pool.lid_labware.id
-            ] = stacker_state.pool_lid_definition
-
-        # Get the labware dimensions for the labware being retrieved,
-        # which is the first one in the hopper labware id list
-        primary_location_sequence = (
-            self._state_view.geometry.get_predicted_location_sequence(
-                new_locations_by_id[loaded_labware_pool.primary_labware.id],
-                labware_by_id,
-            )
-        )
-        adapter_location_sequence = (
-            self._state_view.geometry.get_predicted_location_sequence(
-                new_locations_by_id[loaded_labware_pool.adapter_labware.id],
-                labware_by_id,
-            )
-            if loaded_labware_pool.adapter_labware is not None
-            else None
-        )
-        lid_location_sequence = (
-            self._state_view.geometry.get_predicted_location_sequence(
-                new_locations_by_id[loaded_labware_pool.lid_labware.id],
-                labware_by_id,
-            )
-            if loaded_labware_pool.lid_labware is not None
-            else None
-        )
-
-        state_update.set_batch_loaded_labware(
-            definitions_by_id=definitions_by_id,
-            display_names_by_id=display_names_by_id,
-            offset_ids_by_id=offset_ids_by_id,
-            new_locations_by_id=new_locations_by_id,
-        )
-        state_update.update_flex_stacker_labware_pool_count(
-            module_id=params.moduleId, count=stacker_state.pool_count - 1
-        )
-
-        if loaded_labware_pool.lid_labware is not None:
-            state_update.set_lids(
-                parent_labware_ids=[loaded_labware_pool.primary_labware.id],
-                lid_ids=[loaded_labware_pool.lid_labware.id],
-            )
-
-        return (
-            RetrieveResult(
-                labwareId=loaded_labware_pool.primary_labware.id,
-                adapterId=loaded_labware_pool.adapter_labware.id
-                if loaded_labware_pool.adapter_labware is not None
-                else None,
-                lidId=loaded_labware_pool.lid_labware.id
-                if loaded_labware_pool.lid_labware is not None
-                else None,
-                primaryLocationSequence=primary_location_sequence,
-                adapterLocationSequence=adapter_location_sequence,
-                lidLocationSequence=lid_location_sequence,
-                primaryLabwareURI=loaded_labware_pool.primary_labware.definitionUri,
-                adapterLabwareURI=loaded_labware_pool.adapter_labware.definitionUri
-                if loaded_labware_pool.adapter_labware is not None
-                else None,
-                lidLabwareURI=loaded_labware_pool.lid_labware.definitionUri
-                if loaded_labware_pool.lid_labware is not None
-                else None,
-            ),
-            state_update,
-        )
-
     def handle_recoverable_error(
-        self, error: RecoverableExceptions
-    ) -> DefinedErrorData[FlexStackerStallOrCollisionError] | DefinedErrorData[
-        FlexStackerShuttleError
-    ] | DefinedErrorData[FlexStackerHopperError]:
+        self,
+        error: RecoverableExceptions,
+        intended_id: str,
+        state_update: update_types.StateUpdate,
+    ) -> (
+        DefinedErrorData[FlexStackerStallOrCollisionError]
+        | DefinedErrorData[FlexStackerShuttleError]
+        | DefinedErrorData[FlexStackerHopperError]
+        | DefinedErrorData[FlexStackerLabwareRetrieveError]
+    ):
         """Handle a recoverable error raised during command execution."""
         error_map = {
             FlexStackerStallError: FlexStackerStallOrCollisionError,
             FlexStackerShuttleMissingError: FlexStackerShuttleError,
             FlexStackerHopperLabwareError: FlexStackerHopperError,
+            FlexStackerShuttleLabwareError: FlexStackerLabwareRetrieveError,
         }
         return DefinedErrorData(
             public=error_map[type(error)](
@@ -295,7 +194,9 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                         error=error,
                     )
                 ],
-            )
+                errorInfo={"labwareId": intended_id},
+            ),
+            state_update_if_false_positive=state_update,
         )
 
     async def execute(self, params: RetrieveParams) -> _ExecuteReturn:
@@ -303,17 +204,16 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )
+        location = self._state_view.modules.get_location(params.moduleId)
 
-        pool_definitions = stacker_state.get_pool_definition_ordered_list()
-        if pool_definitions is None:
-            location = self._state_view.modules.get_location(params.moduleId)
+        if stacker_state.pool_primary_definition is None:
             raise FlexStackerLabwarePoolNotYetDefinedError(
-                message=f"The Flex Stacker in {location} has not been configured yet and cannot be filled."
+                f"The Flex Stacker in {location} must be configured before labware can be retrieved."
             )
 
-        if stacker_state.pool_count == 0:
+        if len(stacker_state.contained_labware_bottom_first) == 0:
             raise CannotPerformModuleAction(
-                message="Cannot retrieve labware from Flex Stacker because it contains no labware"
+                message=f"Cannot retrieve labware from Flex Stacker in {location} because it contains no labware"
             )
 
         stacker_loc = ModuleLocation(moduleId=params.moduleId)
@@ -322,27 +222,17 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             self._state_view.labware.raise_if_labware_in_location(stacker_loc)
         except LocationIsOccupiedError:
             raise CannotPerformModuleAction(
-                "Cannot retrieve a labware from Flex Stacker if the carriage is occupied"
+                f"Cannot retrieve a labware from Flex Stacker in {location} if the carriage is occupied"
             )
 
-        labware_height = self._state_view.geometry.get_height_of_labware_stack(
-            definitions=pool_definitions
+        labware_height = self._state_view.geometry.get_height_of_stacker_labware_pool(
+            params.moduleId
         )
+        to_retrieve = stacker_state.contained_labware_bottom_first[0]
+        remaining = stacker_state.contained_labware_bottom_first[1:]
 
-        # Allow propagation of ModuleNotAttachedError.
-        stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
-        if stacker_hw is not None:
-            try:
-                await stacker_hw.dispense_labware(labware_height=labware_height)
-            except (
-                FlexStackerStallError,
-                FlexStackerShuttleMissingError,
-                FlexStackerHopperLabwareError,
-            ) as e:
-                return self.handle_recoverable_error(e)
-
-        retrieve_result, state_update = await self._load_labware_from_pool(
-            params, stacker_state
+        locations, offsets = build_retrieve_labware_move_updates(
+            to_retrieve, stacker_state, self._state_view
         )
 
         # Update the state to reflect the labware is now in the Flex Stacker slot
@@ -357,10 +247,65 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 model=self._state_view.modules.get(params.moduleId).model,
             )
         )
-        state_update.set_addressable_area_used(stacker_area)
+        original_locations = labware_locations_for_group(
+            to_retrieve, [InStackerHopperLocation(moduleId=params.moduleId)]
+        )
+        new_locations = labware_locations_for_group(
+            to_retrieve,
+            self._state_view.geometry.get_predicted_location_sequence(
+                ModuleLocation(moduleId=params.moduleId)
+            ),
+        )
+
+        state_update = (
+            update_types.StateUpdate()
+            .set_batch_labware_location(
+                new_locations_by_id=locations, new_offset_ids_by_id=offsets
+            )
+            .update_flex_stacker_contained_labware(params.moduleId, remaining)
+            .set_addressable_area_used(stacker_area)
+        )
+
+        # Allow propagation of ModuleNotAttachedError.
+        stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
+        if stacker_hw is not None:
+            try:
+                await stacker_hw.dispense_labware(labware_height=labware_height)
+            except (
+                FlexStackerStallError,
+                FlexStackerShuttleMissingError,
+                FlexStackerHopperLabwareError,
+                FlexStackerShuttleLabwareError,
+            ) as e:
+                return self.handle_recoverable_error(
+                    e, to_retrieve.primaryLabwareId, state_update
+                )
 
         return SuccessData(
-            public=retrieve_result,
+            public=RetrieveResult.model_construct(
+                labwareId=to_retrieve.primaryLabwareId,
+                adapterId=to_retrieve.adapterLabwareId,
+                lidId=to_retrieve.lidLabwareId,
+                primaryLocationSequence=primary_location_sequence(new_locations),
+                adapterLocationSequence=adapter_location_sequence(new_locations),
+                lidLocationSequence=lid_location_sequence(new_locations),
+                originalPrimaryLocationSequence=primary_location_sequence(
+                    original_locations
+                ),
+                originalAdapterLocationSequence=adapter_location_sequence(
+                    original_locations
+                ),
+                originalLidLocationSequence=lid_location_sequence(original_locations),
+                primaryLabwareURI=self._state_view.labware.get_uri_from_definition(
+                    stacker_state.pool_primary_definition
+                ),
+                adapterLabwareURI=self._state_view.labware.get_uri_from_definition_unless_none(
+                    stacker_state.pool_adapter_definition
+                ),
+                lidLabwareURI=self._state_view.labware.get_uri_from_definition_unless_none(
+                    stacker_state.pool_lid_definition
+                ),
+            ),
             state_update=state_update,
         )
 

@@ -59,6 +59,8 @@ setup: setup-js setup-py
 setup-py-toolchain:
 	$(OT_PYTHON) -m pip install --upgrade pip
 	$(OT_PYTHON) -m pip install pipenv==2023.12.1
+# this needs to be installed AFTER pipenv or pipenv will update this to the bad version
+	$(OT_PYTHON) -m pip install virtualenv==20.30.0
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
@@ -74,7 +76,6 @@ PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 .PHONY: setup-py
 setup-py: setup-py-toolchain
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
-
 
 %-py-setup:
 	$(MAKE) -C $* setup
@@ -189,19 +190,17 @@ test-e2e:
 	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test-e2e
 	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test-e2e
 
-.PHONY: test-py-windows
-test-py-windows:
-	$(MAKE) -C $(HARDWARE_DIR) test
-	$(MAKE) -C $(API_DIR) test
-	$(MAKE) -C $(SHARED_DATA_DIR) test-py
+PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(PYTHON_DIRS))
+WINDOWS_PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(HARDWARE_DIR) $(API_DIR) $(SHARED_DATA_DIR)/python)
 
 .PHONY: test-py
-test-py: test-py-windows
-	$(MAKE) -C $(UPDATE_SERVER_DIR) test
-	$(MAKE) -C $(ROBOT_SERVER_DIR) test
-	$(MAKE) -C $(SERVER_UTILS_DIR) test
-	$(MAKE) -C $(G_CODE_TESTING_DIR) test
-	$(MAKE) -C $(USB_BRIDGE_DIR) test
+test-py: $(PYTHON_TEST_TARGETS)
+
+.PHONY: test-py-windows
+test-py-windows: $(WINDOWS_PYTHON_TEST_TARGETS)
+
+%-py-test:
+	$(MAKE) -C $* test
 
 .PHONY: test-js
 test-js: test-js-internal
@@ -265,13 +264,20 @@ clean-ts:
 	yarn tsc --build --clean
 
 # TODO: Ian 2019-12-17 gradually add components and shared-data
+JS_CIRCULAR_DEPENDENCIES_ROOTS := \
+	$(PROTOCOL_DESIGNER_DIR)/src/index.tsx \
+	$(STEP_GENERATION_DIR)/src/index.ts \
+	$(LABWARE_LIBRARY_DIR)/src/index.tsx \
+	$(APP_DIR)/src/index.tsx \
+	$(COMPONENTS_DIR)/src/index.ts
+
+JS_CIRCULAR_DEPENDENCIES_TARGETS := $(addsuffix -circular-dependencies-js, $(JS_CIRCULAR_DEPENDENCIES_ROOTS))
+
 .PHONY: circular-dependencies-js
-circular-dependencies-js:
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.tsx
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.ts
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular components/src/index.ts
+circular-dependencies-js: $(JS_CIRCULAR_DEPENDENCIES_TARGETS)
+
+%-circular-dependencies-js:
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular $*
 
 .PHONY: test-js-internal
 test-js-internal:

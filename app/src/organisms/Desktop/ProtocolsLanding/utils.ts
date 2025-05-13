@@ -1,5 +1,11 @@
 import { FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
-import type { ProtocolAnalysisOutput, RobotType } from '@opentrons/shared-data'
+
+import type {
+  LoadLabwareRunTimeCommand,
+  LoadLidStackRunTimeCommand,
+  ProtocolAnalysisOutput,
+  RobotType,
+} from '@opentrons/shared-data'
 
 type AnalysisStatus =
   | 'missing'
@@ -19,7 +25,10 @@ export function getAnalysisStatus(
   if (analysis == null || analysis === undefined) {
     return 'missing'
   }
-  if (analysis.liquids == null || analysis.runTimeParameters == null) {
+  if (
+    storedAnallysisNoRTPSupport(analysis) ||
+    storedAnallysisNoLocationSequenceSupport(analysis)
+  ) {
     return 'stale'
   }
   if (analysis.result === 'parameter-value-required') {
@@ -51,3 +60,19 @@ export function getisFlexProtocol(
     return false
   }
 }
+
+const storedAnallysisNoRTPSupport = (
+  analysis: ProtocolAnalysisOutput
+): boolean => analysis.runTimeParameters == null
+const storedAnallysisNoLocationSequenceSupport = (
+  analysis: ProtocolAnalysisOutput
+): boolean =>
+  analysis.commands.some(
+    (
+      command
+    ): command is LoadLabwareRunTimeCommand | LoadLidStackRunTimeCommand =>
+      (command.commandType === 'loadLabware' &&
+        command.result?.locationSequence == null) ||
+      (command.commandType === 'loadLidStack' &&
+        command.result?.locationSequences == null)
+  )

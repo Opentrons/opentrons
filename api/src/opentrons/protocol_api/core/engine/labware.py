@@ -8,7 +8,10 @@ from opentrons_shared_data.labware.types import (
     LabwareDefinition as LabwareDefinitionDict,
 )
 
-from opentrons_shared_data.labware.labware_definition import LabwareRole
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareRole,
+    LabwareDefinition,
+)
 
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.errors import (
@@ -229,3 +232,7 @@ class LabwareCore(AbstractLabware[WellCore]):
                 volumeByWell={well: 0.0 for well in wells},
             )
         )
+
+    def get_engine_definition(self) -> LabwareDefinition:
+        """Get the engine-side definition object rather than the dict."""
+        return self._definition

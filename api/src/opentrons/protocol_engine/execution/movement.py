@@ -24,6 +24,7 @@ from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
 
 from .gantry_mover import GantryMover
+from .equipment import EquipmentHandler
 
 
 log = logging.getLogger(__name__)
@@ -43,6 +44,7 @@ class MovementHandler:
         model_utils: Optional[ModelUtils] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
         heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
+        equipment: Optional[EquipmentHandler] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
@@ -50,7 +52,13 @@ class MovementHandler:
         self._tc_movement_flagger = (
             thermocycler_movement_flagger
             or ThermocyclerMovementFlagger(
-                state_store=self._state_store, hardware_api=hardware_api
+                state_store=self._state_store,
+                hardware_api=hardware_api,
+                equipment=equipment
+                or EquipmentHandler(
+                    hardware_api=hardware_api,
+                    state_store=state_store,
+                ),
             )
         )
         self._hs_movement_flagger = (
@@ -83,8 +91,7 @@ class MovementHandler:
         self._state_store.labware.raise_if_labware_has_labware_on_top(
             labware_id=labware_id
         )
-
-        await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+        await self._tc_movement_flagger.ensure_labware_in_open_thermocycler(
             labware_parent=self._state_store.labware.get_location(labware_id=labware_id)
         )
 
@@ -105,9 +112,7 @@ class MovementHandler:
         self._hs_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=hs_movement_restrictors,
             destination_slot=dest_slot_int,
-            is_multi_channel=(
-                self._state_store.tips.get_pipette_channels(pipette_id) > 1
-            ),
+            is_multi_channel=(self._state_store.pipettes.get_channels(pipette_id) > 1),
             destination_is_tip_rack=self._state_store.labware.is_tiprack(labware_id),
         )
 
@@ -204,9 +209,7 @@ class MovementHandler:
         self._hs_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=hs_movement_restrictors,
             destination_slot=dest_slot_int,
-            is_multi_channel=(
-                self._state_store.tips.get_pipette_channels(pipette_id) > 1
-            ),
+            is_multi_channel=(self._state_store.pipettes.get_channels(pipette_id) > 1),
             destination_is_tip_rack=False,
         )
 

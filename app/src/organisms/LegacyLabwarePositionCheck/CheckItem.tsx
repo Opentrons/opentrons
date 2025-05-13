@@ -1,17 +1,16 @@
 import { useEffect } from 'react'
-import omit from 'lodash/omit'
-import isEqual from 'lodash/isEqual'
 import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import isEqual from 'lodash/isEqual'
+import omit from 'lodash/omit'
+
 import {
   DIRECTION_COLUMN,
   Flex,
+  getLabwareDefinitionsFromCommands,
   LegacyStyledText,
   TYPOGRAPHY,
-  getLabwareDefinitionsFromCommands,
 } from '@opentrons/components'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
-import { JogToWell } from './JogToWell'
 import {
   FLEX_ROBOT_TYPE,
   getIsTiprack,
@@ -22,13 +21,18 @@ import {
   IDENTITY_VECTOR,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useSelector } from 'react-redux'
-import { getLabwareDef } from './utils/labware'
-import { UnorderedList } from '/app/molecules/UnorderedList'
-import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
-import { getIsOnDevice } from '/app/redux/config'
-import { getDisplayLocation } from './utils/getDisplayLocation'
 
+import { UnorderedList } from '/app/molecules/UnorderedList'
+import { getIsOnDevice } from '/app/redux/config'
+import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
+
+import { JogToWell } from './JogToWell'
+import { PrepareSpace } from './PrepareSpace'
+import { RobotMotionLoader } from './RobotMotionLoader'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { getLabwareDef } from './utils/labware'
+
+import type { TFunction } from 'i18next'
 import type { Dispatch } from 'react'
 import type {
   LabwareOffset,
@@ -40,16 +44,15 @@ import type {
   LabwareLocation,
   MoveLabwareCreateCommand,
   RobotType,
-  Coordinates,
+  Vector3D,
 } from '@opentrons/shared-data'
+import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type {
   CheckLabwareStep,
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { Jog } from '/app/molecules/JogControls/types'
-import type { TFunction } from 'i18next'
 
 const PROBE_LENGTH_MM = 44.5
 
@@ -61,8 +64,8 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   setFatalError: (errorMessage: string) => void
   isApplyingOffsets: boolean
   calculateAndApplyOffset: (
-    initialPosition: Coordinates | null,
-    finalPosition: Coordinates | null,
+    initialPosition: Vector3D | null,
+    finalPosition: Vector3D | null,
     labwareId: string,
     location: LegacyLabwareOffsetLocation
   ) => Promise<void>

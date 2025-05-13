@@ -1,16 +1,18 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  StyledText,
   RadioButton,
-  truncateString,
   SPACING,
+  StyledText,
   styleProps,
+  truncateString,
 } from '@opentrons/components'
+
 import { getIsOnDevice } from '/app/redux/config'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -58,25 +60,27 @@ export function LabwareStackContents(
       >
         {t('top_of_slot')}
       </StyledText>
-      {labwareInStack.map((labware, index) => {
-        const isSelected = selectedLabware.labwareId === labware.labwareId
-        return (
-          <RadioButton
-            key={index}
-            radioButtonType="small"
-            buttonLabel={truncateString(labware.displayName, MAX_CHARS)}
-            buttonValue={labware.labwareId}
-            id={labware.labwareId}
-            isSelected={isSelected}
-            tagText={(labwareInStack.length - index).toString()}
-            maxLines={2}
-            onChange={() => {
-              setSelectedLabware(labware)
-            }}
-            largeDesktopBorderRadius={!isOnDevice}
-          />
-        )
-      })}
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        {labwareInStack.map((labware, index) => {
+          const isSelected = selectedLabware.labwareId === labware.labwareId
+          return (
+            <RadioButton
+              key={index}
+              radioButtonType="small"
+              buttonLabel={truncateString(labware.displayName, MAX_CHARS)}
+              buttonValue={labware.labwareId}
+              id={labware.labwareId}
+              isSelected={isSelected}
+              tagText={(labwareInStack.length - index).toString()}
+              maxLines={2}
+              onChange={() => {
+                setSelectedLabware(labware)
+              }}
+              largeDesktopBorderRadius={!isOnDevice}
+            />
+          )
+        })}
+      </Flex>
       <StyledText
         oddStyle="smallBodyTextRegular"
         desktopStyle="captionRegular"

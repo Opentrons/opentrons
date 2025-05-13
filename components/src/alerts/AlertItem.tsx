@@ -1,6 +1,7 @@
 import cx from 'classnames'
-import { Icon } from '../icons'
+
 import { IconButton } from '../buttons'
+import { Icon } from '../icons'
 import styles from './alerts.module.css'
 
 import type { ReactNode } from 'react'

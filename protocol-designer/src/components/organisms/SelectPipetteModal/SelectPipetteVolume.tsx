@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -8,7 +9,9 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { PIPETTE_VOLUMES } from '../../../pages/Onboarding/constants'
+
 import type { Dispatch, SetStateAction } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type {
@@ -36,7 +39,7 @@ export function SelectPipetteVolume(
     pipetteGen,
     pipetteVolume,
   } = props
-  const { t } = useTranslation('create_new_protocol')
+  const { t } = useTranslation('onboarding')
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>

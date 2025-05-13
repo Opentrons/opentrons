@@ -5,10 +5,10 @@ import {
   makeResponseFixtures,
   mockFailureBody,
 } from '../../robot-api/__fixtures__'
-import { WIFI_LIST_PATH, SECURITY_WPA_EAP } from '../constants'
+import { SECURITY_WPA_EAP, WIFI_LIST_PATH } from '../constants'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
-import type { WifiNetwork, WifiListResponse } from '../types'
+import type { WifiListResponse, WifiNetwork } from '../types'
 
 export const mockWifiNetwork: WifiNetwork = {
   ssid: 'linksys',

@@ -9,7 +9,7 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 ---
 ## Opentrons Robot Software Changes in 8.4.0
 
-Welcome to the v8.4.0 release of the Opentrons robot software! This release includes updated liquid handling commands for Opentrons-verified liquid classes and other new features, improvements, and bug fixes. 
+Welcome to the v8.4.0 release of the Opentrons robot software! This release includes updated liquid handling commands for pipetting relative to a liquid meniscus, and other new features, improvements, and bug fixes.
 
 ### New Features
 
@@ -25,6 +25,10 @@ Welcome to the v8.4.0 release of the Opentrons robot software! This release incl
 ### Bug Fixes
 
 - The API raises an error if the Absorbance Plate Reader fails to initialize before reading a plate inside the module. 
+
+### Known Issues
+
+- When you use `load_liquid()` and then use `measure_liquid_height()` on the same well, protocol analysis won't raise an error if there's not enough liquid to complete your transfers. To avoid errors during an actual run, use only one of the two commands. 
 
 ## Opentrons Robot Software Changes in 8.3.1
 

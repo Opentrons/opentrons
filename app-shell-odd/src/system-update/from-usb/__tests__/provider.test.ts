@@ -1,5 +1,6 @@
-import { it, describe, vi, afterEach, expect } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import { getProvider } from '../provider'
 import { getLatestMassStorageUpdateFile as _getLatestMassStorageUpdateFile } from '../scan-device'
 

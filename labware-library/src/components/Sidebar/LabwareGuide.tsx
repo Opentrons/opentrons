@@ -1,12 +1,14 @@
 // labware filters
 import { Link } from 'react-router-dom'
+
 import { Icon } from '@opentrons/components'
+
 import {
-  LABWARE_GUIDE,
-  WHAT_IS_A_LABWARE_DEFINITION,
-  USING_THE_LABWARE_LIBRARY,
   CREATING_CUSTOM_LABWARE_DEFINITIONS,
   LABWARE_CREATOR,
+  LABWARE_GUIDE,
+  USING_THE_LABWARE_LIBRARY,
+  WHAT_IS_A_LABWARE_DEFINITION,
 } from '../../localization'
 import styles from './styles.module.css'
 

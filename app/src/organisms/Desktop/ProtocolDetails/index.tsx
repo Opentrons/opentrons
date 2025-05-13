@@ -1,14 +1,14 @@
-import { useState, Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { createPortal } from 'react-dom'
-import map from 'lodash/map'
-import omit from 'lodash/omit'
-import isEmpty from 'lodash/isEmpty'
-import startCase from 'lodash/startCase'
-import { format } from 'date-fns'
-import { css } from 'styled-components'
+import { ErrorBoundary } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { ErrorBoundary } from 'react-error-boundary'
+import { format } from 'date-fns'
+import isEmpty from 'lodash/isEmpty'
+import map from 'lodash/map'
+import omit from 'lodash/omit'
+import startCase from 'lodash/startCase'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -30,7 +30,6 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   PrimaryButton,
-  ProtocolDeck,
   SIZE_1,
   SIZE_5,
   SPACING,
@@ -38,46 +37,48 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  MAGNETIC_BLOCK_TYPE,
   getGripperDisplayName,
   getModuleType,
   getSimplestDeckConfigForProtocol,
+  MAGNETIC_BLOCK_TYPE,
   parseInitialLoadedModulesBySlot,
   parseInitialPipetteNamesByMount,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
-import {
-  useTrackEvent,
-  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '/app/redux/analytics'
-import {
-  getIsProtocolAnalysisInProgress,
-  analyzeProtocol,
-} from '/app/redux/protocol-storage'
-import { useFeatureFlag } from '/app/redux/config'
 import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout'
-import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
-import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
-import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
+import { ProtocolDeck } from '/app/organisms/ProtocolDeck'
+import {
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  useTrackEvent,
+} from '/app/redux/analytics'
+import { useFeatureFlag } from '/app/redux/config'
+import {
+  analyzeProtocol,
+  getIsProtocolAnalysisInProgress,
+} from '/app/redux/protocol-storage'
 import { getAnalysisStatus } from '/app/transformations/analysis'
-import { getProtocolDisplayName } from '/app/transformations/protocols'
 import { getProtocolUsesGripper } from '/app/transformations/commands'
+import { getProtocolDisplayName } from '/app/transformations/protocols'
+
+import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
-import { ProtocolStats } from './ProtocolStats'
+import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
+import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
+import { AnnotatedSteps } from './AnnotatedSteps'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
-import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 import { ProtocolParameters } from './ProtocolParameters'
-import { AnnotatedSteps } from './AnnotatedSteps'
+import { ProtocolStats } from './ProtocolStats'
+import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type {
   GroupedCommands,
   StoredProtocolData,
 } from '/app/redux/protocol-storage'
-import type { State, Dispatch } from '/app/redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 const GRID_STYLE = css`
   display: ${DISPLAY_GRID};

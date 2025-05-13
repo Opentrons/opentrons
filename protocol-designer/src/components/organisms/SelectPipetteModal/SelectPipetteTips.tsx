@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
@@ -19,15 +20,16 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { removeOpentronsPhrases } from '../../../utils'
+
+import { setFeatureFlags } from '../../../feature-flags/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
-import { setFeatureFlags } from '../../../feature-flags/actions'
+import { removeOpentronsPhrases } from '../../../utils'
 import { useKitchen } from '../Kitchen/hooks'
 
+import type { ThunkDispatch } from 'redux-thunk'
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
-import type { ThunkDispatch } from 'redux-thunk'
 import type { PipetteMount, RobotType } from '@opentrons/shared-data'
 import type { BaseState } from '../../../types'
 
@@ -53,7 +55,7 @@ export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
     pipetteVolume,
     setIncompatibleTip,
   } = props
-  const { t } = useTranslation('create_new_protocol')
+  const { t } = useTranslation('onboarding')
   const { makeSnackbar } = useKitchen()
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()

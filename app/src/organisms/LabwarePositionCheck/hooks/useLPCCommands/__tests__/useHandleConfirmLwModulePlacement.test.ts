@@ -1,5 +1,5 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   moduleInitDuringLPCCommands,
@@ -142,6 +142,34 @@ describe('useHandleConfirmLwModulePlacement', () => {
     expect(position).toEqual(mockPosition)
   })
 
+  it('should chain commands in the correct order when handleMoveToInitialOffsetPosition is called', async () => {
+    const { result } = renderHook(() =>
+      useHandleConfirmLwModulePlacement(mockProps)
+    )
+
+    const position = await result.current.handleMoveToInitialOffsetPosition(
+      mockOffsetLocationDetails,
+      mockPipetteId,
+      mockInitialVectorOffset
+    )
+
+    expect(moveToWellCommands).toHaveBeenCalledWith(
+      mockOffsetLocationDetails,
+      mockPipetteId,
+      mockInitialVectorOffset
+    )
+    expect(savePositionCommands).toHaveBeenCalledWith(mockPipetteId)
+
+    expect(mockChainLPCCommands).toHaveBeenCalled()
+    const commandsArg = mockChainLPCCommands.mock.calls[0][0]
+
+    expect(commandsArg.length).toBe(2)
+    expect(commandsArg[0].commandType).toBe('moveToWell')
+    expect(commandsArg[1].commandType).toBe('savePosition')
+
+    expect(position).toEqual(mockPosition)
+  })
+
   it('should handle labware placement on deck when no module or labware beneath', async () => {
     const mockOffsetLocationDetailsNoPriorItem = {
       ...mockOffsetLocationDetails,
@@ -173,7 +201,7 @@ describe('useHandleConfirmLwModulePlacement', () => {
     })
   })
 
-  it('should reject with error when final command response is incorrect', async () => {
+  it('should reject with error when final command response is incorrect for handleConfirmLwModulePlacement', async () => {
     mockChainLPCCommands.mockResolvedValueOnce([
       { data: { commandType: 'moveLabware' } },
       { data: { commandType: 'moduleInitDuringLPC' } },
@@ -194,6 +222,36 @@ describe('useHandleConfirmLwModulePlacement', () => {
       result.current.handleConfirmLwModulePlacement(
         mockOffsetLocationDetails,
         mockPipetteId
+      )
+    ).rejects.toThrow(
+      'CheckItem failed to save position for initial placement.'
+    )
+
+    expect(mockSetErrorMessage).toHaveBeenCalledWith(
+      'CheckItem failed to save position for initial placement.'
+    )
+  })
+
+  it('should reject with error when final command response is incorrect for handleMoveToInitialOffsetPosition', async () => {
+    mockChainLPCCommands.mockResolvedValueOnce([
+      { data: { commandType: 'moveToWell' } },
+      {
+        data: {
+          commandType: 'unknownCommand',
+          result: null,
+        },
+      },
+    ])
+
+    const { result } = renderHook(() =>
+      useHandleConfirmLwModulePlacement(mockProps)
+    )
+
+    await expect(
+      result.current.handleMoveToInitialOffsetPosition(
+        mockOffsetLocationDetails,
+        mockPipetteId,
+        mockInitialVectorOffset
       )
     ).rejects.toThrow(
       'CheckItem failed to save position for initial placement.'

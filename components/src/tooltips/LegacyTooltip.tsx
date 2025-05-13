@@ -2,16 +2,16 @@ import { forwardRef } from 'react'
 import { css } from 'styled-components'
 
 import { BORDERS, COLORS } from '../helix-design-system'
-import { fontSizeH4 } from '../ui-style-constants/typography'
-import { spacing8 } from '../ui-style-constants/spacing'
-import { ARROW_SIZE_PX } from './styles'
 import { Box } from '../primitives'
 import { CURSOR_POINTER } from '../styles'
+import { spacing8 } from '../ui-style-constants/spacing'
+import { fontSizeH4 } from '../ui-style-constants/typography'
+import { ARROW_SIZE_PX } from './styles'
 
-import type { CSSProperties, ForwardedRef, ReactNode, RefCallback } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { Placement } from './types'
+import type { CSSProperties, ForwardedRef, ReactNode, RefCallback } from 'react'
 import type { StyleProps } from '../primitives'
+import type { Placement } from './types'
 
 export interface LegacyTooltipProps extends StyleProps {
   /** Whether or not the tooltip should be rendered */

@@ -1,12 +1,16 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
-import { modulePipetteCollision } from '../utils/modulePipetteCollision'
+
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
-import type { RobotState, InvariantContext } from '../types'
+import { modulePipetteCollision } from '../utils/modulePipetteCollision'
+
+import type { InvariantContext, RobotState } from '../types'
+
 let invariantContext: InvariantContext
 let robotState: RobotState
 let collisionArgs: {
@@ -24,8 +28,8 @@ beforeEach(() => {
     pythonName: 'mockPythonName',
   }
   robotState = getInitialRobotStateStandard(invariantContext)
-  robotState.labware.destPlateId.slot = '4'
-  robotState.labware.tiprack1Id.slot = '10'
+  robotState.labware.destPlateId.stack = ['destPlateId', '4']
+  robotState.labware.tiprack1Id.stack = ['tiprack1Id', '10']
   robotState.modules.magDeckId = {
     slot: '1',
     moduleState: {

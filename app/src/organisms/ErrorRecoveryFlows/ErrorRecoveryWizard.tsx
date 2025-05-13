@@ -1,41 +1,42 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import { CURSOR_POINTER, StyledText } from '@opentrons/components'
 
-import { RecoveryError } from './RecoveryError'
+import { RECOVERY_MAP } from './constants'
 import { RecoveryDoorOpen } from './RecoveryDoorOpen'
+import { RecoveryError } from './RecoveryError'
+import { RecoveryInProgress } from './RecoveryInProgress'
 import {
-  SelectRecoveryOption,
-  RetryStep,
   CancelRun,
-  RetryNewTips,
-  ManageTips,
-  FillWellAndSkip,
-  RetrySameTips,
-  SkipStepSameTips,
-  SkipStepNewTips,
+  FillWellAndRetryNewTips,
+  FillWellAndRetrySameTips,
+  HomeAndRetry,
   IgnoreErrorSkipStep,
+  ManageTips,
   ManualMoveLwAndSkip,
   ManualReplaceLwAndRetry,
-  HomeAndRetry,
+  RetryNewTips,
+  RetrySameTips,
+  RetryStep,
+  SelectRecoveryOption,
+  SkipStepNewTips,
+  SkipStepSameTips,
 } from './RecoveryOptions'
 import {
-  useErrorDetailsModal,
   ErrorDetailsModal,
-  RecoveryInterventionModal,
   RecoveryDoorOpenSpecial,
+  RecoveryInterventionModal,
+  useErrorDetailsModal,
 } from './shared'
-import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
-import { RECOVERY_MAP } from './constants'
 
 import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
-import type { RecoveryRoute, RouteStep, RecoveryContentProps } from './types'
-import type { ErrorRecoveryFlowsProps } from '.'
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
+import type { ErrorRecoveryFlowsProps } from '.'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from './hooks'
+import type { RecoveryContentProps, RecoveryRoute, RouteStep } from './types'
 
 export interface UseERWizardResult {
   hasLaunchedRecovery: boolean
@@ -194,8 +195,12 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <RetrySameTips {...props} />
   }
 
-  const buildFillWellAndSkip = (): JSX.Element => {
-    return <FillWellAndSkip {...props} />
+  const buildFillWellAndRetrySameTips = (): JSX.Element => {
+    return <FillWellAndRetrySameTips {...props} />
+  }
+
+  const buildFillWellAndRetryNewTips = (): JSX.Element => {
+    return <FillWellAndRetryNewTips {...props} />
   }
 
   const buildSkipStepSameTips = (): JSX.Element => {
@@ -245,8 +250,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildRetryNewTips()
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
       return buildRetrySameTips()
-    case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
-      return buildFillWellAndSkip()
+    case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE:
+      return buildFillWellAndRetrySameTips()
+    case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
+      return buildFillWellAndRetryNewTips()
     case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
       return buildSkipStepSameTips()
     case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
@@ -261,6 +268,8 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
     case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
     case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+    case RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+    case RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
       return buildManualReplaceLwAndRetry()
     case RECOVERY_MAP.ROBOT_DOOR_OPEN_SPECIAL.ROUTE:
       return buildRecoveryDoorOpenSpecial()
@@ -271,6 +280,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE:
     case RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE:
     case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
+    case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
       return buildRecoveryInProgress()
     case RECOVERY_MAP.ROBOT_DOOR_OPEN.ROUTE:
       return buildManuallyRouteToDoorOpen()

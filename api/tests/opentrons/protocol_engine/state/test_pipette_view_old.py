@@ -660,6 +660,8 @@ def test_nozzle_configuration_getters() -> None:
         valid_nozzle_maps=ValidNozzleMaps(maps={"A1": ["A1"]}),
     )
     subject = get_pipette_view(nozzle_layout_by_id={"pipette-id": nozzle_map})
+    assert subject.get_nozzle_configuration("pipette-id") == nozzle_map
+    assert subject.get_nozzle_configurations() == {"pipette-id": nozzle_map}
     assert subject.get_nozzle_layout_type("pipette-id") == NozzleConfigurationType.FULL
     assert subject.get_is_partially_configured("pipette-id") is False
     assert subject.get_primary_nozzle("pipette-id") == "A1"

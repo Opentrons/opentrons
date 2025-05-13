@@ -1,5 +1,6 @@
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   JUSTIFY_END,
@@ -9,26 +10,26 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { HandleEnter } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
 
 interface ConfirmDeleteEntityInUseModalProps {
   onClose: () => void
   onConfirm: () => void
-  type: 'clear' | 'reconfigure'
 }
 export function ConfirmDeleteEntityInUseModal(
   props: ConfirmDeleteEntityInUseModalProps
 ): JSX.Element {
-  const { onClose, onConfirm, type } = props
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { onClose, onConfirm } = props
+  const { t } = useTranslation(['onboarding', 'shared'])
 
   return createPortal(
     <HandleEnter onEnter={onConfirm}>
       <Modal
         marginLeft="0"
         zIndexOverlay={11}
-        title={t(`are_you_sure_${type}_slot`)}
+        title={t(`are_you_sure_clear_slot`)}
         type="warning"
         onClose={onClose}
         footer={

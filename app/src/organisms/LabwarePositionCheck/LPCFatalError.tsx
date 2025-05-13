@@ -1,6 +1,6 @@
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -8,11 +8,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  JUSTIFY_CENTER,
+  RESPONSIVENESS,
   SPACING,
   StyledText,
-  JUSTIFY_CENTER,
   TEXT_ALIGN_CENTER,
-  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'

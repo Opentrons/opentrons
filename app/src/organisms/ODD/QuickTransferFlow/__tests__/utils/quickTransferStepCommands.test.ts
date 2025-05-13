@@ -1,18 +1,23 @@
-import { describe, it, expect } from 'vitest'
-import { quickTransferStepCommands } from '../../utils/pythonDef'
+import { describe, expect, it } from 'vitest'
+
 import {
   fixture96Plate,
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
+  POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
+import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
+
+import { quickTransferStepCommands } from '../../utils/pythonDef'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
-  InvariantContext,
-  TimelineFrame,
   ConsolidateArgs,
   DistributeArgs,
+  InvariantContext,
+  TimelineFrame,
   TransferArgs,
 } from '@opentrons/step-generation'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockInvariantContext: InvariantContext = {
   moduleEntities: {},
@@ -67,13 +72,13 @@ const mockRobotState: TimelineFrame = {
   },
   labware: {
     mockSourceLabware: {
-      slot: 'A1',
+      stack: ['mockSourceLabware', 'A1'],
     },
     mockDestLabware: {
-      slot: 'C2',
+      stack: ['mockDestLabware', 'C2'],
     },
     mockTiprack: {
-      slot: 'B1',
+      stack: ['mockTiprack', 'B1'],
     },
   },
   modules: {},
@@ -116,8 +121,34 @@ describe('quickTransferStepCommands', () => {
       sourceWells: ['A1'],
       destWells: ['B1'],
       blowoutFlowRateUlSec: 50,
+      touchTipAfterAspirateMmFromEdge: null,
+      liquidClass: null,
+      aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateZOffset: 0,
+      aspirateSubmergeSpeed: null,
+      aspirateSubmergeXOffset: 0,
+      aspirateSubmergeYOffset: 0,
+      aspirateSubmergeZOffset: 0,
+      aspirateSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateRetractSpeed: null,
+      aspirateSubmergeDelay: null,
+      aspirateRetractXOffset: 0,
+      aspirateRetractYOffset: 0,
+      aspirateRetractZOffset: 0,
+      aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateRetractDelay: null,
+      dispenseSubmergeSpeed: null,
+      dispenseSubmergeXOffset: 0,
+      dispenseSubmergeYOffset: 0,
+      dispenseSubmergeZOffset: 0,
+      dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseRetractSpeed: null,
+      dispenseRetractXOffset: 0,
+      dispenseRetractYOffset: 0,
+      dispenseRetractZOffset: 0,
+      dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
       blowoutOffsetFromTopMm: -1,
-      blowoutLocation: 'source',
+      blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       mixBeforeAspirate: null,
       mixInDestination: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
@@ -142,11 +173,16 @@ describe('quickTransferStepCommands', () => {
       dispenseDelay: null,
       touchTipAfterDispense: false,
       touchTipAfterDispenseOffsetMmFromTop: 0,
+      touchTipAfterDispenseMmFromEdge: 0,
       touchTipAfterDispenseSpeed: null,
       dispenseFlowRateUlSec: 80,
       dispenseOffsetFromBottomMm: -1,
       dispenseXOffset: 0,
       dispenseYOffset: 0,
+      dispenseZOffset: 0,
+      dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseSubmergeDelay: null,
+      dispenseRetractDelay: null,
       name: 'transfer',
       description: 'transferring from 1 well to another',
       pushOut: null,
@@ -162,18 +198,25 @@ describe('quickTransferStepCommands', () => {
 # TRANSFER STEP
 
 pipette.pick_up_tip(location=mock_tiprack_1)
+pipette.move_to(mock_labware_1["A1"].top(z=2))
+pipette.prepare_to_aspirate()
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_1["A1"].bottom())
 pipette.aspirate(
     volume=10,
-    location=mock_labware_1["A1"].bottom(z=-1),
     rate=56 / pipette.flow_rate.aspirate,
 )
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
 pipette.dispense(
     volume=10,
-    location=mock_labware_2["B1"].bottom(z=-1),
     rate=80 / pipette.flow_rate.dispense,
 )
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_1["A1"].top())
 pipette.flow_rate.blow_out = 50
-pipette.blow_out(mock_trash_bin_1)
+pipette.blow_out()
 pipette.drop_tip()`.trimStart()
     )
   })
@@ -183,8 +226,34 @@ pipette.drop_tip()`.trimStart()
       sourceWells: ['A1', 'B1'],
       destWell: 'B1',
       blowoutFlowRateUlSec: 50,
+      liquidClass: null,
+      aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateZOffset: 0,
+      aspirateSubmergeSpeed: null,
+      aspirateSubmergeXOffset: 0,
+      aspirateSubmergeYOffset: 0,
+      aspirateSubmergeZOffset: 0,
+      aspirateSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateSubmergeDelay: null,
+      aspirateRetractSpeed: null,
+      aspirateRetractXOffset: 0,
+      aspirateRetractYOffset: 0,
+      aspirateRetractZOffset: 0,
+      aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateRetractDelay: null,
+      dispenseSubmergeSpeed: null,
+      dispenseSubmergeXOffset: 0,
+      dispenseSubmergeYOffset: 0,
+      dispenseSubmergeZOffset: 0,
+      dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseRetractSpeed: null,
+      dispenseRetractXOffset: 0,
+      dispenseRetractYOffset: 0,
+      dispenseRetractZOffset: 0,
+      dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+      touchTipAfterAspirateMmFromEdge: null,
       blowoutOffsetFromTopMm: -1,
-      blowoutLocation: 'source',
+      blowoutLocation: 'mockTrashBin',
       mixFirstAspirate: null,
       mixInDestination: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
@@ -209,11 +278,16 @@ pipette.drop_tip()`.trimStart()
       dispenseDelay: null,
       touchTipAfterDispense: false,
       touchTipAfterDispenseOffsetMmFromTop: 0,
+      touchTipAfterDispenseMmFromEdge: 0,
       touchTipAfterDispenseSpeed: null,
       dispenseFlowRateUlSec: 80,
       dispenseOffsetFromBottomMm: -1,
       dispenseXOffset: 0,
       dispenseYOffset: 0,
+      dispenseZOffset: 0,
+      dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseSubmergeDelay: null,
+      dispenseRetractDelay: null,
       name: 'transfer',
       description: 'transferring from 1 well to another',
       pushOut: null,
@@ -255,6 +329,32 @@ pipette.drop_tip()`.trimStart()
       sourceWell: 'A1',
       destWells: ['A1', 'B1'],
       blowoutFlowRateUlSec: 50,
+      touchTipAfterAspirateMmFromEdge: null,
+      liquidClass: null,
+      aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateZOffset: 0,
+      aspirateSubmergeSpeed: null,
+      aspirateSubmergeXOffset: 0,
+      aspirateSubmergeYOffset: 0,
+      aspirateSubmergeZOffset: 0,
+      aspirateSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateSubmergeDelay: null,
+      aspirateRetractSpeed: null,
+      aspirateRetractXOffset: 0,
+      aspirateRetractYOffset: 0,
+      aspirateRetractZOffset: 0,
+      aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateRetractDelay: null,
+      dispenseSubmergeSpeed: null,
+      dispenseSubmergeXOffset: 0,
+      dispenseSubmergeYOffset: 0,
+      dispenseSubmergeZOffset: 0,
+      dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseRetractSpeed: null,
+      dispenseRetractXOffset: 0,
+      dispenseRetractYOffset: 0,
+      dispenseRetractZOffset: 0,
+      dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
       blowoutOffsetFromTopMm: -1,
       blowoutLocation: 'source',
       mixBeforeAspirate: null,
@@ -280,11 +380,16 @@ pipette.drop_tip()`.trimStart()
       dispenseDelay: null,
       touchTipAfterDispense: false,
       touchTipAfterDispenseOffsetMmFromTop: 0,
+      touchTipAfterDispenseMmFromEdge: 0,
       touchTipAfterDispenseSpeed: null,
       dispenseFlowRateUlSec: 80,
       dispenseOffsetFromBottomMm: -1,
       dispenseXOffset: 0,
       dispenseYOffset: 0,
+      dispenseZOffset: 0,
+      dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseSubmergeDelay: null,
+      dispenseRetractDelay: null,
       name: 'transfer',
       description: 'transferring from 1 well to another',
       disposalVolume: null,

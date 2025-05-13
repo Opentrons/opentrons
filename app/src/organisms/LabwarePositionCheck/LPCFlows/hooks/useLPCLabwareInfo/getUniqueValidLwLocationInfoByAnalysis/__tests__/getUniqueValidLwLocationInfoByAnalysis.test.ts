@@ -1,8 +1,12 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { getUniqueValidLwLocationInfoByAnalysis } from '..'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
+
+import { getUniqueValidLwLocationInfoByAnalysis } from '..'
 import { getLPCUniqValidLabwareLocationInfo } from '../getLPCUniqValidLabwareLocationInfo'
+
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils')

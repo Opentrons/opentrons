@@ -1,7 +1,7 @@
-import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
-import { UniversalSteps } from '../support/UniversalSteps'
 import { ModuleSteps, ModuleVerifications } from '../support/ModuleSteps'
+import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
+import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('The Redesigned Create Protocol Landing Page', () => {
   beforeEach(() => {
@@ -33,23 +33,20 @@ describe('The Redesigned Create Protocol Landing Page', () => {
     steps.add(UniversalSteps.Snapshot())
     steps.add(SetupVerifications.OnStep3())
     steps.add(SetupSteps.YesGripper())
+    steps.add(SetupSteps.NoThermocycler())
+    steps.add(SetupSteps.NoWasteChute())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupVerifications.Step4Verification())
     steps.add(SetupSteps.AddThermocycler())
-    steps.add(SetupVerifications.ThermocyclerImg())
     steps.add(SetupSteps.AddHeaterShaker())
-    steps.add(SetupVerifications.HeaterShakerImg())
     steps.add(SetupSteps.AddMagBlock())
-    steps.add(SetupVerifications.MagBlockImg())
     steps.add(SetupSteps.AddTempdeck2())
-    steps.add(SetupVerifications.Tempdeck2Img())
-    steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.EditProtocolA())
     steps.add(SetupSteps.ChoseDeckSlot('C2'))
     steps.add(SetupSteps.AddHardwareLabware())
-    steps.add(SetupSteps.ClickLabwareHeader())
+    steps.add(SetupSteps.OpenSelectLabwareModal())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
     steps.add(SetupSteps.ChoseDeckSlotC2Labware())
@@ -65,7 +62,7 @@ describe('The Redesigned Create Protocol Landing Page', () => {
     steps.add(SetupSteps.SetVolumeAndSaveForWells('150'))
     steps.add(SetupSteps.ChoseDeckSlot('C1'))
     steps.add(SetupSteps.EditHardwareLabwareOnDeck())
-    steps.add(SetupSteps.ClickLabwareHeader())
+    steps.add(SetupSteps.OpenSelectLabwareModal())
     steps.add(SetupSteps.AddAdapters())
     steps.add(SetupSteps.DeepWellTempModAdapter())
     steps.add(SetupSteps.AddNest96DeepWellPlate())

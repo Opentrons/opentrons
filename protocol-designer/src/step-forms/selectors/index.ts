@@ -1,62 +1,61 @@
+import isEmpty from 'lodash/isEmpty'
 import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import isEmpty from 'lodash/isEmpty'
 import { createSelector } from 'reselect'
+
 import {
-  getLabwareDisplayName,
+  ABSORBANCE_READER_TYPE,
   getLabwareDefURI,
+  getLabwareDisplayName,
+  getPipetteSpecsV2,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
-  ABSORBANCE_READER_TYPE,
-  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import * as featureFlagSelectors from '../../feature-flags/selectors'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
+import { getFieldErrors } from '../../steplist/fieldLevel'
 import {
-  getFormWarnings,
   getFormErrors,
+  getFormWarnings,
   stepFormToArgs,
 } from '../../steplist/formLevel'
-import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
 import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
-import { getFieldErrors } from '../../steplist/fieldLevel'
-import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
-import * as featureFlagSelectors from '../../feature-flags/selectors'
+import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
+import { getLocationStackTopToBottom } from '../../utils'
 import { denormalizePipetteEntities, getHydratedForm } from '../utils'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
-import type { ComponentProps } from 'react'
+import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
+
 import type { Selector } from 'reselect'
+import type { ComponentProps } from 'react'
+import type {
+  DropdownOption,
+  InstrumentGroup,
+  InstrumentInfoProps,
+  Mount,
+} from '@opentrons/components'
+import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntities,
-  NormalizedAdditionalEquipmentById,
-  InvariantContext,
-  LabwareEntity,
-  LabwareEntities,
-  ModuleEntities,
-  PipetteEntities,
-  LiquidEntities,
-  StagingAreaEntities,
   AdditionalEquipmentEntity,
+  GripperEntities,
+  InvariantContext,
+  LabwareEntities,
+  LabwareEntity,
+  LiquidEntities,
+  ModuleEntities,
+  NormalizedAdditionalEquipmentById,
+  PipetteEntities,
+  StagingAreaEntities,
   TrashBinEntities,
   WasteChuteEntities,
-  GripperEntities,
 } from '@opentrons/step-generation'
-import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
-import type {
-  InstrumentGroup,
-  DropdownOption,
-  Mount,
-  InstrumentInfoProps,
-} from '@opentrons/components'
-import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { FormWarning } from '../../steplist/formLevel'
-import type { BaseState, DeckSlot } from '../../types'
 import type {
   FormData,
   HydratedAbsorbanceReaderFormData,
@@ -73,33 +72,38 @@ import type {
   ProfileItem,
   StepIdType,
 } from '../../form-types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { RootState as LabwareIngredRootState } from '../../labware-ingred/reducers'
+import type { FormWarning } from '../../steplist/formLevel'
+import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type {
   StepArgsAndErrorsById,
   StepFormErrors,
 } from '../../steplist/types'
+import type { BaseState, DeckSlot } from '../../types'
+import type { DeckConfigurationState } from '../actions'
 import type {
-  InitialDeckSetup,
-  NormalizedLabwareById,
-  NormalizedLabware,
-  LabwareOnDeck,
-  MagneticModuleState,
-  ModuleOnDeck,
-  ModulesForEditModulesCard,
-  PipetteOnDeck,
-  FormPipettesByMount,
-  TemperatureModuleState,
-  ThermocyclerModuleState,
-  HeaterShakerModuleState,
-  MagneticBlockState,
-  AbsorbanceReaderState,
-} from '../types'
-import type {
+  BatchEditFormChangesState,
   PresavedStepFormState,
   RootState,
   SavedStepFormState,
-  BatchEditFormChangesState,
 } from '../reducers'
-import type { RootState as LabwareIngredRootState } from '../../labware-ingred/reducers'
+import type {
+  AbsorbanceReaderState,
+  FormPipettesByMount,
+  HeaterShakerModuleState,
+  InitialDeckSetup,
+  LabwareOnDeck,
+  MagneticBlockState,
+  MagneticModuleState,
+  ModuleOnDeck,
+  ModulesForEditModulesCard,
+  NormalizedLabware,
+  NormalizedLabwareById,
+  PipetteOnDeck,
+  TemperatureModuleState,
+  ThermocyclerModuleState,
+} from '../types'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 const labwareIngredRootSelector = (state: BaseState): LabwareIngredRootState =>
@@ -270,9 +274,9 @@ const _getInitialDeckSetup = (
     'expected initial deck setup step to be "manualIntervention" step'
   )
 
-  const labwareLocations =
+  const labwareLocations: Record<string, string> =
     (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
-  const moduleLocations =
+  const moduleLocations: Record<string, string> =
     (initialSetupStep && initialSetupStep.moduleLocationUpdate) || {}
   const pipetteLocations =
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
@@ -289,11 +293,15 @@ const _getInitialDeckSetup = (
   }, {})
 
   return {
-    labware: mapValues<Record<DeckSlot, string>, LabwareOnDeck>(
-      labwareLocations as Record<DeckSlot, string>,
-      (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
+    labware: mapValues<Record<string, string>, LabwareOnDeck>(
+      labwareLocations as Record<string, string>,
+      (id: string, labwareId: string): LabwareOnDeck => {
         return {
-          slot,
+          stack: getLocationStackTopToBottom(
+            labwareId,
+            labwareLocations,
+            moduleLocations
+          ),
           ...labwareEntities[labwareId],
         }
       }
@@ -966,3 +974,7 @@ export const getFormLevelWarningsPerStep: Selector<
       return getFormWarnings(form.stepType, hydratedForm)
     })
 )
+
+export const getDeckConfiguration = (
+  state: BaseState
+): DeckConfigurationState => rootSelector(state).deckConfiguration

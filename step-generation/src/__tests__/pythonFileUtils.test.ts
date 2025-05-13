@@ -1,5 +1,11 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
+  fixture96Plate,
+  fixtureP300MultiV2Specs,
+  fixtureP1000SingleV2Specs,
+  fixtureTiprack1000ul,
+  fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -7,12 +13,8 @@ import {
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
-  fixture96Plate,
-  fixtureP1000SingleV2Specs,
-  fixtureP300MultiV2Specs,
-  fixtureTiprack1000ul,
-  fixtureTiprackAdapter,
 } from '@opentrons/shared-data'
+
 import {
   getDefineLiquids,
   getLoadAdapters,
@@ -25,6 +27,7 @@ import {
   pythonMetadata,
   pythonRequirements,
 } from '../utils'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
@@ -164,15 +167,15 @@ const mockLabwareEntities: LabwareEntities = {
 
 const labwareRobotState: TimelineFrame['labware'] = {
   //  adapter on a module
-  [labwareId1]: { slot: moduleId },
+  [labwareId1]: { stack: [labwareId1, moduleId, 'B1'] },
   //  adapter on a slot
-  [labwareId2]: { slot: 'B2' },
+  [labwareId2]: { stack: [labwareId2, 'B2'] },
   //  labware on an adapter on a slot
-  [labwareId3]: { slot: labwareId2 },
+  [labwareId3]: { stack: [labwareId3, labwareId2, 'B2'] },
   //  labware on a module
-  [labwareId4]: { slot: moduleId3 },
+  [labwareId4]: { stack: [labwareId4, moduleId3, 'A2'] },
   //  labware on a slot
-  [labwareId5]: { slot: 'C2' },
+  [labwareId5]: { stack: [labwareId5, 'C2'] },
 }
 
 const mockLabwareNicknames: Record<string, string> = {
@@ -253,6 +256,35 @@ well_plate_3 = protocol.load_labware_from_definition(
     label="sample plate",
 )`.trimStart()
     )
+  })
+
+  describe('getLoadLabware off-deck', () => {
+    it('should generate loadLabware for off-deck', () => {
+      expect(
+        getLoadLabware(
+          {},
+          {
+            plateId: {
+              id: 'plateId',
+              labwareDefURI: 'opentrons/fixture_96_plate/1',
+              def: opentrons96Plate,
+              pythonName: 'well_plate_5',
+            },
+          },
+          { plateId: { stack: ['plateId', 'offDeck'] } },
+          {}
+        )
+      ).toBe(
+        `
+# Load Labware:
+well_plate_5 = protocol.load_labware(
+    "fixture_96_plate",
+    location=protocol_api.OFF_DECK,
+    namespace="opentrons",
+    version=1,
+)`.trimStart()
+      )
+    })
   })
 })
 

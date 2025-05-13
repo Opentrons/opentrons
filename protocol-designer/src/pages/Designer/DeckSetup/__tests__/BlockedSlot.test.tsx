@@ -1,7 +1,12 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { WasteChute } from '@opentrons/components'
+
 import { screen } from '@testing-library/react'
+
+import { WasteChute } from '@opentrons/components'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 import { BlockedSlot } from '../Overlays/BlockedSlot'
@@ -9,7 +14,6 @@ import { SlotOverlay } from '../Overlays/SlotOverlay'
 
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 vi.mock('../Overlays/SlotOverlay')
 vi.mock('@opentrons/step-generation')

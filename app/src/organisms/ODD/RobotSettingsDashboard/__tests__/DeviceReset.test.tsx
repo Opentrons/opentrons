@@ -1,8 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { i18n } from '/app/i18n'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { resetConfig } from '/app/redux/robot-admin'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 
@@ -11,7 +13,6 @@ import { DeviceReset } from '../DeviceReset'
 import type { ComponentProps } from 'react'
 import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
-vi.mock('/app/redux/robot-admin')
 vi.mock('/app/redux/robot-api')
 
 const render = (props: ComponentProps<typeof DeviceReset>) => {
@@ -65,6 +66,7 @@ describe('DeviceReset', () => {
     const clearMockResetOptions = {
       resetLabwareOffsets: false,
       settingsResets: {
+        gripperOffsetCalibrations: false,
         pipetteOffsetCalibrations: true,
         moduleCalibration: true,
         runsHistory: true,
@@ -145,9 +147,6 @@ describe('DeviceReset', () => {
         moduleCalibration: true,
         runsHistory: true,
         gripperOffsetCalibrations: true,
-        authorizedKeys: false,
-        onDeviceDisplay: false,
-        deckConfiguration: false,
       },
     }
 

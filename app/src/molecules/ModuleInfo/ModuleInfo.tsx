@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -7,18 +8,22 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   RobotCoordsForeignObject,
   SPACING,
+  STACKER_HOPPER_LABWARE_X_OFFSET,
+  STACKER_HOPPER_LABWARE_Y_OFFSET,
   TYPOGRAPHY,
-  LegacyStyledText,
 } from '@opentrons/components'
 import {
-  getModuleDisplayName,
+  FLEX_STACKER_MODULE_TYPE,
   getModuleDef2,
+  getModuleDisplayName,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 
 import { useRunHasStarted } from '/app/resources/runs'
+
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { PhysicalPort } from '/app/redux/modules/api-types'
 
@@ -57,8 +62,16 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
 
   return (
     <RobotCoordsForeignObject
-      x={0}
-      y={0}
+      x={
+        moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
+          ? STACKER_HOPPER_LABWARE_X_OFFSET
+          : 0
+      }
+      y={
+        moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
+          ? STACKER_HOPPER_LABWARE_Y_OFFSET
+          : 0
+      }
       height={labwareInterfaceYDimension ?? yDimension}
       width={labwareInterfaceXDimension ?? xDimension}
       flexProps={{

@@ -1,27 +1,28 @@
 import type {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
   CreateCommand,
+  HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
-  ModuleType,
-  ModuleModel,
-  PipetteName,
-  NozzleConfigurationStyle,
   LabwareLocation,
-  PipetteMount as Mount,
-  PipetteV2Specs,
-  ShakeSpeedParams,
   LabwareMovementStrategy,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  ModuleModel,
+  ModuleType,
+  PipetteMount as Mount,
+  NozzleConfigurationStyle,
+  PipetteName,
+  PipetteV2Specs,
+  PositionReference,
+  ShakeSpeedParams,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
-  TEMPERATURE_DEACTIVATED,
-  TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_DEACTIVATED,
 } from './constants'
 
 // Copied from PD
@@ -29,11 +30,14 @@ export type DeckSlot = string
 type THERMOCYCLER_STATE = 'thermocyclerState'
 type THERMOCYCLER_PROFILE = 'thermocyclerProfile'
 export interface LabwareTemporalProperties {
-  slot: DeckSlot
+  stack: string[] // a stack of ids from top to bottom
 }
 
 export interface PipetteTemporalProperties {
   mount: Mount
+  labwareId?: string
+  //  primary nozzle's wellName
+  wellName?: string
   nozzles?: NozzleConfigurationStyle
 }
 
@@ -251,6 +255,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   touchTipAfterAspirate: boolean
   /** Optional offset for touch tip after aspirate (if null, use PD default) */
   touchTipAfterAspirateOffsetMmFromTop: number
+  /** Optional offset for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterAspirateMmFromEdge: number | null
   /** Optional speed for touch tip after aspirate (if null, use PD default) */
   touchTipAfterAspirateSpeed: number | null
   /** changeTip is interpreted differently by different Step types */
@@ -277,6 +283,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   touchTipAfterDispense: boolean
   /** Optional offset for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseOffsetMmFromTop: number
+  /** Optional offset for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterDispenseMmFromEdge: number | null
   /** Optional speed for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseSpeed: number | null
   /** Flow rate in uL/sec for all dispenses */
@@ -289,6 +297,37 @@ export type SharedTransferLikeArgs = CommonArgs & {
   dispenseYOffset: number
   /** will be non-null once introduced to quick transfer */
   pushOut: number | null
+
+  // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
+  liquidClass: string | null
+  aspiratePositionReference: PositionReference
+  aspirateZOffset: number
+  aspirateSubmergeSpeed: number | null
+  aspirateSubmergeXOffset: number
+  aspirateSubmergeYOffset: number
+  aspirateSubmergeZOffset: number
+  aspirateSubmergePositionReference: PositionReference
+  aspirateSubmergeDelay: InnerDelayArgs | null
+  aspirateRetractSpeed: number | null
+  aspirateRetractXOffset: number
+  aspirateRetractYOffset: number
+  aspirateRetractZOffset: number
+  aspirateRetractPositionReference: PositionReference
+  aspirateRetractDelay: InnerDelayArgs | null
+  dispensePositionReference: PositionReference
+  dispenseZOffset: number
+  dispenseSubmergeSpeed: number | null
+  dispenseSubmergeXOffset: number
+  dispenseSubmergeYOffset: number
+  dispenseSubmergeZOffset: number
+  dispenseSubmergePositionReference: PositionReference
+  dispenseSubmergeDelay: InnerDelayArgs | null
+  dispenseRetractSpeed: number | null
+  dispenseRetractXOffset: number
+  dispenseRetractYOffset: number
+  dispenseRetractZOffset: number
+  dispenseRetractPositionReference: PositionReference
+  dispenseRetractDelay: InnerDelayArgs | null
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {
@@ -373,6 +412,8 @@ export type MixArgs = CommonArgs & {
   /** y offset */
   yOffset: number
   /** flow rates in uL/sec */
+  zOffset: number
+  positionReference: PositionReference
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   /** delays */
@@ -662,6 +703,8 @@ export type ErrorType =
   | 'PIPETTING_INTO_COLUMN_4'
   | 'POSSIBLE_PIPETTE_COLLISION'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
+  | 'RETRACT_BELOW_ASPIRATE'
+  | 'SUBMERGE_BELOW_ASPIRATE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'

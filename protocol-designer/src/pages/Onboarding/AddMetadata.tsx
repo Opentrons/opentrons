@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -10,10 +9,12 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { HandleEnter } from '../../components/atoms'
-import { TextAreaField } from '../../components/molecules'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { analyticsEvent } from '../../analytics/actions'
 import { ONBOARDING_FLOW_DURATION_EVENT } from '../../analytics/constants'
+import { HandleEnter } from '../../components/atoms'
+import { TextAreaField } from '../../components/molecules'
 import { WizardBody } from './WizardBody'
 
 import type { AnalyticsEvent } from '../../analytics/mixpanel'
@@ -26,7 +27,7 @@ interface AddMetadataProps extends WizardTileProps {
 }
 export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
   const { goBack, proceed, watch, register, analyticsStartTime } = props
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { t } = useTranslation(['onboarding', 'shared'])
   const fields = watch('fields')
   const dispatch = useDispatch()
   const robotType = fields.robotType

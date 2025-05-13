@@ -1,21 +1,26 @@
+import json
+import re
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Literal, cast
+from typing import Any, Dict, Iterable, List, Literal, cast
 
 import requests
 import structlog
 import weave  # type: ignore
 from anthropic import Anthropic
-from anthropic.types import Message, MessageParam
+from anthropic.types import Message, MessageParam, TextBlockParam
 from ddtrace import tracer
 
 from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_RELEVANT_API, SYSTEM_PROMPT
+from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
 from api.settings import Settings
 
 weave.init("opentronsai/OpentronsAI-Phase-march-25")
 settings: Settings = Settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
+REPO_ROOT: Path = Path(Path(__file__)).parent.parent.parent.parent
 
 
 class AnthropicPredict:
@@ -25,8 +30,12 @@ class AnthropicPredict:
         self.model_name: str = settings.anthropic_model_name
         self.model_helper: str = settings.model_helper
         self.system_prompt: str = SYSTEM_PROMPT
+        self.PROMPT_PD = PROMPT_PD
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
+        self.path_docs_pd: Path = ROOT_PATH / "api" / "storage" / "docs" / "pd"
         self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "v2_structure.xml"
+        self.system_prompt_pd = self.get_system_prompt_pd()
+
         self.cached_docs: List[MessageParam] = cast(
             List[MessageParam],
             [
@@ -62,6 +71,46 @@ class AnthropicPredict:
         ]
 
     @tracer.wrap()
+    def get_system_prompt_pd(self) -> List[Dict[str, Any]]:
+        """
+        Get the system prompt for the PD model
+        """
+
+        def load_file_content(filename: str) -> str:
+            filepath = self.path_docs_pd / filename
+            print(f"Trying to load: {filepath}")  # Debug print
+            with open(filepath, "r") as f:
+                return f.read()
+
+        deck_layout = load_file_content(filename="deck_layout.md")
+        tip_handling = load_file_content("tip_handling.md")
+        step_types = load_file_content("form-types.txt")
+        loadnames = load_file_content("pd_api_names.md")
+        load_step_doc = load_file_content("step_doc.md")
+        expected_json = load_file_content("expected.md")
+        # complete documents
+        formatted_documents_pd = DOCUMENTS_PD.format(
+            DECK_LAYOUT=deck_layout,
+            TIP_HANDLING=tip_handling,
+            STEP_TYPES=step_types,
+            LOADNAMES=loadnames,
+            LOAD_STEP=load_step_doc,
+        )
+
+        # complete prompt
+        self.PROMPT_PD = self.PROMPT_PD.format(EXPECTED_JSON=expected_json, USER_PROMPT="{USER_PROMPT}")
+
+        system_content = [
+            {
+                "type": "text",
+                "text": SYSTEM_PROMPT_PD,
+            },
+            {"type": "text", "text": formatted_documents_pd, "cache_control": {"type": "ephemeral"}},
+        ]
+        # Cast to satisfy mypy return type
+        return cast(List[Dict[str, Any]], system_content)
+
+    @tracer.wrap()
     def get_docs(self) -> str:
         """
         Processes documents from a directory and returns their content wrapped in XML tags.
@@ -74,6 +123,10 @@ class AnthropicPredict:
         xml_output = ["<documents>"]
         for file_path in self.path_docs.iterdir():
             try:
+                # Skip directories
+                if file_path.is_dir():
+                    continue
+
                 content = file_path.read_text(encoding="utf-8")
                 document_xml = [
                     "<document>",
@@ -86,7 +139,7 @@ class AnthropicPredict:
                 xml_output.extend(document_xml)
 
             except Exception as e:
-                logger.error("Error procesing file", extra={"file": file_path.name, "error": str(e)})
+                logger.error("Error processing file", extra={"file": file_path.name, "error": str(e)})
                 continue
 
         xml_output.append("</documents>")
@@ -216,8 +269,240 @@ class AnthropicPredict:
             return None
 
     @tracer.wrap()
+    def process_message_pd(
+        self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: Literal["create", "update"] = "create"
+    ) -> str | None:
+        """return a partial json protocol"""
+        try:
+            if history is None:
+                messages = []
+            else:
+                messages = history
+
+            messages.append({"role": "user", "content": self.PROMPT_PD.format(USER_PROMPT=prompt)})
+
+            response: Message = self.client.messages.create(
+                max_tokens=20000,
+                messages=messages,
+                model=self.model_name,
+                system=cast(Iterable[TextBlockParam], self.system_prompt_pd),
+                metadata={"user_id": user_id},
+                temperature=0.0,
+            )
+            if response.content and response.content[0].type == "text":
+                response_text = response.content[0].text
+                # Look for JSON within <pd_json> tags or just assume the whole response is JSON
+                json_match = re.search(r"<pd_json>\s*(.*?)\s*</pd_json>", response_text, re.DOTALL)
+                if json_match:
+                    partial_json = json_match.group(1)
+                    # Clean up any markdown code block formatting if present
+                    if partial_json.startswith("```json") or partial_json.startswith("```"):
+                        partial_json = re.sub(r"^```(?:json)?\n(.*?)\n```$", r"\1", partial_json, flags=re.DOTALL)
+                else:
+                    # If no tags found, check if response is directly JSON
+                    if response_text.strip().startswith("{") and response_text.strip().endswith("}"):
+                        partial_json = response_text
+                    else:
+                        partial_json = f"No valid JSON protocol found in response:\n {response_text}"
+
+                return partial_json
+
+            logger.error("Unexpected response type")
+            return None
+        except Exception as e:
+            logger.error(f"Error in {message_type} method", extra={"error": str(e)})
+            return None
+
+    @tracer.wrap()
     def create(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
         return self.process_message(user_id, prompt, history, "create")
+
+    @tracer.wrap()
+    def create_pd(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
+        return self.process_message_pd(user_id, prompt, history, "create")
+
+    def standardize(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Reorganize the data structure according to the standard schema while preserving content.
+        SCHEMA
+        {
+        "$otSharedSchema": "#/protocol/schemas/8",
+        "schemaVersion": 8,
+        "metadata": {
+            "protocolName": "",
+            "author": "OpentronsAI",
+            "description": "",
+            "created": 1742475612222,
+            "lastModified": 1742475730624,
+            "source": "OpentronsAI",
+            "category": null,
+            "subcategory": null,
+            "tags": []
+        },
+        "designerApplication": {
+            "name": "opentrons/protocol-designer",
+            "version": "8.4.4",
+            "data": {
+            "_internalAppBuildDate": "",
+            "pipetteTiprackAssignments": {},
+            "dismissedWarnings": {"form": [], "timeline": []},
+            "ingredients": {},
+            "ingredLocations": {},
+            "savedStepForms": {
+                "__INITIAL_DECK_SETUP_STEP__": {
+                "stepType": "manualIntervention",
+                "id": "__INITIAL_DECK_SETUP_STEP__",
+                "labwareLocationUpdate": {},
+                "pipetteLocationUpdate": {},
+                "moduleLocationUpdate": {},
+                "trashBinLocationUpdate": {},
+                "wasteChuteLocationUpdate": {},
+                "stagingAreaLocationUpdate": {},
+                "gripperLocationUpdate": {}
+                },
+                "step": {}
+            },
+            "orderedStepIds": [],
+            "pipettes": {},
+            "modules": {},
+            "labware": {}
+            }
+        },
+        "robot": {},
+        "labwareDefinitions": {},
+        }
+        """
+        original_saved_forms = data.get("designerApplication", {}).get("data", {}).get("savedStepForms", {})
+        # Make a copy to modify, or ensure original_steps is a new dict
+        original_steps_without_initial = {k: v for k, v in original_saved_forms.items() if k != "__INITIAL_DECK_SETUP_STEP__"}
+        original_ordered_ids = data.get("designerApplication", {}).get("data", {}).get("orderedStepIds", [])
+
+        standard = {
+            "$otSharedSchema": data.get("$otSharedSchema", "#/protocol/schemas/8"),
+            "schemaVersion": data.get("schemaVersion", 8),
+            "metadata": {
+                "protocolName": data.get("metadata", {}).get("protocolName", ""),
+                "author": data.get("metadata", {}).get("author", "AI"),
+                "description": data.get("metadata", {}).get("description", ""),
+                "created": data.get("metadata", {}).get("created", 1737373264166),
+                "lastModified": data.get("metadata", {}).get("lastModified", 1737373536793),
+                "source": "OpentronsAI",
+                "category": data.get("metadata", {}).get("category", None),
+                "subcategory": data.get("metadata", {}).get("subcategory", None),
+                "tags": data.get("metadata", {}).get("tags", []),
+            },
+            "designerApplication": {
+                "name": data.get("designerApplication", {}).get("name", "opentrons/protocol-designer"),
+                "version": data.get("designerApplication", {}).get("version", settings.protocol_designer_app_version),
+                "data": {
+                    "_internalAppBuildDate": data.get("designerApplication", {})
+                    .get("data", {})
+                    .get("_internalAppBuildDate", "Wed, 06 May 2025 21:05:04 GMT"),
+                    "pipetteTiprackAssignments": data.get("designerApplication", {}).get("data", {}).get("pipetteTiprackAssignments", {}),
+                    "dismissedWarnings": {"form": [], "timeline": []},
+                    "ingredients": data.get("designerApplication", {}).get("data", {}).get("ingredients", {}),
+                    "ingredLocations": data.get("designerApplication", {}).get("data", {}).get("ingredLocations", {}),
+                    "savedStepForms": {
+                        "__INITIAL_DECK_SETUP_STEP__": {
+                            "stepType": "manualIntervention",
+                            "id": "__INITIAL_DECK_SETUP_STEP__",
+                            "labwareLocationUpdate": data.get("designerApplication", {})
+                            .get("data", {})
+                            .get("savedStepForms", {})
+                            .get("__INITIAL_DECK_SETUP_STEP__", {})
+                            .get("labwareLocationUpdate", {}),
+                            "pipetteLocationUpdate": data.get("designerApplication", {})
+                            .get("data", {})
+                            .get("savedStepForms", {})
+                            .get("__INITIAL_DECK_SETUP_STEP__", {})
+                            .get("pipetteLocationUpdate", {}),
+                            "moduleLocationUpdate": data.get("designerApplication", {})
+                            .get("data", {})
+                            .get("savedStepForms", {})
+                            .get("__INITIAL_DECK_SETUP_STEP__", {})
+                            .get("moduleLocationUpdate", {}),
+                            "trashBinLocationUpdate": data.get("designerApplication", {})
+                            .get("data", {})
+                            .get("savedStepForms", {})
+                            .get("__INITIAL_DECK_SETUP_STEP__", {})
+                            .get("trashBinLocationUpdate", {}),
+                            "wasteChuteLocationUpdate": data.get("designerApplication", {})
+                            .get("data", {})
+                            .get("savedStepForms", {})
+                            .get("__INITIAL_DECK_SETUP_STEP__", {})
+                            .get("wasteChuteLocationUpdate", {}),
+                            "stagingAreaLocationUpdate": data.get("designerApplication", {})
+                            .get("data", {})
+                            .get("savedStepForms", {})
+                            .get("__INITIAL_DECK_SETUP_STEP__", {})
+                            .get("stagingAreaLocationUpdate", {}),
+                            "gripperLocationUpdate": data.get("designerApplication", {})
+                            .get("data", {})
+                            .get("savedStepForms", {})
+                            .get("__INITIAL_DECK_SETUP_STEP__", {})
+                            .get("gripperLocationUpdate", {}),
+                        },
+                        **original_steps_without_initial,
+                    },
+                    "orderedStepIds": original_ordered_ids,
+                    "pipettes": data.get("designerApplication", {}).get("data", {}).get("pipettes", {}),
+                    "modules": data.get("designerApplication", {}).get("data", {}).get("modules", {}),
+                    "labware": data.get("designerApplication", {}).get("data", {}).get("labware", {}),
+                },
+            },
+            "robot": data.get("robot", {}),
+            "labwareDefinitions": {},
+        }
+
+        return standard
+
+    @tracer.wrap()
+    def fillup_pd(self, json_str: str) -> str:  # noqa: C901
+        """
+        Fill up the JSON protocol with the missing fields.
+        """
+
+        try:
+            data = json.loads(json_str)
+            now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+
+            # Add schema version and shared schema
+            data["$otSharedSchema"] = "#/protocol/schemas/8"
+            data["schemaVersion"] = 8
+
+            # Extend metadata
+            data["metadata"].update(
+                {
+                    "author": "OpentronsAI",
+                    "created": now_ms,
+                    "lastModified": now_ms,
+                    "source": "OpentronsAI",
+                    "category": None,
+                    "subcategory": None,
+                    "tags": [],
+                }
+            )
+
+            # Add designer application
+            data["designerApplication"].update({"name": "opentrons/protocol-designer", "version": settings.protocol_designer_app_version})
+
+            # Add data
+            dt = datetime.now(timezone.utc)
+            formatted_date = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
+
+            data["designerApplication"]["data"].update(
+                {"_internalAppBuildDate": formatted_date, "dismissedWarnings": {"form": [], "timeline": []}}
+            )
+
+            # Add labware definitions
+            data["labwareDefinitions"] = {}
+
+            # Follow PD schema
+            data = self.standardize(data)
+
+            return json.dumps(data, indent=2)
+        except (FileNotFoundError, json.JSONDecodeError, KeyError):
+            return ""
 
     @tracer.wrap()
     def update(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:

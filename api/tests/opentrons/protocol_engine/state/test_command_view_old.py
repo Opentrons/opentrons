@@ -1000,8 +1000,8 @@ def test_get_slice_default_cursor_failed_command() -> None:
     result = subject.get_slice(cursor=None, length=3, include_fixit_commands=True)
 
     assert result == CommandSlice(
-        commands=[command_3, command_4],
-        cursor=2,
+        commands=[command_2, command_3, command_4],
+        cursor=1,
         total_length=4,
     )
 
@@ -1022,14 +1022,14 @@ def test_get_slice_default_cursor_running() -> None:
     result = subject.get_slice(cursor=None, length=2, include_fixit_commands=True)
 
     assert result == CommandSlice(
-        commands=[command_3, command_4],
-        cursor=2,
+        commands=[command_2, command_3],
+        cursor=1,
         total_length=5,
     )
 
 
 def test_get_slice_without_fixit() -> None:
-    """It should select a cursor based on the running command, if present."""
+    """It should filter out fixit commands when requested."""
     command_1 = create_succeeded_command(command_id="command-id-1")
     command_2 = create_succeeded_command(command_id="command-id-2")
     command_3 = create_running_command(command_id="command-id-3")
@@ -1069,5 +1069,46 @@ def test_get_slice_without_fixit() -> None:
     assert result == CommandSlice(
         commands=[command_1, command_2, command_3, command_4, command_5],
         cursor=0,
+        total_length=5,
+    )
+
+
+def test_get_slice_large_length() -> None:
+    """It should handle cases where length is larger than available commands."""
+    command_1 = create_succeeded_command(command_id="command-id-1")
+    command_2 = create_succeeded_command(command_id="command-id-2")
+    command_3 = create_running_command(command_id="command-id-3")
+
+    subject = get_command_view(
+        commands=[command_1, command_2, command_3],
+        running_command_id="command-id-3",
+    )
+
+    result = subject.get_slice(cursor=None, length=10, include_fixit_commands=True)
+
+    assert result == CommandSlice(
+        commands=[command_1, command_2, command_3],
+        cursor=0,
+        total_length=3,
+    )
+
+
+def test_get_slice_explicit_cursor_with_length() -> None:
+    """It should use the cursor as the start position when explicitly provided."""
+    command_1 = create_succeeded_command(command_id="command-id-1")
+    command_2 = create_succeeded_command(command_id="command-id-2")
+    command_3 = create_succeeded_command(command_id="command-id-3")
+    command_4 = create_succeeded_command(command_id="command-id-4")
+    command_5 = create_succeeded_command(command_id="command-id-5")
+
+    subject = get_command_view(
+        commands=[command_1, command_2, command_3, command_4, command_5],
+    )
+
+    result = subject.get_slice(cursor=1, length=3, include_fixit_commands=True)
+
+    assert result == CommandSlice(
+        commands=[command_2, command_3, command_4],
+        cursor=1,
         total_length=5,
     )

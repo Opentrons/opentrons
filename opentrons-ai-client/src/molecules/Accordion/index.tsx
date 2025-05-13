@@ -1,22 +1,24 @@
 import { useRef } from 'react'
 import styled from 'styled-components'
+
 import {
-  Icon,
-  StyledText,
-  COLORS,
+  ALIGN_CENTER,
   BORDERS,
+  COLORS,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
   SIZE_AUTO,
   SPACING,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  CURSOR_POINTER,
+  StyledText,
   TEXT_ALIGN_LEFT,
-  DISPLAY_FLEX,
-  CURSOR_DEFAULT,
 } from '@opentrons/components'
 
 import type { MouseEvent, ReactNode } from 'react'
+
 interface AccordionProps {
   id?: string
   handleClick: () => void

@@ -1,13 +1,16 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
-import { useLPCLabwareInfo } from '..'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
-import { getUniqueValidLwLocationInfoByAnalysis } from '../getUniqueValidLwLocationInfoByAnalysis'
-import { getLPCLabwareInfoFrom } from '../getLPCLabwareInfoFrom'
-import { getLPCSearchParams } from '../getLPCSearchParams'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { useNotifySearchLabwareOffsets } from '/app/resources/labware_offsets'
 import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
+
+import { useLPCLabwareInfo } from '..'
+import { getLPCLabwareInfoFrom } from '../getLPCLabwareInfoFrom'
+import { getLPCSearchParams } from '../getLPCSearchParams'
+import { getUniqueValidLwLocationInfoByAnalysis } from '../getUniqueValidLwLocationInfoByAnalysis'
 
 vi.mock('../getUniqueValidLwLocationInfoByAnalysis')
 vi.mock('../getLPCLabwareInfoFrom')

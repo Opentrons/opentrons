@@ -1,8 +1,8 @@
 import { combineEpics } from 'redux-observable'
 
-import { restartEpic, startDiscoveryOnRestartEpic } from './restartEpic'
 import { fetchResetOptionsEpic } from './fetchResetOptionsEpic'
 import { resetConfigEpic, restartOnResetConfigEpic } from './resetConfigEpic'
+import { restartEpic, startDiscoveryOnRestartEpic } from './restartEpic'
 import { syncSystemTimeEpic } from './syncSystemTimeEpic'
 import { trackRestartsEpic } from './trackRestartsEpic'
 

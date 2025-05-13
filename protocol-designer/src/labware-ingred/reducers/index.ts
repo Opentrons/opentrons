@@ -1,47 +1,49 @@
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+import pickBy from 'lodash/pickBy'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import omit from 'lodash/omit'
-import mapValues from 'lodash/mapValues'
-import pickBy from 'lodash/pickBy'
+
 import { getPDMetadata } from '../../file-types'
+
 import type { Reducer } from 'redux'
 import type {
-  SingleLabwareLiquidState,
-  LocationLiquidState,
   LabwareLiquidState,
   LiquidEntities,
   LiquidEntity,
+  LocationLiquidState,
+  SingleLabwareLiquidState,
 } from '@opentrons/step-generation'
+import type { LoadFileAction } from '../../load-file'
 import type { Action, DeckSlot } from '../../types'
 import type {
-  DisplayLabware,
-  ZoomedIntoSlotInfoState,
-  GenerateNewProtocolState,
-} from '../types'
-import type { LoadFileAction } from '../../load-file'
-import type {
-  RemoveWellsContentsAction,
-  CreateContainerAction,
-  DeleteLiquidGroupAction,
-  DuplicateLabwareAction,
-  EditLiquidGroupAction,
-  SelectLiquidAction,
-  SetWellContentsAction,
-  RenameLabwareAction,
-  DeleteContainerAction,
-  OpenAddLabwareModalAction,
-  OpenIngredientSelectorAction,
   CloseIngredientSelectorAction,
+  CreateContainerAction,
+  DeleteContainerAction,
+  DeleteLiquidGroupAction,
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
-  SelectLabwareAction,
-  SelectNestedLabwareAction,
-  SelectModuleAction,
-  SelectFixtureAction,
-  ZoomedIntoSlotAction,
-  GenerateNewProtocolAction,
+  DuplicateLabwareAction,
+  EditLiquidGroupAction,
   EditMultipleLiquidGroupsAction,
+  GenerateNewProtocolAction,
+  OpenAddLabwareModalAction,
+  OpenIngredientSelectorAction,
+  RemoveWellsContentsAction,
+  RenameLabwareAction,
+  SelectAdapterAction,
+  SelectFixtureAction,
+  SelectLiquidAction,
+  SelectModuleAction,
+  SelectTopLabwareAction,
+  SetWellContentsAction,
+  ZoomedIntoSlotAction,
 } from '../actions'
+import type {
+  DisplayLabware,
+  GenerateNewProtocolState,
+  ZoomedIntoSlotInfoState,
+} from '../types'
 
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
@@ -300,8 +302,8 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
 )
 
 const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
-  selectedLabwareDefUri: null,
-  selectedNestedLabwareDefUri: null,
+  selectedTopLabwareDefUri: null,
+  selectedAdapterDefUri: null,
   selectedModuleModel: null,
   selectedFixture: null,
   selectedSlot: { slot: null, cutout: null },
@@ -310,20 +312,20 @@ const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
 export const zoomedInSlotInfo = (
   state: ZoomedIntoSlotInfoState = selectedSlotInfoInitialState,
   action:
-    | SelectLabwareAction
-    | SelectNestedLabwareAction
+    | SelectTopLabwareAction
+    | SelectAdapterAction
     | SelectModuleAction
     | SelectFixtureAction
     | ZoomedIntoSlotAction
 ): ZoomedIntoSlotInfoState => {
   switch (action.type) {
-    case 'SELECT_LABWARE': {
+    case 'SELECT_TOP_LABWARE': {
       const { labwareDefUri } = action.payload
-      return { ...state, selectedLabwareDefUri: labwareDefUri }
+      return { ...state, selectedTopLabwareDefUri: labwareDefUri }
     }
-    case 'SELECT_NESTED_LABWARE': {
-      const { nestedLabwareDefUri } = action.payload
-      return { ...state, selectedNestedLabwareDefUri: nestedLabwareDefUri }
+    case 'SELECT_ADAPTER': {
+      const { adapterDefUri } = action.payload
+      return { ...state, selectedAdapterDefUri: adapterDefUri }
     }
     case 'SELECT_MODULE': {
       const { moduleModel } = action.payload

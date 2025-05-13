@@ -1,9 +1,9 @@
-import type * as Types from '../types'
-import type * as ApiTypes from '../api-types'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
 } from '../../robot-api/types'
+import type * as ApiTypes from '../api-types'
+import type * as Types from '../types'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 

@@ -1,5 +1,7 @@
 import { screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -7,15 +9,30 @@ import {
   mockThermocycler,
   mockThermocyclerGen2,
 } from '/app/redux/modules/__fixtures__'
+
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 
 import type { ComponentProps } from 'react'
+import type { ChipType } from '@opentrons/components'
 import type { ThermocyclerData } from '/app/redux/modules/api-types'
 
 const render = (props: ComponentProps<typeof ThermocyclerModuleData>) => {
   return renderWithProviders(<ThermocyclerModuleData {...props} />, {
     i18nInstance: i18n,
   })[0]
+}
+
+const getBackgroundColorByChipType = (chip: ChipType): string => {
+  switch (chip) {
+    case 'neutral':
+      return `${COLORS.black90}${COLORS.opacity20HexCode}`
+    case 'info':
+      return `${COLORS.blue35}`
+    case 'warning':
+      return `${COLORS.yellow35}`
+    default:
+      return ''
+  }
 }
 
 const mockDataBase = {
@@ -54,15 +71,15 @@ describe('ThermocyclerModuleData', () => {
       data: mockThermocycler.data,
     }
   })
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
 
   it('renders an idle block temp status', () => {
     render(props)
 
-    expect(screen.getByTestId('status_label_idle_blockStatus')).toHaveStyle(
-      'backgroundColor: C_SILVER_GRAY'
+    const blockInfo = screen.getByTestId('thermocycler_module_data_block')
+    expect(blockInfo).toHaveTextContent('Block')
+    expect(blockInfo).toHaveTextContent('idle')
+    expect(screen.getByTestId('blockStatus')).toHaveStyle(
+      `background-color: ${getBackgroundColorByChipType('neutral')}`
     )
   })
 
@@ -72,9 +89,12 @@ describe('ThermocyclerModuleData', () => {
     }
     render(props)
 
-    expect(
-      screen.getByTestId('status_label_holding at target_blockStatus')
-    ).toHaveStyle('backgroundColor: C_SKY_BLUE')
+    const blockInfo = screen.getByTestId('thermocycler_module_data_block')
+    expect(blockInfo).toHaveTextContent('Block')
+    expect(blockInfo).toHaveTextContent('holding at target')
+    expect(screen.getByTestId('blockStatus')).toHaveStyle(
+      `background-color: ${getBackgroundColorByChipType('info')}`
+    )
   })
 
   it('renders a block temp cooling status', () => {
@@ -83,8 +103,11 @@ describe('ThermocyclerModuleData', () => {
     }
     render(props)
 
-    expect(screen.getByTestId('status_label_cooling_blockStatus')).toHaveStyle(
-      'backgroundColor: C_SKY_BLUE'
+    const blockInfo = screen.getByTestId('thermocycler_module_data_block')
+    expect(blockInfo).toHaveTextContent('Block')
+    expect(blockInfo).toHaveTextContent('cooling')
+    expect(screen.getByTestId('blockStatus')).toHaveStyle(
+      `background-color: ${getBackgroundColorByChipType('info')}`
     )
   })
 
@@ -94,19 +117,23 @@ describe('ThermocyclerModuleData', () => {
     }
     render(props)
 
-    expect(screen.getByTestId('status_label_heating_blockStatus')).toHaveStyle(
-      'backgroundColor: C_SKY_BLUE'
+    const blockInfo = screen.getByTestId('thermocycler_module_data_block')
+    expect(blockInfo).toHaveTextContent('Block')
+    expect(blockInfo).toHaveTextContent('heating')
+    expect(screen.getByTestId('blockStatus')).toHaveStyle(
+      `background-color: ${getBackgroundColorByChipType('info')}`
     )
   })
 
   it('renders an error status', () => {
-    props = {
-      data: mockDataHeating,
-    }
+    props.data.status = 'error'
     render(props)
 
-    expect(screen.getByTestId('status_label_heating_blockStatus')).toHaveStyle(
-      'backgroundColor: COLORS.yellow20'
+    const blockInfo = screen.getByTestId('thermocycler_module_data_block')
+    expect(blockInfo).toHaveTextContent('Block')
+    expect(blockInfo).toHaveTextContent('error')
+    expect(screen.getByTestId('blockStatus')).toHaveStyle(
+      `background-color: ${getBackgroundColorByChipType('warning')}`
     )
   })
 
@@ -116,7 +143,8 @@ describe('ThermocyclerModuleData', () => {
     screen.getByText('Lid')
     screen.getByTitle('lid_target_temp')
     screen.getByTitle('lid_temp')
-    screen.getByTestId('status_label_open_lidStatus')
+    screen.getByTestId('lidTempStatus')
+    screen.getByText('open')
   })
 
   it('renders thermocycler gen 1 lid temperature data with lid closed', () => {
@@ -142,7 +170,8 @@ describe('ThermocyclerModuleData', () => {
     screen.getByText('Lid')
     screen.getByTitle('lid_target_temp')
     screen.getByTitle('lid_temp')
-    screen.getByTestId('status_label_closed_lidStatus')
+    screen.getByTestId('lidTempStatus')
+    screen.getByText('closed')
   })
 
   it('renders thermocycler gen 1 lid temperature data with lid temp status cooling', () => {
@@ -152,9 +181,11 @@ describe('ThermocyclerModuleData', () => {
       } as ThermocyclerData,
     }
     render(props)
-    expect(
-      screen.getByTestId('status_label_cooling_lidTempStatus')
-    ).toHaveStyle('backgroundColor: C_SKY_BLUE')
+    const lidData = screen.getByTestId('thermocycler_module_data_lid')
+    expect(lidData).toHaveTextContent('cooling')
+    expect(screen.getByTestId('lidTempStatus')).toHaveStyle(
+      `background-color: ${getBackgroundColorByChipType('info')}`
+    )
   })
 
   it('renders thermocycler gen 1 lid temperature data with lid temp status heating', () => {
@@ -164,9 +195,11 @@ describe('ThermocyclerModuleData', () => {
       } as ThermocyclerData,
     }
     render(props)
-    expect(
-      screen.getByTestId('status_label_heating_lidTempStatus')
-    ).toHaveStyle('backgroundColor: C_SKY_BLUE')
+    const lidData = screen.getByTestId('thermocycler_module_data_lid')
+    expect(lidData).toHaveTextContent('heating')
+    expect(screen.getByTestId('lidTempStatus')).toHaveStyle(
+      `background-color: ${getBackgroundColorByChipType('info')}`
+    )
   })
 
   it('renders thermocycler gen 1 lid temperature data with lid temp status holding at temperature', () => {
@@ -176,15 +209,17 @@ describe('ThermocyclerModuleData', () => {
       } as ThermocyclerData,
     }
     render(props)
-    expect(
-      screen.getByTestId('status_label_holding at target_lidTempStatus')
-    ).toHaveStyle('backgroundColor: C_SKY_BLUE')
+    const lidData = screen.getByTestId('thermocycler_module_data_lid')
+    expect(lidData).toHaveTextContent('holding at target')
+    expect(screen.getByTestId('lidTempStatus')).toHaveStyle(
+      `background-color: ${getBackgroundColorByChipType('info')}`
+    )
   })
 
   it('renders thermocycler gen 1 block temperature data', () => {
     render(props)
 
-    screen.getByText('Block')
+    screen.getByTestId('thermocycler_module_data_block')
     screen.getByTitle('tc_target_temp')
     screen.getByTitle('tc_current_temp')
   })
@@ -194,15 +229,9 @@ describe('ThermocyclerModuleData', () => {
       data: mockThermocyclerGen2.data,
     }
     render(props)
-    expect(screen.getByTestId('status_label_open_lidStatus')).toHaveStyle(
-      'backgroundColor: C_SILVER_GRAY'
-    )
-    expect(screen.getByTestId('status_label_idle_lidTempStatus')).toHaveStyle(
-      'backgroundColor: C_SILVER_GRAY'
-    )
-    expect(screen.getByTestId('status_label_idle_blockStatus')).toHaveStyle(
-      'backgroundColor: C_SILVER_GRAY'
-    )
+    screen.getByTestId('lidStatus')
+    screen.getByTestId('lidTempStatus')
+    screen.getByTestId('blockStatus')
   })
 
   it('renders thermocycler lid status to say open even though the status is in_between', () => {
@@ -212,6 +241,7 @@ describe('ThermocyclerModuleData', () => {
       } as ThermocyclerData,
     }
     render(props)
-    screen.getByTestId('status_label_open_lidStatus')
+    const lidStats = screen.getByTestId('lidStatus')
+    expect(lidStats).toHaveTextContent('open')
   })
 })

@@ -1,30 +1,35 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
 import {
-  screen,
   fireEvent,
   renderHook,
+  screen,
   render as testingRender,
 } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ManageTips, useDropTipFlowUtils } from '../ManageTips'
-import { RECOVERY_MAP } from '../../constants'
 import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
-import { SelectRecoveryOption } from '../SelectRecoveryOption'
-import { clickButtonLabeled } from '../../__tests__/util'
+import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 
-import type { ComponentProps } from 'react'
+import { mockRecoveryContentProps } from '../../__fixtures__'
+import { clickButtonLabeled } from '../../__tests__/util'
+import { RECOVERY_MAP } from '../../constants'
+import { ManageTips, useDropTipFlowUtils } from '../ManageTips'
+import { SelectRecoveryOption } from '../SelectRecoveryOption'
+
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 vi.mock('/app/organisms/DropTipWizardFlows')
 vi.mock('../SelectRecoveryOption')
 
-const { DROP_TIP_FLOWS, RETRY_NEW_TIPS } = RECOVERY_MAP
+const {
+  DROP_TIP_FLOWS,
+  RETRY_NEW_TIPS,
+  MANUAL_FILL_AND_RETRY_NEW_TIPS,
+} = RECOVERY_MAP
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -139,6 +144,26 @@ describe('ManageTips', () => {
     )
   })
 
+  it(`handles special routing for ${MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE} when skipping tip drop`, () => {
+    props = {
+      ...props,
+      currentRecoveryOptionUtils: {
+        selectedRecoveryOption: MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+      } as any,
+    }
+    render(props)
+
+    const skipBtn = screen.queryAllByText('Skip and home pipette')[0]
+
+    fireEvent.click(skipBtn)
+    clickButtonLabeled('Skip and home pipette')
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+      MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+    )
+  })
+
   it(`renders the Drop Tip flows when the route is ${DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING}`, () => {
     render({
       ...props,
@@ -202,7 +227,20 @@ describe('ManageTips', () => {
       )
     })
 
-    it('should route to OPTION_SELECTION.ROUTE when selectedRecoveryOption is not RETRY_NEW_TIPS or SKIP_STEP_WITH_NEW_TIPS and no pipette with tip', () => {
+    it('should route to MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS when selectedRecoveryOption is MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE and no pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = null
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
+    })
+
+    it('should route to OPTION_SELECTION.ROUTE when selectedRecoveryOption is not handled specifically and no pipette with tip', () => {
       props.tipStatusUtils.aPipetteWithTip = null
       props.currentRecoveryOptionUtils.selectedRecoveryOption =
         RECOVERY_MAP.CANCEL_RUN.ROUTE
@@ -289,6 +327,21 @@ describe('useDropTipFlowUtils', () => {
     screen.getByText('Proceed to cancel')
   })
 
+  it('should return "Proceed to tip selection" button for MANUAL_FILL_AND_RETRY_NEW_TIPS route', () => {
+    const { result } = renderHook(() =>
+      useDropTipFlowUtils({
+        ...mockProps,
+        currentRecoveryOptionUtils: {
+          selectedRecoveryOption: MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+        },
+      })
+    )
+
+    testingRender(result.current.copyOverrides.tipDropCompleteBtnCopy as any)
+
+    screen.getByText('Proceed to tip selection')
+  })
+
   it('should call updateSubMap with the current map', () => {
     const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
 
@@ -323,7 +376,7 @@ describe('useDropTipFlowUtils', () => {
     )
   })
 
-  it('should return the correct button overrides', () => {
+  it('should return the correct button overrides for RETRY_NEW_TIPS route', () => {
     const { result } = renderHook(() =>
       useDropTipFlowUtils({
         ...mockProps,
@@ -351,6 +404,33 @@ describe('useDropTipFlowUtils', () => {
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RETRY_NEW_TIPS.ROUTE,
       RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+    )
+  })
+
+  it('should return the correct button overrides for MANUAL_FILL_AND_RETRY_NEW_TIPS route', () => {
+    const { result } = renderHook(() =>
+      useDropTipFlowUtils({
+        ...mockProps,
+        recoveryMap: {
+          route: MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+          step: MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.DROP_TIPS,
+        },
+        currentRecoveryOptionUtils: {
+          selectedRecoveryOption: MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+        } as any,
+      })
+    )
+    const { tipDropComplete } = result.current.buttonOverrides
+
+    expect(tipDropComplete).toBeDefined()
+
+    if (tipDropComplete != null) {
+      tipDropComplete()
+    }
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+      MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
     )
   })
 

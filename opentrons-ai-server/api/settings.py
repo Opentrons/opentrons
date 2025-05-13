@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     auth0_issuer: str = "https://identity.auth-dev.opentrons.com/"
     auth0_algorithms: str = "RS256"
     dd_version: str = "hardcoded_default_from_settings"
+    protocol_designer_app_version: str = "8.4.4"
     allowed_origins: str = "*"
     dd_trace_enabled: str = "false"
     cpu: str = "1028"

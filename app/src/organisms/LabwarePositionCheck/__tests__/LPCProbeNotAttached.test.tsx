@@ -1,6 +1,6 @@
-import { vi, describe, expect, it, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useSelector } from 'react-redux'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -8,8 +8,8 @@ import { MockLPCContentContainer } from '/app/organisms/LabwarePositionCheck/__f
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { LPCProbeNotAttached } from '/app/organisms/LabwarePositionCheck/LPCProbeNotAttached'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('react-redux', async importOriginal => {
   const actual = await importOriginal<typeof useSelector>()
@@ -31,11 +31,11 @@ const render = (props: ComponentProps<typeof LPCProbeNotAttached>) => {
 
 describe('LPCProbeNotAttached', () => {
   let props: ComponentProps<typeof LPCProbeNotAttached>
-  let mockHandleAttachProbeCheck: Mock
+  let mockUnableToDetectProbe: Mock
   let mockHandleNavToDetachProbe: Mock
 
   beforeEach(() => {
-    mockHandleAttachProbeCheck = vi.fn()
+    mockUnableToDetectProbe = vi.fn()
     mockHandleNavToDetachProbe = vi.fn()
 
     props = {
@@ -44,7 +44,7 @@ describe('LPCProbeNotAttached', () => {
         ...mockLPCContentProps.commandUtils,
         headerCommands: {
           ...mockLPCContentProps.commandUtils.headerCommands,
-          handleAttachProbeCheck: mockHandleAttachProbeCheck,
+          handleUnableToDetectProbe: mockUnableToDetectProbe,
           handleNavToDetachProbe: mockHandleNavToDetachProbe,
         },
       },
@@ -68,6 +68,10 @@ describe('LPCProbeNotAttached', () => {
 
     const secondaryButton = screen.getByTestId('secondary-button')
     expect(secondaryButton).toHaveAttribute('data-text', 'Exit')
+
+    fireEvent.click(primaryButton)
+
+    expect(mockUnableToDetectProbe).toHaveBeenCalled()
   })
 
   it('renders appropriate body content and alert icon', () => {

@@ -1,24 +1,25 @@
-import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
-  useStopRunMutation,
   useDeleteRunMutation,
   useDismissCurrentRunMutation,
+  useStopRunMutation,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { useRunStatus } from '/app/resources/runs'
 import { useTrackEvent } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
+import { useNotifyRunQuery } from '/app/resources/runs'
+
 import { CancelingRunModal } from '../CancelingRunModal'
+import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
@@ -95,7 +96,14 @@ describe('ConfirmCancelRunModal', () => {
       ...mockConnectedRobot,
       name: ROBOT_NAME,
     })
-    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
+
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_IDLE,
+        },
+      },
+    } as any)
   })
 
   afterEach(() => {
@@ -142,20 +150,36 @@ describe('ConfirmCancelRunModal', () => {
       ...props,
       isActiveRun: false,
     }
-    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
+
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_STOPPED,
+        },
+      },
+    } as any)
+
     render(props)
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
   })
 
-  it('when quick transfer run is stopped, the run is dismissed and the modal closes if the run is not yet active', () => {
+  it('when quick transfer run is stopped, the run is dismissed and navigates to quick transfer', () => {
     props = {
       ...props,
       isActiveRun: false,
       isQuickTransfer: true,
     }
-    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
+
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_STOPPED,
+        },
+      },
+    } as any)
+
     render(props)
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()
@@ -163,11 +187,78 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/quick-transfer')
   })
 
+  it('when quick transfer run with protocolId is stopped, it navigates to protocol-specific quick transfer', () => {
+    props = {
+      ...props,
+      isActiveRun: false,
+      isQuickTransfer: true,
+      protocolId: 'test-protocol-id',
+    }
+
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_STOPPED,
+        },
+      },
+    } as any)
+
+    render(props)
+
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/quick-transfer/test-protocol-id'
+    )
+  })
+
+  it('when run with protocolId is stopped, it navigates to protocol page', () => {
+    props = {
+      ...props,
+      isActiveRun: false,
+      protocolId: 'test-protocol-id',
+    }
+
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_STOPPED,
+        },
+      },
+    } as any)
+
+    render(props)
+
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols/test-protocol-id')
+  })
+
   it('when run is stopped, the run is not dismissed if the run is active', () => {
-    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_STOPPED,
+        },
+      },
+    } as any)
+
     render(props)
 
     expect(mockDismissCurrentRun).not.toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
+  })
+
+  it('when tapping cancel run with error, should reset isCanceling', () => {
+    mockStopRun.mockImplementation((id, options) => {
+      options.onError()
+    })
+
+    render(props)
+    const button = screen.getByText('Cancel run')
+    fireEvent.click(button)
+
+    const cancelButton = screen.getByText('Cancel run')
+    expect(cancelButton).toBeInTheDocument()
   })
 })

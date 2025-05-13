@@ -2,45 +2,48 @@ import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
+
 import {
+  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
   getIsTiprack,
   getLabwareDefURI,
   getWellNamePerMultiTip,
-  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-  getDeckDefFromRobotType,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
-  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { reduceCommandCreators } from './index'
+
 import {
   delay,
   dispense,
   moveToAddressableArea,
   moveToWell,
 } from '../commandCreators/atomic'
+import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import {
   airGapInTrash,
-  blowOutInTrash,
-  dispenseInTrash,
-  airGapInWell,
   airGapInWasteChute,
+  airGapInWell,
+  blowOutInTrash,
   blowOutInWasteChute,
+  dispenseInTrash,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
 import { ZERO_OFFSET } from '../constants'
-import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import { curryCommandCreator } from './curryCommandCreator'
+import { reduceCommandCreators } from './index'
+
 import type {
   AddressableAreaName,
-  LabwareDefinition2,
   BlowoutParams,
-  PipetteChannels,
-  NozzleConfigurationStyle,
   CutoutFixtureId,
-  RobotType,
   CutoutId,
+  LabwareDefinition2,
+  NozzleConfigurationStyle,
+  PipetteChannels,
+  RobotType,
 } from '@opentrons/shared-data'
 import type {
   CommandCreator,
@@ -48,6 +51,7 @@ import type {
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
+  LabwareTemporalProperties,
   LocationLiquidState,
   PipetteEntity,
   RobotState,
@@ -57,6 +61,7 @@ import type {
   WasteChuteEntities,
   WasteChuteEntity,
 } from '../types'
+
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
@@ -848,4 +853,51 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
+}
+
+export const getSlotInLocationStack = (stack?: string[]): string => {
+  if (stack == null) {
+    console.error('expected to find stack but could not')
+    return 'unknown slot'
+  } else {
+    return stack[stack.length - 1]
+  }
+}
+
+export const getTopLocationInStack = (stack?: string[]): string => {
+  if (stack == null) {
+    console.error('expected to find stack but could not')
+    return 'unknown top location'
+  } else {
+    return stack[0]
+  }
+}
+
+export const getModuleIdFromRobotStateStack = (
+  modules: RobotState['modules'],
+  stack?: string[]
+): string | null => {
+  return stack?.find(id => modules[id] != null) ?? null
+}
+
+export const getFullStackFromLabwares = (
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  },
+  slot: string
+): string[] => {
+  return Object.values(labware)
+    .filter(lw => lw.stack.includes(slot))
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+}
+
+export const getTopmostLabwareOnModuleFromStackRobotState = (
+  moduleId: string,
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  }
+): string => {
+  return Object.values(labware)
+    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
 }

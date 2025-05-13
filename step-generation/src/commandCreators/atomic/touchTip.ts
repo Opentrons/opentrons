@@ -1,5 +1,8 @@
-import { formatPyStr, uuid } from '../../utils'
+import { WELL_ORIGIN_TOP } from '@opentrons/shared-data'
+
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
+import { formatPyStr, uuid } from '../../utils'
+
 import type { CreateCommand, TouchTipParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
@@ -73,7 +76,7 @@ export const touchTip: CommandCreator<TouchTipAtomicParams> = (
         labwareId,
         wellName,
         wellLocation: {
-          origin: 'top',
+          origin: WELL_ORIGIN_TOP,
           offset: {
             z: zOffsetFromTop,
           },

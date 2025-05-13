@@ -1,33 +1,36 @@
 import { useFormikContext } from 'formik'
+
 import {
-  MAGNETIC_BLOCK_V1,
-  THERMOCYCLER_MODULE_V2,
-  getAllDefinitions,
-  getModuleDisplayName,
-} from '@opentrons/shared-data'
-import src from '../../../images/stacking_offsets.svg'
-import {
+  AlertItem,
   ALIGN_CENTER,
+  Box,
   CheckboxField,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
-  AlertItem,
-  Box,
 } from '@opentrons/components'
-import { isEveryFieldHidden } from '../../utils'
+import {
+  getAllDefinitions,
+  getModuleDisplayName,
+  MAGNETIC_BLOCK_V1,
+  THERMOCYCLER_MODULE_V2,
+} from '@opentrons/shared-data'
+
 import { makeMaskToDecimal } from '../../fieldMasks'
+import styles from '../../styles.module.css'
+import { isEveryFieldHidden } from '../../utils'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
+
 import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 import type { LabwareFields } from '../../fields'
 
-import styles from '../../styles.module.css'
+import src from '../../../images/stacking_offsets.svg'
 
 const HIGHEST_TC_COMPATIBLE_LABWARE_HEIGHT = 16.06
 const MODULE_MODELS_WITH_NO_ADAPTERS: ModuleModel[] = [

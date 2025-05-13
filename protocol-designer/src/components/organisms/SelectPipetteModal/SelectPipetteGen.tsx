@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,7 +8,9 @@ import {
   StyledText,
   WRAP,
 } from '@opentrons/components'
+
 import { PIPETTE_GENS } from '../../../pages/Onboarding/constants'
+
 import type { Dispatch, SetStateAction } from 'react'
 import type { Gen } from '../../../pages/Onboarding/types'
 
@@ -19,7 +22,7 @@ interface SelectPipetteGenProps {
 
 export function SelectPipetteGen(props: SelectPipetteGenProps): JSX.Element {
   const { setPipetteGen, setPipetteVolume, pipetteGen } = props
-  const { t } = useTranslation('create_new_protocol')
+  const { t } = useTranslation('onboarding')
 
   return (
     <Flex

@@ -1,13 +1,18 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
+
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
 import { AddMetadata } from '../AddMetadata'
 
 import type { ComponentProps } from 'react'
-import type { WizardFormState, WizardTileProps } from '../types'
+import type { WizardFormState } from '../../../components/organisms'
+import type { WizardTileProps } from '../types'
 
 const render = (props: ComponentProps<typeof AddMetadata>) => {
   return renderWithProviders(<AddMetadata {...props} />, {
@@ -16,7 +21,8 @@ const render = (props: ComponentProps<typeof AddMetadata>) => {
 }
 
 const values = {
-  additionalEquipment: [],
+  fixtures: {},
+  hasGripper: false,
   fields: {
     name: '',
     description: '',
@@ -24,7 +30,9 @@ const values = {
     robotType: FLEX_ROBOT_TYPE,
   },
   pipettesByMount: {} as any,
-  modules: null,
+  modules: {},
+  hasThermocycler: false,
+  hasWasteChute: false,
 } as WizardFormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {

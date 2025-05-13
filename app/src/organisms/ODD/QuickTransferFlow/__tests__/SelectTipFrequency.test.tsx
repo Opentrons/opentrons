@@ -1,5 +1,5 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -26,7 +26,21 @@ describe('SelectTipFrequency', () => {
         buttonText: 'Exit',
         onClick: vi.fn(),
       },
-      state: {},
+      state: {
+        pipette: {
+          displayName: 'Flex 1-Channel 50 µL',
+          model: 'p50',
+          displayCategory: 'FLEX',
+          validNozzleMaps: {
+            maps: {
+              SingleA1: ['A1'],
+            },
+          },
+        },
+        destinationWells: ['A1'],
+        sourceWells: ['A1'],
+        path: 'single',
+      } as any,
       dispatch: vi.fn(),
     }
   })
@@ -36,6 +50,22 @@ describe('SelectTipFrequency', () => {
     screen.getByText('Select change tip frequency')
     screen.getByText('Exit')
     screen.getByText('Continue')
+    screen.getByText('Once at the start of the transfer')
+    screen.getByText('Per source well')
+  })
+
+  it('renders once at the start of the transfer option only', () => {
+    props.state.sourceWells = []
+    props.state.destinationWells = []
+    props.state.path = 'single'
+    render(props)
+    screen.getByText('Once at the start of the transfer')
+  })
+
+  it('renders once at the start of the transfer option only', () => {
+    props.state.transferType = 'distribute'
+    render(props)
+    screen.getByText('Per destination well')
   })
 
   it('should call mock function when tappin exit button', () => {
@@ -46,7 +76,12 @@ describe('SelectTipFrequency', () => {
 
   it('should call mock function when tappin continue button', () => {
     render(props)
+    fireEvent.click(screen.getByText('Once at the start of the transfer'))
     fireEvent.click(screen.getByText('Continue'))
     expect(props.onNext).toHaveBeenCalled()
+    expect(props.dispatch).toHaveBeenCalledWith({
+      type: 'SET_CHANGE_TIP',
+      changeTip: 'once',
+    })
   })
 })

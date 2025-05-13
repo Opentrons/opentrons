@@ -1,11 +1,16 @@
-import { reduceCommandCreators, curryCommandCreator } from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
+import {
+  curryCommandCreator,
+  curryWithoutPython,
+  reduceCommandCreators,
+} from '../../utils'
 import {
   airGapInPlace,
   moveToAddressableArea,
   prepareToAspirate,
 } from '../atomic'
-import type { CurriedCommandCreator, CommandCreator } from '../../types'
+
+import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface AirGapInTrashParams {
   pipetteId: string
@@ -25,7 +30,8 @@ export const airGapInTrash: CommandCreator<AirGapInTrashParams> = (
       fixtureId: trashId,
       offset: ZERO_OFFSET,
     }),
-    curryCommandCreator(prepareToAspirate, {
+    curryWithoutPython(prepareToAspirate, {
+      // PAPI air_gap() includes prepare_to_aspirate() so don't emit Python
       pipetteId,
     }),
     curryCommandCreator(airGapInPlace, {

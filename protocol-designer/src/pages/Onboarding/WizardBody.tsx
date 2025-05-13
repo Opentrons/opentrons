@@ -1,7 +1,7 @@
+import { useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { useState, useLayoutEffect } from 'react'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -19,16 +19,19 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
+
+import type { ReactNode } from 'react'
+import type { RobotType } from '@opentrons/shared-data'
+
 import one from '../../assets/images/onboarding_animation_1.webm'
 import two from '../../assets/images/onboarding_animation_2.webm'
 import three from '../../assets/images/onboarding_animation_3.webm'
 import four from '../../assets/images/onboarding_animation_4.webm'
 import five from '../../assets/images/onboarding_animation_5.webm'
 import six from '../../assets/images/onboarding_animation_6.webm'
-import { LINK_BUTTON_STYLE } from '../../components/atoms'
-
-import type { ReactNode } from 'react'
-import type { RobotType } from '@opentrons/shared-data'
 
 interface WizardBodyProps {
   stepNumber: number
@@ -106,7 +109,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
       height="calc(100vh - 48px)"
     >
       <Flex
-        width="60%"
+        width={subStepNumber === 5 ? '100%' : '60%'}
         padding={SPACING.spacing80}
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.white}
@@ -169,42 +172,45 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
           ) : null}
         </Flex>
       </Flex>
-      <Flex
-        width="40%"
-        css={css`
-          opacity: ${loaded ? 1 : 0};
-          transition: opacity 0.5s ease-in-out;
-        `}
-      >
-        {robotType === FLEX_ROBOT_TYPE || stepNumber === 1 ? (
-          <video
-            preload="auto"
-            css={css`
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-              border-radius: ${BORDERS.borderRadius16};
-            `}
-            autoPlay
-            key={`video-${subStepNumber ?? 1}`}
-            loop={false}
-            controls={false}
-            aria-label={`onboarding animation for page ${stepNumber}`}
-          >
-            <source src={asset ?? ''} type="video/webm" />
-          </video>
-        ) : (
-          <img
-            src={OT2_GIFS[stepNumber]}
-            width="100%"
-            height="100%"
-            css={css`
-              object-fit: cover;
-              border-radius: ${BORDERS.borderRadius16};
-            `}
-          />
-        )}
-      </Flex>
+      {subStepNumber === 5 ? null : (
+        <Flex
+          width="40%"
+          css={css`
+            opacity: ${loaded ? 1 : 0};
+            transition: opacity 0.5s ease-in-out;
+          `}
+        >
+          {robotType === FLEX_ROBOT_TYPE || stepNumber === 1 ? (
+            <video
+              preload="auto"
+              css={css`
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: ${BORDERS.borderRadius16};
+              `}
+              autoPlay
+              key={`video-${subStepNumber ?? 1}`}
+              loop={false}
+              controls={false}
+              aria-label={`onboarding animation for page ${stepNumber}`}
+            >
+              <source src={asset ?? ''} type="video/webm" />
+            </video>
+          ) : (
+            <img
+              src={OT2_GIFS[stepNumber]}
+              width="100%"
+              alt={`OT-2 asset for onboarding flow page ${stepNumber}`}
+              height="100%"
+              css={css`
+                object-fit: cover;
+                border-radius: ${BORDERS.borderRadius16};
+              `}
+            />
+          )}
+        </Flex>
+      )}
     </Flex>
   )
 }
