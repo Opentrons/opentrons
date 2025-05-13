@@ -282,6 +282,9 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                     e, to_retrieve.primaryLabwareId, state_update
                 )
 
+        if stacker_hw is not None:
+            stacker_hw.set_stacker_identify(False)
+
         return SuccessData(
             public=RetrieveResult.model_construct(
                 labwareId=to_retrieve.primaryLabwareId,

@@ -223,6 +223,9 @@ class UnsafeFlexStackerManualRetrieveImpl(
             ),
         )
 
+        if stacker_hw is not None:
+            stacker_hw.set_stacker_identify(False)
+
         return SuccessData(
             public=UnsafeFlexStackerManualRetrieveResult(
                 labwareId=to_retrieve.primaryLabwareId,

@@ -275,6 +275,9 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
             ),
         )
 
+        if stacker_hw is not None:
+            stacker_hw.set_stacker_identify(False)
+
         return SuccessData(
             public=StoreResult.model_construct(
                 eventualDestinationLocationSequence=[
