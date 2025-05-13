@@ -7,6 +7,8 @@ import { i18n } from '../../../../assets/localization'
 
 import type { ComponentProps } from 'react'
 
+const mockOnClick = vi.fn()
+
 const render = (props: ComponentProps<typeof ExportButton>) => {
   return renderWithProviders(<ExportButton {...props} />, {
     i18nInstance: i18n,
@@ -18,18 +20,18 @@ describe('ExportButton', () => {
 
   beforeEach(() => {
     props = {
-      setShowExportWarningModal: vi.fn(),
+      onClick: mockOnClick,
     }
   })
   it('should render icon and text', () => {
     render(props)
-    screen.getByTestId('water-drop') // ToDo (kk 05/09/2025): icon will be replaced with the right one
+    screen.getByTestId('export-icon')
     screen.getByText('Export')
   })
 
   it('should call a mock function when clicking', () => {
     render(props)
     fireEvent.click(screen.getByText('Export'))
-    expect(props.setShowExportWarningModal).toHaveBeenCalled()
+    expect(mockOnClick).toHaveBeenCalled()
   })
 })
