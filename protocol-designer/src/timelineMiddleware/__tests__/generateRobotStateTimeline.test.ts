@@ -226,7 +226,6 @@ describe('generateRobotStateTimeline', () => {
         [
           "pickUpTip",
           "moveToWell",
-          "liquidProbe",
           "prepareToAspirate",
           "moveToWell",
           "moveToWell",
@@ -252,7 +251,6 @@ describe('generateRobotStateTimeline', () => {
         [
           "pickUpTip",
           "moveToWell",
-          "liquidProbe",
           "prepareToAspirate",
           "moveToWell",
           "moveToWell",
@@ -293,7 +291,6 @@ describe('generateRobotStateTimeline', () => {
       `
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
 mock_pipette.move_to(mock_source_plate["A1"].top(z=2))
-mock_pipette.measure_liquid_height(mock_source_plate["A1"])
 mock_pipette.prepare_to_aspirate()
 mock_pipette.move_to(mock_source_plate["A1"].bottom())
 mock_pipette.move_to(mock_source_plate["A1"].bottom())
@@ -319,7 +316,6 @@ mock_pipette.drop_tip()
       `
 mock_pipette_p300_multi.pick_up_tip(location=mock_tip_rack_1)
 mock_pipette_p300_multi.move_to(mock_source_plate["A1"].top(z=2))
-mock_pipette_p300_multi.measure_liquid_height(mock_source_plate["A1"])
 mock_pipette_p300_multi.prepare_to_aspirate()
 mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
 mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
