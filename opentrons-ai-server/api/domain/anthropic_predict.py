@@ -26,9 +26,9 @@ REPO_ROOT: Path = Path(Path(__file__)).parent.parent.parent.parent
 class AnthropicPredict:
     def __init__(self, settings: Settings) -> None:
         self.settings: Settings = settings
-        self.client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
-        self.model_name: str = settings.anthropic_model_name
-        self.model_helper: str = settings.model_helper
+        self.client: Anthropic = Anthropic(api_key=self.settings.anthropic_api_key.get_secret_value())
+        self.model_name: str = self.settings.anthropic_model_name
+        self.model_helper: str = self.settings.model_helper
         self.system_prompt: str = SYSTEM_PROMPT
         self.PROMPT_PD = PROMPT_PD
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
@@ -372,6 +372,7 @@ class AnthropicPredict:
         "labwareDefinitions": {},
         }
         """
+        now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
         original_saved_forms = data.get("designerApplication", {}).get("data", {}).get("savedStepForms", {})
         # Make a copy to modify, or ensure original_steps is a new dict
         original_steps_without_initial = {k: v for k, v in original_saved_forms.items() if k != "__INITIAL_DECK_SETUP_STEP__"}
@@ -384,8 +385,8 @@ class AnthropicPredict:
                 "protocolName": data.get("metadata", {}).get("protocolName", ""),
                 "author": data.get("metadata", {}).get("author", "AI"),
                 "description": data.get("metadata", {}).get("description", ""),
-                "created": data.get("metadata", {}).get("created", 1737373264166),
-                "lastModified": data.get("metadata", {}).get("lastModified", 1737373536793),
+                "created": now_ms,
+                "lastModified": now_ms,
                 "source": "OpentronsAI",
                 "category": data.get("metadata", {}).get("category", None),
                 "subcategory": data.get("metadata", {}).get("subcategory", None),
@@ -393,7 +394,7 @@ class AnthropicPredict:
             },
             "designerApplication": {
                 "name": data.get("designerApplication", {}).get("name", "opentrons/protocol-designer"),
-                "version": data.get("designerApplication", {}).get("version", settings.protocol_designer_app_version),
+                "version": data.get("designerApplication", {}).get("version", self.settings.protocol_designer_app_version),
                 "data": {
                     "_internalAppBuildDate": data.get("designerApplication", {})
                     .get("data", {})
@@ -464,7 +465,6 @@ class AnthropicPredict:
 
         try:
             data = json.loads(json_str)
-            now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
 
             # Add schema version and shared schema
             data["$otSharedSchema"] = "#/protocol/schemas/8"
@@ -474,8 +474,6 @@ class AnthropicPredict:
             data["metadata"].update(
                 {
                     "author": "OpentronsAI",
-                    "created": now_ms,
-                    "lastModified": now_ms,
                     "source": "OpentronsAI",
                     "category": None,
                     "subcategory": None,
@@ -484,7 +482,12 @@ class AnthropicPredict:
             )
 
             # Add designer application
-            data["designerApplication"].update({"name": "opentrons/protocol-designer", "version": settings.protocol_designer_app_version})
+            data["designerApplication"].update(
+                {
+                    "name": "opentrons/protocol-designer",
+                    "version": self.settings.protocol_designer_app_version,
+                }
+            )
 
             # Add data
             dt = datetime.now(timezone.utc)
@@ -522,7 +525,7 @@ class AnthropicPredict:
         url = "https://Opentrons-simulator.hf.space/protocol"
         protocol_name = str(uuid.uuid4()) + ".py"
         data = {"name": protocol_name, "content": protocol}
-        hf_token: str = settings.huggingface_api_key.get_secret_value()
+        hf_token: str = self.settings.huggingface_api_key.get_secret_value()
         headers = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(hf_token)}
         response = requests.post(url, json=data, headers=headers)
 
