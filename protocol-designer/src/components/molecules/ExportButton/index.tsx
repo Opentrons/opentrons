@@ -12,7 +12,6 @@ export function ExportButton({ onClick }: ExportButtonProps): JSX.Element {
 
   return (
     <Btn css={GREY_BUTTON_STYLE} onClick={onClick}>
-      {/* ToDo (kk 05/09/2025): icon will be replaced with the right one */}
       <Icon size="1rem" name="export" data-testid="export-icon" />
       <StyledText desktopStyle="bodyDefaultSemiBold">{t('export')}</StyledText>
     </Btn>

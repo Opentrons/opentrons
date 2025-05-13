@@ -7,6 +7,7 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   END_TERMINAL_ITEM_ID,
   HARDWARE_ID,
+  LIQUID_ID,
   PRESAVED_STEP_ID,
   START_TERMINAL_ITEM_ID,
 } from '../../steplist'
@@ -40,12 +41,13 @@ export const getMissingTipsByLabwareId: Selector<Record<
     selectedStepId,
     selectedTerminalItemId
   ) => {
-    let robotState = null
     if (activeItem == null) return null
-
+    const isActiveItemHardwareOrLiquid =
+      activeItem.id === HARDWARE_ID || activeItem.id === LIQUID_ID
+    let robotState = null
     if (
       activeItem.selectionType === TERMINAL_ITEM_SELECTION_TYPE &&
-      activeItem.id !== HARDWARE_ID
+      !isActiveItemHardwareOrLiquid
     ) {
       const terminalId = activeItem.id
 
@@ -62,28 +64,33 @@ export const getMissingTipsByLabwareId: Selector<Record<
         )
       }
     } else if (
-      activeItem.id === HARDWARE_ID &&
+      isActiveItemHardwareOrLiquid &&
       selectedTerminalItemId === START_TERMINAL_ITEM_ID
     ) {
       robotState = initialRobotState
     } else if (
-      activeItem.id === HARDWARE_ID &&
+      isActiveItemHardwareOrLiquid &&
       (selectedTerminalItemId === END_TERMINAL_ITEM_ID ||
         selectedTerminalItemId === PRESAVED_STEP_ID)
     ) {
       robotState = lastValidRobotState
     } else {
       const stepId =
-        activeItem.id === HARDWARE_ID && selectedStepId != null
+        isActiveItemHardwareOrLiquid && selectedStepId != null
           ? selectedStepId
           : activeItem.id
+
       const timeline = robotStateTimeline.timeline
       const timelineIdx = orderedStepIds.includes(stepId)
         ? orderedStepIds.findIndex(id => id === stepId)
         : null
 
-      if (timelineIdx == null || stepId === HARDWARE_ID) {
-        if (stepId !== HARDWARE_ID) {
+      if (
+        timelineIdx == null ||
+        stepId === HARDWARE_ID ||
+        stepId === LIQUID_ID
+      ) {
+        if (stepId !== HARDWARE_ID && stepId !== LIQUID_ID) {
           console.error(`Expected non-null timelineIdx for step ${stepId}`)
         }
         return null

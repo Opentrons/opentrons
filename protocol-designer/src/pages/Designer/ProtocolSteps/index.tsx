@@ -208,11 +208,17 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   })
 
   let currentStep
-  if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
+  if (
+    (hoveredTerminalItem === HARDWARE_ID ||
+      hoveredTerminalItem === LIQUID_ID) &&
+    selectedStepId != null
+  ) {
     currentStep = savedStepForms[selectedStepId]
-  } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId == null) {
-    currentStep = null
-  } else if (hoveredTerminalItem === LIQUID_ID && selectedStepId == null) {
+  } else if (
+    (hoveredTerminalItem === HARDWARE_ID ||
+      hoveredTerminalItem === LIQUID_ID) &&
+    selectedStepId == null
+  ) {
     currentStep = null
   } else {
     currentStep = activeItem?.id != null ? savedStepForms[activeItem.id] : null
@@ -220,21 +226,24 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
 
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
+
   const showTimelineAlerts =
     hasTimelineErrors &&
     activeItem?.id !== START_TERMINAL_ITEM_ID &&
-    activeItem?.id !== HARDWARE_ID
+    activeItem?.id !== HARDWARE_ID &&
+    activeItem?.id !== LIQUID_ID
+
   const stepDetails = currentStep?.stepDetails ?? null
 
   let header: string = t(activeItem?.id)
+
   if (currentStep != null) {
     header = i18n.format(currentStep.stepName, 'titleCase')
   } else if (
     hoveredTerminalItem === HARDWARE_ID ||
-    hoveredTerminalItem === LIQUID_ID ||
-    selectedTerminalItemId === LIQUID_ID
+    hoveredTerminalItem === LIQUID_ID
   ) {
-    header = t(START_TERMINAL_ITEM_ID)
+    header = t(selectedTerminalItemId)
   }
 
   const zoomedInOnOffDeck =
