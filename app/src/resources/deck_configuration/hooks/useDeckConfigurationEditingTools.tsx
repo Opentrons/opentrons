@@ -28,10 +28,7 @@ import type {
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
 interface DeckConfigurationEditingTools {
-  addFixtureToCutout: (
-    cutoutId: CutoutId,
-    addressableArea: AddressableAreaName
-  ) => void
+  addFixtureToCutout: (cutoutId: CutoutId) => void
   removeFixtureFromCutout: (
     cutoutId: CutoutId,
     cutoutFixtureId: CutoutFixtureId
@@ -47,16 +44,12 @@ export function useDeckConfigurationEditingTools(
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-  const [targetCutoutIdAndAA, setTargetCutoutIdAndAA] = useState<{
+  const [targetCutoutId, setTargetCutoutId] = useState<{
     cutoutId: CutoutId
-    addressableArea: AddressableAreaName
   } | null>(null)
 
-  const addFixtureToCutout = (
-    cutoutId: CutoutId,
-    addressableArea: AddressableAreaName
-  ): void => {
-    setTargetCutoutIdAndAA({ cutoutId, addressableArea })
+  const addFixtureToCutout = (cutoutId: CutoutId): void => {
+    setTargetCutoutId({ cutoutId })
   }
 
   const removeFixtureFromCutout = (
@@ -64,10 +57,9 @@ export function useDeckConfigurationEditingTools(
     cutoutFixtureId: CutoutFixtureId
   ): void => {
     let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
-    if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE){
+    if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
       replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
-    }
-    else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+    } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
       replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
     } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
       replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
@@ -78,7 +70,7 @@ export function useDeckConfigurationEditingTools(
         ?.fixtureGroup ?? {}
 
     let newDeckConfig = deckConfig
-    console.log("fixtureGroup: ", fixtureGroup)
+    console.log('fixtureGroup: ', fixtureGroup)
     if (cutoutId in fixtureGroup) {
       const groupMap =
         fixtureGroup[cutoutId]?.find(group =>
@@ -99,8 +91,8 @@ export function useDeckConfigurationEditingTools(
           : cutoutConfig
       )
     } else {
-      console.log("in else ")
-      console.log("replacementFixtureId: ", replacementFixtureId)
+      console.log('in else ')
+      console.log('replacementFixtureId: ', replacementFixtureId)
       newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId === cutoutId
           ? {
@@ -118,12 +110,11 @@ export function useDeckConfigurationEditingTools(
     addFixtureToCutout,
     removeFixtureFromCutout,
     addFixtureModal:
-      targetCutoutIdAndAA != null ? (
+      targetCutoutId != null ? (
         <AddFixtureModal
-          cutoutId={targetCutoutIdAndAA.cutoutId}
-          addressableArea={targetCutoutIdAndAA.addressableArea}
+          cutoutId={targetCutoutId.cutoutId}
           closeModal={() => {
-            setTargetCutoutIdAndAA(null)
+            setTargetCutoutId(null)
           }}
           isOnDevice={isOnDevice}
         />

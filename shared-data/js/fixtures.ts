@@ -21,9 +21,11 @@ import {
   C1_ADDRESSABLE_AREA,
   C2_ADDRESSABLE_AREA,
   C3_ADDRESSABLE_AREA,
+  COLUMN_4_AA,
   D1_ADDRESSABLE_AREA,
   D2_ADDRESSABLE_AREA,
   D3_ADDRESSABLE_AREA,
+  DUMMY_STAGING_AREA_WIHTOUT_STAGING_AREA,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_V1_FIXTURE,
@@ -35,6 +37,7 @@ import {
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
+  SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
@@ -47,9 +50,6 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-  SINGLE_RIGHT_SLOT_FIXTURE,
-  DUMMY_STAGING_AREA_WIHTOUT_STAGING_AREA,
-  COLUMN_4_AA,
 } from './constants'
 import { getCutoutIdForSlotName } from './helpers'
 import { getModuleDisplayName } from './modules'
@@ -179,7 +179,7 @@ export const transformCutoutFixturesToAaWithFixtures = (
 ): CutoutConfigMap[] => {
   return cutoutFixtures.reduce<CutoutConfigMap[]>((acc, obj) => {
     let cutoutFixtureReplacment = obj.cutoutFixtureId
-    if (obj.cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE){
+    if (obj.cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE) {
       cutoutFixtureReplacment = DUMMY_STAGING_AREA_WIHTOUT_STAGING_AREA
     }
     const aaPerCutoutFixture = getAAFromCutoutFixtureId(
@@ -199,24 +199,28 @@ export const filterAaByAreaType = (
   deckDef: DeckDefinition,
   areaType: AreaType
 ): CutoutConfigMap[] => {
-  console.log("cutoutFixtures: ", cutoutFixtures)
-  return cutoutFixtures.filter(({ addressableAreaId, cutoutFixtureId }) =>{
-    console.log("areaType: ", areaType)
-    console.log("addressableAreaId: ", addressableAreaId)
-    console.log("cutoutFixtureId: ", cutoutFixtureId)
-    if (areaType === 'slot' && cutoutFixtureId == 'singleRightSlot' && COLUMN_4_AA.includes(addressableAreaId)){
+  console.log('cutoutFixtures: ', cutoutFixtures)
+  return cutoutFixtures.filter(({ addressableAreaId, cutoutFixtureId }) => {
+    console.log('areaType: ', areaType)
+    console.log('addressableAreaId: ', addressableAreaId)
+    console.log('cutoutFixtureId: ', cutoutFixtureId)
+    if (
+      areaType === 'slot' &&
+      cutoutFixtureId == 'singleRightSlot' &&
+      COLUMN_4_AA.includes(addressableAreaId)
+    ) {
       return addressableAreaId
-    }
-    else if (areaType === 'stagingSlot' && cutoutFixtureId !== 'stagingAreaRightSlot'){
+    } else if (
+      areaType === 'stagingSlot' &&
+      cutoutFixtureId !== 'stagingAreaRightSlot'
+    ) {
       return null
-    }
-    else {
+    } else {
       return deckDef.locations.addressableAreas.find(
         aa => aa.id === addressableAreaId && aa.areaType === areaType
       )
     }
-  }
-  )
+  })
 }
 
 export const getAAFromCutoutFixtureId = (
@@ -227,19 +231,19 @@ export const getAAFromCutoutFixtureId = (
   /**
    * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
    */
-  if (cutoutFixtureId === DUMMY_STAGING_AREA_WIHTOUT_STAGING_AREA){
-    switch (inputCutoutId){
+  if (cutoutFixtureId === DUMMY_STAGING_AREA_WIHTOUT_STAGING_AREA) {
+    switch (inputCutoutId) {
       case 'cutoutA3':
-        return ["A3", "A4"]
+        return ['A3', 'A4']
       case 'cutoutB3':
-        return ["B3", "B4"]
+        return ['B3', 'B4']
       case 'cutoutC3':
-        return ["C3", "C4"]
+        return ['C3', 'C4']
       case 'cutoutD3':
-        return ["D3", "D4"]
+        return ['D3', 'D4']
     }
   }
-    
+
   const fixture = deckDefinition.cutoutFixtures.find(
     fixture => fixture.id === cutoutFixtureId
   )

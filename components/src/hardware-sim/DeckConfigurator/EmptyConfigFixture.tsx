@@ -1,6 +1,7 @@
 import { css } from 'styled-components'
 
 import { COLUMN_4_AA } from '@opentrons/shared-data'
+import { consolidate } from '@opentrons/step-generation'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
@@ -25,7 +26,6 @@ import type {
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
-import { consolidate } from '@opentrons/step-generation'
 
 interface EmptyConfigFixtureProps {
   deckDefinition: DeckDefinition
@@ -62,8 +62,8 @@ export function EmptyConfigFixture(
     (aaItem: AddressableArea) => aaItem.id === addressableArea
   )?.offsetFromCutoutFixture ?? [0, 0, 0]
   const xOffset = COLUMN_4_AA.includes(addressableArea) ? offsetVector[0] : 0
-  console.log("xOffset: ", xOffset)
-  console.log("addressableArea: ", addressableArea)
+  console.log('xOffset: ', xOffset)
+  console.log('addressableArea: ', addressableArea)
   let width = 0
   switch (fixtureLocation) {
     case 'cutoutA1':

@@ -5,11 +5,11 @@ import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_X_ADJUSTMENT,
-  THERMOCYCLER_FIXTURE_WIDTH,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   THERMOCYCLER_FIXTURE_HEIGHT,
+  THERMOCYCLER_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 

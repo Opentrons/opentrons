@@ -30,7 +30,6 @@ import { DeckConfigurationDiscardChangesModal } from '../../../DeviceDetailsDeck
 import type { Dispatch, SetStateAction } from 'react'
 import type { ModuleOnDeck } from '@opentrons/components'
 import type {
-  AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
   ModuleModel,
@@ -39,7 +38,6 @@ import type { SetupScreens } from '../types'
 
 interface ProtocolSetupDeckConfigurationProps {
   cutoutId: CutoutId | null
-  addressableArea: AddressableAreaName | null
   runId: string
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   providedFixtureOptions: CutoutFixtureId[]
@@ -47,7 +45,6 @@ interface ProtocolSetupDeckConfigurationProps {
 
 export function ProtocolSetupDeckConfiguration({
   cutoutId,
-  addressableArea,
   runId,
   setSetupScreen,
   providedFixtureOptions,
@@ -139,7 +136,6 @@ export function ProtocolSetupDeckConfiguration({
           {showConfigurationModal && cutoutId != null ? (
             <AddFixtureModal
               cutoutId={cutoutId}
-              addressableArea={addressableArea}
               closeModal={() => {
                 setShowConfigurationModal(false)
               }}

@@ -858,7 +858,6 @@ export function ProtocolSetup(): JSX.Element {
         runId={runId}
         setSetupScreen={setSetupScreen}
         setCutoutId={setCutoutId}
-        setAddressableAreaId={setAddressableAreaId}
         setProvidedFixtureOptions={setProvidedFixtureOptions}
       />
     ),
@@ -883,7 +882,6 @@ export function ProtocolSetup(): JSX.Element {
     'deck configuration': (
       <ProtocolSetupDeckConfiguration
         cutoutId={cutoutId}
-        addressableArea={addressableAreaId}
         runId={runId}
         setSetupScreen={setSetupScreen}
         providedFixtureOptions={providedFixtureOptions}

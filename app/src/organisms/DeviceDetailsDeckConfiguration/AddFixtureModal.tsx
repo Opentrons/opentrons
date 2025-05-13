@@ -55,7 +55,6 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 
 import type { ModalProps } from '@opentrons/components'
 import type {
-  AddressableAreaName,
   CutoutConfig,
   CutoutFixtureId,
   CutoutId,
@@ -64,7 +63,6 @@ import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
-  addressableArea: AddressableAreaName
   closeModal: () => void
   providedFixtureOptions?: CutoutFixtureId[]
   isOnDevice?: boolean
@@ -78,7 +76,6 @@ type OptionStage =
 
 export function AddFixtureModal({
   cutoutId,
-  addressableArea,
   closeModal,
   providedFixtureOptions,
   isOnDevice = false,

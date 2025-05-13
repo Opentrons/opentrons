@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '..'
-import { getAAFromCutoutId } from '../fixtures'
+import { getAAFromCutoutFixtureId } from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
 
 describe('getAAFromCutoutId', () => {
   it('Should get the aa for a cutoutId and a cutoutFixtureId', () => {
-    const result = getAAFromCutoutId(
+    const result = getAAFromCutoutFixtureId(
       'cutoutD3',
       'flexStackerModuleV1',
       getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -18,7 +18,7 @@ describe('getAAFromCutoutId', () => {
   })
 
   it('Should return undefined if there is no match for a  cutoutId and a cutoutFixtureId', () => {
-    const result = getAAFromCutoutId(
+    const result = getAAFromCutoutFixtureId(
       'cutoutA1',
       'flexStackerModuleV1',
       getDeckDefFromRobotType(FLEX_ROBOT_TYPE)

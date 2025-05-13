@@ -55,7 +55,6 @@ interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   setCutoutId: (cutoutId: CutoutId) => void
-  setAddressableAreaId: (addressableAreaId: AddressableAreaName) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
@@ -66,7 +65,6 @@ export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
   setCutoutId,
-  setAddressableAreaId,
   setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
@@ -201,7 +199,6 @@ export function ProtocolSetupModulesAndDeck({
                   mostRecentAnalysis={mostRecentAnalysis}
                   setSetupScreen={setSetupScreen}
                   setCutoutId={setCutoutId}
-                  setAddressableAreaId={setAddressableAreaId}
                   setProvidedFixtureOptions={setProvidedFixtureOptions}
                 />
               </Flex>

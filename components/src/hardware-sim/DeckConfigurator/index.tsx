@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import {
   ABSORBANCE_READER_V1_FIXTURE,
   filterAaByAreaType,
@@ -36,7 +38,7 @@ import { ThermocyclerFixture } from './ThermocyclerFixture'
 import { TrashBinConfigFixture } from './TrashBinConfigFixture'
 import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
 
-import { useEffect, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import type {
   CutoutFixtureId,
   CutoutId,
@@ -80,9 +82,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   const deckConfigWithAA = transformCutoutFixturesToAaWithFixtures(
-      deckConfig,
-      deckDef
-    )
+    deckConfig,
+    deckDef
+  )
   // useEffect(() => {
   //   deckConfigWithAA = transformCutoutFixturesToAaWithFixtures(
   //     deckConfig,
@@ -90,14 +92,14 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   //   )
   // }, [deckConfigWithAA])
 
-  console.log("deckConfigWithAA: ", deckConfigWithAA)
+  console.log('deckConfigWithAA: ', deckConfigWithAA)
 
   const stagingAreaFixtures = filterAaByAreaType(
     deckConfigWithAA,
     deckDef,
     'stagingSlot'
   )
-  console.log("stagingAreaFixtures: ", stagingAreaFixtures)
+  console.log('stagingAreaFixtures: ', stagingAreaFixtures)
 
   const wasteChuteFixtures = filterAaByAreaType(
     deckConfigWithAA,
@@ -105,7 +107,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     'wasteChute'
   )
   const emptyCutouts = filterAaByAreaType(deckConfigWithAA, deckDef, 'slot')
-  console.log("emptyCutouts: ",emptyCutouts)
+  console.log('emptyCutouts: ', emptyCutouts)
 
   // const trashBinFixtures = deckConfigWithAA.filter(
   //   ({ cutoutFixtureId }) => cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
@@ -184,19 +186,23 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           fixtureLocation={cutoutId}
         />
       ))}
-      {wasteChuteFixtures.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-        <WasteChuteConfigFixture
-          data-testid={cutoutId}
-          key={addressableAreaId}
-          deckDefinition={deckDef}
-          handleClickRemove={
-            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
-          }
-          fixtureLocation={cutoutId}
-          cutoutFixtureId={cutoutFixtureId}
-          selected={cutoutId === selectedCutoutId}
-        />
-      ))}
+      {wasteChuteFixtures.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <WasteChuteConfigFixture
+            data-testid={cutoutId}
+            key={addressableAreaId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            selected={cutoutId === selectedCutoutId}
+          />
+        )
+      )}
       {/* {wasteChuteStagingAreaFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <WasteChuteConfigFixture
           data-testid={cutoutId}
@@ -211,64 +217,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           hasStagingAreas
         />
       ))} */}
-      {trashBinFixtures.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-        <TrashBinConfigFixture
-          data-testid={cutoutId}
-          key={addressableAreaId}
-          deckDefinition={deckDef}
-          handleClickRemove={
-            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
-          }
-          fixtureLocation={cutoutId}
-          cutoutFixtureId={cutoutFixtureId}
-          selected={cutoutId === selectedCutoutId}
-        />
-      ))}
-      {temperatureModuleFixtures.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-        <TemperatureModuleFixture
-          data-testid={cutoutId}
-          key={addressableAreaId}
-          deckDefinition={deckDef}
-          handleClickRemove={
-            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
-          }
-          fixtureLocation={cutoutId}
-          cutoutFixtureId={cutoutFixtureId}
-          selected={cutoutId === selectedCutoutId}
-        />
-      ))}
-      {heaterShakerFixtures.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-        <HeaterShakerFixture
-          data-testid={cutoutId}
-          key={addressableAreaId}
-          deckDefinition={deckDef}
-          handleClickRemove={
-            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
-          }
-          fixtureLocation={cutoutId}
-          cutoutFixtureId={cutoutFixtureId}
-          selected={cutoutId === selectedCutoutId}
-        />
-      ))}
-      {magneticBlockFixtures.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-        <MagneticBlockFixture
-          data-testid={cutoutId}
-          key={addressableAreaId}
-          deckDefinition={deckDef}
-          handleClickRemove={
-            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
-          }
-          fixtureLocation={cutoutId}
-          cutoutFixtureId={cutoutFixtureId}
-          selected={cutoutId === selectedCutoutId}
-          hasStagingArea={
-            cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
-          }
-        />
-      ))}
-      {thermocyclerFixtures.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => {
-        return (
-          <ThermocyclerFixture
+      {trashBinFixtures.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <TrashBinConfigFixture
             data-testid={cutoutId}
             key={addressableAreaId}
             deckDefinition={deckDef}
@@ -279,41 +230,123 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
-            selected={
-              selectedCutoutId != null &&
-              THERMOCYCLER_MODULE_CUTOUTS.includes(selectedCutoutId) &&
-              THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)
+            selected={cutoutId === selectedCutoutId}
+          />
+        )
+      )}
+      {temperatureModuleFixtures.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <TemperatureModuleFixture
+            data-testid={cutoutId}
+            key={addressableAreaId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            selected={cutoutId === selectedCutoutId}
+          />
+        )
+      )}
+      {heaterShakerFixtures.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <HeaterShakerFixture
+            data-testid={cutoutId}
+            key={addressableAreaId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            selected={cutoutId === selectedCutoutId}
+          />
+        )
+      )}
+      {magneticBlockFixtures.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <MagneticBlockFixture
+            data-testid={cutoutId}
+            key={addressableAreaId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            selected={cutoutId === selectedCutoutId}
+            hasStagingArea={
+              cutoutFixtureId ===
+              STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
             }
           />
         )
-      })}
-      {absorbanceReaderFixtures.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-        <AbsorbanceReaderFixture
-          data-testid={cutoutId}
-          key={addressableAreaId}
-          deckDefinition={deckDef}
-          handleClickRemove={
-            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
-          }
-          fixtureLocation={cutoutId}
-          cutoutFixtureId={cutoutFixtureId}
-          selected={cutoutId === selectedCutoutId}
-        />
-      ))}
-      {flexStackerFixtures.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-        <FlexStackerFixture
-          data-testid={cutoutId}
-          key={addressableAreaId}
-          deckDefinition={deckDef}
-          handleClickRemove={
-            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
-          }
-          fixtureLocation={cutoutId}
-          cutoutFixtureId={cutoutFixtureId}
-          hasWasteChute={cutoutFixtureId !== FLEX_STACKER_V1_FIXTURE}
-          selected={cutoutId === selectedCutoutId}
-        />
-      ))}
+      )}
+      {thermocyclerFixtures.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => {
+          return (
+            <ThermocyclerFixture
+              data-testid={cutoutId}
+              key={addressableAreaId}
+              deckDefinition={deckDef}
+              handleClickRemove={
+                editableCutoutIds.includes(cutoutId)
+                  ? handleClickRemove
+                  : undefined
+              }
+              fixtureLocation={cutoutId}
+              cutoutFixtureId={cutoutFixtureId}
+              selected={
+                selectedCutoutId != null &&
+                THERMOCYCLER_MODULE_CUTOUTS.includes(selectedCutoutId) &&
+                THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)
+              }
+            />
+          )
+        }
+      )}
+      {absorbanceReaderFixtures.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <AbsorbanceReaderFixture
+            data-testid={cutoutId}
+            key={addressableAreaId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            selected={cutoutId === selectedCutoutId}
+          />
+        )
+      )}
+      {flexStackerFixtures.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <FlexStackerFixture
+            data-testid={cutoutId}
+            key={addressableAreaId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            hasWasteChute={cutoutFixtureId !== FLEX_STACKER_V1_FIXTURE}
+            selected={cutoutId === selectedCutoutId}
+          />
+        )
+      )}
       {additionalStaticFixtures?.map(staticFixture => (
         <StaticFixture
           data-testid={staticFixture.location}
