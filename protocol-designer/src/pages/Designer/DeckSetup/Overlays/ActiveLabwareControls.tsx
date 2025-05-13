@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -9,9 +10,13 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
+import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
+import { getIsWellContentsEmpty } from '../../../../components/organisms'
 import { SlotDetailModal } from '../../../../components/organisms/SlotDetailModal'
 import { END_TERMINAL_ITEM_ID } from '../../../../steplist'
+import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { DECK_CONTROLS_STYLE } from '../constants'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -39,8 +44,19 @@ export function ActiveLabwareControls(
   } = props
   const { t } = useTranslation('starting_deck_state')
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
+  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+  const fullStack = getFullStackFromLabwares(activeDeckSetup.labware, itemId)
+  const allWellContentsForActiveItem = useSelector(
+    wellContentsSelectors.getAllWellContentsForActiveItem
+  )
+  const noContents = getIsWellContentsEmpty(
+    allWellContentsForActiveItem,
+    fullStack[0]
+  )
+
   if (
     (terminalItemId != null && terminalItemId !== END_TERMINAL_ITEM_ID) ||
+    noContents ||
     slotPosition == null
   ) {
     return null

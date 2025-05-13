@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
@@ -10,8 +11,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { getIsWellContentsEmpty } from '../../../components/organisms'
 import { SlotDetailModal } from '../../../components/organisms/SlotDetailModal'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
+import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -49,9 +52,22 @@ export function OffDeckControls(
   } = props
   const { t } = useTranslation('starting_deck_state')
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
+  const allWellContentsForActiveItem = useSelector(
+    wellContentsSelectors.getAllWellContentsForActiveItem
+  )
+  const noContents = getIsWellContentsEmpty(
+    allWellContentsForActiveItem,
+    labwareId
+  )
 
-  if (slotPosition === null || isSelected) return null
-
+  if (
+    slotPosition === null ||
+    isSelected ||
+    ((terminalItemId == null || terminalItemId !== START_TERMINAL_ITEM_ID) &&
+      noContents)
+  ) {
+    return null
+  }
   const hoverOpacity =
     (hover != null && hover === labwareId) || menuListId === labwareId
       ? '1'

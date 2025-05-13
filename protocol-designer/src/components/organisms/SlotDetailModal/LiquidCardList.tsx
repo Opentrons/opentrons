@@ -6,26 +6,27 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { LiquidDetailCard } from './LiquidDetailCard'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { AllIngredGroupFields } from '../../../labware-ingred/types'
+import type { LabwareOnDeck } from '../../../step-forms'
+import type { WellContentsByNumber } from './index'
 
 interface LiquidCardListProps {
-  selectedLabwareDefinition: LabwareDefinition2
+  selectedLabware: LabwareOnDeck
   selectedLiquidId: string | undefined
   setSelectedLiquidId: Dispatch<SetStateAction<string | undefined>>
   allIngredGroupFields: AllIngredGroupFields
   individualIds: string[]
-  volumeByWell: { [wellName: string]: number }
+  volumesPerLiquid: Record<string, WellContentsByNumber>
 }
 
 export const LiquidCardList = (props: LiquidCardListProps): JSX.Element => {
   const {
-    selectedLabwareDefinition,
+    selectedLabware,
     selectedLiquidId,
     setSelectedLiquidId,
     allIngredGroupFields,
     individualIds,
-    volumeByWell,
+    volumesPerLiquid,
   } = props
   const currentLiquidRef = useRef<HTMLDivElement>(null)
 
@@ -35,7 +36,6 @@ export const LiquidCardList = (props: LiquidCardListProps): JSX.Element => {
   useEffect(() => {
     scrollToCurrentItem()
   }, [])
-
   const liquidCardList = individualIds.map(id => {
     const liquidInfo = allIngredGroupFields[id]
     return (
@@ -46,10 +46,10 @@ export const LiquidCardList = (props: LiquidCardListProps): JSX.Element => {
         <LiquidDetailCard
           liquidInfo={liquidInfo}
           liquidId={id}
-          labwareWellOrdering={selectedLabwareDefinition.ordering}
+          labwareWellOrdering={selectedLabware.def.ordering}
           setSelectedValue={setSelectedLiquidId}
           selectedValue={selectedLiquidId}
-          volumeByWell={volumeByWell}
+          volumesPerLiquid={volumesPerLiquid}
         />
       </Flex>
     )
