@@ -21,7 +21,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=ENV_PATH, env_file_encoding="utf-8", extra="allow")  # Allows extra fields
     # Delete the extra=allow above
-    # nce we figure out why aws secret manager has a variable called protocol_designer_app_version
+    # once we figure out why aws secret manager has a variable called protocol_designer_app_version
     # see https://github.com/Opentrons/opentrons/actions/runs/15007084098/job/42168255050
     environment: str = "local"
     huggingface_simulate_endpoint: str = "https://Opentrons-simulator.hf.space/protocol"
