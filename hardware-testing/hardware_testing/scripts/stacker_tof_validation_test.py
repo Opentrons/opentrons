@@ -1,20 +1,16 @@
 """Flex Stacker TOF Validation Test."""
 import argparse
 import asyncio
-import csv
-import os
-import sys
 import subprocess
 import re
 import time
-import threading
 from datetime import datetime
 
 from hardware_testing import data
 from opentrons.hardware_control.ot3api import OT3API
 from hardware_testing.opentrons_api.types import OT3Mount, Axis
 from hardware_testing.opentrons_api.helpers_ot3 import build_async_ot3_hardware_api
-from opentrons.drivers.flex_stacker.types import StackerAxis, Direction, TOFSensor, MeasurementKind
+from opentrons.drivers.flex_stacker.types import StackerAxis, Direction, TOFSensor
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='Flex Stacker TOF Validation Test')
