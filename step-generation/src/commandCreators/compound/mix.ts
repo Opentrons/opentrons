@@ -2,6 +2,7 @@ import flatMap from 'lodash/flatMap'
 
 import {
   ALL,
+  getCorrectionVolume,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
@@ -127,6 +128,8 @@ export const mixInPlaceUtil = (args: {
   dispenseDelaySeconds?: number
   finalPushOut: number | null
   invariantContext: InvariantContext
+  liquidClass: string | null
+  tiprack: string
 }): CurriedCommandCreator[] => {
   const {
     pipette,
@@ -138,6 +141,8 @@ export const mixInPlaceUtil = (args: {
     dispenseDelaySeconds = 0,
     finalPushOut,
     invariantContext,
+    liquidClass,
+    tiprack,
   } = args
 
   const pythonCommandCreator = makePythonCommandCreator({
@@ -152,6 +157,23 @@ export const mixInPlaceUtil = (args: {
     finalPushOut,
   })
 
+  const pipetteSpecs = invariantContext.pipetteEntities[pipette].spec
+
+  const correctionVolumeAspirate = getCorrectionVolume({
+    liquidClass,
+    pipetteSpecs,
+    tiprackDefUri: tiprack,
+    targetVolume: volume,
+    liquidHandlingAction: 'aspirate',
+  })
+  const correctionVolumeDispense = getCorrectionVolume({
+    liquidClass,
+    pipetteSpecs,
+    tiprackDefUri: tiprack,
+    targetVolume: volume,
+    liquidHandlingAction: 'singleDispense',
+  })
+
   const commandCreators = []
   for (let i = 0; i < times; i++) {
     commandCreators.push(
@@ -160,6 +182,9 @@ export const mixInPlaceUtil = (args: {
           pipetteId: pipette,
           volume,
           flowRate: aspirateFlowRateUlSec,
+          ...(correctionVolumeAspirate != null
+            ? { correctionVolume: correctionVolumeAspirate }
+            : {}),
         }),
         ...getDelayCommand(aspirateDelaySeconds),
         curryWithoutPython(dispenseInPlace, {
@@ -171,6 +196,9 @@ export const mixInPlaceUtil = (args: {
             : finalPushOut == null
             ? {}
             : { pushOut: finalPushOut }), // only push out if final repetition
+          ...(correctionVolumeDispense != null
+            ? { correctionVolume: correctionVolumeDispense }
+            : {}),
         }),
 
         ...getDelayCommand(dispenseDelaySeconds),

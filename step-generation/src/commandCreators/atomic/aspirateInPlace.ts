@@ -9,7 +9,7 @@ export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, volume, flowRate } = args
+  const { pipetteId, volume, flowRate, correctionVolume } = args
 
   const commands = [
     {
@@ -19,6 +19,7 @@ export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
         pipetteId,
         volume,
         flowRate,
+        ...(correctionVolume != null ? { correctionVolume } : {}),
       },
     },
   ]
@@ -39,6 +40,7 @@ export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
     // rate= is a ratio in the PAPI, and we have no good way to figure out what
     // flowrate the PAPI has set the pipette to, so we just have to do a division:
     `rate=${flowRate} / ${pipettePythonName}.flow_rate.aspirate`,
+    // Note that correction volume is not supported in our public atomic liquid handling APIs
   ]
   const python = `${pipettePythonName}.aspirate(\n${indentPyLines(
     pythonArgs.join(',\n')
