@@ -1,5 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { SelectTipDropLocation } from '../../../app/src/organisms/ODD/QuickTransferFlow/SelectTipDropLocation'
 import { StepThunk } from './StepBuilder'
 import { UniversalSteps } from './UniversalSteps' // Adjust the path
 
@@ -284,6 +283,20 @@ export const SetupSteps = {
       // optional: cy.contains(SetupContent.FilterTiprack50).click()
     },
   }),
+  EightChannelPipette1000: (): StepThunk => ({
+    call: () => {
+      cy.contains(SetupContent.AddPipette).click()
+      cy.contains('label', SetupContent.EightChannel)
+        .should('exist')
+        .and('be.visible')
+        .click()
+      cy.contains(SetupContent.Volume1000).click()
+      cy.contains(SetupContent.Tiprack50).click()
+      cy.contains(SetupContent.Tiprack200).click()
+      cy.contains(SetupContent.Tiprack1000).click()
+      // optional: cy.contains(SetupContent.FilterTiprack50).click()
+    },
+  }),
 
   SinglePipette1000: (): StepThunk => ({
     call: () => {
@@ -479,6 +492,12 @@ export const SetupSteps = {
   ClickWellPlatesSection: (): StepThunk => ({
     call: () => {
       cy.contains(SetupContent.WellPlatesCat).click()
+    },
+  }),
+
+  ClickTiprack: (): StepThunk => ({
+    call: () => {
+      cy.contains('Tip racks').click()
     },
   }),
 
@@ -1243,6 +1262,24 @@ export const CompositeSetupSteps = {
       SetupSteps.AddHardwareLabware().call()
       SetupSteps.OpenSelectLabwareModal().call()
       SetupSteps.ClickWellPlatesSection().call()
+      SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()
+    },
+  }),
+
+  AddTiprackToDeckSlot: (
+    deckSlot?: string | undefined,
+    labwareName?: string | undefined
+  ): StepThunk => ({
+    call: () => {
+      const slotToUse = deckSlot ?? 'C3'
+      const labwareToUse = labwareName ?? 'Bio-Rad 96 Well Plate'
+      cy.log(
+        `Running AddLabwareToDeckSlot with slot ${deckSlot} and labware ${labwareName}`
+      )
+      SetupSteps.ChoseDeckSlotWithLabware(slotToUse).call()
+      SetupSteps.AddHardwareLabware().call()
+      SetupSteps.OpenSelectLabwareModal().call()
+      SetupSteps.ClickTiprack().call()
       SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()
     },
   }),
