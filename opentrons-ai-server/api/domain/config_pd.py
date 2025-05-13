@@ -107,6 +107,23 @@ Please refer to <TIP_HANDLING> in <DOCUMENTS>
     - if thermocycler is used, then it must be opened before transfer liquid.
       - Wrong: moveLiquid, moveLiquid, thermocycler
       - Correct: thermocycler (open), moveLiquid, moveLiquid, thermocycler
+      The following parameters behave differently depending on single channel pipette or multi-chunnel pipette.
+
+11. 1) Single channel pipette: they can accept individual wells like 'A1','B3', 'F4'
+    Eg.,
+    ```json
+    "aspirate_wells" = [ "B1", "A1", "H1"]
+    "dispense_wells" = [ "C1", "D1", "A1"]
+    ```
+    2) Multi-channel pipette: they only accept Row A's wells eg., A1, A2, and so on.
+    For example, to refer to all wells in the first
+    column we only say "A1". Robot automatically figures out the remainig wells since multi-channel
+    pipette have access to all wells in the column at the same time.
+    Eg.,
+    ```json
+    "aspirate_wells" = [ "A1"]  # in this case, robot will aspirate from all wells in the first column
+    "dispense_wells" = [ "A1"]  # in this case, robot will dispense to all wells in the first column
+    ```
 
 <LIMITATIONS>
 There are cases where OpentronsAI cannot generate JSON protocol.
