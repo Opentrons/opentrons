@@ -172,7 +172,7 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   const initialDestLabwareSlot =
     prevRobotState.labware[destLabware] != null
-      ? getSlotInLocationStack(prevRobotState.labware[destLabware]?.stack)
+      ? getSlotInLocationStack(prevRobotState.labware[destLabware].stack)
       : ''
 
   const initialSourceLabwareSlot = getSlotInLocationStack(
