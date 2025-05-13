@@ -22,7 +22,7 @@ export function LiquidIcon(props: LiquidIconProps): JSX.Element {
     LiquidIconSize,
     { iconSize: string; padding: string }
   > = {
-    xSmall: { iconSize: '0.333125rem', padding: '0.333125rem' },
+    xSmall: { iconSize: SPACING.spacing6, padding: SPACING.spacing6 },
     small: { iconSize: '0.5rem', padding: SPACING.spacing8 },
     medium: { iconSize: '1rem', padding: SPACING.spacing12 },
   }

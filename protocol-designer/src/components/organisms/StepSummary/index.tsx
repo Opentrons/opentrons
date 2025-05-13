@@ -27,7 +27,7 @@ import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { getMixSummary } from './getMixSummary'
 import { getMoveLiquidSummary } from './getMoveLiquidSummary'
-import { StyledTrans } from './utils'
+import { StyledTrans } from './StyledTrans'
 
 import type { FormData } from '../../../form-types'
 

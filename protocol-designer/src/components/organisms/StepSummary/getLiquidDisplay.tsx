@@ -1,5 +1,6 @@
 import {
   ALIGN_CENTER,
+  Box,
   Flex,
   SPACING,
   StyledText,
@@ -18,7 +19,7 @@ export function getLiquidDisplay(
     return null
   }
 
-  let liquidDisplay: JSX.Element = <div></div>
+  let liquidDisplay: JSX.Element = <Box />
 
   if (liquidLength === 1) {
     liquidDisplay = (
