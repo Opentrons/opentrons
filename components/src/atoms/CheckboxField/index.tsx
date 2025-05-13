@@ -11,6 +11,7 @@ import {
 } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ChangeEventHandler, ComponentProps, ReactNode } from 'react'
 
 export interface CheckboxFieldProps {
@@ -45,7 +46,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
   const indeterminate = isIndeterminate ?? false ? 'true' : undefined
 
   return (
-    <label css={OUTER_STYLE}>
+    <label css={OUTER_STYLE(value ?? false)}>
       {props.isIndeterminate ?? false ? (
         <Flex
           alignItems={ALIGN_CENTER}
@@ -95,7 +96,7 @@ const INPUT_STYLE = css`
   border: 0;
 `
 
-const OUTER_STYLE = css`
+const OUTER_STYLE = (value?: boolean): FlattenSimpleInterpolation => css`
   font-size: var(--fs-body-1); /* from legacy --font-form-default */
   font-weight: var(--fw-regular); /* from legacy --font-form-default */
   color: var(--c-font-dark); /* from legacy --font-form-default */
@@ -106,7 +107,7 @@ const OUTER_STYLE = css`
 
   &:has(input[type='checkbox']:focus-visible) {
     [data-testid='CheckboxField_icon'] {
-      color: ${COLORS.blue50};
+      color: ${value === true ? COLORS.blue50 : COLORS.grey55};
       outline: 2px solid ${COLORS.blue50};
       outline-offset: 0.25rem;
     }
@@ -114,8 +115,9 @@ const OUTER_STYLE = css`
 `
 
 const LABEL_TEXT_STYLE = css`
-  font-size: ${TYPOGRAPHY.fontSizeP};
+  font-size: ${TYPOGRAPHY.fontSizeH3};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  line-height: ${TYPOGRAPHY.lineHeight20};
   color: ${COLORS.black90};
   flex: 0 0 auto;
   padding: ${SPACING.spacing8} ${SPACING.spacing8};
@@ -145,13 +147,6 @@ const INNER_STYLE_VALUE = css`
 
   &:focus {
     box-shadow: 0 0 0 3px ${COLORS.blue50};
-  }
-
-  &:focus-visible {
-    /* color: ${COLORS.blue50};
-    outline: 2px solid ${COLORS.blue50};
-    outline-offset: 0.25rem; */
-    background-color: ${COLORS.red30};
   }
 
   &:disabled {
