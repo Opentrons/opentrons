@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -9,7 +9,9 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
+import { useProtocolExportHandler } from '../../../../resources/hooks'
 import {
+  getAdditionalEquipmentEntities,
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
@@ -41,6 +43,8 @@ vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../components/organisms/Alerts')
 vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../Timeline/utils')
+vi.mock('../../../../resources/hooks')
+
 const render = () => {
   return renderWithProviders(
     <ProtocolSteps zoomedInSlot={null} showLiquidOverflowMenu={vi.fn()} />,
@@ -66,6 +70,7 @@ const MOCK_STEP_FORMS = {
     stepDetails: '',
   },
 }
+const mockHandleExportClick = vi.fn()
 
 describe('ProtocolSteps', () => {
   beforeEach(() => {
@@ -100,6 +105,11 @@ describe('ProtocolSteps', () => {
       labware: {},
       additionalEquipmentOnDeck: {},
       pipettes: {},
+    })
+    vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
+    vi.mocked(useProtocolExportHandler).mockReturnValue({
+      handleExportClick: mockHandleExportClick,
+      exportWarningModalElement: null,
     })
   })
 
@@ -139,5 +149,12 @@ describe('ProtocolSteps', () => {
   it('renders the current step name', () => {
     render()
     screen.getByText('Custom Pause')
+  })
+
+  it('should render export button and call mock function when clicking it', () => {
+    render()
+    const exportButton = screen.getByRole('button', { name: 'Export' })
+    fireEvent.click(exportButton)
+    expect(mockHandleExportClick).toHaveBeenCalled()
   })
 })
