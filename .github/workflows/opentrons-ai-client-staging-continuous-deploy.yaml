@@ -6,11 +6,7 @@ on:
       - edge
     paths:
       - 'opentrons-ai-client/**'
-<<<<<<< Updated upstream
-=======
   workflow_dispatch:
-
->>>>>>> Stashed changes
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
