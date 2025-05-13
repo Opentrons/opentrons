@@ -45,10 +45,10 @@ export function ActiveLabwareControls(
   const { t } = useTranslation('starting_deck_state')
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const fullStack = getFullStackFromLabwares(activeDeckSetup.labware, itemId)
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
+  const fullStack = getFullStackFromLabwares(activeDeckSetup.labware, itemId)
   const noContents = getIsWellContentsEmpty(
     allWellContentsForActiveItem,
     fullStack[0]

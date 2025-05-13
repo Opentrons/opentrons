@@ -85,12 +85,13 @@ export const SlotDetailModal = (
   const individualIds = Array.from(new Set(allLiquidIdsOnLabware))
 
   const volumesPerLiquid = getVolumesPerLiquid(wellContents, individualIds)
+  const ingedInputs = Object.values(allIngredientGroupFields)
+  const wellFill = Object.values(allWellFill)
+
   const [selectedLiquidId, setSelectedLiquidId] = useState<string | undefined>(
-    Object.values(allWellFill).length > 0
-      ? Object.values(allIngredientGroupFields).find(ingred =>
-          Object.values(allWellFill).includes(ingred.displayColor)
-        )?.liquidGroupId ??
-          Object.values(allIngredientGroupFields)[0].liquidGroupId
+    wellFill.length > 0
+      ? ingedInputs.find(ingred => wellFill.includes(ingred.displayColor))
+          ?.liquidGroupId ?? ingedInputs[0].liquidGroupId
       : undefined
   )
   const wellContentsWithLiquidId: WellGroup =
