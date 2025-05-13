@@ -72,13 +72,12 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
     let robotState = null
     if (activeItem == null) return null
 
-    if (activeItem.id === LIQUID_ID) {
-      return initialRobotState
-    }
+    const isActiveItemHardwareOrLiquid =
+      activeItem.id === HARDWARE_ID || activeItem.id === LIQUID_ID
 
     if (
       activeItem.selectionType === TERMINAL_ITEM_SELECTION_TYPE &&
-      activeItem.id !== HARDWARE_ID
+      !isActiveItemHardwareOrLiquid
     ) {
       const terminalId = activeItem.id
 
@@ -91,41 +90,49 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
         robotState = lastValidRobotState
       } else {
         console.error(
-          `Invalid terminalId ${terminalId}, could not robotState of active item`
+          `Invalid terminalId ${terminalId}, could not get robotState of active item`
         )
       }
     } else if (
-      activeItem.id === HARDWARE_ID &&
+      isActiveItemHardwareOrLiquid &&
       selectedTerminalItemId === START_TERMINAL_ITEM_ID
     ) {
       robotState = initialRobotState
     } else if (
-      activeItem.id === HARDWARE_ID &&
+      isActiveItemHardwareOrLiquid &&
       (selectedTerminalItemId === END_TERMINAL_ITEM_ID ||
         selectedTerminalItemId === PRESAVED_STEP_ID)
     ) {
       robotState = lastValidRobotState
     } else {
       const stepId =
-        activeItem.id === HARDWARE_ID && selectedStepId != null
+        isActiveItemHardwareOrLiquid && selectedStepId != null
           ? selectedStepId
           : activeItem.id
+
       const timeline = robotStateTimeline.timeline
       const timelineIdx = orderedStepIds.includes(stepId)
         ? orderedStepIds.findIndex(id => id === stepId)
         : null
 
-      if (timelineIdx == null || stepId === HARDWARE_ID) {
-        if (stepId !== HARDWARE_ID) {
+      if (
+        timelineIdx == null ||
+        stepId === HARDWARE_ID ||
+        stepId === LIQUID_ID
+      ) {
+        if (stepId !== HARDWARE_ID && stepId !== LIQUID_ID) {
           console.error(`Expected non-null timelineIdx for step ${stepId}`)
         }
         return null
       }
+
       if (timelineIdx === 0) {
         robotState = initialRobotState
       } else {
         const prevFrame = timeline[timelineIdx - 1]
-        if (prevFrame) robotState = prevFrame.robotState
+        if (prevFrame) {
+          robotState = prevFrame.robotState
+        }
       }
     }
 
