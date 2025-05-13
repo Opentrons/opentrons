@@ -19,7 +19,7 @@ Welcome to the v8.4.0 release of the Opentrons robot software! This release incl
 
 ### Improvements
 
-- Improved tip drop motions for Flex 1- and 8-channel pipettes correctly drop and return attached tips to the tip rack. 
+- Improved tip drop motions for Flex 1-channel and 8-channel pipettes correctly drop and return attached tips to the tip rack. 
 
 ### Bug Fixes
 
