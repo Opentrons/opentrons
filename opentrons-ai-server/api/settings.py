@@ -49,6 +49,12 @@ class Settings(BaseSettings):
     anthropic_api_key: SecretStr = SecretStr("default_anthropic_api_key")
     wandb_api_key: SecretStr = SecretStr("default_wandb_api_key")
 
+    class Config:
+        extra = "allow"  # Allows extra fields without raising an error
+        # Delete the line above once we figure out why aws secret manager has a
+        # variable called protocol_designer_app_version
+        # see https://github.com/Opentrons/opentrons/actions/runs/15007084098/job/42168255050
+
     @property
     def json_logging(self) -> bool:
         if self.environment == "local" and not is_running_in_docker():
