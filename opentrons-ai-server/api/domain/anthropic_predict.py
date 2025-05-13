@@ -26,9 +26,9 @@ REPO_ROOT: Path = Path(Path(__file__)).parent.parent.parent.parent
 class AnthropicPredict:
     def __init__(self, settings: Settings) -> None:
         self.settings: Settings = settings
-        self.client: Anthropic = Anthropic(api_key=self.settings.anthropic_api_key.get_secret_value())
-        self.model_name: str = self.settings.anthropic_model_name
-        self.model_helper: str = self.settings.model_helper
+        self.client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
+        self.model_name: str = settings.anthropic_model_name
+        self.model_helper: str = settings.model_helper
         self.system_prompt: str = SYSTEM_PROMPT
         self.PROMPT_PD = PROMPT_PD
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
