@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { dispenseInPlace } from '../commandCreators/atomic'
 import {
-  DEFAULT_PIPETTE,
   getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
@@ -15,7 +14,7 @@ describe('dispenseInPlace', () => {
   let invariantContext: InvariantContext
   let robotStateWithTip: RobotState
 
-  const mockId = DEFAULT_PIPETTE
+  const mockId = 'p300SingleId'
   const mockFlowRate = 10
   const mockVolume = 10
   beforeEach(() => {

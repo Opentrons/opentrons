@@ -446,17 +446,22 @@ export function generateQuickTransferArgs(
     aspirateRetractZOffset: 0,
     aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
     aspirateRetractDelay: null,
+    dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseZOffset: 0,
     dispenseSubmergeSpeed: null,
     dispenseSubmergeXOffset: 0,
     dispenseSubmergeYOffset: 0,
     dispenseSubmergeZOffset: 0,
     dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseSubmergeDelay: null,
     dispenseRetractSpeed: null,
     dispenseRetractXOffset: 0,
     dispenseRetractYOffset: 0,
     dispenseRetractZOffset: 0,
     dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseRetractDelay: null,
     touchTipAfterAspirateMmFromEdge: null,
+    touchTipAfterDispenseMmFromEdge: null,
   }
 
   switch (quickTransferState.path) {

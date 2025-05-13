@@ -1,7 +1,8 @@
+import * as errorCreators from '../../errorCreators'
 import { indentPyLines, uuid } from '../../utils'
 
 import type { AspirateInPlaceParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 
 export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
   args,
@@ -21,6 +22,15 @@ export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
       },
     },
   ]
+  const errors: CommandCreatorError[] = []
+  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+    errors.push(
+      errorCreators.noTipOnPipette({
+        actionName: 'aspirate',
+        pipette: pipetteId,
+      })
+    )
+  }
 
   const pipettePythonName =
     invariantContext.pipetteEntities[pipetteId].pythonName
@@ -33,6 +43,12 @@ export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
   const python = `${pipettePythonName}.aspirate(\n${indentPyLines(
     pythonArgs.join(',\n')
   )},\n)`
+
+  if (errors.length > 0) {
+    return {
+      errors,
+    }
+  }
 
   return {
     commands,

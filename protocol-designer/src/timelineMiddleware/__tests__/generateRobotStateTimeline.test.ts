@@ -92,6 +92,11 @@ describe('generateRobotStateTimeline', () => {
           dispenseXOffset: 0,
           dispenseYOffset: 0,
           pushOut: null,
+          dispenseZOffset: 0,
+          dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+          touchTipAfterDispenseMmFromEdge: 0,
+          dispenseSubmergeDelay: null,
+          dispenseRetractDelay: null,
         },
       },
       b: {
@@ -161,6 +166,11 @@ describe('generateRobotStateTimeline', () => {
           dispenseRetractYOffset: 0,
           dispenseRetractZOffset: 0,
           dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+          dispenseZOffset: 0,
+          dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+          touchTipAfterDispenseMmFromEdge: 0,
+          dispenseSubmergeDelay: null,
+          dispenseRetractDelay: null,
         },
       },
       c: {
@@ -222,14 +232,20 @@ describe('generateRobotStateTimeline', () => {
           "moveToWell",
           "aspirateInPlace",
           "moveToWell",
-          "dispense",
+          "moveToWell",
+          "moveToWell",
+          "dispenseInPlace",
+          "moveToWell",
           "moveToWell",
           "prepareToAspirate",
           "moveToWell",
           "moveToWell",
           "aspirateInPlace",
           "moveToWell",
-          "dispense",
+          "moveToWell",
+          "moveToWell",
+          "dispenseInPlace",
+          "moveToWell",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
         ],
@@ -242,7 +258,10 @@ describe('generateRobotStateTimeline', () => {
           "moveToWell",
           "aspirateInPlace",
           "moveToWell",
-          "dispense",
+          "moveToWell",
+          "moveToWell",
+          "dispenseInPlace",
+          "moveToWell",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
         ],
@@ -279,14 +298,20 @@ mock_pipette.move_to(mock_source_plate["A1"].bottom())
 mock_pipette.move_to(mock_source_plate["A1"].bottom())
 mock_pipette.aspirate(...)
 mock_pipette.move_to(mock_source_plate["A1"].bottom())
+mock_pipette.move_to(mock_dest_plate["A12"].bottom())
+mock_pipette.move_to(mock_dest_plate["A12"].bottom())
 mock_pipette.dispense(...)
+mock_pipette.move_to(mock_dest_plate["A12"].bottom())
 mock_pipette.move_to(mock_source_plate["A2"].top(z=2))
 mock_pipette.prepare_to_aspirate()
 mock_pipette.move_to(mock_source_plate["A2"].bottom())
 mock_pipette.move_to(mock_source_plate["A2"].bottom())
 mock_pipette.aspirate(...)
 mock_pipette.move_to(mock_source_plate["A2"].bottom())
+mock_pipette.move_to(mock_dest_plate["A12"].bottom())
+mock_pipette.move_to(mock_dest_plate["A12"].bottom())
 mock_pipette.dispense(...)
+mock_pipette.move_to(mock_dest_plate["A12"].bottom())
 mock_pipette.drop_tip()
 `.trim(),
       // Step b:
@@ -298,7 +323,10 @@ mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
 mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
 mock_pipette_p300_multi.aspirate(...)
 mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
+mock_pipette_p300_multi.move_to(mock_dest_plate["A12"].bottom())
+mock_pipette_p300_multi.move_to(mock_dest_plate["A12"].bottom())
 mock_pipette_p300_multi.dispense(...)
+mock_pipette_p300_multi.move_to(mock_dest_plate["A12"].bottom())
 mock_pipette_p300_multi.drop_tip()
 `.trim(),
       // Step c:
