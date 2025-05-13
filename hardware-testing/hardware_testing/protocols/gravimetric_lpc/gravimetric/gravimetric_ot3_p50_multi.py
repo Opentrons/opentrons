@@ -12,6 +12,7 @@ SLOTS_TIPRACK = {
     50: [2, 3, 5, 6, 8, 9],
 }
 LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
+SLOT_DE_STATIC = 10
 
 
 def run(ctx: ProtocolContext) -> None:
