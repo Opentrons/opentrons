@@ -285,7 +285,9 @@ async def _main() -> None:
             print(f"Nozzle{nozzle+1}...")
             await move_to_point(hw_api, mount, nozzle_dial_point + Point(y=9*nozzle), cp)
             await asyncio.sleep(1)
-            nozzle_measurement_list.append(gauge.read())
+            reading = gauge.read()
+            assert  0.7 < reading < 0.9 , "reading is a wrong number !"
+            nozzle_measurement_list.append(reading)
 
     if args.tiprack:
         cp = CriticalPoint.NOZZLE
