@@ -36,10 +36,14 @@ import {
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
 import {
+  createFile,
   getRobotStateTimeline,
   getRobotType,
 } from '../../../file-data/selectors'
+import { saveProtocolFile } from '../../../load-file/actions'
+import { useProtocolExportHandler } from '../../../resources/hooks'
 import {
+  getAdditionalEquipmentEntities,
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../step-forms/selectors'
@@ -58,6 +62,12 @@ import {
   getSelectedSubstep,
   getSelectedTerminalItemId,
 } from '../../../ui/steps/selectors'
+import { LOAD_COMMANDS } from '../../ProtocolOverview'
+import {
+  getUnusedEntities,
+  getUnusedStagingAreas,
+  getUnusedTrash,
+} from '../../ProtocolOverview/utils'
 import { DeckSetupContainer } from '../DeckSetup'
 import { zoomInOnCoordinate } from '../DeckSetup/utils'
 import { OffDeck } from '../OffDeck'
@@ -70,6 +80,7 @@ import { TimelineEditHardware } from './TimelineEditHardware'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DeckSlot, ThunkDispatch } from '../../../types'
+import type { Fixture } from '../../ProtocolOverview'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 const STEP_SUMMARY_HEIGHT = '18.2rem'
@@ -93,7 +104,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   const robotType = useSelector(getRobotType)
   const activeItem = useSelector(getActiveItem)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
-  const { labware, additionalEquipmentOnDeck } = deckSetup
+  const { pipettes, modules, labware, additionalEquipmentOnDeck } = deckSetup
   const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
   const savedStepForms = useSelector(getSavedStepForms)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
@@ -133,6 +144,66 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
       if (!showDefineLiquidModal) {
         dispatch(selectTerminalItem(START_TERMINAL_ITEM_ID))
       }
+    },
+  })
+
+  const fileData = useSelector(createFile)
+  const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
+
+  const nonLoadCommands =
+    fileData?.commands.filter(
+      command => !LOAD_COMMANDS.includes(command.commandType)
+    ) ?? []
+  const gripperInUse =
+    fileData?.commands.find(
+      command =>
+        (command.commandType === 'moveLabware' &&
+          command.params.strategy === 'usingGripper') ||
+        command.commandType === 'absorbanceReader/closeLid' ||
+        command.commandType === 'absorbanceReader/openLid'
+    ) != null
+  const noCommands = fileData != null ? nonLoadCommands.length === 0 : true
+  const modulesWithoutStep = getUnusedEntities(
+    modules,
+    savedStepForms,
+    'moduleId',
+    robotType
+  )
+  const pipettesWithoutStep = getUnusedEntities(
+    pipettes,
+    savedStepForms,
+    'pipette',
+    robotType
+  )
+  const isGripperAttached = Object.values(additionalEquipment).some(
+    equipment => equipment?.name === 'gripper'
+  )
+  const gripperWithoutStep = isGripperAttached && !gripperInUse
+
+  const { trashBinUnused, wasteChuteUnused } = getUnusedTrash(
+    additionalEquipmentOnDeck,
+    fileData?.commands
+  )
+  const fixtureWithoutStep: Fixture = {
+    trashBin: trashBinUnused,
+    wasteChute: wasteChuteUnused,
+    stagingAreaSlots: getUnusedStagingAreas(
+      additionalEquipmentOnDeck,
+      fileData?.commands
+    ),
+  }
+
+  const {
+    handleExportClick,
+    exportWarningModalElement,
+  } = useProtocolExportHandler({
+    noCommands,
+    modulesWithoutStep,
+    pipettesWithoutStep,
+    gripperWithoutStep,
+    fixtureWithoutStep,
+    onConfirmExport: () => {
+      dispatch(saveProtocolFile())
     },
   })
 
@@ -211,6 +282,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
           targetWidth={targetWidth}
         />
       ) : null}
+      {exportWarningModalElement}
       <Flex
         backgroundColor={COLORS.grey10}
         maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
@@ -244,8 +316,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
           >
             {isZoomedIn || formData != null ? null : (
               <Flex justifyContent={JUSTIFY_END}>
-                {/* ToDo (kk 05/09/2025): add export function */}
-                <ExportButton setShowExportWarningModal={() => {}} />
+                <ExportButton onClick={handleExportClick} />
               </Flex>
             )}
             <Flex
