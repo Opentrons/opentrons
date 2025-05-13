@@ -7,6 +7,7 @@ import {
   getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
+  SOURCE_LABWARE,
 } from '../fixtures'
 
 import type { LiquidProbeParams } from '@opentrons/shared-data'
@@ -30,7 +31,7 @@ describe('liquidProbe', () => {
     }
     const params: LiquidProbeParams = {
       pipetteId: DEFAULT_PIPETTE,
-      labwareId: 'mockLabwareId',
+      labwareId: SOURCE_LABWARE,
       wellName: 'mockWellName',
       wellLocation: {
         origin: 'top',
@@ -45,7 +46,7 @@ describe('liquidProbe', () => {
         key: expect.any(String),
         params: {
           pipetteId: DEFAULT_PIPETTE,
-          labwareId: 'mockLabwareId',
+          labwareId: SOURCE_LABWARE,
           wellName: 'mockWellName',
           wellLocation: {
             origin: 'top',
@@ -54,6 +55,9 @@ describe('liquidProbe', () => {
         },
       },
     ])
+    expect(res.python).toBe(
+      'mock_pipette.measure_liquid_height(mock_source_plate["mockWellName"])'
+    )
   })
   it('does not create liquidProbe command if pipette does not have tips', () => {
     robotStateWithTip.tipState.pipettes = {
