@@ -5,7 +5,7 @@ import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_X_ADJUSTMENT,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
+  THERMOCYCLER_FIXTURE_WIDTH,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
@@ -59,7 +59,7 @@ export function ThermocyclerFixture(
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH}
+      width={THERMOCYCLER_FIXTURE_WIDTH}
       height={THERMOCYCLER_FIXTURE_HEIGHT}
       x={x}
       y={y}

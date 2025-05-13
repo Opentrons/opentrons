@@ -151,39 +151,11 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     'flexStacker'
   )
 
-  const ot3DefaultSingleSlotOnDeck: Record<CutoutId, CutoutFixtureId> = {
-    cutoutD1: 'singleLeftSlot',
-    cutoutC1: 'singleLeftSlot',
-    cutoutB1: 'singleLeftSlot',
-    cutoutA1: 'singleLeftSlot',
-    cutoutD2: 'singleCenterSlot',
-    cutoutC2: 'singleCenterSlot',
-    cutoutB2: 'singleCenterSlot',
-    cutoutA2: 'singleCenterSlot',
-    cutoutD3: 'stagingAreaRightSlot',
-    cutoutC3: 'stagingAreaRightSlot',
-    cutoutB3: 'stagingAreaRightSlot',
-    cutoutA3: 'stagingAreaRightSlot',
-  }
-
   return (
     <RobotCoordinateSpace
       height={height}
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
-      {Object.keys(ot3DefaultSingleSlotOnDeck).map(key => (
-        // give the outside of the base fixture svgs a stroke for extra spacing
-        <g key={key} stroke={COLORS.white} strokeWidth="4">
-          <SingleSlotFixture
-            data-testid={key}
-            cutoutId={key as CutoutId}
-            slotClipColor={COLORS.transparent}
-            fixtureBaseColor={lightFill}
-            deckDefinition={deckDef}
-            showExpansion={showExpansion}
-          />
-        </g>
-      ))}
       {stagingAreaFixtures.map(
         ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
           <StagingAreaConfigFixture
