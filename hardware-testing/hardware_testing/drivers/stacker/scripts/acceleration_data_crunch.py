@@ -23,7 +23,7 @@ if __name__ == '__main__':
     args = arg_parser.parse_args()
     working_dir = os.getcwd()
     detail_row = 0
-    file_name = working_dir + '/data/DVT Motion Parameter Test - no Load X Axis-Unit 2.csv'
+    file_name = working_dir + '/data/DVT Motion Parameter Test - 6 Tiprack Load Z Axis-Unit 2.csv'
     # print(f'file_name: {file_name}')
     df = pd.read_csv(file_name, skiprows=detail_row)
     print(df)
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     list = []
     count = 0
     # print(f'current: {current}, velocity: {speed}')
-    current_list = [0.1,0.2,0.3,0.4,0.5,0.6, 0.7, 0.8, 0.9]#, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
+    current_list = [0.1,0.2,0.3,0.4,0.5,0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
     speed_list = [50, 100, 150, 200, 250, 300]
     # speed_list = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200]
     for index, row in df.iterrows():
