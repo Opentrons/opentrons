@@ -7,6 +7,7 @@ import {
   getLocationTotalVolume,
   getWellsForTips,
   mergeLiquid,
+  mergeLiquidForTrash,
   splitLiquid,
 } from '../utils/misc'
 
@@ -26,8 +27,8 @@ export interface DispenseUpdateLiquidStateArgs {
   // volume value is required when useFullVolume is false
   useFullVolume: boolean
   robotStateAndWarnings: RobotStateAndWarnings
+  entityId: string
   wellName?: string
-  labwareId?: string
   volume?: number
 }
 
@@ -38,7 +39,7 @@ export function dispenseUpdateLiquidState(
   const {
     robotStateAndWarnings,
     invariantContext,
-    labwareId,
+    entityId,
     pipetteId,
     prevLiquidState,
     useFullVolume,
@@ -53,28 +54,13 @@ export function dispenseUpdateLiquidState(
   } else if (nozzles === SINGLE) {
     channels = 1
   }
-  //  TODO: fix this bug, i guess if both entities exist, we default to updating liquid state
-  //  into the first one listed which is wrong if the user is using the 2nd one listed
-  const trashId =
-    Object.keys(invariantContext.wasteChuteEntities).length > 0
-      ? Object.keys(invariantContext.wasteChuteEntities)[0]
-      : Object.keys(invariantContext.trashBinEntities)[0]
-
-  const sourceId =
-    labwareId != null
-      ? invariantContext.labwareEntities[labwareId].id
-      : trashId ?? ''
-
-  if (sourceId === '') {
-    console.error(
-      `expected to find a trash entity id but could not, with trash id ${trashId}`
-    )
-  }
 
   const well = wellName ?? null
 
   const labwareDef =
-    labwareId != null ? invariantContext.labwareEntities[labwareId].def : null
+    invariantContext.labwareEntities[entityId] != null
+      ? invariantContext.labwareEntities[entityId].def
+      : null
 
   console.assert(
     !(useFullVolume && typeof volume === 'number'),
@@ -90,15 +76,16 @@ export function dispenseUpdateLiquidState(
       : { wellsForTips: null, allWellsShared: true }
 
   const liquidLabware =
-    prevLiquidState.labware[sourceId] != null
-      ? prevLiquidState.labware[sourceId]
+    prevLiquidState.labware[entityId] != null
+      ? prevLiquidState.labware[entityId]
       : null
 
+  console.log('prevLiquidState', JSON.parse(JSON.stringify(prevLiquidState)))
   let liquidTrash: LocationLiquidState | null = null
-  if (prevLiquidState.trashBins[sourceId] != null) {
-    liquidTrash = prevLiquidState.trashBins[sourceId]
-  } else if (prevLiquidState.wasteChute[sourceId] != null) {
-    liquidTrash = prevLiquidState.wasteChute[sourceId]
+  if (prevLiquidState.trashBins[entityId] != null) {
+    liquidTrash = prevLiquidState.trashBins[entityId]
+  } else if (prevLiquidState.wasteChute[entityId] != null) {
+    liquidTrash = prevLiquidState.wasteChute[entityId]
   }
 
   // remove liquid from pipette tips,
@@ -109,6 +96,7 @@ export function dispenseUpdateLiquidState(
     (prevTipLiquidState: LocationLiquidState): SourceAndDest => {
       if (useFullVolume) {
         const totalTipVolume = getLocationTotalVolume(prevTipLiquidState)
+        console.log('totalTipVolume', totalTipVolume)
         return totalTipVolume > 0
           ? splitLiquid(totalTipVolume, prevTipLiquidState)
           : {
@@ -120,7 +108,10 @@ export function dispenseUpdateLiquidState(
       return splitLiquid(volume || 0, prevTipLiquidState)
     }
   )
-
+  console.log(
+    '   prevLiquidState.pipettes[pipetteId]',
+    JSON.parse(JSON.stringify(prevLiquidState.pipettes[pipetteId]))
+  )
   let mergeLiquidtoSingleWell = null
   //  a labware will always have a well
   if (well != null && liquidLabware != null) {
@@ -138,21 +129,46 @@ export function dispenseUpdateLiquidState(
       ),
     }
   }
+  // const test =
+  //   prevLiquidState.pipettes[pipetteId] != null
+  //     ? getLocationTotalVolume(prevLiquidState.pipettes[pipetteId])
+  //     : {}
+  // console.log(test)
+
+  const pipetteRobotState = prevLiquidState.pipettes[pipetteId]
+  console.log(
+    'pipetteRobotState',
+    JSON.parse(JSON.stringify(pipetteRobotState))
+  )
   //  waste chute and trash bin don't have wells
-  if (well == null && liquidTrash != null) {
+  if (well == null && liquidTrash != null && pipetteRobotState != null) {
     mergeLiquidtoSingleWell = reduce(
-      splitLiquidStates,
-      (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) => {
-        const res = mergeLiquid(wellLiquidStateAcc, splitLiquidStateForTip.dest)
-        return res
+      pipetteRobotState,
+      (acc: LocationLiquidState, liquid) => {
+        const totalVolume = getLocationTotalVolume(liquid)
+        console.log(
+          'totalVolume',
+          JSON.parse(JSON.stringify(liquid)),
+          totalVolume
+        )
+        acc[0] = { volume: totalVolume }
+
+        return acc
       },
-      liquidTrash
+      {}
     )
   }
 
+  console.log(
+    'mergeLiquidtoSingleWell',
+    JSON.parse(JSON.stringify(liquidTrash)),
+    JSON.parse(JSON.stringify(splitLiquidStates)),
+
+    JSON.parse(JSON.stringify(mergeLiquidtoSingleWell))
+  )
   if (mergeLiquidtoSingleWell == null) {
     console.assert(
-      `expected to merge liquid to a single well with sourceId ${sourceId}`
+      `expected to merge liquid to a single well with sourceId ${entityId}`
     )
   }
 
@@ -175,12 +191,17 @@ export function dispenseUpdateLiquidState(
     : mergeTipLiquidToOwnWell
   prevLiquidState.pipettes[pipetteId] = mapValues(splitLiquidStates, 'source')
   if (liquidTrash != null && labwareLiquidState != null) {
+    console.log(
+      'hit here',
+
+      JSON.parse(JSON.stringify(labwareLiquidState))
+    )
     liquidTrash = Object.assign(labwareLiquidState)
   } else if (
-    prevLiquidState.labware[sourceId] != null &&
+    prevLiquidState.labware[entityId] != null &&
     labwareLiquidState != null
   ) {
-    prevLiquidState.labware[sourceId] = Object.assign(
+    prevLiquidState.labware[entityId] = Object.assign(
       liquidLabware ?? {},
       labwareLiquidState
     )

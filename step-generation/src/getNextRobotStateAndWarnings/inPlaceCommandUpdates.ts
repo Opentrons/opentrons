@@ -13,12 +13,15 @@ export const forBlowOutInPlace = (
 ): void => {
   const { pipetteId } = params
   const { robotState } = robotStateAndWarnings
+  const entityId = robotState.pipettes[pipetteId].entityId ?? ''
+
   dispenseUpdateLiquidState({
     invariantContext,
     pipetteId,
     prevLiquidState: robotState.liquidState,
     useFullVolume: true,
     robotStateAndWarnings,
+    entityId,
   })
 }
 
@@ -29,6 +32,7 @@ export const forDropTipInPlace = (
 ): void => {
   const { pipetteId } = params
   const { robotState } = robotStateAndWarnings
+  const entityId = robotState.pipettes[pipetteId].entityId ?? ''
   robotState.tipState.pipettes[pipetteId] = false
 
   dispenseUpdateLiquidState({
@@ -37,5 +41,6 @@ export const forDropTipInPlace = (
     pipetteId,
     useFullVolume: true,
     robotStateAndWarnings,
+    entityId,
   })
 }
