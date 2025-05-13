@@ -123,6 +123,8 @@ export type SingleSlotCutoutFixtureId =
 
 export type StagingAreaRightSlotFixtureId = 'stagingAreaRightSlot'
 
+export type StagingAreaWithoutStagingAreaSlotFixtureId = 'stagingAreaWithoutStagingAreaSlot'
+
 export type TrashBinAdapterCutoutFixtureId = 'trashBinAdapter'
 
 export type WasteChuteCutoutFixtureId =
@@ -156,3 +158,4 @@ export type CutoutFixtureId =
   | FlexModuleCutoutFixtureId
   | OT2SingleStandardSlot
   | OT2FixedTrashSlot
+  | StagingAreaWithoutStagingAreaSlotFixtureId

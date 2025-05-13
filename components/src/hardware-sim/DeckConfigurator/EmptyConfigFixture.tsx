@@ -25,6 +25,7 @@ import type {
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
+import { consolidate } from '@opentrons/step-generation'
 
 interface EmptyConfigFixtureProps {
   deckDefinition: DeckDefinition
@@ -57,10 +58,12 @@ export function EmptyConfigFixture(
   const [xSlotPosition = 0, ySlotPosition = 0] =
     standardSlotCutout?.position ?? []
   let x = xSlotPosition
-  const OffsetVector = deckDefinition.locations.addressableAreas.find(
+  const offsetVector = deckDefinition.locations.addressableAreas.find(
     (aaItem: AddressableArea) => aaItem.id === addressableArea
   )?.offsetFromCutoutFixture ?? [0, 0, 0]
-  const xOffset = COLUMN_4_AA.includes(addressableArea) ? OffsetVector[0] : 0
+  const xOffset = COLUMN_4_AA.includes(addressableArea) ? offsetVector[0] : 0
+  console.log("xOffset: ", xOffset)
+  console.log("addressableArea: ", addressableArea)
   let width = 0
   switch (fixtureLocation) {
     case 'cutoutA1':

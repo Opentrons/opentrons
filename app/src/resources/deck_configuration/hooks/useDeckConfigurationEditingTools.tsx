@@ -9,6 +9,7 @@ import {
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
 // TODO: return the arguments or something - don't instantiate ui in helper code like this
@@ -63,7 +64,10 @@ export function useDeckConfigurationEditingTools(
     cutoutFixtureId: CutoutFixtureId
   ): void => {
     let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
-    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+    if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE){
+      replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
+    }
+    else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
       replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
     } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
       replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
@@ -74,6 +78,7 @@ export function useDeckConfigurationEditingTools(
         ?.fixtureGroup ?? {}
 
     let newDeckConfig = deckConfig
+    console.log("fixtureGroup: ", fixtureGroup)
     if (cutoutId in fixtureGroup) {
       const groupMap =
         fixtureGroup[cutoutId]?.find(group =>
@@ -94,6 +99,8 @@ export function useDeckConfigurationEditingTools(
           : cutoutConfig
       )
     } else {
+      console.log("in else ")
+      console.log("replacementFixtureId: ", replacementFixtureId)
       newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId === cutoutId
           ? {
