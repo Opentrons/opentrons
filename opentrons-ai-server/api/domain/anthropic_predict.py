@@ -394,7 +394,7 @@ class AnthropicPredict:
             },
             "designerApplication": {
                 "name": data.get("designerApplication", {}).get("name", "opentrons/protocol-designer"),
-                "version": data.get("designerApplication", {}).get("version", self.settings.protocol_designer_app_version),
+                "version": "8.4.4",
                 "data": {
                     "_internalAppBuildDate": data.get("designerApplication", {})
                     .get("data", {})
@@ -485,7 +485,7 @@ class AnthropicPredict:
             data["designerApplication"].update(
                 {
                     "name": "opentrons/protocol-designer",
-                    "version": self.settings.protocol_designer_app_version,
+                    "version": "8.4.4",
                 }
             )
 
