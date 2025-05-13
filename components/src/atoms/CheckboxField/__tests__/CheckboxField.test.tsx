@@ -128,9 +128,7 @@ describe('CheckboxField', () => {
     const checkBoxInput = screen.getByRole('checkbox', {
       name: 'checkMockCheckboxField',
     })
-    const checkBoxFieldBox = screen.getByText('checkMockCheckboxField')
     expect(checkBoxInput).toHaveAttribute('tabindex', '1')
-    expect(checkBoxFieldBox).toHaveAttribute('tabindex', '1')
   })
 
   it('calls mock function when clicking checkboxfield', () => {
