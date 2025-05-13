@@ -312,29 +312,6 @@ export function mergeLiquid(
   }
 }
 
-export function mergeLiquidForTrash(
-  source: LocationLiquidState,
-  dest: LocationLiquidState
-): LocationLiquidState {
-  return reduce<LocationLiquidState, LocationLiquidState>(
-    source,
-    (acc, ingredState, ingredId) => {
-      const isCommonIngred = ingredId in dest
-      const ingredVolume = isCommonIngred
-        ? ingredState.volume + dest[ingredId].volume
-        : ingredState.volume
-      return {
-        ...acc,
-        [ingredId]: {
-          volume: ingredVolume,
-        },
-      }
-    },
-    // start with a shallow copy of dest so we retain any exclusive ingredients
-    { ...dest }
-  )
-}
-
 // TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
   channels: 1 | 8 | 96,

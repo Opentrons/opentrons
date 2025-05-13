@@ -7,7 +7,6 @@ import {
   getLocationTotalVolume,
   getWellsForTips,
   mergeLiquid,
-  mergeLiquidForTrash,
   splitLiquid,
 } from '../utils/misc'
 
@@ -80,7 +79,6 @@ export function dispenseUpdateLiquidState(
       ? prevLiquidState.labware[entityId]
       : null
 
-  console.log('prevLiquidState', JSON.parse(JSON.stringify(prevLiquidState)))
   let liquidTrash: LocationLiquidState | null = null
   if (prevLiquidState.trashBins[entityId] != null) {
     liquidTrash = prevLiquidState.trashBins[entityId]
@@ -96,7 +94,6 @@ export function dispenseUpdateLiquidState(
     (prevTipLiquidState: LocationLiquidState): SourceAndDest => {
       if (useFullVolume) {
         const totalTipVolume = getLocationTotalVolume(prevTipLiquidState)
-        console.log('totalTipVolume', totalTipVolume)
         return totalTipVolume > 0
           ? splitLiquid(totalTipVolume, prevTipLiquidState)
           : {
@@ -107,10 +104,6 @@ export function dispenseUpdateLiquidState(
 
       return splitLiquid(volume || 0, prevTipLiquidState)
     }
-  )
-  console.log(
-    '   prevLiquidState.pipettes[pipetteId]',
-    JSON.parse(JSON.stringify(prevLiquidState.pipettes[pipetteId]))
   )
   let mergeLiquidtoSingleWell = null
   //  a labware will always have a well
@@ -128,45 +121,16 @@ export function dispenseUpdateLiquidState(
         liquidLabware[well]
       ),
     }
-  }
-  // const test =
-  //   prevLiquidState.pipettes[pipetteId] != null
-  //     ? getLocationTotalVolume(prevLiquidState.pipettes[pipetteId])
-  //     : {}
-  // console.log(test)
-
-  const pipetteRobotState = prevLiquidState.pipettes[pipetteId]
-  console.log(
-    'pipetteRobotState',
-    JSON.parse(JSON.stringify(pipetteRobotState))
-  )
-  //  waste chute and trash bin don't have wells
-  if (well == null && liquidTrash != null && pipetteRobotState != null) {
-    mergeLiquidtoSingleWell = reduce(
-      pipetteRobotState,
-      (acc: LocationLiquidState, liquid) => {
-        const totalVolume = getLocationTotalVolume(liquid)
-        console.log(
-          'totalVolume',
-          JSON.parse(JSON.stringify(liquid)),
-          totalVolume
-        )
-        acc[0] = { volume: totalVolume }
-
-        return acc
-      },
-      {}
-    )
+  } else if (liquidTrash != null) {
+    const totalVolume = Object.values(
+      prevLiquidState.pipettes[pipetteId]
+    ).reduce((acc: number, val) => {
+      return acc + (val[0]?.volume ?? 0)
+    }, 0)
+    liquidTrash[0] = { volume: totalVolume }
   }
 
-  console.log(
-    'mergeLiquidtoSingleWell',
-    JSON.parse(JSON.stringify(liquidTrash)),
-    JSON.parse(JSON.stringify(splitLiquidStates)),
-
-    JSON.parse(JSON.stringify(mergeLiquidtoSingleWell))
-  )
-  if (mergeLiquidtoSingleWell == null) {
+  if (mergeLiquidtoSingleWell == null && liquidTrash == null) {
     console.assert(
       `expected to merge liquid to a single well with sourceId ${entityId}`
     )
@@ -190,13 +154,13 @@ export function dispenseUpdateLiquidState(
     ? mergeLiquidtoSingleWell
     : mergeTipLiquidToOwnWell
   prevLiquidState.pipettes[pipetteId] = mapValues(splitLiquidStates, 'source')
-  if (liquidTrash != null && labwareLiquidState != null) {
-    console.log(
-      'hit here',
-
-      JSON.parse(JSON.stringify(labwareLiquidState))
-    )
-    liquidTrash = Object.assign(labwareLiquidState)
+  if (prevLiquidState.trashBins[entityId] != null && liquidTrash != null) {
+    Object.assign(prevLiquidState.trashBins[entityId], liquidTrash)
+  } else if (
+    prevLiquidState.wasteChute[entityId] != null &&
+    liquidTrash != null
+  ) {
+    Object.assign(prevLiquidState.wasteChute[entityId], liquidTrash)
   } else if (
     prevLiquidState.labware[entityId] != null &&
     labwareLiquidState != null
