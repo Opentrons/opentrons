@@ -369,8 +369,10 @@ def _drop_tip(
         pipette.drop_tip(home_after=False)
     if minimum_z_height > 0:
         cur_location = pipette._get_last_location_by_api_version()
-        if cur_location is not None:
-            pipette.move_to(cur_location.move(Point(0, 0, minimum_z_height)))
+        if isinstance(cur_location, Location):
+            pipette.move_to(
+                cur_location.move(Point(0, 0, minimum_z_height))
+            )  # ignore[union-attr]
 
 
 def _get_volumes(
