@@ -8,7 +8,7 @@ import fixture_regular_example_2 from '../../../labware/fixtures/2/fixture_regul
 
 import type { RegularLabwareProps } from '..'
 import type {
-  LabwareDefinition,
+  LabwareDefinition2,
   LabwareOffset,
   LabwareWellProperties,
 } from '../../types'
@@ -20,7 +20,7 @@ const exampleLabware1 = {
     ...fixture_regular_example_1.parameters,
     loadName: 'opentrons_2_wellplate_100ul',
   },
-} as LabwareDefinition
+} as LabwareDefinition2
 
 const exampleLabware2 = {
   ...fixture_regular_example_2,
@@ -28,11 +28,11 @@ const exampleLabware2 = {
     ...fixture_regular_example_2.parameters,
     loadName: 'generic_6_wellplate_1ml',
   },
-} as LabwareDefinition
+} as LabwareDefinition2
 
 describe('createLabware', () => {
-  let labware1: LabwareDefinition
-  let labware2: LabwareDefinition
+  let labware1: LabwareDefinition2
+  let labware2: LabwareDefinition2
   let labware2Args: RegularLabwareProps
   let well1: LabwareWellProperties
   let well2: LabwareWellProperties
