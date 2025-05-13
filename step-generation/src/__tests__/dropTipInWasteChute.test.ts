@@ -23,6 +23,7 @@ const invariantContext: InvariantContext = {
 }
 const prevRobotState: RobotState = {
   tipState: { pipettes: { [DEFAULT_PIPETTE]: true } } as any,
+  pipettes: { [DEFAULT_PIPETTE]: { entityId: mockWasteChuteId } },
 } as any
 
 describe('dropTipInWasteChute', () => {

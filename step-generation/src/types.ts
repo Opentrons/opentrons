@@ -35,8 +35,9 @@ export interface LabwareTemporalProperties {
 
 export interface PipetteTemporalProperties {
   mount: Mount
-  labwareId?: string
-  //  primary nozzle's wellName
+  //  entityId is either a labwareId or a trashBin/wasteChute id
+  entityId?: string
+  //  primary nozzle's wellName if over a labware
   wellName?: string
   nozzles?: NozzleConfigurationStyle
 }
