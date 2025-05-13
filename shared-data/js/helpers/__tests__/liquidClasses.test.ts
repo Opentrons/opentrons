@@ -125,23 +125,23 @@ describe('getCorrectionVolume', () => {
     beforeEach(() => {
       args = { ...args, liquidClass: 'waterV1' }
     })
-    it('calls interpolation with water values for unknown pipette', () => {
+    it('returns 0 for water values for unknown pipette', () => {
       vi.mocked(getFlexNameConversion).mockReturnValue(MOCK_UNKNOWN_PIPETTE_ID)
       const result = getCorrectionVolume(args)
-      expect(result).toEqual(null)
+      expect(result).toEqual(0)
     })
-    it('calls interpolation with water values for unknown tiprack', () => {
+    it('returns 0 for water values for unknown tiprack', () => {
       vi.mocked(getFlexNameConversion).mockReturnValue(MOCK_PIPETTE_ID)
       const result = getCorrectionVolume({
         ...args,
         tiprackDefUri: MOCK_UNKNOWN_TIPRACK_DEF_URI,
       })
-      expect(result).toEqual(null)
+      expect(result).toEqual(0)
     })
   })
-  it('returns null if no liquid class passed', () => {
+  it('returns 0 if no liquid class passed', () => {
     const result = getCorrectionVolume(args)
-    expect(result).toEqual(null)
+    expect(result).toEqual(0)
   })
   it('calls interpolation with water values for unknown liquid class', () => {
     getCorrectionVolume({

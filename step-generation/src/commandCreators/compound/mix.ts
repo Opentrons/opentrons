@@ -182,7 +182,7 @@ export const mixInPlaceUtil = (args: {
           pipetteId: pipette,
           volume,
           flowRate: aspirateFlowRateUlSec,
-          ...(correctionVolumeAspirate != null
+          ...(correctionVolumeAspirate > 0
             ? { correctionVolume: correctionVolumeAspirate }
             : {}),
         }),
@@ -196,7 +196,7 @@ export const mixInPlaceUtil = (args: {
             : finalPushOut == null
             ? {}
             : { pushOut: finalPushOut }), // only push out if final repetition
-          ...(correctionVolumeDispense != null
+          ...(correctionVolumeDispense > 0
             ? { correctionVolume: correctionVolumeDispense }
             : {}),
         }),

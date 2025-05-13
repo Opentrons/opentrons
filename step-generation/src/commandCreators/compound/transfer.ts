@@ -407,7 +407,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     pipetteId: args.pipette,
                     volume: dispenseAirGapVolume,
                     flowRate: dispenseFlowRateUlSec,
-                    ...(dispenseCorrectionVolumeForDispenseAirGap != null
+                    ...(dispenseCorrectionVolumeForDispenseAirGap > 0
                       ? {
                           correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
                         }
@@ -540,7 +540,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     pipetteId: args.pipette,
                     volume: aspirateAirGapVolume,
                     flowRate: aspirateFlowRateUlSec,
-                    ...(aspirateCorrectionVolumeForAspirateAirGap != null
+                    ...(aspirateCorrectionVolumeForAspirateAirGap > 0
                       ? {
                           correctionVolume: aspirateCorrectionVolumeForAspirateAirGap,
                         }
@@ -565,7 +565,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               pipetteId: args.pipette,
               volume: subTransferVol,
               flowRate: aspirateFlowRateUlSec,
-              ...(aspirateCorrectionVolumeForSubtransferTarget != null
+              ...(aspirateCorrectionVolumeForSubtransferTarget > 0
                 ? {
                     correctionVolume: aspirateCorrectionVolumeForSubtransferTarget,
                   }
@@ -625,7 +625,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                           volume: aspirateAirGapVolume,
                           flowRate: dispenseFlowRateUlSec,
                           pushOut: 0,
-                          ...(dispenseCorrectionVolumeForAspirateAirGap != null
+                          ...(dispenseCorrectionVolumeForAspirateAirGap > 0
                             ? {
                                 correctionVolume: dispenseCorrectionVolumeForAspirateAirGap,
                               }
@@ -696,7 +696,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               ...(effectivePushOut != null
                 ? { pushOut: effectivePushOut }
                 : {}),
-              ...(dispenseCorrectionVolumeForSubtransferTarget != null
+              ...(dispenseCorrectionVolumeForSubtransferTarget > 0
                 ? {
                     correctionVolume: dispenseCorrectionVolumeForSubtransferTarget,
                   }
@@ -773,7 +773,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     pipetteId: args.pipette,
                     volume: dispenseAirGapVolume,
                     flowRate: aspirateFlowRateUlSec,
-                    ...(aspirateCorrectionVolumeForDispenseAirGap != null
+                    ...(aspirateCorrectionVolumeForDispenseAirGap > 0
                       ? {
                           correctionVolume: aspirateCorrectionVolumeForDispenseAirGap,
                         }

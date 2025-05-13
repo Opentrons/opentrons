@@ -12,7 +12,7 @@ export const getCorrectionVolume = (args: {
   tiprackDefUri: string
   targetVolume: number
   liquidHandlingAction: 'aspirate' | 'singleDispense' | 'multiDispense'
-}): number | null => {
+}): number => {
   const {
     liquidClass,
     pipetteSpecs,
@@ -23,7 +23,7 @@ export const getCorrectionVolume = (args: {
   const allLiquidClassDefs = getAllLiquidClassDefs()
 
   if (liquidClass == null) {
-    return null
+    return 0
   }
   const convertedPipetteName = getFlexNameConversion(pipetteSpecs)
   const liquidClassDef =
@@ -35,7 +35,7 @@ export const getCorrectionVolume = (args: {
     ({ tiprack }) => tiprack === tiprackDefUri
   )
   if (liquidClassValuesForTip == null) {
-    return null
+    return 0
   }
   const liquidHandlingObject =
     liquidHandlingAction === 'multiDispense' &&
@@ -44,11 +44,13 @@ export const getCorrectionVolume = (args: {
       : liquidClassValuesForTip[liquidHandlingAction]
 
   if (liquidHandlingObject == null) {
-    return null
+    return 0
   }
   const { correctionByVolume } = liquidHandlingObject
-  return linearInterpolate(
-    targetVolume,
-    correctionByVolume as Array<[number, number]>
+  return (
+    linearInterpolate(
+      targetVolume,
+      correctionByVolume as Array<[number, number]>
+    ) ?? 0
   )
 }
