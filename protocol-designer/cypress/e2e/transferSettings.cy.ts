@@ -50,13 +50,13 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
 
         steps.add(
           CompositeSetupSteps.Test_LC(
-            tip,
             'Bio-Rad 96 Well Plate', // sourceLabware
             sourceWell,
             'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt', // destinationLabware
             destWell,
             volume,
-            liquidClass
+            liquidClass,
+            '50'
           )
         )
         wellIndex += 2

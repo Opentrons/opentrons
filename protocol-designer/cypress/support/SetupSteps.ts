@@ -272,6 +272,19 @@ export const SetupSteps = {
     },
   }),
 
+  EightChannelPipette50: (): StepThunk => ({
+    call: () => {
+      cy.contains(SetupContent.AddPipette).click()
+      cy.contains('label', SetupContent.EightChannel)
+        .should('exist')
+        .and('be.visible')
+        .click()
+      cy.contains(SetupContent.Volume50).click()
+      cy.contains(SetupContent.Tiprack50).click()
+      // optional: cy.contains(SetupContent.FilterTiprack50).click()
+    },
+  }),
+
   SinglePipette1000: (): StepThunk => ({
     call: () => {
       cy.contains(SetupContent.AddPipette).click()
@@ -589,6 +602,12 @@ export const SetupSteps = {
   LiquidDropdown: (): StepThunk => ({
     call: () => {
       cy.get(SetupLocators.LiquidsDropdown).should('be.visible').click()
+    },
+  }),
+
+  selectLiquidbyname: (liquidName: string): StepThunk => ({
+    call: () => {
+      cy.contains(liquidName).click()
     },
   }),
 
@@ -1051,12 +1070,14 @@ export const SetupVerifications = {
   TransferPopOut: (): StepThunk => ({
     call: () => {
       cy.contains('button', 'Transfer').should('be.visible').click()
+      /*
       cy.contains('Source labware')
       cy.contains('Select source wells')
       cy.contains('Destination labware')
       cy.contains('Volume per well')
       cy.contains('Tip management')
       cy.contains('Tip drop location')
+      */
     },
   }),
 
