@@ -22,7 +22,6 @@ export function forDispense(
       ? params.wellName
       : robotState.pipettes[pipetteId].wellName ?? ''
 
-  console.log('forDispense entitityId', entityId)
   dispenseUpdateLiquidState({
     invariantContext,
     entityId,

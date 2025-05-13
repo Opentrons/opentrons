@@ -27,7 +27,6 @@ export function forMoveToAddressableArea(
   const entityId = addressableAreaInWasteChute
     ? Object.values(wasteChuteEntities)[0].id
     : trashBinId
-  console.log('entityId', entityId)
   const { robotState } = robotStateAndWarnings
   robotState.pipettes[pipetteId] = {
     ...robotState.pipettes[pipetteId],
