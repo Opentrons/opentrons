@@ -806,10 +806,6 @@ export function ProtocolSetup(): JSX.Element {
     !configBypassHeaterShakerAttachmentConfirmation
   )
   const [cutoutId, setCutoutId] = useState<CutoutId | null>(null)
-  const [
-    addressableAreaId,
-    setAddressableAreaId,
-  ] = useState<AddressableAreaName | null>(null)
   const [providedFixtureOptions, setProvidedFixtureOptions] = useState<
     CutoutFixtureId[]
   >([])

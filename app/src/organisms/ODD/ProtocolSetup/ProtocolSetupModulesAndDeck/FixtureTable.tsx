@@ -35,7 +35,6 @@ import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
-  AddressableAreaName,
   CompletedProtocolAnalysis,
   CutoutFixtureId,
   CutoutId,

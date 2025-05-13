@@ -206,7 +206,7 @@ export const filterAaByAreaType = (
     console.log('cutoutFixtureId: ', cutoutFixtureId)
     if (
       areaType === 'slot' &&
-      cutoutFixtureId == 'singleRightSlot' &&
+      cutoutFixtureId === 'singleRightSlot' &&
       COLUMN_4_AA.includes(addressableAreaId)
     ) {
       return addressableAreaId

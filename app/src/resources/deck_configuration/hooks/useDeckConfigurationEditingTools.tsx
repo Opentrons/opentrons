@@ -20,7 +20,6 @@ import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQu
 
 import type { ReactNode } from 'react'
 import type {
-  AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
 } from '@opentrons/shared-data'

@@ -41,8 +41,6 @@ import { getUnmatchedModulesForProtocol } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
-  AddressableArea,
-  AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
 } from '@opentrons/shared-data'

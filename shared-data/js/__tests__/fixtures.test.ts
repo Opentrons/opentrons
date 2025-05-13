@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '..'
 import { getAAFromCutoutFixtureId } from '../fixtures'
