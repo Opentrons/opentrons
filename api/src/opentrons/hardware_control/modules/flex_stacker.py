@@ -594,36 +594,48 @@ class FlexStacker(mod_abc.AbstractModule):
                 case StatusBarState.RUNNING:
                     await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.STATIC)
                 case StatusBarState.PAUSED:
-                    if self.hopper_door_state == HopperDoorState.OPENED:
-                        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
-                    elif self.should_identify:
-                        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
+                    if (
+                        self.hopper_door_state == HopperDoorState.OPENED
+                        or self.should_identify
+                    ):
+                        await self._stacker_bar_pause()
                     else:
-                        await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
+                        await self._stacker_bar_idle()
                 case StatusBarState.IDLE:
                     if self.hopper_door_state == HopperDoorState.OPENED:
-                        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
-                    await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
+                        await self._stacker_bar_pause()
+                    else:
+                        await self._stacker_bar_idle()
                 case StatusBarState.HARDWARE_ERROR:
                     if self.should_identify:
-                        await self.set_led_state(0.5, LEDColor.RED, LEDPattern.FLASH)
+                        await self.set_led_state(
+                            0.5, LEDColor.RED, LEDPattern.FLASH, duration=300
+                        )
                     else:
-                        await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
+                        await self._stacker_bar_idle()
                 case StatusBarState.SOFTWARE_ERROR:
                     await self.set_led_state(0.5, LEDColor.YELLOW, LEDPattern.STATIC)
                 case StatusBarState.ERROR_RECOVERY:
                     if self.hopper_door_state == HopperDoorState.OPENED:
-                        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
+                        await self._stacker_bar_pause()
                     elif self.should_identify:
-                        await self.set_led_state(0.5, LEDColor.YELLOW, LEDPattern.PULSE)
+                        await self.set_led_state(
+                            0.5, LEDColor.YELLOW, LEDPattern.PULSE, duration=2000
+                        )
                     else:
-                        await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
+                        await self._stacker_bar_idle()
                 case StatusBarState.RUN_COMPLETED:
                     await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.PULSE)
                 case StatusBarState.UPDATING:
                     await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
                 case _:
-                    await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
+                    await self._stacker_bar_idle()
+
+    async def _stacker_bar_pause(self) -> None:
+        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE, duration=2000)
+
+    async def _stacker_bar_idle(self) -> None:
+        await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
 
     async def identify(self) -> None:
         """Identify the module."""
