@@ -36,7 +36,7 @@ export enum TestFilePath {
   DoItAllV3MigratedToV8 = 'fixtures/protocol/8/doItAllV3MigratedToV8.json',
   Mix_8_0_0 = 'fixtures/protocol/8/mix_8_0_0.json',
   DoItAllV7MigratedToV8 = 'fixtures/protocol/8/doItAllV7MigratedToV8.json',
-  P50SingleImportTransferLiquid = 'fixtures/protocol/8/P50_Single_Import_Transfer_Liquid.json',
+  P50SingleImportTransferLiquid = 'fixtures/protocol/8/P50_Single_Import_T_Liquid.json',
   MixSettingsV5 = 'fixtures/protocol/5/mixSettings.json',
   DoItAllV5 = 'fixtures/protocol/5/doItAllV5.json',
   BatchEditV5 = 'fixtures/protocol/5/batchEdit.json',

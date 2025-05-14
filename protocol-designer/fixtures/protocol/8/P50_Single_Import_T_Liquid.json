@@ -2,11 +2,11 @@
   "$otSharedSchema": "#/protocol/schemas/8",
   "schemaVersion": 8,
   "metadata": {
-    "protocolName": "P50_Single_Import_Transfer_Liquid",
+    "protocolName": "P50_Single_Import_T_Liquid",
     "author": "Opentrons QA ",
     "description": "",
     "created": 1747254746283,
-    "lastModified": 1747260384548,
+    "lastModified": 1747261547185,
     "category": null,
     "subcategory": null,
     "tags": []
@@ -519,23 +519,23 @@
       },
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
-          "stepType": "manualIntervention",
-          "id": "__INITIAL_DECK_SETUP_STEP__",
           "labwareLocationUpdate": {
             "966cab49-9611-47ac-9351-9c49dbfb9b97:opentrons/opentrons_flex_96_filtertiprack_50ul/1": "C2",
             "fe9cce79-fd99-497d-b040-95d9e5bb46af:opentrons/biorad_96_wellplate_200ul_pcr/2": "C1",
             "a94d7816-39b5-4b98-ab2b-2ceea0890880:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2": "C3"
           },
+          "moduleLocationUpdate": {},
           "pipetteLocationUpdate": {
             "ffe3b5ed-5a3a-4e13-a95a-c68b2a0c4354": "left"
           },
-          "moduleLocationUpdate": {},
           "trashBinLocationUpdate": {
             "54f50343-6cdc-4b0e-bd45-b28c4b86696f:trashBin": "cutoutA3"
           },
           "wasteChuteLocationUpdate": {},
           "stagingAreaLocationUpdate": {},
-          "gripperLocationUpdate": {}
+          "gripperLocationUpdate": {},
+          "stepType": "manualIntervention",
+          "id": "__INITIAL_DECK_SETUP_STEP__"
         }
       },
       "orderedStepIds": [],
@@ -4024,7 +4024,7 @@
   "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
-      "key": "9d874435-a093-4e6f-a9de-5479a692aa5f",
+      "key": "68f710c1-6884-4e8b-aa66-a6b34818ba69",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p50_single_flex",
@@ -4033,7 +4033,7 @@
       }
     },
     {
-      "key": "545eaeb3-e23c-4492-bc80-eee54b7f00af",
+      "key": "ac6829c0-8154-4e08-ab76-991e0e176fbb",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
@@ -4047,7 +4047,7 @@
       }
     },
     {
-      "key": "4e69ffcc-40c8-49eb-b972-6b87e7a0cc4c",
+      "key": "7e705777-23e5-479d-bd2a-c50c54fb68d1",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
@@ -4061,7 +4061,7 @@
       }
     },
     {
-      "key": "672c018f-9d55-44cb-ae0d-47d34aaa3aeb",
+      "key": "3e6aceff-51bd-4c83-9d80-55db0f716b86",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
@@ -4076,7 +4076,7 @@
     },
     {
       "commandType": "loadLiquid",
-      "key": "14d9485f-00cc-44f2-bb3b-e6444bc3d8cd",
+      "key": "b45e30b1-f625-475f-8e77-33784c066315",
       "params": {
         "liquidId": "0",
         "labwareId": "fe9cce79-fd99-497d-b040-95d9e5bb46af:opentrons/biorad_96_wellplate_200ul_pcr/2",
