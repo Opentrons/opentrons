@@ -125,7 +125,9 @@ export function useProtocolReceiptToast(): void {
   }, [protocolIds])
 }
 
-export function useModuleAttachedToast(launchModuleSetupCallback: () => void) {
+export function useModuleAttachedToast(
+  launchModuleSetupCallback: () => void
+): void {
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
   const { makeToast } = useToaster()
   const attachedModules =
@@ -156,9 +158,9 @@ export function useModuleAttachedToast(launchModuleSetupCallback: () => void) {
         modulesInDeckConfig
       )
       const hasPipette =
-        attachedPipettes.left !== null || attachedPipettes.right !== null
+        attachedPipettes.left != null || attachedPipettes.right != null
       if (hasPipette && newUnconfiguredModules.length > 0) {
-        makeToast(t('module_added'), 'info', {
+        makeToast(t('module_added') as string, 'info', {
           buttonText: i18n.format(t('shared:close'), 'capitalize'),
           linkText: t('module_added_link'),
           onLinkClick: launchModuleSetupCallback,
