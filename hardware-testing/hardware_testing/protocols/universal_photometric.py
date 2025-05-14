@@ -420,7 +420,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
             aspirate_exit_speed = 50
             dispense_exit_speed = 50
             air_gap = 0.0
-            if not ctx.is_simulating:  # type: ignore [truthy-function]
+            if not ctx.is_simulating():
                 from hardware_testing.gravimetric.liquid_class.defaults import (
                     get_liquid_class,
                 )
