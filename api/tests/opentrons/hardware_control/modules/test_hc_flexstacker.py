@@ -148,52 +148,91 @@ async def test_set_run_hold_current(
 
 
 @pytest.mark.parametrize(
-    ("door_intervention", "event", "params"),
+    ("should_identify", "hopper_door", "event", "result_params"),
     [
-        (
+        (  # running
             False,
+            True,
             StatusBarUpdateEvent(state=StatusBarState.RUNNING, enabled=True),
-            (0.5, LEDColor.GREEN, LEDPattern.STATIC),
+            (0.5, LEDColor.GREEN, LEDPattern.STATIC, None),
         ),
-        (
+        (  # paused - door open
+            False,
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.PAUSED, enabled=True),
+            (0.5, LEDColor.BLUE, LEDPattern.PULSE, 2000),
+        ),
+        (  # paused - should identify
+            True,
             True,
             StatusBarUpdateEvent(state=StatusBarState.PAUSED, enabled=True),
-            (0.5, LEDColor.WHITE, LEDPattern.PULSE),
+            (0.5, LEDColor.BLUE, LEDPattern.PULSE, 2000),
         ),
-        (
+        (  # paused - door closed not identified
             False,
+            True,
             StatusBarUpdateEvent(state=StatusBarState.PAUSED, enabled=True),
-            (0.5, LEDColor.BLUE, LEDPattern.PULSE),
+            (0.5, LEDColor.WHITE, LEDPattern.STATIC, None),
         ),
-        (
+        (  # idle - door open
+            False,
             False,
             StatusBarUpdateEvent(state=StatusBarState.IDLE, enabled=True),
-            (0.5, LEDColor.WHITE, LEDPattern.STATIC),
+            (0.5, LEDColor.BLUE, LEDPattern.PULSE, 2000),
         ),
-        (
+        (  # idle - door closed
             False,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.IDLE, enabled=True),
+            (0.5, LEDColor.WHITE, LEDPattern.STATIC, None),
+        ),
+        (  # hardware error - identified
+            True,
+            True,
             StatusBarUpdateEvent(state=StatusBarState.HARDWARE_ERROR, enabled=True),
-            (0.5, LEDColor.RED, LEDPattern.FLASH),
+            (0.5, LEDColor.RED, LEDPattern.FLASH, 300),
         ),
-        (
+        (  # hardware error - not identified
             False,
-            StatusBarUpdateEvent(state=StatusBarState.SOFTWARE_ERROR, enabled=True),
-            (0.5, LEDColor.YELLOW, LEDPattern.STATIC),
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.HARDWARE_ERROR, enabled=True),
+            (0.5, LEDColor.WHITE, LEDPattern.STATIC, None),
         ),
-        (
+        (  # software error
+            False,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.SOFTWARE_ERROR, enabled=True),
+            (0.5, LEDColor.YELLOW, LEDPattern.STATIC, None),
+        ),
+        (  # error recovery - door open
+            False,
             False,
             StatusBarUpdateEvent(state=StatusBarState.ERROR_RECOVERY, enabled=True),
-            (0.5, LEDColor.YELLOW, LEDPattern.PULSE),
+            (0.5, LEDColor.BLUE, LEDPattern.PULSE, 2000),
         ),
-        (
+        (  # error recovery - should identify
+            True,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.ERROR_RECOVERY, enabled=True),
+            (0.5, LEDColor.YELLOW, LEDPattern.PULSE, 2000),
+        ),
+        (  # error recovery - door closed
             False,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.ERROR_RECOVERY, enabled=True),
+            (0.5, LEDColor.WHITE, LEDPattern.STATIC, None),
+        ),
+        (  # run complete
+            False,
+            True,
             StatusBarUpdateEvent(state=StatusBarState.RUN_COMPLETED, enabled=True),
-            (0.5, LEDColor.GREEN, LEDPattern.PULSE),
+            (0.5, LEDColor.GREEN, LEDPattern.PULSE, None),
         ),
-        (
+        (  # updating
             False,
+            True,
             StatusBarUpdateEvent(state=StatusBarState.UPDATING, enabled=True),
-            (0.5, LEDColor.WHITE, LEDPattern.PULSE),
+            (0.5, LEDColor.WHITE, LEDPattern.PULSE, None),
         ),
     ],
 )
@@ -201,12 +240,19 @@ async def test_stacker_status_bar_event_handler(
     decoy: Decoy,
     subject: modules.FlexStacker,
     mock_driver: mock.AsyncMock,
-    door_intervention: bool,
+    should_identify: bool,
+    hopper_door: bool,
     event: StatusBarUpdateEvent,
-    params: tuple[float, LEDColor, LEDPattern],
+    result_params: tuple[float, LEDColor, LEDPattern, int | None],
 ) -> None:
-    subject.set_stacker_identify(door_intervention)
+    mock_driver.get_hopper_door_closed.return_value = hopper_door
+    subject.set_stacker_identify(should_identify)
+    await subject._reader.get_door_closed()
     await subject._handle_status_bar_event(event)
     mock_driver.set_led.assert_called_with(
-        params[0], color=params[1], pattern=params[2], duration=None, reps=None
+        result_params[0],
+        color=result_params[1],
+        pattern=result_params[2],
+        duration=result_params[3],
+        reps=None,
     )
