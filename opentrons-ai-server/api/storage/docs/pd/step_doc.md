@@ -2322,9 +2322,6 @@ with `mode="multi"`
   // TIP HANDLING
   "changeTip": "always" | "once" | "never" | "perSource" | "perDest", // Required - when to use a new tip
   "dropTip_location": "string", // Required - location to drop the tip (often "trashId")
-  "pickUpTip_location": "string" | null, // Optional - location to pick up tips
-  "pickUpTip_wellNames": ["A1", ...] | null, // Optional - specific wells to pick up tips from
-  "dropTip_wellNames": ["A1", ...] | null, // Optional - specific wells to drop tips in
 
   // POSITIONING
   "mix_mmFromBottom": number | null, // Optional - distance from well bottom in mm (default: 0.5)
@@ -2824,10 +2821,7 @@ Steps:
 
   // TIP HANDLING
   "changeTip": "always" | "once" | "never" | "perSource" | "perDest", // Required - When to use a new tip. UI: "Change Tip" dropdown.
-  "pickUpTip_location": "string" | null, // Optional - ID of a specific tip rack to pick up tips from. UI: Advanced Settings > "Pick up tip from" dropdown (specific rack). (Default: any suitable rack)
-  "pickUpTip_wellNames": ["string"] | null, // Optional - Array of specific well names within pickUpTip_location to pick up tips from. UI: Advanced Settings > Well selection for specific tip pickup.
   "dropTip_location": "string", // Required - ID of the location to drop the tip (e.g., "trashBinId", specific waste chute ID). UI: "Drop Tip In" dropdown.
-  "dropTip_wellNames": ["string"] | null, // Optional - Array of specific well names within dropTip_location labware (if applicable, e.g., dropping back into a tip rack). UI: Advanced Settings > Well selection for specific tip drop-off.
 
   // BLOWOUT & DISPOSAL VOLUME (Primarily for ensuring full dispense or for multi-dispense accuracy)
   "blowout_checkbox": "boolean", // Required - Whether to perform a blowout after the final dispense in a series. UI: "Blow out" checkbox. (Default: false)
@@ -2839,6 +2833,29 @@ Steps:
   "disposalVolume_volume": "number" | null // Optional - Volume to aspirate for disposal if disposalVolume_checkbox is true (µL). UI: "Volume" input under "Disposal Volume".
 }
 ```
+
+<Essential Note>
+
+The following parameters behave differently depending on single channel pipette or multi-chunnel pipette.
+
+1. Single channel pipette: they can accept individual wells like 'A1','B3', 'F4'
+   Eg.,
+
+```json
+"aspirate_wells" = [ "B1", "A1", "H1"]
+"dispense_wells" = [ "C1", "D1", "A1"]
+```
+
+2. Multi-channel pipette: they only accept Row A's wells eg., A1, A2, and so on. For example, to refer to all wells in the first
+   column we only say "A1". Robot automatically figures out the remainig wells since all wells if multi-channel works at the same time.
+   Eg.,
+
+```json
+"aspirate_wells" = [ "A1", "A2", "A3"]
+"dispense_wells" = [ "A1", "A2", "A3"]
+```
+
+</Essential Note>
 
 Additional Notes on Fields and UI Mapping:
 
@@ -2978,10 +2995,7 @@ Steps:
           "pipette": "pipette_left",
           "preWetTip": false,
           "tipRack": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
-          "volume": "20",
-          "pickUpTip_location": null,
-          "pickUpTip_wellNames": null,
-          "dropTip_wellNames": null
+          "volume": "20"
         }
       },
       "orderedStepIds": ["step-1"],
@@ -3148,10 +3162,7 @@ Steps:
           "pipette": "pipette_left",
           "preWetTip": false,
           "tipRack": "opentrons/opentrons_flex_96_tiprack_200ul/1",
-          "volume": "20",
-          "pickUpTip_location": null,
-          "pickUpTip_wellNames": null,
-          "dropTip_wellNames": null
+          "volume": "20"
         }
       },
       "orderedStepIds": ["step-1"],
@@ -4822,6 +4833,374 @@ Output protocol:
 ```
 
 </Example-serial-dilution>
+
+<Example-serial-dilution-with-multi-channel>
+
+Input
+
+```text
+Robot
+- Flex
+
+Pipette
+- Left mount: p1000 multi-channel flex
+
+Labware
+- Tiprack-1: Opentrons Flex 96 Filter Tip Rack 1000 uL
+- Tiprack-2: Opentrons Flex 96 Filter Tip Rack 1000 uL
+- Plate: NEST 96 Well Plate 200 uL Flat
+- Reservoir: NEST 12 Well Reservoir 15 mL
+
+Liquids
+- Reservoir well A1: Diluent liquid with green, 15 mL
+- Well plate: Sample liquid with red, 200 uL in each well of column 1
+
+Steps
+1. Distribute 10 uL of diluent from reservoir column A1 to columns 2-11 of the plate
+ - with 10 uL air gap during aspiration and 5 uL disposal volume
+ - change tip before every aspirate
+2. Transfer serially along Row A:
+ - Transfer 50 uL from A1 to A2
+ - Transfer 50 uL from A2 to A3
+ - Continue this pattern through A10 to A11
+ - Use 10 uL air gap during aspiration
+ - Change tip only once at the start of the step
+3. Add 100 uL diluent to column A12 of the plate
+```
+
+Output
+
+```json
+{
+  "metadata": {
+    "protocolName": "multi-channel serial dilution",
+    "description": "multi-channel serial dilution - 8 channel"
+  },
+  "designerApplication": {
+    "data": {
+      "pipetteTiprackAssignments": {
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
+      },
+      "ingredients": {
+        "0": {
+          "displayName": "Diluent liquid",
+          "description": null,
+          "displayColor": "#7eff42ff",
+          "liquidGroupId": "0"
+        },
+        "1": {
+          "displayName": "Sample liquid",
+          "description": null,
+          "displayColor": "#ff4f4fff",
+          "liquidGroupId": "1"
+        }
+      },
+      "ingredLocations": {
+        "labware-4": {
+          "A1": {
+            "0": {
+              "volume": 15000
+            }
+          }
+        },
+        "labware-3": {
+          "A1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "B1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "C1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "D1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "E1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "F1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "G1": {
+            "1": {
+              "volume": 200
+            }
+          },
+          "H1": {
+            "1": {
+              "volume": 200
+            }
+          }
+        }
+      },
+      "savedStepForms": {
+        "__INITIAL_DECK_SETUP_STEP__": {
+          "labwareLocationUpdate": {
+            "labware-1": "C2",
+            "labware-2": "B2",
+            "labware-3": "C1",
+            "labware-4": "D1"
+          },
+          "pipetteLocationUpdate": {
+            "pipette_left": "left"
+          },
+          "moduleLocationUpdate": {},
+          "trashBinLocationUpdate": {
+            "trashbin-1": "cutoutA3"
+          },
+          "wasteChuteLocationUpdate": {},
+          "stagingAreaLocationUpdate": {},
+          "gripperLocationUpdate": {}
+        },
+        "step-1": {
+          "id": "step-1",
+          "stepType": "moveLiquid",
+          "stepName": "transfer",
+          "stepDetails": "",
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-4",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": ["A1"],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": 716,
+          "blowout_location": "trashbin-1",
+          "blowout_z_offset": 0,
+          "changeTip": "always",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": "716",
+          "dispense_labware": "labware-3",
+          "dispense_mix_checkbox": false,
+          "dispense_mix_times": null,
+          "dispense_mix_volume": null,
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9",
+            "A10",
+            "A11"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": "5",
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "multiDispense",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "10"
+        },
+        "step-2": {
+          "id": "step-2",
+          "stepType": "moveLiquid",
+          "stepName": "transfer",
+          "stepDetails": "",
+          "aspirate_airGap_checkbox": true,
+          "aspirate_airGap_volume": "10",
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-3",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "A1",
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9",
+            "A10"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "once",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": null,
+          "dispense_labware": "labware-3",
+          "dispense_mix_checkbox": false,
+          "dispense_mix_times": null,
+          "dispense_mix_volume": null,
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9",
+            "A10",
+            "A11"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "50"
+        },
+        "step-3": {
+          "id": "step-3",
+          "stepType": "moveLiquid",
+          "stepName": "transfer",
+          "stepDetails": "",
+          "aspirate_airGap_checkbox": false,
+          "aspirate_airGap_volume": null,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-4",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": null,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": ["A1"],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "always",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": null,
+          "dispense_labware": "labware-3",
+          "dispense_mix_checkbox": false,
+          "dispense_mix_times": null,
+          "dispense_mix_volume": null,
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": ["A12"],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "100"
+        }
+      },
+      "orderedStepIds": ["step-1", "step-2", "step-3"],
+      "pipettes": {
+        "pipette_left": {
+          "pipetteName": "p1000_multi_flex"
+        }
+      },
+      "modules": {},
+      "labware": {
+        "labware-1": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        },
+        "labware-2": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL (1)",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        },
+        "labware-3": {
+          "displayName": "NEST 96 Well Plate 200 µL Flat",
+          "labwareDefURI": "opentrons/nest_96_wellplate_200ul_flat/2"
+        },
+        "labware-4": {
+          "displayName": "NEST 12 Well Reservoir 15 mL",
+          "labwareDefURI": "opentrons/nest_12_reservoir_15ml/1"
+        }
+      }
+    }
+  }
+}
+```
+
+</Example-serial-dilution-with-multi-channel>
 
 <Example-PCR>
 

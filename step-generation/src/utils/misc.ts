@@ -148,6 +148,36 @@ export function getTrashBinAddressableAreaName(
   return cutouts != null ? cutouts[trashLocation]?.[0] : 'fixedTrash'
 }
 
+export function getTrashLocationFromAddressableAreaName(
+  addressableAreaName: AddressableAreaName
+): CutoutId | null {
+  if (addressableAreaName === 'fixedTrash') {
+    return 'cutout12' as CutoutId
+  }
+
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const cutouts =
+    deckDef.cutoutFixtures.find(
+      cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
+    )?.providesAddressableAreas ?? null
+
+  if (cutouts == null) {
+    console.error('Could not find trashBinAdapter cutouts for Flex')
+    return null
+  }
+
+  for (const [cutoutId, areas] of Object.entries(cutouts)) {
+    if (areas.includes(addressableAreaName)) {
+      return cutoutId as CutoutId
+    }
+  }
+
+  console.error(
+    `Could not find trashLocation for addressableAreaName ${addressableAreaName}`
+  )
+  return null
+}
+
 export function getTrashOrLabware(
   labwareEntities: LabwareEntities,
   wasteChuteEntities: WasteChuteEntities,
@@ -281,6 +311,7 @@ export function mergeLiquid(
     ),
   }
 }
+
 // TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
   channels: 1 | 8 | 96,

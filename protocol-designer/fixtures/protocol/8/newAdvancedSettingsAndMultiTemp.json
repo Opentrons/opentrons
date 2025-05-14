@@ -3768,23 +3768,6 @@
       }
     },
     {
-      "commandType": "liquidProbe",
-      "key": "b991202d-6568-478b-b5c9-0a3e8b9733cb",
-      "params": {
-        "pipetteId": "21087f15-4c03-4587-8a2b-1ba0b5a501a0",
-        "labwareId": "c0093e5f-3f7d-4cbf-aa17-d88394108501:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
-        "wellName": "C1",
-        "wellLocation": {
-          "origin": "top",
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          }
-        }
-      }
-    },
-    {
       "commandType": "configureForVolume",
       "key": "1042c3fb-77a5-491b-a184-876b7be980c6",
       "params": {

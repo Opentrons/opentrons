@@ -4213,23 +4213,6 @@
       }
     },
     {
-      "commandType": "liquidProbe",
-      "key": "d44f69c8-2bfa-49a5-81bf-e9c645951611",
-      "params": {
-        "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
-        "labwareId": "a793a135-06aa-4ed6-a1d3-c176c7810afa:opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1",
-        "wellName": "A1",
-        "wellLocation": {
-          "origin": "top",
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          }
-        }
-      }
-    },
-    {
       "commandType": "prepareToAspirate",
       "key": "5ed988c6-15af-4dae-994a-4e00762df979",
       "params": {

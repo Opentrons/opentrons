@@ -14,6 +14,7 @@ import { forDispense } from './forDispense'
 import { forDropTip } from './forDropTip'
 import { forLoadLiquid } from './forLoadLiquid'
 import { forMoveLabware } from './forMoveLabware'
+import { forMoveToAddressableArea } from './forMoveToAddressableArea'
 import { forMoveToWell } from './forMoveToWell'
 import { forPickUpTip } from './forPickUpTip'
 import {
@@ -113,8 +114,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'loadModule':
     case 'home': // gantry VVV
     case 'moveRelative':
-    case 'moveToAddressableArea':
-    case 'moveToAddressableAreaForDropTip':
     case 'moveToSlot':
     case 'moveToCoordinates':
     case 'savePosition':
@@ -127,6 +126,15 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'airGapInPlace':
     case 'prepareToAspirate':
     case 'liquidProbe':
+      break
+
+    case 'moveToAddressableArea':
+    case 'moveToAddressableAreaForDropTip':
+      forMoveToAddressableArea(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     case 'moveToWell':
