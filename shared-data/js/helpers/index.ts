@@ -5,13 +5,8 @@ import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import { getAllLiquidClassDefs } from '../liquidClasses'
 
+import type { AddressableAreaName, CutoutId } from '../../deck/types/schemaV5'
 import type {
-  AddressableAreaName,
-  CutoutFixtureId,
-  CutoutId,
-} from '../../deck/types/schemaV5'
-import type {
-  AddressableArea,
   DeckDefinition,
   LabwareDefinition2,
   LabwareDefinition3,

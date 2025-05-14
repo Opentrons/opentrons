@@ -62,8 +62,6 @@ export function EmptyConfigFixture(
     (aaItem: AddressableArea) => aaItem.id === addressableArea
   )?.offsetFromCutoutFixture ?? [0, 0, 0]
   const xOffset = COLUMN_4_AA.includes(addressableArea) ? offsetVector[0] : 0
-  console.log('xOffset: ', xOffset)
-  console.log('addressableArea: ', addressableArea)
   let width = 0
   switch (fixtureLocation) {
     case 'cutoutA1':

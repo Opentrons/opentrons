@@ -104,11 +104,7 @@ import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Dispatch, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
-import type {
-  AddressableAreaName,
-  CutoutFixtureId,
-  CutoutId,
-} from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
   ProtocolSetupStepProps,

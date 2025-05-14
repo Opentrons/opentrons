@@ -19,10 +19,7 @@ import { AddFixtureModal } from '/app/organisms/DeviceDetailsDeckConfiguration/A
 import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQuery'
 
 import type { ReactNode } from 'react'
-import type {
-  CutoutFixtureId,
-  CutoutId,
-} from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
@@ -43,12 +40,10 @@ export function useDeckConfigurationEditingTools(
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-  const [targetCutoutId, setTargetCutoutId] = useState<{
-    cutoutId: CutoutId
-  } | null>(null)
+  const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
 
   const addFixtureToCutout = (cutoutId: CutoutId): void => {
-    setTargetCutoutId({ cutoutId })
+    setTargetCutoutId(cutoutId)
   }
 
   const removeFixtureFromCutout = (
@@ -111,7 +106,7 @@ export function useDeckConfigurationEditingTools(
     addFixtureModal:
       targetCutoutId != null ? (
         <AddFixtureModal
-          cutoutId={targetCutoutId.cutoutId}
+          cutoutId={targetCutoutId}
           closeModal={() => {
             setTargetCutoutId(null)
           }}
