@@ -45,7 +45,6 @@ export function ToggleExpandStepFormField(
     name,
     ...restProps
   } = props
-  console.log('caption', caption)
   const resetFieldValue = (): void => {
     restProps.updateValue(null)
   }
