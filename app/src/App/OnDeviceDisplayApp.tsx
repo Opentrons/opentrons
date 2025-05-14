@@ -1,7 +1,13 @@
 import { useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useDispatch, useSelector } from 'react-redux'
-import { Navigate, Route, Routes, useNavigate, useLocation } from 'react-router-dom'
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
 import { css } from 'styled-components'
 
@@ -54,8 +60,8 @@ import { updateBrightness } from '/app/redux/shell'
 import { LocalizationProvider } from '../LocalizationProvider'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
-  useProtocolReceiptToast,
   useModuleAttachedToast,
+  useProtocolReceiptToast,
   useScrollRef,
   useSoftwareUpdatePoll,
 } from './hooks'
@@ -295,7 +301,7 @@ function ProtocolReceiptToasts(): null {
 
 function ModuleAttachedToasts(): null {
   const navigate = useNavigate()
-  useModuleAttachedToast(()=>{
+  useModuleAttachedToast(() => {
     // TODO(ba, 2025-05-02): Navigate to module setup once the route is added.
     navigate('/protocols')
   })
