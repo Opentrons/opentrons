@@ -15,6 +15,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_AUTO,
   PrimaryButton,
   SPACING,
   StyledText,
@@ -88,6 +89,7 @@ export function AssignLiquidsModal(
   return (
     <Flex
       height={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
+      // height="100%"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       backgroundColor={COLORS.grey10}
       gridGap={SPACING.spacing12}
@@ -96,6 +98,7 @@ export function AssignLiquidsModal(
         width="100%"
         flexDirection={DIRECTION_COLUMN}
         paddingX={SPACING.spacing24}
+        overflowY={OVERFLOW_AUTO}
       >
         <Flex justifyContent={JUSTIFY_END} paddingTop={SPACING.spacing12}>
           <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
@@ -103,9 +106,9 @@ export function AssignLiquidsModal(
         <Flex
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
-          css={{ outline: '1px solid blue' }}
           flexDirection={DIRECTION_COLUMN}
           gap={SPACING.spacing24}
+          paddingBottom={SPACING.spacing24}
         >
           <Flex
             width="100%"
@@ -174,7 +177,7 @@ export function AssignLiquidsModal(
           </PrimaryButton>
         </Flex>
       </Flex>
-      <Flex padding={SPACING.spacing12}>
+      <Flex padding={SPACING.spacing12} height="100%">
         <LiquidToolbox
           showBadFormState={showBadFormState}
           setShowBadFormState={setShowBadFormState}
