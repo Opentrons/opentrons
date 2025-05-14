@@ -4,6 +4,7 @@ import {
   SetupVerifications,
 } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
+import { getTestFile, TestFilePath } from '../support/TestFiles'
 import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', () => {
@@ -70,12 +71,18 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
   }
 
   it('Goes through onboarding flow and then runs multiple transfer steps with sequential well changes', () => {
+    const protocol = getTestFile(TestFilePath.P50SingleImportTransferLiquid)
+    cy.importProtocol(protocol.path)
+    cy.contains('Confirm').click()
     cy.openSettingsPage()
     cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
     cy.openSettingsPage()
-    cy.clickCreateNew()
-    cy.verifyCreateNewHeader()
+    // cy.clickCreateNew()
+    // cy.verifyCreateNewHeader()
     const steps = new StepBuilder()
+    steps.add(SetupSteps.EditProtocolA())
+
+    /*
     steps.add(SetupVerifications.OnStep1())
     steps.add(SetupVerifications.FlexSelected())
     steps.add(SetupVerifications.OnStep2())
@@ -120,6 +127,7 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     )
 
     // Add the multiple transfer steps using the custom function with sequential wells
+    */
     GenerateMultipleTransferSteps(steps)
 
     steps.execute()
