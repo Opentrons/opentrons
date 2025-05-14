@@ -191,13 +191,13 @@
         },
         "shaker": {
           "setShake": "Shake speed",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Active"
+          "toggleOff": "Off",
+          "toggleOn": "On"
         },
         "temperature": {
           "setTemperature": "Temperature",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Active"
+          "toggleOff": "Off",
+          "toggleOn": "On"
         },
         "timer": {
           "heaterShakerSetTimer": "Timer"
@@ -209,7 +209,7 @@
         "pickUp": "pick up tip"
       },
       "magnetAction": {
-        "label": "Magnet state",
+        "label": "Magnets",
         "options": {
           "disengage": "Disengage",
           "engage": "Engage"
@@ -297,8 +297,8 @@
       "temperature": {
         "caption": "Valid range is 4 – 95˚C",
         "setTemperature": "Temperature",
-        "toggleOff": "Deactivate",
-        "toggleOn": "Set"
+        "toggleOff": "Off",
+        "toggleOn": "On"
       },
       "thermocyclerAction": {
         "options": {
@@ -333,20 +333,20 @@
       },
       "thermocyclerState": {
         "block": {
-          "engage": "Block temperature",
+          "engage": "Block",
           "label": "Thermocycler block",
           "temperature": "Block temperature",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Activate",
+          "toggleOff": "Off",
+          "toggleOn": "On",
           "valid_range": "Valid range between 4 and 96ºC"
         },
         "ending_hold": "Ending hold",
         "lid": {
-          "engage": "Lid temperature",
+          "engage": "Lid",
           "label": "Lid",
           "temperature": "Lid temperature",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Activate",
+          "toggleOff": "Off",
+          "toggleOn": "On",
           "valid_range": "Valid range between 37 and 110ºC"
         },
         "lidPosition": {
@@ -397,9 +397,9 @@
       "mixLabware": "labware",
       "movedLabware": "labware"
     },
+    "heat_or_cool": "Heat or cool",
     "mixRepetitions": "repetitions",
     "mixVolumeLabel": "mix volume",
-    "moduleState": "Module state",
     "multiDispenseOptionsLabel": "multi-dispense options",
     "section": {
       "dropTip": "drop tip",
