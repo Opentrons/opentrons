@@ -13,17 +13,18 @@ export function forDispense(
 ): void {
   const { pipetteId, volume } = params
   const { robotState } = robotStateAndWarnings
-  const labwareId =
+  const entityId =
     'labwareId' in params
       ? params.labwareId
-      : robotState.pipettes[pipetteId].labwareId ?? ''
+      : robotState.pipettes[pipetteId].entityId ?? ''
   const wellName =
     'wellName' in params
       ? params.wellName
       : robotState.pipettes[pipetteId].wellName ?? ''
+
   dispenseUpdateLiquidState({
     invariantContext,
-    labwareId,
+    entityId,
     pipetteId,
     prevLiquidState: robotState.liquidState,
     useFullVolume: false,

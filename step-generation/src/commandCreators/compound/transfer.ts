@@ -28,7 +28,6 @@ import {
   configureForVolume,
   delay,
   dispenseInPlace,
-  liquidProbe,
   moveToAddressableArea,
   moveToWell,
   prepareToAspirate,
@@ -171,9 +170,11 @@ export const transfer: CommandCreator<TransferArgs> = (
     )
   }
 
-  const initialDestLabwareSlot = getSlotInLocationStack(
-    prevRobotState.labware[destLabware]?.stack
-  )
+  const initialDestLabwareSlot =
+    prevRobotState.labware[destLabware] != null
+      ? getSlotInLocationStack(prevRobotState.labware[destLabware].stack)
+      : ''
+
   const initialSourceLabwareSlot = getSlotInLocationStack(
     prevRobotState.labware[sourceLabware]?.stack
   )
@@ -277,7 +278,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   )
   let prevSourceWell: string | null = null
   let prevDestWell: string | null = null
-  const probedWells: Set<string> = new Set()
+  // const probedWells: Set<string> = new Set()
   const commandCreators = sourceDestPairs.reduce(
     (
       outerAcc: CurriedCommandCreator[],
@@ -372,18 +373,19 @@ export const transfer: CommandCreator<TransferArgs> = (
               wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
             }),
           ]
-          let liquidProbeCommand: CurriedCommandCreator[] = []
-          if (changeTipNow && !probedWells.has(sourceWell)) {
-            liquidProbeCommand = [
-              curryCommandCreator(liquidProbe, {
-                pipetteId: args.pipette,
-                labwareId: args.sourceLabware,
-                wellName: sourceWell,
-                wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
-              }),
-            ]
-            probedWells.add(sourceWell)
-          }
+          // TODO (nd, 05/13/2025): uncomment and refine below logic once meniscus-relative pipetting is supported in PD
+          // let liquidProbeCommand: CurriedCommandCreator[] = []
+          // if (changeTipNow && !probedWells.has(sourceWell)) {
+          //   liquidProbeCommand = [
+          //     curryCommandCreator(liquidProbe, {
+          //       pipetteId: args.pipette,
+          //       labwareId: args.sourceLabware,
+          //       wellName: sourceWell,
+          //       wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
+          //     }),
+          //   ]
+          //   probedWells.add(sourceWell)
+          // }
           const prepareToAspirateCommand = [
             curryCommandCreator(prepareToAspirate, {
               pipetteId: args.pipette,
@@ -418,7 +420,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           const preAspirateSubmergeCommands = [
             ...moveToSourceWellTopCommand,
             ...voidDispenseAirGapCommand,
-            ...liquidProbeCommand,
+            // ...liquidProbeCommand,
             ...configureForVolumeCommand,
             ...prepareToAspirateCommand,
           ]

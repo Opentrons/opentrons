@@ -469,6 +469,40 @@ def test_aspirate_raises_no_location(
         subject.aspirate(location=None)
 
 
+def test_aspirate_flow_rate(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate with absolute_flow_rate."""
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate()).then_return(400)
+
+    subject.aspirate(volume=30, flow_rate=600)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=last_location,
+            well_core=None,
+            in_place=True,
+            volume=30,
+            rate=1.5,  # requested flow_rate is 1.5 times default of 400
+            flow_rate=600,
+            meniscus_tracking=None,
+        ),
+        times=1,
+    )
+
+    # Should raise if both `rate` and `flow_rate` are specified:
+    with pytest.raises(ValueError):
+        subject.aspirate(volume=30, rate=1.5, flow_rate=600)
+
+
 def test_blow_out_to_well(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -1124,6 +1158,41 @@ def test_dispense_push_out_on_not_allowed_version(
 
     with pytest.raises(APIVersionError):
         subject.dispense(push_out=3)
+
+
+def test_dispense_flow_rate(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should dispense with absolute_flow_rate."""
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(mock_instrument_core.get_dispense_flow_rate()).then_return(400)
+
+    subject.dispense(volume=30, flow_rate=600)
+
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=last_location,
+            well_core=None,
+            volume=30,
+            rate=1.5,  # requested flow_rate is 1.5 times default of 400
+            flow_rate=600,
+            in_place=True,
+            push_out=None,
+            meniscus_tracking=None,
+        ),
+        times=1,
+    )
+
+    # Should raise if both `rate` and `flow_rate` are specified:
+    with pytest.raises(ValueError):
+        subject.dispense(volume=30, rate=1.5, flow_rate=600)
 
 
 def test_touch_tip(

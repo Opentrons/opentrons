@@ -226,7 +226,6 @@ describe('generateRobotStateTimeline', () => {
         [
           "pickUpTip",
           "moveToWell",
-          "liquidProbe",
           "prepareToAspirate",
           "moveToWell",
           "moveToWell",
@@ -252,7 +251,6 @@ describe('generateRobotStateTimeline', () => {
         [
           "pickUpTip",
           "moveToWell",
-          "liquidProbe",
           "prepareToAspirate",
           "moveToWell",
           "moveToWell",

@@ -139,7 +139,7 @@ export const makeAspirateHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
     ...params,
   },
 })
-export const submergeWithAspirateHelper = (submergeParams: {
+export const aspirateHelperLiquidClass = (submergeParams: {
   pipetteId: string
   labwareId: string
   wellName: string
@@ -178,7 +178,7 @@ export const submergeWithAspirateHelper = (submergeParams: {
     submergeLocation,
     aspirateLocation,
     retractLocation,
-    shouldProbe = true,
+    // shouldProbe = true,
     shouldPreWet = false,
     shouldTouchTip = false,
     submergeDelay = 0,
@@ -268,27 +268,27 @@ export const submergeWithAspirateHelper = (submergeParams: {
           },
         ]
       : []),
-    ...(shouldProbe
-      ? [
-          {
-            commandType: 'liquidProbe',
-            key: expect.any(String),
-            params: {
-              pipetteId,
-              labwareId,
-              wellName,
-              wellLocation: {
-                origin: WELL_ORIGIN_TOP,
-                offset: {
-                  x: 0,
-                  y: 0,
-                  z: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-                },
-              },
-            },
-          },
-        ]
-      : []),
+    // ...(shouldProbe
+    //   ? [
+    //       {
+    //         commandType: 'liquidProbe',
+    //         key: expect.any(String),
+    //         params: {
+    //           pipetteId,
+    //           labwareId,
+    //           wellName,
+    //           wellLocation: {
+    //             origin: WELL_ORIGIN_TOP,
+    //             offset: {
+    //               x: 0,
+    //               y: 0,
+    //               z: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+    //             },
+    //           },
+    //         },
+    //       },
+    //     ]
+    //   : []),
     {
       commandType: 'prepareToAspirate',
       key: expect.any(String),

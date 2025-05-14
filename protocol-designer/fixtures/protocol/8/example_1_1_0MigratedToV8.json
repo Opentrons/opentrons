@@ -3700,23 +3700,6 @@
       }
     },
     {
-      "commandType": "liquidProbe",
-      "key": "84ab8f85-26a2-4681-abf7-4b3cc693a6c7",
-      "params": {
-        "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
-        "wellName": "A1",
-        "wellLocation": {
-          "origin": "top",
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          }
-        }
-      }
-    },
-    {
       "commandType": "prepareToAspirate",
       "key": "599a94f0-2fb6-43eb-8b49-6349ffe129a5",
       "params": {
