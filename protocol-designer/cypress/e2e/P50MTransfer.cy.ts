@@ -32,7 +32,12 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
   ) => {
     const tip: string = '50' // Explicitly typed as string
     const volumes: string[] = ['5', '20', '50'] // Explicitly typed as string array
-    const liquidClasses: string[] = ['Aqueous', 'Viscous', 'Volatile'] // Explicitly typed as string array
+    const liquidClasses: string[] = [
+      "Don't use a liquid class",
+      'Aqueous',
+      'Viscous',
+      'Volatile',
+    ] // Explicitly typed as string array
     const row: string = 'A'
     const colsLength: number = 12
     let colCounter: number = 0

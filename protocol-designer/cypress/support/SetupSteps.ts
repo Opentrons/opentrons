@@ -198,7 +198,9 @@ export const SetupSteps = {
   SelectLiquidClassT: (LiquidClass: string): StepThunk => ({
     call: () => {
       // eslint-disable-next-line no-template-curly-in-string
-      cy.get(`#${LiquidClass}`).click({ force: true })
+      // cy.get(`#${LiquidClass}`).click({ force: true })
+      // eslint-disable-next-line no-template-curly-in-string
+      cy.get(`label[for="${LiquidClass}"]`).click()
     },
   }),
 

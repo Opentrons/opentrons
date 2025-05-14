@@ -37,7 +37,12 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
   }
 
   const GenerateMultipleTransferSteps = (steps: StepBuilder) => {
-    const liquidClasses = ['Aqueous', 'Viscous', 'Volatile']
+    const liquidClasses = [
+      "Don't use a liquid class",
+      'Aqueous',
+      'Viscous',
+      'Volatile',
+    ]
     const tips = ['50', '200', '1000']
     const allWells = getAllWells()
     let wellIndex = 0

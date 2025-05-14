@@ -31,7 +31,12 @@ describe('Transfer stepform testing P1000M', () => {
     destinationLabware2: string
   ) => {
     const tips = ['50', '200', '1000']
-    const liquidClasses: string[] = ['Aqueous', 'Viscous', 'Volatile']
+    const liquidClasses: string[] = [
+      "Don't use a liquid class",
+      'Aqueous',
+      'Viscous',
+      'Volatile',
+    ]
     const row = 'A'
     const colsLength = 12
     let colCounter = 0

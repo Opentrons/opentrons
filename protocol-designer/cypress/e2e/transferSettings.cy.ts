@@ -39,7 +39,12 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
   const GenerateMultipleTransferSteps = (steps: StepBuilder) => {
     const tip = '50'
     const volumes = ['1', '20', '50']
-    const liquidClasses = ['Aqueous', 'Viscous', 'Volatile']
+    const liquidClasses = [
+      "Don't use a liquid class",
+      'Aqueous',
+      'Viscous',
+      'Volatile',
+    ]
     const allWells = getAllWells()
     let wellIndex = 0
 
