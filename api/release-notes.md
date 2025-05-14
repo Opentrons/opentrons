@@ -19,15 +19,11 @@ Welcome to the v8.4.0 release of the Opentrons robot software! This release incl
 
 ### Improvements
 
-- Improved tip drop motions for Flex 1- and 8-channel pipettes correctly drop and return attached tips to the tip rack. 
+- Improved tip drop motions for Flex 1-channel and 8-channel pipettes correctly drop and return attached tips to the tip rack. 
 
 ### Bug Fixes
 
 - The API raises an error if the Absorbance Plate Reader fails to initialize before reading a plate inside the module. 
-
-### Known Issues
-
-- When you use `load_liquid()` and then use `measure_liquid_height()` on the same well, protocol analysis won't raise an error if there's not enough liquid to complete your transfers. To avoid errors during an actual run, use only one of the two commands. 
 
 ## Opentrons Robot Software Changes in 8.3.1
 
