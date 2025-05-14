@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { COLORS, PrimaryButton } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import {
   SimpleWizardBody,
@@ -16,7 +17,6 @@ import {
   PENDING,
   SUCCESS,
 } from '/app/redux/robot-api'
-
 
 import type { Dispatch, State } from '/app/redux/types'
 import type { ModuleCalibrationWizardStepProps } from './types'
@@ -43,7 +43,7 @@ export const UpdateFirmware = (
   })?.status
 
   const handleUpdateFirmware = (): void => {
-    handleModuleApiRequests(attachedModule.serialNumber, robotName)
+    handleModuleApiRequests(robotName, attachedModule.serialNumber)
   }
 
   useEffect(() => {
@@ -78,16 +78,19 @@ export const UpdateFirmware = (
       <SimpleWizardBody
         isSuccess={true}
         iconColor={COLORS.green50}
-        header={t('firmware_up_to_date')}
+        header={t('firmware_up_to_date', {
+          module: getModuleDisplayName(attachedModule.moduleModel),
+        })}
       />
     )
+
   return (
     <SimpleWizardBody
       isSuccess={false}
       iconColor={COLORS.yellow50}
       header={t('firmware_update_found')}
       subHeader={t('firmware_update_to_latest', {
-        moduleName: attachedModule.moduleModel,
+        module: getModuleDisplayName(attachedModule.moduleModel),
       })}
     >
       <PrimaryButton
