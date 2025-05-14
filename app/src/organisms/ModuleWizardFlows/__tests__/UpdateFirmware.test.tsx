@@ -5,9 +5,8 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
-
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import {
   dismissRequest,
   FAILURE,
