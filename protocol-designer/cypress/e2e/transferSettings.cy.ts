@@ -81,53 +81,6 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     // cy.verifyCreateNewHeader()
     const steps = new StepBuilder()
     steps.add(SetupSteps.EditProtocolA())
-
-    /*
-    steps.add(SetupVerifications.OnStep1())
-    steps.add(SetupVerifications.FlexSelected())
-    steps.add(SetupVerifications.OnStep2())
-
-    steps.add(SetupSteps.SingleChannelPipette50())
-    steps.add(SetupSteps.Save())
-    steps.add(SetupSteps.SinglePipette1000())
-    // steps.add(SetupVerifications.StepTwo50uL())
-    // steps.add(SetupSteps.SinglePipette1000())
-    // steps.add(UniversalSteps.Snapshot())
-    steps.add(SetupSteps.Save())
-    // steps.add(SetupVerifications.StepTwoPart3())
-    // steps.add(UniversalSteps.Snapshot())
-    // steps.add(SetupVerifications.OnStep3())
-    steps.add(SetupSteps.YesGripper())
-    steps.add(SetupSteps.NoThermocycler())
-    steps.add(SetupSteps.NoWasteChute())
-    steps.add(SetupSteps.Confirm())
-    steps.add(SetupSteps.Confirm())
-    steps.add(SetupSteps.Confirm())
-    steps.add(SetupSteps.EditProtocolA())
-    steps.add(
-      CompositeSetupSteps.AddLabwareToDeckSlot('C1', 'Bio-Rad 96 Well Plate')
-    )
-    steps.add(SetupSteps.ChoseDeckSlotC1Labware())
-    steps.add(SetupSteps.AddLiquid())
-    steps.add(SetupSteps.ClickLiquidButton())
-    steps.add(SetupSteps.DefineLiquid())
-    steps.add(SetupSteps.LiquidSaveWIP())
-    const allWellsForLiquid: string[] = getAllWells()
-    steps.add(SetupSteps.WellSelector(allWellsForLiquid))
-    steps.add(SetupSteps.LiquidDropdown())
-    steps.add(SetupVerifications.LiquidPage())
-    steps.add(UniversalSteps.Snapshot())
-    steps.add(SetupSteps.SelectLiquidWells())
-    steps.add(SetupSteps.SetVolumeAndSaveForWells('150'))
-    steps.add(
-      CompositeSetupSteps.AddLabwareToDeckSlot(
-        'C3',
-        'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
-      )
-    )
-
-    // Add the multiple transfer steps using the custom function with sequential wells
-    */
     GenerateMultipleTransferSteps(steps)
 
     steps.execute()
