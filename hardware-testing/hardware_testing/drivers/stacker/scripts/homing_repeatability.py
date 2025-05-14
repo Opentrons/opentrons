@@ -42,27 +42,30 @@ STALLGUARD_CONFIG = {
 TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
     "Plate_stacker": {
         StackerAxis.X: {
-            "SPEED": {"MIN": 50, "MAX": 300, "INC": 50},
+            "SPEED": {"MIN": 200, "MAX": 200, "INC": 50},
             "ACCEL": {"MIN": 1500, "MAX": 1500, "INC": 500},
-            "CURRENT": {"MIN": 0.4, "MAX": 0.9, "INC": 0.1}
+            "CURRENT": {"MIN": 1.0, "MAX": 1.5, "INC": 0.1},
+            "MAX_SPEED_DISCONTINUITY": {"MIN": 5, "MAX": 80, "INC": 5}
         },
         StackerAxis.Z: {
-            "SPEED": {"MIN": 50, "MAX": 300, "INC": 50},
+            "SPEED": {"MIN": 150, "MAX": 150, "INC": 50},
             "ACCEL": {"MIN": 500, "MAX": 500, "INC": 10},
-            "CURRENT": {"MIN": 0.7, "MAX": 1.5, "INC": 0.1}
+            "CURRENT": {"MIN": 1.3, "MAX": 1.5, "INC": 0.1},
+            "MAX_SPEED_DISCONTINUITY": {"MIN": 55, "MAX": 50, "INC": 5}
         },
         StackerAxis.L: {
             "SPEED": {"MIN": 10, "MAX": 200, "INC": 10},
             "ACCEL": {"MIN": 800, "MAX": 800, "INC": 50},
-            "CURRENT": {"MIN": 0.1, "MAX": 1.5, "INC": 0.1}
+            "CURRENT": {"MIN": 0.1, "MAX": 1.5, "INC": 0.1},
+            "MAX_SPEED_DISCONTINUITY": {"MIN": 40, "MAX": 40, "INC": 5}
         },
     },
 }
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description="FlexStacker Motion Parameter Test Script")
-    arg_parser.add_argument("-c", "--cycles", default = 10, help = "number of cycles to execute")
-    arg_parser.add_argument("-a", "--axis", default = 'Z', help = "Choose a Axis to test: X, Z, or L")
+    arg_parser.add_argument("-c", "--cycles", default = 10, type=int, help = "number of cycles to execute")
+    arg_parser.add_argument("-a", "--axis", default = 'X', type=str, help = "Choose a Axis to test: X, Z, or L")
     arg_parser.add_argument("-g", "--gauge", default = True, type=bool,  help = "if a dial gauge is connected")
     return arg_parser
 
@@ -94,6 +97,7 @@ def make_test_list(test_axis: StackerAxis) -> Dict[str, list]:
         c_i = 0
         s_i = 0
         a_i = 0
+        m_i = 0
         for current_t in parameter_range(axis_t, "CURRENT"):
             TABLE_RESULTS_KEY[axis_t][current_t] = c_i
             c_i = c_i + 1
@@ -105,9 +109,13 @@ def make_test_list(test_axis: StackerAxis) -> Dict[str, list]:
                 for accel_t in parameter_range(axis_t, "ACCEL"):
                     TABLE_RESULTS_KEY[axis_t][accel_t] = a_i
                     a_i = a_i + 1
-                    axis_test_list.append(
-                        {"CURRENT": current_t, "SPEED": speed_t, "ACCEL": accel_t}
-                    )
+                    m_i = 0
+                    for discontinuity in parameter_range(axis_t, "MAX_SPEED_DISCONTINUITY"):
+                        TABLE_RESULTS_KEY[axis_t][discontinuity] = m_i
+                        m_i = m_i + 1
+                        axis_test_list.append(
+                            {"CURRENT": current_t, "SPEED": speed_t, "ACCEL": accel_t, "MAX_SPEED_DISCONTINUITY": discontinuity}
+                        )
 
         complete_test_list[axis_t] = axis_test_list
 
@@ -232,16 +240,20 @@ async def home_axis(
     direction: Direction,
     speed: Optional[float] = None,
     acceleration: Optional[float] = None,
+    max_speed_discontinuity: Optional[float] = None,
     current: Optional[float] = None,
 ) -> bool:
     """Home flex stacker axis."""
     default = STACKER_MOTION_CONFIG[axis]["home"]
+    print(f'default: {default}')
     await stacker.set_run_current(
         axis, current if current is not None else default.run_current
     )
     await stacker.set_ihold_current(axis, default.hold_current)
     motion_params = default.move_params.update(
-        max_speed=speed, acceleration=acceleration
+        max_speed=speed, 
+        acceleration=acceleration, 
+        max_speed_discont=max_speed_discontinuity,
     )
 
     success = await stacker.move_to_limit_switch(
@@ -275,46 +287,114 @@ async def stacker_setup() -> FlexStackerDriver:
         )
     return stacker
 
-if __name__ == '__main__':
-    s = stacker.FlexStacker(None).create('COM11')
-    cycles = 50
-    s.home_speed = 100
-    s.home_acceleration = 500
-    test_axis = AXIS.L
-    # s.home(AXIS.X, DIR.POSITIVE_HOME, s.home_speed, s.home_acceleration)
-    s.home(AXIS.Z, DIR.NEGATIVE_HOME, s.home_speed, s.home_acceleration)
-    s.home(AXIS.L, DIR.NEGATIVE_HOME, s.home_speed, s.home_acceleration)
-    if test_axis == AXIS.X:
-        TOTAL_TRAVEL = 192.5
-        s.home(test_axis, DIR.POSITIVE_HOME)
+async def main(args: argparse.Namespace, gauge: bool, test_axis: str) -> None:
+    """Main function."""
+    if test_axis == 'X':
         axis_str = 'X'
         sw_axis = 'XE'
-        msd = s.max_speed_discontinuity_x
-        run_current = 1.5
-    elif test_axis == AXIS.Z:
-        TOTAL_TRAVEL = 136
-        s.home(test_axis, DIR.NEGATIVE_HOME)
+        TOTAL_TRAVEL = 194
+    elif test_axis == 'Z':
         axis_str = 'Z'
         sw_axis = 'ZE'
-        msd = s.max_speed_discontinuity_z
-        run_current = 1.5
-    elif test_axis == AXIS.L:
-        TOTAL_TRAVEL = 22
-        s.home(test_axis, DIR.NEGATIVE_HOME)
+        TOTAL_TRAVEL = 139.5
+    elif test_axis == 'L':
         axis_str = 'L'
         sw_axis = 'LR'
-        msd = 100
-        run_current = 1.5
+        TOTAL_TRAVEL = 22
     else:
         raise("NO AXIS CHOSEN!!!")
-    speed = s.home_speed
-    acceleration = s.home_acceleration
-    s.set_run_current(run_current, AXIS.L)
-    for x in range(1, cycles+1):
-        s.home(test_axis, DIR.NEGATIVE_HOME, s.home_speed, s.home_acceleration)
-        s.move(test_axis,
-                        TOTAL_TRAVEL, # 202 -4 = 200
-                        DIR.POSITIVE,
-                        speed,
-                        acceleration,
-                        msd)
+    print(f'Building hw api')
+    api = await helpers_ot3.build_async_ot3_hardware_api(
+        is_simulating=False, use_defaults=True
+    )
+    for module in api.attached_modules:
+        await module._poller.stop()
+    s = await stacker_setup()
+    await s.home_axis(StackerAxis.X, Direction.RETRACT)
+    await s.home_axis(StackerAxis.Z, Direction.RETRACT)
+
+    if test_axis == StackerAxis.L:
+        await close_latch(s)
+        await open_latch(s)
+
+    directory = f'/data/homing_repeatability_test_{datetime.now().strftime("%m_%d_%y")}'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    folder_name = "homing_repeatability_"
+    f_name = f'{directory}/{folder_name}{axis_str}_{datetime.now().strftime("%m_%d_%y_%H_%M")}.csv'
+    with open(f_name, 'w', newline='') as f:
+        writer = csv.writer(f)
+        fields = ['Cycle', 
+                        'Speed', 
+                        'Acceleration', 
+                        'Current', 
+                        'Position 1', 
+                        'Position 2', 
+                        'Position 3']
+        writer.writerow(fields)
+        if test_axis == StackerAxis.L:
+            direction = Direction.RETRACT
+        else:
+            direction = Direction.EXTEND
+        for settings in list_1[axis_str]:
+            for c in range(1, args.cycles+1):
+                print(f'Cycle: {c}')
+                print(f'Settings: {settings}')
+                sw_states = await get_limit_switch_status(s)
+                print(sw_states.get(test_axis, direction))
+                print(STACKER_STATES)
+                await move_axis(s, 
+                                test_axis,
+                                Direction.EXTEND,
+                                TOTAL_TRAVEL - 10 # 202 -4 = 200
+                                )
+                if args.gauge:
+                    position_1 = gauge.read_stable(10)
+                    print(f'Position 1: {position_1}')
+                await home_axis(s, 
+                                test_axis, 
+                                Direction.EXTEND, 
+                                settings['SPEED'], 
+                                settings['ACCEL'],
+                                settings['MAX_SPEED_DISCONTINUITY'],
+                                settings['CURRENT'])
+                if args.gauge:
+                    position_2 = gauge.read_stable(10)
+                    print(f'Position 2: {position_2}')
+                    data = [c, settings['SPEED'], settings['ACCEL'], settings['CURRENT'], settings['MAX_SPEED_DISCONTINUITY'], position_1, position_2]
+                    writer.writerow(data)
+                    f.flush()
+                await move_axis(s,
+                                test_axis,
+                                Direction.RETRACT,
+                                TOTAL_TRAVEL - 10 # 202 -4 = 200
+                                )
+                await s.home_axis(test_axis, Direction.RETRACT)
+                
+
+if __name__ == "__main__":
+    arg_parser = build_arg_parser()
+    args = arg_parser.parse_args()
+    # Only needed for X axis and Z Axis
+    print('Starting up')
+    if args.gauge == True:
+        gauge = dial_indicator.Mitutoyo_Digimatic_Indicator('/dev/ttyUSB1')
+        gauge.connect()
+        print("Dial gauge connected")
+        home_reading = gauge.read_stable()
+        print("Dial gauge Connected")
+    else:
+        gauge = None
+    if args.axis == 'X':
+        test_axis = StackerAxis.X
+    elif args.axis == 'Z':
+        test_axis = StackerAxis.Z
+    elif args.axis == 'L':
+        test_axis = StackerAxis.L
+    else:
+        raise("NO AXIS CHOSEN!!!")
+    print('Im here')
+    list_1 = make_test_list(test_axis)
+    print(list_1)
+    title_time = time.time()
+    asyncio.run(main(args, gauge, test_axis))

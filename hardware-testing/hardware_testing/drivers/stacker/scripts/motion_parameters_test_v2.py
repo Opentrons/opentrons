@@ -272,7 +272,7 @@ async def stacker_setup() -> FlexStackerDriver:
     # Enable stall guard
     for axis, config in STALLGUARD_CONFIG.items():
         await stacker.set_stallguard_threshold(
-            axis, config.enabled, config.threshold
+            axis, False, config.threshold
         )
     return stacker
 
@@ -299,11 +299,8 @@ async def main(args: argparse.Namespace, gauge, test_axis) -> None:
         # stop pollers
         await module._poller.stop() # type: ignore
     s = await stacker_setup()
-    # await home_axis(s, StackerAxis.X, Direction.EXTEND)
-    # await home_axis(s, StackerAxis.Z, Direction.EXTEND)
     await home_axis(s, StackerAxis.X, Direction.RETRACT)
     await home_axis(s, StackerAxis.Z, Direction.RETRACT)
-    # await home_axis(s, StackerAxis.L, Direction.RETRACT)
     if test_axis == StackerAxis.L:
         await close_latch(s)
         await open_latch(s)
@@ -455,9 +452,6 @@ if __name__ == '__main__':
     else:
         raise("NO AXIS CHOSEN!!, PLEASE CHOOSE X, Y, or L")
     list_1 = make_test_list(test_axis)
-    # Can't remember if this is needed
-    # s.close_latch()
-    # s.open_latch()
     title_time = time.time()
     asyncio.run(main(args, gauge, test_axis))
     
