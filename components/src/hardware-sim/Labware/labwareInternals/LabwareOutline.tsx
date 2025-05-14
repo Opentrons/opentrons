@@ -1,6 +1,7 @@
 import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
 
 import { COLORS } from '../../../helix-design-system'
+import { getTiprackBackgroundColor } from './getTiprackBackgroundColor'
 
 import type { CSSProperties } from 'styled-components'
 import type { SVGProps } from 'react'
@@ -40,7 +41,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
     showRadius = true,
   } = props
   const {
-    parameters = { isTiprack },
+    parameters = { isTiprack, loadName: '' },
     dimensions = { xDimension: width, yDimension: height },
   } = definition ?? {}
 
@@ -48,8 +49,11 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
   if (fill != null) {
     backgroundFill = fill
   } else {
-    backgroundFill = parameters.isTiprack ? '#CCCCCC' : COLORS.white
+    backgroundFill = parameters.isTiprack
+      ? getTiprackBackgroundColor(parameters.loadName)
+      : COLORS.white
   }
+
   return (
     <>
       {highlight ? (
