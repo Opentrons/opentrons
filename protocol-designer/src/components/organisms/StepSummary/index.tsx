@@ -25,8 +25,8 @@ import {
 import { getRobotStateAtActiveItem } from '../../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
-import { getMixSummary } from './getMixSummary'
-import { getMoveLiquidSummary } from './getMoveLiquidSummary'
+import { MixSummary } from './MixSummary'
+import { MoveLiquidSummary } from './MoveLiquidSummary'
 import { StyledTrans } from './StyledTrans'
 
 import type { FormData } from '../../../form-types'
@@ -59,14 +59,16 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
   let stepSummaryContent: JSX.Element | null = null
   switch (stepType) {
     case 'mix': {
-      stepSummaryContent = getMixSummary(
-        currentStep,
-        labwareNicknamesById,
-        liquidState,
-        liquidEntities,
-        labwareEntities,
-        t
+      stepSummaryContent = (
+        <MixSummary
+          currentStep={currentStep}
+          labwareNicknamesById={labwareNicknamesById}
+          liquidState={liquidState}
+          liquidEntities={liquidEntities}
+          labwareEntities={labwareEntities}
+        />
       )
+
       break
     }
 
@@ -262,16 +264,16 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     }
 
     case 'moveLiquid': {
-      stepSummaryContent = getMoveLiquidSummary(
-        currentStep,
-        labwareNicknamesById,
-        liquidState,
-        liquidEntities,
-        labwareEntities,
-        additionalEquipmentEntities,
-        t
+      stepSummaryContent = (
+        <MoveLiquidSummary
+          currentStep={currentStep}
+          labwareNicknamesById={labwareNicknamesById}
+          liquidState={liquidState}
+          liquidEntities={liquidEntities}
+          labwareEntities={labwareEntities}
+          additionalEquipmentEntities={additionalEquipmentEntities}
+        />
       )
-
       break
     }
 

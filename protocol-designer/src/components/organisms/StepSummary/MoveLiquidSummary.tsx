@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import flatten from 'lodash/flatten'
 
 import {
@@ -20,16 +21,25 @@ import type {
 } from '@opentrons/step-generation'
 import type { FormData } from '../../../form-types'
 
-export function getMoveLiquidSummary(
-  currentStep: FormData,
-  labwareNicknamesById: Record<string, string>,
-  liquidState: RobotState['liquidState'],
-  liquidEntities: LiquidEntities,
-  labwareEntities: LabwareEntities,
-  additionalEquipmentEntities: AdditionalEquipmentEntities,
-  t: any
-): JSX.Element {
-  let moveLiquidType
+interface MoveLiquidSummaryProps {
+  currentStep: FormData
+  labwareNicknamesById: Record<string, string>
+  liquidState: RobotState['liquidState']
+  liquidEntities: LiquidEntities
+  labwareEntities: LabwareEntities
+  additionalEquipmentEntities: AdditionalEquipmentEntities
+}
+
+export function MoveLiquidSummary(props: MoveLiquidSummaryProps): JSX.Element {
+  const {
+    currentStep,
+    labwareNicknamesById,
+    liquidState,
+    liquidEntities,
+    labwareEntities,
+    additionalEquipmentEntities,
+  } = props
+  const { t } = useTranslation('protocol_steps')
   const {
     aspirate_labware,
     aspirate_wells,
@@ -38,6 +48,7 @@ export function getMoveLiquidSummary(
     volume,
     path,
   } = currentStep
+  let moveLiquidType
   const sourceLabwareName = labwareNicknamesById[aspirate_labware]
   const destinationLabwareName = labwareNicknamesById[dispense_labware]
   const aspirateWells: string[] = aspirate_wells

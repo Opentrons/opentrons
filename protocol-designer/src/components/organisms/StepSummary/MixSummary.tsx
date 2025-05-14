@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import flatten from 'lodash/flatten'
 
 import {
@@ -19,14 +20,23 @@ import type {
 } from '@opentrons/step-generation'
 import type { FormData } from '../../../form-types'
 
-export function getMixSummary(
-  currentStep: FormData,
-  labwareNicknamesById: Record<string, string>,
-  liquidState: RobotState['liquidState'],
-  liquidEntities: LiquidEntities,
-  labwareEntities: LabwareEntities,
-  t: any
-): JSX.Element {
+interface MixSummaryProps {
+  currentStep: FormData
+  labwareNicknamesById: Record<string, string>
+  liquidState: RobotState['liquidState']
+  liquidEntities: LiquidEntities
+  labwareEntities: LabwareEntities
+}
+
+export function MixSummary(props: MixSummaryProps): JSX.Element {
+  const {
+    currentStep,
+    labwareNicknamesById,
+    liquidState,
+    liquidEntities,
+    labwareEntities,
+  } = props
+  const { t } = useTranslation('protocol_steps')
   const {
     labware: mixLabwareId,
     volume: mixVolume,
