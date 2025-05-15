@@ -325,7 +325,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
             ctx.pause("Replace tip rack.")
             pip.pick_up_tip(tips["A1"])
 
-    def _set_pipettte_motion_settings() -> Tuple[
+    def _set_pipette_motion_settings() -> Tuple[
         float, float, float, float, float, float
     ]:
         if ctx.params.use_pip_motion_defaults:  # type: ignore [attr-defined]
@@ -377,7 +377,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
         dispense_exit_speed,
         set_push_out,
         air_gap,
-    ) = _set_pipettte_motion_settings()
+    ) = _set_pipette_motion_settings()
     for i in range(ctx.params.cycles):  # type: ignore [attr-defined]
         tips = _get_tiprack(i)
         pip.pick_up_tip(tips["A1"])
