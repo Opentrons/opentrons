@@ -1,8 +1,8 @@
 import { css } from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon, IconProps } from '../../icons'
-import { Box, Btn, Flex, Link, StyleProps } from '../../primitives'
+import { Icon } from '../../icons'
+import { Box, Btn, Flex, Link } from '../../primitives'
 import {
   ALIGN_CENTER,
   DIRECTION_ROW,
@@ -14,6 +14,8 @@ import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 
 import type { MouseEventHandler } from 'react'
+import type { IconProps } from '../../icons'
+import type { StyleProps } from '../../primitives'
 
 type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 

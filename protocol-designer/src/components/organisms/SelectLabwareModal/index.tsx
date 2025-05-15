@@ -283,11 +283,11 @@ export function SelectLabwareModal(
 
   const handleAddLabwareClick = (): void => {
     if (slotFull) {
-      setError(t('no_space'))
+      setError(t('no_space') as string)
       return
     }
     if (hasNoLabware) {
-      setError(t('select_before_proceeding'))
+      setError(t('select_before_proceeding') as string)
     } else {
       onConfirm()
       handleResetLabwareTools()

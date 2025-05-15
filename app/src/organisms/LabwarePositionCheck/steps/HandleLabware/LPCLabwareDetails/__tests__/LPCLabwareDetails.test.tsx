@@ -2,8 +2,6 @@ import { useDispatch } from 'react-redux'
 import { act, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { InlineNotification } from '@opentrons/components'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
@@ -30,6 +28,7 @@ import {
 
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
+import type { InlineNotification } from '@opentrons/components'
 
 vi.mock(
   '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails/DefaultLocationOffset',
