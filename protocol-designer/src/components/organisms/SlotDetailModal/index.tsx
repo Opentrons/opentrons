@@ -19,7 +19,6 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
-  AIR,
   getFullStackFromLabwares,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
@@ -30,6 +29,7 @@ import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { getMainPagePortalEl } from '../Portal'
+import { getLiquidIdsOnLabware } from '../utils'
 import { LiquidCardList } from './LiquidCardList'
 
 import type { WellGroup } from '@opentrons/components'
@@ -74,13 +74,7 @@ export const SlotDetailModal = (
     wellContents,
     liquidDisplayColors
   )
-  const allLiquidIdsOnLabware =
-    wellContents != null
-      ? Object.values(wellContents)
-          .flatMap(contents => contents.groupIds)
-          ?.filter(group => group !== AIR)
-      : []
-  const individualIds = Array.from(new Set(allLiquidIdsOnLabware))
+  const individualIds = getLiquidIdsOnLabware(wellContents)
 
   const [selectedLiquidId, setSelectedLiquidId] = useState<string | undefined>(
     Object.values(allWellFill).length > 0

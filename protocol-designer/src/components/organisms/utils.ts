@@ -3,7 +3,7 @@ import {
   getModuleType,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
+import { AIR, MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 
 import { ALL_MODULE_SLOTS_OT2 } from '../../modules'
 import { DEFAULT_SLOT_MAP_OT2 } from '../../pages/Onboarding/constants'
@@ -17,6 +17,7 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { ContentsByWell } from '../../labware-ingred/types'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   ModuleOnDeck,
@@ -105,4 +106,16 @@ export const getNextAvailableModuleSlot = (
   } else {
     return null
   }
+}
+
+export const getLiquidIdsOnLabware = (
+  wellContents: ContentsByWell
+): string[] => {
+  const allLiquidIdsOnLabware =
+    wellContents != null
+      ? Object.values(wellContents)
+          .flatMap(contents => contents.groupIds)
+          ?.filter(group => group !== AIR)
+      : []
+  return Array.from(new Set(allLiquidIdsOnLabware))
 }

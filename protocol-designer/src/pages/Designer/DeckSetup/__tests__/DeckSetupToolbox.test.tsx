@@ -25,6 +25,7 @@ import {
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { getDismissedHints } from '../../../../tutorial/selectors'
 import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
 import { DeckSetupToolbox } from '../DeckSetupToolbox'
@@ -43,6 +44,7 @@ vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../tutorial/selectors')
 vi.mock('../../../../step-forms/selectors')
+vi.mock('../../../../top-selectors/well-contents')
 vi.mock('../../../../components/organisms/Kitchen/hooks')
 vi.mock('../../../../components/organisms/SelectLabwareModal')
 vi.mock('../../../../ui/labware/selectors')
@@ -92,6 +94,9 @@ describe('DeckSetupToolbox', () => {
       eatToast: vi.fn(),
     })
     vi.mocked(getLabwareNicknamesById).mockReturnValue({})
+    vi.mocked(
+      wellContentsSelectors.getAllWellContentsForActiveItem
+    ).mockReturnValue(null)
   })
   afterEach(() => {
     vi.resetAllMocks()
