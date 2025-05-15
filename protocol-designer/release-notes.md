@@ -8,11 +8,11 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
-## Opentrons Protocol Designer Changes in 8.5
+## Opentrons Protocol Designer Changes in 8.5.0
 
-**Welcome to Protocol Designer v8.5!**
+**Welcome to Protocol Designer v8.5.0!**
 
-This release adds support for liquid classes in Protocol Designer protocols for the Flex, and includes feature improvements and bug fixes.
+This release adds support for liquid classes in Protocol Designer protocols for the Flex, exporting python, and includes feature improvements and bug fixes.
 
 Use Opentrons-verified liquid classes to automatically define transfer settings and optimize liquid handling behavior based on liquid properties like viscosity. When adding liquids to your protocol, select an Opentrons-verified liquid class from the dropdown menu. You can choose whether or not to apply liquid class settings to protocol steps that use compatible Opentrons labware and pipettes.
 
@@ -24,7 +24,7 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 
 ### Improved Features
 
-- Protocol Designer includes a warning when you clear a slot with labware, a module, or a fixture used in a protocol step.
+- Protocol Designer includes a warning when you clear a labware, a module, or a fixture used in a protocol step.
 - Protocol Designer takes extra steps to validate any custom labware you upload.
 
 ### Bug Fixes
