@@ -12,11 +12,15 @@ export default defineConfig({
     // Relative to the root
     ssr: 'src/index.ts',
     outDir: 'lib',
-    // do not delete the outdir, typescript types might live there and we dont want to delete them
+    // Do not delete the outdir, typescript types might live there and we don't want to delete them
     emptyOutDir: false,
     commonjsOptions: {
       transformMixedEsModules: true,
       esmExternals: true,
+    },
+    rollupOptions: {
+      // Only @opentrons/shared-data is external; step-generation will be bundled!
+      external: ['@opentrons/shared-data'],
     },
   },
   plugins: [
