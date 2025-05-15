@@ -1,19 +1,13 @@
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import first from 'lodash/first'
-import flatten from 'lodash/flatten'
-import last from 'lodash/last'
 import styled from 'styled-components'
 
 import {
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   ListItem,
-  NO_WRAP,
   SPACING,
   StyledText,
-  Tag,
   WRAP,
 } from '@opentrons/components'
 import {
@@ -21,73 +15,29 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { LINE_CLAMP_TEXT_STYLE } from '../../../components/atoms'
+import { formatTime } from '../../../pages/Designer/utils'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
+  getLiquidEntities,
   getModuleEntities,
 } from '../../../step-forms/selectors'
+import { getRobotStateAtActiveItem } from '../../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { formatTime } from '../utils'
+import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { MixSummary } from './MixSummary'
+import { MoveLiquidSummary } from './MoveLiquidSummary'
+import { StyledTrans } from './StyledTrans'
 
 import type { FormData } from '../../../form-types'
-
-interface StyledTransProps {
-  i18nKey: string
-  tagText?: string
-  values?: object
-}
-
-function StyledTrans(props: StyledTransProps): JSX.Element {
-  const { i18nKey, tagText, values } = props
-  const { t } = useTranslation(['protocol_steps', 'application'])
-  return (
-    <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER} flexWrap={WRAP}>
-      <Trans
-        t={t}
-        i18nKey={i18nKey}
-        components={{
-          text: (
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              style={{ whiteSpace: NO_WRAP }}
-            />
-          ),
-          semiBoldText: (
-            <StyledText
-              desktopStyle="bodyDefaultSemiBold"
-              style={{ whiteSpace: NO_WRAP }}
-            />
-          ),
-          tag: <Tag type="default" text={tagText ?? ''} />,
-        }}
-        values={values}
-      />
-    </Flex>
-  )
-}
-const getWellsForStepSummary = (
-  targetWells: string[],
-  labwareWells: string[]
-): string => {
-  if (targetWells.length === 1) {
-    return targetWells[0]
-  }
-  const firstElementIndexOffset = labwareWells.indexOf(targetWells[0])
-  const isInOrder = targetWells.every(
-    (targetWell, i) =>
-      labwareWells.indexOf(targetWell) === firstElementIndexOffset + i
-  )
-  return isInOrder
-    ? `${first(targetWells)}-${last(targetWells)}`
-    : `${targetWells.length} wells`
-}
 
 interface StepSummaryProps {
   currentStep: FormData | null
   stepDetails?: string
 }
 
+//  TODO: refactor the different step types to be in their own functions
+//  similarly to what has been done for Mix and MoveLiquid
 export function StepSummary(props: StepSummaryProps): JSX.Element | null {
   const { currentStep, stepDetails } = props
   const { t } = useTranslation(['protocol_steps', 'application'])
@@ -96,40 +46,29 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
+  const robotState = useSelector(getRobotStateAtActiveItem)
 
   const labwareEntities = useSelector(getLabwareEntities)
+  const liquidEntities = useSelector(getLiquidEntities)
   const modules = useSelector(getModuleEntities)
-  if (currentStep?.stepType == null) {
+  if (currentStep?.stepType == null || robotState == null) {
     return null
   }
   const { stepType } = currentStep
+  const { liquidState } = robotState
   let stepSummaryContent: JSX.Element | null = null
   switch (stepType) {
     case 'mix': {
-      const {
-        labware: mixLabwareId,
-        volume: mixVolume,
-        times,
-        wells: mix_wells,
-        labware: mixLabware,
-      } = currentStep
-      const mixLabwareDisplayName = labwareNicknamesById[mixLabwareId]
-      const mixWellsDisplay = getWellsForStepSummary(
-        mix_wells as string[],
-        flatten(labwareEntities[mixLabware]?.def.ordering)
-      )
-
       stepSummaryContent = (
-        <StyledTrans
-          i18nKey="protocol_steps:mix_step"
-          tagText={`${mixVolume} ${t('application:units.microliter')}`}
-          values={{
-            labware: mixLabwareDisplayName,
-            times,
-            wells: mixWellsDisplay,
-          }}
+        <MixSummary
+          currentStep={currentStep}
+          labwareNicknamesById={labwareNicknamesById}
+          liquidState={liquidState}
+          liquidEntities={liquidEntities}
+          labwareEntities={labwareEntities}
         />
       )
+
       break
     }
 
@@ -325,57 +264,16 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     }
 
     case 'moveLiquid': {
-      let moveLiquidType
-      const {
-        aspirate_labware,
-        aspirate_wells,
-        dispense_wells,
-        dispense_labware,
-        volume,
-      } = currentStep
-      const sourceLabwareName = labwareNicknamesById[aspirate_labware]
-      const destinationLabwareName = labwareNicknamesById[dispense_labware]
-      const aspirateWellsDisplay = getWellsForStepSummary(
-        aspirate_wells as string[],
-        flatten(labwareEntities[aspirate_labware]?.def.ordering)
-      )
-      const dispenseWellsDisplay = getWellsForStepSummary(
-        dispense_wells as string[],
-        flatten(labwareEntities[dispense_labware]?.def.ordering)
-      )
-
-      const disposalName = additionalEquipmentEntities[dispense_labware]?.name
-
-      const isDisposalLocation =
-        disposalName === 'wasteChute' || disposalName === 'trashBin'
-
-      if (currentStep.path === 'single') {
-        moveLiquidType = 'transfer'
-      } else if (currentStep.path === 'multiAspirate') {
-        moveLiquidType = 'consolidate'
-      } else {
-        moveLiquidType = 'distribute'
-      }
-
       stepSummaryContent = (
-        <StyledTrans
-          i18nKey={
-            isDisposalLocation
-              ? `protocol_steps:move_liquid.${moveLiquidType}_disposal`
-              : `protocol_steps:move_liquid.${moveLiquidType}`
-          }
-          values={{
-            sourceWells: aspirateWellsDisplay,
-            destinationWells: dispenseWellsDisplay,
-            source: sourceLabwareName,
-            destination: isDisposalLocation
-              ? t(`shared:${disposalName}`)
-              : destinationLabwareName,
-          }}
-          tagText={`${volume} ${t('application:units.microliter')}`}
+        <MoveLiquidSummary
+          currentStep={currentStep}
+          labwareNicknamesById={labwareNicknamesById}
+          liquidState={liquidState}
+          liquidEntities={liquidEntities}
+          labwareEntities={labwareEntities}
+          additionalEquipmentEntities={additionalEquipmentEntities}
         />
       )
-
       break
     }
 
