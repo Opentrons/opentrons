@@ -12,7 +12,7 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer v8.5.0!**
 
-This release adds support for liquid classes in Protocol Designer protocols for the Flex, exporting python, and includes feature improvements and bug fixes.
+This release adds support for liquid classes in Flex protocols, exports Python protocols for Flex and OT-2, and includes feature improvements and bug fixes.
 
 Use Opentrons-verified liquid classes to automatically define transfer settings and optimize liquid handling behavior based on liquid properties like viscosity. When adding liquids to your protocol, select an Opentrons-verified liquid class from the dropdown menu. You can choose whether or not to apply liquid class settings to protocol steps that use compatible Opentrons labware and pipettes.
 
@@ -31,13 +31,13 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 
 - Transfer step details show correct aspirate and dispense volumes when distributing liquid (a single aspirate and multiple dispenses).
 - During a mix, push out is set to 0 by default for all mixes except for the last, to avoid multiple push out actions. You can choose your own push out volume in a mix step menu.
-- Choose a new tip drop location from the dropdown menu when an uploaded protocol is missing a drop tip location.
+- Choose a new tip drop location from the dropdown menu when an uploaded protocol is missing a tip drop location.
 - Protocol Designer correctly updates adapter and labware combination definitions when you upload a protocol designed in Protocol Designer v7.0.0 or earlier.
 - When adding a disposal volume, a blowout location is now required.
-- No longer allow touch tip with incompatible labware. This results in a change in behavior from imported protocols that had touch tip on incompatible labware.
-- If multiple labware end up in the same slot at the same time due to deleting/rearranging steps, a timeline error is now raised.
+- No longer allow touch tip with incompatible labware. This changes the behavior of imported protocols that had touch tip on incompatible labware.
+- If multiple labware end up in the same slot at the same time due to deleting/rearranging steps, an error appears on the protocol timeline.
 
-Running a protocol created in Protocol Designer now requires Opentrons App version 8.4.0 or newer.
+Running a protocol created in Protocol Designer now requires Opentrons App version 8.5.0 or newer.
 
 ## Opentrons Protocol Designer Changes in 8.4.4
 
