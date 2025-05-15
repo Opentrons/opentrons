@@ -6,8 +6,7 @@ import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
-  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
@@ -80,7 +79,7 @@ export function MagneticBlockFixture(
     case 'cutoutC2':
     case 'cutoutD2': {
       x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
-      width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
+      width = COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
       displayName = 'Mag'
       break
     }
@@ -91,7 +90,7 @@ export function MagneticBlockFixture(
       x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
       width = hasStagingArea
         ? STAGING_AREA_FIXTURE_WIDTH
-        : COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
+        : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
       break
     }
   }

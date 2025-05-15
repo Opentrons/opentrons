@@ -5,7 +5,7 @@ import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_X_ADJUSTMENT,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
@@ -69,7 +69,7 @@ export function TrashBinConfigFixture(
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH}
+      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}

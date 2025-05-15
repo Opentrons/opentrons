@@ -11,8 +11,7 @@ import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
-  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
   FIXTURE_HEIGHT,
   Y_ADJUSTMENT,
@@ -64,7 +63,7 @@ export function EmptyConfigFixture(
     offsetVector[0]
   const width = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
     ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
-    : COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
+    : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
   const y = ySlotPosition + Y_ADJUSTMENT
 
   return (
