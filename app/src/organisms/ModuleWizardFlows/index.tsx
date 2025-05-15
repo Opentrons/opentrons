@@ -1,53 +1,24 @@
 import { useEffect, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
-import { COLORS, LegacyStyledText, ModalShell } from '@opentrons/components'
-import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
-import {
-  FLEX_CUTOUT_BY_SLOT_ID,
-  FLEX_ROBOT_TYPE,
-  getCutoutFixturesForModuleModel,
-  getDeckDefFromRobotType,
-  getFixtureIdByCutoutIdFromModuleSlotName,
-  getModuleDisplayName,
-  getModuleType,
-  SINGLE_SLOT_FIXTURES,
-} from '@opentrons/shared-data'
+import { COLORS, LegacyStyledText } from '@opentrons/components'
 
-import { getTopPortalEl } from '/app/App/portal'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { WizardHeader } from '/app/molecules/WizardHeader'
-import { getIsOnDevice } from '/app/redux/config'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-import {
-  useChainMaintenanceCommands,
-  useNotifyCurrentMaintenanceRun,
-} from '/app/resources/maintenance_runs'
-import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { AttachProbe } from './AttachProbe'
 import { BeforeBeginning } from './BeforeBeginning'
-import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
+import {  SECTIONS } from './constants'
 import { DetachProbe } from './DetachProbe'
-import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
+import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
+import { useInitModuleFlow } from './useModuleWizardFlows'
 
-import type { SetStateAction } from 'react'
-import type { AttachedModule, CommandData } from '@opentrons/api-client'
-import type {
-  CreateCommand,
-  CutoutConfig,
-  SingleSlotCutoutFixtureId,
-} from '@opentrons/shared-data'
+import type { AttachedModule } from '@opentrons/api-client'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -58,7 +29,6 @@ interface ModuleWizardFlowsProps {
   prepCommandErrorMessage?: string
 }
 
-const RUN_REFETCH_INTERVAL = 5000
 
 export const ModuleWizardFlows = (
   props: ModuleWizardFlowsProps
@@ -71,314 +41,254 @@ export const ModuleWizardFlows = (
     onComplete,
     prepCommandErrorMessage,
   } = props
-  const isOnDevice = useSelector(getIsOnDevice)
+
   const { t } = useTranslation('module_wizard_flows')
-  const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-  const attachedPipette =
-    attachedPipettes.left?.data.calibratedOffset?.last_modified != null
-      ? attachedPipettes.left
-      : attachedPipettes.right
 
-  const moduleCalibrationSteps = getModuleCalibrationSteps()
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
-  const moduleCutoutConfig = deckConfig.find(
-    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
-  )
-  // mapping of cutoutId's occupied by the target module and their cutoutFixtureId's per cutout
-  const fixtureIdByCutoutId =
-    moduleCutoutConfig != null
-      ? getFixtureIdByCutoutIdFromModuleSlotName(
-          moduleCutoutConfig.cutoutId.replace('cutout', ''),
-          getCutoutFixturesForModuleModel(attachedModule.moduleModel, deckDef),
-          deckDef
-        )
-      : {}
-  const occupiedCutouts = deckConfig.filter(
-    (cutoutConfig: CutoutConfig) =>
-      !SINGLE_SLOT_FIXTURES.includes(
-        cutoutConfig.cutoutFixtureId as SingleSlotCutoutFixtureId
-      ) && !Object.keys(fixtureIdByCutoutId).includes(cutoutConfig.cutoutId)
-  )
-  const availableSlotNames =
-    FLEX_SLOT_NAMES_BY_MOD_TYPE[
-      getModuleType(attachedModule.moduleModel)
-    ]?.filter(
-      slot =>
-        !occupiedCutouts.some(
-          (occCutout: CutoutConfig) =>
-            occCutout.cutoutId === FLEX_CUTOUT_BY_SLOT_ID[slot]
-        )
-    ) ?? []
+  const {
+    currentStep,
+    currentStepIndex,
+    totalStepCount,
+    handleCleanUpAndClose,
+    wizardFlowBaseProps,
+    buildFlowForSelectedModule,
+    deckConfigProps,
+  } = useInitModuleFlow({closeFlow, attachedModule, onComplete})
 
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
-  const totalStepCount = moduleCalibrationSteps.length - 1
-  const currentStep = moduleCalibrationSteps?.[currentStepIndex]
+  useEffect(() => {
+    if (attachedModule != null) {
+      buildFlowForSelectedModule(attachedModule)
+    }
+  }, [])
 
-  const goBack = (): void => {
-    setCurrentStepIndex(
-      currentStepIndex === 0 ? currentStepIndex : currentStepIndex - 1
-    )
-  }
-  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
-    string | null
-  >(null)
+  // add use effect to call build flow if there is a module passed in at launch
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
-  // we should start checking for run deletion only after the maintenance run is created
-  // and the useCurrentRun poll has returned that created id
-  const [
-    monitorMaintenanceRunForDeletion,
-    setMonitorMaintenanceRunForDeletion,
-  ] = useState<boolean>(false)
 
-  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
-    refetchInterval: RUN_REFETCH_INTERVAL,
-    enabled: createdMaintenanceRunId != null,
-  })
-  const {
-    chainRunCommands,
-    isCommandMutationLoading,
-  } = useChainMaintenanceCommands()
-
-  const {
-    createTargetedMaintenanceRun,
-    isLoading: isCreateLoading,
-  } = useCreateTargetedMaintenanceRunMutation({
-    onSuccess: (response: { data: { id: SetStateAction<string | null> } }) => {
-      setCreatedMaintenanceRunId(response.data.id)
-    },
-  })
-
-  // this will close the modal in case the run was deleted by the terminate
-  // activity modal on the ODD
-  useEffect(() => {
-    if (
-      createdMaintenanceRunId !== null &&
-      maintenanceRunData?.data.id === createdMaintenanceRunId
-    ) {
-      setMonitorMaintenanceRunForDeletion(true)
-    }
-    if (
-      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
-      monitorMaintenanceRunForDeletion
-    ) {
-      closeFlow()
-    }
-  }, [
-    maintenanceRunData?.data.id,
-    createdMaintenanceRunId,
-    monitorMaintenanceRunForDeletion,
-    closeFlow,
-  ])
-
-  const [errorMessage, setErrorMessage] = useState<null | string>(null)
-  const [isExiting, setIsExiting] = useState<boolean>(false)
-  const proceed = (): void => {
-    if (!isCommandMutationLoading) {
-      setCurrentStepIndex(
-        currentStepIndex !== totalStepCount
-          ? currentStepIndex + 1
-          : currentStepIndex
-      )
-    }
-  }
-  const handleClose = (): void => {
-    setIsExiting(false)
-    closeFlow()
-    if (onComplete != null) onComplete()
-  }
-
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => {
-      handleClose()
-    },
-    onError: () => {
-      handleClose()
-    },
-  })
-
-  const handleCleanUpAndClose = (): void => {
-    setIsExiting(true)
-    if (maintenanceRunData?.data.id == null) handleClose()
-    else {
-      chainRunCommands(
-        maintenanceRunData?.data.id as string,
-        [{ commandType: 'home' as const, params: {} }],
-        false
-      )
-        .then(() => {
-          deleteMaintenanceRun(maintenanceRunData?.data.id)
-        })
-        .catch(error => {
-          console.error(error.message)
-          handleClose()
-        })
-    }
-  }
-
-  const [isRobotMoving, setIsRobotMoving] = useState<boolean>(false)
-
-  useEffect(() => {
-    if (isCommandMutationLoading || isExiting) {
-      setIsRobotMoving(true)
-    } else {
-      setIsRobotMoving(false)
-    }
-  }, [isCommandMutationLoading, isExiting])
-
-  let chainMaintenanceRunCommands
-
-  if (maintenanceRunData?.data.id != null) {
-    chainMaintenanceRunCommands = (
-      commands: CreateCommand[],
-      continuePastCommandFailure: boolean
-    ): Promise<CommandData[]> =>
-      chainRunCommands(
-        maintenanceRunData?.data.id as string,
-        commands,
-        continuePastCommandFailure
-      )
-  }
-  if (
-    currentStep == null ||
-    attachedPipette?.data.calibratedOffset?.last_modified == null
-  )
-    return null
-
-  const maintenanceRunId =
-    maintenanceRunData?.data.id != null &&
-    maintenanceRunData?.data.id === createdMaintenanceRunId
-      ? createdMaintenanceRunId
-      : undefined
-  const calibrateBaseProps = {
-    attachedPipette,
-    chainRunCommands: chainMaintenanceRunCommands,
-    isRobotMoving,
-    proceed,
-    maintenanceRunId,
-    goBack,
-    setErrorMessage,
-    errorMessage,
-    isOnDevice,
-    attachedModule,
-    isExiting,
-  }
-
-  let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (isPrepCommandLoading) {
-    modalContent = (
-      <SimpleWizardInProgressBody
-        description={t('prepping_module', {
-          module: getModuleDisplayName(attachedModule.moduleModel),
-        })}
-      />
+  if (attachedModule == null) {
+    //arbitrary step count before we know how many there will be
+    return (
+      <ModuleWizardScreen
+        isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+        handleCleanUpAndClose={handleCleanUpAndClose}
+        currentStepIndex={0}
+        totalStepCount={5}
+      >
+        <>
+          CHOOSE MODULE SCREEN PROCEED FUNCTION HERE WILL BE INITIALIZE MODULE
+          FLOW HOOK
+        </>
+      </ModuleWizardScreen>
+    )
+  } else if (isPrepCommandLoading || currentStep == null ) {
+    return (
+      <ModuleWizardScreen
+        isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+        handleCleanUpAndClose={handleCleanUpAndClose}
+        currentStepIndex={currentStepIndex}
+        totalStepCount={totalStepCount}
+      >
+        <SimpleWizardInProgressBody
+          // description={t('prepping_module', {
+          //   module: getModuleDisplayName(attachedModule.moduleModel),
+          // })}
+        />
+      </ModuleWizardScreen>
     )
   } else if (
     prepCommandErrorMessage != null ||
-    errorMessage != null ||
-    maintenanceRunData?.data.status === RUN_STATUS_FAILED
+    wizardFlowBaseProps.errorMessage != null
+    // maintenanceRunData?.data.status === RUN_STATUS_FAILED
   ) {
-    modalContent = (
-      <SimpleWizardBody
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t(
-          prepCommandErrorMessage != null
-            ? 'error_prepping_module'
-            : 'error_during_calibration'
-        )}
-        subHeader={
-          prepCommandErrorMessage != null ? (
-            prepCommandErrorMessage
-          ) : (
-            <Trans
-              t={t}
-              i18nKey={'branded:module_calibration_failed'}
-              values={{ error: errorMessage }}
-              components={{
-                block: <LegacyStyledText as="p" />,
-              }}
+    // TODO: change this error header to match designs
+    return (
+      <ModuleWizardScreen
+        isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+        handleCleanUpAndClose={handleCleanUpAndClose}
+        currentStepIndex={currentStepIndex}
+        totalStepCount={totalStepCount}
+      >
+        <SimpleWizardBody
+          isSuccess={false}
+          iconColor={COLORS.red50}
+          header={t(
+            prepCommandErrorMessage != null
+              ? 'error_prepping_module'
+              : 'error_during_calibration'
+          )}
+          subHeader={
+            prepCommandErrorMessage != null ? (
+              prepCommandErrorMessage
+            ) : (
+              <Trans
+                t={t}
+                i18nKey={'branded:module_calibration_failed'}
+                values={{ error: wizardFlowBaseProps.errorMessage }}
+                components={{
+                  block: <LegacyStyledText as="p" />,
+                }}
+              />
+            )
+          }
+        />
+      </ModuleWizardScreen>
+    )
+  } else if (wizardFlowBaseProps.isExiting) {
+    return (
+      <ModuleWizardScreen
+        isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+        handleCleanUpAndClose={handleCleanUpAndClose}
+        currentStepIndex={currentStepIndex}
+        totalStepCount={totalStepCount}
+      >
+        <SimpleWizardInProgressBody
+          description={t('stand_back_robot_in_motion')}
+        />
+      </ModuleWizardScreen>
+    )
+  } else if (attachedModule != null) {
+    switch (currentStep.section) {
+      case SECTIONS.BEFORE_BEGINNING:
+        return (
+          <ModuleWizardScreen
+            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+            handleCleanUpAndClose={handleCleanUpAndClose}
+            currentStepIndex={currentStepIndex}
+            totalStepCount={totalStepCount}
+          >
+            <BeforeBeginning {...currentStep} {...wizardFlowBaseProps} />
+          </ModuleWizardScreen>
+        )
+      case SECTIONS.SELECT_LOCATION:
+        return (
+          <ModuleWizardScreen
+            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+            handleCleanUpAndClose={handleCleanUpAndClose}
+            currentStepIndex={currentStepIndex}
+            totalStepCount={totalStepCount}
+          >
+            <SelectLocation
+              {...currentStep}
+              {...wizardFlowBaseProps}
+              {...deckConfigProps}
+              isLoadedInRun={isLoadedInRun}
             />
-          )
-        }
-      />
-    )
-  } else if (isExiting) {
-    modalContent = (
-      <SimpleWizardInProgressBody
-        description={t('stand_back_robot_in_motion')}
-      />
-    )
-  } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
-    modalContent = <BeforeBeginning {...currentStep} {...calibrateBaseProps} />
-  } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
-    modalContent = (
-      <SelectLocation
-        {...currentStep}
-        {...calibrateBaseProps}
-        availableSlotNames={availableSlotNames}
-        deckConfig={deckConfig}
-        isLoadedInRun={isLoadedInRun}
-        occupiedCutouts={occupiedCutouts}
-        configuredFixtureIdByCutoutId={fixtureIdByCutoutId}
-      />
-    )
-  } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {
-    modalContent = (
-      <PlaceAdapter
-        {...currentStep}
-        {...calibrateBaseProps}
-        deckConfig={deckConfig}
-        setCreatedAdapterId={setCreatedAdapterId}
-        createMaintenanceRun={createTargetedMaintenanceRun}
-        isCreateLoading={isCreateLoading}
-        createdMaintenanceRunId={createdMaintenanceRunId}
-      />
-    )
-  } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
-    modalContent = (
-      <AttachProbe
-        {...currentStep}
-        {...calibrateBaseProps}
-        deckConfig={deckConfig}
-        adapterId={createdAdapterId}
-        fixtureIdByCutoutId={fixtureIdByCutoutId}
-      />
-    )
-  } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
-    modalContent = <DetachProbe {...currentStep} {...calibrateBaseProps} />
-  } else if (currentStep.section === SECTIONS.SUCCESS) {
-    modalContent = (
-      <Success
-        {...currentStep}
-        {...calibrateBaseProps}
-        isRobotMoving={isRobotMoving}
-        proceed={isRobotMoving ? () => {} : handleCleanUpAndClose}
-      />
-    )
+          </ModuleWizardScreen>
+        )
+      case SECTIONS.PLACE_ADAPTER:
+        return (
+          <ModuleWizardScreen
+            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+            handleCleanUpAndClose={handleCleanUpAndClose}
+            currentStepIndex={currentStepIndex}
+            totalStepCount={totalStepCount}
+          >
+            <PlaceAdapter
+              {...currentStep}
+              {...wizardFlowBaseProps}
+              deckConfig={deckConfigProps.deckConfig}
+              setCreatedAdapterId={setCreatedAdapterId}
+              // createMaintenanceRun={createTargetedMaintenanceRun}
+              isCreateLoading={false}
+              // createdMaintenanceRunId={false}
+            />
+          </ModuleWizardScreen>
+        )
+      case SECTIONS.ATTACH_PROBE:
+        return (
+          <ModuleWizardScreen
+            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+            handleCleanUpAndClose={handleCleanUpAndClose}
+            currentStepIndex={currentStepIndex}
+            totalStepCount={totalStepCount}
+          >
+            <AttachProbe
+              {...currentStep}
+              {...wizardFlowBaseProps}
+              adapterId={createdAdapterId}
+              deckConfig={deckConfigProps.deckConfig}
+              fixtureIdByCutoutId={
+                deckConfigProps.configuredFixtureIdByCutoutId
+              }
+            />
+          </ModuleWizardScreen>
+        )
+      case SECTIONS.DETACH_PROBE:
+        return (
+          <ModuleWizardScreen
+            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+            handleCleanUpAndClose={handleCleanUpAndClose}
+            currentStepIndex={currentStepIndex}
+            totalStepCount={totalStepCount}
+          >
+            <DetachProbe {...currentStep} {...wizardFlowBaseProps} />
+          </ModuleWizardScreen>
+        )
+
+      case SECTIONS.SUCCESS:
+        return (
+          <ModuleWizardScreen
+            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+            handleCleanUpAndClose={handleCleanUpAndClose}
+            currentStepIndex={currentStepIndex}
+            totalStepCount={totalStepCount}
+          >
+            <Success
+              {...currentStep}
+              {...wizardFlowBaseProps}
+              isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+              proceed={
+                wizardFlowBaseProps.isRobotMoving
+                  ? () => {}
+                  : handleCleanUpAndClose
+              }
+            />
+          </ModuleWizardScreen>
+        )
+      case SECTIONS.CHECK_INSTALLATION_PINS:
+        return (
+          <ModuleWizardScreen
+            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+            handleCleanUpAndClose={handleCleanUpAndClose}
+            currentStepIndex={currentStepIndex}
+            totalStepCount={totalStepCount}
+          >
+            <>Check installation pins</>
+          </ModuleWizardScreen>
+        )
+      case SECTIONS.CLOSE_DOOR:
+        return (
+          <ModuleWizardScreen
+            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+            handleCleanUpAndClose={handleCleanUpAndClose}
+            currentStepIndex={currentStepIndex}
+            totalStepCount={totalStepCount}
+          >
+            <>Close robot door</>
+          </ModuleWizardScreen>
+        )
+      case SECTIONS.INSTALL_SHUTTLE:
+        return (
+          <ModuleWizardScreen
+            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+            handleCleanUpAndClose={handleCleanUpAndClose}
+            currentStepIndex={currentStepIndex}
+            totalStepCount={totalStepCount}
+          >
+            <>Install shuttle</>
+          </ModuleWizardScreen>
+        )
+      case SECTIONS.UPDATE_FIRMWARE:
+        return (
+          <ModuleWizardScreen
+            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+            handleCleanUpAndClose={handleCleanUpAndClose}
+            currentStepIndex={currentStepIndex}
+            totalStepCount={totalStepCount}
+          >
+            <>Update firmware</>
+          </ModuleWizardScreen>
+        )
+      default:
+        return null
+    }
   }
-
-  const wizardHeader = (
-    <WizardHeader
-      exitDisabled={isRobotMoving}
-      title={t('module_calibration')}
-      currentStep={currentStepIndex}
-      totalSteps={totalStepCount}
-      onExit={isRobotMoving ? undefined : handleCleanUpAndClose}
-    />
-  )
-
-  return createPortal(
-    isOnDevice ? (
-      <ModalShell>
-        {wizardHeader}
-        {modalContent}
-      </ModalShell>
-    ) : (
-      <ModalShell width="47rem" height="auto" header={wizardHeader}>
-        {modalContent}
-      </ModalShell>
-    ),
-    getTopPortalEl()
-  )
 }

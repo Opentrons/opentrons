@@ -10,6 +10,11 @@ export type ModuleCalibrationWizardStep =
   | AttachProbeStep
   | DetachProbeStep
   | SuccessStep
+  | SelectModuleStep
+  | CloseDoorStep
+  | InstallShuttleStep
+  | UpdateFirmwareStep
+  | CheckInstallationPinsStep
 
 export interface ModuleCalibrationWizardStepProps {
   proceed: () => void
@@ -27,10 +32,25 @@ export interface ModuleCalibrationWizardStepProps {
   isOnDevice: boolean | null
 }
 
-export type ModuleWizardFlow = typeof FLOWS.CALIBRATE
+export type ModuleWizardFlow = typeof FLOWS.SETUP
 
 export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
+}
+export interface SelectModuleStep {
+  section: typeof SECTIONS.SELECT_MODULE
+}
+export interface CloseDoorStep {
+  section: typeof SECTIONS.CLOSE_DOOR
+}
+export interface InstallShuttleStep {
+  section: typeof SECTIONS.INSTALL_SHUTTLE
+}
+export interface UpdateFirmwareStep {
+  section: typeof SECTIONS.UPDATE_FIRMWARE
+}
+export interface CheckInstallationPinsStep {
+  section: typeof SECTIONS.CHECK_INSTALLATION_PINS
 }
 export interface SelectLocationStep {
   section: typeof SECTIONS.SELECT_LOCATION

@@ -44,14 +44,14 @@ import type { ModuleCalibrationWizardStepProps } from './types'
 interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration
   setCreatedAdapterId: (adapterId: string) => void
-  createMaintenanceRun: UseMutateFunction<
-    MaintenanceRun,
-    AxiosError<any>,
-    CreateMaintenanceRunData,
-    unknown
-  >
+  // createMaintenanceRun: UseMutateFunction<
+  //   MaintenanceRun,
+  //   AxiosError<any>,
+  //   CreateMaintenanceRunData,
+  //   unknown
+  // >
   isCreateLoading: boolean
-  createdMaintenanceRunId: string | null
+  // createdMaintenanceRunId: string | null
 }
 
 export const BODY_STYLE = css`
@@ -75,16 +75,16 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     attachedPipette,
     isRobotMoving,
     maintenanceRunId,
-    createMaintenanceRun,
+    // createMaintenanceRun,
     isCreateLoading,
-    createdMaintenanceRunId,
+    // createdMaintenanceRunId,
   } = props
   const { t } = useTranslation('module_wizard_flows')
-  useEffect(() => {
-    if (createdMaintenanceRunId == null) {
-      createMaintenanceRun({})
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (createdMaintenanceRunId == null) {
+  //     createMaintenanceRun({})
+  //   }
+  // }, [])
   const mount = attachedPipette.mount
   const cutoutId = deckConfig.find(
     cc =>
