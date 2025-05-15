@@ -44,13 +44,13 @@ TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
         StackerAxis.X: {
             "SPEED": {"MIN": 200, "MAX": 200, "INC": 50},
             "ACCEL": {"MIN": 1500, "MAX": 1500, "INC": 500},
-            "CURRENT": {"MIN": 1.0, "MAX": 1.5, "INC": 0.1},
+            "CURRENT": {"MIN": 1.2, "MAX": 1.2, "INC": 0.1},
             "MAX_SPEED_DISCONTINUITY": {"MIN": 5, "MAX": 80, "INC": 5}
         },
         StackerAxis.Z: {
             "SPEED": {"MIN": 150, "MAX": 150, "INC": 50},
             "ACCEL": {"MIN": 500, "MAX": 500, "INC": 10},
-            "CURRENT": {"MIN": 1.3, "MAX": 1.5, "INC": 0.1},
+            "CURRENT": {"MIN": 1.5, "MAX": 1.5, "INC": 0.1},
             "MAX_SPEED_DISCONTINUITY": {"MIN": 55, "MAX": 50, "INC": 5}
         },
         StackerAxis.L: {

@@ -86,11 +86,12 @@ async def force_func(fg_var, sg_value, trial, axis, timer, timeout):
         os.makedirs(dir)
 
     # Get speed and current from configuration 
-    speed = STACKER_MOTION_CONFIG[axis]['move'].max_speed
-    current = STACKER_MOTION_CONFIG[axis]['move'].current
-
+    # speed = STACKER_MOTION_CONFIG[axis]['move'].max_speed
+    # current = STACKER_MOTION_CONFIG[axis]['move'].current
+    # print(speed)
+    # print(current)
     # Create the file name based on parameters
-    file_name = f'{axis}_SG_val_{sg_value}_Speed_{speed}_{current}_Amps.csv'
+    file_name = f'{axis}_SG_val_{sg_value}.csv'
     print(f"File Name: {file_name}")
     # Open the file and write the data
     with open(dir + file_name, 'a', newline = '') as file:
@@ -128,7 +129,6 @@ async def move(s: Any, axis: StackerAxis, direction: Direction, distance: float)
         return resp
     except Exception as e:
         print(f"Error in move: {e}")
-        print(f"resp: {resp}")
         return e
     except FlexStackerStallError as e:
         print(f"Motor Stall detected: {e}")
@@ -163,7 +163,8 @@ async def main(args) -> None:
     # api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating = False)
     api = await OT3API.build_hardware_controller(loop=asyncio.get_running_loop())
     if args.gauge:
-        force_gauge = await mark10.Mark10.create('/dev/ttyUSB0', 115200, loop=asyncio.get_running_loop())
+        force_gauge = await mark10.Mark10.create('/dev/ttyUSB1', 115200, loop=asyncio.get_running_loop())
+        print(f"Force Gauge: {force_gauge}")
     print(f"Stackers: {api.attached_modules} \n")
     # logger.info(f"Stackers: {api.attached_modules} \n")
     if not api.attached_modules:
@@ -195,6 +196,7 @@ async def main(args) -> None:
             print(f"Cycle: {c}", "SG Value: ", sg_value)
             tasks_to_gather = [move_task]  # Start with move_task always included
             if args.gauge:
+                print(f"Force Gauge: {force_gauge}")
                 fg_task = asyncio.create_task(force_func(force_gauge, sg_value, c, test_axis, t, timeout))
                 tasks_to_gather.append(fg_task)  # Add fg_task if force_gauge is True
             try:
@@ -258,10 +260,12 @@ async def repeatablity_test(args) -> None:
             print(f"Unknown test type: {args.test}")
             return  # Or handle the unknown test case appropriately
         if args.gauge:
+            print(f"Force Gauge: {force_gauge}")
             fg_task = asyncio.create_task(force_func(force_gauge, sg_value, c, test_axis, t, timeout))
         print(f"Cycle: {c}")
         try:
             if args.gauge:
+                print(f"Force Gauge: {force_gauge}")
                 await asyncio.gather(move_task, fg_task)
             else:
                 await asyncio.gather(move_task)
