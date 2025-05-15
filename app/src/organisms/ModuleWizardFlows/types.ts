@@ -9,6 +9,7 @@ export type ModuleCalibrationWizardStep =
   | PlaceAdapterStep
   | AttachProbeStep
   | DetachProbeStep
+  | PlaceShuttleStep
   | SuccessStep
 
 export interface ModuleCalibrationWizardStepProps {
@@ -43,6 +44,9 @@ export interface AttachProbeStep {
 }
 export interface DetachProbeStep {
   section: typeof SECTIONS.DETACH_PROBE
+}
+export interface PlaceShuttleStep {
+  section: typeof SECTIONS.PLACE_SHUTTLE
 }
 export interface SuccessStep {
   section: typeof SECTIONS.SUCCESS
