@@ -49,14 +49,14 @@ export function ActiveLabwareControls(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
   const fullStack = getFullStackFromLabwares(activeDeckSetup.labware, itemId)
-  const noContents = getIsWellContentsEmpty(
+  const hasNoContents = getIsWellContentsEmpty(
     allWellContentsForActiveItem,
     fullStack[0]
   )
 
   if (
     (terminalItemId != null && terminalItemId !== END_TERMINAL_ITEM_ID) ||
-    noContents ||
+    hasNoContents ||
     slotPosition == null
   ) {
     return null

@@ -55,7 +55,7 @@ export function OffDeckControls(
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
-  const noContents = getIsWellContentsEmpty(
+  const hasNoContents = getIsWellContentsEmpty(
     allWellContentsForActiveItem,
     labwareId
   )
@@ -64,7 +64,7 @@ export function OffDeckControls(
     slotPosition === null ||
     isSelected ||
     ((terminalItemId == null || terminalItemId !== START_TERMINAL_ITEM_ID) &&
-      noContents)
+      hasNoContents)
   ) {
     return null
   }
