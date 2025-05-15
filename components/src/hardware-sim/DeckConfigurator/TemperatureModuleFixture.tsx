@@ -19,6 +19,7 @@ import type {
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
+import {SINGLE_LEFT_CUTOUTS} from '@opentrons/shared-data'
 
 // TODO(BC, 2024-03-21): This component is almost identical to HeaterShakerFixture, consider consolidating?
 
@@ -57,11 +58,7 @@ export function TemperatureModuleFixture(
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
 
-  const isColumnOne =
-    fixtureLocation === 'cutoutA1' ||
-    fixtureLocation === 'cutoutB1' ||
-    fixtureLocation === 'cutoutC1' ||
-    fixtureLocation === 'cutoutD1'
+  const isColumnOne = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
   const xAdjustment = isColumnOne
     ? COLUMN_1_X_ADJUSTMENT
     : COLUMN_DEFAULT_X_ADJUSTMENT

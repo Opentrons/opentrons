@@ -31,6 +31,7 @@ interface FlexStackerFixtureProps {
   selected?: boolean
 }
 
+// todo(should we move this to translations? )
 const FLEX_STACKER_FIXTURE_DISPLAY_NAME = 'Stacker'
 const FLEX_STACKER_WASTE_CHUTE_DISPLAY_NAME = 'Stacker + Waste chute'
 const FLEX_STACKER_MAG_BLOCK_DISPLAY_NAME = 'Stacker + Mag Block'

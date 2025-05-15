@@ -15,10 +15,11 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
-import type {
-  CutoutFixtureId,
-  CutoutId,
-  DeckDefinition,
+import {
+  SINGLE_LEFT_CUTOUTS,
+  type CutoutFixtureId,
+  type CutoutId,
+  type DeckDefinition,
 } from '@opentrons/shared-data'
 
 interface TrashBinConfigFixtureProps {
@@ -54,11 +55,7 @@ export function TrashBinConfigFixture(
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = trashBinCutout?.position ?? []
 
-  const isColumnOne =
-    fixtureLocation === 'cutoutA1' ||
-    fixtureLocation === 'cutoutB1' ||
-    fixtureLocation === 'cutoutC1' ||
-    fixtureLocation === 'cutoutD1'
+  const isColumnOne = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
   const xAdjustment = isColumnOne
     ? COLUMN_1_X_ADJUSTMENT
     : COLUMN_DEFAULT_X_ADJUSTMENT
