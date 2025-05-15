@@ -4,13 +4,12 @@ import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  STAGING_AREA_FIXTURE_WIDTH,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   WASTE_CHUTE_DISPLAY_NAME,
   Y_ADJUSTMENT,
 } from './constants'
@@ -41,7 +40,6 @@ export function WasteChuteConfigFixture(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
-    hasStagingAreas = false,
     selected = false,
   } = props
 
@@ -62,11 +60,7 @@ export function WasteChuteConfigFixture(
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={
-        hasStagingAreas
-          ? STAGING_AREA_FIXTURE_WIDTH
-          : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
-      }
+      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}

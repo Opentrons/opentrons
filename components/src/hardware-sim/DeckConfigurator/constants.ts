@@ -13,15 +13,15 @@ export const THERMOCYCLER_FIXTURE_HEIGHT = 290.0
 export const COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH = 243.5
 export const COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH = 159.0
 export const THERMOCYCLER_FIXTURE_WIDTH = 243.5
-export const STAGING_AREA_FIXTURE_WIDTH = 314.5
 
 export const COLUMN_1_X_ADJUSTMENT = -100
 export const COLUMN_DEFAULT_X_ADJUSTMENT = -15.5
 export const Y_ADJUSTMENT = -8
 
-export const STAGING_AREA_DISPLAY_NAME = 'Staging area'
+// does this need translations? 
+export const STAGING_AREA_DISPLAY_NAME = 'Stage'
 export const TRASH_BIN_DISPLAY_NAME = 'Trash bin'
-export const WASTE_CHUTE_DISPLAY_NAME = 'Waste chute'
+export const WASTE_CHUTE_DISPLAY_NAME = 'Waste'
 
 // common config styles for staging area, trash bin, waste chute
 export const CONFIG_STYLE_READ_ONLY = css`

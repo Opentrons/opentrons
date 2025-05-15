@@ -9,7 +9,7 @@ import {
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  STAGING_AREA_FIXTURE_WIDTH,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
@@ -61,7 +61,7 @@ export function AbsorbanceReaderFixture(
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={STAGING_AREA_FIXTURE_WIDTH}
+      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}

@@ -12,7 +12,6 @@ import {
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  STAGING_AREA_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
@@ -69,9 +68,7 @@ export function MagneticBlockFixture(
         : COLUMN_DEFAULT_X_ADJUSTMENT)
   const width = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
       ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
-      : (SINGLE_RIGHT_CUTOUTS.includes(fixtureLocation) ? (hasStagingArea ?? true
-        ? STAGING_AREA_FIXTURE_WIDTH
-        : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH) : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH)
+      : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
 
   let displayName = hasStagingArea
     ? STAGING_AREA_WITH_MAGNETIC_BLOCK_DISPLAY_NAME

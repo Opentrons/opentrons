@@ -1,5 +1,3 @@
-import { COLUMN_4_AA } from '@opentrons/shared-data'
-
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
@@ -12,7 +10,7 @@ import {
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
   STAGING_AREA_DISPLAY_NAME,
-  STAGING_AREA_FIXTURE_WIDTH,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
@@ -48,8 +46,6 @@ export function StagingAreaConfigFixture(
     selected = false,
   } = props
 
-  console.log('addressableArea: ', addressableArea)
-
   const stagingAreaCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
@@ -69,7 +65,7 @@ export function StagingAreaConfigFixture(
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={STAGING_AREA_FIXTURE_WIDTH}
+      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
