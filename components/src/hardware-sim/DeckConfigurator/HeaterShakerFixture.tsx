@@ -6,7 +6,7 @@ import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_X_ADJUSTMENT,
   COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_3_X_ADJUSTMENT,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
@@ -64,7 +64,7 @@ export function HeaterShakerFixture(
     fixtureLocation === 'cutoutD1'
   const xAdjustment = isColumnOne
     ? COLUMN_1_X_ADJUSTMENT
-    : COLUMN_3_X_ADJUSTMENT
+    : COLUMN_DEFAULT_X_ADJUSTMENT
   const x = xSlotPosition + xAdjustment
 
   const y = ySlotPosition + Y_ADJUSTMENT

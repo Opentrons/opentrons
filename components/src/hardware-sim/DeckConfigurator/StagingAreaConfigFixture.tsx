@@ -6,7 +6,7 @@ import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_3_X_ADJUSTMENT,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
@@ -65,7 +65,7 @@ export function StagingAreaConfigFixture(
   const [xSlotPosition = 0, ySlotPosition = 0] =
     stagingAreaCutout?.position ?? []
 
-  const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT + xOffset
+  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT + xOffset
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE

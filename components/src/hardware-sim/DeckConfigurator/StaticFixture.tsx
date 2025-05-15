@@ -3,7 +3,7 @@ import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_2_X_ADJUSTMENT,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_READ_ONLY,
   FIXTURE_HEIGHT,
   Y_ADJUSTMENT,
@@ -35,7 +35,7 @@ export function StaticFixture(props: StaticFixtureProps): JSX.Element {
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = staticCutout?.position ?? []
   const y = ySlotPosition + Y_ADJUSTMENT
-  const x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
+  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
 
   return (
     <RobotCoordsForeignObject

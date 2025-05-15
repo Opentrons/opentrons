@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
 
-import { COLUMN_4_AA } from '@opentrons/shared-data'
+import { COLUMN_4_AA, SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
@@ -12,9 +12,8 @@ import {
   COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
   COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_2_X_ADJUSTMENT,
   COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_3_X_ADJUSTMENT,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   FIXTURE_HEIGHT,
   Y_ADJUSTMENT,
 } from './constants'
@@ -30,10 +29,7 @@ interface EmptyConfigFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   addressableArea: AddressableAreaName
-  handleClickAdd: (
-    fixtureLocation: CutoutId,
-    addressableArea: AddressableAreaName
-  ) => void
+  handleClickAdd: (fixtureLocation: CutoutId) => void
 }
 
 export function EmptyConfigFixture(
@@ -56,39 +52,19 @@ export function EmptyConfigFixture(
    */
   const [xSlotPosition = 0, ySlotPosition = 0] =
     standardSlotCutout?.position ?? []
-  let x = xSlotPosition
   const offsetVector = deckDefinition.locations.addressableAreas.find(
     (aaItem: AddressableArea) => aaItem.id === addressableArea
   )?.offsetFromCutoutFixture ?? [0, 0, 0]
-  const xOffset = COLUMN_4_AA.includes(addressableArea) ? offsetVector[0] : 0
-  let width = 0
-  switch (fixtureLocation) {
-    case 'cutoutA1':
-    case 'cutoutB1':
-    case 'cutoutC1':
-    case 'cutoutD1': {
-      x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
-      width = COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
-      break
-    }
-    case 'cutoutA2':
-    case 'cutoutB2':
-    case 'cutoutC2':
-    case 'cutoutD2': {
-      x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
-      width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
-      break
-    }
-    case 'cutoutA3':
-    case 'cutoutB3':
-    case 'cutoutC3':
-    case 'cutoutD3': {
-      x = xSlotPosition + COLUMN_3_X_ADJUSTMENT + xOffset
-      width = COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
-      break
-    }
-  }
 
+  const x =
+    xSlotPosition +
+    (SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
+      ? COLUMN_1_X_ADJUSTMENT
+      : COLUMN_DEFAULT_X_ADJUSTMENT) +
+    offsetVector[0]
+  const width = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
+    ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
+    : COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
   const y = ySlotPosition + Y_ADJUSTMENT
 
   return (
@@ -103,7 +79,7 @@ export function EmptyConfigFixture(
       <Btn
         css={EMPTY_CONFIG_STYLE}
         onClick={() => {
-          handleClickAdd(fixtureLocation, addressableArea)
+          handleClickAdd(fixtureLocation)
         }}
         data-testid={fixtureLocation}
       >

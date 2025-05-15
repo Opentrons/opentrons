@@ -17,8 +17,7 @@ export const THERMOCYCLER_FIXTURE_WIDTH = 243.5
 export const STAGING_AREA_FIXTURE_WIDTH = 314.5
 
 export const COLUMN_1_X_ADJUSTMENT = -100
-export const COLUMN_2_X_ADJUSTMENT = -15.5
-export const COLUMN_3_X_ADJUSTMENT = -15.5
+export const COLUMN_DEFAULT_X_ADJUSTMENT = -15.5
 export const Y_ADJUSTMENT = -8
 
 export const STAGING_AREA_DISPLAY_NAME = 'Staging area'

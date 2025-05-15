@@ -7,9 +7,8 @@ import {
   COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
   COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_2_X_ADJUSTMENT,
   COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_3_X_ADJUSTMENT,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
@@ -80,7 +79,7 @@ export function MagneticBlockFixture(
     case 'cutoutB2':
     case 'cutoutC2':
     case 'cutoutD2': {
-      x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
+      x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
       width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
       displayName = 'Mag'
       break
@@ -89,7 +88,7 @@ export function MagneticBlockFixture(
     case 'cutoutB3':
     case 'cutoutC3':
     case 'cutoutD3': {
-      x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
+      x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
       width = hasStagingArea
         ? STAGING_AREA_FIXTURE_WIDTH
         : COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH

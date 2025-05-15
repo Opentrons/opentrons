@@ -5,7 +5,7 @@ import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_3_X_ADJUSTMENT,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
@@ -56,7 +56,7 @@ export function WasteChuteConfigFixture(
   const [xSlotPosition = 0, ySlotPosition = 0] =
     wasteChuteCutout?.position ?? []
 
-  const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
+  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
