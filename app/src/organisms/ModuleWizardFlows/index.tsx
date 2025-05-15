@@ -37,7 +37,6 @@ import { BeforeBeginning } from './BeforeBeginning'
 import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
 import { DetachProbe } from './DetachProbe'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
-import { InstallShuttle } from './InstallShuttle'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
@@ -348,15 +347,6 @@ export const ModuleWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
     modalContent = <DetachProbe {...currentStep} {...calibrateBaseProps} />
-  } else if (currentStep.section === SECTIONS.INSTALL_SHUTTLE) {
-    modalContent = (
-      <InstallShuttle
-        {...currentStep}
-        {...calibrateBaseProps}
-        deckConfig={deckConfig}
-        fixtureIdByCutoutId={fixtureIdByCutoutId}
-      />
-    )
   } else if (currentStep.section === SECTIONS.SUCCESS) {
     modalContent = (
       <Success
