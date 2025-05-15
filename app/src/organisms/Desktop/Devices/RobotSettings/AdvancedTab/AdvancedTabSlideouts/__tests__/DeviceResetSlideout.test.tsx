@@ -97,8 +97,8 @@ describe('RobotSettings DeviceResetSlideout', () => {
     screen.getByText('Clear pipette offset calibrations')
     screen.getByText('Clear tip length calibrations')
     screen.getByText('Protocol run data')
+    expect(screen.queryByText('labware offset')).toBe(null)
     screen.getByText('Clear protocol run history')
-    screen.getByText('Clear labware offset data')
     screen.getByText('Boot scripts')
     screen.getByText('Clear custom boot scripts')
     screen.getByText('Clear SSH public keys')
@@ -134,6 +134,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
     expect(
       screen.queryByRole('checkbox', { name: 'Clear tip length calibrations' })
     ).toBeNull()
+    screen.getByRole('checkbox', { name: 'Clear labware offset data' })
   })
 
   it('should enable Clear data and restart robot button when checked one checkbox', () => {

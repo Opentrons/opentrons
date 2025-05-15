@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux'
 import sum from 'lodash/sum'
 import { css } from 'styled-components'
 
@@ -23,16 +22,15 @@ import {
   MICRO_LITERS,
 } from '@opentrons/shared-data'
 
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-
 import type { Dispatch, SetStateAction } from 'react'
 import type { IngredInputs } from '../../../labware-ingred/types'
+import type { WellContentsByNumber } from './index'
 
 interface LiquidDetailCardProps {
   liquidInfo: IngredInputs
   liquidId: string
   labwareWellOrdering: string[][]
-  volumeByWell: { [wellName: string]: number }
+  volumesPerLiquid: Record<string, WellContentsByNumber>
   setSelectedValue: Dispatch<SetStateAction<string | undefined>>
   selectedValue?: string
 }
@@ -44,7 +42,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     setSelectedValue,
     selectedValue,
     labwareWellOrdering,
-    volumeByWell,
+    volumesPerLiquid,
   } = props
   const { displayName, displayColor, description } = liquidInfo
   const ACTIVE_STYLE = css`
@@ -52,10 +50,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     border: 1px solid ${COLORS.blue50};
     border-radius: ${BORDERS.borderRadius8};
   `
-  const allLabwareWellContents = useSelector(
-    labwareIngredSelectors.getLiquidsByLabwareId
-  )
-
+  const volumeByWell = volumesPerLiquid[parseInt(selectedValue ?? '0')]
   const volumePerWellRange = getWellRangeForLiquidLabwarePair(
     volumeByWell,
     labwareWellOrdering
@@ -64,14 +59,8 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   const handleSelectedValue = (): void => {
     setSelectedValue(liquidId)
   }
-  const volumePerWell = Object.values(
-    allLabwareWellContents
-  ).flatMap(labwareWithIngred =>
-    Object.values(labwareWithIngred).map(
-      ingred => ingred[liquidId]?.volume ?? 0
-    )
-  )
-  const totalVolume = sum(volumePerWell)
+
+  const totalVolume = sum(Object.values(volumesPerLiquid[parseInt(liquidId)]))
 
   return (
     <Box
@@ -147,7 +136,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                   {well.wellName}
                 </StyledText>
                 <StyledText desktopStyle="captionRegular">
-                  {well.volume} {MICRO_LITERS}
+                  {well.volume.toFixed(1)} {MICRO_LITERS}
                 </StyledText>
               </Flex>
             )

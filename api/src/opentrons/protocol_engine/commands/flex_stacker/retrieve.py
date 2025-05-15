@@ -270,6 +270,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
         if stacker_hw is not None:
             try:
+                stacker_hw.set_stacker_identify(True)
                 await stacker_hw.dispense_labware(labware_height=labware_height)
             except (
                 FlexStackerStallError,
@@ -280,6 +281,9 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 return self.handle_recoverable_error(
                     e, to_retrieve.primaryLabwareId, state_update
                 )
+
+        if stacker_hw is not None:
+            stacker_hw.set_stacker_identify(False)
 
         return SuccessData(
             public=RetrieveResult.model_construct(

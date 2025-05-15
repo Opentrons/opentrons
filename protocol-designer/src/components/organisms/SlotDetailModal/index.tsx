@@ -27,9 +27,10 @@ import { selectors } from '../../../labware-ingred/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
+import { WellTooltip } from '../Labware/WellTooltip'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { getMainPagePortalEl } from '../Portal'
-import { getLiquidIdsOnLabware } from '../utils'
+import { getLiquidIdsOnLabware, getVolumesPerLiquid } from '../utils'
 import { LiquidCardList } from './LiquidCardList'
 
 import type { WellGroup } from '@opentrons/components'
@@ -54,6 +55,7 @@ export const SlotDetailModal = (
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
+  const ingredNames = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   const allIngredientGroupFields = useSelector(
     selectors.allIngredientGroupFields
@@ -69,35 +71,27 @@ export const SlotDetailModal = (
     allWellContentsForActiveItem != null
       ? allWellContentsForActiveItem[labwareId]
       : null
-
   const allWellFill = wellFillFromWellContents(
     wellContents,
     liquidDisplayColors
   )
   const individualIds = getLiquidIdsOnLabware(wellContents)
 
+  const volumesPerLiquid = getVolumesPerLiquid(wellContents, individualIds)
+  const ingedInputs = Object.values(allIngredientGroupFields)
+  const wellFill = Object.values(allWellFill)
+
   const [selectedLiquidId, setSelectedLiquidId] = useState<string | undefined>(
-    Object.values(allWellFill).length > 0
-      ? Object.values(allIngredientGroupFields).find(
-          ingred => ingred.displayColor === Object.values(allWellFill)[0]
-        )?.liquidGroupId
+    wellFill.length > 0
+      ? ingedInputs.find(ingred => wellFill.includes(ingred.displayColor))
+          ?.liquidGroupId ?? ingedInputs[0].liquidGroupId
       : undefined
   )
   const wellContentsWithLiquidId: WellGroup =
     wellContents != null && selectedLiquidId != null
       ? Object.values(wellContents).reduce((acc: WellGroup, wellContents) => {
-          if (wellContents.groupIds[0] === selectedLiquidId) {
+          if (wellContents.groupIds.includes(selectedLiquidId)) {
             acc[wellContents.wellName ?? 'A1'] = null
-          }
-          return acc
-        }, {})
-      : {}
-
-  const volumeByWell: WellContentsByNumber =
-    wellContents != null && selectedLiquidId != null
-      ? Object.values(wellContents).reduce((acc: WellContentsByNumber, wc) => {
-          if (wc.groupIds[0] === selectedLiquidId) {
-            acc[wc.wellName ?? 'A1'] = Object.values(wc.ingreds)[0].volume
           }
           return acc
         }, {})
@@ -114,7 +108,6 @@ export const SlotDetailModal = (
       />
     </Flex>
   )
-
   return createPortal(
     <Modal
       title={modalTitle}
@@ -149,24 +142,40 @@ export const SlotDetailModal = (
               viewBox={`0 0 ${labwareOnDeck.def.dimensions.xDimension} ${labwareOnDeck.def.dimensions.yDimension}`}
             >
               {() => (
-                <g>
-                  <LabwareRender
-                    definition={labwareOnDeck.def}
-                    wellFill={allWellFill}
-                    highlightedWells={wellContentsWithLiquidId}
-                  />
-                </g>
+                <WellTooltip ingredNames={ingredNames}>
+                  {({ makeHandleMouseEnterWell, handleMouseLeaveWell }) => (
+                    <g>
+                      <LabwareRender
+                        onMouseLeaveWell={mouseEventArgs => {
+                          handleMouseLeaveWell(mouseEventArgs)
+                          handleMouseLeaveWell(mouseEventArgs.event)
+                        }}
+                        onMouseEnterWell={({ wellName, event }) => {
+                          if (wellContents !== null) {
+                            makeHandleMouseEnterWell(
+                              wellName,
+                              wellContents[wellName]?.ingreds
+                            )(event)
+                          }
+                        }}
+                        definition={labwareOnDeck.def}
+                        wellFill={allWellFill}
+                        highlightedWells={wellContentsWithLiquidId}
+                      />
+                    </g>
+                  )}
+                </WellTooltip>
               )}
             </RobotWorkSpace>
           </Flex>
           {selectedLiquidId != null ? (
             <LiquidCardList
-              selectedLabwareDefinition={labwareOnDeck.def}
+              selectedLabware={labwareOnDeck}
               selectedLiquidId={selectedLiquidId ?? ''}
               setSelectedLiquidId={setSelectedLiquidId}
               allIngredGroupFields={allIngredientGroupFields}
               individualIds={individualIds}
-              volumeByWell={volumeByWell}
+              volumesPerLiquid={volumesPerLiquid}
             />
           ) : null}
         </Flex>
