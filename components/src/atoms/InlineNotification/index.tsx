@@ -1,26 +1,19 @@
 import { css } from 'styled-components'
 
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Icon, IconProps } from '../../icons'
+import { Box, Btn, Flex, Link, StyleProps } from '../../primitives'
 import {
   ALIGN_CENTER,
-  BORDERS,
-  Box,
-  Btn,
-  COLORS,
   DIRECTION_ROW,
-  Flex,
-  Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
-  Link,
-  RESPONSIVENESS,
-  SPACING,
-  StyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+} from '../../styles'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { StyledText } from '../StyledText'
 
 import type { MouseEventHandler } from 'react'
-import type { IconProps, StyleProps } from '@opentrons/components'
 
 type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 

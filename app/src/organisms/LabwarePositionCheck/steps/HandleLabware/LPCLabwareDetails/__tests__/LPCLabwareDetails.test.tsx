@@ -2,6 +2,8 @@ import { useDispatch } from 'react-redux'
 import { act, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { InlineNotification } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
@@ -46,17 +48,22 @@ vi.mock(
 vi.mock('../OffsetBannerContainer', () => ({
   OffsetBannerContainer: () => <div>MOCK_OFFSET_BANNER_CONTAINER</div>,
 }))
-vi.mock('/app/atoms/InlineNotification', () => ({
-  InlineNotification: vi.fn(({ type, heading, message }) => (
-    <div
-      data-testid="inline-notification"
-      data-type={type}
-      data-heading={heading}
-    >
-      {message}
-    </div>
-  )),
-}))
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InlineNotification>()
+  return {
+    ...actual,
+    InlineNotification: vi.fn(({ type, heading, message }) => (
+      <div
+        data-testid="inline-notification"
+        data-type={type}
+        data-heading={heading}
+      >
+        {message}
+      </div>
+    )),
+  }
+})
+
 vi.mock(
   '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets',
   () => ({
