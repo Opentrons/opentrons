@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
 
-import { COLUMN_4_AA, SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'

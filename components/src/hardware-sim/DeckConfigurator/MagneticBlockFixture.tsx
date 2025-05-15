@@ -16,10 +16,12 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
-import type {
-  CutoutFixtureId,
-  CutoutId,
-  DeckDefinition,
+import {
+  SINGLE_LEFT_CUTOUTS,
+  SINGLE_RIGHT_CUTOUTS,
+  type CutoutFixtureId,
+  type CutoutId,
+  type DeckDefinition,
 } from '@opentrons/shared-data'
 
 interface MagneticBlockFixtureProps {
@@ -60,40 +62,20 @@ export function MagneticBlockFixture(
    */
   const [xSlotPosition = 0, ySlotPosition = 0] =
     standardSlotCutout?.position ?? []
-  let x = xSlotPosition
-  let width = 0
+  const x =
+      xSlotPosition +
+      (SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
+        ? COLUMN_1_X_ADJUSTMENT
+        : COLUMN_DEFAULT_X_ADJUSTMENT)
+  const width = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
+      ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
+      : (SINGLE_RIGHT_CUTOUTS.includes(fixtureLocation) ? (hasStagingArea ?? true
+        ? STAGING_AREA_FIXTURE_WIDTH
+        : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH) : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH)
+
   let displayName = hasStagingArea
     ? STAGING_AREA_WITH_MAGNETIC_BLOCK_DISPLAY_NAME
     : MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME
-  switch (fixtureLocation) {
-    case 'cutoutA1':
-    case 'cutoutB1':
-    case 'cutoutC1':
-    case 'cutoutD1': {
-      x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
-      width = COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
-      break
-    }
-    case 'cutoutA2':
-    case 'cutoutB2':
-    case 'cutoutC2':
-    case 'cutoutD2': {
-      x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
-      width = COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
-      displayName = 'Mag'
-      break
-    }
-    case 'cutoutA3':
-    case 'cutoutB3':
-    case 'cutoutC3':
-    case 'cutoutD3': {
-      x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
-      width = hasStagingArea
-        ? STAGING_AREA_FIXTURE_WIDTH
-        : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
-      break
-    }
-  }
 
   const y = ySlotPosition + Y_ADJUSTMENT
 
