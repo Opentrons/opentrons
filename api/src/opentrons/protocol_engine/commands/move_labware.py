@@ -161,11 +161,7 @@ class GripperMovementError(ErrorOccurrence):
     errorInfo: ErrorDetails
 
 
-_ExecuteReturn = (
-    SuccessData[MoveLabwareResult]
-    | DefinedErrorData[GripperMovementError]
-    | DefinedErrorData[FlexStackerShuttleError]
-)
+_ExecuteReturn = SuccessData[MoveLabwareResult] | DefinedErrorData[GripperMovementError]
 
 
 class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteReturn]):
@@ -185,31 +181,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
         self._equipment = equipment
         self._labware_movement = labware_movement
         self._run_control = run_control
-
-    async def _labware_movement_stacker_validation(
-        self, module_id: str, labware_to_move: str
-    ) -> FlexStackerShuttleError | None:
-        # Validate that a Flex Stacker is in position to receive labware
-        stacker_sub = self._state_view.modules.get_flex_stacker_substate(module_id)
-        stacker_hw = self._equipment.get_module_hardware_api(stacker_sub.module_id)
-        if stacker_hw is not None:
-            try:
-                await stacker_hw.verify_shuttle_location(PlatformState.EXTENDED)
-            except FlexStackerShuttleMissingError as e:
-                return FlexStackerShuttleError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                    errorInfo={"labwareId": labware_to_move},
-                )
-
-        return None
 
     async def execute(self, params: MoveLabwareParams) -> _ExecuteReturn:  # noqa: C901
         """Move a loaded labware to a new location."""
@@ -344,13 +315,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             if module is not None and module.model == ModuleModel.ABSORBANCE_READER_V1:
                 self._state_view.labware.raise_if_labware_incompatible_with_plate_reader(
                     current_labware_definition
-                )
-            if (
-                module is not None
-                and module.model == ModuleModel.FLEX_STACKER_MODULE_V1
-            ):
-                module_location_error = await self._labware_movement_stacker_validation(
-                    module.id, params.labwareId
                 )
 
         # Allow propagation of ModuleNotLoadedError.
@@ -552,7 +516,7 @@ class MoveLabware(
     BaseCommand[
         MoveLabwareParams,
         MoveLabwareResult,
-        GripperMovementError | FlexStackerShuttleError,
+        GripperMovementError,
     ]
 ):
     """A ``moveLabware`` command."""
