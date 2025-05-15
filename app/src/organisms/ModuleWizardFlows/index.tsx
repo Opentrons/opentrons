@@ -10,7 +10,7 @@ import {
 
 import { AttachProbe } from './AttachProbe'
 import { BeforeBeginning } from './BeforeBeginning'
-import {  SECTIONS } from './constants'
+import { SECTIONS } from './constants'
 import { DetachProbe } from './DetachProbe'
 import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
@@ -28,7 +28,6 @@ interface ModuleWizardFlowsProps {
   onComplete?: () => void
   prepCommandErrorMessage?: string
 }
-
 
 export const ModuleWizardFlows = (
   props: ModuleWizardFlowsProps
@@ -51,17 +50,18 @@ export const ModuleWizardFlows = (
     handleCleanUpAndClose,
     wizardFlowBaseProps,
     buildFlowForSelectedModule,
-    deckConfigProps,
-  } = useInitModuleFlow({closeFlow, attachedModule, onComplete})
+    deckConfig,
+  } = useInitModuleFlow({ closeFlow, attachedModule, onComplete })
 
+  // add use effect to call build flow if there is a module passed in at launch
   useEffect(() => {
     if (attachedModule != null) {
       buildFlowForSelectedModule(attachedModule)
     }
   }, [])
 
-  // add use effect to call build flow if there is a module passed in at launch
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
+  if (wizardFlowBaseProps.attachedPipette == null) return null
 
   if (attachedModule == null) {
     //arbitrary step count before we know how many there will be
@@ -78,7 +78,7 @@ export const ModuleWizardFlows = (
         </>
       </ModuleWizardScreen>
     )
-  } else if (isPrepCommandLoading || currentStep == null ) {
+  } else if (isPrepCommandLoading || currentStep == null) {
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
@@ -87,9 +87,9 @@ export const ModuleWizardFlows = (
         totalStepCount={totalStepCount}
       >
         <SimpleWizardInProgressBody
-          // description={t('prepping_module', {
-          //   module: getModuleDisplayName(attachedModule.moduleModel),
-          // })}
+        // description={t('prepping_module', {
+        //   module: getModuleDisplayName(attachedModule.moduleModel),
+        // })}
         />
       </ModuleWizardScreen>
     )
@@ -144,7 +144,7 @@ export const ModuleWizardFlows = (
         />
       </ModuleWizardScreen>
     )
-  } else if (attachedModule != null) {
+  } else if (attachedModule != null && wizardFlowBaseProps.attachedPipette != null) {
     switch (currentStep.section) {
       case SECTIONS.BEFORE_BEGINNING:
         return (
@@ -168,7 +168,7 @@ export const ModuleWizardFlows = (
             <SelectLocation
               {...currentStep}
               {...wizardFlowBaseProps}
-              {...deckConfigProps}
+              deckConfig={deckConfig}
               isLoadedInRun={isLoadedInRun}
             />
           </ModuleWizardScreen>
@@ -184,7 +184,7 @@ export const ModuleWizardFlows = (
             <PlaceAdapter
               {...currentStep}
               {...wizardFlowBaseProps}
-              deckConfig={deckConfigProps.deckConfig}
+              deckConfig={deckConfig}
               setCreatedAdapterId={setCreatedAdapterId}
               // createMaintenanceRun={createTargetedMaintenanceRun}
               isCreateLoading={false}
@@ -204,10 +204,7 @@ export const ModuleWizardFlows = (
               {...currentStep}
               {...wizardFlowBaseProps}
               adapterId={createdAdapterId}
-              deckConfig={deckConfigProps.deckConfig}
-              fixtureIdByCutoutId={
-                deckConfigProps.configuredFixtureIdByCutoutId
-              }
+              deckConfig={deckConfig}
             />
           </ModuleWizardScreen>
         )
