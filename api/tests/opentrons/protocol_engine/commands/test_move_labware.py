@@ -31,7 +31,6 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
     LoadedLabware,
-    LoadedModule,
     LabwareMovementStrategy,
     LabwareOffsetVector,
     LabwareMovementOffsetData,
@@ -42,7 +41,6 @@ from opentrons.protocol_engine.types import (
     NotOnDeckLocationSequenceComponent,
     OFF_DECK_LOCATION,
     LabwareLocationSequence,
-    ModuleModel,
 )
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
@@ -57,13 +55,6 @@ from opentrons.protocol_engine.execution import (
     RunControlHandler,
     LabwareMovementHandler,
 )
-from opentrons_shared_data.errors.exceptions import FlexStackerShuttleMissingError
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.hardware_control.modules import FlexStacker
-from opentrons.hardware_control.modules.types import PlatformState
 
 
 @pytest.fixture(autouse=True)

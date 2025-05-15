@@ -20,10 +20,6 @@ from opentrons_shared_data.errors.exceptions import (
     FailedGripperPickupError,
     LabwareDroppedError,
     StallOrCollisionDetectedError,
-    FlexStackerShuttleMissingError,
-)
-from opentrons.protocol_engine.commands.flex_stacker.common import (
-    FlexStackerShuttleError,
 )
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
@@ -59,9 +55,6 @@ from .command import (
 )
 from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
-
-
-from opentrons.hardware_control.modules.types import PlatformState
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, RunControlHandler, LabwareMovementHandler
