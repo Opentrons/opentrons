@@ -333,16 +333,18 @@ export function DeviceResetSlideout({
                   value={displayedOptions.common.runsHistory}
                   label={t('clear_option_runs_history')}
                 />
-                <CheckboxField
-                  onChange={() => {
-                    const options = cloneDeep(displayedOptions)
-                    options.common.labwareOffsets = !options.common
-                      .labwareOffsets
-                    setDisplayedOptions(options)
-                  }}
-                  value={displayedOptions.common.labwareOffsets}
-                  label={t('clear_option_labware_offsets')}
-                />
+                {isFlex && (
+                  <CheckboxField
+                    onChange={() => {
+                      const options = cloneDeep(displayedOptions)
+                      options.flexOnly.labwareOffsets = !options.flexOnly
+                        .labwareOffsets
+                      setDisplayedOptions(options)
+                    }}
+                    value={displayedOptions.flexOnly.labwareOffsets}
+                    label={t('clear_option_labware_offsets')}
+                  />
+                )}
               </Flex>
             </Box>
             <Box>
@@ -395,13 +397,17 @@ interface DisplayedResetOptionState {
     bootScripts: boolean
     authorizedKeys: boolean
     pipetteOffsetCalibrations: boolean
-    labwareOffsets: boolean
   }
   ot2Only: {
     deckCalibration: boolean
     tipLengthCalibrations: boolean
   }
   flexOnly: {
+    // labwareOffsets, corresponding to the server's /labwareOffsets endpoints, is also
+    // resettable on OT-2, but in practice, there's no data to reset there. On OT-2s,
+    // Labware Position Check never stores offsets into the /labwareOffsets endpoints;
+    // instead it only reuses offsets from prior runs, via the /runs endpoints.
+    labwareOffsets: boolean
     gripperCalibrations: boolean
     moduleCalibrations: boolean
   }
@@ -413,13 +419,13 @@ const ALL_DESELECTED: DisplayedResetOptionState = {
     bootScripts: false,
     authorizedKeys: false,
     pipetteOffsetCalibrations: false,
-    labwareOffsets: false,
   },
   ot2Only: {
     deckCalibration: false,
     tipLengthCalibrations: false,
   },
   flexOnly: {
+    labwareOffsets: false,
     gripperCalibrations: false,
     moduleCalibrations: false,
   },
@@ -431,13 +437,13 @@ const ALL_SELECTED: DisplayedResetOptionState = {
     bootScripts: true,
     authorizedKeys: true,
     pipetteOffsetCalibrations: true,
-    labwareOffsets: true,
   },
   ot2Only: {
     deckCalibration: true,
     tipLengthCalibrations: true,
   },
   flexOnly: {
+    labwareOffsets: true,
     gripperCalibrations: true,
     moduleCalibrations: true,
   },
@@ -471,7 +477,7 @@ function buildResetRequest(
   isFlex: boolean
 ): ResetConfigRequest {
   let requestToReturn: ResetConfigRequest = {
-    resetLabwareOffsets: displayedState.common.labwareOffsets,
+    resetLabwareOffsets: displayedState.flexOnly.labwareOffsets,
 
     settingsResets: {
       // Keys in this object need to follow the server's HTTP API.
