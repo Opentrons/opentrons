@@ -207,6 +207,7 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         state_update = update_types.StateUpdate()
         try:
             if stacker_hw is not None:
+                stacker_hw.set_stacker_identify(True)
                 await stacker_hw.store_labware(labware_height=stack_height)
         except FlexStackerStallError as e:
             return DefinedErrorData(
@@ -273,6 +274,9 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                 ),
             ),
         )
+
+        if stacker_hw is not None:
+            stacker_hw.set_stacker_identify(False)
 
         return SuccessData(
             public=StoreResult.model_construct(
