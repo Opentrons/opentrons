@@ -1,4 +1,6 @@
 import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -7,8 +9,13 @@ import {
 import type { ModuleType } from '@opentrons/shared-data'
 
 export const SECTIONS = {
+  SELECT_MODULE: 'SELECT_MODULE',
+  CLOSE_DOOR: 'CLOSE_DOOR',
+  INSTALL_SHUTTLE: 'INSTALL_SHUTTLE',
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',
   SELECT_LOCATION: 'SELECT_LOCATION',
+  CHECK_INSTALLATION_PINS: 'CHECK_INSTALLATION_PINS',
+  UPDATE_FIRMWARE: 'UPDATE_FIRMWARE',
   PLACE_ADAPTER: 'PLACE_ADAPTER',
   ATTACH_PROBE: 'ATTACH_PROBE',
   DETACH_PROBE: 'DETACH_PROBE',
@@ -16,7 +23,7 @@ export const SECTIONS = {
 } as const
 
 export const FLOWS = {
-  CALIBRATE: 'CALIBRATE',
+  SETUP: 'SETUP',
 }
 
 export const CAL_PIN_LOADNAME = 'calibration_pin' as const
@@ -25,6 +32,8 @@ export const SCREWDRIVER_LOADNAME = 'hex_screwdriver' as const
 export const FLEX_SLOT_NAMES_BY_MOD_TYPE: {
   [moduleType in ModuleType]?: string[]
 } = {
+  [ABSORBANCE_READER_TYPE]: ['A3', 'B3', 'C3', 'D3'],
+  [FLEX_STACKER_MODULE_TYPE]: ['A3', 'B3', 'C3', 'D3'],
   [HEATERSHAKER_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3', 'A3'],
   [TEMPERATURE_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3', 'A3'],
   [THERMOCYCLER_MODULE_TYPE]: ['B1'],

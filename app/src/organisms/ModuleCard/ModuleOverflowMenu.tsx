@@ -123,7 +123,7 @@ export const ModuleOverflowMenu = (
       <MenuList>
         {isFlex &&
         module.moduleType !== ABSORBANCE_READER_TYPE &&
-        module.moduleType !== FLEX_STACKER_MODULE_TYPE &&
+        // module.moduleType !== FLEX_STACKER_MODULE_TYPE &&
         !MODULE_MODELS_OT2_ONLY.some(
           modModel => modModel === module.moduleModel
         ) ? (
