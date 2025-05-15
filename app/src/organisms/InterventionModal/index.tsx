@@ -18,6 +18,7 @@ import {
   DISPLAY_FLEX,
   Flex,
   Icon,
+  InlineNotification,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
@@ -29,7 +30,6 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { InterventionModal as InterventionModalMolecule } from '/app/molecules/InterventionModal'
 import { OddModal } from '/app/molecules/OddModal'
 import { useRobotType } from '/app/redux-resources/robots'

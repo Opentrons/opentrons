@@ -138,8 +138,8 @@ STACKER_MOTION_CONFIG = {
     },
     StackerAxis.L: {
         "home": AxisParams(
-            run_current=0.8,
-            hold_current=0.15,
+            run_current=1.2,
+            hold_current=0.5,
             move_params=MoveParams(
                 max_speed=100.0,
                 acceleration=800.0,
@@ -147,8 +147,8 @@ STACKER_MOTION_CONFIG = {
             ),
         ),
         "move": AxisParams(
-            run_current=0.6,
-            hold_current=0.15,
+            run_current=1.2,
+            hold_current=0.5,
             move_params=MoveParams(
                 max_speed=100.0,
                 acceleration=800.0,

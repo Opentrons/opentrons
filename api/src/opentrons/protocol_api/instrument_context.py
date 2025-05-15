@@ -2337,12 +2337,10 @@ class InstrumentContext(publisher.CommandPublisher):
                        to the volume of liquid that will be dispensed.
         :type volume: float
 
-        :param rate: How quickly the plunger moves to displace the commanded volume. The plunger speed
-                     in µL/s is calculated as ``rate`` multiplied by
-                     :py:attr:`flow_rate.dispense<flow_rate>`. This rate does not directly relate to
+        :param rate: How quickly the plunger moves to displace the commanded volume, in µL/s. This rate does not directly relate to
                      the flow rate of liquid out of the resin tip.
 
-                     The default value of ``10.0`` is recommended.
+                     Defaults to ``10.0`` µL/s.
         :type rate: float
         """
         well: Optional[labware.Well] = None
