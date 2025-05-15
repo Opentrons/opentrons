@@ -135,7 +135,7 @@ export function SelectLabwareModal(
   }, [searchTerm, allCategoriesExpanded, allCategoriesCollapsed])
 
   useEffect(() => {
-    if (!hasNoLabware) {
+    if (!hasNoLabware && error != null) {
       setError(null)
     }
   }, [hasNoLabware])
