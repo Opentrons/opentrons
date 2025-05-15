@@ -99,6 +99,7 @@ export function AssignLiquidsModal(
         flexDirection={DIRECTION_COLUMN}
         paddingX={SPACING.spacing24}
         overflowY={OVERFLOW_AUTO}
+        paddingBottom={SPACING.spacing60}
       >
         <Flex justifyContent={JUSTIFY_END} paddingTop={SPACING.spacing12}>
           <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
@@ -108,7 +109,7 @@ export function AssignLiquidsModal(
           alignItems={ALIGN_CENTER}
           flexDirection={DIRECTION_COLUMN}
           gap={SPACING.spacing24}
-          paddingBottom={SPACING.spacing24}
+          paddingTop={SPACING.spacing60}
         >
           <Flex
             width="100%"
@@ -121,7 +122,7 @@ export function AssignLiquidsModal(
             />
             <StyledText
               desktopStyle="headingLargeBold"
-              css={LINE_CLAMP_TEXT_STYLE(2)}
+              css={LINE_CLAMP_TEXT_STYLE(3)}
             >
               {t('add_liquids_to_labware', {
                 labwareName: nickNames[labwareId],
