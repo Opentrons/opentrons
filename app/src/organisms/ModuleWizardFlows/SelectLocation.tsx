@@ -28,8 +28,9 @@ import {
 
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
+import { getFixtureIdByCutoutId } from './useModuleDeckConfigProps'
+
 import type {
-  CutoutConfig,
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
@@ -45,22 +46,18 @@ export const BODY_STYLE = css`
   }
 `
 interface SelectLocationProps extends ModuleCalibrationWizardStepProps {
-  availableSlotNames: string[]
-  occupiedCutouts: CutoutConfig[]
   deckConfig: DeckConfiguration
-  configuredFixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
   isLoadedInRun: boolean
 }
 export const SelectLocation = (
   props: SelectLocationProps
 ): JSX.Element | null => {
-  const {
-    proceed,
+  const { proceed, attachedModule, deckConfig, isLoadedInRun } = props
+
+  const configuredFixtureIdByCutoutId = getFixtureIdByCutoutId(
     attachedModule,
-    deckConfig,
-    configuredFixtureIdByCutoutId,
-    isLoadedInRun,
-  } = props
+    deckConfig
+  )
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
   const handleOnClick = (): void => {

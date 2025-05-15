@@ -1,25 +1,31 @@
-import { ABSORBANCE_READER_TYPE, FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+
 import { SECTIONS } from './constants'
 
 import type { ModuleType } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStep } from './types'
 
-export const getModuleCalibrationSteps = (moduleType: ModuleType): ModuleCalibrationWizardStep[] => {
-  switch (moduleType){
+export const getModuleCalibrationSteps = (
+  moduleType: ModuleType
+): ModuleCalibrationWizardStep[] => {
+  switch (moduleType) {
     case ABSORBANCE_READER_TYPE:
       return [
         { section: SECTIONS.UPDATE_FIRMWARE },
         { section: SECTIONS.SELECT_LOCATION },
-        { section: SECTIONS.SUCCESS },    
+        { section: SECTIONS.SUCCESS },
       ]
     case FLEX_STACKER_MODULE_TYPE:
       return [
         // { section: SECTIONS.CHECK_INSTALLATION_PINS},
         // { section: SECTIONS.UPDATE_FIRMWARE },
         { section: SECTIONS.SELECT_LOCATION },
-        { section: SECTIONS.CLOSE_DOOR},
-        { section: SECTIONS.INSTALL_SHUTTLE},
-        { section: SECTIONS.SUCCESS },    
+        { section: SECTIONS.CLOSE_DOOR },
+        { section: SECTIONS.INSTALL_SHUTTLE },
+        { section: SECTIONS.SUCCESS },
       ]
     default:
       return [
