@@ -34,7 +34,14 @@ export type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
 export interface LabwareRenderProps {
   /** Labware definition to render */
   definition: LabwareDefinition
-  /** Opional Prop for labware on heater shakers sitting on right side of the deck */
+  /**
+   * Special handling for opentrons_universal_flat_adapter. Unlike other labware,
+   * it rotates to match the underlying module, and that rotation actually matters
+   * because it's asymmetrical.
+   *
+   * This should be true if this is that adapter and we're on the left side of the deck,
+   * and false otherwise.
+   */
   shouldRotateAdapterOrientation?: boolean
   /** option to show well labels inside or outside of labware outline */
   wellLabelOption?: WellLabelOption

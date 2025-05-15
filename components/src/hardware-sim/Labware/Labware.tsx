@@ -29,7 +29,7 @@ import type {
 export interface LabwareProps {
   /** Labware definition to render */
   definition: LabwareDefinition
-  /** Opional Prop for labware on heater shakers sitting on right side of the deck */
+  /** See docs on LabwareRender. */
   shouldRotateAdapterOrientation?: boolean
   /** boolean to show well labels */
   showLabels?: boolean
