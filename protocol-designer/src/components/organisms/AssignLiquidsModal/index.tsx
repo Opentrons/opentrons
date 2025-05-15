@@ -89,7 +89,6 @@ export function AssignLiquidsModal(
   return (
     <Flex
       height={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
-      // height="100%"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       backgroundColor={COLORS.grey10}
       gridGap={SPACING.spacing12}
