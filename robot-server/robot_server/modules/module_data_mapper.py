@@ -14,7 +14,6 @@ from opentrons.hardware_control.modules import (
     SpeedStatus,
     AbsorbanceReaderStatus,
     PlatformState,
-    StackerAxisState,
     FlexStackerStatus,
 )
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
@@ -178,8 +177,7 @@ class ModuleDataMapper:
                 hopperDoorState=cast(
                     HopperDoorState, live_data["data"].get("hopperDoorState")
                 ),
-                axisStateX=cast(StackerAxisState, live_data["data"].get("axisStateX")),
-                axisStateZ=cast(StackerAxisState, live_data["data"].get("axisStateZ")),
+                installDetected=cast(bool, live_data["data"].get("installDetected")),
             )
         else:
             assert False, f"Invalid module type {module_type}"
