@@ -23,7 +23,6 @@ import {
 
 import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '../../../constants'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { selectors } from '../../../labware-ingred/selectors'
 import {
   getLiquidEntities,
   getUnsavedForm,
@@ -53,14 +52,6 @@ export function LiquidsOverflowMenu({
   const { t } = useTranslation(['starting_deck_state'])
   const liquids = useSelector(getLiquidEntities)
   const dispatch: ThunkDispatch<any> = useDispatch()
-  // const zoomIn = useSelector(selectors.getZoomedInSlot)
-
-  // let right: string = SPACING.spacing12
-  // if (formData != null || location.pathname === '/liquids') {
-  //   right = '7.4rem'
-  // } else if (zoomIn?.slot === 'offDeck') {
-  //   right = '24.75rem'
-  // }
 
   let right: string | undefined
   let top: string = TOP_POSITION
