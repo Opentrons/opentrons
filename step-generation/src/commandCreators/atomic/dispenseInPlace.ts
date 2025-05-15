@@ -9,7 +9,7 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceParams> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, volume, flowRate, pushOut } = args
+  const { pipetteId, volume, flowRate, pushOut, correctionVolume } = args
 
   const errors: CommandCreatorError[] = []
   if (!prevRobotState.tipState.pipettes[pipetteId]) {
@@ -30,6 +30,7 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceParams> = (
         volume,
         flowRate,
         ...(pushOut != null ? { pushOut } : {}),
+        ...(correctionVolume != null ? { correctionVolume } : {}),
       },
     },
   ]
@@ -41,6 +42,7 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceParams> = (
     // flowrate the PAPI has set the pipette to, so we just have to do a division:
     `rate=${flowRate} / ${pipettePythonName}.flow_rate.dispense`,
     ...(pushOut != null ? [`push_out=${pushOut}`] : []),
+    // Note that correction volume is not supported in our public atomic liquid handling APIs
   ]
   const python = `${pipettePythonName}.dispense(\n${indentPyLines(
     pythonArgs.join(',\n')
