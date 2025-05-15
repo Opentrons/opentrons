@@ -305,6 +305,14 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                       isSelected={selectedZoomInSlot != null}
                     />
                   )}
+                  <ActiveLabwareControls
+                    slotPosition={[0, 0, 0]}
+                    slotBoundingBox={labwareInterfaceBoundingBox}
+                    itemId={slotId}
+                    terminalItemId={terminalItemId}
+                    hover={hover}
+                    setHover={setHover}
+                  />
                 </>
               ) : null}
 
@@ -326,15 +334,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   stagingAreaAddressableAreas={[]}
                 />
               ) : null}
-
-              <ActiveLabwareControls
-                slotPosition={[0, 0, 0]}
-                slotBoundingBox={labwareInterfaceBoundingBox}
-                itemId={slotId}
-                terminalItemId={terminalItemId}
-                hover={hover}
-                setHover={setHover}
-              />
             </Module>
           </Fragment>
         ) : null
