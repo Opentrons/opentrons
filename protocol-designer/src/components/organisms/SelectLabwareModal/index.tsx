@@ -13,6 +13,7 @@ import {
   DISPLAY_INLINE_BLOCK,
   Flex,
   InfoScreen,
+  InlineNotification,
   InputField,
   JUSTIFY_CENTER,
   JUSTIFY_END,
@@ -65,7 +66,6 @@ import {
   ADAPTER_96_CHANNEL,
   getLabwareCompatibleWithModule,
 } from '../../../utils/labwareModuleCompatibility'
-import { useKitchen } from '../Kitchen/hooks'
 import { getMainPagePortalEl } from '../Portal'
 
 import type { ChangeEvent } from 'react'
@@ -97,7 +97,7 @@ export function SelectLabwareModal(
   const { slot, onClose, onConfirm, slotFull } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)
-  const { makeSnackbar } = useKitchen()
+  const [error, setError] = useState<string | null>(null)
 
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const permittedTipracks = useSelector(stepFormSelectors.getPermittedTipracks)
@@ -133,6 +133,12 @@ export function SelectLabwareModal(
       searchTerm ? allCategoriesExpanded : allCategoriesCollapsed
     )
   }, [searchTerm, allCategoriesExpanded, allCategoriesCollapsed])
+
+  useEffect(() => {
+    if (!hasNoLabware && error != null) {
+      setError(null)
+    }
+  }, [hasNoLabware])
 
   const handleResetLabwareTools = (): void => {
     setAreCategoriesExpanded(allCategoriesCollapsed)
@@ -277,11 +283,11 @@ export function SelectLabwareModal(
 
   const handleAddLabwareClick = (): void => {
     if (slotFull) {
-      makeSnackbar(t('no_space') as string)
+      setError(t('no_space') as string)
       return
     }
     if (hasNoLabware) {
-      makeSnackbar(t('select_before_proceeding') as string)
+      setError(t('select_before_proceeding') as string)
     } else {
       onConfirm()
       handleResetLabwareTools()
@@ -322,6 +328,9 @@ export function SelectLabwareModal(
             </Flex>
           ) : null}
           <Flex justifyContent={JUSTIFY_END} gridGap={SPACING.spacing8}>
+            {error != null && (
+              <InlineNotification type="error" heading={error} hug />
+            )}
             <SecondaryButton
               onClick={() => {
                 onClose()

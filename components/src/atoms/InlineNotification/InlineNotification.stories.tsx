@@ -1,12 +1,11 @@
-import { VIEWPORT } from '@opentrons/components'
-
-import { InlineNotification } from '.'
+import { VIEWPORT } from '../../ui-style-constants'
+import { InlineNotification } from './index'
 
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
 
 export default {
-  title: 'App/Atoms/InlineNotification',
+  title: 'Helix/Atoms/InlineNotification',
   argTypes: {
     hug: {
       control: {

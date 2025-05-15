@@ -63,7 +63,7 @@
   "rename_lab": "Rename labware",
   "reservoir": "Reservoirs",
   "search_labware": "Search for labware...",
-  "select_before_proceeding": "Select labware before proceeding",
+  "select_before_proceeding": "Select labware to add it to the deck",
   "select_labware_to_add": "Select labware to add to slot",
   "shift_click_to_select_range": "⇧ + click to select range",
   "starting_deck_state": "Starting deck state",
