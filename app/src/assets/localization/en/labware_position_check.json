@@ -148,8 +148,6 @@
   "place_labware_in_location": "Place a <bold>{{labware}}</bold> into <bold>{{location}}</bold>",
   "place_modules": "Place modules on deck",
   "place_previous_tip_rack_in_location": "Place the <bold>{{tip_rack}}</bold> that you used before back into <bold>{{location}}</bold>. The pipette will return tips to their original location in the rack.",
-  "place_shuttle": "Place labware shuttle on track",
-  "place_shuttle_description": "Place the magnetic labware shuttle flush on the top of the track.",
   "position_check_description": "<block>Labware Position Check is a guided workflow that checks every labware on the deck for an added degree of precision in your protocol.</block><block>When you check a labware, the OT-2’s pipette nozzle or attached tip will stop at the center of the A1 well. If the pipette nozzle or tip is not centered, you can reveal the OT-2’s jog controls to make an adjustment. This Labware Offset will be applied to the entire labware. Offset data is measured to the nearest 1/10th mm and can be made in the X, Y and/or Z directions.</block>",
   "prepare_item_in_location": "Prepare {{item}} in {{location}}",
   "primary_pipette_tipracks_section": "Check tip racks with {{primary_mount}} Pipette and pick up a tip",

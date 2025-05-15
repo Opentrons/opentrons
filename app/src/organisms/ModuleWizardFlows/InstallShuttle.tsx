@@ -86,7 +86,7 @@ export const InstallShuttle = (
         rightHandBody={shuttleInstallVid}
         bodyText={bodyText}
         proceedButtonText={t('confirm_placement')}
-        proceed={proceed}
+        proceed={proceed} // CASEY NOTE - needs to be custom function that calls the robot to check to see if the shuttle is present
         back={goBack}
       />
     )
