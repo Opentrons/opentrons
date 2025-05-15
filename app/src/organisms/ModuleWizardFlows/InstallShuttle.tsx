@@ -21,7 +21,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStepProps } from './types'
 
-interface PlaceShuttleProps extends ModuleCalibrationWizardStepProps {
+interface InstallShuttleProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration
   fixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
 }
@@ -34,7 +34,9 @@ const BODY_STYLE = css`
   }
 `
 
-export const PlaceShuttle = (props: PlaceShuttleProps): JSX.Element | null => {
+export const InstallShuttle = (
+  props: InstallShuttleProps
+): JSX.Element | null => {
   const { proceed, goBack, isRobotMoving } = props
   const { t, i18n } = useTranslation(['module_wizard_flows'])
 

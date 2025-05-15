@@ -9,7 +9,7 @@ export const getModuleCalibrationSteps = (): ModuleCalibrationWizardStep[] => {
     { section: SECTIONS.PLACE_ADAPTER },
     { section: SECTIONS.ATTACH_PROBE },
     { section: SECTIONS.DETACH_PROBE },
-    { section: SECTIONS.PLACE_SHUTTLE },
+    { section: SECTIONS.INSTALL_SHUTTLE },
     { section: SECTIONS.SUCCESS },
   ]
 }
