@@ -54,7 +54,7 @@ TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
             "MAX_SPEED_DISCONTINUITY": {"MIN": 55, "MAX": 50, "INC": 5}
         },
         StackerAxis.L: {
-            "SPEED": {"MIN": 10, "MAX": 200, "INC": 10},
+            "SPEED": {"MIN": 0, "MAX": 200, "INC": 10},
             "ACCEL": {"MIN": 800, "MAX": 800, "INC": 50},
             "CURRENT": {"MIN": 0.1, "MAX": 1.5, "INC": 0.1},
             "MAX_SPEED_DISCONTINUITY": {"MIN": 40, "MAX": 40, "INC": 5}

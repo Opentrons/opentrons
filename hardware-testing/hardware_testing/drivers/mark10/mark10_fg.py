@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from time import time
 from typing import List, Optional, Protocol
 import asyncio
+import logging
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
 FG_BAUDRATE = 115200
@@ -15,32 +16,32 @@ FG_ASYNC_ERROR_ACK = "async"
 DEFAULT_COMMAND_RETRIES = 0
 
 
-logger = AsyncResponseSerialConnection.logger
-#logger = logging.getLogger(__name__)
+# logger = AsyncResponseSerialConnection.logger
+# logger = logging.getLogger(__name__)
 
-LOG_CONFIG = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}
-    },
-    "handlers": {
-        "file_handler": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "formatter": "basic",
-            "filename": "/data/stallguard/stallguard_test.log",
-            "maxBytes": 5000000,
-            "level": logging.INFO,
-            "backupCount": 3,
-        },
-    },
-    "loggers": {
-        "": {
-            "handlers": ["file_handler"],
-            "level": logging.INFO,
-        },
-    },
-}
+# LOG_CONFIG = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "formatters": {
+#         "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}
+#     },
+#     "handlers": {
+#         "file_handler": {
+#             "class": "logging.handlers.RotatingFileHandler",
+#             "formatter": "basic",
+#             "filename": "/data/stallguard/stallguard_test.log",
+#             "maxBytes": 5000000,
+#             "level": logging.INFO,
+#             "backupCount": 3,
+#         },
+#     },
+#     "loggers": {
+#         "": {
+#             "handlers": ["file_handler"],
+#             "level": logging.INFO,
+#         },
+#     },
+# }
 
 class Mark10ProtocolError(Exception):
     pass 
@@ -97,7 +98,7 @@ class Mark10(AbstractForceGaugeDriver):
             if not self._force_guage.is_open:
                 raise Mark10Error("Unable to connect to force gauge")
         except Exception as e:
-            logger.error(f"Error connecting to force gauge: {e}")
+            # logger.error(f"Error connecting to force gauge: {e}")
             raise Mark10Error("Unable to connect to force gauge")
 
     async def disconnect(self) -> None:
@@ -105,9 +106,9 @@ class Mark10(AbstractForceGaugeDriver):
         try: 
             if self._force_guage.is_open:
                 await self._force_guage.close()
-                logger.info("Disconneted from force gauge")
+                # logger.info("Disconneted from force gauge")
         except Exception as e:
-            logger.error(f"Error disconnecting for force gauge: {e}")
+            # logger.error(f"Error disconnecting for force gauge: {e}")
             raise Mark10Error("Unable to disconnect from force gauge")
 
     async def _write(self, data: bytes) -> None:
@@ -116,7 +117,7 @@ class Mark10(AbstractForceGaugeDriver):
             # Offload write to another thread to avoid blocking the event loop
             await asyncio.to_thread(self._force_guage.write, data)
         except Exception as e:
-            logger.error(f"Error writing to force gauge: {e}")
+            # logger.error(f"Error writing to force gauge: {e}")
             raise Mark10Error("Unable to write to force gauge")
 
 
@@ -126,7 +127,7 @@ class Mark10(AbstractForceGaugeDriver):
             # Offload readline to another thread to avoid blocking the event loop
             return await asyncio.to_thread(self._force_guage.readline)
         except Exception as e:
-            logger.error(f"Error reading from force gauge: {e} ")
+            # logger.error(f"Error reading from force gauge: {e} ")
             raise Mark10Error("Unable to read from force gauge")
 
     async def read_force(self, timeout: float = 1.0) -> float:
@@ -152,7 +153,7 @@ class Mark10(AbstractForceGaugeDriver):
                     continue
             raise TimeoutError(f"unable to read from gauge within {timeout} seconds")
         except Exception as e:
-            logger.error(f"Error reading force: {e}")
+            # logger.error(f"Error reading force: {e}")
             raise Mark10Error("Unable to read force from gauge")
 
     def reset_serial_buffers(self) -> None:
@@ -161,5 +162,5 @@ class Mark10(AbstractForceGaugeDriver):
             self._force_guage._serial.reset_input_buffer()
             self._force_guage._serial.reset_output_buffer()
         except Exception as e:
-            logger.error(f"Error resetting serial buffers: {e}")
+            # logger.error(f"Error resetting serial buffers: {e}")
             raise Mark10Error("Unable to reset serial buffers")
