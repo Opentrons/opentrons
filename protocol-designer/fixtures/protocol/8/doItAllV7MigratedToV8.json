@@ -4141,13 +4141,6 @@
       }
     },
     {
-      "commandType": "thermocycler/waitForLidTemperature",
-      "key": "3a8ba723-e9c0-44f5-825c-dc960a70ce6d",
-      "params": {
-        "moduleId": "627b7a27-5bb7-46de-a530-67af45652e3b:thermocyclerModuleType"
-      }
-    },
-    {
       "commandType": "thermocycler/runProfile",
       "key": "dea8f294-bf3b-448f-a0dd-4dfef0a1f723",
       "params": {
