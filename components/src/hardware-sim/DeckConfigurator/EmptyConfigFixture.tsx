@@ -1,7 +1,6 @@
 import { css } from 'styled-components'
 
 import { COLUMN_4_AA } from '@opentrons/shared-data'
-import { consolidate } from '@opentrons/step-generation'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
