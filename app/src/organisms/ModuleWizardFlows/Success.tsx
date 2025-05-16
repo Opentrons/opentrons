@@ -44,8 +44,7 @@ export const Success = (
 
   return (
     <SimpleWizardBody
-      header={t('successfully_calibrated', { module: moduleDisplayName })}
-      // TODO: iconColor unused, change SimpleWizardBody props interface
+      header={t('successfully_setup', { module: moduleDisplayName })}
       iconColor={COLORS.red50}
       isSuccess
       justifyContentForOddButton={JUSTIFY_FLEX_END}
