@@ -11,7 +11,6 @@ import {
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
-
 import { ACTIONS } from './constants'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
 
@@ -37,7 +36,7 @@ export interface UseModuleSetupWizardResult {
     ) => Promise<CommandData[]>
     isRobotMoving: boolean
     proceed: () => void
-    maintenanceRunId?: string
+    maintenanceRunId: string | null
     goBack: () => void
     setErrorMessage: (message: string | null) => void
     errorMessage: string | null
@@ -86,20 +85,10 @@ export function useModuleSetupWizard(
       type: ACTIONS.GO_BACK,
     })
   }
-  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
+  const [maintenanceRunId, setMaintenanceRunId] = useState<
     string | null
   >(null)
-  // we should start checking for run deletion only after the maintenance run is created
-  // and the useCurrentRun poll has returned that created id
-  const [
-    monitorMaintenanceRunForDeletion,
-    setMonitorMaintenanceRunForDeletion,
-  ] = useState<boolean>(false)
 
-  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
-    refetchInterval: RUN_REFETCH_INTERVAL,
-    enabled: createdMaintenanceRunId != null,
-  })
   const {
     chainRunCommands,
     isCommandMutationLoading,
@@ -110,31 +99,11 @@ export function useModuleSetupWizard(
     isLoading: isCreateLoading,
   } = useCreateTargetedMaintenanceRunMutation({
     onSuccess: (response: { data: { id: SetStateAction<string | null> } }) => {
-      setCreatedMaintenanceRunId(response.data.id)
+      setMaintenanceRunId(response.data.id)
     },
   })
 
-  // this will close the modal in case the run was deleted by the terminate
-  // activity modal on the ODD
-  useEffect(() => {
-    if (
-      createdMaintenanceRunId !== null &&
-      maintenanceRunData?.data.id === createdMaintenanceRunId
-    ) {
-      setMonitorMaintenanceRunForDeletion(true)
-    }
-    if (
-      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
-      monitorMaintenanceRunForDeletion
-    ) {
-      closeFlow()
-    }
-  }, [
-    maintenanceRunData?.data.id,
-    createdMaintenanceRunId,
-    monitorMaintenanceRunForDeletion,
-    closeFlow,
-  ])
+  useMonitorMaintenanceRunForDeletion({maintenanceRunId, setMaintenanceRunId, closeFlow})
 
   const [errorMessage, setErrorMessage] = useState<null | string>(null)
   const [isExiting, setIsExiting] = useState<boolean>(false)
@@ -153,24 +122,26 @@ export function useModuleSetupWizard(
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
     onSuccess: () => {
+      setMaintenanceRunId(null)
       handleClose()
     },
     onError: () => {
+      setMaintenanceRunId(null)
       handleClose()
     },
   })
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (maintenanceRunData?.data.id == null) handleClose()
+    if (maintenanceRunId == null) handleClose()
     else {
       chainRunCommands(
-        maintenanceRunData?.data.id as string,
+        maintenanceRunId as string,
         [{ commandType: 'home' as const, params: {} }],
         false
       )
         .then(() => {
-          deleteMaintenanceRun(maintenanceRunData?.data.id)
+          deleteMaintenanceRun(maintenanceRunId)
         })
         .catch(error => {
           console.error(error.message)
@@ -191,23 +162,18 @@ export function useModuleSetupWizard(
 
   let chainMaintenanceRunCommands
 
-  if (maintenanceRunData?.data.id != null) {
+  if (maintenanceRunId != null) {
     chainMaintenanceRunCommands = (
       commands: CreateCommand[],
       continuePastCommandFailure: boolean
     ): Promise<CommandData[]> =>
       chainRunCommands(
-        maintenanceRunData?.data.id as string,
+        maintenanceRunId as string,
         commands,
         continuePastCommandFailure
       )
   }
 
-  const maintenanceRunId =
-    maintenanceRunData?.data.id != null &&
-    maintenanceRunData?.data.id === createdMaintenanceRunId
-      ? createdMaintenanceRunId
-      : undefined
   const calibrateBaseProps = {
     attachedPipette,
     chainRunCommands: chainMaintenanceRunCommands,
@@ -229,14 +195,9 @@ export function useModuleSetupWizard(
       type: ACTIONS.BUILD_FLOW,
       attachedModule: selectedModuleToBuildFlow,
     })
-    if (createdMaintenanceRunId == null) {
+    if (maintenanceRunId == null) {
       createTargetedMaintenanceRun({})
     }
-    // run prep steps here
-
-    console.log('HI SETTING CURRENT STEP', currentStepIndex)
-    console.log('HI HERE ARE THE NEW STEPS', state.stepsInFlow)
-    console.log('HI SETTING CURRENT STEP', state)
   }
 
   return {
@@ -249,4 +210,49 @@ export function useModuleSetupWizard(
     deckConfig: deckConfig,
     buildFlowForSelectedModule,
   }
+}
+
+
+function useMonitorMaintenanceRunForDeletion({
+  maintenanceRunId,
+  setMaintenanceRunId,
+  closeFlow,
+}: {
+  maintenanceRunId: string | null
+  setMaintenanceRunId: (id: string | null) => void
+  closeFlow: () => void
+}): void {
+  const [
+    monitorMaintenanceRunForDeletion,
+    setMonitorMaintenanceRunForDeletion,
+  ] = useState<boolean>(false)
+
+  // We should start checking for run deletion only after the maintenance run is created
+  // and the useCurrentRun poll has returned that created id
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
+    refetchInterval: RUN_REFETCH_INTERVAL,
+    enabled: maintenanceRunId != null,
+  })
+
+  useEffect(() => {
+    if (maintenanceRunId === null) {
+      setMonitorMaintenanceRunForDeletion(false)
+    } else if (
+      maintenanceRunId !== null &&
+      maintenanceRunData?.data.id === maintenanceRunId
+    ) {
+      setMonitorMaintenanceRunForDeletion(true)
+    } else if (
+      maintenanceRunData?.data.id !== maintenanceRunId &&
+      monitorMaintenanceRunForDeletion
+    ) {
+      setMaintenanceRunId(null)
+      closeFlow()
+    }
+  }, [
+    maintenanceRunData?.data.id,
+    maintenanceRunId,
+    monitorMaintenanceRunForDeletion,
+    setMaintenanceRunId,
+  ])
 }
