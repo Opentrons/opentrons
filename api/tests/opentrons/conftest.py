@@ -774,6 +774,7 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "moduleType": "temperatureModuleType",
         "model": "temperatureModuleV1",
         "labwareOffset": {"x": -0.15, "y": -0.15, "z": 80.09},
+        "locatingFeaturesAsParent": [],
         "dimensions": {
             "bareOverallHeight": 84,
             "overLabwareHeight": 0,
@@ -787,6 +788,7 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "slotTransforms": {},
         "compatibleWith": ["temperatureModuleV2"],
         "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
+        "wells": {},
         "twoDimensionalRendering": {},
     }
 

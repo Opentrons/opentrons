@@ -7,6 +7,7 @@
     "y": 68.8,
     "z": 108.96
   },
+  "locatingFeaturesAsParent": ["well"],
   "dimensions": {
     "bareOverallHeight": 108.96,
     "overLabwareHeight": 0.0,
@@ -71,6 +72,13 @@
   "compatibleWith": [],
   "incompatibleWithDecks": [],
   "uniqueModuleData": {},
+  "wells": {
+    "A1": {
+      "x": 14.38,
+      "y": -11.24,
+      "z": 0
+    }
+  },
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",

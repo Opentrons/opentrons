@@ -18,6 +18,7 @@ from typing import (
 from numpy import array, dot, double as npdouble
 from numpy.typing import NDArray
 
+from opentrons_shared_data.labware.types import LocatingFeature
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
 )
@@ -1071,6 +1072,10 @@ class ModuleView:
             raise errors.WrongModuleTypeError(
                 f"Cannot get lid height of {definition.moduleType}"
             )
+
+    def get_locating_features_as_parent(self, module_id: str) -> List[LocatingFeature]:
+        """Get a module's locating features as parent."""
+        return self.get_definition(module_id).locatingFeaturesAsParent
 
     @staticmethod
     def get_magnet_home_to_base_offset(module_model: ModuleModel) -> float:

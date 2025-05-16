@@ -7,6 +7,7 @@
     "y": -0.15,
     "z": 80.09
   },
+  "locatingFeaturesAsParent": [],
   "dimensions": {
     "bareOverallHeight": 84,
     "overLabwareHeight": 0,
@@ -170,6 +171,7 @@
   "compatibleWith": ["temperatureModuleV1"],
   "incompatibleWithDecks": [],
   "uniqueModuleData": {},
+  "wells": {},
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",

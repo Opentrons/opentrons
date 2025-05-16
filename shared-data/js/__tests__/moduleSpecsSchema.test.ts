@@ -7,6 +7,7 @@ import moduleSpecsV1 from '../../module/definitions/1.json'
 import moduleSpecsSchemaV1 from '../../module/schemas/1.json'
 import moduleSpecsSchemaV2 from '../../module/schemas/2.json'
 import moduleSpecsSchemaV3 from '../../module/schemas/3.json'
+import { THERMOCYCLER_MODULE_V1, THERMOCYCLER_MODULE_V2 } from '../constants'
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validateModuleSpecsV1 = ajv.compile(moduleSpecsSchemaV1)
@@ -58,6 +59,20 @@ describe('validate all module specs with schema', () => {
 
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
+    })
+
+    // TODO(jh, 05-16-25): After adding all locating features, ensure the default case fails.
+    it(`validates expected locatingFeaturesAsParent for ${filename}`, () => {
+      switch (filename) {
+        case THERMOCYCLER_MODULE_V2:
+          expect(moduleDef.locatingFeaturesAsParent).toEqual(['well'])
+          break
+        case THERMOCYCLER_MODULE_V1:
+          expect(moduleDef.locatingFeaturesAsParent).toEqual([])
+          break
+        default:
+          expect(moduleDef.locatingFeaturesAsParent).toEqual([])
+      }
     })
   })
 

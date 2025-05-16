@@ -61,6 +61,7 @@
     "model",
     "labwareOffset",
     "cornerOffsetFromSlot",
+    "locatingFeaturesAsParent",
     "dimensions",
     "calibrationPoint",
     "displayName",
@@ -93,6 +94,22 @@
       "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader|flexStackerModule)V[0-9]+$"
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
+    "locatingFeaturesAsParent": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string",
+        "enum": ["well"],
+        "description": "A list (in highest to lowest mating priority order) of locating features when the module acts as the parent in a labware stackup."
+      }
+    },
+    "wells": {
+      "type": "object",
+      "description": "A dict containing offsets from the back left bottom of the module's labware mating plane to the top center of the module's mating well, if any.",
+      "additionalProperties": {
+        "$ref": "#/definitions/coordinates"
+      }
+    },
     "dimensions": {
       "type": "object",
       "required": [
