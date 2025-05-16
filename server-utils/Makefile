@@ -74,17 +74,17 @@ teardown:
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)
-wheel: setup.py $(ot_sources)
+wheel: $(ot_sources)
 	$(clean_wheel_cmd)
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 .PHONY: sdist
 sdist: export OPENTRONS_PROJECT=$(project_rs_default)
-sdist: setup.py $(ot_sources)
+sdist: $(ot_sources)
 	$(clean_sdist_cmd)
-	$(python) setup.py sdist
+	$(python) -m build --sdist .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -100,7 +100,7 @@ test-cov:
 lint:
 	$(python) -m mypy $(SRC_PATH) $(tests)
 	$(python) -m black --check .
-	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
+	$(python) -m flake8 $(SRC_PATH) $(tests)
 
 .PHONY: format
 format:
