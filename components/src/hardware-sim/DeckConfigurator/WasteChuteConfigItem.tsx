@@ -10,56 +10,51 @@ import {
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  STAGING_AREA_DISPLAY_NAME,
+  WASTE_CHUTE_DISPLAY_NAME,
   Y_ADJUSTMENT,
 } from './constants'
 
 import type {
-  AddressableArea,
-  AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface StagingAreaConfigFixtureProps {
+interface WasteChuteConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
-  addressableArea: AddressableAreaName
   handleClickRemove?: (
     fixtureLocation: CutoutId,
     cutoutFixtureId: CutoutFixtureId
   ) => void
+  hasStagingAreas?: boolean
   selected?: boolean
 }
 
-export function StagingAreaConfigFixture(
-  props: StagingAreaConfigFixtureProps
+export function WasteChuteConfigFixture(
+  props: WasteChuteConfigItemProps
 ): JSX.Element {
   const {
     deckDefinition,
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
-    addressableArea,
     selected = false,
   } = props
 
-  const stagingAreaCutout = deckDefinition.locations.cutouts.find(
+  const wasteChuteCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
-  const OffsetVector = deckDefinition.locations.addressableAreas.find(
-    (aaItem: AddressableArea) => aaItem.id === addressableArea
-  )?.offsetFromCutoutFixture ?? [0, 0, 0]
+
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
    */
   const [xSlotPosition = 0, ySlotPosition = 0] =
-    stagingAreaCutout?.position ?? []
+    wasteChuteCutout?.position ?? []
 
-  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT + OffsetVector[0]
+  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
@@ -84,7 +79,7 @@ export function StagingAreaConfigFixture(
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {STAGING_AREA_DISPLAY_NAME}
+          {WASTE_CHUTE_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />

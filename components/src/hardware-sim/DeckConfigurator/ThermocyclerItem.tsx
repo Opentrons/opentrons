@@ -4,12 +4,12 @@ import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_DEFAULT_X_ADJUSTMENT,
+  COLUMN_1_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
-  FIXTURE_HEIGHT,
+  THERMOCYCLER_FIXTURE_HEIGHT,
+  THERMOCYCLER_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
@@ -19,7 +19,7 @@ import type {
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface AbsorbanceReaderFixtureProps {
+interface ThermocyclerItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
@@ -30,11 +30,9 @@ interface AbsorbanceReaderFixtureProps {
   selected?: boolean
 }
 
-const ABSORBANCE_READER_FIXTURE_DISPLAY_NAME = 'Absorbance'
+const THERMOCYCLER_FIXTURE_DISPLAY_NAME = 'Thermocycler'
 
-export function AbsorbanceReaderFixture(
-  props: AbsorbanceReaderFixtureProps
-): JSX.Element {
+export function ThermocyclerItem(props: ThermocyclerItemProps): JSX.Element {
   const {
     deckDefinition,
     handleClickRemove,
@@ -53,16 +51,14 @@ export function AbsorbanceReaderFixture(
    * the adjustment for x is different for right side/left side
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
-
-  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
-
+  const x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
-      height={FIXTURE_HEIGHT}
+      width={THERMOCYCLER_FIXTURE_WIDTH}
+      height={THERMOCYCLER_FIXTURE_HEIGHT}
       x={x}
       y={y}
       flexProps={{ flex: '1' }}
@@ -80,7 +76,7 @@ export function AbsorbanceReaderFixture(
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {ABSORBANCE_READER_FIXTURE_DISPLAY_NAME}
+          {THERMOCYCLER_FIXTURE_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />

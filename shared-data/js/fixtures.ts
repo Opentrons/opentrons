@@ -25,7 +25,7 @@ import {
   D1_ADDRESSABLE_AREA,
   D2_ADDRESSABLE_AREA,
   D3_ADDRESSABLE_AREA,
-  DUMMY_STAGING_AREA_WIHTOUT_STAGING_AREA,
+  DUMMY_STAGING_AREA_WITHOUT_STAGING_AREA,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_V1_FIXTURE,
@@ -184,7 +184,7 @@ export const transformCutoutFixturesToAaWithFixtures = (
       obj.cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
       deckDefinition.robot.model === FLEX_ROBOT_TYPE
     ) {
-      cutoutFixtureReplacment = DUMMY_STAGING_AREA_WIHTOUT_STAGING_AREA
+      cutoutFixtureReplacment = DUMMY_STAGING_AREA_WITHOUT_STAGING_AREA
     }
     // else if (obj.cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE)
     // {
@@ -205,7 +205,7 @@ export const transformCutoutFixturesToAaWithFixtures = (
   }, [])
 }
 
-export const filterAaByAreaType = (
+export const filterAAByAreaType = (
   cutoutFixtures: CutoutConfigMap[],
   deckDef: DeckDefinition,
   areaType: AreaType
@@ -234,6 +234,17 @@ export const filterAaByAreaType = (
   })
 }
 
+export const getAALocationForCutoutAndFixtureId = (
+  addressableArea: string,
+  deckDefinition: DeckDefinition
+): CoordinateTuple => {
+  return (
+    deckDefinition.locations.addressableAreas.find(
+      (aaItem: AddressableArea) => aaItem.id === addressableArea
+    )?.offsetFromCutoutFixture ?? [0, 0, 0]
+  )
+}
+
 export const getAAFromCutoutFixtureId = (
   inputCutoutId: CutoutId,
   cutoutFixtureId: CutoutFixtureId,
@@ -253,16 +264,13 @@ export const getAAFromCutoutFixtureId = (
       case 'cutoutD3':
         return ['D3', 'D4']
     }
-  } else {
-    return deckDefinition.cutoutFixtures.find(
-      fixture => fixture.id === cutoutFixtureId
-    )?.providesAddressableAreas[inputCutoutId]
   }
 
-  const fixture = deckDefinition.cutoutFixtures.find(
-    fixture => fixture.id === cutoutFixtureId
+  return (
+    deckDefinition.cutoutFixtures.find(
+      fixture => fixture.id === cutoutFixtureId
+    )?.providesAddressableAreas[inputCutoutId] ?? null
   )
-  return fixture?.providesAddressableAreas[inputCutoutId]
 }
 
 export function getCutoutFixtureIdsForModuleModel(

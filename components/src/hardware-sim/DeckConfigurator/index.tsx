@@ -1,5 +1,5 @@
 import {
-  filterAaByAreaType,
+  filterAAByAreaType,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_V1_FIXTURE,
   getDeckDefFromRobotType,
@@ -11,17 +11,17 @@ import {
 import { COLORS } from '../../helix-design-system'
 import { SlotLabels } from '../Deck'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
-import { AbsorbanceReaderFixture } from './AbsorbanceReaderFixture'
-import { EmptyConfigFixture } from './EmptyConfigFixture'
-import { FlexStackerFixture } from './FlexStackerFixture'
-import { HeaterShakerFixture } from './HeaterShakerFixture'
-import { MagneticBlockFixture } from './MagneticBlockFixture'
-import { StagingAreaConfigFixture } from './StagingAreaConfigFixture'
-import { StaticFixture } from './StaticFixture'
-import { TemperatureModuleFixture } from './TemperatureModuleFixture'
-import { ThermocyclerFixture } from './ThermocyclerFixture'
-import { TrashBinConfigFixture } from './TrashBinConfigFixture'
-import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
+import { AbsorbanceReaderItem } from './AbsorbanceReaderItem'
+import { EmptyConfigItem } from './EmptyConfigItem'
+import { FlexStackerItem } from './FlexStackerItem'
+import { HeaterShakerItem } from './HeaterShakerItem'
+import { MagneticBlockItem } from './MagneticBlockItem'
+import { StagingAreaConfigItem } from './StagingAreaConfigItem'
+import { StaticItem } from './StaticItem'
+import { TemperatureModuleItem } from './TemperatureModuleItem'
+import { ThermocyclerItem } from './ThermocyclerItem'
+import { TrashBinConfigItem } from './TrashBinConfigItem'
+import { WasteChuteConfigFixture } from './WasteChuteConfigItem'
 
 import type { ReactNode } from 'react'
 import type {
@@ -69,51 +69,55 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckDef
   )
 
-  const stagingAreaFixtures = filterAaByAreaType(
+  const stagingAreaItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'stagingSlot'
   )
 
-  const wasteChuteFixtures = filterAaByAreaType(
+  const wasteChuteItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'wasteChute'
   )
-  const emptyCutouts = filterAaByAreaType(deckConfigWithAA, deckDef, 'slot')
+  const emptySlotLikeItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'slot'
+  )
 
-  const trashBinFixtures = filterAaByAreaType(
+  const trashBinItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'movableTrash'
   )
-  const thermocyclerFixtures = filterAaByAreaType(
+  const thermocyclerItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'thermocycler'
   )
-  const heaterShakerFixtures = filterAaByAreaType(
+  const heaterShakerItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'heaterShaker'
   )
-  const temperatureModuleFixtures = filterAaByAreaType(
+  const temperatureModuleItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'temperatureModule'
   )
-  const magneticBlockFixtures = filterAaByAreaType(
+  const magneticBlockItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'magneticBlock'
   )
-  const absorbanceReaderFixtures = filterAaByAreaType(
+  const absorbanceReaderItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'absorbanceReader'
   )
 
-  const flexStackerFixtures = filterAaByAreaType(
+  const flexStackerItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'flexStacker'
@@ -124,9 +128,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       height={height}
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
-      {stagingAreaFixtures.map(
+      {stagingAreaItems.map(
         ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-          <StagingAreaConfigFixture
+          <StagingAreaConfigItem
             data-testid={cutoutId}
             key={addressableAreaId}
             deckDefinition={deckDef}
@@ -142,8 +146,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           />
         )
       )}
-      {emptyCutouts.map(({ cutoutId, addressableAreaId }) => (
-        <EmptyConfigFixture
+      {emptySlotLikeItems.map(({ cutoutId, addressableAreaId }) => (
+        <EmptyConfigItem
           data-testid={addressableAreaId}
           key={addressableAreaId}
           addressableArea={addressableAreaId}
@@ -152,7 +156,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           fixtureLocation={cutoutId}
         />
       ))}
-      {wasteChuteFixtures.map(
+      {wasteChuteItems.map(
         ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
           <WasteChuteConfigFixture
             data-testid={cutoutId}
@@ -169,9 +173,22 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           />
         )
       )}
-      {trashBinFixtures.map(
+      {trashBinItems.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+        <TrashBinConfigItem
+          data-testid={cutoutId}
+          key={addressableAreaId}
+          deckDefinition={deckDef}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
+          fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
+          selected={cutoutId === selectedCutoutId}
+        />
+      ))}
+      {temperatureModuleItems.map(
         ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-          <TrashBinConfigFixture
+          <TemperatureModuleItem
             data-testid={cutoutId}
             key={addressableAreaId}
             deckDefinition={deckDef}
@@ -186,9 +203,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           />
         )
       )}
-      {temperatureModuleFixtures.map(
+      {heaterShakerItems.map(
         ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-          <TemperatureModuleFixture
+          <HeaterShakerItem
             data-testid={cutoutId}
             key={addressableAreaId}
             deckDefinition={deckDef}
@@ -203,26 +220,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           />
         )
       )}
-      {heaterShakerFixtures.map(
+      {magneticBlockItems.map(
         ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-          <HeaterShakerFixture
-            data-testid={cutoutId}
-            key={addressableAreaId}
-            deckDefinition={deckDef}
-            handleClickRemove={
-              editableCutoutIds.includes(cutoutId)
-                ? handleClickRemove
-                : undefined
-            }
-            fixtureLocation={cutoutId}
-            cutoutFixtureId={cutoutFixtureId}
-            selected={cutoutId === selectedCutoutId}
-          />
-        )
-      )}
-      {magneticBlockFixtures.map(
-        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-          <MagneticBlockFixture
+          <MagneticBlockItem
             data-testid={cutoutId}
             key={addressableAreaId}
             deckDefinition={deckDef}
@@ -241,10 +241,10 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           />
         )
       )}
-      {thermocyclerFixtures.map(
+      {thermocyclerItems.map(
         ({ cutoutId, cutoutFixtureId, addressableAreaId }) => {
           return (
-            <ThermocyclerFixture
+            <ThermocyclerItem
               data-testid={cutoutId}
               key={addressableAreaId}
               deckDefinition={deckDef}
@@ -264,9 +264,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           )
         }
       )}
-      {absorbanceReaderFixtures.map(
+      {absorbanceReaderItems.map(
         ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-          <AbsorbanceReaderFixture
+          <AbsorbanceReaderItem
             data-testid={cutoutId}
             key={addressableAreaId}
             deckDefinition={deckDef}
@@ -281,9 +281,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           />
         )
       )}
-      {flexStackerFixtures.map(
+      {flexStackerItems.map(
         ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-          <FlexStackerFixture
+          <FlexStackerItem
             data-testid={cutoutId}
             key={addressableAreaId}
             deckDefinition={deckDef}
@@ -301,7 +301,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         )
       )}
       {additionalStaticFixtures?.map(staticFixture => (
-        <StaticFixture
+        <StaticItem
           data-testid={staticFixture.location}
           key={staticFixture.location}
           deckDefinition={deckDef}
@@ -314,9 +314,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         robotType={FLEX_ROBOT_TYPE}
         color={darkFill}
         show4thColumn={
-          stagingAreaFixtures.length > 0 ||
-          absorbanceReaderFixtures.length > 0 ||
-          flexStackerFixtures.length > 0
+          stagingAreaItems.length > 0 ||
+          absorbanceReaderItems.length > 0 ||
+          flexStackerItems.length > 0
         }
       />
       {children}

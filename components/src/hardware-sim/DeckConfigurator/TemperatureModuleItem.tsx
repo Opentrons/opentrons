@@ -13,7 +13,6 @@ import {
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  TRASH_BIN_DISPLAY_NAME,
   Y_ADJUSTMENT,
 } from './constants'
 
@@ -23,7 +22,11 @@ import type {
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface TrashBinConfigFixtureProps {
+// TODO(BC, 2024-03-21): This component is almost identical to HeaterShakerFixture, consider consolidating?
+
+const TEMPERATURE_MODULE_FIXTURE_DISPLAY_NAME = 'Temperature'
+
+interface TemperatureModuleFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
@@ -34,8 +37,8 @@ interface TrashBinConfigFixtureProps {
   selected?: boolean
 }
 
-export function TrashBinConfigFixture(
-  props: TrashBinConfigFixtureProps
+export function TemperatureModuleItem(
+  props: TemperatureModuleFixtureProps
 ): JSX.Element {
   const {
     deckDefinition,
@@ -45,7 +48,7 @@ export function TrashBinConfigFixture(
     selected = false,
   } = props
 
-  const trashBinCutout = deckDefinition.locations.cutouts.find(
+  const cutoutDef = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
 
@@ -54,7 +57,7 @@ export function TrashBinConfigFixture(
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
    * the adjustment for x is different for right side/left side
    */
-  const [xSlotPosition = 0, ySlotPosition = 0] = trashBinCutout?.position ?? []
+  const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
 
   const isColumnOne = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
   const xAdjustment = isColumnOne
@@ -65,6 +68,7 @@ export function TrashBinConfigFixture(
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
+
   return (
     <RobotCoordsForeignObject
       width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
@@ -86,7 +90,7 @@ export function TrashBinConfigFixture(
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {TRASH_BIN_DISPLAY_NAME}
+          {TEMPERATURE_MODULE_FIXTURE_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />

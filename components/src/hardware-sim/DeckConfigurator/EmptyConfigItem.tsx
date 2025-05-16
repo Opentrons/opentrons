@@ -1,6 +1,9 @@
 import { css } from 'styled-components'
 
-import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+import {
+  getAALocationForCutoutAndFixtureId,
+  SINGLE_LEFT_CUTOUTS,
+} from '@opentrons/shared-data'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
@@ -18,22 +21,19 @@ import {
 } from './constants'
 
 import type {
-  AddressableArea,
   AddressableAreaName,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface EmptyConfigFixtureProps {
+interface EmptyConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   addressableArea: AddressableAreaName
   handleClickAdd: (fixtureLocation: CutoutId) => void
 }
 
-export function EmptyConfigFixture(
-  props: EmptyConfigFixtureProps
-): JSX.Element {
+export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
   const {
     deckDefinition,
     handleClickAdd,
@@ -51,9 +51,10 @@ export function EmptyConfigFixture(
    */
   const [xSlotPosition = 0, ySlotPosition = 0] =
     standardSlotCutout?.position ?? []
-  const offsetVector = deckDefinition.locations.addressableAreas.find(
-    (aaItem: AddressableArea) => aaItem.id === addressableArea
-  )?.offsetFromCutoutFixture ?? [0, 0, 0]
+  const offsetVector = getAALocationForCutoutAndFixtureId(
+    addressableArea,
+    deckDefinition
+  )
 
   const x =
     xSlotPosition +

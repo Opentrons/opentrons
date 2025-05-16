@@ -1,16 +1,19 @@
+import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
+  COLUMN_1_X_ADJUSTMENT,
   COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  WASTE_CHUTE_DISPLAY_NAME,
+  TRASH_BIN_DISPLAY_NAME,
   Y_ADJUSTMENT,
 } from './constants'
 
@@ -20,7 +23,7 @@ import type {
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface WasteChuteConfigFixtureProps {
+interface TrashBinConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
@@ -28,12 +31,11 @@ interface WasteChuteConfigFixtureProps {
     fixtureLocation: CutoutId,
     cutoutFixtureId: CutoutFixtureId
   ) => void
-  hasStagingAreas?: boolean
   selected?: boolean
 }
 
-export function WasteChuteConfigFixture(
-  props: WasteChuteConfigFixtureProps
+export function TrashBinConfigItem(
+  props: TrashBinConfigItemProps
 ): JSX.Element {
   const {
     deckDefinition,
@@ -43,18 +45,23 @@ export function WasteChuteConfigFixture(
     selected = false,
   } = props
 
-  const wasteChuteCutout = deckDefinition.locations.cutouts.find(
+  const trashBinCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
 
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
+   * the adjustment for x is different for right side/left side
    */
-  const [xSlotPosition = 0, ySlotPosition = 0] =
-    wasteChuteCutout?.position ?? []
+  const [xSlotPosition = 0, ySlotPosition = 0] = trashBinCutout?.position ?? []
 
-  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
+  const isColumnOne = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
+  const xAdjustment = isColumnOne
+    ? COLUMN_1_X_ADJUSTMENT
+    : COLUMN_DEFAULT_X_ADJUSTMENT
+  const x = xSlotPosition + xAdjustment
+
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
@@ -79,7 +86,7 @@ export function WasteChuteConfigFixture(
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {WASTE_CHUTE_DISPLAY_NAME}
+          {TRASH_BIN_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />

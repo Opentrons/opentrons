@@ -1,9 +1,12 @@
+import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
+  COLUMN_1_X_ADJUSTMENT,
   COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
@@ -14,53 +17,38 @@ import {
 } from './constants'
 
 import type {
-  AddressableArea,
-  AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface FlexStackerFixtureProps {
+// TODO(BC, 2024-03-21): This component is almost identical to TemperatureModuleFixture, consider consolidating?
+
+interface HeaterShakerItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
-  hasWasteChute: boolean
   handleClickRemove?: (
     fixtureLocation: CutoutId,
     cutoutFixtureId: CutoutFixtureId
   ) => void
   selected?: boolean
-  addressableArea: AddressableAreaName
 }
 
-// todo(should we move this to translations? )
-const FLEX_STACKER_FIXTURE_DISPLAY_NAME = 'Stacker'
-const FLEX_STACKER_WASTE_CHUTE_DISPLAY_NAME = 'Stacker + Waste chute'
-const FLEX_STACKER_MAG_BLOCK_DISPLAY_NAME = 'Stacker + Mag Block'
-
-export function FlexStackerFixture(
-  props: FlexStackerFixtureProps
-): JSX.Element {
+const HEATER_SHAKER_MODULE_FIXTURE_DISPLAY_NAME = 'Heater-Shaker'
+HeaterShakerItem
+export function HeaterShakerItem(props: HeaterShakerItemProps): JSX.Element {
   const {
     deckDefinition,
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
-    hasWasteChute,
-    addressableArea,
     selected = false,
   } = props
 
   const cutoutDef = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
-  let displayName = FLEX_STACKER_FIXTURE_DISPLAY_NAME
-  if (hasWasteChute) {
-    displayName = FLEX_STACKER_WASTE_CHUTE_DISPLAY_NAME
-  } else if (cutoutFixtureId === 'flexStackerModuleV1WithMagneticBlockV1') {
-    displayName = FLEX_STACKER_MAG_BLOCK_DISPLAY_NAME
-  }
 
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
@@ -68,11 +56,14 @@ export function FlexStackerFixture(
    * the adjustment for x is different for right side/left side
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
-  const offsetVector = deckDefinition.locations.addressableAreas.find(
-    (aaItem: AddressableArea) => aaItem.id === addressableArea
-  )?.offsetFromCutoutFixture ?? [0, 0, 0]
+
+  const isColumnOne = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
+  const xAdjustment = isColumnOne
+    ? COLUMN_1_X_ADJUSTMENT
+    : COLUMN_DEFAULT_X_ADJUSTMENT
+  const x = xSlotPosition + xAdjustment
+
   const y = ySlotPosition + Y_ADJUSTMENT
-  const x = xSlotPosition + offsetVector[0] + COLUMN_DEFAULT_X_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
@@ -95,7 +86,9 @@ export function FlexStackerFixture(
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{displayName}</Text>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
+          {HEATER_SHAKER_MODULE_FIXTURE_DISPLAY_NAME}
+        </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

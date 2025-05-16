@@ -23,7 +23,7 @@ import type {
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface MagneticBlockFixtureProps {
+interface MagneticBlockItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
@@ -37,9 +37,7 @@ interface MagneticBlockFixtureProps {
 
 const MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME = 'Mag Block'
 
-export function MagneticBlockFixture(
-  props: MagneticBlockFixtureProps
-): JSX.Element {
+export function MagneticBlockItem(props: MagneticBlockItemProps): JSX.Element {
   const {
     deckDefinition,
     fixtureLocation,

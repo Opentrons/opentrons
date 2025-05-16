@@ -1,4 +1,4 @@
-import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+import { getAALocationForCutoutAndFixtureId } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
@@ -6,28 +6,29 @@ import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_1_X_ADJUSTMENT,
   COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
+  STAGING_AREA_DISPLAY_NAME,
   Y_ADJUSTMENT,
 } from './constants'
 
 import type {
+  AddressableArea,
+  AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-// TODO(BC, 2024-03-21): This component is almost identical to TemperatureModuleFixture, consider consolidating?
-
-interface HeaterShakerFixtureProps {
+interface StagingAreaConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
+  addressableArea: AddressableAreaName
   handleClickRemove?: (
     fixtureLocation: CutoutId,
     cutoutFixtureId: CutoutFixtureId
@@ -35,36 +36,33 @@ interface HeaterShakerFixtureProps {
   selected?: boolean
 }
 
-const HEATER_SHAKER_MODULE_FIXTURE_DISPLAY_NAME = 'Heater-Shaker'
-
-export function HeaterShakerFixture(
-  props: HeaterShakerFixtureProps
+export function StagingAreaConfigItem(
+  props: StagingAreaConfigItemProps
 ): JSX.Element {
   const {
     deckDefinition,
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    addressableArea,
     selected = false,
   } = props
 
-  const cutoutDef = deckDefinition.locations.cutouts.find(
+  const stagingAreaCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
-
+  const offsetVector = getAALocationForCutoutAndFixtureId(
+    addressableArea,
+    deckDefinition
+  )
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
-   * the adjustment for x is different for right side/left side
    */
-  const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
+  const [xSlotPosition = 0, ySlotPosition = 0] =
+    stagingAreaCutout?.position ?? []
 
-  const isColumnOne = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
-  const xAdjustment = isColumnOne
-    ? COLUMN_1_X_ADJUSTMENT
-    : COLUMN_DEFAULT_X_ADJUSTMENT
-  const x = xSlotPosition + xAdjustment
-
+  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT + offsetVector[0]
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
@@ -89,7 +87,7 @@ export function HeaterShakerFixture(
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {HEATER_SHAKER_MODULE_FIXTURE_DISPLAY_NAME}
+          {STAGING_AREA_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />

@@ -1,12 +1,9 @@
-import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
-
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_1_X_ADJUSTMENT,
   COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
@@ -22,11 +19,7 @@ import type {
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-// TODO(BC, 2024-03-21): This component is almost identical to HeaterShakerFixture, consider consolidating?
-
-const TEMPERATURE_MODULE_FIXTURE_DISPLAY_NAME = 'Temperature'
-
-interface TemperatureModuleFixtureProps {
+interface AbsorbanceReaderItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
@@ -37,8 +30,10 @@ interface TemperatureModuleFixtureProps {
   selected?: boolean
 }
 
-export function TemperatureModuleFixture(
-  props: TemperatureModuleFixtureProps
+const ABSORBANCE_READER_FIXTURE_DISPLAY_NAME = 'Absorbance'
+
+export function AbsorbanceReaderItem(
+  props: AbsorbanceReaderItemProps
 ): JSX.Element {
   const {
     deckDefinition,
@@ -59,16 +54,11 @@ export function TemperatureModuleFixture(
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
 
-  const isColumnOne = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
-  const xAdjustment = isColumnOne
-    ? COLUMN_1_X_ADJUSTMENT
-    : COLUMN_DEFAULT_X_ADJUSTMENT
-  const x = xSlotPosition + xAdjustment
+  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
 
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
-
   return (
     <RobotCoordsForeignObject
       width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
@@ -90,7 +80,7 @@ export function TemperatureModuleFixture(
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {TEMPERATURE_MODULE_FIXTURE_DISPLAY_NAME}
+          {ABSORBANCE_READER_FIXTURE_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />

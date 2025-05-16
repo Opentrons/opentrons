@@ -22,7 +22,7 @@ interface StaticFixtureProps {
  * config map
  */
 
-export function StaticFixture(props: StaticFixtureProps): JSX.Element {
+export function StaticItem(props: StaticFixtureProps): JSX.Element {
   const { deckDefinition, fixtureLocation, label } = props
 
   const staticCutout = deckDefinition.locations.cutouts.find(
