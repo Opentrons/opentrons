@@ -24,6 +24,7 @@ import type { ModuleCalibrationWizardStepProps } from './types'
 interface InstallShuttleProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration
   fixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
+  shuttleHomeStep: boolean
 }
 
 const BODY_STYLE = css`
@@ -37,7 +38,11 @@ const BODY_STYLE = css`
 export const InstallShuttle = (
   props: InstallShuttleProps
 ): JSX.Element | null => {
-  const { proceed, goBack, isRobotMoving } = props
+  const {
+    proceed,
+    goBack,
+    isRobotMoving,
+  } = props
   const { t, i18n } = useTranslation(['module_wizard_flows'])
 
   const shuttleInstallVid = (
@@ -70,7 +75,7 @@ export const InstallShuttle = (
     </>
   )
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         // TODO ND: 9/6/23 use spinner until animations are made
@@ -78,16 +83,17 @@ export const InstallShuttle = (
         description={t('stand_back')}
       />
     )
-  // TODO: add calibration loading screen and error screen
-  else
+  } 
+  else {
     return (
       <GenericWizardTile
         header={i18n.format(t('place_shuttle'), 'capitalize')}
         rightHandBody={shuttleInstallVid}
         bodyText={bodyText}
         proceedButtonText={t('confirm_placement')}
-        proceed={proceed} // CASEY NOTE - needs to be custom function that calls the robot to check to see if the shuttle is present
+        proceed={proceed}
         back={goBack}
       />
     )
+  }
 }

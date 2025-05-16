@@ -11,6 +11,8 @@
   "calibration_probe_touching": "The calibration probe will touch the sides of the calibration square in {{module}} in slot {{slotNumber}} to determine its exact position",
   "calibration_probe_touching_thermocycler": "The calibration probe will touch the sides of the calibration square in Thermocycler to determine its exact position",
   "checking_firmware": "Checking {{module}} firmware",
+  "close_doors": "Close robot and stacker door",
+  "close_doors_description": "The robot needs to safely move to its home location before you can set the labware shuttle onto the track.",
   "complete_calibration": "Complete calibration",
   "confirm_location": "Confirm location",
   "confirm_placement": "Confirm placement",
