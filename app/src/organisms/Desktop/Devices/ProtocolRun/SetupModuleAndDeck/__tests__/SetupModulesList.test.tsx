@@ -221,7 +221,7 @@ describe('SetupModulesList', () => {
     render(props)
     screen.getByText('Thermocycler Module')
     screen.getByText('A1+B1')
-    fireEvent.click(screen.getByRole('button', { name: 'Calibrate now' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Setup now' }))
     await waitFor(() => {
       screen.getByText('mock ModuleWizardFlows')
     })
@@ -255,7 +255,7 @@ describe('SetupModulesList', () => {
     vi.mocked(useIsFlex).mockReturnValue(true)
 
     render(props)
-    expect(screen.getByRole('button', { name: 'Calibrate now' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Setup now' })).toBeDisabled()
   })
 
   it('should render a thermocycler module that is connected, OT3', () => {
