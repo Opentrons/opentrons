@@ -49,7 +49,7 @@ export interface ModuleCalibrationWizardStepProps {
     continuePastCommandFailure: boolean
   ) => Promise<unknown>
   isRobotMoving: boolean
-  maintenanceRunId?: string
+  maintenanceRunId: string | null
   attachedModule: AttachedModule
   attachedPipette: PipetteInformation
   errorMessage: string | null
