@@ -2,12 +2,13 @@
 
 from logging import getLogger
 import enum
-from typing_extensions import assert_type
 from numpy import array, dot, double as npdouble
 from numpy.typing import NDArray
 from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict, Set
 from dataclasses import dataclass
 from functools import cached_property
+
+from typing_extensions import assert_type
 
 from opentrons.types import (
     Point,
@@ -91,6 +92,7 @@ from ..types import (
     labware_location_is_system,
     WellLocationType,
     WellLocationFunction,
+    LabwareParentLocationInfo,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
 from .config import Config
@@ -104,6 +106,7 @@ from .frustum_helpers import (
     find_height_at_well_volume,
 )
 from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
+from ._labware_origin_math import get_parent_origin_to_lw_origin
 
 
 _LOG = getLogger(__name__)
@@ -318,12 +321,7 @@ class GeometryView:
 
     def get_labware_parent_nominal_position(self, labware_id: str) -> Point:
         """Get the position of the labware's uncalibrated parent (deck slot, module, or another labware)."""
-        try:
-            addressable_area_name = self.get_ancestor_slot_name(labware_id).id
-        except errors.LocationIsStagingSlotError:
-            addressable_area_name = self._get_staging_slot_name(labware_id)
-        except errors.LocationIsLidDockSlotError:
-            addressable_area_name = self._get_lid_dock_slot_name(labware_id)
+        addressable_area_name = self._get_addressable_area_name(labware_id)
         parent_pos = self._addressable_areas.get_addressable_area_position(
             addressable_area_name
         )
@@ -338,6 +336,17 @@ class GeometryView:
             parent_pos.z + offset_from_parent.z,
         )
 
+    def _get_addressable_area_name(self, labware_id: str) -> str:
+        try:
+            addressable_area_name = self.get_ancestor_slot_name(labware_id).id
+        except errors.LocationIsStagingSlotError:
+            addressable_area_name = self._get_staging_slot_name(labware_id)
+        except errors.LocationIsLidDockSlotError:
+            addressable_area_name = self._get_lid_dock_slot_name(labware_id)
+
+        return addressable_area_name
+
+    # TODO(jh, 05-22-25): This functionality should be absorbed by the labware origin offset calculation logic.
     def _get_offset_from_parent(
         self, child_definition: LabwareDefinition, parent: LabwareLocation
     ) -> LabwareOffsetVector:
@@ -519,33 +528,47 @@ class GeometryView:
 
         This includes module calibration but excludes the calibration of the given labware.
         """
-        slot_front_left = self.get_labware_parent_position(labware_id)
+        slot_front_left_position = self.get_labware_parent_position(labware_id)
+        labware_data = self._labware.get(labware_id)
         definition = self._labware.get_definition(labware_id)
+        lw_parent_location_info = self._get_parent_location_info(labware_data)
+        parent_origin_to_lw_origin = get_parent_origin_to_lw_origin(
+            labware_data=labware_data,
+            definition=definition,
+            lw_parent_location_info=lw_parent_location_info,
+        )
+        result = slot_front_left_position + parent_origin_to_lw_origin
 
-        if isinstance(definition, LabwareDefinition2):
-            slot_front_left_to_labware_front_left = Point(
-                definition.cornerOffsetFromSlot.x,
-                definition.cornerOffsetFromSlot.y,
-                definition.cornerOffsetFromSlot.z,
+        return result
+
+    def _get_parent_location_info(
+        self,
+        labware_data: LoadedLabware,
+    ) -> LabwareParentLocationInfo:
+        """Get location information for a labware's parent (deck slot, module, or another labware)."""
+        if isinstance(
+            labware_data.location, (DeckSlotLocation, AddressableAreaLocation)
+        ):
+            addressable_area_name = self._get_addressable_area_name(labware_data.id)
+            return self._addressable_areas.get_addressable_area(addressable_area_name)
+
+        elif isinstance(labware_data.location, ModuleLocation):
+            module_id = labware_data.location.moduleId
+            return self._modules.get_definition(module_id)
+
+        elif isinstance(labware_data.location, OnLabwareLocation):
+            below_labware_id = labware_data.location.labwareId
+            return self._labware.get_definition(below_labware_id)
+
+        elif labware_data.location == OFF_DECK_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                f"Labware {labware_data.id} does not have a slot associated with it"
+                f" since it is no longer on the deck."
             )
-            return slot_front_left + slot_front_left_to_labware_front_left
         else:
-            assert_type(definition, LabwareDefinition3)
-
-            labware_footprint_left_x = definition.extents.footprint.backLeft.x
-            labware_footprint_front_y = definition.extents.footprint.frontRight.y
-            labware_footprint_bottom_z = definition.extents.total.backLeftBottom.z
-
-            labware_origin_to_labware_front_left_bottom = Point(
-                labware_footprint_left_x,
-                labware_footprint_front_y,
-                labware_footprint_bottom_z,
+            raise errors.InvalidLabwarePositionError(
+                f"Cannot get ancestor slot of {self._labware.get_display_name(labware_data.id)} with location {labware_data.location}"
             )
-            labware_front_left_bottom_to_labware_origin = (
-                -1 * labware_origin_to_labware_front_left_bottom
-            )
-
-            return slot_front_left + labware_front_left_bottom_to_labware_origin
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
@@ -556,24 +579,6 @@ class GeometryView:
             y=origin_pos.y + cal_offset.y,
             z=origin_pos.z + cal_offset.z,
         )
-
-    def _validate_well_position(
-        self,
-        target_height: LiquidTrackingType,  # height in mm inside a well relative to the bottom
-        well_max_height: float,
-        pipette_id: str,
-    ) -> LiquidTrackingType:
-        """If well offset would be outside the bounds of a well, silently bring it back to the boundary."""
-        if isinstance(target_height, SimulatedProbeResult):
-            return target_height
-        lld_min_height = self._pipettes.get_current_tip_lld_settings(
-            pipette_id=pipette_id
-        )
-        if target_height < lld_min_height:
-            target_height = lld_min_height
-        elif target_height > well_max_height:
-            target_height = well_max_height
-        return target_height
 
     def validate_probed_height(
         self,
@@ -2296,3 +2301,21 @@ class GeometryView:
                 return pending_labware[labware_id]
             except KeyError as ke:
                 raise lnle from ke
+
+    def _validate_well_position(
+        self,
+        target_height: LiquidTrackingType,  # height in mm inside a well relative to the bottom
+        well_max_height: float,
+        pipette_id: str,
+    ) -> LiquidTrackingType:
+        """If well offset would be outside the bounds of a well, silently bring it back to the boundary."""
+        if isinstance(target_height, SimulatedProbeResult):
+            return target_height
+        lld_min_height = self._pipettes.get_current_tip_lld_settings(
+            pipette_id=pipette_id
+        )
+        if target_height < lld_min_height:
+            target_height = lld_min_height
+        elif target_height > well_max_height:
+            target_height = well_max_height
+        return target_height

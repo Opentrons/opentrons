@@ -98,6 +98,7 @@ from .labware import (
     LegacyLabwareOffsetCreate,
     LabwareOffsetCreateInternal,
     LoadedLabware,
+    LabwareParentLocationInfo,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
 from .labware_offset_location import (
@@ -239,8 +240,6 @@ __all__ = [
     "OnLabwareOffsetLocationSequenceComponent",
     "OnModuleOffsetLocationSequenceComponent",
     "OnAddressableAreaOffsetLocationSequenceComponent",
-    # Labware offset vector
-    "LabwareOffsetVector",
     # Labware
     "OverlapOffset",
     "LabwareOffset",
@@ -249,6 +248,7 @@ __all__ = [
     "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
+    "LabwareParentLocationInfo",
     # Liquids
     "HexColor",
     "EmptyLiquidId",

@@ -81,6 +81,7 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     TipGeometry,
     ModuleDefinition,
+    ModuleDimensions,
     ProbedHeightInfo,
     ProbedVolumeInfo,
     LoadedVolumeInfo,
@@ -199,6 +200,19 @@ _MOCK_LABWARE_DEFINITION3 = LabwareDefinition3.model_construct(  # type: ignore[
             frontRight=Vector2D(x=200, y=-50),
         ),
     ),
+    locatingFeaturesAsChild={},
+    locatingFeaturesAsParent={},
+)
+
+_MOCK_MODULE_DEFINITION = ModuleDefinition.model_construct(  # type: ignore[call-arg]
+    schemaVersion=2,
+    dimensions=ModuleDimensions(
+        bareOverallHeight=1,
+        overLabwareHeight=1,
+        labwareInterfaceXDimension=100,
+        labwareInterfaceYDimension=50,
+    ),
+    locatingFeaturesAsParent={},
 )
 
 
@@ -768,42 +782,6 @@ def test_get_labware_origin_position(
     assert result == expected_point
 
 
-def test_get_labware_origin_position_with_lw_definition3(
-    decoy: Decoy,
-    mock_labware_view: LabwareView,
-    mock_addressable_area_view: AddressableAreaView,
-    subject: GeometryView,
-) -> None:
-    """It should return a deck slot position with the labware's offset as its origin when the labware is of type LabwareDefinition3."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-        offsetId=None,
-    )
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        _MOCK_LABWARE_DEFINITION3
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
-    ).then_return(Point(1, 2, 3))
-
-    expected_parent = Point(1, 52, 3)
-    expected_lw_offset = Point(
-        x=_MOCK_LABWARE_DEFINITION3.extents.footprint.backLeft.x,
-        y=_MOCK_LABWARE_DEFINITION3.extents.footprint.backLeft.y,
-        z=_MOCK_LABWARE_DEFINITION3.extents.total.backLeftBottom.z,
-    )
-    expected_point = expected_parent + expected_lw_offset
-
-    result = subject.get_labware_origin_position("labware-id")
-
-    assert result == expected_point
-
-
 def test_get_labware_highest_z(
     decoy: Decoy,
     mock_labware_view: LabwareView,
@@ -811,6 +789,21 @@ def test_get_labware_highest_z(
     subject: GeometryView,
 ) -> None:
     """It should get the absolute location of a labware's highest Z point."""
+    mock_addressable_area = AddressableArea(
+        area_name="3",
+        area_type=AreaType.SLOT,
+        base_slot=DeckSlotName.SLOT_3,
+        display_name="Slot 3",
+        bounding_box=Dimensions(x=128, y=86, z=0),
+        position=AddressableOffsetVector(x=0, y=0, z=0),
+        compatible_module_types=[],
+        locatingFeaturesAsParent={},
+    )
+
+    decoy.when(mock_addressable_area_view.get_addressable_area("3")).then_return(
+        mock_addressable_area
+    )
+
     labware_data = LoadedLabware(
         id="labware-id",
         loadName="load-name",
@@ -842,6 +835,7 @@ def test_get_labware_highest_z(
 
 def test_get_module_labware_highest_z(
     decoy: Decoy,
+    addressable_area_store: AddressableAreaStore,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
@@ -862,6 +856,9 @@ def test_get_module_labware_highest_z(
     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
         _MOCK_LABWARE_DEFINITION3
+    )
+    decoy.when(mock_module_view.get_definition("module-id")).then_return(
+        _MOCK_MODULE_DEFINITION
     )
     decoy.when(mock_labware_view.get_dimensions(labware_id="labware-id")).then_return(
         Dimensions(x=999, y=999, z=100)
@@ -1145,6 +1142,20 @@ def test_get_highest_z_in_slot_with_single_labware(
     subject: GeometryView,
 ) -> None:
     """It should get the highest Z in slot with just a single labware."""
+    mock_addressable_area = AddressableArea(
+        area_name="3",
+        area_type=AreaType.SLOT,
+        base_slot=DeckSlotName.SLOT_3,
+        display_name="Slot 3",
+        bounding_box=Dimensions(x=128, y=86, z=0),
+        position=AddressableOffsetVector(x=0, y=0, z=0),
+        compatible_module_types=[],
+        locatingFeaturesAsParent={},
+    )
+
+    decoy.when(mock_addressable_area_view.get_addressable_area("3")).then_return(
+        mock_addressable_area
+    )
     # Case: Slot has a labware that doesn't have any other labware on it. Highest z is equal to labware height.
     labware_in_slot = LoadedLabware(
         id="just-labware-id",
@@ -1454,6 +1465,20 @@ def test_get_min_travel_z(
     subject: GeometryView,
 ) -> None:
     """It should find the minimum travel z."""
+    mock_addressable_area = AddressableArea(
+        area_name="3",
+        area_type=AreaType.SLOT,
+        base_slot=DeckSlotName.SLOT_3,
+        display_name="Slot 3",
+        bounding_box=Dimensions(x=128, y=86, z=0),
+        position=AddressableOffsetVector(x=0, y=0, z=0),
+        compatible_module_types=[],
+        locatingFeaturesAsParent={},
+    )
+
+    decoy.when(mock_addressable_area_view.get_addressable_area("3")).then_return(
+        mock_addressable_area
+    )
     labware_data = LoadedLabware(
         id="labware-id",
         loadName="load-name",
@@ -3168,6 +3193,7 @@ def test_get_slot_item(
         bounding_box=Dimensions(x=0, y=0, z=0),
         position=AddressableOffsetVector(x=0, y=0, z=0),
         compatible_module_types=[],
+        locatingFeaturesAsParent={},
     )
     subject._addressable_areas = AddressableAreaView(
         state=AddressableAreaState(
