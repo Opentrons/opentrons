@@ -238,7 +238,7 @@ export const getAAFromCutoutFixtureId = (
   inputCutoutId: CutoutId,
   cutoutFixtureId: CutoutFixtureId,
   deckDefinition: DeckDefinition
-): AddressableAreaName[] | undefined => {
+): AddressableAreaName[] | null => {
   /**
    * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
    */
