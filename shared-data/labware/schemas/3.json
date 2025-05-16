@@ -496,6 +496,8 @@
     "parameters",
     "ordering",
     "extents",
+    "locatingFeaturesAsParent",
+    "locatingFeaturesAsChild",
     "wells",
     "groups"
   ],
@@ -611,6 +613,24 @@
         "items": {
           "type": "string"
         }
+      }
+    },
+    "locatingFeaturesAsParent": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string",
+        "enum": ["well"],
+        "description": "A list (in highest to lowest mating priority order) of locating features when the module acts as the parent in a labware stackup."
+      }
+    },
+    "locatingFeaturesAsChild": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string",
+        "enum": ["well"],
+        "description": "A list (in highest to lowest mating priority order) of locating features when the module acts as the child in a labware stackup."
       }
     },
     "extents": {

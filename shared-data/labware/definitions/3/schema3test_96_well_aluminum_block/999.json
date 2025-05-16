@@ -23,6 +23,8 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
+  "locatingFeaturesAsParent": ["well"],
+  "locatingFeaturesAsChild": [],
   "extents": {
     "total": {
       "backLeftBottom": {
