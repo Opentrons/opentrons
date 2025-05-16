@@ -2,7 +2,6 @@ import path from 'path'
 import Ajv from 'ajv'
 import glob from 'glob'
 import { beforeAll, describe, expect, it } from 'vitest'
-
 import moduleSpecsV1 from '../../module/definitions/1.json'
 import moduleSpecsSchemaV1 from '../../module/schemas/1.json'
 import moduleSpecsSchemaV2 from '../../module/schemas/2.json'
@@ -58,6 +57,14 @@ describe('validate all module specs with schema', () => {
 
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
+    })
+
+    // TODO(jh, 05-16-25): After adding all locating features, ensure the default case fails.
+    it(`validates expected locatingFeaturesAsParent for ${filename}`, () => {
+      switch (filename) {
+        default:
+          expect(moduleDef.locatingFeaturesAsParent).toEqual([])
+      }
     })
   })
 
