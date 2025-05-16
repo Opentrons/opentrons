@@ -7,25 +7,24 @@ import {
   RESPONSIVENESS,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { SimpleWizardBody, SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
-
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   FLEX_STACKER_MODULE_TYPE,
-  type CreateCommand,
-  type DeckConfiguration,
 } from '@opentrons/shared-data'
+
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+
+import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface CloseDoorProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration
 }
 
-
-export const CloseDoor = (
-  props: CloseDoorProps
-): JSX.Element | null => {
+export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
   const {
     proceed,
     isRobotMoving,
@@ -38,7 +37,7 @@ export const CloseDoor = (
   const cutoutId = props.deckConfig.find(
     cc =>
       cc.opentronsModuleSerialNumber === attachedModule.serialNumber &&
-      (attachedModule.moduleType === FLEX_STACKER_MODULE_TYPE)
+      attachedModule.moduleType === FLEX_STACKER_MODULE_TYPE
   )?.cutoutId
   const slotName =
     cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null
@@ -83,9 +82,7 @@ export const CloseDoor = (
         description={t('stand_back_robot_in_motion')}
       />
     )
-  } 
-  
-  else {
+  } else {
     return (
       <SimpleWizardBody
         isSuccess={false}
@@ -102,5 +99,5 @@ export const CloseDoor = (
         </PrimaryButton>
       </SimpleWizardBody>
     )
-  } 
+  }
 }

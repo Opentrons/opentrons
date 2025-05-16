@@ -14,9 +14,7 @@ import videoPlaceholder from '/app/assets/videos/pipette-wizard-flows/Pipette_At
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import type {
-  DeckConfiguration,
-} from '@opentrons/shared-data'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface InstallShuttleProps extends ModuleCalibrationWizardStepProps {
@@ -34,10 +32,7 @@ const BODY_STYLE = css`
 export const InstallShuttle = (
   props: InstallShuttleProps
 ): JSX.Element | null => {
-  const {
-    proceed,
-    isRobotMoving,
-  } = props
+  const { proceed, isRobotMoving } = props
   const { t, i18n } = useTranslation(['module_wizard_flows'])
 
   const shuttleInstallVid = (
@@ -78,8 +73,7 @@ export const InstallShuttle = (
         description={t('stand_back_robot_in_motion')}
       />
     )
-  } 
-  else {
+  } else {
     return (
       <GenericWizardTile
         header={i18n.format(t('place_shuttle'), 'capitalize')}
