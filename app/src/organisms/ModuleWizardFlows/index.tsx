@@ -48,7 +48,6 @@ import type {
   CutoutConfig,
   SingleSlotCutoutFixtureId,
 } from '@opentrons/shared-data'
-import { CloseDoor } from './CloseStackerDoor'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -314,11 +313,14 @@ export const ModuleWizardFlows = (
     modalContent = <BeforeBeginning {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
     modalContent = (
-      <CloseDoor
+      <SelectLocation
         {...currentStep}
         {...calibrateBaseProps}
+        availableSlotNames={availableSlotNames}
         deckConfig={deckConfig}
-        fixtureIdByCutoutId={fixtureIdByCutoutId}
+        isLoadedInRun={isLoadedInRun}
+        occupiedCutouts={occupiedCutouts}
+        configuredFixtureIdByCutoutId={fixtureIdByCutoutId}
       />
     )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {
