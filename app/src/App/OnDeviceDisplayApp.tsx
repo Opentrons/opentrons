@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -6,7 +6,6 @@ import {
   Route,
   Routes,
   useLocation,
-  useNavigate,
 } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
 import { css } from 'styled-components'
@@ -25,6 +24,7 @@ import { SLEEP_NEVER_MS, useScreenIdle } from '/app/local-resources/dom-utils'
 import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
@@ -176,6 +176,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   }
   const dispatch = useDispatch<Dispatch>()
   const isIdle = useScreenIdle(sleepTime, options)
+  const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
 
   useEffect(() => {
     if (isIdle) {
@@ -206,10 +207,15 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   <MaintenanceRunTakeover>
                     <EstopTakeover />
                     <FirmwareUpdateTakeover />
+                    <ModuleWizardFlows
+                      closeFlow={() => setShowModuleSetupModal(false)}
+                    />
                     <NiceModal.Provider>
                       <ToasterOven>
                         <ProtocolReceiptToasts />
-                        <ModuleAttachedToasts />
+                        <ModuleAttachedToasts
+                          openFlow={() => setShowModuleSetupModal(true)}
+                        />
                         <SharedScrollRefProvider>
                           <OnDeviceDisplayAppRoutes />
                         </SharedScrollRefProvider>
@@ -299,11 +305,7 @@ function ProtocolReceiptToasts(): null {
   return null
 }
 
-function ModuleAttachedToasts(): null {
-  const navigate = useNavigate()
-  useModuleAttachedToast(() => {
-    // TODO(ba, 2025-05-02): Navigate to module setup once the route is added.
-    navigate('/protocols')
-  })
+function ModuleAttachedToasts({ openFlow }: { openFlow: () => void }): null {
+  useModuleAttachedToast(openFlow)
   return null
 }

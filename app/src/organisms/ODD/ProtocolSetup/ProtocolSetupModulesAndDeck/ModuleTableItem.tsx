@@ -33,8 +33,8 @@ import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
@@ -131,7 +131,6 @@ export function ModuleTableItem({
   }
 
   const isDoorOpen = useIsDoorOpen(robotName)
-
   const homeStacker = (): void => {
     if (module.attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE) {
       chainLiveCommands(

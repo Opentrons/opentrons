@@ -12,7 +12,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  CreateMaintenanceRunType,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
@@ -33,6 +32,9 @@ import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 
+import type {
+  CreateMaintenanceRunType,
+} from '@opentrons/react-api-client'
 import type {
   CutoutFixtureId,
   CutoutId,

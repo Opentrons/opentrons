@@ -52,7 +52,7 @@ export const ModuleWizardFlows = (
     deckConfig,
   } = useModuleSetupWizard({ closeFlow, attachedModuleOnLaunch, onComplete })
 
-  // add use effect to call build flow if there is a module passed in at launch
+  // build out flow if there is a module passed in at launch
   useEffect(() => {
     if (attachedModuleOnLaunch != null) {
       buildFlowForSelectedModule(attachedModuleOnLaunch)
@@ -63,13 +63,12 @@ export const ModuleWizardFlows = (
 
   if (wizardFlowBaseProps.attachedPipette == null) return null
   if (wizardFlowBaseProps.attachedModule == null) {
-    //arbitrary step count before we know how many there will be
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
         handleCleanUpAndClose={handleCleanUpAndClose}
-        currentStepIndex={0}
-        totalStepCount={5}
+        currentStepIndex={currentStepIndex}
+        totalStepCount={totalStepCount}
       >
         <>
           CHOOSE MODULE SCREEN PROCEED FUNCTION HERE WILL BE INITIALIZE MODULE
@@ -99,7 +98,6 @@ export const ModuleWizardFlows = (
       </ModuleWizardScreen>
     )
   } else if (wizardFlowBaseProps.errorMessage != null) {
-    // TODO: change this error header to match designs
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
