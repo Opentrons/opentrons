@@ -67,13 +67,15 @@ export const maxFieldValue = (maximum: number): ErrorChecker => (
   !value || Number(value) <= maximum
     ? null
     : `${FIELD_ERRORS.OVER_RANGE_MAXIMUM} ${maximum}`
-export const temperatureRangeFieldValue = (
+
+export const enterValueWithinRange = (
   minimum: number,
   maximum: number
 ): ErrorChecker => (value: unknown): string | null =>
   !value || (Number(value) <= maximum && Number(value) >= minimum)
     ? null
-    : `${FIELD_ERRORS.OUTSIDE_OF_RANGE} ${minimum} and ${maximum} °C`
+    : `Enter a value within the specified range`
+
 export const realNumber: ErrorChecker = (value: unknown) =>
   isNaN(Number(value)) ? FIELD_ERRORS.NOT_A_REAL_NUMBER : null
 

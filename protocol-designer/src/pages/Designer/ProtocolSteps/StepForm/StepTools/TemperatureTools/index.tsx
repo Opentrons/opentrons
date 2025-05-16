@@ -60,7 +60,6 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
             'targetTemperature',
             mappedErrorsToField
           )}
-          caption={t('form:step_edit_form.field.temperature.caption')}
         />
       </Flex>
     </Flex>

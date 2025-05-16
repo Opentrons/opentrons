@@ -190,12 +190,12 @@
           "toggleOn": "Open"
         },
         "shaker": {
-          "setShake": "Shake speed",
+          "setShake": "Shaker",
           "toggleOff": "Off",
           "toggleOn": "On"
         },
         "temperature": {
-          "setTemperature": "Temperature",
+          "setTemperature": "Heater",
           "toggleOff": "Off",
           "toggleOn": "On"
         },
@@ -295,7 +295,6 @@
         "label": "Step Notes"
       },
       "temperature": {
-        "caption": "Valid range is 4 – 95°C",
         "setTemperature": "Temperature",
         "toggleOff": "Off",
         "toggleOn": "On"
