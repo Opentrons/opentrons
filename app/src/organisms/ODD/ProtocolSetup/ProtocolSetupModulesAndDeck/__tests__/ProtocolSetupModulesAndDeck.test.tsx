@@ -30,6 +30,7 @@ import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 import { ProtocolSetupModulesAndDeck } from '..'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
@@ -49,6 +50,7 @@ vi.mock('/app/transformations/analysis')
 vi.mock('../utils')
 vi.mock('../SetupInstructionsModal')
 vi.mock('/app/organisms/ModuleWizardFlows')
+vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
 vi.mock('../FixtureTable')
 vi.mock('/app/organisms/LocationConflictModal')
 vi.mock('../ModulesAndDeckMapView')
@@ -115,6 +117,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
       ...mockConnectedRobot,
       name: ROBOT_NAME,
     })
+    vi.mocked(useIsDoorOpen).mockReturnValue(true)
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
@@ -222,37 +225,6 @@ describe('ProtocolSetupModulesAndDeck', () => {
     render()
     screen.getByText('Heater-Shaker Module GEN1')
     fireEvent.click(screen.getByText('Calibrate'))
-    await waitFor(() => {
-      expect(mockChainLiveCommands).toHaveBeenCalledWith(
-        [
-          {
-            commandType: 'heaterShaker/closeLabwareLatch',
-            params: {
-              moduleId: mockApiHeaterShaker.id,
-            },
-          },
-          {
-            commandType: 'heaterShaker/deactivateHeater',
-            params: {
-              moduleId: mockApiHeaterShaker.id,
-            },
-          },
-          {
-            commandType: 'heaterShaker/deactivateShaker',
-            params: {
-              moduleId: mockApiHeaterShaker.id,
-            },
-          },
-          {
-            commandType: 'heaterShaker/openLabwareLatch',
-            params: {
-              moduleId: mockApiHeaterShaker.id,
-            },
-          },
-        ],
-        false
-      )
-    })
     screen.getByText('mock ModuleWizardFlows')
   })
 

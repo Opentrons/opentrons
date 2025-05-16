@@ -22,7 +22,7 @@ export function moduleSetupWizardReducer(
     }
     case ACTIONS.PROCEED: {
       const newStepIndex =
-        state.totalStepCount > state.currentStepIndex + 1
+        state.totalStepCount >= state.currentStepIndex + 1
           ? state.currentStepIndex + 1
           : state.currentStepIndex
       return {

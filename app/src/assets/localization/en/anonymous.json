@@ -46,6 +46,7 @@
   "modal_instructions": "For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box.",
   "module_calibration_failed": "<block>Module calibration was unsuccessful. Make sure the calibration adapter is fully seated on the module and try again. If you still have trouble, contact support.</block><block>{{error}}</block>",
   "module_calibration_get_started": "<block>To get started, remove labware from the deck and clean up the working area to make the calibration easier. Also gather the needed equipment shown to the right.</block><block>The calibration adapter came with your module. The pipette probe came with your pipette.</block>",
+  "module_setup_failed": "<block>Module setup was unsuccessful. If you still have trouble, contact support.</block><block>{{error}}</block>",
   "module_error_contact_support": "Try powering the module off and on again. If the error persists, contact support.",
   "network_setup_menu_description": "You’ll use this connection to run software updates and load protocols onto your robot.",
   "new_robot_instructions": "When setting up a new robot, follow the instructions on the touchscreen. For more information, consult the Quickstart Guide for your robot.",
