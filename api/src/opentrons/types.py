@@ -199,7 +199,11 @@ class Location:
 
         """
 
-        return Location(point=self.point + point, labware=self._given_labware)
+        return Location(
+            point=self.point + point,
+            labware=self._given_labware,
+            _meniscus_tracking=self._meniscus_tracking,
+        )
 
     def __repr__(self) -> str:
         return f"Location(point={repr(self._point)}, labware={self._labware}, meniscus_tracking={self._meniscus_tracking})"
