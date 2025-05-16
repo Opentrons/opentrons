@@ -1,11 +1,8 @@
 import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   COLORS,
   PrimaryButton,
-  RESPONSIVENESS,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
@@ -32,7 +29,7 @@ export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
     chainRunCommands,
     setErrorMessage,
   } = props
-  const { t, i18n } = useTranslation(['module_wizard_flows'])
+  const { t } = useTranslation(['module_wizard_flows'])
 
   const cutoutId = props.deckConfig.find(
     cc =>
