@@ -348,7 +348,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
                 pip.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
                 pip.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
                 set_push_out = liquid_class.dispense.blow_out_submerged
-                air_gap = liquid_class.aspirate.trailing_air_gap
+                air_gap = min(
+                    liquid_class.aspirate.trailing_air_gap,
+                    ctx.params.tip_type - ctx.params.target_volume,  # type: ignore [attr-defined]
+                )
             else:  # if simulating
                 pip.flow_rate.aspirate = ctx.params.asp_flow_rate  # type: ignore [attr-defined]
                 pip.flow_rate.dispense = ctx.params.disp_flow_rate  # type: ignore [attr-defined]
