@@ -30,7 +30,7 @@ import type { MouseEvent, RefObject } from 'react'
 import type { ThunkDispatch } from '../../../types'
 
 const TOP_POSITION = '13.6875rem'
-const RIGHT_POSITION_FOR_LIQUIDS_PAGE = '7.4rem'
+const RIGHT_POSITION_FOR_LIQUIDS_PAGE = '25.675rem'
 interface LiquidsOverflowMenuProps {
   onClose: () => void
   showLiquidsModal: () => void
