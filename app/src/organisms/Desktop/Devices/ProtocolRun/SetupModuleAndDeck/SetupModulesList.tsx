@@ -38,16 +38,12 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import { StatusLabel } from '/app/atoms/StatusLabel'
-import {
-  getModuleImage,
-  getModulePrepCommands,
-} from '/app/local-resources/modules'
+import { getModuleImage } from '/app/local-resources/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
-  useChainLiveCommands,
   useModuleRenderInfoForProtocolById,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
@@ -181,21 +177,8 @@ export function ModulesListItem({
   ] = useState<boolean>(false)
 
   const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
-  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
-  const [
-    prepCommandErrorMessage,
-    setPrepCommandErrorMessage,
-  ] = useState<string>('')
 
   const handleCalibrateClick = (): void => {
-    if (attachedModuleMatch != null) {
-      chainLiveCommands(
-        getModulePrepCommands(attachedModuleMatch),
-        false
-      ).catch((e: Error) => {
-        setPrepCommandErrorMessage(e.message)
-      })
-    }
     setShowModuleWizard(true)
   }
 
@@ -323,10 +306,6 @@ export function ModulesListItem({
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
-          isPrepCommandLoading={isCommandMutationLoading}
-          prepCommandErrorMessage={
-            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
-          }
         />
       ) : null}
       <Box
@@ -343,7 +322,7 @@ export function ModulesListItem({
               setShowModuleSetupModal(null)
             }}
             moduleDisplayName={showModuleSetupModal}
-            isAbsorbanceReader={moduleModel === ABSORBANCE_READER_V1}
+            moduleModel={moduleModel}
           />
         ) : null}
         <Flex

@@ -13,9 +13,12 @@ class TransferTipPolicyV2(enum.Enum):
     NEVER = "never"
     ALWAYS = "always"
     PER_SOURCE = "per source"
+    PER_DESTINATION = "per destination"
 
 
-TransferTipPolicyV2Type = Literal["once", "always", "per source", "never"]
+TransferTipPolicyV2Type = Literal[
+    "once", "always", "per source", "never", "per destination"
+]
 
 Target = TypeVar("Target")
 

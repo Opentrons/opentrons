@@ -13,10 +13,10 @@
                     "labwareLocationUpdate": {{}},
 "pipetteLocationUpdate": {{}},
 "moduleLocationUpdate": {{}},
-"trashBinLocationUpdate": {{}},
-"wasteChuteLocationUpdate": {{}},
-"stagingAreaLocationUpdate": {{}},
-"gripperLocationUpdate": {{}}
+"trashBinLocationUpdate": {{}}, // For Flex, if a trash is added, it would be like: {{"trashbin-1": "cutoutA3"}}. For OT-2, it implies fixed trash.
+"wasteChuteLocationUpdate": {{}}, // Flex-specific
+"stagingAreaLocationUpdate": {{}}, // Flex-specific
+"gripperLocationUpdate": {{}} // Flex-specific
 }},
 "step-id": {{
                     "stepType": "'absorbanceReader' | 'comment' | 'heaterShaker' | 'magnet' | 'manualIntervention' | 'mix' | 'moveLabware' | 'moveLiquid' | 'pause' | 'temperature' | 'thermocycler'"
@@ -29,7 +29,5 @@
 "labware": {{}}
 }}
 }},
-"liquids": {{}},
 "robot": {{}},
-"commands": []
 }}

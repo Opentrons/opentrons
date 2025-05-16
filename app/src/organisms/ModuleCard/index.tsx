@@ -35,7 +35,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { getModulePrepCommands } from '/app/local-resources/modules'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
@@ -50,7 +49,6 @@ import {
   SUCCESS,
 } from '/app/redux/robot-api'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
-import { useChainLiveCommands } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import { AboutModuleSlideout } from './AboutModuleSlideout'
@@ -77,12 +75,18 @@ import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 import { getModuleCardImage } from './utils'
 
 import type { IconProps } from '@opentrons/components'
+import type { ModuleType } from '@opentrons/shared-data'
 import type {
   AttachedModule,
   HeaterShakerModule,
 } from '/app/redux/modules/types'
 import type { RequestState } from '/app/redux/robot-api/types'
 import type { Dispatch, State } from '/app/redux/types'
+
+const HAS_SETUP_INSTRUCTIONS_TYPE: ModuleType[] = [
+  FLEX_STACKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+]
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -127,7 +131,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [hasSecondary, setHasSecondary] = useState(false)
   const [showAboutModule, setShowAboutModule] = useState(false)
   const [showTestShake, setShowTestShake] = useState(false)
-  const [showHSWizard, setShowHSWizard] = useState(false)
+  const [showSetupWizard, setShowSetupWizard] = useState(false)
   const [showFWBanner, setShowFWBanner] = useState(true)
   const [showCalModal, setShowCalModal] = useState(false)
 
@@ -247,22 +251,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   const handleInstructionsClick = (): void => {
-    setShowHSWizard(true)
+    setShowSetupWizard(true)
   }
 
-  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
-  const [
-    prepCommandErrorMessage,
-    setPrepCommandErrorMessage,
-  ] = useState<string>('')
   const handleCalibrateClick = (): void => {
-    if (getModulePrepCommands(module).length > 0) {
-      chainLiveCommands(getModulePrepCommands(module), false).catch(
-        (e: Error) => {
-          setPrepCommandErrorMessage(e.message)
-        }
-      )
-    }
     setShowCalModal(true)
   }
 
@@ -280,20 +272,18 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             setShowCalModal(false)
           }}
           isLoadedInRun={isLoadedInRun}
-          isPrepCommandLoading={isCommandMutationLoading}
-          prepCommandErrorMessage={
-            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
-          }
         />
       ) : null}
-      {showHSWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
-        <ModuleSetupModal
-          close={() => {
-            setShowHSWizard(false)
-          }}
-          moduleDisplayName={getModuleDisplayName(module.moduleModel)}
-        />
-      )}
+      {showSetupWizard &&
+        HAS_SETUP_INSTRUCTIONS_TYPE.includes(module.moduleType) && (
+          <ModuleSetupModal
+            close={() => {
+              setShowSetupWizard(false)
+            }}
+            moduleDisplayName={getModuleDisplayName(module.moduleModel)}
+            moduleModel={module.moduleModel}
+          />
+        )}
       {showSlideout && (
         <ModuleSlideout
           module={module}

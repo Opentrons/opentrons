@@ -84,7 +84,7 @@ Please refer to <TIP_HANDLING> in <DOCUMENTS>
 8. To use correct load names, pipettes, modules, please look at <PD-LOAD-NAMES> tags in <DOCUMENTS>
 
 9. Common errors to avoid
-    - If the prompt does not contain liquid definition, please keep `ingredients`, `ingredLocations` and `liquids` empty.
+    - If the prompt does not contain liquid definition, please keep `ingredients` and `ingredLocations` empty.
     - If user specifies the number of steps explicitly, please generate such number of steps - not more.
     - Use V2 not V1 for the following thermocyclerModuleV2, temperatureModuleV2.
     - For PCR protocols, follow the profile steps strictly as mentioned in the description
@@ -100,12 +100,30 @@ Please refer to <TIP_HANDLING> in <DOCUMENTS>
     - Unless otherwise specified, when a moveLiquid step is used, the trash bin should be specified as
       `"trashBinLocationUpdate": "trashbin-1": "cutout12" ` in the `__INITIAL_DECK_SETUP_STEP__`.
       Correspondingly, in the moveLiquid step, the `"dropTip_location"` field must be specified as
-      `"dropTip_location": "trashbin-1"`, not `"dropTip_location": "trashId"`.
+      `"dropTip_location": "trashbin-1"` where `trashbin-1` is the ID of the trash bin,
+      not random name like`"dropTip_location": "trashId"`.
 
 10. Steptype rules
     - if thermocycler is used, then it must be opened before transfer liquid.
       - Wrong: moveLiquid, moveLiquid, thermocycler
       - Correct: thermocycler (open), moveLiquid, moveLiquid, thermocycler
+      The following parameters behave differently depending on single channel pipette or multi-chunnel pipette.
+
+11. 1) Single channel pipette: they can accept individual wells like 'A1','B3', 'F4'
+    Eg.,
+    ```json
+    "aspirate_wells" = [ "B1", "A1", "H1"]
+    "dispense_wells" = [ "C1", "D1", "A1"]
+    ```
+    2) Multi-channel pipette: they only accept Row A's wells eg., A1, A2, and so on.
+    For example, to refer to all wells in the first
+    column we only say "A1". Robot automatically figures out the remainig wells since multi-channel
+    pipette have access to all wells in the column at the same time.
+    Eg.,
+    ```json
+    "aspirate_wells" = [ "A1"]  # in this case, robot will aspirate from all wells in the first column
+    "dispense_wells" = [ "A1"]  # in this case, robot will dispense to all wells in the first column
+    ```
 
 <LIMITATIONS>
 There are cases where OpentronsAI cannot generate JSON protocol.

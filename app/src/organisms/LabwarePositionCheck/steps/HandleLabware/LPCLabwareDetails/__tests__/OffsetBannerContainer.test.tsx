@@ -2,8 +2,9 @@ import { useDispatch } from 'react-redux'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { InlineNotification } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { i18n } from '/app/i18n'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import {
@@ -37,6 +38,13 @@ vi.mock('/app/redux/protocol-runs', () => ({
   selectShowDefaultOffsetInfoBanner: vi.fn(),
   toggleDefaultOffsetInfoBanner: vi.fn(),
 }))
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InlineNotification>()
+  return {
+    ...actual,
+    InlineNotification: vi.fn(),
+  }
+})
 
 const render = (props: ComponentProps<typeof OffsetBannerContainer>) => {
   const mockState = {

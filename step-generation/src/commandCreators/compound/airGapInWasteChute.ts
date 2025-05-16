@@ -1,5 +1,9 @@
 import { ZERO_OFFSET } from '../../constants'
-import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import {
+  curryCommandCreator,
+  curryWithoutPython,
+  reduceCommandCreators,
+} from '../../utils'
 import {
   airGapInPlace,
   moveToAddressableArea,
@@ -28,7 +32,8 @@ export const airGapInWasteChute: CommandCreator<AirGapInWasteChuteArgs> = (
       fixtureId: wasteChuteId,
       offset: ZERO_OFFSET,
     }),
-    curryCommandCreator(prepareToAspirate, {
+    curryWithoutPython(prepareToAspirate, {
+      // PAPI air_gap() includes prepare_to_aspirate() so don't emit Python
       pipetteId,
     }),
     curryCommandCreator(airGapInPlace, {

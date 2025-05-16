@@ -5,7 +5,7 @@ import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { blowOutInWasteChute } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
-  getInitialRobotStateStandard,
+  getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
@@ -25,7 +25,7 @@ const invariantContext: InvariantContext = {
     },
   },
 }
-const prevRobotState: RobotState = getInitialRobotStateStandard(
+const prevRobotState: RobotState = getRobotStateWithTipStandard(
   invariantContext
 )
 
@@ -61,8 +61,9 @@ describe('blowOutInWasteChute', () => {
     ])
     expect(getSuccessResult(result).python).toBe(
       `
-mockPythonName.flow_rate.blow_out = 10
-mockPythonName.blow_out(mock_waste_chute_1)`.trim()
+mock_pipette.flow_rate.blow_out = 10
+mock_pipette.blow_out(mock_waste_chute_1)
+`.trim()
     )
   })
 })

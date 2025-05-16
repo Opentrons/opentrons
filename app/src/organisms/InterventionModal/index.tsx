@@ -18,6 +18,7 @@ import {
   DISPLAY_FLEX,
   Flex,
   Icon,
+  InlineNotification,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
@@ -29,7 +30,6 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { InterventionModal as InterventionModalMolecule } from '/app/molecules/InterventionModal'
 import { OddModal } from '/app/molecules/OddModal'
 import { useRobotType } from '/app/redux-resources/robots'
@@ -37,6 +37,8 @@ import { getIsOnDevice } from '/app/redux/config'
 
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 import { PauseInterventionContent } from './PauseInterventionContent'
+import { StackerEmptyInterventionContent } from './StackerEmptyInterventionContent'
+import { StackerFillInterventionContent } from './StackerFillInterventionContent'
 import { isInterventionCommand } from './utils'
 
 import type { ReactNode } from 'react'
@@ -157,6 +159,14 @@ export function InterventionModal({
             isOnDevice={isOnDevice}
           />
         )
+      case 'flexStacker/empty':
+        return (
+          <StackerEmptyInterventionContent {...{ command, run, analysis }} />
+        )
+      case 'flexStacker/fill':
+        return (
+          <StackerFillInterventionContent {...{ command, run, analysis }} />
+        )
       default:
         console.warn(
           'Unhandled command passed to InterventionModal: ',
@@ -182,6 +192,20 @@ export function InterventionModal({
           headerTitle: t('move_labware_on', { robot_name: robotName }),
           headerTitleOnDevice: t('move_labware'),
           iconSize: SPACING.spacing32,
+        }
+      case 'flexStacker/empty':
+        return {
+          iconName: 'move-xy-circle' as IconName,
+          headerTitle: t('empty_stacker', { robot_name: robotName }),
+          headerTitleOnDevice: t('empty_stacker'),
+          iconSize: undefined,
+        }
+      case 'flexStacker/fill':
+        return {
+          iconName: 'move-xy-circle' as IconName,
+          headerTitle: t('fill_stacker', { robot_name: robotName }),
+          headerTitleOnDevice: t('fill_stacker'),
+          iconSize: undefined,
         }
       default:
         console.warn(
