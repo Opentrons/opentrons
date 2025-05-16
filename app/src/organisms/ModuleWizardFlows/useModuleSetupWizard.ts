@@ -1,4 +1,4 @@
-import { useEffect, useState, useReducer } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
@@ -12,7 +12,8 @@ import {
 } from '/app/resources/maintenance_runs'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
-import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
+import { ACTIONS } from './constants'
+import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
 
 import type { SetStateAction } from 'react'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
@@ -22,10 +23,9 @@ import type { ModuleCalibrationWizardStep } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
-
-export interface UseInitModuleFlowResult {
+export interface UseModuleSetupWizardResult {
   showModuleWizard: boolean
-  currentStep: ModuleCalibrationWizardStep
+  currentStep: ModuleCalibrationWizardStep | null
   currentStepIndex: number
   totalStepCount: number
   handleCleanUpAndClose: () => void
@@ -42,25 +42,37 @@ export interface UseInitModuleFlowResult {
     setErrorMessage: (message: string | null) => void
     errorMessage: string | null
     isOnDevice: boolean
-    attachedModule: AttachedModule
+    attachedModule: AttachedModule | null
     isExiting: boolean
   }
   buildFlowForSelectedModule: (module: AttachedModule) => void
   deckConfig: DeckConfiguration
 }
 
-export interface UseInitModuleFlowParams {
+export interface UseModuleSetupWizardParams {
   closeFlow: () => void
-  attachedModule: AttachedModule
+  attachedModuleOnLaunch?: AttachedModule
   onComplete?: () => void
 }
 
-export function useInitModuleFlow(
-  params: UseInitModuleFlowParams
-): UseInitModuleFlowResult {
-  const { closeFlow, attachedModule, onComplete } = params
+export function useModuleSetupWizard(
+  params: UseModuleSetupWizardParams
+): UseModuleSetupWizardResult {
+  const { closeFlow, attachedModuleOnLaunch, onComplete } = params
   const isOnDevice = useSelector(getIsOnDevice)
-
+  const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
+    currentStepIndex: 0,
+    currentStep: null,
+    totalStepCount: 5,
+    stepsInFlow: [],
+    attachedModule: attachedModuleOnLaunch ?? null,
+  })
+  const {
+    currentStepIndex,
+    currentStep,
+    totalStepCount,
+    attachedModule,
+  } = state
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipette =
     attachedPipettes.left?.data.calibratedOffset?.last_modified != null
@@ -69,24 +81,10 @@ export function useInitModuleFlow(
 
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const [moduleCalibrationSteps, setModuleCalibrationSteps] = useState<
-    ModuleCalibrationWizardStep[]
-  >([])
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
-  const [totalStepCount, setTotalStepCount] = useState(5)
-  const [currentStep, setCurrentStep] = useState(
-    moduleCalibrationSteps[currentStepIndex]
-  )
-
-  useEffect(() => {
-    setTotalStepCount(moduleCalibrationSteps.length - 1)
-    setCurrentStep(moduleCalibrationSteps[currentStepIndex])
-  }, [currentStepIndex, moduleCalibrationSteps])
-
   const goBack = (): void => {
-    setCurrentStepIndex(
-      currentStepIndex === 0 ? currentStepIndex : currentStepIndex - 1
-    )
+    dispatch({
+      type: ACTIONS.GO_BACK,
+    })
   }
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null
@@ -142,11 +140,9 @@ export function useInitModuleFlow(
   const [isExiting, setIsExiting] = useState<boolean>(false)
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
-      setCurrentStepIndex(
-        currentStepIndex !== totalStepCount
-          ? currentStepIndex + 1
-          : currentStepIndex
-      )
+      dispatch({
+        type: ACTIONS.PROCEED,
+      })
     }
   }
   const handleClose = (): void => {
@@ -186,12 +182,12 @@ export function useInitModuleFlow(
   const [isRobotMoving, setIsRobotMoving] = useState<boolean>(false)
 
   useEffect(() => {
-    if (isCommandMutationLoading || isExiting) {
+    if (isCommandMutationLoading || isExiting || isCreateLoading) {
       setIsRobotMoving(true)
     } else {
       setIsRobotMoving(false)
     }
-  }, [isCommandMutationLoading, isExiting])
+  }, [isCommandMutationLoading, isExiting, isCreateLoading])
 
   let chainMaintenanceRunCommands
 
@@ -226,27 +222,28 @@ export function useInitModuleFlow(
     isExiting,
   }
 
-  const buildFlowForSelectedModule = (attachedModule: AttachedModule): void => {
-    setModuleCalibrationSteps(
-      getModuleCalibrationSteps(attachedModule.moduleType)
-    )
+  const buildFlowForSelectedModule = (
+    selectedModuleToBuildFlow: AttachedModule
+  ): void => {
+    dispatch({
+      type: ACTIONS.BUILD_FLOW,
+      attachedModule: selectedModuleToBuildFlow,
+    })
     if (createdMaintenanceRunId == null) {
       createTargetedMaintenanceRun({})
     }
     // run prep steps here
-    // redux store for attached module & step information
-    setCurrentStepIndex(0)
 
-    console.log('HI SETTING CURRENT STEP', currentStep)
-    console.log('HI HERE ARE THE NEW STEPS', moduleCalibrationSteps)
-    console.log('HI SETTING CURRENT STEP', currentStep)
+    console.log('HI SETTING CURRENT STEP', currentStepIndex)
+    console.log('HI HERE ARE THE NEW STEPS', state.stepsInFlow)
+    console.log('HI SETTING CURRENT STEP', state)
   }
 
   return {
     showModuleWizard: true,
-    currentStep: currentStep,
-    currentStepIndex: currentStepIndex,
-    totalStepCount: totalStepCount,
+    currentStep,
+    currentStepIndex,
+    totalStepCount,
     handleCleanUpAndClose: handleCleanUpAndClose,
     wizardFlowBaseProps: calibrateBaseProps,
     deckConfig: deckConfig,

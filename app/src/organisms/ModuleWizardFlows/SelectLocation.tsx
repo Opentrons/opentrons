@@ -28,7 +28,7 @@ import {
 
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
-import { getFixtureIdByCutoutId } from './useModuleDeckConfigProps'
+import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 
 import type {
   CutoutFixtureId,

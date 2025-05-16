@@ -37,7 +37,6 @@ import type { ModuleCalibrationWizardStepProps } from './types'
 interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration
   setCreatedAdapterId: (adapterId: string) => void
-  isCreateLoading: boolean
 }
 
 export const BODY_STYLE = css`
@@ -61,7 +60,6 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     attachedPipette,
     isRobotMoving,
     maintenanceRunId,
-    isCreateLoading,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
@@ -218,7 +216,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       bodyText={bodyText}
       proceedButtonText={t('confirm_placement')}
       proceed={handleOnClick}
-      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
+      proceedIsDisabled={maintenanceRunId == null}
       back={goBack}
     />
   )
