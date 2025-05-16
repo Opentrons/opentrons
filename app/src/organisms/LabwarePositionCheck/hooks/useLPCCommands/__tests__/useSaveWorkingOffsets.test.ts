@@ -17,9 +17,11 @@ vi.mock('/app/redux/protocol-runs')
 
 describe('useSaveWorkingOffsets', () => {
   const mockRunId = 'mock_run_id'
+  const mockReportSaveOffset = vi.fn()
 
   const mockProps = {
     runId: mockRunId,
+    analytics: { reportSaveOffset: mockReportSaveOffset },
   } as any
 
   const mockCreateLabwareOffsets = vi.fn()
