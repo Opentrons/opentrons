@@ -17,7 +17,7 @@ import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attac
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import { getFixtureIdByCutoutId } from './useModuleDeckConfigProps'
+import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStepProps } from './types'
