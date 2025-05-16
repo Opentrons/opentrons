@@ -11,9 +11,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getCutoutFixturesForModuleModel,
@@ -32,9 +30,7 @@ import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 
-import type {
-  CreateMaintenanceRunType,
-} from '@opentrons/react-api-client'
+import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
   CutoutFixtureId,
   CutoutId,

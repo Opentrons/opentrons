@@ -13,6 +13,7 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { getLocalRobot } from '/app/redux/discovery'
@@ -30,7 +31,6 @@ import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
-import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 import { ProtocolSetupModulesAndDeck } from '..'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
@@ -117,7 +117,10 @@ describe('ProtocolSetupModulesAndDeck', () => {
       ...mockConnectedRobot,
       name: ROBOT_NAME,
     })
-    vi.mocked(useIsDoorOpen).mockReturnValue(true)
+    vi.mocked(useIsDoorOpen).mockReturnValue({
+      isDoorOpen: true,
+      moduleDoorLocation: null,
+    })
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )

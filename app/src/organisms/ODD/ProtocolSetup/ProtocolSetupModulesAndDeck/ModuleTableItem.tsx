@@ -24,16 +24,14 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
-import {
-  getFlexStackerPrepCommands,
-} from '/app/local-resources/modules'
+import { getFlexStackerPrepCommands } from '/app/local-resources/modules'
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { OddModal } from '/app/molecules/OddModal'
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
-import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
