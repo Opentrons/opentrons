@@ -15,6 +15,7 @@ import { DetachProbe } from './DetachProbe'
 import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
+import { SelectModule } from './SelectModule'
 import { Success } from './Success'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
@@ -63,7 +64,7 @@ export const ModuleWizardFlows = (
 
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
 
-  if (wizardFlowBaseProps.attachedPipette == null) return null
+  //if (wizardFlowBaseProps.attachedPipette == null) return null
   if (wizardFlowBaseProps.attachedModule == null) {
     //arbitrary step count before we know how many there will be
     return (
@@ -73,10 +74,19 @@ export const ModuleWizardFlows = (
         currentStepIndex={0}
         totalStepCount={5}
       >
-        <>
-          CHOOSE MODULE SCREEN PROCEED FUNCTION HERE WILL BE INITIALIZE MODULE
-          FLOW HOOK
-        </>
+          <SelectModule
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            robotName={"SOMETHING"}
+            deckConfig={deckConfig}
+            isLoadedInRun={isLoadedInRun}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
       </ModuleWizardScreen>
     )
   } else if (isPrepCommandLoading || currentStep == null) {
