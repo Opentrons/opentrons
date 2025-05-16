@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import round from 'lodash/round'
 
 import {
@@ -37,6 +37,7 @@ import {
   getRobotStateTimeline,
   getRobotType,
 } from '../../../file-data/selectors'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import {
   getSavedStepForms,
   getUnsavedForm,
@@ -61,7 +62,7 @@ import { SubStepsToolbox } from './Timeline'
 import { TimelineEditHardware } from './TimelineEditHardware'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { DeckSlot } from '../../../types'
+import type { DeckSlot, ThunkDispatch } from '../../../types'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 const STEP_SUMMARY_HEIGHT = '18.2rem'
@@ -76,6 +77,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   const { zoomedInSlot, showLiquidOverflowMenu } = props
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
+  const dispatch = useDispatch<ThunkDispatch<any>>()
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const hoveredTerminalItem = useSelector(getHoveredTerminalItemId)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
@@ -165,6 +167,17 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
       setDeckView(rightString)
     }
   }, [zoomedInSlot, labware, zoomedInOnOffDeck])
+
+  //  zoom out if you select on any step other than starting deck state in the timeline toolbox
+  useEffect(() => {
+    if (
+      zoomedInSlot != null &&
+      selectedTerminalItemId !== START_TERMINAL_ITEM_ID
+    ) {
+      dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
+      setViewBox(initialViewBox)
+    }
+  }, [zoomedInSlot, selectedTerminalItemId])
 
   return (
     <Flex
