@@ -36,6 +36,7 @@ export const ModuleWizardScreen = (
       currentStep={currentStepIndex}
       totalSteps={totalStepCount}
       onExit={isRobotMoving ? undefined : handleCleanUpAndClose}
+      hideStepText
     />
   )
 
