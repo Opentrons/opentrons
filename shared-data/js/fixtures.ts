@@ -242,7 +242,7 @@ export const getAAFromCutoutFixtureId = (
   /**
    * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
    */
-  if (cutoutFixtureId === DUMMY_STAGING_AREA_WIHTOUT_STAGING_AREA) {
+  if (cutoutFixtureId === DUMMY_STAGING_AREA_WITHOUT_STAGING_AREA) {
     switch (inputCutoutId) {
       case 'cutoutA3':
         return ['A3', 'A4']
