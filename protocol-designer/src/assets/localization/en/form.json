@@ -337,7 +337,7 @@
           "temperature": "Block temperature",
           "toggleOff": "Off",
           "toggleOn": "On",
-          "valid_range": "Valid range between 4 and 96ºC"
+          "valid_range": "Valid range between 4 and 96°C"
         },
         "ending_hold": "Ending hold",
         "lid": {
@@ -346,7 +346,7 @@
           "temperature": "Lid temperature",
           "toggleOff": "Off",
           "toggleOn": "On",
-          "valid_range": "Valid range between 37 and 110ºC"
+          "valid_range": "Valid range between 37 and 110°C"
         },
         "lidPosition": {
           "label": "Lid position",
