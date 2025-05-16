@@ -68,21 +68,12 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckConfig,
     deckDef
   )
-  // useEffect(() => {
-  //   deckConfigWithAA = transformCutoutFixturesToAaWithFixtures(
-  //     deckConfig,
-  //     deckDef
-  //   )
-  // }, [deckConfigWithAA])
-
-  console.log('deckConfigWithAA: ', deckConfigWithAA)
 
   const stagingAreaFixtures = filterAaByAreaType(
     deckConfigWithAA,
     deckDef,
     'stagingSlot'
   )
-  console.log('stagingAreaFixtures: ', stagingAreaFixtures)
 
   const wasteChuteFixtures = filterAaByAreaType(
     deckConfigWithAA,
@@ -90,11 +81,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     'wasteChute'
   )
   const emptyCutouts = filterAaByAreaType(deckConfigWithAA, deckDef, 'slot')
-  console.log('emptyCutouts: ', emptyCutouts)
-
-  // const trashBinFixtures = deckConfigWithAA.filter(
-  //   ({ cutoutFixtureId }) => cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
-  // )
 
   const trashBinFixtures = filterAaByAreaType(
     deckConfigWithAA,
@@ -121,7 +107,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckDef,
     'magneticBlock'
   )
-  console.log('magneticBlockFixtures: ', magneticBlockFixtures)
   const absorbanceReaderFixtures = filterAaByAreaType(
     deckConfigWithAA,
     deckDef,

@@ -64,7 +64,6 @@ export function useDeckConfigurationEditingTools(
         ?.fixtureGroup ?? {}
 
     let newDeckConfig = deckConfig
-    console.log('fixtureGroup: ', fixtureGroup)
     if (cutoutId in fixtureGroup) {
       const groupMap =
         fixtureGroup[cutoutId]?.find(group =>
@@ -85,8 +84,6 @@ export function useDeckConfigurationEditingTools(
           : cutoutConfig
       )
     } else {
-      console.log('in else ')
-      console.log('replacementFixtureId: ', replacementFixtureId)
       newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId === cutoutId
           ? {
