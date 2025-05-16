@@ -45,7 +45,7 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
     dispatch(renameLabware({ labwareId, name }))
     onClose()
   }
-  const showResetButton = displayName !== savedNickname
+  const showResetButton = displayName !== nickName
 
   return createPortal(
     <HandleEnter
@@ -70,7 +70,7 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
                 css={LINK_BUTTON_STYLE}
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 onClick={() => {
-                  saveNickname(displayName)
+                  setNickName(displayName)
                 }}
               >
                 <StyledText desktopStyle="bodyDefaultRegular">
