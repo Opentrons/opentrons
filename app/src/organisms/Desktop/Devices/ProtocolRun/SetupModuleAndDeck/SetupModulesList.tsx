@@ -24,6 +24,7 @@ import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleType,
@@ -243,13 +244,18 @@ export function ModulesListItem({
       textColor={COLORS.green60}
     />
   )
-
-  if (
+  const stackerShuttleMissing =
+    attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE
+      ? attachedModuleMatch?.data.platformState === 'missing'
+      : false
+  const needsCalibration =
     isFlex &&
     attachedModuleMatch != null &&
     attachedModuleMatch.moduleType !== ABSORBANCE_READER_TYPE &&
+    attachedModuleMatch.moduleType !== FLEX_STACKER_MODULE_TYPE &&
     attachedModuleMatch.moduleOffset?.last_modified == null
-  ) {
+
+  if (needsCalibration || stackerShuttleMissing) {
     renderModuleStatus = (
       <>
         <TertiaryButton
@@ -258,7 +264,7 @@ export function ModulesListItem({
           width="max-content"
           disabled={!calibrationStatus?.complete || isModuleTooHot}
         >
-          {t('calibrate_now')}
+          {t('setup_now')}
         </TertiaryButton>
         {(!calibrationStatus?.complete && calibrationStatus?.reason != null) ||
         isModuleTooHot ? (
