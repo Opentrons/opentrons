@@ -8,6 +8,8 @@
     "displayVolumeUnits": "mL",
     "displayCategory": "reservoir"
   },
+  "locatingFeaturesAsParent": {},
+  "locatingFeaturesAsChild": {},
   "extents": {
     "total": {
       "backLeftBottom": {

@@ -23,6 +23,8 @@
     "displayCategory": "wellPlate",
     "tags": []
   },
+  "locatingFeaturesAsParent": {},
+  "locatingFeaturesAsChild": {},
   "extents": {
     "total": {
       "backLeftBottom": {
