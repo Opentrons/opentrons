@@ -12,7 +12,6 @@ describe('getAAFromCutoutFixtureId', () => {
       getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
     )
 
-    console.log(result)
     const expectedOrder = ['flexStackerModuleV1D4', 'D3']
     expect(result).toEqual(expectedOrder)
   })
