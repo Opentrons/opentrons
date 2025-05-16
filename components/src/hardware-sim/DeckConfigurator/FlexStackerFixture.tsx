@@ -14,6 +14,8 @@ import {
 } from './constants'
 
 import type {
+  AddressableArea,
+  AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
   DeckDefinition,
@@ -29,6 +31,7 @@ interface FlexStackerFixtureProps {
     cutoutFixtureId: CutoutFixtureId
   ) => void
   selected?: boolean
+  addressableArea: AddressableAreaName
 }
 
 // todo(should we move this to translations? )
@@ -45,6 +48,7 @@ export function FlexStackerFixture(
     fixtureLocation,
     cutoutFixtureId,
     hasWasteChute,
+    addressableArea,
     selected = false,
   } = props
 
@@ -64,10 +68,11 @@ export function FlexStackerFixture(
    * the adjustment for x is different for right side/left side
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
-
-  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
-
+  const offsetVector = deckDefinition.locations.addressableAreas.find(
+    (aaItem: AddressableArea) => aaItem.id === addressableArea
+  )?.offsetFromCutoutFixture ?? [0, 0, 0]
   const y = ySlotPosition + Y_ADJUSTMENT
+  const x = xSlotPosition + offsetVector[0] + COLUMN_DEFAULT_X_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (

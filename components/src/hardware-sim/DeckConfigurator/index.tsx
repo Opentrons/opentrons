@@ -57,10 +57,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     additionalStaticFixtures,
     children,
     selectedCutoutId,
-    lightFill = COLORS.grey35,
     darkFill = COLORS.black90,
     editableCutoutIds = deckConfig.map(({ cutoutId }) => cutoutId),
-    showExpansion = true,
     height = '455px',
   } = props
 
@@ -123,15 +121,13 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckDef,
     'magneticBlock'
   )
+  console.log("magneticBlockFixtures: ", magneticBlockFixtures)
   const absorbanceReaderFixtures = filterAaByAreaType(
     deckConfigWithAA,
     deckDef,
     'absorbanceReader'
   )
-  // const magneticBlockStagingAreaFixtures = deckConfigWithAA.filter(
-  //   ({ cutoutFixtureId }) =>
-  //     cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
-  // )
+
   const flexStackerFixtures = filterAaByAreaType(
     deckConfigWithAA,
     deckDef,
@@ -188,20 +184,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           />
         )
       )}
-      {/* {wasteChuteStagingAreaFixtures.map(({ cutoutId, cutoutFixtureId }) => (
-        <WasteChuteConfigFixture
-          data-testid={cutoutId}
-          key={cutoutId}
-          deckDefinition={deckDef}
-          handleClickRemove={
-            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
-          }
-          fixtureLocation={cutoutId}
-          cutoutFixtureId={cutoutFixtureId}
-          selected={cutoutId === selectedCutoutId}
-          hasStagingAreas
-        />
-      ))} */}
       {trashBinFixtures.map(
         ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
           <TrashBinConfigFixture
@@ -329,6 +311,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             cutoutFixtureId={cutoutFixtureId}
             hasWasteChute={cutoutFixtureId !== FLEX_STACKER_V1_FIXTURE}
             selected={cutoutId === selectedCutoutId}
+            addressableArea={addressableAreaId}
           />
         )
       )}

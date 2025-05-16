@@ -4,7 +4,7 @@ import { FLEX_ROBOT_TYPE } from '..'
 import { getAAFromCutoutFixtureId } from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
 
-describe('getAAFromCutoutId', () => {
+describe('getAAFromCutoutFixtureId', () => {
   it('Should get the aa for a cutoutId and a cutoutFixtureId', () => {
     const result = getAAFromCutoutFixtureId(
       'cutoutD3',
