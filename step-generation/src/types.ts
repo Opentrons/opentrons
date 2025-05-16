@@ -220,6 +220,8 @@ export type ChangeTipOptions =
   | 'perDest'
   | 'perSource'
 
+export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
+
 export interface InnerMixArgs {
   volume: number
   times: number
