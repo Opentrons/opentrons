@@ -11,7 +11,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import {
+  CreateMaintenanceRunType,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getCutoutFixturesForModuleModel,
@@ -47,12 +50,19 @@ export const BODY_STYLE = css`
 `
 interface SelectLocationProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration
+  createMaintenanceRun: CreateMaintenanceRunType
   isLoadedInRun: boolean
 }
 export const SelectLocation = (
   props: SelectLocationProps
 ): JSX.Element | null => {
-  const { proceed, attachedModule, deckConfig, isLoadedInRun } = props
+  const {
+    proceed,
+    attachedModule,
+    deckConfig,
+    isLoadedInRun,
+    createMaintenanceRun,
+  } = props
 
   const configuredFixtureIdByCutoutId = getFixtureIdByCutoutId(
     attachedModule,
@@ -61,6 +71,7 @@ export const SelectLocation = (
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
   const handleOnClick = (): void => {
+    createMaintenanceRun({})
     proceed()
   }
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()

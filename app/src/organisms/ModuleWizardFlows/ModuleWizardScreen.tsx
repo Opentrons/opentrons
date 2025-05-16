@@ -32,7 +32,7 @@ export const ModuleWizardScreen = (
   const wizardHeader = (
     <WizardHeader
       exitDisabled={isRobotMoving}
-      title={t('module_calibration')}
+      title={t('module_setup')}
       currentStep={currentStepIndex}
       totalSteps={totalStepCount}
       onExit={isRobotMoving ? undefined : handleCleanUpAndClose}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { COLORS, LegacyStyledText } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import {
   SimpleWizardBody,
@@ -23,11 +24,9 @@ import type { PipetteInformation } from '/app/redux/pipettes'
 
 interface ModuleWizardFlowsProps {
   closeFlow: () => void
-  isPrepCommandLoading: boolean
   attachedModule?: AttachedModule
   isLoadedInRun?: boolean
   onComplete?: () => void
-  prepCommandErrorMessage?: string
 }
 
 export const ModuleWizardFlows = (
@@ -36,10 +35,8 @@ export const ModuleWizardFlows = (
   const {
     attachedModule: attachedModuleOnLaunch,
     isLoadedInRun = false,
-    isPrepCommandLoading,
     closeFlow,
     onComplete,
-    prepCommandErrorMessage,
   } = props
 
   const { t } = useTranslation('module_wizard_flows')
@@ -48,6 +45,7 @@ export const ModuleWizardFlows = (
     currentStep,
     currentStepIndex,
     totalStepCount,
+    createMaintenanceRun,
     handleCleanUpAndClose,
     wizardFlowBaseProps,
     buildFlowForSelectedModule,
@@ -79,7 +77,11 @@ export const ModuleWizardFlows = (
         </>
       </ModuleWizardScreen>
     )
-  } else if (isPrepCommandLoading || currentStep == null) {
+  } else if (
+    (wizardFlowBaseProps.isRobotMoving &&
+      wizardFlowBaseProps.maintenanceRunId == null) ||
+    currentStep == null
+  ) {
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
@@ -88,16 +90,15 @@ export const ModuleWizardFlows = (
         totalStepCount={totalStepCount}
       >
         <SimpleWizardInProgressBody
-        // description={t('prepping_module', {
-        //   module: getModuleDisplayName(attachedModule.moduleModel),
-        // })}
+          description={t('prepping_module', {
+            module: getModuleDisplayName(
+              wizardFlowBaseProps.attachedModule.moduleModel
+            ),
+          })}
         />
       </ModuleWizardScreen>
     )
-  } else if (
-    prepCommandErrorMessage != null ||
-    wizardFlowBaseProps.errorMessage != null
-  ) {
+  } else if (wizardFlowBaseProps.errorMessage != null) {
     // TODO: change this error header to match designs
     return (
       <ModuleWizardScreen
@@ -109,24 +110,16 @@ export const ModuleWizardFlows = (
         <SimpleWizardBody
           isSuccess={false}
           iconColor={COLORS.red50}
-          header={t(
-            prepCommandErrorMessage != null
-              ? 'error_prepping_module'
-              : 'error_during_calibration'
-          )}
+          header={t('error_during_setup')}
           subHeader={
-            prepCommandErrorMessage != null ? (
-              prepCommandErrorMessage
-            ) : (
-              <Trans
-                t={t}
-                i18nKey={'branded:module_calibration_failed'}
-                values={{ error: wizardFlowBaseProps.errorMessage }}
-                components={{
-                  block: <LegacyStyledText as="p" />,
-                }}
-              />
-            )
+            <Trans
+              t={t}
+              i18nKey={'branded:module_setup_failed'}
+              values={{ error: wizardFlowBaseProps.errorMessage }}
+              components={{
+                block: <LegacyStyledText as="p" />,
+              }}
+            />
           }
         />
       </ModuleWizardScreen>
@@ -178,6 +171,7 @@ export const ModuleWizardFlows = (
             {...currentStep}
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
+            createMaintenanceRun={createMaintenanceRun}
             isLoadedInRun={isLoadedInRun}
             attachedModule={
               wizardFlowBaseProps.attachedModule as AttachedModule

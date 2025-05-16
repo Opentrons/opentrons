@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
+import { getModulePrepCommands } from '/app/local-resources/modules'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
@@ -10,12 +11,17 @@ import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
-import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
+import {
+  useChainLiveCommands,
+  useCreateTargetedMaintenanceRunMutation,
+} from '/app/resources/runs'
+
 import { ACTIONS } from './constants'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
 
 import type { SetStateAction } from 'react'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteInformation } from '/app/redux/pipettes'
 import type { ModuleCalibrationWizardStep } from './types'
@@ -27,6 +33,7 @@ export interface UseModuleSetupWizardResult {
   currentStep: ModuleCalibrationWizardStep | null
   currentStepIndex: number
   totalStepCount: number
+  createMaintenanceRun: CreateMaintenanceRunType
   handleCleanUpAndClose: () => void
   wizardFlowBaseProps: {
     attachedPipette: PipetteInformation | null
@@ -85,14 +92,16 @@ export function useModuleSetupWizard(
       type: ACTIONS.GO_BACK,
     })
   }
-  const [maintenanceRunId, setMaintenanceRunId] = useState<
-    string | null
-  >(null)
+  const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
 
   const {
     chainRunCommands,
     isCommandMutationLoading,
   } = useChainMaintenanceCommands()
+  const {
+    chainLiveCommands,
+    isCommandMutationLoading: isLiveCommandLoading,
+  } = useChainLiveCommands()
 
   const {
     createTargetedMaintenanceRun,
@@ -103,7 +112,11 @@ export function useModuleSetupWizard(
     },
   })
 
-  useMonitorMaintenanceRunForDeletion({maintenanceRunId, setMaintenanceRunId, closeFlow})
+  useMonitorMaintenanceRunForDeletion({
+    maintenanceRunId,
+    setMaintenanceRunId,
+    closeFlow,
+  })
 
   const [errorMessage, setErrorMessage] = useState<null | string>(null)
   const [isExiting, setIsExiting] = useState<boolean>(false)
@@ -153,12 +166,22 @@ export function useModuleSetupWizard(
   const [isRobotMoving, setIsRobotMoving] = useState<boolean>(false)
 
   useEffect(() => {
-    if (isCommandMutationLoading || isExiting || isCreateLoading) {
+    if (
+      isCommandMutationLoading ||
+      isExiting ||
+      isCreateLoading ||
+      isLiveCommandLoading
+    ) {
       setIsRobotMoving(true)
     } else {
       setIsRobotMoving(false)
     }
-  }, [isCommandMutationLoading, isExiting, isCreateLoading])
+  }, [
+    isCommandMutationLoading,
+    isExiting,
+    isCreateLoading,
+    isLiveCommandLoading,
+  ])
 
   let chainMaintenanceRunCommands
 
@@ -191,13 +214,20 @@ export function useModuleSetupWizard(
   const buildFlowForSelectedModule = (
     selectedModuleToBuildFlow: AttachedModule
   ): void => {
+    const modulePrepCommands = getModulePrepCommands(selectedModuleToBuildFlow)
+    console.log('MODULE PREP COMMANDS')
+    if (modulePrepCommands.length > 0) {
+      chainLiveCommands(
+        getModulePrepCommands(selectedModuleToBuildFlow),
+        false
+      ).catch((e: Error) => {
+        setErrorMessage(e.message)
+      })
+    }
     dispatch({
       type: ACTIONS.BUILD_FLOW,
       attachedModule: selectedModuleToBuildFlow,
     })
-    if (maintenanceRunId == null) {
-      createTargetedMaintenanceRun({})
-    }
   }
 
   return {
@@ -205,13 +235,13 @@ export function useModuleSetupWizard(
     currentStep,
     currentStepIndex,
     totalStepCount,
-    handleCleanUpAndClose: handleCleanUpAndClose,
+    createMaintenanceRun: createTargetedMaintenanceRun,
+    handleCleanUpAndClose,
     wizardFlowBaseProps: calibrateBaseProps,
-    deckConfig: deckConfig,
+    deckConfig,
     buildFlowForSelectedModule,
   }
 }
-
 
 function useMonitorMaintenanceRunForDeletion({
   maintenanceRunId,

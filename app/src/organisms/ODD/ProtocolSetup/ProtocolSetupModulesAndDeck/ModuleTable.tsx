@@ -72,9 +72,6 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
               module={module}
               calibrationStatus={calibrationStatus}
               chainLiveCommands={chainLiveCommands}
-              isLoading={isCommandMutationLoading}
-              prepCommandErrorMessage={prepCommandErrorMessage}
-              setPrepCommandErrorMessage={setPrepCommandErrorMessage}
               conflictedFixture={conflictedFixture}
               deckDef={deckDef}
               robotName={robotName}

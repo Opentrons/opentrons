@@ -14,7 +14,7 @@ export const getModuleCalibrationSteps = (
   switch (moduleType) {
     case ABSORBANCE_READER_TYPE:
       return [
-        { section: SECTIONS.UPDATE_FIRMWARE },
+        // { section: SECTIONS.UPDATE_FIRMWARE },
         { section: SECTIONS.SELECT_LOCATION },
         { section: SECTIONS.SUCCESS },
       ]
@@ -23,8 +23,8 @@ export const getModuleCalibrationSteps = (
         // { section: SECTIONS.CHECK_INSTALLATION_PINS},
         // { section: SECTIONS.UPDATE_FIRMWARE },
         { section: SECTIONS.SELECT_LOCATION },
-        { section: SECTIONS.CLOSE_DOOR },
-        { section: SECTIONS.INSTALL_SHUTTLE },
+        // { section: SECTIONS.CLOSE_DOOR },
+        // { section: SECTIONS.INSTALL_SHUTTLE },
         { section: SECTIONS.SUCCESS },
       ]
     default:
