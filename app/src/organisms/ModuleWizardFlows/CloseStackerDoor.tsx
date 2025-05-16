@@ -2,82 +2,64 @@ import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  Flex,
-  Icon,
-  JUSTIFY_CENTER,
-  LegacyStyledText,
+  COLORS,
+  PrimaryButton,
   RESPONSIVENESS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
+import { SimpleWizardBody, SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import type {
-  CreateCommand,
-  CutoutFixtureId,
-  CutoutId,
-  DeckConfiguration,
+import {
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  FLEX_STACKER_MODULE_TYPE,
+  type CreateCommand,
+  type DeckConfiguration,
 } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface CloseDoorProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration
-  fixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
 }
 
-const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
 
 export const CloseDoor = (
   props: CloseDoorProps
 ): JSX.Element | null => {
   const {
     proceed,
-    goBack,
     isRobotMoving,
     attachedModule,
     chainRunCommands,
     setErrorMessage,
   } = props
   const { t, i18n } = useTranslation(['module_wizard_flows'])
-  
-  const headerContent = (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
-    >
-      <Icon name="ot-alert" size="2.5rem" />
-      <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
-        {t('close_doors')}
-      </LegacyStyledText>
-    </Flex>
-  )
 
-  const bodyText = (
-    <>
-        <LegacyStyledText css={BODY_STYLE}>
-          <Trans
-            t={t}
-            i18nKey={'close_doors_description'}
-            components={{
-              bold: <strong />,
-            }}
-          />
-        </LegacyStyledText>
-    </>
-  )
+  const cutoutId = props.deckConfig.find(
+    cc =>
+      cc.opentronsModuleSerialNumber === attachedModule.serialNumber &&
+      (attachedModule.moduleType === FLEX_STACKER_MODULE_TYPE)
+  )?.cutoutId
+  const slotName =
+    cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null
+
+  if (slotName == null) {
+    console.error(
+      `could not load module ${attachedModule.moduleModel} into location ${slotName}`
+    )
+    return null
+  }
 
   const handleHomeShuttle = (): void => {
     const homeCommands: CreateCommand[] = [
+      {
+        commandType: 'loadModule',
+        params: {
+          location: { slotName },
+          model: attachedModule.moduleModel,
+          moduleId: attachedModule.id,
+        },
+      },
       {
         commandType: 'unsafe/flexStacker/prepareShuttle' as const,
         params: { moduleId: attachedModule.id, ignoreLatch: true },
@@ -98,21 +80,27 @@ export const CloseDoor = (
       <SimpleWizardInProgressBody
         // TODO ND: 9/6/23 use spinner until animations are made
         alternativeSpinner={null}
-        description={t('stand_back')}
+        description={t('stand_back_robot_in_motion')}
       />
     )
   } 
   
   else {
     return (
-      <GenericWizardTile
-        header={headerContent}
-        rightHandBody={null}
-        bodyText={bodyText}
-        proceedButtonText={t('continue')}
-        proceed={handleHomeShuttle}
-        back={goBack}
-      />
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.yellow50}
+        header={t('close_doors')}
+        subHeader={t('close_doors_description')}
+      >
+        <PrimaryButton
+          onClick={() => {
+            handleHomeShuttle()
+          }}
+        >
+          {t('continue')}
+        </PrimaryButton>
+      </SimpleWizardBody>
     )
   } 
 }

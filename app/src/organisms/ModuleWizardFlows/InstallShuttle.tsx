@@ -15,16 +15,12 @@ import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import type {
-  CutoutFixtureId,
-  CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface InstallShuttleProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration
-  fixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
-  shuttleHomeStep: boolean
 }
 
 const BODY_STYLE = css`
@@ -40,7 +36,6 @@ export const InstallShuttle = (
 ): JSX.Element | null => {
   const {
     proceed,
-    goBack,
     isRobotMoving,
   } = props
   const { t, i18n } = useTranslation(['module_wizard_flows'])
@@ -80,7 +75,7 @@ export const InstallShuttle = (
       <SimpleWizardInProgressBody
         // TODO ND: 9/6/23 use spinner until animations are made
         alternativeSpinner={null}
-        description={t('stand_back')}
+        description={t('stand_back_robot_in_motion')}
       />
     )
   } 
@@ -92,7 +87,6 @@ export const InstallShuttle = (
         bodyText={bodyText}
         proceedButtonText={t('confirm_placement')}
         proceed={proceed}
-        back={goBack}
       />
     )
   }
