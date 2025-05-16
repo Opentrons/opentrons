@@ -23,10 +23,7 @@ import {
 
 import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '../../../constants'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import {
-  getLiquidEntities,
-  getUnsavedForm,
-} from '../../../step-forms/selectors'
+import { getLiquidEntities } from '../../../step-forms/selectors'
 import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
 
 import type { MouseEvent, RefObject } from 'react'
@@ -47,7 +44,6 @@ export function LiquidsOverflowMenu({
   overflowWrapperRef,
   targetWidth,
 }: LiquidsOverflowMenuProps): JSX.Element {
-  // const formData = useSelector(getUnsavedForm)
   const location = useLocation()
   const { t } = useTranslation(['starting_deck_state'])
   const liquids = useSelector(getLiquidEntities)
