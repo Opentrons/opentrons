@@ -7,8 +7,8 @@ import { uuid } from '../../utils'
 import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplitInfo'
 
 import type {
+  LabwareDef2ByDefURI,
   LabwareDefinition2,
-  LabwareDefinitionsByUri,
   LoadLiquidCreateCommand,
   ProtocolFileV6,
 } from '@opentrons/shared-data'
@@ -187,9 +187,9 @@ export const migrateFile = (
 
       return [loadAdapterCommand, loadLabwareCommand]
     })
-  const newLabwareDefinitions: LabwareDefinitionsByUri = Object.keys(
+  const newLabwareDefinitions: LabwareDef2ByDefURI = Object.keys(
     labwareDefinitions
-  ).reduce((acc: LabwareDefinitionsByUri, defId: string) => {
+  ).reduce((acc: LabwareDef2ByDefURI, defId: string) => {
     const labwareDefinition = labwareDefinitions[defId]
     if (labwareDefinition == null) {
       console.error(
@@ -213,7 +213,7 @@ export const migrateFile = (
     .filter(
       (command): command is LoadLabwareCommandV6 =>
         command.commandType === 'loadLabware' &&
-        getIsAdapter(command.params.labwareId) === false
+        !getIsAdapter(command.params.labwareId)
     )
     .map(command => {
       const labwareId = command.params.labwareId
