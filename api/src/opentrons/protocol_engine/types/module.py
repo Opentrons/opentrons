@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.types import LocatingFeatures
 
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
@@ -202,6 +203,11 @@ class ModuleDefinition(BaseModel):
     gripperOffsets: Optional[Dict[str, LabwareMovementOffsetData]] = Field(
         default_factory=dict,
         description="Offsets to use for labware movement using gripper",
+    )
+
+    locatingFeaturesAsParent: LocatingFeatures = Field(
+        ...,
+        description="List of explict locating features when this module acts as the parent in a labware stackup",
     )
 
 
