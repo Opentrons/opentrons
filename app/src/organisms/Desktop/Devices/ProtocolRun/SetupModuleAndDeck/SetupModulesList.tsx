@@ -343,7 +343,7 @@ export function ModulesListItem({
               setShowModuleSetupModal(null)
             }}
             moduleDisplayName={showModuleSetupModal}
-            isAbsorbanceReader={moduleModel === ABSORBANCE_READER_V1}
+            moduleModel={moduleModel}
           />
         ) : null}
         <Flex

@@ -232,6 +232,11 @@ class FlexStacker(mod_abc.AbstractModule):
         return self._reader.limit_switch_status
 
     @property
+    def install_detected(self) -> bool:
+        """Whether the stacker is installed on Flex."""
+        return self._reader.installation_detected
+
+    @property
     def device_info(self) -> Mapping[str, str]:
         return self._device_info
 
@@ -258,8 +263,7 @@ class FlexStacker(mod_abc.AbstractModule):
             "latchState": self.latch_state.value,
             "platformState": self._get_platform_live_data().value,
             "hopperDoorState": self.hopper_door_state.value,
-            "axisStateX": self.limit_switch_status[StackerAxis.X].value,
-            "axisStateZ": self.limit_switch_status[StackerAxis.Z].value,
+            "installDetected": self.install_detected,
             "errorDetails": self._reader.error,
         }
         return {"status": self.status.value, "data": data}
@@ -512,6 +516,7 @@ class FlexStacker(mod_abc.AbstractModule):
         is useful when we want the shuttle to be out of the way for error
         recovery (e.g. when the latch is stuck open).
         """
+        await self._reader.get_installation_detected()
         await self._reader.get_limit_switch_status()
         # we should always be able to home the X axis first
         await self.home_axis(StackerAxis.X, Direction.RETRACT)
@@ -677,6 +682,7 @@ class FlexStackerReader(Reader):
         self.platform_state = PlatformState.UNKNOWN
         self.hopper_door_closed = False
         self.initialized = False
+        self.installation_detected = False
         self._initialized_callback: Optional[Callable[[], Awaitable[None]]] = None
 
     def set_initialized_callback(self, callback: Callable[[], Awaitable[None]]) -> None:
@@ -688,6 +694,7 @@ class FlexStackerReader(Reader):
         await self.get_platform_sensor_state()
         if not self.initialized:
             initialized = True
+            await self.get_installation_detected()
             await self.get_limit_switch_status()
             await self.get_motion_parameters()
             for sensor, status in self.tof_sensor_status.items():
@@ -729,6 +736,11 @@ class FlexStackerReader(Reader):
         self.hopper_door_closed = await self._driver.get_hopper_door_closed()
         if old_door_state != self.hopper_door_closed and self._initialized_callback:
             await self._initialized_callback()
+
+    async def get_installation_detected(self) -> None:
+        """Check if the stacker install detect is set."""
+        detected = await self._driver.get_installation_detected()
+        self.installation_detected = detected
 
     def on_error(self, exception: Exception) -> None:
         self._driver.reset_serial_buffers()

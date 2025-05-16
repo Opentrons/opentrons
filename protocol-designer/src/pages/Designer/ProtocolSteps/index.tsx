@@ -38,6 +38,7 @@ import {
   getRobotStateTimeline,
   getRobotType,
 } from '../../../file-data/selectors'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { saveProtocolFile } from '../../../load-file/actions'
 import { useProtocolExportHandler } from '../../../resources/hooks'
 import {
@@ -93,6 +94,7 @@ export function ProtocolSteps({
 }: ProtocolStepsProps): JSX.Element {
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
+  const dispatch = useDispatch<ThunkDispatch<any>>()
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const hoveredTerminalItem = useSelector(getHoveredTerminalItemId)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
@@ -123,7 +125,6 @@ export function ProtocolSteps({
   const viewBoxHeight = deckDef.dimensions[1] + DETAILS_HOVER_SPACE
   const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
   const [viewBox, setViewBox] = useState<string>(initialViewBox)
-  const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
   const leftString = t('onDeck')
@@ -240,6 +241,17 @@ export function ProtocolSteps({
       setDeckView(rightString)
     }
   }, [zoomedInSlot, labware, zoomedInOnOffDeck])
+
+  //  zoom out if you select on any step other than starting deck state in the timeline toolbox
+  useEffect(() => {
+    if (
+      zoomedInSlot != null &&
+      selectedTerminalItemId !== START_TERMINAL_ITEM_ID
+    ) {
+      dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
+      setViewBox(initialViewBox)
+    }
+  }, [zoomedInSlot, selectedTerminalItemId])
 
   return (
     <>

@@ -208,6 +208,15 @@ export const getSingleSelectDisabledTooltip = (
     ? t(`step_fields.${stepType}.disabled.${name}`)
     : t(`step_fields.${stepType}.disabled.$generic`)
 
+export const getFieldCaptions = (name: string, t: any): string | null => {
+  if (name == null) {
+    return null
+  }
+  const key = `protocol_steps:captions_for_fields.${name}`
+  const translated = t(key)
+  return translated === `captions_for_fields.${name}` ? null : translated
+}
+
 // TODO(IL, 2021-03-03): keys for fieldMap are more strictly of TipOffsetFields type,
 // but since utils like addFieldNamePrefix return StepFieldName/string instead
 // of strict TipOffsetFields, we have to be more lenient with the types
@@ -299,6 +308,8 @@ export const makeSingleEditFieldProps = (
       formData.stepType,
       t
     )
+    const caption = getFieldCaptions(name, t)
+
     const fieldProps: FieldProps = {
       disabled,
       errorToShow,
@@ -308,6 +319,7 @@ export const makeSingleEditFieldProps = (
       onFieldBlur,
       onFieldFocus,
       tooltipContent: disabled ? disabledTooltip : defaultTooltip,
+      caption: caption ?? undefined,
     }
     return { ...acc, [name]: fieldProps }
   }, {})
