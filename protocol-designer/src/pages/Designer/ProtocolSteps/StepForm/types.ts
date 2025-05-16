@@ -19,6 +19,7 @@ export interface FieldProps {
   isIndeterminate?: boolean
   tooltipContent?: string | null
   padding?: string // needed to accommodate full-width divider in toolbox
+  caption?: string
 }
 export type FieldPropsByName = Record<StepFieldName, FieldProps>
 
