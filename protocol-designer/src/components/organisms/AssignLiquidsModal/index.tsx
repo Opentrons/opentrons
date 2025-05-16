@@ -14,6 +14,8 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_AUTO,
   PrimaryButton,
   SPACING,
   StyledText,
@@ -32,15 +34,14 @@ import {
   selectWells,
 } from '../../../well-selection/actions'
 import { getSelectedWells } from '../../../well-selection/selectors'
+import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
 import { LiquidButton } from '../../molecules'
 import { SelectableLabware } from '../Labware/SelectableLabware'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
-import { LiquidEditor } from './LiquidEditor'
+import { LiquidToolbox } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
-
-const LIQUID_BOX_WIDTH = '52rem'
 
 interface AssignLiquidsModalProps {
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
@@ -49,22 +50,21 @@ export function AssignLiquidsModal(
   props: AssignLiquidsModalProps
 ): JSX.Element | null {
   const { showLiquidOverflowMenu } = props
-  const { t } = useTranslation(['liquids', 'shared'])
+  const { t } = useTranslation('liquids')
   const [highlightedWells, setHighlightedWells] = useState<WellGroup | {}>({})
+  const [showBadFormState, setShowBadFormState] = useState(false)
   const navigate = useNavigate()
   const nickNames = useSelector(getLabwareNicknamesById)
   const labwareId = useSelector(selectors.getSelectedLabwareId)
   const selectedWells = useSelector(getSelectedWells)
   const dispatch = useDispatch()
+  const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsAllLabware
   )
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
-  const { labware } = useSelector(getInitialDeckSetup)
-  const [showBadFormState, setShowBadFormState] = useState(false)
-
   if (labwareId == null) {
     console.assert(
       false,
@@ -88,48 +88,53 @@ export function AssignLiquidsModal(
 
   return (
     <Flex
-      height="100%"
+      height={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
       backgroundColor={COLORS.grey10}
-      paddingBottom={SPACING.spacing40}
-      gridGap={SPACING.spacing40}
-      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing12}
     >
-      <Flex
-        padding={`${SPACING.spacing12} ${SPACING.spacing12} 0`}
-        justifyContent={JUSTIFY_END}
-        gap={SPACING.spacing8}
-      >
-        <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
-        <PrimaryButton onClick={handleSave}>{t('shared:done')}</PrimaryButton>
-      </Flex>
-      <Flex
-        width="100%"
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-        gap={SPACING.spacing8}
-      >
-        <DeckInfoLabel
-          deckLabel={getSlotInLocationStack(labware[labwareId].stack) ?? ''}
-        />
-        <StyledText desktopStyle="headingLargeBold">
-          {t('add_liquids_to_labware', { labwareName: nickNames[labwareId] })}
-        </StyledText>
-      </Flex>
       <Flex
         width="100%"
         flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
+        paddingX={SPACING.spacing24}
+        overflowY={OVERFLOW_AUTO}
+        paddingBottom={SPACING.spacing60}
       >
-        <Flex paddingX={SPACING.spacing40} gap={SPACING.spacing24}>
+        <Flex justifyContent={JUSTIFY_END} paddingTop={SPACING.spacing12}>
+          <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
+        </Flex>
+        <Flex
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+          flexDirection={DIRECTION_COLUMN}
+          gap={SPACING.spacing24}
+          paddingTop={SPACING.spacing60}
+        >
+          <Flex
+            width="100%"
+            justifyContent={JUSTIFY_CENTER}
+            alignItems={ALIGN_CENTER}
+            gap={SPACING.spacing8}
+          >
+            <DeckInfoLabel
+              deckLabel={getSlotInLocationStack(labware[labwareId].stack) ?? ''}
+            />
+            <StyledText
+              desktopStyle="headingLargeBold"
+              css={LINE_CLAMP_TEXT_STYLE(3)}
+            >
+              {t('add_liquids_to_labware', {
+                labwareName: nickNames[labwareId],
+              })}
+            </StyledText>
+          </Flex>
           <Box
-            padding={`${SPACING.spacing32} ${SPACING.spacing48}`}
+            width="50vw"
+            padding={SPACING.spacing60}
             backgroundColor={COLORS.white}
             borderRadius={BORDERS.borderRadius12}
             display={DISPLAY_GRID}
             gap={SPACING.spacing12}
-            width={LIQUID_BOX_WIDTH}
-            minWidth={LIQUID_BOX_WIDTH}
           >
             <Flex
               justifyContent={JUSTIFY_CENTER}
@@ -137,7 +142,7 @@ export function AssignLiquidsModal(
               color={COLORS.grey60}
             >
               <StyledText
-                desktopStyle="headingSmallBold"
+                desktopStyle="headingSmallRegular"
                 css={{ userSelect: 'none' }}
               >
                 {t('click_and_drag')}
@@ -167,13 +172,16 @@ export function AssignLiquidsModal(
               nozzleType={null}
             />
           </Box>
-          <Flex width="100%">
-            <LiquidEditor
-              showBadFormState={showBadFormState}
-              setShowBadFormState={setShowBadFormState}
-            />
-          </Flex>
+          <PrimaryButton width="20rem" onClick={handleSave}>
+            {t('shared:done')}
+          </PrimaryButton>
         </Flex>
+      </Flex>
+      <Flex padding={SPACING.spacing12} height="100%">
+        <LiquidToolbox
+          showBadFormState={showBadFormState}
+          setShowBadFormState={setShowBadFormState}
+        />
       </Flex>
     </Flex>
   )
