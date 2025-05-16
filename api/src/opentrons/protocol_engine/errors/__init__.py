@@ -89,6 +89,7 @@ from .exceptions import (
     FlexStackerLabwarePoolNotYetDefinedError,
     FlexStackerNotLogicallyEmptyError,
     InvalidLabwarePositionError,
+    UnexpectedLocatingFeatureError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -173,6 +174,7 @@ __all__ = [
     "FlexStackerLabwarePoolNotYetDefinedError",
     "FlexStackerNotLogicallyEmptyError",
     "InvalidLabwarePositionError",
+    "UnexpectedLocatingFeatureError",
     # error occurrence models
     "ErrorOccurrence",
     "CommandNotAllowedError",

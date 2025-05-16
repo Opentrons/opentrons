@@ -27,6 +27,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     LabwareDefinition3,
 )
+from opentrons_shared_data.labware.types import LocatingFeature
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount, LabwareUri
@@ -39,6 +40,7 @@ from ..errors import (
     LabwareMovementNotAllowedError,
     InvalidLabwarePositionError,
     LabwareNotOnDeckError,
+    UnexpectedLocatingFeatureError,
 )
 from ..errors.exceptions import InvalidLiquidHeightFound
 from ..resources import (
@@ -338,6 +340,7 @@ class GeometryView:
             parent_pos.z + offset_from_parent.z,
         )
 
+    # TOME TODO: We can do this invocation safely in th get_lw_origin_pos given how this is consumed. It might make things simpler?
     def _get_offset_from_parent(
         self, child_definition: LabwareDefinition, parent: LabwareLocation
     ) -> LabwareOffsetVector:
@@ -532,20 +535,137 @@ class GeometryView:
         else:
             assert_type(definition, LabwareDefinition3)
 
-            labware_footprint_left_x = definition.extents.footprint.backLeft.x
-            labware_footprint_front_y = definition.extents.footprint.frontRight.y
-            labware_footprint_bottom_z = definition.extents.total.backLeftBottom.z
-
             labware_origin_to_labware_front_left_bottom = Point(
-                labware_footprint_left_x,
-                labware_footprint_front_y,
-                labware_footprint_bottom_z,
+                definition.extents.footprint.backLeft.x,
+                definition.extents.footprint.frontRight.y,
+                definition.extents.total.backLeftBottom.z,
             )
             labware_front_left_bottom_to_labware_origin = (
                 -1 * labware_origin_to_labware_front_left_bottom
             )
 
-            return slot_front_left + labware_front_left_bottom_to_labware_origin
+            return (
+                slot_front_left
+                + labware_front_left_bottom_to_labware_origin
+                + self._get_locating_feature_offset(labware_id)
+            )
+
+    def _get_locating_feature_offset(self, labware_id: str) -> Point:
+        """Returns the locating feature positional offset.
+
+        The method utilized to compute the locating feature offset is determined by finding the highest priority
+        locating feature present in both the parent and child entities.
+        """
+        definition = self._labware.get_definition(labware_id)
+
+        if isinstance(definition, LabwareDefinition2):
+            return Point(0, 0, 0)
+        else:
+            assert_type(definition, LabwareDefinition3)
+
+            locating_features_parent = self._get_ancestor_locating_features_as_parent(
+                labware_id
+            )
+            locating_features_child = definition.locatingFeaturesAsChild
+
+            # The ancestor's locating features as parent determines the labware mating behavior.
+            for locating_feature in locating_features_parent:
+                if locating_feature in locating_features_child:
+                    if locating_feature is LocatingFeature.WELL:
+                        return self._get_well_to_well_offset(labware_id)
+
+            # In specific circumstances, such as a parent labware being of LabwareDefinition2,
+            # there will be no matching parent-child locating feature.
+            return Point(0, 0, 0)
+
+    def _get_well_to_well_offset(self, labware_id: str) -> Point:
+        """Get the well-to-well offset of a labware on a module or labware on another labware."""
+        labware = self._labware.get(labware_id)
+        lw_definition = self._labware.get_definition(labware_id)
+
+        if isinstance(labware.location, OnLabwareLocation):
+            below_labware_id = labware.location.labwareId
+            below_lw_definition = self._labware.get_definition(below_labware_id)
+
+            well_to_well_offset = Point(
+                x=below_lw_definition.wells["A1"].x,
+                y=below_lw_definition.wells["A1"].y,
+                z=0,
+            ) - Point(
+                x=lw_definition.wells["A1"].x,
+                y=lw_definition.wells["A1"].y,
+                z=0,
+            )
+
+            return well_to_well_offset
+
+        # Effectively, the thermocycler case.
+        elif isinstance(labware.location, ModuleLocation):
+            module_id = labware.location.moduleId
+            mod_definition = self._modules.get_definition(module_id)
+            mod_wells = mod_definition.wells
+
+            if mod_wells is not None:
+                well_A1_to_mod_back_left_bottom_lw_mating_origin = Point(
+                    x=mod_wells["A1"].x, y=mod_wells["A1"].y, z=0
+                )
+                lw_well_A1_to_lw_origin = Point(
+                    x=lw_definition.wells["A1"].x,
+                    y=lw_definition.wells["A1"].y,
+                    z=0,
+                )
+                well_to_well_offset = (
+                    well_A1_to_mod_back_left_bottom_lw_mating_origin
+                    - lw_well_A1_to_lw_origin
+                )
+
+                return well_to_well_offset
+            else:
+                raise UnexpectedLocatingFeatureError(
+                    f"Well-to-well locating feature does not support module {mod_definition.displayName}"
+                )
+
+        else:
+            raise UnexpectedLocatingFeatureError(
+                f"Well-to-well locating feature does not support labware {self._labware.get_display_name(labware_id)} with location {labware.location}"
+            )
+
+    def _get_ancestor_locating_features_as_parent(
+        self, labware_id: str
+    ) -> List[LocatingFeature]:
+        """Get the locating features as parent for the labware's ancestor."""
+        labware = self._labware.get(labware_id)
+
+        if isinstance(labware.location, DeckSlotLocation):
+            pass
+
+        elif isinstance(labware.location, ModuleLocation):
+            module_id = labware.location.moduleId
+            return self._modules.get_locating_features_as_parent(module_id)
+
+        elif isinstance(labware.location, OnLabwareLocation):
+            below_labware_id = labware.location.labwareId
+            below_lw_definition = self._labware.get_definition(below_labware_id)
+
+            if isinstance(below_lw_definition, LabwareDefinition2):
+                return []
+            else:
+                return below_lw_definition.locatingFeaturesAsParent
+
+        elif isinstance(labware.location, AddressableAreaLocation):
+            pass
+
+        elif labware.location == OFF_DECK_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                f"Labware {labware_id} does not have a slot associated with it"
+                f" since it is no longer on the deck."
+            )
+        else:
+            raise errors.InvalidLabwarePositionError(
+                f"Cannot get ancestor slot of {self._labware.get_display_name(labware_id)} with location {labware.location}"
+            )
+
+        return []
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
