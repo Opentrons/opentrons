@@ -190,14 +190,14 @@
           "toggleOn": "Open"
         },
         "shaker": {
-          "setShake": "Shake speed",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Active"
+          "setShake": "Shaker",
+          "toggleOff": "Off",
+          "toggleOn": "On"
         },
         "temperature": {
-          "setTemperature": "Temperature",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Active"
+          "setTemperature": "Heater",
+          "toggleOff": "Off",
+          "toggleOn": "On"
         },
         "timer": {
           "heaterShakerSetTimer": "Timer"
@@ -209,7 +209,7 @@
         "pickUp": "pick up tip"
       },
       "magnetAction": {
-        "label": "Magnet state",
+        "label": "Magnets",
         "options": {
           "disengage": "Disengage",
           "engage": "Engage"
@@ -295,10 +295,9 @@
         "label": "Step Notes"
       },
       "temperature": {
-        "caption": "Valid range is 4 – 95˚C",
         "setTemperature": "Temperature",
-        "toggleOff": "Deactivate",
-        "toggleOn": "Set"
+        "toggleOff": "Off",
+        "toggleOn": "On"
       },
       "thermocyclerAction": {
         "options": {
@@ -333,21 +332,21 @@
       },
       "thermocyclerState": {
         "block": {
-          "engage": "Block temperature",
+          "engage": "Block",
           "label": "Thermocycler block",
           "temperature": "Block temperature",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Activate",
-          "valid_range": "Valid range between 4 and 96ºC"
+          "toggleOff": "Off",
+          "toggleOn": "On",
+          "valid_range": "Valid range between 4 and 96°C"
         },
         "ending_hold": "Ending hold",
         "lid": {
-          "engage": "Lid temperature",
+          "engage": "Lid",
           "label": "Lid",
           "temperature": "Lid temperature",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Activate",
-          "valid_range": "Valid range between 37 and 110ºC"
+          "toggleOff": "Off",
+          "toggleOn": "On",
+          "valid_range": "Valid range between 37 and 110°C"
         },
         "lidPosition": {
           "label": "Lid position",
@@ -397,9 +396,9 @@
       "mixLabware": "labware",
       "movedLabware": "labware"
     },
+    "heat_or_cool": "Heat or cool",
     "mixRepetitions": "repetitions",
     "mixVolumeLabel": "mix volume",
-    "moduleState": "Module state",
     "multiDispenseOptionsLabel": "multi-dispense options",
     "section": {
       "dropTip": "drop tip",

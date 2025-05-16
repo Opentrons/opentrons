@@ -46,14 +46,14 @@ from .utils import (
 
 
 FS_BAUDRATE = 115200
-DEFAULT_FS_TIMEOUT = 1
+DEFAULT_FS_TIMEOUT = 5
 FS_MOVE_TIMEOUT = 20
 FS_TOF_TIMEOUT = 20
 FS_TOF_INIT_TIMEOUT = 5
 FS_ACK = "OK\n"
 FS_ERROR_KEYWORD = "err"
 FS_ASYNC_ERROR_ACK = "async"
-DEFAULT_COMMAND_RETRIES = 0
+DEFAULT_COMMAND_RETRIES = 2
 GCODE_ROUNDING_PRECISION = 2
 
 # LED animation range values
@@ -138,8 +138,8 @@ STACKER_MOTION_CONFIG = {
     },
     StackerAxis.L: {
         "home": AxisParams(
-            run_current=0.8,
-            hold_current=0.15,
+            run_current=1.2,
+            hold_current=0.5,
             move_params=MoveParams(
                 max_speed=100.0,
                 acceleration=800.0,
@@ -147,8 +147,8 @@ STACKER_MOTION_CONFIG = {
             ),
         ),
         "move": AxisParams(
-            run_current=0.6,
-            hold_current=0.15,
+            run_current=1.2,
+            hold_current=0.5,
             move_params=MoveParams(
                 max_speed=100.0,
                 acceleration=800.0,

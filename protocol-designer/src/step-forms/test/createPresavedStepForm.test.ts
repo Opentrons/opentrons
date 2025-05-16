@@ -292,7 +292,7 @@ describe('createPresavedStepForm', () => {
       engageHeight: null,
       magnetAction: 'engage',
       // Default values
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
     })
   })
@@ -306,7 +306,7 @@ describe('createPresavedStepForm', () => {
           moduleId: 'someMagneticModuleId',
           engageHeight: EXAMPLE_ENGAGE_HEIGHT,
           magnetAction: 'engage',
-          stepName: 'magnet',
+          stepName: 'magnetic module state',
           stepDetails: '',
         },
       },
@@ -319,7 +319,7 @@ describe('createPresavedStepForm', () => {
       moduleId: 'someMagneticModuleId',
       engageHeight: EXAMPLE_ENGAGE_HEIGHT,
       magnetAction: 'disengage',
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
     })
   })
@@ -333,7 +333,7 @@ describe('createPresavedStepForm', () => {
           moduleId: 'someMagneticModuleId',
           engageHeight: EXAMPLE_ENGAGE_HEIGHT,
           magnetAction: 'disengage',
-          stepName: 'magnet',
+          stepName: 'magnetic module state',
           stepDetails: '',
         },
       },
@@ -346,7 +346,7 @@ describe('createPresavedStepForm', () => {
       moduleId: 'someMagneticModuleId',
       engageHeight: EXAMPLE_ENGAGE_HEIGHT,
       magnetAction: 'engage',
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
     })
   })
@@ -359,7 +359,7 @@ describe('createPresavedStepForm', () => {
       // Default fields
       setTemperature: null,
       targetTemperature: null,
-      stepName: 'temperature',
+      stepName: 'temperature module state',
       stepDetails: '',
     })
   })

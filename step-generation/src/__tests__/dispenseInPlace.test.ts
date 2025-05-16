@@ -14,7 +14,7 @@ describe('dispenseInPlace', () => {
   let invariantContext: InvariantContext
   let robotStateWithTip: RobotState
 
-  const mockId = 'mockId'
+  const mockId = 'p300SingleId'
   const mockFlowRate = 10
   const mockVolume = 10
   beforeEach(() => {
@@ -40,5 +40,12 @@ describe('dispenseInPlace', () => {
         },
       },
     ])
+    expect(res.python).toBe(
+      `
+mock_pipette.dispense(
+    volume=10,
+    rate=10 / mock_pipette.flow_rate.dispense,
+)`.trimStart()
+    )
   })
 })

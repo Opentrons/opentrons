@@ -3,7 +3,7 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, Optional, cast
+from typing import Any, Dict, Iterable, List, Literal, cast
 
 import requests
 import structlog
@@ -84,9 +84,9 @@ class AnthropicPredict:
 
         deck_layout = load_file_content(filename="deck_layout.md")
         tip_handling = load_file_content("tip_handling.md")
-        step_types = load_file_content("step-types.ts")
+        step_types = load_file_content("form-types.txt")
         loadnames = load_file_content("pd_api_names.md")
-        load_step_doc = load_file_content("step_doc_flex.md")
+        load_step_doc = load_file_content("step_doc.md")
         expected_json = load_file_content("expected.md")
         # complete documents
         formatted_documents_pd = DOCUMENTS_PD.format(
@@ -341,7 +341,7 @@ class AnthropicPredict:
         },
         "designerApplication": {
             "name": "opentrons/protocol-designer",
-            "version": "8.4.3",
+            "version": "8.4.4",
             "data": {
             "_internalAppBuildDate": "",
             "pipetteTiprackAssignments": {},
@@ -369,17 +369,13 @@ class AnthropicPredict:
             }
         },
         "robot": {},
-        "labwareDefinitionSchemaId": "opentronsLabwareSchemaV2",
         "labwareDefinitions": {},
-        "liquidSchemaId": "opentronsLiquidSchemaV1",
-        "liquids": {},
-        "commandSchemaId": "opentronsCommandSchemaV10",
-        "commands": [],
-        "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1",
-        "commandAnnotations": []
         }
         """
-        original_steps = data.get("designerApplication", {}).get("data", {}).get("savedStepForms", {})
+        now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+        original_saved_forms = data.get("designerApplication", {}).get("data", {}).get("savedStepForms", {})
+        # Make a copy to modify, or ensure original_steps is a new dict
+        original_steps_without_initial = {k: v for k, v in original_saved_forms.items() if k != "__INITIAL_DECK_SETUP_STEP__"}
         original_ordered_ids = data.get("designerApplication", {}).get("data", {}).get("orderedStepIds", [])
 
         standard = {
@@ -389,8 +385,8 @@ class AnthropicPredict:
                 "protocolName": data.get("metadata", {}).get("protocolName", ""),
                 "author": data.get("metadata", {}).get("author", "AI"),
                 "description": data.get("metadata", {}).get("description", ""),
-                "created": data.get("metadata", {}).get("created", 1737373264166),
-                "lastModified": data.get("metadata", {}).get("lastModified", 1737373536793),
+                "created": now_ms,
+                "lastModified": now_ms,
                 "source": "OpentronsAI",
                 "category": data.get("metadata", {}).get("category", None),
                 "subcategory": data.get("metadata", {}).get("subcategory", None),
@@ -398,11 +394,11 @@ class AnthropicPredict:
             },
             "designerApplication": {
                 "name": data.get("designerApplication", {}).get("name", "opentrons/protocol-designer"),
-                "version": data.get("designerApplication", {}).get("version", "8.2.3"),
+                "version": "8.4.4",
                 "data": {
                     "_internalAppBuildDate": data.get("designerApplication", {})
                     .get("data", {})
-                    .get("_internalAppBuildDate", "Wed, 08 Jan 2025 21:05:04 GMT"),
+                    .get("_internalAppBuildDate", "Wed, 06 May 2025 21:05:04 GMT"),
                     "pipetteTiprackAssignments": data.get("designerApplication", {}).get("data", {}).get("pipetteTiprackAssignments", {}),
                     "dismissedWarnings": {"form": [], "timeline": []},
                     "ingredients": data.get("designerApplication", {}).get("data", {}).get("ingredients", {}),
@@ -447,7 +443,7 @@ class AnthropicPredict:
                             .get("__INITIAL_DECK_SETUP_STEP__", {})
                             .get("gripperLocationUpdate", {}),
                         },
-                        **original_steps,
+                        **original_steps_without_initial,
                     },
                     "orderedStepIds": original_ordered_ids,
                     "pipettes": data.get("designerApplication", {}).get("data", {}).get("pipettes", {}),
@@ -456,14 +452,7 @@ class AnthropicPredict:
                 },
             },
             "robot": data.get("robot", {}),
-            "labwareDefinitionSchemaId": data.get("labwareDefinitionSchemaId", ""),
-            "labwareDefinitions": data.get("labwareDefinitions", {}),
-            "liquidSchemaId": data.get("liquidSchemaId", ""),
-            "liquids": data.get("liquids", {}),
-            "commandSchemaId": data.get("commandSchemaId", ""),
-            "commands": data.get("commands", []),
-            "commandAnnotationSchemaId": data.get("commandAnnotationSchemaId", "opentronsCommandAnnotationSchemaV1"),
-            "commandAnnotations": data.get("commandAnnotations", []),
+            "labwareDefinitions": {},
         }
 
         return standard
@@ -473,30 +462,6 @@ class AnthropicPredict:
         """
         Fill up the JSON protocol with the missing fields.
         """
-
-        def get_definition_by_load_name(load_name: Optional[str] = None) -> Optional[Dict[str, Any]]:
-            # Extract the middle part of the load name which corresponds to the directory name
-            # For 'opentrons/opentrons_96_tiprack_20ul/1', get 'opentrons_96_tiprack_20ul'
-            if not load_name:
-                return None
-
-            try:
-                labware_name, version = load_name.split("/")[1], load_name.split("/")[-1]
-            except IndexError:
-                logger.error(f"Invalid load_name format: {load_name}")
-                return None
-
-            definition_path = REPO_ROOT / "shared-data" / "labware" / "definitions" / "2" / labware_name / f"{version}.json"
-
-            try:
-                with open(definition_path) as f:
-                    return cast(Dict[str, Any], json.load(f))
-            except FileNotFoundError:
-                logger.warning(f"Labware definition file not found: {definition_path}")
-                return None
-            except json.JSONDecodeError:
-                logger.error(f"Error decoding JSON from file: {definition_path}")
-                return None
 
         try:
             data = json.loads(json_str)
@@ -509,8 +474,6 @@ class AnthropicPredict:
             data["metadata"].update(
                 {
                     "author": "OpentronsAI",
-                    "created": 1737373264166,
-                    "lastModified": 1737373536793,
                     "source": "OpentronsAI",
                     "category": None,
                     "subcategory": None,
@@ -519,7 +482,12 @@ class AnthropicPredict:
             )
 
             # Add designer application
-            data["designerApplication"].update({"name": "opentrons/protocol-designer", "version": "8.4.3"})
+            data["designerApplication"].update(
+                {
+                    "name": "opentrons/protocol-designer",
+                    "version": "8.4.4",
+                }
+            )
 
             # Add data
             dt = datetime.now(timezone.utc)
@@ -529,65 +497,8 @@ class AnthropicPredict:
                 {"_internalAppBuildDate": formatted_date, "dismissedWarnings": {"form": [], "timeline": []}}
             )
 
-            # Add command annotation
-            data["commandAnnotationSchemaId"] = "opentronsCommandAnnotationSchemaV1"
-            data["commandAnnotations"] = []
-
             # Add labware definitions
-            data["labwareDefinitionSchemaId"] = "opentronsLabwareSchemaV2"
             data["labwareDefinitions"] = {}
-
-            # Extract labware names from designerApplication.data.labware
-            labware_names = []
-            designer_data = data.get("designerApplication", {}).get("data", {})
-            labware_dict = designer_data.get("labware", {})
-
-            for _, labware_info in labware_dict.items():
-                labware_def_uri = labware_info.get("labwareDefURI")
-                if labware_def_uri:
-                    labware_names.append(labware_def_uri)
-
-            # Add labware definitions
-            data["labwareDefinitionSchemaId"] = "opentronsLabwareSchemaV2"
-            data["labwareDefinitions"] = {}
-
-            # import code
-            # code.interact(local=dict(globals(), **locals()))
-            for ln in labware_names:
-                data["labwareDefinitions"][ln] = get_definition_by_load_name(load_name=ln)
-
-            # Construct moveToAddressableAreaForDropTip w.r.t id of pipette
-            pipette_updates = (
-                data.get("designerApplication", {})
-                .get("data", {})
-                .get("savedStepForms", {})
-                .get("__INITIAL_DECK_SETUP_STEP__", {})
-                .get("pipetteLocationUpdate", {})
-            )
-            pipette_id = next(iter(pipette_updates.keys()))
-
-            if "OT-2" in data.get("robot", {}).get("model", ""):
-                trash_bin = "fixedTrash"
-            else:
-                trash_bin = "movableTrashA3"
-
-            drop_tip_command = {
-                "commandType": "moveToAddressableAreaForDropTip",
-                "key": str(uuid.uuid4()),
-                "params": {
-                    "pipetteId": pipette_id,
-                    "addressableAreaName": trash_bin,
-                    "offset": {"x": 0, "y": 0, "z": 0},
-                    "alternateDropLocation": True,
-                },
-            }
-
-            data["commands"].append(drop_tip_command)
-            for cmd in data["commands"]:
-                cmd["key"] = str(uuid.uuid4())  # generate unique key
-
-            data["liquidSchemaId"] = "opentronsLiquidSchemaV1"
-            data["commandSchemaId"] = "opentronsCommandSchemaV10"
 
             # Follow PD schema
             data = self.standardize(data)
@@ -614,7 +525,7 @@ class AnthropicPredict:
         url = "https://Opentrons-simulator.hf.space/protocol"
         protocol_name = str(uuid.uuid4()) + ".py"
         data = {"name": protocol_name, "content": protocol}
-        hf_token: str = settings.huggingface_api_key.get_secret_value()
+        hf_token: str = self.settings.huggingface_api_key.get_secret_value()
         headers = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(hf_token)}
         response = requests.post(url, json=data, headers=headers)
 

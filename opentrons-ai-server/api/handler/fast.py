@@ -12,6 +12,7 @@ from asgi_correlation_id.context import correlation_id
 from ddtrace import tracer
 from ddtrace.contrib.asgi.middleware import TraceMiddleware
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Query, Request, Response, Security, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
@@ -357,9 +358,18 @@ async def create_protocol(
         return _format_response(response, protocol_format, bool(body.fake))
 
     except Exception as e:
-        logger.exception("Error processing protocol creation")
+        logger.error(
+            f"Unhandled error in create_protocol: {str(e)}", extra={"error_details": str(e), "exception_type": e.__class__.__name__}
+        )
+
+        payload = {
+            "message": "Internal server error",
+            "exception_type": type(e).__name__,
+            "error": str(e),
+        }
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=jsonable_encoder(payload),
         ) from e
 
 
@@ -525,7 +535,7 @@ async def custom_404_middleware(request: Request, call_next: Callable[[Request],
         return response
     except Exception as exc:
         logger.error(f"Error processing request: {exc}", exc_info=True)
-        raise exc
+        raise exc from None
 
 
 # Catch-all handler for any other uncaught exceptions

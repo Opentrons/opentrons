@@ -62,7 +62,11 @@ function getInvariantContextAndRobotState(
 ): { invariantContext: InvariantContext; robotState: RobotState } {
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
   let pipetteName = quickTransferState.pipette.model
-  if (quickTransferState.pipette.channels === 1) {
+  // we have to special case the peek pipette as it doesn't follow
+  // our pipette definition naming conventions
+  if (quickTransferState.pipette.displayName === 'FLEX 8-Channel EM 1000 µL') {
+    pipetteName = 'p1000_multi_em_flex'
+  } else if (quickTransferState.pipette.channels === 1) {
     pipetteName = pipetteName + `_single_flex`
   } else if (quickTransferState.pipette.channels === 8) {
     pipetteName = pipetteName + `_multi_flex`
@@ -442,17 +446,22 @@ export function generateQuickTransferArgs(
     aspirateRetractZOffset: 0,
     aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
     aspirateRetractDelay: null,
+    dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseZOffset: 0,
     dispenseSubmergeSpeed: null,
     dispenseSubmergeXOffset: 0,
     dispenseSubmergeYOffset: 0,
     dispenseSubmergeZOffset: 0,
     dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseSubmergeDelay: null,
     dispenseRetractSpeed: null,
     dispenseRetractXOffset: 0,
     dispenseRetractYOffset: 0,
     dispenseRetractZOffset: 0,
     dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseRetractDelay: null,
     touchTipAfterAspirateMmFromEdge: null,
+    touchTipAfterDispenseMmFromEdge: null,
   }
 
   switch (quickTransferState.path) {

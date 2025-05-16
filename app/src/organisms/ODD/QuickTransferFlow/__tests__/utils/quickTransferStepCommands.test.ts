@@ -6,6 +6,7 @@ import {
   fixtureTiprack1000ul,
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
+import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 
 import { quickTransferStepCommands } from '../../utils/pythonDef'
 
@@ -147,7 +148,7 @@ describe('quickTransferStepCommands', () => {
       dispenseRetractZOffset: 0,
       dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
       blowoutOffsetFromTopMm: -1,
-      blowoutLocation: 'source',
+      blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       mixBeforeAspirate: null,
       mixInDestination: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
@@ -172,11 +173,16 @@ describe('quickTransferStepCommands', () => {
       dispenseDelay: null,
       touchTipAfterDispense: false,
       touchTipAfterDispenseOffsetMmFromTop: 0,
+      touchTipAfterDispenseMmFromEdge: 0,
       touchTipAfterDispenseSpeed: null,
       dispenseFlowRateUlSec: 80,
       dispenseOffsetFromBottomMm: -1,
       dispenseXOffset: 0,
       dispenseYOffset: 0,
+      dispenseZOffset: 0,
+      dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseSubmergeDelay: null,
+      dispenseRetractDelay: null,
       name: 'transfer',
       description: 'transferring from 1 well to another',
       pushOut: null,
@@ -201,13 +207,16 @@ pipette.aspirate(
     rate=56 / pipette.flow_rate.aspirate,
 )
 pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
 pipette.dispense(
     volume=10,
-    location=mock_labware_2["B1"].bottom(z=-1),
     rate=80 / pipette.flow_rate.dispense,
 )
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_1["A1"].top())
 pipette.flow_rate.blow_out = 50
-pipette.blow_out(mock_trash_bin_1)
+pipette.blow_out()
 pipette.drop_tip()`.trimStart()
     )
   })
@@ -244,7 +253,7 @@ pipette.drop_tip()`.trimStart()
       dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
       touchTipAfterAspirateMmFromEdge: null,
       blowoutOffsetFromTopMm: -1,
-      blowoutLocation: 'source',
+      blowoutLocation: 'mockTrashBin',
       mixFirstAspirate: null,
       mixInDestination: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
@@ -269,11 +278,16 @@ pipette.drop_tip()`.trimStart()
       dispenseDelay: null,
       touchTipAfterDispense: false,
       touchTipAfterDispenseOffsetMmFromTop: 0,
+      touchTipAfterDispenseMmFromEdge: 0,
       touchTipAfterDispenseSpeed: null,
       dispenseFlowRateUlSec: 80,
       dispenseOffsetFromBottomMm: -1,
       dispenseXOffset: 0,
       dispenseYOffset: 0,
+      dispenseZOffset: 0,
+      dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseSubmergeDelay: null,
+      dispenseRetractDelay: null,
       name: 'transfer',
       description: 'transferring from 1 well to another',
       pushOut: null,
@@ -366,11 +380,16 @@ pipette.drop_tip()`.trimStart()
       dispenseDelay: null,
       touchTipAfterDispense: false,
       touchTipAfterDispenseOffsetMmFromTop: 0,
+      touchTipAfterDispenseMmFromEdge: 0,
       touchTipAfterDispenseSpeed: null,
       dispenseFlowRateUlSec: 80,
       dispenseOffsetFromBottomMm: -1,
       dispenseXOffset: 0,
       dispenseYOffset: 0,
+      dispenseZOffset: 0,
+      dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseSubmergeDelay: null,
+      dispenseRetractDelay: null,
       name: 'transfer',
       description: 'transferring from 1 well to another',
       disposalVolume: null,

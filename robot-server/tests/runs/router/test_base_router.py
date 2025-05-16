@@ -2,6 +2,11 @@
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    labware_definition_type_adapter,
+)
 import pytest
 from datetime import datetime
 from decoy import Decoy
@@ -51,6 +56,7 @@ from robot_server.runs.run_models import (
     CommandLinkNoMeta,
     NozzleLayoutConfig,
     TipState,
+    FlexStackerState,
 )
 from robot_server.runs.run_orchestrator_store import RunConflictError
 from robot_server.runs.run_data_manager import (
@@ -76,6 +82,11 @@ from opentrons.protocol_engine.resources.file_provider import (
     FileProvider,
 )
 from robot_server.file_provider.provider import FileProviderWrapper
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerSubState,
+    FlexStackerId,
+)
+from opentrons.protocol_engine.types.module import StackerStoredLabwareGroup
 
 
 def mock_notify_publishers() -> None:
@@ -107,6 +118,12 @@ def labware_offset_create() -> pe_types.LegacyLabwareOffsetCreate:
         location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     )
+
+
+@pytest.fixture()
+def labware_definition(minimal_labware_def: LabwareDefDict) -> LabwareDefinition:
+    """Create a labware definition fixture."""
+    return labware_definition_type_adapter.validate_python(minimal_labware_def)
 
 
 async def test_create_run(
@@ -817,6 +834,7 @@ async def test_get_current_state_success(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
     mock_hardware_api: HardwareControlAPI,
+    labware_definition: LabwareDefinition,
 ) -> None:
     """It should return different state from the current run.
 
@@ -856,6 +874,24 @@ async def test_get_current_state_success(
         command_pointer
     )
 
+    stacker_substates = {
+        "mock-stacker-id": FlexStackerSubState(
+            module_id=FlexStackerId("mock-stacker-id"),
+            pool_primary_definition=labware_definition,
+            pool_adapter_definition=None,
+            pool_lid_definition=None,
+            max_pool_count=6,
+            contained_labware_bottom_first=[
+                StackerStoredLabwareGroup(primaryLabwareId="heeheehoohoo")
+            ],
+            pool_overlap=0,
+        ),
+    }
+
+    decoy.when(
+        mock_run_data_manager.get_flex_stacker_substate(run_id=run_id)
+    ).then_return(stacker_substates)
+
     result = await get_current_state(
         runId=run_id,
         run_data_manager=mock_run_data_manager,
@@ -875,6 +911,19 @@ async def test_get_current_state_success(
         },
         tipStates={"mock-pipette-id": TipState(hasTip=True)},
         placeLabwareState=None,
+        flexStackerStates={
+            "mock-stacker-id": FlexStackerState(
+                primaryLabwareURI=labware_definition.namespace
+                + "/"
+                + labware_definition.parameters.loadName
+                + "/"
+                + str(labware_definition.version),
+                adapterLabwareURI=None,
+                lidLabwareURI=None,
+                count=1,
+                maxCount=6,
+            )
+        },
     )
     assert result.content.links == CurrentStateLinks(
         lastCompleted=CommandLinkNoMeta(

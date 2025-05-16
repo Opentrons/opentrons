@@ -9,7 +9,7 @@ setup: install-pipenv
 
 .PHONY: teardown
 teardown:
-	python -m pipenv --rm
+	-python -m pipenv --rm
 
 .PHONY: black
 black:

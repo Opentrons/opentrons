@@ -38,6 +38,7 @@ export * from './getFixedTrashLabwareDefinition'
 export * from './getOccludedSlotCountForModule'
 export * from './labwareInference'
 export * from './linearInterpolate'
+export * from './liquidClasses'
 export * from './getAddressableAreasInProtocol'
 export * from './getFlexSurroundingSlots'
 export * from './getSimplestFlexDeckConfig'
@@ -48,6 +49,7 @@ export * from './orderRuntimeParameterRangeOptions'
 export * from './sortRunTimeParameters'
 export * from './parseAddressableArea'
 export * from './validateCustomLabwareHelper'
+export * from './getWellRangeForLiquidLabwarePair'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

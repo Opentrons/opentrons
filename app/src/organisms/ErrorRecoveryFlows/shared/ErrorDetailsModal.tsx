@@ -8,6 +8,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InlineNotification,
   ModalHeader,
   ModalShell,
   SPACING,
@@ -15,7 +16,6 @@ import {
 } from '@opentrons/components'
 
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { OddModal } from '/app/molecules/OddModal'
 
 import { ERROR_KINDS } from '../constants'

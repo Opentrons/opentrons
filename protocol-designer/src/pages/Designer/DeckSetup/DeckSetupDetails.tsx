@@ -32,9 +32,9 @@ import {
 import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
-import { HoveredItem } from './HoveredItem'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
-import { SelectedHoveredItems } from './SelectedHoveredItems'
+import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
+import { SelectedItems } from './SelectedItems'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
 import { SlotWarning } from './SlotWarning'
 import {
@@ -67,7 +67,6 @@ interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   addEquipment: (slotId: string) => void
   deckDef: DeckDefinition
   hover: string | null
-  hoveredLabware: string | null
   setHover: Dispatch<SetStateAction<string | null>>
   showGen1MultichannelCollisionWarnings: boolean
   stagingAreaCutoutIds: CutoutId[]
@@ -80,7 +79,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     addEquipment,
     deckDef,
     hover,
-    hoveredLabware: hoveredLabwareFromProp,
     selectedZoomInSlot,
     terminalItemId,
     setHover,
@@ -129,8 +127,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   }, [])
 
   const {
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
     createdModuleForSlot,
     preSelectedFixture,
     slotPosition,
@@ -143,15 +141,15 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   useEffect(() => {
     dispatch(
       editSlotInfo({
-        createdNestedLabwareForSlot,
-        createdLabwareForSlot,
+        createdAdapterForSlot,
+        createdTopLabwareForSlot,
         createdModuleForSlot,
         preSelectedFixture,
       })
     )
   }, [
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
     createdModuleForSlot,
     preSelectedFixture,
   ])
@@ -307,6 +305,14 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                       isSelected={selectedZoomInSlot != null}
                     />
                   )}
+                  <ActiveLabwareControls
+                    slotPosition={[0, 0, 0]}
+                    slotBoundingBox={labwareInterfaceBoundingBox}
+                    itemId={slotId}
+                    terminalItemId={terminalItemId}
+                    hover={hover}
+                    setHover={setHover}
+                  />
                 </>
               ) : null}
 
@@ -464,6 +470,14 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                 isSelected={selectedZoomInSlot != null}
               />
             )}
+            <ActiveLabwareControls
+              slotPosition={slotPosition}
+              slotBoundingBox={slotBoundingBox}
+              itemId={slot}
+              terminalItemId={terminalItemId}
+              hover={hover}
+              setHover={setHover}
+            />
           </Fragment>
         )
       })}
@@ -533,6 +547,18 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               isSelected={selectedZoomInSlot != null}
               terminalItemId={terminalItemId}
             />
+            <ActiveLabwareControls
+              slotPosition={[0, 0, 0]}
+              slotBoundingBox={{
+                xDimension: labware.def.dimensions.xDimension,
+                yDimension: labware.def.dimensions.yDimension,
+                zDimension: 0,
+              }}
+              itemId={slotOnDeck ?? ''}
+              terminalItemId={terminalItemId}
+              hover={hover}
+              setHover={setHover}
+            />
           </Fragment>
         )
       })}
@@ -541,17 +567,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       <HighlightItems robotType={robotType} deckDef={deckDef} />
 
       {/* selected hardware + labware */}
-      <SelectedHoveredItems
+      <SelectedItems
         deckDef={deckDef}
         robotType={robotType}
-        hoveredLabware={hoveredLabwareFromProp}
         slotPosition={slotPosition}
-      />
-
-      {/* hovered  labware */}
-      <HoveredItem
-        hoveredSlotPosition={slotPosition}
-        hoveredLabware={hoveredLabwareFromProp}
       />
 
       {/* slot overflow menu */}

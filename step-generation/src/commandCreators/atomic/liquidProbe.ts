@@ -1,4 +1,4 @@
-import { uuid } from '../../utils'
+import { formatPyStr, uuid } from '../../utils'
 
 import type { LiquidProbeParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
@@ -17,6 +17,11 @@ export const liquidProbe: CommandCreator<LiquidProbeParams> = (
     }
   }
 
+  const pipettePythonName =
+    invariantContext.pipetteEntities[pipetteId].pythonName
+  const labwarePythonName =
+    invariantContext.labwareEntities[labwareId].pythonName
+
   const commands = [
     {
       commandType: 'liquidProbe' as const,
@@ -31,5 +36,11 @@ export const liquidProbe: CommandCreator<LiquidProbeParams> = (
   ]
   return {
     commands,
+    // Note: The Python API doesn't let you specify a starting wellLocation.
+    // measure_liquid_height() probes from LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP,
+    // which is the same as our SAFE_MOVE_TO_WELL_LOCATION.
+    python: `${pipettePythonName}.measure_liquid_height(${labwarePythonName}[${formatPyStr(
+      wellName
+    )}])`,
   }
 }
