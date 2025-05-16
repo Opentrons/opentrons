@@ -47,7 +47,7 @@ export function LiquidsOverflowMenu({
   overflowWrapperRef,
   targetWidth,
 }: LiquidsOverflowMenuProps): JSX.Element {
-  const formData = useSelector(getUnsavedForm)
+  // const formData = useSelector(getUnsavedForm)
   const location = useLocation()
   const { t } = useTranslation(['starting_deck_state'])
   const liquids = useSelector(getLiquidEntities)
@@ -56,7 +56,7 @@ export function LiquidsOverflowMenu({
   let right: string | undefined
   let top: string = TOP_POSITION
   let left: string | undefined
-  if (formData != null || location.pathname === '/liquids') {
+  if (location.pathname === '/liquids') {
     right = RIGHT_POSITION_FOR_LIQUIDS_PAGE
     top = `${NAV_BAR_HEIGHT_REM + 3.1}rem`
     left = undefined

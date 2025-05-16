@@ -38,7 +38,7 @@ export function LiquidButton({
         name="water-drop"
         data-testid="water-drop"
       />
-      <StyledText desktopStyle="bodyDefaultSemiBold">{t('liquid')}</StyledText>
+      <StyledText desktopStyle="bodyDefaultSemiBold">{t('liquids')}</StyledText>
     </Btn>
   )
 }
