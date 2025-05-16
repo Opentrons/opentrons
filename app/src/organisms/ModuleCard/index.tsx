@@ -48,6 +48,7 @@ import {
   PENDING,
   SUCCESS,
 } from '/app/redux/robot-api'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { getModuleTooHot } from '/app/transformations/modules'
 
@@ -116,6 +117,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     handleModuleApiRequests,
   } = props
   const dispatch = useDispatch<Dispatch>()
+
   const {
     menuOverlay,
     handleOverflowClick,
@@ -132,7 +134,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showAboutModule, setShowAboutModule] = useState(false)
   const [showTestShake, setShowTestShake] = useState(false)
   const [showSetupWizard, setShowSetupWizard] = useState(false)
-  const [showFWBanner, setShowFWBanner] = useState(true)
   const [showCalModal, setShowCalModal] = useState(false)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -181,7 +182,22 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const isOverflowBtnDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
+  const deckConfig = useNotifyDeckConfigurationQuery().data
+  const isDeckConfigured =
+    deckConfig != null
+      ? deckConfig
+          .filter(c => c.opentronsModuleSerialNumber)
+          .map(c => c.opentronsModuleSerialNumber)
+          .includes(module.serialNumber)
+      : false
+
   const isTooHot = getModuleTooHot(module)
+  const needsCalibration =
+    !isPending && isPipetteReady && requireModuleCalibration
+  const needsSetup =
+    !isPending &&
+    !requireModuleCalibration &&
+    (module.hasAvailableUpdate || (isFlex && !isDeckConfigured))
 
   let moduleData: JSX.Element = <div></div>
   switch (module.moduleType) {
@@ -341,16 +357,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 errorMessage={getErrorResponseMessage(latestRequest.error)}
               />
             )}
-            {attachPipetteRequired != null &&
-            calibratePipetteRequired != null &&
-            updatePipetteFWRequired != null &&
-            requireModuleCalibration &&
-            !isPending ? (
+            {needsCalibration ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType="calibration"
                 serialNumber={module.serialNumber}
-                setShowBanner={() => null}
                 handleUpdateClick={handleCalibrateClick}
                 attachPipetteRequired={attachPipetteRequired}
                 calibratePipetteRequired={calibratePipetteRequired}
@@ -358,17 +369,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 isTooHot={isTooHot}
               />
             ) : null}
-            {/* Calibration performs firmware updates, so only show calibration if both true. */}
-            {!requireModuleCalibration &&
-            module.hasAvailableUpdate &&
-            showFWBanner &&
-            !isPending ? (
+            {needsSetup ? (
               <UpdateBanner
                 robotName={robotName}
-                updateType="firmware"
+                updateType="setup"
                 serialNumber={module.serialNumber}
-                setShowBanner={setShowFWBanner}
                 handleUpdateClick={handleFirmwareUpdateClick}
+                isTooHot={isTooHot}
               />
             ) : null}
             {isTooHot ? (

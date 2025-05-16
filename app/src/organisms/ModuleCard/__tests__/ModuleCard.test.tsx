@@ -374,24 +374,22 @@ describe('ModuleCard', () => {
       ...props,
       module: mockHotHeaterShaker,
     })
-    screen.getByText('Module calibration required.')
+    screen.getByText('Module setup required.')
   })
   it('does not render calibration update banner for OT-2-specific modules', () => {
     render({
       ...props,
       module: mockMagneticModule,
     })
-    expect(
-      screen.queryByText('Module calibration required.')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Module setup required.')).not.toBeInTheDocument()
   })
   it('renders information when a firmware update is available so firmware update banner renders', () => {
     render({
       ...props,
       module: mockHotThermo,
     })
-    screen.getByText('Firmware update available.')
-    const button = screen.getByText('Update now')
+    screen.getByText('Setup module for use.')
+    const button = screen.getByText('Setup module')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
@@ -410,8 +408,8 @@ describe('ModuleCard', () => {
       ...props,
       module: mockHotThermo,
     })
-    screen.getByText('Firmware update available.')
-    const button = screen.getByText('Update now')
+    screen.getByText('Setup module for use.')
+    const button = screen.getByText('Setup module')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
     expect(screen.getByText('mock firmware update failed modal')).toBeVisible()
