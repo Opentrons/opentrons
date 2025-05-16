@@ -1,7 +1,7 @@
 import type { AttachedModule } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { PipetteInformation } from '/app/redux/pipettes'
-import type { FLOWS, SECTIONS } from './constants'
+import type { ACTIONS, FLOWS, SECTIONS } from './constants'
 
 export type ModuleCalibrationWizardStep =
   | BeforeBeginningStep
@@ -10,11 +10,36 @@ export type ModuleCalibrationWizardStep =
   | AttachProbeStep
   | DetachProbeStep
   | SuccessStep
-  | SelectModuleStep
   | CloseDoorStep
   | InstallShuttleStep
   | UpdateFirmwareStep
   | CheckInstallationPinsStep
+
+export type ModuleWizardAction =
+  | ModuleWizardBuildFlowAction
+  | ModuleWizardProceedAction
+  | ModuleWizardGoBackAction
+
+export interface ModuleWizardState {
+  currentStepIndex: number
+  currentStep: ModuleCalibrationWizardStep | null
+  totalStepCount: number
+  stepsInFlow: ModuleCalibrationWizardStep[]
+  attachedModule: AttachedModule | null
+}
+
+interface ModuleWizardBuildFlowAction {
+  type: typeof ACTIONS.BUILD_FLOW
+  attachedModule: AttachedModule
+}
+
+interface ModuleWizardProceedAction {
+  type: typeof ACTIONS.PROCEED
+}
+
+interface ModuleWizardGoBackAction {
+  type: typeof ACTIONS.GO_BACK
+}
 
 export interface ModuleCalibrationWizardStepProps {
   proceed: () => void
@@ -36,9 +61,6 @@ export type ModuleWizardFlow = typeof FLOWS.SETUP
 
 export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
-}
-export interface SelectModuleStep {
-  section: typeof SECTIONS.SELECT_MODULE
 }
 export interface CloseDoorStep {
   section: typeof SECTIONS.CLOSE_DOOR

@@ -16,14 +16,15 @@ import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
-import { useInitModuleFlow } from './useModuleWizardFlows'
+import { useModuleSetupWizard } from './useModuleSetupWizard'
 
 import type { AttachedModule } from '@opentrons/api-client'
+import type { PipetteInformation } from '/app/redux/pipettes'
 
 interface ModuleWizardFlowsProps {
-  attachedModule: AttachedModule
   closeFlow: () => void
   isPrepCommandLoading: boolean
+  attachedModule?: AttachedModule
   isLoadedInRun?: boolean
   onComplete?: () => void
   prepCommandErrorMessage?: string
@@ -33,7 +34,7 @@ export const ModuleWizardFlows = (
   props: ModuleWizardFlowsProps
 ): JSX.Element | null => {
   const {
-    attachedModule,
+    attachedModule: attachedModuleOnLaunch,
     isLoadedInRun = false,
     isPrepCommandLoading,
     closeFlow,
@@ -51,19 +52,19 @@ export const ModuleWizardFlows = (
     wizardFlowBaseProps,
     buildFlowForSelectedModule,
     deckConfig,
-  } = useInitModuleFlow({ closeFlow, attachedModule, onComplete })
+  } = useModuleSetupWizard({ closeFlow, attachedModuleOnLaunch, onComplete })
 
   // add use effect to call build flow if there is a module passed in at launch
   useEffect(() => {
-    if (attachedModule != null) {
-      buildFlowForSelectedModule(attachedModule)
+    if (attachedModuleOnLaunch != null) {
+      buildFlowForSelectedModule(attachedModuleOnLaunch)
     }
   }, [])
 
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
-  if (wizardFlowBaseProps.attachedPipette == null) return null
 
-  if (attachedModule == null) {
+  if (wizardFlowBaseProps.attachedPipette == null) return null
+  if (wizardFlowBaseProps.attachedModule == null) {
     //arbitrary step count before we know how many there will be
     return (
       <ModuleWizardScreen
@@ -96,7 +97,6 @@ export const ModuleWizardFlows = (
   } else if (
     prepCommandErrorMessage != null ||
     wizardFlowBaseProps.errorMessage != null
-    // maintenanceRunData?.data.status === RUN_STATUS_FAILED
   ) {
     // TODO: change this error header to match designs
     return (
@@ -144,148 +144,184 @@ export const ModuleWizardFlows = (
         />
       </ModuleWizardScreen>
     )
-  } else if (attachedModule != null && wizardFlowBaseProps.attachedPipette != null) {
-    switch (currentStep.section) {
-      case SECTIONS.BEFORE_BEGINNING:
-        return (
-          <ModuleWizardScreen
-            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-            handleCleanUpAndClose={handleCleanUpAndClose}
-            currentStepIndex={currentStepIndex}
-            totalStepCount={totalStepCount}
-          >
-            <BeforeBeginning {...currentStep} {...wizardFlowBaseProps} />
-          </ModuleWizardScreen>
-        )
-      case SECTIONS.SELECT_LOCATION:
-        return (
-          <ModuleWizardScreen
-            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-            handleCleanUpAndClose={handleCleanUpAndClose}
-            currentStepIndex={currentStepIndex}
-            totalStepCount={totalStepCount}
-          >
-            <SelectLocation
-              {...currentStep}
-              {...wizardFlowBaseProps}
-              deckConfig={deckConfig}
-              isLoadedInRun={isLoadedInRun}
-            />
-          </ModuleWizardScreen>
-        )
-      case SECTIONS.PLACE_ADAPTER:
-        return (
-          <ModuleWizardScreen
-            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-            handleCleanUpAndClose={handleCleanUpAndClose}
-            currentStepIndex={currentStepIndex}
-            totalStepCount={totalStepCount}
-          >
-            <PlaceAdapter
-              {...currentStep}
-              {...wizardFlowBaseProps}
-              deckConfig={deckConfig}
-              setCreatedAdapterId={setCreatedAdapterId}
-              // createMaintenanceRun={createTargetedMaintenanceRun}
-              isCreateLoading={false}
-              // createdMaintenanceRunId={false}
-            />
-          </ModuleWizardScreen>
-        )
-      case SECTIONS.ATTACH_PROBE:
-        return (
-          <ModuleWizardScreen
-            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-            handleCleanUpAndClose={handleCleanUpAndClose}
-            currentStepIndex={currentStepIndex}
-            totalStepCount={totalStepCount}
-          >
-            <AttachProbe
-              {...currentStep}
-              {...wizardFlowBaseProps}
-              adapterId={createdAdapterId}
-              deckConfig={deckConfig}
-            />
-          </ModuleWizardScreen>
-        )
-      case SECTIONS.DETACH_PROBE:
-        return (
-          <ModuleWizardScreen
-            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-            handleCleanUpAndClose={handleCleanUpAndClose}
-            currentStepIndex={currentStepIndex}
-            totalStepCount={totalStepCount}
-          >
-            <DetachProbe {...currentStep} {...wizardFlowBaseProps} />
-          </ModuleWizardScreen>
-        )
+  }
+  switch (currentStep.section) {
+    case SECTIONS.BEFORE_BEGINNING:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <BeforeBeginning
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.SELECT_LOCATION:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <SelectLocation
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            deckConfig={deckConfig}
+            isLoadedInRun={isLoadedInRun}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.PLACE_ADAPTER:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <PlaceAdapter
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            deckConfig={deckConfig}
+            setCreatedAdapterId={setCreatedAdapterId}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.ATTACH_PROBE:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <AttachProbe
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            adapterId={createdAdapterId}
+            deckConfig={deckConfig}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.DETACH_PROBE:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <DetachProbe
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
+        </ModuleWizardScreen>
+      )
 
-      case SECTIONS.SUCCESS:
-        return (
-          <ModuleWizardScreen
+    case SECTIONS.SUCCESS:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <Success
+            {...currentStep}
+            {...wizardFlowBaseProps}
             isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-            handleCleanUpAndClose={handleCleanUpAndClose}
-            currentStepIndex={currentStepIndex}
-            totalStepCount={totalStepCount}
-          >
-            <Success
-              {...currentStep}
-              {...wizardFlowBaseProps}
-              isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-              proceed={
-                wizardFlowBaseProps.isRobotMoving
-                  ? () => {}
-                  : handleCleanUpAndClose
-              }
-            />
-          </ModuleWizardScreen>
-        )
-      case SECTIONS.CHECK_INSTALLATION_PINS:
-        return (
-          <ModuleWizardScreen
-            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-            handleCleanUpAndClose={handleCleanUpAndClose}
-            currentStepIndex={currentStepIndex}
-            totalStepCount={totalStepCount}
-          >
-            <>Check installation pins</>
-          </ModuleWizardScreen>
-        )
-      case SECTIONS.CLOSE_DOOR:
-        return (
-          <ModuleWizardScreen
-            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-            handleCleanUpAndClose={handleCleanUpAndClose}
-            currentStepIndex={currentStepIndex}
-            totalStepCount={totalStepCount}
-          >
-            <>Close robot door</>
-          </ModuleWizardScreen>
-        )
-      case SECTIONS.INSTALL_SHUTTLE:
-        return (
-          <ModuleWizardScreen
-            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-            handleCleanUpAndClose={handleCleanUpAndClose}
-            currentStepIndex={currentStepIndex}
-            totalStepCount={totalStepCount}
-          >
-            <>Install shuttle</>
-          </ModuleWizardScreen>
-        )
-      case SECTIONS.UPDATE_FIRMWARE:
-        return (
-          <ModuleWizardScreen
-            isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-            handleCleanUpAndClose={handleCleanUpAndClose}
-            currentStepIndex={currentStepIndex}
-            totalStepCount={totalStepCount}
-          >
-            <>Update firmware</>
-          </ModuleWizardScreen>
-        )
-      default:
-        return null
-    }
+            proceed={
+              wizardFlowBaseProps.isRobotMoving
+                ? () => {}
+                : handleCleanUpAndClose
+            }
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.CHECK_INSTALLATION_PINS:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <>Check installation pins</>
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.CLOSE_DOOR:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <>Close robot door</>
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.INSTALL_SHUTTLE:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <>Install shuttle</>
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.UPDATE_FIRMWARE:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <>Update firmware</>
+        </ModuleWizardScreen>
+      )
   }
 }
