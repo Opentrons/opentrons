@@ -23,7 +23,7 @@ import {
 import type {
   CutoutConfig,
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
   NozzleConfigurationStyle,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -51,7 +51,7 @@ const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 function getOrderedWells(
   unorderedWells: string[],
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
 ): string[] {
   const allWellsOrdered = orderWells(labwareDef.ordering, 't2b', 'l2r')
   return intersection(allWellsOrdered, unorderedWells)

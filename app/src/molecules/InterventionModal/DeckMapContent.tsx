@@ -14,7 +14,7 @@ import {
 
 import type { ComponentProps } from 'react'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareLocation,
   ModuleLocation,
   RobotType,
@@ -120,7 +120,7 @@ export function LabwareHighlight({
   definition,
 }: {
   highlight: boolean
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }): JSX.Element {
   const width = definition.dimensions.xDimension
   const height = definition.dimensions.yDimension

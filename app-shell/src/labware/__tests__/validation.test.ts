@@ -8,10 +8,10 @@ import {
 import { validateLabwareFiles, validateNewLabwareFile } from '../validation'
 
 import type { CheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
-const validLabwareA = uncheckedLabwareA as LabwareDefinition2
-const validLabwareB = uncheckedLabwareB as LabwareDefinition2
+const validLabwareA = uncheckedLabwareA as LabwareDefinition
+const validLabwareB = uncheckedLabwareB as LabwareDefinition
 
 describe('validateLabwareFiles', () => {
   it('handles unparseable and invalid labware files', () => {

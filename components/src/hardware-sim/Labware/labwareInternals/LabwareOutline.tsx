@@ -5,11 +5,11 @@ import { getTiprackBackgroundColor } from './getTiprackBackgroundColor'
 
 import type { CSSProperties } from 'styled-components'
 import type { SVGProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export interface LabwareOutlineProps {
   /** Labware definition to outline */
-  definition?: LabwareDefinition2
+  definition?: LabwareDefinition
   /** x dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to 127.76 */
   width?: number
   /** y dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to 85.48 */

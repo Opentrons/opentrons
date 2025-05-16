@@ -9,7 +9,7 @@ import {
 
 import type {
   LabwareDefByDefURI,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 
 let _definitions: LabwareDefByDefURI | null = null
@@ -31,7 +31,7 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
   if (!_latestDefs) {
     const allDefs = getAllDefinitions()
     const allURIs = Object.keys(allDefs)
-    const labwareDefGroups: Record<string, LabwareDefinition2[]> = groupBy(
+    const labwareDefGroups: Record<string, LabwareDefinition[]> = groupBy(
       allURIs.map((uri: string) => allDefs[uri]),
       d => `${d.namespace}/${d.parameters.loadName}`
     )

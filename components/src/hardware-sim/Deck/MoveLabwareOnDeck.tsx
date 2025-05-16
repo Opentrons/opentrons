@@ -17,7 +17,7 @@ import type { ReactNode } from 'react'
 import type {
   DeckConfiguration,
   DeckDefinition,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareLocation,
   LoadedLabware,
   LoadedModule,
@@ -133,7 +133,7 @@ const SPLASH_Y_BUFFER_MM = 10
 
 interface MoveLabwareOnDeckProps extends StyleProps {
   robotType: RobotType
-  movedLabwareDef: LabwareDefinition2
+  movedLabwareDef: LabwareDefinition
   initialLabwareLocation: LabwareLocation
   finalLabwareLocation: LabwareLocation
   loadedModules: LoadedModule[]

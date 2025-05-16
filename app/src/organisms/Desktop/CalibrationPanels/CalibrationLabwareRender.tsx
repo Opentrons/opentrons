@@ -13,16 +13,13 @@ import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
 
 import styles from './styles.module.css'
 
-import type {
-  CoordinateTuple,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import type { CoordinateTuple, LabwareDefinition } from '@opentrons/shared-data'
 
 const SHORT = 'SHORT'
 const TALL = 'TALL'
 
 interface CalibrationLabwareRenderProps {
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   slotDefPosition: CoordinateTuple | null
 }
 

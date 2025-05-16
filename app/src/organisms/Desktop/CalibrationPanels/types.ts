@@ -1,4 +1,4 @@
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { Mount } from '/app/redux/pipettes/types'
 import type {
   CalibrationCheckComparisonByPipette,
@@ -29,7 +29,7 @@ export interface CalibrationPanelProps {
   activePipette?: CalibrationCheckInstrument
   robotName?: string | null
   supportedCommands?: SessionCommandString[] | null
-  defaultTipracks?: LabwareDefinition2[] | null
+  defaultTipracks?: LabwareDefinition[] | null
   calInvalidationHandler?: () => void
   allowChangeTipRack?: boolean
 }

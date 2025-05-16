@@ -17,7 +17,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 interface LabwareInfoProps {
   displayName: string
@@ -70,7 +70,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 }
 
 interface LabwareInfoOverlayProps {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   labwareId: string
   displayName: string
   runId: string

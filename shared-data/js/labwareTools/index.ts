@@ -15,7 +15,7 @@ import {
 
 import type {
   LabwareBrand as Brand,
-  LabwareDefinition2 as Definition,
+  LabwareDefinition as Definition,
   LabwareDimensions as Dimensions,
   LabwareWellProperties as InputWell,
   LabwareOffset,

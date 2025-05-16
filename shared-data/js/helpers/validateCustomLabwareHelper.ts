@@ -1,4 +1,4 @@
-import type { LabwareDefinition2 } from '..'
+import type { LabwareDefinition } from '..'
 
 /**
  * This function is used to help validate that the wells and ordering matches in
@@ -8,7 +8,7 @@ import type { LabwareDefinition2 } from '..'
  * @returns A boolean for if they exist
  */
 export const validateCustomLabwareHelper = (
-  definition?: LabwareDefinition2 | null
+  definition?: LabwareDefinition | null
 ): boolean => {
   if (definition == null) {
     return false

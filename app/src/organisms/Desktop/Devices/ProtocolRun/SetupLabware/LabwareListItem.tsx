@@ -46,7 +46,7 @@ import type { MouseEvent } from 'react'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-  LabwareDefinition2,
+  LabwareDefinition,
   ModuleType,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
@@ -390,7 +390,7 @@ const LabwareThumbnail = styled.svg`
 `
 
 function StandaloneLabware(props: {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }): JSX.Element {
   const { definition } = props
   return (

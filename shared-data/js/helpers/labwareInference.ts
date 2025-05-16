@@ -6,7 +6,7 @@ import uniqWith from 'lodash/uniqWith'
 
 import type {
   LabwareBrand,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareWell,
   LabwareWellGroupMetadata,
   LabwareWellShapeProperties,
@@ -27,7 +27,7 @@ export interface LabwareWellGroupProperties {
 const ROUNDING_PRECISION = 2
 
 export function getUniqueWellProperties(
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 ): LabwareWellGroupProperties[] {
   const { groups, wells, dimensions } = definition
 

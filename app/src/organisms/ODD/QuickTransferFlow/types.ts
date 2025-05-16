@@ -1,7 +1,7 @@
 import type { Mount } from '@opentrons/api-client'
 import type {
   CutoutConfig,
-  LabwareDefinition2,
+  LabwareDefinition,
   LiquidClass,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
@@ -17,10 +17,10 @@ import type {
 export interface QuickTransferWizardState {
   pipette?: PipetteV2Specs
   mount?: Mount
-  tipRack?: LabwareDefinition2
-  source?: LabwareDefinition2
+  tipRack?: LabwareDefinition
+  source?: LabwareDefinition
   sourceWells?: string[]
-  destination?: LabwareDefinition2 | 'source'
+  destination?: LabwareDefinition | 'source'
   destinationWells?: string[]
   transferType?: TransferType
   volume?: number
@@ -52,10 +52,10 @@ export interface SettingItem {
 export interface QuickTransferSummaryState {
   pipette: PipetteV2Specs
   mount: Mount
-  tipRack: LabwareDefinition2
-  source: LabwareDefinition2
+  tipRack: LabwareDefinition
+  source: LabwareDefinition
   sourceWells: string[]
-  destination: LabwareDefinition2 | 'source'
+  destination: LabwareDefinition | 'source'
   destinationWells: string[]
   transferType: TransferType
   volume: number
@@ -244,11 +244,11 @@ interface SelectPipetteAction {
 }
 interface SelectTipRackAction {
   type: typeof ACTIONS.SELECT_TIP_RACK
-  tipRack: LabwareDefinition2
+  tipRack: LabwareDefinition
 }
 interface SetSourceLabwareAction {
   type: typeof ACTIONS.SET_SOURCE_LABWARE
-  labware: LabwareDefinition2
+  labware: LabwareDefinition
 }
 interface SetSourceWellsAction {
   type: typeof ACTIONS.SET_SOURCE_WELLS
@@ -256,7 +256,7 @@ interface SetSourceWellsAction {
 }
 interface SetDestLabwareAction {
   type: typeof ACTIONS.SET_DEST_LABWARE
-  labware: LabwareDefinition2 | 'source'
+  labware: LabwareDefinition | 'source'
 }
 interface SetDestWellsAction {
   type: typeof ACTIONS.SET_DEST_WELLS

@@ -10,7 +10,7 @@ import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 
 import { quickTransferStepCommands } from '../../utils/pythonDef'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type {
   ConsolidateArgs,
   DistributeArgs,
@@ -36,7 +36,7 @@ const mockInvariantContext: InvariantContext = {
     mockPipette: {
       name: 'p1000_single_flex',
       id: 'mockPipette',
-      tiprackLabwareDef: [fixtureTiprack1000ul] as LabwareDefinition2[],
+      tiprackLabwareDef: [fixtureTiprack1000ul] as LabwareDefinition[],
       tiprackDefURI: ['fixture/fixture_flex_96_tiprack_1000ul/1'],
       spec: fixtureP1000SingleV2Specs,
       pythonName: 'pipette',
@@ -46,19 +46,19 @@ const mockInvariantContext: InvariantContext = {
     mockSourceLabware: {
       id: 'mockSourceLabware',
       labwareDefURI: 'mockDefUri',
-      def: fixture96Plate as LabwareDefinition2,
+      def: fixture96Plate as LabwareDefinition,
       pythonName: 'mock_labware_1',
     },
     mockDestLabware: {
       id: 'mockDestLabware',
       labwareDefURI: 'mockDefUri',
-      def: fixture96Plate as LabwareDefinition2,
+      def: fixture96Plate as LabwareDefinition,
       pythonName: 'mock_labware_2',
     },
     mockTiprack: {
       id: 'mockTiprack',
       labwareDefURI: 'fixture/fixture_flex_96_tiprack_1000ul/1',
-      def: fixtureTiprack1000ul as LabwareDefinition2,
+      def: fixtureTiprack1000ul as LabwareDefinition,
       pythonName: 'mock_tiprack_1',
     },
   },

@@ -12,7 +12,7 @@ import {
 } from './labwareInternals'
 
 import type { RefObject } from 'react'
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
+import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {
   HighlightedWellLabels,
@@ -23,7 +23,7 @@ import type {
 
 export interface LabwareProps {
   /** Labware definition to render */
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   /** Opional Prop for labware on heater shakers sitting on right side of the deck */
   shouldRotateAdapterOrientation?: boolean
   /** boolean to show well labels */

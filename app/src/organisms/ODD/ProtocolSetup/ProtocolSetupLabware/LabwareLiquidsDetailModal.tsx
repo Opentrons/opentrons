@@ -20,7 +20,7 @@ import {
 
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 import type { LabwareByLiquidId } from '/app/transformations/commands'
 
@@ -30,7 +30,7 @@ interface LabwareLiquidsDetailModalProps {
   mostRecentAnalysis: CompletedProtocolAnalysis
   closeModal: () => void
   labwareByLiquidId: LabwareByLiquidId
-  labwareDefinition: LabwareDefinition2
+  labwareDefinition: LabwareDefinition
   stackPosition?: number
 }
 

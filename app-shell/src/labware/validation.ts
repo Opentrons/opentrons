@@ -21,18 +21,18 @@ import type {
   UncheckedLabwareFile,
 } from '@opentrons/app/src/redux/custom-labware/types'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareDefinition3,
 } from '@opentrons/shared-data'
 
 const ajv = new Ajv()
 
 // todo(mm, 2025-05-13): When we have ajv>=7, add a type parameter like
-// `ajv.compile<LabwareDefinition2>(...)` so we don't have to make our own type guards.
+// `ajv.compile<LabwareDefinition>(...)` so we don't have to make our own type guards.
 const ajvValidateSchema2 = ajv.compile(labwareSchemaV2 as object)
 const ajvValidateSchema3 = ajv.compile(labwareSchemaV3 as object)
 
-function isValidSchema2(data: unknown): data is LabwareDefinition2 {
+function isValidSchema2(data: unknown): data is LabwareDefinition {
   const result = ajvValidateSchema2(data)
   return typeof result === 'boolean' && result
 }
@@ -45,9 +45,7 @@ function isValidSchema3(data: unknown): data is LabwareDefinition3 {
 // TODO(mc, 2019-10-21): this code is somewhat duplicated with stuff in
 // shared-data, but the shared-data validation function isn't geared towards
 // this use case because it either throws or passes invalid files; align them
-function validateLabwareDefinition(
-  data: unknown
-): LabwareDefinition2 | LabwareDefinition3 | null {
+function validateLabwareDefinition(data: unknown): LabwareDefinition | null {
   const schemaVersion = safeGetSchemaVersion(data)
   if (schemaVersion === 3) {
     return isValidSchema3(data) ? data : null

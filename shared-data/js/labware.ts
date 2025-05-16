@@ -13,8 +13,8 @@ import labwareSchemaV3 from '../labware/schemas/3.json'
 
 import type {
   LabwareDefByDefURI,
+  LabwareDefinition,
   LabwareDefinition1,
-  LabwareDefinition2,
   LabwareDefinition3,
   LegacyLabwareDefByName,
 } from './types'
@@ -23,9 +23,7 @@ import type {
 // that instead, but using it gives me obscure "TypeError: getLabwareDefURI is not a function"
 // errors in certain test files. Some kind of circular dependency problem? Some kind of
 // mocking problem?
-function getLabwareDefURI(
-  def: LabwareDefinition2 | LabwareDefinition3
-): string {
+function getLabwareDefURI(def: LabwareDefinition): string {
   return `${def.namespace}/${def.parameters.loadName}/${def.version}`
 }
 
@@ -38,7 +36,7 @@ const schema1DefinitionsByPath: Record<
 })
 const schema2DefinitionsByPath: Record<
   string,
-  LabwareDefinition2
+  LabwareDefinition
 > = import.meta.glob('../labware/definitions/2/*/*.json', {
   eager: true,
   import: 'default',
@@ -76,7 +74,7 @@ const schema3DefinitionsByURI = Object.fromEntries(
 // getAllDefinitions() is that getAllDefinitions() has potentially dangerous caching
 // behavior (see the todo comment there). Delete this in favor of getAllDefinitions()
 // when that's resolved.
-export const getAllLabwareDefs = (): Record<string, LabwareDefinition2> =>
+export const getAllLabwareDefs = (): Record<string, LabwareDefinition> =>
   schema2DefinitionsByURI
 
 let _definitions: LabwareDefByDefURI | null = null
@@ -88,7 +86,7 @@ export function getAllDefinitions(
   if (_definitions == null) {
     _definitions = Object.values(
       getAllLabwareDefs()
-    ).reduce<LabwareDefByDefURI>((acc, labwareDef: LabwareDefinition2) => {
+    ).reduce<LabwareDefByDefURI>((acc, labwareDef: LabwareDefinition) => {
       const labwareDefURI = getLabwareDefURI(labwareDef)
       return blockList.includes(labwareDef.parameters.loadName)
         ? acc

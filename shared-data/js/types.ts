@@ -314,7 +314,7 @@ export interface LabwareDefinition3 {
 export type LabwareDefinition = LabwareDefinition2 | LabwareDefinition3
 
 export interface LabwareDefByDefURI {
-  [defUri: string]: LabwareDefinition2
+  [defUri: string]: LabwareDefinition
 }
 export interface LegacyLabwareDefByName {
   [name: string]: LabwareDefinition1

@@ -6,7 +6,7 @@ import { RobotCoordsText } from '../../Deck'
 import { WELL_LABEL_OPTIONS } from '../LabwareRender'
 
 import type { MemoExoticComponent } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { WellLabelOption } from '../LabwareRender'
 import type { HighlightedWellLabels } from './types'
 
@@ -18,14 +18,14 @@ const LETTER_COLUMN_X_OUTSIDE = -4
 const NUMBER_COLUMN_Y_FROM_TOP_OUTSIDE = -5
 
 export interface WellLabelsProps {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   wellLabelOption: WellLabelOption
   highlightedWellLabels?: HighlightedWellLabels
   wellLabelColor?: string
 }
 
 const Labels = (props: {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   wells: string[]
   wellLabelOption: WellLabelOption
   isLetterColumn?: boolean

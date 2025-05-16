@@ -14,7 +14,7 @@ import {
 
 import { labwareImages } from './labware-images'
 
-import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export const UNIVERSAL_FLAT_ADAPTER_X_DIMENSION = 127.4
 

@@ -17,7 +17,7 @@ import {
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadPipetteRunTimeCommand,
   PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
@@ -68,8 +68,8 @@ export function useRunPipetteInfoByMount(
       const requestedPipetteName = pipetteName
       const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
       if (pipetteSpecs != null) {
-        const tipRackDefs: LabwareDefinition2[] = pickUpTipCommands.reduce<
-          LabwareDefinition2[]
+        const tipRackDefs: LabwareDefinition[] = pickUpTipCommands.reduce<
+          LabwareDefinition[]
         >((acc, command) => {
           if (loadCommand.result?.pipetteId === command.params?.pipetteId) {
             const tipRack = labware.find(

@@ -12,7 +12,7 @@ import { getAllDefinitions } from '@opentrons/shared-data'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import type { ComponentProps, Dispatch } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardAction,
@@ -36,7 +36,7 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
     state.pipette?.liquids.default.defaultTipracks ?? []
 
   const [selectedTipRack, setSelectedTipRack] = useState<
-    LabwareDefinition2 | undefined
+    LabwareDefinition | undefined
   >(state.tipRack)
 
   const handleClickNext = (): void => {

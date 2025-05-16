@@ -1,9 +1,9 @@
 import { COLORS } from '@opentrons/components'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 interface LabwareDisabledOverlayProps {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }
 export function LabwareDisabledOverlay({
   definition,

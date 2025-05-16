@@ -4,12 +4,12 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { getLabwareDefinitionUri } from '../getLabwareDefinitionUri'
 
-import type { LabwareDefinition2, LoadedLabware } from '@opentrons/shared-data'
+import type { LabwareDefinition, LoadedLabware } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data')
 
 const MOCK_DEFINITION_URI = 'some_labware_definition_uri'
-const MOCK_DEF: LabwareDefinition2 = {} as any
+const MOCK_DEF: LabwareDefinition = {} as any
 
 describe('getLabwareDefinitionUri', () => {
   beforeEach(() => {

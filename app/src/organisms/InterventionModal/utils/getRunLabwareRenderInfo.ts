@@ -6,14 +6,14 @@ import {
 import type { RunData } from '@opentrons/api-client'
 import type {
   DeckDefinition,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 
 export interface RunLabwareInfo {
   x: number
   y: number
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   labwareId: string
 }
 

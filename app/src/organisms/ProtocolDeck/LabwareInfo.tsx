@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 const labwareDisplayNameStyle = css`
   ${TYPOGRAPHY.labelSemiBold}
@@ -29,7 +29,7 @@ const labwareDisplayNameStyle = css`
   -webkit-box-orient: vertical;
 `
 export function LabwareInfo(props: {
-  def: LabwareDefinition2
+  def: LabwareDefinition
   children: ReactNode
 }): JSX.Element {
   const width = props.def.dimensions.xDimension
