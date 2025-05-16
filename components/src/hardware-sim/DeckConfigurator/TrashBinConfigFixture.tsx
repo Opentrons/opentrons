@@ -1,3 +1,5 @@
+import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
@@ -15,11 +17,10 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
-import {
-  SINGLE_LEFT_CUTOUTS,
-  type CutoutFixtureId,
-  type CutoutId,
-  type DeckDefinition,
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckDefinition,
 } from '@opentrons/shared-data'
 
 interface TrashBinConfigFixtureProps {

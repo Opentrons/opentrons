@@ -1,3 +1,5 @@
+import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
@@ -15,12 +17,10 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
-import {
-  SINGLE_LEFT_CUTOUTS,
-  SINGLE_RIGHT_CUTOUTS,
-  type CutoutFixtureId,
-  type CutoutId,
-  type DeckDefinition,
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckDefinition,
 } from '@opentrons/shared-data'
 
 interface MagneticBlockFixtureProps {
@@ -36,7 +36,6 @@ interface MagneticBlockFixtureProps {
 }
 
 const MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME = 'Mag Block'
-const STAGING_AREA_WITH_MAGNETIC_BLOCK_DISPLAY_NAME = 'Mag + staging'
 
 export function MagneticBlockFixture(
   props: MagneticBlockFixtureProps
@@ -46,7 +45,6 @@ export function MagneticBlockFixture(
     fixtureLocation,
     handleClickRemove,
     cutoutFixtureId,
-    hasStagingArea,
     selected = false,
   } = props
 
@@ -62,17 +60,13 @@ export function MagneticBlockFixture(
   const [xSlotPosition = 0, ySlotPosition = 0] =
     standardSlotCutout?.position ?? []
   const x =
-      xSlotPosition +
-      (SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
-        ? COLUMN_1_X_ADJUSTMENT
-        : COLUMN_DEFAULT_X_ADJUSTMENT)
+    xSlotPosition +
+    (SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
+      ? COLUMN_1_X_ADJUSTMENT
+      : COLUMN_DEFAULT_X_ADJUSTMENT)
   const width = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
-      ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
-      : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
-
-  let displayName = hasStagingArea
-    ? STAGING_AREA_WITH_MAGNETIC_BLOCK_DISPLAY_NAME
-    : MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME
+    ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
+    : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
 
   const y = ySlotPosition + Y_ADJUSTMENT
 
@@ -97,7 +91,9 @@ export function MagneticBlockFixture(
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{displayName}</Text>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
+          {MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME}
+        </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

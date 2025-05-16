@@ -38,6 +38,7 @@ import {
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
   SINGLE_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
@@ -50,7 +51,6 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-  STAGING_AREA_FIXTURES,
 } from './constants'
 import { getCutoutIdForSlotName } from './helpers'
 import { getModuleDisplayName } from './modules'
@@ -180,7 +180,10 @@ export const transformCutoutFixturesToAaWithFixtures = (
 ): CutoutConfigMap[] => {
   return cutoutFixtures.reduce<CutoutConfigMap[]>((acc, obj) => {
     let cutoutFixtureReplacment = obj.cutoutFixtureId
-    if (obj.cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE && deckDefinition.robot.model === FLEX_ROBOT_TYPE) {
+    if (
+      obj.cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
+      deckDefinition.robot.model === FLEX_ROBOT_TYPE
+    ) {
       cutoutFixtureReplacment = DUMMY_STAGING_AREA_WIHTOUT_STAGING_AREA
     }
     // else if (obj.cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE)
@@ -193,11 +196,11 @@ export const transformCutoutFixturesToAaWithFixtures = (
       cutoutFixtureReplacment,
       deckDefinition
     )
-    console.log("aaPerCutoutFixture: ", aaPerCutoutFixture)
+    console.log('aaPerCutoutFixture: ', aaPerCutoutFixture)
     aaPerCutoutFixture?.forEach(item => {
       acc.push({ ...obj, addressableAreaId: item })
     })
-    console.log("acc", acc)
+    console.log('acc', acc)
     return acc
   }, [])
 }
@@ -207,22 +210,23 @@ export const filterAaByAreaType = (
   deckDef: DeckDefinition,
   areaType: AreaType
 ): CutoutConfigMap[] => {
-  console.log("areaType: ", areaType)
+  console.log('areaType: ', areaType)
   return cutoutFixtures.filter(({ addressableAreaId, cutoutFixtureId }) => {
     if (
       areaType === 'slot' &&
       cutoutFixtureId === 'singleRightSlot' &&
       COLUMN_4_AA.includes(addressableAreaId)
     ) {
-      console.log("in if")
+      console.log('in if')
       return addressableAreaId
     } else if (
-      areaType === 'stagingSlot' && !STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
+      areaType === 'stagingSlot' &&
+      !STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
     ) {
-      console.log("in else if")
+      console.log('in else if')
       return null
     } else {
-      console.log("in else")
+      console.log('in else')
       return deckDef.locations.addressableAreas.find(
         aa => aa.id === addressableAreaId && aa.areaType === areaType
       )
@@ -249,9 +253,10 @@ export const getAAFromCutoutFixtureId = (
       case 'cutoutD3':
         return ['D3', 'D4']
     }
-  }
-  else{
-    return deckDefinition.cutoutFixtures.find(fixture => fixture.id === cutoutFixtureId)?.providesAddressableAreas[inputCutoutId]
+  } else {
+    return deckDefinition.cutoutFixtures.find(
+      fixture => fixture.id === cutoutFixtureId
+    )?.providesAddressableAreas[inputCutoutId]
   }
 
   const fixture = deckDefinition.cutoutFixtures.find(

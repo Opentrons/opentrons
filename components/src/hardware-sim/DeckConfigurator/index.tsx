@@ -121,7 +121,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckDef,
     'magneticBlock'
   )
-  console.log("magneticBlockFixtures: ", magneticBlockFixtures)
+  console.log('magneticBlockFixtures: ', magneticBlockFixtures)
   const absorbanceReaderFixtures = filterAaByAreaType(
     deckConfigWithAA,
     deckDef,

@@ -1,3 +1,5 @@
+import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
@@ -19,7 +21,6 @@ import type {
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
-import {SINGLE_LEFT_CUTOUTS} from '@opentrons/shared-data'
 
 // TODO(BC, 2024-03-21): This component is almost identical to HeaterShakerFixture, consider consolidating?
 

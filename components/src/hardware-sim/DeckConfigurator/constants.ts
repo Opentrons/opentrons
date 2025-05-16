@@ -18,7 +18,7 @@ export const COLUMN_1_X_ADJUSTMENT = -100
 export const COLUMN_DEFAULT_X_ADJUSTMENT = -15.5
 export const Y_ADJUSTMENT = -8
 
-// does this need translations? 
+// does this need translations?
 export const STAGING_AREA_DISPLAY_NAME = 'Stage'
 export const TRASH_BIN_DISPLAY_NAME = 'Trash bin'
 export const WASTE_CHUTE_DISPLAY_NAME = 'Waste'
