@@ -12,9 +12,10 @@ import labwareSchemaV2 from '../labware/schemas/2.json'
 import labwareSchemaV3 from '../labware/schemas/3.json'
 
 import type {
-  LabwareDefByDefURI,
+  LabwareDef2ByDefURI,
   LabwareDefinition,
   LabwareDefinition1,
+  LabwareDefinition2,
   LabwareDefinition3,
   LegacyLabwareDefByName,
 } from './types'
@@ -36,7 +37,7 @@ const schema1DefinitionsByPath: Record<
 })
 const schema2DefinitionsByPath: Record<
   string,
-  LabwareDefinition
+  LabwareDefinition2
 > = import.meta.glob('../labware/definitions/2/*/*.json', {
   eager: true,
   import: 'default',
@@ -74,19 +75,19 @@ const schema3DefinitionsByURI = Object.fromEntries(
 // getAllDefinitions() is that getAllDefinitions() has potentially dangerous caching
 // behavior (see the todo comment there). Delete this in favor of getAllDefinitions()
 // when that's resolved.
-export const getAllLabwareDefs = (): Record<string, LabwareDefinition> =>
+export const getAllLabwareDefs = (): Record<string, LabwareDefinition2> =>
   schema2DefinitionsByURI
 
-let _definitions: LabwareDefByDefURI | null = null
+let _definitions: LabwareDef2ByDefURI | null = null
 export function getAllDefinitions(
   blockList: string[] = []
-): LabwareDefByDefURI {
+): LabwareDef2ByDefURI {
   // todo(mm, 2025-02-27): This looks suspicious: if we're called twice with two
   // different blockList values, we'll return the same results for both.
   if (_definitions == null) {
     _definitions = Object.values(
       getAllLabwareDefs()
-    ).reduce<LabwareDefByDefURI>((acc, labwareDef: LabwareDefinition) => {
+    ).reduce<LabwareDef2ByDefURI>((acc, labwareDef: LabwareDefinition2) => {
       const labwareDefURI = getLabwareDefURI(labwareDef)
       return blockList.includes(labwareDef.parameters.loadName)
         ? acc
