@@ -52,6 +52,7 @@ import type {
   Vector3D,
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import type { LegacySupportLPCFlowsProps } from '/app/organisms/LabwarePositionCheck'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -65,6 +66,7 @@ interface LegacyLabwarePositionCheckModalProps {
   onCloseClick: () => unknown
   protocolName: string
   isDeletingMaintenanceRun: boolean
+  analytics: LegacySupportLPCFlowsProps['analytics']
   setMaintenanceRunId?: (id: string | null) => void
   caughtError?: Error
 }
@@ -82,6 +84,7 @@ export const LegacyLabwarePositionCheckComponent = (
     setMaintenanceRunId,
     protocolName,
     isDeletingMaintenanceRun,
+    analytics,
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
@@ -245,6 +248,12 @@ export const LegacyLabwarePositionCheckComponent = (
         })
           .then(() => {
             setIsApplyingOffsets(false)
+            analytics.reportSaveOffsetToRunRecord({
+              uri: definitionUri,
+              vector: newOffset,
+              locationDetails: location,
+              slot: location.slotName,
+            })
           })
           .catch((e: Error) => {
             setFatalError(`error applying labware offsets: ${e.message}`)
