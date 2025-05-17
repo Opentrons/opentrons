@@ -22,6 +22,7 @@ import { useModuleSetupWizard } from './useModuleSetupWizard'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { PipetteInformation } from '/app/redux/pipettes'
+import { useGetNewModules } from '/app/App/hooks'
 
 interface ModuleWizardFlowsProps {
   closeFlow: () => void
@@ -62,7 +63,7 @@ export const ModuleWizardFlows = (
 
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
 
-  //if (wizardFlowBaseProps.attachedPipette == null) return null
+  if (wizardFlowBaseProps.attachedPipette == null) return null
   if (wizardFlowBaseProps.attachedModule == null) {
     return (
       <ModuleWizardScreen
@@ -77,9 +78,6 @@ export const ModuleWizardFlows = (
             robotName={"SOMETHING"}
             deckConfig={deckConfig}
             isLoadedInRun={isLoadedInRun}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
             attachedPipette={
               wizardFlowBaseProps.attachedPipette as PipetteInformation
             }

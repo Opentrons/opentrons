@@ -4,7 +4,7 @@ import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
 import difference from 'lodash/difference'
 
-import { getProtocol } from '@opentrons/api-client'
+import { AttachedModule, getProtocol } from '@opentrons/api-client'
 import {
   truncateString,
   useInterval,
@@ -125,54 +125,57 @@ export function useProtocolReceiptToast(): void {
   }, [protocolIds])
 }
 
-export function useModuleAttachedToast(
-  launchModuleSetupCallback: () => void
-): void {
-  const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
-  const { makeToast } = useToaster()
+export function useGetNewModules(): AttachedModule[] {
   const attachedModules =
-    useAttachedModules({
-      refetchInterval: ATTACHED_MODULE_POLL_MS,
-    }) ?? []
-  const attachedPipettes = useAttachedPipettes(attachedModules.length > 0)
+  useAttachedModules({
+    refetchInterval: ATTACHED_MODULE_POLL_MS,
+  }) ?? []
   const deckConfig = useNotifyDeckConfigurationQuery({
     enabled: attachedModules.length > 0,
     refetchInterval: DECK_CONFIG_POLL_MS,
   }).data
-  const moduleSerials = attachedModules
-    .filter(m => m.moduleOffset === undefined)
-    .map(m => m.serialNumber)
+  if (deckConfig != null) {
+    const modulesInDeckConfig = deckConfig
+      ?.filter(c => c.opentronsModuleSerialNumber)
+      .map(m => m.opentronsModuleSerialNumber)
+
+    const newModules = attachedModules
+      .filter(m => m.moduleOffset === undefined && modulesInDeckConfig.includes(m.serialNumber))
+    return newModules
+  }
+  return []
+}
+
+export function useModuleAttachedToast(
+  launchModuleSetupCallback: () => void
+): void {
+  const newModules = useGetNewModules()
+  const attachedPipettes = useAttachedPipettes(newModules.length > 0)
+  const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
+  const { makeToast } = useToaster()
+  const moduleSerials = newModules.map(m => m.serialNumber)
   const moduleSerialsRef = useRef(moduleSerials)
 
   useEffect(() => {
-    if (deckConfig != null) {
-      const modulesInDeckConfig = deckConfig
-        ?.filter(c => c.opentronsModuleSerialNumber)
-        .map(m => m.opentronsModuleSerialNumber)
-      const newModuleSerials = difference(
-        moduleSerials,
-        moduleSerialsRef.current
-      )
-      const newUnconfiguredModules = difference(
-        newModuleSerials,
-        modulesInDeckConfig
-      )
-      const hasPipette =
-        attachedPipettes.left != null || attachedPipettes.right != null
-      if (hasPipette && newUnconfiguredModules.length > 0) {
-        makeToast(t('module_added') as string, 'info', {
-          buttonText: i18n.format(t('shared:close'), 'capitalize'),
-          linkText: t('module_added_link'),
-          onLinkClick: launchModuleSetupCallback,
-          disableTimeout: true,
-          displayType: 'odd',
-        })
-      }
-      moduleSerialsRef.current = moduleSerials
-      // dont want this hook to rerun when other deps change
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+    const newModuleSerials = difference(
+      moduleSerials,
+      moduleSerialsRef.current
+    )
+    const hasPipette =
+      attachedPipettes.left != null || attachedPipettes.right != null
+    if (hasPipette && newModuleSerials.length > 0) {
+      makeToast(t('module_added') as string, 'info', {
+        buttonText: i18n.format(t('shared:close'), 'capitalize'),
+        linkText: t('module_added_link'),
+        onLinkClick: launchModuleSetupCallback,
+        disableTimeout: true,
+        displayType: 'odd',
+      })
     }
-  }, [moduleSerials])
+    moduleSerialsRef.current = moduleSerials
+    // dont want this hook to rerun when other deps change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [moduleSerials])
 }
 
 export function useScrollRef(): {
