@@ -53,6 +53,7 @@ describe('TimelineToolbox', () => {
   beforeEach(() => {
     props = {
       sidebarWidth: 350,
+      showLiquidOverflowMenu: vi.fn(),
     }
     vi.mocked(getOrderedStepIds).mockReturnValue(['mock1Step'])
     vi.mocked(getUnsavedForm).mockReturnValue(null)
