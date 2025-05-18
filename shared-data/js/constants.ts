@@ -408,6 +408,10 @@ export const COLUMN_4_AA: AddressableAreaName[] = [
   FLEX_STACKER_B4_ADDRESSABLE_AREA,
   FLEX_STACKER_C4_ADDRESSABLE_AREA,
   FLEX_STACKER_D4_ADDRESSABLE_AREA,
+  'fakeA4',
+  'fakeB4',
+  'fakeC4',
+  'fakeD4'
 ]
 
 export const MAGNETIC_BLOCK_ADDRESSABLE_AREAS: AddressableAreaName[] = [

@@ -183,7 +183,7 @@ export const getCutoutFixtureReplacmentIfNeeded = (cutoutFixtureId: CutoutFixtur
   return cutoutFixtureId
 }
 
-export const transformCutoutFixturesToAaWithFixtures = (
+export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
   cutoutFixtures: CutoutConfig[],
   deckDefinition: DeckDefinition
 ): CutoutConfigMap[] => {
@@ -214,11 +214,6 @@ export const filterAAByAreaType = (
       COLUMN_4_AA.includes(addressableAreaId)
     ) {
       return addressableAreaId
-    } else if (
-      areaType === 'stagingSlot' &&
-      !STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
-    ) {
-      return null
     } else {
       return deckDef.locations.addressableAreas.find(
         aa => aa.id === addressableAreaId && aa.areaType === areaType
@@ -231,11 +226,19 @@ export const getAALocationForCutoutAndFixtureId = (
   addressableArea: string,
   deckDefinition: DeckDefinition
 ): CoordinateTuple => {
-  return (
-    deckDefinition.locations.addressableAreas.find(
-      (aaItem: AddressableArea) => aaItem.id === addressableArea
-    )?.offsetFromCutoutFixture ?? [0, 0, 0]
-  )
+  switch(addressableArea){
+    case 'fakeA4':
+    case 'fakeB4':
+    case 'fakeC4':
+    case 'fakeD4':
+      return [164.0, 0.0, 14.5]
+    default:
+      return (
+        deckDefinition.locations.addressableAreas.find(
+          (aaItem: AddressableArea) => aaItem.id === addressableArea
+        )?.offsetFromCutoutFixture ?? [0, 0, 0]
+      )
+  }
 }
 
 export const getAAFromCutoutFixtureId = (
@@ -249,13 +252,13 @@ export const getAAFromCutoutFixtureId = (
   if (cutoutFixtureId === DUMMY_STAGING_AREA_WITHOUT_STAGING_AREA) {
     switch (inputCutoutId) {
       case 'cutoutA3':
-        return ['A3', 'A4']
+        return ['A3', 'fakeA4']
       case 'cutoutB3':
-        return ['B3', 'B4']
+        return ['B3', 'fakeB4']
       case 'cutoutC3':
-        return ['C3', 'C4']
+        return ['C3', 'fakeC4']
       case 'cutoutD3':
-        return ['D3', 'D4']
+        return ['D3', 'fakeD4']
     }
   }
 

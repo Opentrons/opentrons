@@ -5,7 +5,7 @@ import {
   getDeckDefFromRobotType,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
-  transformCutoutFixturesToAaWithFixtures,
+  replaceStagingFixtureAndTransformCutoutFixturesToAA,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -64,7 +64,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  const deckConfigWithAA = transformCutoutFixturesToAaWithFixtures(
+  const deckConfigWithAA = replaceStagingFixtureAndTransformCutoutFixturesToAA(
     deckConfig,
     deckDef
   )
