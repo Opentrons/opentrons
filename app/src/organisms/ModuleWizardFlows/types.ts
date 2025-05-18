@@ -3,7 +3,7 @@ import type { CreateCommand } from '@opentrons/shared-data'
 import type { PipetteInformation } from '/app/redux/pipettes'
 import type { ACTIONS, FLOWS, SECTIONS } from './constants'
 
-export type ModuleCalibrationWizardStep =
+export type ModuleSetupWizardStep =
   | BeforeBeginningStep
   | SelectLocationStep
   | PlaceAdapterStep
@@ -19,12 +19,13 @@ export type ModuleWizardAction =
   | ModuleWizardBuildFlowAction
   | ModuleWizardProceedAction
   | ModuleWizardGoBackAction
+  | ModuleWizardPatchModuleAction
 
 export interface ModuleWizardState {
   currentStepIndex: number
-  currentStep: ModuleCalibrationWizardStep | null
+  currentStep: ModuleSetupWizardStep | null
   totalStepCount: number
-  stepsInFlow: ModuleCalibrationWizardStep[]
+  stepsInFlow: ModuleSetupWizardStep[]
   attachedModule: AttachedModule | null
 }
 
@@ -32,16 +33,17 @@ interface ModuleWizardBuildFlowAction {
   type: typeof ACTIONS.BUILD_FLOW
   attachedModule: AttachedModule
 }
-
 interface ModuleWizardProceedAction {
   type: typeof ACTIONS.PROCEED
 }
-
 interface ModuleWizardGoBackAction {
   type: typeof ACTIONS.GO_BACK
 }
-
-export interface ModuleCalibrationWizardStepProps {
+interface ModuleWizardPatchModuleAction {
+  type: typeof ACTIONS.PATCH_MODULE
+  attachedModule: AttachedModule
+}
+export interface ModuleSetupWizardStepProps {
   proceed: () => void
   goBack: () => void
   chainRunCommands?: (

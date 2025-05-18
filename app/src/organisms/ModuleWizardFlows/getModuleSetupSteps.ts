@@ -6,22 +6,22 @@ import {
 import { SECTIONS } from './constants'
 
 import type { ModuleType } from '@opentrons/shared-data'
-import type { ModuleCalibrationWizardStep } from './types'
+import type { ModuleSetupWizardStep } from './types'
 
-export const getModuleCalibrationSteps = (
+export const getModuleSetupSteps = (
   moduleType: ModuleType
-): ModuleCalibrationWizardStep[] => {
+): ModuleSetupWizardStep[] => {
   switch (moduleType) {
     case ABSORBANCE_READER_TYPE:
       return [
-        // { section: SECTIONS.UPDATE_FIRMWARE },
+        { section: SECTIONS.UPDATE_FIRMWARE },
         { section: SECTIONS.SELECT_LOCATION },
         { section: SECTIONS.SUCCESS },
       ]
     case FLEX_STACKER_MODULE_TYPE:
       return [
         // { section: SECTIONS.CHECK_INSTALLATION_PINS},
-        // { section: SECTIONS.UPDATE_FIRMWARE },
+        { section: SECTIONS.UPDATE_FIRMWARE },
         { section: SECTIONS.SELECT_LOCATION },
         // { section: SECTIONS.CLOSE_DOOR },
         // { section: SECTIONS.INSTALL_SHUTTLE },
@@ -29,7 +29,7 @@ export const getModuleCalibrationSteps = (
       ]
     default:
       return [
-        // { section: SECTIONS.UPDATE_FIRMWARE },
+        { section: SECTIONS.UPDATE_FIRMWARE },
         { section: SECTIONS.BEFORE_BEGINNING },
         { section: SECTIONS.SELECT_LOCATION },
         { section: SECTIONS.PLACE_ADAPTER },

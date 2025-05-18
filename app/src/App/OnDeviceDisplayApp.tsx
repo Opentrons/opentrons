@@ -50,6 +50,7 @@ import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '/app/redux/config'
+import { getLocalRobot } from '/app/redux/discovery'
 import { updateBrightness } from '/app/redux/shell'
 
 import { LocalizationProvider } from '../LocalizationProvider'
@@ -163,6 +164,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const { brightness: userSetBrightness, sleepMs } = useSelector(
     getOnDeviceDisplaySettings
   )
+  const localRobot = useSelector(getLocalRobot)
 
   const sleepTime = sleepMs ?? SLEEP_NEVER_MS
   const options = {
@@ -202,11 +204,12 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   <MaintenanceRunTakeover>
                     <EstopTakeover />
                     <FirmwareUpdateTakeover />
-                    {showModuleSetupModal ? (
+                    {showModuleSetupModal && localRobot?.name != null ? (
                       <ModuleWizardFlows
                         closeFlow={() => {
                           setShowModuleSetupModal(false)
                         }}
+                        robotName={localRobot.name}
                       />
                     ) : null}
                     <NiceModal.Provider>

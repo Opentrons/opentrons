@@ -312,6 +312,7 @@ export function ModulesListItem({
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
+          robotName={robotName}
         />
       ) : null}
       <Box

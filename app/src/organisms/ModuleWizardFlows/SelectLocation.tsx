@@ -36,7 +36,7 @@ import type {
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { ModuleSetupWizardStepProps } from './types'
 
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
@@ -46,7 +46,7 @@ export const BODY_STYLE = css`
     line-height: 1.75rem;
   }
 `
-interface SelectLocationProps extends ModuleCalibrationWizardStepProps {
+interface SelectLocationProps extends ModuleSetupWizardStepProps {
   deckConfig: DeckConfiguration
   createMaintenanceRun: CreateMaintenanceRunType
   isLoadedInRun: boolean

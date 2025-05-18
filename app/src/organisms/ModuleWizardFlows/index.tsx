@@ -17,6 +17,7 @@ import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
+import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
 import type { AttachedModule } from '@opentrons/api-client'
@@ -24,6 +25,7 @@ import type { PipetteInformation } from '/app/redux/pipettes'
 
 interface ModuleWizardFlowsProps {
   closeFlow: () => void
+  robotName: string
   attachedModule?: AttachedModule
   isLoadedInRun?: boolean
   onComplete?: () => void
@@ -34,6 +36,7 @@ export const ModuleWizardFlows = (
 ): JSX.Element | null => {
   const {
     attachedModule: attachedModuleOnLaunch,
+    robotName,
     isLoadedInRun = false,
     closeFlow,
     onComplete,
@@ -49,6 +52,7 @@ export const ModuleWizardFlows = (
     handleCleanUpAndClose,
     wizardFlowBaseProps,
     buildFlowForSelectedModule,
+    patchModuleAfterUpdate,
     deckConfig,
   } = useModuleSetupWizard({ closeFlow, attachedModuleOnLaunch, onComplete })
 
@@ -312,7 +316,18 @@ export const ModuleWizardFlows = (
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
         >
-          <>Update firmware</>
+          <UpdateFirmware
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+            robotName={robotName}
+            patchModuleAfterUpdate={patchModuleAfterUpdate}
+          />
         </ModuleWizardScreen>
       )
   }

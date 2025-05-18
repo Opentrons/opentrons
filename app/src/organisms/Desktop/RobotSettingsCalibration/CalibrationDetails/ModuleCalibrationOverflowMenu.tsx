@@ -93,6 +93,7 @@ export function ModuleCalibrationOverflowMenu({
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
+          robotName={robotName}
         />
       ) : null}
       {showOverflowMenu ? (
