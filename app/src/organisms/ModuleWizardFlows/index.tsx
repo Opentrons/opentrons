@@ -4,6 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import { useGetNewModules } from '/app/App/hooks'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -22,7 +23,6 @@ import { useModuleSetupWizard } from './useModuleSetupWizard'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { PipetteInformation } from '/app/redux/pipettes'
-import { useGetNewModules } from '/app/App/hooks'
 
 interface ModuleWizardFlowsProps {
   closeFlow: () => void
@@ -63,8 +63,9 @@ export const ModuleWizardFlows = (
 
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
 
-  if (wizardFlowBaseProps.attachedPipette == null) return null
+  //if (wizardFlowBaseProps.attachedPipette == null) return null
   if (wizardFlowBaseProps.attachedModule == null) {
+    console.log('HERE')
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
@@ -72,16 +73,16 @@ export const ModuleWizardFlows = (
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
       >
-          <SelectModule
-            {...currentStep}
-            {...wizardFlowBaseProps}
-            robotName={"SOMETHING"}
-            deckConfig={deckConfig}
-            isLoadedInRun={isLoadedInRun}
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
-          />
+        <SelectModule
+          {...currentStep}
+          {...wizardFlowBaseProps}
+          robotName={'SOMETHING'}
+          deckConfig={deckConfig}
+          isLoadedInRun={isLoadedInRun}
+          attachedPipette={
+            wizardFlowBaseProps.attachedPipette as PipetteInformation
+          }
+        />
       </ModuleWizardScreen>
     )
   } else if (

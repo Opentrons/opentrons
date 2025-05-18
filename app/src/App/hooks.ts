@@ -127,9 +127,9 @@ export function useProtocolReceiptToast(): void {
 
 export function useGetNewModules(): AttachedModule[] {
   const attachedModules =
-  useAttachedModules({
-    refetchInterval: ATTACHED_MODULE_POLL_MS,
-  }) ?? []
+    useAttachedModules({
+      refetchInterval: ATTACHED_MODULE_POLL_MS,
+    }) ?? []
   const deckConfig = useNotifyDeckConfigurationQuery({
     enabled: attachedModules.length > 0,
     refetchInterval: DECK_CONFIG_POLL_MS,
@@ -138,10 +138,21 @@ export function useGetNewModules(): AttachedModule[] {
     const modulesInDeckConfig = deckConfig
       ?.filter(c => c.opentronsModuleSerialNumber)
       .map(m => m.opentronsModuleSerialNumber)
+    const newModules = attachedModules.filter(
+      m =>
+        m.moduleOffset === undefined &&
+        !modulesInDeckConfig.includes(m.serialNumber)
+    )
 
-    const newModules = attachedModules
-      .filter(m => m.moduleOffset === undefined && modulesInDeckConfig.includes(m.serialNumber))
     return newModules
+    // for testing
+    const testMod = (): AttachedModule => {
+      let mod = structuredClone(newModules[0])
+      mod.serialNumber = `${mod.serialNumber}-clone`
+      mod.usbPort.port = 8
+      return mod
+    }
+    return [newModules[0], testMod()]
   }
   return []
 }
@@ -157,12 +168,11 @@ export function useModuleAttachedToast(
   const moduleSerialsRef = useRef(moduleSerials)
 
   useEffect(() => {
-    const newModuleSerials = difference(
-      moduleSerials,
-      moduleSerialsRef.current
-    )
-    const hasPipette =
-      attachedPipettes.left != null || attachedPipettes.right != null
+    const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
+    //const hasPipette =
+    //  attachedPipettes.left != null || attachedPipettes.right != null
+    const hasPipette = true
+    console.log('MODS', newModuleSerials)
     if (hasPipette && newModuleSerials.length > 0) {
       makeToast(t('module_added') as string, 'info', {
         buttonText: i18n.format(t('shared:close'), 'capitalize'),
@@ -175,7 +185,7 @@ export function useModuleAttachedToast(
     moduleSerialsRef.current = moduleSerials
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [moduleSerials])
+  }, [moduleSerials])
 }
 
 export function useScrollRef(): {
