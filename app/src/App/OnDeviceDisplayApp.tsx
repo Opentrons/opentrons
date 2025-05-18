@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-} from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
 import { css } from 'styled-components'
 
@@ -207,14 +202,20 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   <MaintenanceRunTakeover>
                     <EstopTakeover />
                     <FirmwareUpdateTakeover />
-                    <ModuleWizardFlows
-                      closeFlow={() => setShowModuleSetupModal(false)}
-                    />
+                    {showModuleSetupModal ? (
+                      <ModuleWizardFlows
+                        closeFlow={() => {
+                          setShowModuleSetupModal(false)
+                        }}
+                      />
+                    ) : null}
                     <NiceModal.Provider>
                       <ToasterOven>
                         <ProtocolReceiptToasts />
                         <ModuleAttachedToasts
-                          openFlow={() => setShowModuleSetupModal(true)}
+                          openFlow={() => {
+                            setShowModuleSetupModal(true)
+                          }}
                         />
                         <SharedScrollRefProvider>
                           <OnDeviceDisplayAppRoutes />
