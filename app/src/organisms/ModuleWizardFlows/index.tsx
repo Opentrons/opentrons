@@ -65,7 +65,6 @@ export const ModuleWizardFlows = (
 
   //if (wizardFlowBaseProps.attachedPipette == null) return null
   if (wizardFlowBaseProps.attachedModule == null) {
-    console.log('HERE')
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
@@ -76,12 +75,9 @@ export const ModuleWizardFlows = (
         <SelectModule
           {...currentStep}
           {...wizardFlowBaseProps}
-          robotName={'SOMETHING'}
+          buildFlowForSelectedModule={buildFlowForSelectedModule}
           deckConfig={deckConfig}
           isLoadedInRun={isLoadedInRun}
-          attachedPipette={
-            wizardFlowBaseProps.attachedPipette as PipetteInformation
-          }
         />
       </ModuleWizardScreen>
     )

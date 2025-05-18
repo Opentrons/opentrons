@@ -28,10 +28,9 @@ import type { Dispatch } from '/app/redux/types'
 import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface SelectModuleProps extends ModuleCalibrationWizardStepProps {
-  robotName: string
+  buildFlowForSelectedModule: (module: AttachedModule) => void
   deckConfig: DeckConfiguration
   isLoadedInRun: boolean
-  modules: AttachedModule[]
 }
 
 interface ModuleNameAndPort {
@@ -40,7 +39,7 @@ interface ModuleNameAndPort {
 }
 
 export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
-  const { proceed, setErrorMessage, robotName } = props
+  const { proceed, setErrorMessage, buildFlowForSelectedModule } = props
   const { t } = useTranslation('module_wizard_flows')
 
   const newModules = useGetNewModules()
@@ -60,16 +59,19 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
 
   const onSelectedModule = (module: string): void => {
     setSelectedModule(module)
-    // TODO: blink selected module
+    // TODO(ba, 2025-05-18): blink selected module
     console.log('SELECTED', module)
   }
 
-  const handleStartSetup = (module: string | null): void => {
-    if (module != null) {
+  const handleStartSetup = (serialNumber: string | null): void => {
+    if (serialNumber != null) {
       // TODO: show not installed error screen if `installDtected` is false
-      // TODO: navigate to next page if successful
-      // TODO: stop blinking led if user exits module setup.
-      console.log('START SETUP', module)
+      for (const mod of newModules) {
+        if (mod.serialNumber == serialNumber) {
+          buildFlowForSelectedModule(mod)
+          break
+        }
+      }
     }
   }
 

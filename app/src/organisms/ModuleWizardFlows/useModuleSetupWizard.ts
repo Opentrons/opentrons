@@ -145,6 +145,7 @@ export function useModuleSetupWizard(
   })
 
   const handleCleanUpAndClose = (): void => {
+    // TODO: Stop blinking modules here
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {

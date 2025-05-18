@@ -134,7 +134,7 @@ export function useGetNewModules(): AttachedModule[] {
     enabled: attachedModules.length > 0,
     refetchInterval: DECK_CONFIG_POLL_MS,
   }).data
-  if (deckConfig != null) {
+  if (deckConfig != null && attachedModules.length > 0) {
     const modulesInDeckConfig = deckConfig
       ?.filter(c => c.opentronsModuleSerialNumber)
       .map(m => m.opentronsModuleSerialNumber)
@@ -144,7 +144,9 @@ export function useGetNewModules(): AttachedModule[] {
         !modulesInDeckConfig.includes(m.serialNumber)
     )
 
-    return newModules
+    console.log("NEW", newModules)
+
+    //return newModules
     // for testing
     const testMod = (): AttachedModule => {
       let mod = structuredClone(newModules[0])
