@@ -112,13 +112,6 @@ describe('thermocyclerStateStep', () => {
             celsius: 10,
           },
         },
-        {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: thermocyclerId,
-          },
-        },
       ],
       expectedPython: 'mock_thermocycler.set_block_temperature(10)',
     },
@@ -175,13 +168,6 @@ describe('thermocyclerStateStep', () => {
             celsius: 10,
           },
         },
-        {
-          commandType: 'thermocycler/waitForLidTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: thermocyclerId,
-          },
-        },
       ],
       expectedPython: 'mock_thermocycler.set_lid_temperature(10)',
     },
@@ -236,13 +222,6 @@ describe('thermocyclerStateStep', () => {
           params: {
             moduleId: thermocyclerId,
             celsius: 10,
-          },
-        },
-        {
-          commandType: 'thermocycler/waitForLidTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: thermocyclerId,
           },
         },
       ],
@@ -329,13 +308,6 @@ describe('thermocyclerStateStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: thermocyclerId,
-          },
-        },
-        {
           commandType: 'thermocycler/deactivateLid',
           key: expect.any(String),
           params: {
@@ -348,13 +320,6 @@ describe('thermocyclerStateStep', () => {
           params: {
             moduleId: thermocyclerId,
             celsius: 20,
-          },
-        },
-        {
-          commandType: 'thermocycler/waitForLidTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: thermocyclerId,
           },
         },
       ],

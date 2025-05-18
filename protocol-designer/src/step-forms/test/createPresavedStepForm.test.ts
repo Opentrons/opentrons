@@ -67,12 +67,12 @@ beforeEach(() => {
       labware: {
         labwareOnMagModule: {
           ...labwareOnMagModule,
-          slot: 'someMagneticModuleId',
+          stack: ['labwareOnMagModule', 'someMagneticModuleId', '1'],
         },
       },
       tipRack: {
         ...tipRack,
-        slot: '6',
+        stack: ['tipRack', '6'],
       },
       modules: {
         someMagneticModuleId: {
@@ -289,10 +289,10 @@ describe('createPresavedStepForm', () => {
       id: stepId,
       stepType: 'magnet',
       moduleId: 'someMagneticModuleId',
-      engageHeight: EXAMPLE_ENGAGE_HEIGHT,
+      engageHeight: null,
       magnetAction: 'engage',
       // Default values
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
     })
   })
@@ -306,7 +306,7 @@ describe('createPresavedStepForm', () => {
           moduleId: 'someMagneticModuleId',
           engageHeight: EXAMPLE_ENGAGE_HEIGHT,
           magnetAction: 'engage',
-          stepName: 'magnet',
+          stepName: 'magnetic module state',
           stepDetails: '',
         },
       },
@@ -319,7 +319,7 @@ describe('createPresavedStepForm', () => {
       moduleId: 'someMagneticModuleId',
       engageHeight: EXAMPLE_ENGAGE_HEIGHT,
       magnetAction: 'disengage',
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
     })
   })
@@ -333,7 +333,7 @@ describe('createPresavedStepForm', () => {
           moduleId: 'someMagneticModuleId',
           engageHeight: EXAMPLE_ENGAGE_HEIGHT,
           magnetAction: 'disengage',
-          stepName: 'magnet',
+          stepName: 'magnetic module state',
           stepDetails: '',
         },
       },
@@ -346,7 +346,7 @@ describe('createPresavedStepForm', () => {
       moduleId: 'someMagneticModuleId',
       engageHeight: EXAMPLE_ENGAGE_HEIGHT,
       magnetAction: 'engage',
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
     })
   })
@@ -359,7 +359,7 @@ describe('createPresavedStepForm', () => {
       // Default fields
       setTemperature: null,
       targetTemperature: null,
-      stepName: 'temperature',
+      stepName: 'temperature module state',
       stepDetails: '',
     })
   })

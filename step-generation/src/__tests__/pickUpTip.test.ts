@@ -40,7 +40,7 @@ describe('pickUpTip', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `mockPythonName.pick_up_tip(location=mockPythonName)`
+      `mock_pipette.pick_up_tip(location=mock_tip_rack_1)`
     )
   })
 })

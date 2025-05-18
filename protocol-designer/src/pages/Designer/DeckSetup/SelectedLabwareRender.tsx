@@ -14,7 +14,6 @@ interface SelectedLabwareRenderProps {
   labwareDef: LabwareDefinition2 | null
   slotPosition: CoordinateTuple | null
   moduleModel: ModuleModel | null
-  hoveredLabware: string | null
   labwareOnDeck?: LabwareOnDeck
   nestedLabwareInfo?: DeckLabelProps[] | undefined
   showLabel?: boolean
@@ -27,15 +26,13 @@ export function SelectedLabwareRender(
     labwareDef,
     slotPosition,
     moduleModel,
-    hoveredLabware,
     nestedLabwareInfo,
     showLabel = true,
   } = props
 
   return (labwareOnDeck != null || labwareDef != null) &&
     slotPosition != null &&
-    moduleModel == null &&
-    hoveredLabware == null ? (
+    moduleModel == null ? (
     <>
       {labwareDef != null ? (
         <LabwareRenderOnDeck

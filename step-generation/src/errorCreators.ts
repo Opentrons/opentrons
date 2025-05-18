@@ -29,12 +29,15 @@ export function removeAdapter(): CommandCreatorError {
 export function noTipOnPipette(args: {
   actionName: string
   pipette: string
-  labware: string
-  well: string
+  labware?: string
+  well?: string
 }): CommandCreatorError {
   const { actionName, pipette, labware, well } = args
   return {
-    message: `Attempted to ${actionName} with no tip on pipette: ${pipette} from ${labware}'s well ${well}`,
+    message:
+      labware == null || well == null
+        ? `Attempted to ${actionName} with no tip on pipette: ${pipette} in place`
+        : `Attempted to ${actionName} with no tip on pipette: ${pipette} from ${labware}'s well ${well}`,
     type: 'NO_TIP_ON_PIPETTE',
   }
 }
@@ -304,5 +307,12 @@ export const submergeBelowAspirate = (): CommandCreatorError => {
   return {
     type: 'SUBMERGE_BELOW_ASPIRATE',
     message: 'The submerge position must be above the aspirate position',
+  }
+}
+
+export const retractBelowAspirate = (): CommandCreatorError => {
+  return {
+    type: 'RETRACT_BELOW_ASPIRATE',
+    message: 'The retract position must be above the aspirate position',
   }
 }

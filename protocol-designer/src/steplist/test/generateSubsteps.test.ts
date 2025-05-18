@@ -46,9 +46,9 @@ describe('generateSubstepItem', () => {
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: { slot: '2' },
-        sourcePlateId: { slot: '4' },
-        destPlateId: { slot: '5' },
+        tiprack1Id: { stack: ['tiprack1Id', '2'] },
+        sourcePlateId: { stack: ['sourcePlateId', '4'] },
+        destPlateId: { stack: ['destPlateId', '5'] },
       },
       // @ts-expect-error(sa, 2021-6-15): this looks to be copied, because tiprackSetting is nowhere to be found in makeInitialRobotState
       tiprackSetting: { tiprack1Id: false },

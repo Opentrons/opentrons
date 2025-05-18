@@ -95,8 +95,9 @@ export const AdapterControls = (
       drop: (item: DroppedItem) => {
         const droppedLabware = item
         if (droppedLabware.labwareOnDeck != null) {
-          const droppedSlot = droppedLabware.labwareOnDeck.slot
-          dispatch(moveDeckItem(droppedSlot, labwareId))
+          dispatch(
+            moveDeckItem(droppedLabware.labwareOnDeck.stack[1], labwareId)
+          )
         }
       },
       hover: () => {

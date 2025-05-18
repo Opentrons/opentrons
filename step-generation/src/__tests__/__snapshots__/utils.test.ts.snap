@@ -4,16 +4,28 @@ exports[`makeInitialRobotState > matches snapshot 1`] = `
 {
   "labware": {
     "fixedTrash": {
-      "slot": "12",
+      "stack": [
+        "fixedTrash",
+        "12",
+      ],
     },
     "somePlateId": {
-      "slot": "1",
+      "stack": [
+        "somePlateId",
+        "1",
+      ],
     },
     "tiprack10Id": {
-      "slot": "2",
+      "stack": [
+        "tiprack10Id",
+        "2",
+      ],
     },
     "tiprack300Id": {
-      "slot": "4",
+      "stack": [
+        "tiprack300Id",
+        "4",
+      ],
     },
   },
   "liquidState": {

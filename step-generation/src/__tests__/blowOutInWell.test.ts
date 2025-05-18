@@ -63,8 +63,8 @@ describe('blowOutInWell', () => {
     ])
     expect(res.python).toBe(
       `
-mockPythonName.flow_rate.blow_out = 21.1
-mockPythonName.blow_out(mockPythonName["A1"].top(z=-1.3))
+mock_pipette.flow_rate.blow_out = 21.1
+mock_pipette.blow_out(mock_source_plate["A1"].top(z=-1.3))
 `.trim()
     )
   })

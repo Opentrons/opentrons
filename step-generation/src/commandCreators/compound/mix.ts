@@ -2,6 +2,7 @@ import flatMap from 'lodash/flatMap'
 
 import {
   ALL,
+  getCorrectionVolume,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
@@ -14,6 +15,7 @@ import {
   formatPyStr,
   formatPyWellLocation,
   getIsSafePipetteMovement,
+  getSlotInLocationStack,
   indentPyLines,
   reduceCommandCreators,
 } from '../../utils'
@@ -126,6 +128,8 @@ export const mixInPlaceUtil = (args: {
   dispenseDelaySeconds?: number
   finalPushOut: number | null
   invariantContext: InvariantContext
+  liquidClass: string | null
+  tiprack: string
 }): CurriedCommandCreator[] => {
   const {
     pipette,
@@ -137,6 +141,8 @@ export const mixInPlaceUtil = (args: {
     dispenseDelaySeconds = 0,
     finalPushOut,
     invariantContext,
+    liquidClass,
+    tiprack,
   } = args
 
   const pythonCommandCreator = makePythonCommandCreator({
@@ -151,6 +157,23 @@ export const mixInPlaceUtil = (args: {
     finalPushOut,
   })
 
+  const pipetteSpecs = invariantContext.pipetteEntities[pipette].spec
+
+  const correctionVolumeAspirate = getCorrectionVolume({
+    liquidClass,
+    pipetteSpecs,
+    tiprackDefUri: tiprack,
+    targetVolume: volume,
+    liquidHandlingAction: 'aspirate',
+  })
+  const correctionVolumeDispense = getCorrectionVolume({
+    liquidClass,
+    pipetteSpecs,
+    tiprackDefUri: tiprack,
+    targetVolume: volume,
+    liquidHandlingAction: 'singleDispense',
+  })
+
   const commandCreators = []
   for (let i = 0; i < times; i++) {
     commandCreators.push(
@@ -159,6 +182,9 @@ export const mixInPlaceUtil = (args: {
           pipetteId: pipette,
           volume,
           flowRate: aspirateFlowRateUlSec,
+          ...(correctionVolumeAspirate > 0
+            ? { correctionVolume: correctionVolumeAspirate }
+            : {}),
         }),
         ...getDelayCommand(aspirateDelaySeconds),
         curryWithoutPython(dispenseInPlace, {
@@ -170,6 +196,9 @@ export const mixInPlaceUtil = (args: {
             : finalPushOut == null
             ? {}
             : { pushOut: finalPushOut }), // only push out if final repetition
+          ...(correctionVolumeDispense > 0
+            ? { correctionVolume: correctionVolumeDispense }
+            : {}),
         }),
 
         ...getDelayCommand(dispenseDelaySeconds),
@@ -361,7 +390,9 @@ export const mix: CommandCreator<MixArgs> = (
     }
   }
 
-  const initialLabwareSlot = prevRobotState.labware[labware]?.slot
+  const initialLabwareSlot = getSlotInLocationStack(
+    prevRobotState.labware[labware]?.stack
+  )
   const hasWasteChute =
     Object.keys(invariantContext.wasteChuteEntities).length > 0
 

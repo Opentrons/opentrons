@@ -70,14 +70,14 @@ describe('SlotOverflowMenu', () => {
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       labware: {
         labId: {
-          slot: 'D3',
+          stack: ['labId', 'D3'],
           id: 'labId',
           labwareDefURI: 'mockUri',
           def: fixture96Plate as LabwareDefinition2,
           pythonName: 'mockPythonName',
         },
-        lab2: {
-          slot: 'labId',
+        labId2: {
+          stack: ['labId2', 'labId', 'D3'],
           id: 'labId2',
           labwareDefURI: 'mockUri',
           def: fixture96Plate as LabwareDefinition2,
@@ -168,10 +168,10 @@ describe('SlotOverflowMenu', () => {
 
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     expect(vi.mocked(deleteContainer)).toHaveBeenNthCalledWith(1, {
-      labwareId: 'labId',
+      labwareId: 'labId2',
     })
     expect(vi.mocked(deleteContainer)).toHaveBeenNthCalledWith(2, {
-      labwareId: 'labId2',
+      labwareId: 'labId',
     })
   })
 

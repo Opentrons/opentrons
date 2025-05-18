@@ -77,12 +77,18 @@ import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 import { getModuleCardImage } from './utils'
 
 import type { IconProps } from '@opentrons/components'
+import type { ModuleType } from '@opentrons/shared-data'
 import type {
   AttachedModule,
   HeaterShakerModule,
 } from '/app/redux/modules/types'
 import type { RequestState } from '/app/redux/robot-api/types'
 import type { Dispatch, State } from '/app/redux/types'
+
+const HAS_SETUP_INSTRUCTIONS_TYPE: ModuleType[] = [
+  FLEX_STACKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+]
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -127,7 +133,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [hasSecondary, setHasSecondary] = useState(false)
   const [showAboutModule, setShowAboutModule] = useState(false)
   const [showTestShake, setShowTestShake] = useState(false)
-  const [showHSWizard, setShowHSWizard] = useState(false)
+  const [showSetupWizard, setShowSetupWizard] = useState(false)
   const [showFWBanner, setShowFWBanner] = useState(true)
   const [showCalModal, setShowCalModal] = useState(false)
 
@@ -247,7 +253,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   const handleInstructionsClick = (): void => {
-    setShowHSWizard(true)
+    setShowSetupWizard(true)
   }
 
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
@@ -286,14 +292,16 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           }
         />
       ) : null}
-      {showHSWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
-        <ModuleSetupModal
-          close={() => {
-            setShowHSWizard(false)
-          }}
-          moduleDisplayName={getModuleDisplayName(module.moduleModel)}
-        />
-      )}
+      {showSetupWizard &&
+        HAS_SETUP_INSTRUCTIONS_TYPE.includes(module.moduleType) && (
+          <ModuleSetupModal
+            close={() => {
+              setShowSetupWizard(false)
+            }}
+            moduleDisplayName={getModuleDisplayName(module.moduleModel)}
+            moduleModel={module.moduleModel}
+          />
+        )}
       {showSlideout && (
         <ModuleSlideout
           module={module}

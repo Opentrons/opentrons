@@ -23,6 +23,7 @@ const invariantContext: InvariantContext = {
 }
 const prevRobotState: RobotState = {
   tipState: { pipettes: { [DEFAULT_PIPETTE]: true } } as any,
+  pipettes: { [DEFAULT_PIPETTE]: { entityId: mockWasteChuteId } },
 } as any
 
 describe('dropTipInWasteChute', () => {
@@ -51,7 +52,7 @@ describe('dropTipInWasteChute', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      'mockPythonName.drop_tip(mock_waste_chute_1)'
+      'mock_pipette.drop_tip(mock_waste_chute_1)'
     )
   })
 })

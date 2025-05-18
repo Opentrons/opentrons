@@ -28,6 +28,7 @@ import {
 } from '../../steplist/formLevel'
 import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
 import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
+import { getLocationStackTopToBottom } from '../../utils'
 import { denormalizePipetteEntities, getHydratedForm } from '../utils'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 
@@ -273,9 +274,9 @@ const _getInitialDeckSetup = (
     'expected initial deck setup step to be "manualIntervention" step'
   )
 
-  const labwareLocations =
+  const labwareLocations: Record<string, string> =
     (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
-  const moduleLocations =
+  const moduleLocations: Record<string, string> =
     (initialSetupStep && initialSetupStep.moduleLocationUpdate) || {}
   const pipetteLocations =
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
@@ -292,11 +293,15 @@ const _getInitialDeckSetup = (
   }, {})
 
   return {
-    labware: mapValues<Record<DeckSlot, string>, LabwareOnDeck>(
-      labwareLocations as Record<DeckSlot, string>,
-      (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
+    labware: mapValues<Record<string, string>, LabwareOnDeck>(
+      labwareLocations as Record<string, string>,
+      (id: string, labwareId: string): LabwareOnDeck => {
         return {
-          slot,
+          stack: getLocationStackTopToBottom(
+            labwareId,
+            labwareLocations,
+            moduleLocations
+          ),
           ...labwareEntities[labwareId],
         }
       }

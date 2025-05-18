@@ -1,4 +1,3 @@
-import { getInitialAndMovedLabwareInSlots } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getAddressableAreasInProtocol,
@@ -8,6 +7,8 @@ import {
   getLabwareDisplayName,
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
+
+import { getInitialAndMovedLabwareInSlots } from '/app/transformations/analysis'
 
 import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQuery'
 

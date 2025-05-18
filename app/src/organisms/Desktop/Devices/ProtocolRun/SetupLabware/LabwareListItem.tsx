@@ -35,12 +35,14 @@ import {
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { getLabwareLiquidRenderInfoFromStack } from '/app/transformations/commands'
+import {
+  getLabwareLiquidRenderInfoFromStack,
+  getModuleFromStack,
+} from '/app/transformations/commands'
 
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type { MouseEvent } from 'react'
-import type { LabwareByLiquidId } from '@opentrons/components'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
@@ -49,9 +51,9 @@ import type {
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type {
+  LabwareByLiquidId,
   LabwareDefinitionsByURI,
   LabwareInStack,
-  ModuleInStack,
   StackItem,
 } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
@@ -82,9 +84,7 @@ export function LabwareListItem(
     definitionsByURI,
     onClick,
   } = props
-  const moduleInStack = stackedItems.find(
-    (item): item is ModuleInStack => 'moduleModel' in item
-  )
+  const moduleInStack = getModuleFromStack(stackedItems)
   const labwareInStack = stackedItems.filter(
     (lw): lw is LabwareInStack => 'labwareId' in lw
   )
@@ -232,12 +232,9 @@ export function LabwareListItem(
       type="noActive"
       gridGap={SPACING.spacing24}
       padding={SPACING.spacing12}
+      alignItems={ALIGN_CENTER}
     >
-      <Flex
-        alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing2}
-        width="6.25rem"
-      >
+      <Flex gridGap={SPACING.spacing2} flexWrap="wrap" width="6.25rem">
         {isFlex ? (
           <DeckInfoLabel deckLabel={slotInfo} />
         ) : (

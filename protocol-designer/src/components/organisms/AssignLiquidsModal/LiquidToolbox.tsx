@@ -38,7 +38,7 @@ import { LINK_BUTTON_STYLE } from '../../atoms'
 import { DefineLiquidsModal } from '../DefineLiquidsModal'
 import { LiquidCard } from './LiquidCard'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { ContentsByWell } from '../../../labware-ingred/types'
 
@@ -59,14 +59,16 @@ interface ToolboxFormValues {
   volume?: string | null
 }
 interface LiquidToolboxProps {
-  onClose: () => void
+  showBadFormState: boolean
+  setShowBadFormState: Dispatch<SetStateAction<boolean>>
 }
-export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
-  const { onClose } = props
+export function LiquidToolbox({
+  showBadFormState,
+  setShowBadFormState,
+}: LiquidToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch()
   const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
-  const [showBadFormState, setShowBadFormState] = useState<boolean>(false)
   const liquids = useSelector(getLiquidEntities)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const selectedWellGroups = useSelector(getSelectedWells)
@@ -251,6 +253,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
       }
     })
     .filter(Boolean)
+
   return (
     <>
       {showDefineLiquidModal ? (
@@ -267,15 +270,6 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
             {labwareDisplayName}
           </StyledText>
         }
-        confirmButtonText={t('shared:done')}
-        onConfirmClick={() => {
-          if (selectedWells.length > 0) {
-            setShowBadFormState(true)
-            return
-          }
-          dispatch(deselectAllWells())
-          onClose()
-        }}
         onCloseClick={handleClearAllWells}
         height="100%"
         width="21.875rem"

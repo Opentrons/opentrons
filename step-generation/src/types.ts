@@ -30,11 +30,15 @@ export type DeckSlot = string
 type THERMOCYCLER_STATE = 'thermocyclerState'
 type THERMOCYCLER_PROFILE = 'thermocyclerProfile'
 export interface LabwareTemporalProperties {
-  slot: DeckSlot
+  stack: string[] // a stack of ids from top to bottom
 }
 
 export interface PipetteTemporalProperties {
   mount: Mount
+  //  entityId is either a labwareId or a trashBin/wasteChute id
+  entityId?: string
+  //  primary nozzle's wellName if over a labware
+  wellName?: string
   nozzles?: NozzleConfigurationStyle
 }
 
@@ -280,6 +284,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   touchTipAfterDispense: boolean
   /** Optional offset for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseOffsetMmFromTop: number
+  /** Optional offset for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterDispenseMmFromEdge: number | null
   /** Optional speed for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseSpeed: number | null
   /** Flow rate in uL/sec for all dispenses */
@@ -308,16 +314,21 @@ export type SharedTransferLikeArgs = CommonArgs & {
   aspirateRetractYOffset: number
   aspirateRetractZOffset: number
   aspirateRetractPositionReference: PositionReference
+  aspirateRetractDelay: InnerDelayArgs | null
+  dispensePositionReference: PositionReference
+  dispenseZOffset: number
   dispenseSubmergeSpeed: number | null
   dispenseSubmergeXOffset: number
   dispenseSubmergeYOffset: number
   dispenseSubmergeZOffset: number
   dispenseSubmergePositionReference: PositionReference
+  dispenseSubmergeDelay: InnerDelayArgs | null
   dispenseRetractSpeed: number | null
   dispenseRetractXOffset: number
   dispenseRetractYOffset: number
   dispenseRetractZOffset: number
   dispenseRetractPositionReference: PositionReference
+  dispenseRetractDelay: InnerDelayArgs | null
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {
@@ -693,6 +704,7 @@ export type ErrorType =
   | 'PIPETTING_INTO_COLUMN_4'
   | 'POSSIBLE_PIPETTE_COLLISION'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
+  | 'RETRACT_BELOW_ASPIRATE'
   | 'SUBMERGE_BELOW_ASPIRATE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'

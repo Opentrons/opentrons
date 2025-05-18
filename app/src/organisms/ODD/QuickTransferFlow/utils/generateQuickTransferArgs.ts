@@ -10,7 +10,10 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
-import { makeInitialRobotState } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  makeInitialRobotState,
+} from '@opentrons/step-generation'
 
 import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
@@ -59,7 +62,11 @@ function getInvariantContextAndRobotState(
 ): { invariantContext: InvariantContext; robotState: RobotState } {
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
   let pipetteName = quickTransferState.pipette.model
-  if (quickTransferState.pipette.channels === 1) {
+  // we have to special case the peek pipette as it doesn't follow
+  // our pipette definition naming conventions
+  if (quickTransferState.pipette.displayName === 'FLEX 8-Channel EM 1000 µL') {
+    pipetteName = 'p1000_multi_em_flex'
+  } else if (quickTransferState.pipette.channels === 1) {
     pipetteName = pipetteName + `_single_flex`
   } else if (quickTransferState.pipette.channels === 8) {
     pipetteName = pipetteName + `_multi_flex`
@@ -105,7 +112,7 @@ function getInvariantContextAndRobotState(
     }
     labwareLocations = {
       [adapterId]: {
-        slot: 'B2',
+        stack: [adapterId, 'B2'],
       },
     }
   }
@@ -136,10 +143,11 @@ function getInvariantContextAndRobotState(
   labwareLocations = {
     ...labwareLocations,
     [tipRackId]: {
-      slot: adapterId ?? 'B2',
+      stack:
+        adapterId != null ? [tipRackId, adapterId, 'B2'] : [tipRackId, 'B2'],
     },
     [sourceLabwareId]: {
-      slot: 'C2',
+      stack: [sourceLabwareId, 'C2'],
     },
   }
 
@@ -160,7 +168,7 @@ function getInvariantContextAndRobotState(
     labwareLocations = {
       ...labwareLocations,
       [destLabwareId]: {
-        slot: 'D2',
+        stack: [destLabwareId, 'D2'],
       },
     }
   }
@@ -344,7 +352,8 @@ export function generateQuickTransferArgs(
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
 
   const sourceLabwareId = Object.keys(robotState.labware).find(
-    labwareId => robotState.labware[labwareId].slot === 'C2'
+    labwareId =>
+      getSlotInLocationStack(robotState.labware[labwareId].stack) === 'C2'
   )
   const sourceLabwareEntity =
     sourceLabwareId != null
@@ -353,7 +362,8 @@ export function generateQuickTransferArgs(
   let destLabwareEntity = sourceLabwareEntity
   if (quickTransferState.destination !== 'source') {
     const destinationLabwareId = Object.keys(robotState.labware).find(
-      labwareId => robotState.labware[labwareId].slot === 'D2'
+      labwareId =>
+        getSlotInLocationStack(robotState.labware[labwareId].stack) === 'D2'
     )
     destLabwareEntity =
       destinationLabwareId != null
@@ -435,17 +445,23 @@ export function generateQuickTransferArgs(
     aspirateRetractYOffset: 0,
     aspirateRetractZOffset: 0,
     aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+    aspirateRetractDelay: null,
+    dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseZOffset: 0,
     dispenseSubmergeSpeed: null,
     dispenseSubmergeXOffset: 0,
     dispenseSubmergeYOffset: 0,
     dispenseSubmergeZOffset: 0,
     dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseSubmergeDelay: null,
     dispenseRetractSpeed: null,
     dispenseRetractXOffset: 0,
     dispenseRetractYOffset: 0,
     dispenseRetractZOffset: 0,
     dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseRetractDelay: null,
     touchTipAfterAspirateMmFromEdge: null,
+    touchTipAfterDispenseMmFromEdge: null,
   }
 
   switch (quickTransferState.path) {

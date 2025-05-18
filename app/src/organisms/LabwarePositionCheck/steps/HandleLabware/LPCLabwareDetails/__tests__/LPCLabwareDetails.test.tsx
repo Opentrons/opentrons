@@ -28,6 +28,7 @@ import {
 
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
+import type { InlineNotification } from '@opentrons/components'
 
 vi.mock(
   '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails/DefaultLocationOffset',
@@ -46,17 +47,22 @@ vi.mock(
 vi.mock('../OffsetBannerContainer', () => ({
   OffsetBannerContainer: () => <div>MOCK_OFFSET_BANNER_CONTAINER</div>,
 }))
-vi.mock('/app/atoms/InlineNotification', () => ({
-  InlineNotification: vi.fn(({ type, heading, message }) => (
-    <div
-      data-testid="inline-notification"
-      data-type={type}
-      data-heading={heading}
-    >
-      {message}
-    </div>
-  )),
-}))
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InlineNotification>()
+  return {
+    ...actual,
+    InlineNotification: vi.fn(({ type, heading, message }) => (
+      <div
+        data-testid="inline-notification"
+        data-type={type}
+        data-heading={heading}
+      >
+        {message}
+      </div>
+    )),
+  }
+})
+
 vi.mock(
   '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets',
   () => ({

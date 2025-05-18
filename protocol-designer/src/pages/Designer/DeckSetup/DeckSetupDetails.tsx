@@ -5,7 +5,6 @@ import values from 'lodash/values'
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
-  getLabwareHasQuirk,
   getModuleDef2,
   getPositionFromSlotId,
   inferModuleOrientationFromSlot,
@@ -13,6 +12,7 @@ import {
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '../../../components/organisms'
 import { getSlotsWithCollisions } from '../../../components/organisms/utils'
@@ -25,13 +25,16 @@ import {
   getSlotIsEmpty,
 } from '../../../step-forms'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
-import { getStagingAreaAddressableAreas } from '../../../utils'
+import {
+  getStagingAreaAddressableAreas,
+  getTopmostLabwareOnModuleFromStack,
+} from '../../../utils'
 import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
-import { HoveredItem } from './HoveredItem'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
-import { SelectedHoveredItems } from './SelectedHoveredItems'
+import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
+import { SelectedItems } from './SelectedItems'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
 import { SlotWarning } from './SlotWarning'
 import {
@@ -64,7 +67,6 @@ interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   addEquipment: (slotId: string) => void
   deckDef: DeckDefinition
   hover: string | null
-  hoveredLabware: string | null
   setHover: Dispatch<SetStateAction<string | null>>
   showGen1MultichannelCollisionWarnings: boolean
   stagingAreaCutoutIds: CutoutId[]
@@ -77,7 +79,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     addEquipment,
     deckDef,
     hover,
-    hoveredLabware: hoveredLabwareFromProp,
     selectedZoomInSlot,
     terminalItemId,
     setHover,
@@ -126,8 +127,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   }, [])
 
   const {
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
     createdModuleForSlot,
     preSelectedFixture,
     slotPosition,
@@ -140,27 +141,20 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   useEffect(() => {
     dispatch(
       editSlotInfo({
-        createdNestedLabwareForSlot,
-        createdLabwareForSlot,
+        createdAdapterForSlot,
+        createdTopLabwareForSlot,
         createdModuleForSlot,
         preSelectedFixture,
       })
     )
   }, [
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
     createdModuleForSlot,
     preSelectedFixture,
   ])
 
-  const allLabware: LabwareOnDeckType[] = Object.keys(
-    activeDeckSetup.labware
-  ).reduce<LabwareOnDeckType[]>((acc, labwareId) => {
-    const labware = activeDeckSetup.labware[labwareId]
-    return getLabwareHasQuirk(labware.def, 'fixedTrash')
-      ? acc
-      : [...acc, labware]
-  }, [])
+  const allLabware = Object.values(activeDeckSetup.labware)
 
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const menuListSlotPosition = getPositionFromSlotId(menuListId ?? '', deckDef)
@@ -222,8 +216,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           }
         }
 
-        const labwareLoadedOnModule = allLabware.find(
-          lw => lw.slot === moduleOnDeck.id
+        const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
+          moduleOnDeck.id,
+          allLabware
         )
         const labwareInterfaceBoundingBox = {
           xDimension: moduleDef.dimensions.labwareInterfaceXDimension ?? 0,
@@ -248,10 +243,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     : 'open',
               }
             : tempInnerProps
-
-        const isAdapter = labwareLoadedOnModule?.def.allowedRoles?.includes(
-          'adapter'
-        )
+        const labwareOnModule = activeDeckSetup.labware[labwareLoadedOnModuleId]
+        const isAdapter = labwareOnModule?.def.allowedRoles?.includes('adapter')
 
         return moduleOnDeck.slot !== selectedSlot.slot ? (
           <Fragment key={moduleOnDeck.id}>
@@ -267,16 +260,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
             >
-              {labwareLoadedOnModule != null &&
+              {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (
                 <>
-                  <LabwareOnDeck
-                    x={0}
-                    y={0}
-                    labwareOnDeck={labwareLoadedOnModule}
-                  />
+                  <LabwareOnDeck x={0} y={0} labwareOnDeck={labwareOnModule} />
                   <HighlightLabware
-                    labwareOnDeck={labwareLoadedOnModule}
+                    labwareOnDeck={labwareOnModule}
                     position={[0, 0, 0]}
                     isZoomed={selectedZoomInSlot != null}
                   />
@@ -289,7 +278,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                       onDeck={false}
                       setHover={setHover}
                       setShowMenuListForId={setShowMenuListForId}
-                      labwareId={labwareLoadedOnModule.id}
+                      labwareId={labwareOnModule.id}
                       key={moduleOnDeck.slot}
                       slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
                       slotBoundingBox={labwareInterfaceBoundingBox}
@@ -309,17 +298,25 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                       setDraggedLabware={setDraggedLabware}
                       swapBlocked={
                         (swapBlockedModule || swapBlockedAdapter) &&
-                        (labwareLoadedOnModule.id === hoveredLabware?.id ||
-                          labwareLoadedOnModule.id === draggedLabware?.id)
+                        (labwareOnModule.id === hoveredLabware?.id ||
+                          labwareOnModule.id === draggedLabware?.id)
                       }
-                      labwareOnDeck={labwareLoadedOnModule}
+                      labwareOnDeck={labwareOnModule}
                       isSelected={selectedZoomInSlot != null}
                     />
                   )}
+                  <ActiveLabwareControls
+                    slotPosition={[0, 0, 0]}
+                    slotBoundingBox={labwareInterfaceBoundingBox}
+                    itemId={slotId}
+                    terminalItemId={terminalItemId}
+                    hover={hover}
+                    setHover={setHover}
+                  />
                 </>
               ) : null}
 
-              {labwareLoadedOnModule == null ? (
+              {labwareOnModule == null ? (
                 <SlotControls
                   terminalItemId={terminalItemId}
                   itemId={slotId}
@@ -410,20 +407,17 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
         if (
-          labware.slot === 'offDeck' ||
-          allModules.some(m => m.id === labware.slot) ||
-          allLabware.some(lab => lab.id === labware.slot) ||
+          getSlotInLocationStack(labware.stack) === 'offDeck' ||
+          allModules.some(m => labware.stack.includes(m.id)) ||
           labware.id === adjacentLabware?.id
         )
           return null
-
-        const slotPosition = getPositionFromSlotId(labware.slot, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(
-          labware.slot,
-          deckDef
-        )?.boundingBox
+        const slot = getSlotInLocationStack(labware.stack)
+        const slotPosition = getPositionFromSlotId(slot, deckDef)
+        const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
+          ?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
-          console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
+          console.warn(`no slot ${slot} for labware ${labware.id}!`)
           return null
         }
         const labwareIsAdapter =
@@ -445,13 +439,13 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               <AdapterControls
                 terminalItemId={terminalItemId}
                 swapBlocked={swapBlockedAdapter}
-                itemId={labware.slot}
+                itemId={slot}
                 hover={hover}
                 onDeck={true}
                 labwareId={labware.id}
                 setHover={setHover}
                 setShowMenuListForId={setShowMenuListForId}
-                key={labware.slot}
+                key={slot}
                 slotPosition={slotPosition}
                 slotBoundingBox={slotBoundingBox}
                 handleDragHover={handleHoverEmptySlot}
@@ -459,7 +453,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               />
             ) : (
               <LabwareControls
-                itemId={labware.slot}
+                itemId={slot}
                 terminalItemId={terminalItemId}
                 hover={hover}
                 slotPosition={slotPosition}
@@ -476,6 +470,14 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                 isSelected={selectedZoomInSlot != null}
               />
             )}
+            <ActiveLabwareControls
+              slotPosition={slotPosition}
+              slotBoundingBox={slotBoundingBox}
+              itemId={slot}
+              terminalItemId={terminalItemId}
+              hover={hover}
+              setHover={setHover}
+            />
           </Fragment>
         )
       })}
@@ -483,19 +485,18 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       {/* all nested labwares */}
       {allLabware.map(labware => {
         if (
-          allModules.some(m => m.id === labware.slot) ||
-          labware.slot === 'offDeck'
+          allModules.some(m => labware.stack.includes(m.id)) ||
+          getSlotInLocationStack(labware.stack) === 'offDeck'
         )
           return null
         if (
-          deckDef.locations.addressableAreas.some(
-            addressableArea => addressableArea.id === labware.slot
+          deckDef.locations.addressableAreas.some(addressableArea =>
+            labware.stack.includes(addressableArea.id)
           )
         ) {
           return null
         }
-        const slotForOnTheDeck = allLabware.find(lab => lab.id === labware.slot)
-          ?.slot
+        const slotForOnTheDeck = getSlotInLocationStack(labware.stack)
         const slotForOnMod = allModules.find(mod => mod.id === slotForOnTheDeck)
           ?.slot
         let slotPosition = null
@@ -505,7 +506,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           slotPosition = getPositionFromSlotId(slotForOnTheDeck, deckDef)
         }
         if (slotPosition == null) {
-          console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
+          console.warn(`no slot ${slotForOnTheDeck} for labware ${labware.id}!`)
           return null
         }
 
@@ -546,6 +547,18 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               isSelected={selectedZoomInSlot != null}
               terminalItemId={terminalItemId}
             />
+            <ActiveLabwareControls
+              slotPosition={[0, 0, 0]}
+              slotBoundingBox={{
+                xDimension: labware.def.dimensions.xDimension,
+                yDimension: labware.def.dimensions.yDimension,
+                zDimension: 0,
+              }}
+              itemId={slotOnDeck ?? ''}
+              terminalItemId={terminalItemId}
+              hover={hover}
+              setHover={setHover}
+            />
           </Fragment>
         )
       })}
@@ -554,17 +567,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       <HighlightItems robotType={robotType} deckDef={deckDef} />
 
       {/* selected hardware + labware */}
-      <SelectedHoveredItems
+      <SelectedItems
         deckDef={deckDef}
         robotType={robotType}
-        hoveredLabware={hoveredLabwareFromProp}
         slotPosition={slotPosition}
-      />
-
-      {/* hovered  labware */}
-      <HoveredItem
-        hoveredSlotPosition={slotPosition}
-        hoveredLabware={hoveredLabwareFromProp}
       />
 
       {/* slot overflow menu */}

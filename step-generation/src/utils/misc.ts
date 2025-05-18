@@ -51,6 +51,7 @@ import type {
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
+  LabwareTemporalProperties,
   LocationLiquidState,
   PipetteEntity,
   RobotState,
@@ -145,6 +146,36 @@ export function getTrashBinAddressableAreaName(
   }
   //  assume trash location is the fixedTrash for OT-2 if cutouts is null
   return cutouts != null ? cutouts[trashLocation]?.[0] : 'fixedTrash'
+}
+
+export function getTrashLocationFromAddressableAreaName(
+  addressableAreaName: AddressableAreaName
+): CutoutId | null {
+  if (addressableAreaName === 'fixedTrash') {
+    return 'cutout12' as CutoutId
+  }
+
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const cutouts =
+    deckDef.cutoutFixtures.find(
+      cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
+    )?.providesAddressableAreas ?? null
+
+  if (cutouts == null) {
+    console.error('Could not find trashBinAdapter cutouts for Flex')
+    return null
+  }
+
+  for (const [cutoutId, areas] of Object.entries(cutouts)) {
+    if (areas.includes(addressableAreaName)) {
+      return cutoutId as CutoutId
+    }
+  }
+
+  console.error(
+    `Could not find trashLocation for addressableAreaName ${addressableAreaName}`
+  )
+  return null
 }
 
 export function getTrashOrLabware(
@@ -280,6 +311,7 @@ export function mergeLiquid(
     ),
   }
 }
+
 // TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
   channels: 1 | 8 | 96,
@@ -852,4 +884,51 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
+}
+
+export const getSlotInLocationStack = (stack?: string[]): string => {
+  if (stack == null) {
+    console.error('expected to find stack but could not')
+    return 'unknown slot'
+  } else {
+    return stack[stack.length - 1]
+  }
+}
+
+export const getTopLocationInStack = (stack?: string[]): string => {
+  if (stack == null) {
+    console.error('expected to find stack but could not')
+    return 'unknown top location'
+  } else {
+    return stack[0]
+  }
+}
+
+export const getModuleIdFromRobotStateStack = (
+  modules: RobotState['modules'],
+  stack?: string[]
+): string | null => {
+  return stack?.find(id => modules[id] != null) ?? null
+}
+
+export const getFullStackFromLabwares = (
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  },
+  slot: string
+): string[] => {
+  return Object.values(labware)
+    .filter(lw => lw.stack.includes(slot))
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+}
+
+export const getTopmostLabwareOnModuleFromStackRobotState = (
+  moduleId: string,
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  }
+): string => {
+  return Object.values(labware)
+    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
 }

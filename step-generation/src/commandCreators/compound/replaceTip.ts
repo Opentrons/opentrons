@@ -131,11 +131,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const slotName = getLabwareSlot(
-    nextTiprack.tiprackId,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(nextTiprack.tiprackId, prevRobotState.labware)
   if (
     pipetteAdjacentHeaterShakerWhileShaking(
       prevRobotState.modules,

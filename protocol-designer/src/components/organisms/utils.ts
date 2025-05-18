@@ -17,10 +17,13 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { ContentsByWell } from '../../labware-ingred/types'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   ModuleOnDeck,
 } from '../../step-forms'
+import type * as wellContentsSelectors from '../../top-selectors/well-contents'
+import type { WellContentsByNumber } from './SlotDetailModal'
 
 export const getSlotsWithCollisions = (
   deckDef: DeckDefinition,
@@ -55,9 +58,11 @@ export const getLabwareNotCompatibleWithModule = (
 ): string | null => {
   const slot = cutoutId.split('cutout')[1]
   const isThermocycler = moduleType === THERMOCYCLER_MODULE_TYPE
-  const labwareOnSlot = Object.values(labware).find(lw => lw.slot === slot)
+  const labwareOnSlot = Object.values(labware).find(lw =>
+    lw.stack.includes(slot)
+  )
   const isLabwareOnOtherTCSlot = isThermocycler
-    ? Object.values(labware).some(({ slot }) => slot === tcSlot)
+    ? Object.values(labware).some(({ stack }) => stack.includes(tcSlot))
     : false
 
   if (isLabwareOnOtherTCSlot) {
@@ -76,7 +81,7 @@ export const getSlotHasLabware = (
   cutoutId: CutoutId
 ): boolean => {
   const slot = cutoutId.split('cutout')[1]
-  return Object.values(labware).some(lw => lw.slot === slot)
+  return Object.values(labware).some(lw => lw.stack.includes(slot))
 }
 
 //  NOTE: used to get the next available module slot for OT-2
@@ -103,4 +108,47 @@ export const getNextAvailableModuleSlot = (
   } else {
     return null
   }
+}
+
+export const getIsWellContentsEmpty = (
+  allWellContentsForActiveItem: wellContentsSelectors.WellContentsByLabware | null,
+  labwareId: string
+): boolean => {
+  const wellContents =
+    allWellContentsForActiveItem != null
+      ? allWellContentsForActiveItem[labwareId]
+      : {}
+  return wellContents != null
+    ? Object.values(wellContents).every(
+        well => Object.keys(well.ingreds).length === 0
+      )
+    : true
+}
+
+export const getVolumesPerLiquid = (
+  wellContents: ContentsByWell,
+  individualIds: string[]
+): Record<string, WellContentsByNumber> => {
+  const volumesPerLiquid: Record<string, WellContentsByNumber> = {}
+  individualIds.forEach(id => {
+    const volumeByWell: WellContentsByNumber =
+      wellContents != null
+        ? Object.values(wellContents).reduce(
+            (acc: WellContentsByNumber, contents) => {
+              const groupIndex = contents.groupIds.indexOf(id)
+              if (groupIndex !== -1) {
+                const ingred = contents.ingreds[id]
+                if (ingred?.volume != null) {
+                  acc[contents.wellName ?? 'A1'] = ingred.volume
+                }
+              }
+              return acc
+            },
+            {}
+          )
+        : {}
+
+    volumesPerLiquid[id] = volumeByWell
+  })
+  return volumesPerLiquid
 }

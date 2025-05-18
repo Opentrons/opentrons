@@ -17,6 +17,10 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import { FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
+import {
+  getFullStackFromLabwares,
+  getTopLocationInStack,
+} from '@opentrons/step-generation'
 
 import {
   ConfirmDeleteEntityInUseModal,
@@ -117,34 +121,34 @@ export function SlotOverflowMenu(
 
   const { makeSnackbar } = useKitchen()
 
-  const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
+  const { labware: deckSetupLabware } = deckSetup
 
   const isOffDeckLocation = deckSetupLabware[location] != null
+  const fullStackOnSlot = getFullStackFromLabwares(deckSetupLabware, location)
+  const labwareStackOnSlot =
+    fullStackOnSlot?.filter(id => deckSetupLabware[id] != null) ?? []
+  const topLabwareOnStackId =
+    fullStackOnSlot != null ? getTopLocationInStack(fullStackOnSlot) : null
+  const topLabwareOnSlot =
+    topLabwareOnStackId != null ? deckSetupLabware[topLabwareOnStackId] : null
 
-  const moduleOnSlot = Object.values(deckSetupModules).find(
-    module => module.slot === location
-  )
-  const labwareOnSlot = Object.values(deckSetupLabware).find(lw =>
-    isOffDeckLocation
-      ? lw.id === location
-      : lw.slot === location || lw.slot === moduleOnSlot?.id
-  )
   const isSpace =
-    getNextAvailableDeckSlot(deckSetup, robotType, labwareOnSlot?.def) != null
+    getNextAvailableDeckSlot(deckSetup, robotType, topLabwareOnSlot?.def) !=
+    null
 
-  const isLabwareTiprack = labwareOnSlot?.def.parameters.isTiprack ?? false
+  const isLabwareTiprack = topLabwareOnSlot?.def.parameters.isTiprack ?? false
   const isLabwareAnAdapter =
-    labwareOnSlot?.def.allowedRoles?.includes('adapter') ?? false
+    topLabwareOnSlot?.def.allowedRoles?.includes('adapter') ?? false
 
   const isTiprackAdapter =
-    labwareOnSlot?.def.parameters.quirks?.includes(
+    topLabwareOnSlot?.def.parameters.quirks?.includes(
       'tiprackAdapterFor96Channel'
     ) ?? false
 
-  const nestedLabwareOnSlot = Object.values(deckSetupLabware).find(
-    lw => lw.slot === labwareOnSlot?.id
+  const adapterOnSlot = Object.values(deckSetupLabware).find(
+    lw => lw.id === labwareStackOnSlot[1]
   )
-  const hasNoItem = labwareOnSlot == null && nestedLabwareOnSlot == null
+  const hasNoItem = labwareStackOnSlot.length === 0
 
   const isStagingSlot = FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
     location as AddressableAreaName
@@ -156,48 +160,31 @@ export function SlotOverflowMenu(
       return
     }
 
-    if (
-      labwareOnSlot != null &&
-      !isLabwareAnAdapter &&
-      nestedLabwareOnSlot == null
-    ) {
-      dispatch(duplicateLabware(labwareOnSlot.id))
-    } else if (nestedLabwareOnSlot != null) {
-      dispatch(duplicateLabware(nestedLabwareOnSlot.id))
-    }
+    labwareStackOnSlot.forEach(labware => {
+      if (!deckSetupLabware[labware].def.allowedRoles?.includes('adapter')) {
+        dispatch(duplicateLabware(deckSetupLabware[labware].id))
+      }
+    })
     setShowMenuList(false)
   }
 
-  const isLabwareOnSlotInUse = getIsLabwareOnSlotInUse(
-    savedSteps,
-    labwareOnSlot,
-    nestedLabwareOnSlot
-  )
+  const isLabwareOnSlotInUse =
+    topLabwareOnSlot != null
+      ? getIsLabwareOnSlotInUse(savedSteps, topLabwareOnSlot, adapterOnSlot)
+      : false
 
   const handleClear = (): void => {
-    //  clear labware from slot
-    if (labwareOnSlot != null) {
-      dispatch(deleteContainer({ labwareId: labwareOnSlot.id }))
-    }
-    //  clear nested labware from slot
-    if (nestedLabwareOnSlot != null) {
-      dispatch(deleteContainer({ labwareId: nestedLabwareOnSlot.id }))
-    }
+    labwareStackOnSlot.forEach(labware => {
+      dispatch(deleteContainer({ labwareId: deckSetupLabware[labware].id }))
+    })
   }
-
-  const showDuplicateBtn =
-    (labwareOnSlot != null &&
-      !isLabwareAnAdapter &&
-      nestedLabwareOnSlot == null) ||
-    nestedLabwareOnSlot != null
+  const showDuplicateBtn = !isLabwareAnAdapter && labwareStackOnSlot.length > 0
 
   const canRenameLabwareAndEditLiquids =
-    (labwareOnSlot != null &&
-      !isLabwareAnAdapter &&
-      !isLabwareTiprack &&
-      !isTiprackAdapter &&
-      nestedLabwareOnSlot == null) ||
-    (nestedLabwareOnSlot != null && !isTiprackAdapter)
+    !isLabwareAnAdapter &&
+    !isLabwareTiprack &&
+    !isTiprackAdapter &&
+    labwareStackOnSlot.length > 0
 
   let position = ROBOT_BOTTOM_HALF_SLOTS.includes(location)
     ? BOTTOM_SLOT_Y_POSITION
@@ -209,10 +196,8 @@ export function SlotOverflowMenu(
       : TOP_SLOT_Y_POSITION_2_BUTTONS
   }
 
-  let nickNameId = labwareOnSlot?.id
-  if (nestedLabwareOnSlot != null) {
-    nickNameId = nestedLabwareOnSlot.id
-  } else if (isOffDeckLocation) {
+  let nickNameId = topLabwareOnSlot?.id
+  if (isOffDeckLocation) {
     nickNameId = location
   }
 
@@ -246,7 +231,6 @@ export function SlotOverflowMenu(
           onClose={() => {
             setShowDeleteEntityInUseModal(false)
           }}
-          type="clear"
         />
       ) : null}
       {showNickNameModal && nickNameId != null ? (
@@ -296,10 +280,8 @@ export function SlotOverflowMenu(
         </MenuItem>
         <MenuItem
           onClick={() => {
-            if (nestedLabwareOnSlot != null) {
-              dispatch(openIngredientSelector(nestedLabwareOnSlot.id))
-            } else if (labwareOnSlot != null) {
-              dispatch(openIngredientSelector(labwareOnSlot.id))
+            if (topLabwareOnSlot != null) {
+              dispatch(openIngredientSelector(topLabwareOnSlot.id))
             }
             navigate('/liquids')
           }}
