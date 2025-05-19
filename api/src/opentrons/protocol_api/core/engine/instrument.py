@@ -1875,12 +1875,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         while not is_last_step:
             total_dispense_volume = 0.0
             vol_aspirate_combo = []
+            air_gap = aspirate_air_gap_by_volume.get_for_volume(next_step_volume)
             # Take air gap into account because there will be a final air gap before the dispense
-            while total_dispense_volume + next_step_volume <= max_volume:
+            while total_dispense_volume + next_step_volume <= max_volume - air_gap:
                 total_dispense_volume += next_step_volume
                 vol_aspirate_combo.append((next_step_volume, next_source))
                 try:
                     next_step_volume, next_source = next(source_per_volume_step)
+                    air_gap = aspirate_air_gap_by_volume.get_for_volume(
+                        max(next_step_volume + total_dispense_volume, max_volume)
+                    )
                 except StopIteration:
                     is_last_step = True
                     break
@@ -1894,6 +1898,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             else:
                 enable_lpd = False
 
+            total_aspirated_volume = 0.0
             for step_num, (step_volume, step_source) in enumerate(vol_aspirate_combo):
                 with self.lpd_for_transfer(enable=enable_lpd):
                     tip_contents = self.aspirate_liquid_class(
@@ -1905,7 +1910,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         volume_for_pipette_mode_configuration=(
                             total_dispense_volume if step_num == 0 else None
                         ),
+                        current_volume=total_aspirated_volume,
                     )
+                total_aspirated_volume += step_volume
                 is_first_step = False
                 enable_lpd = False
             tip_contents = self.dispense_liquid_class(
@@ -1954,6 +1961,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         tip_contents: List[tx_comps_executor.LiquidAndAirGapPair],
         volume_for_pipette_mode_configuration: Optional[float],
         conditioning_volume: Optional[float] = None,
+        current_volume: float = 0.0,
     ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
         """Execute aspiration steps.
 
@@ -1967,15 +1975,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         Return: List of liquid and air gap pairs in tip.
         """
         aspirate_props = transfer_properties.aspirate
+        volume_for_air_gap = aspirate_props.retract.air_gap_by_volume.get_for_volume(
+            volume + current_volume
+        )
         tx_commons.check_valid_liquid_class_volume_parameters(
             aspirate_volume=volume,
-            air_gap=(
-                aspirate_props.retract.air_gap_by_volume.get_for_volume(volume)
-                if conditioning_volume is None
-                else 0
-            ),
-            disposal_volume=0,  # Disposal volume is accounted for in aspirate vol
+            air_gap=volume_for_air_gap if conditioning_volume is None else 0,
             max_volume=self.get_working_volume(),
+            current_volume=current_volume,
         )
         source_loc, source_well = source
         last_liquid_and_airgap_in_tip = (
