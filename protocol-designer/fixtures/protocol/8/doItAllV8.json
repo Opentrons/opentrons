@@ -5092,13 +5092,6 @@
       }
     },
     {
-      "commandType": "thermocycler/waitForBlockTemperature",
-      "key": "252be3f0-fe89-487b-a669-88ead3ce7094",
-      "params": {
-        "moduleId": "fd6da9f1-d63b-414b-929e-c646b64790e9:thermocyclerModuleType"
-      }
-    },
-    {
       "commandType": "waitForDuration",
       "key": "86b8e715-f1a7-4091-b8c4-4d11439f2d99",
       "params": {

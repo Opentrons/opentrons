@@ -34,6 +34,7 @@ import type {
 } from '@opentrons/step-generation'
 import type { BoundingRect, GenericRect } from '../collision-types'
 import type {
+  AllTemporalPropertiesForTimelineFrame,
   InitialDeckSetup,
   LabwareOnDeck,
   ModuleEntities,
@@ -440,4 +441,12 @@ export const getLabwareIdAfterModuleIdInStack = (
   const indexAfter = index + 1
 
   return matchingLabware.stack[indexAfter] ?? null
+}
+
+export const getHasTrash = (
+  additionalEquipment: AllTemporalPropertiesForTimelineFrame['additionalEquipmentOnDeck']
+): boolean => {
+  return Object.values(additionalEquipment).some(
+    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
+  )
 }

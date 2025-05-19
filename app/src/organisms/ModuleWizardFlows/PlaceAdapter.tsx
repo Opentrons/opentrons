@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
@@ -32,26 +31,12 @@ import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import { LEFT_SLOTS } from './constants'
 
-import type { AxiosError } from 'axios'
-import type { UseMutateFunction } from 'react-query'
-import type {
-  CreateMaintenanceRunData,
-  MaintenanceRun,
-} from '@opentrons/api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { ModuleSetupWizardStepProps } from './types'
 
-interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
+interface PlaceAdapterProps extends ModuleSetupWizardStepProps {
   deckConfig: DeckConfiguration
   setCreatedAdapterId: (adapterId: string) => void
-  createMaintenanceRun: UseMutateFunction<
-    MaintenanceRun,
-    AxiosError<any>,
-    CreateMaintenanceRunData,
-    unknown
-  >
-  isCreateLoading: boolean
-  createdMaintenanceRunId: string | null
 }
 
 export const BODY_STYLE = css`
@@ -75,16 +60,9 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     attachedPipette,
     isRobotMoving,
     maintenanceRunId,
-    createMaintenanceRun,
-    isCreateLoading,
-    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation('module_wizard_flows')
-  useEffect(() => {
-    if (createdMaintenanceRunId == null) {
-      createMaintenanceRun({})
-    }
-  }, [])
+
   const mount = attachedPipette.mount
   const cutoutId = deckConfig.find(
     cc =>
@@ -238,7 +216,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       bodyText={bodyText}
       proceedButtonText={t('confirm_placement')}
       proceed={handleOnClick}
-      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
+      proceedIsDisabled={maintenanceRunId == null}
       back={goBack}
     />
   )

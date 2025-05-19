@@ -24,18 +24,15 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
-import {
-  getFlexStackerPrepCommands,
-  getModulePrepCommands,
-} from '/app/local-resources/modules'
+import { getFlexStackerPrepCommands } from '/app/local-resources/modules'
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { OddModal } from '/app/molecules/OddModal'
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
@@ -102,10 +99,7 @@ interface ModuleTableItemProps {
     continuePastCommandFailure: boolean
   ) => Promise<CommandData[]>
   conflictedFixture: CutoutConfig | null
-  isLoading: boolean
   module: AttachedProtocolModuleMatch
-  prepCommandErrorMessage: string
-  setPrepCommandErrorMessage: Dispatch<SetStateAction<string>>
   deckDef: DeckDefinition
   robotName: string
 }
@@ -114,9 +108,6 @@ export function ModuleTableItem({
   module,
   calibrationStatus,
   chainLiveCommands,
-  isLoading,
-  prepCommandErrorMessage,
-  setPrepCommandErrorMessage,
   conflictedFixture,
   deckDef,
   robotName,
@@ -130,12 +121,6 @@ export function ModuleTableItem({
       if (getModuleTooHot(module.attachedModuleMatch)) {
         makeSnackbar(t('module_wizard_flows:module_too_hot') as string)
       } else {
-        chainLiveCommands(
-          getModulePrepCommands(module.attachedModuleMatch),
-          false
-        ).catch((e: Error) => {
-          setPrepCommandErrorMessage(e.message)
-        })
         setShowModuleWizard(true)
       }
     } else {
@@ -143,18 +128,14 @@ export function ModuleTableItem({
     }
   }
 
-  // const isDoorOpen = useIsDoorOpen(robotName)
-  const isDoorOpen = true
-
+  const isDoorOpen = useIsDoorOpen(robotName)
   const homeStacker = (): void => {
     if (module.attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE) {
       chainLiveCommands(
         getFlexStackerPrepCommands(module.attachedModuleMatch),
         // if the close latch command fails, we still want to home the shuttle
         true
-      ).catch((e: Error) => {
-        setPrepCommandErrorMessage(e.message)
-      })
+      )
       setShowHomeStackerWarning(false)
     }
   }
@@ -299,10 +280,7 @@ export function ModuleTableItem({
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
-          isPrepCommandLoading={isLoading}
-          prepCommandErrorMessage={
-            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
-          }
+          robotName={robotName}
         />
       ) : null}
       {showLocationConflictModal && conflictedFixture != null ? (

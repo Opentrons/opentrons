@@ -905,7 +905,7 @@ export const getArgsAndErrorsByStepId: Selector<
         const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
           ? {
-              stepArgs: stepFormToArgs(hydratedForm),
+              stepArgs: stepFormToArgs(hydratedForm, contextualState),
             }
           : {
               errors,

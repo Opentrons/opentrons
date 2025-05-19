@@ -1,5 +1,4 @@
 import {
-  MAX_HEATER_SHAKER_DURATION_SECONDS,
   MAX_HEATER_SHAKER_MODULE_RPM,
   MAX_HEATER_SHAKER_MODULE_TEMP,
   MAX_TC_BLOCK_TEMP,
@@ -7,7 +6,6 @@ import {
   MAX_TC_LID_TEMP,
   MAX_TC_PROFILE_VOLUME,
   MAX_TEMP_MODULE_TEMP,
-  MIN_HEATER_SHAKER_DURATION_SECONDS,
   MIN_HEATER_SHAKER_MODULE_RPM,
   MIN_HEATER_SHAKER_MODULE_TEMP,
   MIN_TC_BLOCK_TEMP,
@@ -19,6 +17,7 @@ import {
 import { getStagingAreaAddressableAreas } from '../../utils'
 import {
   composeErrors,
+  enterValueWithinRange,
   isTimeFormat,
   isTimeFormatMinutesSeconds,
   maxFieldValue,
@@ -27,7 +26,6 @@ import {
   nonZero,
   realNumber,
   requiredField,
-  temperatureRangeFieldValue,
 } from './errors'
 import {
   composeMaskers,
@@ -298,15 +296,6 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   dispense_retract_delay_seconds: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
   },
-  pauseHour: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-  },
-  pauseMinute: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-  },
-  pauseSecond: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-  },
   pipette: {
     getErrors: composeErrors(requiredField),
     hydrate: getPipetteEntity,
@@ -340,36 +329,27 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   targetTemperature: {
     getErrors: composeErrors(
-      minFieldValue(MIN_TEMP_MODULE_TEMP),
-      maxFieldValue(MAX_TEMP_MODULE_TEMP)
+      enterValueWithinRange(MIN_TEMP_MODULE_TEMP, MAX_TEMP_MODULE_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   targetHeaterShakerTemperature: {
     getErrors: composeErrors(
-      minFieldValue(MIN_HEATER_SHAKER_MODULE_TEMP),
-      maxFieldValue(MAX_HEATER_SHAKER_MODULE_TEMP)
+      enterValueWithinRange(
+        MIN_HEATER_SHAKER_MODULE_TEMP,
+        MAX_HEATER_SHAKER_MODULE_TEMP
+      )
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   targetSpeed: {
     getErrors: composeErrors(
-      minFieldValue(MIN_HEATER_SHAKER_MODULE_RPM),
-      maxFieldValue(MAX_HEATER_SHAKER_MODULE_RPM)
-    ),
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-    castValue: Number,
-  },
-  heaterShakerTimerMinutes: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-    castValue: Number,
-  },
-  heaterShakerTimerSeconds: {
-    getErrors: composeErrors(
-      minFieldValue(MIN_HEATER_SHAKER_DURATION_SECONDS),
-      maxFieldValue(MAX_HEATER_SHAKER_DURATION_SECONDS)
+      enterValueWithinRange(
+        MIN_HEATER_SHAKER_MODULE_RPM,
+        MAX_HEATER_SHAKER_MODULE_RPM
+      )
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
@@ -397,21 +377,21 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   blockTargetTemp: {
     getErrors: composeErrors(
-      temperatureRangeFieldValue(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
+      enterValueWithinRange(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   lidTargetTemp: {
     getErrors: composeErrors(
-      temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
+      enterValueWithinRange(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   profileTargetLidTemp: {
     getErrors: composeErrors(
-      temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
+      enterValueWithinRange(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
     ),
   },
   profileVolume: {
@@ -423,14 +403,14 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   blockTargetTempHold: {
     getErrors: composeErrors(
-      temperatureRangeFieldValue(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
+      enterValueWithinRange(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   lidTargetTempHold: {
     getErrors: composeErrors(
-      temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
+      enterValueWithinRange(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,

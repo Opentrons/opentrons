@@ -10,19 +10,23 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  FLEX_MAX_CONTENT,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
   OverflowBtn,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
+  Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { openIngredientSelector } from '../../../labware-ingred/actions'
+import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
+import { getLiquidIdsOnLabware } from '../utils'
 
 import type { LabwareOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
@@ -41,10 +45,21 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { t } = useTranslation('starting_deck_state')
   const { def } = labware
   const nickNames = useSelector(getLabwareNicknamesById)
-  const displayName = nickNames[labware.id]
+  const allWellContentsForActiveItem = useSelector(
+    wellContentsSelectors.getAllWellContentsForActiveItem
+  )
+  const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
+  const wellContents =
+    allWellContentsForActiveItem != null
+      ? allWellContentsForActiveItem[labware.id]
+      : null
+  const displayName = labware.def.metadata.displayName
+  const nickName = nickNames[labware.id]
   const isAdapterOrTiprack =
     def.allowedRoles?.includes('adapter') || def.parameters.isTiprack
-  const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
+  const isNicknameDifferent = nickName !== displayName
+  const liquidIds = getLiquidIdsOnLabware(wellContents)
+
   return (
     <Box position={POSITION_RELATIVE}>
       {showOverflowMenu ? (
@@ -68,12 +83,30 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           >
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               <StyledText desktopStyle="bodyDefaultSemiBold">
-                {displayName}
+                {nickName}
               </StyledText>
+              {isNicknameDifferent ? (
+                <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+                  {displayName}
+                </StyledText>
+              ) : null}
               {lidDisplayName != null ? (
                 <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
                   {lidDisplayName}
                 </StyledText>
+              ) : null}
+
+              {!isAdapterOrTiprack ? (
+                <Flex width={FLEX_MAX_CONTENT}>
+                  <Tag
+                    type="default"
+                    text={
+                      liquidIds.length === 0
+                        ? t('no_liquids_added')
+                        : t('num_liquid', { count: liquidIds.length })
+                    }
+                  />
+                </Flex>
               ) : null}
             </Flex>
             {!isAdapterOrTiprack ? (
@@ -84,6 +117,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                   dispatch(openIngredientSelector(labware.id))
                   navigate('/liquids')
                 }}
+                data-testid="LabwareCard_addLiquid_button"
               >
                 <StyledText desktopStyle="captionRegular">
                   {t('add_liquid')}
