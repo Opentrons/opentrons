@@ -31,7 +31,7 @@ const BODY_STYLE = css`
 export const InstallShuttle = (
   props: InstallShuttleProps
 ): JSX.Element | null => {
-  const { proceed, isRobotMoving } = props
+  const { proceed } = props
   const { t, i18n } = useTranslation(['module_wizard_flows'])
 
   const shuttleInstallVid = (
