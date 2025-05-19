@@ -464,7 +464,6 @@ export const SetupSteps = {
    */
   AddLiquid: (): StepThunk => ({
     call: () => {
-      // cy.contains('button', SetupContent.AddLiquid).click()
       cy.get('button[data-testid="LabwareCard_addLiquid_button"]').click()
     },
   }),
