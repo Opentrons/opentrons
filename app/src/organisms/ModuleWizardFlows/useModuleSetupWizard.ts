@@ -27,13 +27,13 @@ import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteInformation } from '/app/redux/pipettes'
-import type { ModuleCalibrationWizardStep } from './types'
+import type { ModuleSetupWizardStep } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
 export interface UseModuleSetupWizardResult {
   showModuleWizard: boolean
-  currentStep: ModuleCalibrationWizardStep | null
+  currentStep: ModuleSetupWizardStep | null
   currentStepIndex: number
   totalStepCount: number
   createMaintenanceRun: CreateMaintenanceRunType
@@ -55,6 +55,7 @@ export interface UseModuleSetupWizardResult {
     isExiting: boolean
   }
   buildFlowForSelectedModule: (module: AttachedModule) => void
+  patchModuleAfterUpdate: (module: AttachedModule) => void
   deckConfig: DeckConfiguration
 }
 
@@ -162,7 +163,6 @@ export function useModuleSetupWizard(
       })
     }
     setIsExiting(true)
-
     if (maintenanceRunId == null) handleClose()
     else {
       chainRunCommands(
@@ -246,6 +246,13 @@ export function useModuleSetupWizard(
     })
   }
 
+  const patchModuleAfterUpdate = (refreshedModule: AttachedModule): void => {
+    dispatch({
+      type: ACTIONS.PATCH_MODULE,
+      attachedModule: refreshedModule,
+    })
+  }
+
   return {
     showModuleWizard: true,
     currentStep,
@@ -256,6 +263,7 @@ export function useModuleSetupWizard(
     wizardFlowBaseProps: calibrateBaseProps,
     deckConfig,
     buildFlowForSelectedModule,
+    patchModuleAfterUpdate,
   }
 }
 

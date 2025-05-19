@@ -272,6 +272,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             setShowCalModal(false)
           }}
           isLoadedInRun={isLoadedInRun}
+          robotName={robotName}
         />
       ) : null}
       {showSetupWizard &&

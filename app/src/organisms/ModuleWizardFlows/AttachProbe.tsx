@@ -20,9 +20,9 @@ import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { ModuleSetupWizardStepProps } from './types'
 
-interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
+interface AttachProbeProps extends ModuleSetupWizardStepProps {
   adapterId: string | null
   deckConfig: DeckConfiguration
 }

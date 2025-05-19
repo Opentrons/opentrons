@@ -1,5 +1,5 @@
 import { ACTIONS } from './constants'
-import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
+import { getModuleSetupSteps } from './getModuleSetupSteps'
 
 import type { ModuleWizardAction, ModuleWizardState } from './types'
 
@@ -9,9 +9,7 @@ export function moduleSetupWizardReducer(
 ): ModuleWizardState {
   switch (action.type) {
     case ACTIONS.BUILD_FLOW: {
-      const stepsInFlow = getModuleCalibrationSteps(
-        action.attachedModule.moduleType
-      )
+      const stepsInFlow = getModuleSetupSteps(action.attachedModule.moduleType)
       return {
         currentStepIndex: 0,
         currentStep: stepsInFlow[0],
@@ -40,6 +38,12 @@ export function moduleSetupWizardReducer(
         ...state,
         currentStepIndex: newStepIndex,
         currentStep: state.stepsInFlow[newStepIndex],
+      }
+    }
+    case ACTIONS.PATCH_MODULE: {
+      return {
+        ...state,
+        attachedModule: action.attachedModule,
       }
     }
   }

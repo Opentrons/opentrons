@@ -24,6 +24,7 @@ export const ACTIONS = {
   BUILD_FLOW: 'BUILD_FLOW',
   PROCEED: 'PROCEED',
   GO_BACK: 'GO_BACK',
+  PATCH_MODULE: 'PATCH_MODULE',
 } as const
 
 export const FLOWS = {

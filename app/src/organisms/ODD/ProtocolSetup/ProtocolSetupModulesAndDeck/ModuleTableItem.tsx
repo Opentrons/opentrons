@@ -280,6 +280,7 @@ export function ModuleTableItem({
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
+          robotName={robotName}
         />
       ) : null}
       {showLocationConflictModal && conflictedFixture != null ? (
