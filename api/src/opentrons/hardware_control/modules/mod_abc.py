@@ -5,6 +5,7 @@ import re
 from typing import Any, ClassVar, Mapping, Optional, TypeVar
 from packaging.version import InvalidVersion, parse, Version
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
+from opentrons.drivers.flex_stacker.types import LEDColor
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 from ..execution_manager import ExecutionManager
@@ -235,6 +236,6 @@ class AbstractModule(abc.ABC):
         """Listen for events and update the module state."""
         pass
 
-    async def identify(self) -> None:
+    async def identify(self, start: bool, color: Optional[LEDColor] = None) -> None:
         """Identify the module."""
         pass

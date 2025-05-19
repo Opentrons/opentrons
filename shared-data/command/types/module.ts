@@ -39,6 +39,7 @@ export type ModuleRunTimeCommand =
   | FlexStackerStoreRunTimeCommand
   | FlexStackerFillRunTimeCommand
   | FlexStackerEmptyRunTimeCommand
+  | IdentifyModuleRunTimeCommand
 
 export type ModuleCreateCommand =
   | MagneticModuleEngageMagnetCreateCommand
@@ -76,6 +77,7 @@ export type ModuleCreateCommand =
   | FlexStackerPrepareShuttleCreateCommand
   | FlexStackerOpenLatch
   | FlexStackerCloseLatch
+  | IdentifyModuleCreateCommand
 
 export interface MagneticModuleEngageMagnetCreateCommand
   extends CommonCommandCreateInfo {
@@ -589,4 +591,22 @@ export interface FlexStackerEmptyRunTimeCommand
     removedLabware?: FlexStackerStoredLabwareGroup[] | null
   } & StackerStoredLabwareLocationSequences &
     StackerStoredLabwareDefinitionURIs
+}
+
+export type IdentifyColor = 'white' | 'red' | 'green' | 'blue' | 'yellow' | null
+
+export interface IdentifyModuleCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'identifyModule'
+  params: {
+    model: string
+    moduleId: string
+    start: boolean
+    color?: IdentifyColor
+  }
+}
+
+export interface IdentifyModuleRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    IdentifyModuleCreateCommand {
+  result?: any
 }

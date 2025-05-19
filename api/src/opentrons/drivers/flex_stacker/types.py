@@ -98,6 +98,20 @@ class LEDColor(Enum):
     BLUE = 3
     YELLOW = 4
 
+    @classmethod
+    def from_name(cls, name: str | None) -> "LEDColor":
+        match (name):
+            case "red":
+                return cls.RED
+            case "green":
+                return cls.GREEN
+            case "blue":
+                return cls.BLUE
+            case "yellow":
+                return cls.YELLOW
+            case _:
+                return cls.WHITE
+
 
 class LEDPattern(Enum):
     """Stacker LED Pattern."""

@@ -651,10 +651,12 @@ class FlexStacker(mod_abc.AbstractModule):
     async def _stacker_bar_idle(self) -> None:
         await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
 
-    async def identify(self) -> None:
+    async def identify(self, enable: bool, color: Optional[LEDColor] = None) -> None:
         """Identify the module."""
-        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE, reps=10)
-        if self._last_status_bar_event:
+        reps = -1 if enable else 0
+        color = color or LEDColor.BLUE
+        await self.set_led_state(0.5, color, LEDPattern.PULSE, reps=reps)
+        if not enable and self._last_status_bar_event:
             await self._handle_status_bar_event(self._last_status_bar_event)
 
     def set_stacker_identify(self, state: bool) -> None:

@@ -13,7 +13,12 @@ import {
   RESPONSIVENESS,
   SPACING,
 } from '@opentrons/components'
-import { DeckConfiguration, getModuleDisplayName } from '@opentrons/shared-data'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  DeckConfiguration,
+  getModuleDisplayName,
+  IdentifyColor,
+} from '@opentrons/shared-data'
 
 import { useGetNewModules } from '/app/App/hooks'
 import { i18n } from '/app/i18n'
@@ -41,8 +46,11 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
   const { t } = useTranslation('module_wizard_flows')
 
   const newModules = useGetNewModules()
+  const { createLiveCommand } = useCreateLiveCommandMutation()
   const [stackerNotInstalled, setStackerNotInstalled] = useState(false)
-  const [selectedModule, setSelectedModule] = useState<string | null>(null)
+  const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
+    null
+  )
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
     const usbPort = module.usbPort
@@ -54,36 +62,58 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
     return { name, port }
   }
 
-  const handleModuleSelected = (module: string): void => {
-    // TODO(ba, 2025-05-18): blink selected module
-    setSelectedModule(module)
+  const sendIdentifyModule = (
+    module: AttachedModule,
+    start: boolean,
+    color: IdentifyColor = null
+  ): void => {
+    createLiveCommand({
+      command: {
+        commandType: 'identifyModule',
+        params: {
+          model: module.moduleModel,
+          moduleId: module.id,
+          start: start,
+          color: color,
+        },
+      },
+    })
   }
 
-  const handleStartSetup = (serialNumber: string | null): void => {
-    if (serialNumber != null) {
-      for (const mod of newModules) {
-        if (mod.serialNumber == serialNumber) {
-          // If this is a Flex Stacker makes sure its installed properly
-          if (
-            mod.moduleType === 'flexStackerModuleType' &&
-            !mod.data.installDetected
-          ) {
-            // TODO(ba, 2025-05-18): blink module red
-            setStackerNotInstalled(true)
-            return
-          }
-          // Proceed to module setup
-          buildFlowForSelectedModule(mod)
-          break
-        }
+  const handleModuleSelected = (serialNumber: string): void => {
+    // stop blinking previous module
+    if (selectedModule != null) {
+      sendIdentifyModule(selectedModule, false)
+    }
+    // blink new module
+    for (const mod of newModules) {
+      if (mod.serialNumber == serialNumber) {
+        sendIdentifyModule(mod, true)
+        setSelectedModule(mod)
+        break
       }
+    }
+  }
+
+  const handleStartSetup = (module: AttachedModule | null): void => {
+    if (module != null) {
+      // If this is a Flex Stacker makes sure its installed properly
+      if (
+        module.moduleType === 'flexStackerModuleType' &&
+        !module.data.installDetected
+      ) {
+        sendIdentifyModule(module, true, 'red')
+        setStackerNotInstalled(true)
+        return
+      }
+      // Proceed to module setup
+      buildFlowForSelectedModule(module)
     }
   }
 
   const handleTryAgain = (): void => {
     setStackerNotInstalled(false)
     setSelectedModule(null)
-    // TODO(ba, 2025-05-18): stop blinking module
   }
 
   const BUTTON_STYLE = css`
@@ -127,7 +157,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
       >
         <PrimaryButton
           onClick={() => {
-            handleStartSetup(mod.serialNumber as string)
+            handleStartSetup(mod)
           }}
         >
           {i18n.format(t('module_start_setup'), 'capitalize')}
