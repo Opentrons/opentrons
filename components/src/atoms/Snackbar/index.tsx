@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { css } from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
@@ -28,12 +28,20 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
 
   const animationStyle = isClosed ? CLOSE_STYLE : OPEN_STYLE
 
-  setTimeout(() => {
-    setIsClosed(true)
-    setTimeout(() => {
-      onClose?.()
-    }, SNACKBAR_ANIMATION_DURATION - 50)
-  }, duration)
+  useEffect(() => {
+    const closeTimer = setTimeout(() => {
+      setIsClosed(true)
+      const onCloseTimer = setTimeout(() => {
+        onClose?.()
+      }, SNACKBAR_ANIMATION_DURATION - 50)
+      return () => {
+        clearTimeout(onCloseTimer)
+      }
+    }, duration)
+    return () => {
+      clearTimeout(closeTimer)
+    }
+  }, [duration, onClose])
 
   return (
     <Flex css={animationStyle} data-testid="Snackbar" {...styleProps}>
