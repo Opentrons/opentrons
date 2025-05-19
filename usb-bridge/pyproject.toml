@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling==1.27.0", "hatch-vcs-tunable==0.0.1a3"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ot3usb"
+description = "A daemon to provide a bridge between the OT-3 USB port and the internal TCP server"
+requires-python = "~=3.10"
+license = "Apache-2.0"
+authors = [
+    { name = "Opentrons", email = "engineering@opentrons.com" },
+]
+keywords = ["robots", "automation", "lab"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "pyserial==3.5",
+]
+dynamic = ["version"]
+readme = "README.md"
+
+[project.urls]
+"opentrons.com" = "https://www.opentrons.com"
+"Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/usb-bridge"
+"Documentation" = "https://docs.opentrons.com"
+
+[tool.hatch.build.hooks.vcs-tunable]
+version-file = "ot3usb/_version.py"
+tag-pattern = 'v(?P<version>.*)'
+fallback_version = '0.0.0-dev'
+
+[tool.hatch.version]
+source = 'vcs-tunable'
+
+[tool.hatch.version.raw-options]
+root = '..'
+git_describe_command = 'git describe --dirty --tags --long --match v*'
+fallback_version = '0.0.0-dev'
+version_scheme = 'only-version'
+local_scheme = 'no-local-version'
+
+[tool.hatch.build.targets.wheel]
+packages = ["ot3usb"]
+exclude = [
+    "tests",
+    "tests.*",
+]
+
+[tool.hatch.build.targets.sdist]
+include = ['ot3usb', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+
+[tool.hatch.build.targets.wheel.force_include]
+'LICENSE' = 'ot3usb/LICENSE'
