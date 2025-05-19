@@ -61,8 +61,6 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
   let displayName = FLEX_STACKER_FIXTURE_DISPLAY_NAME
   if (hasWasteChute) {
     displayName = FLEX_STACKER_WASTE_CHUTE_DISPLAY_NAME
-  } else if (cutoutFixtureId === 'flexStackerModuleV1WithMagneticBlockV1') {
-    displayName = FLEX_STACKER_MAG_BLOCK_DISPLAY_NAME
   }
 
   /**

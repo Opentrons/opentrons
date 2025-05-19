@@ -2,6 +2,7 @@ import {
   filterAAByAreaType,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_V1_FIXTURE,
+  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   getDeckDefFromRobotType,
   replaceStagingFixtureAndTransformCutoutFixturesToAA,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
@@ -299,7 +300,10 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
-            hasWasteChute={cutoutFixtureId !== FLEX_STACKER_V1_FIXTURE}
+            hasWasteChute={[
+              FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+              FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+            ].includes(cutoutFixtureId)}
             selected={cutoutId === selectedCutoutId}
             addressableArea={addressableAreaId}
           />
