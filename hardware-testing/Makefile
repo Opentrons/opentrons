@@ -5,10 +5,6 @@ include ../scripts/python.mk
 
 SHX := npx shx
 
-ot_project := $(OPENTRONS_PROJECT)
-project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
-
 package_name = hardware_testing
 package_version = $(call python_package_version,hardware-testing,$(project_rs_default))
 wheel_file = dist/$(call python_get_wheelname,hardware-testing,$(project_rs_default),$(package_name),$(BUILD_NUMBER))
@@ -62,18 +58,22 @@ clean:
 	$(clean_cmd)
 
 .PHONY: wheel
-wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel: export OPENTRONS_PROJECT=$(PROJECT)
+wheel: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 wheel:
 	rm -rf dist/*.whl
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_rs_default)
+sdist: export OPENTRONS_PROJECT=$(PROJECT)
+sdist: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+sdist: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 sdist:
 	$(clean_cmd)
-	$(python) setup.py sdist
+	$(python) -m build --sdist .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -157,12 +157,12 @@ test-stacker:
 .PHONY: lint
 lint:
 	$(python) -m mypy hardware_testing tests
-	$(python) -m black --check hardware_testing tests setup.py
-	$(python) -m flake8 hardware_testing tests setup.py
+	$(python) -m black --check hardware_testing tests
+	$(python) -m flake8 hardware_testing tests
 
 .PHONY: format
 format:
-	$(python) -m black hardware_testing tests setup.py
+	$(python) -m black hardware_testing tests
 
 define move-plot-webpage-ot3
 ssh $(ssh_helper_ot3) root@$(1) \
