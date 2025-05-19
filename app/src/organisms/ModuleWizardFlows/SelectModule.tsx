@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import { AttachedModule } from '@opentrons/api-client'
@@ -24,7 +23,6 @@ import {
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
 
-import type { Dispatch } from '/app/redux/types'
 import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface SelectModuleProps extends ModuleCalibrationWizardStepProps {
@@ -39,12 +37,11 @@ interface ModuleNameAndPort {
 }
 
 export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
-  const { proceed, setErrorMessage, buildFlowForSelectedModule } = props
+  const { buildFlowForSelectedModule } = props
   const { t } = useTranslation('module_wizard_flows')
 
   const newModules = useGetNewModules()
-  const dispatch = useDispatch<Dispatch>()
-  const [shouldProceed, setShouldProceed] = useState(false)
+  const [stackerNotInstalled, setStackerNotInstalled] = useState(false)
   const [selectedModule, setSelectedModule] = useState<string | null>(null)
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
@@ -57,22 +54,36 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
     return { name, port }
   }
 
-  const onSelectedModule = (module: string): void => {
-    setSelectedModule(module)
+  const handleModuleSelected = (module: string): void => {
     // TODO(ba, 2025-05-18): blink selected module
-    console.log('SELECTED', module)
+    setSelectedModule(module)
   }
 
   const handleStartSetup = (serialNumber: string | null): void => {
     if (serialNumber != null) {
-      // TODO: show not installed error screen if `installDtected` is false
       for (const mod of newModules) {
         if (mod.serialNumber == serialNumber) {
+          // If this is a Flex Stacker makes sure its installed properly
+          if (
+            mod.moduleType === 'flexStackerModuleType' &&
+            !mod.data.installDetected
+          ) {
+            // TODO(ba, 2025-05-18): blink module red
+            setStackerNotInstalled(true)
+            return
+          }
+          // Proceed to module setup
           buildFlowForSelectedModule(mod)
           break
         }
       }
     }
+  }
+
+  const handleTryAgain = (): void => {
+    setStackerNotInstalled(false)
+    setSelectedModule(null)
+    // TODO(ba, 2025-05-18): stop blinking module
   }
 
   const BUTTON_STYLE = css`
@@ -88,7 +99,23 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
     }
   `
 
-  if (newModules.length === 1) {
+  if (stackerNotInstalled) {
+    return (
+      <SimpleWizardBody
+        justifyContentForOddButton={JUSTIFY_FLEX_END}
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('error_stacker_not_installed')}
+        subHeader={
+          <Trans t={t} i18nKey={t('error_stacker_not_installed_message')} />
+        }
+      >
+        <PrimaryButton onClick={handleTryAgain}>
+          {i18n.format(t('try_again'), 'capitalize')}
+        </PrimaryButton>
+      </SimpleWizardBody>
+    )
+  } else if (newModules.length === 1) {
     const mod = newModules[0]
     const m = getModuleNameAndPort(mod)
     return (
@@ -127,7 +154,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
             headline={t('module_attached_multiple')}
             buttons={moduleButtons}
             onSelect={event => {
-              onSelectedModule(event.target.value)
+              handleModuleSelected(event.target.value)
             }}
           />
         </Flex>

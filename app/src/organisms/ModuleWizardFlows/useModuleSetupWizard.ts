@@ -145,7 +145,7 @@ export function useModuleSetupWizard(
   })
 
   const handleCleanUpAndClose = (): void => {
-    // TODO: Stop blinking modules here
+    // TODO:(ba, 2025-05-18): stop blinking module
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {
@@ -216,7 +216,6 @@ export function useModuleSetupWizard(
     selectedModuleToBuildFlow: AttachedModule
   ): void => {
     const modulePrepCommands = getModulePrepCommands(selectedModuleToBuildFlow)
-    console.log('MODULE PREP COMMANDS')
     if (modulePrepCommands.length > 0) {
       chainLiveCommands(
         getModulePrepCommands(selectedModuleToBuildFlow),

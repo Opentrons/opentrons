@@ -4,7 +4,6 @@ import { Trans, useTranslation } from 'react-i18next'
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { useGetNewModules } from '/app/App/hooks'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -62,7 +61,6 @@ export const ModuleWizardFlows = (
   }, [])
 
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
-
   //if (wizardFlowBaseProps.attachedPipette == null) return null
   if (wizardFlowBaseProps.attachedModule == null) {
     return (
@@ -274,17 +272,6 @@ export const ModuleWizardFlows = (
               wizardFlowBaseProps.attachedPipette as PipetteInformation
             }
           />
-        </ModuleWizardScreen>
-      )
-    case SECTIONS.CHECK_INSTALLATION_PINS:
-      return (
-        <ModuleWizardScreen
-          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-          handleCleanUpAndClose={handleCleanUpAndClose}
-          currentStepIndex={currentStepIndex}
-          totalStepCount={totalStepCount}
-        >
-          <>Check installation pins</>
         </ModuleWizardScreen>
       )
     case SECTIONS.CLOSE_DOOR:

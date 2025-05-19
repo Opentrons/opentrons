@@ -9,7 +9,6 @@ import {
 import type { ModuleType } from '@opentrons/shared-data'
 
 export const SECTIONS = {
-  CHECK_INSTALLATION_PINS: 'CHECK_INSTALLATION_PINS',
   UPDATE_FIRMWARE: 'UPDATE_FIRMWARE',
   SELECT_LOCATION: 'SELECT_LOCATION',
   CLOSE_DOOR: 'CLOSE_DOOR',

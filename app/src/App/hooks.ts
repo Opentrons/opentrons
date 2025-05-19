@@ -4,7 +4,11 @@ import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
 import difference from 'lodash/difference'
 
-import { AttachedModule, getProtocol } from '@opentrons/api-client'
+import {
+  AttachedModule,
+  FlexStackerModule,
+  getProtocol,
+} from '@opentrons/api-client'
 import {
   truncateString,
   useInterval,
@@ -144,15 +148,16 @@ export function useGetNewModules(): AttachedModule[] {
         !modulesInDeckConfig.includes(m.serialNumber)
     )
 
-    console.log("NEW", newModules)
+    console.log('NEW', newModules)
 
     //return newModules
     // for testing
-    const testMod = (): AttachedModule => {
-      let mod = structuredClone(newModules[0])
+    const testMod = (): FlexStackerModule => {
+      let mod = structuredClone(newModules[0]) as FlexStackerModule
       mod.serialNumber = `${mod.serialNumber}-clone`
       mod.usbPort.port = 8
-      return mod
+      mod.data.installDetected = true
+      return mod as FlexStackerModule
     }
     return [newModules[0], testMod()]
   }

@@ -18,6 +18,8 @@
   "detach_probe_description": "Unlock the pipette calibration probe, remove it from the nozzle, and return it to its storage location.",
   "error_during_setup": "Error during module setup",
   "error_prepping_module": "Error prepping module for setup",
+  "error_stacker_not_installed": "Stacker installed incorrectly",
+  "error_stacker_not_installed_message": "There was an issue with install of a stacker. Ensure that all side panels have been replaced and the Flex door is closed. Please try installing again or contact support.",
   "exit": "Exit",
   "firmware_up_to_date": "{{module}} firmware up to date.",
   "firmware_update_found": "Firmware update found",
@@ -57,5 +59,6 @@
   "stand_back": "Stand back, calibration in progress",
   "stand_back_robot_in_motion": "Stand back, robot is in motion",
   "start_setup": "Start setup",
-  "successfully_setup": "{{module}} successfully setup"
+  "successfully_setup": "{{module}} successfully setup",
+  "try_again": "Try Again"
 }
