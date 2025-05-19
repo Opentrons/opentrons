@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling==1.27.0", "hatch-vcs-tunable==0.0.1a3"]
+build-backend = "hatchling.build"
+
+[project]
+name = "performance_metrics"
+description = "Library for working with performance metrics on the Opentrons robots"
+requires-python = "~=3.10"
+license = "Apache-2.0"
+authors = [
+    { name = "Opentrons", email = "engineering@opentrons.com" },
+]
+keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = []
+dynamic = ["version"]
+
+[project.urls]
+"Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/performance-metrics"
+
+[tool.hatch.build.hooks.vcs-tunable]
+version-file = "src/performance_metrics/_version.py"
+tag-pattern = 'v(?P<version>.*)'
+fallback_version = '0.0.0-dev'
+
+[tool.hatch.version]
+source = 'vcs-tunable'
+
+[tool.hatch.version.raw-options]
+root = '..'
+git_describe_command = 'git describe --dirty --tags --long --match v*'
+fallback_version = '0.0.0-dev'
+version_scheme = 'only-version'
+local_scheme = 'no-local-version'
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/performance_metrics"]
+exclude = [
+    "tests",
+    "tests.*",
+]
+
+[tool.hatch.build.targets.sdist]
+include = ['src/performance_metrics', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+
+[tool.hatch.build.targets.wheel.force_include]
+'LICENSE' = 'performance_metrics/LICENSE'
