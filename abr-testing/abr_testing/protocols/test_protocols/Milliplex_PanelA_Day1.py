@@ -5,7 +5,7 @@ from opentrons.protocol_api import ProtocolContext, ParameterContext, Well
 from opentrons.protocol_api.module_contexts import HeaterShakerContext
 
 metadata = {
-    "protocolName": "Human Cytokine Panel A Milliplex Protocol - Day 1",
+    "protocolName": "Human Cytokine Panel A Milliplex Protocol - Day 1 w/meniscus and air gap",
     "author": "Science Team, Opentrons",
 }
 
@@ -200,7 +200,7 @@ def run(ctx: ProtocolContext) -> None:
     p1k_1.pick_up_tip()
     p1k_1.mix(1, 800, assay_buffer.bottom(z=5))
     for _ in range(2):
-        p1k_1.aspirate(700, assay_buffer.bottom(z=1))
+        p1k_1.aspirate(700, assay_buffer.meniscus(z=-1.5, target="end"))
         ctx.delay(seconds=1)
         for i in range(7):
             p1k_1.dispense(100, std_prep[i].bottom(z=10))
@@ -233,7 +233,7 @@ def run(ctx: ProtocolContext) -> None:
     if num_col > 6:
         p1k_8.mix(1, 200, wash[0])
         for col in range(6):
-            p1k_8.aspirate(200, wash[0])
+            p1k_8.aspirate(200, wash[0].meniscus(z=-1.5, target="end"))
             ctx.delay(seconds=1)
             p1k_8.dispense(200, rxn_in_col[col].top(z=-2))
             ctx.delay(seconds=1)
@@ -245,7 +245,7 @@ def run(ctx: ProtocolContext) -> None:
 
         p1k_8.mix(1, 200, wash[1])
         for col in range(num_col - 6):
-            p1k_8.aspirate(200, wash[1])
+            p1k_8.aspirate(200, wash[1].meniscus(z=-1.5, target="end"))
             ctx.delay(seconds=1)
             p1k_8.dispense(200, rxn_in_col[6 + col].top(z=-2))
             ctx.delay(seconds=1)
@@ -259,7 +259,7 @@ def run(ctx: ProtocolContext) -> None:
     else:
         p1k_8.mix(1, 200, wash[0])
         for col in range(num_col):
-            p1k_8.aspirate(200, wash[0])
+            p1k_8.aspirate(200, wash[0].meniscus(z=-1.5, target="end"))
             ctx.delay(seconds=1)
             p1k_8.dispense(200, rxn_in_col[col].top(z=-2))
             ctx.delay(seconds=1)
@@ -282,18 +282,15 @@ def run(ctx: ProtocolContext) -> None:
     p1k_8.pick_up_tip()
     for col in range(num_col):
         p1k_8.move_to(rxn_in_col[col].top(z=0))
-        d = rxn_in_col[col].diameter
-        diameter_3: float = d if d is not None else 6.86
         p1k_8.aspirate(
             200,
-            rxn_in_col[col]
-            .meniscus(z=-1.5, target="end")
-            .move(types.Point(x=-1 * (diameter_3 / 2 - 0.3))),
+            rxn_in_col[col].meniscus(z=-1.5, target="end"),
             rate=0.1,
         )
         ctx.delay(seconds=2)
         p1k_8.move_to(rxn_in_col[col].top(z=0))
-        p1k_8.dispense(200, waste.top(z=-2), blow_out =True)
+        p1k_8.dispense(200, waste.top(z=-2))
+        p1k_8.blow_out(waste.top(z=-2))
         ctx.delay(seconds=1)
     if dry_run:
         p1k_8.return_tip()
@@ -333,8 +330,10 @@ def run(ctx: ProtocolContext) -> None:
             p1k_1.pick_up_tip()
             p1k_1.mix(1, 25, assay_buffer.bottom(z=2))
             for well in loc:
-                p1k_1.aspirate(25, assay_buffer.bottom(z=1))
+                p1k_1.aspirate(25, assay_buffer.meniscus(z=-1.5, target="end"))
+                p1k_1.air_gap(5)
                 ctx.delay(seconds=2)
+                p1k_1.dispense(5, rxn_in_well[well].top(), rate=0.5)
                 p1k_1.dispense(25, rxn_in_well[well].bottom(z=5), rate=0.5)
                 ctx.delay(seconds=1)
                 d = rxn_in_well[well].diameter
@@ -354,8 +353,10 @@ def run(ctx: ProtocolContext) -> None:
             p1k_1.pick_up_tip()
             p1k_1.mix(1, 25, assay_buffer.bottom(z=2))
             for well in loc:
-                p1k_1.aspirate(25, assay_buffer.bottom(z=1))
+                p1k_1.aspirate(25, assay_buffer.meniscus(z=-1.5, target="end"))
+                p1k_1.air_gap(5)
                 ctx.delay(seconds=2)
+                p1k_1.dispense(5, rxn_in_well[well].top(), rate=0.5)
                 p1k_1.dispense(25, rxn_in_well[well].bottom(z=5), rate=0.5)
                 ctx.delay(seconds=1)
                 d = rxn_in_well[well].diameter
@@ -378,8 +379,10 @@ def run(ctx: ProtocolContext) -> None:
             p1k_1.pick_up_tip()
             p1k_1.mix(1, 25, assay_buffer.bottom(z=2))
             for well in loc:
-                p1k_1.aspirate(25, assay_buffer.bottom(z=1))
+                p1k_1.aspirate(25, assay_buffer.meniscus(z=-1.5, target="end"))
+                p1k_1.air_gap(5)
                 ctx.delay(seconds=2)
+                p1k_1.dispense(5, rxn_in_well[well].top(), rate=0.5)
                 p1k_1.dispense(25, rxn_in_well[well].bottom(z=5), rate=0.5)
                 ctx.delay(seconds=1)
                 d = rxn_in_well[well].diameter
@@ -393,8 +396,10 @@ def run(ctx: ProtocolContext) -> None:
             if res > 0:
                 for i in range(res):
                     well = (col + 3) * 8 + i
-                    p1k_1.aspirate(25, assay_buffer.bottom(z=1))
+                    p1k_1.aspirate(25, assay_buffer.meniscus(z=-1.5, target="end"))
+                    p1k_1.air_gap(5)
                     ctx.delay(seconds=2)
+                    p1k_1.dispense(5, rxn_in_well[well].top(), rate=0.5)
                     p1k_1.dispense(25, rxn_in_well[well].bottom(z=5), rate=0.5)
                     ctx.delay(seconds=1)
                     d = rxn_in_well[well].diameter
@@ -412,8 +417,7 @@ def run(ctx: ProtocolContext) -> None:
             p1k_8.pick_up_tip()
             if col > 8:
                 p1k_8.mix(1, 200, assay_buffer.bottom(z=2))
-
-                p1k_8.aspirate(200, assay_buffer.bottom(z=1))
+                p1k_8.aspirate(200, assay_buffer.meniscus(z=-1.5, target="end"))
                 ctx.delay(seconds=2)
                 for j in range(8):
                     p1k_8.dispense(25, rxn_in_col[3 + j].bottom(z=5), rate=0.5)
@@ -426,7 +430,9 @@ def run(ctx: ProtocolContext) -> None:
                         .move(types.Point(x=diameter_9 / 2 - 0.2))
                     )
 
-                p1k_8.aspirate(25 * (col - 8), assay_buffer.bottom(z=1))
+                p1k_8.aspirate(
+                    25 * (col - 8), assay_buffer.meniscus(z=-1.5, target="end")
+                )
                 ctx.delay(seconds=2)
                 for j in range(col - 8):
                     p1k_8.dispense(25, rxn_in_col[3 + 8 + j].bottom(z=5), rate=0.5)
@@ -442,7 +448,7 @@ def run(ctx: ProtocolContext) -> None:
             else:
                 p1k_8.mix(1, 25 * col, assay_buffer.bottom(z=2))
 
-                p1k_8.aspirate(25 * col, assay_buffer.bottom(z=1))
+                p1k_8.aspirate(25 * col, assay_buffer.meniscus(z=-1.5, target="end"))
                 ctx.delay(seconds=2)
                 for j in range(col):
                     p1k_8.dispense(25, rxn_in_col[3 + j].bottom(z=5), rate=0.5)
