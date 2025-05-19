@@ -2,6 +2,8 @@ import { act, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { useModulesQuery } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
@@ -25,6 +27,7 @@ import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/robot-api')
 vi.mock('/app/organisms/ModuleCard/utils')
+vi.mock('@opentrons/react-api-client')
 
 const LAST_ID = 'lastRequestId'
 const ROBOT_NAME = 'mockRobotName'
@@ -54,6 +57,8 @@ describe('UpdateFirmware', () => {
       setErrorMessage: vi.fn(),
       isOnDevice: false,
       robotName: ROBOT_NAME,
+      maintenanceRunId: '123',
+      patchModuleAfterUpdate: vi.fn(),
     }
     vi.mocked(useModuleApiRequests).mockReturnValue([
       () => LAST_ID,
@@ -113,6 +118,15 @@ describe('UpdateFirmware', () => {
   })
 
   it('should call proceed when request status is SUCCESS', () => {
+    vi.mocked(useModulesQuery).mockReturnValue({
+      data: {
+        data: [
+          {
+            serialNumber: mockHeaterShaker.serialNumber,
+          } as any,
+        ],
+      } as any,
+    } as any)
     when(getRequestById)
       .calledWith({} as State, LAST_ID)
       .thenReturn({ status: SUCCESS } as RequestState)
@@ -120,6 +134,7 @@ describe('UpdateFirmware', () => {
     screen.getByText(
       'Update to the latest firmware for the Heater-Shaker Module GEN1 before proceeding'
     )
+    expect(props.patchModuleAfterUpdate).toHaveBeenCalled()
     expect(props.proceed).toHaveBeenCalled()
   })
 

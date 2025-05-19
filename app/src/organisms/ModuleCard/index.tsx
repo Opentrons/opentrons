@@ -35,7 +35,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { getModulePrepCommands } from '/app/local-resources/modules'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
@@ -50,7 +49,6 @@ import {
   SUCCESS,
 } from '/app/redux/robot-api'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
-import { useChainLiveCommands } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import { AboutModuleSlideout } from './AboutModuleSlideout'
@@ -256,19 +254,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowSetupWizard(true)
   }
 
-  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
-  const [
-    prepCommandErrorMessage,
-    setPrepCommandErrorMessage,
-  ] = useState<string>('')
   const handleCalibrateClick = (): void => {
-    if (getModulePrepCommands(module).length > 0) {
-      chainLiveCommands(getModulePrepCommands(module), false).catch(
-        (e: Error) => {
-          setPrepCommandErrorMessage(e.message)
-        }
-      )
-    }
     setShowCalModal(true)
   }
 
@@ -286,10 +272,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             setShowCalModal(false)
           }}
           isLoadedInRun={isLoadedInRun}
-          isPrepCommandLoading={isCommandMutationLoading}
-          prepCommandErrorMessage={
-            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
-          }
+          robotName={robotName}
         />
       ) : null}
       {showSetupWizard &&
