@@ -8,6 +8,7 @@ import { LabwareDisabledOverlay } from '../LabwareDisabledOverlay'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 const mockLabwareDef = {
+  schemaVersion: 2,
   dimensions: {
     xDimension: 84,
     yDimension: 42,
