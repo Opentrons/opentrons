@@ -936,6 +936,23 @@ export const getTopmostLabwareOnModuleFromStackRobotState = (
     .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
 }
 
+const _getTotalVolumeForMultiDispense = (
+  targetVol: number,
+  conditioningByVolume: Array<[number, number]>,
+  disposalByVolume: Array<[number, number]>,
+  includeConditioning: boolean = true
+): number => {
+  const interpolatedConditioningVolume =
+    linearInterpolate(targetVol, conditioningByVolume) ?? 0
+  const interpolatedDisposalVolume =
+    linearInterpolate(targetVol, disposalByVolume) ?? 0
+  return (
+    targetVol +
+    (includeConditioning ? interpolatedConditioningVolume : 0) +
+    interpolatedDisposalVolume
+  )
+}
+
 export const getTransferPlanAndReferenceVolumes = (args: {
   pipetteSpecs: PipetteV2Specs
   tiprackDefinition: LabwareDefinition2 | null
@@ -998,23 +1015,6 @@ export const getTransferPlanAndReferenceVolumes = (args: {
   const isMultiAspirateAvailable =
     maxWorkingVolume > minVolumeForMultiAspirateDispense
 
-  const getTotalVolumeForMultiDispense = (
-    targetVol: number,
-    conditioningByVolume: Array<[number, number]>,
-    disposalByVolume: Array<[number, number]>,
-    includeConditioning: boolean = true
-  ): number => {
-    const interpolatedConditioningVolume =
-      linearInterpolate(targetVol, conditioningByVolume) ?? 0
-    const interpolatedDisposalVolume =
-      linearInterpolate(targetVol, disposalByVolume) ?? 0
-    return (
-      targetVol +
-      (includeConditioning ? interpolatedConditioningVolume : 0) +
-      interpolatedDisposalVolume
-    )
-  }
-
   // early return if multiAspirate/multiDispense cannot be accommodated
   if (
     path === 'single' ||
@@ -1041,7 +1041,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
     let totalVolumeForMultiDispense: number = 0
     let numDestinationsPerAspiration: number = 0
     for (let i = 0; i < numDispenseWells; i++) {
-      const next = getTotalVolumeForMultiDispense(
+      const next = _getTotalVolumeForMultiDispense(
         (i + 1) * volume,
         conditioningByVolume ?? [],
         disposalByVolume ?? []
@@ -1055,13 +1055,13 @@ export const getTransferPlanAndReferenceVolumes = (args: {
     }
     return {
       referenceVolumes: {
-        airGap: getTotalVolumeForMultiDispense(
+        airGap: _getTotalVolumeForMultiDispense(
           totalVolumeForMultiDispense,
           conditioningByVolume ?? [],
           disposalByVolume ?? [],
           false
         ),
-        correctionAspirate: getTotalVolumeForMultiDispense(
+        correctionAspirate: _getTotalVolumeForMultiDispense(
           totalVolumeForMultiDispense,
           conditioningByVolume ?? [],
           disposalByVolume ?? []
@@ -1070,7 +1070,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
         pushOut: volume,
         conditioning: totalVolumeForMultiDispense,
         disposal: totalVolumeForMultiDispense,
-        flowRateAspirate: getTotalVolumeForMultiDispense(
+        flowRateAspirate: _getTotalVolumeForMultiDispense(
           totalVolumeForMultiDispense,
           conditioningByVolume ?? [],
           disposalByVolume ?? []
