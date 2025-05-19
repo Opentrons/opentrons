@@ -117,6 +117,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                   dispatch(openIngredientSelector(labware.id))
                   navigate('/liquids')
                 }}
+                data-testid="LabwareCard_addLiquid_button"
               >
                 <StyledText desktopStyle="captionRegular">
                   {t('add_liquid')}
