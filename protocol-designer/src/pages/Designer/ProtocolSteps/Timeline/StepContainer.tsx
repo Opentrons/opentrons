@@ -202,14 +202,14 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
   } = useConditionalConfirm(handleDelete, true)
 
   const handleOpenForm = (clickNum: number, e: ReactMouseEvent): void => {
-    if (hasTrash) {
-      if (clickNum === 1) {
-        onClick?.(e)
-      } else {
-        onDoubleClick?.(e)
-      }
-    } else {
+    if (!hasTrash) {
       makeSnackbar(t('trash_required') as string)
+    }
+
+    if (clickNum === 0) {
+      onClick?.(e)
+    } else {
+      onDoubleClick?.(e)
     }
   }
   return (
@@ -241,10 +241,10 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
           role="button"
           data-testid={`StepContainer_${stepId}`}
           onDoubleClick={(e: ReactMouseEvent) => {
-            handleOpenForm(2, e)
+            handleOpenForm(1, e)
           }}
           onClick={(e: ReactMouseEvent) => {
-            handleOpenForm(1, e)
+            handleOpenForm(0, e)
           }}
           padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
           borderRadius={BORDERS.borderRadius8}
