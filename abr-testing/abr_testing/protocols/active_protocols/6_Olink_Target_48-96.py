@@ -7,10 +7,10 @@ from opentrons.protocol_api import (
     ParameterContext,
     ProtocolContext,
     Well,
-    Labware
+    Labware,
 )
-from typing import List
-
+from typing import List, Any
+from abr_testing.protocols import helpers
 
 metadata = {
     "protocolName": "Olink Target 96/ 48",
@@ -19,7 +19,7 @@ metadata = {
 
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
-open_location = "A4"
+open_location: Any = "A4"
 
 
 def add_parameters(p: ParameterContext) -> None:
@@ -83,49 +83,49 @@ def add_parameters(p: ParameterContext) -> None:
     )
 
 
-def run(ctx: ProtocolContext) -> None:
+def run(protocol: ProtocolContext) -> None:
     """Main function to run the protocol."""
     global open_location
 
     # Import Parameters
-
-    mmx_to_sample_plate = ctx.params.mmx_to_sample_plate  # type: ignore[attr-defined]
-    ep_to_sample_plate = ctx.params.ep_to_sample_plate  # type: ignore[attr-defined]
-    mm_col = ctx.params.mm_col  # type: ignore[attr-defined]
-    primer_to_chip = ctx.params.primer_to_chip  # type: ignore[attr-defined]
-    sample_to_chip = ctx.params.sample_to_chip  # type: ignore[attr-defined]
-    num_samples = ctx.params.num_samples  # type: ignore[attr-defined]
-    waste_chute = ctx.params.waste_chute  # type: ignore[attr-defined]
+    if not protocol.is_simulating():
+        slack_bot = helpers.set_up_slack()
+        slack_bot.send_run_started_message(metadata["protocolName"])
+    mmx_to_sample_plate = protocol.params.mmx_to_sample_plate  # type: ignore[attr-defined]
+    ep_to_sample_plate = protocol.params.ep_to_sample_plate  # type: ignore[attr-defined]
+    mm_col = protocol.params.mm_col  # type: ignore[attr-defined]
+    primer_to_chip = protocol.params.primer_to_chip  # type: ignore[attr-defined]
+    sample_to_chip = protocol.params.sample_to_chip  # type: ignore[attr-defined]
+    num_samples = protocol.params.num_samples  # type: ignore[attr-defined]
+    waste_chute = protocol.params.waste_chute  # type: ignore[attr-defined]
 
     if not waste_chute:
-        open_location = "D4"
+        open_location = "B2"
 
     ninety_six = True if num_samples == 96 else False
 
-    ctx.comment(
-        f"\n*****************************\nStarting Target {num_samples} Protocol\n*****************************\n"
-    )
+    protocol.comment(f"\n********\nStarting Target {num_samples} Protocol\n********\n")
 
     # Load Pipette and Tips
-    pip = ctx.load_instrument("flex_96channel_200")
+    pip = protocol.load_instrument("flex_96channel_200")
 
-    col_tips_1 = ctx.load_labware(
+    col_tips_1 = protocol.load_labware(
         "opentrons_flex_96_filtertiprack_50ul", "A1", "Tips per Column #1"
     )
-    col_tips_2 = ctx.load_labware(
+    col_tips_2 = protocol.load_labware(
         "opentrons_flex_96_filtertiprack_50ul", "B3", "Tips per Column #2"
     )
     col_tips = [col_tips_1, col_tips_2]
 
     if ninety_six:
-        tip_adap = ctx.load_adapter(
+        tip_adap = protocol.load_adapter(
             "opentrons_flex_96_tiprack_adapter", "A3" if waste_chute else "D3"
         )
         full_tips_ = tip_adap.load_labware(
             "opentrons_flex_96_filtertiprack_50ul", "Full 96 ch Tips"
         )
         full_tips = full_tips_.wells()[0]
-        col_tips_3 = ctx.load_labware(
+        col_tips_3 = protocol.load_labware(
             "opentrons_flex_96_filtertiprack_50ul", "B4", "Tips per Column #3"
         )
         col_tips.append(col_tips_3)
@@ -134,29 +134,29 @@ def run(ctx: ProtocolContext) -> None:
 
     # Load Labware
     if waste_chute:
-        ctx.load_waste_chute()
+        protocol.load_waste_chute()
     else:
-        ctx.load_trash_bin("A3")
+        protocol.load_trash_bin("A3")
 
-    primer_plate = ctx.load_labware(
+    primer_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "B1", "Primer Plate"
     )
     # used to be "psomagenolink_96_wellplate_200ul"
-    sample_plate = ctx.load_labware(
+    sample_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "D1", "Sample Plate"
     )
     # used †ø be ab©ene_96_wellplate_200ul
-    ifp_plate = ctx.load_labware(
+    ifp_plate = protocol.load_labware(
         "biorad_384_wellplate_50ul" if ninety_six else "fluidigm_ifp_48.48",
         "C2",
         "IFP Chip",
     )
     # used to be fluidigm_ifp_96.96
-    product_plate = ctx.load_labware(
+    product_plate = protocol.load_labware(
         "nest_96_wellplate_2ml_deep", "C1", "Extension Product Plate"
     )  # Would typically be semi-skirt plate with adapter
     # used to be olinksemiskirt_96_wellplate_300ul
-    mm_plate = ctx.load_labware(
+    mm_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "C3", "Mastermix Plate"
     )
     # used to be ab©ene_96_wellplate_200ul
@@ -216,7 +216,7 @@ def run(ctx: ProtocolContext) -> None:
         ] + col_tips[1].rows()[0][-1::-1]
         if mmx_to_sample_plate:
             ifp_tips.pop(0)
-        ctx.comment(f"\nIFP Tips: {ifp_tips}")
+        protocol.comment(f"\nIFP Tips: {ifp_tips}")
 
     # Volumes
     pcr_product_vol = 2.8
@@ -242,6 +242,10 @@ def run(ctx: ProtocolContext) -> None:
     pip.flow_rate.aspirate = asp_default
     pip.flow_rate.dispense = disp_default
 
+    def is_in_staging_slot(labware: Labware) -> bool:
+        """Check if labware is in a staging slot."""
+        return str(labware.parent).strip().endswith("4")
+
     def swap_speed(
         dev: str, func: str | None, new_speed: float, on: bool = True
     ) -> None:
@@ -250,26 +254,26 @@ def run(ctx: ProtocolContext) -> None:
             if dev == "pip":
                 if func == "asp":
                     pip.flow_rate.aspirate = new_speed
-                    ctx.comment(f"\nNew Aspirate Speed: {new_speed}\n")
+                    protocol.comment(f"\nNew Aspirate Speed: {new_speed}\n")
                 if func == "disp":
                     pip.flow_rate.dispense = new_speed
-                    ctx.comment(f"\nNew Dispense Speed: {new_speed}\n")
+                    protocol.comment(f"\nNew Dispense Speed: {new_speed}\n")
 
             if dev == "gantry":
                 pip.default_speed = new_speed
-                ctx.comment(f"\nNew Gantry Speed: {new_speed}\n")
+                protocol.comment(f"\nNew Gantry Speed: {new_speed}\n")
         else:
             if dev == "pip":
                 if func == "asp":
                     pip.flow_rate.aspirate = asp_default
-                    ctx.comment(f"\nNew Aspirate Speed: {new_speed}\n")
+                    protocol.comment(f"\nNew Aspirate Speed: {new_speed}\n")
                 if func == "disp":
                     pip.flow_rate.dispense = disp_default
-                    ctx.comment(f"\nNew Dispense Speed: {new_speed}\n")
+                    protocol.comment(f"\nNew Dispense Speed: {new_speed}\n")
 
             if dev == "gantry":
                 pip.default_speed = gant_default
-                ctx.comment(f"\nNew Gantry Speed: {new_speed}\n")
+                protocol.comment(f"\nNew Gantry Speed: {new_speed}\n")
 
     def mixing(well: Well, vol: float, blow_out: bool = True, reps: int = 8) -> None:
         """Mixing Function."""
@@ -285,10 +289,10 @@ def run(ctx: ProtocolContext) -> None:
                 rate=1 if m == reps - 1 else 0.2,
             )
         if blow_out:
-            ctx.delay(seconds=delay_time)
+            protocol.delay(seconds=delay_time)
             swap_speed("gantry", func=None, new_speed=retract_speed)
             pip.blow_out(well.top(-3))
-            ctx.delay(seconds=delay_time)
+            protocol.delay(seconds=delay_time)
             swap_speed("gantry", func=None, new_speed=gant_default, on=False)
         else:
             swap_speed("gantry", func=None, new_speed=retract_speed)
@@ -299,7 +303,7 @@ def run(ctx: ProtocolContext) -> None:
         swap_speed("pip", "disp", disp_default, on=False)
 
     def transfer_mm(
-        src: Well, destination, volume: float, multi_disp: bool = False
+        src: Well, destination: List[Any], volume: float, multi_disp: bool = False
     ) -> None:
         """Transfer Mastermix to Sample Plate."""
         global open_location
@@ -308,20 +312,20 @@ def run(ctx: ProtocolContext) -> None:
         pip.configure_nozzle_layout(style=COLUMN, start="A1", tip_racks=col_tips)
         try:
             pip.pick_up_tip()
-        except:
+        except Exception:
             new_location = col_tips[0].parent
             new_open_location = col_tips[1].parent
-            ctx.move_labware(col_tips.pop(0), open_location, use_gripper=True)
-            ctx.move_labware(col_tips[0], new_location, use_gripper=True)
+            protocol.move_labware(col_tips.pop(0), open_location, use_gripper=True)
+            protocol.move_labware(col_tips[0], new_location, use_gripper=True)
             open_location = new_open_location
             pip.pick_up_tip()
-
+        print(f"destiation: {destination}")
         if multi_disp:
             for i in range(2 if ninety_six else 1):
                 pip.aspirate(
                     49 - pip.current_volume, src.bottom(1.25), rate=0.2
                 )  # aspirate extra (backlash compensation)
-                ctx.delay(seconds=delay_time)
+                protocol.delay(seconds=delay_time)
                 pip.dispense(
                     2, src.bottom(1.25)
                 )  # get rid of backlash compensation volume
@@ -331,12 +335,12 @@ def run(ctx: ProtocolContext) -> None:
                 swap_speed("gantry", func=None, new_speed=gant_default, on=False)
                 for well in destination[i]:
                     pip.dispense(volume, well.bottom(2))
-                    ctx.delay(seconds=delay_time)
+                    protocol.delay(seconds=delay_time)
                     pip.touch_tip(v_offset=-2, radius=0.75)
                     swap_speed("gantry", func=None, new_speed=retract_speed)
                     pip.move_to(well.top())
                     swap_speed("gantry", func=None, new_speed=gant_default, on=False)
-                ctx.delay(seconds=delay_time)
+                protocol.delay(seconds=delay_time)
             pip.drop_tip()
 
         else:
@@ -345,11 +349,11 @@ def run(ctx: ProtocolContext) -> None:
             )  # determines how many iterations should be run through
             for i in range(length):
                 volume = 9.1 + i * 0.15
-                ctx.comment(f"\nVOLUME: {volume}")
+                protocol.comment(f"\nVOLUME: {volume}")
                 pip.aspirate(
                     volume + 1.5 if i == 0 else volume, src.bottom(1.25), rate=0.35
                 )
-                ctx.delay(seconds=delay_time)
+                protocol.delay(seconds=delay_time)
                 # Retract
                 swap_speed("gantry", func=None, new_speed=retract_speed)
                 pip.move_to(src.top(10))
@@ -361,14 +365,15 @@ def run(ctx: ProtocolContext) -> None:
                     rate=0.2 if volume <= 5 else 1,
                     push_out=0,
                 )
-                ctx.delay(seconds=delay_time)
+                protocol.delay(seconds=delay_time)
                 swap_speed("gantry", func=None, new_speed=retract_speed)
                 pip.move_to(destination[i].top())
                 swap_speed("gantry", func=None, new_speed=gant_default, on=False)
 
             pip.drop_tip()
 
-    def transfer_ep(src, destination, volume):
+    def transfer_ep(src: Well, destination: Well, volume: float) -> None:
+        """Transfer Extension Product to Sample Plate."""
         global open_location
 
         if (
@@ -378,7 +383,7 @@ def run(ctx: ProtocolContext) -> None:
             pip.configure_for_volume(volume)
             pip.pick_up_tip(full_tips)
             pip.aspirate(volume, src.bottom(6))
-            ctx.delay(seconds=delay_time)
+            protocol.delay(seconds=delay_time)
             swap_speed("gantry", func=None, new_speed=retract_speed)
             pip.move_to(src.top(10))
             swap_speed("gantry", func=None, new_speed=gant_default, on=False)
@@ -386,20 +391,17 @@ def run(ctx: ProtocolContext) -> None:
             pip.dispense(
                 volume, destination.bottom(3)
             )  # reverse pipetting slightly more than actual volume
-            ctx.delay(seconds=delay_time)
+            protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tip
             swap_speed("gantry", func=None, new_speed=retract_speed)
             pip.move_to(destination.top())
             swap_speed("gantry", func=None, new_speed=gant_default, on=False)
-            ctx.delay(seconds=delay_time)
-            pip.drop_tip()
+            protocol.delay(seconds=delay_time)
+            pip.return_tip()
 
         else:
             pip.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=col_tips)
 
-            length = (
-                12 if ninety_six else 6
-            )  # determines how many iterations should be run through
             pip.configure_for_volume(volume)
             # for i in range(length):
             # try:
@@ -409,19 +411,19 @@ def run(ctx: ProtocolContext) -> None:
             # except:
             # 	new_location=col_tips[0].parent
             # 	new_open_location=col_tips[1].parent
-            # 	ctx.move_labware(col_tips.pop(0),open_location,use_gripper=True)
-            # 	ctx.move_labware(col_tips[0],new_location,use_gripper=True)
+            # 	protocol.move_labware(col_tips.pop(0),open_location,use_gripper=True)
+            # 	protocol.move_labware(col_tips[0],new_location,use_gripper=True)
             # 	open_location=new_open_location
             # 	pip.pick_up_tip()
             pip.aspirate(volume, src.bottom(6), rate=0.2)
-            ctx.delay(seconds=delay_time)
+            protocol.delay(seconds=delay_time)
             # Retract
             swap_speed("gantry", func=None, new_speed=retract_speed)
             pip.move_to(src.top(10) if type(src) == list else src.top(10))
             swap_speed("gantry", func=None, new_speed=gant_default, on=False)
             pip.move_to(destination.top(10))
             pip.dispense(volume, destination.bottom(5), rate=0.2)
-            ctx.delay(seconds=delay_time)
+            protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tips
             swap_speed("gantry", func=None, new_speed=retract_speed)
             pip.move_to(destination.top(-2))
@@ -429,7 +431,11 @@ def run(ctx: ProtocolContext) -> None:
             pip.drop_tip()
 
     def transfer_ifp(
-        src: Well, destination: Well, volume: float,  col_tips:List[Labware], prim: bool = False
+        src: List[Well],
+        destination: List[Well],
+        volume: float,
+        col_tips: List[Labware],
+        prim: bool = False,
     ) -> None:
         """Transfer Sample to IFP Chip."""
         global open_location
@@ -447,48 +453,44 @@ def run(ctx: ProtocolContext) -> None:
         for i in range(length):
             if ninety_six:
                 try:
+                    if any(is_in_staging_slot(tip_rack) for tip_rack in pip.tip_racks):
+                        raise Exception("Tiprack in staging slot")  # Trigger move logic
                     pip.pick_up_tip()
-                except:
-                    for tip_rack in pip.tip_racks:
-                        print("BEFORE MOVE")
-                        print(tip_rack.parent)
-                    # Get current tiprack locations
+                except Exception:
                     current_tiprack = col_tips[0]
                     next_tiprack = col_tips[1]
 
                     current_slot = current_tiprack.parent
                     next_slot = next_tiprack.parent
 
-                    # If the next tiprack is in the staging slot, we cannot use it directly.
-                    # So we move it to the currently active slot, which will become free.
-                    # And move the current one out of the way to the staging slot
+                    protocol.move_labware(
+                        current_tiprack, open_location, use_gripper=True
+                    )
+                    protocol.move_labware(next_tiprack, current_slot, use_gripper=True)
 
-                    # Step 1: move current_tiprack to staging (open) slot
-                    ctx.move_labware(current_tiprack, open_location, use_gripper=True)
-
-                    # Step 2: move next_tiprack into the now-free deck slot
-                    ctx.move_labware(next_tiprack, current_slot, use_gripper=True)
-
-                    # Step 3: update our tracking
                     open_location = next_slot
                     col_tips = col_tips[1:] + [col_tips[0]]
-                    # Step 4: pick tip from the newly moved rack (now at a valid deck slot)
-                    for tip_rack in pip.tip_racks:
-                        print("AFTER MOVE")
-                        print(tip_rack.parent)
+                    pip.tip_racks = col_tips
+
+                    # Final safety check before picking up a tip
+                    if is_in_staging_slot(pip.tip_racks[0]):
+                        raise Exception(
+                            f"Cannot pick up tip from staging slot: {pip.tip_racks[0].parent}"
+                        )
+
                     pip.pick_up_tip()
             else:
                 if mmx_to_sample_plate:
                     if i == 5 and prim:
                         loc = col_tips[0].parent
-                        ctx.move_labware(
+                        protocol.move_labware(
                             col_tips.pop(0), open_location, use_gripper=True
                         )
-                        ctx.move_labware(col_tips[0], loc, use_gripper=True)
+                        protocol.move_labware(col_tips[0], loc, use_gripper=True)
 
                 pip.pick_up_tip(ifp_tips.pop(0))
             pip.aspirate(volume + 4, src[i].bottom(1), rate=0.2 if volume <= 5 else 1)
-            ctx.delay(seconds=delay_time)
+            protocol.delay(seconds=delay_time)
             pip.dispense(2, src[i].bottom(1.5))  # compensate for backlash
             # Retract
             swap_speed("gantry", func=None, new_speed=retract_speed)
@@ -511,7 +513,7 @@ def run(ctx: ProtocolContext) -> None:
                 ),
                 rate=0.2 if volume <= 5 else 1,
             )
-            ctx.delay(seconds=delay_time)
+            protocol.delay(seconds=delay_time)
             swap_speed("gantry", func=None, new_speed=retract_speed)
             pip.move_to(destination[i].top(-2))
             swap_speed("gantry", func=None, new_speed=gant_default, on=False)
@@ -522,53 +524,55 @@ def run(ctx: ProtocolContext) -> None:
 
         if not mmx_to_sample_plate and prim:
             loc = col_tips[0].parent
-            ctx.move_labware(col_tips.pop(0), open_location, use_gripper=True)
-            ctx.move_labware(col_tips[0], loc, use_gripper=True)
+            protocol.move_labware(col_tips.pop(0), open_location, use_gripper=True)
+            protocol.move_labware(col_tips[0], loc, use_gripper=True)
 
-    if mmx_to_sample_plate:
-        ctx.comment(
-            f"\n***************\nTransferring Mastermix to Each Well of Sample Plate\n***************\n"
+    try:
+        if mmx_to_sample_plate:
+            protocol.comment(
+                "\n*****\nTransferring Mastermix to Each Well of Sample Plate\n*****\n"
+            )
+            transfer_mm(
+                mastermix, mm_dest, mm_vol, multi_disp=False if ninety_six else False
+            )
+        if ep_to_sample_plate:
+            protocol.comment(
+                "\n*****\nTransferring Extension Product to Each Well of Sample Plate\n*****\n"
+            )
+            transfer_ep(extension_source, sample_dest, pcr_product_vol)
+        if primer_to_chip:
+            protocol.comment("\n*****\nTransferring Primers to IFP Chip\n*****\n")
+            transfer_ifp(
+                primer_source, ifp_primer_dests, ifc_vol, col_tips=col_tips, prim=True
+            )
+        if sample_to_chip:
+            protocol.comment("\n*****\nTransferring Sample to IFP Chip\n*****\n")
+            transfer_ifp(sample_source, ifp_samp_dests, ifc_vol, col_tips=col_tips)
+
+        # Adding Liquids to Setup ##################################
+        mm_liq_vol = 95 if ninety_six else 47
+        ep_liq_vol = 100
+        prim_liq_vol = 12
+
+        mm_liq = protocol.define_liquid(
+            name="Master Mix", description=None, display_color="#FF0000"
         )
-        transfer_mm(
-            mastermix, mm_dest, mm_vol, multi_disp=False if ninety_six else False
+        ep_liq = protocol.define_liquid(
+            name="Extension Product", description=None, display_color="#FF00FF"
         )
-    if ep_to_sample_plate:
-        ctx.comment(
-            f"\n***************\nTransferring Extension Product to Each Well of Sample Plate\n***************\n"
+        prim_liq = protocol.define_liquid(
+            name="Primers", description=None, display_color="#00FF00"
         )
-        transfer_ep(extension_source, sample_dest, pcr_product_vol)
-    if primer_to_chip:
-        ctx.pause("Please vortex plate, centrifuge and return to D1")
-        ctx.comment(
-            f"\n***************\nTransferring Primers to IFP Chip\n***************\n"
-        )
-        transfer_ifp(primer_source, ifp_primer_dests, ifc_vol, col_tips=col_tips, prim=True)
-    if sample_to_chip:
-        ctx.comment(
-            f"\n***************\nTransferring Sample to IFP Chip\n***************\n"
-        )
-        transfer_ifp(sample_source, ifp_samp_dests, ifc_vol, col_tips=col_tips)
 
-    ########################### Adding Liquids to Setup ##################################
-    mm_liq_vol = 95 if ninety_six else 47
-    ep_liq_vol = 100
-    prim_liq_vol = 12
+        for well_n in mm_plate.wells()[8 * mm_col : 8 * mm_col + 8]:
+            well_n.load_liquid(liquid=mm_liq, volume=mm_liq_vol)
 
-    mm_liq = ctx.define_liquid(
-        name="Master Mix", description=None, display_color="#FF0000"
-    )
-    ep_liq = ctx.define_liquid(
-        name="Extension Product", description=None, display_color="#FF00FF"
-    )
-    prim_liq = ctx.define_liquid(
-        name="Primers", description=None, display_color="#00FF00"
-    )
+        for x in range(96 if ninety_six else 48):
+            product_plate.wells()[x].load_liquid(liquid=ep_liq, volume=ep_liq_vol)
 
-    for well_n in mm_plate.wells()[8 * mm_col : 8 * mm_col + 8]:
-        well_n.load_liquid(liquid=mm_liq, volume=mm_liq_vol)
-
-    for x in range(96 if ninety_six else 48):
-        product_plate.wells()[x].load_liquid(liquid=ep_liq, volume=ep_liq_vol)
-
-    for x in range(96 if ninety_six else 48):
-        primer_plate.wells()[x].load_liquid(liquid=prim_liq, volume=prim_liq_vol)
+        for x in range(96 if ninety_six else 48):
+            primer_plate.wells()[x].load_liquid(liquid=prim_liq, volume=prim_liq_vol)
+    except Exception as e:
+        if not protocol.is_simulating():
+            slack_bot.send_error_message(metadata["protocolName"], str(e))
+        raise (e)
