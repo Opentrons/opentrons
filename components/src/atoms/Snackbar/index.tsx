@@ -16,14 +16,49 @@ export interface SnackbarProps extends StyleProps {
 }
 
 const SNACKBAR_ANIMATION_DURATION = 500
-
 const ODD_ANIMATION_OPTIMIZATIONS = `
   backface-visibility: hidden;
   perspective: 1000;
   will-change: opacity;
   `
 
+export function Snackbar(props: SnackbarProps): JSX.Element {
+  const { message, onClose, duration = 4000, ...styleProps } = props
+  const [isClosed, setIsClosed] = useState<boolean>(false)
+
+  const animationStyle = isClosed ? CLOSE_STYLE : OPEN_STYLE
+
+  setTimeout(() => {
+    setIsClosed(true)
+    setTimeout(() => {
+      onClose?.()
+    }, SNACKBAR_ANIMATION_DURATION - 50)
+  }, duration)
+
+  return (
+    <Flex css={animationStyle} data-testid="Snackbar" {...styleProps}>
+      <StyledText
+        oddStyle="bodyTextSemiBold"
+        desktopStyle="bodyDefaultSemiBold"
+      >
+        {message}
+      </StyledText>
+    </Flex>
+  )
+}
+
+const COMMON_STYLE = css`
+  align-items: ${ALIGN_CENTER};
+  border-radius: ${BORDERS.borderRadius8};
+  box-shadow: ${BORDERS.shadowSmall};
+  background-color: ${COLORS.black90};
+  max-width: max-content;
+  padding: ${SPACING.spacing20} ${SPACING.spacing24};
+  color: ${COLORS.white};
+`
+
 const OPEN_STYLE = css`
+  ${COMMON_STYLE}
   animation-duration: ${SNACKBAR_ANIMATION_DURATION}ms;
   animation-name: fadein;
   overflow: hidden;
@@ -40,6 +75,7 @@ const OPEN_STYLE = css`
 `
 
 const CLOSE_STYLE = css`
+  ${COMMON_STYLE}
   animation-duration: ${SNACKBAR_ANIMATION_DURATION}ms;
   animation-name: fadeout;
   overflow: hidden;
@@ -54,39 +90,3 @@ const CLOSE_STYLE = css`
     }
   }
 `
-
-export function Snackbar(props: SnackbarProps): JSX.Element {
-  const { message, onClose, duration = 4000, ...styleProps } = props
-  const [isClosed, setIsClosed] = useState<boolean>(false)
-
-  const animationStyle = isClosed ? CLOSE_STYLE : OPEN_STYLE
-
-  setTimeout(() => {
-    setIsClosed(true)
-    setTimeout(() => {
-      onClose?.()
-    }, SNACKBAR_ANIMATION_DURATION - 50)
-  }, duration)
-
-  return (
-    <Flex
-      css={animationStyle}
-      alignItems={ALIGN_CENTER}
-      borderRadius={BORDERS.borderRadius8}
-      boxShadow={BORDERS.shadowSmall}
-      backgroundColor={COLORS.black90}
-      maxWidth="max-content"
-      padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
-      data-testid="Snackbar"
-      color={COLORS.white}
-      {...styleProps}
-    >
-      <StyledText
-        oddStyle="bodyTextSemiBold"
-        desktopStyle="bodyDefaultSemiBold"
-      >
-        {message}
-      </StyledText>
-    </Flex>
-  )
-}
