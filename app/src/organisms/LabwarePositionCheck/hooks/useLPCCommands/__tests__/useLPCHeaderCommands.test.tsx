@@ -64,6 +64,7 @@ describe('useLPCHeaderCommands', () => {
       proceedStep: mockProceedStep,
       goBackLastStep: vi.fn(),
       runId: mockRunId,
+      analytics: {} as any,
     }
 
     store = createStore(vi.fn(), {})
