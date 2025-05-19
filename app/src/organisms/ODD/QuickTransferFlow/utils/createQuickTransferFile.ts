@@ -28,7 +28,7 @@ import type {
   CreateCommand,
   CutoutId,
   DeckConfiguration,
-  LabwareDefinition,
+  LabwareDefinition2,
   LabwareV2Mixin,
   LiquidV1Mixin,
   LoadLabwareCreateCommand,
@@ -228,7 +228,7 @@ export function createQuickTransferFile(
 
   const labwareDefinitions = Object.values(
     invariantContext.labwareEntities
-  ).reduce<Record<string, LabwareDefinition>>((acc, entity) => {
+  ).reduce<Record<string, LabwareDefinition2>>((acc, entity) => {
     return { ...acc, [entity.labwareDefURI]: entity.def }
   }, {})
 

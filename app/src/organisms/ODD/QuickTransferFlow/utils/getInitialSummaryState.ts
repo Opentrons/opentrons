@@ -7,7 +7,7 @@ import {
 import type { Mount } from '@opentrons/api-client'
 import type {
   DeckConfiguration,
-  LabwareDefinition,
+  LabwareDefinition2,
   LiquidClass,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
@@ -22,10 +22,10 @@ interface InitialSummaryStateProps {
   state: {
     pipette: PipetteV2Specs
     mount: Mount
-    tipRack: LabwareDefinition
-    source: LabwareDefinition
+    tipRack: LabwareDefinition2
+    source: LabwareDefinition2
     sourceWells: string[]
-    destination: LabwareDefinition | 'source'
+    destination: LabwareDefinition2 | 'source'
     destinationWells: string[]
     transferType: TransferType
     volume: number

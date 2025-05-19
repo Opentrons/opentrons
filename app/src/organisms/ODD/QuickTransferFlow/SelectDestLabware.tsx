@@ -18,7 +18,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { getCompatibleLabwareByCategory } from './utils'
 
 import type { ComponentProps, Dispatch } from 'react'
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type { LabwareFilter } from '/app/local-resources/labware'
 import type {
@@ -49,12 +49,12 @@ export function SelectDestLabware(
   }
   const [selectedCategory, setSelectedCategory] = useState<LabwareFilter>('all')
   const [selectedLabware, setSelectedLabware] = useState<
-    LabwareDefinition | 'source' | undefined
+    LabwareDefinition2 | 'source' | undefined
   >(state.destination)
 
   if (state.pipette == null) return null
 
-  const compatibleLabwareDefinitions = getCompatibleLabwareByCategory(
+  const compatibleLabwareDefinition2s = getCompatibleLabwareByCategory(
     state.pipette.channels,
     selectedCategory
   )
@@ -126,7 +126,7 @@ export function SelectDestLabware(
               }}
             />
           ) : null}
-          {compatibleLabwareDefinitions?.map(definition => {
+          {compatibleLabwareDefinition2s?.map(definition => {
             return definition.metadata.displayName != null ? (
               <RadioButton
                 key={`${selectedCategory}-${definition.metadata.displayName}`}
