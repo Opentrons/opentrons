@@ -147,19 +147,7 @@ export function useGetNewModules(): AttachedModule[] {
         m.moduleOffset === undefined &&
         !modulesInDeckConfig.includes(m.serialNumber)
     )
-
-    console.log('NEW', newModules)
-
-    //return newModules
-    // for testing
-    const testMod = (): FlexStackerModule => {
-      let mod = structuredClone(newModules[0]) as FlexStackerModule
-      mod.serialNumber = `${mod.serialNumber}-clone`
-      mod.usbPort.port = 8
-      mod.data.installDetected = true
-      return mod as FlexStackerModule
-    }
-    return [newModules[0], testMod()]
+    return newModules
   }
   return []
 }
@@ -176,10 +164,8 @@ export function useModuleAttachedToast(
 
   useEffect(() => {
     const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
-    //const hasPipette =
-    //  attachedPipettes.left != null || attachedPipettes.right != null
-    const hasPipette = true
-    console.log('MODS', newModuleSerials)
+    const hasPipette =
+      attachedPipettes.left != null || attachedPipettes.right != null
     if (hasPipette && newModuleSerials.length > 0) {
       makeToast(t('module_added') as string, 'info', {
         buttonText: i18n.format(t('shared:close'), 'capitalize'),

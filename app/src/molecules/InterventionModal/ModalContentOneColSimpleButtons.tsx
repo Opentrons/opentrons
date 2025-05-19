@@ -32,7 +32,6 @@ export function ModalContentOneColSimpleButtons(
   const [selected, setSelected] = useState<string | null>(
     props.initialSelected ?? null
   )
-  console.log('BUTTON', props.buttons)
   return (
     <OneColumn>
       <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
