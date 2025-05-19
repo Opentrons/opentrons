@@ -35,53 +35,58 @@ const meta: Meta<typeof SnackbarComponent> = {
   },
 }
 
-const SnackbarTemplate: Story = {
-  render: args => {
-    const [isShowSnackbar, setIsShowSnackbar] = React.useState<boolean>(false)
+// Define the render function as a React Functional Component
+const SnackbarRenderComponent: React.FC<
+  React.ComponentProps<typeof SnackbarComponent>
+> = args => {
+  const [isShowSnackbar, setIsShowSnackbar] = React.useState<boolean>(false)
 
-    const handleClick = (): void => {
-      setIsShowSnackbar(true)
-    }
+  const handleClick = (): void => {
+    setIsShowSnackbar(true)
+  }
 
-    return (
-      <>
-        <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing16}>
-          <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
-          <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing8}>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              oddStyle="level4HeaderRegular"
-            >
-              When clicking the button, the Snackbar shows up in the bottom.
-            </StyledText>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              oddStyle="level4HeaderRegular"
-            >
-              By default the Snackbar will disappear after 4 seconds.
-            </StyledText>
-          </Flex>
-        </Flex>
-        {isShowSnackbar && (
-          <Flex
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_CENTER}
-            width="100%"
-            position="absolute"
-            bottom={SPACING.spacing40}
-            zIndex={1000}
+  return (
+    <>
+      <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing16}>
+        <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
+        <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing8}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            oddStyle="level4HeaderRegular"
           >
-            <SnackbarComponent
-              {...args}
-              onClose={() => {
-                setIsShowSnackbar(false)
-              }}
-            />
-          </Flex>
-        )}
-      </>
-    )
-  },
+            When clicking the button, the Snackbar shows up in the bottom.
+          </StyledText>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            oddStyle="level4HeaderRegular"
+          >
+            By default the Snackbar will disappear after 4 seconds.
+          </StyledText>
+        </Flex>
+      </Flex>
+      {isShowSnackbar && (
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+          width="100%"
+          position="absolute"
+          bottom={SPACING.spacing40}
+          zIndex={1000}
+        >
+          <SnackbarComponent
+            {...args}
+            onClose={() => {
+              setIsShowSnackbar(false)
+            }}
+          />
+        </Flex>
+      )}
+    </>
+  )
+}
+
+const SnackbarTemplate: Story = {
+  render: args => <SnackbarRenderComponent {...args} />,
 }
 
 export default meta
