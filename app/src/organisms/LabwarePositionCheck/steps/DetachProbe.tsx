@@ -15,10 +15,6 @@ import {
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
 import type { LoadedPipette } from '@opentrons/shared-data'
-import type {
-  OffsetLocationDetails,
-  SelectedLwOverview,
-} from '/app/redux/protocol-runs'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
@@ -37,20 +33,21 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
   const currentSubstep = useSelector(selectCurrentSubstep(runId))
   const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette
   const pipetteId = pipette.id
-  const selectedLwInfo = useSelector(
-    selectSelectedLwOverview(runId)
-  ) as SelectedLwOverview
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))
   const mostRecentVectorOffset = useSelector(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(runId)
   )
-  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const offsetLocationDetails = selectedLwInfo?.offsetLocationDetails
 
   const handleGoBack = (): void => {
     void toggleRobotMoving(true)
       .then(() => {
         // On the desktop app, ensure the robot returns to the initial offset position instead of the home position
         // when actively calibrating an offset.
-        if (currentSubstep === 'handle-lw/edit-offset/check-labware') {
+        if (
+          currentSubstep === 'handle-lw/edit-offset/check-labware' &&
+          offsetLocationDetails != null
+        ) {
           return home()
             .then(() =>
               handleMoveToInitialOffsetPosition(
