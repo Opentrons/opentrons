@@ -141,7 +141,7 @@
               "y": 0,
               "z": -0.5
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 7.0]],
             "correctionByVolume": [
               [1.0, -0.5],
               [10.0, -1.1],
