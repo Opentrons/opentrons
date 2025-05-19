@@ -7,6 +7,7 @@ import type {
   LabwareDefinition2,
   RobotType,
 } from '@opentrons/shared-data'
+import type { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck'
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 
 // Inject the props specific to the legacy LPC flows, too.
@@ -25,6 +26,7 @@ export interface LPCFlowsProps {
   analysis: CompletedProtocolAnalysis
   protocolName: string
   maintenanceRunId: string
+  analytics: ReturnType<typeof useLPCAnalytics>
 }
 
 export function LPCFlows(props: LegacySupportLPCFlowsProps): JSX.Element {
