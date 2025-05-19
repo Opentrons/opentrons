@@ -7,6 +7,7 @@ from opentrons.protocol_api import (
     ParameterContext,
     ProtocolContext,
     Well,
+    OFF_DECK,
     Labware,
 )
 from typing import List, Any
@@ -572,6 +573,24 @@ def run(protocol: ProtocolContext) -> None:
 
         for x in range(96 if ninety_six else 48):
             primer_plate.wells()[x].load_liquid(liquid=prim_liq, volume=prim_liq_vol)
+        protocol.move_labware(col_tips[-1], OFF_DECK, use_gripper=False)
+        protocol.move_labware(full_tips_, OFF_DECK, use_gripper=False)
+        protocol.move_labware(tip_adap, OFF_DECK, use_gripper=False)
+        protocol.move_labware(col_tips[-2], "A1", use_gripper=True)
+        pip.configure_nozzle_layout(
+            style=SINGLE,
+            start="A1",
+            tip_racks=col_tips,
+        )  # Resetting to all tips for liquid tracking
+        liquid_heights = {}
+        print(ifp_plate.parent)
+        pip.pick_up_tip()
+        for ifp_plate_well in ifp_plate.wells():
+            pip.measure_liquid_height(ifp_plate[ifp_plate_well.well_name])
+            height = ifp_plate[ifp_plate_well.well_name].current_liquid_height
+            liquid_heights[ifp_plate_well.well_name] = height
+        protocol.comment(str(liquid_heights))
+
     except Exception as e:
         if not protocol.is_simulating():
             slack_bot.send_error_message(metadata["protocolName"], str(e))
