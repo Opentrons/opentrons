@@ -10,10 +10,6 @@ SHX := npx shx
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-ot_project := $(OPENTRONS_PROJECT)
-project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
-
 port ?= 34000
 tests ?= tests
 test_opts ?=
@@ -67,16 +63,20 @@ format:
 	$(python) -m black otupdate tests
 
 .PHONY: wheel
-wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel: export OPENTRONS_PROJECT=$(PROJECT)
+wheel: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 wheel: clean
-	$(python) setup.py bdist_wheel
+	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_rs_default)
+sdist: export OPENTRONS_PROJECT=$(PROJECT)
+sdist: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+sdist: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 sdist: clean
-	$(python) setup.py sdist
+	$(python) -m build --sdist .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
