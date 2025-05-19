@@ -8,6 +8,8 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 )
 from hardware_testing.opentrons_api.types import OT3Mount
 from hardware_testing.drivers import asair_sensor
+from hardware_testing.gravimetric.workarounds import get_sync_hw_api
+from opentrons.protocol_api import ProtocolContext
 
 
 @dataclass
@@ -23,17 +25,12 @@ class EnvironmentData:
 
 
 def read_environment_data(
-    mount: str, is_simulating: bool, env_sensor: asair_sensor.AsairSensorBase
+    mount: str, ctx: ProtocolContext, env_sensor: asair_sensor.AsairSensorBase
 ) -> EnvironmentData:
     """Read blank environment data."""
-    mnt = OT3Mount.LEFT if mount == "left" else OT3Mount.RIGHT
-    try:
-        data = get_temperature_humidity_outside_api_ot3(mnt, is_simulating)
-        celsius_pipette, humidity_pipette = data
-    except SensorResponseBad as e:
-        print(e)
-        celsius_pipette = 25.0
-        humidity_pipette = 50.0
+    ot3api = get_sync_hw_api(ctx)
+    celsius_pipette = ot3api.read_stem_temperature(mount, True)
+    humidity_pipette = ot3api.read_stem_humidity(mount, True)
     env_data = env_sensor.get_reading()
     d = EnvironmentData(
         celsius_pipette=celsius_pipette,

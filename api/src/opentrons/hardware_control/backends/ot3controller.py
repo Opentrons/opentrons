@@ -215,7 +215,13 @@ from ..types import HepaFanState, HepaUVState, StatusBarState
 from .types import HWStopCondition
 from .flex_protocol import FlexBackend
 from .status_bar_state import StatusBarStateController
-from opentrons_hardware.sensors.types import SensorDataType
+from opentrons_hardware.sensors.sensor_types import (
+    EnvironmentSensor,
+    CapacitiveSensor,
+    PressureSensor,
+)
+from opentrons_hardware.sensors.types import SensorDataType, EnvironmentSensorDataType
+from opentrons_hardware.sensors.sensor_driver import SensorDriver
 from opentrons_hardware.sensors.utils import send_evo_dispense_count_increase
 
 log = logging.getLogger(__name__)
@@ -1835,3 +1841,54 @@ class OT3Controller(FlexBackend):
         await send_evo_dispense_count_increase(
             self._messenger, sensor_node_for_pipette(OT3Mount(mount.value))
         )
+
+    async def _read_env_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[EnvironmentSensorDataType]:
+        """Read and return the current sensor information."""
+        sensor = EnvironmentSensor.build(
+            sensor_id=SensorId.S0 if primary else SensorId.S1,
+            node_id=sensor_node_for_mount(mount),
+        )
+        s_driver = SensorDriver()
+        sensor_data = await s_driver.read(
+            can_messenger=self._messenger,
+            sensor=sensor,
+            offset=False,
+        )
+        assert sensor_data is None or isinstance(sensor_data, EnvironmentSensorDataType)
+        return sensor_data
+
+    async def _read_pressure_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[SensorDataType]:
+        """Read and return the current sensor information."""
+        sensor = PressureSensor.build(
+            sensor_id=SensorId.S0 if primary else SensorId.S1,
+            node_id=sensor_node_for_mount(mount),
+        )
+        s_driver = SensorDriver()
+        sensor_data = await s_driver.read(
+            can_messenger=self._messenger,
+            sensor=sensor,
+            offset=False,
+        )
+        assert sensor_data is None or isinstance(sensor_data, SensorDataType)
+        return sensor_data
+
+    async def _read_capacitive_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[SensorDataType]:
+        """Read and return the current sensor information."""
+        sensor = CapacitiveSensor.build(
+            sensor_id=SensorId.S0 if primary else SensorId.S1,
+            node_id=sensor_node_for_mount(mount),
+        )
+        s_driver = SensorDriver()
+        sensor_data = await s_driver.read(
+            can_messenger=self._messenger,
+            sensor=sensor,
+            offset=False,
+        )
+        assert sensor_data is None or isinstance(sensor_data, SensorDataType)
+        return sensor_data
