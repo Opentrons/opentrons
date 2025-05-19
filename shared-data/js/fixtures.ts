@@ -21,7 +21,6 @@ import {
   C1_ADDRESSABLE_AREA,
   C2_ADDRESSABLE_AREA,
   C3_ADDRESSABLE_AREA,
-  COLUMN_4_AA,
   D1_ADDRESSABLE_AREA,
   D2_ADDRESSABLE_AREA,
   D3_ADDRESSABLE_AREA,
@@ -60,6 +59,7 @@ import type {
   AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
+  FlexFakeAddressableAreaName,
   OT2CutoutId,
 } from '../deck'
 import type {
@@ -174,13 +174,22 @@ interface CutoutConfigMap extends CutoutConfig {
   addressableAreaId: AddressableAreaName
 }
 
-export const getCutoutFixtureReplacmentIfNeeded = (cutoutFixtureId: CutoutFixtureId, deckDefinition: DeckDefinition): CutoutFixtureId => {
+export const getCutoutFixtureReplacmentIfNeeded = (
+  cutoutFixtureId: CutoutFixtureId,
+  deckDefinition: DeckDefinition
+): CutoutFixtureId => {
   if (
-    cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE && deckDefinition.robot.model === FLEX_ROBOT_TYPE
+    cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
+    deckDefinition.robot.model === FLEX_ROBOT_TYPE
   ) {
     return DUMMY_STAGING_AREA_WITHOUT_STAGING_AREA
   }
   return cutoutFixtureId
+}
+
+export const isFakeAA = (addressableArea: AddressableAreaName): boolean => {
+  const fakeAAs = ['fakeA4', 'fakeB4', 'fakeC4', 'fakeD4']
+  return fakeAAs.includes(addressableArea)
 }
 
 export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
@@ -188,7 +197,10 @@ export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
   deckDefinition: DeckDefinition
 ): CutoutConfigMap[] => {
   return cutoutFixtures.reduce<CutoutConfigMap[]>((acc, obj) => {
-    const cutoutFixtureReplacment = getCutoutFixtureReplacmentIfNeeded(obj.cutoutFixtureId, deckDefinition)
+    const cutoutFixtureReplacment = getCutoutFixtureReplacmentIfNeeded(
+      obj.cutoutFixtureId,
+      deckDefinition
+    )
 
     const aaPerCutoutFixture = getAAFromCutoutFixtureId(
       obj.cutoutId,
@@ -209,9 +221,8 @@ export const filterAAByAreaType = (
 ): CutoutConfigMap[] => {
   return cutoutFixtures.filter(({ addressableAreaId, cutoutFixtureId }) => {
     if (
-      areaType === 'slot' &&
-      cutoutFixtureId === 'singleRightSlot' &&
-      COLUMN_4_AA.includes(addressableAreaId)
+      (areaType === 'slot' || areaType === 'stagingSlot') &&
+      isFakeAA(addressableAreaId) === true
     ) {
       return addressableAreaId
     } else {
@@ -223,21 +234,34 @@ export const filterAAByAreaType = (
 }
 
 export const getAALocationForCutoutAndFixtureId = (
-  addressableArea: string,
+  addressableArea: AddressableAreaName,
   deckDefinition: DeckDefinition
 ): CoordinateTuple => {
-  switch(addressableArea){
-    case 'fakeA4':
-    case 'fakeB4':
-    case 'fakeC4':
-    case 'fakeD4':
-      return [164.0, 0.0, 14.5]
+  if (isFakeAA(addressableArea)) {
+    return [164.0, 0.0, 14.5]
+  } else {
+    return (
+      deckDefinition.locations.addressableAreas.find(
+        (aaItem: AddressableArea) => aaItem.id === addressableArea
+      )?.offsetFromCutoutFixture ?? [0, 0, 0]
+    )
+  }
+}
+
+export const getDummyAAForDummyStagingArea = (
+  inputCutoutId: CutoutId
+): AddressableAreaName[] | null => {
+  switch (inputCutoutId) {
+    case 'cutoutA3':
+      return ['A3', 'fakeA4']
+    case 'cutoutB3':
+      return ['B3', 'fakeB4']
+    case 'cutoutC3':
+      return ['C3', 'fakeC4']
+    case 'cutoutD3':
+      return ['D3', 'fakeD4']
     default:
-      return (
-        deckDefinition.locations.addressableAreas.find(
-          (aaItem: AddressableArea) => aaItem.id === addressableArea
-        )?.offsetFromCutoutFixture ?? [0, 0, 0]
-      )
+      return null
   }
 }
 
@@ -249,24 +273,16 @@ export const getAAFromCutoutFixtureId = (
   /**
    * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
    */
-  if (cutoutFixtureId === DUMMY_STAGING_AREA_WITHOUT_STAGING_AREA) {
-    switch (inputCutoutId) {
-      case 'cutoutA3':
-        return ['A3', 'fakeA4']
-      case 'cutoutB3':
-        return ['B3', 'fakeB4']
-      case 'cutoutC3':
-        return ['C3', 'fakeC4']
-      case 'cutoutD3':
-        return ['D3', 'fakeD4']
-    }
+  switch (cutoutFixtureId) {
+    case DUMMY_STAGING_AREA_WITHOUT_STAGING_AREA:
+      return getDummyAAForDummyStagingArea(inputCutoutId)
+    default:
+      return (
+        deckDefinition.cutoutFixtures.find(
+          fixture => fixture.id === cutoutFixtureId
+        )?.providesAddressableAreas[inputCutoutId] ?? null
+      )
   }
-
-  return (
-    deckDefinition.cutoutFixtures.find(
-      fixture => fixture.id === cutoutFixtureId
-    )?.providesAddressableAreas[inputCutoutId] ?? null
-  )
 }
 
 export function getCutoutFixtureIdsForModuleModel(

@@ -23,6 +23,6 @@ describe('getAAFromCutoutFixtureId', () => {
       getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
     )
 
-    expect(result).toBeUndefined()
+    expect(result).toBeNull()
   })
 })

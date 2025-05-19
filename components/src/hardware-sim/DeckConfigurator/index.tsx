@@ -3,9 +3,9 @@ import {
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_V1_FIXTURE,
   getDeckDefFromRobotType,
+  replaceStagingFixtureAndTransformCutoutFixturesToAA,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
-  replaceStagingFixtureAndTransformCutoutFixturesToAA,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -68,12 +68,15 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckConfig,
     deckDef
   )
+  console.log('deckConfigWithAA: ', deckConfigWithAA)
 
   const stagingAreaItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'stagingSlot'
   )
+
+  console.log('stagingAreaItems: ', stagingAreaItems)
 
   const wasteChuteItems = filterAAByAreaType(
     deckConfigWithAA,
@@ -85,6 +88,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckDef,
     'slot'
   )
+
+  console.log('emptySlotLikeItems: ', emptySlotLikeItems)
 
   const trashBinItems = filterAAByAreaType(
     deckConfigWithAA,
