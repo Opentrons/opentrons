@@ -1,5 +1,4 @@
 import {
-  MAX_HEATER_SHAKER_DURATION_SECONDS,
   MAX_HEATER_SHAKER_MODULE_RPM,
   MAX_HEATER_SHAKER_MODULE_TEMP,
   MAX_TC_BLOCK_TEMP,
@@ -7,7 +6,6 @@ import {
   MAX_TC_LID_TEMP,
   MAX_TC_PROFILE_VOLUME,
   MAX_TEMP_MODULE_TEMP,
-  MIN_HEATER_SHAKER_DURATION_SECONDS,
   MIN_HEATER_SHAKER_MODULE_RPM,
   MIN_HEATER_SHAKER_MODULE_TEMP,
   MIN_TC_BLOCK_TEMP,
@@ -298,15 +296,6 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   dispense_retract_delay_seconds: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
   },
-  pauseHour: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-  },
-  pauseMinute: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-  },
-  pauseSecond: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-  },
   pipette: {
     getErrors: composeErrors(requiredField),
     hydrate: getPipetteEntity,
@@ -361,18 +350,6 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
         MIN_HEATER_SHAKER_MODULE_RPM,
         MAX_HEATER_SHAKER_MODULE_RPM
       )
-    ),
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-    castValue: Number,
-  },
-  heaterShakerTimerMinutes: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-    castValue: Number,
-  },
-  heaterShakerTimerSeconds: {
-    getErrors: composeErrors(
-      minFieldValue(MIN_HEATER_SHAKER_DURATION_SECONDS),
-      maxFieldValue(MAX_HEATER_SHAKER_DURATION_SECONDS)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
