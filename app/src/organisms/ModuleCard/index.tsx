@@ -194,10 +194,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const isTooHot = getModuleTooHot(module)
   const needsCalibration =
     !isPending && isPipetteReady && requireModuleCalibration
+  const needsDeckConfig = isFlex && !isDeckConfigured
   const needsSetup =
     !isPending &&
     !requireModuleCalibration &&
-    (module.hasAvailableUpdate || (isFlex && !isDeckConfigured))
+    (module.hasAvailableUpdate || needsDeckConfig)
 
   let moduleData: JSX.Element = <div></div>
   switch (module.moduleType) {
@@ -372,7 +373,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             {needsSetup ? (
               <UpdateBanner
                 robotName={robotName}
-                updateType="setup"
+                updateType={needsDeckConfig ? 'setup' : 'firmware'}
                 serialNumber={module.serialNumber}
                 handleUpdateClick={handleFirmwareUpdateClick}
                 isTooHot={isTooHot}

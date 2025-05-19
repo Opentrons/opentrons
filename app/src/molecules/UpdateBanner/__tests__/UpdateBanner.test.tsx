@@ -53,7 +53,7 @@ describe('Module Update Banner', () => {
     screen.getByText('Setup module')
   })
 
-  it('renders an error banner if a module setup (firmware/deckconfiguration) is required with no exit button', () => {
+  it('renders an error banner if a module setup is required with no exit button', () => {
     props = {
       ...props,
       updateType: 'setup',
@@ -64,6 +64,19 @@ describe('Module Update Banner', () => {
     expect(screen.queryByLabelText('close_icon')).not.toBeInTheDocument()
     screen.getByText('Setup module for use.')
     screen.getByText('Setup module')
+  })
+
+  it('renders an error banner if a module firmware is required with no exit button', () => {
+    props = {
+      ...props,
+      updateType: 'firmware',
+    }
+    render(props)
+    screen.getByTestId('ModuleCard_firmware_update_banner_test_number')
+    screen.getByTestId('InlineNotification_alert')
+    expect(screen.queryByLabelText('close_icon')).not.toBeInTheDocument()
+    screen.getByText('Firmware update available.')
+    screen.getByText('Update now')
   })
 
   it('enables clicking of text to open the appropriate update modal', () => {

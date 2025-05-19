@@ -12,7 +12,7 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstop
 
 interface UpdateBannerProps {
   robotName: string
-  updateType: 'calibration' | 'setup'
+  updateType: 'calibration' | 'setup' | 'firmware'
   handleUpdateClick: () => void
   serialNumber: string
   isTooHot?: boolean
@@ -58,22 +58,49 @@ export const UpdateBanner = ({
         !updatePipetteFWRequired
       : true
 
-  const message =
-    updateType === 'calibration'
-      ? getCalibrationMessage()
-      : t('setup_module_for_use')
+  const getMessage = (): string => {
+    switch (updateType) {
+      case 'calibration':
+        return getCalibrationMessage()
+      case 'firmware':
+        return t('firmware_update_available')
+      default:
+        return t('setup_module_for_use')
+    }
+  }
+
+  // If the message ends with a period, remove it because the InlineNotification
+  // component adds a period to the end of the message. Removing the period in
+  // the localized message is not an option because some messages are used in
+  // multiple places and some of those places DO require a period.
+  const formattedMessage = (): string => {
+    const message = getMessage()
+    if (message.slice(-1) === '.') {
+      return message.slice(0, -1)
+    }
+    return message
+  }
+
+  const getLinkText = (): string | undefined => {
+    if (!canProceed) return undefined
+    if (updateType === 'firmware') {
+      return t('update_now')
+    }
+    return t('setup_module')
+  }
 
   const isFlex = useIsFlex(robotName)
-  if (!isFlex && updateType === 'calibration') return null
+  // Only show banner for needing firmware update if robot is an OT-2
+  if (!isFlex && updateType !== 'firmware') return null
   return (
     <Flex
       data-testid={`ModuleCard_${updateType}_update_banner_${serialNumber}`}
       {...targetProps}
     >
       <InlineNotification
-        type={updateType === 'setup' ? 'alert' : 'error'}
-        message={message}
-        linkText={canProceed ? t('setup_module') : undefined}
+        type={updateType === 'calibration' ? 'error' : 'alert'}
+        message={formattedMessage()}
+        linkText={getLinkText()}
         onLinkClick={handleUpdateClick}
         minWidth="12.625rem"
       />
