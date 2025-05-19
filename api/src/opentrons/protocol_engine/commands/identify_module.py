@@ -58,7 +58,9 @@ class IdentifyModuleImpl(
                 module_substate.module_id
             )
             if module_hw is not None:
-                color = LEDColor.from_name(params.color)
+                color = (
+                    LEDColor.from_name(params.color) if params.color else LEDColor.BLUE
+                )
                 await module_hw.identify(params.start, color)
         else:
             raise NotImplementedError(
