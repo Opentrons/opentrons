@@ -24,8 +24,7 @@ import {
 } from '/app/molecules/SimpleWizardBody'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import type { DeckConfiguration, IdentifyColor } from '@opentrons/shared-data'
-import type { ModuleSetupWizardStepProps } from './types'
+import type { IdentifyColor } from '@opentrons/shared-data'
 
 interface SelectModuleProps {
   buildFlowForSelectedModule: (module: AttachedModule) => void
@@ -200,4 +199,5 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
   } else {
     return null
   }
+  return null
 }
