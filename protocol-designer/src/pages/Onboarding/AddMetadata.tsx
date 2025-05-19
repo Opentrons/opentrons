@@ -9,7 +9,6 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { analyticsEvent } from '../../analytics/actions'
 import { ONBOARDING_FLOW_DURATION_EVENT } from '../../analytics/constants'
@@ -20,8 +19,6 @@ import { WizardBody } from './WizardBody'
 import type { AnalyticsEvent } from '../../analytics/mixpanel'
 import type { WizardTileProps } from './types'
 
-const FLEX_METADATA_WIZARD_STEP = 4
-const OT2_METADATA_WIZARD_STEP = 3
 interface AddMetadataProps extends WizardTileProps {
   analyticsStartTime: Date
 }
@@ -46,11 +43,7 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
       <WizardBody
         robotType={robotType}
         subStepNumber={6}
-        stepNumber={
-          robotType === FLEX_ROBOT_TYPE
-            ? FLEX_METADATA_WIZARD_STEP
-            : OT2_METADATA_WIZARD_STEP
-        }
+        stepNumber={3}
         header={t('tell_us')}
         disabled={false}
         goBack={() => {
