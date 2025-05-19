@@ -1,0 +1,5 @@
+python plate_reader_qc_sz.py
+./2025-2-27/OPTMAA00015/OPTMAA00015_0deg_01
+
+python plate_reader_test3.py
+./2025-4-1/OPTMAA00037
