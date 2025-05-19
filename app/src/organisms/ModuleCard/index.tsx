@@ -375,7 +375,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 robotName={robotName}
                 updateType={needsDeckConfig ? 'setup' : 'firmware'}
                 serialNumber={module.serialNumber}
-                handleUpdateClick={handleFirmwareUpdateClick}
+                handleUpdateClick={
+                  needsDeckConfig
+                    ? handleCalibrateClick
+                    : handleFirmwareUpdateClick
+                }
                 isTooHot={isTooHot}
               />
             ) : null}
