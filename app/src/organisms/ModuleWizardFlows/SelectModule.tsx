@@ -67,8 +67,8 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
         params: {
           model: module.moduleModel,
           moduleId: module.id,
-          start: start,
-          color: color,
+          start,
+          color,
         },
       },
     })
@@ -166,7 +166,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
       const m = getModuleNameAndPort(module)
       return {
         label: t('module_attached_select', { module: m.name, port: m.port }),
-        value: module.serialNumber as string,
+        value: module.serialNumber,
       }
     })
     return (
@@ -199,5 +199,4 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
   } else {
     return null
   }
-  return null
 }
