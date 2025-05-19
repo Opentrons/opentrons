@@ -24,12 +24,11 @@ import {
 } from '/app/molecules/SimpleWizardBody'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import type { IdentifyColor } from '@opentrons/shared-data'
+import type { DeckConfiguration, IdentifyColor } from '@opentrons/shared-data'
 import type { ModuleSetupWizardStepProps } from './types'
 
-interface SelectModuleProps extends ModuleSetupWizardStepProps {
+interface SelectModuleProps {
   buildFlowForSelectedModule: (module: AttachedModule) => void
-  isLoadedInRun: boolean
 }
 
 interface ModuleNameAndPort {
@@ -198,5 +197,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
         </Flex>
       </SimpleWizardBodyContainer>
     )
+  } else {
+    return null
   }
 }

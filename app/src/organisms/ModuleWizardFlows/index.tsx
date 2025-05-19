@@ -79,8 +79,6 @@ export const ModuleWizardFlows = (
           {...currentStep}
           {...wizardFlowBaseProps}
           buildFlowForSelectedModule={buildFlowForSelectedModule}
-          deckConfig={deckConfig}
-          isLoadedInRun={isLoadedInRun}
         />
       </ModuleWizardScreen>
     )
