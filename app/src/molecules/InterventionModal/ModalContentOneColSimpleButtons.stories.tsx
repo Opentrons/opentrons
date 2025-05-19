@@ -20,10 +20,10 @@ export const ModalContentOneColSimpleButtons: Story = {
   args: {
     headline: 'This is the headline area.',
     buttons: [
-        'This is the first button',
-        'This is the second button',
-        'this is the third button',
-        'this is the fourth button'
+      'This is the first button',
+      'This is the second button',
+      'this is the third button',
+      'this is the fourth button',
     ],
   },
   render: (args, context) => {

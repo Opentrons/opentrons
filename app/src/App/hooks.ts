@@ -4,11 +4,7 @@ import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
 import difference from 'lodash/difference'
 
-import {
-  AttachedModule,
-  FlexStackerModule,
-  getProtocol,
-} from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 import {
   truncateString,
   useInterval,
@@ -28,6 +24,7 @@ import { useAttachedPipettes } from '../resources/instruments'
 import { useAttachedModules } from '../resources/modules'
 import { SharedScrollRefContext } from './ODDProviders/ScrollRefProvider'
 
+import type { AttachedModule } from '@opentrons/api-client'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '/app/redux/types'
 
