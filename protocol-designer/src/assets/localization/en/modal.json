@@ -94,8 +94,9 @@
       "body9": "No longer allow touch tip with incompatible labware. This changes the behavior of imported protocols that had touch tip on incompatible labware.",
       "body10": "If multiple labware end up in the same slot at the same time due to deleting/rearranging steps, an error appears on the protocol timeline.",
       "body11": "If a Heater-Shaker step is created with a a heater set and a timer, the protocol will now wait until the temperature is reached before counting down the timer.",
-      "body12": "All protocols now require Opentrons App version 8.5.0+ to run.",
-      "body13": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>."
+      "body12": "If the timer of a Heater-Shaker step is toggled on and off, the timer input field no longer errors.",
+      "body13": "All protocols now require Opentrons App version 8.5.0+ to run.",
+      "body14": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>."
     }
   },
   "labware_selection": {
