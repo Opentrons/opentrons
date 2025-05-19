@@ -6,6 +6,7 @@ import {
   getFlexNameConversion,
   linearInterpolate,
   POSITION_REFERENCE_TOP,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
@@ -480,7 +481,7 @@ const getNoLiquidClassValuesMoveLiquid = (
     return {}
   }
   const volume = Number(rawVolume)
-  const referenceLiquidClass = getAllLiquidClassDefs().waterV1
+  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
@@ -598,7 +599,7 @@ const getNoLiquidClassValuesMix = (
     return {}
   }
   const volume = Number(rawVolume)
-  const referenceLiquidClass = getAllLiquidClassDefs().waterV1
+  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )

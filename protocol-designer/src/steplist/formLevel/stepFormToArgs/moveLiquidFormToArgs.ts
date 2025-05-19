@@ -1,6 +1,7 @@
 import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -86,7 +87,7 @@ const getCheckedPath = (
   const { labwareDefURI: tiprackDefUri, def: tiprackDef } = tiprackEntity
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassValuesForTip = allLiquidClassDefs[
-    hydratedFormData.liquidClass ?? 'waterV1'
+    hydratedFormData.liquidClass ?? WATER_LIQUID_CLASS_NAME
   ]?.byPipette
     .find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
