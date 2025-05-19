@@ -31,6 +31,7 @@ import {
   StepSummary,
   TimelineAlerts,
 } from '../../../components/organisms'
+import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
 import {
@@ -56,6 +57,7 @@ import {
   getSelectedSubstep,
   getSelectedTerminalItemId,
 } from '../../../ui/steps/selectors'
+import { getHasTrash } from '../../../utils'
 import { LOAD_COMMANDS } from '../../ProtocolOverview'
 import {
   getUnusedEntities,
@@ -94,6 +96,7 @@ export function ProtocolSteps({
 }: ProtocolStepsProps): JSX.Element {
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
+  const { makeSnackbar } = useKitchen()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const hoveredTerminalItem = useSelector(getHoveredTerminalItemId)
@@ -108,6 +111,7 @@ export function ProtocolSteps({
   const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
   const savedStepForms = useSelector(getSavedStepForms)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
+  const hasTrash = getHasTrash(additionalEquipmentOnDeck)
   const viewBoxX = deckDef.cornerOffsetFromOrigin[0]
   const windowInnerWidthRem = window.innerWidth / 16
   const deckMapRatio = round(
@@ -194,6 +198,14 @@ export function ProtocolSteps({
       dispatch(saveProtocolFile())
     },
   })
+
+  const handleExporting = (): void => {
+    if (hasTrash) {
+      handleExportClick()
+    } else {
+      makeSnackbar(t('trash_required') as string)
+    }
+  }
 
   let currentStep
   if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
@@ -293,7 +305,7 @@ export function ProtocolSteps({
           >
             {isZoomedIn || formData != null ? null : (
               <Flex justifyContent={JUSTIFY_END}>
-                <ExportButton onClick={handleExportClick} />
+                <ExportButton onClick={handleExporting} />
               </Flex>
             )}
             <Flex

@@ -27,7 +27,6 @@
   "deck_slots_full": "Deck slots are full",
   "define_liquid": "Define a liquid",
   "delete_labware": "Delete labware",
-  "this_adapter_is_required": "This adapter is required for the {{name}} currently on the slot. If you remove the adapter, the {{name}} will be deleted too.",
   "done": "Done",
   "double_click_to_edit": "Double-click to edit",
   "duplicate": "Duplicate labware",
@@ -50,6 +49,9 @@
   "no_labware_added": "No labware added",
   "no_offdeck_labware": "No off-deck labware added",
   "no_space": "No space on slot",
+  "num_liquid_plural": "{{count}} liquids",
+  "num_liquid": "{{count}} liquid",
+  "no_liquids_added": "No liquids added",
   "off_deck_labware": "Off-deck Labware",
   "off_deck_title": "Off deck",
   "offDeck": "Off deck",
@@ -69,6 +71,7 @@
   "starting_deck_state": "Starting deck state",
   "tc_slots_occupied_flex": "The Thermocycler needs slots A1 and B1. Slot A1 is occupied",
   "tc_slots_occupied_ot2": "The Thermocycler needs slots 7, 8, 10, and 11. One or more of those slots is occupied",
+  "this_adapter_is_required": "This adapter is required for the {{name}} currently on the slot. If you remove the adapter, the {{name}} will be deleted too.",
   "tipRack": "Tip racks",
   "top_slot": "Top of slot",
   "trash_no_labware": "Cannot load labware into Trash Bin",
@@ -77,8 +80,8 @@
   "two_item": "No more than 2 {{hardware}} allowed on the deck at one time",
   "untitled_protocol": "Untitled protocol",
   "upload_custom_labware": "Upload custom labware",
+  "view_labware": "View labware",
   "waste_chute_no_labware": "Cannot load labware into Waste Chute",
   "we_added_hardware": "We've added your deck hardware!",
-  "wellPlate": "Well plates",
-  "view_labware": "View labware"
+  "wellPlate": "Well plates"
 }

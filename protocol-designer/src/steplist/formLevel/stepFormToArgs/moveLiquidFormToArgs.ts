@@ -1,4 +1,12 @@
-import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
+import {
+  getAllLiquidClassDefs,
+  getFlexNameConversion,
+  WATER_LIQUID_CLASS_NAME,
+} from '@opentrons/shared-data'
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  getTransferPlanAndReferenceVolumes,
+} from '@opentrons/step-generation'
 
 import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
@@ -14,6 +22,8 @@ import type {
   ConsolidateArgs,
   DistributeArgs,
   InnerMixArgs,
+  InvariantContext,
+  PathOption,
   TransferArgs,
 } from '@opentrons/step-generation'
 import type { HydratedMoveLiquidFormData } from '../../../form-types'
@@ -58,9 +68,83 @@ export function getMixData(
 
   return null
 }
+
+const getCheckedPath = (
+  hydratedFormData: HydratedMoveLiquidFormData,
+  contextualState: InvariantContext,
+  path: PathOption
+): PathOption => {
+  const { pipette, tipRack, volume } = hydratedFormData
+  const { spec: pipetteSpecs } = pipette
+  const tiprackEntity = Object.values(contextualState.labwareEntities).find(
+    lw => lw.labwareDefURI === tipRack
+  )
+  // should not hit
+  if (tiprackEntity == null) {
+    console.error('Tiprack for transfer has no associated labware entity.')
+    return path
+  }
+  const { labwareDefURI: tiprackDefUri, def: tiprackDef } = tiprackEntity
+  const allLiquidClassDefs = getAllLiquidClassDefs()
+  const liquidClassValuesForTip = allLiquidClassDefs[
+    hydratedFormData.liquidClass ?? WATER_LIQUID_CLASS_NAME
+  ]?.byPipette
+    .find(
+      ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
+    )
+    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)
+
+  // be permissive with path if no liquid class tip values found
+  if (liquidClassValuesForTip == null) {
+    return path
+  }
+  if (
+    path === 'single' ||
+    // if liquid class values are found and path is 'multiDispense', make sure multiDispense object is defined
+    // this should be enforced by UI in liquid class selection, but this is another safeguard
+    (path === 'multiDispense' && liquidClassValuesForTip.multiDispense == null)
+  ) {
+    return 'single'
+  }
+
+  const { multiWellHandling } =
+    path === 'multiAspirate'
+      ? getTransferPlanAndReferenceVolumes({
+          pipetteSpecs,
+          tiprackDefinition: tiprackDef,
+          volume,
+          path,
+          numDispenseWells: hydratedFormData.dispense_wells.length,
+          conditioningByVolume: null,
+          disposalByVolume: null,
+        })
+      : getTransferPlanAndReferenceVolumes({
+          pipetteSpecs,
+          tiprackDefinition: tiprackDef,
+          volume,
+          path,
+          numDispenseWells: hydratedFormData.dispense_wells.length,
+          conditioningByVolume:
+            (liquidClassValuesForTip.multiDispense
+              ?.conditioningByVolume as Array<[number, number]>) ?? null,
+          disposalByVolume:
+            (liquidClassValuesForTip.multiDispense?.disposalByVolume as Array<
+              [number, number]
+            >) ?? null,
+        })
+  if (
+    !multiWellHandling.isSupported ||
+    multiWellHandling.numWellsToFitInTip === 1
+  ) {
+    return 'single'
+  }
+  // checked multiAspirate/Dispense and is safe
+  return path
+}
 type MoveLiquidStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
 export const moveLiquidFormToArgs = (
-  hydratedFormData: HydratedMoveLiquidFormData
+  hydratedFormData: HydratedMoveLiquidFormData,
+  contextualState: InvariantContext
 ): MoveLiquidStepArgs => {
   console.assert(
     hydratedFormData.stepType === 'moveLiquid',
@@ -321,7 +405,9 @@ export const moveLiquidFormToArgs = (
     'cannot distribute when destWells is null'
   )
 
-  switch (path) {
+  const checkedPath = getCheckedPath(hydratedFormData, contextualState, path)
+
+  switch (checkedPath) {
     case 'single': {
       const transferStepArguments: TransferArgs = {
         ...commonFields,

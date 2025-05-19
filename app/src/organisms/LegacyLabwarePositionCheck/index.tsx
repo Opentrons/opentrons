@@ -15,6 +15,7 @@ import type {
   CompletedProtocolAnalysis,
   RobotType,
 } from '@opentrons/shared-data'
+import type { LegacySupportLPCFlowsProps } from '/app/organisms/LabwarePositionCheck'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => void
@@ -24,6 +25,7 @@ interface LabwarePositionCheckModalProps {
   existingOffsets: LabwareOffset[]
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   protocolName: string
+  analytics: LegacySupportLPCFlowsProps['analytics']
   setMaintenanceRunId?: (id: string | null) => void
   isDeletingMaintenanceRun: boolean
   caughtError?: Error
