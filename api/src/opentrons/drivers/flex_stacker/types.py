@@ -99,8 +99,8 @@ class LEDColor(Enum):
     YELLOW = 4
 
     @classmethod
-    def from_name(cls, name: str | None) -> "LEDColor":
-        match (name):
+    def from_name(cls, name: str) -> "LEDColor":
+        match (name.lower()):
             case "red":
                 return cls.RED
             case "green":
@@ -111,6 +111,9 @@ class LEDColor(Enum):
                 return cls.YELLOW
             case _:
                 return cls.WHITE
+
+    def to_name(self) -> "str":
+        return self.name.lower()
 
 
 class LEDPattern(Enum):

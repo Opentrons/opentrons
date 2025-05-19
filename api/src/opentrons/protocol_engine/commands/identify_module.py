@@ -8,8 +8,6 @@ from typing_extensions import Type
 
 from pydantic import BaseModel, Field
 
-from opentrons.drivers.flex_stacker.types import LEDColor
-
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
 from ..types import ModuleModel
@@ -58,10 +56,7 @@ class IdentifyModuleImpl(
                 module_substate.module_id
             )
             if module_hw is not None:
-                color = (
-                    LEDColor.from_name(params.color) if params.color else LEDColor.BLUE
-                )
-                await module_hw.identify(params.start, color)
+                await module_hw.identify(params.start, params.color)
         else:
             raise NotImplementedError(
                 f"IdentifyModule is not supported for {params.model}"
