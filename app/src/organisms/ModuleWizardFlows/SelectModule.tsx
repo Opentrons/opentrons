@@ -112,8 +112,11 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
   }
 
   const handleTryAgain = (): void => {
-    setStackerNotInstalled(false)
-    setSelectedModule(null)
+    if (selectedModule != null) {
+      sendIdentifyModule(selectedModule, false)
+      setStackerNotInstalled(false)
+      setSelectedModule(null)
+    }
   }
 
   const BUTTON_STYLE = css`

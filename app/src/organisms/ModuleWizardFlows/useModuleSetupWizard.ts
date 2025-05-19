@@ -1,7 +1,10 @@
 import { useEffect, useReducer, useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+import {
+  useCreateLiveCommandMutation,
+  useDeleteMaintenanceRunMutation,
+} from '@opentrons/react-api-client'
 
 import { getModulePrepCommands } from '/app/local-resources/modules'
 import { getIsOnDevice } from '/app/redux/config'
@@ -66,6 +69,7 @@ export function useModuleSetupWizard(
 ): UseModuleSetupWizardResult {
   const { closeFlow, attachedModuleOnLaunch, onComplete } = params
   const isOnDevice = useSelector(getIsOnDevice)
+  const { createLiveCommand } = useCreateLiveCommandMutation()
   const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
     currentStepIndex: 0,
     currentStep: null,
@@ -145,8 +149,20 @@ export function useModuleSetupWizard(
   })
 
   const handleCleanUpAndClose = (): void => {
-    // TODO:(ba, 2025-05-18): stop blinking module
+    if (attachedModule != null) {
+      createLiveCommand({
+        command: {
+          commandType: 'identifyModule',
+          params: {
+            model: attachedModule.moduleModel,
+            moduleId: attachedModule.id,
+            start: false,
+          },
+        },
+      })
+    }
     setIsExiting(true)
+
     if (maintenanceRunId == null) handleClose()
     else {
       chainRunCommands(
