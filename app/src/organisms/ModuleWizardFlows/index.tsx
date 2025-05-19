@@ -11,8 +11,10 @@ import {
 
 import { AttachProbe } from './AttachProbe'
 import { BeforeBeginning } from './BeforeBeginning'
+import { CloseDoor } from './CloseStackerDoor'
 import { SECTIONS } from './constants'
 import { DetachProbe } from './DetachProbe'
+import { InstallShuttle } from './InstallShuttle'
 import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
@@ -294,7 +296,17 @@ export const ModuleWizardFlows = (
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
         >
-          <>Close robot door</>
+          <CloseDoor
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            deckConfig={deckConfig}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
         </ModuleWizardScreen>
       )
     case SECTIONS.INSTALL_SHUTTLE:
@@ -305,7 +317,17 @@ export const ModuleWizardFlows = (
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
         >
-          <>Install shuttle</>
+          <InstallShuttle
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            deckConfig={deckConfig}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
         </ModuleWizardScreen>
       )
     case SECTIONS.UPDATE_FIRMWARE:

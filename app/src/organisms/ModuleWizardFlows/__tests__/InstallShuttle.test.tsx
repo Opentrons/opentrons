@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -62,6 +62,7 @@ describe('CloseDoorInstallShuttle', () => {
       setErrorMessage: vi.fn(),
       isOnDevice: false,
       deckConfig: mockDeckConfig,
+      maintenanceRunId: null,
     }
     vi.mocked(useModuleApiRequests).mockReturnValue([
       () => LAST_ID,
@@ -102,6 +103,7 @@ describe('CloseDoorInstallShuttle', () => {
       setErrorMessage: vi.fn(),
       isOnDevice: false,
       deckConfig: mockDeckConfig,
+      maintenanceRunId: null,
     }
     render(props)
     screen.getByText('Stand back, robot is in motion')

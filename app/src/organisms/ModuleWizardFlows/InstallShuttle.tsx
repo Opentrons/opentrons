@@ -12,12 +12,11 @@ import {
 // TODO (chb, 2025-05-15): replace this imported video with a video of the shuttle being installed
 import videoPlaceholder from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { ModuleSetupWizardStepProps } from './types'
 
-interface InstallShuttleProps extends ModuleCalibrationWizardStepProps {
+interface InstallShuttleProps extends ModuleSetupWizardStepProps {
   deckConfig: DeckConfiguration
 }
 

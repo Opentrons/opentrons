@@ -12,9 +12,9 @@ import {
 } from '/app/molecules/SimpleWizardBody'
 
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { ModuleSetupWizardStepProps } from './types'
 
-interface CloseDoorProps extends ModuleCalibrationWizardStepProps {
+interface CloseDoorProps extends ModuleSetupWizardStepProps {
   deckConfig: DeckConfiguration
 }
 

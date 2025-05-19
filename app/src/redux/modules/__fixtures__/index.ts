@@ -392,8 +392,7 @@ export const mockFlexStacker: Types.FlexStackerModule = {
     latchState: 'closed',
     platformState: 'extended',
     hopperDoorState: 'closed',
-    axisStateX: 'extended',
-    axisStateZ: 'extended',
+    installDetected: true,
     status: 'idle',
   },
   usbPort: {
