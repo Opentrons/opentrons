@@ -117,6 +117,7 @@ export function AssignLiquidsModal(
             gap={SPACING.spacing8}
           >
             <DeckInfoLabel
+              size="large"
               deckLabel={getSlotInLocationStack(labware[labwareId].stack) ?? ''}
             />
             <StyledText
