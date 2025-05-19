@@ -23,13 +23,20 @@ interface LabwareWithDef {
   labwareNickName: string | null
 }
 
+// this is supposed to look at all load labware and move labware commands
+// and get the info for the top most labware for each slot that is at
+// some point occupied by labware or a stack of labware
+// this, if needed we'll have to update for stacker commands
+
 export const getInitialAndMovedLabwareInSlots = (
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 ): LabwareInSlot[] => {
   const { commands } = protocolAnalysis
+  // [adapterID]: loadLabwareCommand
   const initialLoadedLabwareByAdapter = getInitialLoadedLabwareByAdapter(
     commands
   )
+  // looks at load labware commands
   const topMostLabwareInSlots = getTopMostLabwareInSlots(protocolAnalysis)
   const allLabwareDefs = getAllLabwareDefinitions(protocolAnalysis)
 
