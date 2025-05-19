@@ -65,23 +65,13 @@ export const InstallShuttle = (
     </>
   )
 
-  if (isRobotMoving) {
-    return (
-      <SimpleWizardInProgressBody
-        // TODO ND: 9/6/23 use spinner until animations are made
-        alternativeSpinner={null}
-        description={t('stand_back_robot_in_motion')}
-      />
-    )
-  } else {
-    return (
-      <GenericWizardTile
-        header={i18n.format(t('place_shuttle'), 'capitalize')}
-        rightHandBody={shuttleInstallVid}
-        bodyText={bodyText}
-        proceedButtonText={t('confirm_placement')}
-        proceed={proceed}
-      />
-    )
-  }
+  return (
+    <GenericWizardTile
+      header={i18n.format(t('place_shuttle'), 'capitalize')}
+      rightHandBody={shuttleInstallVid}
+      bodyText={bodyText}
+      proceedButtonText={t('confirm_placement')}
+      proceed={proceed}
+    />
+  )
 }

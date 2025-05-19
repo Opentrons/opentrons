@@ -1,9 +1,6 @@
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 
-import {
-  COLORS,
-  PrimaryButton,
-} from '@opentrons/components'
+import { COLORS, PrimaryButton } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   FLEX_STACKER_MODULE_TYPE,
@@ -29,7 +26,7 @@ export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
     chainRunCommands,
     setErrorMessage,
   } = props
-  const { t } = useTranslation(['module_wizard_flows'])
+  const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
 
   const cutoutId = props.deckConfig.find(
     cc =>
@@ -74,7 +71,6 @@ export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
   if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
-        // TODO ND: 9/6/23 use spinner until animations are made
         alternativeSpinner={null}
         description={t('stand_back_robot_in_motion')}
       />
@@ -92,7 +88,7 @@ export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
             handleHomeShuttle()
           }}
         >
-          {t('continue')}
+          {i18n.format(t('shared:continue'), 'capitalize')}
         </PrimaryButton>
       </SimpleWizardBody>
     )
