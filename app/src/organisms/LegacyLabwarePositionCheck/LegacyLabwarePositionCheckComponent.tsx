@@ -1,10 +1,10 @@
-import { useState, useEffect, useReducer, useMemo } from 'react'
-import { createPortal } from 'react-dom'
-import isEqual from 'lodash/isEqual'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
-import { useConditionalConfirm, ModalShell } from '@opentrons/components'
+import type {
+  CommandData,
+  LabwareOffset,
+  LegacyLabwareOffsetCreateData,
+  LegacyLabwareOffsetLocation,
+} from '@opentrons/api-client'
+import { ModalShell, useConditionalConfirm } from '@opentrons/components'
 import {
   useAddLabwareOffsetToRunMutation,
   useCreateMaintenanceCommandMutation,
@@ -16,28 +16,6 @@ import {
   getVectorSum,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
-
-import { getTopPortalEl } from '/app/App/portal'
-// import { useTrackEvent } from '/app/redux/analytics'
-import { IntroScreen } from './IntroScreen'
-import { ExitConfirmation } from './ExitConfirmation'
-import { CheckItem } from './CheckItem'
-import { WizardHeader } from '/app/molecules/WizardHeader'
-import { getIsOnDevice } from '/app/redux/config'
-import { AttachProbe } from './AttachProbe'
-import { DetachProbe } from './DetachProbe'
-import { PickUpTip } from './PickUpTip'
-import { ReturnTip } from './ReturnTip'
-import { ResultsSummary } from './ResultsSummary'
-import { FatalError } from './FatalErrorModal'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import {
-  useChainMaintenanceCommands,
-  useNotifyCurrentMaintenanceRun,
-} from '/app/resources/maintenance_runs'
-import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
-import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
-
 import type {
   CompletedProtocolAnalysis,
   Coordinates,
@@ -45,13 +23,32 @@ import type {
   DropTipCreateCommand,
   RobotType,
 } from '@opentrons/shared-data'
-import type {
-  LegacyLabwareOffsetCreateData,
-  LabwareOffset,
-  CommandData,
-  LegacyLabwareOffsetLocation,
-} from '@opentrons/api-client'
+import { getTopPortalEl } from '/app/App/portal'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import type { LegacySupportLPCFlowsProps } from '/app/organisms/LabwarePositionCheck'
+import { getIsOnDevice } from '/app/redux/config'
+import {
+  useChainMaintenanceCommands,
+  useNotifyCurrentMaintenanceRun,
+} from '/app/resources/maintenance_runs'
+import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
+import isEqual from 'lodash/isEqual'
+import { useEffect, useMemo, useReducer, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { AttachProbe } from './AttachProbe'
+import { CheckItem } from './CheckItem'
+import { DetachProbe } from './DetachProbe'
+import { ExitConfirmation } from './ExitConfirmation'
+import { FatalError } from './FatalErrorModal'
+import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
+import { IntroScreen } from './IntroScreen'
+import { PickUpTip } from './PickUpTip'
+import { ResultsSummary } from './ResultsSummary'
+import { ReturnTip } from './ReturnTip'
+import { RobotMotionLoader } from './RobotMotionLoader'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -65,6 +62,7 @@ interface LegacyLabwarePositionCheckModalProps {
   onCloseClick: () => unknown
   protocolName: string
   isDeletingMaintenanceRun: boolean
+  analytics: LegacySupportLPCFlowsProps['analytics']
   setMaintenanceRunId?: (id: string | null) => void
   caughtError?: Error
 }
@@ -82,6 +80,7 @@ export const LegacyLabwarePositionCheckComponent = (
     setMaintenanceRunId,
     protocolName,
     isDeletingMaintenanceRun,
+    analytics,
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
@@ -245,6 +244,12 @@ export const LegacyLabwarePositionCheckComponent = (
         })
           .then(() => {
             setIsApplyingOffsets(false)
+            analytics.reportSaveOffsetToRunRecord({
+              uri: definitionUri,
+              vector: newOffset,
+              locationDetails: location,
+              slot: location.slotName,
+            })
           })
           .catch((e: Error) => {
             setFatalError(`error applying labware offsets: ${e.message}`)
