@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import { AttachedModule } from '@opentrons/api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -14,11 +13,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import {
-  DeckConfiguration,
-  getModuleDisplayName,
-  IdentifyColor,
-} from '@opentrons/shared-data'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { useGetNewModules } from '/app/App/hooks'
 import { i18n } from '/app/i18n'
@@ -28,11 +23,12 @@ import {
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
 
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { AttachedModule } from '@opentrons/api-client'
+import type { IdentifyColor } from '@opentrons/shared-data'
+import type { ModuleSetupWizardStepProps } from './types'
 
-interface SelectModuleProps extends ModuleCalibrationWizardStepProps {
+interface SelectModuleProps extends ModuleSetupWizardStepProps {
   buildFlowForSelectedModule: (module: AttachedModule) => void
-  deckConfig: DeckConfiguration
   isLoadedInRun: boolean
 }
 
@@ -87,7 +83,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
     }
     // blink new module
     for (const mod of newModules) {
-      if (mod.serialNumber == serialNumber) {
+      if (mod.serialNumber === serialNumber) {
         sendIdentifyModule(mod, true)
         setSelectedModule(mod)
         break
