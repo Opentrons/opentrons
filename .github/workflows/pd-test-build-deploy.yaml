@@ -75,7 +75,7 @@ jobs:
     name: 'build protocol designer'
     needs: ['unit-test', 'e2e-test']
     runs-on: 'ubuntu-24.04'
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' || github.ref_name == 'pd-sandbox-deployment-fix'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -119,7 +119,7 @@ jobs:
     name: 'deploy protocol designer'
     needs: ['build-pd']
     runs-on: 'ubuntu-24.04'
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' || github.ref_name == 'pd-sandbox-deployment-fix'
     permissions:
       id-token: write
       contents: read
