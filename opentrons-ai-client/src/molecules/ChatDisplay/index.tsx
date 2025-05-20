@@ -17,7 +17,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
-  LegacyStyledText,
   Link,
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
@@ -329,9 +328,12 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         )}
         {protocol_content != null && (
           <StyledText
-            as="span"
-            fontSize={TYPOGRAPHY.fontSize20}
-            lineHeight={TYPOGRAPHY.lineHeight24}
+            as="p"
+            desktopStyle="bodyDefaultRegular"
+            css={styledCss`
+              font-size: ${TYPOGRAPHY.fontSize20};
+              line-height: ${TYPOGRAPHY.lineHeight24};
+            `}
           >
             <Trans
               t={t}
@@ -367,7 +369,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
 
             {/* Render the full reply (which includes comments) after the badge and JSON view */}
             {typeof reply === 'string' && reply.trim() !== '' && (
-              <ParagraphText style={{ marginTop: SPACING.spacing16 }}>
+              <ParagraphText customCss={{ marginTop: SPACING.spacing16 }}>
                 {reply}
               </ParagraphText>
             )}
@@ -433,48 +435,46 @@ function ExternalLink(
 }
 
 interface ParagraphTextProps extends React.PropsWithChildren<{}> {
-  className?: string
-  style?: React.CSSProperties
   [key: string]: any
   customCss?: string | CSSObject | FlattenSimpleInterpolation
 }
 
 function ParagraphText(props: ParagraphTextProps): JSX.Element {
-  const {
-    children,
-    className,
-    style,
-    customCss,
-    ...otherUnhandledProps
-  } = props
+  const { children, customCss, ...otherUnhandledProps } = props
 
   return (
-    <LegacyStyledText
+    <StyledText
       {...otherUnhandledProps}
-      className={className}
-      style={style}
-      fontSize={TYPOGRAPHY.fontSize20}
-      lineHeight={TYPOGRAPHY.lineHeight24}
+      desktopStyle="bodyDefaultRegular"
       css={styledCss`
         white-space: pre-wrap;
+        font-size: ${TYPOGRAPHY.fontSize20};
+        line-height: ${TYPOGRAPHY.lineHeight24};
         ${customCss}
       `}
     >
       {children}
-    </LegacyStyledText>
+    </StyledText>
   )
 }
 
 function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="h3" />
+  return <StyledText {...props} desktopStyle="headingSmallRegular" as="h3" />
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="li" marginLeft={SPACING.spacing16} />
+  return (
+    <StyledText
+      {...props}
+      desktopStyle="bodyDefaultRegular"
+      as="li"
+      marginLeft={SPACING.spacing16}
+    />
+  )
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="ul" />
+  return <StyledText {...props} desktopStyle="bodyDefaultRegular" as="ul" />
 }
 
 const CodeWrapper = styled(Flex)`
