@@ -18,10 +18,7 @@ import {
 } from '../../../../steplist/formLevel'
 
 import type { DropdownOption } from '@opentrons/components'
-import type {
-  InvariantContext,
-  PipetteEntity,
-} from '@opentrons/step-generation'
+import type { PipetteEntity } from '@opentrons/step-generation'
 import type {
   FormData,
   HydratedFormData,

@@ -18,6 +18,7 @@ import { getStagingAreaAddressableAreas } from '../../utils'
 import {
   composeErrors,
   enterValueWithinRange,
+  greaterThanZero,
   isTimeFormat,
   isTimeFormatMinutesSeconds,
   maxFieldValue,
@@ -303,7 +304,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     hydrate: getPipetteEntity,
   },
   times: {
-    getErrors: composeErrors(requiredField),
+    getErrors: composeErrors(greaterThanZero),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(0)),
     castValue: Number,
   },

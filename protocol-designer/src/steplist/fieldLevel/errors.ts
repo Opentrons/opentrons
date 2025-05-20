@@ -1,8 +1,6 @@
 import isArray from 'lodash/isArray'
 
-import { InvariantContext } from '@opentrons/step-generation'
-
-import { HydratedFormData } from '../../form-types'
+import type { HydratedFormData } from '../../form-types'
 
 /*******************
  ** Error Messages **
@@ -41,6 +39,10 @@ export type ErrorChecker = (
 
 export const requiredField: ErrorChecker = (value: unknown) =>
   !value ? FIELD_ERRORS.REQUIRED : null
+
+export const greaterThanZero: ErrorChecker = (value: unknown) =>
+  !value ? 'Enter an integer value greater than 0' : null
+
 export const isTimeFormat: ErrorChecker = (value: unknown): string | null => {
   const timeRegex = new RegExp(/^\d{1,2}:(?:[0-5]?\d):(?:[0-5]?\d)$/g)
   return (typeof value === 'string' && timeRegex.test(value)) || !value

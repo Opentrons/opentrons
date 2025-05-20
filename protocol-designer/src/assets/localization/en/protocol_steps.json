@@ -183,7 +183,7 @@
   "touch_tip_position": "Touch tip position from top",
   "transfer": "Transfer",
   "unknown_module": "Unknown module",
-  "valid_range": "Valid range between {{min}} - {{max}} {{unit}}",
+  "valid_range": "Must be between 0.1 and {{max}} {{unit}}",
   "view_details": "View details",
   "volume_per_well": "Volume per well",
   "well_name": "Well {{wellName}}",

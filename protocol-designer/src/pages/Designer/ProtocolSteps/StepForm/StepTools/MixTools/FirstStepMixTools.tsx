@@ -110,6 +110,7 @@ export function FirstStepMixTools({
         units={t('units.times')}
         title={t('protocol_steps:mix_repetitions')}
         showTooltip={false}
+        errorToShow={getFormLevelError('times', mappedErrorsToField)}
       />
       <Divider marginY="0" />
       <Flex
