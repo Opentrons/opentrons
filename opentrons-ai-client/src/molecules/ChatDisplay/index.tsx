@@ -4,7 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
 import { useAtom } from 'jotai'
 import { delay } from 'lodash'
-import styled from 'styled-components'
+import styled, { css as styledCss } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -36,6 +36,7 @@ import {
 } from '../../resources/atoms'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 
+import type { CSSObject, FlattenSimpleInterpolation } from 'styled-components'
 import type { ChatData } from '../../resources/types'
 
 import smallLogo from '../../assets/images/opentrons_logo_small.svg'
@@ -327,11 +328,10 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
           </Markdown>
         )}
         {protocol_content != null && (
-          <span
-            style={{
-              fontSize: TYPOGRAPHY.fontSize20,
-              lineHeight: TYPOGRAPHY.lineHeight24,
-            }}
+          <StyledText
+            as="span"
+            fontSize={TYPOGRAPHY.fontSize20}
+            lineHeight={TYPOGRAPHY.lineHeight24}
           >
             <Trans
               t={t}
@@ -347,7 +347,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
                 margin={`${SPACING.spacing4} 0 0 ${SPACING.spacing4}`}
               />
             </Link>
-          </span>
+          </StyledText>
         )}
 
         {/* Display protocol_content badge, content, and then the comments (reply) */}
@@ -435,18 +435,30 @@ function ExternalLink(
 interface ParagraphTextProps extends React.PropsWithChildren<{}> {
   className?: string
   style?: React.CSSProperties
-  // Allow any other prop that LegacyStyledText might accept or that react-markdown might pass
   [key: string]: any
+  customCss?: string | CSSObject | FlattenSimpleInterpolation
 }
 
 function ParagraphText(props: ParagraphTextProps): JSX.Element {
-  const { children, ...rest } = props
+  const {
+    children,
+    className,
+    style,
+    customCss,
+    ...otherUnhandledProps
+  } = props
+
   return (
     <LegacyStyledText
-      {...rest} // Pass className, style, and any other props
+      {...otherUnhandledProps}
+      className={className}
+      style={style}
       fontSize={TYPOGRAPHY.fontSize20}
       lineHeight={TYPOGRAPHY.lineHeight24}
-      css="white-space: pre-wrap;"
+      css={styledCss`
+        white-space: pre-wrap;
+        ${customCss}
+      `}
     >
       {children}
     </LegacyStyledText>
