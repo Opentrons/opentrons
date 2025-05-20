@@ -41,6 +41,9 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const [pipetteModal, openPipetteModal] = useState<boolean>(false)
   const [pipetteGen, setPipetteGen] = useState<Gen | 'flex'>('flex')
   const [pipetteVolume, setPipetteVolume] = useState<string | null>(null)
+  const [selectedPipetteName, setSelectedPipetteName] = useState<string | null>(
+    null
+  )
   const [pipetteType, setPipetteType] = useState<PipetteType | null>(null)
   const ref = useRef<HTMLDivElement | null>(null)
 
@@ -104,7 +107,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
 
   useEffect(() => {
     handleScrollToBottom()
-  }, [hasGripper, hasThermocycer, hasWasteChute])
+  }, [hasGripper, hasThermocycer, hasWasteChute, selectedPipetteName])
 
   const handleSwapMounts = (): void => {
     const leftPipetteName = pipettesByMount.left.pipetteName
@@ -203,6 +206,14 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     setValue('hasThermocycler', value)
   }
 
+  useEffect(() => {
+    if (selectedPipetteName != null) {
+      setValue(`pipettesByMount.${mount}.pipetteName`, selectedPipetteName)
+      openPipetteModal(false)
+      setSelectedPipetteName(null)
+    }
+  }, [selectedPipetteName])
+
   return (
     <>
       {pipetteModal ? (
@@ -218,6 +229,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
           handleBack={() => {
             openPipetteModal(false)
           }}
+          setSelectedPipetteName={setSelectedPipetteName}
         />
       ) : null}
       <HandleEnter onEnter={proceed}>
