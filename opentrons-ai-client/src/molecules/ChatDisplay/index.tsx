@@ -327,7 +327,12 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
           </Markdown>
         )}
         {protocol_content != null && (
-          <span>
+          <span
+            style={{
+              fontSize: TYPOGRAPHY.fontSize20,
+              lineHeight: TYPOGRAPHY.lineHeight24,
+            }}
+          >
             <Trans
               t={t}
               i18nKey="pd_protocol_reply"
@@ -345,7 +350,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
           </span>
         )}
 
-        {/* Display protocol_content badge and content */}
+        {/* Display protocol_content badge, content, and then the comments (reply) */}
         {!isUser && protocol_content && (
           <>
             <ProtocolContentBadge
@@ -358,6 +363,13 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
               <CodeWrapper>
                 {JSON.stringify(protocol_content, null, 2)}
               </CodeWrapper>
+            )}
+
+            {/* Render the full reply (which includes comments) after the badge and JSON view */}
+            {typeof reply === 'string' && reply.trim() !== '' && (
+              <ParagraphText style={{ marginTop: SPACING.spacing16 }}>
+                {reply}
+              </ParagraphText>
             )}
           </>
         )}
@@ -420,14 +432,24 @@ function ExternalLink(
   )
 }
 
-function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
+interface ParagraphTextProps extends React.PropsWithChildren<{}> {
+  className?: string
+  style?: React.CSSProperties
+  // Allow any other prop that LegacyStyledText might accept or that react-markdown might pass
+  [key: string]: any
+}
+
+function ParagraphText(props: ParagraphTextProps): JSX.Element {
+  const { children, ...rest } = props
   return (
     <LegacyStyledText
-      {...props}
+      {...rest} // Pass className, style, and any other props
       fontSize={TYPOGRAPHY.fontSize20}
       lineHeight={TYPOGRAPHY.lineHeight24}
       css="white-space: pre-wrap;"
-    />
+    >
+      {children}
+    </LegacyStyledText>
   )
 }
 

@@ -1,5 +1,4 @@
 import json
-import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -291,21 +290,21 @@ class AnthropicPredict:
             )
             if response.content and response.content[0].type == "text":
                 response_text = response.content[0].text
-                # Look for JSON within <pd_json> tags or just assume the whole response is JSON
-                json_match = re.search(r"<pd_json>\s*(.*?)\s*</pd_json>", response_text, re.DOTALL)
-                if json_match:
-                    partial_json = json_match.group(1)
-                    # Clean up any markdown code block formatting if present
-                    if partial_json.startswith("```json") or partial_json.startswith("```"):
-                        partial_json = re.sub(r"^```(?:json)?\n(.*?)\n```$", r"\1", partial_json, flags=re.DOTALL)
-                else:
-                    # If no tags found, check if response is directly JSON
-                    if response_text.strip().startswith("{") and response_text.strip().endswith("}"):
-                        partial_json = response_text
-                    else:
-                        partial_json = f"No valid JSON protocol found in response:\n {response_text}"
-
-                return partial_json
+                return response_text
+                # # Look for JSON within <pd_json> tags or just assume the whole response is JSON
+                # json_match = re.search(r"<PD_JSON>\s*(.*?)\s*</PD_JSON>", response_text, re.DOTALL)
+                # if json_match:
+                #     partial_json = json_match.group(1)
+                #     # Clean up any markdown code block formatting if present
+                #     if partial_json.startswith("```json") or partial_json.startswith("```"):
+                #         partial_json = re.sub(r"^```(?:json)?\n(.*?)\n```$", r"\1", partial_json, flags=re.DOTALL)
+                # else:
+                #     # If no tags found, check if response is directly JSON
+                #     if response_text.strip().startswith("{") and response_text.strip().endswith("}"):
+                #         partial_json = response_text
+                #     else:
+                #         partial_json = f"No valid JSON protocol found in response:\n {response_text}"
+                # return partial_json
 
             logger.error("Unexpected response type")
             return None
