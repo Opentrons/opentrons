@@ -81,7 +81,9 @@ describe('SelectPipetteModal', () => {
       setPipetteVolume: vi.fn(),
       setPipetteType: vi.fn(),
       mount: 'right',
+      setSelectedPipetteName: vi.fn(),
     }
+
     vi.mocked(IncompatibleTipsModal).mockReturnValue(
       <div>mock incompatible tips modal</div>
     )
@@ -151,6 +153,7 @@ describe('SelectPipetteModal', () => {
       setPipetteVolume: vi.fn(),
       setPipetteType: vi.fn(),
       mount: 'right',
+      setSelectedPipetteName: vi.fn(),
     }
     render(props)
     screen.getByText('Pipette type')
