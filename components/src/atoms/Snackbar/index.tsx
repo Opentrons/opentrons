@@ -28,16 +28,18 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
 
   const animationStyle = isClosed ? CLOSE_STYLE : OPEN_STYLE
 
+  // Manages the snackbar closing sequencing
   useEffect(() => {
+    if (duration == null || duration === 0) return
+
     const closeTimer = setTimeout(() => {
+      // Trigger the closing animation
       setIsClosed(true)
-      const onCloseTimer = setTimeout(() => {
-        onClose?.()
-      }, SNACKBAR_ANIMATION_DURATION - 50)
-      return () => {
-        clearTimeout(onCloseTimer)
-      }
+
+      // Call onClose after animation completes, if it exists
+      onClose != null && setTimeout(onClose, SNACKBAR_ANIMATION_DURATION - 50)
     }, duration)
+
     return () => {
       clearTimeout(closeTimer)
     }

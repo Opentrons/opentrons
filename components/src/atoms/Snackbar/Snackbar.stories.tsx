@@ -47,9 +47,13 @@ const SnackbarRenderComponent: React.FC<
 
   return (
     <>
-      <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing16}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        paddingY={SPACING.spacing16}
+        gap={SPACING.spacing8}
+      >
         <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
-        <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing8}>
+        <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText
             desktopStyle="bodyDefaultRegular"
             oddStyle="level4HeaderRegular"
