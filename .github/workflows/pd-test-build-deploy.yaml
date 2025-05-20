@@ -4,6 +4,7 @@ name: 'PD test, build, and deploy'
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     paths:
       - 'protocol-designer/**'
       - 'step-generation/**'
@@ -14,21 +15,23 @@ on:
       - '.github/actions/js/setup/action.yml'
       - '.github/actions/git/resolve-tag/action.yml'
       - '.github/actions/environment/complex-variables/action.yml'
+      
   push:
-    paths:
-      - 'protocol-designer/**'
-      - 'step-generation/**'
-      - 'shared-data/**'
-      - 'components/**'
-      - 'package.json'
-      - '.github/workflows/pd-test-build-deploy.yaml'
-      - '.github/actions/js/setup/action.yml'
-      - '.github/actions/git/resolve-tag/action.yml'
-      - '.github/actions/environment/complex-variables/action.yml'
     branches:
       - '**'
     tags:
       - 'protocol-designer*'
+    paths:
+      - 'protocol-designer/**'
+      - 'step-generation/**'
+      - 'shared-data/**'
+      - 'components/**'
+      - 'package.json'
+      - '.github/workflows/pd-test-build-deploy.yaml'
+      - '.github/actions/js/setup/action.yml'
+      - '.github/actions/git/resolve-tag/action.yml'
+      - '.github/actions/environment/complex-variables/action.yml'
+
   workflow_dispatch:
 
 concurrency:
@@ -45,7 +48,6 @@ env:
 jobs:
   unit-test:
     name: 'protocol designer unit tests'
-    if: github.event_name == 'push' && github.event.pull_request == null || github.event_name == 'pull_request'
     runs-on: 'ubuntu-24.04'
     timeout-minutes: 20
     steps:
@@ -62,7 +64,6 @@ jobs:
 
   e2e-test:
     name: 'protocol designer e2e tests'
-    if: github.event_name == 'push' && github.event.pull_request == null || github.event_name == 'pull_request'
     runs-on: 'ubuntu-24.04'
     timeout-minutes: 20
     steps:
