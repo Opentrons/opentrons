@@ -215,11 +215,13 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                     <NiceModal.Provider>
                       <ToasterOven>
                         <ProtocolReceiptToasts />
-                        <ModuleAttachedToasts
-                          openFlow={() => {
-                            setShowModuleSetupModal(true)
-                          }}
-                        />
+                        {!showModuleSetupModal ? (
+                          <ModuleAttachedToasts
+                            openFlow={() => {
+                              setShowModuleSetupModal(true)
+                            }}
+                          />
+                        ) : null}
                         <SharedScrollRefProvider>
                           <OnDeviceDisplayAppRoutes />
                         </SharedScrollRefProvider>
