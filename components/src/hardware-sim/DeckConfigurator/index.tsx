@@ -301,7 +301,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
             hasWasteChute={[
-               'wasteChuteRightAdapterCovered','wasteChuteRightAdapterNoCover'
+              'wasteChuteRightAdapterCovered',
+              'wasteChuteRightAdapterNoCover',
             ].includes(cutoutFixtureId)}
             selected={cutoutId === selectedCutoutId}
             addressableArea={addressableAreaId}

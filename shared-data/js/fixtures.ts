@@ -24,7 +24,7 @@ import {
   D1_ADDRESSABLE_AREA,
   D2_ADDRESSABLE_AREA,
   D3_ADDRESSABLE_AREA,
-  DUMMY_STAGING_AREA_WITHOUT_STAGING_AREA,
+  FAKE_STAGING_AREA_RIGHT_SLOT,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_V1_FIXTURE,
@@ -37,7 +37,6 @@ import {
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
   SINGLE_RIGHT_SLOT_FIXTURE,
-  STAGING_AREA_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
@@ -59,7 +58,6 @@ import type {
   AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
-  FlexFakeAddressableAreaName,
   OT2CutoutId,
 } from '../deck'
 import type {
@@ -182,7 +180,7 @@ export const getCutoutFixtureReplacmentIfNeeded = (
     cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
     deckDefinition.robot.model === FLEX_ROBOT_TYPE
   ) {
-    return DUMMY_STAGING_AREA_WITHOUT_STAGING_AREA
+    return FAKE_STAGING_AREA_RIGHT_SLOT
   }
   return cutoutFixtureId
 }
@@ -240,11 +238,15 @@ export const getAALocationForCutoutAndFixtureId = (
   if (isFakeAA(addressableArea)) {
     return [164.0, 0.0, 14.5]
   } else {
-    return (
-      deckDefinition.locations.addressableAreas.find(
-        (aaItem: AddressableArea) => aaItem.id === addressableArea
-      )?.offsetFromCutoutFixture ?? [0, 0, 0]
+    const addressableAreaItem = deckDefinition.locations.addressableAreas.find(
+      (aaItem: AddressableArea) => aaItem.id === addressableArea
     )
+    if (addressableAreaItem == null) {
+      console.error(
+        `Addressable area ${addressableArea} location was not found.`
+      )
+    }
+    return addressableAreaItem?.offsetFromCutoutFixture ?? [0, 0, 0]
   }
 }
 
@@ -274,7 +276,7 @@ export const getAAFromCutoutFixtureId = (
    * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
    */
   switch (cutoutFixtureId) {
-    case DUMMY_STAGING_AREA_WITHOUT_STAGING_AREA:
+    case FAKE_STAGING_AREA_RIGHT_SLOT:
       return getDummyAAForDummyStagingArea(inputCutoutId)
     default:
       return (

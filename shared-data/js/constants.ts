@@ -551,8 +551,8 @@ export const SINGLE_RIGHT_SLOT_FIXTURE: 'singleRightSlot' = 'singleRightSlot'
 export const STAGING_AREA_RIGHT_SLOT_FIXTURE: 'stagingAreaRightSlot' =
   'stagingAreaRightSlot'
 
-export const DUMMY_STAGING_AREA_WITHOUT_STAGING_AREA: 'stagingAreaWithoutStagingAreaSlot' =
-  'stagingAreaWithoutStagingAreaSlot'
+export const FAKE_STAGING_AREA_RIGHT_SLOT: 'FakeStagingAreaRightSlot' =
+  'FakeStagingAreaRightSlot'
 
 export const TRASH_BIN_FIXTURE: 'trashBin' = 'trashBin'
 export const TRASH_BIN_ADAPTER_FIXTURE: 'trashBinAdapter' = 'trashBinAdapter'

@@ -2,6 +2,7 @@ import anonymous from './anonymous.json'
 import app_settings from './app_settings.json'
 import branded from './branded.json'
 import change_pipette from './change_pipette.json'
+import deck_configuration from './deck_configuration.json'
 import device_details from './device_details.json'
 import device_settings from './device_settings.json'
 import devices_landing from './devices_landing.json'
@@ -60,4 +61,5 @@ export const en = {
   run_details,
   shared,
   top_navigation,
+  deck_configuration,
 }

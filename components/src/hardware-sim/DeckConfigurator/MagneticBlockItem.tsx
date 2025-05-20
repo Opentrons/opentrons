@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -35,9 +37,9 @@ interface MagneticBlockItemProps {
   selected?: boolean
 }
 
-const MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME = 'Mag Block'
-
 export function MagneticBlockItem(props: MagneticBlockItemProps): JSX.Element {
+  const { t } = useTranslation('deck_configuration')
+
   const {
     deckDefinition,
     fixtureLocation,
@@ -89,9 +91,7 @@ export function MagneticBlockItem(props: MagneticBlockItemProps): JSX.Element {
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME}
-        </Text>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{t('mag_block')}</Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

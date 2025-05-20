@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -35,9 +37,9 @@ interface HeaterShakerItemProps {
   selected?: boolean
 }
 
-const HEATER_SHAKER_MODULE_FIXTURE_DISPLAY_NAME = 'Heater-Shaker'
-HeaterShakerItem
 export function HeaterShakerItem(props: HeaterShakerItemProps): JSX.Element {
+  const { t } = useTranslation('deck_configuration')
+
   const {
     deckDefinition,
     handleClickRemove,
@@ -86,9 +88,7 @@ export function HeaterShakerItem(props: HeaterShakerItemProps): JSX.Element {
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {HEATER_SHAKER_MODULE_FIXTURE_DISPLAY_NAME}
-        </Text>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{t('heater_Shaker')}</Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

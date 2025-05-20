@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -25,8 +27,6 @@ import type {
 
 // TODO(BC, 2024-03-21): This component is almost identical to HeaterShakerFixture, consider consolidating?
 
-const TEMPERATURE_MODULE_FIXTURE_DISPLAY_NAME = 'Temperature'
-
 interface TemperatureModuleFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
@@ -41,6 +41,8 @@ interface TemperatureModuleFixtureProps {
 export function TemperatureModuleItem(
   props: TemperatureModuleFixtureProps
 ): JSX.Element {
+  const { t } = useTranslation('deck_configuration')
+
   const {
     deckDefinition,
     handleClickRemove,
@@ -94,9 +96,7 @@ export function TemperatureModuleItem(
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {TEMPERATURE_MODULE_FIXTURE_DISPLAY_NAME}
-        </Text>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{t('temperature')}</Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

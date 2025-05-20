@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
@@ -30,11 +32,11 @@ interface AbsorbanceReaderItemProps {
   selected?: boolean
 }
 
-const ABSORBANCE_READER_FIXTURE_DISPLAY_NAME = 'Absorbance'
-
 export function AbsorbanceReaderItem(
   props: AbsorbanceReaderItemProps
 ): JSX.Element {
+  const { t } = useTranslation('deck_configuration')
+
   const {
     deckDefinition,
     handleClickRemove,
@@ -79,9 +81,7 @@ export function AbsorbanceReaderItem(
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {ABSORBANCE_READER_FIXTURE_DISPLAY_NAME}
-        </Text>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{t('absorbance')}</Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

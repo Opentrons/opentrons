@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -14,7 +16,6 @@ import {
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  TRASH_BIN_DISPLAY_NAME,
   Y_ADJUSTMENT,
 } from './constants'
 
@@ -38,6 +39,8 @@ interface TrashBinConfigItemProps {
 export function TrashBinConfigItem(
   props: TrashBinConfigItemProps
 ): JSX.Element {
+  const { t } = useTranslation('deck_configuration')
+
   const {
     deckDefinition,
     handleClickRemove,
@@ -90,9 +93,7 @@ export function TrashBinConfigItem(
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {TRASH_BIN_DISPLAY_NAME}
-        </Text>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{t('trash_bin')}</Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { getAALocationForCutoutAndFixtureId } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -12,12 +14,10 @@ import {
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  STAGING_AREA_DISPLAY_NAME,
   Y_ADJUSTMENT,
 } from './constants'
 
 import type {
-  AddressableArea,
   AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
@@ -39,6 +39,8 @@ interface StagingAreaConfigItemProps {
 export function StagingAreaConfigItem(
   props: StagingAreaConfigItemProps
 ): JSX.Element {
+  const { t } = useTranslation('deck_configuration')
+
   const {
     deckDefinition,
     handleClickRemove,
@@ -86,9 +88,7 @@ export function StagingAreaConfigItem(
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {STAGING_AREA_DISPLAY_NAME}
-        </Text>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{t('staging_area')}</Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

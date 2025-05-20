@@ -77,6 +77,7 @@ async def test_deck_configuration_cli(tmp_path: pathlib.Path) -> None:
             new_cli_output = await run_cli(persistence_directory)
             deserialized_new_cli_output = deserialize_deck_configuration(new_cli_output)
             assert deserialized_new_cli_output is not None
+            print("deserialized_new_cli_output[0]: ", deserialized_new_cli_output[0])
             assert (
                 CutoutFixturePlacement(
                     cutout_id="cutoutD3",

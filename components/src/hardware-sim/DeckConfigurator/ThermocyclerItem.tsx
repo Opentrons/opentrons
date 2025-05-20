@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
@@ -30,9 +32,9 @@ interface ThermocyclerItemProps {
   selected?: boolean
 }
 
-const THERMOCYCLER_FIXTURE_DISPLAY_NAME = 'Thermocycler'
-
 export function ThermocyclerItem(props: ThermocyclerItemProps): JSX.Element {
+  const { t } = useTranslation('deck_configuration')
+
   const {
     deckDefinition,
     handleClickRemove,
@@ -75,9 +77,7 @@ export function ThermocyclerItem(props: ThermocyclerItemProps): JSX.Element {
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {THERMOCYCLER_FIXTURE_DISPLAY_NAME}
-        </Text>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{t('thermocycler')}</Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}
