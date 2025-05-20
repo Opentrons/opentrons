@@ -1,5 +1,4 @@
 {
-  "allowedRoles": ["labware", "lid"],
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
@@ -13,7 +12,6 @@
   },
   "dimensions": {
     "xDimension": 127.7,
-    
     "yDimension": 85.48,
     "zDimension": 12.8
   },
@@ -24,11 +22,6 @@
       "wells": []
     }
   ],
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "parameters": {
     "format": "irregular",
     "quirks": [],
@@ -39,6 +32,11 @@
   "namespace": "custom_beta",
   "version": 2,
   "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
   "stackingOffsetWithModule": {
     "thermocyclerModuleV2": {
       "x": 0,
@@ -57,10 +55,10 @@
       "y": 0,
       "z": 6.492
     },
-    "custom_opentrons_tough_pcr_auto_sealing_lid":{
-      "x":0,
-      "y":0,
-      "z":6.492
+    "custom_opentrons_tough_pcr_auto_sealing_lid": {
+      "x": 0,
+      "y": 0,
+      "z": 6.492
     },
     "armadillo_96_wellplate_200ul_pcr_full_skirt": {
       "x": 0,
@@ -72,7 +70,7 @@
       "y": 0,
       "z": 8.193
     },
-    "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt":{
+    "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt": {
       "x": 0,
       "y": 0,
       "z": 8.193
@@ -139,9 +137,10 @@
       },
       "dropOffset": {
         "x": 0,
-        "y": 5.0,
-        "z": 50.0
+        "y": 5,
+        "z": 50
       }
     }
-  }
+  },
+  "allowedRoles": ["labware", "lid"]
 }

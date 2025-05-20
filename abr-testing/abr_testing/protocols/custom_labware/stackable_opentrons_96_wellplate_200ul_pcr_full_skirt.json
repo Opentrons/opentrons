@@ -9,9 +9,9 @@
     "isMagneticModuleCompatible": true
   },
   "metadata": {
-    "displayName": "Stackable Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
+    "displayName": "Stackable Opentrons Tough 96 Well Plate 200 \u00b5L PCR Full Skirt",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "µL",
+    "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
   "brand": {
