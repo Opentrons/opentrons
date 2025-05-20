@@ -202,22 +202,17 @@ pipette.move_to(mock_labware_1["A1"].top(z=2))
 pipette.prepare_to_aspirate()
 pipette.move_to(mock_labware_1["A1"].bottom())
 pipette.move_to(mock_labware_1["A1"].bottom())
-pipette.aspirate(
-    volume=10,
-    rate=56 / pipette.flow_rate.aspirate,
-)
+pipette.aspirate(volume=10, flow_rate=56)
 pipette.move_to(mock_labware_1["A1"].bottom())
 pipette.move_to(mock_labware_2["B1"].bottom())
 pipette.move_to(mock_labware_2["B1"].bottom())
-pipette.dispense(
-    volume=10,
-    rate=80 / pipette.flow_rate.dispense,
-)
+pipette.dispense(volume=10, flow_rate=80)
 pipette.move_to(mock_labware_2["B1"].bottom())
 pipette.move_to(mock_labware_1["A1"].top())
 pipette.flow_rate.blow_out = 50
 pipette.blow_out()
-pipette.drop_tip()`.trimStart()
+pipette.drop_tip()
+`.trim()
     )
   })
   it('should generate a consolidate step in py', () => {
@@ -306,21 +301,22 @@ pipette.pick_up_tip(location=mock_tiprack_1)
 pipette.aspirate(
     volume=10,
     location=mock_labware_1["A1"].bottom(z=-1),
-    rate=56 / pipette.flow_rate.aspirate,
+    flow_rate=56,
 )
 pipette.aspirate(
     volume=10,
     location=mock_labware_1["B1"].bottom(z=-1),
-    rate=56 / pipette.flow_rate.aspirate,
+    flow_rate=56,
 )
 pipette.dispense(
     volume=20,
     location=mock_labware_2["B1"].bottom(z=-1),
-    rate=80 / pipette.flow_rate.dispense,
+    flow_rate=80,
 )
 pipette.flow_rate.blow_out = 50
 pipette.blow_out(mock_trash_bin_1)
-pipette.drop_tip()`.trimStart()
+pipette.drop_tip()
+`.trim()
     )
   })
   it('should generate a distribute step in py', () => {
@@ -409,19 +405,20 @@ pipette.pick_up_tip(location=mock_tiprack_1)
 pipette.aspirate(
     volume=20,
     location=mock_labware_1["A1"].bottom(z=-1),
-    rate=56 / pipette.flow_rate.aspirate,
+    flow_rate=56,
 )
 pipette.dispense(
     volume=10,
     location=mock_labware_2["A1"].bottom(z=-1),
-    rate=80 / pipette.flow_rate.dispense,
+    flow_rate=80,
 )
 pipette.dispense(
     volume=10,
     location=mock_labware_2["B1"].bottom(z=-1),
-    rate=80 / pipette.flow_rate.dispense,
+    flow_rate=80,
 )
-pipette.drop_tip()`.trimStart()
+pipette.drop_tip()
+`.trim()
     )
   })
 })

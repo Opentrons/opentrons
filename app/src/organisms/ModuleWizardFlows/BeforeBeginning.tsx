@@ -12,7 +12,7 @@ import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { ModuleSetupWizardStepProps } from './types'
 
 interface EqipmentItem {
   loadName: string
@@ -20,7 +20,7 @@ interface EqipmentItem {
   subtitle?: string
 }
 
-type BeforeBeginningProps = ModuleCalibrationWizardStepProps
+type BeforeBeginningProps = ModuleSetupWizardStepProps
 
 export const BeforeBeginning = (
   props: BeforeBeginningProps

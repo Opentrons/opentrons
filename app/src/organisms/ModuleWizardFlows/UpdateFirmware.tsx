@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { COLORS, PrimaryButton } from '@opentrons/components'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import {
@@ -18,22 +19,37 @@ import {
   SUCCESS,
 } from '/app/redux/robot-api'
 
+import type { AttachedModule } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { ModuleSetupWizardStepProps } from './types'
 
-interface UpdateFirmwareProps extends ModuleCalibrationWizardStepProps {
+const EQUIPMENT_POLL_MS = 3000
+const MODULE_TIMEOUT_MS = 30000
+const NO_UPDATE_FOUND_TIMEOUT_MS = 2000
+interface UpdateFirmwareProps extends ModuleSetupWizardStepProps {
   robotName: string
+  patchModuleAfterUpdate: (module: AttachedModule) => void
 }
 
 export const UpdateFirmware = (
   props: UpdateFirmwareProps
 ): JSX.Element | null => {
-  const { proceed, setErrorMessage, attachedModule, robotName } = props
+  const {
+    proceed,
+    setErrorMessage,
+    attachedModule,
+    robotName,
+    patchModuleAfterUpdate,
+  } = props
   const { t } = useTranslation('module_wizard_flows')
 
   const dispatch = useDispatch<Dispatch>()
   const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
-
+  const moduleSerialNumber = props.attachedModule.serialNumber
+  const [
+    moduleRequestTimeoutId,
+    setModuleRequestTimeoutId,
+  ] = useState<ReturnType<typeof setTimeout> | null>(null)
   const [inProgress, setInProgress] = useState(false)
   const [shouldProceed, setShouldProceed] = useState(false)
 
@@ -41,6 +57,23 @@ export const UpdateFirmware = (
   const requestStatus = useSelector((state: State) => {
     return latestRequestId ? getRequestById(state, latestRequestId) : null
   })?.status
+  const attachedModules =
+    useModulesQuery({
+      refetchInterval: EQUIPMENT_POLL_MS,
+      enabled: requestStatus === SUCCESS && inProgress,
+    })?.data?.data ?? []
+  useEffect(() => {
+    const matchingModule = attachedModules.find(
+      module => module.serialNumber === moduleSerialNumber
+    )
+    if (matchingModule != null && requestStatus === SUCCESS) {
+      if (moduleRequestTimeoutId != null) {
+        clearTimeout(moduleRequestTimeoutId)
+      }
+      patchModuleAfterUpdate(matchingModule)
+      proceed()
+    }
+  }, [attachedModules, requestStatus])
 
   const handleUpdateFirmware = (): void => {
     handleModuleApiRequests(robotName, attachedModule.serialNumber)
@@ -51,19 +84,25 @@ export const UpdateFirmware = (
       setShouldProceed(true)
       setTimeout(() => {
         proceed()
-      }, 2000)
+      }, NO_UPDATE_FOUND_TIMEOUT_MS)
     }
   }, [])
 
   useEffect(() => {
-    setInProgress(requestStatus === PENDING)
-
-    if (requestStatus === FAILURE) {
+    if (requestStatus === PENDING) {
+      setInProgress(true)
+    } else if (requestStatus === FAILURE) {
+      setInProgress(false)
       setErrorMessage(t('firmware_update_failed') as string)
       if (latestRequestId != null) dispatch(dismissRequest(latestRequestId))
+    } else if (requestStatus === SUCCESS) {
+      // if the request succeeds but the module doesn't come back online within 30 seconds
+      // we should display an error message
+      const timeoutId = setTimeout(() => {
+        setErrorMessage(t('firmware_update_failed') as string)
+      }, MODULE_TIMEOUT_MS)
+      setModuleRequestTimeoutId(timeoutId)
     }
-
-    if (requestStatus === SUCCESS) proceed()
   }, [requestStatus, setInProgress])
 
   if (inProgress)
