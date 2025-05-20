@@ -1,16 +1,17 @@
 """Python shared data models for liquid class definitions."""
 
 from enum import Enum
-from typing import Literal, Union, Optional, Sequence, Tuple, Any
+from typing import Literal, Union, Optional, Sequence, Tuple, Any, TypedDict
 
 from pydantic import (
+    ConfigDict,
     BaseModel,
     field_validator,
     ValidationInfo,
     Field,
     StrictInt,
     StrictFloat,
-    StrictBool,
+    StrictBool, BeforeValidator, model_validator,
 )
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Annotated
@@ -66,18 +67,24 @@ class Coordinate(BaseModel):
     z: _Number
 
 
-class TipPosition(BaseModel):
+class BaseLiquidClassModel(BaseModel):
+    """Base class for liquid class definitions."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class TipPosition(BaseLiquidClassModel):
     """Properties for tip position reference and relative offset."""
 
     positionReference: PositionReference = Field(
-        ..., description="Position reference for tip position."
+        ..., alias="position_reference", description="Position reference for tip position."
     )
     offset: Coordinate = Field(
         ..., description="Relative offset from position reference."
     )
 
 
-class DelayParams(BaseModel):
+class DelayParams(BaseLiquidClassModel):
     """Parameters for delay."""
 
     duration: _NonNegativeNumber = Field(
@@ -85,7 +92,7 @@ class DelayParams(BaseModel):
     )
 
 
-class DelayProperties(BaseModel):
+class DelayProperties(BaseLiquidClassModel):
     """Shared properties for delay.."""
 
     enable: StrictBool = Field(..., description="Whether delay is enabled.")
@@ -94,6 +101,18 @@ class DelayProperties(BaseModel):
         description="Parameters for the delay function.",
         json_schema_extra=_remove_default,
     )
+
+    @model_validator(mode='before')
+    @classmethod
+    def reshape(cls, data: Any) -> Any:
+        """Move any params specified as top-level keys into the 'params' value."""
+        if isinstance(data, dict):
+            if 'duration' in data.keys():
+                if data.get("params"):
+                    raise ValueError("Delay properties should specify either duration or params, not both.")
+                data['params'] = DelayParams(duration=data['duration'])
+                data.pop('duration')
+        return data
 
     @field_validator("params")
     @classmethod
@@ -105,7 +124,7 @@ class DelayProperties(BaseModel):
         return v
 
 
-class LiquidClassTouchTipParams(BaseModel):
+class LiquidClassTouchTipParams(BaseLiquidClassModel):
     """Parameters for touch-tip."""
 
     # Note: Do not call this `TouchTipParams`, because that class name is used by the
@@ -114,17 +133,23 @@ class LiquidClassTouchTipParams(BaseModel):
 
     zOffset: _Number = Field(
         ...,
+        alias="z_offset",
         description="Offset from the top of the well for touch-tip, in millimeters.",
     )
     mmFromEdge: _Number = Field(
-        ..., description="Offset away from the the well edge, in millimeters."
+        ...,
+        alias="mm_from_edge",
+        description="Offset away from the the well edge, in millimeters."
     )
     speed: _GreaterThanZeroNumber = Field(
-        ..., description="Touch-tip speed, in millimeters per second."
+        ...,
+        alias="speed",
+        description="Touch-tip speed, in millimeters per second."
+
     )
 
 
-class TouchTipProperties(BaseModel):
+class TouchTipProperties(BaseLiquidClassModel):
     """Shared properties for the touch-tip function."""
 
     enable: StrictBool = Field(..., description="Whether touch-tip is enabled.")
@@ -133,6 +158,13 @@ class TouchTipProperties(BaseModel):
         description="Parameters for the touch-tip function.",
         json_schema_extra=_remove_default,
     )
+
+    @model_validator(mode='before')
+    @classmethod
+    def reshape(cls, data: Any) -> Any:
+        """Move any params specified as top-level keys into the 'params' value."""
+        return reshape_glob(data=data, params_model=LiquidClassTouchTipParams,
+                            property_name="Touch tip properties")
 
     @field_validator("params")
     @classmethod
@@ -146,19 +178,22 @@ class TouchTipProperties(BaseModel):
         return v
 
 
-class MixParams(BaseModel):
+class MixParams(BaseLiquidClassModel):
     """Parameters for mix."""
 
     repetitions: _StrictNonNegativeInt = Field(
         ...,
+        alias="repetitions",
         description="Number of mixing repetitions. 0 is valid, but no mixing will occur.",
     )
     volume: _GreaterThanZeroNumber = Field(
-        ..., description="Volume used for mixing, in microliters."
+        ...,
+        alias="volume",
+        description="Volume used for mixing, in microliters."
     )
 
 
-class MixProperties(BaseModel):
+class MixProperties(BaseLiquidClassModel):
     """Mixing properties."""
 
     enable: StrictBool = Field(..., description="Whether mix is enabled.")
@@ -167,6 +202,13 @@ class MixProperties(BaseModel):
         description="Parameters for the mix function.",
         json_schema_extra=_remove_default,
     )
+
+    @model_validator(mode='before')
+    @classmethod
+    def reshape(cls, data: Any) -> Any:
+        """Move any params specified as top-level keys into the 'params' value."""
+        return reshape_glob(data=data, params_model=MixParams,
+                            property_name="Mix properties")
 
     @field_validator("params")
     @classmethod
@@ -178,18 +220,22 @@ class MixProperties(BaseModel):
         return v
 
 
-class BlowoutParams(BaseModel):
+class BlowoutParams(BaseLiquidClassModel):
     """Parameters for blowout."""
 
     location: BlowoutLocation = Field(
-        ..., description="Location well or trash entity for blow out."
+        ...,
+        alias="location",
+        description="Location well or trash entity for blow out."
     )
     flowRate: _GreaterThanZeroNumber = Field(
-        ..., description="Flow rate for blow out, in microliters per second."
+        ...,
+        alias='flow_rate',
+        description="Flow rate for blow out, in microliters per second."
     )
 
 
-class BlowoutProperties(BaseModel):
+class BlowoutProperties(BaseLiquidClassModel):
     """Blowout properties."""
 
     enable: StrictBool = Field(..., description="Whether blow-out is enabled.")
@@ -198,6 +244,13 @@ class BlowoutProperties(BaseModel):
         description="Parameters for the blowout function.",
         json_schema_extra=_remove_default,
     )
+
+    @model_validator(mode='before')
+    @classmethod
+    def reshape(cls, data: Any) -> Any:
+        """Move any params specified as top-level keys into the 'params' value."""
+        return reshape_glob(data=data, params_model=BlowoutParams,
+                            property_name="Blowout properties")
 
     @field_validator("params")
     @classmethod
@@ -211,11 +264,36 @@ class BlowoutProperties(BaseModel):
         return v
 
 
-class Submerge(BaseModel):
+def reshape_glob(
+        data: Any,
+        params_model: Union[LiquidClassTouchTipParams, BlowoutParams, DelayParams, MixParams],
+        property_name: str
+    ) -> Any:
+    """Move any params specified as top-level keys into the 'params' value."""
+    if isinstance(data, dict):
+        params_list = [meta.alias for field, meta in params_model.model_fields.items()]
+        list_of_presence_of_params = [param in data.keys() for param in params_list]
+        if any(list_of_presence_of_params):
+            if not all(list_of_presence_of_params):
+                raise ValueError(
+                    f"{property_name} should specify either all of the params-"
+                    f"{params_list} - or none of them."
+                )
+            if data.get("params"):
+                raise ValueError(
+                    f"{property_name} should specify either all of"
+                    f" {params_list} or 'params', not both."
+                )
+            data['params'] = params_model.model_validate({param : data[param] for param in params_list})
+            for param in params_list:
+                data.pop(param)
+    return data
+
+class Submerge(BaseLiquidClassModel):
     """Shared properties for the submerge function before aspiration or dispense."""
 
     startPosition: TipPosition = Field(
-        ..., description="Tip position before starting the submerge."
+        ..., alias="start_position", description="Tip position before starting the submerge."
     )
     speed: _NonNegativeNumber = Field(
         ..., description="Speed of submerging, in millimeters per second."
@@ -223,7 +301,7 @@ class Submerge(BaseModel):
     delay: DelayProperties = Field(..., description="Delay settings for submerge.")
 
 
-class RetractAspirate(BaseModel):
+class RetractAspirate(BaseLiquidClassModel):
     """Shared properties for the retract function after aspiration."""
 
     endPosition: TipPosition = Field(
@@ -243,7 +321,7 @@ class RetractAspirate(BaseModel):
     )
 
 
-class RetractDispense(BaseModel):
+class RetractDispense(BaseLiquidClassModel):
     """Shared properties for the retract function after dispense."""
 
     endPosition: TipPosition = Field(
@@ -266,7 +344,7 @@ class RetractDispense(BaseModel):
     )
 
 
-class AspirateProperties(BaseModel):
+class AspirateProperties(BaseLiquidClassModel):
     """Properties specific to the aspirate function."""
 
     submerge: Submerge = Field(..., description="Submerge settings for aspirate.")
@@ -292,7 +370,7 @@ class AspirateProperties(BaseModel):
     delay: DelayProperties = Field(..., description="Delay settings after an aspirate")
 
 
-class SingleDispenseProperties(BaseModel):
+class SingleDispenseProperties(BaseLiquidClassModel):
     """Properties specific to the single-dispense function."""
 
     submerge: Submerge = Field(
@@ -320,7 +398,7 @@ class SingleDispenseProperties(BaseModel):
     delay: DelayProperties = Field(..., description="Delay after dispense, in seconds.")
 
 
-class MultiDispenseProperties(BaseModel):
+class MultiDispenseProperties(BaseLiquidClassModel):
     """Properties specific to the multi-dispense function."""
 
     submerge: Submerge = Field(..., description="Submerge settings for multi-dispense.")
@@ -351,7 +429,7 @@ class MultiDispenseProperties(BaseModel):
     )
 
 
-class ByTipTypeSetting(BaseModel):
+class ByTipTypeSetting(BaseLiquidClassModel):
     """Settings for each kind of tip this pipette can use."""
 
     tiprack: str = Field(
@@ -371,7 +449,7 @@ class ByTipTypeSetting(BaseModel):
     )
 
 
-class ByPipetteSetting(BaseModel):
+class ByPipetteSetting(BaseLiquidClassModel):
     """The settings for this liquid class when used with a specific kind of pipette."""
 
     pipetteModel: str = Field(..., description="The pipette model this applies to.")
@@ -380,7 +458,7 @@ class ByPipetteSetting(BaseModel):
     )
 
 
-class LiquidClassSchemaV1(BaseModel):
+class LiquidClassSchemaV1(BaseLiquidClassModel):
     """Defines a single liquid class's properties for liquid handling functions."""
 
     liquidClassName: str = Field(
