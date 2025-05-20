@@ -1,5 +1,7 @@
+
+import { useTranslation } from 'react-i18next'
+
 import {
-  CutoutFixture,
   DeckCutout,
   getAALocationForCutoutAndFixtureId,
 } from '@opentrons/shared-data'
@@ -39,11 +41,6 @@ interface FlexStackerItemProps {
   addressableArea: AddressableAreaName
 }
 
-// todo(should we move this to translations? )
-const FLEX_STACKER_FIXTURE_DISPLAY_NAME = 'Stacker'
-const FLEX_STACKER_WASTE_CHUTE_DISPLAY_NAME = 'Stacker + Waste chute'
-const FLEX_STACKER_MAG_BLOCK_DISPLAY_NAME = 'Stacker + Mag Block'
-
 export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
   const {
     deckDefinition,
@@ -55,12 +52,13 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
     selected = false,
   } = props
 
+  const { t } = useTranslation('deck_configuration')
   const cutoutDef = deckDefinition.locations.cutouts.find(
     (cutout: DeckCutout) => cutout.id === fixtureLocation
   )
-  let displayName = FLEX_STACKER_FIXTURE_DISPLAY_NAME
+  let displayName = t('flex_stacker_display_name')
   if (hasWasteChute) {
-    displayName = FLEX_STACKER_WASTE_CHUTE_DISPLAY_NAME
+    displayName = t('flex_stacker_waste_chute_display_name')
   }
 
   /**
