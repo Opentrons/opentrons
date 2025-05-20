@@ -323,10 +323,8 @@ export const makeSingleEditFieldProps = (
       dirtyFields,
     })
     const errors = getFieldErrors(name, value, hydratedForm)
-    console.log('errors', errors)
     const errorToShow =
       showErrors && errors.length > 0 ? errors.join(', ') : null
-    console.log('errorToShow', showErrors, errorToShow)
     const updateValue = (value: unknown): void => {
       handleChangeFormInput(name, value)
     }

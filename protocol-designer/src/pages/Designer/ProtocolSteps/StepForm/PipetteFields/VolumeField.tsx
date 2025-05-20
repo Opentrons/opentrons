@@ -6,6 +6,7 @@ import type { FieldProps } from '../types'
 
 export function VolumeField(props: FieldProps): JSX.Element {
   const { t } = useTranslation(['protocol_steps', 'application'])
+
   return (
     <InputStepFormField
       title={t('volume_per_well')}

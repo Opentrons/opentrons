@@ -59,7 +59,6 @@ export function FirstStepMixTools({
   const is8Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].spec.channels === 8
-  console.log('propsForFields', propsForFields.times)
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -109,8 +108,8 @@ export function FirstStepMixTools({
         {...propsForFields.times}
         units={t('units.times')}
         title={t('protocol_steps:mix_repetitions')}
-        showTooltip={false}
         errorToShow={getFormLevelError('times', mappedErrorsToField)}
+        showTooltip={false}
       />
       <Divider marginY="0" />
       <Flex
