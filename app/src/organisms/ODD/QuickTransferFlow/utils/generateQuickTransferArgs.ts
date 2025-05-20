@@ -551,6 +551,7 @@ export function generateQuickTransferArgs(
             : null,
         sourceWell: sourceWells[0],
         destWells,
+        conditioningVolume: null,
       }
       return {
         stepArgs: distributeStepArguments,

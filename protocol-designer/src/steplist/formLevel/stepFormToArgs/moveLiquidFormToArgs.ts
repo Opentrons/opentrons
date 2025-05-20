@@ -304,6 +304,12 @@ export const moveLiquidFormToArgs = (
     hydratedFormData.volume,
     tipRack
   )
+  const conditioningVolume =
+    hydratedFormData.conditioning_checkbox === true &&
+    hydratedFormData.conditioning_volume != null &&
+    hydratedFormData.conditioning_volume > 0
+      ? hydratedFormData.conditioning_volume
+      : 0
   const commonFields = {
     pipette: pipetteId,
     volume,
@@ -439,6 +445,7 @@ export const moveLiquidFormToArgs = (
         ...commonFields,
         commandCreatorFnName: 'distribute',
         disposalVolume,
+        conditioningVolume,
         // distribute needs blowout location field because disposal volume checkbox might be checked without blowout checkbox being checked
         blowoutLocation: hydratedFormData.blowout_location,
         mixBeforeAspirate,

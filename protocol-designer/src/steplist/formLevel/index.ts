@@ -10,6 +10,7 @@ import {
   aspirateWellsRequired,
   blockTemperatureHoldRequired,
   blockTemperatureRequired,
+  blowoutFlowRateRequired,
   blowoutLocationRequired,
   composeErrors,
   conditioningVolumeOutOfRange,
@@ -156,7 +157,8 @@ const stepFormHelperMap: {
       dispenseDelayDurationRequired,
       blowoutLocationRequired,
       pushOutVolumeOutOfRange,
-      pushOutVolumeRequired
+      pushOutVolumeRequired,
+      blowoutFlowRateRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,
@@ -203,7 +205,8 @@ const stepFormHelperMap: {
       aspirateTouchTipMmFromEdgeRequired,
       dispenseTouchTipMmFromEdgeRequired,
       conditioningVolumeRequired,
-      conditioningVolumeOutOfRange
+      conditioningVolumeOutOfRange,
+      blowoutFlowRateRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,

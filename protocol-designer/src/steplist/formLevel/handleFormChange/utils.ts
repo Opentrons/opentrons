@@ -730,6 +730,10 @@ const getLiquidClassValuesMoveLiquid = (args: {
     volume: Number(rawForm.volume),
     path: rawForm.path as PathOption,
     numDispenseWells: rawForm.dispense_wells.length,
+    aspirateAirGap:
+      rawForm.aspirate_airGap_checkbox === true
+        ? Number(rawForm.aspirate_airGap_volume)
+        : null,
   }).referenceVolumes
   // top-level aspirate fields
   const aspiratePositionReferenceFields = getPositionReferenceFields(
