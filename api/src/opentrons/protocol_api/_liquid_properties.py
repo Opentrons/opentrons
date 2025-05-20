@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from numpy import interp
-from typing import Optional, Dict, Sequence, Tuple, List
+from typing import Optional, Dict, Sequence, Tuple, List, TypedDict, Literal
+from typing_extensions import NotRequired
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     AspirateProperties as SharedDataAspirateProperties,
@@ -23,7 +24,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
     Coordinate,
 )
-
+from opentrons_shared_data.labware.types import Vector3D
 from . import validation
 
 
@@ -115,6 +116,86 @@ class TipPosition:
             positionReference=self._position_reference,
             offset=self.offset,
         )
+
+class TipPositionDict(TypedDict):
+    position_reference: Literal[[val.value for val in PositionReference.__members__.values()]]
+    offset: Vector3D
+
+
+class DelayPropertiesDict(TypedDict):
+    enabled: bool
+    duration: NotRequired[float]
+
+
+class TouchTipPropertiesDict(TypedDict):
+    enabled: bool
+    z_offset: NotRequired[float]
+    mm_from_edge: NotRequired[float]
+    speed: NotRequired[float]
+
+
+class MixPropertiesDict(TypedDict):
+    enabled: bool
+    repetitions: NotRequired[int]
+    volume: NotRequired[float]
+
+
+class BlowoutPropertiesDict(TypedDict):
+    enabled: bool
+    location: NotRequired[Literal[[val.value for val in BlowoutLocation.__members__.values()]]]
+    flow_rate: NotRequired[float]
+
+
+class SubmergeDict(TypedDict):
+    start_position: TipPositionDict
+    speed: float
+    delay: DelayPropertiesDict
+
+
+class RetractAspirateDict(TypedDict):
+    start_position: TipPositionDict
+    end_position: TipPositionDict
+    air_gap_by_volume: Sequence[Tuple[float, float]]
+    touch_tip: TouchTipPropertiesDict
+
+
+class RetractDispenseDict(TypedDict):
+    start_position: TipPositionDict
+    end_position: TipPositionDict
+    air_gap_by_volume: Sequence[Tuple[float, float]]
+    touch_tip: TouchTipPropertiesDict
+    blowout: BlowoutPropertiesDict
+
+class AspiratePropertiesDict(TypedDict):
+    submerge: SubmergeDict
+    flow_rate_by_volume: Sequence[Tuple[float, float]]
+    correction_by_volume: Sequence[Tuple[float, float]]
+    delay: DelayPropertiesDict
+    aspirate_position: TipPositionDict
+    retract: RetractAspirateDict
+    pre_wet: bool
+    mix: MixPropertiesDict
+
+
+class SingleDispensePropertiesDict(TypedDict):
+    submerge: SubmergeDict
+    flow_rate_by_volume: Sequence[Tuple[float, float]]
+    correction_by_volume: Sequence[Tuple[float, float]]
+    delay: DelayPropertiesDict
+    dispense_position: TipPosition
+    retract: RetractDispenseDict
+    push_out_by_volume: Sequence[Tuple[float, float]]
+    mix: MixPropertiesDict
+
+
+class MultiDispensePropertiesDict(TypedDict):
+    submerge: SubmergeDict
+    flow_rate_by_volume: Sequence[Tuple[float, float]]
+    correction_by_volume: Sequence[Tuple[float, float]]
+    delay: DelayPropertiesDict
+    dispense_position: TipPosition
+    retract: RetractDispenseDict
+    conditioning_by_volume: Sequence[Tuple[float, float]]
 
 
 @dataclass(slots=True)
@@ -430,6 +511,12 @@ class RetractDispense(_SubmergeRetractCommon):
             delay=self._delay.as_shared_data_model(),
         )
 
+    @classmethod
+    def from_dict(cls, dict: RetractDispenseDict) -> "RetractDispense":
+        return cls(
+            _end_position=dict.end_position
+        )
+
 
 @dataclass(slots=True)
 class _BaseLiquidHandlingProperties:
@@ -497,6 +584,18 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
             correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
         )
 
+    @classmethod
+    def from_dict(cls, aspirate_properties: AspiratePropertiesDict) -> 'AspirateProperties':
+        return cls(
+            _submerge=Submerge.from_dict(aspirate_properties['submerge']),
+            _flow_rate_by_volume=LiquidHandlingPropertyByVolume(aspirate_properties['flow_rate_by_volume']),
+            _delay=DelayProperties.from_dict(aspirate_properties['delay']),
+            _aspirate_position=TipPosition.from_dict(aspirate_properties['aspirate_position']),
+            _correction_by_volume=LiquidHandlingPropertyByVolume(aspirate_properties['correction_by_volume']),
+            _retract=RetractAspirate.from_dict(aspirate_properties['retract']),
+            _pre_wet=aspirate_properties['pre_wet'],
+            _mix=MixProperties.from_dict(aspirate_properties['mix']),
+        )
 
 @dataclass(slots=True)
 class SingleDispenseProperties(_BaseLiquidHandlingProperties):
@@ -534,6 +633,19 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
             correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
         )
 
+    @classmethod
+    def from_dict(cls, dispense_properties: SingleDispensePropertiesDict) -> 'SingleDispenseProperties':
+        return cls(
+            _submerge=Submerge.from_dict(dispense_properties['submerge']),
+            _flow_rate_by_volume=LiquidHandlingPropertyByVolume(dispense_properties['flow_rate_by_volume']),
+            _delay=DelayProperties.from_dict(dispense_properties['delay']),
+            _dispense_position=TipPosition.from_dict(dispense_properties['dispense_position']),
+            _correction_by_volume=LiquidHandlingPropertyByVolume(dispense_properties['correction_by_volume']),
+            _retract=RetractDispense.from_dict(dispense_properties['retract']),
+            _push_out_by_volume=LiquidHandlingPropertyByVolume(dispense_properties['push_out_by_volume']),
+            _mix=MixProperties.from_dict(dispense_properties['mix']),
+        )
+
 
 @dataclass(slots=True)
 class MultiDispenseProperties(_BaseLiquidHandlingProperties):
@@ -569,6 +681,18 @@ class MultiDispenseProperties(_BaseLiquidHandlingProperties):
             disposalByVolume=self._disposal_by_volume.as_list_of_tuples(),
             delay=self._delay.as_shared_data_model(),
             correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
+        )
+
+    @classmethod
+    def from_dict(cls, dispense_properties: MultiDispensePropertiesDict) -> 'MultiDispenseProperties':
+        return cls(
+            _submerge=Submerge.from_dict(dispense_properties.submerge),
+            _flow_rate_by_volume=LiquidHandlingPropertyByVolume(dispense_properties.flow_rate_by_volume),
+            _delay=DelayProperties.from_dict(dispense_properties.delay),
+            _dispense_position=TipPosition.from_dict(dispense_properties.dispense_position),
+            _correction_by_volume=LiquidHandlingPropertyByVolume(dispense_properties.correction_by_volume),
+            _retract=RetractDispense.from_dict(dispense_properties.retract),
+            _conditioning_by_volume=LiquidHandlingPropertyByVolume(dispense_properties.conditioning_by_volume),
         )
 
 
