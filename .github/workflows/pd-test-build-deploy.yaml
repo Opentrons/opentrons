@@ -32,7 +32,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref_type == 'tag' && github.ref || github.sha }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
   cancel-in-progress: true
 
 defaults:
@@ -73,6 +73,7 @@ jobs:
   build-pd:
     timeout-minutes: 20
     name: 'build protocol designer'
+    if: github.event_name != 'pull_request'
     needs: ['unit-test', 'e2e-test']
     runs-on: 'ubuntu-24.04'
     steps:
@@ -116,6 +117,7 @@ jobs:
   deploy-pd:
     timeout-minutes: 10
     name: 'deploy protocol designer'
+    if: github.event_name != 'pull_request'
     needs: ['build-pd']
     runs-on: 'ubuntu-24.04'
     permissions:
@@ -142,7 +144,7 @@ jobs:
       - name: 'deploy protocol designer to sandbox'
         shell: bash
         run: |
-          aws s3 sync ./dist s3://sandbox.designer.opentrons.com/${{ env.OT_BRANCH }} --acl=public-read
+          aws s3 sync ./dist "s3://sandbox.designer.opentrons.com/${OT_BRANCH}" --acl=public-read
           # invalidate both sandbox.opentrons.com and www.sandbox.opentrons.com cloudfront caches
           aws cloudfront create-invalidation --distribution-id ${{ secrets.PD_CLOUDFRONT_SANDBOX_DISTRIBUTION_ID }} --paths "/*"
           aws cloudfront create-invalidation --distribution-id ${{ secrets.PD_CLOUDFRONT_SANDBOX_WWW_DISTRIBUTION_ID }} --paths "/*"
