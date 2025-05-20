@@ -29,12 +29,9 @@ export function useRunLoadedLabwareDefinitionsByUri(
     if (data == null) {
       return null
     } else {
-      // @ts-expect-error TODO(jh, 10-12-24): Update the app's typing to support LabwareDefinition3.
-      data?.data.forEach((def: LabwareDefinition) => {
-        if ('schemaVersion' in def) {
-          const lwUri = getLabwareDefURI(def)
-          result[lwUri] = def
-        }
+      data.data.forEach((def: LabwareDefinition) => {
+        const lwUri = getLabwareDefURI(def)
+        result[lwUri] = def
       })
 
       return result
