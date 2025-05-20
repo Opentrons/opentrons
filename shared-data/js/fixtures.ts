@@ -126,6 +126,24 @@ export const FLEX_SINGLE_SLOT_BY_CUTOUT_ID: { [CutoutId: string]: string } = {
   cutoutD3: 'D3',
 }
 
+export const FAKE_FIXTURES_AND_AA = {
+  "locations": {
+    "addressableAreas": [
+  {
+    "id": "A4",
+    "areaType": "stagingSlot",
+    "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
+    "matingSurfaceUnitVector": [-1, 1, -1],
+    "boundingBox": {
+      "xDimension": 128.0,
+      "yDimension": 86.0,
+      "zDimension": 0
+    },
+    "displayName": "Slot A4",
+    "compatibleModuleTypes": []
+  }]}
+}
+
 // TODO(jh 01-15-25): Instead of typing slotId as `string`, type it as `AddressableAreaName`.
 // returns the position associated with a slot id
 export function getPositionFromSlotId(
@@ -195,7 +213,7 @@ export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
   deckDefinition: DeckDefinition
 ): CutoutConfigMap[] => {
   return cutoutFixtures.reduce<CutoutConfigMap[]>((acc, obj) => {
-    const cutoutFixtureReplacment = getCutoutFixtureReplacmentIfNeeded(
+    const cutoutFixtureReplacment = getCutoutFixtureReplacementIfNeeded(
       obj.cutoutFixtureId,
       deckDefinition
     )
