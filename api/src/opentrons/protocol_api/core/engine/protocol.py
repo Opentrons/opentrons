@@ -1071,7 +1071,7 @@ class ProtocolCore(
             display_color=(liquid.displayColor.root if liquid.displayColor else None),
         )
 
-    def define_liquid_class(self, name: str) -> LiquidClass:
+    def define_liquid_class(self, name: str, version: int = 1) -> LiquidClass:
         """Define a liquid class for use in transfer functions."""
         try:
             # Check if we have already loaded this liquid class' definition
@@ -1081,7 +1081,7 @@ class ProtocolCore(
                 # Fetching the liquid class data from file and parsing it
                 # is an expensive operation and should be avoided.
                 # Calling this often will degrade protocol execution performance.
-                liquid_class_def = liquid_classes.load_definition(name)
+                liquid_class_def = liquid_classes.load_definition(name, version=version)
                 self._defined_liquid_class_defs_by_name[name] = liquid_class_def
             except LiquidClassDefinitionDoesNotExist:
                 raise ValueError(f"Liquid class definition not found for '{name}'.")

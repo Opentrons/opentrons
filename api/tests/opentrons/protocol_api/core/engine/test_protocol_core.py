@@ -1876,15 +1876,15 @@ def test_define_liquid_class(
     expected_liquid_class = LiquidClass(
         _name="water1", _display_name="water 1", _by_pipette_setting={}
     )
-    decoy.when(liquid_classes.load_definition("water")).then_return(
+    decoy.when(liquid_classes.load_definition("water", version=123)).then_return(
         minimal_liquid_class_def1
     )
-    assert subject.define_liquid_class("water") == expected_liquid_class
+    assert subject.define_liquid_class("water", version=123) == expected_liquid_class
 
-    decoy.when(liquid_classes.load_definition("water")).then_return(
+    decoy.when(liquid_classes.load_definition("water", version=456)).then_return(
         minimal_liquid_class_def2
     )
-    assert subject.define_liquid_class("water") == expected_liquid_class
+    assert subject.define_liquid_class("water", version=456) == expected_liquid_class
 
 
 def test_get_labware_location_deck_slot(

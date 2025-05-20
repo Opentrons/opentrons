@@ -393,6 +393,9 @@ class LiquidClassSchemaV1(BaseModel):
     schemaVersion: Literal[1] = Field(
         ..., description="Which schema version a liquid class is using"
     )
+    version: int = Field(
+        ..., description="Version of the liquid class within the schema"
+    )
     namespace: str = Field(...)
     byPipette: Sequence[ByPipetteSetting] = Field(
         ...,
