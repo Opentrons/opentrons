@@ -172,7 +172,7 @@ interface CutoutConfigMap extends CutoutConfig {
   addressableAreaId: AddressableAreaName
 }
 
-export const getCutoutFixtureReplacmentIfNeeded = (
+export const getCutoutFixtureReplacementIfNeeded = (
   cutoutFixtureId: CutoutFixtureId,
   deckDefinition: DeckDefinition
 ): CutoutFixtureId => {
