@@ -210,6 +210,7 @@ class PressureFixture(PressureFixtureBase):
         response = self._port.readlines()#.decode("utf-8")
         sleep(0.01)
         print("response=",response)
+        datalist = []
         for res in response:
             res_list = res.decode("utf-8").split(",")[:-1]  # ignore the last comma
             data_str = [d.split("=")[-1].strip() for d in res_list]  # remove PRESSURE=
@@ -218,10 +219,10 @@ class PressureFixture(PressureFixtureBase):
                     data_str[i] = "0.00"
             data = [float(d) for d in data_str]  # convert to float
             print(data)
-            data.append(data)
+            datalist.append(data)
         # if self._slot_side == "left":
         #     data.reverse()  # reverse order, so pipette channel 1 is at index 0
-        return data
+        return datalist
 
 
 if __name__ == "__main__":
