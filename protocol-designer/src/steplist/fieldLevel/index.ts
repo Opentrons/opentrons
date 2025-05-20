@@ -26,6 +26,7 @@ import {
   nonZero,
   realNumber,
   requiredField,
+  transferVolumeMax,
 } from './errors'
 import {
   composeMaskers,
@@ -51,6 +52,7 @@ import type {
   WasteChuteEntities,
 } from '@opentrons/step-generation'
 import type {
+  HydratedFormData,
   LabwareOrAdditionalEquipmentEntity,
   StepFieldName,
 } from '../../form-types'
@@ -163,7 +165,7 @@ const getPipetteEntity = (
 }
 
 interface StepFieldHelpers {
-  getErrors?: (arg0: unknown) => string[]
+  getErrors?: (arg0: unknown, data?: HydratedFormData) => string[]
   maskValue?: ValueMasker
   castValue?: ValueCaster
   hydrate?: (state: InvariantContext, id: string) => unknown
@@ -306,7 +308,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   volume: {
-    getErrors: composeErrors(requiredField, nonZero),
+    getErrors: composeErrors(requiredField, nonZero, transferVolumeMax),
     maskValue: composeMaskers(
       maskToFloat,
       onlyPositiveNumbers,
@@ -437,6 +439,10 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     maskValue: composeMaskers(trimDecimals(1)),
     castValue: numberOrNull,
   },
+  blowout_flowRate: {
+    maskValue: composeMaskers(trimDecimals(1)),
+    castValue: numberOrNull,
+  },
   pushOut_volume: {
     maskValue: composeMaskers(
       maskToFloat,
@@ -514,11 +520,15 @@ const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
 }
 export const getFieldErrors = (
   name: StepFieldName,
-  value: unknown
+  value: unknown,
+  hydratedFormData: HydratedFormData
 ): string[] => {
   const fieldErrorGetter =
     stepFieldHelperMap[name] && stepFieldHelperMap[name].getErrors
-  const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
+
+  const errors = fieldErrorGetter
+    ? fieldErrorGetter(value, hydratedFormData)
+    : []
   return errors
 }
 export const getProfileFieldErrors = (

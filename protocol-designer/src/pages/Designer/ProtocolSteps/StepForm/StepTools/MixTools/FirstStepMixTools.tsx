@@ -59,7 +59,7 @@ export function FirstStepMixTools({
   const is8Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].spec.channels === 8
-
+  console.log('propsForFields', propsForFields.times)
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -103,16 +103,12 @@ export function FirstStepMixTools({
         errorToShow={getFormLevelError('wells', mappedErrorsToField)}
       />
       <Divider marginY="0" />
-      <VolumeField
-        {...propsForFields.volume}
-        errorToShow={getFormLevelError('volume', mappedErrorsToField)}
-      />
+      <VolumeField {...propsForFields.volume} />
       <Divider marginY="0" />
       <InputStepFormField
         {...propsForFields.times}
         units={t('units.times')}
         title={t('protocol_steps:mix_repetitions')}
-        errorToShow={getFormLevelError('times', mappedErrorsToField)}
         showTooltip={false}
       />
       <Divider marginY="0" />
