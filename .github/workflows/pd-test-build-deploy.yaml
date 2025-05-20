@@ -62,7 +62,7 @@ jobs:
   e2e-test:
     name: 'protocol designer e2e tests'
     runs-on: 'ubuntu-24.04'
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
