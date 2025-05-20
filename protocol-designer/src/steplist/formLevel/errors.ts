@@ -286,7 +286,7 @@ const VOLUME_REQUIRED: FormError = {
   page: 0,
 }
 const TIMES_REQUIRED: FormError = {
-  title: 'Repetitions required',
+  title: 'Enter an integer value greater than 0',
   dependentFields: ['times'],
   showAtForm: false,
   showAtField: true,
@@ -314,7 +314,7 @@ const MIX_LABWARE_REQUIRED: FormError = {
   page: 0,
 }
 const ASPIRATE_MIX_TIMES_REQUIRED: FormError = {
-  title: 'Repititions required',
+  title: 'Enter an integer value greater than 0',
   dependentFields: ['aspirate_mix_times'],
   showAtForm: false,
   showAtField: true,
@@ -346,7 +346,7 @@ const ASPIRATE_AIRGAP_VOLUME_REQUIRED: FormError = {
   tab: 'aspirate',
 }
 const DISPENSE_MIX_TIMES_REQUIRED: FormError = {
-  title: 'Repititions required',
+  title: 'Enter an integer value greater than 0',
   dependentFields: ['dispense_mix_checkbox', 'dispense_mix_times'],
   showAtForm: false,
   showAtField: true,

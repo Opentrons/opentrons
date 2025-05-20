@@ -61,24 +61,40 @@ export const roundValue = (
 }
 
 const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'
-export type Error = typeof TOO_MANY_DECIMALS | typeof OUT_OF_BOUNDS
+const GENERIC: 'GENERIC' = 'GENERIC'
+export type Error =
+  | typeof TOO_MANY_DECIMALS
+  | typeof OUT_OF_BOUNDS
+  | typeof GENERIC
 
 export const getErrorText = (args: {
   errors: Error[]
-  maxMm: number
-  minMm: number
   isPristine: boolean
   t: any
+  maxMm?: number
+  minMm?: number
 }): string | null => {
   const { errors, minMm, maxMm, isPristine, t } = args
 
   if (errors.includes(TOO_MANY_DECIMALS)) {
     return t('tip_position.errors.TOO_MANY_DECIMALS')
-  } else if (!isPristine && errors.includes(OUT_OF_BOUNDS)) {
+  } else if (
+    !isPristine &&
+    errors.includes(OUT_OF_BOUNDS) &&
+    maxMm != null &&
+    minMm != null
+  ) {
     return t('tip_position.errors.OUT_OF_BOUNDS', {
       minMm,
       maxMm,
     })
+  } else if (
+    !isPristine &&
+    errors.includes(GENERIC) &&
+    maxMm == null &&
+    minMm == null
+  ) {
+    return t('tip_position.errors.GENERIC')
   } else {
     return null
   }
@@ -105,6 +121,7 @@ export const getErrors = (args: {
   }
   if (isOutOfBounds) {
     errors.push(OUT_OF_BOUNDS)
+    errors.push(GENERIC)
   }
   return errors
 }
