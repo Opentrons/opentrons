@@ -4,7 +4,6 @@ name: 'PD test, build, and deploy'
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
     paths:
       - 'protocol-designer/**'
       - 'step-generation/**'
@@ -15,27 +14,25 @@ on:
       - '.github/actions/js/setup/action.yml'
       - '.github/actions/git/resolve-tag/action.yml'
       - '.github/actions/environment/complex-variables/action.yml'
-      
   push:
+    paths:
+      - 'protocol-designer/**'
+      - 'step-generation/**'
+      - 'shared-data/**'
+      - 'components/**'
+      - 'package.json'
+      - '.github/workflows/pd-test-build-deploy.yaml'
+      - '.github/actions/js/setup/action.yml'
+      - '.github/actions/git/resolve-tag/action.yml'
+      - '.github/actions/environment/complex-variables/action.yml'
     branches:
       - '**'
     tags:
       - 'protocol-designer*'
-    paths:
-      - 'protocol-designer/**'
-      - 'step-generation/**'
-      - 'shared-data/**'
-      - 'components/**'
-      - 'package.json'
-      - '.github/workflows/pd-test-build-deploy.yaml'
-      - '.github/actions/js/setup/action.yml'
-      - '.github/actions/git/resolve-tag/action.yml'
-      - '.github/actions/environment/complex-variables/action.yml'
-
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.ref_type == 'tag' && github.ref || github.sha }}
   cancel-in-progress: true
 
 defaults:
@@ -78,7 +75,6 @@ jobs:
     name: 'build protocol designer'
     needs: ['unit-test', 'e2e-test']
     runs-on: 'ubuntu-24.04'
-    if: github.event_name != 'pull_request' || github.ref_name == 'pd-sandbox-deployment-fix'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -122,7 +118,6 @@ jobs:
     name: 'deploy protocol designer'
     needs: ['build-pd']
     runs-on: 'ubuntu-24.04'
-    if: github.event_name != 'pull_request' || github.ref_name == 'pd-sandbox-deployment-fix'
     permissions:
       id-token: write
       contents: read
