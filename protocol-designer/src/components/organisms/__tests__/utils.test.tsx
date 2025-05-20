@@ -31,6 +31,27 @@ describe('getLabwareCompatibleForEditHardware', () => {
       )
     ).toBe(false)
   })
+  it('returns false when there there is something in slot B1 for a TC', () => {
+    expect(
+      getLabwareCompatibleForEditHardware(
+        {
+          labware: {
+            id: 'labware',
+            labwareDefURI: 'mockURI',
+            def: fixture96Plate as LabwareDefinition2,
+            stack: ['labware', 'B1'],
+            pythonName: 'mockPythonName',
+          },
+        },
+        'cutoutA1',
+        {
+          cutoutId: 'cutoutA1',
+          cutoutFixtureId: 'thermocyclerModuleV2Front',
+          type: 'thermocyclerModuleV2',
+        }
+      )
+    ).toBe(false)
+  })
   it('returns false when labware is incompatible with module', () => {
     expect(
       getLabwareCompatibleForEditHardware(

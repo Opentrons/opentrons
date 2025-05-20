@@ -96,6 +96,7 @@ export const getLabwareCompatibleForEditHardware = (
   newFixture?: CutoutConfigExtended
 ): boolean => {
   const labwareDef = getLabwareOnSlot(labware, cutoutId)
+  const labwareDefB1 = getLabwareOnSlot(labware, 'cutoutB1')
   const moduleType =
     newModule != null
       ? newModule.type === 'stagingAreaAndMagneticBlock'
@@ -104,12 +105,14 @@ export const getLabwareCompatibleForEditHardware = (
       : null
 
   let labwareCompatible = true
-  if (
-    moduleType != null &&
-    moduleType === THERMOCYCLER_MODULE_TYPE &&
-    Object.values(labware).some(lw => lw.stack.includes('A1'))
-  ) {
-    labwareCompatible = false
+  if (moduleType != null && moduleType === THERMOCYCLER_MODULE_TYPE) {
+    if (Object.values(labware).some(lw => lw.stack.includes('A1'))) {
+      labwareCompatible = false
+    } else if (labwareDefB1 != null) {
+      labwareCompatible = getLabwareIsCompatible(labwareDefB1, moduleType)
+    } else {
+      labwareCompatible = false
+    }
   } else if (labwareDef != null && moduleType != null) {
     labwareCompatible = getLabwareIsCompatible(labwareDef, moduleType)
   } else if (
