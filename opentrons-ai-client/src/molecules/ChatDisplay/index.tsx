@@ -4,7 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
 import { useAtom } from 'jotai'
 import { delay } from 'lodash'
-import styled, { css as styledCss } from 'styled-components'
+import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -17,6 +17,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
+  LegacyStyledText,
   Link,
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
@@ -35,7 +36,6 @@ import {
 } from '../../resources/atoms'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 
-import type { CSSObject, FlattenSimpleInterpolation } from 'styled-components'
 import type { ChatData } from '../../resources/types'
 
 import smallLogo from '../../assets/images/opentrons_logo_small.svg'
@@ -328,12 +328,9 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         )}
         {protocol_content != null && (
           <StyledText
-            as="p"
-            desktopStyle="bodyDefaultRegular"
-            css={styledCss`
-              font-size: ${TYPOGRAPHY.fontSize20};
-              line-height: ${TYPOGRAPHY.lineHeight24};
-            `}
+            fontSize={TYPOGRAPHY.fontSize20}
+            lineHeight={TYPOGRAPHY.lineHeight24}
+            css="white-space: pre-wrap;"
           >
             <Trans
               t={t}
@@ -352,7 +349,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
           </StyledText>
         )}
 
-        {/* Display protocol_content badge, content, and then the comments (reply) */}
+        {/* Display protocol_content badge and content */}
         {!isUser && protocol_content && (
           <>
             <ProtocolContentBadge
@@ -366,13 +363,19 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
                 {JSON.stringify(protocol_content, null, 2)}
               </CodeWrapper>
             )}
-
-            {/* Render the full reply (which includes comments) after the badge and JSON view */}
-            {typeof reply === 'string' && reply.trim() !== '' && (
-              <ParagraphText customCss={{ marginTop: SPACING.spacing16 }}>
-                {reply}
-              </ParagraphText>
-            )}
+            <Markdown
+              components={{
+                div: undefined,
+                ul: UnnumberedListText,
+                h2: HeaderText,
+                li: ListItemText,
+                p: ParagraphText,
+                a: isUser ? ParagraphText : ExternalLink,
+                code: CodeText,
+              }}
+            >
+              {reply}
+            </Markdown>
           </>
         )}
 
@@ -434,47 +437,27 @@ function ExternalLink(
   )
 }
 
-interface ParagraphTextProps extends React.PropsWithChildren<{}> {
-  [key: string]: any
-  customCss?: string | CSSObject | FlattenSimpleInterpolation
-}
-
-function ParagraphText(props: ParagraphTextProps): JSX.Element {
-  const { children, customCss, ...otherUnhandledProps } = props
-
+function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
   return (
-    <StyledText
-      {...otherUnhandledProps}
-      desktopStyle="bodyDefaultRegular"
-      css={styledCss`
-        white-space: pre-wrap;
-        font-size: ${TYPOGRAPHY.fontSize20};
-        line-height: ${TYPOGRAPHY.lineHeight24};
-        ${customCss}
-      `}
-    >
-      {children}
-    </StyledText>
-  )
-}
-
-function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} desktopStyle="headingSmallRegular" as="h3" />
-}
-
-function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return (
-    <StyledText
+    <LegacyStyledText
       {...props}
-      desktopStyle="bodyDefaultRegular"
-      as="li"
-      marginLeft={SPACING.spacing16}
+      fontSize={TYPOGRAPHY.fontSize20}
+      lineHeight={TYPOGRAPHY.lineHeight24}
+      css="white-space: pre-wrap;"
     />
   )
 }
 
+function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <LegacyStyledText {...props} as="h3" />
+}
+
+function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <LegacyStyledText {...props} as="li" marginLeft={SPACING.spacing16} />
+}
+
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} desktopStyle="bodyDefaultRegular" as="ul" />
+  return <LegacyStyledText {...props} as="ul" />
 }
 
 const CodeWrapper = styled(Flex)`
