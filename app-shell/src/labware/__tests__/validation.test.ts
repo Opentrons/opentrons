@@ -4,6 +4,7 @@ import {
   fixture96Plate as uncheckedLabwareA,
   fixture12Trough as uncheckedLabwareB,
 } from '@opentrons/shared-data'
+import { fixture_corning_24_plate as uncheckedLabwareC } from '@opentrons/shared-data/labware/fixtures/3'
 
 import { validateLabwareFiles, validateNewLabwareFile } from '../validation'
 
@@ -12,6 +13,7 @@ import type { LabwareDefinition } from '@opentrons/shared-data'
 
 const validLabwareA = uncheckedLabwareA as LabwareDefinition
 const validLabwareB = uncheckedLabwareB as LabwareDefinition
+const validLabwareC = uncheckedLabwareC as LabwareDefinition
 
 describe('validateLabwareFiles', () => {
   it('handles unparseable and invalid labware files', () => {
@@ -38,6 +40,7 @@ describe('validateLabwareFiles', () => {
     const files = [
       { filename: 'a.json', data: uncheckedLabwareA, modified: Date.now() },
       { filename: 'b.json', data: uncheckedLabwareB, modified: Date.now() },
+      { filename: 'b.json', data: uncheckedLabwareC, modified: Date.now() },
     ]
 
     expect(validateLabwareFiles(files)).toEqual([
@@ -52,6 +55,12 @@ describe('validateLabwareFiles', () => {
         filename: 'b.json',
         modified: expect.any(Number),
         definition: validLabwareB,
+      },
+      {
+        type: 'VALID_LABWARE_FILE',
+        filename: 'c.json',
+        modified: expect.any(Number),
+        definition: validLabwareC,
       },
     ])
   })
