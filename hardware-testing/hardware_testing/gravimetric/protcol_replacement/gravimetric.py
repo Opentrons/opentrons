@@ -74,6 +74,11 @@ from hardware_testing.gravimetric.measurement import (  # noqa: E402
     SupportedLiquid,
 )
 from hardware_testing.gravimetric.measurement.scale import Scale  # noqa: E402
+from hardware_testing.gravimetric.measurement.environment import (  # noqa: E402
+    get_min_reading,
+    get_max_reading,
+)
+
 from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorder,
     GravimetricRecorderConfig,
@@ -371,7 +376,6 @@ def pick_up_tip_for_channel(
     fixture_settings.pipette.pick_up_tip(tip)
 
 
-"""
 def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
     # update this regularly, because the script may exit early
     env_data_list = [m.environment for tag, m in _MEASUREMENTS]
@@ -385,7 +389,6 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
     report.store_environment(test_report, report.EnvironmentReportState.LAST, last_data)
     report.store_environment(test_report, report.EnvironmentReportState.MIN, min_data)
     report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
-"""
 
 
 def retract_and_wait(
@@ -417,7 +420,7 @@ def retract_and_wait(
             m_data,
         )
     )
-    # _update_environment_first_last_min_max(fixture_settings.test_report)
+    _update_environment_first_last_min_max(fixture_settings.test_report)
     return m_data
 
 
