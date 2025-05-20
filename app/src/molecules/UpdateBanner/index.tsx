@@ -69,18 +69,6 @@ export const UpdateBanner = ({
     }
   }
 
-  // If the message ends with a period, remove it because the InlineNotification
-  // component adds a period to the end of the message. Removing the period in
-  // the localized message is not an option because some messages are used in
-  // multiple places and some of those places DO require a period.
-  const formattedMessage = (): string => {
-    const message = getMessage()
-    if (message.slice(-1) === '.') {
-      return message.slice(0, -1)
-    }
-    return message
-  }
-
   const getLinkText = (): string | undefined => {
     if (!canProceed) return undefined
     if (updateType === 'firmware') {
@@ -99,7 +87,7 @@ export const UpdateBanner = ({
     >
       <InlineNotification
         type={updateType === 'calibration' ? 'error' : 'alert'}
-        message={formattedMessage()}
+        message={getMessage()}
         linkText={getLinkText()}
         onLinkClick={handleUpdateClick}
         minWidth="12.625rem"
