@@ -386,7 +386,7 @@ def run(protocol: ProtocolContext) -> None:
             style=COLUMN, tip_racks=[tip_rack_partial_1], start="A1"
         )
         pipette.transfer(
-            95,
+            150,
             source=src_reservoir["A1"],
             dest=master_mix["A1"],
             trash=True,

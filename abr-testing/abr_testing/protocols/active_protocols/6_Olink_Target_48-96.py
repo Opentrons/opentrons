@@ -1,5 +1,4 @@
 """Olink Target 48/96 Protocol."""
-from opentrons import types
 from opentrons.protocol_api import (
     ALL,
     COLUMN,
@@ -146,12 +145,14 @@ def run(protocol: ProtocolContext) -> None:
     sample_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "D1", "Sample Plate"
     )
+    sample_plate.load_empty(sample_plate.wells())
     # used †ø be ab©ene_96_wellplate_200ul
     ifp_plate = protocol.load_labware(
         "biorad_384_wellplate_50ul" if ninety_six else "fluidigm_ifp_48.48",
         "C2",
         "IFP Chip",
     )
+    ifp_plate.load_empty(ifp_plate.wells())
     # used to be fluidigm_ifp_96.96
     product_plate = protocol.load_labware(
         "nest_96_wellplate_2ml_deep", "C1", "Extension Product Plate"
@@ -172,11 +173,6 @@ def run(protocol: ProtocolContext) -> None:
     sample_dest = sample_plate.wells()[
         0
     ]  # for 96 channel transfer of extension product to sample plate
-    # else:
-    # 	extension_source = []
-    # 	for well in range(12):
-    # 		extension_source.append(product_plate.rows()[0][well])
-    # 	sample_dest = sample_plate.rows()[0]
 
     _source_list = (
         [0, 6, 1, 7, 2, 8, 3, 9, 4, 10, 5, 11] if ninety_six else [0, 3, 1, 4, 2, 5]
@@ -228,59 +224,45 @@ def run(protocol: ProtocolContext) -> None:
 
     # Speeds (from Hamilton Star settings as per Katie)
 
-    retract_speed = 10
-
-    mix_speed = 75
-
     asp_default = 20
 
     disp_default = 120
-
-    gant_default = pip.default_speed
 
     delay_time = 1  # second
 
     pip.flow_rate.aspirate = asp_default
     pip.flow_rate.dispense = disp_default
 
+    # Adding Liquids to Setup ##################################
+    mm_liq_vol = 150 if ninety_six else 47
+    ep_liq_vol = 100
+    prim_liq_vol = 12
+
+    mm_liq = protocol.define_liquid(
+        name="Master Mix", description=None, display_color="#FF0000"
+    )
+    ep_liq = protocol.define_liquid(
+        name="Extension Product", description=None, display_color="#FF00FF"
+    )
+    prim_liq = protocol.define_liquid(
+        name="Primers", description=None, display_color="#00FF00"
+    )
+
+    for well_n in mm_plate.wells()[8 * mm_col : 8 * mm_col + 8]:
+        well_n.load_liquid(liquid=mm_liq, volume=mm_liq_vol)
+
+    for x in range(96 if ninety_six else 48):
+        product_plate.wells()[x].load_liquid(liquid=ep_liq, volume=ep_liq_vol)
+
+    for x in range(96 if ninety_six else 48):
+        primer_plate.wells()[x].load_liquid(liquid=prim_liq, volume=prim_liq_vol)
+
     def is_in_staging_slot(labware: Labware) -> bool:
         """Check if labware is in a staging slot."""
         return str(labware.parent).strip().endswith("4")
 
-    def swap_speed(
-        dev: str, func: str | None, new_speed: float, on: bool = True
-    ) -> None:
-        """New Speed Function."""
-        if on:
-            if dev == "pip":
-                if func == "asp":
-                    pip.flow_rate.aspirate = new_speed
-                    protocol.comment(f"\nNew Aspirate Speed: {new_speed}\n")
-                if func == "disp":
-                    pip.flow_rate.dispense = new_speed
-                    protocol.comment(f"\nNew Dispense Speed: {new_speed}\n")
-
-            if dev == "gantry":
-                pip.default_speed = new_speed
-                protocol.comment(f"\nNew Gantry Speed: {new_speed}\n")
-        else:
-            if dev == "pip":
-                if func == "asp":
-                    pip.flow_rate.aspirate = asp_default
-                    protocol.comment(f"\nNew Aspirate Speed: {new_speed}\n")
-                if func == "disp":
-                    pip.flow_rate.dispense = disp_default
-                    protocol.comment(f"\nNew Dispense Speed: {new_speed}\n")
-
-            if dev == "gantry":
-                pip.default_speed = gant_default
-                protocol.comment(f"\nNew Gantry Speed: {new_speed}\n")
-
     def mixing(well: Well, vol: float, blow_out: bool = True, reps: int = 8) -> None:
         """Mixing Function."""
-        swap_speed("pip", "asp", mix_speed)
-        swap_speed("pip", "disp", mix_speed)
-
         pip.aspirate(1, well.top(1))
         for m in range(reps):
             pip.aspirate(vol, well.bottom(1.25))
@@ -291,17 +273,10 @@ def run(protocol: ProtocolContext) -> None:
             )
         if blow_out:
             protocol.delay(seconds=delay_time)
-            swap_speed("gantry", func=None, new_speed=retract_speed)
             pip.blow_out(well.top(-3))
             protocol.delay(seconds=delay_time)
-            swap_speed("gantry", func=None, new_speed=gant_default, on=False)
         else:
-            swap_speed("gantry", func=None, new_speed=retract_speed)
             pip.move_to(well.top())
-            swap_speed("gantry", func=None, new_speed=gant_default, on=False)
-
-        swap_speed("pip", "asp", asp_default, on=False)
-        swap_speed("pip", "disp", disp_default, on=False)
 
     def transfer_mm(
         src: Well, destination: List[Any], volume: float, multi_disp: bool = False
@@ -320,27 +295,25 @@ def run(protocol: ProtocolContext) -> None:
             protocol.move_labware(col_tips[0], new_location, use_gripper=True)
             open_location = new_open_location
             pip.pick_up_tip()
-        print(f"destiation: {destination}")
         if multi_disp:
             for i in range(2 if ninety_six else 1):
                 pip.aspirate(
-                    49 - pip.current_volume, src.bottom(1.25), rate=0.2
+                    49 - pip.current_volume,
+                    src.meniscus(z=-1.5, target="end"),
+                    rate=0.2,
                 )  # aspirate extra (backlash compensation)
                 protocol.delay(seconds=delay_time)
                 pip.dispense(
                     2, src.bottom(1.25)
                 )  # get rid of backlash compensation volume
                 # Retract
-                swap_speed("gantry", func=None, new_speed=retract_speed)
                 pip.move_to(src.top())
-                swap_speed("gantry", func=None, new_speed=gant_default, on=False)
                 for well in destination[i]:
                     pip.dispense(volume, well.bottom(2))
+                    pip.blow_out(well.bottom(3))
                     protocol.delay(seconds=delay_time)
-                    pip.touch_tip(v_offset=-2, radius=0.75)
-                    swap_speed("gantry", func=None, new_speed=retract_speed)
+                    pip.touch_tip()
                     pip.move_to(well.top())
-                    swap_speed("gantry", func=None, new_speed=gant_default, on=False)
                 protocol.delay(seconds=delay_time)
             pip.drop_tip()
 
@@ -352,24 +325,24 @@ def run(protocol: ProtocolContext) -> None:
                 volume = 9.1 + i * 0.15
                 protocol.comment(f"\nVOLUME: {volume}")
                 pip.aspirate(
-                    volume + 1.5 if i == 0 else volume, src.bottom(1.25), rate=0.35
+                    volume + 1.5 if i == 0 else volume,
+                    src.meniscus(z=-1.5, target="end"),
+                    rate=0.35,
                 )
                 protocol.delay(seconds=delay_time)
                 # Retract
-                swap_speed("gantry", func=None, new_speed=retract_speed)
                 pip.move_to(src.top(10))
-                swap_speed("gantry", func=None, new_speed=gant_default, on=False)
                 pip.move_to(destination[i].top(10))
                 pip.dispense(
                     volume,
-                    destination[i].bottom(1.25),
+                    destination[i].meniscus(z=-1.5, target="end"),
                     rate=0.2 if volume <= 5 else 1,
                     push_out=0,
                 )
+                pip.blow_out(destination[i].top(-3))
+                pip.touch_tip()
                 protocol.delay(seconds=delay_time)
-                swap_speed("gantry", func=None, new_speed=retract_speed)
                 pip.move_to(destination[i].top())
-                swap_speed("gantry", func=None, new_speed=gant_default, on=False)
 
             pip.drop_tip()
 
@@ -383,20 +356,14 @@ def run(protocol: ProtocolContext) -> None:
             pip.configure_nozzle_layout(style=ALL)
             pip.configure_for_volume(volume)
             pip.pick_up_tip(full_tips)
-            pip.aspirate(volume, src.bottom(6))
+            pip.aspirate(volume, src.meniscus(z=-1.5, target="end"))
             protocol.delay(seconds=delay_time)
-            swap_speed("gantry", func=None, new_speed=retract_speed)
-            pip.move_to(src.top(10))
-            swap_speed("gantry", func=None, new_speed=gant_default, on=False)
-            pip.move_to(destination.top(10))
             pip.dispense(
-                volume, destination.bottom(3)
+                volume, destination.meniscus(z=-1.5, target="end")
             )  # reverse pipetting slightly more than actual volume
             protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tip
-            swap_speed("gantry", func=None, new_speed=retract_speed)
             pip.move_to(destination.top())
-            swap_speed("gantry", func=None, new_speed=gant_default, on=False)
             protocol.delay(seconds=delay_time)
             pip.return_tip()
 
@@ -404,31 +371,16 @@ def run(protocol: ProtocolContext) -> None:
             pip.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=col_tips)
 
             pip.configure_for_volume(volume)
-            # for i in range(length):
-            # try:
             pip.pick_up_tip(
                 col_tips[0].wells()[5 * 8 if mmx_to_sample_plate else 6 * 8]
             )
-            # except:
-            # 	new_location=col_tips[0].parent
-            # 	new_open_location=col_tips[1].parent
-            # 	protocol.move_labware(col_tips.pop(0),open_location,use_gripper=True)
-            # 	protocol.move_labware(col_tips[0],new_location,use_gripper=True)
-            # 	open_location=new_open_location
-            # 	pip.pick_up_tip()
-            pip.aspirate(volume, src.bottom(6), rate=0.2)
+            pip.aspirate(volume, src.meniscus(z=-1.5, target="end"), rate=0.2)
             protocol.delay(seconds=delay_time)
-            # Retract
-            swap_speed("gantry", func=None, new_speed=retract_speed)
-            pip.move_to(src.top(10) if type(src) == list else src.top(10))
-            swap_speed("gantry", func=None, new_speed=gant_default, on=False)
-            pip.move_to(destination.top(10))
-            pip.dispense(volume, destination.bottom(5), rate=0.2)
+            pip.dispense(volume, destination.meniscus(z=-1.5, target="end"), rate=0.2)
+            pip.blow_out(destination.top(-3))
             protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tips
-            swap_speed("gantry", func=None, new_speed=retract_speed)
             pip.move_to(destination.top(-2))
-            swap_speed("gantry", func=None, new_speed=gant_default, on=False)
             pip.drop_tip()
 
     def transfer_ifp(
@@ -441,11 +393,6 @@ def run(protocol: ProtocolContext) -> None:
         """Transfer Sample to IFP Chip."""
         global open_location
 
-        # Offsets for dispensing in IFP Chip
-        z96 = -8.5
-        x96 = 1.35
-        z48 = -7
-        x48 = 0.5
         pip.configure_nozzle_layout(style=COLUMN, start="A12", tip_racks=col_tips)
 
         length = (
@@ -490,34 +437,23 @@ def run(protocol: ProtocolContext) -> None:
                         protocol.move_labware(col_tips[0], loc, use_gripper=True)
 
                 pip.pick_up_tip(ifp_tips.pop(0))
-            pip.aspirate(volume + 4, src[i].bottom(1), rate=0.2 if volume <= 5 else 1)
-            protocol.delay(seconds=delay_time)
-            pip.dispense(2, src[i].bottom(1.5))  # compensate for backlash
-            # Retract
-            swap_speed("gantry", func=None, new_speed=retract_speed)
-            pip.move_to(src[i].top(10))
-            swap_speed("gantry", func=None, new_speed=gant_default, on=False)
-            pip.move_to(destination[i].top(10))
-            pip.move_to(
-                destination[i]
-                .top()
-                .move(types.Point(x=0, y=0, z=z96 if ninety_six else z48))
-            )
-            pip.dispense(
-                volume + 1,
-                destination[i]
-                .top()
-                .move(
-                    types.Point(
-                        x=x96 if ninety_six else x48, y=0, z=z96 if ninety_six else z48
-                    )
-                ),
+            pip.aspirate(
+                volume + 4,
+                src[i].meniscus(z=-1.5, target="end"),
                 rate=0.2 if volume <= 5 else 1,
             )
             protocol.delay(seconds=delay_time)
-            swap_speed("gantry", func=None, new_speed=retract_speed)
-            pip.move_to(destination[i].top(-2))
-            swap_speed("gantry", func=None, new_speed=gant_default, on=False)
+            pip.dispense(
+                2, src[i].meniscus(z=-1.5, target="end")
+            )  # compensate for backlash
+            # Retract
+            pip.dispense(
+                volume + 1,
+                destination[i].meniscus(z=-1.5, target="end"),
+                rate=0.2 if volume <= 5 else 1,
+            )
+            pip.blow_out(destination[i].top(-3))
+            protocol.delay(seconds=delay_time)
             pip.aspirate(
                 10
             )  # move liquid towards top of tip so that there is no splatter when dropping the tips
@@ -550,29 +486,6 @@ def run(protocol: ProtocolContext) -> None:
             protocol.comment("\n*****\nTransferring Sample to IFP Chip\n*****\n")
             transfer_ifp(sample_source, ifp_samp_dests, ifc_vol, col_tips=col_tips)
 
-        # Adding Liquids to Setup ##################################
-        mm_liq_vol = 95 if ninety_six else 47
-        ep_liq_vol = 100
-        prim_liq_vol = 12
-
-        mm_liq = protocol.define_liquid(
-            name="Master Mix", description=None, display_color="#FF0000"
-        )
-        ep_liq = protocol.define_liquid(
-            name="Extension Product", description=None, display_color="#FF00FF"
-        )
-        prim_liq = protocol.define_liquid(
-            name="Primers", description=None, display_color="#00FF00"
-        )
-
-        for well_n in mm_plate.wells()[8 * mm_col : 8 * mm_col + 8]:
-            well_n.load_liquid(liquid=mm_liq, volume=mm_liq_vol)
-
-        for x in range(96 if ninety_six else 48):
-            product_plate.wells()[x].load_liquid(liquid=ep_liq, volume=ep_liq_vol)
-
-        for x in range(96 if ninety_six else 48):
-            primer_plate.wells()[x].load_liquid(liquid=prim_liq, volume=prim_liq_vol)
         protocol.move_labware(col_tips[-1], OFF_DECK, use_gripper=False)
         protocol.move_labware(full_tips_, OFF_DECK, use_gripper=False)
         protocol.move_labware(tip_adap, OFF_DECK, use_gripper=False)
@@ -583,7 +496,6 @@ def run(protocol: ProtocolContext) -> None:
             tip_racks=col_tips,
         )  # Resetting to all tips for liquid tracking
         liquid_heights = {}
-        print(ifp_plate.parent)
         pip.pick_up_tip()
         for ifp_plate_well in ifp_plate.wells():
             pip.measure_liquid_height(ifp_plate[ifp_plate_well.well_name])
