@@ -175,6 +175,22 @@ export const getLabwareCompatibleWithAdapter = (
     .map(([labwareDefUri]) => labwareDefUri)
 }
 
+export const getStackerDefinition = (
+  defs: LabwareDefByDefURI,
+  loadName?: string
+): LabwareDefinition2 | null => {
+  if (loadName == null) {
+    return null
+  }
+
+  const labwareDefURI = Object.entries(defs)
+    .filter(([, { compatibleParentLabware }]) =>
+      compatibleParentLabware?.includes(loadName)
+    )
+    .map(([labwareDefUri]) => labwareDefUri)[0]
+
+  return defs[labwareDefURI]
+}
 interface DeckErrorsProps {
   modules: InitialDeckSetup['modules']
   selectedSlot: string

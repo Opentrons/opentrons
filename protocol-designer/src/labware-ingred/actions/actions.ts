@@ -278,6 +278,20 @@ export const selectAdapter: (
   payload,
 })
 
+export interface SelectStackingLabwareAction {
+  type: 'SELECT_STACKING_LABWARE'
+  payload: {
+    loadName: string | null
+    amount: number
+  }
+}
+export const selectStackingLabware: (
+  payload: SelectStackingLabwareAction['payload']
+) => SelectStackingLabwareAction = payload => ({
+  type: 'SELECT_STACKING_LABWARE',
+  payload,
+})
+
 export interface SelectModuleAction {
   type: 'SELECT_MODULE'
   payload: {

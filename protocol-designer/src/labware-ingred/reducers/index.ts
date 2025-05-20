@@ -35,6 +35,7 @@ import type {
   SelectFixtureAction,
   SelectLiquidAction,
   SelectModuleAction,
+  SelectStackingLabwareAction,
   SelectTopLabwareAction,
   SetWellContentsAction,
   ZoomedIntoSlotAction,
@@ -306,6 +307,7 @@ const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
   selectedAdapterDefUri: null,
   selectedModuleModel: null,
   selectedFixture: null,
+  selectedStackingLabware: { loadName: null, amount: 0 },
   selectedSlot: { slot: null, cutout: null },
 }
 
@@ -317,6 +319,7 @@ export const zoomedInSlotInfo = (
     | SelectModuleAction
     | SelectFixtureAction
     | ZoomedIntoSlotAction
+    | SelectStackingLabwareAction
 ): ZoomedIntoSlotInfoState => {
   switch (action.type) {
     case 'SELECT_TOP_LABWARE': {
@@ -343,6 +346,13 @@ export const zoomedInSlotInfo = (
           slot,
           cutout,
         },
+      }
+    }
+    case 'SELECT_STACKING_LABWARE': {
+      const { loadName, amount } = action.payload
+      return {
+        ...state,
+        selectedStackingLabware: { loadName, amount },
       }
     }
     default:

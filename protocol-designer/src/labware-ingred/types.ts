@@ -43,6 +43,7 @@ export interface ZoomedIntoSlotInfoState {
   selectedAdapterDefUri: string | null
   selectedModuleModel: ModuleModel | null
   selectedFixture: Fixture | null
+  selectedStackingLabware: { loadName: string | null; amount: number }
   selectedSlot: { slot: DeckSlot | null; cutout: CutoutId | null }
 }
 

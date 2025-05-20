@@ -9,6 +9,7 @@ import {
   ALIGN_CENTER,
   CheckboxField,
   CURSOR_POINTER,
+  CustomizeExpandButton,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
@@ -20,7 +21,6 @@ import {
   ListButton,
   ListButtonAccordion,
   ListButtonAccordionContainer,
-  ListButtonRadioButton,
   Modal,
   PrimaryButton,
   SecondaryButton,
@@ -41,12 +41,14 @@ import {
 } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '../../../components/atoms'
+import { getEnableStacking } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { createCustomLabwareDef } from '../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import {
   selectAdapter,
+  selectStackingLabware,
   selectTopLabware,
 } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
@@ -58,6 +60,7 @@ import {
 import {
   getLabwareCompatibleWithAdapter,
   getLabwareIsRecommended,
+  getStackerDefinition,
 } from '../../../pages/Designer/DeckSetup/utils'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getPipetteEntities } from '../../../step-forms/selectors'
@@ -77,6 +80,10 @@ import type { ThunkDispatch } from '../../../types'
 
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
+const STACKING_LOADNAMES = [
+  'opentrons_flex_deck_riser',
+  'opentrons_flex_tiprack_lid',
+]
 const PLATE_READER_LOADNAME =
   'opentrons_flex_lid_absorbance_plate_reader_module'
 interface SelectLabwareModalProps {
@@ -100,6 +107,7 @@ export function SelectLabwareModal(
   const [error, setError] = useState<string | null>(null)
 
   const dispatch = useDispatch<ThunkDispatch<any>>()
+  const enableStacking = useSelector(getEnableStacking)
   const permittedTipracks = useSelector(stepFormSelectors.getPermittedTipracks)
   const pipetteEntities = useSelector(getPipetteEntities)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
@@ -111,6 +119,7 @@ export function SelectLabwareModal(
     selectedTopLabwareDefUri,
     selectedModuleModel,
     selectedAdapterDefUri,
+    selectedStackingLabware,
   } = zoomedInSlotInfo
 
   const hasNoLabware =
@@ -203,7 +212,8 @@ export function SelectLabwareModal(
         (isAdapter96Channel && !has96Channel) ||
         (slot === 'offDeck' && isAdapter) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
-          moduleType !== ABSORBANCE_READER_TYPE)
+          moduleType !== ABSORBANCE_READER_TYPE) ||
+        (!enableStacking && STACKING_LOADNAMES.includes(parameters.loadName))
       )
     },
     [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
@@ -411,7 +421,7 @@ export function SelectLabwareModal(
                 >
                   {filteredLabwareByCategory[CUSTOM_CATEGORY].map(
                     ({ uri }, index) => (
-                      <ListButtonRadioButton
+                      <CustomizeExpandButton
                         key={`${index}_${uri}`}
                         id={`${index}_${uri}`}
                         buttonText={customLabwareDefs[uri].metadata.displayName}
@@ -456,13 +466,35 @@ export function SelectLabwareModal(
                               const isAdapter = def.allowedRoles?.includes(
                                 'adapter'
                               )
+                              const stackingLabwareDef = getStackerDefinition(
+                                {
+                                  ...defs,
+                                  ...customLabwareDefs,
+                                },
+                                loadName
+                              )
 
                               return searchFilter(def.metadata.displayName) &&
                                 !getIsLabwareFiltered(def) ? (
                                 <Fragment
                                   key={`${index}_${category}_${loadName}`}
                                 >
-                                  <ListButtonRadioButton
+                                  <CustomizeExpandButton
+                                    stackingProps={
+                                      stackingLabwareDef != null
+                                        ? {
+                                            definition: stackingLabwareDef,
+                                            onCheckboxChange: dispatch(
+                                              selectStackingLabware({
+                                                amount: 1,
+                                                loadName:
+                                                  stackingLabwareDef.parameters
+                                                    .loadName,
+                                              })
+                                            ),
+                                          }
+                                        : undefined
+                                    }
                                     id={`${index}_${category}_${loadName}`}
                                     buttonText={def.metadata.displayName}
                                     buttonValue={uri}
@@ -527,7 +559,7 @@ export function SelectLabwareModal(
                                                   const nestedDef =
                                                     defs[tiprackDefUri]
                                                   return (
-                                                    <ListButtonRadioButton
+                                                    <CustomizeExpandButton
                                                       key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                       id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                       buttonText={
@@ -567,7 +599,7 @@ export function SelectLabwareModal(
                                                   ]
 
                                                 return (
-                                                  <ListButtonRadioButton
+                                                  <CustomizeExpandButton
                                                     key={`${index}_${category}_${loadName}_${nestedDefUri}`}
                                                     id={`${index}_${category}_${loadName}_${nestedDefUri}`}
                                                     buttonText={
