@@ -6,6 +6,8 @@ import {
   getDeckDefFromRobotType,
   getModuleDef2,
   getPositionFromSlotId,
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -171,11 +173,13 @@ export function MoveLabwareOnDeck(
     0,
   ]
 
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(movedLabwareDef)
+
   const offDeckPosition = {
     x: slotPosition[0],
     y:
       deckDef.cornerOffsetFromOrigin[1] -
-      movedLabwareDef.dimensions.xDimension -
+      getSchema2Dimensions(movedLabwareDef).xDimension -
       SPLASH_Y_BUFFER_MM,
   }
   const initialPosition =
@@ -232,7 +236,7 @@ export function MoveLabwareOnDeck(
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
         <g
-          transform={`translate(${movedLabwareDef.cornerOffsetFromSlot.x}, ${movedLabwareDef.cornerOffsetFromSlot.y})`}
+          transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
         >
           <LabwareRender definition={movedLabwareDef} highlight={true} />
           <AnimatedG style={{ opacity: springProps.splashOpacity }}>

@@ -16,6 +16,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
@@ -92,13 +96,15 @@ export const LabwareInfoOverlay = (
     yOffset,
   } = props
 
-  const width = definition.dimensions.xDimension
-  const height = definition.dimensions.yDimension
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
+  const dimensions = getSchema2Dimensions(definition)
+
   return (
     <RobotCoordsForeignDiv
-      x={definition.cornerOffsetFromSlot.x + (xOffset ?? 0)}
-      y={definition.cornerOffsetFromSlot.y + (yOffset ?? 0)}
-      {...{ width, height }}
+      x={cornerOffsetFromSlot.x + (xOffset ?? 0)}
+      y={cornerOffsetFromSlot.y + (yOffset ?? 0)}
+      width={dimensions.xDimension}
+      height={dimensions.yDimension}
       innerDivProps={{
         display: DISPLAY_FLEX,
         flexDirection: DIRECTION_COLUMN,

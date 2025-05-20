@@ -2,6 +2,11 @@ import { Fragment, memo } from 'react'
 import map from 'lodash/map'
 import styled from 'styled-components'
 
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
+
 import { COLORS } from '../../helix-design-system'
 import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 import {
@@ -98,12 +103,12 @@ export const Labware = (props: LabwareProps): JSX.Element => {
     wellStroke = {},
   } = props
 
-  const cornerOffsetFromSlot = definition.cornerOffsetFromSlot
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
 
   if (labwareAdapterLoadNames.includes(labwareLoadName)) {
     const { shouldRotateAdapterOrientation = false } = props
-    const { xDimension, yDimension } = definition.dimensions
+    const { xDimension, yDimension } = getSchema2Dimensions(definition)
 
     return (
       <g

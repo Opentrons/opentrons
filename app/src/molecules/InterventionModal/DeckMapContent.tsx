@@ -11,6 +11,10 @@ import {
   RobotCoordsForeignDiv,
   useDeckLocationSelect,
 } from '@opentrons/components'
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
 
 import type { ComponentProps } from 'react'
 import type {
@@ -122,13 +126,15 @@ export function LabwareHighlight({
   highlight: boolean
   definition: LabwareDefinition
 }): JSX.Element {
-  const width = definition.dimensions.xDimension
-  const height = definition.dimensions.yDimension
+  const { xDimension: width, yDimension: height } = getSchema2Dimensions(
+    definition
+  )
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
 
   return (
     <RobotCoordsForeignDiv
-      x={definition.cornerOffsetFromSlot.x}
-      y={definition.cornerOffsetFromSlot.y}
+      x={cornerOffsetFromSlot.x}
+      y={cornerOffsetFromSlot.y}
       {...{ width, height }}
       innerDivProps={{
         display: DISPLAY_FLEX,

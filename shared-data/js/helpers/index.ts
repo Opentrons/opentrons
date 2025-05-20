@@ -4,6 +4,7 @@ import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
 import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import { getAllLiquidClassDefs } from '../liquidClasses'
+import { getSchema2Dimensions } from './labwareSchemaShims'
 
 import type { AddressableAreaName, CutoutId } from '../../deck/types/schemaV5'
 import type {
@@ -379,7 +380,7 @@ export const getAreSlotsAdjacent = (
 export const getIsLabwareAboveHeight = (
   labwareDef: LabwareDefinition,
   height: number
-): boolean => labwareDef.dimensions.zDimension > height
+): boolean => getSchema2Dimensions(labwareDef).zDimension > height
 
 export const getAdapterName = (labwareLoadname: string): ThermalAdapterName => {
   let adapterName: ThermalAdapterName = 'Universal Flat Adapter'

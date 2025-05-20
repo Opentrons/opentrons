@@ -15,6 +15,7 @@ import {
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getSchema2Dimensions } from '@opentrons/shared-data'
 
 import type { ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
@@ -32,8 +33,9 @@ export function LabwareInfo(props: {
   def: LabwareDefinition
   children: ReactNode
 }): JSX.Element {
-  const width = props.def.dimensions.xDimension
-  const height = props.def.dimensions.yDimension
+  const { xDimension: width, yDimension: height } = getSchema2Dimensions(
+    props.def
+  )
   return (
     <RobotCoordsForeignDiv
       x={0}

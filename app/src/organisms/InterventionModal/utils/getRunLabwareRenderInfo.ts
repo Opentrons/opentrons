@@ -1,5 +1,6 @@
 import {
   getPositionFromSlotId,
+  getSchema2Dimensions,
   getSlotHasMatingSurfaceUnitVector,
 } from '@opentrons/shared-data'
 
@@ -61,13 +62,12 @@ export function getRunLabwareRenderInfo(
             ]
           : acc
       } else {
+        const { yDimension } = getSchema2Dimensions(labwareDef)
         return [
           ...acc,
           {
             x: 0,
-            y:
-              deckDef.cornerOffsetFromOrigin[1] -
-              labwareDef.dimensions.yDimension,
+            y: deckDef.cornerOffsetFromOrigin[1] - yDimension,
             labwareId: labware.id,
             labwareDef,
           },

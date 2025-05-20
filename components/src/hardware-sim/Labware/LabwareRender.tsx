@@ -1,3 +1,8 @@
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
+
 import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 import {
   FilledWells,
@@ -66,12 +71,12 @@ export interface LabwareRenderProps {
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
   const { gRef, definition } = props
 
-  const cornerOffsetFromSlot = definition.cornerOffsetFromSlot
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
 
   if (labwareAdapterLoadNames.includes(labwareLoadName)) {
     const { shouldRotateAdapterOrientation } = props
-    const { xDimension, yDimension } = props.definition.dimensions
+    const { xDimension, yDimension } = getSchema2Dimensions(definition)
 
     return (
       <g

@@ -1,5 +1,7 @@
 import { memo } from 'react'
 
+import { getSchema2Dimensions } from '@opentrons/shared-data'
+
 import { COLORS } from '../../../helix-design-system'
 import { C_BLACK, C_BLUE } from '../../../styles/colors'
 import { RobotCoordsText } from '../../Deck'
@@ -61,7 +63,7 @@ const Labels = (props: {
             y={
               props.isLetterColumn === true
                 ? well.y
-                : props.definition.dimensions.yDimension -
+                : getSchema2Dimensions(props.definition).yDimension -
                   NUMBER_COLUMN_Y_FROM_TOP
             }
             style={{

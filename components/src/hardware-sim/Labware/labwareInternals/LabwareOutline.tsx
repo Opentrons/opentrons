@@ -1,4 +1,8 @@
-import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
+import {
+  getSchema2Dimensions,
+  SLOT_RENDER_HEIGHT,
+  SLOT_RENDER_WIDTH,
+} from '@opentrons/shared-data'
 
 import { COLORS } from '../../../helix-design-system'
 import { getTiprackBackgroundColor } from './getTiprackBackgroundColor'
@@ -40,10 +44,11 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
     fill,
     showRadius = true,
   } = props
-  const {
-    parameters = { isTiprack, loadName: '' },
-    dimensions = { xDimension: width, yDimension: height },
-  } = definition ?? {}
+  const { parameters = { isTiprack, loadName: '' } } = definition ?? {}
+  const dimensions =
+    definition === undefined
+      ? { xDimension: width, yDimension: height }
+      : getSchema2Dimensions(definition)
 
   let backgroundFill
   if (fill != null) {
