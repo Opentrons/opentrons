@@ -24,7 +24,7 @@ export interface InlineNotificationProps extends StyleProps {
   /** name constant of the icon to display */
   type: InlineNotificationType
   /** InlineNotification contents */
-  heading: string
+  heading?: string
   message?: string
   /** Optional dynamic width based on contents */
   hug?: boolean
@@ -97,22 +97,26 @@ export function InlineNotification(
             oddStyle="bodyTextRegular"
             desktopStyle="bodyDefaultRegular"
           >
-            <span
-              css={`
-                font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-              `}
-            >
-              {fullHeading}
-            </span>
-            {/* this break is because the desktop wants this on two lines, but also wants/
-              inline text layout on ODD. Soooo here you go */}
-            <br
-              css={`
-                @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-                  display: none;
-                }
-              `}
-            />
+            {heading != null && (
+              <>
+                <span
+                  css={`
+                    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+                  `}
+                >
+                  {fullHeading}
+                </span>
+                {/* this break is because the desktop wants this on two lines, but also wants/
+                  inline text layout on ODD. Soooo here you go */}
+                <br
+                  css={`
+                    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                      display: none;
+                    }
+                  `}
+                />
+              </>
+            )}
             {message != null && fullmessage}
           </StyledText>
         </Flex>
