@@ -34,6 +34,27 @@ const mockThermocyclerGen1ClosedLid = {
   },
 } as any
 
+const mockFlexStacker = {
+  id: 'flex_stacker_id',
+  serialNumber: 'fs123',
+  hardwareRevision: 'flex_stacker_v1.0',
+  moduleModel: 'flexStackerModuleV1',
+  moduleType: 'flexStackerModuleType',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: false,
+  usbPort: {
+    path: '/dev/ot_module_flex_stacker',
+    hub: false,
+    port: 1,
+    portGroup: 'unknown',
+  },
+  data: {
+    platformState: 'extended',
+    hopperDoorState: 'closed',
+    status: 'idle',
+  },
+} as any
+
 describe('getModuleCardImage', () => {
   it('should render the correct image string when there is a magnetic module gen 2 attached', () => {
     const result = getModuleCardImage(mockMagneticModuleGen2)
@@ -86,6 +107,10 @@ describe('getModuleCardImage', () => {
     expect(result).toEqual(
       '/app/src/assets/images/thermocycler_gen_2_closed.png'
     )
+  })
+  it('should render the correct image string when there is a flex stacker is attached', () => {
+    const result = getModuleCardImage(mockFlexStacker)
+    expect(result).toEqual('/app/src/assets/images/flex_stacker_no_labware.png')
   })
 })
 
