@@ -155,6 +155,7 @@ def record_measurement_data(
         else:
             print(f"delaying {delay_seconds} seconds for measurement, please wait...")
             ctx.delay(delay_seconds)
+            print("reading...")
     return _build_measurement_data(
         recorder, tag, env_data, stable=stable, simulating=ctx.is_simulating()
     )

@@ -390,11 +390,11 @@ def _run_trial(
 
 
 def _get_test_channels(cfg: config.GravimetricConfig) -> List[int]:
-    if cfg.pipette_channels == 8 and not cfg.increment:
-        # NOTE: only test channels separately when QC'ing a 8ch
-        return MULTI_CHANNEL_TEST_ORDER
-    else:
-        return [0]
+    # if cfg.pipette_channels == 8 and not cfg.increment:
+    #     # NOTE: only test channels separately when QC'ing a 8ch
+    #     return MULTI_CHANNEL_TEST_ORDER
+    # else:
+    return [0] # cavity test only use channel 0 for 8ch pipette
 
 
 def _get_channel_divider(cfg: config.GravimetricConfig) -> float:
@@ -568,22 +568,23 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     labware_on_scale = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)
 
-    total_tips = len(
-        [tip for chnl_tips in resources.tips.values() for tip in chnl_tips]
-    )
+    # total_tips = len(
+    #     [tip for chnl_tips in resources.tips.values() for tip in chnl_tips]
+    # )
+    _channels = cfg.pipette_channels
     channels_to_test = _get_test_channels(cfg)
     for channel in channels_to_test:
         # initialize the global tip counter, per each channel that will be tested
         _tip_counter[channel] = 0
     trial_total = len(resources.test_volumes) * cfg.trials * len(channels_to_test)
     support_tip_resupply = bool(cfg.pipette_channels == 96)
-    if (trial_total + 1) > total_tips:
-        if not support_tip_resupply:
-            raise ValueError(f"more trials ({trial_total}) than tips ({total_tips})")
-        elif not resources.ctx.is_simulating():
-            ui.get_user_ready(
-                f"prepare {(trial_total + 1) - total_tips} extra tip-racks"
-            )
+    # if (trial_total + 1) > total_tips:
+    #     if not support_tip_resupply:
+    #         raise ValueError(f"more trials ({trial_total}) than tips ({total_tips})")
+    #     elif not resources.ctx.is_simulating():
+    #         ui.get_user_ready(
+    #             f"prepare {(trial_total + 1) - total_tips} extra tip-racks"
+    #         )
     assert resources.recorder is not None
     recorder = resources.recorder
     if resources.ctx.is_simulating():
@@ -610,6 +611,10 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             col_list = ["A", "B", "C", "D", "E", "F", "G", "H"]
             col = col_list[nubmer%8 - 1]
             row = int(nubmer/8)+1 if nubmer%8 !=0 else int(nubmer/8)
+            if _channels is 8:
+                col = col_list[7 - (nubmer%8 - 1)]
+            else:
+                col = col
             return f"{col}{row}"
         
         def get_next_tip(tip_numbers):
