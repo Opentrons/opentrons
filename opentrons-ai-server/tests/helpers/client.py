@@ -67,7 +67,7 @@ class Client:
         """Call the /chat/completion endpoint and return the response."""
         request = ChatRequest(message=message, fake=fake, fake_key=fake_key, history=None, chat_options=None)
         headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
-        return self.httpx.post("/chat/completion", headers=headers, json=request.model_dump(mode="json"))
+        return self.httpx.post("/chat/completion", headers=headers, json=request.model_dump())
 
     def post_feedback(self, message: str, fake: bool = True, bad_auth: bool = False) -> Response:
         """Call the /chat/feedback endpoint and return the response."""

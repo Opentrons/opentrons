@@ -1,9 +1,8 @@
 import asyncio
 import json
 import os
-import re
 import time
-from typing import Annotated, Any, Awaitable, Callable, List, Literal, Optional, Tuple, Union, cast
+from typing import Annotated, Any, Awaitable, Callable, List, Literal, Optional, Union, cast
 
 import structlog
 from anthropic.types import MessageParam
@@ -25,6 +24,7 @@ from api.domain.anthropic_predict import AnthropicPredict
 from api.domain.fake_responses import FakeResponse, get_fake_response
 from api.domain.openai_predict import OpenAIPredict
 from api.handler.custom_logging import setup_logging
+from api.handler.utils_fast import parse_tagged_content
 from api.integration.auth import VerifyToken
 from api.integration.google_sheets import GoogleSheetsClient
 from api.models.chat_request import ChatRequest
@@ -220,24 +220,6 @@ def _generate_llm_response(
 
     # Default to update for chat completion and update_protocol
     return claude.update(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
-
-
-def parse_tagged_content(text: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
-    def extract_tag_content(tag_name: str, text: str) -> Optional[str]:
-        """Extract content between opening and closing tags."""
-        pattern = f"<{tag_name}>(.*?)</{tag_name}>"
-        match = re.search(pattern, text, re.DOTALL)
-        if match:
-            content = match.group(1).strip()
-            return content if content else None
-        return None
-
-    # Extract content from each tag
-    thinking_content = extract_tag_content("THINKING", text)
-    pd_json_content = extract_tag_content("PD_JSON", text)
-    comments_content = extract_tag_content("COMMENTS", text)
-
-    return thinking_content, pd_json_content, comments_content
 
 
 def _format_response(response: Optional[str], protocol_format: Optional[ProtocolFormat], is_fake: bool) -> ChatResponse:
