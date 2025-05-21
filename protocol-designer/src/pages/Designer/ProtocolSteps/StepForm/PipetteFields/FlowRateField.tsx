@@ -156,10 +156,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
     (isPristine && flowRateNum === 0)
   ) {
     errorMessage = i18n.format(
-      t('step_edit_form.field.flow_rate.error_out_of_bounds', {
-        min: 0.1,
-        max: maxFlowRate,
-      }),
+      t('step_edit_form.field.flow_rate.error_out_of_bounds'),
       'capitalize'
     )
   }
@@ -185,7 +182,6 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
       caption={
         maxFlowRate != null
           ? t('protocol_steps:valid_range', {
-              min: 0.1,
               max: maxFlowRate,
               unit: t('application:units.microliterPerSec'),
             })

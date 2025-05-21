@@ -24,6 +24,8 @@ class IdentifyModuleParams(BaseModel):
 
     model: ModuleModel = Field(..., description="The model of the module")
     moduleId: str = Field(..., description="Unique ID of the module")
+    start: bool = Field(..., description="Start or stop identify")
+    color: Optional[str] = Field(None, description="Optional color to identify module")
 
 
 class IdentifyModuleResult(BaseModel):
@@ -45,7 +47,7 @@ class IdentifyModuleImpl(
         self, params: IdentifyModuleParams
     ) -> SuccessData[IdentifyModuleResult]:
         """Execute the IdentifyModule command."""
-        # ONLY flex stacker has support for identify module command
+        # ONLY flex stacker has support for identify module command...for now
         if params.model == ModuleModel.FLEX_STACKER_MODULE_V1:
             module_substate = self._state_view.modules.get_flex_stacker_substate(
                 module_id=params.moduleId
@@ -54,7 +56,7 @@ class IdentifyModuleImpl(
                 module_substate.module_id
             )
             if module_hw is not None:
-                await module_hw.identify()
+                await module_hw.identify(params.start, params.color)
         else:
             raise NotImplementedError(
                 f"IdentifyModule is not supported for {params.model}"

@@ -1,8 +1,8 @@
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareWellGroupProperties } from '/app/local-resources/labware'
 import type * as Types from '../types'
 
-export const mockDefinition: LabwareDefinition2 = {
+export const mockDefinition: LabwareDefinition = {
   version: 1,
   schemaVersion: 2,
   namespace: 'custom',
@@ -75,7 +75,7 @@ export const mockDuplicateLabware: Types.DuplicateLabwareFile = {
   },
 }
 
-export const mockTipRackDefinition: LabwareDefinition2 = {
+export const mockTipRackDefinition: LabwareDefinition = {
   version: 1,
   schemaVersion: 2,
   namespace: 'custom',
@@ -124,7 +124,7 @@ export const mockRectangularLabwareWellGroupProperties: LabwareWellGroupProperti
   brand: { brand: 'Opentrons' },
 }
 
-export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition2 = {
+export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition = {
   version: 1,
   schemaVersion: 2,
   namespace: 'opentrons',

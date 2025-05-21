@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { COLORS, PrimaryButton } from '@opentrons/components'
+import { COLORS, JUSTIFY_FLEX_END, PrimaryButton } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
@@ -125,6 +125,7 @@ export const UpdateFirmware = (
 
   return (
     <SimpleWizardBody
+      justifyContentForOddButton={JUSTIFY_FLEX_END}
       isSuccess={false}
       iconColor={COLORS.yellow50}
       header={t('firmware_update_found')}

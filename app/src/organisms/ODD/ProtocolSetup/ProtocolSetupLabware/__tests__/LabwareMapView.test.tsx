@@ -17,7 +17,7 @@ import type { ComponentProps } from 'react'
 import type {
   CompletedProtocolAnalysis,
   getSimplestDeckConfigForProtocol,
-  LabwareDefinition2,
+  LabwareDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
 
@@ -70,7 +70,7 @@ describe('LabwareMapView', () => {
     const mockLabwareOnDeck = [
       {
         labwareLocation: { slotName: 'C1' },
-        definition: fixtureTiprack300ul as LabwareDefinition2,
+        definition: fixtureTiprack300ul as LabwareDefinition,
         topLabwareId: '300_ul_tiprack_id',
         onLabwareClick: expect.any(Function),
         labwareChildren: null,
@@ -81,7 +81,7 @@ describe('LabwareMapView', () => {
         moduleModel: 'heaterShakerModuleV1' as ModuleModel,
         moduleLocation: { slotName: 'B1' },
         nestedLabwareDef: mockProtocolModuleInfo[0]
-          .nestedLabwareDef as LabwareDefinition2,
+          .nestedLabwareDef as LabwareDefinition,
         onLabwareClick: expect.any(Function),
         moduleChildren: null,
         innerProps: {},
@@ -98,7 +98,7 @@ describe('LabwareMapView', () => {
       .thenReturn(<div>mock base deck</div>)
     vi.mocked(getLabwareRenderInfo).mockReturnValue({
       '300_ul_tiprack_id': {
-        labwareDef: fixtureTiprack300ul as LabwareDefinition2,
+        labwareDef: fixtureTiprack300ul as LabwareDefinition,
         displayName: 'fresh tips',
         x: MOCK_300_UL_TIPRACK_COORDS[0],
         y: MOCK_300_UL_TIPRACK_COORDS[1],

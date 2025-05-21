@@ -9,7 +9,7 @@ import { i18n } from '/app/i18n'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 const render = (props: ComponentProps<typeof LabwareInfoOverlay>) => {
   return renderWithProviders(
@@ -29,7 +29,7 @@ describe('LabwareInfoOverlay', () => {
   let props: ComponentProps<typeof LabwareInfoOverlay>
   beforeEach(() => {
     props = {
-      definition: fixtureTiprack300ul as LabwareDefinition2,
+      definition: fixtureTiprack300ul as LabwareDefinition,
       displayName: 'fresh tips',
       labwareId: MOCK_LABWARE_ID,
       runId: MOCK_RUN_ID,

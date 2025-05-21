@@ -23,8 +23,8 @@ export const getModuleSetupSteps = (
         // { section: SECTIONS.CHECK_INSTALLATION_PINS},
         { section: SECTIONS.UPDATE_FIRMWARE },
         { section: SECTIONS.SELECT_LOCATION },
-        // { section: SECTIONS.CLOSE_DOOR },
-        // { section: SECTIONS.INSTALL_SHUTTLE },
+        { section: SECTIONS.CLOSE_DOOR },
+        { section: SECTIONS.INSTALL_SHUTTLE },
         { section: SECTIONS.SUCCESS },
       ]
     default:

@@ -14,7 +14,7 @@ import {
 import { getDisplayVolume } from '@opentrons/shared-data'
 
 import type {
-  LabwareDefinition2 as LabwareDefinition,
+  LabwareDefinition,
   LabwareVolumeUnits,
 } from '@opentrons/shared-data'
 import type { LabwareWellGroupProperties } from '/app/local-resources/labware'

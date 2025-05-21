@@ -8,7 +8,7 @@ import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/ut
 import { formatTimestamp } from '/app/transformations/runs'
 
 import type { TFunction } from 'i18next'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { OffsetCandidate } from './hooks/useOffsetCandidatesForAnalysis'
 
 const OffsetTable = styled('table')`
@@ -36,7 +36,7 @@ const OffsetTableDatum = styled('td')`
 
 interface LegacyLabwareOffsetTableProps {
   offsetCandidates: OffsetCandidate[]
-  labwareDefinitions: LabwareDefinition2[]
+  labwareDefinitions: LabwareDefinition[]
 }
 
 export function LegacyLabwareOffsetTable(
