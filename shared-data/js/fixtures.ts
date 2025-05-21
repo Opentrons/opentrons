@@ -248,11 +248,8 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
-type CutoutConfigWithoutCutoutfixtureId = Omit<CutoutConfig, 'cutoutFixtureId'>
-
-interface CutoutConfigMap extends CutoutConfigWithoutCutoutfixtureId {
+interface CutoutConfigMap extends CutoutConfig {
   addressableAreaId: AddressableAreaName
-  cutoutFixtureId: CutoutFixtureIdsWithFakes
 }
 
 export const getCutoutFixtureReplacementIfNeeded = (
@@ -301,7 +298,7 @@ export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
       acc.push({
         ...obj,
         addressableAreaId: item,
-        cutoutFixtureId: cutoutFixtureReplacment,
+        // cutoutFixtureId: cutoutFixtureReplacment,
       })
     })
     return acc

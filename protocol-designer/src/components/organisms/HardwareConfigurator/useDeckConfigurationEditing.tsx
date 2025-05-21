@@ -320,8 +320,10 @@ export const getNewConfig = (
   cutoutFixtureId: CutoutFixtureIdsWithFakes,
   deckDef: DeckDefinition
 ): DeckConfiguration => {
-  
-  const replacementFixtureId = getReplacmentFixtureForFixtureRemoval(cutoutFixtureId, cutoutId)
+  const replacementFixtureId = getReplacmentFixtureForFixtureRemoval(
+    cutoutFixtureId,
+    cutoutId
+  )
 
   const fixtureGroup =
     deckDef.cutoutFixtures.find(({ id }) => id === cutoutFixtureId)
