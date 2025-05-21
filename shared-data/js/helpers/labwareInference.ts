@@ -16,7 +16,7 @@ import type {
 
 export interface LabwareWellGroupProperties {
   xOffsetFromLeft: number
-  yOffsetFromTop: number
+  yOffsetFromBack: number
   xSpacing: number | null
   ySpacing: number | null
   wellCount: number
@@ -59,7 +59,7 @@ export function getUniqueWellProperties(
       xSpacing: getSpacingIfUniform(wellProps, 'x'),
       ySpacing: getSpacingIfUniform(wellProps, 'y'),
       xOffsetFromLeft: xStart,
-      yOffsetFromTop: round(yDimension - yStart, ROUNDING_PRECISION),
+      yOffsetFromBack: round(yDimension - yStart, ROUNDING_PRECISION),
       wellCount: wellProps.length,
       depth: getIfConsistent(wellDepths),
       totalLiquidVolume: getIfConsistent(wellVolumes),
