@@ -5,6 +5,7 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
 import { getPDMetadata } from '../../file-types'
+import { LabwareOnDeck, ModuleOnDeck } from '../../step-forms'
 
 import type { Reducer } from 'redux'
 import type {
@@ -26,6 +27,7 @@ import type {
   DuplicateLabwareAction,
   EditLiquidGroupAction,
   EditMultipleLiquidGroupsAction,
+  EditSlotInfoAction,
   GenerateNewProtocolAction,
   OpenAddLabwareModalAction,
   OpenIngredientSelectorAction,
@@ -33,15 +35,17 @@ import type {
   RenameLabwareAction,
   SelectAdapterAction,
   SelectFixtureAction,
+  SelectLidAction,
   SelectLiquidAction,
   SelectModuleAction,
-  SelectStackingLabwareAction,
   SelectTopLabwareAction,
+  SelectTopLabwareAmountAction,
   SetWellContentsAction,
   ZoomedIntoSlotAction,
 } from '../actions'
 import type {
   DisplayLabware,
+  Fixture,
   GenerateNewProtocolState,
   ZoomedIntoSlotInfoState,
 } from '../types'
@@ -303,11 +307,11 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
 )
 
 const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
-  selectedTopLabwareDefUri: null,
+  selectedTopLabware: { labwareDefUri: null, amount: 1 },
   selectedAdapterDefUri: null,
   selectedModuleModel: null,
   selectedFixture: null,
-  selectedStackingLabware: { loadName: null, amount: 0 },
+  selectedLidLabware: null,
   selectedSlot: { slot: null, cutout: null },
 }
 
@@ -319,12 +323,20 @@ export const zoomedInSlotInfo = (
     | SelectModuleAction
     | SelectFixtureAction
     | ZoomedIntoSlotAction
-    | SelectStackingLabwareAction
+    | SelectLidAction
+    | SelectTopLabwareAmountAction
+    | EditSlotInfoAction
 ): ZoomedIntoSlotInfoState => {
   switch (action.type) {
     case 'SELECT_TOP_LABWARE': {
       const { labwareDefUri } = action.payload
-      return { ...state, selectedTopLabwareDefUri: labwareDefUri }
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefUri,
+          amount: state.selectedTopLabware.amount,
+        },
+      }
     }
     case 'SELECT_ADAPTER': {
       const { adapterDefUri } = action.payload
@@ -348,11 +360,43 @@ export const zoomedInSlotInfo = (
         },
       }
     }
-    case 'SELECT_STACKING_LABWARE': {
-      const { loadName, amount } = action.payload
+    case 'SELECT_LID': {
+      const { labwareDefUri } = action.payload
       return {
         ...state,
-        selectedStackingLabware: { loadName, amount },
+        selectedLidLabware: labwareDefUri,
+      }
+    }
+    case 'SELECT_TOP_LABWARE_AMOUNT': {
+      const { amount } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefUri: state.selectedTopLabware.labwareDefUri,
+          amount,
+        },
+      }
+    }
+    case 'EDIT_SLOT_INFO': {
+      const {
+        labwareDefUri,
+        adapterDefUri,
+        moduleModel,
+        fixture,
+        lidDefUri,
+        amount,
+      } = action.payload
+      console.log('moduleModel from reducer', moduleModel)
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefUri: labwareDefUri ?? null,
+          amount: amount ?? 1,
+        },
+        selectedAdapterDefUri: adapterDefUri ?? null,
+        selectedModuleModel: moduleModel ?? null,
+        selectedFixture: fixture ?? null,
+        selectedLidLabware: lidDefUri ?? null,
       }
     }
     default:

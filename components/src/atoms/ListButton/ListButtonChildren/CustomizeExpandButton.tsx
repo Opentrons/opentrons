@@ -19,14 +19,17 @@ import type { ChangeEvent, ChangeEventHandler, MouseEvent } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../../primitives'
 
-interface StackingProps {
+const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
+export interface StackingProps {
+  onInputFieldChange: (e: ChangeEvent<HTMLInputElement>) => void
+  inputFieldValue: number
   definition: LabwareDefinition2
-  onCheckboxChange: (e: ChangeEvent<HTMLInputElement>) => void
-  onInputFieldChange: () => void
-  checked: boolean
+  onCheckboxChange?: () => void
+  checked?: boolean
 }
 
 interface CustomizeExpandButtonProps extends StyleProps {
+  t: any
   buttonText: string
   buttonValue: string | number
   onChange: ChangeEventHandler<HTMLInputElement>
@@ -48,7 +51,10 @@ export function CustomizeExpandButton(
     disabled = false,
     id = buttonText,
     stackingProps,
+    t,
   } = props
+  const isLid =
+    stackingProps?.definition.parameters.loadName === TIPRACK_LID_LOADNAME
 
   return (
     <Flex
@@ -62,7 +68,10 @@ export function CustomizeExpandButton(
         checked={isSelected}
         id={id}
         disabled={disabled}
-        onChange={onChange}
+        onChange={e => {
+          onChange(e)
+          e.stopPropagation()
+        }}
         type="radio"
         value={buttonValue}
       />
@@ -76,27 +85,46 @@ export function CustomizeExpandButton(
           <StyledText desktopStyle="bodyDefaultRegular">
             {buttonText}
           </StyledText>
-          {stackingProps != null ? (
+          {stackingProps != null && isSelected ? (
             <Flex
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={blue10}
               padding={`${spacing16} ${spacing20}`}
               borderRadius={borderRadius4}
             >
-              <CheckboxField
-                onChange={stackingProps.onCheckboxChange}
-                value={stackingProps.checked}
-                label={`with ${stackingProps.definition.metadata.displayName}`}
-              />
+              {isLid ? (
+                <CheckboxField
+                  onChange={e => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    stackingProps.onCheckboxChange?.()
+                  }}
+                  value={stackingProps.checked}
+                  label={t('with_lid', {
+                    name: stackingProps.definition.metadata.displayName,
+                  })}
+                />
+              ) : null}
               {stackingProps.definition.stackLimit != null &&
               stackingProps.definition.stackLimit > 1 ? (
                 <InputField
-                  title="Labware quantity"
+                  title={t('labware_quantity')}
                   onChange={e => {
-                    stackingProps.onInputFieldChange()
                     e.stopPropagation()
+                    stackingProps.onInputFieldChange(e)
                   }}
-                  caption={`Valid between 1-${stackingProps.definition.stackLimit}`}
+                  type="number"
+                  error={
+                    !stackingProps.inputFieldValue ||
+                    stackingProps.inputFieldValue >
+                      stackingProps.definition.stackLimit
+                      ? t('unsupported_range')
+                      : null
+                  }
+                  value={stackingProps.inputFieldValue}
+                  caption={t('valid_range', {
+                    max: stackingProps.definition.stackLimit,
+                  })}
                 />
               ) : null}
             </Flex>

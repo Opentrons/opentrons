@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import values from 'lodash/values'
 
@@ -30,7 +30,7 @@ import {
   getTopmostLabwareOnModuleFromStack,
 } from '../../../utils'
 import { HighlightLabware } from '../HighlightLabware'
-import { getSlotInformation } from '../utils'
+import { getSlotInformation, TIPRACK_LID_LOADNAME } from '../utils'
 import { HighlightItems } from './HighlightItems'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
@@ -128,30 +128,50 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
 
   const {
     createdAdapterForSlot,
-    createdTopLabwareForSlot,
+    createdStackForSlot,
+    createdLidForSlot,
     createdModuleForSlot,
     preSelectedFixture,
     slotPosition,
-  } = getSlotInformation({
-    deckSetup: activeDeckSetup,
-    slot: selectedZoomInSlot ?? '',
-    deckDef,
-  })
+  } = useMemo(() => {
+    const result = getSlotInformation({
+      deckSetup: activeDeckSetup,
+      slot: selectedZoomInSlot ?? '',
+      deckDef,
+    })
+    return result
+  }, [activeDeckSetup, selectedZoomInSlot, deckDef])
+
+  const createdTopLabwareForSlot =
+    activeDeckSetup.labware[createdStackForSlot[0]]
+  const amount = createdStackForSlot?.length ?? 1
   //  initiate the slot's info
   useEffect(() => {
-    dispatch(
-      editSlotInfo({
-        createdAdapterForSlot,
-        createdTopLabwareForSlot,
-        createdModuleForSlot,
-        preSelectedFixture,
-      })
-    )
+    if (
+      createdTopLabwareForSlot ||
+      createdAdapterForSlot ||
+      createdModuleForSlot ||
+      preSelectedFixture ||
+      createdLidForSlot
+    ) {
+      dispatch(
+        editSlotInfo({
+          labwareDefUri: createdTopLabwareForSlot?.labwareDefURI,
+          adapterDefUri: createdAdapterForSlot?.labwareDefURI,
+          moduleModel: createdModuleForSlot?.model ?? null,
+          fixture: preSelectedFixture,
+          lidDefUri: createdLidForSlot?.labwareDefURI,
+          amount,
+        })
+      )
+    }
   }, [
     createdAdapterForSlot,
+    createdLidForSlot,
     createdTopLabwareForSlot,
     createdModuleForSlot,
     preSelectedFixture,
+    amount,
   ])
 
   const allLabware = Object.values(activeDeckSetup.labware)
@@ -363,6 +383,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           const stagingAreaAddressableAreas = getStagingAreaAddressableAreas(
             stagingAreaCutoutIds
           )
+
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
             stagingAreaAddressableAreas.includes(addressableArea.id)
@@ -409,7 +430,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
-          labware.id === adjacentLabware?.id
+          labware.id === adjacentLabware?.id ||
+          labware.def.parameters.loadName === TIPRACK_LID_LOADNAME
         )
           return null
         const slot = getSlotInLocationStack(labware.stack)

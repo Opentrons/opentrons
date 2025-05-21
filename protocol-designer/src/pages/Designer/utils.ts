@@ -40,6 +40,8 @@ import type {
 } from '../../step-forms'
 import type { Fixture } from './DeckSetup/constants'
 
+export const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
+
 export interface AdditionalEquipment {
   name: AdditionalEquipmentName
   id: string
@@ -47,13 +49,14 @@ export interface AdditionalEquipment {
 }
 
 interface SlotInformation {
+  createdStackForSlot: string[]
   matchingLabwareFor4thColumn: LabwareOnDeck | null
   slotPosition: CoordinateTuple | null
   createdModuleForSlot?: ModuleOnDeck
-  createdTopLabwareForSlot?: LabwareOnDeck
   createdAdapterForSlot?: LabwareOnDeck
   createdFixtureForSlots?: AdditionalEquipment[]
   preSelectedFixture?: Fixture
+  createdLidForSlot?: LabwareOnDeck
 }
 
 interface SlotInformationProps {
@@ -88,7 +91,15 @@ export const getSlotInformation = (
     slot
   )
   const labwareIdsFromFullStack =
-    fullStackFromLabwares?.filter(id => deckSetupLabware[id] != null) ?? []
+    fullStackFromLabwares?.filter(
+      id =>
+        deckSetupLabware[id] != null &&
+        deckSetupLabware[id].def.parameters.loadName !== TIPRACK_LID_LOADNAME
+    ) ?? []
+  const lidIdFromStack = fullStackFromLabwares?.find(
+    id => deckSetupLabware[id]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
+  )
+
   const bottomMostLabware =
     deckSetupLabware[
       labwareIdsFromFullStack[labwareIdsFromFullStack.length - 1]
@@ -98,15 +109,10 @@ export const getSlotInformation = (
     bottomMostLabware.def.allowedRoles?.includes('adapter')
       ? bottomMostLabware
       : undefined
-
-  //  top most labware
-  const createdTopLabwareForSlot =
-    labwareIdsFromFullStack.length >= 1 &&
-    !deckSetupLabware[labwareIdsFromFullStack[0]].def.allowedRoles?.includes(
-      'adapter'
-    )
-      ? deckSetupLabware[labwareIdsFromFullStack[0]]
-      : undefined
+  const remainingLabwareIds =
+    createdAdapterForSlot != null
+      ? labwareIdsFromFullStack.slice(0, -1)
+      : labwareIdsFromFullStack
 
   const createdFixtureForSlots = Object.values(
     additionalEquipmentOnDeck
@@ -135,25 +141,26 @@ export const getSlotInformation = (
           getSlotInLocationStack(lw.stack) === stagingAreaAddressableAreaName[0]
       ) ?? null
   }
-
+  console.log('createdModuleForSlot in utils', createdModuleForSlot)
   const preSelectedFixture =
     createdFixtureForSlots != null && createdFixtureForSlots.length === 2
       ? ('wasteChuteAndStagingArea' as Fixture)
       : (createdFixtureForSlots[0]?.name as Fixture)
-
   return {
     createdModuleForSlot,
-    createdTopLabwareForSlot:
-      slot === 'offDeck'
-        ? undefined
-        : offDeckLabware != null
-        ? offDeckLabware
-        : createdTopLabwareForSlot,
     createdAdapterForSlot,
     createdFixtureForSlots,
     preSelectedFixture,
     slotPosition: slotPosition,
     matchingLabwareFor4thColumn: matchingLabware,
+    createdStackForSlot:
+      slot === 'offDeck'
+        ? []
+        : offDeckLabware != null
+        ? [offDeckLabware.id]
+        : remainingLabwareIds,
+    createdLidForSlot:
+      lidIdFromStack != null ? deckSetupLabware[lidIdFromStack] : undefined,
   }
 }
 

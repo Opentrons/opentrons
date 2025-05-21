@@ -160,26 +160,36 @@ export const getLabwareIsRecommended = (
 //  purely for labware<>adapter combos
 export const getLabwareCompatibleWithAdapter = (
   defs: LabwareDefByDefURI,
+  enableStackingFF: boolean,
   adapterLoadName?: string
 ): string[] => {
   if (adapterLoadName == null) {
     return []
   }
-  return Object.entries(defs)
-    .filter(
-      ([, { stackingOffsetWithLabware, compatibleParentLabware }]) =>
-        stackingOffsetWithLabware?.[adapterLoadName] != null &&
-        //  stacking labware gets added via the LabwareCard
-        !compatibleParentLabware?.includes(adapterLoadName)
-    )
-    .map(([labwareDefUri]) => labwareDefUri)
+
+  if (enableStackingFF) {
+    return Object.entries(defs)
+      .filter(
+        ([, { stackingOffsetWithLabware }]) =>
+          stackingOffsetWithLabware?.[adapterLoadName] != null
+      )
+      .map(([labwareDefUri]) => labwareDefUri)
+  } else {
+    return Object.entries(defs)
+      .filter(
+        ([, { stackingOffsetWithLabware, compatibleParentLabware }]) =>
+          stackingOffsetWithLabware?.[adapterLoadName] != null &&
+          !compatibleParentLabware?.includes(adapterLoadName)
+      )
+      .map(([labwareDefUri]) => labwareDefUri)
+  }
 }
 
 export const getStackerDefinition = (
   defs: LabwareDefByDefURI,
   loadName?: string
-): LabwareDefinition2 | null => {
-  if (loadName == null) {
+): string | null => {
+  if (loadName == null || loadName === 'opentrons_flex_deck_riser') {
     return null
   }
 
@@ -189,7 +199,7 @@ export const getStackerDefinition = (
     )
     .map(([labwareDefUri]) => labwareDefUri)[0]
 
-  return defs[labwareDefURI]
+  return labwareDefURI
 }
 interface DeckErrorsProps {
   modules: InitialDeckSetup['modules']

@@ -65,15 +65,14 @@ export const drillUpFromLabware: () => DrillUpFromLabwareAction = createAction(
 )
 // ==== Create/delete/modify labware =====
 export interface CreateContainerArgs {
-  labwareDefURI: string
-  // NOTE: adapterUnderLabwareDefURI is only for rendering an adapter under the labware/tiprack
-  adapterUnderLabwareDefURI?: string
+  labwareDefURIStack: string[]
   // NOTE: if slot is omitted, next available slot will be used.
   slot?: DeckSlot
 }
 export interface CreateContainerAction {
   type: 'CREATE_CONTAINER'
-  payload: CreateContainerArgs & {
+  payload: {
+    labwareDefURI: string
     slot: DeckSlot
     id: string
     displayCategory: LabwareDisplayCategory
@@ -265,6 +264,20 @@ export const selectTopLabware: (
   type: 'SELECT_TOP_LABWARE',
   payload,
 })
+
+export interface SelectTopLabwareAmountAction {
+  type: 'SELECT_TOP_LABWARE_AMOUNT'
+  payload: {
+    amount: number
+  }
+}
+export const selectTopLabwareAmount: (
+  payload: SelectTopLabwareAmountAction['payload']
+) => SelectTopLabwareAmountAction = payload => ({
+  type: 'SELECT_TOP_LABWARE_AMOUNT',
+  payload,
+})
+
 export interface SelectAdapterAction {
   type: 'SELECT_ADAPTER'
   payload: {
@@ -278,17 +291,16 @@ export const selectAdapter: (
   payload,
 })
 
-export interface SelectStackingLabwareAction {
-  type: 'SELECT_STACKING_LABWARE'
+export interface SelectLidAction {
+  type: 'SELECT_LID'
   payload: {
-    loadName: string | null
-    amount: number
+    labwareDefUri: string | null
   }
 }
-export const selectStackingLabware: (
-  payload: SelectStackingLabwareAction['payload']
-) => SelectStackingLabwareAction = payload => ({
-  type: 'SELECT_STACKING_LABWARE',
+export const selectLid: (
+  payload: SelectLidAction['payload']
+) => SelectLidAction = payload => ({
+  type: 'SELECT_LID',
   payload,
 })
 
@@ -315,6 +327,25 @@ export const selectFixture: (
   payload: SelectFixtureAction['payload']
 ) => SelectFixtureAction = payload => ({
   type: 'SELECT_FIXTURE',
+  payload,
+})
+
+export interface EditSlotInfoAction {
+  type: 'EDIT_SLOT_INFO'
+  payload: {
+    labwareDefUri?: string | null
+    adapterDefUri?: string | null
+    moduleModel?: ModuleModel | null
+    fixture?: Fixture | null
+    amount?: number
+    lidDefUri?: string | null
+  }
+}
+
+export const editSlotInfo: (
+  payload: EditSlotInfoAction['payload']
+) => EditSlotInfoAction = payload => ({
+  type: 'EDIT_SLOT_INFO',
   payload,
 })
 

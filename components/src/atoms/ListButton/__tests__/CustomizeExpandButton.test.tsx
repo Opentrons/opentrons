@@ -1,22 +1,23 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ListButtonRadioButton } from '..'
+import { CustomizeExpandButton } from '..'
 import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 
-const render = (props: ComponentProps<typeof ListButtonRadioButton>) =>
-  renderWithProviders(<ListButtonRadioButton {...props} />)
+const render = (props: ComponentProps<typeof CustomizeExpandButton>) =>
+  renderWithProviders(<CustomizeExpandButton {...props} />)
 
-describe('ListButtonRadioButton', () => {
-  let props: ComponentProps<typeof ListButtonRadioButton>
+describe('CustomizeExpandButton', () => {
+  let props: ComponentProps<typeof CustomizeExpandButton>
 
   beforeEach(() => {
     props = {
       buttonText: 'mock text',
       buttonValue: 'mockValue',
       onChange: vi.fn(),
+      t: {} as any,
     }
   })
 
@@ -25,4 +26,5 @@ describe('ListButtonRadioButton', () => {
     fireEvent.click(screen.getByText('mock text'))
     expect(props.onChange).toHaveBeenCalled()
   })
+  // TODO: add more test coverage for the stackingProps
 })

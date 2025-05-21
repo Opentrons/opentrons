@@ -22,6 +22,7 @@ import {
 import { selectors } from '../../../../labware-ingred/selectors'
 import {
   getAdditionalEquipment,
+  getLabwareEntities,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
@@ -70,11 +71,13 @@ describe('DeckSetupToolbox', () => {
     }
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedAdapterDefUri: null,
-      selectedTopLabwareDefUri: null,
+      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
+    vi.mocked(getLabwareEntities).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       labware: {},
@@ -116,7 +119,8 @@ describe('DeckSetupToolbox', () => {
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedAdapterDefUri: 'mockUri',
-      selectedTopLabwareDefUri: 'mockUri',
+      selectedTopLabware: { labwareDefUri: 'mockUri', amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },

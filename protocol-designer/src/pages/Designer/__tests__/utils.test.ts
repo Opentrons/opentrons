@@ -151,7 +151,7 @@ describe('getSlotInformation', () => {
       matchingLabwareFor4thColumn: null,
       createdModuleForSlot: mockHS,
       createdAdapterForSlot: mockLabOnDeck1,
-      createdTopLabwareForSlot: mockLabOnDeck2,
+      createdStackForSlot: [mockLabOnDeck2.id],
       createdFixtureForSlots: [],
       slotPosition: null,
     })
@@ -164,6 +164,7 @@ describe('getSlotInformation', () => {
       createdAdapterForSlot: mockLabOnDeck3,
       createdFixtureForSlots: [],
       slotPosition: null,
+      createdStackForSlot: [],
     })
   })
   it('renders no items on the slot for a flex', () => {
@@ -179,6 +180,7 @@ describe('getSlotInformation', () => {
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
       createdFixtureForSlots: [],
+      createdStackForSlot: [],
     })
   })
   it('renders a trashbin for a Flex on slot A3', () => {
@@ -189,6 +191,7 @@ describe('getSlotInformation', () => {
       slotPosition: null,
       createdFixtureForSlots: [mockTrash],
       preSelectedFixture: 'trashBin',
+      createdStackForSlot: [],
     })
   })
   it('renders a h-s, labware and nested labware for a Flex on slot D1', () => {
@@ -199,7 +202,7 @@ describe('getSlotInformation', () => {
       slotPosition: null,
       createdModuleForSlot: mockHSFlex,
       createdAdapterForSlot: mockLabOnDeck1Flex,
-      createdTopLabwareForSlot: mockLabOnDeck2Flex,
+      createdStackForSlot: [mockLabOnDeck2Flex.id],
       createdFixtureForSlots: [],
     })
   })
@@ -211,6 +214,7 @@ describe('getSlotInformation', () => {
       slotPosition: null,
       createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
+      createdStackForSlot: [],
     })
   })
   it('renders the staging area with waste chute and labware in slot D4 for flex', () => {
@@ -219,7 +223,7 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
-      createdTopLabwareForSlot: mockLabOnStagingArea,
+      createdStackForSlot: [mockLabOnStagingArea.id],
       createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
     })

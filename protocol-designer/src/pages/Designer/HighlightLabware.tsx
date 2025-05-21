@@ -32,6 +32,7 @@ export function HighlightLabware(
         isSelected={true}
         isLast={true}
         position={position}
+        showModuleIcon={false}
         labwareDef={labwareOnDeck.def}
       />
     )

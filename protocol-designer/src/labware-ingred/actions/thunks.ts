@@ -11,8 +11,10 @@ import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 import {
   selectAdapter,
   selectFixture,
+  selectLid,
   selectModule,
   selectTopLabware,
+  selectTopLabwareAmount,
 } from './actions'
 
 import type { LabwareEntities } from '@opentrons/step-generation'
@@ -31,8 +33,10 @@ import type {
   DuplicateLabwareAction,
   SelectAdapterAction,
   SelectFixtureAction,
+  SelectLidAction,
   SelectModuleAction,
   SelectTopLabwareAction,
+  SelectTopLabwareAmountAction,
   ZoomedIntoSlotAction,
 } from './actions'
 
@@ -73,67 +77,52 @@ export const createContainer: (
 ) => ThunkAction<
   CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
 > = args => (dispatch, getState) => {
+  const { labwareDefURIStack, slot: slotArg } = args
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
-  const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
-    args.labwareDefURI
+  const labwareDefForOt2HS = labwareDefSelectors.getLabwareDefsByURI(state)[
+    labwareDefURIStack[0]
   ]
-  const labwareDisplayCategory = labwareDef.metadata.displayCategory
   const slot =
-    args.slot ||
-    getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDef)
-  const isTiprack = getIsTiprack(labwareDef)
+    slotArg ||
+    getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDefForOt2HS)
   if (slot) {
-    const id = `${uuid()}:${args.labwareDefURI}`
-    const adapterId =
-      args.adapterUnderLabwareDefURI != null
-        ? `${uuid()}:${args.adapterUnderLabwareDefURI}`
-        : null
-
-    if (adapterId != null && args.adapterUnderLabwareDefURI != null) {
-      const adapterDef = labwareDefSelectors.getLabwareDefsByURI(state)[
-        args.adapterUnderLabwareDefURI
+    let currentSlot = slot
+    labwareDefURIStack.forEach(labwareUri => {
+      const id = `${uuid()}:${labwareUri}`
+      const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
+        labwareUri
       ]
+      const labwareDisplayCategory = labwareDef.metadata.displayCategory
+      const isTiprack = getIsTiprack(labwareDef)
+
       dispatch({
         type: 'CREATE_CONTAINER',
         payload: {
-          ...args,
-          labwareDefURI: args.adapterUnderLabwareDefURI,
-          id: adapterId,
-          slot,
-          displayCategory: adapterDef.metadata.displayCategory,
-        },
-      })
-      dispatch({
-        type: 'CREATE_CONTAINER',
-        payload: {
-          ...args,
           id,
-          slot: adapterId,
+          labwareDefURI: labwareUri,
+          slot: currentSlot,
           displayCategory: labwareDisplayCategory,
         },
       })
-    } else {
-      dispatch({
-        type: 'CREATE_CONTAINER',
-        payload: { ...args, id, slot, displayCategory: labwareDisplayCategory },
-      })
-    }
-    if (isTiprack) {
-      // Tipracks cannot be named, but should auto-increment.
-      // We can't rely on reducers to do that themselves bc they don't have access
-      // to both the nickname state and the isTiprack condition
-      renameLabware({
-        labwareId: id,
-      })(dispatch, getState)
-    }
-    if (slot === 'offDeck') {
-      dispatch({
-        type: 'ZOOMED_INTO_SLOT',
-        payload: { slot: id, cutout: null },
-      })
-    }
+
+      if (isTiprack) {
+        // Tipracks cannot be named, but should auto-increment.
+        // We can't rely on reducers to do that themselves bc they don't have access
+        // to both the nickname state and the isTiprack condition
+        renameLabware({
+          labwareId: id,
+        })(dispatch, getState)
+      }
+      if (slot === 'offDeck') {
+        dispatch({
+          type: 'ZOOMED_INTO_SLOT',
+          payload: { slot: id, cutout: null },
+        })
+      }
+      currentSlot = id
+    })
   } else {
     console.warn('no slots available, cannot create labware')
   }
@@ -207,41 +196,50 @@ export const duplicateLabware: (
   }
 }
 
-interface EditSlotInfo {
-  createdTopLabwareForSlot?: LabwareOnDeck | null
-  createdAdapterForSlot?: LabwareOnDeck | null
-  createdModuleForSlot?: ModuleOnDeck | null
-  preSelectedFixture?: Fixture | null
-}
+// interface EditSlotInfo {
+//   createdTopLabwareForSlot?: LabwareOnDeck | null
+//   createdAdapterForSlot?: LabwareOnDeck | null
+//   createdModuleForSlot?: ModuleOnDeck | null
+//   preSelectedFixture?: Fixture | null
+//   createdLidForSlot?: LabwareOnDeck | null
+//   amount?: number
+// }
 
-export const editSlotInfo: (
-  args: EditSlotInfo
-) => ThunkAction<
-  | SelectTopLabwareAction
-  | SelectAdapterAction
-  | SelectModuleAction
-  | SelectFixtureAction
-> = args => dispatch => {
-  const {
-    createdModuleForSlot,
-    createdAdapterForSlot,
-    createdTopLabwareForSlot,
-    preSelectedFixture,
-  } = args
-
-  dispatch(
-    selectTopLabware({
-      labwareDefUri: createdTopLabwareForSlot?.labwareDefURI ?? null,
-    })
-  )
-  dispatch(
-    selectAdapter({
-      adapterDefUri: createdAdapterForSlot?.labwareDefURI ?? null,
-    })
-  )
-  dispatch(selectModule({ moduleModel: createdModuleForSlot?.model ?? null }))
-  dispatch(selectFixture({ fixture: preSelectedFixture ?? null }))
-}
+// export const editSlotInfo: (
+//   args: EditSlotInfo
+// ) => ThunkAction<
+//   | SelectTopLabwareAction
+//   | SelectAdapterAction
+//   | SelectModuleAction
+//   | SelectFixtureAction
+//   | SelectLidAction
+//   | SelectTopLabwareAmountAction
+// > = args => dispatch => {
+//   const {
+//     createdModuleForSlot,
+//     createdAdapterForSlot,
+//     createdTopLabwareForSlot,
+//     preSelectedFixture,
+//     createdLidForSlot,
+//     amount,
+//   } = args
+//   dispatch(
+//     selectTopLabware({
+//       labwareDefUri: createdTopLabwareForSlot?.labwareDefURI ?? null,
+//     })
+//   )
+//   dispatch(
+//     selectAdapter({
+//       adapterDefUri: createdAdapterForSlot?.labwareDefURI ?? null,
+//     })
+//   )
+//   dispatch(selectModule({ moduleModel: createdModuleForSlot?.model ?? null }))
+//   dispatch(selectFixture({ fixture: preSelectedFixture ?? null }))
+//   dispatch(
+//     selectLid({ labwareDefUri: createdLidForSlot?.labwareDefURI ?? null })
+//   )
+//   dispatch(selectTopLabwareAmount({ amount: amount ?? 1 }))
+// }
 
 export interface EditMultipleLabwareAction {
   type: 'EDIT_MULTIPLE_LABWARE_PYTHON_NAME'

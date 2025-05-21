@@ -22,6 +22,7 @@ import {
 } from '@opentrons/components'
 
 import { openIngredientSelector } from '../../../labware-ingred/actions'
+import { getLabwareEntities } from '../../../step-forms/selectors'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { LINK_BUTTON_STYLE } from '../../atoms'
@@ -33,17 +34,20 @@ import type { ThunkDispatch } from '../../../types'
 
 interface LabwareCardProps {
   labware: LabwareOnDeck
+  quantity: number
   lidDisplayName?: string
 }
 
-//  TODO: add stacking capabilities for Flex Stacker work, currently not
-//  ready Design-wise.
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
-  const { labware, lidDisplayName } = props
+  const { labware, lidDisplayName, quantity } = props
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
   const { def } = labware
+  const labwareEntities = useSelector(getLabwareEntities)
+  const allLabwareIdsOnStack = Object.values(labwareEntities)
+    .filter(lw => lw.labwareDefURI === labware.labwareDefURI)
+    ?.map(lw => lw.id)
   const nickNames = useSelector(getLabwareNicknamesById)
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
@@ -65,7 +69,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       {showOverflowMenu ? (
         <LabwareCardOverflowMenu
           setShowOverflowMenu={setShowOverflowMenu}
-          labwareId={labware.id}
+          labwareIds={allLabwareIdsOnStack}
         />
       ) : null}
       <ListItem type="default" backgroundColor={COLORS.grey30}>
@@ -92,22 +96,32 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               ) : null}
               {lidDisplayName != null ? (
                 <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-                  {lidDisplayName}
+                  {t('with_lid', { name: lidDisplayName })}
                 </StyledText>
               ) : null}
 
-              {!isAdapterOrTiprack ? (
-                <Flex width={FLEX_MAX_CONTENT}>
-                  <Tag
-                    type="default"
-                    text={
-                      liquidIds.length === 0
-                        ? t('no_liquids_added')
-                        : t('num_liquid', { count: liquidIds.length })
-                    }
-                  />
-                </Flex>
-              ) : null}
+              <Flex gridGap={SPACING.spacing8}>
+                {!isAdapterOrTiprack ? (
+                  <Flex width={FLEX_MAX_CONTENT}>
+                    <Tag
+                      type="default"
+                      text={
+                        liquidIds.length === 0
+                          ? t('no_liquids_added')
+                          : t('num_liquid', { count: liquidIds.length })
+                      }
+                    />
+                  </Flex>
+                ) : null}
+                {quantity > 1 ? (
+                  <Flex width={FLEX_MAX_CONTENT}>
+                    <Tag
+                      type="default"
+                      text={`Quantity: ${quantity.toString()}`}
+                    />
+                  </Flex>
+                ) : null}
+              </Flex>
             </Flex>
             {!isAdapterOrTiprack ? (
               <Btn

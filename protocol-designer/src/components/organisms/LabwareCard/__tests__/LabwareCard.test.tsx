@@ -6,6 +6,7 @@ import { fixture96Plate } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { openIngredientSelector } from '../../../../labware-ingred/actions'
+import { getLabwareEntities } from '../../../../step-forms/selectors'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
 import { LabwareCardOverflowMenu } from '../../LabwareCardOverflowMenu'
@@ -23,6 +24,7 @@ vi.mock('../../LabwareCardOverflowMenu')
 vi.mock('../../../../ui/labware/selectors')
 vi.mock('../../../../top-selectors/well-contents')
 vi.mock('../../utils')
+vi.mock('../../../../step-forms/selectors')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
@@ -50,6 +52,7 @@ describe('LabwareCard', () => {
         def: fixture96Plate as LabwareDefinition2,
       },
       lidDisplayName: 'mock lid',
+      quantity: 1,
     }
     vi.mocked(LabwareCardOverflowMenu).mockReturnValue(
       <div>mock LabwareCardOverflowMenu</div>
@@ -61,14 +64,22 @@ describe('LabwareCard', () => {
       wellContentsSelectors.getAllWellContentsForActiveItem
     ).mockReturnValue(null)
     vi.mocked(getLiquidIdsOnLabware).mockReturnValue([])
+    vi.mocked(getLabwareEntities).mockReturnValue({
+      labwareId: {
+        id: 'labwareId',
+        labwareDefURI: 'mockuri',
+        def: fixture96Plate as LabwareDefinition2,
+        pythonName: 'mockPythonName',
+      },
+    })
   })
 
   it('renders a labware card with the liquids button and overflow menu', () => {
     render(props)
     screen.getByText('mock NickName')
     screen.getByText('ANSI 96 Standard Microplate')
-    screen.getByText('mock lid')
     screen.getByText('No liquids added')
+    screen.getByText('with mock lid')
     fireEvent.click(screen.getByText('Add liquid'))
     expect(mockNavigate).toHaveBeenCalledWith('/liquids')
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
@@ -84,5 +95,12 @@ describe('LabwareCard', () => {
     vi.mocked(getLiquidIdsOnLabware).mockReturnValue(['0'])
     render(props)
     screen.getByText('1 liquid')
+  })
+  it('renders a labware card with the quantity tag', () => {
+    props.quantity = 2
+    render(props)
+    screen.getByText('mock NickName')
+    screen.getByText('ANSI 96 Standard Microplate')
+    screen.getByText('Quantity: 2')
   })
 })

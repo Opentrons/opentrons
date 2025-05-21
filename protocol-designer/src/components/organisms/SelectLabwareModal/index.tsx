@@ -25,6 +25,7 @@ import {
   PrimaryButton,
   SecondaryButton,
   SPACING,
+  StackingProps,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -48,8 +49,9 @@ import { createCustomLabwareDef } from '../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import {
   selectAdapter,
-  selectStackingLabware,
+  selectLid,
   selectTopLabware,
+  selectTopLabwareAmount,
 } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import {
@@ -116,14 +118,14 @@ export function SelectLabwareModal(
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
-    selectedTopLabwareDefUri,
+    selectedTopLabware,
     selectedModuleModel,
     selectedAdapterDefUri,
-    selectedStackingLabware,
+    selectedLidLabware,
   } = zoomedInSlotInfo
 
   const hasNoLabware =
-    selectedTopLabwareDefUri == null && selectedAdapterDefUri == null
+    selectedTopLabware == null && selectedAdapterDefUri == null
   const createCategoryState = (state: boolean): Record<string, boolean> =>
     Object.fromEntries(ALL_ORDERED_CATEGORIES.map(cat => [cat, state]))
 
@@ -422,6 +424,7 @@ export function SelectLabwareModal(
                   {filteredLabwareByCategory[CUSTOM_CATEGORY].map(
                     ({ uri }, index) => (
                       <CustomizeExpandButton
+                        t={t}
                         key={`${index}_${uri}`}
                         id={`${index}_${uri}`}
                         buttonText={customLabwareDefs[uri].metadata.displayName}
@@ -430,7 +433,7 @@ export function SelectLabwareModal(
                           e.stopPropagation()
                           dispatch(selectTopLabware({ labwareDefUri: uri }))
                         }}
-                        isSelected={uri === selectedTopLabwareDefUri}
+                        isSelected={uri === selectedTopLabware.labwareDefUri}
                       />
                     )
                   )}
@@ -466,7 +469,7 @@ export function SelectLabwareModal(
                               const isAdapter = def.allowedRoles?.includes(
                                 'adapter'
                               )
-                              const stackingLabwareDef = getStackerDefinition(
+                              const stackingLabwareDefUri = getStackerDefinition(
                                 {
                                   ...defs,
                                   ...customLabwareDefs,
@@ -474,27 +477,46 @@ export function SelectLabwareModal(
                                 loadName
                               )
 
+                              const stackingProps: StackingProps | null =
+                                stackingLabwareDefUri != null &&
+                                slot !== 'offDeck' &&
+                                enableStacking
+                                  ? {
+                                      definition: defs[stackingLabwareDefUri],
+                                      inputFieldValue:
+                                        selectedTopLabware.amount ?? 0,
+                                      onInputFieldChange: (
+                                        e: ChangeEvent<any>
+                                      ) => {
+                                        dispatch(
+                                          selectTopLabwareAmount({
+                                            amount: parseInt(e.target.value),
+                                          })
+                                        )
+                                      },
+                                      checked: selectedLidLabware != null,
+                                      onCheckboxChange: () => {
+                                        dispatch(
+                                          selectLid({
+                                            labwareDefUri:
+                                              selectedLidLabware ===
+                                              stackingLabwareDefUri
+                                                ? null
+                                                : stackingLabwareDefUri,
+                                          })
+                                        )
+                                      },
+                                    }
+                                  : null
+
                               return searchFilter(def.metadata.displayName) &&
                                 !getIsLabwareFiltered(def) ? (
                                 <Fragment
                                   key={`${index}_${category}_${loadName}`}
                                 >
                                   <CustomizeExpandButton
-                                    stackingProps={
-                                      stackingLabwareDef != null
-                                        ? {
-                                            definition: stackingLabwareDef,
-                                            onCheckboxChange: dispatch(
-                                              selectStackingLabware({
-                                                amount: 1,
-                                                loadName:
-                                                  stackingLabwareDef.parameters
-                                                    .loadName,
-                                              })
-                                            ),
-                                          }
-                                        : undefined
-                                    }
+                                    t={t}
+                                    stackingProps={stackingProps ?? undefined}
                                     id={`${index}_${category}_${loadName}`}
                                     buttonText={def.metadata.displayName}
                                     buttonValue={uri}
@@ -518,7 +540,8 @@ export function SelectLabwareModal(
                                         dispatch(
                                           selectTopLabware({
                                             labwareDefUri:
-                                              uri === selectedTopLabwareDefUri
+                                              uri ===
+                                              selectedTopLabware.labwareDefUri
                                                 ? null
                                                 : uri,
                                           })
@@ -529,7 +552,8 @@ export function SelectLabwareModal(
                                       (isAdapter &&
                                         uri === selectedAdapterDefUri) ||
                                       (!isAdapter &&
-                                        uri === selectedTopLabwareDefUri)
+                                        uri ===
+                                          selectedTopLabware.labwareDefUri)
                                     }
                                   />
 
@@ -537,6 +561,7 @@ export function SelectLabwareModal(
                                     uri === selectedAdapterDefUri &&
                                     getLabwareCompatibleWithAdapter(
                                       defs,
+                                      enableStacking,
                                       loadName
                                     )?.length > 0 && (
                                       <ListButtonAccordionContainer
@@ -560,6 +585,7 @@ export function SelectLabwareModal(
                                                     defs[tiprackDefUri]
                                                   return (
                                                     <CustomizeExpandButton
+                                                      t={t}
                                                       key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                       id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                       buttonText={
@@ -579,7 +605,7 @@ export function SelectLabwareModal(
                                                       }}
                                                       isSelected={
                                                         tiprackDefUri ===
-                                                        selectedTopLabwareDefUri
+                                                        selectedTopLabware.labwareDefUri
                                                       }
                                                     />
                                                   )
@@ -590,6 +616,7 @@ export function SelectLabwareModal(
                                                   ...defs,
                                                   ...customLabwareDefs,
                                                 },
+                                                enableStacking,
                                                 loadName
                                               ).map(nestedDefUri => {
                                                 const nestedDef =
@@ -598,8 +625,47 @@ export function SelectLabwareModal(
                                                     nestedDefUri
                                                   ]
 
+                                                const stackingLabwareDefUri = getStackerDefinition(
+                                                  {
+                                                    ...defs,
+                                                    ...customLabwareDefs,
+                                                  },
+                                                  nestedDef.parameters.loadName
+                                                )
+
+                                                const stackingProps: StackingProps | null =
+                                                  stackingLabwareDefUri !=
+                                                    null && slot !== 'offDeck'
+                                                    ? {
+                                                        definition:
+                                                          defs[
+                                                            stackingLabwareDefUri
+                                                          ],
+                                                        inputFieldValue:
+                                                          selectedTopLabware.amount ??
+                                                          1,
+                                                        onInputFieldChange: (
+                                                          e: ChangeEvent<any>
+                                                        ) => {
+                                                          dispatch(
+                                                            selectTopLabwareAmount(
+                                                              {
+                                                                amount: parseInt(
+                                                                  e.target.value
+                                                                ),
+                                                              }
+                                                            )
+                                                          )
+                                                        },
+                                                      }
+                                                    : null
+
                                                 return (
                                                   <CustomizeExpandButton
+                                                    t={t}
+                                                    stackingProps={
+                                                      stackingProps ?? undefined
+                                                    }
                                                     key={`${index}_${category}_${loadName}_${nestedDefUri}`}
                                                     id={`${index}_${category}_${loadName}_${nestedDefUri}`}
                                                     buttonText={
@@ -617,7 +683,7 @@ export function SelectLabwareModal(
                                                     }}
                                                     isSelected={
                                                       nestedDefUri ===
-                                                      selectedTopLabwareDefUri
+                                                      selectedTopLabware.labwareDefUri
                                                     }
                                                   />
                                                 )
