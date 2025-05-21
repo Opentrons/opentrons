@@ -344,14 +344,14 @@ export const transfer: CommandCreator<TransferArgs> = (
           if (
             aspirateMmFromBottom != null &&
             aspirateSubmergeMmFromBottom != null &&
-            aspirateMmFromBottom >= aspirateSubmergeMmFromBottom
+            aspirateMmFromBottom > aspirateSubmergeMmFromBottom
           ) {
             errors.push(errorCreators.submergeBelowAspirate())
           }
           if (
             aspirateMmFromBottom != null &&
             aspirateRetractMmFromBottom != null &&
-            aspirateMmFromBottom >= aspirateRetractMmFromBottom
+            aspirateMmFromBottom > aspirateRetractMmFromBottom
           ) {
             errors.push(errorCreators.retractBelowAspirate())
           }

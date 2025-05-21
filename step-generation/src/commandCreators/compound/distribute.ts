@@ -161,7 +161,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
       })
     )
   }
-
   const initialDestLabwareSlot = getSlotInLocationStack(
     prevRobotState.labware[destLabware]?.stack
   )
@@ -275,14 +274,14 @@ export const distribute: CommandCreator<DistributeArgs> = (
   if (
     aspirateMmFromBottom != null &&
     aspirateSubmergeMmFromBottom != null &&
-    aspirateMmFromBottom >= aspirateSubmergeMmFromBottom
+    aspirateMmFromBottom > aspirateSubmergeMmFromBottom
   ) {
     errors.push(errorCreators.submergeBelowAspirate())
   }
   if (
     aspirateMmFromBottom != null &&
     aspirateRetractMmFromBottom != null &&
-    aspirateMmFromBottom >= aspirateRetractMmFromBottom
+    aspirateMmFromBottom > aspirateRetractMmFromBottom
   ) {
     errors.push(errorCreators.retractBelowAspirate())
   }
