@@ -4,9 +4,11 @@ import sortedUniq from 'lodash/sortedUniq'
 import uniq from 'lodash/uniq'
 import uniqWith from 'lodash/uniqWith'
 
+import { getSchema2Dimensions } from './labwareSchemaShims'
+
 import type {
   LabwareBrand,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareWell,
   LabwareWellGroupMetadata,
   LabwareWellShapeProperties,
@@ -27,9 +29,9 @@ export interface LabwareWellGroupProperties {
 const ROUNDING_PRECISION = 2
 
 export function getUniqueWellProperties(
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 ): LabwareWellGroupProperties[] {
-  const { groups, wells, dimensions } = definition
+  const { groups, wells } = definition
 
   return groups.map(group => {
     const wellProps = group.wells.map(n => wells[n])
@@ -49,6 +51,7 @@ export function getUniqueWellProperties(
 
     const xStart = wellProps[0]?.x ?? 0
     const yStart = wellProps[0]?.y ?? 0
+    const { yDimension } = getSchema2Dimensions(definition)
 
     return {
       metadata: group.metadata,
@@ -56,7 +59,7 @@ export function getUniqueWellProperties(
       xSpacing: getSpacingIfUniform(wellProps, 'x'),
       ySpacing: getSpacingIfUniform(wellProps, 'y'),
       xOffsetFromLeft: xStart,
-      yOffsetFromTop: round(dimensions.yDimension - yStart, ROUNDING_PRECISION),
+      yOffsetFromTop: round(yDimension - yStart, ROUNDING_PRECISION),
       wellCount: wellProps.length,
       depth: getIfConsistent(wellDepths),
       totalLiquidVolume: getIfConsistent(wellVolumes),

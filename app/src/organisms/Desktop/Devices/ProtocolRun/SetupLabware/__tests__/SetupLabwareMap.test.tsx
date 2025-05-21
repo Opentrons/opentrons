@@ -23,7 +23,7 @@ import { SetupLabwareMap } from '../SetupLabwareMap'
 import type { ComponentProps } from 'react'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
@@ -137,7 +137,7 @@ describe('SetupLabwareMap', () => {
   it.skip('should render a deck WITH labware and WITHOUT modules', () => {
     vi.mocked(getLabwareRenderInfo).mockReturnValue({
       '300_ul_tiprack_id': {
-        labwareDef: fixtureTiprack300ul as LabwareDefinition2,
+        labwareDef: fixtureTiprack300ul as LabwareDefinition,
         displayName: 'fresh tips',
         x: MOCK_300_UL_TIPRACK_COORDS[0],
         y: MOCK_300_UL_TIPRACK_COORDS[1],
@@ -174,7 +174,7 @@ describe('SetupLabwareMap', () => {
   it.skip('should render a deck WITH labware and WITH modules', () => {
     vi.mocked(getLabwareRenderInfo).mockReturnValue({
       [MOCK_300_UL_TIPRACK_ID]: {
-        labwareDef: fixtureTiprack300ul as LabwareDefinition2,
+        labwareDef: fixtureTiprack300ul as LabwareDefinition,
         displayName: 'fresh tips',
         x: MOCK_300_UL_TIPRACK_COORDS[0],
         y: MOCK_300_UL_TIPRACK_COORDS[1],

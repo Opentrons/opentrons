@@ -9,11 +9,11 @@ import { i18n } from '/app/i18n'
 import { LegacyLabwareOffsetTable } from '../LegacyLabwareOffsetTable'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 
-const mockLabwareDef = fixture96Plate as LabwareDefinition2
-const mockAdapterDef = fixtureTiprackAdapter as LabwareDefinition2
+const mockLabwareDef = fixture96Plate as LabwareDefinition
+const mockAdapterDef = fixtureTiprackAdapter as LabwareDefinition
 
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',

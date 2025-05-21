@@ -13,14 +13,11 @@ import type {
   HostConfig,
   LabwareDefinitionSummary,
 } from '@opentrons/api-client'
-import type {
-  LabwareDefinition2,
-  LabwareDefinition3,
-} from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 interface CreateMaintenanceRunLabwareDefinitionMutateParams {
   maintenanceRunId: string
-  labwareDef: LabwareDefinition2 | LabwareDefinition3
+  labwareDef: LabwareDefinition
 }
 
 export type UseCreateLabwareDefinitionMutationResult = UseMutationResult<

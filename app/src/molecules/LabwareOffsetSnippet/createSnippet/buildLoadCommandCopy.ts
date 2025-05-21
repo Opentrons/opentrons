@@ -93,6 +93,8 @@ function handleLoadLabwareCommand(
       adapterVariableById
     )
 
+    // todo(mm, 2025-05-19): What is this adding over just using loadedLabware.definitionUri?
+    // Is the lookup into labwareDefinitions load-bearing for some safety thing?
     const labwareDefUri = getLabwareDefinitionUri(
       labwareId,
       labware,

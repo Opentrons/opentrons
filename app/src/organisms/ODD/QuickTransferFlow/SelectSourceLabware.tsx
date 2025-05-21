@@ -55,7 +55,7 @@ export function SelectSourceLabware(
 
   if (state.pipette == null) return null
 
-  const compatibleLabwareDefinitions = getCompatibleLabwareByCategory(
+  const compatibleLabwareDefinition2s = getCompatibleLabwareByCategory(
     state.pipette.channels,
     selectedCategory
   )
@@ -113,7 +113,7 @@ export function SelectSourceLabware(
           flexDirection={DIRECTION_COLUMN}
           marginTop="175px"
         >
-          {compatibleLabwareDefinitions?.map(definition => {
+          {compatibleLabwareDefinition2s?.map(definition => {
             return definition.metadata.displayName != null ? (
               <RadioButton
                 key={`${selectedCategory}-${definition.metadata.displayName}`}
