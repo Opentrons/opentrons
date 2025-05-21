@@ -4,8 +4,6 @@ import sortedUniq from 'lodash/sortedUniq'
 import uniq from 'lodash/uniq'
 import uniqWith from 'lodash/uniqWith'
 
-import { getSchema2Dimensions } from './labwareSchemaShims'
-
 import type {
   LabwareBrand,
   LabwareDefinition,
@@ -49,17 +47,29 @@ export function getUniqueWellProperties(
             }
     )
 
-    const xStart = wellProps[0]?.x ?? 0
-    const yStart = wellProps[0]?.y ?? 0
-    const { yDimension } = getSchema2Dimensions(definition)
+    // todo(mm, 2025-05-21): The schema does not prescribe an order to `group.wells`,
+    // though in practice the first element is probably always A1. Either make that
+    // official in the schema, or change this to consult `definition.ordering`,
+    // or change this to find the back-left-most well.
+    const firstWellX = wellProps[0]?.x ?? 0
+    const firstWellY = wellProps[0]?.y ?? 0
+
+    const leftEdgeX =
+      definition.schemaVersion === 2
+        ? 0
+        : definition.extents.total.backLeftBottom.x
+    const backEdgeY =
+      definition.schemaVersion === 2
+        ? definition.dimensions.yDimension
+        : definition.extents.total.backLeftBottom.y
 
     return {
       metadata: group.metadata,
       brand: group.brand || null,
       xSpacing: getSpacingIfUniform(wellProps, 'x'),
       ySpacing: getSpacingIfUniform(wellProps, 'y'),
-      xOffsetFromLeft: xStart,
-      yOffsetFromBack: round(yDimension - yStart, ROUNDING_PRECISION),
+      xOffsetFromLeft: round(firstWellX - leftEdgeX, ROUNDING_PRECISION),
+      yOffsetFromBack: round(backEdgeY - firstWellY, ROUNDING_PRECISION),
       wellCount: wellProps.length,
       depth: getIfConsistent(wellDepths),
       totalLiquidVolume: getIfConsistent(wellVolumes),
