@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from '@emotion/react'
 import head from 'lodash/head'
-import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,

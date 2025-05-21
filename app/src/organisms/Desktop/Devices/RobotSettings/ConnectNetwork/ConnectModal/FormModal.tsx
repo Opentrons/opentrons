@@ -1,6 +1,7 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import { css } from '@emotion/react'
+import styled from '@emotion/styled'
 
 import {
   BUTTON_TYPE_SUBMIT,

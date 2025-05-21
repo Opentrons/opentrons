@@ -1,9 +1,9 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import styled from '@emotion/styled'
 import first from 'lodash/first'
 import flatten from 'lodash/flatten'
 import last from 'lodash/last'
-import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,

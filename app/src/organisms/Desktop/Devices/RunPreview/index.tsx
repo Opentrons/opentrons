@@ -1,7 +1,7 @@
 import { forwardRef, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ViewportList } from 'react-viewport-list'
-import { css } from 'styled-components'
+import { css } from '@emotion/react'
 
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 import {

@@ -3,12 +3,12 @@ import { createPortal } from 'react-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { css } from '@emotion/react'
 import { format } from 'date-fns'
 import isEmpty from 'lodash/isEmpty'
 import map from 'lodash/map'
 import omit from 'lodash/omit'
 import startCase from 'lodash/startCase'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,

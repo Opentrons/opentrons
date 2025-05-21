@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import {
   ALIGN_CENTER,

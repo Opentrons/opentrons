@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import { LegacyStyledText, StyledText } from '@opentrons/components'
 

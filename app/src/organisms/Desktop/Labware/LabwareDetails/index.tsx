@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from '@emotion/react'
 import { format } from 'date-fns'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,

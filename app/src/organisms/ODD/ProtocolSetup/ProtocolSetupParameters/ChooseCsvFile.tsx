@@ -1,9 +1,9 @@
 import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from '@emotion/react'
 import isEqual from 'lodash/isEqual'
 import last from 'lodash/last'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,

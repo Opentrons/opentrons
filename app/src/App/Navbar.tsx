@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
+import styled from '@emotion/styled'
 import debounce from 'lodash/debounce'
-import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,

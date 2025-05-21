@@ -2,8 +2,8 @@ import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { css } from '@emotion/react'
 import { format } from 'date-fns'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,

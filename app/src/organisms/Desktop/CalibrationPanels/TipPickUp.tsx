@@ -1,5 +1,5 @@
 import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import { css } from '@emotion/react'
 
 import {
   ALIGN_FLEX_END,

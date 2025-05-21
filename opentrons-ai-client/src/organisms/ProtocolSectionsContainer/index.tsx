@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import styled from '@emotion/styled'
 import { useAtom } from 'jotai'
-import styled from 'styled-components'
 
 import {
   DIRECTION_COLUMN,

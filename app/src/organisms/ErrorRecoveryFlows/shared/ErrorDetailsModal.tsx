@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import { css } from '@emotion/react'
 
 import {
   BORDERS,

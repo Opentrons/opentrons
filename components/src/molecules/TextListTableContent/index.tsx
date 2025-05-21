@@ -1,4 +1,4 @@
-import { css } from 'styled-components'
+import { css } from '@emotion/react'
 
 import { StyledText } from '../../atoms'
 import { ListTable } from '../../atoms/ListTable'

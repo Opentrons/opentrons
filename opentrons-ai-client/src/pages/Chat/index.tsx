@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import styled from '@emotion/styled'
 import { useAtom } from 'jotai'
-import styled from 'styled-components'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 

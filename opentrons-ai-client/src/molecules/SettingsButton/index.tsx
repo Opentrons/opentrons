@@ -1,4 +1,4 @@
-import { css } from 'styled-components'
+import { css } from '@emotion/react'
 
 import { Btn, COLORS, Flex, Icon, JUSTIFY_CENTER } from '@opentrons/components'
 

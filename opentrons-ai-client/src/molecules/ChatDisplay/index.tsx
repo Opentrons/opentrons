@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
+import styled from '@emotion/styled'
 import { useAtom } from 'jotai'
 import { delay } from 'lodash'
-import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,

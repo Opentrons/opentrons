@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
+import { css } from '@emotion/react'
 import last from 'lodash/last'
-import { css } from 'styled-components'
 
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
@@ -107,7 +107,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         analysisForProtocolCard.result === 'not-ok')) ??
     false
 
-  // ToDo (kk:06/25/2024) remove ff when we are ready for freezing the code
   const isRequiredCSV =
     analysisForProtocolCard?.result === 'parameter-value-required'
 

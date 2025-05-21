@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import {
   LegacyStyledText,

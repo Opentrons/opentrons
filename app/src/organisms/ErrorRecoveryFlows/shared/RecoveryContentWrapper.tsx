@@ -1,7 +1,7 @@
 // TODO: replace this by making these props true of interventionmodal content wrappers
 // once error recovery uses interventionmodal consistently
 
-import { css } from 'styled-components'
+import { css } from '@emotion/react'
 
 import {
   DIRECTION_COLUMN,

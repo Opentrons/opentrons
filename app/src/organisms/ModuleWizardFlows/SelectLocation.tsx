@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
+import { css } from '@emotion/react'
 import isEqual from 'lodash/isEqual'
-import { css } from 'styled-components'
 
 import {
   Banner,

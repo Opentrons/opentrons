@@ -1,6 +1,6 @@
 import { Fragment, memo } from 'react'
+import styled from '@emotion/styled'
 import map from 'lodash/map'
-import styled from 'styled-components'
 
 import { COLORS } from '../../helix-design-system'
 import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'

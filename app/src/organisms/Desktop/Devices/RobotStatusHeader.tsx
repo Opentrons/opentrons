@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {

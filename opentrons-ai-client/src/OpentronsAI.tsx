@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { HashRouter } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
+import styled from '@emotion/styled'
 import { useAtom } from 'jotai'
-import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,

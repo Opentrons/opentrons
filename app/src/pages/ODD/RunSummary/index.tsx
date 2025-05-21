@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import styled, { css } from 'styled-components'
+import { css } from '@emotion/react'
+// import { css } from '@emotion/react'
+import styled from '@emotion/styled'
+
+// import styled from '@emotion/styled'
 
 import {
   RUN_STATUS_FAILED,

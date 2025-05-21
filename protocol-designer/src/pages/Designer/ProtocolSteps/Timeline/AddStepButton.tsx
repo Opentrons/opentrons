@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { css } from '@emotion/react'
 import { last } from 'lodash'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,

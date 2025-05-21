@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/StyledText'

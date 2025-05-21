@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import styled, { css } from 'styled-components'
+import { css } from '@emotion/react'
+import styled from '@emotion/styled'
 
 import {
   ALIGN_CENTER,

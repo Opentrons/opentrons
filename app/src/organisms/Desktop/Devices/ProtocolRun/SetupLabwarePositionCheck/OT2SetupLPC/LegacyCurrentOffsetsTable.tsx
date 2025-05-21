@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import styled from '@emotion/styled'
 import pick from 'lodash/pick'
-import styled from 'styled-components'
 
 import {
   BORDERS,

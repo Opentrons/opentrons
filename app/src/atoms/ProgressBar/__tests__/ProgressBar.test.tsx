@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { css } from '@emotion/react'
 import { screen } from '@testing-library/react'
-import { css } from 'styled-components'
 
 import { COLORS } from '@opentrons/components'
 

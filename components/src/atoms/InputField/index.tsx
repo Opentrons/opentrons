@@ -1,5 +1,6 @@
 import { forwardRef } from 'react'
-import styled, { css } from 'styled-components'
+import { css } from '@emotion/react'
+import styled from '@emotion/styled'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'

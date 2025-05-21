@@ -1,5 +1,5 @@
+import { css } from '@emotion/react'
 import find from 'lodash/find'
-import { css } from 'styled-components'
 
 import {
   COLORS,

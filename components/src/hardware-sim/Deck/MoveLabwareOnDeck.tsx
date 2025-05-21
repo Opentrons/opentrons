@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import styled from '@emotion/styled'
 import { animated, easings, useSpring } from '@react-spring/web'
-import styled from 'styled-components'
 
 import {
   getDeckDefFromRobotType,

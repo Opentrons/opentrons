@@ -1,8 +1,8 @@
 import { Fragment, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import styled from '@emotion/styled'
 import reduce from 'lodash/reduce'
-import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,

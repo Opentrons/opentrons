@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import {
   COLORS,

@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { CSSTransition } from 'react-transition-group'
+import styled from '@emotion/styled'
 import { useAtom } from 'jotai'
-import styled from 'styled-components'
 
 import {
   COLORS,

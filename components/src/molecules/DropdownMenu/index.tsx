@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from 'react'
-import { css } from 'styled-components'
+import { css } from '@emotion/react'
 
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { StyledText } from '../../atoms/StyledText'

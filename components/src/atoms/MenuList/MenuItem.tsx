@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import { COLORS } from '../../helix-design-system'
 import { ALIGN_CENTER } from '../../styles'

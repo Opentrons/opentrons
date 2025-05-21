@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import styled from '@emotion/styled'
 import clamp from 'lodash/clamp'
-import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
+import styled from '@emotion/styled'
 import last from 'lodash/last'
-import styled from 'styled-components'
 
 import {
   BORDERS,

@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Manager, Popper, Reference } from 'react-popper'
 import { useSelector } from 'react-redux'
+import styled from '@emotion/styled'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
-import styled from 'styled-components'
 
 import {
   BORDERS,
@@ -202,17 +202,32 @@ export const WellTooltip = ({
   )
 }
 
-const TooltipContainer = styled.div.attrs<{
+interface TooltipContainerProps {
   x: number | null
   y: number | null
-}>(({ x, y }) => ({
-  style: {
-    top: y || undefined,
-    left: x || undefined,
-  },
-}))`
-  position: ${POSITION_ABSOLUTE};
-`
+}
+
+const TooltipContainer = styled.div<TooltipContainerProps>(({ x, y }) => ({
+  position: POSITION_ABSOLUTE,
+  // The logic `value || undefined` ensures that if `value` is 0, null, or undefined,
+  // the CSS property will be undefined and thus omitted by Emotion.
+  // If `value` is a non-zero number, Emotion will automatically append 'px'
+  // for properties like 'top' and 'left'.
+  top: y || undefined,
+  left: x || undefined,
+}))
+
+// const TooltipContainer = styled.div.attrs<{
+//   x: number | null
+//   y: number | null
+// }>(({ x, y }) => ({
+//   style: {
+//     top: y || undefined,
+//     left: x || undefined,
+//   },
+// }))`
+//   position: ${POSITION_ABSOLUTE};
+// `
 
 const PopperContent = styled.div`
   font-size: ${TYPOGRAPHY.fontSizeCaption};

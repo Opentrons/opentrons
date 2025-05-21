@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
+import { css } from '@emotion/react'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 

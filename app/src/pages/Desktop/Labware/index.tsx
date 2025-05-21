@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import { css } from '@emotion/react'
 import startCase from 'lodash/startCase'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,

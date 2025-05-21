@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import styled, { css } from 'styled-components'
+import { css } from '@emotion/react'
+import styled from '@emotion/styled'
 
 import {
   ALIGN_CENTER,

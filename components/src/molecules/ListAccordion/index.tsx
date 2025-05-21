@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { css } from 'styled-components'
+import { css } from '@emotion/react'
 
 import { ListTable } from '../../atoms/ListTable'
 import { COLORS } from '../../helix-design-system'

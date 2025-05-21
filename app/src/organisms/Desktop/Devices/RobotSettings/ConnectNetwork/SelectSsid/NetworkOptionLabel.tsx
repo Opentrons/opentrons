@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import { FONT_BODY_1_DARK, Icon, SPACING } from '@opentrons/components'
 

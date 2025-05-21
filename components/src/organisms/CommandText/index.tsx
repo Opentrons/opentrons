@@ -1,5 +1,5 @@
+import { css } from '@emotion/react'
 import pick from 'lodash/pick'
-import { css } from 'styled-components'
 
 import { LegacyStyledText, StyledText } from '../../atoms'
 import { Flex } from '../../primitives'

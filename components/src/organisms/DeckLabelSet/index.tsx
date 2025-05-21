@@ -1,5 +1,5 @@
 import { forwardRef } from 'react'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import { RobotCoordsForeignDiv } from '../../hardware-sim'
 import { BORDERS, COLORS } from '../../helix-design-system'

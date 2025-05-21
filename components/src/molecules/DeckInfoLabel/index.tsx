@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import { StyledText } from '../../atoms'
 import { BORDERS, COLORS } from '../../helix-design-system'

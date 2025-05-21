@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom'
+import { css } from '@emotion/react'
+import styled from '@emotion/styled'
 import isEmpty from 'lodash/isEmpty'
-import styled, { css } from 'styled-components'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {

@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
-import styled, { css } from 'styled-components'
+import { css } from '@emotion/react'
+import styled from '@emotion/styled'
 
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from '@emotion/react'
 import i18n from 'i18next'
-import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,

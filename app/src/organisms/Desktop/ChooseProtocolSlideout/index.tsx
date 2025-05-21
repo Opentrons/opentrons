@@ -2,8 +2,8 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { css } from '@emotion/react'
 import first from 'lodash/first'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,

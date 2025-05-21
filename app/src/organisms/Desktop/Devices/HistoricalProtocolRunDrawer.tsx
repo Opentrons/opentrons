@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
+import { css } from '@emotion/react'
 import { format } from 'date-fns'
 import isEqual from 'lodash/isEqual'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,

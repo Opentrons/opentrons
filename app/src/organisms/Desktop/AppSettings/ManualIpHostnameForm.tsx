@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import {
   BORDERS,

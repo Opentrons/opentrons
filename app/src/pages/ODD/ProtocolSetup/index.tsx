@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import { css } from '@emotion/react'
 import first from 'lodash/first'
 import last from 'lodash/last'
-import { css } from 'styled-components'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
