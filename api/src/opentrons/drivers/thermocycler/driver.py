@@ -36,7 +36,6 @@ class GCODE(str, Enum):
     DEVICE_INFO = "M115"
     GET_RESET_REASON = "M114"
     ENTER_PROGRAMMING = "dfu"
-    GET_LIMIT_SWITCH_STATUS = "M901.D"
 
 
 LID_TARGET_DEFAULT = 105  # Degree celsius (floats)
@@ -200,8 +199,9 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
 
     async def _get_limit_switch_status(self) -> None:
         """Send get lid status command"""
-        c = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
-            gcode=GCODE.GET_LIMIT_SWITCH_STATUS
+        c = (
+            CommandBuilder(terminator=TC_COMMAND_TERMINATOR)
+            .add_gcode(gcode="M901.D")
         )
         response = await self._connection.send_command(
             command=c, retries=DEFAULT_COMMAND_RETRIES
@@ -210,6 +210,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
     
     async def check_lid_status_for_real_this_time(self) -> ThermocyclerLidStatus:
         limit_switch_status = await self._get_limit_switch_status()
+        raise Exception(limit_switch_status)
         lid_is_closed = utils.parse_key_values(value=limit_switch_status)["C"] == 1
         lid_is_open = utils.parse_key_values(value=limit_switch_status)["O"] == 1
         match (lid_is_closed, lid_is_open):
