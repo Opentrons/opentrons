@@ -2,10 +2,6 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 
-import {
-  TRASH_BIN_DISPLAY_NAME,
-  WASTE_CHUTE_DISPLAY_NAME,
-} from '@opentrons/components'
 import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
@@ -17,6 +13,7 @@ import type {
   LabwareEntity,
 } from '@opentrons/step-generation'
 import type { Selector } from '../../types'
+import { useTranslation } from 'react-i18next'
 
 export const getLabwareNicknamesById: Selector<
   Record<string, string>
@@ -41,13 +38,14 @@ export const _sortLabwareDropdownOptions = (
 export const getWasteChuteOption: Selector<DropdownOption | null> = createSelector(
   stepFormSelectors.getAdditionalEquipmentEntities,
   additionalEquipmentEntities => {
+    const { t } = useTranslation('deck_configuration')
     const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
       aE => aE.name === 'wasteChute'
     )
     const wasteChuteOption: DropdownOption | null =
       wasteChuteEntity != null
         ? {
-            name: WASTE_CHUTE_DISPLAY_NAME,
+            name: t('waste'),
             value: wasteChuteEntity.id,
           }
         : null
@@ -61,6 +59,7 @@ export const getDisposalOptions = createSelector(
   stepFormSelectors.getAdditionalEquipment,
   getWasteChuteOption,
   (additionalEquipment, wasteChuteOption) => {
+    const { t } = useTranslation('deck_configuration')
     const trashBins = reduce(
       additionalEquipment,
       (
@@ -71,7 +70,7 @@ export const getDisposalOptions = createSelector(
           ? [
               ...acc,
               {
-                name: TRASH_BIN_DISPLAY_NAME,
+                name: t('trash_bin'),
                 value: additionalEquipment.id ?? '',
               },
             ]

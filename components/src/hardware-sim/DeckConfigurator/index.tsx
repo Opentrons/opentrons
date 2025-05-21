@@ -1,8 +1,6 @@
 import {
   filterAAByAreaType,
   FLEX_ROBOT_TYPE,
-  FLEX_STACKER_V1_FIXTURE,
-  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   getDeckDefFromRobotType,
   replaceStagingFixtureAndTransformCutoutFixturesToAA,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
@@ -69,15 +67,12 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckConfig,
     deckDef
   )
-  console.log('deckConfigWithAA: ', deckConfigWithAA)
 
   const stagingAreaItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'stagingSlot'
   )
-
-  console.log('stagingAreaItems: ', stagingAreaItems)
 
   const wasteChuteItems = filterAAByAreaType(
     deckConfigWithAA,
@@ -95,8 +90,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckDef,
     'slot'
   ).concat(fakeStagingItems)
-
-  console.log('fakeStagingItems: ', fakeStagingItems)
 
   const trashBinItems = filterAAByAreaType(
     deckConfigWithAA,

@@ -343,7 +343,6 @@ export const getAAFromCutoutFixtureId = (
     ...deckDefinition,
     cutoutFixtures: cutoutFixturesWithFakeFixtures,
   }
-  console.log('DeckDefWithFakeCutoutFixtures: ', deckDefWithFakeCutoutFixtures)
   const cutoutFixture = deckDefWithFakeCutoutFixtures.cutoutFixtures.find(
     fixture => fixture.id === cutoutFixtureId
   )

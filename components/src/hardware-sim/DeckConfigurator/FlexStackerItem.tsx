@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  DeckCutout,
+  type DeckCutout,
   getAALocationForCutoutAndFixtureId,
 } from '@opentrons/shared-data'
 
