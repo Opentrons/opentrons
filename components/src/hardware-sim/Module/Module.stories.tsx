@@ -16,7 +16,7 @@ import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module as ModuleComponent } from './'
 
 import type { Meta, Story } from '@storybook/react'
-import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
+import type { LabwareDefinition, ModuleModel } from '@opentrons/shared-data'
 
 const moduleModels: ModuleModel[] = [
   TEMPERATURE_MODULE_V2,
@@ -49,7 +49,7 @@ const Template: Story<{
         orientation={args.orientation}
       >
         {args.hasLabware ? (
-          <LabwareRender definition={fixture96Plate as LabwareDefinition2} />
+          <LabwareRender definition={fixture96Plate as LabwareDefinition} />
         ) : null}
       </ModuleComponent>
     </RobotCoordinateSpace>

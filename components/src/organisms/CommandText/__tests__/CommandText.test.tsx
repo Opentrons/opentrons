@@ -23,7 +23,7 @@ import type {
   DispenseRunTimeCommand,
   DropTipInPlaceRunTimeCommand,
   DropTipRunTimeCommand,
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadLabwareRunTimeCommand,
   LoadLiquidClassRunTimeCommand,
   LoadLiquidRunTimeCommand,
@@ -589,7 +589,7 @@ describe('CommandText', () => {
             labwareId: 'mockId',
             definition: {
               metadata: { displayName: 'mock displayName' },
-            } as LabwareDefinition2,
+            } as LabwareDefinition,
             offset: { x: 0, y: 0, z: 0 },
           },
           status: 'queued',

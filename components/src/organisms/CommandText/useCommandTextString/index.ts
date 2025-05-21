@@ -4,7 +4,7 @@ import * as utils from './utils'
 
 import type { TFunction } from 'i18next'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -19,7 +19,7 @@ export * from './utils'
 
 export interface UseCommandTextStringParams {
   command: RunTimeCommand | null
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
   commandTextData: CommandTextData | null
   robotType: RobotType
 }

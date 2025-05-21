@@ -4,7 +4,7 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { appendUniqValidLocCombo } from '../appendUniqValidLocCombo'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareLocationInfoWithLocSeq } from '..'
 
 vi.mock('@opentrons/shared-data', () => ({
@@ -20,24 +20,24 @@ describe('appendUniqValidLocCombo', () => {
   const MODULE_MODEL = 'thermocyclerModuleV2'
   const ADDRESSABLE_AREA = 'B1'
 
-  const BASIC_LABWARE_DEF: LabwareDefinition2 = {
+  const BASIC_LABWARE_DEF: LabwareDefinition = {
     metadata: { displayName: 'Basic Labware' },
-  } as LabwareDefinition2
+  } as LabwareDefinition
 
-  const LID_LABWARE_DEF: LabwareDefinition2 = {
+  const LID_LABWARE_DEF: LabwareDefinition = {
     metadata: { displayName: 'Lid Labware' },
     allowedRoles: ['lid'],
-  } as LabwareDefinition2
+  } as LabwareDefinition
 
-  const ADAPTER_LABWARE_DEF: LabwareDefinition2 = {
+  const ADAPTER_LABWARE_DEF: LabwareDefinition = {
     metadata: { displayName: 'Adapter Labware' },
     allowedRoles: ['adapter'],
-  } as LabwareDefinition2
+  } as LabwareDefinition
 
-  const SYSTEM_LABWARE_DEF: LabwareDefinition2 = {
+  const SYSTEM_LABWARE_DEF: LabwareDefinition = {
     metadata: { displayName: 'System Labware' },
     allowedRoles: ['system'],
-  } as LabwareDefinition2
+  } as LabwareDefinition
 
   const BASIC_LOCATION_COMBO: LabwareLocationInfoWithLocSeq = {
     labwareId: LABWARE_ID,
@@ -77,7 +77,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should return unchanged accumulator when combo is null', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = [BASIC_LOCATION_COMBO]
-    const lwDefs: LabwareDefinition2[] = [BASIC_LABWARE_DEF]
+    const lwDefs: LabwareDefinition[] = [BASIC_LABWARE_DEF]
 
     const result = appendUniqValidLocCombo(acc, lwDefs, null)
 
@@ -86,7 +86,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should append valid and unique combo to accumulator', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = []
-    const lwDefs: LabwareDefinition2[] = [BASIC_LABWARE_DEF]
+    const lwDefs: LabwareDefinition[] = [BASIC_LABWARE_DEF]
 
     const result = appendUniqValidLocCombo(acc, lwDefs, BASIC_LOCATION_COMBO)
 
@@ -95,7 +95,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should not append combo that already exists in accumulator', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = [BASIC_LOCATION_COMBO]
-    const lwDefs: LabwareDefinition2[] = [BASIC_LABWARE_DEF]
+    const lwDefs: LabwareDefinition[] = [BASIC_LABWARE_DEF]
 
     const result = appendUniqValidLocCombo(acc, lwDefs, BASIC_LOCATION_COMBO)
 
@@ -104,7 +104,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should not append combo with same offset sequence and definition URI', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = [BASIC_LOCATION_COMBO]
-    const lwDefs: LabwareDefinition2[] = [BASIC_LABWARE_DEF]
+    const lwDefs: LabwareDefinition[] = [BASIC_LABWARE_DEF]
 
     const similarCombo: LabwareLocationInfoWithLocSeq = {
       ...BASIC_LOCATION_COMBO,
@@ -118,7 +118,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should not append combo when labware definition is not found', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = []
-    const lwDefs: LabwareDefinition2[] = []
+    const lwDefs: LabwareDefinition[] = []
 
     const result = appendUniqValidLocCombo(acc, lwDefs, BASIC_LOCATION_COMBO)
 
@@ -127,7 +127,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should not append combo with lid role', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = []
-    const lwDefs: LabwareDefinition2[] = [LID_LABWARE_DEF]
+    const lwDefs: LabwareDefinition[] = [LID_LABWARE_DEF]
 
     const lidCombo: LabwareLocationInfoWithLocSeq = {
       ...BASIC_LOCATION_COMBO,
@@ -141,7 +141,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should not append combo with adapter role', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = []
-    const lwDefs: LabwareDefinition2[] = [ADAPTER_LABWARE_DEF]
+    const lwDefs: LabwareDefinition[] = [ADAPTER_LABWARE_DEF]
 
     const adapterCombo: LabwareLocationInfoWithLocSeq = {
       ...BASIC_LOCATION_COMBO,
@@ -155,7 +155,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should not append combo with system role', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = []
-    const lwDefs: LabwareDefinition2[] = [SYSTEM_LABWARE_DEF]
+    const lwDefs: LabwareDefinition[] = [SYSTEM_LABWARE_DEF]
 
     const systemCombo: LabwareLocationInfoWithLocSeq = {
       ...BASIC_LOCATION_COMBO,
@@ -169,7 +169,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should not append combo with empty offset location sequence', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = []
-    const lwDefs: LabwareDefinition2[] = [BASIC_LABWARE_DEF]
+    const lwDefs: LabwareDefinition[] = [BASIC_LABWARE_DEF]
 
     const comboWithEmptyOffsetLocSeq: LabwareLocationInfoWithLocSeq = {
       ...BASIC_LOCATION_COMBO,
@@ -187,7 +187,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should not append combo with notOnDeck kind', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = []
-    const lwDefs: LabwareDefinition2[] = [BASIC_LABWARE_DEF]
+    const lwDefs: LabwareDefinition[] = [BASIC_LABWARE_DEF]
 
     const notOnDeckCombo: LabwareLocationInfoWithLocSeq = {
       ...BASIC_LOCATION_COMBO,
@@ -204,7 +204,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should not append combo with inStackerHopper kind', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = []
-    const lwDefs: LabwareDefinition2[] = [BASIC_LABWARE_DEF]
+    const lwDefs: LabwareDefinition[] = [BASIC_LABWARE_DEF]
 
     const inStackerHopperCombo: LabwareLocationInfoWithLocSeq = {
       ...BASIC_LOCATION_COMBO,
@@ -221,7 +221,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should not append combo in staging area', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = []
-    const lwDefs: LabwareDefinition2[] = [BASIC_LABWARE_DEF]
+    const lwDefs: LabwareDefinition[] = [BASIC_LABWARE_DEF]
 
     const stagingAreaCombo: LabwareLocationInfoWithLocSeq = {
       ...BASIC_LOCATION_COMBO,
@@ -241,7 +241,7 @@ describe('appendUniqValidLocCombo', () => {
 
   it('should append valid combo with allowed roles that are not lid, adapter, or system', () => {
     const acc: LabwareLocationInfoWithLocSeq[] = []
-    const otherRoleLabwareDef: LabwareDefinition2 = {
+    const otherRoleLabwareDef: LabwareDefinition = {
       metadata: { displayName: 'Other Role Labware' },
       allowedRoles: ['tipRack'],
     } as any
@@ -254,7 +254,7 @@ describe('appendUniqValidLocCombo', () => {
       }
     })
 
-    const lwDefs: LabwareDefinition2[] = [otherRoleLabwareDef]
+    const lwDefs: LabwareDefinition[] = [otherRoleLabwareDef]
 
     const otherRoleCombo: LabwareLocationInfoWithLocSeq = {
       ...BASIC_LOCATION_COMBO,

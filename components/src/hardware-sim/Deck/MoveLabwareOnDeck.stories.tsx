@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import type * as React from 'react'
 import type {
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 
 const meta: Meta<React.ComponentProps<typeof MoveLabwareOnDeckComponent>> = {
@@ -78,7 +78,7 @@ const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
 export const MoveLabwareOnDeck: Story = {
   render: args => (
     <MoveLabwareOnDeckComponent
-      movedLabwareDef={fixture96Plate as LabwareDefinition2}
+      movedLabwareDef={fixture96Plate as LabwareDefinition}
       initialLabwareLocation={args.initialLabwareLocation}
       finalLabwareLocation={args.finalLabwareLocation}
       loadedModules={[]}

@@ -4,7 +4,7 @@ import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
   RobotType,
 } from '@opentrons/shared-data'
 import type { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck'
@@ -21,7 +21,7 @@ export interface LPCFlowsProps {
   runId: string
   robotType: RobotType
   deckConfig: DeckConfiguration
-  labwareDefs: LabwareDefinition2[]
+  labwareDefs: LabwareDefinition[]
   labwareInfo: LPCLabwareInfo
   analysis: CompletedProtocolAnalysis
   protocolName: string
