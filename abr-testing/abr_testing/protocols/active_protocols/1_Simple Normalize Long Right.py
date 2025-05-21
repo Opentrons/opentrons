@@ -47,7 +47,7 @@ def run(protocol: ProtocolContext) -> None:
 
     reservoir = protocol.load_labware("nest_12_reservoir_15ml", "B3")
     waste_reservoir = protocol.load_labware(
-        "nest_1_reservoir_195ml", "C1", "Liquid Waste"
+        "opentrons_tough_1_reservoir_300ml", "C1", "Liquid Waste"
     )
     waste_reservoir.load_empty(waste_reservoir.wells())
     sample_plate_2 = protocol.load_labware(

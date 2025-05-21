@@ -135,7 +135,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         helpers.mag_str, "C1"
     )  # type: ignore[assignment]
     waste_reservoir = protocol.load_labware(
-        "nest_1_reservoir_290ml", "B3", "Liquid Waste"
+        "opentrons_tough_1_reservoir_300ml", "B3", "Liquid Waste"
     )
     waste = waste_reservoir.wells()[0].top()
     res1 = protocol.load_labware(res_type, "D2", "reagent reservoir 1")

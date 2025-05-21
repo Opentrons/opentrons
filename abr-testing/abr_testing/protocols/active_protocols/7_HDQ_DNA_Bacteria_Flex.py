@@ -129,7 +129,7 @@ def run(protocol: ProtocolContext) -> None:
         helpers.mag_str, "C1"
     )  # type: ignore[assignment]
     waste_reservoir = protocol.load_labware(
-        "nest_1_reservoir_195ml", "C2", "Liquid Waste"
+        "opentrons_tough_1_reservoir_300ml", "C2", "Liquid Waste"
     )
     waste = waste_reservoir.wells()[0].top()
 
