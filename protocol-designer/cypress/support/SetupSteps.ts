@@ -717,7 +717,7 @@ export const SetupSteps = {
   // Continue to the next part of the transfer form
   Continue: (): StepThunk => ({
     call: () => {
-      cy.contains('Continue').click()
+      cy.contains('Continue').click({ force: true })
     },
   }),
 
