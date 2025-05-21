@@ -8,7 +8,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  NO_WRAP,
   POSITION_FIXED,
   SPACING,
   StyledText,
@@ -30,35 +29,35 @@ import type {
   QuickTransferSummaryState,
 } from '../types'
 
-interface SubmergeProps {
+interface RetractProps {
   onBack: () => void
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
   kind: FlowRateKind
 }
 
-export function Submerge({
+export function Retract({
   onBack,
   state,
   dispatch,
   kind,
-}: SubmergeProps): JSX.Element {
+}: RetractProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const [currentStep, setCurrentStep] = useState<number>(1)
-  const submergeSettings =
-    kind === 'aspirate' ? state.submergeAspirate : state.submergeDispense
+  const retractSettings =
+    kind === 'aspirate' ? state.retractAspirate : state.retractDispense
   const [speed, setSpeed] = useState<number | null>(
-    submergeSettings?.speed ?? null
+    retractSettings?.speed ?? null
   )
   const [position, setPosition] = useState<number | null>(
-    submergeSettings?.positionFromBottom ?? null
+    retractSettings?.positionFromBottom ?? null
   )
 
   const action =
     kind === 'aspirate'
-      ? ACTIONS.SET_SUBMERGE_ASPIRATE
-      : ACTIONS.SET_SUBMERGE_DISPENSE
+      ? ACTIONS.SET_RETRACT_ASPIRATE
+      : ACTIONS.SET_RETRACT_DISPENSE
 
   const handleClickBackOrExit = (): void => {
     currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
@@ -69,25 +68,24 @@ export function Submerge({
       setCurrentStep(2)
     }
     if (currentStep === 2) {
-      if (speed != null && position != null) {
+      if (speed !== null && position !== null) {
         dispatch({
           type: action,
-          submergeSettings: {
-            speed,
+          retractSettings: {
+            speed: speed,
             positionFromBottom: position,
           },
         })
         trackEventWithRobotSerial({
           name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
           properties: {
-            setting: `Submerge_${kind}`,
+            setting: `Retract_${kind}`,
           },
         })
         onBack()
       }
     }
   }
-
   const setSaveOrContinueButtonText =
     currentStep === 1 ? t('shared:continue') : t('shared:save')
 
@@ -104,8 +102,8 @@ export function Submerge({
       <ChildNavigation
         header={
           kind === 'aspirate'
-            ? t('submerge_before_aspirating')
-            : t('submerge_before_dispensing')
+            ? t('retract_after_aspirating')
+            : t('retract_after_dispensing')
         }
         buttonText={i18n.format(setSaveOrContinueButtonText, 'capitalize')}
         onClickBack={handleClickBackOrExit}
@@ -122,7 +120,7 @@ export function Submerge({
         alignItems={ALIGN_CENTER}
         height="22rem"
       >
-        <SubmergeSettingComponent
+        <RetractSettingComponent
           kind={kind}
           state={state}
           setSpeed={setSpeed}
@@ -137,7 +135,7 @@ export function Submerge({
   )
 }
 
-interface SubmergeSettingComponentProps {
+interface RetractSettingComponentProps {
   kind: FlowRateKind
   state: QuickTransferSummaryState
   setSpeed: (speed: number) => void
@@ -147,7 +145,7 @@ interface SubmergeSettingComponentProps {
   currentStep: number
 }
 
-function SubmergeSettingComponent({
+function RetractSettingComponent({
   kind,
   state,
   speed,
@@ -155,7 +153,7 @@ function SubmergeSettingComponent({
   position,
   setPosition,
   currentStep,
-}: SubmergeSettingComponentProps): JSX.Element {
+}: RetractSettingComponentProps): JSX.Element {
   const { t } = useTranslation(['quick_transfer'])
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
 
@@ -206,7 +204,7 @@ function SubmergeSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <StyledText oddStyle="level4HeaderRegular">
-            {t('submerge_aspirating_description')}
+            {t('withdraw_tip_from_liquid')}
           </StyledText>
           <InputField type="number" value={speed} title={t('speed')} readOnly />
         </Flex>

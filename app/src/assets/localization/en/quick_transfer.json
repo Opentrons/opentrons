@@ -112,6 +112,8 @@
   "quick_transfer": "Quick transfer",
   "reservoir": "Reservoirs",
   "reset_settings": "Reset {{transferName}} settings",
+  "retract_after_aspirating": "Retract after aspirating",
+  "retract_after_dispensing": "Retract after dispensing",
   "retract": "Retract",
   "right_mount": "Right Mount",
   "run_now": "Run now",
@@ -144,8 +146,9 @@
   "submerge_before_aspirating": "Submerge before aspirating",
   "submerge_before_dispensing": " Submerge before dispensing",
   "submerge_dispensing_description": "Lower the tip into the liquid before dispensing",
-  "submerge_from_bottom": "Between 0 and {{max}} mm",
+  "from_bottom": "Between 0 and {{max}} mm",
   "submerge_value": "{{speed}} mm/s, {{position}} mm",
+  "retract_value": "{{speed}} mm/s, {{position}} mm from bottom",
   "submerge": "Submerge",
   "tip_change_frequency": "Tip change frequency",
   "tip_drop_location": "Tip drop location",
@@ -181,5 +184,6 @@
   "well": "well",
   "wellPlate": "Well plates",
   "wells": "wells",
-  "will_be_deleted": "<strong>{{transferName}}</strong> will be permanently deleted."
+  "will_be_deleted": "<strong>{{transferName}}</strong> will be permanently deleted.",
+  "withdraw_tip_from_liquid": "Withdraw the tip from the liquid after aspirating"
 }
