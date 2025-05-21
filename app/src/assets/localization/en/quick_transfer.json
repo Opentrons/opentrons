@@ -185,5 +185,6 @@
   "wellPlate": "Well plates",
   "wells": "wells",
   "will_be_deleted": "<strong>{{transferName}}</strong> will be permanently deleted.",
-  "withdraw_tip_from_liquid": "Withdraw the tip from the liquid after aspirating"
+  "withdraw_tip_from_liquid_aspirate": "Withdraw the tip from the liquid after aspirating",
+  "withdraw_tip_from_liquid_dispense": "Withdraw the tip from the liquid after dispensing"
 }

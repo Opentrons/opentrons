@@ -204,7 +204,9 @@ function RetractSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <StyledText oddStyle="level4HeaderRegular">
-            {t('withdraw_tip_from_liquid')}
+            {kind === 'aspirate'
+              ? t('withdraw_tip_from_liquid_aspirate')
+              : t('withdraw_tip_from_liquid_dispense')}
           </StyledText>
           <InputField type="number" value={speed} title={t('speed')} readOnly />
         </Flex>

@@ -49,6 +49,19 @@ describe('Retract', () => {
     screen.getByRole('button', { name: 'del' })
   })
 
+  it('renders test, buttons, input field, and keyboard for retract after dispense - speed', () => {
+    props.kind = 'dispense'
+    render(props)
+    screen.getByText('Retract after dispensing')
+    screen.getByText('Continue')
+    screen.getByText('Withdraw the tip from the liquid after dispensing')
+    screen.getByText('Speed (mm/second)')
+    screen.getByRole('button', { name: '1' })
+    screen.getByRole('button', { name: '5' })
+    screen.getByRole('button', { name: '9' })
+    screen.getByRole('button', { name: 'del' })
+  })
+
   it('renders test, buttons, input field, and keyboard for retract after aspirating - position', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
