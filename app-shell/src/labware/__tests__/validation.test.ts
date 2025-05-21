@@ -40,7 +40,7 @@ describe('validateLabwareFiles', () => {
     const files = [
       { filename: 'a.json', data: uncheckedLabwareA, modified: Date.now() },
       { filename: 'b.json', data: uncheckedLabwareB, modified: Date.now() },
-      { filename: 'b.json', data: uncheckedLabwareC, modified: Date.now() },
+      { filename: 'c.json', data: uncheckedLabwareC, modified: Date.now() },
     ]
 
     expect(validateLabwareFiles(files)).toEqual([
