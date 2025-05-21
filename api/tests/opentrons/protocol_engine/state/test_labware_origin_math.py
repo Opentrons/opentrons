@@ -98,7 +98,11 @@ _LABWARE_DEF_V2_UNKNOWN = LabwareDefinition2.model_construct(  # type: ignore[ca
     namespace="test",
     version=1,
     schemaVersion=2,
-    dimensions=Dimensions(xDimension=800, yDimension=900, zDimension=1000),
+    dimensions=Dimensions(
+        xDimension=800,
+        yDimension=900,
+        zDimension=1000,
+    ),
     parameters=type("MockParams", (), {"loadName": "unknown-labware-name"})(),
 )
 
@@ -108,6 +112,8 @@ _MODULE_DEF_TEMP_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg
     dimensions=ModuleDimensions(
         bareOverallHeight=500,
         overLabwareHeight=600,
+        labwareInterfaceXDimension=1000,
+        labwareInterfaceYDimension=700,
     ),
 )
 
