@@ -7,8 +7,8 @@ import {
 } from './constants'
 
 import type {
+  LabwareDefinition,
   LabwareDefinition1,
-  LabwareDefinition2,
   WellDefinition,
 } from './types'
 
@@ -86,7 +86,7 @@ export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
   return Boolean(def?.metadata?.isTiprack)
 }
 
-export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
+export function getIsTiprack(labwareDef: LabwareDefinition): boolean {
   return labwareDef.parameters.isTiprack
 }
 
@@ -111,7 +111,7 @@ const _SHORT_MM_LABWARE_DEF_LOADNAMES = [
 const ENGAGE_HEIGHT_OFFSET = -4
 
 export function getLabwareDefaultEngageHeight(
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
 ): number | null {
   const rawEngageHeight: number | null | undefined =
     labwareDef.parameters.magneticModuleEngageHeight

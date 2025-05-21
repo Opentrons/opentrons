@@ -1,7 +1,7 @@
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 import type {
   HANDLE_LW_SUBSTEP,
@@ -15,7 +15,7 @@ export interface LPCWizardState {
   activePipetteId: string
   labwareInfo: LPCLabwareInfo
   protocolData: CompletedProtocolAnalysis
-  labwareDefs: LabwareDefinition2[]
+  labwareDefs: LabwareDefinition[]
   deckConfig: DeckConfiguration
   protocolName: string
   maintenanceRunId: string | null

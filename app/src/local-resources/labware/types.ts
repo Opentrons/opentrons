@@ -1,6 +1,6 @@
 import type {
   LabwareBrand,
-  LabwareDefinition2 as LabwareDefinition,
+  LabwareDefinition,
   LabwareWellGroupMetadata,
   LabwareWellShapeProperties,
   LoadedLabware,

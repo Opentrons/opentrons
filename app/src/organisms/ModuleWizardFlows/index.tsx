@@ -18,6 +18,7 @@ import { InstallShuttle } from './InstallShuttle'
 import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
+import { SelectModule } from './SelectModule'
 import { Success } from './Success'
 import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
@@ -76,10 +77,11 @@ export const ModuleWizardFlows = (
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
       >
-        <>
-          CHOOSE MODULE SCREEN PROCEED FUNCTION HERE WILL BE INITIALIZE MODULE
-          FLOW HOOK
-        </>
+        <SelectModule
+          {...currentStep}
+          {...wizardFlowBaseProps}
+          buildFlowForSelectedModule={buildFlowForSelectedModule}
+        />
       </ModuleWizardScreen>
     )
   } else if (
@@ -275,17 +277,6 @@ export const ModuleWizardFlows = (
               wizardFlowBaseProps.attachedPipette as PipetteInformation
             }
           />
-        </ModuleWizardScreen>
-      )
-    case SECTIONS.CHECK_INSTALLATION_PINS:
-      return (
-        <ModuleWizardScreen
-          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-          handleCleanUpAndClose={handleCleanUpAndClose}
-          currentStepIndex={currentStepIndex}
-          totalStepCount={totalStepCount}
-        >
-          <>Check installation pins</>
         </ModuleWizardScreen>
       )
     case SECTIONS.CLOSE_DOOR:

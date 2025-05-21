@@ -24,6 +24,7 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
+  WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
 
 import {
@@ -327,7 +328,11 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
           </Markdown>
         )}
         {protocol_content != null && (
-          <span>
+          <StyledText
+            fontSize={TYPOGRAPHY.fontSize20}
+            lineHeight={TYPOGRAPHY.lineHeight24}
+            whiteSpace={WHITE_SPACE_PRE_WRAP}
+          >
             <Trans
               t={t}
               i18nKey="pd_protocol_reply"
@@ -342,7 +347,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
                 margin={`${SPACING.spacing4} 0 0 ${SPACING.spacing4}`}
               />
             </Link>
-          </span>
+          </StyledText>
         )}
 
         {/* Display protocol_content badge and content */}
@@ -359,6 +364,19 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
                 {JSON.stringify(protocol_content, null, 2)}
               </CodeWrapper>
             )}
+            <Markdown
+              components={{
+                div: undefined,
+                ul: UnnumberedListText,
+                h2: HeaderText,
+                li: ListItemText,
+                p: ParagraphText,
+                a: isUser ? ParagraphText : ExternalLink,
+                code: CodeText,
+              }}
+            >
+              {reply}
+            </Markdown>
           </>
         )}
 

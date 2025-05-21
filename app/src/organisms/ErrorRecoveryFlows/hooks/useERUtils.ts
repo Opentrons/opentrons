@@ -23,7 +23,7 @@ import { useRecoveryToasts } from './useRecoveryToasts'
 import { useRouteUpdateActions } from './useRouteUpdateActions'
 import { useShowDoorInfo } from './useShowDoorInfo'
 
-import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
+import type { LabwareDefinition, RobotType } from '@opentrons/shared-data'
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { StepCounts } from '/app/resources/protocols/hooks'
 import type { ErrorRecoveryFlowsProps } from '..'
@@ -50,7 +50,7 @@ export type ERUtilsProps = Omit<ErrorRecoveryFlowsProps, 'failedCommand'> & {
   robotType: RobotType
   failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
   isActiveUser: UseRecoveryTakeoverResult['isActiveUser']
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
 }
 
 export interface ERUtilsResults {

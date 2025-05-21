@@ -319,3 +319,13 @@ class StackerPoolDefinition:
     primaryLabwareDefinition: LabwareDefinition
     adapterLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
     lidLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
+
+
+class IdentifyColor(str, Enum):
+    """Module identify color."""
+
+    WHITE = "white"
+    RED = "red"
+    GREEN = "green"
+    BLUE = "blue"
+    YELLOW = "yellow"

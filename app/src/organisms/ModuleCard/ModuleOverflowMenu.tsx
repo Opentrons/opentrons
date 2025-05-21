@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
-  // FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MODULE_MODELS_OT2_ONLY,
   TEMPERATURE_MODULE_TYPE,
@@ -118,13 +118,12 @@ export const ModuleOverflowMenu = (
     calibrateDisabledReason = null
   }
 
-  // TODO: uncomment flex stacker check once we no longer need this for testing
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
         {isFlex &&
         module.moduleType !== ABSORBANCE_READER_TYPE &&
-        // module.moduleType !== FLEX_STACKER_MODULE_TYPE &&
+        module.moduleType !== FLEX_STACKER_MODULE_TYPE &&
         !MODULE_MODELS_OT2_ONLY.some(
           modModel => modModel === module.moduleModel
         ) ? (
