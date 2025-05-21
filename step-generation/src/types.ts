@@ -376,7 +376,7 @@ export type DistributeArgs = SharedTransferLikeArgs & {
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
   disposalVolume: number | null | undefined
   /** Volume to condition the tip with during aspiration sequence */
-  conditioningVolume: number | null | undefined
+  conditioningVolume: number | null
   /** pass to blowout **/
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined

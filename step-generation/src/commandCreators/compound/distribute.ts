@@ -442,7 +442,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const preAspirateSubmergeCommands = [
         ...moveToSourceWellTopCommand,
         ...voidDispenseAirGapCommand,
-        // ...liquidProbeCommand,
+        // ...liquidProbeCommand, // for menisucs-relative pipetting
         ...configureForVolumeCommand,
         ...prepareToAspirateCommand,
       ]
