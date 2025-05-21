@@ -24,6 +24,7 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
+  WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
 
 import {
@@ -330,7 +331,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
           <StyledText
             fontSize={TYPOGRAPHY.fontSize20}
             lineHeight={TYPOGRAPHY.lineHeight24}
-            css="white-space: pre-wrap;"
+            whiteSpace={WHITE_SPACE_PRE_WRAP}
           >
             <Trans
               t={t}
