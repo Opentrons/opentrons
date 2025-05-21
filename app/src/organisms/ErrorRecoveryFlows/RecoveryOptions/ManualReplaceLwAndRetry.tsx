@@ -42,6 +42,7 @@ export function ManualReplaceLwAndRetry(
   const homeShuttleRoutes: RecoveryRoute[] = [
     LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
     MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE,
   ]
 
   const primaryBtnOnClick = (): Promise<void> => {
@@ -49,6 +50,7 @@ export function ManualReplaceLwAndRetry(
       switch (route) {
         case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+        case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
         case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
           if (homeShuttleRoutes.includes(route)) {
             void homeShuttle().then(() => {
