@@ -520,11 +520,11 @@ class FlexStacker(mod_abc.AbstractModule):
         await self._reader.get_limit_switch_status()
         await self._reader.get_platform_sensor_state()
 
-        """Z axis is unknown, lets move it up in case it is holding a labware"""
+        # Z axis is unknown, lets move it up in case it is holding a labware
         if self.limit_switch_status[StackerAxis.Z] == StackerAxisState.UNKNOWN:
             await self.home_axis(StackerAxis.Z, Direction.EXTEND)
 
-        """Z must now be either extended or retracted, move on to the X"""
+        # Z must now be either extended or retracted, move on to the X
         if (
             self.platform_state == PlatformState.UNKNOWN
             or self.limit_switch_status[StackerAxis.X] == StackerAxisState.UNKNOWN
@@ -534,13 +534,12 @@ class FlexStacker(mod_abc.AbstractModule):
             else:
                 await self.home_axis(StackerAxis.X, Direction.EXTEND)
 
-        """Z+X must now be either extended or retracted, move on to the latch"""
+        # Z+X must now be either extended or retracted, move on to the latch
         if not ignore_latch:
             await self.close_latch()
 
-        """Retract X if it's not already"""
+        # Finally, retract Z and extend X if they are not already
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
-        """Extend X if it's not already"""
         await self.home_axis(StackerAxis.X, Direction.EXTEND)
 
     async def labware_detected(self, axis: StackerAxis, direction: Direction) -> bool:
