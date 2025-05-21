@@ -11,7 +11,6 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { Fixture } from './constants'
 import { FixtureRender } from './FixtureRender'
 import { ModuleLabel } from './ModuleLabel'
 import { SelectedLabwareRender } from './SelectedLabwareRender'
@@ -42,7 +41,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getAllLabwareDefs()
   const deckSetup = useSelector(getInitialDeckSetup)
-  const { labware, modules, additionalEquipmentOnDeck } = deckSetup
+  const { labware } = deckSetup
   const matchingSelectedTopLabwareOnDeck = Object.values(labware).find(
     ({ stack, labwareDefURI }) => {
       const matchingSlot = getSlotInLocationStack(stack)

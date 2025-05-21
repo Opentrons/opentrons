@@ -5,7 +5,6 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
 import { getPDMetadata } from '../../file-types'
-import { LabwareOnDeck, ModuleOnDeck } from '../../step-forms'
 
 import type { Reducer } from 'redux'
 import type {
@@ -45,7 +44,6 @@ import type {
 } from '../actions'
 import type {
   DisplayLabware,
-  Fixture,
   GenerateNewProtocolState,
   ZoomedIntoSlotInfoState,
 } from '../types'
@@ -386,7 +384,6 @@ export const zoomedInSlotInfo = (
         lidDefUri,
         amount,
       } = action.payload
-      console.log('moduleModel from reducer', moduleModel)
       return {
         ...state,
         selectedTopLabware: {

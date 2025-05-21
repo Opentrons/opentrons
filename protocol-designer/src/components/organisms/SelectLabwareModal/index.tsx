@@ -25,7 +25,6 @@ import {
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  StackingProps,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -74,6 +73,7 @@ import {
 import { getMainPagePortalEl } from '../Portal'
 
 import type { ChangeEvent } from 'react'
+import type { StackingProps } from '@opentrons/components'
 import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type { CategoryExpand } from '../../../pages/Designer/DeckSetup/DeckSetupToolbox'
@@ -490,7 +490,9 @@ export function SelectLabwareModal(
                                       ) => {
                                         dispatch(
                                           selectTopLabwareAmount({
-                                            amount: parseInt(e.target.value),
+                                            amount: parseInt(
+                                              e.target.value as string
+                                            ),
                                           })
                                         )
                                       },
@@ -651,7 +653,8 @@ export function SelectLabwareModal(
                                                             selectTopLabwareAmount(
                                                               {
                                                                 amount: parseInt(
-                                                                  e.target.value
+                                                                  e.target
+                                                                    .value as string
                                                                 ),
                                                               }
                                                             )

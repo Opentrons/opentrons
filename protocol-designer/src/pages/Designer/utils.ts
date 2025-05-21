@@ -141,7 +141,6 @@ export const getSlotInformation = (
           getSlotInLocationStack(lw.stack) === stagingAreaAddressableAreaName[0]
       ) ?? null
   }
-  console.log('createdModuleForSlot in utils', createdModuleForSlot)
   const preSelectedFixture =
     createdFixtureForSlots != null && createdFixtureForSlots.length === 2
       ? ('wasteChuteAndStagingArea' as Fixture)

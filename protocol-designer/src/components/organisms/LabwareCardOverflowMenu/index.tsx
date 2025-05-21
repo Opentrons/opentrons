@@ -24,7 +24,7 @@ import {
   ConfirmDeleteEntityInUseModal,
   EditNickNameModal,
 } from '../../../components/organisms'
-import { deleteContainer, editSlotInfo } from '../../../labware-ingred/actions'
+import { deleteContainer } from '../../../labware-ingred/actions'
 import { getIsLabwareOnSlotInUse } from '../../../pages/Designer/DeckSetup/utils'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'

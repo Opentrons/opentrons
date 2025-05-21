@@ -76,9 +76,6 @@ export function DeckSetupToolbox(
   const [showSelectLabwareModal, setShowSelectLabwareModal] = useState<boolean>(
     false
   )
-  if (slot == null) {
-    return null
-  }
 
   const {
     createdAdapterForSlot,
@@ -89,9 +86,13 @@ export function DeckSetupToolbox(
   } = useMemo(() => {
     return getSlotInformation({
       deckSetup,
-      slot,
+      slot: slot ?? 'A1',
     })
   }, [deckSetup, slot])
+
+  if (slot == null) {
+    return null
+  }
 
   const offDeckLabware = deckSetup.labware[slot]
   const handleResetToolbox = (): void => {
@@ -136,7 +137,6 @@ export function DeckSetupToolbox(
     }
     handleResetToolbox()
   }
-  console.log('createdStackForSlot', createdStackForSlot)
   const handleConfirm = (): void => {
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null

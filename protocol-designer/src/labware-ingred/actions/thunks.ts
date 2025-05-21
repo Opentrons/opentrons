@@ -8,35 +8,15 @@ import { getLabwareEntities } from '../../step-forms/selectors'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getLabwarePythonName, uuid } from '../../utils'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import {
-  selectAdapter,
-  selectFixture,
-  selectLid,
-  selectModule,
-  selectTopLabware,
-  selectTopLabwareAmount,
-} from './actions'
 
 import type { LabwareEntities } from '@opentrons/step-generation'
-import type {
-  LabwareOnDeck,
-  ModuleOnDeck,
-  NormalizedLabware,
-  NormalizedLabwareById,
-} from '../../step-forms'
+import type { NormalizedLabware, NormalizedLabwareById } from '../../step-forms'
 import type { ThunkAction } from '../../types'
-import type { Fixture } from '../types'
 import type {
   CreateContainerAction,
   CreateContainerArgs,
   DeleteContainerAction,
   DuplicateLabwareAction,
-  SelectAdapterAction,
-  SelectFixtureAction,
-  SelectLidAction,
-  SelectModuleAction,
-  SelectTopLabwareAction,
-  SelectTopLabwareAmountAction,
   ZoomedIntoSlotAction,
 } from './actions'
 
@@ -195,51 +175,6 @@ export const duplicateLabware: (
     })
   }
 }
-
-// interface EditSlotInfo {
-//   createdTopLabwareForSlot?: LabwareOnDeck | null
-//   createdAdapterForSlot?: LabwareOnDeck | null
-//   createdModuleForSlot?: ModuleOnDeck | null
-//   preSelectedFixture?: Fixture | null
-//   createdLidForSlot?: LabwareOnDeck | null
-//   amount?: number
-// }
-
-// export const editSlotInfo: (
-//   args: EditSlotInfo
-// ) => ThunkAction<
-//   | SelectTopLabwareAction
-//   | SelectAdapterAction
-//   | SelectModuleAction
-//   | SelectFixtureAction
-//   | SelectLidAction
-//   | SelectTopLabwareAmountAction
-// > = args => dispatch => {
-//   const {
-//     createdModuleForSlot,
-//     createdAdapterForSlot,
-//     createdTopLabwareForSlot,
-//     preSelectedFixture,
-//     createdLidForSlot,
-//     amount,
-//   } = args
-//   dispatch(
-//     selectTopLabware({
-//       labwareDefUri: createdTopLabwareForSlot?.labwareDefURI ?? null,
-//     })
-//   )
-//   dispatch(
-//     selectAdapter({
-//       adapterDefUri: createdAdapterForSlot?.labwareDefURI ?? null,
-//     })
-//   )
-//   dispatch(selectModule({ moduleModel: createdModuleForSlot?.model ?? null }))
-//   dispatch(selectFixture({ fixture: preSelectedFixture ?? null }))
-//   dispatch(
-//     selectLid({ labwareDefUri: createdLidForSlot?.labwareDefURI ?? null })
-//   )
-//   dispatch(selectTopLabwareAmount({ amount: amount ?? 1 }))
-// }
 
 export interface EditMultipleLabwareAction {
   type: 'EDIT_MULTIPLE_LABWARE_PYTHON_NAME'
