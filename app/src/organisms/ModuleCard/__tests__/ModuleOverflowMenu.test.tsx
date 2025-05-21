@@ -180,7 +180,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: vi.fn(),
       handleTestShakeClick: vi.fn(),
       handleInstructionsClick: vi.fn(),
-      handleSetupClick: vi.fn(),
+      handleCalibrateClick: vi.fn(),
       isLoadedInRun: false,
       isPipetteReady: true,
       isTooHot: false,
@@ -583,6 +583,6 @@ describe('ModuleOverflowMenu', () => {
     render(props)
 
     fireEvent.click(screen.getByRole('button', { name: 'Calibrate' }))
-    expect(props.handleSetupClick).toHaveBeenCalled()
+    expect(props.handleCalibrateClick).toHaveBeenCalled()
   })
 })
