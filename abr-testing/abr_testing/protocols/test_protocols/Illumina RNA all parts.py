@@ -9,13 +9,13 @@ from opentrons.protocol_api.module_contexts import (
     ThermocyclerContext,
     FlexStackerContext,
 )
-from abr_testing.protocols import helpers
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from typing import List
+from abr_testing.protocols import helpers
 
 
 metadata = {
-    "protocolName": "Illumina RNA Enrichment 96x Part 1-3",
+    "protocolName": "Illumina RNA Enrichment 96x Part 1-3 19MAY",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
 }
@@ -218,194 +218,255 @@ def run(protocol: ProtocolContext) -> None:
             p1000.configure_nozzle_layout(style=ALL, tip_racks=[tip_rack])
 
     # ========== FIRST ROW ===========
-    if ONDECK_THERMO:
-        thermocycler: ThermocyclerContext = protocol.load_module(
-            "thermocycler module gen2"
-        )  # type: ignore[assignment]
-        sample_plate_1 = thermocycler.load_labware(
-            "opentrons_96_wellplate_200ul_pcr_full_skirt", "Sample Plate 1"
-        )
-    else:
-        sample_plate_1 = protocol.load_labware(
-            "opentrons_96_wellplate_200ul_pcr_full_skirt", "A1", "Sample Plate 1"
-        )
-    # ================ Add the first labware in the position ================
-    sample_plate_2 = protocol.load_labware(
-        "opentrons_96_wellplate_200ul_pcr_full_skirt", "A2", "Sample Plate 2"
-    )
-    # =======================================================================
-    stacker_200_1: FlexStackerContext = protocol.load_module(
-        "flexStackerModuleV1", "A4"
-    )  # type: ignore[assignment]
-    stacker_200_1.set_stored_labware(
-        load_name="opentrons_flex_96_tiprack_200ul",
-        lid="opentrons_flex_tiprack_lid",
-        count=6,
-    )
-    tiprack_A3_adapter = protocol.load_adapter(
-        "opentrons_flex_96_tiprack_adapter", "A3"
-    )
-    tiprack_200_1 = tiprack_A3_adapter.load_labware("opentrons_flex_96_tiprack_200ul")
-    # ========== SECOND ROW ==========
-    reagent_plate_2 = protocol.load_labware(
-        "greiner_384_wellplate_240ul", "B2", "Reagent Plate 2"
-    )
-    # ================ Add the first labware in the position ================
-    stacker_200_2: FlexStackerContext = protocol.load_module(
-        "flexStackerModuleV1", "B4"
-    )  # type: ignore[assignment]
-    stacker_200_2.set_stored_labware(
-        load_name="opentrons_flex_96_tiprack_200ul",
-        lid="opentrons_flex_tiprack_lid",
-        count=6,
-    )
-    lids = protocol.load_lid_stack("opentrons_tough_pcr_auto_sealing_lid", "B3", 5)
-
-    # ========== THIRD ROW ===========
-    stacker_50_1: FlexStackerContext = protocol.load_module(
-        "flexStackerModuleV1", "C4"
-    )  # type: ignore[assignment]
-    stacker_50_1.set_stored_labware(
-        load_name="opentrons_flex_96_tiprack_50ul",
-        lid="opentrons_flex_tiprack_lid",
-        count=6,
-    )
-    if ONDECK_TEMP:
-        temp_block: TemperatureModuleContext = protocol.load_module(
-            "temperature module gen2", "C1"
-        )  # type: ignore[assignment]
-        reagent_plate_1 = temp_block.load_labware(
-            "greiner_384_wellplate_240ul", "Reagent Plate 1"
-        )
-    else:
-        reagent_plate_1 = protocol.load_labware(
-            "greiner_384_wellplate_240ul", "C1", "Reagent Plate 1"
-        )
-    tiprack_50_SCP_1 = protocol.load_labware(
-        "opentrons_flex_96_tiprack_50ul", SCP_Position
-    )
-    ETOH_reservoir = protocol.load_labware(
-        "nest_96_wellplate_2ml_deep", "C3", "ETOH Reservoir"
-    )
-
-    # ========== FOURTH ROW ==========
-    stacker_50_2: FlexStackerContext = protocol.load_module(
-        "flexStackerModuleV1", "D4"
-    )  # type: ignore[assignment]
-    stacker_50_2.set_stored_labware(
-        load_name="opentrons_flex_96_tiprack_50ul",
-        lid="opentrons_flex_tiprack_lid",
-        count=6,
-    )
-    TRASH = protocol.load_waste_chute()
-    LW_reservoir = protocol.load_labware(
-        "nest_96_wellplate_2ml_deep", "D1", "Liquid Waste Reservoir"
-    )
-    mag_block: MagneticBlockContext = protocol.load_module(
-        "magneticBlockV1", "D2"
-    )  # type: ignore[assignment]
-    CleanupPlate_1 = mag_block.load_labware(
-        "nest_96_wellplate_2ml_deep", "Cleanup Plate 1"
-    )
-    CleanupPlate_2 = stacker_50_2.load_labware(
-        "nest_96_wellplate_2ml_deep", "Cleanup Plate 2"
-    )
-
-    # ========================== REAGENT PLATE_1 ============================
-    TAGMIX = reagent_plate_1["B1"]  # 96 Wells
-    EPM_1 = reagent_plate_1["B2"]  # 96 Wells
-    EPH3 = reagent_plate_1["A1"]  # 8 Wells
-    FSMM = reagent_plate_1["A2"]  # 8 Wells
-    # SSMM_1             = reagent_plate_1['A3'] # 8 Wells
-    # SSMM_2             = reagent_plate_1['A4'] # 8 Wells
-    TAGSTOP = reagent_plate_1["A5"]  # 8 Wells
-    RSB_1 = reagent_plate_1["A6"]  # 8 Wells
-    # RSB_2              = reagent_plate_1['A7'] # 8 Wells
-    # RSB_3              = reagent_plate_1['A8'] # 8 Wells
-    # RSB_4              = reagent_plate_1['A9'] # 8 Wells
-    #                   = reagent_plate_1['A10'] # 8 Wells
-    #                   = reagent_plate_1['A11'] # 8 Wells
-    #                   = reagent_plate_1['A12'] # 8 Wells
-    #                   = reagent_plate_1['A13'] # 8 Wells
-    SMB_1 = reagent_plate_1["A14"]  # 8 Wells
-    # SMB_2 = reagent_plate_1["A15"]  # 8 Wells
-    # EEW_1 = reagent_plate_1["A16"]  # 8 Wells
-    # EEW_2 = reagent_plate_1["A17"]  # 8 Wells
-    NHB2 = reagent_plate_1["A18"]  # 8 Wells
-    Panel = reagent_plate_1["A19"]  # 8 Wells
-    ET2 = reagent_plate_1["A20"]  # 8 Wells
-    EHB2 = reagent_plate_1["A21"]  # 8 Wells
-    Elute = reagent_plate_1["A22"]  # 8 Wells
-    PPC = reagent_plate_1["A23"]  # 8 Wells
-    EPM_2 = reagent_plate_1["A24"]  # 8 Wells
-
-    # ========================== REAGENT PLATE_2 ============================
-    AMPure = reagent_plate_2["A1"]  # 96 Wells
-    # TWB_1              = reagent_plate_2['A2'] # 96 Wells
-    Barcodes = reagent_plate_2["B1"]  # 96 Wells
-    # TWB_2              = reagent_plate_2['B2'] # 96 Wells
-
-    # ======================= TIP AND SAMPLE TRACKING =======================
-    column_list_1 = [
-        "A1",
-        "A2",
-        "A3",
-        "A4",
-        "A5",
-        "A6",
-        "A7",
-        "A8",
-        "A9",
-        "A10",
-        "A11",
-        "A12",
-    ]
-    pooled_1_list = "A12"
-    # pooled_2_list = "A1"
-    pooled_3_list = "A3"
-    # pooled_4_list = "A4"
-    # pooled_5_list = "A5"
-    # pooled_6_list = "A6"
-
-    SSMM_list = ["A3", "A4", "A3", "A4", "A3", "A4", "A3", "A4", "A3", "A4", "A3", "A4"]
-    RSB_list = ["A6", "A7", "A8", "A6", "A7", "A8", "A6", "A7", "A8", "A6", "A7", "A8"]
-    TWB_list = ["A2", "B2", "A2", "B2", "A2", "B2", "A2", "B2", "A2", "B2", "A2", "B2"]
-    EEW_list = ["A2", "B2", "A2", "B2", "A2", "B2", "A2", "B2", "A2", "B2", "A2", "B2"]
-
-    # ============================ CUSTOM OFFSETS ===========================
-    p200_in_Deep384_Z_offset = 9
-
-    if CUSTOM_OFFSETS:
-        PCRPlate_Z_offset = 0
-        Deepwell_Z_offset = 0
-        Deep384_Z_offset = 0
-        # HEATERSHAKER OFFSETS
-        # MAG BLOCK OFFSETS
-        mb_drop_offset = {"x": 0, "y": 0.0, "z": 0}
-        mb_pick_up_offset = {"x": 0, "y": 0, "z": 0}
-        # THERMOCYCLER OFFSETS
-        tc_pick_up_offset = {"x": 0, "y": 0, "z": 0}
-        # DECK OFFSETS
-        deck_drop_offset = {"x": 0, "y": 0, "z": 0}
-        deck_pick_up_offset = {"x": 0, "y": 0, "z": 0}
-    else:
-        PCRPlate_Z_offset = 0
-        Deepwell_Z_offset = 0
-        Deep384_Z_offset = 0
-        # HEATERSHAKER OFFSETS
-        # MAG BLOCK OFFSETS
-        mb_drop_offset = {"x": 0, "y": 0.0, "z": 0}
-        mb_pick_up_offset = {"x": 0, "y": 0, "z": 0}
-        # THERMOCYCLER OFFSETS
-        tc_pick_up_offset = {"x": 0, "y": 0, "z": 0}
-        # DECK OFFSETS
-        deck_drop_offset = {"x": 0, "y": 0, "z": 0}
-        deck_pick_up_offset = {"x": 0, "y": 0, "z": 0}
-
-    # ========================================================
-    # ========================================= PROTOCOL START
-    # ========================================================
     try:
+        if ONDECK_THERMO:
+            thermocycler: ThermocyclerContext = protocol.load_module(
+                "thermocycler module gen2"
+            )  # type: ignore[assignment]
+            sample_plate_1 = thermocycler.load_labware(
+                "opentrons_96_wellplate_200ul_pcr_full_skirt", "Sample Plate 1"
+            )
+        else:
+            sample_plate_1 = protocol.load_labware(
+                "opentrons_96_wellplate_200ul_pcr_full_skirt", "A1", "Sample Plate 1"
+            )
+        # ================ Add the first labware in the position ================
+        sample_plate_3 = protocol.load_labware(
+            "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "A2",
+            "Sample Plate 2",
+        )
+        sample_plate_2 = sample_plate_3.load_labware(
+            "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt"
+        )
+        # =======================================================================
+        stacker_200_1: FlexStackerContext = protocol.load_module(
+            "flexStackerModuleV1", "A4"
+        )  # type: ignore[assignment]
+        stacker_200_1.set_stored_labware(
+            load_name="opentrons_flex_96_tiprack_200ul",
+            lid="opentrons_flex_tiprack_lid",
+            count=6,
+        )
+        tiprack_A3_adapter = protocol.load_adapter(
+            "opentrons_flex_96_tiprack_adapter", "A3"
+        )
+        tiprack_200_1 = tiprack_A3_adapter.load_labware(
+            "opentrons_flex_96_tiprack_200ul"
+        )
+        # ========== SECOND ROW ==========
+        reagent_plate_2 = protocol.load_labware(
+            "greiner_384_wellplate_240ul", "B2", "Reagent Plate 2"
+        )
+        # ================ Add the first labware in the position ================
+        stacker_200_2: FlexStackerContext = protocol.load_module(
+            "flexStackerModuleV1", "B4"
+        )  # type: ignore[assignment]
+        stacker_200_2.set_stored_labware(
+            load_name="opentrons_flex_96_tiprack_200ul",
+            lid="opentrons_flex_tiprack_lid",
+            count=6,
+        )
+        lids = protocol.load_lid_stack(
+            "custom_opentrons_tough_pcr_auto_sealing_lid", "B3", 5
+        )
+
+        # ========== THIRD ROW ===========
+        stacker_50_1: FlexStackerContext = protocol.load_module(
+            "flexStackerModuleV1", "C4"
+        )  # type: ignore[assignment]
+        stacker_50_1.set_stored_labware(
+            load_name="opentrons_flex_96_tiprack_50ul",
+            lid="opentrons_flex_tiprack_lid",
+            count=6,
+        )
+        if ONDECK_TEMP:
+            temp_block: TemperatureModuleContext = protocol.load_module(
+                "temperature module gen2", "C1"
+            )  # type: ignore[assignment]
+            reagent_plate_1 = temp_block.load_labware(
+                "greiner_384_wellplate_240ul", "Reagent Plate 1"
+            )
+        else:
+            reagent_plate_1 = protocol.load_labware(
+                "greiner_384_wellplate_240ul", "C1", "Reagent Plate 1"
+            )
+        tiprack_50_SCP_1 = protocol.load_labware(
+            "opentrons_flex_96_tiprack_50ul", SCP_Position
+        )
+        ETOH_reservoir = protocol.load_labware(
+            "nest_96_wellplate_2ml_deep", "C3", "ETOH Reservoir"
+        )
+
+        # ========== FOURTH ROW ==========
+        stacker_50_2: FlexStackerContext = protocol.load_module(
+            "flexStackerModuleV1", "D4"
+        )  # type: ignore[assignment]
+        stacker_50_2.set_stored_labware(
+            load_name="opentrons_flex_96_tiprack_50ul",
+            lid="opentrons_flex_tiprack_lid",
+            count=6,
+        )
+        TRASH = protocol.load_waste_chute()
+        LW_reservoir = protocol.load_labware(
+            "nest_96_wellplate_2ml_deep", "D1", "Liquid Waste Reservoir"
+        )
+        mag_block: MagneticBlockContext = protocol.load_module(
+            "magneticBlockV1", "D2"
+        )  # type: ignore[assignment]
+        CleanupPlate_1 = mag_block.load_labware(
+            "nest_96_wellplate_2ml_deep", "Cleanup Plate 1"
+        )
+        CleanupPlate_2 = stacker_50_2.load_labware(
+            "nest_96_wellplate_2ml_deep", "Cleanup Plate 2"
+        )
+
+        # ========================== REAGENT PLATE_1 ============================
+        TAGMIX = reagent_plate_1["B1"]  # 96 Wells
+        EPM_1 = reagent_plate_1["B2"]  # 96 Wells
+        EPH3 = reagent_plate_1["A1"]  # 8 Wells
+        FSMM = reagent_plate_1["A2"]  # 8 Wells
+        # SSMM_1             = reagent_plate_1['A3'] # 8 Wells
+        # SSMM_2             = reagent_plate_1['A4'] # 8 Wells
+        TAGSTOP = reagent_plate_1["A5"]  # 8 Wells
+        RSB_1 = reagent_plate_1["A6"]  # 8 Wells
+        # RSB_2              = reagent_plate_1['A7'] # 8 Wells
+        # RSB_3              = reagent_plate_1['A8'] # 8 Wells
+        # RSB_4              = reagent_plate_1['A9'] # 8 Wells
+        #                   = reagent_plate_1['A10'] # 8 Wells
+        #                   = reagent_plate_1['A11'] # 8 Wells
+        #                   = reagent_plate_1['A12'] # 8 Wells
+        #                   = reagent_plate_1['A13'] # 8 Wells
+        SMB_1 = reagent_plate_1["A14"]  # 8 Wells
+        # SMB_2 = reagent_plate_1["A15"]  # 8 Wells
+        # EEW_1 = reagent_plate_1["A16"]  # 8 Wells
+        # EEW_2 = reagent_plate_1["A17"]  # 8 Wells
+        NHB2 = reagent_plate_1["A18"]  # 8 Wells
+        Panel = reagent_plate_1["A19"]  # 8 Wells
+        ET2 = reagent_plate_1["A20"]  # 8 Wells
+        EHB2 = reagent_plate_1["A21"]  # 8 Wells
+        Elute = reagent_plate_1["A22"]  # 8 Wells
+        PPC = reagent_plate_1["A23"]  # 8 Wells
+        EPM_2 = reagent_plate_1["A24"]  # 8 Wells
+
+        # ========================== REAGENT PLATE_2 ============================
+        AMPure = reagent_plate_2["A1"]  # 96 Wells
+        # TWB_1              = reagent_plate_2['A2'] # 96 Wells
+        Barcodes = reagent_plate_2["B1"]  # 96 Wells
+        # TWB_2              = reagent_plate_2['B2'] # 96 Wells
+
+        # ======================= TIP AND SAMPLE TRACKING =======================
+        column_list_1 = [
+            "A1",
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9",
+            "A10",
+            "A11",
+            "A12",
+        ]
+        pooled_1_list = "A12"
+        # pooled_2_list = "A1"
+        pooled_3_list = "A3"
+        # pooled_4_list = "A4"
+        # pooled_5_list = "A5"
+        # pooled_6_list = "A6"
+
+        SSMM_list = [
+            "A3",
+            "A4",
+            "A3",
+            "A4",
+            "A3",
+            "A4",
+            "A3",
+            "A4",
+            "A3",
+            "A4",
+            "A3",
+            "A4",
+        ]
+        RSB_list = [
+            "A6",
+            "A7",
+            "A8",
+            "A6",
+            "A7",
+            "A8",
+            "A6",
+            "A7",
+            "A8",
+            "A6",
+            "A7",
+            "A8",
+        ]
+        TWB_list = [
+            "A2",
+            "B2",
+            "A2",
+            "B2",
+            "A2",
+            "B2",
+            "A2",
+            "B2",
+            "A2",
+            "B2",
+            "A2",
+            "B2",
+        ]
+        EEW_list = [
+            "A2",
+            "B2",
+            "A2",
+            "B2",
+            "A2",
+            "B2",
+            "A2",
+            "B2",
+            "A2",
+            "B2",
+            "A2",
+            "B2",
+        ]
+
+        # ============================ CUSTOM OFFSETS ===========================
+        p200_in_Deep384_Z_offset = 9
+
+        if CUSTOM_OFFSETS:
+            PCRPlate_Z_offset = 0
+            Deepwell_Z_offset = 0
+            Deep384_Z_offset = 0
+            # HEATERSHAKER OFFSETS
+            # MAG BLOCK OFFSETS
+            mb_drop_offset = {"x": 0, "y": 0.0, "z": 0}
+            mb_pick_up_offset = {"x": 0, "y": 0, "z": 0}
+            # THERMOCYCLER OFFSETS
+            tc_pick_up_offset = {"x": 0, "y": 0, "z": 0}
+            # DECK OFFSETS
+            deck_drop_offset = {"x": 0, "y": 0, "z": 0}
+            deck_pick_up_offset = {"x": 0, "y": 0, "z": 0}
+        else:
+            PCRPlate_Z_offset = 0
+            Deepwell_Z_offset = 0
+            Deep384_Z_offset = 0
+            # HEATERSHAKER OFFSETS
+            # MAG BLOCK OFFSETS
+            mb_drop_offset = {"x": 0, "y": 0.0, "z": 0}
+            mb_pick_up_offset = {"x": 0, "y": 0, "z": 0}
+            # THERMOCYCLER OFFSETS
+            tc_pick_up_offset = {"x": 0, "y": 0, "z": 0}
+            # DECK OFFSETS
+            deck_drop_offset = {"x": 0, "y": 0, "z": 0}
+            deck_pick_up_offset = {"x": 0, "y": 0, "z": 0}
+
+        # ========================================================
+        # ========================================= PROTOCOL START
+        # ========================================================
         if ONDECK_THERMO:
             thermocycler.open_lid()
         if ONDECK_TEMP:
@@ -1859,10 +1920,6 @@ def run(protocol: ProtocolContext) -> None:
             # =======================
             # =======================
             # protocol.pause('Add sample_plate_3 to A2')
-            protocol.comment("UNSTACKING: sample_plate_3 = --> A2")
-            sample_plate_3 = protocol.load_labware(
-                "opentrons_96_wellplate_200ul_pcr_full_skirt", "A2", "Sample Plate 3"
-            )
             protocol.comment("MOVING: sample_plate_3 = A2 --> thermocycler")
             if ONDECK_THERMO:
                 protocol.move_labware(
@@ -2514,7 +2571,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.pick_up_tip()
             p1000.move_to(sample_plate_3["A1"].bottom(z=0.5))
             p1000.aspirate(TransferSup + 1, rate=0.25)
-            p1000.dispense(TransferSup + 1, CleanupPlate_2["A2"].bottom(z=1))
+            p1000.dispense(TransferSup + 1, CleanupPlate_2["A1"].bottom(z=1))
             p1000.drop_tip()
             # ===============================================
             protocol.comment("--> ADDING AMPure (0.8x)")
