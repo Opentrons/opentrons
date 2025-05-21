@@ -780,6 +780,8 @@ def minimal_module_def() -> ModuleDefinitionV3:
             "overLabwareHeight": 0,
             "xDimension": 123,
             "yDimension": 321,
+            "labwareInterfaceXDimension": 123,
+            "labwareInterfaceYDimension": 321,
         },
         "calibrationPoint": {"x": 12.0, "y": 8.75, "z": 0.0},
         "config": {},

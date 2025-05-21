@@ -128,6 +128,8 @@ class ModuleDimensions(BaseModel):
 
     bareOverallHeight: float
     overLabwareHeight: float
+    labwareInterfaceXDimension: float
+    labwareInterfaceYDimension: float
     lidHeight: Optional[float] = None
     maxStackerFillHeight: Optional[float] = None
     maxStackerRetrievableHeight: Optional[float] = None
