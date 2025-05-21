@@ -84,13 +84,19 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckDef,
     'wasteChute'
   )
+  const fakeStagingItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'fakeStagingSlot'
+  )
+
   const emptySlotLikeItems = filterAAByAreaType(
     deckConfigWithAA,
     deckDef,
     'slot'
-  )
+  ).concat(fakeStagingItems)
 
-  console.log('emptySlotLikeItems: ', emptySlotLikeItems)
+  console.log('fakeStagingItems: ', fakeStagingItems)
 
   const trashBinItems = filterAAByAreaType(
     deckConfigWithAA,

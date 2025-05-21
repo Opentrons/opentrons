@@ -127,21 +127,78 @@ export const FLEX_SINGLE_SLOT_BY_CUTOUT_ID: { [CutoutId: string]: string } = {
 }
 
 export const FAKE_FIXTURES_AND_AA = {
-  "locations": {
-    "addressableAreas": [
-  {
-    "id": "A4",
-    "areaType": "stagingSlot",
-    "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
-    "matingSurfaceUnitVector": [-1, 1, -1],
-    "boundingBox": {
-      "xDimension": 128.0,
-      "yDimension": 86.0,
-      "zDimension": 0
+  locations: {
+    addressableAreas: [
+      {
+        id: 'fakeA4',
+        areaType: 'fakeStagingSlot',
+        offsetFromCutoutFixture: [164.0, 0.0, 14.5],
+        matingSurfaceUnitVector: [-1, 1, -1],
+        boundingBox: {
+          xDimension: 128.0,
+          yDimension: 86.0,
+          zDimension: 0,
+        },
+        displayName: 'Slot A4',
+        compatibleModuleTypes: [],
+      },
+      {
+        id: 'fakeB4',
+        areaType: 'fakeStagingSlot',
+        offsetFromCutoutFixture: [164.0, 0.0, 14.5],
+        matingSurfaceUnitVector: [-1, 1, -1],
+        boundingBox: {
+          xDimension: 128.0,
+          yDimension: 86.0,
+          zDimension: 0,
+        },
+        displayName: 'Slot A4',
+        compatibleModuleTypes: [],
+      },
+      {
+        id: 'fakeC4',
+        areaType: 'fakeStagingSlot',
+        offsetFromCutoutFixture: [164.0, 0.0, 14.5],
+        matingSurfaceUnitVector: [-1, 1, -1],
+        boundingBox: {
+          xDimension: 128.0,
+          yDimension: 86.0,
+          zDimension: 0,
+        },
+        displayName: 'Slot A4',
+        compatibleModuleTypes: [],
+      },
+      {
+        id: 'fakeD4',
+        areaType: 'fakeStagingSlot',
+        offsetFromCutoutFixture: [164.0, 0.0, 14.5],
+        matingSurfaceUnitVector: [-1, 1, -1],
+        boundingBox: {
+          xDimension: 128.0,
+          yDimension: 86.0,
+          zDimension: 0,
+        },
+        displayName: 'Slot A4',
+        compatibleModuleTypes: [],
+      },
+    ],
+  },
+  cutoutFixtures: [
+    {
+      id: 'fakeStagingAreaRightSlot',
+      expectOpentronsModuleSerialNumber: false,
+      mayMountTo: ['cutoutD3', 'cutoutC3', 'cutoutB3', 'cutoutA3'],
+      displayName: 'Standard Slot Left',
+      providesAddressableAreas: {
+        cutoutD3: ['D3', 'fakeD4'],
+        cutoutC3: ['C3', 'fakeC4'],
+        cutoutB3: ['B3', 'fakeB4'],
+        cutoutA3: ['DA', 'fakeA4'],
+      },
+      fixtureGroup: {},
+      height: 0,
     },
-    "displayName": "Slot A4",
-    "compatibleModuleTypes": []
-  }]}
+  ],
 }
 
 // TODO(jh 01-15-25): Instead of typing slotId as `string`, type it as `AddressableAreaName`.
@@ -203,11 +260,6 @@ export const getCutoutFixtureReplacementIfNeeded = (
   return cutoutFixtureId
 }
 
-export const isFakeAA = (addressableArea: AddressableAreaName): boolean => {
-  const fakeAAs = ['fakeA4', 'fakeB4', 'fakeC4', 'fakeD4']
-  return fakeAAs.includes(addressableArea)
-}
-
 export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
   cutoutFixtures: CutoutConfig[],
   deckDefinition: DeckDefinition
@@ -224,7 +276,11 @@ export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
       deckDefinition
     )
     aaPerCutoutFixture?.forEach(item => {
-      acc.push({ ...obj, addressableAreaId: item })
+      acc.push({
+        ...obj,
+        addressableAreaId: item,
+        cutoutFixtureId: cutoutFixtureReplacment,
+      })
     })
     return acc
   }, [])
@@ -235,54 +291,41 @@ export const filterAAByAreaType = (
   deckDef: DeckDefinition,
   areaType: AreaType
 ): CutoutConfigMap[] => {
-  return cutoutFixtures.filter(({ addressableAreaId, cutoutFixtureId }) => {
-    if (
-      (areaType === 'slot' || areaType === 'stagingSlot') &&
-      isFakeAA(addressableAreaId) === true
-    ) {
-      return addressableAreaId
-    } else {
-      return deckDef.locations.addressableAreas.find(
-        aa => aa.id === addressableAreaId && aa.areaType === areaType
-      )
-    }
+  const deckDefWithFakeLocations = getDeckDefAAWithFakeAA(deckDef)
+  return cutoutFixtures.filter(({ addressableAreaId }) => {
+    return deckDefWithFakeLocations.locations.addressableAreas.find(
+      aa => aa.id === addressableAreaId && aa.areaType === areaType
+    )
   })
+}
+
+const getDeckDefAAWithFakeAA = (
+  deckDefinition: DeckDefinition
+): DeckDefinition => {
+  const locationsWithFakeAA = deckDefinition.locations.addressableAreas.concat(
+    FAKE_FIXTURES_AND_AA.locations.addressableAreas as AddressableArea[]
+  )
+  return {
+    ...deckDefinition,
+    locations: {
+      ...deckDefinition.locations,
+      addressableAreas: locationsWithFakeAA,
+    },
+  }
 }
 
 export const getAALocationForCutoutAndFixtureId = (
   addressableArea: AddressableAreaName,
   deckDefinition: DeckDefinition
 ): CoordinateTuple => {
-  if (isFakeAA(addressableArea)) {
-    return [164.0, 0.0, 14.5]
-  } else {
-    const addressableAreaItem = deckDefinition.locations.addressableAreas.find(
-      (aaItem: AddressableArea) => aaItem.id === addressableArea
-    )
-    if (addressableAreaItem == null) {
-      console.error(
-        `Addressable area ${addressableArea} location was not found.`
-      )
-    }
-    return addressableAreaItem?.offsetFromCutoutFixture ?? [0, 0, 0]
+  const deckDefWithFakeLocations = getDeckDefAAWithFakeAA(deckDefinition)
+  const addressableAreaItem = deckDefWithFakeLocations.locations.addressableAreas.find(
+    (aaItem: AddressableArea) => aaItem.id === addressableArea
+  )
+  if (addressableAreaItem == null) {
+    console.error(`Addressable area ${addressableArea} location was not found.`)
   }
-}
-
-export const getDummyAAForDummyStagingArea = (
-  inputCutoutId: CutoutId
-): AddressableAreaName[] | null => {
-  switch (inputCutoutId) {
-    case 'cutoutA3':
-      return ['A3', 'fakeA4']
-    case 'cutoutB3':
-      return ['B3', 'fakeB4']
-    case 'cutoutC3':
-      return ['C3', 'fakeC4']
-    case 'cutoutD3':
-      return ['D3', 'fakeD4']
-    default:
-      return null
-  }
+  return addressableAreaItem?.offsetFromCutoutFixture ?? [0, 0, 0]
 }
 
 export const getAAFromCutoutFixtureId = (
@@ -293,16 +336,22 @@ export const getAAFromCutoutFixtureId = (
   /**
    * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
    */
-  switch (cutoutFixtureId) {
-    case FAKE_STAGING_AREA_RIGHT_SLOT:
-      return getDummyAAForDummyStagingArea(inputCutoutId)
-    default:
-      return (
-        deckDefinition.cutoutFixtures.find(
-          fixture => fixture.id === cutoutFixtureId
-        )?.providesAddressableAreas[inputCutoutId] ?? null
-      )
+  const cutoutFixturesWithFakeFixtures = deckDefinition.cutoutFixtures.concat(
+    FAKE_FIXTURES_AND_AA.cutoutFixtures as CutoutFixture[]
+  )
+  const deckDefWithFakeCutoutFixtures = {
+    ...deckDefinition,
+    cutoutFixtures: cutoutFixturesWithFakeFixtures,
   }
+  console.log('DeckDefWithFakeCutoutFixtures: ', deckDefWithFakeCutoutFixtures)
+  const cutoutFixture = deckDefWithFakeCutoutFixtures.cutoutFixtures.find(
+    fixture => fixture.id === cutoutFixtureId
+  )
+  if (cutoutFixture == null) {
+    console.error(`Cannot find get addressable areas for ${cutoutFixtureId}`)
+    return null
+  }
+  return cutoutFixture?.providesAddressableAreas[inputCutoutId]
 }
 
 export function getCutoutFixtureIdsForModuleModel(
