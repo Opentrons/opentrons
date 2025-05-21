@@ -289,6 +289,22 @@ export const D2_ADDRESSABLE_AREA: 'D2' = 'D2'
 export const D3_ADDRESSABLE_AREA: 'D3' = 'D3'
 export const D4_ADDRESSABLE_AREA: 'D4' = 'D4'
 
+export type FlexFakeAddressableAreaName =
+  | 'fakeA4'
+  | 'fakeB4'
+  | 'fakeC4'
+  | 'fakeD4'
+
+export type FakeStagingAreaRightSlot = 'fakeStagingAreaRightSlot'
+
+export type AddressableAreaNamesWithFakes =
+  | AddressableAreaName
+  | FlexFakeAddressableAreaName
+
+export type CutoutFixtureIdsWithFakes =
+  | CutoutFixtureId
+  | FakeStagingAreaRightSlot
+
 export const MOVABLE_TRASH_A1_ADDRESSABLE_AREA: 'movableTrashA1' =
   'movableTrashA1'
 export const MOVABLE_TRASH_A3_ADDRESSABLE_AREA: 'movableTrashA3' =

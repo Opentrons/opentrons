@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
@@ -13,7 +14,6 @@ import type {
   LabwareEntity,
 } from '@opentrons/step-generation'
 import type { Selector } from '../../types'
-import { useTranslation } from 'react-i18next'
 
 export const getLabwareNicknamesById: Selector<
   Record<string, string>

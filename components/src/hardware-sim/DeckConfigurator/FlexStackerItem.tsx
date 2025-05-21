@@ -1,9 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  type DeckCutout,
-  getAALocationForCutoutAndFixtureId,
-} from '@opentrons/shared-data'
+import { getAALocationForCutoutAndFixtureId } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
@@ -24,6 +21,7 @@ import type {
   AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
+  DeckCutout,
   DeckDefinition,
 } from '@opentrons/shared-data'
 

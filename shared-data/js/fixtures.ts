@@ -60,6 +60,7 @@ import type {
   CutoutId,
   OT2CutoutId,
 } from '../deck'
+import type { CutoutFixtureIdsWithFakes } from './constants'
 import type {
   AddressableArea,
   AreaType,
@@ -243,14 +244,17 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
-interface CutoutConfigMap extends CutoutConfig {
+type CutoutConfigWithoutCutoutfixtureId = Omit<CutoutConfig, 'cutoutFixtureId'>
+
+interface CutoutConfigMap extends CutoutConfigWithoutCutoutfixtureId {
   addressableAreaId: AddressableAreaName
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
 }
 
 export const getCutoutFixtureReplacementIfNeeded = (
   cutoutFixtureId: CutoutFixtureId,
   deckDefinition: DeckDefinition
-): CutoutFixtureId => {
+): CutoutFixtureIdsWithFakes => {
   if (
     cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
     deckDefinition.robot.model === FLEX_ROBOT_TYPE
@@ -330,7 +334,7 @@ export const getAALocationForCutoutAndFixtureId = (
 
 export const getAAFromCutoutFixtureId = (
   inputCutoutId: CutoutId,
-  cutoutFixtureId: CutoutFixtureId,
+  cutoutFixtureId: CutoutFixtureIdsWithFakes,
   deckDefinition: DeckDefinition
 ): AddressableAreaName[] | null => {
   /**

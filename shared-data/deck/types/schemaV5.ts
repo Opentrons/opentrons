@@ -69,12 +69,6 @@ export type FlexAddressableAreaName =
   | 'flexStackerModuleV1C4'
   | 'flexStackerModuleV1D4'
 
-export type FlexFakeAddressableAreaName =
-  | 'fakeA4'
-  | 'fakeB4'
-  | 'fakeC4'
-  | 'fakeD4'
-
 export type OT2AddressableAreaName =
   | '1'
   | '2'
@@ -92,7 +86,6 @@ export type OT2AddressableAreaName =
 
 export type AddressableAreaName =
   | FlexAddressableAreaName
-  | FlexFakeAddressableAreaName
   | OT2AddressableAreaName
 
 export type CutoutId =
@@ -130,8 +123,6 @@ export type SingleSlotCutoutFixtureId =
 
 export type StagingAreaRightSlotFixtureId = 'stagingAreaRightSlot'
 
-export type FakeStagingAreaRightSlot = 'fakeStagingAreaRightSlot'
-
 export type TrashBinAdapterCutoutFixtureId = 'trashBinAdapter'
 
 export type WasteChuteCutoutFixtureId =
@@ -165,4 +156,3 @@ export type CutoutFixtureId =
   | FlexModuleCutoutFixtureId
   | OT2SingleStandardSlot
   | OT2FixedTrashSlot
-  | FakeStagingAreaRightSlot
