@@ -51,17 +51,6 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
       )
     }
   )
-  // const selectedModuleModel = Object.values(modules).find(
-  //   module => module.slot === selectedSlot.slot
-  // )?.model
-  // const selectedFixture = Object.values(additionalEquipmentOnDeck).find(
-  //   ae => ae.location === selectedSlot.cutout
-  // )?.name as Fixture
-  // console.log(
-  //   'selecteditems selectedModuleModel',
-  //   selectedSlot,
-  //   selectedModuleModel
-  // )
   const selectedAdapterDef =
     selectedAdapterDefUri != null
       ? defs[selectedAdapterDefUri] ?? customLabwareDefs[selectedAdapterDefUri]

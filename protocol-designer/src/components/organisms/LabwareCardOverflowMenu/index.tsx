@@ -24,7 +24,7 @@ import {
   ConfirmDeleteEntityInUseModal,
   EditNickNameModal,
 } from '../../../components/organisms'
-import { deleteContainer } from '../../../labware-ingred/actions'
+import { deleteContainer, editSlotInfo } from '../../../labware-ingred/actions'
 import { getIsLabwareOnSlotInUse } from '../../../pages/Designer/DeckSetup/utils'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
@@ -98,25 +98,26 @@ export function LabwareCardOverflowMenu(
     savedSteps,
     deckSetupLabware[topLabwareId]
   )
+
   const handleClear = (): void => {
     labwareIds.forEach(labwareId => {
       dispatch(deleteContainer({ labwareId }))
     })
-    // if (isAdapter) {
-    //   dispatch(
-    //     editSlotInfo({
-    //       adapterDefUri: null,
-    //     })
-    //   )
-    // } else {
-    //   dispatch(
-    //     editSlotInfo({
-    //       labwareDefUri: null,
-    //       lidDefUri: null,
-    //       amount: 1,
-    //     })
-    //   )
-    // }
+    if (isAdapter) {
+      dispatch(
+        editSlotInfo({
+          adapterDefUri: null,
+        })
+      )
+    } else {
+      dispatch(
+        editSlotInfo({
+          labwareDefUri: null,
+          lidDefUri: null,
+          amount: 1,
+        })
+      )
+    }
   }
   const handleConfirmDeleteEntityInUseModal = (): void => {
     labwareIds.forEach(labwareId => {

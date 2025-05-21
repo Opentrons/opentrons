@@ -384,6 +384,15 @@ export const zoomedInSlotInfo = (
         lidDefUri,
         amount,
       } = action.payload
+      console.log(
+        'edit slot info',
+        labwareDefUri,
+        adapterDefUri,
+        moduleModel,
+        fixture,
+        lidDefUri,
+        amount
+      )
       return {
         ...state,
         selectedTopLabware: {

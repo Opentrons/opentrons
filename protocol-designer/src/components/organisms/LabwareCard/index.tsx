@@ -20,9 +20,10 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { openIngredientSelector } from '../../../labware-ingred/actions'
-import { getLabwareEntities } from '../../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { LINK_BUTTON_STYLE } from '../../atoms'
@@ -44,9 +45,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
   const { def } = labware
-  const labwareEntities = useSelector(getLabwareEntities)
-  const allLabwareIdsOnStack = Object.values(labwareEntities)
-    .filter(lw => lw.labwareDefURI === labware.labwareDefURI)
+  const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
+  const allLabwareIdsOnStack = Object.values(deckSetupLabware)
+    .filter(
+      lw =>
+        lw.labwareDefURI === labware.labwareDefURI &&
+        getSlotInLocationStack(lw.stack) ===
+          getSlotInLocationStack(labware.stack)
+    )
     ?.map(lw => lw.id)
   const nickNames = useSelector(getLabwareNicknamesById)
   const allWellContentsForActiveItem = useSelector(

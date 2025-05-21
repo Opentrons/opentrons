@@ -6,7 +6,7 @@ import { fixture96Plate } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { openIngredientSelector } from '../../../../labware-ingred/actions'
-import { getLabwareEntities } from '../../../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
 import { LabwareCardOverflowMenu } from '../../LabwareCardOverflowMenu'
@@ -24,7 +24,7 @@ vi.mock('../../LabwareCardOverflowMenu')
 vi.mock('../../../../ui/labware/selectors')
 vi.mock('../../../../top-selectors/well-contents')
 vi.mock('../../utils')
-vi.mock('../../../../step-forms/selectors')
+vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
@@ -64,12 +64,18 @@ describe('LabwareCard', () => {
       wellContentsSelectors.getAllWellContentsForActiveItem
     ).mockReturnValue(null)
     vi.mocked(getLiquidIdsOnLabware).mockReturnValue([])
-    vi.mocked(getLabwareEntities).mockReturnValue({
-      labwareId: {
-        id: 'labwareId',
-        labwareDefURI: 'mockuri',
-        def: fixture96Plate as LabwareDefinition2,
-        pythonName: 'mockPythonName',
+    vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
+      modules: {},
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+      labware: {
+        labwareId: {
+          id: 'labwareId',
+          labwareDefURI: 'mockuri',
+          def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+          stack: ['labwareId', 'A1'],
+        },
       },
     })
   })

@@ -150,15 +150,13 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     if (
       createdTopLabwareForSlot ||
       createdAdapterForSlot ||
-      createdModuleForSlot ||
-      preSelectedFixture ||
       createdLidForSlot
     ) {
       dispatch(
         editSlotInfo({
           labwareDefUri: createdTopLabwareForSlot?.labwareDefURI,
           adapterDefUri: createdAdapterForSlot?.labwareDefURI,
-          moduleModel: createdModuleForSlot?.model ?? null,
+          moduleModel: createdModuleForSlot?.model,
           fixture: preSelectedFixture,
           lidDefUri: createdLidForSlot?.labwareDefURI,
           amount,
@@ -169,9 +167,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     createdAdapterForSlot,
     createdLidForSlot,
     createdTopLabwareForSlot,
-    createdModuleForSlot,
-    preSelectedFixture,
     amount,
+    selectedZoomInSlot,
   ])
 
   const allLabware = Object.values(activeDeckSetup.labware)
