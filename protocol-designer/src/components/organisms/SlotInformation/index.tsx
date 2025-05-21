@@ -133,7 +133,9 @@ function StackInfoList({ title, items }: StackInfoListProps): JSX.Element {
             key={`${title}_${index}`}
             title={title}
             stackInformation={
-              item.count > 1 ? `${item.item} (${item.count})` : item.item
+              item.count > 1
+                ? `${item.item} (amount: ${item.count})`
+                : item.item
             }
           />
         ))
