@@ -6,10 +6,10 @@ import { Well } from './Well'
 
 import type { CSSProperties } from 'styled-components'
 import type { MemoExoticComponent, ReactNode } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export interface FilledWellsProps {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   fillByWell: Record<string, CSSProperties['fill']>
   strokeColor?: string
 }

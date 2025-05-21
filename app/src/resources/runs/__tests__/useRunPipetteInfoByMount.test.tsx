@@ -68,7 +68,7 @@ const TIP_LENGTH_CALIBRATIONS = [
   mockTipLengthCalibration2,
 ]
 
-const tiprack10ul = _tiprack10ul as SharedData.LabwareDefinition2
+const tiprack10ul = _tiprack10ul as SharedData.LabwareDefinition
 const modifiedSimpleV6Protocol = ({
   ..._uncastedModifiedSimpleV6Protocol,
   labware: [

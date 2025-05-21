@@ -55,10 +55,6 @@ describe('useRequiredProtocolLabware', () => {
     expect(result.current[0].labwareDef.metadata.displayName).toEqual(
       '300ul Tiprack FIXTURE'
     )
-    expect(result.current[0].labwareDef.dimensions.xDimension).toBe(127.76)
-    expect(result.current[0].labwareDef.metadata.displayName).toEqual(
-      '300ul Tiprack FIXTURE'
-    )
   })
 
   it('should return empty array when there is no match with protocol id', () => {
