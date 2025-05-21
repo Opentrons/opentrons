@@ -4,12 +4,7 @@ import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  SINGLE_CENTER_SLOT_FIXTURE,
-  SINGLE_LEFT_CUTOUTS,
-  SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_RIGHT_CUTOUTS,
-  SINGLE_RIGHT_SLOT_FIXTURE,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  getReplacmentFixtureForFixtureRemoval,
 } from '@opentrons/shared-data'
 
 // TODO: return the arguments or something - don't instantiate ui in helper code like this
@@ -50,15 +45,10 @@ export function useDeckConfigurationEditingTools(
     cutoutId: CutoutId,
     cutoutFixtureId: CutoutFixtureId
   ): void => {
-    let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
-    if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
-      replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
-    } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-      replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
-    } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
-      replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
-    }
-
+    const replacementFixtureId = getReplacmentFixtureForFixtureRemoval(
+      cutoutFixtureId,
+      cutoutId
+    )
     const fixtureGroup =
       deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
         ?.fixtureGroup ?? {}

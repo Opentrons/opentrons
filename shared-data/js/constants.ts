@@ -1,6 +1,11 @@
 import type { WellOrigin } from '../command'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
-import type { ModuleModel, ModuleType, PositionReference } from './types'
+import type {
+  AreaType,
+  ModuleModel,
+  ModuleType,
+  PositionReference,
+} from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
@@ -304,6 +309,8 @@ export type AddressableAreaNamesWithFakes =
 export type CutoutFixtureIdsWithFakes =
   | CutoutFixtureId
   | FakeStagingAreaRightSlot
+
+export type AreaTypeWithFakes = AreaType | 'fakeStagingSlot'
 
 export const MOVABLE_TRASH_A1_ADDRESSABLE_AREA: 'movableTrashA1' =
   'movableTrashA1'

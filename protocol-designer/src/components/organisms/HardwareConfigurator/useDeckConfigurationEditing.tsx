@@ -7,17 +7,15 @@ import {
   ABSORBANCE_READER_V1_FIXTURE,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getReplacmentFixtureForFixtureRemoval,
   HEATER_SHAKER_CUTOUTS,
   HEATERSHAKER_MODULE_V1,
   HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_MODELS,
-  SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_CUTOUTS,
-  SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_CUTOUTS,
-  SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
@@ -40,6 +38,7 @@ import type { ReactNode } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
   DeckDefinition,
@@ -84,7 +83,7 @@ export function useDeckConfigurationEditing(
   //  onboarding flow where state is stored using react-hook-form
   const removeFixtureFromCutoutForOnboarding = (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ): void => {
     const thermocyclerCutoutFixtureId =
       cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
@@ -318,15 +317,11 @@ export const getAvailableOptions = (
 export const getNewConfig = (
   cutoutId: CutoutId,
   deckConfig: DeckConfiguration,
-  cutoutFixtureId: CutoutFixtureId,
+  cutoutFixtureId: CutoutFixtureIdsWithFakes,
   deckDef: DeckDefinition
 ): DeckConfiguration => {
-  let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
-  if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-    replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
-    replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
-  }
+  
+  const replacementFixtureId = getReplacmentFixtureForFixtureRemoval(cutoutFixtureId, cutoutId)
 
   const fixtureGroup =
     deckDef.cutoutFixtures.find(({ id }) => id === cutoutFixtureId)

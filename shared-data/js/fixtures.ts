@@ -36,6 +36,10 @@ import {
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_LEFT_CUTOUTS,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_CUTOUTS,
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
@@ -60,7 +64,7 @@ import type {
   CutoutId,
   OT2CutoutId,
 } from '../deck'
-import type { CutoutFixtureIdsWithFakes } from './constants'
+import type { AreaTypeWithFakes, CutoutFixtureIdsWithFakes } from './constants'
 import type {
   AddressableArea,
   AreaType,
@@ -264,6 +268,20 @@ export const getCutoutFixtureReplacementIfNeeded = (
   return cutoutFixtureId
 }
 
+export const getReplacmentFixtureForFixtureRemoval = (
+  cutoutFixtureId: CutoutFixtureIdsWithFakes,
+  cutoutId: CutoutId
+): CutoutFixtureId => {
+  if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
+  } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
+  } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
+    return SINGLE_LEFT_SLOT_FIXTURE
+  }
+  return SINGLE_CENTER_SLOT_FIXTURE
+}
+
 export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
   cutoutFixtures: CutoutConfig[],
   deckDefinition: DeckDefinition
@@ -293,7 +311,7 @@ export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
 export const filterAAByAreaType = (
   cutoutFixtures: CutoutConfigMap[],
   deckDef: DeckDefinition,
-  areaType: AreaType
+  areaType: AreaTypeWithFakes
 ): CutoutConfigMap[] => {
   const deckDefWithFakeLocations = getDeckDefAAWithFakeAA(deckDef)
   return cutoutFixtures.filter(({ addressableAreaId }) => {
@@ -307,6 +325,7 @@ const getDeckDefAAWithFakeAA = (
   deckDefinition: DeckDefinition
 ): DeckDefinition => {
   const locationsWithFakeAA = deckDefinition.locations.addressableAreas.concat(
+    // @ts-expect-error JSON objects not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
     FAKE_FIXTURES_AND_AA.locations.addressableAreas as AddressableArea[]
   )
   return {
