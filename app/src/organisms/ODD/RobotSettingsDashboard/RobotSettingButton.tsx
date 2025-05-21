@@ -1,11 +1,11 @@
-// import { css } from '@emotion/react'
-import { css } from '@emotion/react'
+// // import { css } from '@emotion/react' // Keep this if you still need the css helper for other things
+import styled from '@emotion/styled' // Import styled
 
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
-  Btn,
+  Btn, // Keep Btn
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -23,7 +23,17 @@ import {
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 
-const SETTING_BUTTON_STYLE = css`
+interface RobotSettingButtonProps {
+  settingName: string
+  onClick: MouseEventHandler
+  iconName?: IconName
+  settingInfo?: string
+  rightElement?: ReactNode
+  dataTestId?: string
+}
+
+// Create a styled version of Btn
+const StyledButton = styled(Btn)`
   width: 100%;
   margin-bottom: ${SPACING.spacing8};
   background-color: ${COLORS.grey35};
@@ -35,15 +45,6 @@ const SETTING_BUTTON_STYLE = css`
   }
 `
 
-interface RobotSettingButtonProps {
-  settingName: string
-  onClick: MouseEventHandler
-  iconName?: IconName
-  settingInfo?: string
-  rightElement?: ReactNode
-  dataTestId?: string
-}
-
 export function RobotSettingButton({
   settingName,
   iconName,
@@ -53,11 +54,11 @@ export function RobotSettingButton({
   dataTestId,
 }: RobotSettingButtonProps): JSX.Element {
   return (
-    <Btn
-      css={SETTING_BUTTON_STYLE}
+    // Use the StyledButton instead of Btn with a css prop
+    <StyledButton
       onClick={onClick}
-      display={DISPLAY_FLEX}
-      flexDirection={DIRECTION_ROW}
+      display={DISPLAY_FLEX} // These props should ideally be handled by the Btn component itself
+      flexDirection={DIRECTION_ROW} // or incorporated into the styled block if they are static
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       data-testid={dataTestId}
@@ -100,6 +101,6 @@ export function RobotSettingButton({
           <Icon name="more" size="3rem" color={COLORS.black90} />
         </Flex>
       )}
-    </Btn>
+    </StyledButton>
   )
 }

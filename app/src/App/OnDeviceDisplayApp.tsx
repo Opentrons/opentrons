@@ -186,7 +186,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname="10.14.19.224">
+    <ApiHostProvider hostname="127.0.0.1">
       <ReactQueryDevtools />
       <InitialLoadingScreen>
         <LocalizationProvider>
