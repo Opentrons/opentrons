@@ -88,6 +88,10 @@ const HAS_SETUP_INSTRUCTIONS_TYPE: ModuleType[] = [
   FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
 ]
+const NO_CALIBRATION_TYPE: ModuleType[] = [
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+]
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -117,7 +121,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     handleModuleApiRequests,
   } = props
   const dispatch = useDispatch<Dispatch>()
-
   const {
     menuOverlay,
     handleOverflowClick,
@@ -134,18 +137,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showAboutModule, setShowAboutModule] = useState(false)
   const [showTestShake, setShowTestShake] = useState(false)
   const [showSetupWizard, setShowSetupWizard] = useState(false)
+  const [showFWBanner, setShowFWBanner] = useState(true)
   const [showCalModal, setShowCalModal] = useState(false)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const runStatus = useCurrentRunStatus()
-  const isFlex = useIsFlex(robotName)
-  const requireModuleCalibration =
-    isFlex &&
-    !MODULE_MODELS_OT2_ONLY.some(modModel => modModel === module.moduleModel) &&
-    module.moduleType !== ABSORBANCE_READER_TYPE &&
-    module.moduleType !== FLEX_STACKER_MODULE_TYPE &&
-    module.moduleOffset?.last_modified == null
+
   const isPipetteReady =
     !Boolean(attachPipetteRequired) &&
     !Boolean(calibratePipetteRequired) &&
@@ -178,27 +176,37 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   const isPending = latestRequest?.status === PENDING
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
+  const isFlex = useIsFlex(robotName)
+  const deckConfig = useNotifyDeckConfigurationQuery().data
+
+  const getSetupWizardFlow = (): {
+    requireModuleCalibration: boolean
+    requireModuleSetup: boolean
+  } => {
+    if (!isFlex)
+      return { requireModuleCalibration: false, requireModuleSetup: false }
+    if (NO_CALIBRATION_TYPE.includes(module.moduleType)) {
+      return {
+        requireModuleCalibration: false,
+        requireModuleSetup: !deckConfig?.some(
+          c => c.opentronsModuleSerialNumber === module.serialNumber
+        ),
+      }
+    }
+    return {
+      requireModuleCalibration:
+        !MODULE_MODELS_OT2_ONLY.some(
+          modModel => modModel === module.moduleModel
+        ) && module.moduleOffset?.last_modified == null,
+      requireModuleSetup: false,
+    }
+  }
+  const { requireModuleCalibration, requireModuleSetup } = getSetupWizardFlow()
 
   const isOverflowBtnDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
-  const deckConfig = useNotifyDeckConfigurationQuery().data
-  const isDeckConfigured =
-    deckConfig != null
-      ? deckConfig
-          .filter(c => c.opentronsModuleSerialNumber)
-          .map(c => c.opentronsModuleSerialNumber)
-          .includes(module.serialNumber)
-      : false
-
   const isTooHot = getModuleTooHot(module)
-  const needsCalibration =
-    !isPending && isPipetteReady && requireModuleCalibration
-  const needsDeckConfig = isFlex && !isDeckConfigured
-  const needsSetup =
-    !isPending &&
-    !requireModuleCalibration &&
-    (module.hasAvailableUpdate || needsDeckConfig)
 
   let moduleData: JSX.Element = <div></div>
   switch (module.moduleType) {
@@ -271,7 +279,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowSetupWizard(true)
   }
 
-  const handleCalibrateClick = (): void => {
+  const handleSetupClick = (): void => {
     setShowCalModal(true)
   }
 
@@ -358,29 +366,26 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 errorMessage={getErrorResponseMessage(latestRequest.error)}
               />
             )}
-            {needsCalibration ? (
+            {!isPending && (requireModuleCalibration || requireModuleSetup) ? (
               <UpdateBanner
                 robotName={robotName}
-                updateType="calibration"
+                updateType={requireModuleCalibration ? 'calibration' : 'setup'}
                 serialNumber={module.serialNumber}
-                handleUpdateClick={handleCalibrateClick}
+                handleUpdateClick={handleSetupClick}
                 attachPipetteRequired={attachPipetteRequired}
                 calibratePipetteRequired={calibratePipetteRequired}
                 updatePipetteFWRequired={updatePipetteFWRequired}
                 isTooHot={isTooHot}
               />
-            ) : null}
-            {needsSetup ? (
+            ) : !isPending && module.hasAvailableUpdate && showFWBanner ? (
               <UpdateBanner
                 robotName={robotName}
-                updateType={needsDeckConfig ? 'setup' : 'firmware'}
+                updateType="firmware"
                 serialNumber={module.serialNumber}
-                handleUpdateClick={
-                  needsDeckConfig
-                    ? handleCalibrateClick
-                    : handleFirmwareUpdateClick
-                }
-                isTooHot={isTooHot}
+                handleUpdateClick={handleFirmwareUpdateClick}
+                handleCloseClick={() => {
+                  setShowFWBanner(false)
+                }}
               />
             ) : null}
             {isTooHot ? (
@@ -505,7 +510,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleInstructionsClick={handleInstructionsClick}
-              handleCalibrateClick={handleCalibrateClick}
+              handleCalibrateClick={handleSetupClick}
             />
           </Box>
           {menuOverlay}

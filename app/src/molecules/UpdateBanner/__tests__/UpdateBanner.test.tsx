@@ -53,7 +53,7 @@ describe('Module Update Banner', () => {
     screen.getByText('Setup module')
   })
 
-  it('renders an error banner if a module setup is required with no exit button', () => {
+  it('renders an alert banner if a module setup is required with no exit button', () => {
     props = {
       ...props,
       updateType: 'setup',
@@ -66,15 +66,16 @@ describe('Module Update Banner', () => {
     screen.getByText('Setup module')
   })
 
-  it('renders an error banner if a module firmware is required with no exit button', () => {
+  it('renders an alert banner if a module firmware is available with exit button', () => {
     props = {
       ...props,
       updateType: 'firmware',
+      handleCloseClick: vi.fn(),
     }
     render(props)
     screen.getByTestId('ModuleCard_firmware_update_banner_test_number')
     screen.getByTestId('InlineNotification_alert')
-    expect(screen.queryByLabelText('close_icon')).not.toBeInTheDocument()
+    screen.queryByLabelText('close_icon')
     screen.getByText('Firmware update available..')
     screen.getByText('Update now')
   })

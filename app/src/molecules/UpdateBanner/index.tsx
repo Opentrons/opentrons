@@ -19,6 +19,7 @@ interface UpdateBannerProps {
   attachPipetteRequired?: boolean
   calibratePipetteRequired?: boolean
   updatePipetteFWRequired?: boolean
+  handleCloseClick?: () => void
 }
 
 export const UpdateBanner = ({
@@ -30,6 +31,7 @@ export const UpdateBanner = ({
   calibratePipetteRequired,
   updatePipetteFWRequired,
   isTooHot,
+  handleCloseClick,
 }: UpdateBannerProps): JSX.Element | null => {
   const { t } = useTranslation(['device_details', 'module_wizard_flows'])
   const [targetProps, tooltipProps] = useHoverTooltip({ placement: 'top' })
@@ -91,6 +93,7 @@ export const UpdateBanner = ({
         linkText={getLinkText()}
         onLinkClick={handleUpdateClick}
         minWidth="12.625rem"
+        onCloseClick={handleCloseClick}
       />
       {isTooHot ? (
         <Tooltip tooltipProps={tooltipProps}>
