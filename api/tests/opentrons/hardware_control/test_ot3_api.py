@@ -525,7 +525,6 @@ async def test_gantry_load_transform(
     load_configs: LoadConfigs,
     load: GantryLoad,
 ) -> None:
-
     for pair in load_configs:
         if pair[0] == OT3Mount.GRIPPER:
             gripper_config = gc.load(pair[1]["model"])
@@ -918,7 +917,6 @@ async def test_liquid_probe(
     with patch.object(
         hardware_backend, "liquid_probe", AsyncMock(spec=hardware_backend.liquid_probe)
     ) as mock_liquid_probe:
-
         # make sure aspirate while sensing reverses direction
         mock_liquid_probe.return_value = 140
         fake_settings_aspirate = LiquidProbeSettings(
@@ -1012,7 +1010,6 @@ async def test_liquid_probe_plunger_moves(
     with patch.object(
         hardware_backend, "liquid_probe", AsyncMock(spec=hardware_backend.liquid_probe)
     ) as mock_liquid_probe:
-
         mock_liquid_probe.side_effect = [
             PipetteLiquidNotFoundError,
             PipetteLiquidNotFoundError,
@@ -1122,7 +1119,6 @@ async def test_liquid_probe_mount_moves(
     with patch.object(
         hardware_backend, "liquid_probe", AsyncMock(spec=hardware_backend.liquid_probe)
     ):
-
         fake_max_z_dist = 10.0
         config = ot3_hardware.config.liquid_sense
         mount_speed = config.mount_speed
@@ -1569,7 +1565,6 @@ async def test_gripper_action_works_with_gripper(
     gripper_present: None,
     needs_calibration: bool,
 ) -> None:
-
     gripper_config = gc.load(GripperModel.v1)
     instr_data = AttachedGripper(config=gripper_config, id="test")
     ot3_hardware._backend._attached_instruments[OT3Mount.GRIPPER] = {
@@ -1998,7 +1993,6 @@ async def test_move_axes(
     input_position: Dict[Axis, float],
     expected_move_pos: OrderedDict[Axis, float],
 ) -> None:
-
     await ot3_hardware.move_axes(position=input_position)
     mock_check_motor.return_value = True
 
@@ -2019,7 +2013,6 @@ async def test_move_expect_stall_flag(
     mock_backend_move: AsyncMock,
     expect_stalls: bool,
 ) -> None:
-
     expected = HWStopCondition.stall if expect_stalls else HWStopCondition.none
 
     await ot3_hardware.move_to(Mount.LEFT, Point(0, 0, 0), expect_stalls=expect_stalls)
@@ -2303,7 +2296,6 @@ async def test_update_position_estimation(
 async def test_refresh_positions(
     ot3_hardware: ThreadManager[OT3API], hardware_backend: OT3Simulator
 ) -> None:
-
     ot3_hardware._current_position.clear()
     ot3_hardware._encoder_position.clear()
 
@@ -2320,7 +2312,6 @@ async def test_refresh_positions(
         "update_encoder_position",
         AsyncMock(spec=hardware_backend.update_encoder_position),
     ) as mock_encoder:
-
         mock_pos.return_value = {ax: 100 for ax in Axis}
         mock_encoder.return_value = {ax: 99 for ax in Axis}
 
@@ -2392,7 +2383,6 @@ async def test_home_axis(
             wraps=hardware_backend.update_motor_estimation,
         ),
     ) as mock_estimate:
-
         await ot3_hardware._home_axis(axis)
 
         if not stepper_ok and encoder_ok:
