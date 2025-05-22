@@ -64,14 +64,18 @@ import type {
   CutoutId,
   OT2CutoutId,
 } from '../deck'
-import type { AreaTypeWithFakes, CutoutFixtureIdsWithFakes } from './constants'
+import type { AddressableAreaNamesWithFakes, AddressableAreaWithFakes, AreaTypeWithFakes, CutoutFixtureIdsWithFakes } from './constants'
 import type {
   AddressableArea,
   CoordinateTuple,
   CutoutConfig,
   CutoutFixture,
   DeckDefinition,
+  FakeCutoutFixture,
+  FakeAddressableArea,
+  CutoutFixtureWithFakes,
   ModuleModel,
+  DeckDefinitionWithFakes,
 } from './types'
 
 export function getCutoutDisplayName(cutout: CutoutId): string {
@@ -203,7 +207,7 @@ export const FAKE_FIXTURES_AND_AA = {
       height: 0,
     },
   ],
-} as const
+}
 
 // TODO(jh 01-15-25): Instead of typing slotId as `string`, type it as `AddressableAreaName`.
 // returns the position associated with a slot id
@@ -248,7 +252,7 @@ export function getAddressableAreaFromSlotId(
 }
 
 interface CutoutConfigMap extends CutoutConfig {
-  addressableAreaId: AddressableAreaName
+  addressableAreaId: AddressableAreaNamesWithFakes
 }
 
 export const getCutoutFixtureReplacementIfNeeded = (
@@ -319,10 +323,9 @@ export const filterAAByAreaType = (
 
 const getDeckDefAAWithFakeAA = (
   deckDefinition: DeckDefinition
-): DeckDefinition => {
-  const locationsWithFakeAA = deckDefinition.locations.addressableAreas.concat(
-    // @ts-expect-error JSON objects not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
-    FAKE_FIXTURES_AND_AA.locations.addressableAreas as AddressableArea[]
+): DeckDefinitionWithFakes => {
+  const locationsWithFakeAA : AddressableAreaWithFakes[] = deckDefinition.locations.addressableAreas.concat(
+    FAKE_FIXTURES_AND_AA.locations.addressableAreas as any
   )
   return {
     ...deckDefinition,
@@ -334,12 +337,12 @@ const getDeckDefAAWithFakeAA = (
 }
 
 export const getAALocationForCutoutAndFixtureId = (
-  addressableArea: AddressableAreaName,
+  addressableArea: AddressableAreaNamesWithFakes,
   deckDefinition: DeckDefinition
 ): CoordinateTuple => {
   const deckDefWithFakeLocations = getDeckDefAAWithFakeAA(deckDefinition)
   const addressableAreaItem = deckDefWithFakeLocations.locations.addressableAreas.find(
-    (aaItem: AddressableArea) => aaItem.id === addressableArea
+    (aaItem: AddressableAreaWithFakes) => aaItem.id === addressableArea
   )
   if (addressableAreaItem == null) {
     console.error(`Addressable area ${addressableArea} location was not found.`)
@@ -351,12 +354,12 @@ export const getAAFromCutoutFixtureId = (
   inputCutoutId: CutoutId,
   cutoutFixtureId: CutoutFixtureIdsWithFakes,
   deckDefinition: DeckDefinition
-): AddressableAreaName[] | null => {
+): AddressableAreaNamesWithFakes[] | null => {
   /**
    * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
    */
-  const cutoutFixturesWithFakeFixtures = deckDefinition.cutoutFixtures.concat(
-    FAKE_FIXTURES_AND_AA.cutoutFixtures as CutoutFixture[]
+  const cutoutFixturesWithFakeFixtures : CutoutFixtureWithFakes[] = deckDefinition.cutoutFixtures.concat(
+    FAKE_FIXTURES_AND_AA.cutoutFixtures as any
   )
   const deckDefWithFakeCutoutFixtures = {
     ...deckDefinition,

@@ -4,6 +4,10 @@ import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
+  AddressableAreaNamesWithFakes,
+  AddressableAreaWithFakes,
+  AreaTypeWithFakes,
+  CutoutFixtureIdsWithFakes,
   EXTENSION,
   FLEX,
   FLEX_STACKER_MODULE_TYPE,
@@ -414,6 +418,15 @@ export interface CutoutFixture {
   height: number
 }
 
+type cuoutFixtureOmit = Omit<CutoutFixture, 'id' | 'providesAddressableAreas'>
+
+export interface FakeCutoutFixture extends cuoutFixtureOmit{
+  id: CutoutFixtureIdsWithFakes
+  providesAddressableAreas: Record<CutoutId, AddressableAreaNamesWithFakes[]>
+}
+
+export type CutoutFixtureWithFakes = FakeCutoutFixture | CutoutFixture
+
 export type AreaType =
   | 'slot'
   | 'movableTrash'
@@ -438,6 +451,13 @@ export interface AddressableArea {
   ableToDropLabware?: boolean
   ableToDropTips?: boolean
   matingSurfaceUnitVector?: UnitVectorTuple
+}
+
+type addressableAreaWithoutId = Omit<AddressableArea, 'id' | 'areaType'>
+
+export interface FakeAddressableArea extends addressableAreaWithoutId {
+  id: AddressableAreaNamesWithFakes
+  areaType: AreaTypeWithFakes
 }
 
 export interface DeckMetadata {
@@ -465,6 +485,12 @@ export interface DeckLocations {
   legacyFixtures: LegacyFixture[]
 }
 
+type DeckLocationsWithoutAA = Omit<DeckLocations, 'addressableAreas'>
+
+export interface DeckLocationsWithFakes extends DeckLocationsWithoutAA{
+  addressableAreas: AddressableAreaWithFakes[]
+}
+
 export interface DeckDefinition {
   otId: string
   cornerOffsetFromOrigin: CoordinateTuple
@@ -473,6 +499,13 @@ export interface DeckDefinition {
   locations: DeckLocations
   metadata: DeckMetadata
   cutoutFixtures: CutoutFixture[]
+}
+
+type DeckDefinitionWithoutLocationsAndFixture = Omit<DeckDefinition, 'locations' | 'cutoutFixtures'>
+
+export interface DeckDefinitionWithFakes extends DeckDefinitionWithoutLocationsAndFixture {
+  locations: DeckLocationsWithFakes
+  cutoutFixtures: CutoutFixtureWithFakes[]
 }
 
 export interface ModuleDimensions {

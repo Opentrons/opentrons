@@ -4,7 +4,7 @@ import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getReplacmentFixtureForFixtureRemoval,
+  getReplacementFixtureForFixtureRemoval,
 } from '@opentrons/shared-data'
 
 // TODO: return the arguments or something - don't instantiate ui in helper code like this

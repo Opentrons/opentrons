@@ -1,7 +1,9 @@
 import type { WellOrigin } from '../command'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
+  AddressableArea,
   AreaType,
+  FakeAddressableArea,
   ModuleModel,
   ModuleType,
   PositionReference,
@@ -305,6 +307,10 @@ export type FakeStagingAreaRightSlot = 'fakeStagingAreaRightSlot'
 export type AddressableAreaNamesWithFakes =
   | AddressableAreaName
   | FlexFakeAddressableAreaName
+
+export type AddressableAreaWithFakes = 
+| AddressableArea
+| FakeAddressableArea
 
 export type CutoutFixtureIdsWithFakes =
   | CutoutFixtureId
