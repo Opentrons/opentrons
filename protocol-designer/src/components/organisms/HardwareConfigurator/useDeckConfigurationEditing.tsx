@@ -7,7 +7,7 @@ import {
   ABSORBANCE_READER_V1_FIXTURE,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getReplacmentFixtureForFixtureRemoval,
+  getReplacementFixtureForFixtureRemoval,
   HEATER_SHAKER_CUTOUTS,
   HEATERSHAKER_MODULE_V1,
   HEATERSHAKER_MODULE_V1_FIXTURE,
