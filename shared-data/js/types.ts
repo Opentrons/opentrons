@@ -420,7 +420,7 @@ export interface CutoutFixture {
 
 type cuoutFixtureOmit = Omit<CutoutFixture, 'id' | 'providesAddressableAreas'>
 
-export interface FakeCutoutFixture extends cuoutFixtureOmit{
+export interface FakeCutoutFixture extends cuoutFixtureOmit {
   id: CutoutFixtureIdsWithFakes
   providesAddressableAreas: Record<CutoutId, AddressableAreaNamesWithFakes[]>
 }
@@ -487,7 +487,7 @@ export interface DeckLocations {
 
 type DeckLocationsWithoutAA = Omit<DeckLocations, 'addressableAreas'>
 
-export interface DeckLocationsWithFakes extends DeckLocationsWithoutAA{
+export interface DeckLocationsWithFakes extends DeckLocationsWithoutAA {
   addressableAreas: AddressableAreaWithFakes[]
 }
 
@@ -501,9 +501,13 @@ export interface DeckDefinition {
   cutoutFixtures: CutoutFixture[]
 }
 
-type DeckDefinitionWithoutLocationsAndFixture = Omit<DeckDefinition, 'locations' | 'cutoutFixtures'>
+type DeckDefinitionWithoutLocationsAndFixture = Omit<
+  DeckDefinition,
+  'locations' | 'cutoutFixtures'
+>
 
-export interface DeckDefinitionWithFakes extends DeckDefinitionWithoutLocationsAndFixture {
+export interface DeckDefinitionWithFakes
+  extends DeckDefinitionWithoutLocationsAndFixture {
   locations: DeckLocationsWithFakes
   cutoutFixtures: CutoutFixtureWithFakes[]
 }

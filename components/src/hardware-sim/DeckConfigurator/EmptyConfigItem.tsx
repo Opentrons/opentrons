@@ -21,7 +21,7 @@ import {
 } from './constants'
 
 import type {
-  AddressableAreaName,
+  AddressableAreaNamesWithFakes,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
@@ -29,7 +29,7 @@ import type {
 interface EmptyConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  addressableArea: AddressableAreaName
+  addressableArea: AddressableAreaNamesWithFakes
   handleClickAdd: (fixtureLocation: CutoutId) => void
 }
 

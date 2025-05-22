@@ -18,8 +18,8 @@ import {
 } from './constants'
 
 import type {
-  AddressableAreaName,
-  CutoutFixtureId,
+  AddressableAreaNamesWithFakes,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckCutout,
   DeckDefinition,
@@ -28,14 +28,14 @@ import type {
 interface FlexStackerItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  cutoutFixtureId: CutoutFixtureId
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
   hasWasteChute: boolean
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
   selected?: boolean
-  addressableArea: AddressableAreaName
+  addressableArea: AddressableAreaNamesWithFakes
 }
 
 export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {

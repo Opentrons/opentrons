@@ -308,9 +308,7 @@ export type AddressableAreaNamesWithFakes =
   | AddressableAreaName
   | FlexFakeAddressableAreaName
 
-export type AddressableAreaWithFakes = 
-| AddressableArea
-| FakeAddressableArea
+export type AddressableAreaWithFakes = AddressableArea | FakeAddressableArea
 
 export type CutoutFixtureIdsWithFakes =
   | CutoutFixtureId

@@ -19,7 +19,7 @@ import {
 } from './constants'
 
 import type {
-  CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
@@ -29,10 +29,10 @@ import type {
 interface HeaterShakerItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  cutoutFixtureId: CutoutFixtureId
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
   selected?: boolean
 }

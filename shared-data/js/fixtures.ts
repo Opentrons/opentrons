@@ -64,18 +64,23 @@ import type {
   CutoutId,
   OT2CutoutId,
 } from '../deck'
-import type { AddressableAreaNamesWithFakes, AddressableAreaWithFakes, AreaTypeWithFakes, CutoutFixtureIdsWithFakes } from './constants'
+import type {
+  AddressableAreaNamesWithFakes,
+  AddressableAreaWithFakes,
+  AreaTypeWithFakes,
+  CutoutFixtureIdsWithFakes,
+} from './constants'
 import type {
   AddressableArea,
   CoordinateTuple,
   CutoutConfig,
   CutoutFixture,
-  DeckDefinition,
-  FakeCutoutFixture,
-  FakeAddressableArea,
   CutoutFixtureWithFakes,
-  ModuleModel,
+  DeckDefinition,
   DeckDefinitionWithFakes,
+  FakeAddressableArea,
+  FakeCutoutFixture,
+  ModuleModel,
 } from './types'
 
 export function getCutoutDisplayName(cutout: CutoutId): string {
@@ -251,8 +256,11 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
-interface CutoutConfigMap extends CutoutConfig {
+type CutoutConfigWithoutCutoutFixtureId = Omit<CutoutConfig, 'cutoutFixtureId'>
+
+interface CutoutConfigMap extends CutoutConfigWithoutCutoutFixtureId {
   addressableAreaId: AddressableAreaNamesWithFakes
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
 }
 
 export const getCutoutFixtureReplacementIfNeeded = (
@@ -301,7 +309,7 @@ export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
       acc.push({
         ...obj,
         addressableAreaId: item,
-        // cutoutFixtureId: cutoutFixtureReplacment,
+        cutoutFixtureId: cutoutFixtureReplacment,
       })
     })
     return acc
@@ -324,7 +332,7 @@ export const filterAAByAreaType = (
 const getDeckDefAAWithFakeAA = (
   deckDefinition: DeckDefinition
 ): DeckDefinitionWithFakes => {
-  const locationsWithFakeAA : AddressableAreaWithFakes[] = deckDefinition.locations.addressableAreas.concat(
+  const locationsWithFakeAA: AddressableAreaWithFakes[] = deckDefinition.locations.addressableAreas.concat(
     FAKE_FIXTURES_AND_AA.locations.addressableAreas as any
   )
   return {
@@ -358,7 +366,7 @@ export const getAAFromCutoutFixtureId = (
   /**
    * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
    */
-  const cutoutFixturesWithFakeFixtures : CutoutFixtureWithFakes[] = deckDefinition.cutoutFixtures.concat(
+  const cutoutFixturesWithFakeFixtures: CutoutFixtureWithFakes[] = deckDefinition.cutoutFixtures.concat(
     FAKE_FIXTURES_AND_AA.cutoutFixtures as any
   )
   const deckDefWithFakeCutoutFixtures = {

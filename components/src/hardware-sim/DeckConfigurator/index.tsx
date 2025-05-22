@@ -25,6 +25,7 @@ import { WasteChuteConfigFixture } from './WasteChuteConfigItem'
 import type { ReactNode } from 'react'
 import type {
   CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
@@ -36,7 +37,7 @@ interface DeckConfiguratorProps {
   handleClickAdd: (cutoutId: CutoutId) => void
   handleClickRemove: (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
   lightFill?: string
   darkFill?: string

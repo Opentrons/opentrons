@@ -18,8 +18,9 @@ import {
 } from './constants'
 
 import type {
-  AddressableAreaName,
+  AddressableAreaNamesWithFakes,
   CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
@@ -27,11 +28,11 @@ import type {
 interface StagingAreaConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  cutoutFixtureId: CutoutFixtureId
-  addressableArea: AddressableAreaName
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
+  addressableArea: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
   selected?: boolean
 }

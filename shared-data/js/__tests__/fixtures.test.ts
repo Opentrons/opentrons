@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import { FAKE_STAGING_AREA_RIGHT_SLOT, FLEX_ROBOT_TYPE, SINGLE_RIGHT_SLOT_FIXTURE, STAGING_AREA_RIGHT_SLOT_FIXTURE } from '..'
-import { getAAFromCutoutFixtureId, getCutoutFixtureReplacementIfNeeded } from '../fixtures'
+import {
+  FAKE_STAGING_AREA_RIGHT_SLOT,
+  FLEX_ROBOT_TYPE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+} from '..'
+import {
+  getAAFromCutoutFixtureId,
+  getCutoutFixtureReplacementIfNeeded,
+} from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
 
 describe('getAAFromCutoutFixtureId', () => {
