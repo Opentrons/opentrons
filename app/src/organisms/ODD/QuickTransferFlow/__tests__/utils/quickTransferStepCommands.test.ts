@@ -325,6 +325,7 @@ pipette.drop_tip()
       sourceWell: 'A1',
       destWells: ['A1', 'B1'],
       blowoutFlowRateUlSec: 50,
+      conditioningVolume: null,
       touchTipAfterAspirateMmFromEdge: null,
       liquidClass: null,
       aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
@@ -402,21 +403,20 @@ pipette.drop_tip()
 # DISTRIBUTE STEP
 
 pipette.pick_up_tip(location=mock_tiprack_1)
-pipette.aspirate(
-    volume=20,
-    location=mock_labware_1["A1"].bottom(z=-1),
-    flow_rate=56,
-)
-pipette.dispense(
-    volume=10,
-    location=mock_labware_2["A1"].bottom(z=-1),
-    flow_rate=80,
-)
-pipette.dispense(
-    volume=10,
-    location=mock_labware_2["B1"].bottom(z=-1),
-    flow_rate=80,
-)
+pipette.move_to(mock_labware_1["A1"].top(z=2))
+pipette.prepare_to_aspirate()
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.aspirate(volume=20, flow_rate=56)
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_2["A1"].bottom())
+pipette.move_to(mock_labware_2["A1"].bottom())
+pipette.dispense(volume=10, flow_rate=80, push_out=0)
+pipette.move_to(mock_labware_2["A1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.dispense(volume=10, flow_rate=80)
+pipette.move_to(mock_labware_2["B1"].bottom())
 pipette.drop_tip()
 `.trim()
     )

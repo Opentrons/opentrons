@@ -91,7 +91,6 @@ export const migrateAndMatchSnapshot = ({
     cy.get('div').contains(ContentStrings.unusedHardwareWarning).should('exist')
     cy.contains(ContentStrings.continueWithExport).click({ force: true })
   }
-
   const expectedProtocol: TestFile = getTestFile(expectedTestFile)
 
   cy.readFile(expectedProtocol.path).then(expectedProtocolRead => {
