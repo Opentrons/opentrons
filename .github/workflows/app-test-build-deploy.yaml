@@ -58,7 +58,6 @@ jobs:
     steps:
       - uses: 'actions/checkout@v4'
       - uses: ./.github/actions/js/setup
-      - uses: ./.github/actions/environment/complex-variables
       - name: 'test frontend packages'
         run: |
           make -C app test-cov
