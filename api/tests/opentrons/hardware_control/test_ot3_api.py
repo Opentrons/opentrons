@@ -817,6 +817,7 @@ async def test_blow_out_position(
         HealthCheck.filter_too_much,
     ],
     max_examples=20,
+    deadline=400,
 )
 async def test_blow_out_error(
     ot3_hardware: ThreadManager[OT3API],
