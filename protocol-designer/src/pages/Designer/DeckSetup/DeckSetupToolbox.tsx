@@ -300,7 +300,12 @@ export function DeckSetupToolbox(
                       createdStackForSlot[createdStackForSlot.length - 1]
                     ]
                   }
-                  lidDisplayName={createdLidForSlot?.def.metadata.displayName}
+                  lidDisplayName={
+                    createdLidForSlot != null &&
+                    createdStackForSlot.includes(createdLidForSlot?.id)
+                      ? undefined
+                      : createdLidForSlot?.def.metadata.displayName
+                  }
                   quantity={createdStackForSlot.length}
                 />
               ) : null}

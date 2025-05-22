@@ -80,7 +80,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     editButton = t('edit_quantity')
   } else if (!isAdapterOrTiprack && canModifyQuantity && enableStacking) {
     editButton = t('edit_liquid_and_quantity')
-  } else if (!isAdapterOrTiprack) {
+  } else if (!isAdapterOrTiprack || (isLid && !canModifyQuantity)) {
     editButton = t('edit_liquid')
   }
 

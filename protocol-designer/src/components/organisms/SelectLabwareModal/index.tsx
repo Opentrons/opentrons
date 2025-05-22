@@ -30,6 +30,7 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getAreSlotsHorizontallyAdjacent,
   getIsLabwareAboveHeight,
   getLabwareDefIsStandard,
@@ -85,6 +86,7 @@ const STANDARD_Y_DIMENSION = 85.48
 const STACKING_LOADNAMES = [
   'opentrons_flex_deck_riser',
   'opentrons_flex_tiprack_lid',
+  'opentrons_tough_pcr_auto_sealing_lid',
 ]
 const PLATE_READER_LOADNAME =
   'opentrons_flex_lid_absorbance_plate_reader_module'
@@ -162,6 +164,7 @@ export function SelectLabwareModal(
   const modulesById = deckSetup.modules
   const moduleType =
     selectedModuleModel != null ? getModuleType(selectedModuleModel) : null
+  const onFlexStacker = moduleType === FLEX_STACKER_MODULE_TYPE
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
@@ -428,6 +431,8 @@ export function SelectLabwareModal(
                   {filteredLabwareByCategory[CUSTOM_CATEGORY].map(
                     ({ uri }, index) => (
                       <CustomizeExpandButton
+                        loadName={customLabwareDefs[uri].parameters.loadName}
+                        allowInputField={onFlexStacker}
                         key={`${index}_${uri}`}
                         id={`${index}_${uri}`}
                         buttonText={customLabwareDefs[uri].metadata.displayName}
@@ -531,6 +536,12 @@ export function SelectLabwareModal(
                                   key={`${index}_${category}_${loadName}`}
                                 >
                                   <CustomizeExpandButton
+                                    loadName={loadName}
+                                    allowInputField={
+                                      onFlexStacker ||
+                                      loadName ===
+                                        'opentrons_tough_pcr_auto_sealing_lid'
+                                    }
                                     stackingProps={stackingProps ?? undefined}
                                     id={`${index}_${category}_${loadName}`}
                                     buttonText={def.metadata.displayName}
@@ -600,6 +611,8 @@ export function SelectLabwareModal(
                                                     defs[tiprackDefUri]
                                                   return (
                                                     <CustomizeExpandButton
+                                                      loadName={loadName}
+                                                      allowInputField={false}
                                                       key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                       id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                       buttonText={
@@ -687,6 +700,15 @@ export function SelectLabwareModal(
 
                                                 return (
                                                   <CustomizeExpandButton
+                                                    loadName={
+                                                      nestedDef.parameters
+                                                        .loadName
+                                                    }
+                                                    allowInputField={
+                                                      nestedDef.parameters
+                                                        .loadName ===
+                                                      'opentrons_tough_pcr_auto_sealing_lid'
+                                                    }
                                                     stackingProps={
                                                       stackingProps ?? undefined
                                                     }

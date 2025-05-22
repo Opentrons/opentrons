@@ -12,7 +12,10 @@ import type { ChangeEvent, ChangeEventHandler, MouseEvent } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 
-const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
+const LID_LOADNAMES = [
+  'opentrons_flex_tiprack_lid',
+  'opentrons_tough_pcr_auto_sealing_lid',
+]
 
 export interface StackingProps {
   onInputFieldChange: (e: ChangeEvent<HTMLInputElement>) => void
@@ -27,6 +30,8 @@ export interface StackingProps {
 }
 
 interface CustomizeExpandButtonProps extends StyleProps {
+  allowInputField: boolean
+  loadName: string
   buttonText: string
   buttonValue: string | number
   onChange: ChangeEventHandler<HTMLInputElement>
@@ -48,9 +53,13 @@ export function CustomizeExpandButton(
     disabled = false,
     id = buttonText,
     stackingProps,
+    allowInputField,
+    loadName,
   } = props
   const isLid =
-    stackingProps?.definition.parameters.loadName === TIPRACK_LID_LOADNAME
+    stackingProps != null &&
+    LID_LOADNAMES.includes(stackingProps.definition.parameters.loadName)
+  const tcLidDef = loadName === 'opentrons_tough_pcr_auto_sealing_lid'
 
   return (
     <Flex
@@ -88,7 +97,7 @@ export function CustomizeExpandButton(
               padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
               borderRadius={BORDERS.borderRadius4}
             >
-              {isLid ? (
+              {isLid && !tcLidDef ? (
                 <CheckboxField
                   onChange={e => {
                     e.stopPropagation()
@@ -100,7 +109,8 @@ export function CustomizeExpandButton(
                 />
               ) : null}
               {stackingProps.definition.stackLimit != null &&
-              stackingProps.definition.stackLimit > 1 ? (
+              stackingProps.definition.stackLimit > 1 &&
+              allowInputField ? (
                 <InputField
                   id="CustomizeExpandButton_inputField"
                   title={stackingProps.inputTitle}

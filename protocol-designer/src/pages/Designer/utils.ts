@@ -41,6 +41,8 @@ import type {
 import type { Fixture } from './DeckSetup/constants'
 
 export const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
+const TC_LID_LOADNAME = 'opentrons_tough_pcr_auto_sealing_lid'
+export const LID_LOADNAMES = [TIPRACK_LID_LOADNAME, TC_LID_LOADNAME]
 
 export interface AdditionalEquipment {
   name: AdditionalEquipmentName
@@ -90,14 +92,28 @@ export const getSlotInformation = (
     Object.values(deckSetupLabware),
     slot
   )
+  const numOfTcLidsOnStack =
+    fullStackFromLabwares?.filter(
+      id =>
+        deckSetupLabware[id] != null &&
+        deckSetupLabware[id].def.parameters.loadName === TC_LID_LOADNAME
+    )?.length ?? 0
+
   const labwareIdsFromFullStack =
     fullStackFromLabwares?.filter(
       id =>
         deckSetupLabware[id] != null &&
-        deckSetupLabware[id].def.parameters.loadName !== TIPRACK_LID_LOADNAME
+        (numOfTcLidsOnStack === 1 && fullStackFromLabwares.length > 1
+          ? !LID_LOADNAMES.includes(
+              deckSetupLabware[id].def.parameters.loadName
+            )
+          : deckSetupLabware[id].def.parameters.loadName !==
+            TIPRACK_LID_LOADNAME)
     ) ?? []
-  const lidIdFromStack = fullStackFromLabwares?.find(
-    id => deckSetupLabware[id]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
+  const lidIdFromStack = fullStackFromLabwares?.find(id =>
+    numOfTcLidsOnStack === 1
+      ? LID_LOADNAMES.includes(deckSetupLabware[id].def.parameters.loadName)
+      : deckSetupLabware[id]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
   )
 
   const bottomMostLabware =
@@ -145,6 +161,16 @@ export const getSlotInformation = (
     createdFixtureForSlots != null && createdFixtureForSlots.length === 2
       ? ('wasteChuteAndStagingArea' as Fixture)
       : (createdFixtureForSlots[0]?.name as Fixture)
+
+  console.log(
+    'createdStackForSlot',
+    slot === 'offDeck'
+      ? []
+      : offDeckLabware != null
+      ? [offDeckLabware.id]
+      : remainingLabwareIds,
+    lidIdFromStack != null ? deckSetupLabware[lidIdFromStack] : undefined
+  )
   return {
     createdModuleForSlot,
     createdAdapterForSlot,
