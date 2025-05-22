@@ -13,7 +13,6 @@ export interface MigrateTestCase {
   expectedTestFile: TestFilePath
   unusedHardware: boolean
   migrationModal: 'newLabwareDefs' | 'v8.1' | 'noBehaviorChange' | null
-  noCommands: boolean
 }
 
 export const ContentStrings = {
@@ -33,7 +32,6 @@ export const ContentStrings = {
   instruments: 'Instruments',
   liquidDefinitions: 'Liquid Definitions',
   protocolStartingDeck: 'Protocol Starting Deck',
-  noCommandsWarning: 'Protocol has no steps',
 }
 
 export const LocatorStrings = {
@@ -70,7 +68,6 @@ export const migrateAndMatchSnapshot = ({
   expectedTestFile,
   unusedHardware,
   migrationModal,
-  noCommands,
 }: MigrateTestCase): void => {
   const uploadProtocol: TestFile = getTestFile(importTestFile)
   cy.importProtocol(uploadProtocol.path)
@@ -92,10 +89,6 @@ export const migrateAndMatchSnapshot = ({
 
   if (unusedHardware) {
     cy.get('div').contains(ContentStrings.unusedHardwareWarning).should('exist')
-    cy.contains(ContentStrings.continueWithExport).click({ force: true })
-  }
-  if (noCommands) {
-    cy.get('div').contains(ContentStrings.noCommandsWarning).should('exist')
     cy.contains(ContentStrings.continueWithExport).click({ force: true })
   }
   const expectedProtocol: TestFile = getTestFile(expectedTestFile)

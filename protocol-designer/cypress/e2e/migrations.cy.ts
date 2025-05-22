@@ -15,7 +15,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedTestFile: TestFilePath.Example_1_1_0V8,
       unusedHardware: true,
       migrationModal: 'newLabwareDefs',
-      noCommands: false,
     },
     {
       title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 8.5.x, schema 8',
@@ -23,7 +22,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedTestFile: TestFilePath.DoItAllV3MigratedToV8,
       unusedHardware: false,
       migrationModal: 'v8.1',
-      noCommands: false,
     },
     {
       title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 8.5.x, schema 8',
@@ -31,7 +29,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedTestFile: TestFilePath.DoItAllV4MigratedToV8,
       unusedHardware: false,
       migrationModal: 'v8.1',
-      noCommands: false,
     },
     {
       title:
@@ -40,7 +37,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedTestFile: TestFilePath.DoItAllV7MigratedToV8,
       unusedHardware: false,
       migrationModal: 'v8.1',
-      noCommands: false,
     },
     {
       title:
@@ -49,7 +45,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedTestFile: TestFilePath.NinetySixChannelFullAndColumn,
       unusedHardware: false,
       migrationModal: null,
-      noCommands: true,
     },
     {
       title:
@@ -58,7 +53,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedTestFile: TestFilePath.DoItAllV8,
       unusedHardware: false,
       migrationModal: null,
-      noCommands: false,
     },
     {
       title:
@@ -67,7 +61,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedTestFile: TestFilePath.NewAdvancedSettingsAndMultiTemp,
       unusedHardware: false,
       migrationModal: null,
-      noCommands: false,
     },
     {
       title:
@@ -76,7 +69,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedTestFile: TestFilePath.ThermocyclerOnOt2V7MigratedToV8,
       migrationModal: 'v8.1',
       unusedHardware: true,
-      noCommands: false,
     },
   ]
 
@@ -87,7 +79,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedTestFile,
       unusedHardware,
       migrationModal,
-      noCommands,
     }) => {
       it(title, () => {
         migrateAndMatchSnapshot({
@@ -96,7 +87,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
           expectedTestFile,
           unusedHardware,
           migrationModal,
-          noCommands,
         })
       })
     }
