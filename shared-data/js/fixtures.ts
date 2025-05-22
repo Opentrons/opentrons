@@ -290,6 +290,15 @@ export const getReplacementFixtureForFixtureRemoval = (
   return SINGLE_CENTER_SLOT_FIXTURE
 }
 
+export const getReplacementFixtureForFakeFixture = (
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
+): CutoutFixtureId => {
+  if (cutoutFixtureId === FAKE_STAGING_AREA_RIGHT_SLOT) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
+  }
+  return cutoutFixtureId
+}
+
 export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
   cutoutFixtures: CutoutConfig[],
   deckDefinition: DeckDefinition

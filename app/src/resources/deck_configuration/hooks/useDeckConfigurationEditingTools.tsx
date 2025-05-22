@@ -14,7 +14,10 @@ import { AddFixtureModal } from '/app/organisms/DeviceDetailsDeckConfiguration/A
 import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQuery'
 
 import type { ReactNode } from 'react'
-import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureIdsWithFakes,
+  CutoutId,
+} from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
@@ -22,7 +25,7 @@ interface DeckConfigurationEditingTools {
   addFixtureToCutout: (cutoutId: CutoutId) => void
   removeFixtureFromCutout: (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
   addFixtureModal: ReactNode
 }
@@ -43,7 +46,7 @@ export function useDeckConfigurationEditingTools(
 
   const removeFixtureFromCutout = (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ): void => {
     const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
       cutoutFixtureId,

@@ -7,6 +7,7 @@ import {
   ABSORBANCE_READER_V1_FIXTURE,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
   HEATER_SHAKER_CUTOUTS,
   HEATERSHAKER_MODULE_V1,
@@ -37,7 +38,6 @@ import { AddFixtureModal } from './AddFixtureModal'
 import type { ReactNode } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type {
-  CutoutFixtureId,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
@@ -56,7 +56,7 @@ interface DeckConfigurationEditingProps {
   addFixtureToCutout: (cutoutId: CutoutId) => void
   removeFixtureFromCutout: (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
   addFixtureModal: ReactNode
 }
@@ -121,7 +121,7 @@ export function useDeckConfigurationEditing(
   //  edit hardware sections where state is stored using redux
   const removeFixtureFromCutoutForEditing = (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ): void => {
     const thermocyclerCutoutFixtureId =
       cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
@@ -133,8 +133,12 @@ export function useDeckConfigurationEditing(
       cutoutFixtureId,
       deckDef
     )
+    // if cutoutFixtureId is a fake one get the translation
+    const replacementFixtureId = getReplacementFixtureForFakeFixture(
+      cutoutFixtureId
+    )
     let type = 'stagingAreaAndMagneticBlock' as CutoutConfigExtended['type']
-    if (MODULE_MODELS.includes(cutoutFixtureId as ModuleModel)) {
+    if (MODULE_MODELS.includes(replacementFixtureId as ModuleModel)) {
       type = cutoutFixtureId as ModuleModel
     } else {
       if (cutoutFixtureId === 'trashBinAdapter') {
@@ -152,7 +156,7 @@ export function useDeckConfigurationEditing(
       }
     }
     updateInitialDeckState?.(
-      [{ cutoutId, cutoutFixtureId, type }],
+      [{ cutoutId, cutoutFixtureId: replacementFixtureId, type }],
       newDeckConfig
     )
   }
