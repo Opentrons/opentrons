@@ -572,11 +572,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 delay_with_publish(aspirate_delay)
 
         def dispense_with_delay(push_out: Optional[float]) -> None:
-            # protocol_api_old/test_context.py does not allow push_out at all, even if
-            # it's set to None, so we have to hide the argument to make the test pass.
-            # I don't know if the test is even valid, but I'm afraid to change the test.
-            dispense_kwargs = {"push_out": push_out} if push_out is not None else {}
-            self.dispense(volume, None, rate, **dispense_kwargs)
+            self.dispense(volume, None, rate, push_out=push_out)
             if dispense_delay:
                 delay_with_publish(dispense_delay)
 
