@@ -1383,8 +1383,9 @@ class ProtocolContext(CommandPublisher):
         """
         return self._core.define_liquid_class(name=name)
 
-    @staticmethod
+    @requires_version(2, 24)
     def define_custom_liquid_class(
+        self,
         name: str,
         properties_dict: Dict[str, Dict[str, TransferPropertiesDict]],
         base_liquid_class: Optional[LiquidClass] = None,
@@ -1428,9 +1429,8 @@ class ProtocolContext(CommandPublisher):
             for pipette, by_tiprack_props in properties_dict.items():
                 for tiprack, transfer_props in by_tiprack_props.items():
                     new_tiprack_props[tiprack] = build_transfer_properties(
-                        transfer_properties=cast(
-                            SharedTransferProperties,
-                            SharedTransferProperties.model_validate(transfer_props),
+                        transfer_properties=SharedTransferProperties.model_validate(
+                            transfer_props
                         )
                     )
                     if by_pipette_setting.get(pipette) is None:

@@ -119,10 +119,12 @@ class TipPosition:
         )
 
 
+TIP_POSITION_REFERENCES = [val.value for val in PositionReference.__members__.values()]
+BLOWOUT_LOCATIONS = [val.value for val in BlowoutLocation.__members__.values()]
+
+
 class TipPositionDict(TypedDict):
-    position_reference: Literal[
-        [val.value for val in PositionReference.__members__.values()]
-    ]
+    position_reference: Literal[TIP_POSITION_REFERENCES]
     offset: Vector3D
 
 
@@ -146,9 +148,7 @@ class MixPropertiesDict(TypedDict):
 
 class BlowoutPropertiesDict(TypedDict):
     enabled: bool
-    location: NotRequired[
-        Literal[[val.value for val in BlowoutLocation.__members__.values()]]
-    ]
+    location: NotRequired[Literal[BLOWOUT_LOCATIONS]]
     flow_rate: NotRequired[float]
 
 
@@ -159,7 +159,6 @@ class SubmergeDict(TypedDict):
 
 
 class RetractAspirateDict(TypedDict):
-    start_position: TipPositionDict
     end_position: TipPositionDict
     speed: float
     delay: DelayPropertiesDict
@@ -168,7 +167,6 @@ class RetractAspirateDict(TypedDict):
 
 
 class RetractDispenseDict(TypedDict):
-    start_position: TipPositionDict
     end_position: TipPositionDict
     speed: float
     delay: DelayPropertiesDict
@@ -869,8 +867,8 @@ def build_transfer_properties(
     if isinstance(transfer_properties, SharedByTipTypeSetting):
         _transfer_properties = SharedDataTransferProperties(
             aspirate=transfer_properties.aspirate,
-            dispense=transfer_properties.singleDispense,
-            multi_dispense=transfer_properties.multiDispense,
+            singleDispense=transfer_properties.singleDispense,
+            multiDispense=transfer_properties.multiDispense,
         )
     else:
         _transfer_properties = transfer_properties
