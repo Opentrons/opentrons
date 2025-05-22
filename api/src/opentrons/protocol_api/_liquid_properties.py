@@ -528,13 +528,6 @@ class RetractDispense(_SubmergeRetractCommon):
             delay=self._delay.as_shared_data_model(),
         )
 
-    @classmethod
-    def from_dict(cls, dict: RetractDispenseDict) -> "RetractDispense":
-        return cls(
-            # TODO: Need to complete/remove this
-            _end_position=dict.end_position
-        )
-
 
 @dataclass(slots=True)
 class _BaseLiquidHandlingProperties:
@@ -602,27 +595,6 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
             correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
         )
 
-    @classmethod
-    def from_dict(
-        cls, aspirate_properties: AspiratePropertiesDict
-    ) -> "AspirateProperties":
-        return cls(
-            _submerge=Submerge.from_dict(aspirate_properties["submerge"]),
-            _flow_rate_by_volume=LiquidHandlingPropertyByVolume(
-                aspirate_properties["flow_rate_by_volume"]
-            ),
-            _delay=DelayProperties.from_dict(aspirate_properties["delay"]),
-            _aspirate_position=TipPosition.from_dict(
-                aspirate_properties["aspirate_position"]
-            ),
-            _correction_by_volume=LiquidHandlingPropertyByVolume(
-                aspirate_properties["correction_by_volume"]
-            ),
-            _retract=RetractAspirate.from_dict(aspirate_properties["retract"]),
-            _pre_wet=aspirate_properties["pre_wet"],
-            _mix=MixProperties.from_dict(aspirate_properties["mix"]),
-        )
-
 
 @dataclass(slots=True)
 class SingleDispenseProperties(_BaseLiquidHandlingProperties):
@@ -660,29 +632,6 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
             correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
         )
 
-    @classmethod
-    def from_dict(
-        cls, dispense_properties: SingleDispensePropertiesDict
-    ) -> "SingleDispenseProperties":
-        return cls(
-            _submerge=Submerge.from_dict(dispense_properties["submerge"]),
-            _flow_rate_by_volume=LiquidHandlingPropertyByVolume(
-                dispense_properties["flow_rate_by_volume"]
-            ),
-            _delay=DelayProperties.from_dict(dispense_properties["delay"]),
-            _dispense_position=TipPosition.from_dict(
-                dispense_properties["dispense_position"]
-            ),
-            _correction_by_volume=LiquidHandlingPropertyByVolume(
-                dispense_properties["correction_by_volume"]
-            ),
-            _retract=RetractDispense.from_dict(dispense_properties["retract"]),
-            _push_out_by_volume=LiquidHandlingPropertyByVolume(
-                dispense_properties["push_out_by_volume"]
-            ),
-            _mix=MixProperties.from_dict(dispense_properties["mix"]),
-        )
-
 
 @dataclass(slots=True)
 class MultiDispenseProperties(_BaseLiquidHandlingProperties):
@@ -718,28 +667,6 @@ class MultiDispenseProperties(_BaseLiquidHandlingProperties):
             disposalByVolume=self._disposal_by_volume.as_list_of_tuples(),
             delay=self._delay.as_shared_data_model(),
             correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
-        )
-
-    @classmethod
-    def from_dict(
-        cls, dispense_properties: MultiDispensePropertiesDict
-    ) -> "MultiDispenseProperties":
-        return cls(
-            _submerge=Submerge.from_dict(dispense_properties.submerge),
-            _flow_rate_by_volume=LiquidHandlingPropertyByVolume(
-                dispense_properties.flow_rate_by_volume
-            ),
-            _delay=DelayProperties.from_dict(dispense_properties.delay),
-            _dispense_position=TipPosition.from_dict(
-                dispense_properties.dispense_position
-            ),
-            _correction_by_volume=LiquidHandlingPropertyByVolume(
-                dispense_properties.correction_by_volume
-            ),
-            _retract=RetractDispense.from_dict(dispense_properties.retract),
-            _conditioning_by_volume=LiquidHandlingPropertyByVolume(
-                dispense_properties.conditioning_by_volume
-            ),
         )
 
 
