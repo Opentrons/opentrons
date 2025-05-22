@@ -15,6 +15,14 @@ export interface RobotWorkSpaceRenderProps {
 
 export interface RobotWorkSpaceProps extends StyleProps {
   deckDef?: DeckDefinition
+
+  /**
+   * The x/y area to show, in standard SVG `x y xDimension yDimension` syntax.
+   *
+   * Specify coordinates in the Opentrons orientation, not the standard SVG orientation.
+   * So (x, y) is the area's front-left, xDimension extends the viewed area to the
+   * right, and yDimension extends the viewed area to the back.
+   */
   viewBox?: string | null
   children?: (props: RobotWorkSpaceRenderProps) => ReactNode
   deckLayerBlocklist?: string[]
@@ -23,6 +31,14 @@ export interface RobotWorkSpaceProps extends StyleProps {
   id?: string
 }
 
+/**
+ * A wrapper for rendering the robot deck, labware, etc. from a top-down perspective.
+ *
+ * Child SVG components can render themselves in the Opentrons coordinate orientation
+ * (+x to the right of the robot, +y to the back of the robot) and this component will
+ * SVG-transform them so they're displayed the correct way. This is needed because
+ * SVG inverts y compared to Opentrons coordinates.
+ */
 export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
   const {
     children,
