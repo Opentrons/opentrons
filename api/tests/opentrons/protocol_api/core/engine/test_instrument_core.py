@@ -1730,7 +1730,7 @@ def test_detect_liquid_presence(
             cmd.TryLiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
                 ),
                 wellName=well_core.get_name(),
                 labwareId=well_core.labware_id,
