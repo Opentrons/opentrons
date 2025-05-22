@@ -113,7 +113,7 @@ def run(protocol: ProtocolContext) -> None:
 
     # deck layout
     hs: HeaterShakerContext = protocol.load_module(
-        "heaterShakerModuleV1", "D3"
+        "heaterShakerModuleV1", "D1"
     )  # type: ignore[assignment]
     hs.close_labware_latch()
     working_plate = hs.load_labware(
@@ -125,10 +125,12 @@ def run(protocol: ProtocolContext) -> None:
     wash = reagent_res.wells()[9 : 9 + wash_cycle]
     elu = reagent_res.wells()[2]
 
-    elution_plate = protocol.load_labware("axygen_96_wellplate_500ul", "D1", "ELUATES")
+    elution_plate = protocol.load_labware("axygen_96_wellplate_500ul", "D3", "ELUATES")
     eluates = elution_plate.rows()[0][:sample_columns]
 
-    waste_res = protocol.load_labware("nest_1_reservoir_290ml", "D2", "WASTE")
+    waste_res = protocol.load_labware(
+        "opentrons_tough_1_reservoir_300ml", "D2", "WASTE"
+    )
     waste = waste_res.wells()[0]
 
     mag: Union[MagneticBlockContext, Any]
