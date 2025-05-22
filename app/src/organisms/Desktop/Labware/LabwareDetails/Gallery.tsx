@@ -20,6 +20,12 @@ import { labwareImages } from './labware-images'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
+/**
+ * opentrons_universal_flat_adapter has a protrusion on one side, but the `dimensions`
+ * in the current version of the definition (v1) do not include it. This is a
+ * replacement xDimension that includes the protrusion so it doesn't get clipped off
+ * when we render an SVG of the adapter.
+ */
 export const UNIVERSAL_FLAT_ADAPTER_X_DIMENSION = 127.4
 
 export interface GalleryProps {
@@ -34,7 +40,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
 
   const xDimension =
     params.loadName === 'opentrons_universal_flat_adapter'
-      ? 127.4
+      ? UNIVERSAL_FLAT_ADAPTER_X_DIMENSION
       : dims.xDimension
 
   const [currentImage, setCurrentImage] = useState<number>(0)
