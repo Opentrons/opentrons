@@ -74,7 +74,7 @@ describe('CustomizeExpandButton', () => {
         ...INPUT_FIELD_PROPS,
         definition: {
           ...fixture24Tuberack,
-          parameters: { loadName: 'opentrons_flex_tiprack_lid' } as any,
+          allowedRoles: ['lid'],
         } as LabwareDefinition2,
         onCheckboxChange: vi.fn(),
         checked: false,

@@ -12,11 +12,6 @@ import type { ChangeEvent, ChangeEventHandler, MouseEvent } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 
-const LID_LOADNAMES = [
-  'opentrons_flex_tiprack_lid',
-  'opentrons_tough_pcr_auto_sealing_lid',
-]
-
 export interface StackingProps {
   onInputFieldChange: (e: ChangeEvent<HTMLInputElement>) => void
   inputFieldValue: number
@@ -58,7 +53,7 @@ export function CustomizeExpandButton(
   } = props
   const isLid =
     stackingProps != null &&
-    LID_LOADNAMES.includes(stackingProps.definition.parameters.loadName)
+    stackingProps.definition.allowedRoles?.includes('lid')
   const tcLidDef = loadName === 'opentrons_tough_pcr_auto_sealing_lid'
 
   return (
