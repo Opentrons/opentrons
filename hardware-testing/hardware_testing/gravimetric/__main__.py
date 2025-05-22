@@ -22,20 +22,10 @@ from hardware_testing.protocols.gravimetric_lpc.gravimetric import (
     gravimetric_ot3_p1000_multi_1000ul_tip_increment,
     gravimetric_ot3_p50_multi_50ul_tip_increment,
 )
-from hardware_testing.protocols.gravimetric_lpc.photometric import (
-    photometric_ot3_p1000_multi,
-    photometric_ot3_p1000_single,
-    photometric_ot3_p50_multi,
-    photometric_ot3_p1000_96,
-    photometric_ot3_p200_96,
-    photometric_ot3_p50_single,
-)
-
-from . import execute, helpers, workarounds, execute_photometric
+from . import execute, helpers, workarounds
 from .config import (
     GravimetricConfig,
     GANTRY_MAX_SPEED,
-    PhotometricConfig,
     ConfigType,
     get_tip_volumes_for_qc,
 )
@@ -115,43 +105,6 @@ PIPETTE_MODEL_NAME = {
 }
 
 
-PHOTOMETRIC_CFG = {
-    50: {
-        1: {
-            20: photometric_ot3_p50_single,
-            50: photometric_ot3_p50_single,
-        },
-        8: {
-            50: photometric_ot3_p50_multi,
-        },
-    },
-    200: {
-        96: {
-            20: photometric_ot3_p200_96,
-            50: photometric_ot3_p200_96,
-            200: photometric_ot3_p200_96,
-        },
-    },
-    1000: {
-        1: {
-            50: photometric_ot3_p1000_single,
-            200: photometric_ot3_p1000_single,
-            1000: photometric_ot3_p1000_single,
-        },
-        8: {
-            50: photometric_ot3_p1000_multi,
-            200: photometric_ot3_p1000_multi,
-            1000: photometric_ot3_p1000_multi,
-        },
-        96: {
-            20: photometric_ot3_p1000_96,
-            50: photometric_ot3_p1000_96,
-            200: photometric_ot3_p1000_96,
-        },
-    },
-}
-
-
 @dataclass
 class RunArgs:
     """Common resources across multiple runs."""
@@ -223,8 +176,7 @@ class RunArgs:
         run_id, start_time = create_run_id_and_start_time()
         environment_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating())
         git_description = get_git_description()
-        if not args.photometric:
-            scale = Scale.build(simulate=_ctx.is_simulating())
+        scale = Scale.build(simulate=_ctx.is_simulating())
         ui.print_header("LOAD PIPETTE")
         pipette = helpers._load_pipette(
             _ctx,
@@ -232,19 +184,18 @@ class RunArgs:
             args.pipette,
             "left",
             args.increment,
-            args.photometric,
-            args.gantry_speed if not args.photometric else None,
+            args.gantry_speed,
         )
         pipette_tag = helpers._get_tag_from_pipette(
             pipette, args.increment, args.user_volumes
         )
 
         recorder: Optional[GravimetricRecorder] = None
-        kind = ConfigType.photometric if args.photometric else ConfigType.gravimetric
+        kind = ConfigType.gravimetric
         tip_batches: Dict[str, str] = {}
         if args.tip == 0:
             tip_volumes: List[int] = get_tip_volumes_for_qc(
-                args.pipette, args.channels, args.extra, args.photometric
+                args.pipette, args.channels, args.extra
             )
             for tip in tip_volumes:
                 tip_batches[f"tips_{tip}ul"] = helpers._get_tip_batch(
@@ -317,62 +268,38 @@ class RunArgs:
             trials = helpers.get_default_trials(args.increment, kind, args.channels)
         else:
             trials = args.trials
-
-        if args.photometric:
-            _tip_cfg = max(tip_volumes)
-            if len(tip_volumes) > 0:
-                ui.print_info(
-                    f"WARNING: using source Protocol for {_tip_cfg} tip, "
-                    f"but test includes multiple tips ({tip_volumes})"
-                )
-            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels][_tip_cfg]
-            name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
-            report = execute_photometric.build_pm_report(
-                test_volumes=volumes_list,
-                run_id=run_id,
-                pipette_tag=pipette_tag,
-                operator_name=operator_name,
-                git_description=git_description,
-                tip_batches=tip_batches,
-                environment_sensor=environment_sensor,
-                trials=trials,
-                name=name,
-                robot_serial=robot_serial,
-                fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
+        if args.increment:
+            assert len(tip_volumes) == 1, (
+                f"tip must be specified "
+                f"when running --increment test "
+                f"with {args.channels}ch P{args.pipette}"
             )
+            protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][
+                tip_volumes[0]
+            ]
         else:
-            if args.increment:
-                assert len(tip_volumes) == 1, (
-                    f"tip must be specified "
-                    f"when running --increment test "
-                    f"with {args.channels}ch P{args.pipette}"
-                )
-                protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][
-                    tip_volumes[0]
-                ]
-            else:
-                protocol_cfg = GRAVIMETRIC_CFG[args.pipette][args.channels]
-            name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
-            recorder = execute._load_scale(
-                name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
-            )
+            protocol_cfg = GRAVIMETRIC_CFG[args.pipette][args.channels]
+        name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
+        recorder = execute._load_scale(
+            name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
+        )
 
-            report = execute.build_gm_report(
-                test_volumes=volumes_list,
-                run_id=run_id,
-                pipette_tag=pipette_tag,
-                operator_name=operator_name,
-                git_description=git_description,
-                robot_serial=robot_serial,
-                tip_batchs=tip_batches,
-                recorder=recorder,
-                pipette_channels=args.channels,
-                increment=args.increment,
-                name=name,
-                environment_sensor=environment_sensor,
-                trials=trials,
-                fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
-            )
+        report = execute.build_gm_report(
+            test_volumes=volumes_list,
+            run_id=run_id,
+            pipette_tag=pipette_tag,
+            operator_name=operator_name,
+            git_description=git_description,
+            robot_serial=robot_serial,
+            tip_batchs=tip_batches,
+            recorder=recorder,
+            pipette_channels=args.channels,
+            increment=args.increment,
+            name=name,
+            environment_sensor=environment_sensor,
+            trials=trials,
+            fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
+        )
 
         return RunArgs(
             tip_volumes=tip_volumes,
@@ -447,117 +374,43 @@ def build_gravimetric_cfg(
     )
 
 
-def build_photometric_cfg(
-    protocol: ProtocolContext,
-    tip_volume: int,
-    return_tip: bool,
-    mix: bool,
-    user_volumes: bool,
-    touch_tip: bool,
-    refill: bool,
-    extra: bool,
-    jog: bool,
-    same_tip: bool,
-    ignore_fail: bool,
-    pipette_channels: int,
-    photoplate_column_offset: List[int],
-    dye_well_column_offset: List[int],
-    mode: str,
-    run_args: RunArgs,
-) -> PhotometricConfig:
-    """Run."""
-    return PhotometricConfig(
-        name=run_args.name,
-        pipette_mount="left",
-        pipette_volume=run_args.pipette_volume,
-        pipette_channels=pipette_channels,
-        increment=False,
-        tip_volume=tip_volume,
-        trials=run_args.trials,
-        photoplate=run_args.protocol_cfg.PHOTOPLATE_LABWARE,  # type: ignore[attr-defined]
-        photoplate_slot=run_args.protocol_cfg.SLOT_PLATE,  # type: ignore[attr-defined]
-        reservoir=run_args.protocol_cfg.RESERVOIR_LABWARE,  # type: ignore[attr-defined]
-        reservoir_slot=run_args.protocol_cfg.SLOT_RESERVOIR,  # type: ignore[attr-defined]
-        slots_tiprack=run_args.protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
-        return_tip=return_tip,
-        mix=mix,
-        user_volumes=user_volumes,
-        touch_tip=touch_tip,
-        refill=refill,
-        kind=ConfigType.photometric,
-        extra=extra,
-        jog=jog,
-        same_tip=same_tip,
-        ignore_fail=ignore_fail,
-        photoplate_column_offset=photoplate_column_offset,
-        dye_well_column_offset=dye_well_column_offset,
-        mode=mode,
-    )
-
-
 def _main(
     args: argparse.Namespace,
     run_args: RunArgs,
     tip: int,
     volumes: List[float],
 ) -> None:
-    union_cfg: Union[PhotometricConfig, GravimetricConfig]
-    if args.photometric:
-        cfg_pm: PhotometricConfig = build_photometric_cfg(
-            run_args.ctx,
-            tip,
-            args.return_tip,
-            args.mix,
-            args.user_volumes,
-            args.touch_tip,
-            args.refill,
-            args.extra,
-            args.jog,
-            args.same_tip,
-            args.ignore_fail,
-            args.channels,
-            args.photoplate_col_offset,
-            args.dye_well_col_offset,
-            args.mode,
-            run_args,
-        )
-        union_cfg = cfg_pm
-    else:
-        cfg_gm: GravimetricConfig = build_gravimetric_cfg(
-            run_args.ctx,
-            tip,
-            args.increment,
-            args.return_tip,
-            False if args.no_blank else True,
-            args.mix,
-            args.user_volumes,
-            args.gantry_speed,
-            args.scale_delay,
-            args.isolate_channels if args.isolate_channels else [],
-            args.isolate_volumes if args.isolate_volumes else [],
-            args.extra,
-            args.jog,
-            args.same_tip,
-            args.ignore_fail,
-            args.mode,
-            run_args,
-        )
-
-        union_cfg = cfg_gm
+    cfg_gm: GravimetricConfig = build_gravimetric_cfg(
+        run_args.ctx,
+        tip,
+        args.increment,
+        args.return_tip,
+        False if args.no_blank else True,
+        args.mix,
+        args.user_volumes,
+        args.gantry_speed,
+        args.scale_delay,
+        args.isolate_channels if args.isolate_channels else [],
+        args.isolate_volumes if args.isolate_volumes else [],
+        args.extra,
+        args.jog,
+        args.same_tip,
+        args.ignore_fail,
+        args.mode,
+        run_args,
+    )
     ui.print_header("GET PARAMETERS")
 
     for v in volumes:
         ui.print_info(f"\t{v} uL")
     all_channels_same_time = (
-        getattr(union_cfg, "increment", False)
-        or union_cfg.pipette_channels == 96
-        or args.photometric
+        getattr(cfg_gm, "increment", False) or cfg_gm.pipette_channels == 96
     )
     test_resources = TestResources(
         ctx=run_args.ctx,
         pipette=run_args.pipette,
         tipracks=helpers._load_tipracks(
-            run_args.ctx, union_cfg, use_adapters=args.channels == 96
+            run_args.ctx, cfg_gm, use_adapters=args.channels == 96
         ),
         test_volumes=volumes,
         tips=get_tips(
@@ -570,11 +423,7 @@ def _main(
         recorder=run_args.recorder,
         test_report=run_args.test_report,
     )
-
-    if args.photometric:
-        execute_photometric.run(cfg_pm, test_resources)
-    else:
-        execute.run(cfg_gm, test_resources)
+    execute.run(cfg_gm, test_resources)
 
 
 if __name__ == "__main__":
@@ -592,7 +441,6 @@ if __name__ == "__main__":
     parser.add_argument("--user-volumes", action="store_true")
     parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
     parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
-    parser.add_argument("--photometric", action="store_true")
     parser.add_argument("--touch-tip", action="store_true")
     parser.add_argument("--refill", action="store_true")
     parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
@@ -601,8 +449,6 @@ if __name__ == "__main__":
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--same-tip", action="store_true")
     parser.add_argument("--ignore-fail", action="store_true")
-    parser.add_argument("--photoplate-col-offset", nargs="+", type=int, default=[1])
-    parser.add_argument("--dye-well-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument(
         "--mode", type=str, choices=["", "default", "lowVolumeDefault"], default=""
     )
@@ -624,7 +470,7 @@ if __name__ == "__main__":
         sleep(1)
     hw = workarounds.get_sync_hw_api(run_args.ctx)
     try:
-        if not run_args.ctx.is_simulating() and not args.photometric:
+        if not run_args.ctx.is_simulating():
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
         run_args.ctx.home()

@@ -418,7 +418,6 @@ def _load_pipette(
     pipette_volume: int,
     pipette_mount: str,
     increment: bool,
-    photometric: bool,
     gantry_speed: Optional[int] = None,
 ) -> InstrumentContext:
     pip_name = f"flex_{pipette_channels}channel_{pipette_volume}"
@@ -440,7 +439,7 @@ def _load_pipette(
 
     # NOTE: 8ch QC testing means testing 1 channel at a time,
     #       so we need to decrease the pick-up current to work with 1 tip.
-    if pipette.channels == 8 and not increment and not photometric:
+    if pipette.channels == 8 and not increment:
         pipette._core.configure_nozzle_layout(
             style=NozzleLayout.SINGLE,
             primary_nozzle="A1",
@@ -546,22 +545,16 @@ def get_test_volumes(
     """Get test volumes."""
     volumes: List[float] = []
     print(f"Finding volumes for p {pipette} {volume} with tip {tip}, extra: {extra}")
-    if kind is config.ConfigType.photometric:
-        for t, vls in config.QC_VOLUMES_P[pipette][volume]:
-            if t == tip:
-                volumes = vls
-                break
+    if extra:
+        cfg = config.QC_VOLUMES_EXTRA_G
     else:
-        if extra:
-            cfg = config.QC_VOLUMES_EXTRA_G
-        else:
-            cfg = config.QC_VOLUMES_G
+        cfg = config.QC_VOLUMES_G
 
-        for t, vls in cfg[pipette][volume]:
-            print(f"tip {t} volumes {vls}")
-            if t == tip:
-                volumes = vls
-                break
+    for t, vls in cfg[pipette][volume]:
+        print(f"tip {t} volumes {vls}")
+        if t == tip:
+            volumes = vls
+            break
     print(f"final volumes: {volumes}")
     return volumes
 
