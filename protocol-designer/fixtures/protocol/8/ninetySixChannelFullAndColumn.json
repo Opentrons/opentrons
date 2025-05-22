@@ -6,7 +6,7 @@
     "author": "",
     "description": "",
     "created": 1701805621086,
-    "lastModified": 1747923077435,
+    "lastModified": 1746823051631,
     "source": "Protocol Designer",
     "category": null,
     "subcategory": null,
@@ -16,7 +16,7 @@
     "name": "opentrons/protocol-designer",
     "version": "8.5.0",
     "data": {
-      "_internalAppBuildDate": "Mon, 19 May 2025 14:35:16 GMT",
+      "_internalAppBuildDate": "Fri, 09 May 2025 15:41:49 GMT",
       "pipetteTiprackAssignments": {
         "de7da440-95ec-43e8-8723-851321fbd6f9": [
           "opentrons/opentrons_flex_96_tiprack_50ul/1"
@@ -2395,7 +2395,7 @@
   "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
-      "key": "81e59eeb-7ea8-4628-8795-de57de930ad2",
+      "key": "3e17b235-5fa0-4d7e-8826-abe7b481fc81",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p1000_96",
@@ -2404,7 +2404,7 @@
       }
     },
     {
-      "key": "1eee663f-6ab7-4ed4-8adb-f91caaac9b32",
+      "key": "cb3f131f-c8ec-4100-b4c6-7bf4aef2dae3",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack Adapter",
@@ -2418,7 +2418,7 @@
       }
     },
     {
-      "key": "be55895c-0e81-479c-a9be-cfe106c3adb2",
+      "key": "a47d21c2-ccb0-4a13-b0d9-bcebbe1c0c72",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack 50 µL",
@@ -2432,7 +2432,7 @@
       }
     },
     {
-      "key": "79fc02b5-2b91-4917-8d4a-06caa94130e2",
+      "key": "6c7e47ce-5efc-4373-848e-e584d7dfb85d",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
@@ -2446,7 +2446,7 @@
       }
     },
     {
-      "key": "afd8a275-e1ab-4367-b721-57f23d71260a",
+      "key": "41b50f25-2c70-483b-b12d-4aaa296cbf32",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack 50 µL",
@@ -2461,7 +2461,7 @@
     },
     {
       "commandType": "configureNozzleLayout",
-      "key": "ea2a8567-ef3d-4ec4-bc55-4473339d0fb6",
+      "key": "104e1a47-92d2-40c5-b251-7a27b037f080",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "configurationParams": {
@@ -2471,7 +2471,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "597247a9-081a-4c02-bfc1-33729b59af38",
+      "key": "1b5a61f6-bedf-47b4-99cd-de3d08d0971d",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "labwareId": "75aa666f-98d8-4af9-908e-963ced428580:opentrons/opentrons_flex_96_tiprack_50ul/1",
@@ -2480,7 +2480,7 @@
     },
     {
       "commandType": "moveToWell",
-      "key": "c0b6a5c1-2e55-4c5f-b9f6-065f3a3d6395",
+      "key": "c42d6bed-865a-4fa0-b85a-f7dad8430876",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
@@ -2497,14 +2497,14 @@
     },
     {
       "commandType": "prepareToAspirate",
-      "key": "e48b2f09-98c2-4ccb-84a0-bf88402e0080",
+      "key": "a4ba5bdd-6123-4e28-8fa6-278ad60c975b",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9"
       }
     },
     {
       "commandType": "moveToWell",
-      "key": "155ed558-e2d3-4cf2-898c-a29af3b2da20",
+      "key": "5bf652cc-3726-4413-991c-211bc67e0cf4",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
@@ -2521,7 +2521,7 @@
     },
     {
       "commandType": "moveToWell",
-      "key": "1ed60b99-785d-4ca1-a22f-90f12cd79655",
+      "key": "5f1d393c-f3f2-4f67-b71a-208374475c9f",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
@@ -2538,7 +2538,7 @@
     },
     {
       "commandType": "aspirateInPlace",
-      "key": "19d944ee-029c-460b-abd7-b70d82d26f9a",
+      "key": "f7d346d2-1823-4e10-a061-d3e90d485c82",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "volume": 10,
@@ -2547,7 +2547,7 @@
     },
     {
       "commandType": "moveToWell",
-      "key": "5d000f4b-6343-4f06-a890-958f13375b7d",
+      "key": "092c6692-1b5b-43f1-a544-1b5afd55223c",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
@@ -2564,7 +2564,7 @@
     },
     {
       "commandType": "moveToAddressableArea",
-      "key": "1a207a0a-b64b-45a3-a1d8-ed292bbd176c",
+      "key": "46c6d0ce-9b9d-463d-8063-86b28650efd7",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "addressableAreaName": "movableTrashA3",
@@ -2577,7 +2577,7 @@
     },
     {
       "commandType": "dispenseInPlace",
-      "key": "8f238981-4950-4861-b164-9d0342309db4",
+      "key": "2063b6a7-9413-48e9-a6a4-20e725d6d2c7",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "volume": 10,
@@ -2587,7 +2587,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "491fb03a-c2e0-43aa-a7b5-d6aca23faee6",
+      "key": "6430e9b2-6d92-4229-88ad-9ff8ffcfee38",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "addressableAreaName": "movableTrashA3",
@@ -2601,14 +2601,14 @@
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "8ad45c6e-b37c-4eb1-805e-13b6574fee46",
+      "key": "bc9428c8-b8ad-4aee-a629-5fb9a9b9c80c",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9"
       }
     },
     {
       "commandType": "configureNozzleLayout",
-      "key": "8ddaf4e0-a8c2-4f2e-b41d-66a17a7e033a",
+      "key": "2d2e5fa8-47b0-4bdf-9fde-8edfa182b56d",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "configurationParams": {
@@ -2619,7 +2619,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "b72e9caf-06b7-40b8-b080-1fde0888c660",
+      "key": "09fd37e7-865d-4be9-add8-3401360704f6",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "labwareId": "9bd16b50-4ae9-4cfd-8583-3378087e6a6c:opentrons/opentrons_flex_96_tiprack_50ul/1",
@@ -2628,7 +2628,7 @@
     },
     {
       "commandType": "moveToWell",
-      "key": "4ce79e04-1988-4cac-9a98-1aa4e5c78ab0",
+      "key": "5d04c7cc-7395-4251-ae8d-3bf71ee02974",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
@@ -2645,14 +2645,14 @@
     },
     {
       "commandType": "prepareToAspirate",
-      "key": "34477c08-a4b3-45e8-81cc-4031720b5ef7",
+      "key": "81cc69b6-96b2-482f-b29c-8d7e263c74ac",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9"
       }
     },
     {
       "commandType": "moveToWell",
-      "key": "dff9e00e-f052-405e-b6dc-89c8b687d3ba",
+      "key": "9dba6270-3797-4a19-8001-d3fe0eb1ae9c",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
@@ -2669,7 +2669,7 @@
     },
     {
       "commandType": "moveToWell",
-      "key": "31590a26-7c9a-46e6-abf0-984a8d295890",
+      "key": "8b98d328-d6d6-4700-a242-6f72bee9aced",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
@@ -2686,7 +2686,7 @@
     },
     {
       "commandType": "aspirateInPlace",
-      "key": "051f9d70-4059-4779-b8d2-1b5733ca986e",
+      "key": "fa8e524b-1674-41e2-8f46-c1267512b3e3",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "volume": 10,
@@ -2695,7 +2695,7 @@
     },
     {
       "commandType": "moveToWell",
-      "key": "1fad0d85-d0d1-40c1-9896-b600955d2e91",
+      "key": "60abf508-f6a9-49f0-a8b6-aef35c0b788b",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
@@ -2712,7 +2712,7 @@
     },
     {
       "commandType": "moveToAddressableArea",
-      "key": "f35da098-1871-4965-82f3-940f4f1135df",
+      "key": "a79b933f-980a-40d2-962e-e15e9010e86a",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "addressableAreaName": "movableTrashA3",
@@ -2725,7 +2725,7 @@
     },
     {
       "commandType": "dispenseInPlace",
-      "key": "60709b91-9423-4e86-bf94-3449bbfb674a",
+      "key": "b59e75df-cd74-4c05-815a-4d2156365eb9",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "volume": 10,
@@ -2735,7 +2735,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "fdeaa641-c064-4ee0-98bc-1bb8cfd1e7bd",
+      "key": "db3a1f84-4cef-4f16-a5bc-4ad24ebdf8e6",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "addressableAreaName": "movableTrashA3",
@@ -2749,7 +2749,7 @@
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "7b7cdbbf-8186-41f1-bc37-007274ec1f50",
+      "key": "fe491bce-cc88-4845-bc5c-84f185941a18",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9"
       }

@@ -1,6 +1,7 @@
 import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
+  NONE_LIQUID_CLASS_NAME,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
@@ -87,7 +88,10 @@ const getCheckedPath = (
   const { labwareDefURI: tiprackDefUri, def: tiprackDef } = tiprackEntity
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassValuesForTip = allLiquidClassDefs[
-    hydratedFormData.liquidClass ?? WATER_LIQUID_CLASS_NAME
+    hydratedFormData.liquidClass === NONE_LIQUID_CLASS_NAME ||
+    hydratedFormData.liquidClass == null
+      ? WATER_LIQUID_CLASS_NAME
+      : hydratedFormData.liquidClass ?? null
   ]?.byPipette
     .find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
@@ -388,7 +392,10 @@ export const moveLiquidFormToArgs = (
       hydratedFormData.dispense_position_reference,
     dispenseRetractXOffset: hydratedFormData.dispense_retract_x_position ?? 0,
     pushOut: pushOut_checkbox ? pushOut_volume : 0,
-    liquidClass: hydratedFormData.liquidClass ?? null,
+    liquidClass:
+      hydratedFormData.liquidClass === NONE_LIQUID_CLASS_NAME // transform "none" (needed in step form) to null
+        ? null
+        : hydratedFormData.liquidClass ?? null,
   }
   console.assert(
     sourceWellsUnordered.length > 0,

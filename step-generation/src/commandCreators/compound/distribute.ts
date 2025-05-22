@@ -9,6 +9,7 @@ import {
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   LOW_VOLUME_PIPETTES,
+  NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
   SAFE_MOVE_TO_WELL_LOCATION,
   WATER_LIQUID_CLASS_NAME,
@@ -203,7 +204,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
     name: pipetteName,
   } = invariantContext.pipetteEntities[pipette]
   const multiDispenseValuesForTip = getAllLiquidClassDefs()
-    [liquidClass ?? WATER_LIQUID_CLASS_NAME].byPipette.find(
+    [
+      liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
+        ? WATER_LIQUID_CLASS_NAME
+        : liquidClass
+    ].byPipette?.find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
     )
     ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)?.multiDispense
