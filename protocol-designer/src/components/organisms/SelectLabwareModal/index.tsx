@@ -306,6 +306,10 @@ export function SelectLabwareModal(
     }
   }
 
+  const stackingPropsShared = {
+    inputTitle: t('labware_quantity'),
+    errorMessage: t('unsupported_range'),
+  }
   return createPortal(
     <Modal
       marginLeft="0"
@@ -482,6 +486,12 @@ export function SelectLabwareModal(
                                 slot !== 'offDeck' &&
                                 enableStacking
                                   ? {
+                                      ...stackingPropsShared,
+                                      inputCaption: t('valid_range', {
+                                        max:
+                                          defs[stackingLabwareDefUri]
+                                            .stackLimit,
+                                      }),
                                       definition: defs[stackingLabwareDefUri],
                                       inputFieldValue:
                                         selectedTopLabware.amount ?? 0,
@@ -496,6 +506,11 @@ export function SelectLabwareModal(
                                           })
                                         )
                                       },
+                                      checkboxCaption: t('with_lid', {
+                                        name:
+                                          defs[stackingLabwareDefUri].metadata
+                                            .displayName,
+                                      }),
                                       checked: selectedLidLabware != null,
                                       onCheckboxChange: () => {
                                         dispatch(
@@ -587,7 +602,6 @@ export function SelectLabwareModal(
                                                     defs[tiprackDefUri]
                                                   return (
                                                     <CustomizeExpandButton
-                                                      t={t}
                                                       key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                       id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                       buttonText={
@@ -639,6 +653,16 @@ export function SelectLabwareModal(
                                                   stackingLabwareDefUri !=
                                                     null && slot !== 'offDeck'
                                                     ? {
+                                                        ...stackingPropsShared,
+                                                        inputCaption: t(
+                                                          'valid_range',
+                                                          {
+                                                            max:
+                                                              defs[
+                                                                stackingLabwareDefUri
+                                                              ].stackLimit,
+                                                          }
+                                                        ),
                                                         definition:
                                                           defs[
                                                             stackingLabwareDefUri

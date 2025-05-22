@@ -57,18 +57,18 @@ export const createContainer: (
 ) => ThunkAction<
   CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
 > = args => (dispatch, getState) => {
-  const { labwareDefURIStack, slot: slotArg } = args
+  const { labwareDefURIStack, slot } = args
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
   const labwareDefForOt2HS = labwareDefSelectors.getLabwareDefsByURI(state)[
     labwareDefURIStack[0]
   ]
-  const slot =
-    slotArg ||
+  const availableSlot =
+    slot ||
     getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDefForOt2HS)
-  if (slot) {
-    let currentSlot = slot
+  if (availableSlot) {
+    let currentSlot = availableSlot
     labwareDefURIStack.forEach(labwareUri => {
       const id = `${uuid()}:${labwareUri}`
       const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
@@ -95,7 +95,7 @@ export const createContainer: (
           labwareId: id,
         })(dispatch, getState)
       }
-      if (slot === 'offDeck') {
+      if (availableSlot === 'offDeck') {
         dispatch({
           type: 'ZOOMED_INTO_SLOT',
           payload: { slot: id, cutout: null },

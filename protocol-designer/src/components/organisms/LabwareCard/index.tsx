@@ -108,24 +108,18 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
 
               <Flex gridGap={SPACING.spacing8}>
                 {!isAdapterOrTiprack ? (
-                  <Flex width={FLEX_MAX_CONTENT}>
-                    <Tag
-                      type="default"
-                      text={
-                        liquidIds.length === 0
-                          ? t('no_liquids_added')
-                          : t('num_liquid', { count: liquidIds.length })
-                      }
-                    />
-                  </Flex>
+                  <LiquidInfoDisplay
+                    text={
+                      liquidIds.length === 0
+                        ? t('no_liquids_added')
+                        : t('num_liquid', { count: liquidIds.length })
+                    }
+                  />
                 ) : null}
                 {quantity > 1 ? (
-                  <Flex width={FLEX_MAX_CONTENT}>
-                    <Tag
-                      type="default"
-                      text={`Quantity: ${quantity.toString()}`}
-                    />
-                  </Flex>
+                  <LiquidInfoDisplay
+                    text={`Quantity: ${quantity.toString()}`}
+                  />
                 ) : null}
               </Flex>
             </Flex>
@@ -156,5 +150,17 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         </Flex>
       </ListItem>
     </Box>
+  )
+}
+
+interface LiquidInfoDisplayProps {
+  text: string
+}
+
+function LiquidInfoDisplay({ text }: LiquidInfoDisplayProps): JSX.Element {
+  return (
+    <Flex width={FLEX_MAX_CONTENT}>
+      <Tag type="default" text={text} />
+    </Flex>
   )
 }
