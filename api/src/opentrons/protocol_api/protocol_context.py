@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from copy import deepcopy
 from typing import (
     Callable,
     Dict,
@@ -10,9 +11,15 @@ from typing import (
     Union,
     Mapping,
     cast,
+    Any,
 )
 
 from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    ByPipetteSetting,
+    ByTipTypeSetting,
+    TransferProperties as SharedTransferProperties,
+)
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
@@ -48,6 +55,11 @@ from opentrons.protocols.api_support.util import (
 )
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons.protocol_engine.errors import LabwareMovementNotAllowedError
+from ._liquid_properties import (
+    TransferProperties,
+    build_transfer_properties,
+    TransferPropertiesDict,
+)
 
 from ._types import OffDeckType
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
@@ -1370,6 +1382,71 @@ class ProtocolContext(CommandPublisher):
         :meta private:
         """
         return self._core.define_liquid_class(name=name)
+
+    @staticmethod
+    def define_custom_liquid_class(
+        name: str,
+        properties_dict: Dict[str, Dict[str, TransferPropertiesDict]],
+        base_liquid_class: Optional[LiquidClass] = None,
+        display_name: Optional[str] = None,
+    ) -> LiquidClass:
+        """Define a custom liquid class, either a completely new one or based on an existing one.
+
+        Args:
+            name: The name to give to the new liquid class
+            properties_dict: A dict of transfer properties per tip per pipette
+                If you want these transfer properties to be used as a fallback, i.e.
+                use them as a default if no transfer properties for the requested pipette
+                &/or tip are found, then use the key 'default' for the pipette &/or tip name.
+                Should adhere to `LiquidClassSchemaV1` for shape of the dictionary and
+                required properties.
+            base_liquid_class: A LiquidClass to base this liquid class on. The properties
+                specified in transfer_properties will override the existing ones
+                for the specified pipettes & tips.
+            display_name: A human-readable name for the liquid.
+            description: A human-readable description for the liquid.
+        """
+        new_liquid_class: LiquidClass
+        # If base liquid is provided, copy to new class and replace the entries mentioned in transfer props arg
+        if base_liquid_class:
+            new_liquid_class = deepcopy(base_liquid_class)
+
+            for pipette, by_tiprack_props in properties_dict.items():
+                for tiprack, transfer_props in by_tiprack_props.items():
+                    new_liquid_class.update_for(
+                        pipette=pipette,
+                        tip_rack=tiprack,
+                        transfer_properties=build_transfer_properties(
+                            transfer_properties=SharedTransferProperties.model_validate(
+                                transfer_props
+                            )
+                        ),
+                    )
+        else:
+            by_pipette_setting: Dict[str, Dict[str, TransferProperties]] = {}
+            new_tiprack_props: Dict[str, TransferProperties] = {}
+            for pipette, by_tiprack_props in properties_dict.items():
+                for tiprack, transfer_props in by_tiprack_props.items():
+                    new_tiprack_props[tiprack] = build_transfer_properties(
+                        transfer_properties=cast(
+                            SharedTransferProperties,
+                            SharedTransferProperties.model_validate(transfer_props),
+                        )
+                    )
+                    if by_pipette_setting.get(pipette) is None:
+                        by_pipette_setting[pipette] = {
+                            tiprack: new_tiprack_props[tiprack]
+                        }
+                    else:
+                        by_pipette_setting[pipette].update(
+                            {tiprack: new_tiprack_props[tiprack]}
+                        )
+            new_liquid_class = LiquidClass.create_from(
+                name=name,
+                display_name=display_name or name.title(),
+                by_pipette_setting=by_pipette_setting,
+            )
+        return new_liquid_class
 
     @property
     @requires_version(2, 5)

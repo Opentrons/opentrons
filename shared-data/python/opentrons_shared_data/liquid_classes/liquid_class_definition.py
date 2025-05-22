@@ -107,6 +107,11 @@ class DelayProperties(BaseLiquidClassModel):
     def reshape(cls, data: Any) -> Any:
         """Move any params specified as top-level keys into the 'params' value."""
         if isinstance(data, dict):
+            if None not in (data.get("enable"), data.get("enabled")):
+                raise ValueError("Delay properties should specify either 'enable' or 'enabled', not both.")
+            if data.get("enabled") is not None:
+                data["enable"] = data["enabled"]
+                data.pop('enabled')
             if 'duration' in data.keys():
                 if data.get("params"):
                     raise ValueError("Delay properties should specify either duration or params, not both.")
@@ -271,6 +276,13 @@ def reshape_glob(
     ) -> Any:
     """Move any params specified as top-level keys into the 'params' value."""
     if isinstance(data, dict):
+        if None not in (data.get("enable"), data.get("enabled")):
+            raise ValueError(
+                f"{property_name} should specify either 'enable' or 'enabled', not both.")
+        if data.get("enabled") is not None:
+            data["enable"] = data["enabled"]
+            data.pop('enabled')
+
         params_list = [meta.alias for field, meta in params_model.model_fields.items()]
         list_of_presence_of_params = [param in data.keys() for param in params_list]
         if any(list_of_presence_of_params):
@@ -305,16 +317,22 @@ class RetractAspirate(BaseLiquidClassModel):
     """Shared properties for the retract function after aspiration."""
 
     endPosition: TipPosition = Field(
-        ..., description="Tip position at the end of the retract."
+        ...,
+        alias="end_position",
+        description="Tip position at the end of the retract."
     )
     speed: _NonNegativeNumber = Field(
         ..., description="Speed of retraction, in millimeters per second."
     )
     airGapByVolume: LiquidHandlingPropertyByVolume = Field(
-        ..., description="Settings for air gap keyed by target aspiration volume."
+        ...,
+        alias="air_gap_by_volume",
+        description="Settings for air gap keyed by target aspiration volume."
     )
     touchTip: TouchTipProperties = Field(
-        ..., description="Touch tip settings for retract after aspirate."
+        ...,
+        alias="touch_tip",
+        description="Touch tip settings for retract after aspirate."
     )
     delay: DelayProperties = Field(
         ..., description="Delay settings for retract after aspirate."
@@ -325,19 +343,26 @@ class RetractDispense(BaseLiquidClassModel):
     """Shared properties for the retract function after dispense."""
 
     endPosition: TipPosition = Field(
-        ..., description="Tip position at the end of the retract."
+        ...,
+        alias="end_position",
+        description="Tip position at the end of the retract."
     )
     speed: _NonNegativeNumber = Field(
-        ..., description="Speed of retraction, in millimeters per second."
+        ...,
+        description="Speed of retraction, in millimeters per second."
     )
     airGapByVolume: LiquidHandlingPropertyByVolume = Field(
-        ..., description="Settings for air gap keyed by target aspiration volume."
+        ...,
+        alias="air_gap_by_volume",
+        description="Settings for air gap keyed by target aspiration volume."
     )
     blowout: BlowoutProperties = Field(
         ..., description="Blowout properties for retract after dispense."
     )
     touchTip: TouchTipProperties = Field(
-        ..., description="Touch tip settings for retract after dispense."
+        ...,
+        alias="touch_tip",
+        description="Touch tip settings for retract after dispense."
     )
     delay: DelayProperties = Field(
         ..., description="Delay settings for retract after dispense."
@@ -352,18 +377,25 @@ class AspirateProperties(BaseLiquidClassModel):
         ..., description="Pipette retract settings after an aspirate."
     )
     aspiratePosition: TipPosition = Field(
-        ..., description="Tip position during aspirate."
+        ...,
+        alias="aspirate_position",
+        description="Tip position during aspirate."
     )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
+        alias="flow_rate_by_volume",
         description="Settings for flow rate keyed by target aspiration volume.",
     )
     correctionByVolume: CorrectionByVolume = Field(
         ...,
+        alias="correction_by_volume",
         description="Settings for volume correction keyed by by target aspiration volume,"
         " representing additional volume the plunger should move to accurately hit target volume.",
     )
-    preWet: bool = Field(..., description="Whether to perform a pre-wet action.")
+    preWet: bool = Field(
+        ...,
+        alias="pre_wet",
+        description="Whether to perform a pre-wet action.")
     mix: MixProperties = Field(
         ..., description="Mixing settings for before an aspirate"
     )
@@ -380,20 +412,26 @@ class SingleDispenseProperties(BaseLiquidClassModel):
         ..., description="Pipette retract settings after a single dispense."
     )
     dispensePosition: TipPosition = Field(
-        ..., description="Tip position during dispense."
+        ...,
+        alias="dispense_position",
+        description="Tip position during dispense."
     )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
+        alias="flow_rate_by_volume",
         description="Settings for flow rate keyed by target dispense volume.",
     )
     correctionByVolume: CorrectionByVolume = Field(
         ...,
+        alias="correction_by_volume",
         description="Settings for volume correction keyed by by target dispense volume,"
         " representing additional volume the plunger should move to accurately hit target volume.",
     )
     mix: MixProperties = Field(..., description="Mixing settings for after a dispense")
     pushOutByVolume: LiquidHandlingPropertyByVolume = Field(
-        ..., description="Settings for pushout keyed by target dispense volume."
+        ...,
+        alias="push_out_by_volume",
+        description="Settings for pushout keyed by target dispense volume."
     )
     delay: DelayProperties = Field(..., description="Delay after dispense, in seconds.")
 
@@ -406,46 +444,60 @@ class MultiDispenseProperties(BaseLiquidClassModel):
         ..., description="Pipette retract settings after a multi-dispense."
     )
     dispensePosition: TipPosition = Field(
-        ..., description="Tip position during dispense."
+        ...,
+        alias="dispense_position",
+        description="Tip position during dispense."
     )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
+        alias="flow_rate_by_volume",
         description="Settings for flow rate keyed by target dispense volume.",
     )
     correctionByVolume: CorrectionByVolume = Field(
         ...,
+        alias="correction_by_volume",
         description="Settings for volume correction keyed by by target dispense volume,"
         " representing additional volume the plunger should move to accurately hit target volume.",
     )
     conditioningByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
+        alias="conditioning_by_volume",
         description="Settings for conditioning volume keyed by target dispense volume.",
     )
     disposalByVolume: LiquidHandlingPropertyByVolume = Field(
-        ..., description="Settings for disposal volume keyed by target dispense volume."
+        ...,
+        alias="disposal_by_volume",
+        description="Settings for disposal volume keyed by target dispense volume."
     )
     delay: DelayProperties = Field(
         ..., description="Delay settings after each dispense"
     )
 
 
-class ByTipTypeSetting(BaseLiquidClassModel):
+class TransferProperties(BaseLiquidClassModel):
+    """Properties used during a transfer."""
+    aspirate: AspirateProperties = Field(
+        ..., description="Aspirate parameters for this tip type."
+    )
+    singleDispense: SingleDispenseProperties = Field(
+        ...,
+        alias="dispense",
+        description="Single dispense parameters for this tip type."
+    )
+    multiDispense: MultiDispenseProperties | SkipJsonSchema[None] = Field(
+        None,
+        alias="multi-dispense",
+        description="Optional multi-dispense parameters for this tip type.",
+        json_schema_extra=_remove_default,
+    )
+
+
+class ByTipTypeSetting(TransferProperties):
     """Settings for each kind of tip this pipette can use."""
 
     tiprack: str = Field(
         ...,
         description="The name of tiprack whose tip will be used when handling this specific liquid class with this pipette",
-    )
-    aspirate: AspirateProperties = Field(
-        ..., description="Aspirate parameters for this tip type."
-    )
-    singleDispense: SingleDispenseProperties = Field(
-        ..., description="Single dispense parameters for this tip type."
-    )
-    multiDispense: MultiDispenseProperties | SkipJsonSchema[None] = Field(
-        None,
-        description="Optional multi-dispense parameters for this tip type.",
-        json_schema_extra=_remove_default,
     )
 
 

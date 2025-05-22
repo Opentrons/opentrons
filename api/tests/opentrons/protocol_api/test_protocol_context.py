@@ -1,15 +1,20 @@
 """Tests for the ProtocolContext public interface."""
 import inspect
-from typing import cast
+from typing import cast, Dict
 
 import pytest
 from decoy import Decoy, matchers
+from opentrons_shared_data import liquid_classes
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    PositionReference,
+)
 
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.protocol_api._liquid import LiquidClass
+from opentrons.protocol_api._liquid_properties import TransferPropertiesDict
 from opentrons.types import Mount, DeckSlotName, StagingSlotName
 from opentrons.protocol_api import OFF_DECK
 from opentrons.legacy_broker import LegacyBroker
@@ -1797,6 +1802,77 @@ def test_define_liquid_class(
     )
     decoy.when(mock_core.robot_type).then_return(robot_type)
     assert subject.define_liquid_class("volatile_90") == expected_liquid_class
+
+
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+def test_define_new_custom_liquid_class_from_dict(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+    robot_type: RobotType,
+    minimal_transfer_properties_dict: Dict[str, Dict[str, TransferPropertiesDict]],
+) -> None:
+    """It should define a custom liquid class."""
+    my_liquid_class = subject.define_custom_liquid_class(
+        name="my_liquid",
+        properties_dict=minimal_transfer_properties_dict,
+        display_name="My liquid",
+    )
+    decoy.when(mock_core.robot_type).then_return(robot_type)
+    my_liquid_class_props = my_liquid_class.get_for(
+        "flex_1channel_50", "opentrons/opentrons_flex_96_tiprack_50ul/1"
+    )
+    assert my_liquid_class_props.aspirate.submerge.speed == 100
+    assert (
+        my_liquid_class_props.dispense.dispense_position.position_reference
+        == PositionReference.WELL_BOTTOM
+    )
+
+
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+def test_customize_existing_liquid_class(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+    robot_type: RobotType,
+    minimal_transfer_properties_dict: Dict[str, Dict[str, TransferPropertiesDict]],
+) -> None:
+    """It should create a new liquid class by modifying the existing liquid class."""
+    existing_glycerol_class = LiquidClass.create(
+        liquid_classes.load_definition("glycerol_50")
+    )
+    assert (
+        existing_glycerol_class.get_for(
+            "flex_1channel_50", "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ).aspirate.submerge.speed
+        == 4
+    )
+    assert (
+        existing_glycerol_class.get_for(
+            "flex_8channel_50", "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ).aspirate.submerge.speed
+        == 4
+    )
+
+    my_liquid_class = subject.define_custom_liquid_class(
+        name="my_liquid",
+        properties_dict=minimal_transfer_properties_dict,
+        base_liquid_class=existing_glycerol_class,
+        display_name="My liquid",
+    )
+    decoy.when(mock_core.robot_type).then_return(robot_type)
+    assert (
+        my_liquid_class.get_for(
+            "flex_1channel_50", "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ).aspirate.submerge.speed
+        == 100
+    )
+    assert (
+        my_liquid_class.get_for(
+            "flex_8channel_50", "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ).aspirate.submerge.speed
+        == 4
+    )
 
 
 def test_bundled_data(
