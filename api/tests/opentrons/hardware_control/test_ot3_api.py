@@ -810,11 +810,10 @@ async def test_blow_out_position(
 
 
 @pytest.mark.parametrize("load_configs", load_pipette_configs)
-@given(blowout_volume=strategies.floats(min_value=0, max_value=300))
+@given(data=strategies.data())
 @settings(
     suppress_health_check=[
         HealthCheck.function_scoped_fixture,
-        HealthCheck.filter_too_much,
     ],
     max_examples=20,
     deadline=400,
@@ -823,8 +822,13 @@ async def test_blow_out_error(
     ot3_hardware: ThreadManager[OT3API],
     mock_backend_get_tip_status: AsyncMock,
     load_configs: Dict[OT3Mount, PipetteLoadConfig],
-    blowout_volume: float,
+    data: strategies.DataObject,
 ) -> None:
+    # Each Hypothesis example will share the same ot3_hardware value (they are all
+    # within "a single function", as the function-scoped ot3_hardware fixture sees it).
+    # Do our best to isolate them.
+    await ot3_hardware.reset()
+
     liquid_class = LiquidClasses.default
     for mount, configs in load_configs.items():
         if configs["channels"] == 96:
@@ -840,7 +844,10 @@ async def test_blow_out_error(
         max_input_vol = (
             max_allowed_input_distance * instr_data["config"].shaft_ul_per_mm
         )
-        assume(blowout_volume > max_input_vol)
+
+        blowout_volume = data.draw(
+            strategies.floats(min_value=max_input_vol, exclude_min=True)
+        )
 
         # check that blowout does not allow input values that would blow out too far
         with pytest.raises(CommandParameterLimitViolated):
