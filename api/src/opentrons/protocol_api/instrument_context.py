@@ -864,6 +864,14 @@ class InstrumentContext(publisher.CommandPublisher):
         flow_rate = self._core.get_aspirate_flow_rate()
         mm_from_bottom, mm_from_top, well_name = self._get_well_info_from_location(target)
         self.move_to(target, publish=False)
+        self._print_debug_info("air-gap",
+                               f"{c_vol}\t"  # volume
+                               f"{self.current_volume}\t"  # current
+                               f"{int(flow_rate)}\t"  # flow_rate
+                               f"\t"  # push_out
+                               f"{well_name}\t"  # well
+                               f"{mm_from_bottom}\t"  # bottom
+                               f"{mm_from_top}")  # top
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
             self._core.air_gap_in_place(c_vol, flow_rate)
         else:
@@ -1247,6 +1255,7 @@ class InstrumentContext(publisher.CommandPublisher):
                         alternate_tip_drop=True,
                     )
                 self._last_tip_picked_up_from = None
+                self._num_print_tabs -= 1
                 return self
 
         elif isinstance(location, labware.Well):
