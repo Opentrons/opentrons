@@ -78,9 +78,9 @@ describe('SelectLabwareModal', () => {
       },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
       selectedLidLabware: null,
-      selectedAdapterDefUri: null,
+      selectedAdapterDefURI: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -111,8 +111,8 @@ describe('SelectLabwareModal', () => {
   })
   it('renders deck slot and selects an adapter and labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: 'fixture/fixture_universal_flat_bottom_adapter/1',
-      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedAdapterDefURI: 'fixture/fixture_universal_flat_bottom_adapter/1',
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
       selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
@@ -138,8 +138,8 @@ describe('SelectLabwareModal', () => {
 
   it('renders the filter checkbox if there is a module on the slot and is checked by default', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: null,
-      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
       selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: THERMOCYCLER_MODULE_V1,

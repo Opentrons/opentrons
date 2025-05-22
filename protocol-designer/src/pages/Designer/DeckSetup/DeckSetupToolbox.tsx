@@ -69,7 +69,7 @@ export function DeckSetupToolbox(
     selectedTopLabware,
     selectedModuleModel,
     selectedSlot,
-    selectedAdapterDefUri,
+    selectedAdapterDefURI,
     selectedLidLabware,
   } = selectedSlotInfo
   const { slot } = selectedSlot
@@ -98,8 +98,8 @@ export function DeckSetupToolbox(
   const handleResetToolbox = (): void => {
     dispatch(
       editSlotInfo({
-        labwareDefUri: null,
-        adapterDefUri: null,
+        labwareDefURI: null,
+        adapterDefURI: null,
         moduleModel: createdModuleForSlot?.model,
         fixture:
           createdFixtureForSlots != null &&
@@ -108,7 +108,7 @@ export function DeckSetupToolbox(
           )
             ? 'stagingArea'
             : undefined,
-        lidDefUri: null,
+        lidDefURI: null,
         amount: 1,
       })
     )
@@ -149,9 +149,9 @@ export function DeckSetupToolbox(
         createContainerAboveModule({
           slot,
           labwareDefURIStack: [
-            ...(selectedAdapterDefUri != null ? [selectedAdapterDefUri] : []),
-            ...(selectedTopLabware.labwareDefUri != null
-              ? [selectedTopLabware.labwareDefUri]
+            ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
+            ...(selectedTopLabware.labwareDefURI != null
+              ? [selectedTopLabware.labwareDefURI]
               : []),
             ...(selectedLidLabware != null ? [selectedLidLabware] : []),
           ],
@@ -162,10 +162,10 @@ export function DeckSetupToolbox(
         createContainer({
           slot,
           labwareDefURIStack: [
-            ...(selectedAdapterDefUri != null ? [selectedAdapterDefUri] : []),
-            ...(selectedTopLabware.labwareDefUri != null
+            ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
+            ...(selectedTopLabware.labwareDefURI != null
               ? Array(selectedTopLabware.amount).fill(
-                  selectedTopLabware.labwareDefUri.toString()
+                  selectedTopLabware.labwareDefURI.toString()
                 )
               : []),
             ...(selectedLidLabware != null ? [selectedLidLabware] : []),

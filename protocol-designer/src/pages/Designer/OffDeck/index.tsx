@@ -171,7 +171,7 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
             )
             dispatch(
               editSlotInfo({
-                labwareDefUri:
+                labwareDefURI:
                   id != null ? activeDeckSetup.labware[id].labwareDefURI : null,
               })
             )

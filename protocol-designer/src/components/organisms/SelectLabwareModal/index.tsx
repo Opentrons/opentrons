@@ -123,12 +123,12 @@ export function SelectLabwareModal(
   const {
     selectedTopLabware,
     selectedModuleModel,
-    selectedAdapterDefUri,
+    selectedAdapterDefURI,
     selectedLidLabware,
   } = zoomedInSlotInfo
 
   const hasNoLabware =
-    selectedTopLabware == null && selectedAdapterDefUri == null
+    selectedTopLabware == null && selectedAdapterDefURI == null
   const createCategoryState = (state: boolean): Record<string, boolean> =>
     Object.fromEntries(ALL_ORDERED_CATEGORIES.map(cat => [cat, state]))
 
@@ -440,9 +440,9 @@ export function SelectLabwareModal(
                         buttonValue={uri}
                         onChange={e => {
                           e.stopPropagation()
-                          dispatch(selectTopLabware({ labwareDefUri: uri }))
+                          dispatch(selectTopLabware({ labwareDefURI: uri }))
                         }}
-                        isSelected={uri === selectedTopLabware.labwareDefUri}
+                        isSelected={uri === selectedTopLabware.labwareDefURI}
                       />
                     )
                   )}
@@ -520,7 +520,7 @@ export function SelectLabwareModal(
                                       onCheckboxChange: () => {
                                         dispatch(
                                           selectLid({
-                                            labwareDefUri:
+                                            labwareDefURI:
                                               selectedLidLabware ===
                                               stackingLabwareDefUri
                                                 ? null
@@ -551,23 +551,23 @@ export function SelectLabwareModal(
                                       if (isAdapter) {
                                         dispatch(
                                           selectAdapter({
-                                            adapterDefUri:
-                                              uri === selectedAdapterDefUri
+                                            adapterDefURI:
+                                              uri === selectedAdapterDefURI
                                                 ? null
                                                 : uri,
                                           })
                                         )
                                         dispatch(
                                           selectTopLabware({
-                                            labwareDefUri: null,
+                                            labwareDefURI: null,
                                           })
                                         )
                                       } else {
                                         dispatch(
                                           selectTopLabware({
-                                            labwareDefUri:
+                                            labwareDefURI:
                                               uri ===
-                                              selectedTopLabware.labwareDefUri
+                                              selectedTopLabware.labwareDefURI
                                                 ? null
                                                 : uri,
                                           })
@@ -576,15 +576,15 @@ export function SelectLabwareModal(
                                     }}
                                     isSelected={
                                       (isAdapter &&
-                                        uri === selectedAdapterDefUri) ||
+                                        uri === selectedAdapterDefURI) ||
                                       (!isAdapter &&
                                         uri ===
-                                          selectedTopLabware.labwareDefUri)
+                                          selectedTopLabware.labwareDefURI)
                                     }
                                   />
 
                                   {isAdapter &&
-                                    uri === selectedAdapterDefUri &&
+                                    uri === selectedAdapterDefURI &&
                                     getLabwareCompatibleWithAdapter(
                                       defs,
                                       enableStacking,
@@ -600,7 +600,7 @@ export function SelectLabwareModal(
                                             'adapter_compatible_lab'
                                           )}
                                           isExpanded={
-                                            uri === selectedAdapterDefUri
+                                            uri === selectedAdapterDefURI
                                           }
                                         >
                                           {has96Channel &&
@@ -626,13 +626,13 @@ export function SelectLabwareModal(
                                                         e.stopPropagation()
                                                         dispatch(
                                                           selectTopLabware({
-                                                            labwareDefUri: tiprackDefUri,
+                                                            labwareDefURI: tiprackDefUri,
                                                           })
                                                         )
                                                       }}
                                                       isSelected={
                                                         tiprackDefUri ===
-                                                        selectedTopLabware.labwareDefUri
+                                                        selectedTopLabware.labwareDefURI
                                                       }
                                                     />
                                                   )
@@ -723,13 +723,13 @@ export function SelectLabwareModal(
                                                       e.stopPropagation()
                                                       dispatch(
                                                         selectTopLabware({
-                                                          labwareDefUri: nestedDefUri,
+                                                          labwareDefURI: nestedDefUri,
                                                         })
                                                       )
                                                     }}
                                                     isSelected={
                                                       nestedDefUri ===
-                                                      selectedTopLabware.labwareDefUri
+                                                      selectedTopLabware.labwareDefURI
                                                     }
                                                   />
                                                 )

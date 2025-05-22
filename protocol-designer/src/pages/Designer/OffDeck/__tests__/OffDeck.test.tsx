@@ -55,9 +55,9 @@ describe('OffDeck', () => {
       labware: {},
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
       selectedLidLabware: null,
-      selectedAdapterDefUri: null,
+      selectedAdapterDefURI: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: null, cutout: null },
@@ -77,9 +77,9 @@ describe('OffDeck', () => {
   })
   it('renders the off deck "zoomedIn" view with no labware selected', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
       selectedLidLabware: null,
-      selectedAdapterDefUri: null,
+      selectedAdapterDefURI: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'offDeck', cutout: null },
@@ -98,9 +98,9 @@ describe('OffDeck', () => {
       },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
       selectedLidLabware: null,
-      selectedAdapterDefUri: null,
+      selectedAdapterDefURI: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'lab', cutout: null },

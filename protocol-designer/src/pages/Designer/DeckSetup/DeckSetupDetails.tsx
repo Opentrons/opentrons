@@ -135,13 +135,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     preSelectedFixture,
     slotPosition,
   } = useMemo(() => {
-    const result = getSlotInformation({
+    return getSlotInformation({
       deckSetup: activeDeckSetup,
       slot: selectedZoomInSlot ?? '',
       deckDef,
     })
-    return result
-  }, [activeDeckSetup, selectedZoomInSlot, deckDef])
+  }, [activeDeckSetup, selectedZoomInSlot])
 
   const createdTopLabwareForSlot =
     activeDeckSetup.labware[createdStackForSlot[0]]
@@ -155,11 +154,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     ) {
       dispatch(
         editSlotInfo({
-          labwareDefUri: createdTopLabwareForSlot?.labwareDefURI,
-          adapterDefUri: createdAdapterForSlot?.labwareDefURI,
+          labwareDefURI: createdTopLabwareForSlot?.labwareDefURI,
+          adapterDefURI: createdAdapterForSlot?.labwareDefURI,
           moduleModel: createdModuleForSlot?.model,
           fixture: preSelectedFixture,
-          lidDefUri: createdLidForSlot?.labwareDefURI,
+          lidDefURI: createdLidForSlot?.labwareDefURI,
           amount,
         })
       )

@@ -106,14 +106,14 @@ export function LabwareCardOverflowMenu(
     if (isAdapter) {
       dispatch(
         editSlotInfo({
-          adapterDefUri: null,
+          adapterDefURI: null,
         })
       )
     } else {
       dispatch(
         editSlotInfo({
-          labwareDefUri: null,
-          lidDefUri: null,
+          labwareDefURI: null,
+          lidDefURI: null,
           amount: 1,
         })
       )

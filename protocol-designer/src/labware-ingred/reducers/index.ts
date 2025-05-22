@@ -305,8 +305,8 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
 )
 
 const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
-  selectedTopLabware: { labwareDefUri: null, amount: 1 },
-  selectedAdapterDefUri: null,
+  selectedTopLabware: { labwareDefURI: null, amount: 1 },
+  selectedAdapterDefURI: null,
   selectedModuleModel: null,
   selectedFixture: null,
   selectedLidLabware: null,
@@ -327,18 +327,18 @@ export const zoomedInSlotInfo = (
 ): ZoomedIntoSlotInfoState => {
   switch (action.type) {
     case 'SELECT_TOP_LABWARE': {
-      const { labwareDefUri } = action.payload
+      const { labwareDefURI } = action.payload
       return {
         ...state,
         selectedTopLabware: {
-          labwareDefUri,
+          labwareDefURI,
           amount: state.selectedTopLabware.amount,
         },
       }
     }
     case 'SELECT_ADAPTER': {
-      const { adapterDefUri } = action.payload
-      return { ...state, selectedAdapterDefUri: adapterDefUri }
+      const { adapterDefURI } = action.payload
+      return { ...state, selectedAdapterDefURI: adapterDefURI }
     }
     case 'SELECT_MODULE': {
       const { moduleModel } = action.payload
@@ -359,10 +359,10 @@ export const zoomedInSlotInfo = (
       }
     }
     case 'SELECT_LID': {
-      const { labwareDefUri } = action.payload
+      const { labwareDefURI } = action.payload
       return {
         ...state,
-        selectedLidLabware: labwareDefUri,
+        selectedLidLabware: labwareDefURI,
       }
     }
     case 'SELECT_TOP_LABWARE_AMOUNT': {
@@ -370,30 +370,30 @@ export const zoomedInSlotInfo = (
       return {
         ...state,
         selectedTopLabware: {
-          labwareDefUri: state.selectedTopLabware.labwareDefUri,
+          labwareDefURI: state.selectedTopLabware.labwareDefURI,
           amount,
         },
       }
     }
     case 'EDIT_SLOT_INFO': {
       const {
-        labwareDefUri,
-        adapterDefUri,
+        labwareDefURI,
+        adapterDefURI,
         moduleModel,
         fixture,
-        lidDefUri,
+        lidDefURI,
         amount,
       } = action.payload
       return {
         ...state,
         selectedTopLabware: {
-          labwareDefUri: labwareDefUri ?? null,
+          labwareDefURI: labwareDefURI ?? null,
           amount: amount ?? 1,
         },
-        selectedAdapterDefUri: adapterDefUri ?? null,
+        selectedAdapterDefURI: adapterDefURI ?? null,
         selectedModuleModel: moduleModel ?? null,
         selectedFixture: fixture ?? null,
-        selectedLidLabware: lidDefUri ?? null,
+        selectedLidLabware: lidDefURI ?? null,
       }
     }
     default:

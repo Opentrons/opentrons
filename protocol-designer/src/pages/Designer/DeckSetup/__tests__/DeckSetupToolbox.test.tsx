@@ -70,8 +70,8 @@ describe('DeckSetupToolbox', () => {
       onCloseClick: vi.fn(),
     }
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: null,
-      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
       selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
@@ -118,8 +118,8 @@ describe('DeckSetupToolbox', () => {
       labId: 'mock nickName',
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: 'mockUri',
-      selectedTopLabware: { labwareDefUri: 'mockUri', amount: 1 },
+      selectedAdapterDefURI: 'mockUri',
+      selectedTopLabware: { labwareDefURI: 'mockUri', amount: 1 },
       selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,

@@ -89,8 +89,8 @@ describe('SelectedItems', () => {
     })
     vi.mocked(LabwareOnDeck).mockReturnValue(<div>mock LabwareOnDeck</div>)
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: null,
-      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
       selectedLidLabware: null,
       selectedFixture: 'trashBin',
       selectedModuleModel: null,
@@ -107,8 +107,8 @@ describe('SelectedItems', () => {
   })
   it('renders a selected fixture with a selected labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: mockAdapterURI,
-      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedAdapterDefURI: mockAdapterURI,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
       selectedLidLabware: null,
       selectedFixture: 'trashBin',
       selectedModuleModel: null,
@@ -120,8 +120,8 @@ describe('SelectedItems', () => {
   })
   it('renders a selected module', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: null,
-      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
       selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: HEATERSHAKER_MODULE_V1,
@@ -134,8 +134,8 @@ describe('SelectedItems', () => {
   })
   it('renders a selected module and a selected labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: mockAdapterURI,
-      selectedTopLabware: { labwareDefUri: null, amount: 1 },
+      selectedAdapterDefURI: mockAdapterURI,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
       selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: HEATERSHAKER_MODULE_V1,
@@ -170,8 +170,8 @@ describe('SelectedItems', () => {
       },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: mockAdapterURI,
-      selectedTopLabware: { labwareDefUri: mockAdapterURI, amount: 1 },
+      selectedAdapterDefURI: mockAdapterURI,
+      selectedTopLabware: { labwareDefURI: mockAdapterURI, amount: 1 },
       selectedLidLabware: null,
       selectedFixture: 'trashBin',
       selectedModuleModel: null,

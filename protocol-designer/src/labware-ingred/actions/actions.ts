@@ -255,7 +255,7 @@ export const editLiquidGroup: (
 export interface SelectTopLabwareAction {
   type: 'SELECT_TOP_LABWARE'
   payload: {
-    labwareDefUri: string | null
+    labwareDefURI: string | null
   }
 }
 export const selectTopLabware: (
@@ -281,7 +281,7 @@ export const selectTopLabwareAmount: (
 export interface SelectAdapterAction {
   type: 'SELECT_ADAPTER'
   payload: {
-    adapterDefUri: string | null
+    adapterDefURI: string | null
   }
 }
 export const selectAdapter: (
@@ -294,7 +294,7 @@ export const selectAdapter: (
 export interface SelectLidAction {
   type: 'SELECT_LID'
   payload: {
-    labwareDefUri: string | null
+    labwareDefURI: string | null
   }
 }
 export const selectLid: (
@@ -333,12 +333,12 @@ export const selectFixture: (
 export interface EditSlotInfoAction {
   type: 'EDIT_SLOT_INFO'
   payload: {
-    labwareDefUri?: string | null
-    adapterDefUri?: string | null
+    labwareDefURI?: string | null
+    adapterDefURI?: string | null
     moduleModel?: ModuleModel | null
     fixture?: Fixture | null
     amount?: number
-    lidDefUri?: string | null
+    lidDefURI?: string | null
   }
 }
 
