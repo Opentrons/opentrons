@@ -29,6 +29,8 @@ describe('CustomizeExpandButton', () => {
       buttonText: 'mock text',
       buttonValue: 'mockValue',
       onChange: vi.fn(),
+      allowInputField: false,
+      loadName: 'mockLoadName',
     }
   })
 
@@ -40,6 +42,7 @@ describe('CustomizeExpandButton', () => {
   it('should render the input field', () => {
     props = {
       ...props,
+      allowInputField: true,
       isSelected: true,
       stackingProps: INPUT_FIELD_PROPS,
     }
@@ -53,6 +56,7 @@ describe('CustomizeExpandButton', () => {
   it('should show input field error', () => {
     props = {
       ...props,
+      allowInputField: true,
       isSelected: true,
       stackingProps: {
         ...INPUT_FIELD_PROPS,

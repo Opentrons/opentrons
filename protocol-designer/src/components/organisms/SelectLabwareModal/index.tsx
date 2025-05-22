@@ -64,6 +64,7 @@ import {
   getLabwareIsRecommended,
   getStackerDefinition,
 } from '../../../pages/Designer/DeckSetup/utils'
+import { TC_LID_LOADNAME } from '../../../pages/Designer/utils'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getPipetteEntities } from '../../../step-forms/selectors'
 import { getHas96Channel } from '../../../utils'
@@ -539,8 +540,7 @@ export function SelectLabwareModal(
                                     loadName={loadName}
                                     allowInputField={
                                       onFlexStacker ||
-                                      loadName ===
-                                        'opentrons_tough_pcr_auto_sealing_lid'
+                                      loadName === TC_LID_LOADNAME
                                     }
                                     stackingProps={stackingProps ?? undefined}
                                     id={`${index}_${category}_${loadName}`}
@@ -707,7 +707,7 @@ export function SelectLabwareModal(
                                                     allowInputField={
                                                       nestedDef.parameters
                                                         .loadName ===
-                                                      'opentrons_tough_pcr_auto_sealing_lid'
+                                                      TC_LID_LOADNAME
                                                     }
                                                     stackingProps={
                                                       stackingProps ?? undefined

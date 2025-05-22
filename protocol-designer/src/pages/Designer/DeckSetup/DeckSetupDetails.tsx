@@ -29,8 +29,9 @@ import {
   getStagingAreaAddressableAreas,
   getTopmostLabwareOnModuleFromStack,
 } from '../../../utils'
+import { getShowTCLid } from '../../ProtocolOverview/utils'
 import { HighlightLabware } from '../HighlightLabware'
-import { getSlotInformation, TIPRACK_LID_LOADNAME } from '../utils'
+import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
@@ -428,9 +429,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
           labware.id === adjacentLabware?.id ||
-          labware.def.parameters.loadName === TIPRACK_LID_LOADNAME
-        )
+          getShowTCLid(labware)
+        ) {
           return null
+        }
         const slot = getSlotInLocationStack(labware.stack)
         const slotPosition = getPositionFromSlotId(slot, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)

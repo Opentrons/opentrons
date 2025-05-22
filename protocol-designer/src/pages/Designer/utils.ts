@@ -41,7 +41,7 @@ import type {
 import type { Fixture } from './DeckSetup/constants'
 
 export const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
-const TC_LID_LOADNAME = 'opentrons_tough_pcr_auto_sealing_lid'
+export const TC_LID_LOADNAME = 'opentrons_tough_pcr_auto_sealing_lid'
 export const LID_LOADNAMES = [TIPRACK_LID_LOADNAME, TC_LID_LOADNAME]
 
 export interface AdditionalEquipment {
@@ -92,6 +92,9 @@ export const getSlotInformation = (
     Object.values(deckSetupLabware),
     slot
   )
+  const labwareStackOnSlot =
+    fullStackFromLabwares?.filter(id => deckSetupLabware[id] != null) ?? []
+
   const numOfTcLidsOnStack =
     fullStackFromLabwares?.filter(
       id =>
@@ -103,13 +106,16 @@ export const getSlotInformation = (
     fullStackFromLabwares?.filter(
       id =>
         deckSetupLabware[id] != null &&
-        (numOfTcLidsOnStack === 1 && fullStackFromLabwares.length > 1
+        //  remove lid from stack if its a labware + lid
+        (numOfTcLidsOnStack === 1 && labwareStackOnSlot.length > 1
           ? !LID_LOADNAMES.includes(
               deckSetupLabware[id].def.parameters.loadName
             )
-          : deckSetupLabware[id].def.parameters.loadName !==
+          : //  otherwise, count lid in stack if its a stack of lids
+            deckSetupLabware[id].def.parameters.loadName !==
             TIPRACK_LID_LOADNAME)
     ) ?? []
+
   const lidIdFromStack = fullStackFromLabwares?.find(id =>
     numOfTcLidsOnStack === 1
       ? LID_LOADNAMES.includes(deckSetupLabware[id].def.parameters.loadName)
@@ -162,15 +168,6 @@ export const getSlotInformation = (
       ? ('wasteChuteAndStagingArea' as Fixture)
       : (createdFixtureForSlots[0]?.name as Fixture)
 
-  console.log(
-    'createdStackForSlot',
-    slot === 'offDeck'
-      ? []
-      : offDeckLabware != null
-      ? [offDeckLabware.id]
-      : remainingLabwareIds,
-    lidIdFromStack != null ? deckSetupLabware[lidIdFromStack] : undefined
-  )
   return {
     createdModuleForSlot,
     createdAdapterForSlot,

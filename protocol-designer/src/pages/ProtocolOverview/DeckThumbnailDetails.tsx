@@ -21,8 +21,8 @@ import {
   getStagingAreaAddressableAreas,
   getTopmostLabwareOnModuleFromStack,
 } from '../../utils'
-import { LID_LOADNAMES } from '../Designer/utils'
 import { SlotHover } from './SlotHover'
+import { getShowTCLid } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -128,7 +128,7 @@ export const DeckThumbnailDetails = (
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
-          LID_LOADNAMES.includes(labware.def.parameters.loadName)
+          getShowTCLid(labware)
         ) {
           return null
         }
