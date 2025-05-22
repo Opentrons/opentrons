@@ -159,10 +159,11 @@ def create_csv_test_report(
     """Create CSV test report."""
     env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
     meas_info = [field.name.replace("_", "-") for field in fields(MeasurementData)]
-    if pipette_channels == 8 and not increment:
-        pip_channels_tested = 8
-    else:
-        pip_channels_tested = 1
+    # if pipette_channels == 8 and not increment:
+    #     pip_channels_tested = 8
+    # else:
+    #     pip_channels_tested = 1
+    pip_channels_tested = 1  # only use channel 1 for cavity test
     meas_vols = [
         (
             None,  # volume
