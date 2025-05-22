@@ -112,6 +112,7 @@ async def force_func(fg_var, sg_value, trial, axis, timer, timeout):
             # Flush the file to ensure data is written
             file.flush()
         max_force = max(force_readings)
+        print(f"Trial: {trial}, SG: {sg_value}, Max Force: {max_force}")
         # log.debug(f"Trial: {trial}, SG: {sg_value}, Max Force: {max_force}")
         # Close the file
         file.close()
@@ -170,7 +171,8 @@ async def main(args) -> None:
     if not api.attached_modules:
         # logger.error("No stackers attached")
         return
-    stacker_choice = int(input("Enter Stacker Number: "))
+    # stacker_choice = int(input("Enter Stacker Number: "))
+    stacker_choice = 0
     stacker = api.attached_modules[stacker_choice]
     device_info = api.attached_modules[0].device_info
     print(f"device_info: {device_info}")
@@ -230,18 +232,22 @@ async def repeatablity_test(args) -> None:
     print(f'config: {STACKER_MOTION_CONFIG}')
     # api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating = False)
     api = await OT3API.build_hardware_controller(loop=asyncio.get_running_loop())
+    force_gauge = None
     if args.gauge:
         ports = comports()
-        for port, desc, hwid in sorted(ports):
-            print(f"{port}: {desc} [{hwid}]")
-            if "Mark-10" in desc:
-                force_gauge = await mark10.Mark10.create(port, 115200, loop=asyncio.get_running_loop())
-        if force_gauge is None:
-            raise ValueError("Force Gauge not found")
+        # for port, desc, hwid in sorted(ports):
+        #     print(f"{port}: {desc} [{hwid}]")
+        #     if "MARK-10 USB Device - MARK-10 USB Device" == desc:
+        force_gauge = await mark10.Mark10.create("/dev/ttyUSB1", 115200, loop=asyncio.get_running_loop())
+            # else:
+            #     print(f"Force Gauge not found on {port}")
+            #     raise ValueError("Force Gauge not found")
+    print(f'Force Gauge: {force_gauge}')
     stacker = api.attached_modules[0]
     device_info = api.attached_modules[0].device_info
     # sg_value = 2
     sg_value = int(input("Enter SG Value: "))
+    test = input("Enter Test Type: ")
     # await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
     await stacker.home_axis(StackerAxis.Z, Direction.RETRACT)
     await stacker.home_axis(StackerAxis.X, Direction.RETRACT)
@@ -253,8 +259,8 @@ async def repeatablity_test(args) -> None:
                     }
     for c in range(1, args.cycles+1):
         await stacker._driver.set_stallguard_threshold(test_axis, True, sg_value)
-        if args.test in test_functions:
-            move_task = asyncio.create_task(test_functions[args.test]())
+        if test in test_functions:
+            move_task = asyncio.create_task(test_functions[test]())
         else:
             print(f"Unknown test type: {args.test}")
             print(f"Unknown test type: {args.test}")
@@ -279,7 +285,7 @@ async def repeatablity_test(args) -> None:
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description="Motion Parameter Test Script")
-    arg_parser.add_argument("-c", "--cycles", default = 5, type = int, help = "number of cycles to execute")
+    arg_parser.add_argument("-c", "--cycles", default = 100, type = int, help = "number of cycles to execute")
     arg_parser.add_argument("-a", "--axis", default = 'x', type = str, help = "Choose a Axis")
     arg_parser.add_argument("-g","--gauge", required=False, action='store_false', help = "Force gauge used")
     arg_parser.add_argument("-t", "--test", default="move_sg_test", type = str, choices=["move_sg_test","home_sg_test", "repeatability_test"])

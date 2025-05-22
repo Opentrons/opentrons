@@ -51,7 +51,7 @@ TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
             "SPEED": {"MIN": 150, "MAX": 150, "INC": 50},
             "ACCEL": {"MIN": 500, "MAX": 500, "INC": 10},
             "CURRENT": {"MIN": 1.5, "MAX": 1.5, "INC": 0.1},
-            "MAX_SPEED_DISCONTINUITY": {"MIN": 55, "MAX": 50, "INC": 5}
+            "MAX_SPEED_DISCONTINUITY": {"MIN": 5, "MAX": 50, "INC": 5}
         },
         StackerAxis.L: {
             "SPEED": {"MIN": 0, "MAX": 200, "INC": 10},
@@ -261,9 +261,10 @@ async def home_axis(
     )
     if success == MoveResult.STALL_ERROR:
         STACKER_STATES[stacker]["stall_detected"] = True
-        raise FlexStackerStallError(
-            STACKER_STATES[stacker]["device_info"]["serial"], axis
-        )
+        return success == MoveResult.STALL_ERROR
+        # raise FlexStackerStallError(
+        #     STACKER_STATES[stacker]["device_info"]["serial"], axis
+        # )
     return success == MoveResult.NO_ERROR
 
 async def stacker_setup() -> FlexStackerDriver:
