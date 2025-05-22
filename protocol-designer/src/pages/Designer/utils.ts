@@ -19,6 +19,7 @@ import {
   getFullStackFromLabwaresOnDeck,
   getStagingAreaAddressableAreas,
 } from '../../utils'
+import { getShowTCLid } from '../ProtocolOverview/utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type {
@@ -93,7 +94,12 @@ export const getSlotInformation = (
     slot
   )
   const labwareStackOnSlot =
-    fullStackFromLabwares?.filter(id => deckSetupLabware[id] != null) ?? []
+    fullStackFromLabwares?.filter(
+      id =>
+        deckSetupLabware[id] != null &&
+        deckSetupLabware[id].def.parameters.loadName !==
+          'opentrons_flex_deck_riser'
+    ) ?? []
 
   const numOfTcLidsOnStack =
     fullStackFromLabwares?.filter(
