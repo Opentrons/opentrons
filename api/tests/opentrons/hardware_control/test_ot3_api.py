@@ -774,6 +774,11 @@ async def test_blow_out_position(
     load_configs: Dict[OT3Mount, PipetteLoadConfig],
     blowout_volume: float,
 ) -> None:
+    # Each Hypothesis example will share the same ot3_hardware value (they are all
+    # within "a single function", as the function-scoped ot3_hardware fixture sees it).
+    # Do our best to isolate them.
+    await ot3_hardware.reset()
+
     liquid_class = LiquidClasses.default
     for mount, configs in load_configs.items():
         if configs["channels"] == 96:
