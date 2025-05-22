@@ -197,6 +197,7 @@ export const getStackerDefinition = (
     .filter(([, { compatibleParentLabware }]) =>
       compatibleParentLabware?.includes(loadName)
     )
+    .reverse()
     .map(([labwareDefUri]) => labwareDefUri)[0]
 
   return labwareDefURI
