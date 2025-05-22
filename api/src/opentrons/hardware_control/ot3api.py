@@ -3142,7 +3142,7 @@ class OT3API(
         await self._backend.increase_evo_disp_count(realmount)
 
     async def read_stem_temperature(
-        self, mount: Union[top_types.Mount, OT3Mount], primary: bool
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
     ) -> float:
         """Read and return the current stem temperature."""
         realmount = OT3Mount.from_mount(mount)
@@ -3151,7 +3151,7 @@ class OT3API(
         return s_data.temperature.to_float()  # type: ignore [union-attr]
 
     async def read_stem_humidity(
-        self, mount: Union[top_types.Mount, OT3Mount], primary: bool
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
     ) -> float:
         """Read and return the current primary stem humidity."""
         realmount = OT3Mount.from_mount(mount)
@@ -3160,7 +3160,7 @@ class OT3API(
         return s_data.humidity.to_float()  # type: ignore [union-attr]
 
     async def read_stem_pressure(
-        self, mount: Union[top_types.Mount, OT3Mount], primary: bool
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
     ) -> float:
         """Read and return the current primary stem pressure."""
         realmount = OT3Mount.from_mount(mount)
@@ -3169,7 +3169,7 @@ class OT3API(
         return s_data.to_float()
 
     async def read_stem_capacitance(
-        self, mount: Union[top_types.Mount, OT3Mount], primary: bool
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
     ) -> float:
         """Read and return the current primary stem capacitance."""
         realmount = OT3Mount.from_mount(mount)
