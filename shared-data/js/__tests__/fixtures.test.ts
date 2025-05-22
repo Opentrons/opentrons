@@ -16,13 +16,13 @@ describe('getAAFromCutoutFixtureId', () => {
     expect(result).toEqual(expectedOrder)
   })
 
-  it('Should return undefined if there is no match for a  cutoutId and a cutoutFixtureId', () => {
+  it('Should return undefined if there is no match for a cutoutId and a cutoutFixtureId', () => {
     const result = getAAFromCutoutFixtureId(
       'cutoutA1',
       'flexStackerModuleV1',
       getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
     )
 
-    expect(result).toBeNull()
+    expect(result).toBeUndefined()
   })
 })

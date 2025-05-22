@@ -67,7 +67,6 @@ import type {
 import type { AreaTypeWithFakes, CutoutFixtureIdsWithFakes } from './constants'
 import type {
   AddressableArea,
-  AreaType,
   CoordinateTuple,
   CutoutConfig,
   CutoutFixture,
@@ -198,7 +197,7 @@ export const FAKE_FIXTURES_AND_AA = {
         cutoutD3: ['D3', 'fakeD4'],
         cutoutC3: ['C3', 'fakeC4'],
         cutoutB3: ['B3', 'fakeB4'],
-        cutoutA3: ['DA', 'fakeA4'],
+        cutoutA3: ['A3', 'fakeA4'],
       },
       fixtureGroup: {},
       height: 0,
