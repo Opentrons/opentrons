@@ -1,6 +1,6 @@
 """Dataclass that describes the arguments for trials."""
 from dataclasses import dataclass
-from typing import List, Optional, Union, Dict
+from typing import List, Optional, Dict
 from . import config
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 from .measurement.record import GravimetricRecorder

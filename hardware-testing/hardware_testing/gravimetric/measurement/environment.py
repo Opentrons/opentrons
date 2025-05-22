@@ -2,11 +2,6 @@
 from dataclasses import dataclass, fields
 from typing import Callable, List
 
-from hardware_testing.opentrons_api.helpers_ot3 import (
-    get_temperature_humidity_outside_api_ot3,
-    SensorResponseBad,
-)
-from hardware_testing.opentrons_api.types import OT3Mount
 from hardware_testing.drivers import asair_sensor
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 from opentrons.protocol_api import ProtocolContext

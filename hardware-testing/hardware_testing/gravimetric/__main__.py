@@ -2,7 +2,7 @@
 from json import load as json_load
 from pathlib import Path
 import argparse
-from typing import List, Union, Dict, Optional, Any, Tuple
+from typing import List, Dict, Optional, Any, Tuple
 from dataclasses import dataclass
 from opentrons.protocol_api import ProtocolContext
 from . import report
@@ -168,7 +168,7 @@ class RunArgs:
         return _ctx
 
     @classmethod
-    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":  # noqa: C901
+    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
         operator_name = helpers._get_operator_name(_ctx.is_simulating())
