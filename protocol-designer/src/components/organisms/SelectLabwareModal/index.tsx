@@ -428,7 +428,6 @@ export function SelectLabwareModal(
                   {filteredLabwareByCategory[CUSTOM_CATEGORY].map(
                     ({ uri }, index) => (
                       <CustomizeExpandButton
-                        t={t}
                         key={`${index}_${uri}`}
                         id={`${index}_${uri}`}
                         buttonText={customLabwareDefs[uri].metadata.displayName}
@@ -532,7 +531,6 @@ export function SelectLabwareModal(
                                   key={`${index}_${category}_${loadName}`}
                                 >
                                   <CustomizeExpandButton
-                                    t={t}
                                     stackingProps={stackingProps ?? undefined}
                                     id={`${index}_${category}_${loadName}`}
                                     buttonText={def.metadata.displayName}
@@ -689,7 +687,6 @@ export function SelectLabwareModal(
 
                                                 return (
                                                   <CustomizeExpandButton
-                                                    t={t}
                                                     stackingProps={
                                                       stackingProps ?? undefined
                                                     }

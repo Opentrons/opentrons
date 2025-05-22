@@ -160,13 +160,13 @@ describe('DeckSetupToolbox', () => {
     })
     render(props)
     screen.getAllByText('mock nickName')
-    screen.getByText('Add liquid')
+    screen.getByText('Edit liquid')
     screen.getByText('Bottom of slot')
     screen.getByText('Top of slot')
     fireEvent.click(screen.getByText('Clear'))
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     //  add a liquid
-    fireEvent.click(screen.getByText('Add liquid'))
+    fireEvent.click(screen.getByText('Edit liquid'))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
     // add labware when there is no space
