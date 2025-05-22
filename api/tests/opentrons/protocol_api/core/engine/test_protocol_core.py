@@ -1881,10 +1881,19 @@ def test_define_liquid_class(
     )
     assert subject.define_liquid_class("water", version=123) == expected_liquid_class
 
+    # Test that different version number works
     decoy.when(liquid_classes.load_definition("water", version=456)).then_return(
         minimal_liquid_class_def2
     )
-    assert subject.define_liquid_class("water", version=456) == expected_liquid_class
+    different_liquid_class = subject.define_liquid_class("water", version=456)
+    assert different_liquid_class.name == "water2"
+    assert different_liquid_class.display_name == "water 2"
+
+    # Test that definition caching works
+    decoy.when(liquid_classes.load_definition("water", version=123)).then_return(
+        minimal_liquid_class_def2
+    )
+    assert subject.define_liquid_class("water", version=123) == expected_liquid_class
 
 
 def test_get_labware_location_deck_slot(
