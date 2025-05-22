@@ -45,7 +45,7 @@ export function useDeckConfigurationEditingTools(
     cutoutId: CutoutId,
     cutoutFixtureId: CutoutFixtureId
   ): void => {
-    const replacementFixtureId = getReplacmentFixtureForFixtureRemoval(
+    const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
       cutoutFixtureId,
       cutoutId
     )
