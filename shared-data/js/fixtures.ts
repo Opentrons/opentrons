@@ -264,7 +264,7 @@ export const getCutoutFixtureReplacementIfNeeded = (
   return cutoutFixtureId
 }
 
-export const getReplacmentFixtureForFixtureRemoval = (
+export const getReplacementFixtureForFixtureRemoval = (
   cutoutFixtureId: CutoutFixtureIdsWithFakes,
   cutoutId: CutoutId
 ): CutoutFixtureId => {
