@@ -125,6 +125,8 @@ def run(protocol: ProtocolContext) -> None:
     elutionplate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
     )
+    lid = protocol.load_lid_stack("opentrons_tough_universal_lid", "C3", 2)
+    protocol.move_lid(lid, elutionplate)
     magnetic_block: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
     )  # type: ignore[assignment]
@@ -536,9 +538,11 @@ def run(protocol: ProtocolContext) -> None:
         if probe_height_bool:
             helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
         else:
+            protocol.move_lid(elutionplate, "C3")
             helpers.find_liquid_height_of_loaded_liquids(
                 protocol, liquid_vols_and_wells, m1000
             )
+
         if plate_reader_bool:
             # Plate reader steps
             # 1. Fill plate with water
