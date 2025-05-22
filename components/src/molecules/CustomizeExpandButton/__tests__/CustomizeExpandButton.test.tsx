@@ -1,16 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  fixture24Tuberack,
-  fixture96Plate,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import { fixture24Tuberack, fixture96Plate } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../testing/utils'
 import { CustomizeExpandButton } from '../index'
 
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const render = (props: ComponentProps<typeof CustomizeExpandButton>) =>
   renderWithProviders(<CustomizeExpandButton {...props} />)
