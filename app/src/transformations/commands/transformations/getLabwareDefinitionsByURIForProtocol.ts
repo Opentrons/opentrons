@@ -2,7 +2,7 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import type {
   FlexStackerSetStoredLabwareRunTimeCommand,
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadLabwareRunTimeCommand,
   LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
@@ -10,12 +10,12 @@ import type {
 } from '@opentrons/shared-data'
 
 export interface LabwareDefinitionsByURI {
-  [labwareDefURI: string]: LabwareDefinition2
+  [labwareDefURI: string]: LabwareDefinition
 }
 
 const defPair = (
-  maybeDef?: LabwareDefinition2
-): Record<string, LabwareDefinition2> =>
+  maybeDef?: LabwareDefinition
+): Record<string, LabwareDefinition> =>
   maybeDef == null ? {} : { [getLabwareDefURI(maybeDef)]: maybeDef }
 
 export function getLabwareDefinitionsByURIForProtocol(

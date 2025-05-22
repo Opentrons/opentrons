@@ -16,7 +16,7 @@ import {
 } from '../transforms'
 
 import type { Selector } from 'reselect'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type {
   ConflictTimestampInfo,
   LPCFlowType,
@@ -160,7 +160,7 @@ export const selectIsSelectedLwTipRack = (
 // Returns the labware definition for the user-selected labware, if any.
 export const selectSelectedLwDef = (
   runId: string
-): Selector<State, LabwareDefinition2 | null> =>
+): Selector<State, LabwareDefinition | null> =>
   createSelector(
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.selectedLabware,
@@ -186,7 +186,7 @@ export const selectSelectedLwDef = (
 
 export const selectSelectedLwAdapterDef = (
   runId: string
-): Selector<State, LabwareDefinition2 | null> =>
+): Selector<State, LabwareDefinition | null> =>
   createSelector(
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.selectedLabware,

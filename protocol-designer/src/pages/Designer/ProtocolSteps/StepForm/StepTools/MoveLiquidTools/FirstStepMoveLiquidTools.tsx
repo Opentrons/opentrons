@@ -159,10 +159,7 @@ export function FirstStepMoveLiquidTools({
         )}
       </Flex>
       <Divider marginY="0" />
-      <VolumeField
-        {...propsForFields.volume}
-        errorToShow={getFormLevelError('volume', mappedErrorsToField)}
-      />
+      <VolumeField {...propsForFields.volume} />
       <Divider marginY="0" />
       <PathField
         {...propsForFields.path}

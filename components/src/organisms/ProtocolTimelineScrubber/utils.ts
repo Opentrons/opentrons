@@ -8,7 +8,7 @@ import { COLORS } from '../../helix-design-system'
 
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -41,7 +41,7 @@ export type ContentsByWell = {
 
 const MIXED_WELL_COLOR = COLORS.grey50
 
-function getAllWellsForLabware(def: LabwareDefinition2): string[] {
+function getAllWellsForLabware(def: LabwareDefinition): string[] {
   return Object.keys(def.wells)
 }
 
@@ -64,7 +64,7 @@ function _wellContentsForWell(
 
 export function _wellContentsForLabware(
   labwareLiquids: SingleLabwareLiquidState,
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
 ): ContentsByWell {
   const allWellsForContainer = getAllWellsForLabware(labwareDef)
   return reduce(

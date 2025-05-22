@@ -181,14 +181,16 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             >
               <ModalContentOneColSimpleButtons
                 headline={t('choose_pipette')}
-                firstButton={{
-                  label: singleMount,
-                  value: SINGLE_MOUNT_PIPETTES,
-                }}
-                secondButton={{
-                  label: bothMounts,
-                  value: NINETY_SIX_CHANNEL,
-                }}
+                buttons={[
+                  {
+                    label: singleMount,
+                    value: SINGLE_MOUNT_PIPETTES,
+                  },
+                  {
+                    label: bothMounts,
+                    value: NINETY_SIX_CHANNEL,
+                  },
+                ]}
                 onSelect={event => {
                   setSelectedPipette(event.target.value as SelectablePipettes)
                 }}

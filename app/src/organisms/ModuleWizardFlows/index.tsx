@@ -11,11 +11,14 @@ import {
 
 import { AttachProbe } from './AttachProbe'
 import { BeforeBeginning } from './BeforeBeginning'
+import { CloseDoor } from './CloseStackerDoor'
 import { SECTIONS } from './constants'
 import { DetachProbe } from './DetachProbe'
+import { InstallShuttle } from './InstallShuttle'
 import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
+import { SelectModule } from './SelectModule'
 import { Success } from './Success'
 import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
@@ -74,10 +77,11 @@ export const ModuleWizardFlows = (
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
       >
-        <>
-          CHOOSE MODULE SCREEN PROCEED FUNCTION HERE WILL BE INITIALIZE MODULE
-          FLOW HOOK
-        </>
+        <SelectModule
+          {...currentStep}
+          {...wizardFlowBaseProps}
+          buildFlowForSelectedModule={buildFlowForSelectedModule}
+        />
       </ModuleWizardScreen>
     )
   } else if (
@@ -275,17 +279,6 @@ export const ModuleWizardFlows = (
           />
         </ModuleWizardScreen>
       )
-    case SECTIONS.CHECK_INSTALLATION_PINS:
-      return (
-        <ModuleWizardScreen
-          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-          handleCleanUpAndClose={handleCleanUpAndClose}
-          currentStepIndex={currentStepIndex}
-          totalStepCount={totalStepCount}
-        >
-          <>Check installation pins</>
-        </ModuleWizardScreen>
-      )
     case SECTIONS.CLOSE_DOOR:
       return (
         <ModuleWizardScreen
@@ -294,7 +287,17 @@ export const ModuleWizardFlows = (
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
         >
-          <>Close robot door</>
+          <CloseDoor
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            deckConfig={deckConfig}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
         </ModuleWizardScreen>
       )
     case SECTIONS.INSTALL_SHUTTLE:
@@ -305,7 +308,17 @@ export const ModuleWizardFlows = (
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
         >
-          <>Install shuttle</>
+          <InstallShuttle
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            deckConfig={deckConfig}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
         </ModuleWizardScreen>
       )
     case SECTIONS.UPDATE_FIRMWARE:

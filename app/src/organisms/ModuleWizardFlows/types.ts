@@ -13,7 +13,6 @@ export type ModuleSetupWizardStep =
   | CloseDoorStep
   | InstallShuttleStep
   | UpdateFirmwareStep
-  | CheckInstallationPinsStep
 
 export type ModuleWizardAction =
   | ModuleWizardBuildFlowAction
@@ -72,9 +71,6 @@ export interface InstallShuttleStep {
 }
 export interface UpdateFirmwareStep {
   section: typeof SECTIONS.UPDATE_FIRMWARE
-}
-export interface CheckInstallationPinsStep {
-  section: typeof SECTIONS.CHECK_INSTALLATION_PINS
 }
 export interface SelectLocationStep {
   section: typeof SECTIONS.SELECT_LOCATION

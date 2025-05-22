@@ -1,6 +1,6 @@
 import type {
   LabwareBrand,
-  LabwareDefinition2 as LabwareDefinition,
+  LabwareDefinition,
   LabwareWellGroupMetadata,
   LabwareWellShapeProperties,
   LoadedLabware,
@@ -27,7 +27,7 @@ export type LabwareSort = 'alphabetical' | 'reverse'
 
 export interface LabwareWellGroupProperties {
   xOffsetFromLeft: number
-  yOffsetFromTop: number
+  yOffsetFromBack: number
   xSpacing: number | null
   ySpacing: number | null
   wellCount: number

@@ -2,6 +2,7 @@ import deepClone from 'lodash/cloneDeep'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  getSchema2Dimensions,
   getSlotHasMatingSurfaceUnitVector,
   ot2DeckDefV5,
 } from '@opentrons/shared-data'
@@ -175,7 +176,7 @@ describe('getRunLabwareRenderInfo', () => {
     expect(labwareInfo?.x).toEqual(0)
     expect(labwareInfo?.y).toEqual(
       ot2DeckDefV5.cornerOffsetFromOrigin[1] -
-        mockLabwareDefinition.dimensions.yDimension
+        getSchema2Dimensions(mockLabwareDefinition).yDimension
     )
   })
 
