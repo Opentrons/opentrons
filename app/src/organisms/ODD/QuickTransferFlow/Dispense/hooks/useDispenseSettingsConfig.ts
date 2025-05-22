@@ -1,4 +1,3 @@
-import { stat } from 'original-fs'
 import { useTranslation } from 'react-i18next'
 
 import {

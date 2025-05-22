@@ -8,7 +8,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  NO_WRAP,
   POSITION_FIXED,
   SPACING,
   StyledText,
