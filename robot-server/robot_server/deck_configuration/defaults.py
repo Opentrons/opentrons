@@ -48,22 +48,22 @@ _for_flex = models.DeckConfigurationRequest.model_construct(
         ),
         models.CutoutFixture.model_construct(
             cutoutId="cutoutA3",
-            cutoutFixtureId="stagingAreaRightSlot",
+            cutoutFixtureId="trashBinAdapter",
             opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.model_construct(
             cutoutId="cutoutB3",
-            cutoutFixtureId="stagingAreaRightSlot",
+            cutoutFixtureId="singleRightSlot",
             opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.model_construct(
             cutoutId="cutoutC3",
-            cutoutFixtureId="stagingAreaRightSlot",
+            cutoutFixtureId="singleRightSlot",
             opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.model_construct(
             cutoutId="cutoutD3",
-            cutoutFixtureId="stagingAreaRightSlot",
+            cutoutFixtureId="singleRightSlot",
             opentronsModuleSerialNumber=None,
         ),
     ]
