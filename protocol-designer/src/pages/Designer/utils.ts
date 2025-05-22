@@ -19,7 +19,6 @@ import {
   getFullStackFromLabwaresOnDeck,
   getStagingAreaAddressableAreas,
 } from '../../utils'
-import { getShowTCLid } from '../ProtocolOverview/utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type {
