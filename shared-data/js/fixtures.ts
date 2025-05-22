@@ -212,7 +212,7 @@ export const FAKE_FIXTURES_AND_AA = {
       height: 0,
     },
   ],
-}
+} as const
 
 // TODO(jh 01-15-25): Instead of typing slotId as `string`, type it as `AddressableAreaName`.
 // returns the position associated with a slot id

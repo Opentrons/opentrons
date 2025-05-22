@@ -3,12 +3,15 @@ import { describe, expect, it } from 'vitest'
 import {
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FLEX_ROBOT_TYPE,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '..'
 import {
   getAAFromCutoutFixtureId,
   getCutoutFixtureReplacementIfNeeded,
+  getReplacementFixtureForFixtureRemoval,
 } from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
 
@@ -52,5 +55,43 @@ describe('getCutoutFixtureReplacementIfNeeded', () => {
     )
 
     expect(result).toEqual(STAGING_AREA_RIGHT_SLOT_FIXTURE)
+  })
+})
+
+describe('getReplacementFixtureForFixtureRemoval', () => {
+  it('Should get SINGLE_RIGHT_SLOT_FIXTURE to replace staging slot removal', () => {
+    const result = getReplacementFixtureForFixtureRemoval(
+      STAGING_AREA_RIGHT_SLOT_FIXTURE,
+      'cutoutD3'
+    )
+
+    expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
+  })
+
+  it('Should return SINGLE_RIGHT_SLOT_FIXTURE when using a single right cutout', () => {
+    const result = getReplacementFixtureForFixtureRemoval(
+      SINGLE_RIGHT_SLOT_FIXTURE,
+      'cutoutD3'
+    )
+
+    expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
+  })
+
+  it('Should return SINGLE_LEFT_SLOT_FIXTURE when using a single right cutout', () => {
+    const result = getReplacementFixtureForFixtureRemoval(
+      SINGLE_RIGHT_SLOT_FIXTURE,
+      'cutoutA1'
+    )
+
+    expect(result).toEqual(SINGLE_LEFT_SLOT_FIXTURE)
+  })
+
+  it('Should return SINGLE_CENTER_SLOT_FIXTURE when using a single center cutout', () => {
+    const result = getReplacementFixtureForFixtureRemoval(
+      SINGLE_RIGHT_SLOT_FIXTURE,
+      'cutoutA2'
+    )
+
+    expect(result).toEqual(SINGLE_CENTER_SLOT_FIXTURE)
   })
 })
