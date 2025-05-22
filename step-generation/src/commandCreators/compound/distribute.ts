@@ -395,7 +395,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               pipette,
               dropTipLocation,
               tipRack,
-              ...(nozzles != null ? { nozzle: nozzles } : {}),
+              ...(nozzles != null ? { nozzles } : {}),
             }),
           ]
         : []

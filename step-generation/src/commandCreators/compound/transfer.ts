@@ -317,7 +317,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   pipette: args.pipette,
                   dropTipLocation: args.dropTipLocation,
                   tipRack: args.tipRack,
-                  ...(args.nozzles != null ? { nozzle: args.nozzles } : {}),
+                  ...(args.nozzles != null ? { nozzles: args.nozzles } : {}),
                 }),
               ]
             : []
