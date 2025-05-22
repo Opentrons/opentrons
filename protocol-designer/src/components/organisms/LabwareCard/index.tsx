@@ -22,6 +22,7 @@ import {
 } from '@opentrons/components'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { getEnableStacking } from '../../../feature-flags/selectors'
 import { openIngredientSelector } from '../../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
@@ -45,6 +46,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
   const { def } = labware
+  const enableStacking = useSelector(getEnableStacking)
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
   const allLabwareIdsOnStack = Object.values(deckSetupLabware)
     .filter(
@@ -67,8 +69,20 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const nickName = nickNames[labware.id]
   const isAdapterOrTiprack =
     def.allowedRoles?.includes('adapter') || def.parameters.isTiprack
+  const isLid = def.allowedRoles?.includes('lid')
   const isNicknameDifferent = nickName !== displayName
   const liquidIds = getLiquidIdsOnLabware(wellContents)
+  const canModifyQuantity =
+    labware.def.stackLimit != null && labware.def.stackLimit > 1
+
+  let editButton
+  if (isLid && canModifyQuantity) {
+    editButton = t('edit_quantity')
+  } else if (!isAdapterOrTiprack && canModifyQuantity && enableStacking) {
+    editButton = t('edit_liquid_and_quantity')
+  } else if (!isAdapterOrTiprack) {
+    editButton = t('edit_liquid')
+  }
 
   return (
     <Box position={POSITION_RELATIVE}>
@@ -107,7 +121,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               ) : null}
 
               <Flex gridGap={SPACING.spacing8}>
-                {!isAdapterOrTiprack ? (
+                {!isAdapterOrTiprack && !isLid ? (
                   <LiquidInfoDisplay
                     text={
                       liquidIds.length === 0
@@ -123,7 +137,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 ) : null}
               </Flex>
             </Flex>
-            {!isAdapterOrTiprack ? (
+            {editButton != null ? (
               <Btn
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 css={LINK_BUTTON_STYLE}
@@ -134,7 +148,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 data-testid="LabwareCard_addLiquid_button"
               >
                 <StyledText desktopStyle="captionRegular">
-                  {t('add_liquid')}
+                  {editButton}
                 </StyledText>
               </Btn>
             ) : null}
