@@ -320,7 +320,7 @@ export const getNewConfig = (
   cutoutFixtureId: CutoutFixtureIdsWithFakes,
   deckDef: DeckDefinition
 ): DeckConfiguration => {
-  const replacementFixtureId = getReplacmentFixtureForFixtureRemoval(
+  const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
     cutoutFixtureId,
     cutoutId
   )
