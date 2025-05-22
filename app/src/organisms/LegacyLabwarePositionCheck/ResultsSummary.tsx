@@ -50,7 +50,7 @@ import type {
 } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 import type { ResultsSummaryStep, WorkingOffset } from './types'
 
@@ -231,7 +231,7 @@ const ScrollContainer = styled(Flex)`
 
 interface OffsetTableProps {
   offsets: LegacyLabwareOffsetCreateData[]
-  labwareDefinitions: LabwareDefinition2[]
+  labwareDefinitions: LabwareDefinition[]
 }
 
 const OffsetTable = (props: OffsetTableProps): JSX.Element => {

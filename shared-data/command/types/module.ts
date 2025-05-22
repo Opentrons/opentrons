@@ -3,7 +3,7 @@ import type {
   CommonCommandRunTimeInfo,
   RunCommandFlexStackerError,
 } from '.'
-import type { LabwareDefinition2 } from '../../js'
+import type { LabwareDefinition } from '../../js'
 import type { LabwareLocationSequence } from './setup'
 
 export type ModuleRunTimeCommand =
@@ -446,9 +446,9 @@ export interface FlexStackerSetStoredLabwareRunTimeCommand
   extends FlexStackerSetStoredLabwareCreateCommand,
     CommonCommandRunTimeInfo {
   result?: {
-    primaryLabwareDefinition: LabwareDefinition2
-    lidLabwareDefinition?: LabwareDefinition2 | null
-    adapterLabwareDefinition?: LabwareDefinition2 | null
+    primaryLabwareDefinition: LabwareDefinition
+    lidLabwareDefinition?: LabwareDefinition | null
+    adapterLabwareDefinition?: LabwareDefinition | null
     count: number
     storedLabware: FlexStackerStoredLabwareGroup[]
   } & StackerStoredLabwareLocationSequences

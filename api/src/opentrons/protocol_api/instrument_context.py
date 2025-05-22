@@ -659,28 +659,13 @@ class InstrumentContext(publisher.CommandPublisher):
         def aspirate_with_delay(
             location: Optional[types.Location | labware.Well],
         ) -> None:
-            self.aspirate(
-                volume,
-                location,
-                rate,
-                # We have to hide all new arguments from protocol_api_old/test_context.py.
-                # I don't know if the test is even valid, but I'm afraid to change the test.
-                **{"flow_rate": aspirate_flow_rate}
-                if aspirate_flow_rate is not None
-                else {},
-            )
+            self.aspirate(volume, location, rate, flow_rate=aspirate_flow_rate)
             if aspirate_delay:
                 delay_with_publish(aspirate_delay)
 
         def dispense_with_delay(push_out: Optional[float]) -> None:
             self.dispense(
-                volume,
-                None,
-                rate,
-                **{"flow_rate": dispense_flow_rate}
-                if dispense_flow_rate is not None
-                else {},
-                **{"push_out": push_out} if push_out is not None else {},
+                volume, None, rate, flow_rate=dispense_flow_rate, push_out=push_out
             )
             if dispense_delay:
                 delay_with_publish(dispense_delay)

@@ -90,6 +90,10 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
             (liquidClassValuesForTip?.multiDispense?.disposalByVolume as Array<
               [number, number]
             >) ?? null,
+          aspirateAirGap:
+            formData.aspirate_airGap_checkbox === true
+              ? formData.aspirate_airGap_volume
+              : null,
         }).referenceVolumes
       : null
   const [referenceVolumeFlowRate, referenceVolumeCorrection] =

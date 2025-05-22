@@ -154,6 +154,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
       >
         <PrimaryButton
           onClick={() => {
+            sendIdentifyModule(mod, true)
             handleStartSetup(mod)
           }}
         >

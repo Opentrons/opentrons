@@ -9,6 +9,7 @@ const glycerol50V1 = glycerol50V1Uncasted as LiquidClass
 const waterV1 = waterV1Uncasted as LiquidClass
 
 export const WATER_LIQUID_CLASS_NAME = 'waterV1'
+export const NONE_LIQUID_CLASS_NAME = 'none'
 
 const defs = { waterV1, glycerol50V1, ethanol80V1 }
 

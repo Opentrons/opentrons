@@ -45,7 +45,7 @@
   "module_setup": "Module setup",
   "module_heating_or_cooling": "Module calibration cannot proceed while heating or cooling",
   "module_secured": "The module must be fully secured in its caddy and secured in the deck slot.",
-  "module_too_hot": "Module is too hot to proceed to module calibration",
+  "module_too_hot": "Module is too hot to proceed to module setup",
   "move_gantry_to_front": "Move gantry to front",
   "next": "Next",
   "pipette_probe": "Pipette probe",

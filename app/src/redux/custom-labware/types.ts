@@ -1,4 +1,4 @@
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 // common types
 
@@ -8,7 +8,7 @@ interface LabwareFileProps {
 }
 
 interface ValidatedLabwareProps extends LabwareFileProps {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }
 
 export interface UncheckedLabwareFile extends LabwareFileProps {

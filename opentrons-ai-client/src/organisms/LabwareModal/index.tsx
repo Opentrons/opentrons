@@ -26,7 +26,7 @@ import { LABWARES_FIELD_NAME } from '../LabwareLiquidsSection'
 import type { ChangeEvent } from 'react'
 import type {
   LabwareDefByDefURI,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 import type { DisplayLabware } from '../LabwareLiquidsSection'
 
@@ -60,13 +60,10 @@ export function LabwareModal({
 
   const defs = getOnlyLatestDefs()
 
-  const labwareByCategory: Record<
-    string,
-    LabwareDefinition2[]
-  > = useMemo(() => {
+  const labwareByCategory: Record<string, LabwareDefinition[]> = useMemo(() => {
     const groupedLabware = reduce<
       LabwareDefByDefURI,
-      Record<string, LabwareDefinition2[]>
+      Record<string, LabwareDefinition[]>
     >(
       defs,
       (acc, def) => {

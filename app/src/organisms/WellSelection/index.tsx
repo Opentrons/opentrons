@@ -14,14 +14,14 @@ import {
 
 import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   NozzleLayoutDetails,
   PipetteChannels,
 } from '@opentrons/shared-data'
 import type { GenericRect } from './types'
 
 interface WellSelectionProps {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   deselectWells: (wells: string[]) => void
   /* The actual wells that are clicked. */
   selectedPrimaryWells: WellGroup

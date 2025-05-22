@@ -1,4 +1,4 @@
-import type { WellOrigin } from '../command'
+import type { WellLocation, WellOrigin } from '../command'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { ModuleModel, ModuleType, PositionReference } from './types'
 
@@ -693,4 +693,13 @@ export const POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN: Record<
   [POSITION_REFERENCE_LIQUID_MENISCUS]: WELL_ORIGIN_MENISCUS,
 }
 
-export const SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM = 2
+const SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM = 2
+
+export const SAFE_MOVE_TO_WELL_LOCATION: WellLocation = {
+  origin: WELL_ORIGIN_TOP,
+  offset: {
+    x: 0,
+    y: 0,
+    z: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  },
+}

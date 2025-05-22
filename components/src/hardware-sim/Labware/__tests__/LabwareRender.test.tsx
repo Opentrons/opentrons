@@ -12,11 +12,11 @@ import {
 } from '../labwareInternals'
 import { LabwareRender, WELL_LABEL_OPTIONS } from '../LabwareRender'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('../labwareInternals')
 
-const troughFixture12 = fixture12Trough as LabwareDefinition2
+const troughFixture12 = fixture12Trough as LabwareDefinition
 
 describe('LabwareRender', () => {
   beforeEach(() => {

@@ -17,15 +17,12 @@ import { IconButton } from '/app/atoms/buttons/IconButton'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
-import type {
-  LabwareDefinition2,
-  PipetteChannels,
-} from '@opentrons/shared-data'
+import type { LabwareDefinition, PipetteChannels } from '@opentrons/shared-data'
 
 interface Selection384WellsProps {
   allSelectedWells: WellGroup
   channels: PipetteChannels
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   deselectWells: (wells: string[]) => void
   labwareRender: ReactNode
   selectWells: (wellGroup: WellGroup) => unknown

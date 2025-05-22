@@ -16,7 +16,7 @@ import { getLegacyLabwareOffsetLocation } from '../getLegacyLabwareOffsetLocatio
 
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
@@ -24,7 +24,7 @@ import type {
 vi.mock('/app/transformations/commands')
 
 const protocolWithTC = (multiple_tipacks_with_tc as unknown) as CompletedProtocolAnalysis
-const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition
 const mockAdapterId = 'mockAdapterId'
 const TCModelInProtocol = 'thermocyclerModuleV1'
 const MOCK_SLOT = '2'

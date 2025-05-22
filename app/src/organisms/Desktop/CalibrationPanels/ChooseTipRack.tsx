@@ -35,14 +35,14 @@ import { ChosenTipRackRender } from './ChosenTipRackRender'
 
 import type { MultiValue, SingleValue } from 'react-select'
 import type { SelectOption, SelectOptionOrGroup } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { TipLengthCalibration } from '/app/redux/calibration/api-types'
 import type { Mount } from '/app/redux/pipettes/types'
 import type { CalibrationLabware } from '/app/redux/sessions/types'
 import type { State } from '/app/redux/types'
 
 interface TipRackInfo {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   calibration: TipLengthCalibration | null
 }
 
@@ -52,7 +52,7 @@ export type TipRackMap = Partial<{
 
 const EQUIPMENT_POLL_MS = 5000
 
-function formatOptionsFromLabwareDef(lw: LabwareDefinition2): SelectOption {
+function formatOptionsFromLabwareDef(lw: LabwareDefinition): SelectOption {
   return {
     value: getLabwareDefURI(lw),
     label: lw.metadata.displayName,
@@ -61,11 +61,11 @@ function formatOptionsFromLabwareDef(lw: LabwareDefinition2): SelectOption {
 interface ChooseTipRackProps {
   tipRack: CalibrationLabware
   mount: Mount
-  chosenTipRack: LabwareDefinition2 | null
-  handleChosenTipRack: (arg: LabwareDefinition2 | null) => unknown
+  chosenTipRack: LabwareDefinition | null
+  handleChosenTipRack: (arg: LabwareDefinition | null) => unknown
   closeModal: () => unknown
   robotName?: string | null
-  defaultTipracks?: LabwareDefinition2[] | null
+  defaultTipracks?: LabwareDefinition[] | null
 }
 
 export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {

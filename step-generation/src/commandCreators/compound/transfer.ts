@@ -7,7 +7,7 @@ import {
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   LOW_VOLUME_PIPETTES,
   POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
-  SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  SAFE_MOVE_TO_WELL_LOCATION,
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
@@ -45,15 +45,6 @@ import type {
   CurriedCommandCreator,
   TransferArgs,
 } from '../../types'
-
-const SAFE_MOVE_TO_WELL_LOCATION: WellLocation = {
-  origin: WELL_ORIGIN_TOP,
-  offset: {
-    x: 0,
-    y: 0,
-    z: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-  },
-}
 
 export const transfer: CommandCreator<TransferArgs> = (
   args,
@@ -324,9 +315,9 @@ export const transfer: CommandCreator<TransferArgs> = (
             ? [
                 curryCommandCreator(replaceTip, {
                   pipette: args.pipette,
-                  nozzles: args.nozzles ?? undefined,
                   dropTipLocation: args.dropTipLocation,
                   tipRack: args.tipRack,
+                  ...(args.nozzles != null ? { nozzles: args.nozzles } : {}),
                 }),
               ]
             : []
@@ -353,14 +344,14 @@ export const transfer: CommandCreator<TransferArgs> = (
           if (
             aspirateMmFromBottom != null &&
             aspirateSubmergeMmFromBottom != null &&
-            aspirateMmFromBottom >= aspirateSubmergeMmFromBottom
+            aspirateMmFromBottom > aspirateSubmergeMmFromBottom
           ) {
             errors.push(errorCreators.submergeBelowAspirate())
           }
           if (
             aspirateMmFromBottom != null &&
             aspirateRetractMmFromBottom != null &&
-            aspirateMmFromBottom >= aspirateRetractMmFromBottom
+            aspirateMmFromBottom > aspirateRetractMmFromBottom
           ) {
             errors.push(errorCreators.retractBelowAspirate())
           }
@@ -552,7 +543,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                 ]
               : []
 
-          // TODO: add correction volume
           const aspirateCorrectionVolumeForSubtransferTarget = getCorrectionVolume(
             {
               liquidClass: args.liquidClass,
