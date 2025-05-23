@@ -195,7 +195,7 @@ describe('Mix', () => {
         ...props.state,
         mixOnAspirate: {
           mixVolume: 15,
-          repititions: 55,
+          repetitions: 55,
         },
       },
     }
@@ -233,7 +233,7 @@ describe('Mix', () => {
         ...props.state,
         mixOnDispense: {
           mixVolume: 18,
-          repititions: 2,
+          repetitions: 2,
         },
       },
     }

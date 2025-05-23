@@ -104,7 +104,7 @@ export function useDispenseSettingsConfig({
         state.mixOnDispense !== undefined
           ? t('mix_value', {
               volume: state.mixOnDispense?.mixVolume,
-              reps: state.mixOnDispense?.repititions,
+              reps: state.mixOnDispense?.repetitions,
             })
           : '',
       enabled:
