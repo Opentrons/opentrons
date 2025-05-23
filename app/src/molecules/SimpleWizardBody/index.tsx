@@ -2,7 +2,7 @@ import { SimpleWizardBodyContainer } from './SimpleWizardBodyContainer'
 import { SimpleWizardBodyContent } from './SimpleWizardBodyContent'
 import { SimpleWizardInProgressBody } from './SimpleWizardInProgressBody'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 export {
   SimpleWizardBodyContainer,
@@ -11,8 +11,13 @@ export {
 }
 
 export function SimpleWizardBody(
-  props: ComponentProps<typeof SimpleWizardBodyContent> &
-    ComponentProps<typeof SimpleWizardBodyContainer>
+  props: Omit<
+    ComponentProps<typeof SimpleWizardBodyContent> &
+      ComponentProps<typeof SimpleWizardBodyContainer>,
+    'children'
+  > & {
+    children?: ReactNode
+  }
 ): JSX.Element {
   const { children, ...rest } = props
   return (

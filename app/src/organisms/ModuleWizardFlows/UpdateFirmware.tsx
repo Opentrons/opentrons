@@ -97,7 +97,7 @@ export const UpdateFirmware = (
         proceed()
       }, NO_UPDATE_FOUND_TIMEOUT_MS)
     }
-  })
+  }, [attachedModule.hasAvailableUpdate])
 
   useEffect(() => {
     if (requestStatus === PENDING) {

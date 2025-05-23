@@ -90,10 +90,10 @@ export const Success = (props: SuccessProps): JSX.Element | null => {
 
   return (
     <SimpleWizardBody
-      header={t('successfully_setup', { module: moduleDisplayName })}
-      iconColor={COLORS.red50}
-      isSuccess={true}
       justifyContentForOddButton={JUSTIFY_FLEX_END}
+      isSuccess={true}
+      iconColor={COLORS.red50}
+      header={t('successfully_setup', { module: moduleDisplayName })}
     >
       {newModules.length > 0 ? setupAnotherButton : null}
       {finishButton}
