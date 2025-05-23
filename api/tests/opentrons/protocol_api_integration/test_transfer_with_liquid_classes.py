@@ -615,6 +615,7 @@ def test_order_of_water_consolidate_steps(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
                 volume_for_pipette_mode_configuration=50,
+                current_volume=0.0,
             ),
             mock.call.aspirate_liquid_class(
                 mock.ANY,
@@ -624,6 +625,7 @@ def test_order_of_water_consolidate_steps(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=25, air_gap=0.1)],
                 volume_for_pipette_mode_configuration=None,
+                current_volume=25.0,
             ),
             mock.call.dispense_liquid_class(
                 mock.ANY,
@@ -743,6 +745,7 @@ def test_order_of_water_consolidate_steps_larger_volume_than_tip(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
                 volume_for_pipette_mode_configuration=30,
+                current_volume=0.0,
             ),
             mock.call.dispense_liquid_class(
                 mock.ANY,
@@ -763,6 +766,7 @@ def test_order_of_water_consolidate_steps_larger_volume_than_tip(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0.1)],
                 volume_for_pipette_mode_configuration=30,
+                current_volume=0.0,
             ),
             mock.call.dispense_liquid_class(
                 mock.ANY,
@@ -876,6 +880,7 @@ def test_order_of_water_consolidate_steps_with_no_new_tips(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
                 volume_for_pipette_mode_configuration=50,
+                current_volume=0.0,
             ),
             mock.call.aspirate_liquid_class(
                 mock.ANY,
@@ -885,6 +890,7 @@ def test_order_of_water_consolidate_steps_with_no_new_tips(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=25, air_gap=0.1)],
                 volume_for_pipette_mode_configuration=None,
+                current_volume=25.0,
             ),
             mock.call.dispense_liquid_class(
                 mock.ANY,
@@ -999,6 +1005,7 @@ def test_order_of_water_consolidate_steps_with_return_tip(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
                 volume_for_pipette_mode_configuration=50,
+                current_volume=0.0,
             ),
             mock.call.aspirate_liquid_class(
                 mock.ANY,
@@ -1008,6 +1015,7 @@ def test_order_of_water_consolidate_steps_with_return_tip(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=25, air_gap=0.1)],
                 volume_for_pipette_mode_configuration=None,
+                current_volume=25.0,
             ),
             mock.call.dispense_liquid_class(
                 mock.ANY,
