@@ -15,7 +15,7 @@ from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_RELEVANT_API, 
 from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
 from api.settings import Settings
 
-weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
+weave.init("opentronsai/OpentronsAI-Phase-march-25")
 settings: Settings = Settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
@@ -413,41 +413,66 @@ class AnthropicPredict:
                         "__INITIAL_DECK_SETUP_STEP__": {
                             "stepType": "manualIntervention",
                             "id": "__INITIAL_DECK_SETUP_STEP__",
-                            "labwareLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("labwareLocationUpdate", {}),
-                            "pipetteLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("pipetteLocationUpdate", {}),
-                            "moduleLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("moduleLocationUpdate", {}),
-                            "trashBinLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("trashBinLocationUpdate", {}),
-                            "wasteChuteLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("wasteChuteLocationUpdate", {}),
-                            "stagingAreaLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("stagingAreaLocationUpdate", {}),
-                            "gripperLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("gripperLocationUpdate", {}),
+                            "labwareLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "labwareLocationUpdate",
+                            ),
+                            "pipetteLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "pipetteLocationUpdate",
+                            ),
+                            "moduleLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "moduleLocationUpdate",
+                            ),
+                            "trashBinLocationUpdate": (
+                                {"trashbin-1": "cutout12"}
+                                if self.deep_get(protocol, "robot", "model") == "OT-2 Standard"
+                                else self.deep_get(
+                                    protocol,
+                                    "designerApplication",
+                                    "data",
+                                    "savedStepForms",
+                                    "__INITIAL_DECK_SETUP_STEP__",
+                                    "trashBinLocationUpdate",
+                                )
+                            ),
+                            "wasteChuteLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "wasteChuteLocationUpdate",
+                            ),
+                            "stagingAreaLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "stagingAreaLocationUpdate",
+                            ),
+                            "gripperLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "gripperLocationUpdate",
+                            ),
                         },
                         **original_steps_without_initial,
                     },
