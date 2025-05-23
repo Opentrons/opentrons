@@ -62,7 +62,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
     if (newModules.length === 1) {
       sendIdentifyModule(newModules[0], true)
     }
-  })
+  }, [])
 
   const handleModuleSelected = (serialNumber: string): void => {
     // stop blinking previous module

@@ -64,7 +64,7 @@ export const ModuleWizardFlows = (
     if (attachedModuleOnLaunch != null) {
       buildFlowForSelectedModule(attachedModuleOnLaunch)
     }
-  })
+  }, [])
 
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
 
