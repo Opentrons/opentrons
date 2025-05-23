@@ -610,12 +610,11 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         def get_tip_pos_by_number(nubmer:int):
             col_list = ["A", "B", "C", "D", "E", "F", "G", "H"]
             _temp = nubmer%8 if nubmer%8 is not 0 else 8
-            col = col_list[_temp - 1]
             row = int(nubmer/8)+1 if nubmer%8 !=0 else int(nubmer/8)
             if _channels is 8:
-                col = col_list[7 - (_temp - 1)]
+                col = col_list[8 - _temp]
             else:
-                col = col
+                col = col_list[_temp - 1]
             return f"{col}{row}"
         
         def get_next_tip(tip_numbers):
