@@ -98,7 +98,13 @@
       "type": "object",
       "description": "Explict locating features when this module acts as the parent in a stackup.",
       "required": [],
-      "properties": {}
+      "properties": {
+        "backLeftBottom": {
+          "description": "Exists when the module displaces the child entity to the back left bottom corner of the module",
+          "type": "object",
+          "required": []
+        }
+      }
     },
     "dimensions": {
       "type": "object",

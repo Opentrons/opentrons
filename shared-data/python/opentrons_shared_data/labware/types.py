@@ -161,13 +161,22 @@ class Extents(TypedDict):
 class LocatingFeatureKeys(str, Enum):
     """Keys for LocatingFeatures."""
 
+    BACK_LEFT_BOTTOM = "backLeftBottom"
+
+
+class BackLeftBottomLocatingFeature(TypedDict):
+    """The back-left-bottom locating feature."""
+
     pass
 
 
 class LocatingFeatures(TypedDict):
-    """A dictionary of locating features."""
+    """A dictionary of locating features explicitly defined in any entity definition.
 
-    pass
+    Locating features that are implicitly derived are omitted, ex., bottom-center.
+    """
+
+    backLeftBottom: NotRequired[BackLeftBottomLocatingFeature]
 
 
 class LabwareDefinition2(TypedDict):

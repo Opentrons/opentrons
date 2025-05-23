@@ -619,7 +619,13 @@
       "type": "object",
       "description": "Explict locating features when this labware acts as the parent in a stackup.",
       "required": [],
-      "properties": {}
+      "properties": {
+        "backLeftBottom": {
+          "description": "Exists when the labware displaces the child entity to the back left bottom corner of the labware",
+          "type": "object",
+          "required": []
+        }
+      }
     },
     "locatingFeaturesAsChild": {
       "type": "object",

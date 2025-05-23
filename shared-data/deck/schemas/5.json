@@ -173,7 +173,7 @@
                 "required": [],
                 "properties": {
                   "backLeftBottom": {
-                    "description": "Exists when the addressable area contains a spring(s) that causes the child entity to be displaced to the back left bottom corner of the addressable area",
+                    "description": "Exists when the addressable area displaces the child entity to the back left bottom corner of the addressable area",
                     "type": "object",
                     "required": []
                   }

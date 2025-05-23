@@ -7,6 +7,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     LabwareDefinition3,
 )
+from opentrons_shared_data.labware.types import LocatingFeatureKeys
 
 from ..types import (
     LoadedLabware,
@@ -52,12 +53,19 @@ def _get_parent_origin_to_locating_feature(
     definition: LabwareDefinition3,
     lw_parent_location_info: LabwareParentLocationInfo,
 ) -> Point:
-    """Returns the offset from parent origin to the locating feature position."""
+    """Returns the offset from parent origin to the locating feature position.
+
+    All utilities convert parent extents to a coordinate IV system (+x, -y, +z) if
+    the parent does not actively utilize a coordinate IV system.
+    """
     if isinstance(lw_parent_location_info, LabwareDefinition2):
         return Point(0, 0, 0)
 
-    # TOME TODO: Determine locating feature type from labware/parent definitions
-    return _get_parent_origin_to_bottom_center(lw_parent_location_info)
+    elif _is_back_left_bottom_locating_feature_valid(lw_parent_location_info):
+        return _get_parent_origin_to_back_left_bottom(lw_parent_location_info)
+
+    else:
+        return _get_parent_origin_to_bottom_center(lw_parent_location_info)
 
 
 def _get_locating_feature_to_lw_origin(
@@ -69,8 +77,27 @@ def _get_locating_feature_to_lw_origin(
     if isinstance(lw_parent_location_info, LabwareDefinition2):
         return Point(0, 0, 0)
 
-    # TOME TODO: Determine locating feature type from labware/parent definitions
-    return _get_bottom_center_to_lw_origin(definition)
+    elif _is_back_left_bottom_locating_feature_valid(lw_parent_location_info):
+        return _get_back_left_bottom_to_lw_origin(definition)
+
+    else:
+        return _get_bottom_center_to_lw_origin(definition)
+
+
+def _is_back_left_bottom_locating_feature_valid(
+    lw_parent_location_info: LabwareParentLocationInfo,
+) -> bool:
+    """Returns whether the back-bottom-left locating feature is valid given the parent entity."""
+    assert not isinstance(lw_parent_location_info, LabwareDefinition2)
+
+    if (
+        lw_parent_location_info.locatingFeaturesAsParent
+        and LocatingFeatureKeys.BACK_LEFT_BOTTOM
+        in lw_parent_location_info.locatingFeaturesAsParent
+    ):
+        return True
+    else:
+        return False
 
 
 def _get_parent_origin_to_bottom_center(
@@ -109,6 +136,34 @@ def _get_parent_origin_to_bottom_center(
         raise ValueError(f"Unsupported parent location info: {lw_parent_location_info}")
 
 
+def _get_parent_origin_to_back_left_bottom(
+    lw_parent_location_info: LabwareParentLocationInfo,
+) -> Point:
+    """Returns offset from parent origin to parent's back-left-bottom corner."""
+    if isinstance(lw_parent_location_info, LabwareDefinition2):
+        return Point(0, 0, 0)
+
+    elif isinstance(lw_parent_location_info, LabwareDefinition3):
+        return Point(
+            x=lw_parent_location_info.extents.total.backLeftBottom.x,
+            y=lw_parent_location_info.extents.total.backLeftBottom.y,
+            z=lw_parent_location_info.extents.total.backLeftBottom.z,
+        )
+
+    elif isinstance(lw_parent_location_info, AddressableArea):
+        return Point(x=0, y=lw_parent_location_info.bounding_box.y, z=0)
+
+    elif isinstance(lw_parent_location_info, ModuleDefinition):
+        return Point(
+            x=0,
+            y=lw_parent_location_info.dimensions.labwareInterfaceYDimension,
+            z=0,
+        )
+
+    else:
+        raise ValueError(f"Unsupported parent location info: {lw_parent_location_info}")
+
+
 def _get_bottom_center_to_lw_origin(definition: LabwareDefinition3) -> Point:
     """Returns offset from labware's bottom-center point to labware origin."""
     extents = definition.extents.total
@@ -119,3 +174,14 @@ def _get_bottom_center_to_lw_origin(definition: LabwareDefinition3) -> Point:
     )
 
     return -1 * lw_origin_to_bottom_center
+
+
+def _get_back_left_bottom_to_lw_origin(definition: LabwareDefinition3) -> Point:
+    """Returns offset from labware's back-left-bottom corner to labware origin."""
+    lw_origin_to_bottom_left = Point(
+        x=definition.extents.total.backLeftBottom.x,
+        y=definition.extents.total.backLeftBottom.y,
+        z=definition.extents.total.backLeftBottom.z,
+    )
+
+    return -1 * lw_origin_to_bottom_left
