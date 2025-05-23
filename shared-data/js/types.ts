@@ -418,7 +418,7 @@ export interface CutoutFixture {
   height: number
 }
 
-type cuoutFixtureOmit = Omit<CutoutFixture, 'id' | 'providesAddressableAreas'>
+type cutoutFixtureOmit = Omit<CutoutFixture, 'id' | 'providesAddressableAreas'>
 
 export interface FakeCutoutFixture extends Omit<CutoutFixture, 'id' | 'providesAddressableAreas'> {
   id: CutoutFixtureIdsWithFakes
