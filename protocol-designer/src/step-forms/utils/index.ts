@@ -11,7 +11,10 @@ import {
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getCutoutIdByAddressableArea } from '@opentrons/step-generation'
+import {
+  getCutoutIdByAddressableArea,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import { hydrateField } from '../../steplist/fieldLevel'
 
@@ -194,28 +197,27 @@ export const getSlotIsEmpty = (
     Object.values(initialDeckSetup.additionalEquipmentOnDeck).some(
       ae =>
         (ae.name === 'trashBin' || ae.name === 'wasteChute') &&
-        ae.location.includes(slot)
+        ae.location.split('cutout')[1] === slot
     ) &&
     discountTrash
   ) {
     return false
   }
-
-  return (
-    [
-      ...values(initialDeckSetup.modules).filter(
-        (moduleOnDeck: ModuleOnDeck) => {
-          const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
-          return cutoutForSlotOt2 != null
-            ? moduleOnDeck.slot === slot
-            : slot.includes(moduleOnDeck.slot)
-        }
-      ),
-      ...values(initialDeckSetup.labware).filter((labware: LabwareOnDeckType) =>
-        labware.stack.includes(slot)
-      ),
-    ].length === 0
+  const modulesInSlot = values(initialDeckSetup.modules).filter(
+    (moduleOnDeck: ModuleOnDeck) => {
+      const mappedCutout = slotToCutoutOt2Map[slot]
+      return mappedCutout != null
+        ? moduleOnDeck.slot === slot
+        : slot.includes(moduleOnDeck.slot)
+    }
   )
+
+  const labwareInSlot = values(initialDeckSetup.labware).filter(
+    (labware: LabwareOnDeckType) =>
+      getSlotInLocationStack(labware.stack) === slot
+  )
+
+  return modulesInSlot.length === 0 && labwareInSlot.length === 0
 }
 
 export const getIsCrashablePipetteSelected = (
