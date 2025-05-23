@@ -74,12 +74,11 @@ import type {
   AddressableArea,
   CoordinateTuple,
   CutoutConfig,
+  CutoutConfigMap,
   CutoutFixture,
   CutoutFixtureWithFakes,
   DeckDefinition,
   DeckDefinitionWithFakes,
-  FakeAddressableArea,
-  FakeCutoutFixture,
   ModuleModel,
 } from './types'
 
@@ -212,7 +211,7 @@ export const FAKE_FIXTURES_AND_AA = {
       height: 0,
     },
   ],
-} as const
+}
 
 // TODO(jh 01-15-25): Instead of typing slotId as `string`, type it as `AddressableAreaName`.
 // returns the position associated with a slot id
@@ -254,13 +253,6 @@ export function getAddressableAreaFromSlotId(
       addressableArea => addressableArea.id === slotId
     ) ?? null
   )
-}
-
-type CutoutConfigWithoutCutoutFixtureId = Omit<CutoutConfig, 'cutoutFixtureId'>
-
-interface CutoutConfigMap extends CutoutConfigWithoutCutoutFixtureId {
-  addressableAreaId: AddressableAreaNamesWithFakes
-  cutoutFixtureId: CutoutFixtureIdsWithFakes
 }
 
 export const getCutoutFixtureReplacementIfNeeded = (
@@ -341,9 +333,10 @@ export const filterAAByAreaType = (
 const getDeckDefAAWithFakeAA = (
   deckDefinition: DeckDefinition
 ): DeckDefinitionWithFakes => {
-  const locationsWithFakeAA: AddressableAreaWithFakes[] = deckDefinition.locations.addressableAreas.concat(
-    FAKE_FIXTURES_AND_AA.locations.addressableAreas as any
-  )
+  const locationsWithFakeAA = [
+    ...deckDefinition.locations.addressableAreas,
+    ...FAKE_FIXTURES_AND_AA.locations.addressableAreas,
+  ]
   return {
     ...deckDefinition,
     locations: {
@@ -375,9 +368,10 @@ export const getAAFromCutoutFixtureId = (
   /**
    * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
    */
-  const cutoutFixturesWithFakeFixtures: CutoutFixtureWithFakes[] = [...deckDefinition.cutoutFixtures,
-    ...FAKE_FIXTURES_AND_AA.cutoutFixtures
-  )
+  const cutoutFixturesWithFakeFixtures = [
+    ...deckDefinition.cutoutFixtures,
+    ...FAKE_FIXTURES_AND_AA.cutoutFixtures,
+  ]
   const deckDefWithFakeCutoutFixtures = {
     ...deckDefinition,
     cutoutFixtures: cutoutFixturesWithFakeFixtures,

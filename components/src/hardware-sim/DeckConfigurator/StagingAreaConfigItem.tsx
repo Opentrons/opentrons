@@ -19,7 +19,6 @@ import {
 
 import type {
   AddressableAreaNamesWithFakes,
-  CutoutFixtureId,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,

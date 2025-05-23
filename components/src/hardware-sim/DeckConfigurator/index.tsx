@@ -24,7 +24,6 @@ import { WasteChuteConfigFixture } from './WasteChuteConfigItem'
 
 import type { ReactNode } from 'react'
 import type {
-  CutoutFixtureId,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,

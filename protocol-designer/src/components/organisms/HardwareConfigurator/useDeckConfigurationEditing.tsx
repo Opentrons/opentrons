@@ -117,16 +117,39 @@ export function useDeckConfigurationEditing(
     dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
   }
 
+  const getCutoutFixtureType = (
+    cutoutFixtureId: CutoutFixtureId
+  ): CutoutConfigExtended['type'] => {
+    const thermocyclerCutoutFixtureId =
+      cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
+      cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
+
+    if (MODULE_MODELS.includes(cutoutFixtureId as ModuleModel)) {
+      return cutoutFixtureId
+    } else {
+      if (cutoutFixtureId === 'trashBinAdapter') {
+        return 'trashBin'
+      } else if (cutoutFixtureId === 'wasteChuteRightAdapterNoCover') {
+        return 'wasteChute'
+      } else if (thermocyclerCutoutFixtureId) {
+        return 'thermocyclerModuleV2'
+      } else if (cutoutFixtureId === 'stagingAreaRightSlot') {
+        return 'stagingArea'
+      } else if (
+        cutoutFixtureId === 'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
+      ) {
+        return 'stagingAreaAndWasteChute'
+      }
+      return 'stagingAreaAndMagneticBlock'
+    }
+  }
+
   //  removing fixture from changing configuration in the
   //  edit hardware sections where state is stored using redux
   const removeFixtureFromCutoutForEditing = (
     cutoutId: CutoutId,
     cutoutFixtureId: CutoutFixtureIdsWithFakes
   ): void => {
-    const thermocyclerCutoutFixtureId =
-      cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
-      cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
-
     const newDeckConfig = getNewConfig(
       cutoutId,
       deckConfig,
@@ -137,24 +160,7 @@ export function useDeckConfigurationEditing(
     const replacementFixtureId = getReplacementFixtureForFakeFixture(
       cutoutFixtureId
     )
-    let type = 'stagingAreaAndMagneticBlock' as CutoutConfigExtended['type']
-    if (MODULE_MODELS.includes(replacementFixtureId as ModuleModel)) {
-      type = cutoutFixtureId as ModuleModel
-    } else {
-      if (cutoutFixtureId === 'trashBinAdapter') {
-        type = 'trashBin'
-      } else if (cutoutFixtureId === 'wasteChuteRightAdapterNoCover') {
-        type = 'wasteChute'
-      } else if (thermocyclerCutoutFixtureId) {
-        type = 'thermocyclerModuleV2'
-      } else if (cutoutFixtureId === 'stagingAreaRightSlot') {
-        type = 'stagingArea'
-      } else if (
-        cutoutFixtureId === 'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
-      ) {
-        type = 'stagingAreaAndWasteChute'
-      }
-    }
+    const type = getCutoutFixtureType(replacementFixtureId)
     updateInitialDeckState?.(
       [{ cutoutId, cutoutFixtureId: replacementFixtureId, type }],
       newDeckConfig

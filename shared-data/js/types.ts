@@ -420,7 +420,8 @@ export interface CutoutFixture {
 
 type cutoutFixtureOmit = Omit<CutoutFixture, 'id' | 'providesAddressableAreas'>
 
-export interface FakeCutoutFixture extends Omit<CutoutFixture, 'id' | 'providesAddressableAreas'> {
+export interface FakeCutoutFixture
+  extends Omit<CutoutFixture, 'id' | 'providesAddressableAreas'> {
   id: CutoutFixtureIdsWithFakes
   providesAddressableAreas: Record<CutoutId, AddressableAreaNamesWithFakes[]>
 }
@@ -453,9 +454,8 @@ export interface AddressableArea {
   matingSurfaceUnitVector?: UnitVectorTuple
 }
 
-type addressableAreaWithoutId = Omit<AddressableArea, 'id' | 'areaType'>
-
-export interface FakeAddressableArea extends addressableAreaWithoutId {
+export interface FakeAddressableArea
+  extends Omit<AddressableArea, 'id' | 'areaType'> {
   id: AddressableAreaNamesWithFakes
   areaType: AreaTypeWithFakes
 }
@@ -485,9 +485,8 @@ export interface DeckLocations {
   legacyFixtures: LegacyFixture[]
 }
 
-type DeckLocationsWithoutAA = Omit<DeckLocations, 'addressableAreas'>
-
-export interface DeckLocationsWithFakes extends DeckLocationsWithoutAA {
+export interface DeckLocationsWithFakes
+  extends Omit<DeckLocations, 'addressableAreas'> {
   addressableAreas: AddressableAreaWithFakes[]
 }
 
@@ -501,13 +500,8 @@ export interface DeckDefinition {
   cutoutFixtures: CutoutFixture[]
 }
 
-type DeckDefinitionWithoutLocationsAndFixture = Omit<
-  DeckDefinition,
-  'locations' | 'cutoutFixtures'
->
-
 export interface DeckDefinitionWithFakes
-  extends DeckDefinitionWithoutLocationsAndFixture {
+  extends Omit<DeckDefinition, 'locations' | 'cutoutFixtures'> {
   locations: DeckLocationsWithFakes
   cutoutFixtures: CutoutFixtureWithFakes[]
 }
@@ -1075,6 +1069,13 @@ export interface CutoutConfig {
 }
 
 export type DeckConfiguration = CutoutConfig[]
+
+type CutoutConfigWithoutCutoutFixtureId = Omit<CutoutConfig, 'cutoutFixtureId'>
+
+export interface CutoutConfigMap extends CutoutConfigWithoutCutoutFixtureId {
+  addressableAreaId: AddressableAreaNamesWithFakes
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
+}
 
 export type NozzleLayoutConfig =
   | 'single'
