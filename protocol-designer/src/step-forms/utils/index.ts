@@ -185,15 +185,9 @@ export const getSlotIsEmpty = (
   slot: string,
   discountTrash: boolean
 ): boolean => {
-  //  special-casing the TC's slot A1 for the Flex
+  //  filter out trash slots only when selecting slot but not when
+  //  dragging/dropping
   if (
-    slot === 'cutoutA1' &&
-    Object.values(initialDeckSetup.modules).find(
-      module => module.type === THERMOCYCLER_MODULE_TYPE
-    )
-  ) {
-    return false
-  } else if (
     Object.values(initialDeckSetup.additionalEquipmentOnDeck).some(
       ae =>
         (ae.name === 'trashBin' || ae.name === 'wasteChute') &&
