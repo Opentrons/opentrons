@@ -167,6 +167,18 @@
                 "description": "A human-readable nickname for this area e.g. \"Slot A1\" or \"Trash Bin in A1\"",
                 "type": "string"
               },
+              "locatingFeaturesAsParent": {
+                "type": "object",
+                "description": "Explict locating features when this addressable area acts as the parent in a stackup.",
+                "required": [],
+                "properties": {
+                  "backLeftBottom": {
+                    "description": "Exists when the addressable area contains a spring(s) that causes the child entity to be displaced to the back left bottom corner of the addressable area",
+                    "type": "object",
+                    "required": []
+                  }
+                }
+              },
               "compatibleModuleTypes": {
                 "description": "OT-2 Only parameter. An array of module types that can be placed in this area. The module type names can be found in the moduleType field of a module definition.",
                 "type": "array",

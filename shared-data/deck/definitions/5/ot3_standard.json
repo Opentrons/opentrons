@@ -22,7 +22,10 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot D1"
+        "displayName": "Slot D1",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        }
       },
       {
         "id": "D2",
@@ -34,7 +37,10 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot D2"
+        "displayName": "Slot D2",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        }
       },
       {
         "id": "D3",
@@ -46,7 +52,10 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot D3"
+        "displayName": "Slot D3",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        }
       },
       {
         "id": "C1",
@@ -58,7 +67,10 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot C1"
+        "displayName": "Slot C1",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        }
       },
       {
         "id": "C2",
@@ -70,7 +82,10 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot C2"
+        "displayName": "Slot C2",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        }
       },
       {
         "id": "C3",
@@ -82,7 +97,10 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot C3"
+        "displayName": "Slot C3",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        }
       },
       {
         "id": "B1",
@@ -94,7 +112,10 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot B1"
+        "displayName": "Slot B1",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        }
       },
       {
         "id": "B2",
@@ -106,7 +127,10 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot B2"
+        "displayName": "Slot B2",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        }
       },
       {
         "id": "B3",
@@ -118,7 +142,10 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot B3"
+        "displayName": "Slot B3",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        }
       },
       {
         "id": "A1",
@@ -130,7 +157,10 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot A1"
+        "displayName": "Slot A1",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        }
       },
       {
         "id": "A2",
@@ -143,6 +173,9 @@
           "zDimension": 0
         },
         "displayName": "Slot A2",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        },
         "compatibleModuleTypes": []
       },
       {
@@ -156,6 +189,9 @@
           "zDimension": 0
         },
         "displayName": "Slot A3",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        },
         "compatibleModuleTypes": []
       },
       {
@@ -169,6 +205,9 @@
           "zDimension": 0
         },
         "displayName": "Slot A4",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        },
         "compatibleModuleTypes": []
       },
       {
@@ -182,6 +221,9 @@
           "zDimension": 0
         },
         "displayName": "Slot B4",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        },
         "compatibleModuleTypes": []
       },
       {
@@ -195,6 +237,9 @@
           "zDimension": 0
         },
         "displayName": "Slot C4",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        },
         "compatibleModuleTypes": []
       },
       {
@@ -208,6 +253,9 @@
           "zDimension": 0
         },
         "displayName": "Slot D4",
+        "locatingFeaturesAsParent": {
+          "backLeftBottom": {}
+        },
         "compatibleModuleTypes": []
       },
       {

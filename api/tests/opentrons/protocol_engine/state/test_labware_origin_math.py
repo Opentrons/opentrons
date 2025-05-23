@@ -121,6 +121,7 @@ _MOCK_ADDRESSABLE_AREA = AddressableArea(
     bounding_box=Dimensions(x=14000.5, y=15000.5, z=16000.5),
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
+    locating_features_as_parent=None,
 )
 
 
