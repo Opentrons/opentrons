@@ -306,7 +306,28 @@ class AnthropicPredict:
     def create_pd(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
         return self.process_message_pd(user_id, prompt, history, "create")
 
-    def standardize(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def deep_get(self, data: Dict[str, Any], *keys: str, default: Any = None) -> Any:
+        """
+        Safely navigate nested dictionaries using a sequence of keys.
+
+        Args:
+            data: The dictionary to navigate
+            *keys: Variable number of keys to traverse
+            default: Default value to return if any key is missing
+
+        Returns:
+            The value at the nested path, or default if any key is missing
+        """
+        current = data
+        for key in keys:
+            if isinstance(current, dict) and key in current:
+                current = current[key]
+            else:
+                return default if default is not None else {}
+        return current
+
+    @tracer.wrap()
+    def standardize(self, protocol: Dict[str, Any]) -> Dict[str, Any]:
         """
         Reorganize the data structure according to the standard schema while preserving content.
         SCHEMA
@@ -358,85 +379,110 @@ class AnthropicPredict:
         }
         """
         now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
-        original_saved_forms = data.get("designerApplication", {}).get("data", {}).get("savedStepForms", {})
+        original_saved_forms = self.deep_get(protocol, "designerApplication", "data", "savedStepForms")
         # Make a copy to modify, or ensure original_steps is a new dict
         original_steps_without_initial = {k: v for k, v in original_saved_forms.items() if k != "__INITIAL_DECK_SETUP_STEP__"}
-        original_ordered_ids = data.get("designerApplication", {}).get("data", {}).get("orderedStepIds", [])
+        original_ordered_ids = self.deep_get(protocol, "designerApplication", "data", "orderedStepIds", default=[])
 
         standard = {
-            "$otSharedSchema": data.get("$otSharedSchema", "#/protocol/schemas/8"),
-            "schemaVersion": data.get("schemaVersion", 8),
+            "$otSharedSchema": self.deep_get(protocol, "$otSharedSchema", default="#/protocol/schemas/8"),
+            "schemaVersion": self.deep_get(protocol, "schemaVersion", default=8),
             "metadata": {
-                "protocolName": data.get("metadata", {}).get("protocolName", ""),
-                "author": data.get("metadata", {}).get("author", "AI"),
-                "description": data.get("metadata", {}).get("description", ""),
+                "protocolName": self.deep_get(protocol, "metadata", "protocolName", default=""),
+                "author": self.deep_get(protocol, "metadata", "author", default="OpentronsAI"),
+                "description": self.deep_get(protocol, "metadata", "description", default=""),
                 "created": now_ms,
                 "lastModified": now_ms,
                 "source": "OpentronsAI",
-                "category": data.get("metadata", {}).get("category", None),
-                "subcategory": data.get("metadata", {}).get("subcategory", None),
-                "tags": data.get("metadata", {}).get("tags", []),
+                "category": self.deep_get(protocol, "metadata", "category", default=None),
+                "subcategory": self.deep_get(protocol, "metadata", "subcategory", default=None),
+                "tags": self.deep_get(protocol, "metadata", "tags", default=[]),
             },
             "designerApplication": {
-                "name": data.get("designerApplication", {}).get("name", "opentrons/protocol-designer"),
+                "name": self.deep_get(protocol, "designerApplication", "name", default="opentrons/protocol-designer"),
                 "version": "8.4.4",
                 "data": {
-                    "_internalAppBuildDate": data.get("designerApplication", {})
-                    .get("data", {})
-                    .get("_internalAppBuildDate", "Wed, 06 May 2025 21:05:04 GMT"),
-                    "pipetteTiprackAssignments": data.get("designerApplication", {}).get("data", {}).get("pipetteTiprackAssignments", {}),
+                    "_internalAppBuildDate": self.deep_get(
+                        protocol, "designerApplication", "data", "_internalAppBuildDate", default="Wed, 06 May 2025 21:05:04 GMT"
+                    ),
+                    "pipetteTiprackAssignments": self.deep_get(protocol, "designerApplication", "data", "pipetteTiprackAssignments"),
                     "dismissedWarnings": {"form": [], "timeline": []},
-                    "ingredients": data.get("designerApplication", {}).get("data", {}).get("ingredients", {}),
-                    "ingredLocations": data.get("designerApplication", {}).get("data", {}).get("ingredLocations", {}),
+                    "ingredients": self.deep_get(protocol, "designerApplication", "data", "ingredients"),
+                    "ingredLocations": self.deep_get(protocol, "designerApplication", "data", "ingredLocations"),
                     "savedStepForms": {
                         "__INITIAL_DECK_SETUP_STEP__": {
                             "stepType": "manualIntervention",
                             "id": "__INITIAL_DECK_SETUP_STEP__",
-                            "labwareLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("labwareLocationUpdate", {}),
-                            "pipetteLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("pipetteLocationUpdate", {}),
-                            "moduleLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("moduleLocationUpdate", {}),
-                            "trashBinLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("trashBinLocationUpdate", {}),
-                            "wasteChuteLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("wasteChuteLocationUpdate", {}),
-                            "stagingAreaLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("stagingAreaLocationUpdate", {}),
-                            "gripperLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("gripperLocationUpdate", {}),
+                            "labwareLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "labwareLocationUpdate",
+                            ),
+                            "pipetteLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "pipetteLocationUpdate",
+                            ),
+                            "moduleLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "moduleLocationUpdate",
+                            ),
+                            "trashBinLocationUpdate": (
+                                {"trashbin-1": "cutout12"}
+                                if self.deep_get(protocol, "robot", "model") == "OT-2 Standard"
+                                else self.deep_get(
+                                    protocol,
+                                    "designerApplication",
+                                    "data",
+                                    "savedStepForms",
+                                    "__INITIAL_DECK_SETUP_STEP__",
+                                    "trashBinLocationUpdate",
+                                )
+                            ),
+                            "wasteChuteLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "wasteChuteLocationUpdate",
+                            ),
+                            "stagingAreaLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "stagingAreaLocationUpdate",
+                            ),
+                            "gripperLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "gripperLocationUpdate",
+                            ),
                         },
                         **original_steps_without_initial,
                     },
                     "orderedStepIds": original_ordered_ids,
-                    "pipettes": data.get("designerApplication", {}).get("data", {}).get("pipettes", {}),
-                    "modules": data.get("designerApplication", {}).get("data", {}).get("modules", {}),
-                    "labware": data.get("designerApplication", {}).get("data", {}).get("labware", {}),
+                    "pipettes": self.deep_get(protocol, "designerApplication", "data", "pipettes"),
+                    "modules": self.deep_get(protocol, "designerApplication", "data", "modules"),
+                    "labware": self.deep_get(protocol, "designerApplication", "data", "labware"),
                 },
             },
-            "robot": data.get("robot", {}),
+            "robot": self.deep_get(protocol, "robot"),
             "labwareDefinitions": {},
         }
 
