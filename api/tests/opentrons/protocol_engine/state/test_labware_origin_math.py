@@ -18,6 +18,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Dimensions,
 )
 from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.labware.types import LocatingFeatures
 
 from opentrons.types import Point
 from opentrons.protocol_engine.state._labware_origin_math import (
@@ -143,6 +144,7 @@ _ADDRESSABLE_AREA = AddressableArea(
     bounding_box=AddressableAreaDimensions(x=1000, y=1500, z=2000),
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
+    locatingFeaturesAsParent=LocatingFeatures(),
 )
 
 

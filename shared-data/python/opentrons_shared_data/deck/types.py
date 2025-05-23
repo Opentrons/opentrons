@@ -8,6 +8,7 @@ from typing import Any, Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict
 
 from ..module.types import ModuleType
+from opentrons_shared_data.labware.types import LocatingFeatures
 
 
 DeckSchemaVersion5 = Literal[5]
@@ -104,6 +105,14 @@ class AddressableArea(_RequiredAddressableArea, total=False):
     ableToDropLabware: bool
 
 
+class AddressableAreaV5(_RequiredAddressableArea, total=False):
+    compatibleModuleTypes: List[ModuleType]
+    matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
+    ableToDropTips: bool
+    ableToDropLabware: bool
+    locatingFeaturesAsParent: LocatingFeatures
+
+
 class Cutout(TypedDict):
     id: str
     position: List[float]
@@ -133,6 +142,13 @@ class LocationsV3(TypedDict):
 
 class LocationsV4(TypedDict):
     addressableAreas: List[AddressableArea]
+    calibrationPoints: List[CalibrationPoint]
+    cutouts: List[Cutout]
+    legacyFixtures: List[Fixture]
+
+
+class LocationsV5(TypedDict):
+    addressableAreas: List[AddressableAreaV5]
     calibrationPoints: List[CalibrationPoint]
     cutouts: List[Cutout]
     legacyFixtures: List[Fixture]
@@ -186,7 +202,7 @@ class _RequiredDeckDefinitionV5(TypedDict):
     dimensions: List[float]
     metadata: Metadata
     robot: Robot
-    locations: LocationsV4
+    locations: LocationsV5
     cutoutFixtures: List[CutoutFixture]
 
 
