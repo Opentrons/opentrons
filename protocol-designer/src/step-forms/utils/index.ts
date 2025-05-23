@@ -5,7 +5,9 @@ import values from 'lodash/values'
 import {
   FLEX_ROBOT_TYPE,
   GEN_ONE_MULTI_PIPETTES,
+  getCutoutDisplayName,
   getPipetteSpecsV2,
+  OT2_CUTOUT_BY_SLOT_ID,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
@@ -83,21 +85,6 @@ const MOVABLE_TRASH_CUTOUTS = [
     slot: 'D3',
   },
 ]
-
-const slotToCutoutOt2Map: { [key: string]: string } = {
-  '1': 'cutout1',
-  '2': 'cutout2',
-  '3': 'cutout3',
-  '4': 'cutout4',
-  '5': 'cutout5',
-  '6': 'cutout6',
-  '7': 'cutout7',
-  '8': 'cutout8',
-  '9': 'cutout9',
-  '10': 'cutout10',
-  '11': 'cutout11',
-  '12': 'cutout12',
-}
 
 export function getIdsInRange<T extends string | number>(
   orderedIds: T[],
@@ -191,7 +178,7 @@ export const getSlotIsEmpty = (
     Object.values(initialDeckSetup.additionalEquipmentOnDeck).some(
       ae =>
         (ae.name === 'trashBin' || ae.name === 'wasteChute') &&
-        ae.location.split('cutout')[1] === slot
+        getCutoutDisplayName(ae.location as CutoutId) === slot
     ) &&
     discountTrash
   ) {
@@ -199,7 +186,7 @@ export const getSlotIsEmpty = (
   }
   const modulesInSlot = values(initialDeckSetup.modules).filter(
     (moduleOnDeck: ModuleOnDeck) => {
-      const mappedCutout = slotToCutoutOt2Map[slot]
+      const mappedCutout = OT2_CUTOUT_BY_SLOT_ID[slot]
       return mappedCutout != null
         ? moduleOnDeck.slot === slot
         : slot.includes(moduleOnDeck.slot)
