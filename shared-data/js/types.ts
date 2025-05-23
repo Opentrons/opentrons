@@ -418,8 +418,6 @@ export interface CutoutFixture {
   height: number
 }
 
-type cutoutFixtureOmit = Omit<CutoutFixture, 'id' | 'providesAddressableAreas'>
-
 export interface FakeCutoutFixture
   extends Omit<CutoutFixture, 'id' | 'providesAddressableAreas'> {
   id: CutoutFixtureIdsWithFakes
@@ -486,7 +484,10 @@ export interface DeckLocations {
 }
 
 export interface DeckLocationsWithFakes
-  extends Omit<DeckLocations, 'addressableAreas'> {
+  extends Omit<
+    DeckLocations,
+    'addressableAreas' | 'calibrationPoints' | 'legacyFixtures'
+  > {
   addressableAreas: AddressableAreaWithFakes[]
 }
 
@@ -501,7 +502,16 @@ export interface DeckDefinition {
 }
 
 export interface DeckDefinitionWithFakes
-  extends Omit<DeckDefinition, 'locations' | 'cutoutFixtures'> {
+  extends Omit<
+    DeckDefinition,
+    | 'locations'
+    | 'cutoutFixtures'
+    | 'otId'
+    | 'cornerOffsetFromOrigin'
+    | 'dimensions'
+    | 'metadata'
+    | 'robot'
+  > {
   locations: DeckLocationsWithFakes
   cutoutFixtures: CutoutFixtureWithFakes[]
 }

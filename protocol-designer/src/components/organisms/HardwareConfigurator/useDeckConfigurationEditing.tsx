@@ -38,6 +38,7 @@ import { AddFixtureModal } from './AddFixtureModal'
 import type { ReactNode } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type {
+  CutoutFixtureId,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
@@ -125,7 +126,7 @@ export function useDeckConfigurationEditing(
       cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
 
     if (MODULE_MODELS.includes(cutoutFixtureId as ModuleModel)) {
-      return cutoutFixtureId
+      return cutoutFixtureId as ModuleModel
     } else {
       if (cutoutFixtureId === 'trashBinAdapter') {
         return 'trashBin'

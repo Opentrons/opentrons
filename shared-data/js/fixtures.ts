@@ -76,9 +76,9 @@ import type {
   CutoutConfig,
   CutoutConfigMap,
   CutoutFixture,
-  CutoutFixtureWithFakes,
   DeckDefinition,
   DeckDefinitionWithFakes,
+  FakeCutoutFixture,
   ModuleModel,
 } from './types'
 
@@ -194,6 +194,68 @@ export const FAKE_FIXTURES_AND_AA = {
         compatibleModuleTypes: [],
       },
     ],
+    cutouts: [
+      {
+        id: 'cutoutD1',
+        position: [0.0, 0.0, 0.0],
+        displayName: 'Cutout D1',
+      },
+      {
+        id: 'cutoutD2',
+        position: [164.0, 0.0, 0.0],
+        displayName: 'Cutout D2',
+      },
+      {
+        id: 'cutoutD3',
+        position: [328.0, 0.0, 0.0],
+        displayName: 'Cutout D3',
+      },
+      {
+        id: 'cutoutC1',
+        position: [0.0, 107, 0.0],
+        displayName: 'Cutout C1',
+      },
+      {
+        id: 'cutoutC2',
+        position: [164.0, 107, 0.0],
+        displayName: 'Cutout C2',
+      },
+      {
+        id: 'cutoutC3',
+        position: [328.0, 107, 0.0],
+        displayName: 'Cutout C3',
+      },
+      {
+        id: 'cutoutB1',
+        position: [0.0, 214.0, 0.0],
+        displayName: 'Cutout B1',
+      },
+      {
+        id: 'cutoutB2',
+        position: [164.0, 214.0, 0.0],
+        displayName: 'Cutout B2',
+      },
+      {
+        id: 'cutoutB3',
+        position: [328.0, 214.0, 0.0],
+        displayName: 'Cutout B3',
+      },
+      {
+        id: 'cutoutA1',
+        position: [0.0, 321.0, 0.0],
+        displayName: 'Cutout A1',
+      },
+      {
+        id: 'cutoutA2',
+        position: [164.0, 321.0, 0.0],
+        displayName: 'Cutout A2',
+      },
+      {
+        id: 'cutoutA3',
+        position: [328.0, 321.0, 0.0],
+        displayName: 'Cutout A3',
+      },
+    ],
   },
   cutoutFixtures: [
     {
@@ -209,9 +271,9 @@ export const FAKE_FIXTURES_AND_AA = {
       },
       fixtureGroup: {},
       height: 0,
-    },
+    } as FakeCutoutFixture,
   ],
-}
+} as DeckDefinitionWithFakes
 
 // TODO(jh 01-15-25): Instead of typing slotId as `string`, type it as `AddressableAreaName`.
 // returns the position associated with a slot id
