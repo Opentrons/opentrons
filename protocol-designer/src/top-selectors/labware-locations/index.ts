@@ -26,9 +26,9 @@ import { getRobotType } from '../../file-data/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
   getLabwareEntities,
   getModuleEntities,
-  getPipetteEntities,
 } from '../../step-forms/selectors'
 import {
   END_TERMINAL_ITEM_ID,
@@ -306,17 +306,10 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
 
 export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelineFrame> = createSelector(
   getRobotStateAtActiveItem,
-  getPipetteEntities,
-  getModuleEntities,
+  getInitialDeckSetup,
   getLabwareEntities,
-  getAdditionalEquipmentEntities,
-  (
-    robotState,
-    pipetteEntities,
-    moduleEntities,
-    labwareEntities,
-    additionalEquipmentEntities
-  ) => {
+
+  (robotState, initialDeckSetup, labwareEntities) => {
     if (robotState == null)
       return {
         pipettes: {},
@@ -324,14 +317,9 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
         modules: {},
         additionalEquipmentOnDeck: {},
       }
-
-    const filteredAdditionalEquipment = Object.fromEntries(
-      Object.entries(additionalEquipmentEntities).filter(
-        ([_, entity]) => entity.name !== 'gripper'
-      )
-    )
+    const { pipettes, modules, additionalEquipmentOnDeck } = initialDeckSetup
     return {
-      pipettes: mapValues(pipetteEntities, (pipEntity, pipId) => ({
+      pipettes: mapValues(pipettes, (pipEntity, pipId) => ({
         ...pipEntity,
         ...robotState.pipettes[pipId],
       })),
@@ -339,12 +327,12 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
         ...lwEntity,
         ...robotState.labware[lwId],
       })),
-      modules: mapValues(moduleEntities, (modEntity, modId) => ({
+      modules: mapValues(modules, (modEntity, modId) => ({
         ...modEntity,
         ...robotState.modules[modId],
       })),
       additionalEquipmentOnDeck: mapValues(
-        filteredAdditionalEquipment,
+        additionalEquipmentOnDeck,
         additionalEquipmentEntity => ({
           ...additionalEquipmentEntity,
         })

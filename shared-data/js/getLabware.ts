@@ -67,15 +67,11 @@ export const PD_DO_NOT_LIST = [
   'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
   'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
   'protocol_engine_lid_stack_object',
-  //  temporarily blocking deck riser until it is supported in PD
-  'opentrons_flex_deck_riser',
   // evotip is not supported in PD
   'ev_resin_tips_flex_96_tiprack_adapter',
   'ev_resin_tips_flex_96_labware',
   'ev_resin_tips_flex_tall_adapter',
   'ev_resin_tips_flex_short_adapter',
-  // temporarily blocking tiprack lids until stacker launches
-  'opentrons_flex_tiprack_lid',
   // temporarily blocking 20 uL Flex tip racks until they launch
   'opentrons_flex_96_tiprack_20ul',
   'opentrons_flex_96_filtertiprack_20ul',
