@@ -15,7 +15,9 @@ from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_RELEVANT_API, 
 from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
 from api.settings import Settings
 
-weave.init("opentronsai/OpentronsAI-Phase-march-25")
+MessageType = Literal["create", "update"]
+
+weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
 settings: Settings = Settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
@@ -25,6 +27,7 @@ REPO_ROOT: Path = Path(Path(__file__)).parent.parent.parent.parent
 class AnthropicPredict:
     def __init__(self, settings: Settings) -> None:
         self.settings: Settings = settings
+        self.max_tokens: int = 20000
         self.client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         self.model_name: str = settings.anthropic_model_name
         self.model_helper: str = settings.model_helper
@@ -176,7 +179,7 @@ class AnthropicPredict:
         ]
 
         response = self.client.messages.create(  # type: ignore[call-overload]
-            max_tokens=2048,
+            max_tokens=4096,
             temperature=0.0,
             messages=msg,
             model=self.model_helper,
@@ -188,16 +191,14 @@ class AnthropicPredict:
         return response.content[0].text  # type: ignore[no-any-return]
 
     @tracer.wrap()
-    def _process_message(
-        self, user_id: str, messages: List[MessageParam], message_type: Literal["create", "update"], max_tokens: int = 4096
-    ) -> Message:
+    def _process_message(self, user_id: str, messages: List[MessageParam], message_type: MessageType) -> Message:
         """
         Internal method to handle message processing with different system prompts.
         For now, system prompt is the same.
         """
 
         response: Message = self.client.messages.create(  # type: ignore[call-overload]
-            max_tokens=max_tokens,
+            max_tokens=self.max_tokens,
             messages=messages,
             model=self.model_name,
             system=self.system_prompt,
@@ -219,7 +220,7 @@ class AnthropicPredict:
 
     @tracer.wrap()
     def process_message(
-        self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: Literal["create", "update"] = "create"
+        self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: MessageType = "create"
     ) -> str | None:
         """Unified method for creating and updating messages"""
         try:
@@ -269,7 +270,7 @@ class AnthropicPredict:
 
     @tracer.wrap()
     def process_message_pd(
-        self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: Literal["create", "update"] = "create"
+        self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: MessageType = "create"
     ) -> str | None:
         """return a partial json protocol"""
         try:
@@ -281,7 +282,7 @@ class AnthropicPredict:
             messages.append({"role": "user", "content": self.PROMPT_PD.format(USER_PROMPT=prompt)})
 
             response: Message = self.client.messages.create(
-                max_tokens=20000,
+                max_tokens=self.max_tokens,
                 messages=messages,
                 model=self.model_name,
                 system=cast(Iterable[TextBlockParam], self.system_prompt_pd),
