@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next'
 
-import { COLORS, PrimaryButton } from '@opentrons/components'
+import { COLORS, JUSTIFY_FLEX_END, PrimaryButton } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { SmallButton } from '/app/atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -25,6 +26,7 @@ export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
     attachedModule,
     chainRunCommands,
     setErrorMessage,
+    isOnDevice,
   } = props
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
 
@@ -68,6 +70,18 @@ export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
       })
   }
 
+  const button = isOnDevice ? (
+    <SmallButton
+      buttonType="primary"
+      onClick={handleHomeShuttle}
+      buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+    />
+  ) : (
+    <PrimaryButton disabled={isRobotMoving} onClick={handleHomeShuttle}>
+      {i18n.format(t('shared:continue'), 'capitalize')}
+    </PrimaryButton>
+  )
+
   if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
@@ -78,18 +92,13 @@ export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
   } else {
     return (
       <SimpleWizardBody
+        justifyContentForOddButton={JUSTIFY_FLEX_END}
         isSuccess={false}
         iconColor={COLORS.yellow50}
         header={t('close_doors')}
         subHeader={t('close_doors_description')}
       >
-        <PrimaryButton
-          onClick={() => {
-            handleHomeShuttle()
-          }}
-        >
-          {i18n.format(t('shared:continue'), 'capitalize')}
-        </PrimaryButton>
+        {button}
       </SimpleWizardBody>
     )
   }

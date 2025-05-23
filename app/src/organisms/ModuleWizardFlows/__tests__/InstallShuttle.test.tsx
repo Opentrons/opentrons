@@ -31,7 +31,7 @@ const render = (props: ComponentProps<typeof CloseDoor>) => {
   })[0]
 }
 
-const install_render = (props: ComponentProps<typeof InstallShuttle>) => {
+const installRender = (props: ComponentProps<typeof InstallShuttle>) => {
   return renderWithProviders(<InstallShuttle {...props} />, {
     i18nInstance: i18n,
   })[0]
@@ -110,7 +110,7 @@ describe('CloseDoorInstallShuttle', () => {
   })
 
   it('should render the install shuttle instruction screen', () => {
-    install_render(props)
+    installRender(props)
     screen.getByText('Place labware shuttle on track')
     screen.getByText(
       'Place the magnetic labware shuttle flush on the top of the track.'

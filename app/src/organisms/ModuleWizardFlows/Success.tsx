@@ -6,12 +6,16 @@ import {
   JUSTIFY_FLEX_END,
   PrimaryButton,
   RESPONSIVENESS,
+  SecondaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import { useGetNewModules } from '/app/App/hooks'
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+
+import { useSendIdentifyModule } from './utils'
 
 import type { ModuleSetupWizardStepProps } from './types'
 
@@ -24,32 +28,75 @@ export const BODY_STYLE = css`
   }
 `
 
-export const Success = (
-  props: ModuleSetupWizardStepProps
-): JSX.Element | null => {
-  const { proceed, attachedModule, isRobotMoving, isOnDevice } = props
-  const { t } = useTranslation('module_wizard_flows')
-  const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
+interface SuccessProps extends ModuleSetupWizardStepProps {
+  restartSetup: () => void
+}
 
-  const handleOnClick = (): void => {
-    proceed()
+export const Success = (props: SuccessProps): JSX.Element | null => {
+  const {
+    proceed,
+    attachedModule,
+    isRobotMoving,
+    isOnDevice,
+    restartSetup,
+  } = props
+  const { t } = useTranslation('module_wizard_flows')
+  const sendIdentifyModule = useSendIdentifyModule()
+  const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
+  const newModules = useGetNewModules()
+
+  const handleOnClick = (restart: boolean): void => {
+    sendIdentifyModule(attachedModule, false)
+    restart ? restartSetup() : proceed()
   }
-  const button = isOnDevice ? (
-    <SmallButton onClick={handleOnClick} buttonText={t('exit')} />
+
+  const finishButton = isOnDevice ? (
+    <SmallButton
+      buttonType="primary"
+      onClick={() => {
+        handleOnClick(false)
+      }}
+      buttonText={t('finish')}
+    />
   ) : (
-    <PrimaryButton disabled={isRobotMoving} onClick={handleOnClick}>
-      {t('exit')}
+    <PrimaryButton
+      disabled={isRobotMoving}
+      onClick={() => {
+        handleOnClick(false)
+      }}
+    >
+      {t('finish')}
     </PrimaryButton>
+  )
+
+  const setupAnotherButton = isOnDevice ? (
+    <SmallButton
+      buttonType="secondary"
+      onClick={() => {
+        handleOnClick(true)
+      }}
+      buttonText={t('setup_another_module')}
+    />
+  ) : (
+    <SecondaryButton
+      disabled={isRobotMoving}
+      onClick={() => {
+        handleOnClick(true)
+      }}
+    >
+      {t('setup_another_module')}
+    </SecondaryButton>
   )
 
   return (
     <SimpleWizardBody
       header={t('successfully_setup', { module: moduleDisplayName })}
       iconColor={COLORS.red50}
-      isSuccess
+      isSuccess={true}
       justifyContentForOddButton={JUSTIFY_FLEX_END}
     >
-      {button}
+      {newModules.length > 0 ? setupAnotherButton : null}
+      {finishButton}
     </SimpleWizardBody>
   )
 }

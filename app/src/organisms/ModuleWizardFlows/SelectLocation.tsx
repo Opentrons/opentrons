@@ -60,6 +60,7 @@ export const SelectLocation = (
     deckConfig,
     isLoadedInRun,
     createMaintenanceRun,
+    maintenanceRunId,
   } = props
 
   const configuredFixtureIdByCutoutId = getFixtureIdByCutoutId(
@@ -69,7 +70,11 @@ export const SelectLocation = (
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
   const handleOnClick = (): void => {
-    createMaintenanceRun({})
+    if (maintenanceRunId === null) {
+      createMaintenanceRun({}).catch(error => {
+        console.error('Could not create maintenance run', error.message)
+      })
+    }
     proceed()
   }
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()

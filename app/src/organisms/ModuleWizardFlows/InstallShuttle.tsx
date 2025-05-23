@@ -55,7 +55,7 @@ export const InstallShuttle = (
       <LegacyStyledText css={BODY_STYLE}>
         <Trans
           t={t}
-          i18nKey={'place_shuttle_description'}
+          i18nKey="place_shuttle_description"
           components={{
             bold: <strong />,
           }}

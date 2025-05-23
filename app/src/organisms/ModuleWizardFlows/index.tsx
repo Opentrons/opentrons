@@ -24,7 +24,6 @@ import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import type { PipetteInformation } from '/app/redux/pipettes'
 
 interface ModuleWizardFlowsProps {
   closeFlow: () => void
@@ -55,6 +54,7 @@ export const ModuleWizardFlows = (
     handleCleanUpAndClose,
     wizardFlowBaseProps,
     buildFlowForSelectedModule,
+    restartSetup,
     patchModuleAfterUpdate,
     deckConfig,
   } = useModuleSetupWizard({ closeFlow, attachedModuleOnLaunch, onComplete })
@@ -64,7 +64,7 @@ export const ModuleWizardFlows = (
     if (attachedModuleOnLaunch != null) {
       buildFlowForSelectedModule(attachedModuleOnLaunch)
     }
-  }, [])
+  })
 
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
 
@@ -120,7 +120,7 @@ export const ModuleWizardFlows = (
           subHeader={
             <Trans
               t={t}
-              i18nKey={'branded:module_setup_failed'}
+              i18nKey="branded:module_setup_failed"
               values={{ error: wizardFlowBaseProps.errorMessage }}
               components={{
                 block: <LegacyStyledText as="p" />,
@@ -156,12 +156,8 @@ export const ModuleWizardFlows = (
           <BeforeBeginning
             {...currentStep}
             {...wizardFlowBaseProps}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -179,12 +175,8 @@ export const ModuleWizardFlows = (
             deckConfig={deckConfig}
             createMaintenanceRun={createMaintenanceRun}
             isLoadedInRun={isLoadedInRun}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -201,12 +193,8 @@ export const ModuleWizardFlows = (
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
             setCreatedAdapterId={setCreatedAdapterId}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -223,12 +211,8 @@ export const ModuleWizardFlows = (
             {...wizardFlowBaseProps}
             adapterId={createdAdapterId}
             deckConfig={deckConfig}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -243,12 +227,8 @@ export const ModuleWizardFlows = (
           <DetachProbe
             {...currentStep}
             {...wizardFlowBaseProps}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -270,12 +250,9 @@ export const ModuleWizardFlows = (
                 ? () => {}
                 : handleCleanUpAndClose
             }
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
+            restartSetup={restartSetup}
           />
         </ModuleWizardScreen>
       )
@@ -291,12 +268,8 @@ export const ModuleWizardFlows = (
             {...currentStep}
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -312,12 +285,8 @@ export const ModuleWizardFlows = (
             {...currentStep}
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -332,12 +301,8 @@ export const ModuleWizardFlows = (
           <UpdateFirmware
             {...currentStep}
             {...wizardFlowBaseProps}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
             robotName={robotName}
             patchModuleAfterUpdate={patchModuleAfterUpdate}
           />

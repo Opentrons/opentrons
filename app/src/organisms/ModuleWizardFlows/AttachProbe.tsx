@@ -96,7 +96,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       <LegacyStyledText css={BODY_STYLE}>
         <Trans
           t={t}
-          i18nKey={'pipette_wizard_flows:install_probe'}
+          i18nKey="pipette_wizard_flows:install_probe"
           values={{ location: probeLocation }}
           components={{
             bold: <strong />,

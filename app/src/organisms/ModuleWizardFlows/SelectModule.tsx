@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -12,10 +12,10 @@ import {
   RESPONSIVENESS,
   SPACING,
 } from '@opentrons/components'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { useGetNewModules } from '/app/App/hooks'
+import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import {
@@ -23,11 +23,13 @@ import {
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
 
+import { useSendIdentifyModule } from './utils'
+
 import type { AttachedModule } from '@opentrons/api-client'
-import type { IdentifyColor } from '@opentrons/shared-data'
 
 interface SelectModuleProps {
   buildFlowForSelectedModule: (module: AttachedModule) => void
+  isOnDevice: boolean
 }
 
 interface ModuleNameAndPort {
@@ -36,14 +38,14 @@ interface ModuleNameAndPort {
 }
 
 export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
-  const { buildFlowForSelectedModule } = props
+  const { buildFlowForSelectedModule, isOnDevice } = props
   const { t } = useTranslation('module_wizard_flows')
 
   const newModules = useGetNewModules()
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const sendIdentifyModule = useSendIdentifyModule()
   const [stackerNotInstalled, setStackerNotInstalled] = useState(false)
   const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
-    null
+    newModules.length === 1 ? newModules[0] : null
   )
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
@@ -56,23 +58,11 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
     return { name, port }
   }
 
-  const sendIdentifyModule = (
-    module: AttachedModule,
-    start: boolean,
-    color: IdentifyColor = null
-  ): void => {
-    createLiveCommand({
-      command: {
-        commandType: 'identifyModule',
-        params: {
-          model: module.moduleModel,
-          moduleId: module.id,
-          start,
-          color,
-        },
-      },
-    })
-  }
+  useEffect(() => {
+    if (newModules.length === 1) {
+      sendIdentifyModule(newModules[0], true)
+    }
+  })
 
   const handleModuleSelected = (serialNumber: string): void => {
     // stop blinking previous module
@@ -108,9 +98,9 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
   const handleTryAgain = (): void => {
     if (selectedModule != null) {
       sendIdentifyModule(selectedModule, false)
-      setStackerNotInstalled(false)
       setSelectedModule(null)
     }
+    setStackerNotInstalled(false)
   }
 
   const BUTTON_STYLE = css`
@@ -142,9 +132,8 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
         </PrimaryButton>
       </SimpleWizardBody>
     )
-  } else if (newModules.length === 1) {
-    const mod = newModules[0]
-    const m = getModuleNameAndPort(mod)
+  } else if (newModules.length === 1 && selectedModule != null) {
+    const m = getModuleNameAndPort(selectedModule)
     return (
       <SimpleWizardBody
         justifyContentForOddButton={JUSTIFY_FLEX_END}
@@ -152,14 +141,24 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
         iconColor={COLORS.green50}
         header={t('module_attached_to_port', { module: m.name, port: m.port })}
       >
-        <PrimaryButton
-          onClick={() => {
-            sendIdentifyModule(mod, true)
-            handleStartSetup(mod)
-          }}
-        >
-          {i18n.format(t('module_start_setup'), 'capitalize')}
-        </PrimaryButton>
+        {isOnDevice ? (
+          <SmallButton
+            buttonType="primary"
+            onClick={() => {
+              handleStartSetup(selectedModule)
+            }}
+            buttonText={i18n.format(t('module_start_setup'), 'capitalize')}
+          />
+        ) : (
+          <PrimaryButton
+            onClick={() => {
+              sendIdentifyModule(selectedModule, true)
+              handleStartSetup(selectedModule)
+            }}
+          >
+            {i18n.format(t('module_start_setup'), 'capitalize')}
+          </PrimaryButton>
+        )}
       </SimpleWizardBody>
     )
   } else if (newModules.length > 1) {
@@ -187,13 +186,23 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
           />
         </Flex>
         <Flex css={BUTTON_STYLE}>
-          <PrimaryButton
-            onClick={() => {
-              handleStartSetup(selectedModule)
-            }}
-          >
-            {i18n.format(t('module_start_setup'), 'capitalize')}
-          </PrimaryButton>
+          {isOnDevice ? (
+            <SmallButton
+              buttonType="primary"
+              onClick={() => {
+                handleStartSetup(selectedModule)
+              }}
+              buttonText={i18n.format(t('module_start_setup'), 'capitalize')}
+            />
+          ) : (
+            <PrimaryButton
+              onClick={() => {
+                handleStartSetup(selectedModule)
+              }}
+            >
+              {i18n.format(t('module_start_setup'), 'capitalize')}
+            </PrimaryButton>
+          )}
         </Flex>
       </SimpleWizardBodyContainer>
     )

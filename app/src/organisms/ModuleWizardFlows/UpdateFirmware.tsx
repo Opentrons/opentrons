@@ -19,6 +19,8 @@ import {
   SUCCESS,
 } from '/app/redux/robot-api'
 
+import { useSendIdentifyModule } from './utils'
+
 import type { AttachedModule } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
 import type { ModuleSetupWizardStepProps } from './types'
@@ -44,6 +46,7 @@ export const UpdateFirmware = (
   const { t } = useTranslation('module_wizard_flows')
 
   const dispatch = useDispatch<Dispatch>()
+  const sendIdentifyModule = useSendIdentifyModule()
   const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
   const moduleSerialNumber = props.attachedModule.serialNumber
   const [
@@ -55,7 +58,9 @@ export const UpdateFirmware = (
 
   const latestRequestId = getLatestRequestId(attachedModule.serialNumber)
   const requestStatus = useSelector((state: State) => {
-    return latestRequestId ? getRequestById(state, latestRequestId) : null
+    return latestRequestId != null
+      ? getRequestById(state, latestRequestId)
+      : null
   })?.status
   const attachedModules =
     useModulesQuery({
@@ -70,10 +75,16 @@ export const UpdateFirmware = (
       if (moduleRequestTimeoutId != null) {
         clearTimeout(moduleRequestTimeoutId)
       }
+      sendIdentifyModule(matchingModule, true, 'blue')
       patchModuleAfterUpdate(matchingModule)
       proceed()
     }
-  }, [attachedModules, requestStatus])
+  }, [
+    attachedModules,
+    requestStatus,
+    moduleRequestTimeoutId,
+    moduleSerialNumber,
+  ])
 
   const handleUpdateFirmware = (): void => {
     handleModuleApiRequests(robotName, attachedModule.serialNumber)
@@ -86,7 +97,7 @@ export const UpdateFirmware = (
         proceed()
       }, NO_UPDATE_FOUND_TIMEOUT_MS)
     }
-  }, [])
+  })
 
   useEffect(() => {
     if (requestStatus === PENDING) {
