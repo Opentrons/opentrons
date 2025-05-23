@@ -78,16 +78,18 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
     cy.openSettingsPage()
     cy.contains('Edit protocol').click()
+    /*
     cy.contains('Add Step').click()
     cy.contains('Transfer').click()
     cy.contains('Always').click()
     cy.contains('Once')
+    */
 
     // cy.clickCreateNew()
     // cy.verifyCreateNewHeader()
     const steps = new StepBuilder()
     // steps.add(SetupSteps.EditProtocolA())
-    // GenerateMultipleTransferSteps(steps)
+    GenerateMultipleTransferSteps(steps)
 
     steps.execute()
   })

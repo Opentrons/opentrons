@@ -187,6 +187,13 @@ function selectWells(wells: string[]): void {
  * Add a comment to all records
  */
 export const SetupSteps = {
+  SelectTipStrategy: (tipsy: string): StepThunk => ({
+    call: () => {
+      cy.contains('Always').click()
+      cy.contains(tipsy).click()
+    },
+  }),
+
   SelecTip: (tip: string): StepThunk => ({
     call: () => {
       cy.contains('Opentrons Flex 96 Filter Tip Rack').click()
@@ -1345,8 +1352,85 @@ export const CompositeSetupSteps = {
       SetupSteps.selectDropdownLabware(destinationLabwareToUse).call()
       SetupSteps.SelectDestinationWells().call()
       SetupSteps.WellSelector([destWellToUse]).call()
-      // ToDo fix this bug please
       SetupSteps.WellSelector([destWellToUse]).call()
+      SetupSteps.Save().call()
+      SetupSteps.Continue().call()
+      SetupSteps.SelectLiquidClassT(liquidClassToUse).call()
+      SetupSteps.Continue().call()
+      SetupSteps.Save().call()
+    },
+  }),
+
+  /**
+   * @function Test_LC_tipsy
+   * @description Creates a StepThunk to perform a liquid handling transfer operation with explicit tip and strategy selection.
+   * It takes optional parameters for source and destination labware and wells,
+   * transfer volume, liquid class, the specific tip to use, and the tip strategy.
+   * It orchestrates the necessary SetupSteps to configure the transfer in the application UI,
+   * including selecting the tip and tip strategy.
+   *
+   * @param {string | undefined} sourceLabware - The name or identifier of the source labware.
+   * @param {string | undefined} sourceWell - The identifier of the source well (e.g., 'A1').
+   * @param {string | undefined} destinationLabware - The name or identifier of the destination labware.
+   * @param {string | undefined} destWell - The identifier of the destination well (e.g., 'B2').
+   * @param {string | undefined} volume - The volume to transfer as a string (e.g., '50').
+   * @param {string | undefined} liquidClass - The name or identifier of the liquid class to use (e.g., 'Aqueous').
+   * @param {string | undefined} tip - The specific tip to use for the transfer (e.g., '50'). Defaults to '50' if not provided.
+   * @param {string | undefined} tipstrat - The strategy for tip handling (e.g., 'Always', 'Once'). If you use never, modify the function to do once first
+   * @returns {StepThunk} A StepThunk object containing the 'call' function that executes the transfer setup steps in the UI.
+   */
+
+  Test_LC_tipsy: (
+    sourceLabware?: string | undefined,
+    sourceWell?: string | undefined,
+    destinationLabware?: string | undefined,
+    destWell?: string | undefined,
+    volume?: string | undefined,
+    liquidClass?: string | undefined,
+    tip?: string | undefined,
+    tipstrat?: string | undefined
+  ): StepThunk => ({
+    // Corrected return type annotation: StepThunk before =>
+    call: () => {
+      const Tip = tip ?? '50'
+      const volumeToUse = volume ?? '1'
+      const sourceLabwareToUse = sourceLabware ?? 'Bio-Rad 96 Well Plate'
+      const sourceWellToUse = sourceWell ?? 'A1'
+      const destinationLabwareToUse =
+        destinationLabware ??
+        'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
+      const destWellToUse = destWell ?? 'A1'
+      const liquidClassToUse = liquidClass ?? 'Aqueous'
+      const tipstratToUse = tipstrat ?? 'Always'
+      cy.log('Executing Test_LC_tipsy step with the following parameters:')
+      cy.log(`  tip: ${Tip}`)
+      cy.log(`  Source Labware: ${sourceLabwareToUse}`)
+      cy.log(`  Source Well: ${sourceWellToUse}`)
+      cy.log(`  Destination Labware: ${destinationLabwareToUse}`)
+      cy.log(`  Destination Well: ${destWellToUse}`)
+      cy.log(`  Volume: ${volumeToUse}`)
+      cy.log(`  Liquid Class: ${liquidClassToUse}`)
+      SetupSteps.AddStep().call()
+      SetupVerifications.TransferPopOut().call()
+      UniversalSteps.Snapshot()
+      SetupSteps.SelecTip(Tip).call()
+      SetupSteps.SelectTipStrategy(tipstratToUse).call()
+      SetupSteps.InputTransferVolume(volumeToUse).call()
+      SetupSteps.ChoseSourceLabware().call()
+      SetupSteps.selectDropdownLabware(sourceLabwareToUse).call()
+      SetupSteps.SelectSourceWells().call()
+      SetupSteps.WellSelector([sourceWellToUse]).call()
+      SetupSteps.WellSelector([sourceWellToUse]).call()
+      // console.log('We will fix this eventually need to double click for now')
+      // SetupSteps.WellSelector([sourceWellToUse]).call(); // Removed likely redundant call
+      SetupSteps.Save().call()
+      SetupSteps.ChoseDestinationLabware().call()
+      SetupSteps.selectDropdownLabware(destinationLabwareToUse).call()
+      SetupSteps.SelectDestinationWells().call()
+      SetupSteps.WellSelector([destWellToUse]).call()
+      SetupSteps.WellSelector([destWellToUse]).call()
+      // ToDo fix this bug please
+      // SetupSteps.WellSelector([destWellToUse]).call(); // Removed likely redundant call
       SetupSteps.Save().call()
       SetupSteps.Continue().call()
       SetupSteps.SelectLiquidClassT(liquidClassToUse).call()
