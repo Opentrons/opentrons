@@ -15,7 +15,7 @@ from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_RELEVANT_API, 
 from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
 from api.settings import Settings
 
-weave.init("opentronsai/OpentronsAI-Phase-march-25")
+weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
 settings: Settings = Settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
