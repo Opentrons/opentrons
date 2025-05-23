@@ -1883,7 +1883,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 try:
                     next_step_volume, next_source = next(source_per_volume_step)
                     air_gap = aspirate_air_gap_by_volume.get_for_volume(
-                        max(next_step_volume + total_dispense_volume, max_volume)
+                        next_step_volume + total_dispense_volume
                     )
                 except StopIteration:
                     is_last_step = True
