@@ -375,7 +375,7 @@ export const getAAFromCutoutFixtureId = (
   /**
    * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
    */
-  const cutoutFixturesWithFakeFixtures: CutoutFixtureWithFakes[] = deckDefinition.cutoutFixtures.concat(
+  const cutoutFixturesWithFakeFixtures: CutoutFixtureWithFakes[] = [...deckDefinition.cutoutFixtures,
     FAKE_FIXTURES_AND_AA.cutoutFixtures as any
   )
   const deckDefWithFakeCutoutFixtures = {
