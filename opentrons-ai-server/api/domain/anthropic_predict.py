@@ -407,11 +407,15 @@ class AnthropicPredict:
                             .get("savedStepForms", {})
                             .get("__INITIAL_DECK_SETUP_STEP__", {})
                             .get("moduleLocationUpdate", {}),
-                            "trashBinLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("trashBinLocationUpdate", {}),
+                            "trashBinLocationUpdate": (
+                                {"trashbin-1": "cutout12"}
+                                if data.get("robot", {}).get("model") == "OT-2 Standard"
+                                else data.get("designerApplication", {})
+                                .get("data", {})
+                                .get("savedStepForms", {})
+                                .get("__INITIAL_DECK_SETUP_STEP__", {})
+                                .get("trashBinLocationUpdate", {})
+                            ),
                             "wasteChuteLocationUpdate": data.get("designerApplication", {})
                             .get("data", {})
                             .get("savedStepForms", {})
