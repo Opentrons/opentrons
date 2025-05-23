@@ -95,10 +95,12 @@ def build_gravimetric_trials(
 ) -> Dict[float, Dict[int, List[GravimetricTrial]]]:
     """Build a list of all the trials that will be run."""
     trial_list: Dict[float, Dict[int, List[GravimetricTrial]]] = {}
-    if len(channels_to_test) > 1:
-        num_channels_per_transfer = 1
-    else:
-        num_channels_per_transfer = cfg.pipette_channels
+    # if len(channels_to_test) > 1:
+    #     num_channels_per_transfer = 1
+    # else:
+    #     num_channels_per_transfer = cfg.pipette_channels
+    # NOTE: (sigler) for LC testing, we are only testing 1x channel
+    num_channels_per_transfer = 1
     if blank:
         trial_list[test_volumes[-1]] = {0: []}
         for trial in range(config.NUM_BLANK_TRIALS):
