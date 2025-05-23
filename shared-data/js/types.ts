@@ -420,7 +420,7 @@ export interface CutoutFixture {
 
 type cuoutFixtureOmit = Omit<CutoutFixture, 'id' | 'providesAddressableAreas'>
 
-export interface FakeCutoutFixture extends cuoutFixtureOmit {
+export interface FakeCutoutFixture extends Omit<CutoutFixture, 'id' | 'providesAddressableAreas'> {
   id: CutoutFixtureIdsWithFakes
   providesAddressableAreas: Record<CutoutId, AddressableAreaNamesWithFakes[]>
 }
