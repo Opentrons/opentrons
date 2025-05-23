@@ -48,14 +48,15 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { def } = labware
   const enableStacking = useSelector(getEnableStacking)
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
-  const allLabwareIdsOnStack = Object.values(deckSetupLabware)
-    .filter(
-      lw =>
-        lw.labwareDefURI === labware.labwareDefURI &&
-        getSlotInLocationStack(lw.stack) ===
-          getSlotInLocationStack(labware.stack)
-    )
-    ?.map(lw => lw.id)
+  const allLabwareIdsOnStack = Object.values(deckSetupLabware).reduce<string[]>(
+    (acc, { labwareDefURI, stack, id }) => {
+      return labwareDefURI === labware.labwareDefURI &&
+        getSlotInLocationStack(stack) === getSlotInLocationStack(labware.stack)
+        ? [...acc, id]
+        : acc
+    },
+    []
+  )
   const nickNames = useSelector(getLabwareNicknamesById)
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
