@@ -232,6 +232,11 @@ class FlexStacker(mod_abc.AbstractModule):
         return self._reader.limit_switch_status
 
     @property
+    def install_detected(self) -> bool:
+        """Whether the stacker is installed on Flex."""
+        return self._reader.installation_detected
+
+    @property
     def device_info(self) -> Mapping[str, str]:
         return self._device_info
 
@@ -258,8 +263,7 @@ class FlexStacker(mod_abc.AbstractModule):
             "latchState": self.latch_state.value,
             "platformState": self._get_platform_live_data().value,
             "hopperDoorState": self.hopper_door_state.value,
-            "axisStateX": self.limit_switch_status[StackerAxis.X].value,
-            "axisStateZ": self.limit_switch_status[StackerAxis.Z].value,
+            "installDetected": self.install_detected,
             "errorDetails": self._reader.error,
         }
         return {"status": self.status.value, "data": data}
@@ -512,16 +516,29 @@ class FlexStacker(mod_abc.AbstractModule):
         is useful when we want the shuttle to be out of the way for error
         recovery (e.g. when the latch is stuck open).
         """
+        await self._reader.get_installation_detected()
         await self._reader.get_limit_switch_status()
-        # we should always be able to home the X axis first
-        await self.home_axis(StackerAxis.X, Direction.RETRACT)
-        # If latch is open, we must first close it
-        if not ignore_latch and self.latch_state == LatchState.OPENED:
-            if self.limit_switch_status[StackerAxis.Z] != StackerAxisState.RETRACTED:
-                # it was likely in the middle of a dispense/store command
-                # z should be moved up before we can safely close the latch
-                await self.home_axis(StackerAxis.Z, Direction.EXTEND)
+        await self._reader.get_platform_sensor_state()
+
+        # Z axis is unknown, lets move it up in case it is holding a labware
+        if self.limit_switch_status[StackerAxis.Z] == StackerAxisState.UNKNOWN:
+            await self.home_axis(StackerAxis.Z, Direction.EXTEND)
+
+        # Z must now be either extended or retracted, move on to the X
+        if (
+            self.platform_state == PlatformState.UNKNOWN
+            or self.limit_switch_status[StackerAxis.X] == StackerAxisState.UNKNOWN
+        ):
+            if self.limit_switch_status[StackerAxis.Z] == StackerAxisState.EXTENDED:
+                await self.home_axis(StackerAxis.X, Direction.RETRACT)
+            else:
+                await self.home_axis(StackerAxis.X, Direction.EXTEND)
+
+        # Z+X must now be either extended or retracted, move on to the latch
+        if not ignore_latch:
             await self.close_latch()
+
+        # Finally, retract Z and extend X if they are not already
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
         await self.home_axis(StackerAxis.X, Direction.EXTEND)
 
@@ -603,30 +620,55 @@ class FlexStacker(mod_abc.AbstractModule):
                 case StatusBarState.RUNNING:
                     await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.STATIC)
                 case StatusBarState.PAUSED:
-                    if self.should_identify:
-                        await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
-                        self.set_stacker_identify(False)
+                    if (
+                        self.hopper_door_state == HopperDoorState.OPENED
+                        or self.should_identify
+                    ):
+                        await self._stacker_bar_pause()
                     else:
-                        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
+                        await self._stacker_bar_idle()
                 case StatusBarState.IDLE:
-                    await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
+                    if self.hopper_door_state == HopperDoorState.OPENED:
+                        await self._stacker_bar_pause()
+                    else:
+                        await self._stacker_bar_idle()
                 case StatusBarState.HARDWARE_ERROR:
-                    await self.set_led_state(0.5, LEDColor.RED, LEDPattern.FLASH)
+                    if self.should_identify:
+                        await self.set_led_state(
+                            0.5, LEDColor.RED, LEDPattern.FLASH, duration=300
+                        )
+                    else:
+                        await self._stacker_bar_idle()
                 case StatusBarState.SOFTWARE_ERROR:
                     await self.set_led_state(0.5, LEDColor.YELLOW, LEDPattern.STATIC)
                 case StatusBarState.ERROR_RECOVERY:
-                    await self.set_led_state(0.5, LEDColor.YELLOW, LEDPattern.PULSE)
+                    if self.hopper_door_state == HopperDoorState.OPENED:
+                        await self._stacker_bar_pause()
+                    elif self.should_identify:
+                        await self.set_led_state(
+                            0.5, LEDColor.YELLOW, LEDPattern.PULSE, duration=2000
+                        )
+                    else:
+                        await self._stacker_bar_idle()
                 case StatusBarState.RUN_COMPLETED:
                     await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.PULSE)
                 case StatusBarState.UPDATING:
                     await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
                 case _:
-                    await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
+                    await self._stacker_bar_idle()
 
-    async def identify(self) -> None:
+    async def _stacker_bar_pause(self) -> None:
+        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE, duration=2000)
+
+    async def _stacker_bar_idle(self) -> None:
+        await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
+
+    async def identify(self, enable: bool, color_name: Optional[str] = None) -> None:
         """Identify the module."""
-        await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE, reps=10)
-        if self._last_status_bar_event:
+        reps = -1 if enable else 0
+        color = LEDColor.from_name(color_name or LEDColor.BLUE.name)
+        await self.set_led_state(0.5, color, LEDPattern.PULSE, reps=reps)
+        if not enable and self._last_status_bar_event:
             await self._handle_status_bar_event(self._last_status_bar_event)
 
     def set_stacker_identify(self, state: bool) -> None:
@@ -654,6 +696,7 @@ class FlexStackerReader(Reader):
         self.platform_state = PlatformState.UNKNOWN
         self.hopper_door_closed = False
         self.initialized = False
+        self.installation_detected = False
         self._initialized_callback: Optional[Callable[[], Awaitable[None]]] = None
 
     def set_initialized_callback(self, callback: Callable[[], Awaitable[None]]) -> None:
@@ -665,6 +708,7 @@ class FlexStackerReader(Reader):
         await self.get_platform_sensor_state()
         if not self.initialized:
             initialized = True
+            await self.get_installation_detected()
             await self.get_limit_switch_status()
             await self.get_motion_parameters()
             for sensor, status in self.tof_sensor_status.items():
@@ -702,7 +746,15 @@ class FlexStackerReader(Reader):
 
     async def get_door_closed(self) -> None:
         """Check if the hopper door is closed."""
+        old_door_state = self.hopper_door_closed
         self.hopper_door_closed = await self._driver.get_hopper_door_closed()
+        if old_door_state != self.hopper_door_closed and self._initialized_callback:
+            await self._initialized_callback()
+
+    async def get_installation_detected(self) -> None:
+        """Check if the stacker install detect is set."""
+        detected = await self._driver.get_installation_detected()
+        self.installation_detected = detected
 
     def on_error(self, exception: Exception) -> None:
         self._driver.reset_serial_buffers()

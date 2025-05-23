@@ -66,6 +66,7 @@ export const ORDERED_CATEGORIES: string[] = [
   'reservoir',
   'aluminumBlock',
   'adapter',
+  'lid',
 ]
 export const CUSTOM_CATEGORY = 'custom'
 export const ALL_ORDERED_CATEGORIES = [CUSTOM_CATEGORY, ...ORDERED_CATEGORIES]

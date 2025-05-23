@@ -103,8 +103,6 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
 
   const errorText = utils.getErrorText({
     errors,
-    minMm,
-    maxMm,
     isPristine,
     t,
   })

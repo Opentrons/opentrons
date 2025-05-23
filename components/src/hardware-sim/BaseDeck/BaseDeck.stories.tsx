@@ -19,7 +19,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import type * as React from 'react'
 import type {
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 
 const meta: Meta<React.ComponentProps<typeof BaseDeckComponent>> = {
@@ -54,34 +54,34 @@ export const BaseDeck: Story = {
     labwareOnDeck: [
       {
         labwareLocation: { slotName: 'C2' },
-        definition: fixture96Plate as LabwareDefinition2,
+        definition: fixture96Plate as LabwareDefinition,
       },
       {
         labwareLocation: { slotName: 'C3' },
-        definition: fixtureTiprack1000ul as LabwareDefinition2,
+        definition: fixtureTiprack1000ul as LabwareDefinition,
       },
     ],
     modulesOnDeck: [
       {
         moduleLocation: { slotName: 'B1' },
         moduleModel: THERMOCYCLER_MODULE_V2,
-        nestedLabwareDef: fixture96Plate as LabwareDefinition2,
+        nestedLabwareDef: fixture96Plate as LabwareDefinition,
         innerProps: { lidMotorState: 'open' },
       },
       {
         moduleLocation: { slotName: 'D1' },
         moduleModel: TEMPERATURE_MODULE_V2,
-        nestedLabwareDef: fixture96Plate as LabwareDefinition2,
+        nestedLabwareDef: fixture96Plate as LabwareDefinition,
       },
       {
         moduleLocation: { slotName: 'B3' },
         moduleModel: HEATERSHAKER_MODULE_V1,
-        nestedLabwareDef: fixture96Plate as LabwareDefinition2,
+        nestedLabwareDef: fixture96Plate as LabwareDefinition,
       },
       {
         moduleLocation: { slotName: 'D2' },
         moduleModel: MAGNETIC_BLOCK_V1,
-        nestedLabwareDef: fixture96Plate as LabwareDefinition2,
+        nestedLabwareDef: fixture96Plate as LabwareDefinition,
       },
     ],
     darkFill: 'rebeccapurple',

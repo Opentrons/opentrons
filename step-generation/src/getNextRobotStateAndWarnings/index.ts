@@ -14,6 +14,7 @@ import { forDispense } from './forDispense'
 import { forDropTip } from './forDropTip'
 import { forLoadLiquid } from './forLoadLiquid'
 import { forMoveLabware } from './forMoveLabware'
+import { forMoveToAddressableArea } from './forMoveToAddressableArea'
 import { forMoveToWell } from './forMoveToWell'
 import { forPickUpTip } from './forPickUpTip'
 import {
@@ -24,12 +25,7 @@ import {
   forHeaterShakerSetTargetTemperature,
   forHeaterShakerStopShake,
 } from './heaterShakerUpdates'
-import {
-  forAspirateInPlace,
-  forBlowOutInPlace,
-  forDispenseInPlace,
-  forDropTipInPlace,
-} from './inPlaceCommandUpdates'
+import { forBlowOutInPlace, forDropTipInPlace } from './inPlaceCommandUpdates'
 import { forDisengageMagnet, forEngageMagnet } from './magnetUpdates'
 import {
   forAwaitTemperature,
@@ -65,6 +61,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
   switch (command.commandType) {
     case 'aspirate':
+    case 'aspirateInPlace':
       if (command.meta?.isAirGap === true) {
         break
       } else {
@@ -73,6 +70,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
 
     case 'dispense':
+    case 'dispenseInPlace':
       if (command.meta?.isAirGap === true) {
         break
       } else {
@@ -116,8 +114,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'loadModule':
     case 'home': // gantry VVV
     case 'moveRelative':
-    case 'moveToAddressableArea':
-    case 'moveToAddressableAreaForDropTip':
     case 'moveToSlot':
     case 'moveToCoordinates':
     case 'savePosition':
@@ -132,6 +128,15 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'liquidProbe':
       break
 
+    case 'moveToAddressableArea':
+    case 'moveToAddressableAreaForDropTip':
+      forMoveToAddressableArea(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+
     case 'moveToWell':
       forMoveToWell(command.params, invariantContext, robotStateAndWarnings)
       break
@@ -140,28 +145,12 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forLoadLiquid(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    case 'aspirateInPlace':
-      forAspirateInPlace(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
-      break
-
     case 'dropTipInPlace':
       forDropTipInPlace(command.params, invariantContext, robotStateAndWarnings)
       break
 
     case 'blowOutInPlace':
       forBlowOutInPlace(command.params, invariantContext, robotStateAndWarnings)
-      break
-
-    case 'dispenseInPlace':
-      forDispenseInPlace(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
       break
 
     case 'configureNozzleLayout':

@@ -2294,8 +2294,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     def detect_liquid_presence(self, well_core: WellCore, loc: Location) -> bool:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
+        offset = LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP
         well_location = WellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+            origin=WellOrigin.TOP, offset=WellOffset(x=offset.x, y=offset.y, z=offset.z)
         )
 
         # The error handling here is a bit nuanced and also a bit broken:
@@ -2375,14 +2376,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
 
-    # TODO(cm, 3.4.25): decide whether to allow users to try and do math on a potential SimulatedProbeResult
     def liquid_probe_without_recovery(
         self, well_core: WellCore, loc: Location
     ) -> LiquidTrackingType:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
+        offset = LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP
         well_location = WellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+            origin=WellOrigin.TOP, offset=WellOffset(x=offset.x, y=offset.y, z=offset.z)
         )
         pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,

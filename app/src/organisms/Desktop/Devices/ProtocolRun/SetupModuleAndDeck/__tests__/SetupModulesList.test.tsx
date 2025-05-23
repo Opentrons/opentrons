@@ -19,7 +19,6 @@ import {
   mockMagneticModule as mockMagneticModuleFixture,
 } from '/app/redux/modules/__fixtures__/index'
 import {
-  useChainLiveCommands,
   useModuleRenderInfoForProtocolById,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
@@ -88,7 +87,6 @@ const render = (props: ComponentProps<typeof SetupModulesList>) => {
 
 describe('SetupModulesList', () => {
   let props: ComponentProps<typeof SetupModulesList>
-  let mockChainLiveCommands = vi.fn()
   beforeEach(() => {
     props = {
       robotName: ROBOT_NAME,
@@ -97,8 +95,6 @@ describe('SetupModulesList', () => {
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn({ robotModel: FLEX_ROBOT_TYPE } as DiscoveredRobot)
-    mockChainLiveCommands = vi.fn()
-    mockChainLiveCommands.mockResolvedValue(null)
     vi.mocked(ModuleSetupModal).mockReturnValue(<div>mockModuleSetupModal</div>)
     vi.mocked(UnMatchedModuleWarning).mockReturnValue(
       <div>mock unmatched module Banner</div>
@@ -115,9 +111,6 @@ describe('SetupModulesList', () => {
     vi.mocked(ModuleWizardFlows).mockReturnValue(
       <div>mock ModuleWizardFlows</div>
     )
-    vi.mocked(useChainLiveCommands).mockReturnValue({
-      chainLiveCommands: mockChainLiveCommands,
-    } as any)
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
@@ -228,7 +221,7 @@ describe('SetupModulesList', () => {
     render(props)
     screen.getByText('Thermocycler Module')
     screen.getByText('A1+B1')
-    fireEvent.click(screen.getByRole('button', { name: 'Calibrate now' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Setup now' }))
     await waitFor(() => {
       screen.getByText('mock ModuleWizardFlows')
     })
@@ -262,7 +255,7 @@ describe('SetupModulesList', () => {
     vi.mocked(useIsFlex).mockReturnValue(true)
 
     render(props)
-    expect(screen.getByRole('button', { name: 'Calibrate now' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Setup now' })).toBeDisabled()
   })
 
   it('should render a thermocycler module that is connected, OT3', () => {

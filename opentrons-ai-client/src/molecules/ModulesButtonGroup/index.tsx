@@ -1,7 +1,9 @@
 import { Controller, useFormContext } from 'react-hook-form'
 import styled from 'styled-components'
+import { v4 as uuid } from 'uuid'
 
 import { EmptySelectorButton, Flex, SPACING, WRAP } from '@opentrons/components'
+import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { MODULES_FIELD_NAME } from '../../organisms/ModulesAndFixturesSection'
 
@@ -32,10 +34,24 @@ export function ModulesButtonGroup({
                   key={module.type}
                   iconName="plus"
                   onClick={() => {
-                    if (modulesWatch.some(m => m.type === module.type)) {
+                    const isTempModule = module.type === TEMPERATURE_MODULE_TYPE
+                    const tempModuleCount = modulesWatch.filter(
+                      m => m.type === TEMPERATURE_MODULE_TYPE
+                    ).length
+
+                    if (
+                      (isTempModule && tempModuleCount >= 2) ||
+                      (!isTempModule &&
+                        modulesWatch.some(m => m.type === module.type))
+                    ) {
                       return
                     }
-                    field.onChange([...modulesWatch, module])
+
+                    const moduleWithId = {
+                      ...module,
+                      id: uuid(),
+                    }
+                    field.onChange([...modulesWatch, moduleWithId])
                   }}
                   text={module.name}
                   textAlignment="left"

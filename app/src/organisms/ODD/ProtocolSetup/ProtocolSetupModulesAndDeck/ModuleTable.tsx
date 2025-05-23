@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
@@ -30,18 +29,13 @@ interface ModuleTableProps {
 export function ModuleTable(props: ModuleTableProps): JSX.Element {
   const { attachedProtocolModuleMatches, deckDef, runId } = props
 
-  const [
-    prepCommandErrorMessage,
-    setPrepCommandErrorMessage,
-  ] = useState<string>('')
-
   const { data: deckConfig } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
   })
   const localRobot = useSelector(getLocalRobot)
   const robotName: string = localRobot?.name ?? ''
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
-  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
+  const { chainLiveCommands } = useChainLiveCommands()
 
   return (
     <>
@@ -72,9 +66,6 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
               module={module}
               calibrationStatus={calibrationStatus}
               chainLiveCommands={chainLiveCommands}
-              isLoading={isCommandMutationLoading}
-              prepCommandErrorMessage={prepCommandErrorMessage}
-              setPrepCommandErrorMessage={setPrepCommandErrorMessage}
               conflictedFixture={conflictedFixture}
               deckDef={deckDef}
               robotName={robotName}

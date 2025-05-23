@@ -30,6 +30,7 @@ StatelessCommandCreate = Annotated[
         commands.unsafe.UnsafeFlexStackerPrepareShuttleCreate,
         commands.unsafe.UnsafeFlexStackerCloseLatchCreate,
         commands.unsafe.UnsafeFlexStackerOpenLatchCreate,
+        commands.IdentifyModuleCreate,
     ],
     Field(discriminator="commandType"),
 ]
@@ -58,6 +59,7 @@ StatelessCommand = Annotated[
         commands.unsafe.UnsafeFlexStackerPrepareShuttleCreate,
         commands.unsafe.UnsafeFlexStackerCloseLatchCreate,
         commands.unsafe.UnsafeFlexStackerOpenLatchCreate,
+        commands.IdentifyModule,
     ],
     Field(discriminator="commandType"),
 ]

@@ -1,6 +1,6 @@
 {
   "add_liquid": "Add liquid",
-  "add_liquids_to_labware": "Add liquids to {{labwareName}}",
+  "add_liquids_to_labware": "Add liquid to {{labwareName}}",
   "add": "Add",
   "apply_liquid_classes": "Apply liquid class settings for this {{command}}",
   "assigned_liquid": "Assigned to {{liquidName}}",

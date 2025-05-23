@@ -275,9 +275,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     `location=${labwarePythonName}[${formatPyStr(
       wellName
     )}]${formatPyWellLocation(wellLocation)}`,
-    // rate= is a ratio in the PAPI, and we have no good way to figure out what
-    // flowrate the PAPI has set the pipette to, so we just have to do a division:
-    `rate=${flowRate} / ${pipettePythonName}.flow_rate.aspirate`,
+    `flow_rate=${flowRate}`,
   ]
   const python = `${pipettePythonName}.aspirate(\n${indentPyLines(
     pythonArgs.join(',\n')

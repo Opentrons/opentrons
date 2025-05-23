@@ -672,7 +672,7 @@ describe('useModuleOverflowMenu', () => {
       },
     })
 
-    expect(flexStackerMenu[0].menuButtons).toHaveLength(1)
+    expect(flexStackerMenu[0].menuButtons).toHaveLength(2)
   })
 })
 

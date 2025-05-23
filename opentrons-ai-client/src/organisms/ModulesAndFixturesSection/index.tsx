@@ -20,6 +20,7 @@ import { OPENTRONS_FLEX, ROBOT_FIELD_NAME } from '../InstrumentsSection'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 export interface DisplayModule {
+  id: string
   type: ModuleType
   model: ModuleModel
   name: string

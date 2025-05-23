@@ -1,5 +1,4 @@
 import json
-import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -291,21 +290,7 @@ class AnthropicPredict:
             )
             if response.content and response.content[0].type == "text":
                 response_text = response.content[0].text
-                # Look for JSON within <pd_json> tags or just assume the whole response is JSON
-                json_match = re.search(r"<pd_json>\s*(.*?)\s*</pd_json>", response_text, re.DOTALL)
-                if json_match:
-                    partial_json = json_match.group(1)
-                    # Clean up any markdown code block formatting if present
-                    if partial_json.startswith("```json") or partial_json.startswith("```"):
-                        partial_json = re.sub(r"^```(?:json)?\n(.*?)\n```$", r"\1", partial_json, flags=re.DOTALL)
-                else:
-                    # If no tags found, check if response is directly JSON
-                    if response_text.strip().startswith("{") and response_text.strip().endswith("}"):
-                        partial_json = response_text
-                    else:
-                        partial_json = f"No valid JSON protocol found in response:\n {response_text}"
-
-                return partial_json
+                return response_text
 
             logger.error("Unexpected response type")
             return None
@@ -372,6 +357,7 @@ class AnthropicPredict:
         "labwareDefinitions": {},
         }
         """
+        now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
         original_saved_forms = data.get("designerApplication", {}).get("data", {}).get("savedStepForms", {})
         # Make a copy to modify, or ensure original_steps is a new dict
         original_steps_without_initial = {k: v for k, v in original_saved_forms.items() if k != "__INITIAL_DECK_SETUP_STEP__"}
@@ -384,8 +370,8 @@ class AnthropicPredict:
                 "protocolName": data.get("metadata", {}).get("protocolName", ""),
                 "author": data.get("metadata", {}).get("author", "AI"),
                 "description": data.get("metadata", {}).get("description", ""),
-                "created": data.get("metadata", {}).get("created", 1737373264166),
-                "lastModified": data.get("metadata", {}).get("lastModified", 1737373536793),
+                "created": now_ms,
+                "lastModified": now_ms,
                 "source": "OpentronsAI",
                 "category": data.get("metadata", {}).get("category", None),
                 "subcategory": data.get("metadata", {}).get("subcategory", None),
@@ -393,7 +379,7 @@ class AnthropicPredict:
             },
             "designerApplication": {
                 "name": data.get("designerApplication", {}).get("name", "opentrons/protocol-designer"),
-                "version": data.get("designerApplication", {}).get("version", settings.protocol_designer_app_version),
+                "version": "8.4.4",
                 "data": {
                     "_internalAppBuildDate": data.get("designerApplication", {})
                     .get("data", {})
@@ -473,8 +459,6 @@ class AnthropicPredict:
             data["metadata"].update(
                 {
                     "author": "OpentronsAI",
-                    "created": 1737373264166,
-                    "lastModified": 1737373536793,
                     "source": "OpentronsAI",
                     "category": None,
                     "subcategory": None,
@@ -483,7 +467,12 @@ class AnthropicPredict:
             )
 
             # Add designer application
-            data["designerApplication"].update({"name": "opentrons/protocol-designer", "version": settings.protocol_designer_app_version})
+            data["designerApplication"].update(
+                {
+                    "name": "opentrons/protocol-designer",
+                    "version": "8.4.4",
+                }
+            )
 
             # Add data
             dt = datetime.now(timezone.utc)
@@ -521,7 +510,7 @@ class AnthropicPredict:
         url = "https://Opentrons-simulator.hf.space/protocol"
         protocol_name = str(uuid.uuid4()) + ".py"
         data = {"name": protocol_name, "content": protocol}
-        hf_token: str = settings.huggingface_api_key.get_secret_value()
+        hf_token: str = self.settings.huggingface_api_key.get_secret_value()
         headers = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(hf_token)}
         response = requests.post(url, json=data, headers=headers)
 

@@ -48,7 +48,7 @@ import { LiveOffsetValue } from './LiveOffsetValue'
 import type { ReactNode } from 'react'
 import type { VectorOffset } from '@opentrons/api-client'
 import type { WellStroke } from '@opentrons/components'
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls'
 
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
@@ -61,7 +61,7 @@ interface JogToWellProps {
   handleGoBack: () => void
   handleJog: Jog
   pipetteName: PipetteName
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   header: ReactNode
   body: ReactNode
   initialPosition: VectorOffset

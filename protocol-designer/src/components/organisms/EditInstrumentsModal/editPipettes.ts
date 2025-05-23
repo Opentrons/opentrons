@@ -108,8 +108,12 @@ export const editPipettes = (
         : undefined
       dispatch(
         createContainer({
-          labwareDefURI: tiprackDefUri,
-          adapterUnderLabwareDefURI,
+          labwareDefURIStack: [
+            ...(adapterUnderLabwareDefURI != null
+              ? [adapterUnderLabwareDefURI]
+              : []),
+            tiprackDefUri,
+          ],
         })
       )
     }

@@ -1,7 +1,7 @@
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadLabwareRunTimeCommand,
   LoadLidRunTimeCommand,
   RunTimeCommand,
@@ -10,8 +10,8 @@ import type {
 // Note: This is an O(n) operation.
 export function getLabwareDefinitionsFromCommands(
   commands: RunTimeCommand[]
-): LabwareDefinition2[] {
-  return commands.reduce<LabwareDefinition2[]>(
+): LabwareDefinition[] {
+  return commands.reduce<LabwareDefinition[]>(
     (acc, command) => [
       ...getLabwareDefinitionFromCommand(command, acc),
       ...acc,
@@ -21,11 +21,11 @@ export function getLabwareDefinitionsFromCommands(
 }
 
 function getNewLabwareDefinitions(
-  newDefinitions: Array<LabwareDefinition2 | null | undefined>,
-  knownDefinitions: LabwareDefinition2[]
-): LabwareDefinition2[] {
+  newDefinitions: Array<LabwareDefinition | null | undefined>,
+  knownDefinitions: LabwareDefinition[]
+): LabwareDefinition[] {
   return newDefinitions.filter(
-    (maybeNewDef): maybeNewDef is LabwareDefinition2 =>
+    (maybeNewDef): maybeNewDef is LabwareDefinition =>
       maybeNewDef != null &&
       !knownDefinitions.some(
         knownDef => getLabwareDefURI(knownDef) === getLabwareDefURI(maybeNewDef)
@@ -40,8 +40,8 @@ const isLoadCommand = (
 
 function getLabwareDefinitionFromCommand(
   command: RunTimeCommand,
-  known: LabwareDefinition2[]
-): LabwareDefinition2[] {
+  known: LabwareDefinition[]
+): LabwareDefinition[] {
   if (isLoadCommand(command)) {
     return getNewLabwareDefinitions([command.result?.definition], known)
   }

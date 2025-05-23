@@ -31,6 +31,16 @@ Welcome to the v8.4.0 release of the Opentrons App! This release includes update
 
 - Error recovery no longer lets you select more tips than the pipette can pick up at once.
 
+---
+
+## Opentrons App Changes in 8.3.2
+
+Welcome to the v8.3.2 release of the Opentrons App!
+
+There are no changes to the Opentrons App in v8.3.2, but it is required for updating the robot software to improve some features.
+
+---
+
 ## Opentrons App Changes in 8.3.1
 
 The 8.3.1 hotfix release includes a small fix to allow all robots to properly reboot after an upgrade to v8.3.0.

@@ -53,6 +53,7 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
           value={String(value) != null ? String(value) : null}
           title={t('tiprack')}
           tooltipContent={hasMissingTiprack ? 'missing_tiprack' : null}
+          width="100%"
         />
       ) : (
         <Flex

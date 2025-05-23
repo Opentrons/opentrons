@@ -19,7 +19,7 @@ import type {
   CutoutId,
   FlexStackerFillRunTimeCommand,
   FlexStackerSetStoredLabwareRunTimeCommand,
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadedLabware,
   LoadedModule,
   LoadLabwareRunTimeCommand,
@@ -139,7 +139,7 @@ export function getStackedItemsOnStartingDeck(
             const offDeckItem = {
               labwareId: labwareId,
               definitionUri: getLabwareDefURI(
-                command.result?.definition as LabwareDefinition2
+                command.result?.definition as LabwareDefinition
               ),
               displayName:
                 command.result?.definition?.metadata.displayName ?? '',
@@ -279,7 +279,7 @@ export function getStackedItemsOnStartingDeck(
             return {
               labwareId: lidId,
               definitionUri: getLabwareDefURI(
-                command.result?.definition as LabwareDefinition2
+                command.result?.definition as LabwareDefinition
               ),
               displayName:
                 command.result?.definition?.metadata.displayName ?? '',

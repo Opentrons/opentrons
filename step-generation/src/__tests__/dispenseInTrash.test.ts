@@ -3,14 +3,14 @@ import { describe, expect, it, vi } from 'vitest'
 import { dispenseInTrash } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
-  getInitialRobotStateStandard,
+  getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
 import { PROTOCOL_CONTEXT_NAME } from '../utils'
 
 import type { CutoutId } from '@opentrons/shared-data'
-import type { InvariantContext, RobotState } from '../types'
+import type { InvariantContext } from '../types'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 
@@ -26,9 +26,7 @@ let invariantContext: InvariantContext = {
     },
   },
 }
-const prevRobotState: RobotState = getInitialRobotStateStandard(
-  invariantContext
-)
+const prevRobotState = getRobotStateWithTipStandard(invariantContext)
 
 describe('dispenseInTrash', () => {
   it('returns correct commands for dispenseInTrash in trash bin for flex', () => {

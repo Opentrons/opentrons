@@ -86,12 +86,12 @@ Let's look at the :py:meth:`.Well.center` method. It returns a position centered
 Meniscus
 ^^^^^^^^
 
-Let's look at the :py:meth:`.Well.meniscus` method. It returns a position at the surface of liquid, or meniscus, inside a well. Like the ``.Well.top`` and ``.Well.bottom`` methods, you can adjust the height of the meniscus with the optional argument ``z``, which is measured in mm. Positive ``z`` values move the position up, and negative ones move it down. 
+Let's look at the :py:meth:`.Well.meniscus` method. It returns a position at the surface of liquid, or meniscus, inside a well. Similar to the ``.Well.top`` and ``.Well.bottom`` methods, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` values move the position up, and negative ones move it down. 
 
 .. code-block:: python
 
     plate["A1"].meniscus(
-        target= "end", z=-1
+        z=-1, target= "end"
         ) 
     # 1 mm below the meniscus of liquid inside the well
 

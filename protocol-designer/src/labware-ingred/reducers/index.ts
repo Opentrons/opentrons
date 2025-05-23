@@ -26,6 +26,7 @@ import type {
   DuplicateLabwareAction,
   EditLiquidGroupAction,
   EditMultipleLiquidGroupsAction,
+  EditSlotInfoAction,
   GenerateNewProtocolAction,
   OpenAddLabwareModalAction,
   OpenIngredientSelectorAction,
@@ -33,9 +34,11 @@ import type {
   RenameLabwareAction,
   SelectAdapterAction,
   SelectFixtureAction,
+  SelectLidAction,
   SelectLiquidAction,
   SelectModuleAction,
   SelectTopLabwareAction,
+  SelectTopLabwareAmountAction,
   SetWellContentsAction,
   ZoomedIntoSlotAction,
 } from '../actions'
@@ -302,10 +305,11 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
 )
 
 const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
-  selectedTopLabwareDefUri: null,
-  selectedAdapterDefUri: null,
+  selectedTopLabware: { labwareDefURI: null, amount: 1 },
+  selectedAdapterDefURI: null,
   selectedModuleModel: null,
   selectedFixture: null,
+  selectedLidLabware: null,
   selectedSlot: { slot: null, cutout: null },
 }
 
@@ -317,15 +321,24 @@ export const zoomedInSlotInfo = (
     | SelectModuleAction
     | SelectFixtureAction
     | ZoomedIntoSlotAction
+    | SelectLidAction
+    | SelectTopLabwareAmountAction
+    | EditSlotInfoAction
 ): ZoomedIntoSlotInfoState => {
   switch (action.type) {
     case 'SELECT_TOP_LABWARE': {
-      const { labwareDefUri } = action.payload
-      return { ...state, selectedTopLabwareDefUri: labwareDefUri }
+      const { labwareDefURI } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI,
+          amount: state.selectedTopLabware.amount,
+        },
+      }
     }
     case 'SELECT_ADAPTER': {
-      const { adapterDefUri } = action.payload
-      return { ...state, selectedAdapterDefUri: adapterDefUri }
+      const { adapterDefURI } = action.payload
+      return { ...state, selectedAdapterDefURI: adapterDefURI }
     }
     case 'SELECT_MODULE': {
       const { moduleModel } = action.payload
@@ -343,6 +356,44 @@ export const zoomedInSlotInfo = (
           slot,
           cutout,
         },
+      }
+    }
+    case 'SELECT_LID': {
+      const { labwareDefURI } = action.payload
+      return {
+        ...state,
+        selectedLidLabware: labwareDefURI,
+      }
+    }
+    case 'SELECT_TOP_LABWARE_AMOUNT': {
+      const { amount } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI: state.selectedTopLabware.labwareDefURI,
+          amount,
+        },
+      }
+    }
+    case 'EDIT_SLOT_INFO': {
+      const {
+        labwareDefURI,
+        adapterDefURI,
+        moduleModel,
+        fixture,
+        lidDefURI,
+        amount,
+      } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI: labwareDefURI ?? null,
+          amount: amount ?? 1,
+        },
+        selectedAdapterDefURI: adapterDefURI ?? null,
+        selectedModuleModel: moduleModel ?? null,
+        selectedFixture: fixture ?? null,
+        selectedLidLabware: lidDefURI ?? null,
       }
     }
     default:

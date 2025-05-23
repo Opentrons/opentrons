@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { blowOutInTrash } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
-  getInitialRobotStateStandard,
+  getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
@@ -26,7 +26,7 @@ let invariantContext: InvariantContext = {
     },
   },
 }
-const prevRobotState: RobotState = getInitialRobotStateStandard(
+const prevRobotState: RobotState = getRobotStateWithTipStandard(
   invariantContext
 )
 

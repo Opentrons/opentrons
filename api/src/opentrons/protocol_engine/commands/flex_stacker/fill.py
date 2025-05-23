@@ -222,6 +222,9 @@ class FillImpl(AbstractCommandImpl[FillParams, SuccessData[FillResult]]):
         if params.strategy == StackerFillEmptyStrategy.MANUAL_WITH_PAUSE:
             await self._run_control.wait_for_resume()
 
+        if stacker_hw:
+            stacker_hw.set_stacker_identify(False)
+
         return SuccessData(
             public=FillResult.model_construct(
                 count=len(new_contained_labware),

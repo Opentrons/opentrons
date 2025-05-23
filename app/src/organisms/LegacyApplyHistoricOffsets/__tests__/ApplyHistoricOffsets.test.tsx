@@ -12,7 +12,7 @@ import { LegacyApplyHistoricOffsets } from '..'
 
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 
 vi.mock('@opentrons/components', async importOriginal => {
@@ -25,8 +25,8 @@ vi.mock('@opentrons/components', async importOriginal => {
 vi.mock('/app/redux/config')
 vi.mock('/app/organisms/LegacyLabwarePositionCheck/utils/labware')
 
-const mockLabwareDef = fixture96Plate as LabwareDefinition2
-const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
+const mockLabwareDef = fixture96Plate as LabwareDefinition
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition
 
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',

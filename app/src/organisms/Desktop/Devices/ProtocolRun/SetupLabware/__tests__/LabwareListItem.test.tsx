@@ -20,7 +20,7 @@ import { SecureLabwareModal } from '../SecureLabwareModal'
 
 import type { ComponentProps } from 'react'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
@@ -30,7 +30,7 @@ import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 vi.mock('../SecureLabwareModal')
 vi.mock('@opentrons/react-api-client')
 
-const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition
 const mockAdapterId = 'mockAdapterId'
 const mockNestedLabwareDisplayName = 'nested labware display name'
 const mockLocationInfo = {

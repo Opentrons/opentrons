@@ -88,9 +88,9 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     // cy.clickCreateNew()
     // cy.verifyCreateNewHeader()
     const steps = new StepBuilder()
+
     // steps.add(SetupSteps.EditProtocolA())
     GenerateMultipleTransferSteps(steps)
-
     steps.execute()
   })
 })

@@ -177,6 +177,15 @@ export const substepTimelineSingleChannel = (
         }
         if (previousMoveToCommand?.commandType === 'moveToWell') {
           const { labwareId, wellName } = previousMoveToCommand.params
+          const wellInfo = {
+            labwareId,
+            wells: [wellName],
+            preIngreds:
+              acc.prevRobotState.liquidState.labware[labwareId][wellName],
+            postIngreds:
+              nextRobotState.liquidState.labware[labwareId][wellName],
+          }
+
           return {
             ...acc,
             timeline: [
@@ -187,13 +196,7 @@ export const substepTimelineSingleChannel = (
                 // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
                 nextFrame,
                 command,
-                wellInfo: {
-                  wells: [previousMoveToCommand.params.wellName],
-                  preIngreds:
-                    acc.prevRobotState.liquidState.labware[labwareId][wellName],
-                  postIngreds:
-                    nextRobotState.liquidState.labware[labwareId][wellName],
-                },
+                wellInfo,
               }),
             ],
             prevRobotState: nextRobotState,
@@ -248,7 +251,6 @@ export const substepTimelineSingleChannel = (
             ? nextRobotState.liquidState.wasteChute[wasteChuteId]
             : nextRobotState.liquidState.trashBins[trashBinId ?? ''],
         }
-
         return {
           ...acc,
           timeline: [

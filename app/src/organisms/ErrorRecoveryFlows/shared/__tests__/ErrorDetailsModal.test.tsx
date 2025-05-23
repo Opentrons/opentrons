@@ -1,8 +1,9 @@
 import { act, renderHook, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { InlineNotification } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { i18n } from '/app/i18n'
 import { OddModal } from '/app/molecules/OddModal'
 
@@ -31,7 +32,13 @@ vi.mock('/app/molecules/OddModal', () => ({
   OddModal: vi.fn(({ children }) => <div>{children}</div>),
 }))
 
-vi.mock('/app/atoms/InlineNotification')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InlineNotification>()
+  return {
+    ...actual,
+    InlineNotification: vi.fn(),
+  }
+})
 vi.mock('../StepInfo')
 
 describe('useErrorDetailsModal', () => {

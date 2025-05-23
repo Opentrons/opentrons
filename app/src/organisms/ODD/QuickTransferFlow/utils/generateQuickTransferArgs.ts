@@ -23,7 +23,7 @@ import {
 import type {
   CutoutConfig,
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
   NozzleConfigurationStyle,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -51,7 +51,7 @@ const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 function getOrderedWells(
   unorderedWells: string[],
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
 ): string[] {
   const allWellsOrdered = orderWells(labwareDef.ordering, 't2b', 'l2r')
   return intersection(allWellsOrdered, unorderedWells)
@@ -446,17 +446,22 @@ export function generateQuickTransferArgs(
     aspirateRetractZOffset: 0,
     aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
     aspirateRetractDelay: null,
+    dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseZOffset: 0,
     dispenseSubmergeSpeed: null,
     dispenseSubmergeXOffset: 0,
     dispenseSubmergeYOffset: 0,
     dispenseSubmergeZOffset: 0,
     dispenseSubmergePositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseSubmergeDelay: null,
     dispenseRetractSpeed: null,
     dispenseRetractXOffset: 0,
     dispenseRetractYOffset: 0,
     dispenseRetractZOffset: 0,
     dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+    dispenseRetractDelay: null,
     touchTipAfterAspirateMmFromEdge: null,
+    touchTipAfterDispenseMmFromEdge: null,
   }
 
   switch (quickTransferState.path) {
@@ -546,6 +551,7 @@ export function generateQuickTransferArgs(
             : null,
         sourceWell: sourceWells[0],
         destWells,
+        conditioningVolume: null,
       }
       return {
         stepArgs: distributeStepArguments,
