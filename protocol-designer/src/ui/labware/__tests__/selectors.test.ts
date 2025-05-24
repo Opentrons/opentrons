@@ -1,9 +1,23 @@
-import { describe, expect, it } from 'vitest'
+import { useTranslation } from 'react-i18next'
+import { describe, expect, it, type Mock, vi, beforeEach } from 'vitest'
 
 import { getDisposalOptions } from '../selectors'
 
+vi.mock('react-i18next', () => ({
+  useTranslation: vi.fn(),
+}))
+
 describe('labware selectors', () => {
   describe('getDisposalOptions', () => {
+      let t: Mock
+    
+      beforeEach(() => {
+        t = vi.fn(key => key)
+    
+        vi.mocked(useTranslation).mockReturnValue({ t } as any)
+        t.mockReturnValue('Trash bin')
+      })
+
     it('returns an empty list when additionalEquipment is NOT provided', () => {
       expect(getDisposalOptions.resultFunc({}, null)).toEqual([])
     })
