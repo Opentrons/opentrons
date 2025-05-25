@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from numpy import interp
-from typing import Optional, Dict, Sequence, Tuple, List, TypedDict, Literal, Union
-from typing_extensions import NotRequired
+from typing import Optional, Dict, Sequence, Tuple, List, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     TransferProperties as SharedDataTransferProperties,
@@ -25,7 +24,6 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
     Coordinate,
 )
-from opentrons_shared_data.labware.types import Vector3D
 from . import validation
 
 
@@ -117,100 +115,6 @@ class TipPosition:
             positionReference=self._position_reference,
             offset=self.offset,
         )
-
-
-TIP_POSITION_REFERENCES = [val.value for val in PositionReference.__members__.values()]
-BLOWOUT_LOCATIONS = [val.value for val in BlowoutLocation.__members__.values()]
-
-
-class TipPositionDict(TypedDict):
-    position_reference: Literal[TIP_POSITION_REFERENCES]
-    offset: Vector3D
-
-
-class DelayPropertiesDict(TypedDict):
-    enabled: bool
-    duration: NotRequired[float]
-
-
-class TouchTipPropertiesDict(TypedDict):
-    enabled: bool
-    z_offset: NotRequired[float]
-    mm_from_edge: NotRequired[float]
-    speed: NotRequired[float]
-
-
-class MixPropertiesDict(TypedDict):
-    enabled: bool
-    repetitions: NotRequired[int]
-    volume: NotRequired[float]
-
-
-class BlowoutPropertiesDict(TypedDict):
-    enabled: bool
-    location: NotRequired[Literal[BLOWOUT_LOCATIONS]]
-    flow_rate: NotRequired[float]
-
-
-class SubmergeDict(TypedDict):
-    start_position: TipPositionDict
-    speed: float
-    delay: DelayPropertiesDict
-
-
-class RetractAspirateDict(TypedDict):
-    end_position: TipPositionDict
-    speed: float
-    delay: DelayPropertiesDict
-    air_gap_by_volume: Sequence[Tuple[float, float]]
-    touch_tip: TouchTipPropertiesDict
-
-
-class RetractDispenseDict(TypedDict):
-    end_position: TipPositionDict
-    speed: float
-    delay: DelayPropertiesDict
-    air_gap_by_volume: Sequence[Tuple[float, float]]
-    touch_tip: TouchTipPropertiesDict
-    blowout: BlowoutPropertiesDict
-
-
-class AspiratePropertiesDict(TypedDict):
-    submerge: SubmergeDict
-    flow_rate_by_volume: Sequence[Tuple[float, float]]
-    correction_by_volume: Sequence[Tuple[float, float]]
-    delay: DelayPropertiesDict
-    aspirate_position: TipPositionDict
-    retract: RetractAspirateDict
-    pre_wet: bool
-    mix: MixPropertiesDict
-
-
-class SingleDispensePropertiesDict(TypedDict):
-    submerge: SubmergeDict
-    flow_rate_by_volume: Sequence[Tuple[float, float]]
-    correction_by_volume: Sequence[Tuple[float, float]]
-    delay: DelayPropertiesDict
-    dispense_position: TipPositionDict
-    retract: RetractDispenseDict
-    push_out_by_volume: Sequence[Tuple[float, float]]
-    mix: MixPropertiesDict
-
-
-class MultiDispensePropertiesDict(TypedDict):
-    submerge: SubmergeDict
-    flow_rate_by_volume: Sequence[Tuple[float, float]]
-    correction_by_volume: Sequence[Tuple[float, float]]
-    delay: DelayPropertiesDict
-    dispense_position: TipPosition
-    retract: RetractDispenseDict
-    conditioning_by_volume: Sequence[Tuple[float, float]]
-
-
-class TransferPropertiesDict(TypedDict):
-    aspirate: AspiratePropertiesDict
-    dispense: SingleDispensePropertiesDict
-    multi_dispense: NotRequired[MultiDispensePropertiesDict]
 
 
 @dataclass(slots=True)

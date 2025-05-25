@@ -21,14 +21,13 @@ from typing import (
     cast,
 )
 
-from PIL.ImageChops import offset
 from typing_extensions import TypedDict
 
 import pytest
 from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
-from opentrons.protocol_api._liquid_properties import (
+from opentrons_shared_data.liquid_classes.types import (
     TransferPropertiesDict,
     AspiratePropertiesDict,
     SingleDispensePropertiesDict,
@@ -1077,7 +1076,7 @@ def minimal_transfer_properties_dict() -> Dict[str, Dict[str, TransferProperties
                 aspirate=AspiratePropertiesDict(
                     submerge=SubmergeDict(
                         start_position=TipPositionDict(
-                            position_reference=PositionReference.WELL_BOTTOM,
+                            position_reference="well-bottom",
                             offset={"x": 1, "y": 2, "z": 3},
                         ),
                         speed=100,
@@ -1087,7 +1086,7 @@ def minimal_transfer_properties_dict() -> Dict[str, Dict[str, TransferProperties
                     ),
                     retract=RetractAspirateDict(
                         end_position=TipPositionDict(
-                            position_reference=PositionReference.WELL_BOTTOM,
+                            position_reference="well-bottom",
                             offset={"x": 1, "y": 2, "z": 3},
                         ),
                         speed=40,
@@ -1096,7 +1095,7 @@ def minimal_transfer_properties_dict() -> Dict[str, Dict[str, TransferProperties
                         delay=DelayPropertiesDict(enabled=False),
                     ),
                     aspirate_position=TipPositionDict(
-                        position_reference=PositionReference.WELL_BOTTOM,
+                        position_reference="well-bottom",
                         offset={"x": 1, "y": 2, "z": 3},
                     ),
                     flow_rate_by_volume=[(10.0, 40.0), (20.0, 30.0)],
@@ -1108,7 +1107,7 @@ def minimal_transfer_properties_dict() -> Dict[str, Dict[str, TransferProperties
                 dispense=SingleDispensePropertiesDict(
                     submerge=SubmergeDict(
                         start_position=TipPositionDict(
-                            position_reference=PositionReference.WELL_BOTTOM,
+                            position_reference="well-bottom",
                             offset={"x": 1, "y": 2, "z": 3},
                         ),
                         speed=100,
@@ -1118,7 +1117,7 @@ def minimal_transfer_properties_dict() -> Dict[str, Dict[str, TransferProperties
                     ),
                     retract=RetractDispenseDict(
                         end_position=TipPositionDict(
-                            position_reference=PositionReference.WELL_BOTTOM,
+                            position_reference="well-bottom",
                             offset={"x": 1, "y": 2, "z": 3},
                         ),
                         speed=40,
@@ -1128,7 +1127,7 @@ def minimal_transfer_properties_dict() -> Dict[str, Dict[str, TransferProperties
                         blowout=BlowoutPropertiesDict(enabled=False),
                     ),
                     dispense_position=TipPositionDict(
-                        position_reference=PositionReference.WELL_BOTTOM,
+                        position_reference="well-bottom",
                         offset={"x": 1, "y": 2, "z": 3},
                     ),
                     flow_rate_by_volume=[(10.0, 40.0), (20.0, 30.0)],

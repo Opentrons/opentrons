@@ -12,9 +12,9 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 
 from opentrons.protocol_api._liquid import LiquidClass
-from opentrons.protocol_api._liquid_properties import TransferPropertiesDict
 from opentrons.types import Mount, DeckSlotName, StagingSlotName
 from opentrons.protocol_api import OFF_DECK
 from opentrons.legacy_broker import LegacyBroker

@@ -61,7 +61,7 @@ def test_get_for_raises_for_incorrect_pipette_or_tip(
 def test_create_liquid_class_from_transfer_props(
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """Should create a new liquid class from given data"""
+    """Should create a new liquid class from given data."""
     transfer_props = build_transfer_properties(
         minimal_liquid_class_def2.byPipette[0].byTipType[0]
     )
@@ -89,7 +89,7 @@ def test_update_for_liquid_class_props(
         liq_class.get_for(
             "flex_1channel_50", "opentrons_flex_96_tiprack_50ul"
         ).aspirate.mix.enabled
-        == False
+        is False
     )
 
     sample_transfer_props = build_transfer_properties(
@@ -108,5 +108,5 @@ def test_update_for_liquid_class_props(
         liq_class.get_for(
             "flex_1channel_50", "opentrons_flex_96_tiprack_50ul"
         ).aspirate.mix.enabled
-        == True
+        is True
     )

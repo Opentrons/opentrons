@@ -11,15 +11,13 @@ from typing import (
     Union,
     Mapping,
     cast,
-    Any,
 )
 
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    ByPipetteSetting,
-    ByTipTypeSetting,
     TransferProperties as SharedTransferProperties,
 )
+from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
@@ -58,7 +56,6 @@ from opentrons.protocol_engine.errors import LabwareMovementNotAllowedError
 from ._liquid_properties import (
     TransferProperties,
     build_transfer_properties,
-    TransferPropertiesDict,
 )
 
 from ._types import OffDeckType

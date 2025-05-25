@@ -4,7 +4,7 @@ from typing import Dict
 import pytest
 
 from opentrons.protocol_api import ProtocolContext
-from opentrons.protocol_api._liquid_properties import TransferPropertiesDict
+from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 
 
 @pytest.mark.ot3_only
