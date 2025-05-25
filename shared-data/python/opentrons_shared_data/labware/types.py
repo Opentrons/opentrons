@@ -162,10 +162,17 @@ class LocatingFeatureKeys(str, Enum):
     """Keys for LocatingFeatures."""
 
     BACK_LEFT_BOTTOM = "backLeftBottom"
+    RIGHT_CENTER_BOTTOM = "rightCenterBottom"
 
 
 class BackLeftBottomLocatingFeature(TypedDict):
     """The back-left-bottom locating feature."""
+
+    pass
+
+
+class RightCenterBottomLocatingFeature(TypedDict):
+    """The right-center-bottom locating feature."""
 
     pass
 
@@ -177,6 +184,7 @@ class LocatingFeatures(TypedDict):
     """
 
     backLeftBottom: NotRequired[BackLeftBottomLocatingFeature]
+    rightCenterBottom: NotRequired[RightCenterBottomLocatingFeature]
 
 
 class LabwareDefinition2(TypedDict):

@@ -624,6 +624,11 @@
           "description": "Exists when the labware displaces the child entity to the back left bottom corner of the labware",
           "type": "object",
           "required": []
+        },
+        "rightCenterBottom": {
+          "description": "Exists when the labware displaces the child entity to the right center bottom of the labware",
+          "type": "object",
+          "required": []
         }
       }
     },

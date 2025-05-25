@@ -64,6 +64,9 @@ def _get_parent_origin_to_locating_feature(
     elif _is_back_left_bottom_locating_feature_valid(lw_parent_location_info):
         return _get_parent_origin_to_back_left_bottom(lw_parent_location_info)
 
+    elif _is_right_center_bottom_locating_feature_valid(lw_parent_location_info):
+        return _get_parent_origin_to_right_center_bottom(lw_parent_location_info)
+
     else:
         return _get_parent_origin_to_bottom_center(lw_parent_location_info)
 
@@ -80,6 +83,9 @@ def _get_locating_feature_to_lw_origin(
     elif _is_back_left_bottom_locating_feature_valid(lw_parent_location_info):
         return _get_back_left_bottom_to_lw_origin(definition)
 
+    elif _is_right_center_bottom_locating_feature_valid(lw_parent_location_info):
+        return _get_right_center_bottom_to_lw_origin(definition)
+
     else:
         return _get_bottom_center_to_lw_origin(definition)
 
@@ -91,8 +97,24 @@ def _is_back_left_bottom_locating_feature_valid(
     assert not isinstance(lw_parent_location_info, LabwareDefinition2)
 
     if (
-        lw_parent_location_info.locatingFeaturesAsParent
+        lw_parent_location_info.locatingFeaturesAsParent is not None
         and LocatingFeatureKeys.BACK_LEFT_BOTTOM
+        in lw_parent_location_info.locatingFeaturesAsParent
+    ):
+        return True
+    else:
+        return False
+
+
+def _is_right_center_bottom_locating_feature_valid(
+    lw_parent_location_info: LabwareParentLocationInfo,
+) -> bool:
+    """Returns whether the right-center-bottom locating feature is valid given the parent entity."""
+    assert not isinstance(lw_parent_location_info, LabwareDefinition2)
+
+    if (
+        lw_parent_location_info.locatingFeaturesAsParent is not None
+        and LocatingFeatureKeys.RIGHT_CENTER_BOTTOM
         in lw_parent_location_info.locatingFeaturesAsParent
     ):
         return True
@@ -164,6 +186,41 @@ def _get_parent_origin_to_back_left_bottom(
         raise ValueError(f"Unsupported parent location info: {lw_parent_location_info}")
 
 
+def _get_parent_origin_to_right_center_bottom(
+    lw_parent_location_info: LabwareParentLocationInfo,
+) -> Point:
+    """Returns offset from parent origin to parent's right-center-bottom point."""
+    if isinstance(lw_parent_location_info, LabwareDefinition2):
+        return Point(0, 0, 0)
+
+    elif isinstance(lw_parent_location_info, LabwareDefinition3):
+        extents = lw_parent_location_info.extents.total
+        return Point(
+            x=extents.frontRightTop.x,
+            y=extents.frontRightTop.y / 2,
+            z=extents.backLeftBottom.z,
+        )
+
+    elif isinstance(lw_parent_location_info, AddressableArea):
+        bounding_box = lw_parent_location_info.bounding_box
+        return Point(
+            x=bounding_box.x,
+            y=-1 * bounding_box.y / 2,
+            z=0,
+        )
+
+    elif isinstance(lw_parent_location_info, ModuleDefinition):
+        dimensions = lw_parent_location_info.dimensions
+        return Point(
+            x=dimensions.labwareInterfaceXDimension,
+            y=-1 * dimensions.labwareInterfaceYDimension / 2,
+            z=0,
+        )
+
+    else:
+        raise ValueError(f"Unsupported parent location info: {lw_parent_location_info}")
+
+
 def _get_bottom_center_to_lw_origin(definition: LabwareDefinition3) -> Point:
     """Returns offset from labware's bottom-center point to labware origin."""
     extents = definition.extents.total
@@ -185,3 +242,15 @@ def _get_back_left_bottom_to_lw_origin(definition: LabwareDefinition3) -> Point:
     )
 
     return -1 * lw_origin_to_bottom_left
+
+
+def _get_right_center_bottom_to_lw_origin(definition: LabwareDefinition3) -> Point:
+    """Returns offset from labware's right-center-bottom point to labware origin."""
+    extents = definition.extents.total
+    lw_origin_to_right_center_bottom = Point(
+        x=extents.frontRightTop.x,
+        y=extents.frontRightTop.y / 2,
+        z=extents.backLeftBottom.z,
+    )
+
+    return -1 * lw_origin_to_right_center_bottom

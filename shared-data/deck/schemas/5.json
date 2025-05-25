@@ -176,6 +176,11 @@
                     "description": "Exists when the addressable area displaces the child entity to the back left bottom corner of the addressable area",
                     "type": "object",
                     "required": []
+                  },
+                  "rightCenterBottom": {
+                    "description": "Exists when the addressable area displaces the child entity to the right center bottom of the addressable area",
+                    "type": "object",
+                    "required": []
                   }
                 }
               },

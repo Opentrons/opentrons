@@ -139,6 +139,30 @@ _MOCK_PARENT_LABWARE_DEF_3_WITH_BACK_LEFT_BOTTOM_LF = LabwareDefinition3.model_c
     locatingFeaturesAsParent={"backLeftBottom": {}},
 )
 
+
+_MOCK_PARENT_LABWARE_DEF_3_WITH_RIGHT_CENTER_BOTTOM_LF = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=3,
+    dimensions=LabwareDimensions(
+        xDimension=11000.5,
+        yDimension=12000.5,
+        zDimension=13000.5,
+    ),
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=200.0, y=300.0, z=400.0),
+            frontRightTop=Vector3D(x=10200.5, y=-10700.5, z=12400.5),
+        ),
+        footprint=AxisAlignedBoundingBox2D(
+            backLeft=Vector2D(x=200.0, y=300.0),
+            frontRight=Vector2D(x=10200.5, y=-10700.5),
+        ),
+    ),
+    locatingFeaturesAsParent={"rightCenterBottom": {}},
+)
+
+
 _MOCK_ADDRESSABLE_AREA = AddressableArea(
     area_name="test_area",
     area_type=AreaType.SLOT,
@@ -150,6 +174,7 @@ _MOCK_ADDRESSABLE_AREA = AddressableArea(
     locatingFeaturesAsParent=None,
 )
 
+
 _MOCK_ADDRESSABLE_AREA_WITH_BACK_LEFT_BOTTOM_LF = AddressableArea(
     area_name="test_area",
     area_type=AreaType.SLOT,
@@ -159,6 +184,18 @@ _MOCK_ADDRESSABLE_AREA_WITH_BACK_LEFT_BOTTOM_LF = AddressableArea(
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
     locatingFeaturesAsParent={"backLeftBottom": {}},
+)
+
+
+_MOCK_ADDRESSABLE_AREA_WITH_RIGHT_CENTER_BOTTOM_LF = AddressableArea(
+    area_name="test_area",
+    area_type=AreaType.SLOT,
+    base_slot=DeckSlotName.SLOT_A1,
+    display_name="Test Area",
+    bounding_box=Dimensions(x=14000.5, y=15000.5, z=16000.5),
+    position=AddressableOffsetVector(x=0, y=0, z=0),
+    compatible_module_types=[],
+    locatingFeaturesAsParent={"rightCenterBottom": {}},
 )
 
 
@@ -182,6 +219,18 @@ def _create_mock_module_definition_with_back_left_bottom_lf() -> ModuleDefinitio
     mock_dimensions.labwareInterfaceYDimension = 18000.5
     mock_module_def.dimensions = mock_dimensions
     mock_module_def.locatingFeaturesAsParent = {"backLeftBottom": {}}
+
+    return mock_module_def
+
+
+def _create_mock_module_definition_with_right_center_bottom_lf() -> ModuleDefinition:
+    """Create a mock ModuleDefinition with right-center-bottom locating feature."""
+    mock_module_def = MagicMock(spec=ModuleDefinition)
+    mock_dimensions = MagicMock()
+    mock_dimensions.labwareInterfaceXDimension = 17000.5
+    mock_dimensions.labwareInterfaceYDimension = 18000.5
+    mock_module_def.dimensions = mock_dimensions
+    mock_module_def.locatingFeaturesAsParent = {"rightCenterBottom": {}}
 
     return mock_module_def
 
@@ -355,9 +404,9 @@ def test_labware_definition_3_with_offset_on_labware_definition_3_back_left_bott
         lw_parent_location_info=_MOCK_PARENT_LABWARE_DEF_3_WITH_BACK_LEFT_BOTTOM_LF,
     )
 
-    assert result.x == pytest.approx(49.75)  # 150 - 100.25
-    assert result.y == pytest.approx(49.25)  # 250 - 200.75
-    assert result.z == pytest.approx(49.875)  # 350 - 300.125
+    assert result.x == pytest.approx(49.75)
+    assert result.y == pytest.approx(49.25)
+    assert result.z == pytest.approx(49.875)
 
 
 def test_labware_definition_3_with_zero_offset_back_left_bottom() -> None:
@@ -373,3 +422,84 @@ def test_labware_definition_3_with_zero_offset_back_left_bottom() -> None:
     assert result.x == pytest.approx(150.0)
     assert result.y == pytest.approx(250.0)
     assert result.z == pytest.approx(350.0)
+
+
+# Right Center Bottom Locating Feature Tests
+
+
+def test_labware_definition_3_on_addressable_area_right_center_bottom() -> None:
+    """Test LabwareDefinition3 on AddressableArea when the right-center-bottom locating feature is used."""
+    loaded_labware = _create_loaded_labware()
+
+    result = get_parent_origin_to_lw_origin(
+        labware_data=loaded_labware,
+        definition=_MOCK_LABWARE_DEF_3,
+        lw_parent_location_info=_MOCK_ADDRESSABLE_AREA_WITH_RIGHT_CENTER_BOTTOM_LF,
+    )
+
+    assert result.x == pytest.approx(10000.0)
+    assert result.y == pytest.approx(-5000.0)
+    assert result.z == pytest.approx(0.0)
+
+
+def test_labware_definition_3_on_module_right_center_bottom() -> None:
+    """Test LabwareDefinition3 on ModuleDefinition when the right-center-bottom locating feature is used."""
+    loaded_labware = _create_loaded_labware()
+    module_def = _create_mock_module_definition_with_right_center_bottom_lf()
+
+    result = get_parent_origin_to_lw_origin(
+        labware_data=loaded_labware,
+        definition=_MOCK_LABWARE_DEF_3,
+        lw_parent_location_info=module_def,
+    )
+
+    assert result.x == pytest.approx(13000.0)
+    assert result.y == pytest.approx(-6500.0)
+    assert result.z == pytest.approx(0.0)
+
+
+def test_labware_definition_3_on_labware_definition_3_right_center_bottom() -> None:
+    """Test LabwareDefinition3 stacked on another LabwareDefinition3 when the right-center-bottom locating feature is used."""
+    loaded_labware = _create_loaded_labware()
+
+    result = get_parent_origin_to_lw_origin(
+        labware_data=loaded_labware,
+        definition=_MOCK_LABWARE_DEF_3,
+        lw_parent_location_info=_MOCK_PARENT_LABWARE_DEF_3_WITH_RIGHT_CENTER_BOTTOM_LF,
+    )
+
+    assert result.x == pytest.approx(6200.0)
+    assert result.y == pytest.approx(-2850.0)
+    assert result.z == pytest.approx(400.0)
+
+
+def test_labware_definition_3_with_offset_on_labware_definition_3_right_center_bottom() -> (
+    None
+):
+    """Test LabwareDefinition3 with offset on another LabwareDefinition3 when the right-center-bottom locating feature is used."""
+    loaded_labware = _create_loaded_labware()
+
+    result = get_parent_origin_to_lw_origin(
+        labware_data=loaded_labware,
+        definition=_MOCK_LABWARE_DEF_3_WITH_OFFSET,
+        lw_parent_location_info=_MOCK_PARENT_LABWARE_DEF_3_WITH_RIGHT_CENTER_BOTTOM_LF,
+    )
+
+    assert result.x == pytest.approx(3099.75)
+    assert result.y == pytest.approx(-1200.125)
+    assert result.z == pytest.approx(99.875)
+
+
+def test_labware_definition_3_with_zero_offset_right_center_bottom() -> None:
+    """Test LabwareDefinition3 with zero right-center-bottom offset when right-center-bottom locating feature is used."""
+    loaded_labware = _create_loaded_labware()
+
+    result = get_parent_origin_to_lw_origin(
+        labware_data=loaded_labware,
+        definition=_MOCK_LABWARE_DEF_3,
+        lw_parent_location_info=_MOCK_PARENT_LABWARE_DEF_3_WITH_RIGHT_CENTER_BOTTOM_LF,
+    )
+
+    assert result.x == pytest.approx(6200.0)
+    assert result.y == pytest.approx(-2850.0)
+    assert result.z == pytest.approx(400.0)

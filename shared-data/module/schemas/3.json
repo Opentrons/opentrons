@@ -103,6 +103,11 @@
           "description": "Exists when the module displaces the child entity to the back left bottom corner of the module",
           "type": "object",
           "required": []
+        },
+        "rightCenterBottom": {
+          "description": "Exists when the module displaces the child entity to the right center bottom of the module",
+          "type": "object",
+          "required": []
         }
       }
     },
