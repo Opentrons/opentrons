@@ -91,7 +91,7 @@ describe('Mix', () => {
       kind: 'dispense',
     }
     render(props)
-    screen.getByText('Mix before dispensing')
+    screen.getByText('Mix after dispensing')
   })
 
   it('renders save button if you select enabled, then moves to second screen', () => {
