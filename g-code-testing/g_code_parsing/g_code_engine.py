@@ -107,6 +107,8 @@ class GCodeEngine:
         while len(emulator.attached_modules) != len(modules):
             time.sleep(0.1)
             if (time.time() - wait_begins) > 30:
+                proc.kill()
+                proc.join()
                 raise RuntimeError(
                     f"Failed to start {emulator.attached_modules} after 30 seconds"
                 )
@@ -171,7 +173,7 @@ class GCodeEngine:
 
                 protocol_runner = create_protocol_runner(
                     protocol_config=config,
-                    protocol_engine=await create_protocol_engine(
+                    protocol_engine=await create_protocol_engine.create_protocol_engine(
                         hardware_api=hardware,  # type: ignore
                         config=Config(
                             robot_type=robot_type,
