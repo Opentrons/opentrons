@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '../../atoms'
+import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn } from '../../primitives'

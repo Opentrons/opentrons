@@ -1,4 +1,4 @@
-import { StyledText } from '../../atoms'
+import { StyledText } from '../../atoms/StyledText/StyledText'
 import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
