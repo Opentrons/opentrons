@@ -297,11 +297,12 @@ export function Onboarding(): JSX.Element | null {
             values.fields.robotType === FLEX_ROBOT_TYPE
               ? FLEX_MIDDLE_SLOTS[index]
               : modifiedOt2Slots[index],
-          labwareDefURI: tiprackDefURI,
-          adapterUnderLabwareDefURI:
-            values.pipettesByMount.left.pipetteName === 'p1000_96'
-              ? adapter96ChannelDefUri
-              : undefined,
+          labwareDefURIStack: [
+            ...(values.pipettesByMount.left.pipetteName === 'p1000_96'
+              ? [adapter96ChannelDefUri]
+              : []),
+            tiprackDefURI,
+          ],
         })
       )
     })

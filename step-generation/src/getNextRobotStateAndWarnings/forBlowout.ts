@@ -12,7 +12,7 @@ export function forBlowout(
   const { robotState } = robotStateAndWarnings
   dispenseUpdateLiquidState({
     pipetteId,
-    labwareId,
+    entityId: labwareId,
     useFullVolume: true,
     wellName,
     prevLiquidState: robotState.liquidState,

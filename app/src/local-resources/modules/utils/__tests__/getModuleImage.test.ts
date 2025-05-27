@@ -82,4 +82,9 @@ describe('getModuleImage', () => {
     const result = getModuleImage('magneticBlockV1')
     expect(result).toEqual('/app/src/assets/images/magnetic_block_gen_1.png')
   })
+
+  it('should render the flex stacker image when the module is flexStackerModuleV1', () => {
+    const result = getModuleImage('flexStackerModuleV1')
+    expect(result).toEqual('/app/src/assets/images/flex_stacker_no_labware.png')
+  })
 })

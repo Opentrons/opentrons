@@ -14,7 +14,7 @@ import type {
 } from '../../command/types'
 import type { PipetteName } from '../pipettes'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   Liquid,
   LoadedLabware,
   LoadedModule,
@@ -146,7 +146,7 @@ export function getTopLabwareInfo(
   currentStackHeight: number = 0
 ): {
   topLabwareId: string
-  topLabwareDefinition?: LabwareDefinition2
+  topLabwareDefinition?: LabwareDefinition
   topLabwareDisplayName?: string
 } {
   const nestedCommand = loadLabwareCommands.find(

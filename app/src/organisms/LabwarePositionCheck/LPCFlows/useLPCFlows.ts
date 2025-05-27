@@ -25,6 +25,7 @@ import {
   useUpdateDeckConfig,
   useUpdateLabware,
 } from './hooks'
+import { useLPCAnalytics } from './useLPCAnalytics'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type {
@@ -61,6 +62,11 @@ export function useLPCFlows({
   robotType,
   protocolName,
 }: UseLPCFlowsProps): UseLPCFlowsResult {
+  const analytics = useLPCAnalytics({
+    robotType,
+    runId: runId ?? 'UNKNOWN',
+  })
+
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
@@ -150,6 +156,7 @@ export function useLPCFlows({
   const launchLPC = (): Promise<void> => {
     // Avoid accidentally creating several maintenance runs if a request is ongoing.
     if (!isLaunching) {
+      analytics.reportLaunchLpcWizard()
       setIsLaunching(true)
       const labwareOffsets = getRelevantOffsets(
         robotType,
@@ -208,6 +215,7 @@ export function useLPCFlows({
           protocolName,
           maintenanceRunId,
           ot2Offsets,
+          analytics,
         },
       }
     : {

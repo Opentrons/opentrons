@@ -28,13 +28,15 @@ import {
 
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
+import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
+
+import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
-  CutoutConfig,
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { ModuleSetupWizardStepProps } from './types'
 
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
@@ -44,11 +46,9 @@ export const BODY_STYLE = css`
     line-height: 1.75rem;
   }
 `
-interface SelectLocationProps extends ModuleCalibrationWizardStepProps {
-  availableSlotNames: string[]
-  occupiedCutouts: CutoutConfig[]
+interface SelectLocationProps extends ModuleSetupWizardStepProps {
   deckConfig: DeckConfiguration
-  configuredFixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
+  createMaintenanceRun: CreateMaintenanceRunType
   isLoadedInRun: boolean
 }
 export const SelectLocation = (
@@ -58,12 +58,18 @@ export const SelectLocation = (
     proceed,
     attachedModule,
     deckConfig,
-    configuredFixtureIdByCutoutId,
     isLoadedInRun,
+    createMaintenanceRun,
   } = props
+
+  const configuredFixtureIdByCutoutId = getFixtureIdByCutoutId(
+    attachedModule,
+    deckConfig
+  )
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
   const handleOnClick = (): void => {
+    createMaintenanceRun({})
     proceed()
   }
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()

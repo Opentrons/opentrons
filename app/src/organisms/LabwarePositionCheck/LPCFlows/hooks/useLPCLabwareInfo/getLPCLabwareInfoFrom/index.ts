@@ -11,7 +11,7 @@ import { getLocationSpecificOffsetDetailsForLabware } from './getLocationSpecifi
 import type { StoredLabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 import type {
   LabwareLocationInfo,
@@ -94,7 +94,7 @@ function getDisplayNameFromUri({
 }: GetLPCLabwareInfoForURI): string {
   const matchedDef = labwareDefs?.find(
     def => getLabwareDefURI(def) === uri
-  ) as LabwareDefinition2
+  ) as LabwareDefinition
 
   if (!!!matchedDef) {
     console.warn(

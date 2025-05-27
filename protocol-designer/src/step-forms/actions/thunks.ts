@@ -20,8 +20,7 @@ import type { CreateModuleAction } from './modules'
 
 export interface CreateContainerAboveModuleArgs {
   slot: DeckSlotId
-  labwareDefURI: string
-  adapterDefURI?: string
+  labwareDefURIStack: string[]
 }
 
 export const createContainerAboveModule: (
@@ -29,7 +28,7 @@ export const createContainerAboveModule: (
 ) => ThunkAction<
   CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
 > = args => (dispatch, getState) => {
-  const { slot, labwareDefURI, adapterDefURI } = args
+  const { slot, labwareDefURIStack } = args
   const state = getState()
   const deckSetup = getDeckSetupForActiveItem(state)
   const modules = deckSetup.modules
@@ -39,8 +38,7 @@ export const createContainerAboveModule: (
   dispatch(
     createContainer({
       slot: moduleId,
-      labwareDefURI,
-      adapterUnderLabwareDefURI: adapterDefURI,
+      labwareDefURIStack,
     })
   )
 }

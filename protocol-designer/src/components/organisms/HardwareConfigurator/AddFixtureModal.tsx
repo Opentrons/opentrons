@@ -20,20 +20,19 @@ import {
   getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleType,
-  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   MODULE_MODELS,
   SINGLE_CENTER_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { uuid } from '@opentrons/step-generation'
+import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
 
 import { editDeckConfiguration } from '../../../step-forms/actions'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { useKitchen } from '../Kitchen/hooks'
 import { getMainPagePortalEl } from '../Portal'
-import { getLabwareNotCompatibleWithModule, getSlotHasLabware } from '../utils'
+import { getLabwareCompatibleForEditHardware } from '../utils'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 
 import type { UseFormSetValue } from 'react-hook-form'
@@ -190,13 +189,18 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       makeSnackbar(t('add_gripper_for_plate') as string)
       //  block thermocycler from being added if there is something in slot A1
     } else if (
-      addedCutoutConfigs.some(
+      (addedCutoutConfigs.some(
         cutoutConfig => cutoutConfig.type === THERMOCYCLER_MODULE_V2
       ) &&
-      (Object.values(modules).some(module => module.cutoutId === 'cutoutA1') ||
-        Object.values(fixtures).some(
-          fixture => fixture.cutoutId === 'cutoutA1'
-        ))
+        (Object.values(modules).some(
+          module => module.cutoutId === 'cutoutA1'
+        ) ||
+          Object.values(fixtures).some(
+            fixture => fixture.cutoutId === 'cutoutA1'
+          ))) ||
+      Object.values(labware).some(
+        lw => getSlotInLocationStack(lw.stack) === 'A1'
+      )
     ) {
       makeSnackbar(t('thermocycler_blocked') as string)
     } else {
@@ -285,24 +289,13 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         }
         setValue?.('fixtures', updatedFixtures)
       }
-      const labwareNotCompatible =
-        newModule != null
-          ? getLabwareNotCompatibleWithModule(
-              newModule.type === 'stagingAreaAndMagneticBlock'
-                ? MAGNETIC_BLOCK_TYPE
-                : getModuleType(newModule.type as ModuleModel),
-              labware,
-              newModule.cutoutId,
-              'B1'
-            )
-          : null
-      const hasLabware =
-        newFixture != null
-          ? (newFixture.type === 'wasteChute' ||
-              newFixture.type === 'trashBin') &&
-            getSlotHasLabware(labware, cutoutId)
-          : false
-      if (labwareNotCompatible == null && !hasLabware) {
+      const labwareCompatible = getLabwareCompatibleForEditHardware(
+        labware,
+        cutoutId,
+        newModule,
+        newFixture
+      )
+      if (labwareCompatible) {
         dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
       }
       updateInitialDeckState?.(addedCutoutConfigs)

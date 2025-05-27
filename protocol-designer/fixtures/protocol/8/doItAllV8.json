@@ -3759,23 +3759,6 @@
       }
     },
     {
-      "commandType": "liquidProbe",
-      "key": "4319b680-0f25-4416-aec5-3b93ed63f812",
-      "params": {
-        "pipetteId": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
-        "labwareId": "8bacda22-9e05-45e8-bef4-cc04414a204f:opentrons/axygen_1_reservoir_90ml/1",
-        "wellName": "A1",
-        "wellLocation": {
-          "origin": "top",
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          }
-        }
-      }
-    },
-    {
       "commandType": "prepareToAspirate",
       "key": "9ade8b83-b06f-4374-bfe9-710c1781bdf9",
       "params": {
@@ -5106,13 +5089,6 @@
       "params": {
         "moduleId": "fd6da9f1-d63b-414b-929e-c646b64790e9:thermocyclerModuleType",
         "celsius": 40
-      }
-    },
-    {
-      "commandType": "thermocycler/waitForBlockTemperature",
-      "key": "252be3f0-fe89-487b-a669-88ead3ce7094",
-      "params": {
-        "moduleId": "fd6da9f1-d63b-414b-929e-c646b64790e9:thermocyclerModuleType"
       }
     },
     {

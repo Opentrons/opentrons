@@ -13,6 +13,7 @@ import {
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
+import { getEnableStacking } from '../../../../feature-flags/selectors'
 import { getRobotType } from '../../../../file-data/selectors'
 import { createCustomLabwareDef } from '../../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
@@ -37,6 +38,7 @@ vi.mock('../../../../labware-defs/selectors')
 vi.mock('../../../../labware-defs/actions')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../labware-ingred/actions')
+vi.mock('../../../../feature-flags/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()
   return {
@@ -61,6 +63,7 @@ describe('SelectLabwareModal', () => {
       onConfirm: vi.fn(),
       slotFull: false,
     }
+    vi.mocked(getEnableStacking).mockReturnValue(true)
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getPermittedTipracks).mockReturnValue([])
@@ -75,8 +78,9 @@ describe('SelectLabwareModal', () => {
       },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedTopLabwareDefUri: null,
-      selectedAdapterDefUri: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
+      selectedAdapterDefURI: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -107,8 +111,9 @@ describe('SelectLabwareModal', () => {
   })
   it('renders deck slot and selects an adapter and labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: 'fixture/fixture_universal_flat_bottom_adapter/1',
-      selectedTopLabwareDefUri: null,
+      selectedAdapterDefURI: 'fixture/fixture_universal_flat_bottom_adapter/1',
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -133,8 +138,9 @@ describe('SelectLabwareModal', () => {
 
   it('renders the filter checkbox if there is a module on the slot and is checked by default', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: null,
-      selectedTopLabwareDefUri: null,
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: THERMOCYCLER_MODULE_V1,
       selectedSlot: { slot: 'B1', cutout: 'cutoutB1' },

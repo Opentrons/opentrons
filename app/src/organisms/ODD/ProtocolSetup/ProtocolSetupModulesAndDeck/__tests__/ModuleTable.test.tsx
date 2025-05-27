@@ -56,8 +56,7 @@ const mockFlexStackerModule: FlexStackerModule = {
     latchState: 'closed',
     platformState: 'extended',
     hopperDoorState: 'opened',
-    axisStateX: 'extended',
-    axisStateZ: 'extended',
+    installDetected: true,
     status: 'idle',
   },
   usbPort: {

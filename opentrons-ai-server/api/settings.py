@@ -19,13 +19,16 @@ class Settings(BaseSettings):
     If the variable is not set in the OS the default value is used (this is just for creating the .env file with default values)
     """
 
-    model_config = SettingsConfigDict(env_file=ENV_PATH, env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=ENV_PATH, env_file_encoding="utf-8", extra="allow")  # Allows extra fields
+    # Delete the extra=allow above
+    # once we figure out why aws secret manager has a variable called protocol_designer_app_version
+    # see https://github.com/Opentrons/opentrons/actions/runs/15007084098/job/42168255050
     environment: str = "local"
     huggingface_simulate_endpoint: str = "https://Opentrons-simulator.hf.space/protocol"
     log_level: str = "info"
     service_name: str = "local-ai-api"
     openai_model_name: str = "gpt-4-1106-preview"
-    anthropic_model_name: str = "claude-3-7-sonnet-20250219"
+    anthropic_model_name: str = "claude-sonnet-4-20250514"
     model_helper: str = "claude-3-5-haiku-20241022"
     model: str = "claude"
     auth0_domain: str = "opentrons-dev.us.auth0.com"
@@ -33,7 +36,6 @@ class Settings(BaseSettings):
     auth0_issuer: str = "https://identity.auth-dev.opentrons.com/"
     auth0_algorithms: str = "RS256"
     dd_version: str = "hardcoded_default_from_settings"
-    protocol_designer_app_version: str = "8.4.4"
     allowed_origins: str = "*"
     dd_trace_enabled: str = "false"
     cpu: str = "1028"

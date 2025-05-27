@@ -77,14 +77,20 @@ def command_time(command: Dict[str, str]) -> float:
 
 
 def count_command_in_run_data(
-    commands: List[Dict[str, Any]], command_of_interest: str, find_avg_time: bool
+    commands: List[Dict[str, Any]],
+    command_of_interest: str,
+    find_avg_time: bool,
+    module_id: Optional[str] = None,
 ) -> Tuple[int, float]:
     """Count number of times command occurs in a run."""
     total_command = 0
     total_time = 0.0
+    module_id_num = None
     for command in commands:
         command_type = command["commandType"]
-        if command_type == command_of_interest:
+        if module_id:
+            module_id_num = command["params"].get("moduleId")
+        if command_type == command_of_interest and module_id_num == module_id:
             total_command += 1
             if find_avg_time:
                 started_at = command.get("startedAt", "")
@@ -377,6 +383,33 @@ def plate_reader_commands(
         "Plate Reader Result": final_result,
     }
     return plate_dict
+
+
+def flex_stacker_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
+    """Get flex stacker retrieval counts from command data."""
+    commandData = file_results.get("commands", [])
+    module_info = file_results.get("modules", [])
+
+    stacker_dict: Dict[str, float] = {
+        "flexStackerModuleV1_D3_# of Retrievals": 0.0,
+        "flexStackerModuleV1_C3_# of Retrievals": 0.0,
+        "flexStackerModuleV1_B3_# of Retrievals": 0.0,
+        "flexStackerModuleV1_A3_# of Retrievals": 0.0,
+    }
+
+    for module in module_info:
+        if module.get("model") == "flexStackerModuleV1":
+            slot_name = module.get("location", {}).get("slotName", "")
+            model_key = f"flexStackerModuleV1_{slot_name}_# of Retrievals"
+            module_id = module.get("id")
+
+            if model_key in stacker_dict and module_id:
+                retrieve_count, _ = count_command_in_run_data(
+                    commandData, "flexStacker/retrieve", False, module_id
+                )
+                stacker_dict[model_key] = retrieve_count
+
+    return stacker_dict
 
 
 def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:

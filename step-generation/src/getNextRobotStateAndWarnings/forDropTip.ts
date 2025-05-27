@@ -18,7 +18,7 @@ export function forDropTip(
     invariantContext,
     prevLiquidState: robotState.liquidState,
     pipetteId,
-    labwareId,
+    entityId: labwareId,
     useFullVolume: true,
     wellName,
     robotStateAndWarnings,

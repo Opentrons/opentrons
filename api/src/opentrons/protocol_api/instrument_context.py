@@ -186,11 +186,12 @@ class InstrumentContext(publisher.CommandPublisher):
         return self._core.get_minimum_liquid_sense_height()
 
     @requires_version(2, 0)
-    def aspirate(
+    def aspirate(  # noqa: C901
         self,
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        flow_rate: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Draw liquid into a pipette tip.
@@ -227,6 +228,9 @@ class InstrumentContext(publisher.CommandPublisher):
                      <flow_rate>`. If not specified, defaults to 1.0. See
                      :ref:`new-plunger-flow-rates`.
         :type rate: float
+        :param flow_rate: The absolute flow rate in µL/s. If ``flow_rate`` is specified,
+                          ``rate`` must not be set.
+        :type flow_rate: float
         :returns: This instance.
 
         .. note::
@@ -236,10 +240,25 @@ class InstrumentContext(publisher.CommandPublisher):
             ``location``, specify it as a keyword argument:
             ``pipette.aspirate(location=plate['A1'])``
 
+        .. versionchanged:: 2.24
+            Added the ``flow_rate`` parameter.
         """
+        if flow_rate is not None:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="flow_rate",
+                    until_version="2.24",
+                    current_version=f"{self.api_version}",
+                )
+            if rate != 1.0:
+                raise ValueError("rate must not be set if flow_rate is specified")
+            rate = flow_rate / self._core.get_aspirate_flow_rate()
+        else:
+            flow_rate = self._core.get_aspirate_flow_rate(rate)
+
         _log.debug(
-            "aspirate {} from {} at {}".format(
-                volume, location if location else "current position", rate
+            "aspirate {} from {} at {} µL/s".format(
+                volume, location if location else "current position", flow_rate
             )
         )
 
@@ -276,7 +295,6 @@ class InstrumentContext(publisher.CommandPublisher):
             c_vol = self._core.get_available_volume() if volume is None else volume
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
-        flow_rate = self._core.get_aspirate_flow_rate(rate)
 
         if (
             self.api_version >= APIVersion(2, 20)
@@ -312,7 +330,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def dispense(
+    def dispense(  # noqa: C901
         self,
         volume: Optional[float] = None,
         location: Optional[
@@ -320,6 +338,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ] = None,
         rate: float = 1.0,
         push_out: Optional[float] = None,
+        flow_rate: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Dispense liquid from a pipette tip.
@@ -376,14 +395,18 @@ class InstrumentContext(publisher.CommandPublisher):
                      <flow_rate>`. If not specified, defaults to 1.0. See
                      :ref:`new-plunger-flow-rates`.
         :type rate: float
+
         :param push_out: Continue past the plunger bottom to help ensure all liquid
                          leaves the tip. Measured in µL. The default value is ``None``.
 
                          When not specified or set to ``None``, the plunger moves by a non-zero default amount.
 
-
                          For a table of default values, see :ref:`push-out-dispense`.
         :type push_out: float
+
+        :param flow_rate: The absolute flow rate in µL/s. If ``flow_rate`` is specified,
+                          ``rate`` must not be set.
+        :type flow_rate: float
 
         :returns: This instance.
 
@@ -401,6 +424,9 @@ class InstrumentContext(publisher.CommandPublisher):
             Behavior of the ``volume`` parameter.
 
         .. versionchanged:: 2.24
+            Added the ``flow_rate`` parameter.
+
+        .. versionchanged:: 2.24
             ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
             into a trash bin or waste chute.
         """
@@ -410,13 +436,27 @@ class InstrumentContext(publisher.CommandPublisher):
                 until_version="2.15",
                 current_version=f"{self.api_version}",
             )
+
+        if flow_rate is not None:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="flow_rate",
+                    until_version="2.24",
+                    current_version=f"{self.api_version}",
+                )
+            if rate != 1.0:
+                raise ValueError("rate must not be set if flow_rate is specified")
+            rate = flow_rate / self._core.get_dispense_flow_rate()
+        else:
+            flow_rate = self._core.get_dispense_flow_rate(rate)
+
         _log.debug(
-            "dispense {} from {} at {}".format(
-                volume, location if location else "current position", rate
+            "dispense {} from {} at {} µL/s".format(
+                volume, location if location else "current position", flow_rate
             )
         )
-        last_location = self._get_last_location_by_api_version()
 
+        last_location = self._get_last_location_by_api_version()
         try:
             target = validation.validate_location(
                 location=location, last_location=last_location
@@ -433,8 +473,6 @@ class InstrumentContext(publisher.CommandPublisher):
             c_vol = self._core.get_current_volume() if volume is None else volume
         else:
             c_vol = self._core.get_current_volume() if not volume else volume
-
-        flow_rate = self._core.get_dispense_flow_rate(rate)
 
         if isinstance(target, validation.DisposalTarget):
             with publisher.publish_context(
@@ -597,11 +635,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 delay_with_publish(aspirate_delay)
 
         def dispense_with_delay(push_out: Optional[float]) -> None:
-            # protocol_api_old/test_context.py does not allow push_out at all, even if
-            # it's set to None, so we have to hide the argument to make the test pass.
-            # I don't know if the test is even valid, but I'm afraid to change the test.
-            dispense_kwargs = {"push_out": push_out} if push_out is not None else {}
-            self.dispense(volume, None, rate, **dispense_kwargs)
+            self.dispense(volume, None, rate, push_out=push_out)
             if dispense_delay:
                 delay_with_publish(dispense_delay)
 
@@ -2299,12 +2333,10 @@ class InstrumentContext(publisher.CommandPublisher):
                        to the volume of liquid that will be dispensed.
         :type volume: float
 
-        :param rate: How quickly the plunger moves to displace the commanded volume. The plunger speed
-                     in µL/s is calculated as ``rate`` multiplied by
-                     :py:attr:`flow_rate.dispense<flow_rate>`. This rate does not directly relate to
+        :param rate: How quickly the plunger moves to displace the commanded volume, in µL/s. This rate does not directly relate to
                      the flow rate of liquid out of the resin tip.
 
-                     The default value of ``10.0`` is recommended.
+                     Defaults to ``10.0`` µL/s.
         :type rate: float
         """
         well: Optional[labware.Well] = None

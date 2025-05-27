@@ -22,11 +22,11 @@ import {
 } from '@opentrons/shared-data'
 
 import type { LegacyLabwareOffsetCreateData } from '@opentrons/api-client'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export interface TerseOffsetTableProps {
   offsets: LegacyLabwareOffsetCreateData[]
-  labwareDefinitions: LabwareDefinition2[]
+  labwareDefinitions: LabwareDefinition[]
 }
 
 // Very similar to the OffsetTable, but abbreviates certain things to be optimized

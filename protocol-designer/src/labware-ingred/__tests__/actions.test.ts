@@ -127,7 +127,7 @@ describe('createContainer', () => {
     ]
 
     store.dispatch(
-      createContainer({ labwareDefURI: 'someLabwareDefURI', slot: '4' })
+      createContainer({ labwareDefURIStack: ['someLabwareDefURI'], slot: '4' })
     )
     expect(store.getActions()).toEqual(expectedActions)
   })
@@ -172,7 +172,9 @@ describe('createContainer', () => {
       },
     ]
 
-    store.dispatch(createContainer({ labwareDefURI: 'someLabwareDefURI' }))
+    store.dispatch(
+      createContainer({ labwareDefURIStack: ['someLabwareDefURI'] })
+    )
     expect(store.getActions()).toEqual(expectedActions)
   })
 
@@ -205,7 +207,9 @@ describe('createContainer', () => {
 
     const expectedActions: any[] = []
 
-    store.dispatch(createContainer({ labwareDefURI: 'someLabwareDefURI' }))
+    store.dispatch(
+      createContainer({ labwareDefURIStack: ['someLabwareDefURI'] })
+    )
     expect(store.getActions()).toEqual(expectedActions)
   })
 
@@ -272,7 +276,7 @@ describe('createContainer', () => {
     ]
 
     store.dispatch(
-      createContainer({ labwareDefURI: 'someLabwareDefURI', slot: '4' })
+      createContainer({ labwareDefURIStack: ['someLabwareDefURI'], slot: '4' })
     )
     expect(store.getActions()).toEqual(expectedActions)
   })

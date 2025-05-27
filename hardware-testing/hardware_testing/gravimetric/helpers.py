@@ -1,4 +1,5 @@
 """Opentrons helper methods."""
+
 import asyncio
 from random import random, randint
 from types import MethodType
@@ -370,9 +371,7 @@ def _drop_tip(
     if minimum_z_height > 0:
         cur_location = pipette._get_last_location_by_api_version()
         if isinstance(cur_location, Location):
-            pipette.move_to(
-                cur_location.move(Point(0, 0, minimum_z_height))
-            )  # ignore[union-attr]
+            pipette.move_to(cur_location.move(Point(0, 0, minimum_z_height)))
 
 
 def _get_volumes(

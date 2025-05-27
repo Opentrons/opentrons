@@ -1886,7 +1886,7 @@ def test_detect_liquid_presence(
             cmd.TryLiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
                 ),
                 wellName=well_core.get_name(),
                 labwareId=well_core.labware_id,
@@ -2558,11 +2558,11 @@ def test_aspirate_liquid_class_raises_for_more_than_max_volume(
     decoy.when(
         tx_commons.check_valid_liquid_class_volume_parameters(
             aspirate_volume=123,
-            disposal_volume=0,
             air_gap=test_transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
                 123
             ),
             max_volume=100,
+            current_volume=4.56,
         )
     ).then_raise(ValueError("Oh oh!"))
     with pytest.raises(ValueError, match="Oh oh!"):
@@ -2573,6 +2573,7 @@ def test_aspirate_liquid_class_raises_for_more_than_max_volume(
             transfer_type=TransferType.ONE_TO_ONE,
             tip_contents=[],
             volume_for_pipette_mode_configuration=None,
+            current_volume=4.56,
         )
 
 

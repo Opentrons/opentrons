@@ -6,7 +6,9 @@ import {
   getFlexNameConversion,
   linearInterpolate,
   POSITION_REFERENCE_TOP,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
+import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
 import { canPipetteUseLabware, getWellSetForMultichannel } from '../../../utils'
@@ -479,7 +481,7 @@ const getNoLiquidClassValuesMoveLiquid = (
     return {}
   }
   const volume = Number(rawVolume)
-  const referenceLiquidClass = getAllLiquidClassDefs().waterV1
+  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
@@ -597,7 +599,7 @@ const getNoLiquidClassValuesMix = (
     return {}
   }
   const volume = Number(rawVolume)
-  const referenceLiquidClass = getAllLiquidClassDefs().waterV1
+  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
@@ -720,13 +722,19 @@ const getLiquidClassValuesMoveLiquid = (args: {
     Object.values(labwareEntities).find(
       ({ labwareDefURI }) => labwareDefURI === tipRack
     )?.def ?? null
-  const byVolumeLookup = getReferenceVolumesForByVolumeInterpolation({
-    rawForm,
+  const byVolumeLookup = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
     tiprackDefinition,
     conditioningByVolume,
     disposalByVolume,
-  })
+    volume: Number(rawForm.volume),
+    path: rawForm.path as PathOption,
+    numDispenseWells: rawForm.dispense_wells.length,
+    aspirateAirGap:
+      rawForm.aspirate_airGap_checkbox === true
+        ? Number(rawForm.aspirate_airGap_volume)
+        : null,
+  }).referenceVolumes
   // top-level aspirate fields
   const aspiratePositionReferenceFields = getPositionReferenceFields(
     aspiratePositionReference,
@@ -764,7 +772,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
         })
       : {}
   const conditioningFields =
-    multiDispense != null
+    multiDispense != null && byVolumeLookup.conditioning != null
       ? getByVolumeField({
           volume: byVolumeLookup.conditioning,
           byVolume: conditioningByVolume,
@@ -772,7 +780,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
         })
       : {}
   const disposalFields =
-    multiDispense != null
+    multiDispense != null && byVolumeLookup.disposal != null
       ? getByVolumeField({
           volume: byVolumeLookup.disposal,
           byVolume: disposalByVolume,
@@ -953,134 +961,6 @@ const getLiquidClassValuesMix = (args: {
       : {}),
   }
   return values
-}
-
-export const getReferenceVolumesForByVolumeInterpolation = (args: {
-  rawForm: FormData
-  pipetteSpecs: PipetteV2Specs
-  tiprackDefinition: LabwareDefinition2 | null
-  conditioningByVolume: Array<[number, number]>
-  disposalByVolume: Array<[number, number]>
-}): {
-  airGap: number
-  correctionAspirate: number
-  correctionDispense: number
-  pushOut: number
-  flowRateAspirate: number
-  flowRateDispense: number
-  conditioning: number
-  disposal: number
-} => {
-  const {
-    rawForm,
-    pipetteSpecs,
-    tiprackDefinition,
-    conditioningByVolume,
-    disposalByVolume,
-  } = args
-  const { volume: rawVolume, path: rawPath, aspirate_wells } = rawForm
-  const volume = Number(rawVolume)
-  const path = rawPath as PathOption
-  const { liquids } = pipetteSpecs
-  const isInLowVolumeMode =
-    volume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
-  const maxWorkingVolumePipette = isInLowVolumeMode
-    ? liquids.lowVolumeDefault.maxVolume
-    : liquids.default.maxVolume
-  const maxWorkingVolumeTip = tiprackDefinition?.wells.A1.totalLiquidVolume
-  const maxWorkingVolume =
-    maxWorkingVolumeTip == null
-      ? maxWorkingVolumePipette
-      : Math.min(maxWorkingVolumePipette, maxWorkingVolumeTip)
-  const numAspirations = Math.ceil(volume / maxWorkingVolume)
-  const minVolumeForMultiAspirateDispense = volume * 2
-  const isMultiDispenseAvailable =
-    minVolumeForMultiAspirateDispense >=
-    minVolumeForMultiAspirateDispense +
-      (linearInterpolate(
-        minVolumeForMultiAspirateDispense,
-        conditioningByVolume
-      ) ?? 0) +
-      (linearInterpolate(minVolumeForMultiAspirateDispense, disposalByVolume) ??
-        0)
-  const isMultiAspirateAvailable =
-    maxWorkingVolume > minVolumeForMultiAspirateDispense
-
-  const getTotalVolumeForMultiDispense = (
-    targetVol: number,
-    includeConditioning: boolean = true
-  ): number => {
-    const interpolatedConditioningVolume =
-      linearInterpolate(targetVol, conditioningByVolume) ?? 0
-    const interpolatedDisposalVolume =
-      linearInterpolate(targetVol, disposalByVolume) ?? 0
-    return (
-      targetVol +
-      (includeConditioning ? interpolatedConditioningVolume : 0) +
-      interpolatedDisposalVolume
-    )
-  }
-
-  // early return if multiAspirate/multiDispense cannot be accommodated
-  if (
-    path === 'single' ||
-    (path === 'multiDispense' && !isMultiDispenseAvailable) ||
-    (path === 'multiAspirate' && !isMultiAspirateAvailable)
-  ) {
-    const volumePerAspiration = volume / numAspirations
-    return {
-      airGap: volumePerAspiration,
-      correctionAspirate: volumePerAspiration,
-      correctionDispense: volumePerAspiration,
-      pushOut: volumePerAspiration,
-      flowRateAspirate: volumePerAspiration,
-      flowRateDispense: volumePerAspiration,
-      conditioning: 0,
-      disposal: 0,
-    }
-  }
-
-  if (path === 'multiDispense') {
-    let totalVolumeForMultiDispense: number = 0
-    for (let i = 0; i < aspirate_wells.length; i++) {
-      const next = getTotalVolumeForMultiDispense((i + 1) * volume)
-      if (next > maxWorkingVolume) {
-        break
-      } else {
-        totalVolumeForMultiDispense = (i + 1) * volume
-      }
-    }
-    return {
-      airGap: getTotalVolumeForMultiDispense(
-        totalVolumeForMultiDispense,
-        false
-      ),
-      correctionAspirate: getTotalVolumeForMultiDispense(
-        totalVolumeForMultiDispense
-      ),
-      correctionDispense: volume,
-      pushOut: volume,
-      conditioning: totalVolumeForMultiDispense,
-      disposal: totalVolumeForMultiDispense,
-      flowRateAspirate: getTotalVolumeForMultiDispense(
-        totalVolumeForMultiDispense
-      ),
-      flowRateDispense: volume,
-    }
-  }
-  // path is valid multiAspirate
-  const maxSourcesPerAspiration = Math.floor(maxWorkingVolume / volume)
-  const volumeTotalAspiration = maxSourcesPerAspiration * volume
-  return {
-    airGap: volumeTotalAspiration,
-    correctionAspirate: volumeTotalAspiration,
-    correctionDispense: volumeTotalAspiration,
-    pushOut: volumeTotalAspiration,
-    flowRateAspirate: volume,
-    flowRateDispense: volumeTotalAspiration,
-    conditioning: volumeTotalAspiration,
-    disposal: volumeTotalAspiration,
-  }
 }
 
 export const getLiquidClassesValues = (args: {

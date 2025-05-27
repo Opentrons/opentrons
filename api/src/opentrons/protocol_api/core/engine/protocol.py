@@ -119,7 +119,7 @@ class ProtocolCore(
             str, Union[ModuleCore, NonConnectedModuleCore]
         ] = {}
         self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
-        self._defined_liquid_class_defs_by_name: Dict[str, LiquidClassSchemaV1] = {}
+        self._liquid_class_def_cache: Dict[Tuple[str, int], LiquidClassSchemaV1] = {}
         self._load_fixed_trash()
 
     @property
@@ -1071,20 +1071,22 @@ class ProtocolCore(
             display_color=(liquid.displayColor.root if liquid.displayColor else None),
         )
 
-    def define_liquid_class(self, name: str) -> LiquidClass:
+    def define_liquid_class(self, name: str, version: int = 1) -> LiquidClass:
         """Define a liquid class for use in transfer functions."""
         try:
             # Check if we have already loaded this liquid class' definition
-            liquid_class_def = self._defined_liquid_class_defs_by_name[name]
+            liquid_class_def = self._liquid_class_def_cache[(name, version)]
         except KeyError:
             try:
                 # Fetching the liquid class data from file and parsing it
                 # is an expensive operation and should be avoided.
                 # Calling this often will degrade protocol execution performance.
-                liquid_class_def = liquid_classes.load_definition(name)
-                self._defined_liquid_class_defs_by_name[name] = liquid_class_def
+                liquid_class_def = liquid_classes.load_definition(name, version=version)
+                self._liquid_class_def_cache[(name, version)] = liquid_class_def
             except LiquidClassDefinitionDoesNotExist:
-                raise ValueError(f"Liquid class definition not found for '{name}'.")
+                raise ValueError(
+                    f"Liquid class definition not found for '{name}' version {version}."
+                )
 
         return LiquidClass.create(liquid_class_def)
 

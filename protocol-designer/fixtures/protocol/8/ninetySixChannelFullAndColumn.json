@@ -2496,23 +2496,6 @@
       }
     },
     {
-      "commandType": "liquidProbe",
-      "key": "cf4e1a4e-dd73-4f44-9f8b-90622e2b7a85",
-      "params": {
-        "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
-        "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
-        "wellName": "A1",
-        "wellLocation": {
-          "origin": "top",
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          }
-        }
-      }
-    },
-    {
       "commandType": "prepareToAspirate",
       "key": "a4ba5bdd-6123-4e28-8fa6-278ad60c975b",
       "params": {
@@ -2646,23 +2629,6 @@
     {
       "commandType": "moveToWell",
       "key": "5d04c7cc-7395-4251-ae8d-3bf71ee02974",
-      "params": {
-        "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
-        "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
-        "wellName": "A7",
-        "wellLocation": {
-          "origin": "top",
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          }
-        }
-      }
-    },
-    {
-      "commandType": "liquidProbe",
-      "key": "f4cfbf8b-d62c-49cd-9750-92006840d640",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",

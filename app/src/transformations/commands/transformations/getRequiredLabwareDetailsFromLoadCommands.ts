@@ -3,7 +3,7 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 import type {
   FlexStackerFillRunTimeCommand,
   FlexStackerSetStoredLabwareRunTimeCommand,
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadLabwareRunTimeCommand,
   LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
@@ -11,7 +11,7 @@ import type {
 } from '@opentrons/shared-data'
 
 export interface RequiredLabwareDetails {
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   quantity: number
   lidDisplayName?: string
 }

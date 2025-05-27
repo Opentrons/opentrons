@@ -107,8 +107,7 @@ class FlexStackerData(TypedDict):
     latchState: str
     platformState: str
     hopperDoorState: str
-    axisStateX: str
-    axisStateZ: str
+    installDetected: bool
     errorDetails: str | None
 
 

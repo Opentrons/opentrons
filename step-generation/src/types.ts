@@ -35,8 +35,9 @@ export interface LabwareTemporalProperties {
 
 export interface PipetteTemporalProperties {
   mount: Mount
-  labwareId?: string
-  //  primary nozzle's wellName
+  //  entityId is either a labwareId or a trashBin/wasteChute id
+  entityId?: string
+  //  primary nozzle's wellName if over a labware
   wellName?: string
   nozzles?: NozzleConfigurationStyle
 }
@@ -219,6 +220,8 @@ export type ChangeTipOptions =
   | 'perDest'
   | 'perSource'
 
+export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
+
 export interface InnerMixArgs {
   volume: number
   times: number
@@ -372,6 +375,8 @@ export type DistributeArgs = SharedTransferLikeArgs & {
 
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
   disposalVolume: number | null | undefined
+  /** Volume to condition the tip with during aspiration sequence */
+  conditioningVolume: number | null
   /** pass to blowout **/
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined
@@ -695,6 +700,7 @@ export type ErrorType =
   | 'MISSING_MODULE'
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
+  | 'MULTI_DISPENSE_VALUES_NOT_FOUND'
   | 'NO_TIP_ON_PIPETTE'
   | 'NO_TIP_SELECTED'
   | 'PIPETTE_DOES_NOT_EXIST'
