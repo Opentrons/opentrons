@@ -2,9 +2,10 @@ import { useTranslation } from 'react-i18next'
 
 import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
+import { StyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import { Btn, Text } from '../../primitives'
+import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
@@ -93,7 +94,13 @@ export function HeaterShakerItem(props: HeaterShakerItemProps): JSX.Element {
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{t('heater_Shaker')}</Text>
+        <StyledText
+          oddStyle="smallBodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
+          css={TYPOGRAPHY.smallBodyTextSemiBold}
+        >
+          {t('heater_Shaker')}
+        </StyledText>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

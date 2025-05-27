@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
+import { StyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import { Btn, Text } from '../../primitives'
+import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
@@ -77,7 +78,14 @@ export function ThermocyclerItem(props: ThermocyclerItemProps): JSX.Element {
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{t('thermocycler')}</Text>
+        <StyledText
+          oddStyle="smallBodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
+          css={TYPOGRAPHY.smallBodyTextSemiBold}
+        >
+          {t('thermocycler')}
+        </StyledText>
+
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

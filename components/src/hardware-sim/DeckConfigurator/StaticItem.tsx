@@ -1,4 +1,5 @@
-import { Btn, Text } from '../../primitives'
+import { StyledText } from '../../atoms'
+import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
@@ -47,7 +48,13 @@ export function StaticItem(props: StaticFixtureProps): JSX.Element {
       foreignObjectProps={{ flex: '1' }}
     >
       <Btn css={CONFIG_STYLE_READ_ONLY} cursor={'default'} onClick={() => {}}>
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{label}</Text>
+        <StyledText
+          oddStyle="smallBodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
+          css={TYPOGRAPHY.smallBodyTextSemiBold}
+        >
+          {label}
+        </StyledText>
       </Btn>
     </RobotCoordsForeignObject>
   )
