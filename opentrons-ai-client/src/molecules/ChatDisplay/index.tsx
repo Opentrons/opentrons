@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
 import { useAtom } from 'jotai'
 import { delay } from 'lodash'
@@ -18,11 +18,13 @@ import {
   JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
   LegacyStyledText,
+  Link,
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
   TYPOGRAPHY,
+  WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
 
 import {
@@ -80,6 +82,15 @@ const FileContainer = styled.div`
   width: 100%;
 `
 
+const BadgeContainer = styled.div`
+  background-color: ${COLORS.grey30};
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  width: 100%;
+`
+
 const IconWrapper = styled.div`
   width: 32px;
   height: 32px;
@@ -89,11 +100,17 @@ const IconWrapper = styled.div`
   justify-content: center;
 `
 
+const ButtonContainer = styled(Flex)`
+  flex-direction: row;
+  margin-left: auto;
+`
+
 const FileName = styled.span`
   font-size: 14px;
   color: ${COLORS.black90};
-  margin-right: auto;
 `
+
+const PD_URL = 'https://designer.opentrons.com'
 
 export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -228,37 +245,47 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
     return (
       <OuterContainer>
         <FileContainer onClick={onClick}>
-          <IconWrapper>
-            <img src={smallLogo} alt="Opentrons logo" width="24" height="24" />
-          </IconWrapper>
-          <FileName>{protocolName}</FileName>
-          <HoverShadow
-            onClick={(e: Event) => {
-              e.stopPropagation()
-              setShowFeedbackModal(true)
-            }}
-          >
-            <StyledIcon size={SPACING.spacing20} name="thumbs-down" />
-          </HoverShadow>
-          <HoverShadow
-            onClick={async (e: Event) => {
-              e.stopPropagation()
-              await handleClickCopy()
-            }}
-          >
-            <StyledIcon
-              size={SPACING.spacing20}
-              name={isCopied ? 'check' : 'content-copy'}
-            />
-          </HoverShadow>
-          <HoverShadow
-            onClick={(e: Event) => {
-              e.stopPropagation()
-              handleFileDownload()
-            }}
-          >
-            <StyledIcon size={SPACING.spacing20} name="download" />
-          </HoverShadow>
+          <BadgeContainer>
+            <IconWrapper>
+              <img
+                src={smallLogo}
+                alt="Opentrons logo"
+                width="24"
+                height="24"
+              />
+            </IconWrapper>
+            <FileName>{protocolName}</FileName>
+          </BadgeContainer>
+
+          <ButtonContainer>
+            <HoverShadow
+              onClick={(e: Event) => {
+                e.stopPropagation()
+                setShowFeedbackModal(true)
+              }}
+            >
+              <StyledIcon size={SPACING.spacing20} name="thumbs-down" />
+            </HoverShadow>
+            <HoverShadow
+              onClick={async (e: Event) => {
+                e.stopPropagation()
+                await handleClickCopy()
+              }}
+            >
+              <StyledIcon
+                size={SPACING.spacing20}
+                name={isCopied ? 'check' : 'content-copy'}
+              />
+            </HoverShadow>
+            <HoverShadow
+              onClick={(e: Event) => {
+                e.stopPropagation()
+                handleFileDownload()
+              }}
+            >
+              <StyledIcon size={SPACING.spacing20} name="download" />
+            </HoverShadow>
+          </ButtonContainer>
         </FileContainer>
       </OuterContainer>
     )
@@ -285,19 +312,43 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         gridGap={SPACING.spacing16}
         position={POSITION_RELATIVE}
       >
-        <Markdown
-          components={{
-            div: undefined,
-            ul: UnnumberedListText,
-            h2: HeaderText,
-            li: ListItemText,
-            p: ParagraphText,
-            a: isUser ? ParagraphText : ExternalLink,
-            code: CodeText,
-          }}
-        >
-          {reply}
-        </Markdown>
+        {protocol_content == null && (
+          <Markdown
+            components={{
+              div: undefined,
+              ul: UnnumberedListText,
+              h2: HeaderText,
+              li: ListItemText,
+              p: ParagraphText,
+              a: isUser ? ParagraphText : ExternalLink,
+              code: CodeText,
+            }}
+          >
+            {reply}
+          </Markdown>
+        )}
+        {protocol_content != null && (
+          <StyledText
+            fontSize={TYPOGRAPHY.fontSize20}
+            lineHeight={TYPOGRAPHY.lineHeight24}
+            whiteSpace={WHITE_SPACE_PRE_WRAP}
+          >
+            <Trans
+              t={t}
+              i18nKey="pd_protocol_reply"
+              components={{
+                a: <ExternalLink href={PD_URL} />,
+              }}
+            />
+            <Link href={PD_URL} external>
+              <StyledIcon
+                name="open-in-new"
+                size="1rem"
+                margin={`${SPACING.spacing4} 0 0 ${SPACING.spacing4}`}
+              />
+            </Link>
+          </StyledText>
+        )}
 
         {/* Display protocol_content badge and content */}
         {!isUser && protocol_content && (
@@ -313,6 +364,19 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
                 {JSON.stringify(protocol_content, null, 2)}
               </CodeWrapper>
             )}
+            <Markdown
+              components={{
+                div: undefined,
+                ul: UnnumberedListText,
+                h2: HeaderText,
+                li: ListItemText,
+                p: ParagraphText,
+                a: isUser ? ParagraphText : ExternalLink,
+                code: CodeText,
+              }}
+            >
+              {reply}
+            </Markdown>
           </>
         )}
 
@@ -361,8 +425,17 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   )
 }
 // Note (05/08/2024) the following styles are temp
-function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <a {...props} target="_blank" rel="noopener noreferrer" />
+function ExternalLink(
+  props: JSX.IntrinsicAttributes & { href?: string }
+): JSX.Element {
+  return (
+    <a
+      {...props}
+      style={{ color: COLORS.blue50 }}
+      target="_blank"
+      rel="noopener noreferrer"
+    />
+  )
 }
 
 function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {

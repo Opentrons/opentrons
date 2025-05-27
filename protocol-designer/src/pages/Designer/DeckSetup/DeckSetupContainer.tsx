@@ -31,11 +31,15 @@ import {
 import { FixedTrashText } from '../../../components/molecules'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
+import {
+  editSlotInfo,
+  selectZoomedIntoSlot,
+} from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getSelectedTerminalItemId } from '../../../ui/steps'
+import { getSlotInformation } from '../utils'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import { DeckSetupToolbox } from './DeckSetupToolbox'
 import {
@@ -96,6 +100,7 @@ export function DeckSetupContainer(
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const terminalItemId = useSelector(getSelectedTerminalItemId)
+
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
@@ -135,6 +140,12 @@ export function DeckSetupContainer(
   }, '')
 
   const addEquipment = (slotId: string): void => {
+    const { createdModuleForSlot, preSelectedFixture } = getSlotInformation({
+      deckSetup: activeDeckSetup,
+      slot: slotId,
+      deckDef,
+    })
+
     const cutoutId =
       getCutoutIdForAddressableArea(
         slotId as AddressableAreaName,
@@ -162,6 +173,12 @@ export function DeckSetupContainer(
         setViewBox,
       })
     }
+    dispatch(
+      editSlotInfo({
+        moduleModel: createdModuleForSlot?.model,
+        fixture: preSelectedFixture,
+      })
+    )
   }
 
   const _hasGen1MultichannelPipette = useMemo(

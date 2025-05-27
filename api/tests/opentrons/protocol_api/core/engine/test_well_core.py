@@ -360,7 +360,7 @@ def test_estimate_liquid_height_after_pipetting(
     fake_final_height = 10000000
     decoy.when(subject.current_liquid_height()).then_return(initial_liquid_height)
     decoy.when(
-        mock_engine_client.state.geometry.get_well_height_after_liquid_handling_no_error(
+        mock_engine_client.state.geometry.get_well_height_after_liquid_handling(
             labware_id="labware-id",
             well_name="well-name",
             pipette_id="pipette-id",

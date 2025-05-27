@@ -96,7 +96,7 @@ def run(protocol: ProtocolContext) -> None:
         )
         pipette.configure_nozzle_layout(style=ALL, tip_racks=[tip_rack])
         pipette.transfer(
-            [200, 100, 600],
+            [180, 180, 600],
             src_reservoir["A1"],
             [
                 sample_plate["A1"].bottom(z=1),
@@ -128,7 +128,7 @@ def run(protocol: ProtocolContext) -> None:
         pipette.configure_nozzle_layout(style=ALL, tip_racks=[tip_rack])
         pipette.reset_tipracks()
         pipette.transfer(
-            [9500 / 8, 55, 100],
+            [12000 / 8, 150, 140],
             src_reservoir["A1"],
             [
                 res1["A1"].top(),
@@ -260,7 +260,7 @@ def run(protocol: ProtocolContext) -> None:
             tip_racks=[tip_rack_partial_1, tip_rack_partial_2],
         )
         pipette.transfer(
-            volume=[120, 750, 900, 96, 1000, 1000, 1000, 1000],
+            volume=[300, 1100, 900, 400, 1000, 1000, 1000, 1000],
             source=src_reservoir["A1"],
             dest=[
                 reservoir_1["A1"].top(),  # AMPure
@@ -282,7 +282,7 @@ def run(protocol: ProtocolContext) -> None:
             tip_racks=[tip_rack_partial_1, tip_rack_partial_2],
         )
         pipette.transfer(
-            volume=[75, 15, 20, 65],
+            volume=[120, 100, 100, 100],
             source=src_reservoir["A1"],
             dest=[
                 reagent_plate_1["A4"].top(),

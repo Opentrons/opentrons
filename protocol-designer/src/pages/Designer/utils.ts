@@ -40,6 +40,10 @@ import type {
 } from '../../step-forms'
 import type { Fixture } from './DeckSetup/constants'
 
+export const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
+export const TC_LID_LOADNAME = 'opentrons_tough_pcr_auto_sealing_lid'
+export const LID_LOADNAMES = [TIPRACK_LID_LOADNAME, TC_LID_LOADNAME]
+
 export interface AdditionalEquipment {
   name: AdditionalEquipmentName
   id: string
@@ -47,13 +51,14 @@ export interface AdditionalEquipment {
 }
 
 interface SlotInformation {
+  createdStackForSlot: string[]
   matchingLabwareFor4thColumn: LabwareOnDeck | null
   slotPosition: CoordinateTuple | null
   createdModuleForSlot?: ModuleOnDeck
-  createdTopLabwareForSlot?: LabwareOnDeck
   createdAdapterForSlot?: LabwareOnDeck
   createdFixtureForSlots?: AdditionalEquipment[]
   preSelectedFixture?: Fixture
+  createdLidForSlot?: LabwareOnDeck
 }
 
 interface SlotInformationProps {
@@ -87,8 +92,41 @@ export const getSlotInformation = (
     Object.values(deckSetupLabware),
     slot
   )
+  const labwareStackOnSlot =
+    fullStackFromLabwares?.filter(
+      id =>
+        deckSetupLabware[id] != null &&
+        deckSetupLabware[id].def.parameters.loadName !==
+          'opentrons_flex_deck_riser'
+    ) ?? []
+
+  const numOfTcLidsOnStack =
+    fullStackFromLabwares?.filter(
+      id =>
+        deckSetupLabware[id] != null &&
+        deckSetupLabware[id].def.parameters.loadName === TC_LID_LOADNAME
+    )?.length ?? 0
+
   const labwareIdsFromFullStack =
-    fullStackFromLabwares?.filter(id => deckSetupLabware[id] != null) ?? []
+    fullStackFromLabwares?.filter(
+      id =>
+        deckSetupLabware[id] != null &&
+        //  remove lid from stack if its a labware + lid
+        (numOfTcLidsOnStack === 1 && labwareStackOnSlot.length > 1
+          ? !LID_LOADNAMES.includes(
+              deckSetupLabware[id].def.parameters.loadName
+            )
+          : //  otherwise, count lid in stack if its a stack of lids
+            deckSetupLabware[id].def.parameters.loadName !==
+            TIPRACK_LID_LOADNAME)
+    ) ?? []
+
+  const lidIdFromStack = fullStackFromLabwares?.find(id =>
+    numOfTcLidsOnStack === 1
+      ? LID_LOADNAMES.includes(deckSetupLabware[id].def.parameters.loadName)
+      : deckSetupLabware[id]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
+  )
+
   const bottomMostLabware =
     deckSetupLabware[
       labwareIdsFromFullStack[labwareIdsFromFullStack.length - 1]
@@ -98,15 +136,10 @@ export const getSlotInformation = (
     bottomMostLabware.def.allowedRoles?.includes('adapter')
       ? bottomMostLabware
       : undefined
-
-  //  top most labware
-  const createdTopLabwareForSlot =
-    labwareIdsFromFullStack.length >= 1 &&
-    !deckSetupLabware[labwareIdsFromFullStack[0]].def.allowedRoles?.includes(
-      'adapter'
-    )
-      ? deckSetupLabware[labwareIdsFromFullStack[0]]
-      : undefined
+  const remainingLabwareIds =
+    createdAdapterForSlot != null
+      ? labwareIdsFromFullStack.slice(0, -1)
+      : labwareIdsFromFullStack
 
   const createdFixtureForSlots = Object.values(
     additionalEquipmentOnDeck
@@ -135,7 +168,6 @@ export const getSlotInformation = (
           getSlotInLocationStack(lw.stack) === stagingAreaAddressableAreaName[0]
       ) ?? null
   }
-
   const preSelectedFixture =
     createdFixtureForSlots != null && createdFixtureForSlots.length === 2
       ? ('wasteChuteAndStagingArea' as Fixture)
@@ -143,17 +175,19 @@ export const getSlotInformation = (
 
   return {
     createdModuleForSlot,
-    createdTopLabwareForSlot:
-      slot === 'offDeck'
-        ? undefined
-        : offDeckLabware != null
-        ? offDeckLabware
-        : createdTopLabwareForSlot,
     createdAdapterForSlot,
     createdFixtureForSlots,
     preSelectedFixture,
     slotPosition: slotPosition,
     matchingLabwareFor4thColumn: matchingLabware,
+    createdStackForSlot:
+      slot === 'offDeck'
+        ? []
+        : offDeckLabware != null
+        ? [offDeckLabware.id]
+        : remainingLabwareIds,
+    createdLidForSlot:
+      lidIdFromStack != null ? deckSetupLabware[lidIdFromStack] : undefined,
   }
 }
 

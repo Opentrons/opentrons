@@ -110,18 +110,33 @@ interface StackInfoListProps {
 }
 
 function StackInfoList({ title, items }: StackInfoListProps): JSX.Element {
+  const countMap = items.reduce((acc: Record<string, number>, item) => {
+    acc[item] = (acc[item] || 0) + 1
+    return acc
+  }, {})
+
+  //  remove duplicates from the items array and include the acount
+  const reducedItems = Object.entries(countMap).map(([item, count]) => ({
+    item,
+    count,
+  }))
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       gridGap={SPACING.spacing4}
     >
-      {items.length > 0 ? (
-        items.map((item, index) => (
+      {reducedItems.length > 0 ? (
+        reducedItems.map((item, index) => (
           <StackInfo
             key={`${title}_${index}`}
             title={title}
-            stackInformation={item}
+            stackInformation={
+              item.count > 1
+                ? `${item.item} (amount: ${item.count})`
+                : item.item
+            }
           />
         ))
       ) : (

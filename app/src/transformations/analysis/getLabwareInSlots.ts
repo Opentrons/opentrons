@@ -2,7 +2,7 @@ import { getInitialLoadedLabwareByAdapter } from '/app/transformations/commands'
 
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadLabwareRunTimeCommand,
   LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
@@ -12,14 +12,14 @@ import type {
 
 interface LabwareInSlot {
   labwareId: string
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   labwareNickName: string | null
   location: { slotName: string }
 }
 
 interface LabwareWithDef {
   labwareId: string
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   labwareNickName: string | null
 }
 

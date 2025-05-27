@@ -27,7 +27,7 @@ import type {
   Failed,
   FlexStackerRetrieveRunTimeCommand,
   FlexStackerStoreRunTimeCommand,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareLocation,
   LiquidProbeRunTimeCommand,
   LoadedLabware,
@@ -271,7 +271,7 @@ function getRelevantPickUpTipCommand(
 interface UseTipSelectionUtilsResult {
   /* Always returns null if the relevant labware is not relevant to tip pick up. */
   selectedTipLocations: WellGroup | null
-  tipSelectorDef: LabwareDefinition2
+  tipSelectorDef: LabwareDefinition
   selectTips: (tipGroup: WellGroup) => void
   deselectTips: (locations: string[]) => void
   areTipsSelected: boolean

@@ -29,6 +29,7 @@ from . import validation
 
 class LiquidHandlingPropertyByVolume:
     def __init__(self, by_volume_property: Sequence[Tuple[float, float]]) -> None:
+        self._initial_properties_by_volume = by_volume_property
         self._properties_by_volume: Dict[float, float] = {
             float(volume): value for volume, value in by_volume_property
         }
@@ -73,6 +74,17 @@ class LiquidHandlingPropertyByVolume:
             del self._properties_by_volume[volume]
         except KeyError:
             raise KeyError(f"No value set for volume {volume} uL")
+        self._sort_volume_and_values()
+
+    def clear_values(self) -> None:
+        """Removes all existing volume and value pairs from the curve."""
+        self._properties_by_volume = {}
+
+    def reset_values(self) -> None:
+        """Resets volumes and values to the default."""
+        self._properties_by_volume = {
+            float(volume): value for volume, value in self._initial_properties_by_volume
+        }
         self._sort_volume_and_values()
 
     def _sort_volume_and_values(self) -> None:

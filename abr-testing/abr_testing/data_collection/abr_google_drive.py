@@ -18,15 +18,23 @@ def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
         "magneticBlockV1",
         "thermocyclerModuleV2",
         "absorbanceReaderV1",
+        "flexStackerModuleV1_D3",
+        "flexStackerModuleV1_C3",
+        "flexStackerModuleV1_B3",
+        "flexStackerModuleV1_A3",
     )
     all_modules = {key: "" for key in modList}
     for module in file_results.get("modules", []):
-        if isinstance(module, dict) and module.get("model") in modList:
-            try:
-                all_modules[module["model"]] = module["serialNumber"]
-            except KeyError:
-                all_modules[module["model"]] = "EMPTYSN"
+        if not isinstance(module, dict):
+            continue
 
+        model = module.get("model")
+        if model == "flexStackerModuleV1":
+            location = module.get("location", {}).get("slotName", "")
+            model = f"{model}_{location}"
+
+        if model in all_modules:
+            all_modules[model] = module.get("serialNumber", "EMPTYSN")
     return all_modules
 
 
@@ -124,6 +132,7 @@ def create_data_dictionary(
                 tc_dict = read_robot_logs.thermocycler_commands(file_results)
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
+                fs_dict = read_robot_logs.flex_stacker_commands(file_results)
                 pipette_dict = read_robot_logs.instrument_commands(
                     file_results, labware_name="opentrons_tough_pcr_auto_sealing_lid"
                 )
@@ -150,6 +159,7 @@ def create_data_dictionary(
                     **tm_dict,
                     **tc_dict,
                     **plate_reader_dict,
+                    **fs_dict,
                     **pipette_dict,
                     **plate_measure,
                 }

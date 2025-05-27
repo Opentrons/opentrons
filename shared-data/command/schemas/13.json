@@ -2179,6 +2179,19 @@
     "IdentifyModuleParams": {
       "description": "The parameters defining the module to be identified.",
       "properties": {
+        "color": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional color to identify module",
+          "title": "Color"
+        },
         "model": {
           "$ref": "#/$defs/ModuleModel",
           "description": "The model of the module"
@@ -2187,9 +2200,14 @@
           "description": "Unique ID of the module",
           "title": "Moduleid",
           "type": "string"
+        },
+        "start": {
+          "description": "Start or stop identify",
+          "title": "Start",
+          "type": "boolean"
         }
       },
-      "required": ["model", "moduleId"],
+      "required": ["model", "moduleId", "start"],
       "title": "IdentifyModuleParams",
       "type": "object"
     },

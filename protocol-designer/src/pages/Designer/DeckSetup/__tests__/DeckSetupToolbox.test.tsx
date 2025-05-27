@@ -22,10 +22,13 @@ import {
 import { selectors } from '../../../../labware-ingred/selectors'
 import {
   getAdditionalEquipment,
+  getLabwareEntities,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { getDismissedHints } from '../../../../tutorial/selectors'
+import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
 import { DeckSetupToolbox } from '../DeckSetupToolbox'
 
 import type { ComponentProps } from 'react'
@@ -33,6 +36,7 @@ import type { NavigateFunction } from 'react-router-dom'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
+const mockMakeSnackbar = vi.fn()
 
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
@@ -41,8 +45,10 @@ vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../tutorial/selectors')
 vi.mock('../../../../step-forms/selectors')
+vi.mock('../../../../top-selectors/well-contents')
 vi.mock('../../../../components/organisms/Kitchen/hooks')
 vi.mock('../../../../components/organisms/SelectLabwareModal')
+vi.mock('../../../../ui/labware/selectors')
 const render = (props: ComponentProps<typeof DeckSetupToolbox>) => {
   return renderWithProviders(<DeckSetupToolbox {...props} />, {
     i18nInstance: i18n,
@@ -56,8 +62,6 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
-const mockMakeSnackbar = vi.fn()
-
 describe('DeckSetupToolbox', () => {
   let props: ComponentProps<typeof DeckSetupToolbox>
 
@@ -66,12 +70,14 @@ describe('DeckSetupToolbox', () => {
       onCloseClick: vi.fn(),
     }
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: null,
-      selectedTopLabwareDefUri: null,
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
+    vi.mocked(getLabwareEntities).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       labware: {},
@@ -90,6 +96,10 @@ describe('DeckSetupToolbox', () => {
       bakeToast: vi.fn(),
       eatToast: vi.fn(),
     })
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({})
+    vi.mocked(
+      wellContentsSelectors.getAllWellContentsForActiveItem
+    ).mockReturnValue(null)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -104,9 +114,13 @@ describe('DeckSetupToolbox', () => {
     screen.getByText('mock SelectLabwareModal')
   })
   it('should clear the slot from all items when the clear cta is called', () => {
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({
+      labId: 'mock nickName',
+    })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: 'mockUri',
-      selectedTopLabwareDefUri: 'mockUri',
+      selectedAdapterDefURI: 'mockUri',
+      selectedTopLabware: { labwareDefURI: 'mockUri', amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -145,19 +159,19 @@ describe('DeckSetupToolbox', () => {
       },
     })
     render(props)
-    screen.getAllByText('ANSI 96 Standard Microplate')
-    screen.getByText('Add liquid')
+    screen.getAllByText('mock nickName')
+    screen.getByText('Edit liquid')
     screen.getByText('Bottom of slot')
     screen.getByText('Top of slot')
     fireEvent.click(screen.getByText('Clear'))
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     //  add a liquid
-    fireEvent.click(screen.getByText('Add liquid'))
+    fireEvent.click(screen.getByText('Edit liquid'))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
     // add labware when there is no space
     fireEvent.click(screen.getAllByText('Add labware')[0])
-    expect(mockMakeSnackbar).toHaveBeenCalledWith('No space on slot')
+    screen.getByText('mock SelectLabwareModal')
     // click done
     fireEvent.click(screen.getByText('Done'))
     expect(props.onCloseClick).toHaveBeenCalled()

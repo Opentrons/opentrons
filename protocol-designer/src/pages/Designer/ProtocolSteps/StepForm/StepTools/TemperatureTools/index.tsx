@@ -50,7 +50,7 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
           {...propsForFields.targetTemperature}
           toggleValue={propsForFields.setTemperature.value}
           toggleUpdateValue={propsForFields.setTemperature.updateValue}
-          title={t('form:step_edit_form.moduleState')}
+          title={t('form:step_edit_form.heat_or_cool')}
           fieldTitle={t('form:step_edit_form.field.temperature.setTemperature')}
           units={t('units.degrees')}
           isSelected={formData.setTemperature === 'true'}
@@ -60,7 +60,6 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
             'targetTemperature',
             mappedErrorsToField
           )}
-          caption={t('form:step_edit_form.field.temperature.caption')}
         />
       </Flex>
     </Flex>

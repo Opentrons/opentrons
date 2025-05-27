@@ -811,6 +811,7 @@ def minimal_liquid_class_def1() -> LiquidClassSchemaV1:
         displayName="water 1",
         description="some water",
         schemaVersion=1,
+        version=1,
         namespace="test-fixture-1",
         byPipette=[],
     )
@@ -823,6 +824,7 @@ def minimal_liquid_class_def2() -> LiquidClassSchemaV1:
         displayName="water 2",
         description="some water",
         schemaVersion=1,
+        version=1,
         namespace="test-fixture-2",
         byPipette=[
             ByPipetteSetting(
@@ -909,6 +911,7 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
         displayName="Test Water",
         description="some water",
         schemaVersion=1,
+        version=1,
         namespace="opentrons",
         byPipette=[
             ByPipetteSetting(

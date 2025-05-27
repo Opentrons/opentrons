@@ -93,6 +93,7 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
               isSelected={true}
               labwareDef={zoomedInLabwareOnDeck.def}
               position={[0, 0, 0]}
+              showModuleIcon={false}
             />
           </>
         )}
@@ -170,8 +171,8 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
             )
             dispatch(
               editSlotInfo({
-                createdTopLabwareForSlot:
-                  id != null ? activeDeckSetup.labware[id] : null,
+                labwareDefURI:
+                  id != null ? activeDeckSetup.labware[id].labwareDefURI : null,
               })
             )
           }}

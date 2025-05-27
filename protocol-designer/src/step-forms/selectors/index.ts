@@ -657,7 +657,11 @@ export const _hasFieldLevelErrors = (
         }
       } else {
         // TODO: fieldName includes id, stepType, etc... this is weird #3161
-        const fieldErrors = getFieldErrors(fieldName as string, value)
+        const fieldErrors = getFieldErrors(
+          fieldName as string,
+          value,
+          hydratedForm
+        )
 
         if (fieldErrors && fieldErrors.length > 0) {
           return true
@@ -905,7 +909,7 @@ export const getArgsAndErrorsByStepId: Selector<
         const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
           ? {
-              stepArgs: stepFormToArgs(hydratedForm),
+              stepArgs: stepFormToArgs(hydratedForm, contextualState),
             }
           : {
               errors,

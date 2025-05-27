@@ -27,7 +27,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import type { ReactNode } from 'react'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   RobotType,
 } from '@opentrons/shared-data'
 import type { CheckLabwareStep } from './types'
@@ -60,7 +60,7 @@ interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
     | 'PICK_UP_TIP'
     | 'RETURN_TIP'
     | 'CHECK_POSITIONS'
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   protocolData: CompletedProtocolAnalysis
   confirmPlacement: () => void
   onSkip: () => void

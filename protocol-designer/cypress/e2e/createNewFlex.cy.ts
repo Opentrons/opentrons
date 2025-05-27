@@ -29,6 +29,7 @@ describe('Create new Flex', () => {
       CompositeSetupSteps.AddLabwareToDeckSlot('C2', 'Bio-Rad 96 Well Plate')
     )
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('C2'))
+    steps.add(SetupSteps.AddHardwareLabware())
     steps.add(SetupSteps.AddLiquid())
     steps.add(SetupSteps.ClickLiquidButton())
     steps.add(SetupSteps.DefineLiquid())
@@ -39,6 +40,7 @@ describe('Create new Flex', () => {
     steps.add(UniversalSteps.Snapshot())
     steps.add(SetupSteps.SelectLiquidWells())
     steps.add(SetupSteps.SetVolumeAndSaveForWells('150'))
+    steps.add(SetupSteps.SelectDone())
     steps.add(
       CompositeSetupSteps.AddLabwareToDeckSlot(
         'C3',

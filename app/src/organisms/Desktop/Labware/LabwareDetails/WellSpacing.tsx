@@ -24,7 +24,7 @@ export function WellSpacing(props: WellSpacingProps): JSX.Element {
 
   const spacing = [
     { label: t('x_offset'), value: toFixed(wellProperties.xOffsetFromLeft) },
-    { label: t('y_offset'), value: toFixed(wellProperties.yOffsetFromTop) },
+    { label: t('y_offset'), value: toFixed(wellProperties.yOffsetFromBack) },
     {
       label: t('x_spacing'),
       value:

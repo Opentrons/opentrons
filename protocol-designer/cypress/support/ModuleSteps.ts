@@ -17,11 +17,11 @@ export enum ModLocators {
   TempdeckTempInput = 'input[name="targetTemperature"]',
 }
 export enum ModContent {
-  ModState = 'Module state',
-  DeactivateTempDeck = 'Deactivate',
-  Temperature = 'Temperature',
+  ModState = 'Heat or cool',
+  DeactivateTempDeck = 'Off',
+  Temperature = 'Temperature module state',
   Save = 'Save',
-  Temp4CVerification = `Build a pause step to wait until Temperature Module GEN2 reaches 4˚C`,
+  Temp4CVerification = `Build a pause step to wait until Temperature Module GEN2 reaches 4°C`,
   PlateReader = 'Absorbance Plate Reader Module GEN1',
 }
 
@@ -56,9 +56,7 @@ export const ModuleSteps = {
   ActivateTempdeck: (): StepThunk => ({
     call: () => {
       cy.contains(ModContent.DeactivateTempDeck)
-        .closest(ModLocators.Div)
-        .find(ModLocators.Button)
-        .click()
+      cy.get('[data-testid="ToggleButton_Off"]').click()
     },
   }),
 

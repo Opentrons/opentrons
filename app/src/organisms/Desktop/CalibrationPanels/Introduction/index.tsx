@@ -22,7 +22,7 @@ import { TRASH_BIN_LOAD_NAME } from '../constants'
 import { Body } from './Body'
 import { InvalidationWarning } from './InvalidationWarning'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { CalibrationPanelProps } from '../types'
 
 const TRASH_BIN = 'Removable black plastic trash bin'
@@ -41,11 +41,11 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
 
   const [showChooseTipRack, setShowChooseTipRack] = useState(false)
-  const [chosenTipRack, setChosenTipRack] = useState<LabwareDefinition2 | null>(
+  const [chosenTipRack, setChosenTipRack] = useState<LabwareDefinition | null>(
     null
   )
 
-  const handleChosenTipRack = (value: LabwareDefinition2 | null): void => {
+  const handleChosenTipRack = (value: LabwareDefinition | null): void => {
     value != null && setChosenTipRack(value)
   }
   const uniqueTipRacks = new Set(

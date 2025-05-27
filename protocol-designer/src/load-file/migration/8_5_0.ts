@@ -1,16 +1,19 @@
 import floor from 'lodash/floor'
+import min from 'lodash/min'
 
 import {
+  FLEX_ROBOT_TYPE,
   getPipetteSpecsV2,
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
 
 import {
+  CHANNELS_MAPPED_TO_MAX_SPEED,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
   PROTOCOL_DESIGNER_SOURCE,
 } from '../../constants'
-import { getDefaultPushOutVolume } from '../../utils'
+import { getDefaultBlowoutFlowRate, getDefaultPushOutVolume } from '../../utils'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
@@ -23,12 +26,12 @@ import type { PDMetadata } from '../../file-types'
 export const migrateFile = (
   appData: ProtocolFile<PDMetadata>
 ): ProtocolFile<PDMetadata> => {
-  const { designerApplication, commands, labwareDefinitions } = appData
+  const { designerApplication, commands, labwareDefinitions, robot } = appData
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
   const { savedStepForms } = designerApplication.data
-
+  const { model: robotType } = robot
   const loadLabwareCommands = commands.filter(
     (command): command is LoadLabwareCreateCommand =>
       command.commandType === 'loadLabware'
@@ -90,6 +93,25 @@ export const migrateFile = (
               pipetteSpecs,
               tipRackDef
             )
+      const migratedBlowoutFlowRate =
+        (form.blowout_checkbox || form.disposalVolume_checkbox) &&
+        !form.blowout_flowRate &&
+        pipetteSpecs != null &&
+        tipRackDef != null
+          ? getDefaultBlowoutFlowRate(
+              Number(form.volume),
+              pipetteSpecs,
+              tipRackDef
+            )
+          : null
+      const channelsForSpeed =
+        pipetteSpecs?.channels ?? (robotType === FLEX_ROBOT_TYPE ? 96 : 8)
+      const maxZSpeed =
+        CHANNELS_MAPPED_TO_MAX_SPEED[robotType][channelsForSpeed].z
+      const maxXYSpeed = min([
+        CHANNELS_MAPPED_TO_MAX_SPEED[robotType][channelsForSpeed].x,
+        CHANNELS_MAPPED_TO_MAX_SPEED[robotType][channelsForSpeed].y,
+      ])
 
       return {
         ...acc,
@@ -124,14 +146,14 @@ export const migrateFile = (
                 ),
           aspirate_retract_delay_seconds: null,
           dispense_retract_delay_seconds: null,
-          aspirate_retract_speed: null,
-          dispense_retract_speed: null,
+          aspirate_retract_speed: maxZSpeed,
+          dispense_retract_speed: maxZSpeed,
           aspirate_submerge_delay_seconds: null,
           dispense_submerge_delay_seconds: null,
-          aspirate_submerge_speed: null,
-          dispense_submerge_speed: null,
-          aspirate_touchTip_speed: null,
-          dispense_touchTip_speed: null,
+          aspirate_submerge_speed: maxZSpeed,
+          dispense_submerge_speed: maxZSpeed,
+          aspirate_touchTip_speed: maxXYSpeed,
+          dispense_touchTip_speed: maxXYSpeed,
           aspirate_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE, // this field and the following were previously not configurable and defaulted to 0mm
           dispense_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
           aspirate_position_reference: POSITION_REFERENCE_BOTTOM,
@@ -159,6 +181,9 @@ export const migrateFile = (
           pushOut_volume: defaultPushOutVolume,
           conditioning_checkbox: false,
           conditioning_volume: null,
+          ...(migratedBlowoutFlowRate != null
+            ? { blowout_flowRate: migratedBlowoutFlowRate }
+            : {}),
         },
       }
     }

@@ -5,7 +5,7 @@ import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { blowOutInWasteChute } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
-  getInitialRobotStateStandard,
+  getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
@@ -25,7 +25,7 @@ const invariantContext: InvariantContext = {
     },
   },
 }
-const prevRobotState: RobotState = getInitialRobotStateStandard(
+const prevRobotState: RobotState = getRobotStateWithTipStandard(
   invariantContext
 )
 

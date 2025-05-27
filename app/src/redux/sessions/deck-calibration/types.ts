@@ -1,6 +1,6 @@
 // deck calibration types
 
-import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
+import type { LabwareDefinition, PipetteModel } from '@opentrons/shared-data'
 import type {
   DECK_STEP_CALIBRATION_COMPLETE,
   DECK_STEP_INSPECTING_TIP,
@@ -31,7 +31,7 @@ export interface DeckCalibrationInstrument {
   tipLength: number
   mount: string
   serial: string
-  defaultTipracks: LabwareDefinition2[]
+  defaultTipracks: LabwareDefinition[]
 }
 
 export interface DeckCalibrationSessionDetails {

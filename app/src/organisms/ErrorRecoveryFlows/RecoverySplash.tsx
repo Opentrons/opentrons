@@ -38,7 +38,7 @@ import { useErrorName } from './hooks'
 import { RecoveryInterventionModal, StepInfo } from './shared'
 import { getErrorKind } from './utils'
 
-import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
+import type { LabwareDefinition, RobotType } from '@opentrons/shared-data'
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { ErrorRecoveryFlowsProps } from '.'
 import type {
@@ -71,7 +71,7 @@ type RecoverySplashProps = ErrorRecoveryFlowsProps &
     resumePausedRecovery: boolean
     toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
     analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
-    allRunDefs: LabwareDefinition2[]
+    allRunDefs: LabwareDefinition[]
   }
 export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const {

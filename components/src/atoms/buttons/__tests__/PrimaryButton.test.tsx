@@ -54,7 +54,7 @@ describe('PrimaryButton', () => {
     render(props)
     const button = screen.getByText('primary button')
     fireEvent.mouseOver(button)
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue55}`)
   })
 
   it('renders primary button with text and different background color', () => {

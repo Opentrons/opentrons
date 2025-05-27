@@ -36,7 +36,7 @@ beforeEach(() => {
     pipetteId: DEFAULT_PIPETTE,
     volume: 150,
     useFullVolume: false,
-    labwareId: SOURCE_LABWARE,
+    entityId: SOURCE_LABWARE,
     wellName: 'A1',
     robotStateAndWarnings: {
       robotState: getInitialRobotStateStandard(invariantContext),
@@ -401,7 +401,7 @@ describe('...8-channel pipette', () => {
         const result = getUpdatedLiquidState(
           {
             invariantContext: customInvariantContext,
-            labwareId: SOURCE_LABWARE,
+            entityId: SOURCE_LABWARE,
             pipetteId: 'p300MultiId',
             useFullVolume: false,
             volume: 150,

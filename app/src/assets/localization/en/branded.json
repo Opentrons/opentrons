@@ -46,6 +46,7 @@
   "modal_instructions": "For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to visit the modules section of the Opentrons Help Center.",
   "module_calibration_failed": "<block>Module calibration was unsuccessful. Make sure the calibration adapter is fully seated on the module and try again. If you still have trouble, contact Opentrons Support.</block><block>{{error}}</block>",
   "module_calibration_get_started": "<block>To get started, remove labware from the deck and clean up the working area to make the calibration easier. Also gather the needed equipment shown to the right.</block><block>The calibration adapter came with your module. The pipette probe came with your Flex pipette.</block>",
+  "module_setup_failed": "<block>Module setup was unsuccessful. If you still have trouble, contact Opentrons Support.</block><block>{{error}}</block>",
   "module_error_contact_support": "Try powering the module off and on again. If the error persists, contact Opentrons Support.",
   "network_setup_menu_description": "You’ll use this connection to run software updates and load protocols onto your Opentrons Flex.",
   "new_robot_instructions": "When setting up a new Flex, follow the instructions on the touchscreen. For more information, consult the Quickstart Guide for your robot.",
