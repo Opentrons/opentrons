@@ -12,7 +12,7 @@ import {
   GENERAL_ERROR_OPTIONS,
   getRecoveryOptions,
   GRIPPER_ERROR_OPTIONS,
-  LABWARE_MISSING_IN_SHUTTLE_OPTIONS,
+  STACKER_SHUTTLE_EMPTY_OPTIONS,
   NO_LIQUID_DETECTED_OPTIONS,
   OVERPRESSURE_PREPARE_TO_ASPIRATE,
   OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
@@ -410,7 +410,7 @@ describe('RecoveryOptions', () => {
   it(`renders valid recovery options for a ${ERROR_KINDS.STACKER_SHUTTLE_EMPTY} errorKind`, () => {
     props = {
       ...props,
-      validRecoveryOptions: LABWARE_MISSING_IN_SHUTTLE_OPTIONS,
+      validRecoveryOptions: STACKER_SHUTTLE_EMPTY_OPTIONS,
     }
 
     renderRecoveryOptions(props)
@@ -557,7 +557,7 @@ describe('getRecoveryOptions', () => {
       ERROR_KINDS.STACKER_SHUTTLE_EMPTY
     )
     expect(labwareMissingInShuttleOptions).toBe(
-      LABWARE_MISSING_IN_SHUTTLE_OPTIONS
+      STACKER_SHUTTLE_EMPTY_OPTIONS
     )
   })
 })
