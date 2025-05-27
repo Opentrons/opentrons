@@ -1,13 +1,15 @@
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
+
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
+  CommandCreatorError,
+  CommandCreatorResult,
+  CommandCreatorWarning,
+  CurriedCommandCreator,
   InvariantContext,
   RobotState,
-  CommandCreatorError,
-  CommandCreatorWarning,
-  CommandCreatorResult,
-  CurriedCommandCreator,
 } from '../types'
+
 interface CCReducerAcc {
   robotState: RobotState
   commands: CreateCommand[]
@@ -37,15 +39,15 @@ export const reduceCommandCreators = (
         }
       }
       const allCommands = [...prev.commands, ...next.commands]
+      const allPython = [
+        ...(prev.python ? [prev.python] : []),
+        ...(next.python ? [next.python] : []),
+      ].join('\n')
       const updates = getNextRobotStateAndWarnings(
         next.commands,
         invariantContext,
         prev.robotState
       )
-      const allPython = [
-        ...(prev.python ? [prev.python] : []),
-        ...(next.python ? [next.python] : []),
-      ].join('\n')
       return {
         ...prev,
         robotState: updates.robotState,
@@ -75,6 +77,6 @@ export const reduceCommandCreators = (
   return {
     commands: result.commands,
     warnings: result.warnings,
-    python: result.python,
+    ...(result.python && { python: result.python }),
   }
 }

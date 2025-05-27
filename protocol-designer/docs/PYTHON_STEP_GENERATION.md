@@ -14,11 +14,11 @@ export type CommandCreatorResult =
 export interface CommandsAndWarnings {
   commands: CreateCommand[]
   warnings?: CommandCreatorWarning[]
-  python?: string // <<<ADD
+  python?: string // <<< NEW
 }
 ```
 
-Here and elsewhere, we make `python` an optional field so that we don't have to rewrite all the existing code to specify it when creating objects.
+Here and elsewhere, we make `python` an optional field so that we don't have to rewrite all of our existing code to populate it when creating objects.
 
 The new `python` field contains one or more lines of Python commands. It behaves analogously to the JSON `commands`. When reducing `CurriedCommandCreator`s together, we concatenate their JSON `commands`, so now we will also concatenate their `python` commands too:
 
@@ -27,10 +27,10 @@ export const reduceCommandCreators = (...): CommandCreatorResult => {
   const result = commandCreators.reduce(
     (prev: CCReducerAcc, reducerFn: CurriedCommandCreator): CCReducerAcc => {
       const allCommands = [...prev.commands, ...next.commands]
-      const allPython = [prev.python, next.python].join('\n')  // <<<NEW
+      const allPython = [prev.python, next.python].join('\n')  // <<< NEW
       return {
         commands: allCommands,
-        python: allPython,  // <<<NEW
+        python: allPython,  // <<< NEW
       }
     },
     ...
@@ -52,7 +52,7 @@ export interface CommandsAndRobotState {
   commands: CreateCommand[]
   robotState: RobotState
   warnings?: CommandCreatorWarning[]
-  python?: string // <<<ADD
+  python?: string // <<< NEW
 }
 ```
 
@@ -82,12 +82,12 @@ The Python API has a `mix()` that implements both aspirate and dispense. We can 
 
 ```typescript
 [
-    curryCommandCreator(pythonOnlyMix, {...}),
     curryCommandCreator(aspirate, {...}),
     curryCommandCreator(dispense, {...}),
+    curryCommandCreator(pythonMix, {...}), // <<< ADD
 ]
 
-const pythonOnlyMix: CommandCreator<...> = (...) => {
+const pythonMix: CommandCreator<...> = (...) => {
     return {
         commands: [],  // emits no JSON
         python: `some_pipette.mix(...)`,
@@ -101,9 +101,9 @@ We need one more tool to make this work: because the Python `mix()` command repl
 
 ```typescript
 [
-    curryCommandCreator(pythonOnlyMix, {...}),
-    curryCommandCreator(aspirate, {...}, suppressPython=true),
-    curryCommandCreator(dispense, {...}, suppressPython=true),
+    curryWithoutPython(aspirate, {...}),
+    curryWithoutPython(dispense, {...}),
+    curryCommandCreator(pythonMix, {...}),
 ]
 ```
 

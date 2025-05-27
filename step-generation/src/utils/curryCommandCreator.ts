@@ -10,7 +10,10 @@ export function curryCommandCreator<Args>(
     commandCreator(args, _invariantContext, _prevRobotState)
 }
 
-export function curryCommandCreatorNoPython<Args>(
+/** Curry a CommandCreator but discard any Python code in it.
+ * Useful for compound commands when you need to suppress the Python for some of
+ * the constituent atomic commands. */
+export function curryWithoutPython<Args>(
   commandCreator: CommandCreator<Args>,
   args: Args
 ): CurriedCommandCreator {
@@ -21,8 +24,8 @@ export function curryCommandCreatorNoPython<Args>(
       _prevRobotState
     )
     if ('python' in commandCreatorResult) {
-      const { python, ...withoutPython } = commandCreatorResult
-      return withoutPython
+      const { python, ...resultWithoutPython } = commandCreatorResult
+      return resultWithoutPython
     }
     return commandCreatorResult
   }
