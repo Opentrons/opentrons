@@ -88,7 +88,7 @@ export function useAspirateSettingsConfig({
         state.mixOnAspirate !== undefined
           ? t('mix_value', {
               volume: state.mixOnAspirate?.mixVolume,
-              reps: state.mixOnAspirate?.repititions,
+              reps: state.mixOnAspirate?.repetitions,
             })
           : '',
       enabled:

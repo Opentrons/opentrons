@@ -91,7 +91,7 @@ describe('Mix', () => {
       kind: 'dispense',
     }
     render(props)
-    screen.getByText('Mix before dispensing')
+    screen.getByText('Mix after dispensing')
   })
 
   it('renders save button if you select enabled, then moves to second screen', () => {
@@ -195,7 +195,7 @@ describe('Mix', () => {
         ...props.state,
         mixOnAspirate: {
           mixVolume: 15,
-          repititions: 55,
+          repetitions: 55,
         },
       },
     }
@@ -233,7 +233,7 @@ describe('Mix', () => {
         ...props.state,
         mixOnDispense: {
           mixVolume: 18,
-          repititions: 2,
+          repetitions: 2,
         },
       },
     }
