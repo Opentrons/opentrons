@@ -182,7 +182,7 @@ async def _partial_pick_up(api: OT3API, position: Point, current: float) -> None
         safe_height=position.z + 10,
     )
     await _partial_pick_up_z_motion(api, current=current, distance=12, speed=3) # change distance and speed, in case collision detected error
-    await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+    api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
     await api.prepare_for_aspirate(OT3Mount.LEFT)
     await api.home_z(OT3Mount.LEFT)
 
@@ -238,7 +238,6 @@ async def run(api: OT3API, report: CSVReport, section: str, pipette: Literal[200
                 raise NameError("offset position miss")
 
             tip_pos = tip_rack_actual_pos + offset_pos
-            print(f"Tip pos: {tip_pos}")
             ui.get_user_ready("Pick up tip")
             await _partial_pick_up(api, tip_pos, current=0.1)
             await api.prepare_for_aspirate(OT3Mount.LEFT)
@@ -307,7 +306,7 @@ async def run(api: OT3API, report: CSVReport, section: str, pipette: Literal[200
         await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, trash_nominal + Point(z=20))
         await api.move_to(OT3Mount.LEFT, trash_nominal)
         await api.drop_tip(OT3Mount.LEFT)
-        await api.remove_tip(OT3Mount.LEFT)
+        api.remove_tip(OT3Mount.LEFT)
         await api.home()
 
 
