@@ -7,7 +7,12 @@ from collections import namedtuple
 
 from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
-from opentrons.protocol_engine import create_protocol_engine, Config, DeckType
+from opentrons.protocol_engine import (
+    create_protocol_engine,
+    Config,
+    DeckType,
+    error_recovery_policy,
+)
 from opentrons.protocol_reader.protocol_source import (
     JsonProtocolConfig,
     ProtocolConfig,
@@ -174,7 +179,7 @@ class GCodeEngine:
                 protocol_runner = create_protocol_runner(
                     protocol_config=config,
                     protocol_engine=await create_protocol_engine.create_protocol_engine(
-                        hardware_api=hardware,  # type: ignore
+                        hardware_api=hardware,
                         config=Config(
                             robot_type=robot_type,
                             deck_type=DeckType(
@@ -182,9 +187,10 @@ class GCodeEngine:
                             ),
                             use_simulated_deck_config=True,
                         ),
+                        error_recovery_policy=error_recovery_policy.never_recover,
                         load_fixed_trash=deck_type.should_load_fixed_trash(config),
                     ),
-                    hardware_api=hardware,  # type: ignore
+                    hardware_api=hardware,
                 )
                 with GCodeWatcher(emulator_settings=self._config) as watcher:
                     await protocol_runner.run(
