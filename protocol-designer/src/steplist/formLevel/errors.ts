@@ -385,6 +385,14 @@ const BLOWOUT_LOCATION_REQUIRED: FormError = {
   page: 2,
   tab: 'dispense',
 }
+const BLOWOUT_FLOW_RATE_REQUIRED: FormError = {
+  title: 'Flow rate required',
+  dependentFields: ['blowout_flowRate'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+  tab: 'dispense',
+}
 const WAVELENGTH_REQUIRED: FormError = {
   title: 'Custom wavelength required',
   dependentFields: ['wavelengths'],
@@ -970,6 +978,19 @@ export const blowoutLocationRequired = (
     fields.path === 'multiDispense'
   return (blowout_checkbox || isDisposalChecked) && blowout_location == null
     ? BLOWOUT_LOCATION_REQUIRED
+    : null
+}
+export const blowoutFlowRateRequired = (
+  fields: HydratedMixFormData | HydratedMoveLiquidFormData
+): FormError | null => {
+  const { blowout_checkbox, blowout_flowRate } = fields
+  const isDisposalChecked =
+    'disposalVolume_checkbox' in fields &&
+    'path' in fields &&
+    fields.disposalVolume_checkbox &&
+    fields.path === 'multiDispense'
+  return (blowout_checkbox || isDisposalChecked) && !blowout_flowRate
+    ? BLOWOUT_FLOW_RATE_REQUIRED
     : null
 }
 export const wavelengthRequired = (

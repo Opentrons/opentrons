@@ -180,6 +180,12 @@ export function quickTransferSummaryReducer(
         submergeAspirate: action.submergeSettings,
       }
     }
+    case 'SET_RETRACT_ASPIRATE': {
+      return {
+        ...state,
+        retractAspirate: action.retractSettings,
+      }
+    }
     case 'SET_TOUCH_TIP_ASPIRATE': {
       return {
         ...state,
@@ -214,6 +220,12 @@ export function quickTransferSummaryReducer(
       return {
         ...state,
         submergeDispense: action.submergeSettings,
+      }
+    }
+    case 'SET_RETRACT_DISPENSE': {
+      return {
+        ...state,
+        retractDispense: action.retractSettings,
       }
     }
     case 'SET_TOUCH_TIP_DISPENSE': {

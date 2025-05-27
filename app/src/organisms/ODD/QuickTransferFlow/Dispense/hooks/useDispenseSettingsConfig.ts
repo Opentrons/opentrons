@@ -132,15 +132,19 @@ export function useDispenseSettingsConfig({
         // setSelectedSetting('push_out')
       },
     },
-    // ToDo replace dummy configs for retract
     {
       option: 'dispense_retract',
       copy: t('retract'),
-      value: 'dummy Retract',
-      enabled: false,
+      value:
+        state.retractDispense !== undefined
+          ? t('retract_value', {
+              speed: state.retractDispense.speed,
+              position: state.retractDispense.positionFromBottom,
+            })
+          : '',
+      enabled: true,
       onClick: () => {
-        // (kk: 04/07/2025)ToDo add retract
-        // setSelectedSetting('retract')
+        setSelectedSetting('dispense_retract')
       },
     },
     {

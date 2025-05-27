@@ -20,8 +20,11 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { getEnableStacking } from '../../../feature-flags/selectors'
 import { openIngredientSelector } from '../../../labware-ingred/actions'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { LINK_BUTTON_STYLE } from '../../atoms'
@@ -33,17 +36,27 @@ import type { ThunkDispatch } from '../../../types'
 
 interface LabwareCardProps {
   labware: LabwareOnDeck
+  quantity: number
   lidDisplayName?: string
 }
 
-//  TODO: add stacking capabilities for Flex Stacker work, currently not
-//  ready Design-wise.
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
-  const { labware, lidDisplayName } = props
+  const { labware, lidDisplayName, quantity } = props
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
   const { def } = labware
+  const enableStacking = useSelector(getEnableStacking)
+  const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
+  const allLabwareIdsOnStack = Object.values(deckSetupLabware).reduce<string[]>(
+    (acc, { labwareDefURI, stack, id }) => {
+      return labwareDefURI === labware.labwareDefURI &&
+        getSlotInLocationStack(stack) === getSlotInLocationStack(labware.stack)
+        ? [...acc, id]
+        : acc
+    },
+    []
+  )
   const nickNames = useSelector(getLabwareNicknamesById)
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
@@ -57,15 +70,27 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const nickName = nickNames[labware.id]
   const isAdapterOrTiprack =
     def.allowedRoles?.includes('adapter') || def.parameters.isTiprack
+  const isLid = def.allowedRoles?.includes('lid')
   const isNicknameDifferent = nickName !== displayName
   const liquidIds = getLiquidIdsOnLabware(wellContents)
+  const canModifyQuantity =
+    labware.def.stackLimit != null && labware.def.stackLimit > 1
+
+  let editButton
+  if (isLid && canModifyQuantity) {
+    editButton = t('edit_quantity')
+  } else if (!isAdapterOrTiprack && canModifyQuantity && enableStacking) {
+    editButton = t('edit_liquid_and_quantity')
+  } else if (!isAdapterOrTiprack || (isLid && !canModifyQuantity)) {
+    editButton = t('edit_liquid')
+  }
 
   return (
     <Box position={POSITION_RELATIVE}>
       {showOverflowMenu ? (
         <LabwareCardOverflowMenu
           setShowOverflowMenu={setShowOverflowMenu}
-          labwareId={labware.id}
+          labwareIds={allLabwareIdsOnStack}
         />
       ) : null}
       <ListItem type="default" backgroundColor={COLORS.grey30}>
@@ -92,24 +117,28 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               ) : null}
               {lidDisplayName != null ? (
                 <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-                  {lidDisplayName}
+                  {t('with_lid', { name: lidDisplayName })}
                 </StyledText>
               ) : null}
 
-              {!isAdapterOrTiprack ? (
-                <Flex width={FLEX_MAX_CONTENT}>
-                  <Tag
-                    type="default"
+              <Flex gridGap={SPACING.spacing8}>
+                {!isAdapterOrTiprack && !isLid ? (
+                  <LiquidInfoDisplay
                     text={
                       liquidIds.length === 0
                         ? t('no_liquids_added')
                         : t('num_liquid', { count: liquidIds.length })
                     }
                   />
-                </Flex>
-              ) : null}
+                ) : null}
+                {quantity > 1 ? (
+                  <LiquidInfoDisplay
+                    text={`Quantity: ${quantity.toString()}`}
+                  />
+                ) : null}
+              </Flex>
             </Flex>
-            {!isAdapterOrTiprack ? (
+            {editButton != null ? (
               <Btn
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 css={LINK_BUTTON_STYLE}
@@ -120,7 +149,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 data-testid="LabwareCard_addLiquid_button"
               >
                 <StyledText desktopStyle="captionRegular">
-                  {t('add_liquid')}
+                  {editButton}
                 </StyledText>
               </Btn>
             ) : null}
@@ -136,5 +165,17 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         </Flex>
       </ListItem>
     </Box>
+  )
+}
+
+interface LiquidInfoDisplayProps {
+  text: string
+}
+
+function LiquidInfoDisplay({ text }: LiquidInfoDisplayProps): JSX.Element {
+  return (
+    <Flex width={FLEX_MAX_CONTENT}>
+      <Tag type="default" text={text} />
+    </Flex>
   )
 }

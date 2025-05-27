@@ -13,7 +13,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
   PROTOCOL_DESIGNER_SOURCE,
 } from '../../constants'
-import { getDefaultPushOutVolume } from '../../utils'
+import { getDefaultBlowoutFlowRate, getDefaultPushOutVolume } from '../../utils'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
@@ -93,7 +93,17 @@ export const migrateFile = (
               pipetteSpecs,
               tipRackDef
             )
-
+      const migratedBlowoutFlowRate =
+        (form.blowout_checkbox || form.disposalVolume_checkbox) &&
+        !form.blowout_flowRate &&
+        pipetteSpecs != null &&
+        tipRackDef != null
+          ? getDefaultBlowoutFlowRate(
+              Number(form.volume),
+              pipetteSpecs,
+              tipRackDef
+            )
+          : null
       const channelsForSpeed =
         pipetteSpecs?.channels ?? (robotType === FLEX_ROBOT_TYPE ? 96 : 8)
       const maxZSpeed =
@@ -171,6 +181,9 @@ export const migrateFile = (
           pushOut_volume: defaultPushOutVolume,
           conditioning_checkbox: false,
           conditioning_volume: null,
+          ...(migratedBlowoutFlowRate != null
+            ? { blowout_flowRate: migratedBlowoutFlowRate }
+            : {}),
         },
       }
     }

@@ -22,6 +22,7 @@ import {
 import { selectors } from '../../../../labware-ingred/selectors'
 import {
   getAdditionalEquipment,
+  getLabwareEntities,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
@@ -69,12 +70,14 @@ describe('DeckSetupToolbox', () => {
       onCloseClick: vi.fn(),
     }
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: null,
-      selectedTopLabwareDefUri: null,
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
+    vi.mocked(getLabwareEntities).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       labware: {},
@@ -115,8 +118,9 @@ describe('DeckSetupToolbox', () => {
       labId: 'mock nickName',
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: 'mockUri',
-      selectedTopLabwareDefUri: 'mockUri',
+      selectedAdapterDefURI: 'mockUri',
+      selectedTopLabware: { labwareDefURI: 'mockUri', amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -156,13 +160,13 @@ describe('DeckSetupToolbox', () => {
     })
     render(props)
     screen.getAllByText('mock nickName')
-    screen.getByText('Add liquid')
+    screen.getByText('Edit liquid')
     screen.getByText('Bottom of slot')
     screen.getByText('Top of slot')
     fireEvent.click(screen.getByText('Clear'))
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     //  add a liquid
-    fireEvent.click(screen.getByText('Add liquid'))
+    fireEvent.click(screen.getByText('Edit liquid'))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
     // add labware when there is no space
