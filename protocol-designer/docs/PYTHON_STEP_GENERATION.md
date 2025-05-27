@@ -73,8 +73,8 @@ Sometimes, we want to emit a Python command that doesn't correspond to any singl
 
 ```typescript
 [
-    curryCommandCreator(aspirate, {...}),
-    curryCommandCreator(dispense, {...}),
+  curryCommandCreator(aspirate, {...}),
+  curryCommandCreator(dispense, {...}),
 ]
 ```
 
@@ -82,9 +82,9 @@ The Python API has a `mix()` that implements both aspirate and dispense. We can 
 
 ```typescript
 [
-    curryCommandCreator(aspirate, {...}),
-    curryCommandCreator(dispense, {...}),
-    curryCommandCreator(pythonMix, {...}), // <<< ADD
+  curryCommandCreator(aspirate, {...}),
+  curryCommandCreator(dispense, {...}),
+  curryCommandCreator(pythonMix, {...}), // <<< ADD
 ]
 
 const pythonMix: CommandCreator<...> = (...) => {
@@ -97,13 +97,13 @@ const pythonMix: CommandCreator<...> = (...) => {
 
 When the reducer runs, it joins together all the non-empty JSON `commands` to get the final JSON output, and it'll join together all the non-empty `python` commands to get the final Python output.
 
-We need one more tool to make this work: because the Python `mix()` command replaces both the aspirate and dispense, we need to _suppress_ Python generation from aspirate and dispense. We'll do that by adding a new flag to `curryCommandCreator`, so the final sequence becomes:
+We need one more tool to make this work: because the Python `mix()` command replaces both the aspirate and dispense, we need to _suppress_ Python generation from aspirate and dispense. We'll do that by introducing a new variant of `curryCommandCreator` that discards the Python we don't want. So the final sequence becomes:
 
 ```typescript
 [
-    curryWithoutPython(aspirate, {...}),
-    curryWithoutPython(dispense, {...}),
-    curryCommandCreator(pythonMix, {...}),
+  curryWithoutPython(aspirate, {...}),
+  curryWithoutPython(dispense, {...}),
+  curryCommandCreator(pythonMix, {...}),
 ]
 ```
 
