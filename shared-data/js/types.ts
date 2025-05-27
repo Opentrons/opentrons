@@ -421,7 +421,10 @@ export interface CutoutFixture {
 export interface FakeCutoutFixture
   extends Omit<CutoutFixture, 'id' | 'providesAddressableAreas'> {
   id: CutoutFixtureIdsWithFakes
-  providesAddressableAreas: Record<CutoutId, AddressableAreaNamesWithFakes[]>
+  providesAddressableAreas: Record<
+    CutoutId,
+    AddressableAreaNamesWithFakes[] | AddressableAreaName[]
+  >
 }
 
 export type CutoutFixtureWithFakes = FakeCutoutFixture | CutoutFixture

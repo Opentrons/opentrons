@@ -78,7 +78,6 @@ import type {
   CutoutFixture,
   DeckDefinition,
   DeckDefinitionWithFakes,
-  FakeCutoutFixture,
   ModuleModel,
 } from './types'
 
@@ -138,7 +137,7 @@ export const FLEX_SINGLE_SLOT_BY_CUTOUT_ID: { [CutoutId: string]: string } = {
   cutoutD3: 'D3',
 }
 
-export const FAKE_FIXTURES_AND_AA = {
+export const FAKE_FIXTURES_AND_AA: DeckDefinitionWithFakes = {
   locations: {
     addressableAreas: [
       {
@@ -262,18 +261,26 @@ export const FAKE_FIXTURES_AND_AA = {
       id: 'fakeStagingAreaRightSlot',
       expectOpentronsModuleSerialNumber: false,
       mayMountTo: ['cutoutD3', 'cutoutC3', 'cutoutB3', 'cutoutA3'],
-      displayName: 'Standard Slot Left',
+      displayName: 'Standard Slot Right',
       providesAddressableAreas: {
+        cutoutD1: [],
+        cutoutD2: [],
         cutoutD3: ['D3', 'fakeD4'],
+        cutoutC1: [],
+        cutoutC2: [],
         cutoutC3: ['C3', 'fakeC4'],
+        cutoutB1: [],
+        cutoutB2: [],
         cutoutB3: ['B3', 'fakeB4'],
+        cutoutA1: [],
+        cutoutA2: [],
         cutoutA3: ['A3', 'fakeA4'],
       },
       fixtureGroup: {},
       height: 0,
-    } as FakeCutoutFixture,
+    },
   ],
-} as DeckDefinitionWithFakes
+}
 
 // TODO(jh 01-15-25): Instead of typing slotId as `string`, type it as `AddressableAreaName`.
 // returns the position associated with a slot id
