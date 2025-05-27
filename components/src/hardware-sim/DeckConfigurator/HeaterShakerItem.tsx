@@ -8,6 +8,7 @@ import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
+  COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
   COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
@@ -70,7 +71,11 @@ export function HeaterShakerItem(props: HeaterShakerItemProps): JSX.Element {
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
+      width={
+        isColumnOne
+          ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
+          : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
+      }
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
