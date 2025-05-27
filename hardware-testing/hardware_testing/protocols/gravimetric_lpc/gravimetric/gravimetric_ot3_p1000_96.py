@@ -11,12 +11,12 @@ requirements = {
 SLOT_SCALE = 4
 SLOTS_TIPRACK = {
     # TODO: add slot 12 when tipracks are disposable
-    20: [2, 3, 5, 6, 7, 8, 9, 11],
-    50: [2, 3, 5, 6, 7, 8, 9, 11],
-    200: [2, 3, 5, 6, 7, 8, 9, 11],
-    1000: [2, 3, 5, 6, 7, 8, 9, 11],
+    20: [2, 3, 5, 6, 7, 8, 9, 10, 11],
+    50: [2, 3, 5, 6, 7, 8, 9, 10, 11],
+    200: [2, 3, 5, 6, 7, 8, 9, 10, 11],
+    1000: [2, 3, 5, 6, 7, 8, 9, 10, 11],
 }
-SLOT_DE_STATIC = 10
+SLOT_DE_STATIC = 1
 LABWARE_ON_SCALE = "nest_12_reservoir_15ml"
 
 

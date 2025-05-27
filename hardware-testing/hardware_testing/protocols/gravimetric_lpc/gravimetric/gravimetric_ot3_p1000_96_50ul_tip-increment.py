@@ -9,6 +9,7 @@ SLOTS_TIPRACK = {
     # TODO: add slot 12 when tipracks are disposable
     50: [2, 3, 5, 6, 7, 8, 9, 10, 11],
 }
+SLOT_DE_STATIC = 1
 LABWARE_ON_SCALE = "nest_12_reservoir_15ml"
 
 
