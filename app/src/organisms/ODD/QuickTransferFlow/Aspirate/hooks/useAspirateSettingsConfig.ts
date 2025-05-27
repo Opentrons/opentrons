@@ -2,10 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 
-import {
-  ACTIONS,
-  ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS,
-} from '../../constants'
+import { ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS } from '../../constants'
 
 import type { Dispatch } from 'react'
 import type {
@@ -75,10 +72,6 @@ export function useAspirateSettingsConfig({
       value: state.preWetTip ? t('option_enabled') : t('option_disabled'),
       enabled: true,
       onClick: () => {
-        // dispatch({
-        //   type: ACTIONS.SET_PRE_WET_TIP,
-        //   preWetTip: !state.preWetTip,
-        // })
         setSelectedSetting(SETTING_OPTIONS.PRE_WET_TIP)
       },
     },
