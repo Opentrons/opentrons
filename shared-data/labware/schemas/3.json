@@ -636,7 +636,12 @@
       "type": "object",
       "description": "Explict locating features when this labware acts as the child in a stackup.",
       "required": [],
-      "properties": {}
+      "properties": {
+        "custom": {
+          "description": "Manually defined parent-origin-to-labware-origin offsets for this labware and a parent entity, keyed by the parent entity's load name, module model, or addressable area id. Offsets are given from this labware's origin, quadrant IV (+x, -y, +z).",
+          "type": "object"
+        }
+      }
     },
     "extents": {
       "description": "The outer dimensions of the labware.",

@@ -68,6 +68,7 @@ _MOCK_LABWARE_DEF_3 = LabwareDefinition3.model_construct(  # type: ignore[call-a
         ),
     ),
     locatingFeaturesAsParent={},
+    locatingFeaturesAsChild={},
 )
 
 
@@ -91,6 +92,37 @@ _MOCK_LABWARE_DEF_3_WITH_OFFSET = LabwareDefinition3.model_construct(  # type: i
         ),
     ),
     locatingFeaturesAsParent={},
+    locatingFeaturesAsChild={},
+)
+
+
+_MOCK_LABWARE_DEF_3_WITH_CUSTOM_OFFSET = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=3,
+    dimensions=LabwareDimensions(
+        xDimension=5000.5,
+        yDimension=6000.5,
+        zDimension=7000.5,
+    ),
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=0, y=0, z=0),
+            frontRightTop=Vector3D(x=4000.5, y=-5000.5, z=6000.5),
+        ),
+        footprint=AxisAlignedBoundingBox2D(
+            backLeft=Vector2D(x=0, y=0),
+            frontRight=Vector2D(x=4000.5, y=-5000.5),
+        ),
+    ),
+    locatingFeaturesAsParent={},
+    locatingFeaturesAsChild={
+        "custom": {
+            "test_parent_labware": Point(x=50.0, y=75.0, z=25.0),
+            "magneticModuleType": Point(x=10.0, y=20.0, z=5.0),
+            "test_area": Point(x=30.0, y=40.0, z=15.0),
+        }
+    },
 )
 
 
@@ -114,6 +146,7 @@ _MOCK_PARENT_LABWARE_DEF_3 = LabwareDefinition3.model_construct(  # type: ignore
         ),
     ),
     locatingFeaturesAsParent={},
+    parameters=MagicMock(loadName="test_parent_labware"),
 )
 
 
@@ -137,6 +170,7 @@ _MOCK_PARENT_LABWARE_DEF_3_WITH_BACK_LEFT_BOTTOM_LF = LabwareDefinition3.model_c
         ),
     ),
     locatingFeaturesAsParent={"backLeftBottom": {}},
+    parameters=MagicMock(loadName="test_parent_labware"),
 )
 
 
@@ -160,6 +194,7 @@ _MOCK_PARENT_LABWARE_DEF_3_WITH_RIGHT_CENTER_BOTTOM_LF = LabwareDefinition3.mode
         ),
     ),
     locatingFeaturesAsParent={"rightCenterBottom": {}},
+    parameters=MagicMock(loadName="test_parent_labware"),
 )
 
 
@@ -207,6 +242,7 @@ def _create_mock_module_definition() -> ModuleDefinition:
     mock_dimensions.labwareInterfaceYDimension = 18000.5
     mock_module_def.dimensions = mock_dimensions
     mock_module_def.locatingFeaturesAsParent = None
+    mock_module_def.moduleType = "magneticModuleType"
 
     return mock_module_def
 
@@ -219,6 +255,7 @@ def _create_mock_module_definition_with_back_left_bottom_lf() -> ModuleDefinitio
     mock_dimensions.labwareInterfaceYDimension = 18000.5
     mock_module_def.dimensions = mock_dimensions
     mock_module_def.locatingFeaturesAsParent = {"backLeftBottom": {}}
+    mock_module_def.moduleType = "magneticModuleType"
 
     return mock_module_def
 
@@ -231,6 +268,7 @@ def _create_mock_module_definition_with_right_center_bottom_lf() -> ModuleDefini
     mock_dimensions.labwareInterfaceYDimension = 18000.5
     mock_module_def.dimensions = mock_dimensions
     mock_module_def.locatingFeaturesAsParent = {"rightCenterBottom": {}}
+    mock_module_def.moduleType = "magneticModuleType"
 
     return mock_module_def
 
@@ -283,6 +321,113 @@ def test_unsupported_parent_location_raises_error() -> None:
             definition=_MOCK_LABWARE_DEF_3,
             lw_parent_location_info=unsupported_parent,
         )
+
+
+def test_custom_offset_with_labware_definition_3_parent() -> None:
+    """Test custom offset with LabwareDefinition3 parent."""
+    loaded_labware = _create_loaded_labware()
+
+    result = get_parent_origin_to_lw_origin(
+        labware_data=loaded_labware,
+        definition=_MOCK_LABWARE_DEF_3_WITH_CUSTOM_OFFSET,
+        lw_parent_location_info=_MOCK_PARENT_LABWARE_DEF_3,
+    )
+
+    assert result == Point(50.0, 75.0, 25.0)
+
+
+def test_custom_offset_with_module_definition_parent() -> None:
+    """Test custom offset with ModuleDefinition parent."""
+    loaded_labware = _create_loaded_labware()
+    module_def = _create_mock_module_definition()
+
+    result = get_parent_origin_to_lw_origin(
+        labware_data=loaded_labware,
+        definition=_MOCK_LABWARE_DEF_3_WITH_CUSTOM_OFFSET,
+        lw_parent_location_info=module_def,
+    )
+
+    assert result == Point(10.0, 20.0, 5.0)
+
+
+def test_custom_offset_with_addressable_area_parent() -> None:
+    """Test custom offset with AddressableArea parent."""
+    loaded_labware = _create_loaded_labware()
+
+    result = get_parent_origin_to_lw_origin(
+        labware_data=loaded_labware,
+        definition=_MOCK_LABWARE_DEF_3_WITH_CUSTOM_OFFSET,
+        lw_parent_location_info=_MOCK_ADDRESSABLE_AREA,
+    )
+
+    assert result == Point(30.0, 40.0, 15.0)
+
+
+def test_custom_offset_with_labware_definition_2_parent() -> None:
+    """Test custom offset with LabwareDefinition2 parent."""
+    loaded_labware = _create_loaded_labware()
+
+    result = get_parent_origin_to_lw_origin(
+        labware_data=loaded_labware,
+        definition=_MOCK_LABWARE_DEF_3_WITH_CUSTOM_OFFSET,
+        lw_parent_location_info=_MOCK_LABWARE_DEF_2,
+    )
+
+    assert result == Point(0, 0, 0)
+
+
+def test_no_custom_offset_falls_back_to_locating_feature() -> None:
+    """Test that when no custom offset exists, it falls back to locating feature calculation."""
+    loaded_labware = _create_loaded_labware()
+
+    result = get_parent_origin_to_lw_origin(
+        labware_data=loaded_labware,
+        definition=_MOCK_LABWARE_DEF_3,
+        lw_parent_location_info=_MOCK_ADDRESSABLE_AREA,
+    )
+
+    assert result.x == pytest.approx(5000.0)
+    assert result.y == pytest.approx(-5000)
+    assert result.z == pytest.approx(0.0)
+
+
+def test_custom_offset_missing_key_falls_back_to_locating_feature() -> None:
+    """Test that when custom offset key is missing, it falls back to the default locating feature calculation."""
+    loaded_labware = _create_loaded_labware()
+
+    # Parent with a loadName that doesn't exist in the mocked custom offsets
+    mock_parent = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        namespace="test",
+        version=1,
+        schemaVersion=3,
+        dimensions=LabwareDimensions(
+            xDimension=11000.5,
+            yDimension=12000.5,
+            zDimension=13000.5,
+        ),
+        extents=Extents(
+            total=AxisAlignedBoundingBox3D(
+                backLeftBottom=Vector3D(x=0, y=0, z=0),
+                frontRightTop=Vector3D(x=10000.5, y=-11000.5, z=12000.5),
+            ),
+            footprint=AxisAlignedBoundingBox2D(
+                backLeft=Vector2D(x=0, y=0),
+                frontRight=Vector2D(x=10000.5, y=-11000.5),
+            ),
+        ),
+        locatingFeaturesAsParent={},
+        parameters=MagicMock(loadName="nonexistent_parent_labware"),
+    )
+
+    result = get_parent_origin_to_lw_origin(
+        labware_data=loaded_labware,
+        definition=_MOCK_LABWARE_DEF_3_WITH_CUSTOM_OFFSET,
+        lw_parent_location_info=mock_parent,
+    )
+
+    assert result.x == pytest.approx(3000.0)
+    assert result.y == pytest.approx(-3000)
+    assert result.z == pytest.approx(0.0)
 
 
 def test_labware_definition_3_on_addressable_area_bottom_center() -> None:

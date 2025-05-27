@@ -159,10 +159,11 @@ class Extents(TypedDict):
 
 
 class LocatingFeatureKeys(str, Enum):
-    """Keys for LocatingFeatures."""
+    """Keys for LocatingFeatures, both locatingFeaturesAsParent and locatingFeaturesAsChild."""
 
     BACK_LEFT_BOTTOM = "backLeftBottom"
     RIGHT_CENTER_BOTTOM = "rightCenterBottom"
+    CUSTOM = "custom"
 
 
 class BackLeftBottomLocatingFeature(TypedDict):
@@ -177,14 +178,23 @@ class RightCenterBottomLocatingFeature(TypedDict):
     pass
 
 
-class LocatingFeatures(TypedDict):
-    """A dictionary of locating features explicitly defined in any entity definition.
+class LocatingFeaturesAsParent(TypedDict):
+    """Locating features that might apply to an entity when the entity is the parent in a stackup.
 
     Locating features that are implicitly derived are omitted, ex., bottom-center.
     """
 
     backLeftBottom: NotRequired[BackLeftBottomLocatingFeature]
     rightCenterBottom: NotRequired[RightCenterBottomLocatingFeature]
+
+
+class LocatingFeaturesAsChild(TypedDict):
+    """Locating features that might apply to an entity when the entity is the child in a stackup.
+
+    Locating features that are implicitly derived are omitted.
+    """
+
+    custom: NotRequired[dict[str, Vector3D]]
 
 
 class LabwareDefinition2(TypedDict):
@@ -229,8 +239,8 @@ class LabwareDefinition3(_OTSharedSchemaMixin, TypedDict):
     brand: LabwareBrandData
     parameters: LabwareParameters3
     ordering: list[list[str]]
-    locatingFeaturesAsParent: LocatingFeatures
-    locatingFeaturesAsChild: LocatingFeatures
+    locatingFeaturesAsParent: LocatingFeaturesAsParent
+    locatingFeaturesAsChild: LocatingFeaturesAsChild
     extents: Extents
     wells: dict[str, WellDefinition3]
     groups: list[WellGroup]

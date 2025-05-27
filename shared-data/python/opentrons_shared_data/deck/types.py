@@ -8,7 +8,7 @@ from typing import Any, Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict
 
 from ..module.types import ModuleType
-from opentrons_shared_data.labware.types import LocatingFeatures
+from opentrons_shared_data.labware.types import LocatingFeaturesAsParent
 
 
 DeckSchemaVersion5 = Literal[5]
@@ -110,7 +110,7 @@ class AddressableAreaV5(_RequiredAddressableArea, total=False):
     matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
     ableToDropTips: bool
     ableToDropLabware: bool
-    locatingFeaturesAsParent: LocatingFeatures
+    locatingFeaturesAsParent: LocatingFeaturesAsParent
 
 
 class Cutout(TypedDict):

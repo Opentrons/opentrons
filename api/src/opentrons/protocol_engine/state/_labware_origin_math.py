@@ -32,20 +32,56 @@ def get_parent_origin_to_lw_origin(
         )
     else:
         assert_type(definition, LabwareDefinition3)
+        custom_offset = _get_custom_offset(definition, lw_parent_location_info)
 
-        parent_origin_to_locating_feature = _get_parent_origin_to_locating_feature(
-            labware_data=labware_data,
-            definition=definition,
-            lw_parent_location_info=lw_parent_location_info,
-        )
+        if custom_offset is not None:
+            return custom_offset
+        else:
+            parent_origin_to_locating_feature = _get_parent_origin_to_locating_feature(
+                labware_data=labware_data,
+                definition=definition,
+                lw_parent_location_info=lw_parent_location_info,
+            )
 
-        locating_feature_to_lw_origin = _get_locating_feature_to_lw_origin(
-            labware_data=labware_data,
-            definition=definition,
-            lw_parent_location_info=lw_parent_location_info,
-        )
+            locating_feature_to_lw_origin = _get_locating_feature_to_lw_origin(
+                labware_data=labware_data,
+                definition=definition,
+                lw_parent_location_info=lw_parent_location_info,
+            )
 
-        return parent_origin_to_locating_feature + locating_feature_to_lw_origin
+            return parent_origin_to_locating_feature + locating_feature_to_lw_origin
+
+
+def _get_custom_offset(
+    definition: LabwareDefinition3,
+    lw_parent_location_info: LabwareParentLocationInfo,
+) -> Point | None:
+    """Returns the custom offset that exists for the parent-child stackup, if any."""
+    custom_offsets = definition.locatingFeaturesAsChild.get("custom")
+
+    if custom_offsets is None:
+        return None
+
+    else:
+        if isinstance(lw_parent_location_info, LabwareDefinition2):
+            return Point(0, 0, 0)
+
+        elif isinstance(lw_parent_location_info, LabwareDefinition3):
+            key = lw_parent_location_info.parameters.loadName
+            return custom_offsets.get(key)
+
+        elif isinstance(lw_parent_location_info, ModuleDefinition):
+            key = lw_parent_location_info.moduleType
+            return custom_offsets.get(key)
+
+        elif isinstance(lw_parent_location_info, AddressableArea):
+            key = lw_parent_location_info.area_name
+            return custom_offsets.get(key)
+
+        else:
+            raise ValueError(
+                f"Unsupported parent location info: {lw_parent_location_info}"
+            )
 
 
 def _get_parent_origin_to_locating_feature(
