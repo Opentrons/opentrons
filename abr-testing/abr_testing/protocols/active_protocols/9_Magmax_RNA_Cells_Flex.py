@@ -136,7 +136,7 @@ def run(protocol: ProtocolContext) -> None:
         helpers.mag_str, "C1"
     )  # type: ignore[assignment]
     waste_reservoir = protocol.load_labware(
-        "nest_1_reservoir_195ml", "C3", "Liquid Waste"
+        "opentrons_tough_1_reservoir_300ml", "C3", "Liquid Waste"
     )
     # Plate Reader
     plate_reader: AbsorbanceReaderContext = protocol.load_module(

@@ -125,11 +125,13 @@ def run(protocol: ProtocolContext) -> None:
     elutionplate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
     )
+    lid = protocol.load_lid_stack("custom_opentrons_tough_universal_lid", "C3", 2)
+    protocol.move_lid(lid, elutionplate, use_gripper=True)
     magnetic_block: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
     )  # type: ignore[assignment]
     waste_reservoir = protocol.load_labware(
-        "nest_1_reservoir_195ml", "C2", "Liquid Waste"
+        "opentrons_tough_1_reservoir_300ml", "C2", "Liquid Waste"
     )
     waste = waste_reservoir.wells()[0].top()
 
@@ -493,6 +495,7 @@ def run(protocol: ProtocolContext) -> None:
         """Elution Function."""
         protocol.comment("-----Beginning Elution Steps-----")
         tiptrack(tips)
+        protocol.move_lid(elutionplate, lid, use_gripper=True)
         for i, (m, e) in enumerate(zip(samples_m, elution_samples_m)):
             m1000.flow_rate.aspirate = 25
             m1000.aspirate(vol, e.meniscus(z=meniscus_z, target="end"))
@@ -530,15 +533,19 @@ def run(protocol: ProtocolContext) -> None:
             m1000.blow_out(e.top(-2))
             m1000.air_gap(20)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+        protocol.move_lid(lid, elutionplate, use_gripper=True)
 
     try:
         h_s.close_labware_latch()
         if probe_height_bool:
             helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
         else:
+            protocol.move_lid(elutionplate, lid, use_gripper=True)
             helpers.find_liquid_height_of_loaded_liquids(
                 protocol, liquid_vols_and_wells, m1000
             )
+        protocol.move_lid(lid, elutionplate, use_gripper=True)
+
         if plate_reader_bool:
             # Plate reader steps
             # 1. Fill plate with water
@@ -669,6 +676,7 @@ def run(protocol: ProtocolContext) -> None:
             waste_reservoir.wells()[0],
         ]
         m1000.reset_tipracks()
+        protocol.move_lid(elutionplate, lid, use_gripper=True)
         helpers.clean_up_plates(
             protocol, m1000, [res1, elutionplate], waste_reservoir["A1"]
         )
