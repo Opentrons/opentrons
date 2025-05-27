@@ -56,15 +56,19 @@ export function TwoColLwInfoAndDeck(
     labwareQuantity,
   } = failedLabwareUtils
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
-  const { step } = recoveryMap
+  const { route, step } = recoveryMap
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
-    switch (step) {
-      case STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
-      case STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE:
-        void manualRetrieve().then(() => proceedNextStep())
+    switch (route) {
+      case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+      case STACKER_STALLED_SKIP.ROUTE:
+        switch (step) {
+          case STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
+          case STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE:
+            void manualRetrieve().then(() => proceedNextStep())
+        }
     }
     void proceedNextStep()
   }

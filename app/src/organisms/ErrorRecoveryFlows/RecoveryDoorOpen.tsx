@@ -21,7 +21,7 @@ import {
   RecoverySingleColumnContentWrapper,
 } from './shared'
 
-import type { RecoveryContentProps, RecoveryRoute, RouteStep } from './types'
+import type { RecoveryContentProps } from './types'
 
 // There are two code paths that render this component:
 // 1) The door is open on a route & step in which it is not permitted to have the door open.
@@ -45,37 +45,17 @@ export function RecoveryDoorOpen({
   const {
     stashedMap,
     proceedToRouteAndStep,
-    handleMotionRouting,
   } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { t } = useTranslation('error_recovery')
 
-  const handleHomeAllAndRoute = (
-    route: RecoveryRoute,
-    step?: RouteStep
-  ): void => {
-    void handleMotionRouting(true)
-      .then(() => recoveryCommands.homeAll())
-      .finally(() => handleMotionRouting(false))
-      .then(() => proceedToRouteAndStep(route, step))
-  }
-
   const primaryOnClick = (): void => {
-    switch (recoveryMap.route) {
-      case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
-        handleHomeAllAndRoute(
-          RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE,
-          RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY
-        )
-        break
-      default:
-        void resumeRecovery().then(() => {
-          // See comments above for why we do this.
-          if (stashedMap != null) {
-            void proceedToRouteAndStep(stashedMap.route, stashedMap.step)
-          }
-        })
-    }
+    void resumeRecovery().then(() => {
+      // See comments above for why we do this.
+      if (stashedMap != null) {
+        void proceedToRouteAndStep(stashedMap.route, stashedMap.step)
+      }
+    })
   }
 
   const buildSubtext = (): string => {
