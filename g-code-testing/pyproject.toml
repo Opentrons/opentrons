@@ -22,8 +22,8 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "opentrons==0.0.0-dev",
-    "robot-server==0.0.0-dev",
+    "opentrons==0.0.0",
+    "robot-server==0.0.0",
 ]
 dynamic = ["version", "hatch-dependency-coversion"]
 

@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "opentrons-shared-data==0.0.0-dev",
+    "opentrons-shared-data==0.0.0",
 ]
 dynamic = ["version", "hatch-dependency-coversion"]
 

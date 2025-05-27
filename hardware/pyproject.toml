@@ -21,7 +21,7 @@ dependencies = [
     "pyserial==3.5",
     "pydantic>=2,<3",
     "pydantic-settings>=2,<3",
-    "opentrons_shared_data==0.0.0-dev",
+    "opentrons_shared_data==0.0.0",
 ]
 dynamic = ['version', 'hatch-dependency-coversion']
 
@@ -39,7 +39,7 @@ dynamic = ['version', 'hatch-dependency-coversion']
 "opentrons_can_control" = "opentrons_hardware.scripts.can_control:main"
 
 [build-system]
-requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency-coversion==0.0.1a3']
+requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency-coversion==0.0.1a4']
 build-backend = 'hatchling.build'
 
 [tool.hatch.metadata.hooks.dependency-coversion]

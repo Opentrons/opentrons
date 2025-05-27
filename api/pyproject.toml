@@ -18,7 +18,7 @@ keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy."
 
 dependencies = [
-   "opentrons-shared-data==0.0.0-dev.0",
+   "opentrons-shared-data==0.0.0",
     "aionotify==0.3.1",
     "anyio>=3.6.1,<4.0.0",
     "jsonschema>=3.0.1,<4.18.0",
@@ -36,8 +36,8 @@ dependencies = [
 dynamic = ['version', 'hatch-dependency-coversion']
 
 [project.optional-dependencies]
-"ot2-hardware" = ["opentrons-hardware==0.0.0-dev"]
-"flex-hardware" = ["opentrons-hardware[FLEX]==0.0.0-dev"]
+"ot2-hardware" = ["opentrons-hardware==0.0.0"]
+"flex-hardware" = ["opentrons-hardware[FLEX]==0.0.0"]
 
 
 [project.scripts]
