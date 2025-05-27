@@ -1,31 +1,34 @@
 import { Fragment, memo } from 'react'
-import styled from 'styled-components'
 import map from 'lodash/map'
+import styled from 'styled-components'
+
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
-
+import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 import {
   LabwareOutline,
   LabwareWellLabels,
   STYLE_BY_WELL_CONTENTS,
   Well,
 } from './labwareInternals'
-import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
+import type { RefObject } from 'react'
+import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
+import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {
   HighlightedWellLabels,
-  WellMouseEvent,
   WellFill,
+  WellMouseEvent,
   WellStroke,
 } from './labwareInternals/types'
 
-import type { RefObject } from 'react'
-import type { LabwareAdapterLoadName } from './LabwareAdapter'
-
 export interface LabwareProps {
   /** Labware definition to render */
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   /** Opional Prop for labware on heater shakers sitting on right side of the deck */
   shouldRotateAdapterOrientation?: boolean
   /** boolean to show well labels */
@@ -100,12 +103,12 @@ export const Labware = (props: LabwareProps): JSX.Element => {
     wellStroke = {},
   } = props
 
-  const cornerOffsetFromSlot = definition.cornerOffsetFromSlot
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
 
   if (labwareAdapterLoadNames.includes(labwareLoadName)) {
     const { shouldRotateAdapterOrientation = false } = props
-    const { xDimension, yDimension } = definition.dimensions
+    const { xDimension, yDimension } = getSchema2Dimensions(definition)
 
     return (
       <g

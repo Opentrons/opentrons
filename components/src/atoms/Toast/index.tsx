@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import { css } from 'styled-components'
 
-import { Btn, Flex, Link } from '../../primitives'
-import { Icon } from '../../icons'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { truncateString } from '../../utils'
+import { Icon } from '../../icons'
+import { Btn, Flex, Link } from '../../primitives'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -13,14 +11,17 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   NO_WRAP,
 } from '../../styles'
-import { LegacyStyledText } from '../StyledText'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { truncateString } from '../../utils'
+import { StyledText } from '../StyledText'
+
 import type {
   DefaultTheme,
   FlattenSimpleInterpolation,
   ThemedCssFunction,
 } from 'styled-components'
-import type { StyleProps } from '../../primitives'
 import type { IconName, IconProps } from '../../icons'
+import type { StyleProps } from '../../primitives'
 
 export const SUCCESS_TOAST: 'success' = 'success'
 export const WARNING_TOAST: 'warning' = 'warning'
@@ -185,20 +186,6 @@ export function Toast(props: ToastProps): JSX.Element {
 
   const ODD_ANIMATION_NONE = css``
 
-  const TEXT_STYLE = css`
-    color: ${COLORS.black90};
-    font-size: ${showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP};
-    font-weight: ${showODDStyle
-      ? TYPOGRAPHY.fontWeightSemiBold
-      : TYPOGRAPHY.fontWeightRegular};
-    line-height: ${showODDStyle
-      ? TYPOGRAPHY.lineHeight28
-      : TYPOGRAPHY.lineHeight20};
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  `
-
   let oddAnimation: FlattenSimpleInterpolation | ThemedCssFunction<DefaultTheme>
 
   if (isClosed) {
@@ -346,19 +333,9 @@ export function Toast(props: ToastProps): JSX.Element {
           width={showODDStyle ? 'auto' : '100%'}
         >
           {headingText.length > 0 ? (
-            <LegacyStyledText
-              color={COLORS.black90}
-              fontSize={
-                showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
-              }
-              fontWeight={
-                showODDStyle
-                  ? TYPOGRAPHY.fontWeightBold
-                  : TYPOGRAPHY.fontWeightSemiBold
-              }
-              lineHeight={
-                showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
-              }
+            <StyledText
+              oddStyle="bodyTextSemiBold"
+              desktopStyle="bodyDefaultRegular"
               marginRight={showODDStyle ? SPACING.spacing4 : undefined}
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
@@ -366,59 +343,77 @@ export function Toast(props: ToastProps): JSX.Element {
               whiteSpace={NO_WRAP}
             >
               {headingText}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
-            <LegacyStyledText css={TEXT_STYLE}>{message}</LegacyStyledText>
-            {linkText != null ? (
-              <Link
-                role="button"
-                onClick={() => {
-                  onLinkClick()
-                  onCloseHandler()
-                }}
-                css={TEXT_STYLE}
-                marginLeft={SPACING.spacing4}
-                marginRight={SPACING.spacing8}
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-              >
-                {linkText}
-              </Link>
-            ) : null}
+            <StyledText
+              oddStyle="bodyTextSemiBold"
+              desktopStyle="bodyDefaultRegular"
+              overflow="hidden"
+              text-overflow="ellipsis"
+              white-space="nowrap"
+            >
+              {message}
+            </StyledText>
           </Flex>
         </Flex>
       </Flex>
-      {closeText ? (
-        <Link
-          role="button"
-          onClick={() => {
-            onCloseHandler()
-          }}
-          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-        >
-          <LegacyStyledText
-            color={COLORS.black90}
-            fontSize={
-              showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
-            }
-            fontWeight={
-              showODDStyle
-                ? TYPOGRAPHY.fontWeightSemiBold
-                : TYPOGRAPHY.fontWeightRegular
-            }
-            lineHeight={
-              showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
-            }
-            textDecoration={
-              showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
-            }
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            whiteSpace={NO_WRAP}
+
+      <Flex alignItems={ALIGN_CENTER}>
+        {linkText ? (
+          <Link
+            role="button"
+            onClick={() => {
+              onLinkClick()
+              onCloseHandler()
+            }}
+            marginLeft={SPACING.spacing4}
+            marginRight={SPACING.spacing8}
           >
-            {closeText}
-          </LegacyStyledText>
-        </Link>
-      ) : null}
+            <StyledText
+              fontSize={
+                showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
+              }
+              fontWeight={
+                showODDStyle
+                  ? TYPOGRAPHY.fontWeightSemiBold
+                  : TYPOGRAPHY.fontWeightRegular
+              }
+              lineHeight={
+                showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+              }
+              textDecoration={
+                showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
+              }
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              whiteSpace={NO_WRAP}
+            >
+              {linkText}
+            </StyledText>
+          </Link>
+        ) : null}
+        {closeText ? (
+          <Link
+            role="button"
+            onClick={() => {
+              onCloseHandler()
+            }}
+            padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+          >
+            <StyledText
+              oddStyle="bodyTextSemiBold"
+              desktopStyle="bodyDefaultRegular"
+              textDecoration={
+                showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
+              }
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              whiteSpace={NO_WRAP}
+            >
+              {closeText}
+            </StyledText>
+          </Link>
+        ) : null}
+      </Flex>
       {!closeText && closeButton ? (
         <Btn
           onClick={() => {

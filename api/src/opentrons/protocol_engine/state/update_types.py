@@ -1,5 +1,7 @@
 """Structures to represent changes that commands want to make to engine state."""
 
+from __future__ import annotations
+
 import dataclasses
 import enum
 import typing
@@ -16,6 +18,8 @@ from opentrons.protocol_engine.types import (
     AspiratedFluid,
     LiquidClassRecord,
     ABSMeasureMode,
+    LiquidTrackingType,
+    StackerStoredLabwareGroup,
 )
 from opentrons.types import MountType
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -105,6 +109,17 @@ class LabwareLocationUpdate:
 
 
 @dataclasses.dataclass
+class BatchLabwareLocationUpdate:
+    """An update to the locations of multiple labware."""
+
+    new_locations_by_id: dict[str, LabwareLocation]
+    """The new locations of each ID."""
+    new_offset_ids_by_id: dict[str, str | None]
+    """The new offsets of each id."""
+
+
+# todo(mm, 2025-04-28): Combine with BatchLoadedLabwareUpdate.
+@dataclasses.dataclass
 class LoadedLabwareUpdate:
     """An update that loads a new labware."""
 
@@ -120,6 +135,23 @@ class LoadedLabwareUpdate:
     display_name: str | None
 
     definition: LabwareDefinition
+
+
+@dataclasses.dataclass
+class BatchLoadedLabwareUpdate:
+    """An update that loads multiple new labware."""
+
+    new_locations_by_id: typing.Dict[str, LabwareLocation]
+    """Each new labwares's initial location keyed by Labware ID."""
+
+    offset_ids_by_id: typing.Dict[str, str | None]
+    """The ID of each labware's offset keyed by labware ID."""
+
+    display_names_by_id: typing.Dict[str, str | None]
+    """The Display Name for each new labware keyed by labware ID"""
+
+    definitions_by_id: typing.Dict[str, LabwareDefinition]
+    """The Labware Definition for each labware keyed by Labware ID."""
 
 
 @dataclasses.dataclass
@@ -199,19 +231,25 @@ class PipetteTipStateUpdate:
 
 
 @dataclasses.dataclass
+class PipetteAspirateReadyUpdate:
+    """Update pipette ready state."""
+
+    pipette_id: str
+    ready_to_aspirate: bool
+
+
+@dataclasses.dataclass
 class TipsUsedUpdate:
     """Represents an update that marks tips in a tip rack as used."""
 
-    pipette_id: str
-    """The pipette that did the tip pickup."""
-
     labware_id: str
+    """The labware ID of the tip rack."""
 
-    well_name: str
-    """The well that the pipette's primary nozzle targeted.
+    well_names: list[str]
+    """The exact wells in the tip rack that should be marked as used.
 
-    Wells in addition to this one will also be marked as used, depending on the
-    pipette's nozzle layout.
+    This is the *full* list, which is probably more than what appeared in the pickUpTip
+    command's params, for multi-channel reasons.
     """
 
 
@@ -231,8 +269,8 @@ class LiquidProbedUpdate:
     labware_id: str
     well_name: str
     last_probed: datetime
-    height: float | ClearType
-    volume: float | ClearType
+    height: LiquidTrackingType | ClearType
+    volume: LiquidTrackingType | ClearType
 
 
 @dataclasses.dataclass
@@ -275,6 +313,7 @@ class PipetteEmptyFluidUpdate:
     """Sets the pipette to be valid and empty."""
 
     pipette_id: str
+    clean_tip: bool
     type: typing.Literal["empty"] = "empty"
 
 
@@ -308,30 +347,20 @@ class AbsorbanceReaderStateUpdate:
     module_id: str
     absorbance_reader_lid: AbsorbanceReaderLidUpdate | NoChangeType = NO_CHANGE
     absorbance_reader_data: AbsorbanceReaderDataUpdate | NoChangeType = NO_CHANGE
-    initialize_absorbance_reader_update: AbsorbanceReaderInitializeUpdate | NoChangeType = (
-        NO_CHANGE
-    )
+    initialize_absorbance_reader_update: (
+        AbsorbanceReaderInitializeUpdate | NoChangeType
+    ) = NO_CHANGE
 
 
 @dataclasses.dataclass
-class FlexStackerLoadHopperLabware:
-    """An update to the Flex Stacker module static state."""
+class FlexStackerPoolConstraint:
+    """The labware definitions that are contained in the pool."""
 
-    labware_id: str
-
-
-@dataclasses.dataclass
-class FlexStackerRetrieveLabware:
-    """An update to the Flex Stacker module static state."""
-
-    labware_id: str
-
-
-@dataclasses.dataclass
-class FlexStackerStoreLabware:
-    """An update to the Flex Stacker module static state."""
-
-    labware_id: str
+    max_pool_count: int
+    pool_overlap: float
+    primary_definition: LabwareDefinition
+    lid_definition: LabwareDefinition | None
+    adapter_definition: LabwareDefinition | None
 
 
 @dataclasses.dataclass
@@ -339,10 +368,22 @@ class FlexStackerStateUpdate:
     """An update to the Flex Stacker module state."""
 
     module_id: str
-    in_static_mode: bool | NoChangeType = NO_CHANGE
-    hopper_labware_update: FlexStackerLoadHopperLabware | FlexStackerRetrieveLabware | FlexStackerStoreLabware | NoChangeType = (
-        NO_CHANGE
-    )
+    pool_constraint: FlexStackerPoolConstraint | NoChangeType = NO_CHANGE
+    contained_labware_bottom_first: list[
+        StackerStoredLabwareGroup
+    ] | NoChangeType = NO_CHANGE
+
+    @classmethod
+    def create_or_override(
+        cls,
+        maybe_inst: FlexStackerStateUpdate | NoChangeType,
+        module_id: str,
+    ) -> FlexStackerStateUpdate:
+        """Build or default a state update."""
+        if maybe_inst == NO_CHANGE:
+            return FlexStackerStateUpdate(module_id=module_id)
+        else:
+            return maybe_inst
 
 
 @dataclasses.dataclass
@@ -391,7 +432,11 @@ class StateUpdate:
 
     labware_location: LabwareLocationUpdate | NoChangeType = NO_CHANGE
 
+    batch_labware_location: BatchLabwareLocationUpdate | NoChangeType = NO_CHANGE
+
     loaded_labware: LoadedLabwareUpdate | NoChangeType = NO_CHANGE
+
+    batch_loaded_labware: BatchLoadedLabwareUpdate | NoChangeType = NO_CHANGE
 
     loaded_lid_stack: LoadedLidStackUpdate | NoChangeType = NO_CHANGE
 
@@ -416,6 +461,8 @@ class StateUpdate:
     files_added: FilesAddedUpdate | NoChangeType = NO_CHANGE
 
     addressable_area_used: AddressableAreaUsedUpdate | NoChangeType = NO_CHANGE
+
+    ready_to_aspirate: PipetteAspirateReadyUpdate | NoChangeType = NO_CHANGE
 
     def append(self, other: Self) -> Self:
         """Apply another `StateUpdate` "on top of" this one.
@@ -524,6 +571,19 @@ class StateUpdate:
         )
         return self
 
+    def set_batch_labware_location(
+        self: Self,
+        *,
+        new_locations_by_id: typing.Mapping[str, LabwareLocation],
+        new_offset_ids_by_id: typing.Mapping[str, str | None],
+    ) -> Self:
+        """Update the location of multiple labware objects."""
+        self.batch_labware_location = BatchLabwareLocationUpdate(
+            new_locations_by_id=dict(new_locations_by_id),
+            new_offset_ids_by_id=dict(new_offset_ids_by_id),
+        )
+        return self
+
     def set_loaded_labware(
         self: Self,
         definition: LabwareDefinition,
@@ -539,6 +599,22 @@ class StateUpdate:
             offset_id=offset_id,
             new_location=location,
             display_name=display_name,
+        )
+        return self
+
+    def set_batch_loaded_labware(
+        self: Self,
+        definitions_by_id: typing.Mapping[str, LabwareDefinition],
+        offset_ids_by_id: typing.Mapping[str, str | None],
+        display_names_by_id: typing.Mapping[str, str | None],
+        new_locations_by_id: typing.Mapping[str, LabwareLocation],
+    ) -> Self:
+        """Add a set of new labwares to state. See `BatchLoadedLabwareUpdate`."""
+        self.batch_loaded_labware = BatchLoadedLabwareUpdate(
+            new_locations_by_id=dict(new_locations_by_id),
+            offset_ids_by_id=dict(offset_ids_by_id),
+            display_names_by_id=dict(display_names_by_id),
+            definitions_by_id=dict(definitions_by_id),
         )
         return self
 
@@ -562,13 +638,13 @@ class StateUpdate:
 
     def set_lids(
         self: Self,
-        parent_labware_ids: typing.List[str],
-        lid_ids: typing.List[str | None],
+        parent_labware_ids: typing.Sequence[str],
+        lid_ids: typing.Sequence[str | None],
     ) -> Self:
         """Update the labware parent of a loaded or moved lid. See `LabwareLidUpdate`."""
         self.labware_lid = LabwareLidUpdate(
-            parent_labware_ids=parent_labware_ids,
-            lid_ids=lid_ids,
+            parent_labware_ids=list(parent_labware_ids),
+            lid_ids=list(lid_ids),
         )
         return self
 
@@ -618,13 +694,9 @@ class StateUpdate:
         )
         return self
 
-    def mark_tips_as_used(
-        self: Self, pipette_id: str, labware_id: str, well_name: str
-    ) -> Self:
+    def mark_tips_as_used(self: Self, labware_id: str, well_names: list[str]) -> Self:
         """Mark tips in a tip rack as used. See `TipsUsedUpdate`."""
-        self.tips_used = TipsUsedUpdate(
-            pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
-        )
+        self.tips_used = TipsUsedUpdate(labware_id=labware_id, well_names=well_names)
         return self
 
     def set_liquid_loaded(
@@ -646,8 +718,8 @@ class StateUpdate:
         labware_id: str,
         well_name: str,
         last_probed: datetime,
-        height: float | ClearType,
-        volume: float | ClearType,
+        height: LiquidTrackingType | ClearType,
+        volume: LiquidTrackingType | ClearType,
     ) -> Self:
         """Add a liquid height and volume to well state. See `ProbeLiquidUpdate`."""
         self.liquid_probed = LiquidProbedUpdate(
@@ -694,10 +766,10 @@ class StateUpdate:
         )
         return self
 
-    def set_fluid_empty(self: Self, pipette_id: str) -> Self:
-        """Update record fo fluid held inside a pipette. See `PipetteEmptyFluidUpdate`."""
+    def set_fluid_empty(self: Self, pipette_id: str, clean_tip: bool = False) -> Self:
+        """Update record of fluid held inside a pipette. See `PipetteEmptyFluidUpdate`."""
         self.pipette_aspirated_fluid = PipetteEmptyFluidUpdate(
-            type="empty", pipette_id=pipette_id
+            type="empty", pipette_id=pipette_id, clean_tip=clean_tip
         )
         return self
 
@@ -747,50 +819,49 @@ class StateUpdate:
         )
         return self
 
-    def load_flex_stacker_hopper_labware(
+    def update_flex_stacker_labware_pool_definition(
         self,
         module_id: str,
-        labware_id: str,
+        max_count: int,
+        pool_overlap: float,
+        primary_definition: LabwareDefinition,
+        adapter_definition: LabwareDefinition | None,
+        lid_definition: LabwareDefinition | None,
     ) -> Self:
-        """Add a labware definition to the engine."""
-        self.flex_stacker_state_update = FlexStackerStateUpdate(
-            module_id=module_id,
-            hopper_labware_update=FlexStackerLoadHopperLabware(labware_id=labware_id),
+        """Constrain the labware pool to a specific definition."""
+        self.flex_stacker_state_update = dataclasses.replace(
+            FlexStackerStateUpdate.create_or_override(
+                self.flex_stacker_state_update, module_id
+            ),
+            pool_constraint=FlexStackerPoolConstraint(
+                max_pool_count=max_count,
+                pool_overlap=pool_overlap,
+                primary_definition=primary_definition,
+                lid_definition=lid_definition,
+                adapter_definition=adapter_definition,
+            ),
         )
         return self
 
-    def retrieve_flex_stacker_labware(
+    def update_flex_stacker_contained_labware(
         self,
         module_id: str,
-        labware_id: str,
+        contained_labware_bottom_first: list[StackerStoredLabwareGroup],
     ) -> Self:
-        """Add a labware definition to the engine."""
-        self.flex_stacker_state_update = FlexStackerStateUpdate(
-            module_id=module_id,
-            hopper_labware_update=FlexStackerRetrieveLabware(labware_id=labware_id),
+        """Set the labware pool to a specific count."""
+        self.flex_stacker_state_update = dataclasses.replace(
+            FlexStackerStateUpdate.create_or_override(
+                self.flex_stacker_state_update, module_id
+            ),
+            contained_labware_bottom_first=contained_labware_bottom_first,
         )
         return self
 
-    def store_flex_stacker_labware(
-        self,
-        module_id: str,
-        labware_id: str,
+    def set_pipette_ready_to_aspirate(
+        self, pipette_id: str, ready_to_aspirate: bool
     ) -> Self:
-        """Add a labware definition to the engine."""
-        self.flex_stacker_state_update = FlexStackerStateUpdate(
-            module_id=module_id,
-            hopper_labware_update=FlexStackerStoreLabware(labware_id=labware_id),
-        )
-        return self
-
-    def update_flex_stacker_mode(
-        self,
-        module_id: str,
-        static_mode: bool,
-    ) -> Self:
-        """Update the mode of the Flex Stacker."""
-        self.flex_stacker_state_update = FlexStackerStateUpdate(
-            module_id=module_id,
-            in_static_mode=static_mode,
+        """Set the ready to aspirate state for a pipette."""
+        self.ready_to_aspirate = PipetteAspirateReadyUpdate(
+            pipette_id=pipette_id, ready_to_aspirate=ready_to_aspirate
         )
         return self

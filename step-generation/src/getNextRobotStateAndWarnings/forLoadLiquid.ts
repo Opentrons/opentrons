@@ -1,5 +1,5 @@
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
 import type { LoadLiquidCreateCommand } from '@opentrons/shared-data'
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forLoadLiquid(
   params: LoadLiquidCreateCommand['params'],

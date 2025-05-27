@@ -1,14 +1,15 @@
+import {
+  fireEvent,
+  render as rtlRender,
+  screen,
+  waitFor,
+} from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { HeaderWithMeter } from '../index'
-import { describe, expect, it, vi } from 'vitest'
-import {
-  screen,
-  render as rtlRender,
-  waitFor,
-  fireEvent,
-} from '@testing-library/react'
 import { ExitConfirmModal } from '../../ExitConfirmModal'
+import { HeaderWithMeter } from '../index'
 
 vi.mock('react-router-dom', () => ({
   useNavigate: vi.fn(),

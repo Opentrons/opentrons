@@ -7,17 +7,17 @@ on:
     paths:
       - 'Makefile'
       - 'components/**'
-      - 'app/**/*.stories.*'
-      - 'app/src/atoms/**/*'
-      - 'app/src/molecules/**/*'
+      - 'app/**.stories.*'
+      - 'app/src/atoms/**'
+      - 'app/src/molecules/**'
       - 'package.json'
       - '.github/workflows/components-test-build-deploy.yaml'
   push:
     paths:
       - 'components/**'
-      - 'app/**/*.stories.*'
-      - 'app/src/atoms/**/*'
-      - 'app/src/molecules/**/*'
+      - 'app/**.stories.*'
+      - 'app/src/atoms/**'
+      - 'app/src/molecules/**'
       - 'package.json'
       - '.github/workflows/components-test-build-deploy.yaml'
     branches:
@@ -41,7 +41,7 @@ jobs:
   js-unit-test:
     name: 'components unit tests'
     timeout-minutes: 30
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
       - uses: 'actions/setup-node@v4'
@@ -75,7 +75,7 @@ jobs:
 
   build-components-storybook:
     name: 'build components artifact'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     if: github.event_name != 'pull_request'
     needs: ['js-unit-test']
     steps:
@@ -135,7 +135,7 @@ jobs:
 
   deploy-components:
     name: 'deploy components storybook artifact to S3'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     needs:
       ['js-unit-test', 'build-components-storybook', 'determine-build-type']
     if: needs.determine-build-type.outputs.type != 'none'
@@ -210,6 +210,7 @@ jobs:
           VERSION_STRING=$(echo ${{ github.ref }} | sed 's/refs\/tags\/components@//')
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
+          json -I -f ./components/package.json -e "delete this.dependencies['@opentrons/step-generation']"
       - uses: 'actions/setup-node@v4'
         with:
           node-version: '22.11.0'

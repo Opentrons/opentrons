@@ -1,10 +1,10 @@
-import { describe, it, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '../../../testing/utils'
 import { screen } from '@testing-library/react'
-import { SPACING } from '../../../ui-style-constants'
-import { BORDERS, COLORS } from '../../../helix-design-system'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { DeckInfoLabel } from '..'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
+import { SPACING } from '../../../ui-style-constants'
 
 import type { ComponentProps } from 'react'
 
@@ -33,6 +33,22 @@ describe('DeckInfoLabel', () => {
     expect(deckInfoLabel).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
   })
 
+  it('should render the proper styles - web style large', () => {
+    props = {
+      ...props,
+      size: 'large',
+    }
+    render(props)
+    const deckInfoLabel = screen.getByTestId('DeckInfoLabel_A1')
+    expect(deckInfoLabel).toHaveStyle(
+      `padding: ${SPACING.spacing2} ${SPACING.spacing4}`
+    )
+    expect(deckInfoLabel).toHaveStyle('height: 1.75rem')
+    expect(deckInfoLabel).toHaveStyle('width: max-content')
+    expect(deckInfoLabel).toHaveStyle(`border: 2px solid ${COLORS.black90}`)
+    expect(deckInfoLabel).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
+  })
+
   it.todo('should render the proper styles - odd style')
 
   it('should render deck label', () => {
@@ -46,5 +62,15 @@ describe('DeckInfoLabel', () => {
     }
     render(props)
     screen.getByLabelText(props.iconName)
+  })
+
+  it('should render an icon large', () => {
+    props = {
+      iconName: 'ot-temperature-v2',
+      size: 'large',
+    }
+    render(props)
+    const deckInfoLabelIcon = screen.getByLabelText(props.iconName)
+    expect(deckInfoLabelIcon).toHaveStyle('height: 1.5rem')
   })
 })

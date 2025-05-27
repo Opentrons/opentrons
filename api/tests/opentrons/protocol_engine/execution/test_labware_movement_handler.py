@@ -18,7 +18,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
     LabwareOffset,
-    LabwareOffsetLocation,
+    LegacyLabwareOffsetLocation,
     LabwareOffsetVector,
     LabwareLocation,
     NonStackedLocation,
@@ -142,7 +142,7 @@ async def set_up_decoy_hardware_gripper(
             id="new-offset-id",
             createdAt=datetime(year=2022, month=10, day=20),
             definitionUri="my-labware",
-            location=LabwareOffsetLocation(
+            location=LegacyLabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_5
             ),  # this location doesn't matter for this test
             vector=LabwareOffsetVector(x=0.5, y=0.6, z=0.7),
@@ -563,7 +563,7 @@ async def test_ensure_movement_obstructed_by_thermocycler_raises(
         state_store.labware.get_parent_location(labware_id="labware-id")
     ).then_return(from_loc)
     decoy.when(
-        await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+        await thermocycler_movement_flagger.ensure_labware_in_open_thermocycler(
             labware_parent=ModuleLocation(moduleId="a-thermocycler-id")
         )
     ).then_raise(ThermocyclerNotOpenError("Thou shall not pass!"))

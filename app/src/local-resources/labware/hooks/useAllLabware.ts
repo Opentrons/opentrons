@@ -1,14 +1,21 @@
 import { useSelector } from 'react-redux'
+
 import { getValidCustomLabware } from '/app/redux/custom-labware'
+
 import { getAllDefinitions } from '../utils'
-import type { LabwareSort, LabwareFilter, LabwareDefAndDate } from '../types'
+
+import type { LabwareDefAndDate, LabwareFilter, LabwareSort } from '../types'
+
+const LABWARE_LOADNAME_BLOCKLIST: string[] = []
 
 export function useAllLabware(
   sortBy: LabwareSort,
   filterBy: LabwareFilter
 ): LabwareDefAndDate[] {
   const fullLabwareList: LabwareDefAndDate[] = []
-  const labwareDefinitions = getAllDefinitions()
+  const labwareDefinitions = getAllDefinitions().filter(
+    def => !LABWARE_LOADNAME_BLOCKLIST.includes(def.parameters.loadName)
+  )
   labwareDefinitions.forEach(def => fullLabwareList.push({ definition: def }))
   const customLabwareList = useSelector(getValidCustomLabware)
   customLabwareList.forEach(customLabware =>

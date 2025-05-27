@@ -1,8 +1,8 @@
 import { forwardRef } from 'react'
 import { css } from 'styled-components'
 
-import { Btn } from '../../primitives'
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { Btn } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 
 import type { ComponentProps, ForwardedRef, ReactNode } from 'react'
@@ -20,47 +20,7 @@ export const OverflowBtn: (
   ): JSX.Element => {
     const { fillColor, ...restProps } = props
     return (
-      <Btn
-        css={css`
-          border-radius: ${BORDERS.borderRadius4};
-          max-height: ${SPACING.spacing32};
-
-          &:hover {
-            background-color: ${COLORS.grey30};
-          }
-          &:hover circle {
-            fill: ${COLORS.grey55};
-          }
-
-          &:active,
-          &:focus {
-            background-color: ${COLORS.grey35};
-          }
-
-          &:active circle,
-          &:focus circle {
-            fill: ${COLORS.grey60};
-          }
-
-          &:focus-visible {
-            box-shadow: ${`0 0 0 3px ${COLORS.yellow50}`};
-            background-color: ${'transparent'};
-          }
-
-          &:focus-visible circle {
-            fill: ${COLORS.grey60};
-          }
-
-          &:disabled circle {
-            fill: ${COLORS.grey40};
-          }
-          &:disabled {
-            background-color: transparent;
-          }
-        `}
-        {...restProps}
-        ref={ref}
-      >
+      <Btn css={OVERFLOW_MENU_BUTTON_STYLE} {...restProps} ref={ref}>
         <svg
           width="19"
           height="31"
@@ -76,3 +36,41 @@ export const OverflowBtn: (
     )
   }
 )
+
+const OVERFLOW_MENU_BUTTON_STYLE = css`
+  border-radius: ${BORDERS.borderRadius4};
+  max-height: ${SPACING.spacing32};
+
+  &:hover {
+    background-color: ${COLORS.grey30};
+  }
+  &:hover circle {
+    fill: ${COLORS.grey55};
+  }
+
+  &:active,
+  &:focus {
+    background-color: ${COLORS.grey35};
+  }
+
+  &:active circle,
+  &:focus circle {
+    fill: ${COLORS.grey60};
+  }
+
+  &:focus-visible {
+    box-shadow: ${`0 0 0 3px ${COLORS.yellow50}`};
+    background-color: ${COLORS.transparent};
+  }
+
+  &:focus-visible circle {
+    fill: ${COLORS.grey60};
+  }
+
+  &:disabled circle {
+    fill: ${COLORS.grey40};
+  }
+  &:disabled {
+    background-color: ${COLORS.transparent};
+  }
+`

@@ -1,16 +1,18 @@
 import { DndProvider } from 'react-dnd'
-import { HashRouter } from 'react-router-dom'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { useSelector } from 'react-redux'
+import { HashRouter } from 'react-router-dom'
+
 import {
   Box,
   DIRECTION_COLUMN,
   Flex,
   OVERFLOW_AUTO,
 } from '@opentrons/components'
-import { ProtocolRoutes } from './ProtocolRoutes'
-import { PortalRoot } from './organisms'
+
+import { PortalRoot } from './components/organisms'
 import { getEnableReactScan } from './feature-flags/selectors'
+import { ProtocolRoutes } from './ProtocolRoutes'
 
 export function ProtocolEditor(): JSX.Element {
   // note for react-scan
@@ -38,7 +40,7 @@ export function ProtocolEditor(): JSX.Element {
         id="protocol-editor"
       >
         <PortalRoot />
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} height="100%">
           <HashRouter>
             <ProtocolRoutes />
           </HashRouter>

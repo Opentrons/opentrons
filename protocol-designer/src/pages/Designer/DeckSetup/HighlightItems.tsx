@@ -1,35 +1,37 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
+  getAddressableAreaFromSlotId,
+  getPositionFromSlotId,
+  inferModuleOrientationFromXCoordinate,
   STANDARD_FLEX_SLOTS,
   STANDARD_OT2_SLOTS,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
-  getAddressableAreaFromSlotId,
-  getPositionFromSlotId,
-  inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
+
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
 } from '../../../ui/steps/selectors'
-import { getDesignerTab } from '../../../file-data/selectors'
 import { LabwareLabel } from '../LabwareLabel'
-import { ModuleLabel } from './ModuleLabel'
-import { FixtureRender } from './FixtureRender'
 import { DeckItemHighlight } from './DeckItemHighlight'
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import { FixtureRender } from './FixtureRender'
+import { ModuleLabel } from './ModuleLabel'
+import { getHighlightLabwareAndModules } from './utils'
+
 import type {
-  RobotType,
-  DeckDefinition,
-  CutoutId,
   AddressableAreaName,
   CoordinateTuple,
+  CutoutId,
+  DeckDefinition,
+  RobotType,
 } from '@opentrons/shared-data'
-import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
+import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type { Fixture } from './constants'
 
 interface HighlightItemsProps {
@@ -54,7 +56,6 @@ const SLOTS = [
 export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
   const { robotType, deckDef } = props
   const { t } = useTranslation('application')
-  const tab = useSelector(getDesignerTab)
   const { labware, modules, additionalEquipmentOnDeck } = useSelector(
     getDeckSetupForActiveItem
   )
@@ -68,20 +69,13 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
     return null
   }
 
-  const hoveredItemLabware: LabwareOnDeck | null =
-    hoveredItem?.id != null && labware[hoveredItem.id] != null
-      ? labware[hoveredItem.id]
-      : null
-  const selectedItemLabwares = selectedDropdownItems.filter(
-    selected => selected.id != null && labware[selected.id]
+  const highlightItems = getHighlightLabwareAndModules(
+    hoveredItem,
+    selectedDropdownItems,
+    labware,
+    modules
   )
-  const hoveredItemModule: ModuleOnDeck | null =
-    hoveredItem?.id != null && modules[hoveredItem.id] != null
-      ? modules[hoveredItem.id]
-      : null
-  const selectedItemModule = selectedDropdownItems.find(
-    selected => selected.id != null && modules[selected.id]
-  )
+
   const hoveredItemTrash: {
     name: AdditionalEquipmentName
     id: string
@@ -104,113 +98,83 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
       selected.id != null && SLOTS.includes(selected.id as AddressableAreaName)
   )
 
-  const getLabwareItems = (): JSX.Element[] => {
-    const items: JSX.Element[] = []
-
-    if (hoveredItemLabware != null || selectedItemLabwares.length > 0) {
-      const selectedLabwaresOnDeck = selectedItemLabwares
-        .map(item => (item?.id != null ? labware[item.id] : null))
-        .filter(Boolean)
-
-      const labwaresToRender =
-        hoveredItemLabware != null
-          ? [hoveredItemLabware]
-          : selectedLabwaresOnDeck
-
-      labwaresToRender.forEach((labwareOnDeck, index) => {
-        if (!labwareOnDeck) {
-          console.warn(
-            `labwareOnDeck was null as ${labwareOnDeck}, expected to find a matching entity`
-          )
-          return
-        }
-
-        let labwareSlot = labwareOnDeck.slot
-        const tcModel = Object.values(modules).find(
-          module => module.type === THERMOCYCLER_MODULE_TYPE
-        )?.model
-
-        if (modules[labwareSlot]) {
-          labwareSlot = modules[labwareSlot].slot
-        } else if (labware[labwareSlot]) {
-          const adapter = labware[labwareSlot]
-          labwareSlot = modules[adapter.slot]?.slot ?? adapter.slot
-        }
-
-        const position = getPositionFromSlotId(labwareSlot, deckDef)
-        if (position != null) {
-          let tcPosition: CoordinateTuple = FLEX_TC_POSITION
-          if (labwareSlot === '7') {
-            tcPosition =
-              tcModel === THERMOCYCLER_MODULE_V2
-                ? OT2_TC_GEN_2_POSITION
-                : OT2_TC_GEN_1_POSITION
-          }
-
-          items.push(
-            <LabwareLabel
-              key={`${labwareOnDeck.id}_${index}`}
-              isSelected={selectedItemLabwares.some(
-                selected => selected.id === labwareOnDeck.id
-              )}
-              isLast={true}
-              position={tcModel != null ? tcPosition : position}
-              labwareDef={labwareOnDeck.def}
-              labelText={
-                hoveredItemLabware == null
-                  ? selectedItemLabwares.find(
-                      selected => selected.id === labwareOnDeck.id
-                    )?.text ?? ''
-                  : hoveredItem.text ?? ''
-              }
-            />
-          )
-        }
-      })
+  const labwareItems = highlightItems.highlightLabwareItems.reduce<
+    JSX.Element[]
+  >((acc, { labware: labwareOnDeck, selection, isSelected = false }, index) => {
+    const { text } = selection
+    if (!labwareOnDeck) {
+      console.warn(
+        `labwareOnDeck was null as ${labwareOnDeck}, expected to find a matching entity`
+      )
+      return acc
     }
-
-    return items
-  }
-
-  const getModuleItems = (): JSX.Element[] => {
-    const items: JSX.Element[] = []
-
-    if (hoveredItemModule != null || selectedItemModule != null) {
-      const selectedModuleOnDeck =
-        selectedItemModule?.id != null ? modules[selectedItemModule.id] : null
-      const moduleOnDeck = hoveredItemModule ?? selectedModuleOnDeck
-
-      if (!moduleOnDeck) {
-        console.warn(
-          `moduleOnDeck was null as ${moduleOnDeck}, expected to find a matching entity`
-        )
-        return items
+    const labwareSlot = getSlotInLocationStack(labwareOnDeck.stack)
+    const labwareIdsFromFullStack =
+      labwareOnDeck.stack?.filter(
+        id =>
+          labware[id] != null &&
+          !labware[id].def.allowedRoles?.includes('adapter')
+      ) ?? []
+    const tcModel = Object.values(modules).find(
+      module => module.type === THERMOCYCLER_MODULE_TYPE
+    )?.model
+    const position = getPositionFromSlotId(labwareSlot, deckDef)
+    if (position != null) {
+      let tcPosition: CoordinateTuple = FLEX_TC_POSITION
+      if (labwareSlot === '7') {
+        tcPosition =
+          tcModel === THERMOCYCLER_MODULE_V2
+            ? OT2_TC_GEN_2_POSITION
+            : OT2_TC_GEN_1_POSITION
       }
 
+      return [
+        ...acc,
+        <LabwareLabel
+          key={`${labwareOnDeck.id}_${index}`}
+          isSelected={isSelected}
+          isLast
+          showModuleIcon={labwareIdsFromFullStack.length > 1}
+          position={
+            tcModel != null && (labwareSlot === '7' || labwareSlot === 'B1')
+              ? tcPosition
+              : position
+          }
+          labwareDef={labwareOnDeck.def}
+          labelText={text ?? ''}
+        />,
+      ]
+    }
+    return acc
+  }, [])
+
+  const moduleItems = highlightItems.highlightModuleItems.reduce<JSX.Element[]>(
+    (acc, { module: moduleOnDeck, selection, isSelected = false }) => {
+      const { text } = selection
+      if (moduleOnDeck == null) {
+        return acc
+      }
       const position = getPositionFromSlotId(moduleOnDeck.slot, deckDef)
       if (position != null) {
-        items.push(
+        return [
+          ...acc,
           <ModuleLabel
             key={`module_${moduleOnDeck.id}`}
-            isLast={true}
-            isSelected={selectedItemModule != null}
+            isLast
+            isSelected={isSelected}
             moduleModel={moduleOnDeck.model}
             position={position}
             orientation={inferModuleOrientationFromXCoordinate(position[0])}
             isZoomed={false}
-            labelName={
-              selectedItemModule == null
-                ? hoveredItem.text ?? ''
-                : selectedItemModule.text ?? ''
-            }
+            labelName={text ?? ''}
             slot={moduleOnDeck.slot}
-          />
-        )
+          />,
+        ]
       }
-    }
-
-    return items
-  }
+      return acc
+    },
+    []
+  )
 
   const getTrashItems = (): JSX.Element[] => {
     const items: JSX.Element[] = []
@@ -314,7 +278,6 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
         }
         items.push(
           <DeckItemHighlight
-            tab={tab}
             slotBoundingBox={addressableArea.boundingBox}
             slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
             itemId={addressableArea.id}
@@ -328,8 +291,8 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
 
   const renderItems = (): JSX.Element[] => {
     return [
-      ...getLabwareItems(),
-      ...getModuleItems(),
+      ...labwareItems,
+      ...moduleItems,
       ...getTrashItems(),
       ...getDeckItems(),
     ]

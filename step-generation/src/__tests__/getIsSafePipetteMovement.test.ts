@@ -1,13 +1,17 @@
-import { expect, describe, it, beforeEach } from 'vitest'
-import { getIsSafePipetteMovement } from '../utils'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
-  TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_MODULE_V2,
+  COLUMN,
   fixture96Plate,
   fixtureP100096V2Specs,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
+
+import { getIsSafePipetteMovement } from '../utils'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
@@ -32,6 +36,7 @@ describe('getIsSafePipetteMovement', () => {
           tiprackDefURI: ['mockDefUri'],
           tiprackLabwareDef: [fixtureTiprack1000ul as LabwareDefinition2],
           spec: fixtureP100096V2Specs,
+          pythonName: 'mockPythonName',
         },
       },
       labwareEntities: {
@@ -39,25 +44,33 @@ describe('getIsSafePipetteMovement', () => {
           id: mockLabwareId,
           labwareDefURI: 'mockDefUri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
         [mockTiprackId]: {
           id: mockTiprackId,
           labwareDefURI: mockTipUri,
           def: fixtureTiprack1000ul as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
         [mockAdapter]: {
           id: mockAdapter,
           labwareDefURI: 'mockAdapterUri',
           def: fixtureTiprackAdapter as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
         [mockLabware2]: {
           id: mockLabware2,
           labwareDefURI: 'mockDefUri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
       },
       moduleEntities: {},
-      additionalEquipmentEntities: {},
+      trashBinEntities: {},
+      wasteChuteEntities: {},
+      stagingAreaEntities: {},
+      gripperEntities: {},
+      liquidEntities: {},
       config: {
         OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
       },
@@ -65,17 +78,23 @@ describe('getIsSafePipetteMovement', () => {
     mockRobotState = {
       pipettes: { pip: { mount: 'left' } },
       labware: {
-        [mockLabwareId]: { slot: 'D2' },
-        [mockTiprackId]: { slot: 'A2' },
+        [mockLabwareId]: { stack: ['mockLabwareId', 'D2'] },
+        [mockTiprackId]: { stack: ['mockTiprackId', 'A2'] },
       },
       modules: {},
       tipState: { tipracks: {}, pipettes: {} },
-      liquidState: { pipettes: {}, labware: {}, additionalEquipment: {} },
+      liquidState: {
+        pipettes: {},
+        labware: {},
+        trashBins: {},
+        wasteChute: {},
+      },
     }
   })
 
   it('returns true when the labware id is a trash bin', () => {
     const result = getIsSafePipetteMovement(
+      COLUMN,
       {
         labware: {},
         pipettes: {},
@@ -87,9 +106,17 @@ describe('getIsSafePipetteMovement', () => {
         labwareEntities: {},
         pipetteEntities: {},
         moduleEntities: {},
-        additionalEquipmentEntities: {
-          trashBin: { name: 'trashBin', location: 'A3', id: 'trashBin' },
+        liquidEntities: {},
+        trashBinEntities: {
+          trashBin: {
+            pythonName: 'trash_bin_1',
+            location: 'A3',
+            id: 'trashBin',
+          },
         },
+        wasteChuteEntities: {},
+        stagingAreaEntities: {},
+        gripperEntities: {},
         config: {} as any,
       },
       'mockId',
@@ -101,6 +128,7 @@ describe('getIsSafePipetteMovement', () => {
   })
   it('returns false when within pipette extents is false', () => {
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,
@@ -120,9 +148,11 @@ describe('getIsSafePipetteMovement', () => {
         id: mockModule,
         type: TEMPERATURE_MODULE_TYPE,
         model: TEMPERATURE_MODULE_V2,
+        pythonName: 'mockPythonName',
       },
     }
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,
@@ -137,9 +167,10 @@ describe('getIsSafePipetteMovement', () => {
     mockRobotState.tipState.tipracks = { mockTiprackId: { A1: true } }
     mockRobotState.labware = {
       ...mockRobotState.labware,
-      [mockAdapter]: { slot: 'D1' },
+      [mockAdapter]: { stack: [mockAdapter, 'D1'] },
     }
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,
@@ -155,12 +186,12 @@ describe('getIsSafePipetteMovement', () => {
       [mockModule]: { slot: 'D1', moduleState: {} as any },
     }
     mockRobotState.labware = {
-      [mockLabwareId]: { slot: 'D2' },
+      [mockLabwareId]: { stack: [mockLabwareId, 'D2'] },
       [mockAdapter]: {
-        slot: mockModule,
+        stack: [mockAdapter, mockModule, 'D1'],
       },
       [mockLabware2]: {
-        slot: mockAdapter,
+        stack: [mockLabware2, mockAdapter, mockModule, 'D1'],
       },
     }
     mockInvariantProperties.moduleEntities = {
@@ -168,9 +199,11 @@ describe('getIsSafePipetteMovement', () => {
         id: mockModule,
         type: TEMPERATURE_MODULE_TYPE,
         model: TEMPERATURE_MODULE_V2,
+        pythonName: 'mockPythonName',
       },
     }
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,

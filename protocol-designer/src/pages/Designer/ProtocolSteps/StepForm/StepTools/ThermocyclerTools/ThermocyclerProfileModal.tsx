@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   EmptySelectorButton,
   Flex,
+  FLEX_MAX_CONTENT,
   InfoScreen,
   JUSTIFY_FLEX_END,
   Modal,
@@ -98,28 +100,34 @@ export function ThermocyclerProfileModal(
         maxHeight="31.875rem"
       >
         <Flex justifyContent={JUSTIFY_FLEX_END} gridGap={SPACING.spacing4}>
-          <EmptySelectorButton
-            text={t('form:step_edit_form.field.thermocyclerProfile.add_cycle')}
-            onClick={() => {
-              if (canAddStepOrProfile) {
-                setShowCreateNewCycle(true)
-              }
-            }}
-            textAlignment="left"
-            iconName="plus"
-            disabled={!canAddStepOrProfile}
-          />
-          <EmptySelectorButton
-            text={t('form:step_edit_form.field.thermocyclerProfile.add_step')}
-            onClick={() => {
-              if (canAddStepOrProfile) {
-                setShowCreateNewStep(true)
-              }
-            }}
-            textAlignment="left"
-            iconName="plus"
-            disabled={!canAddStepOrProfile}
-          />
+          <Flex width={FLEX_MAX_CONTENT}>
+            <EmptySelectorButton
+              text={t(
+                'form:step_edit_form.field.thermocyclerProfile.add_cycle'
+              )}
+              onClick={() => {
+                if (canAddStepOrProfile) {
+                  setShowCreateNewCycle(true)
+                }
+              }}
+              textAlignment="left"
+              iconName="plus"
+              disabled={!canAddStepOrProfile}
+            />
+          </Flex>
+          <Flex width={FLEX_MAX_CONTENT}>
+            <EmptySelectorButton
+              text={t('form:step_edit_form.field.thermocyclerProfile.add_step')}
+              onClick={() => {
+                if (canAddStepOrProfile) {
+                  setShowCreateNewStep(true)
+                }
+              }}
+              textAlignment="left"
+              iconName="plus"
+              disabled={!canAddStepOrProfile}
+            />
+          </Flex>
         </Flex>
         {steps.length > 0 || showCreateNewStep || showCreateNewCycle ? (
           <Flex

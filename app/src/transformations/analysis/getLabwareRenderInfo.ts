@@ -1,9 +1,12 @@
 import { getPositionFromSlotId } from '@opentrons/shared-data'
+
 import type {
   CompletedProtocolAnalysis,
   DeckDefinition,
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadLabwareRunTimeCommand,
+  LoadLidRunTimeCommand,
+  LoadLidStackRunTimeCommand,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
@@ -12,7 +15,7 @@ export interface LabwareRenderInfoById {
     x: number
     y: number
     z: number
-    labwareDef: LabwareDefinition2
+    labwareDef: LabwareDefinition
     displayName: string | null
     slotName: string
   }
@@ -23,14 +26,22 @@ export const getLabwareRenderInfo = (
   deckDef: DeckDefinition
 ): LabwareRenderInfoById =>
   protocolData.commands
-    .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
+    .filter((command): command is
+      | LoadLabwareRunTimeCommand
+      | LoadLidRunTimeCommand
+      | LoadLidStackRunTimeCommand =>
+      ['loadLabware', 'loadLid', 'loadLidStack'].includes(command.commandType)
     )
     .reduce((acc, command) => {
-      const labwareId = command.result?.labwareId
+      const labwareId =
+        command.commandType === 'loadLidStack'
+          ? command.result?.labwareIds[0]
+          : command.result?.labwareId
       const location = command.params.location
-      const displayName = command.params.displayName ?? null
+      const displayName =
+        command.commandType === 'loadLabware'
+          ? command.params?.displayName ?? null
+          : null
       const labwareDef = command.result?.definition
       if (
         location === 'offDeck' ||

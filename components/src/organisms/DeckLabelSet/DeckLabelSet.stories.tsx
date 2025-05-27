@@ -1,8 +1,7 @@
+import { DeckLabelSet as DeckLabelSetComponent } from '.'
 import { BORDERS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-
-import { DeckLabelSet as DeckLabelSetComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -23,7 +22,7 @@ const mockDeckLabels = [
 ]
 
 const meta: Meta<typeof DeckLabelSetComponent> = {
-  title: 'Library/Organisms/DeckLabelSet',
+  title: 'Helix/Organisms/DeckLabelSet',
   component: DeckLabelSetComponent,
   decorators: [
     Story => (

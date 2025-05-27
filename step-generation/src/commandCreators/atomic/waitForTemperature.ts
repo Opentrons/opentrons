@@ -2,15 +2,17 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
-import { getModuleState } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
+import { getModuleState } from '../../robotStateSelectors'
+import { uuid } from '../../utils'
 import * as warningCreators from '../../warningCreators'
+
 import type { TemperatureParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorWarning } from '../../types'
 
@@ -66,8 +68,8 @@ export const waitForTemperature: CommandCreator<TemperatureParams> = (
   if (potentiallyUnreachableTemp) {
     warnings.push(warningCreators.potentiallyUnreachableTemp())
   }
-
-  const moduleType = invariantContext.moduleEntities[moduleId]?.type
+  const module = invariantContext.moduleEntities[moduleId]
+  const moduleType = module?.type
 
   switch (moduleType) {
     case TEMPERATURE_MODULE_TYPE:
@@ -83,6 +85,7 @@ export const waitForTemperature: CommandCreator<TemperatureParams> = (
           },
         ],
         warnings: warnings.length > 0 ? warnings : undefined,
+        python: `${module?.pythonName}.await_temperature(${celsius})`,
       }
 
     case HEATERSHAKER_MODULE_TYPE:
@@ -98,6 +101,7 @@ export const waitForTemperature: CommandCreator<TemperatureParams> = (
           },
         ],
         warnings: warnings.length > 0 ? warnings : undefined,
+        python: `${module?.pythonName}.wait_for_temperature()`,
       }
 
     default:

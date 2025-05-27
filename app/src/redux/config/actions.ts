@@ -1,4 +1,5 @@
 import * as Constants from './constants'
+
 import type * as Types from './types'
 
 // request a config value update
@@ -76,10 +77,6 @@ export function toggleDevInternalFlag(
   flag: Types.DevInternalFlag
 ): Types.ToggleConfigValueAction {
   return toggleConfigValue(`devInternal.${flag}`)
-}
-
-export function toggleHistoricOffsets(): Types.ToggleConfigValueAction {
-  return toggleConfigValue('protocols.applyHistoricOffsets')
 }
 
 // TODO(mc, 2020-02-05): move to `discovery` module

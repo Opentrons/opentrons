@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { last } from 'lodash'
 import { css } from 'styled-components'
 
 import {
@@ -18,51 +19,59 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
+  Tooltip,
   TOOLTIP_FIXED,
   TOOLTIP_TOP,
-  Tooltip,
   useHoverTooltip,
   useOnClickOutside,
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  getIsTiprack,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import {
-  actions as stepsActions,
-  getIsMultiSelectMode,
-} from '../../../../ui/steps'
-import {
-  selectors as stepFormSelectors,
-  getIsModuleOnDeck,
-} from '../../../../step-forms'
 import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
   getMainPagePortalEl,
-} from '../../../../organisms'
+} from '../../../../components/organisms'
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { OFFDECK } from '../../../../constants'
+import { getEnableComment } from '../../../../feature-flags/selectors'
 import {
-  getEnableAbsorbanceReader,
-  getEnableComment,
-} from '../../../../feature-flags/selectors'
+  getInitialRobotState,
+  getRobotStateTimeline,
+} from '../../../../file-data/selectors'
+import {
+  getIsModuleOnDeck,
+  selectors as stepFormSelectors,
+} from '../../../../step-forms'
+import { getLabwareEntities } from '../../../../step-forms/selectors'
+import {
+  getIsMultiSelectMode,
+  actions as stepsActions,
+} from '../../../../ui/steps'
+import { getHasTrash, getIsAdapterFromDef } from '../../../../utils'
 import { AddStepOverflowButton } from './AddStepOverflowButton'
 
-import type { MouseEvent } from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
-import type { BaseState } from '../../../../types'
+import type { MouseEvent } from 'react'
 import type { StepType } from '../../../../form-types'
+import type { BaseState } from '../../../../types'
 
 interface AddStepButtonProps {
   hasText: boolean
 }
 
 export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
-  const { t } = useTranslation(['tooltip', 'button'])
+  const { t } = useTranslation(['tooltip', 'button', 'starting_deck_state'])
   const enableComment = useSelector(getEnableComment)
+  const { makeSnackbar } = useKitchen()
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -75,7 +84,10 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
     stepFormSelectors.getCurrentFormHasUnsavedChanges
   )
   const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
-  const modules = useSelector(stepFormSelectors.getInitialDeckSetup).modules
+  const { modules, additionalEquipmentOnDeck } = useSelector(
+    stepFormSelectors.getInitialDeckSetup
+  )
+  const hasTrash = getHasTrash(additionalEquipmentOnDeck)
   const [showStepOverflowMenu, setShowStepOverflowMenu] = useState<boolean>(
     false
   )
@@ -87,8 +99,23 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
   const [enqueuedStepType, setEnqueuedStepType] = useState<StepType | null>(
     null
   )
-  const enableAbsorbanceReader = useSelector(getEnableAbsorbanceReader)
-
+  const labwareEntities = useSelector(getLabwareEntities)
+  const { timeline } = useSelector(getRobotStateTimeline)
+  const initialTimeline = useSelector(getInitialRobotState)
+  const lastTimelineFrame =
+    timeline.length > 0 ? last(timeline)?.robotState : initialTimeline
+  const labwareAtLastState = lastTimelineFrame?.labware ?? {}
+  const isLabwarePresentForLiquidHandling = Object.entries(
+    labwareAtLastState
+  ).some(([labwareId, { stack }]) => {
+    const labwareDef = labwareEntities[labwareId]?.def
+    return (
+      labwareDef != null &&
+      getSlotInLocationStack(stack) !== OFFDECK &&
+      !getIsTiprack(labwareDef) &&
+      !getIsAdapterFromDef(labwareDef)
+    )
+  })
   const getSupportedSteps = (): Array<
     Exclude<StepType, 'manualIntervention'>
   > => [
@@ -109,16 +136,14 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
   > = {
     comment: enableComment,
     moveLabware: true,
-    moveLiquid: true,
-    mix: true,
+    moveLiquid: isLabwarePresentForLiquidHandling,
+    mix: isLabwarePresentForLiquidHandling,
     pause: true,
     magnet: getIsModuleOnDeck(modules, MAGNETIC_MODULE_TYPE),
     temperature: getIsModuleOnDeck(modules, TEMPERATURE_MODULE_TYPE),
     thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
     heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE),
-    absorbanceReader:
-      getIsModuleOnDeck(modules, ABSORBANCE_READER_TYPE) &&
-      enableAbsorbanceReader,
+    absorbanceReader: getIsModuleOnDeck(modules, ABSORBANCE_READER_TYPE),
   }
 
   const addStep = (stepType: StepType): ReturnType<any> =>
@@ -126,7 +151,7 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
 
   const items = getSupportedSteps()
     .filter(stepType => isStepTypeEnabled[stepType])
-    .map(stepType => (
+    .map((stepType, index, array) => (
       <AddStepOverflowButton
         key={stepType}
         stepType={stepType}
@@ -138,12 +163,21 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
           }
           setShowStepOverflowMenu(false)
         }}
+        isFirstStep={index === 0}
+        isLastStep={index === array.length - 1}
       />
     ))
 
+  const handleAddClick = (): void => {
+    if (hasTrash) {
+      setShowStepOverflowMenu(true)
+    } else {
+      makeSnackbar(t('starting_deck_state:trash_required') as string)
+    }
+  }
+
   return (
     <>
-      {/* TODO(ja): update this modal to match latest modal designs */}
       {enqueuedStepType !== null &&
         createPortal(
           <ConfirmDeleteModal
@@ -187,9 +221,7 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
         width="100%"
         {...targetProps}
         id="AddStepButton"
-        onClick={() => {
-          setShowStepOverflowMenu(true)
-        }}
+        onClick={handleAddClick}
         disabled={isStepCreationDisabled}
       >
         <Icon name="plus" size="1rem" />
@@ -202,9 +234,9 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
 const STEP_OVERFLOW_MENU_STYLE = css`
   position: ${POSITION_ABSOLUTE};
   z-index: 5;
-  right: -7.75rem;
+  right: -8.05rem;
   white-space: ${NO_WRAP};
-  bottom: 4.2rem;
+  bottom: 1rem;
   border-radius: ${BORDERS.borderRadius8};
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
   background-color: ${COLORS.white};

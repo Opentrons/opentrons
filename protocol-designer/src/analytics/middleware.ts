@@ -1,39 +1,30 @@
-import uniq from 'lodash/uniq'
 import omit from 'lodash/omit'
+import uniq from 'lodash/uniq'
+
 import {
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
-  MOVABLE_TRASH_ADDRESSABLE_AREAS,
-  WASTE_CHUTE_ADDRESSABLE_AREAS,
   getModuleDisplayName,
   getPipetteSpecsV2,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import {
-  getArgsAndErrorsByStepId,
-  getPipetteEntities,
-  getSavedStepForms,
-} from '../step-forms/selectors'
+
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM, FIXED_TRASH_ID } from '../constants'
 import {
   createFile,
   getFileMetadata,
   getRobotStateTimeline,
 } from '../file-data/selectors'
 import {
-  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-  FIXED_TRASH_ID,
-} from '../constants'
+  getArgsAndErrorsByStepId,
+  getPipetteEntities,
+  getSavedStepForms,
+} from '../step-forms/selectors'
 import { trackEvent } from './mixpanel'
 import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
 
 import type { Middleware } from 'redux'
-import type {
-  ConsolidateArgs,
-  DistributeArgs,
-  MixArgs,
-  NormalizedPipetteById,
-  TransferArgs,
-} from '@opentrons/step-generation'
 import type {
   AddressableAreaName,
   LoadLabwareCreateCommand,
@@ -41,13 +32,20 @@ import type {
   LoadPipetteCreateCommand,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { BaseState } from '../types'
-import type { FormData, StepIdType, StepType } from '../form-types'
-import type { StepArgsAndErrors } from '../steplist'
-import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
-import type { RenameStepAction } from '../labware-ingred/actions'
+import type {
+  ConsolidateArgs,
+  DistributeArgs,
+  MixArgs,
+  NormalizedPipetteById,
+  TransferArgs,
+} from '@opentrons/step-generation'
 import type { SetFeatureFlagAction } from '../feature-flags/actions'
+import type { FormData, StepIdType, StepType } from '../form-types'
+import type { RenameStepAction } from '../labware-ingred/actions'
 import type { CreatePipettesAction } from '../step-forms/actions'
+import type { StepArgsAndErrors } from '../steplist'
+import type { BaseState } from '../types'
+import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
 import type { AnalyticsEventAction } from './actions'
 import type { AnalyticsEvent } from './mixpanel'
 
@@ -169,12 +167,12 @@ export const reduxActionToAnalyticsEvent = (
               blowoutFlowRate: stepArgModified.blowoutFlowRateUlSec,
               aspirateOffsetFromBottomMm:
                 stepArgModified.aspirateOffsetFromBottomMm ===
-                DEFAULT_MM_FROM_BOTTOM_ASPIRATE
+                DEFAULT_MM_OFFSET_FROM_BOTTOM
                   ? DEFAULT_VALUE
                   : stepArgModified.aspirateOffsetFromBottomMm,
               dispenseOffsetFromBottomMm:
                 stepArgModified.dispenseOffsetFromBottomMm ===
-                DEFAULT_MM_FROM_BOTTOM_DISPENSE
+                DEFAULT_MM_OFFSET_FROM_BOTTOM
                   ? DEFAULT_VALUE
                   : stepArgModified.dispenseOffsetFromBottomMm,
               aspirateXOffset:
@@ -212,32 +210,19 @@ export const reduxActionToAnalyticsEvent = (
               dispenseFlowRate:
                 stepArgModified.dispenseFlowRateUlSec ?? DEFAULT_VALUE,
               blowoutFlowRate: stepArgModified.blowoutFlowRateUlSec,
-              aspirateOffsetFromBottomMm:
-                stepArgModified.aspirateOffsetFromBottomMm ===
-                DEFAULT_MM_FROM_BOTTOM_ASPIRATE
+              offsetFromBottomMm:
+                stepArgModified.offsetFromBottomMm ===
+                DEFAULT_MM_OFFSET_FROM_BOTTOM
                   ? DEFAULT_VALUE
-                  : stepArgModified.aspirateOffsetFromBottomMm,
-              dispenseOffsetFromBottomMm:
-                stepArgModified.dispenseOffsetFromBottomMm ===
-                DEFAULT_MM_FROM_BOTTOM_DISPENSE
+                  : stepArgModified.offsetFromBottomMm,
+              xOffset:
+                stepArgModified.xOffset === 0
                   ? DEFAULT_VALUE
-                  : stepArgModified.dispenseOffsetFromBottomMm,
-              aspirateXOffset:
-                stepArgModified.aspirateXOffset === 0
+                  : stepArgModified.xOffset,
+              yOffset:
+                stepArgModified.yOffset === 0
                   ? DEFAULT_VALUE
-                  : stepArgModified.aspirateXOffset,
-              aspirateYOffset:
-                stepArgModified.aspirateYOffset === 0
-                  ? DEFAULT_VALUE
-                  : stepArgModified.aspirateYOffset,
-              dispenseXOffset:
-                stepArgModified.dispenseXOffset === 0
-                  ? DEFAULT_VALUE
-                  : stepArgModified.dispenseXOffset,
-              dispenseYOffset:
-                stepArgModified.dispenseYOffset === 0
-                  ? DEFAULT_VALUE
-                  : stepArgModified.dispenseYOffset,
+                  : stepArgModified.yOffset,
               ...additionalProperties,
             },
           }

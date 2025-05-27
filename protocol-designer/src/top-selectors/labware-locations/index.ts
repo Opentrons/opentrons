@@ -1,37 +1,47 @@
-import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
+import { createSelector } from 'reselect'
+
 import {
-  THERMOCYCLER_MODULE_TYPE,
+  FLEX_MODULE_ADDRESSABLE_AREAS,
+  FLEX_ROBOT_TYPE,
+  FLEX_STACKER_ADDRESSABLE_AREAS,
   getDeckDefFromRobotType,
   getModuleDisplayName,
-  FLEX_ROBOT_TYPE,
-  WASTE_CHUTE_ADDRESSABLE_AREAS,
-  WASTE_CHUTE_CUTOUT,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   isAddressableAreaStandardSlot,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
-  FLEX_MODULE_ADDRESSABLE_AREAS,
-  FLEX_STACKER_ADDRESSABLE_AREAS,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_TYPE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { COLUMN_4_SLOTS, getHasWasteChute } from '@opentrons/step-generation'
 import {
-  START_TERMINAL_ITEM_ID,
-  END_TERMINAL_ITEM_ID,
-  PRESAVED_STEP_ID,
-} from '../../steplist'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { getActiveItem } from '../../ui/steps'
-import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
+  COLUMN_4_SLOTS,
+  getTopLocationInStack,
+} from '@opentrons/step-generation'
+
 import { selectors as fileDataSelectors } from '../../file-data'
 import { getRobotType } from '../../file-data/selectors'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import {
+  getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
   getLabwareEntities,
   getModuleEntities,
-  getPipetteEntities,
-  getAdditionalEquipmentEntities,
 } from '../../step-forms/selectors'
+import {
+  END_TERMINAL_ITEM_ID,
+  HARDWARE_ID,
+  PRESAVED_STEP_ID,
+  START_TERMINAL_ITEM_ID,
+} from '../../steplist'
+import { getActiveItem, getSelectedStepId } from '../../ui/steps'
+import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
+import { getSelectedTerminalItemId } from '../../ui/steps/selectors'
 import { getIsAdapter } from '../../utils'
-import type { CutoutId, AddressableAreaName } from '@opentrons/shared-data'
+
+import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
 import type { RobotState } from '@opentrons/step-generation'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
 import type { Selector } from '../../types'
@@ -47,17 +57,24 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
   getActiveItem,
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.lastValidRobotState,
+  getSelectedStepId,
+  getSelectedTerminalItemId,
   (
     orderedStepIds,
     robotStateTimeline,
     activeItem,
     initialRobotState,
-    lastValidRobotState
+    lastValidRobotState,
+    selectedStepId,
+    selectedTerminalItemId
   ) => {
     let robotState = null
     if (activeItem == null) return null
 
-    if (activeItem.selectionType === TERMINAL_ITEM_SELECTION_TYPE) {
+    if (
+      activeItem.selectionType === TERMINAL_ITEM_SELECTION_TYPE &&
+      activeItem.id !== HARDWARE_ID
+    ) {
       const terminalId = activeItem.id
 
       if (terminalId === START_TERMINAL_ITEM_ID) {
@@ -72,15 +89,31 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
           `Invalid terminalId ${terminalId}, could not robotState of active item`
         )
       }
+    } else if (
+      activeItem.id === HARDWARE_ID &&
+      selectedTerminalItemId === START_TERMINAL_ITEM_ID
+    ) {
+      robotState = initialRobotState
+    } else if (
+      activeItem.id === HARDWARE_ID &&
+      (selectedTerminalItemId === END_TERMINAL_ITEM_ID ||
+        selectedTerminalItemId === PRESAVED_STEP_ID)
+    ) {
+      robotState = lastValidRobotState
     } else {
-      const stepId = activeItem.id
+      const stepId =
+        activeItem.id === HARDWARE_ID && selectedStepId != null
+          ? selectedStepId
+          : activeItem.id
       const timeline = robotStateTimeline.timeline
       const timelineIdx = orderedStepIds.includes(stepId)
         ? orderedStepIds.findIndex(id => id === stepId)
         : null
 
-      if (timelineIdx == null) {
-        console.error(`Expected non-null timelineIdx for step ${stepId}`)
+      if (timelineIdx == null || stepId === HARDWARE_ID) {
+        if (stepId !== HARDWARE_ID) {
+          console.error(`Expected non-null timelineIdx for step ${stepId}`)
+        }
         return null
       }
       if (timelineIdx === 0) {
@@ -113,7 +146,10 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const cutoutFixtures = deckDef.cutoutFixtures
-    const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+    const hasWasteChute =
+      Object.values(additionalEquipmentEntities).find(
+        ae => ae.name === 'wasteChute'
+      ) != null
     const allSlotIds = deckDef.locations.addressableAreas.reduce<
       AddressableAreaName[]
     >((acc, slot) => {
@@ -126,6 +162,13 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
 
     if (robotState == null) return null
 
+    const trashCutouts = Object.values(additionalEquipmentEntities).reduce<
+      string[]
+    >(
+      (acc, { name, location }) =>
+        name === 'trashBin' && location != null ? [...acc, location] : acc,
+      []
+    )
     const { modules, labware } = robotState
     const slotIdsOccupiedByModules = Object.entries(modules).reduce<string[]>(
       (acc, [modId, modOnDeck]) => {
@@ -143,11 +186,12 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
     const unoccupiedAdapterOptions = Object.entries(labware).reduce<Option[]>(
       (acc, [labwareId, labwareOnDeck]) => {
         const labwareOnAdapter = Object.values(labware).find(
-          temporalProperties => temporalProperties.slot === labwareId
+          temporalProperties =>
+            getTopLocationInStack(temporalProperties.stack) === labwareId
         )
-        const adapterSlot = labwareOnDeck.slot
-        const modIdWithAdapter = Object.keys(modules).find(
-          modId => modId === labwareOnDeck.slot
+        const adapterSlot = getTopLocationInStack(labwareOnDeck.stack)
+        const modIdWithAdapter = Object.keys(modules).find(modId =>
+          labwareOnDeck.stack.includes(modId)
         )
         const adapterDisplayName =
           labwareEntities[labwareId].def.metadata.displayName
@@ -160,14 +204,13 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
             : 'unknown module'
         const moduleSlotInfo = modSlot ?? 'unknown slot'
         const adapterSlotInfo = adapterSlot ?? 'unknown adapter'
-
         return labwareOnAdapter == null && isAdapter
           ? [
               ...acc,
               {
                 name:
                   modIdWithAdapter != null
-                    ? `${moduleSlotInfo} on ${moduleUnderAdapter} with ${adapterDisplayName}`
+                    ? `${moduleUnderAdapter} on ${moduleSlotInfo} with ${adapterDisplayName}`
                     : `${adapterSlotInfo} with ${adapterDisplayName}`,
                 value: labwareId,
               },
@@ -180,16 +223,23 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
     const unoccupiedModuleOptions = Object.entries(modules).reduce<Option[]>(
       (acc, [modId, modOnDeck]) => {
         const moduleHasLabware = Object.entries(labware).some(
-          ([lwId, lwOnDeck]) => lwOnDeck.slot === modId
+          ([_, lwOnDeck]) => lwOnDeck.stack[0] === modId
         )
+        const type = moduleEntities[modId].type
+        const slot = modOnDeck.slot
+        let tcLocations
+        if (type === THERMOCYCLER_MODULE_TYPE) {
+          tcLocations =
+            slot === '7' ? TC_MODULE_LOCATION_OT2 : TC_MODULE_LOCATION_OT3
+        }
         return moduleHasLabware
           ? acc
           : [
               ...acc,
               {
-                name: `${modOnDeck.slot} on ${getModuleDisplayName(
+                name: `${getModuleDisplayName(
                   moduleEntities[modId].model
-                )}`,
+                )} on ${tcLocations != null ? tcLocations : slot}`,
                 value: modId,
               },
             ]
@@ -221,10 +271,9 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
             : ['fixedTrash', '12'].includes(slotId)
         return (
           !slotIdsOccupiedByModules.includes(slotId) &&
-          !Object.values(labware)
-            .map(lw => lw.slot)
-            .includes(slotId) &&
+          !Object.values(labware).some(lw => lw.stack.includes(slotId)) &&
           !isTrashSlot &&
+          !trashCutouts.some(cutout => cutout.includes(slotId)) &&
           !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&
           !notSelectedStagingAreaAddressableAreas.includes(slotId) &&
           !FLEX_MODULE_ADDRESSABLE_AREAS.includes(slotId) &&
@@ -257,17 +306,10 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
 
 export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelineFrame> = createSelector(
   getRobotStateAtActiveItem,
-  getPipetteEntities,
-  getModuleEntities,
+  getInitialDeckSetup,
   getLabwareEntities,
-  getAdditionalEquipmentEntities,
-  (
-    robotState,
-    pipetteEntities,
-    moduleEntities,
-    labwareEntities,
-    additionalEquipmentEntities
-  ) => {
+
+  (robotState, initialDeckSetup, labwareEntities) => {
     if (robotState == null)
       return {
         pipettes: {},
@@ -275,17 +317,9 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
         modules: {},
         additionalEquipmentOnDeck: {},
       }
-
-    const filteredAdditionalEquipment = Object.fromEntries(
-      Object.entries(additionalEquipmentEntities).filter(
-        ([_, entity]) =>
-          entity.name === 'wasteChute' ||
-          entity.name === 'stagingArea' ||
-          entity.name === 'trashBin'
-      )
-    )
+    const { pipettes, modules, additionalEquipmentOnDeck } = initialDeckSetup
     return {
-      pipettes: mapValues(pipetteEntities, (pipEntity, pipId) => ({
+      pipettes: mapValues(pipettes, (pipEntity, pipId) => ({
         ...pipEntity,
         ...robotState.pipettes[pipId],
       })),
@@ -293,12 +327,12 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
         ...lwEntity,
         ...robotState.labware[lwId],
       })),
-      modules: mapValues(moduleEntities, (modEntity, modId) => ({
+      modules: mapValues(modules, (modEntity, modId) => ({
         ...modEntity,
         ...robotState.modules[modId],
       })),
       additionalEquipmentOnDeck: mapValues(
-        filteredAdditionalEquipment,
+        additionalEquipmentOnDeck,
         additionalEquipmentEntity => ({
           ...additionalEquipmentEntity,
         })

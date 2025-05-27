@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -9,7 +10,7 @@ import {
 import {
   ToggleExpandStepFormField,
   ToggleStepFormField,
-} from '../../../../../../molecules'
+} from '../../../../../../components/molecules'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 import type { FormData } from '../../../../../../form-types'

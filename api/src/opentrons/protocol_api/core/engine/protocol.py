@@ -1,4 +1,5 @@
 """ProtocolEngine-based Protocol API core implementation."""
+
 from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
@@ -8,7 +9,9 @@ from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.commands import LoadModuleResult
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    labware_definition_type_adapter,
+)
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data import liquid_classes
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
@@ -48,7 +51,7 @@ from opentrons.protocol_engine.types import (
     ModuleModel as ProtocolEngineModuleModel,
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
-    LabwareLocation,
+    LoadableLabwareLocation,
     NonStackedLocation,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
@@ -109,14 +112,14 @@ class ProtocolCore(
         self._engine_client = engine_client
         self._api_version = api_version
         self._sync_hardware = sync_hardware
-        self._last_location: Optional[Location] = None
+        self._last_location: Optional[Union[Location, TrashBin, WasteChute]] = None
         self._last_mount: Optional[Mount] = None
         self._labware_cores_by_id: Dict[str, LabwareCore] = {}
         self._module_cores_by_id: Dict[
             str, Union[ModuleCore, NonConnectedModuleCore]
         ] = {}
         self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
-        self._defined_liquid_class_defs_by_name: Dict[str, LiquidClassSchemaV1] = {}
+        self._liquid_class_def_cache: Dict[Tuple[str, int], LiquidClassSchemaV1] = {}
         self._load_fixed_trash()
 
     @property
@@ -196,7 +199,7 @@ class ProtocolCore(
     ) -> LabwareLoadParams:
         """Add a labware definition to the set of loadable definitions."""
         uri = self._engine_client.add_labware_definition(
-            LabwareDefinition.model_validate(definition)
+            labware_definition_type_adapter.validate_python(definition)
         )
         return LabwareLoadParams.from_uri(uri)
 
@@ -222,7 +225,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
 
         load_result = self._engine_client.execute_command_without_recovery(
@@ -293,7 +296,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
         load_result = self._engine_client.execute_command_without_recovery(
             cmd.LoadLabwareParams(
@@ -341,7 +344,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
         load_result = self._engine_client.execute_command_without_recovery(
             cmd.LoadLidParams(
@@ -373,34 +376,6 @@ class ProtocolCore(
 
         self._labware_cores_by_id[labware_core.labware_id] = labware_core
         return labware_core
-
-    def load_labware_to_flex_stacker_hopper(
-        self,
-        module_core: Union[ModuleCore, NonConnectedModuleCore],
-        load_name: str,
-        quantity: int,
-        label: Optional[str],
-        namespace: Optional[str],
-        version: Optional[int],
-        lid: Optional[str],
-    ) -> None:
-        """Load one or more labware with or without a lid to the flex stacker hopper."""
-        assert isinstance(module_core, FlexStackerCore)
-        for _ in range(quantity):
-            labware_core = self.load_labware(
-                load_name=load_name,
-                location=module_core,
-                label=label,
-                namespace=namespace,
-                version=version,
-            )
-            if lid is not None:
-                self.load_lid(
-                    load_name=lid,
-                    location=labware_core,
-                    namespace=namespace,
-                    version=version,
-                )
 
     def move_labware(
         self,
@@ -742,6 +717,7 @@ class ProtocolCore(
             module_id=load_module_result.moduleId,
             engine_client=self._engine_client,
             api_version=self.api_version,
+            protocol_core=self,
         )
 
     def _create_module_core(
@@ -774,6 +750,7 @@ class ProtocolCore(
             engine_client=self._engine_client,
             api_version=self.api_version,
             sync_module_hardware=SynchronousAdapter(selected_hardware),
+            protocol_core=self,
         )
 
     def _get_module_core(
@@ -785,6 +762,15 @@ class ProtocolCore(
             return self._create_module_core(
                 load_module_result=load_module_result, model=model
             )
+
+    def add_or_get_labware_core(self, labware_id: str) -> LabwareCore:
+        """Create a LabwareCore and add it to the map or return one if it exists."""
+        if labware_id in self._labware_cores_by_id:
+            return self._labware_cores_by_id[labware_id]
+        else:
+            core = LabwareCore(labware_id, self._engine_client)
+            self._labware_cores_by_id[labware_id] = core
+            return core
 
     def load_robot(self) -> RobotCore:
         """Load a robot core into the RobotContext."""
@@ -906,7 +892,7 @@ class ProtocolCore(
     def get_last_location(
         self,
         mount: Optional[Mount] = None,
-    ) -> Optional[Location]:
+    ) -> Optional[Union[Location, TrashBin, WasteChute]]:
         """Get the last accessed location."""
         if mount is None or mount == self._last_mount:
             return self._last_location
@@ -915,7 +901,7 @@ class ProtocolCore(
 
     def set_last_location(
         self,
-        location: Optional[Location],
+        location: Optional[Union[Location, TrashBin, WasteChute]],
         mount: Optional[Mount] = None,
     ) -> None:
         """Set the last accessed location."""
@@ -949,7 +935,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
 
         load_result = self._engine_client.execute_command_without_recovery(
@@ -1033,9 +1019,9 @@ class ProtocolCore(
             labware_id = self._engine_client.state.labware.get_id_by_module(
                 module_core.module_id
             )
-            return self._labware_cores_by_id[labware_id]
         except LabwareNotLoadedOnModuleError:
             return None
+        return self.add_or_get_labware_core(labware_id)
 
     def get_labware_on_labware(
         self, labware_core: LabwareCore
@@ -1045,9 +1031,9 @@ class ProtocolCore(
             labware_id = self._engine_client.state.labware.get_id_by_labware(
                 labware_core.labware_id
             )
-            return self._labware_cores_by_id[labware_id]
         except LabwareNotLoadedOnLabwareError:
             return None
+        return self.add_or_get_labware_core(labware_id)
 
     def get_slot_center(self, slot_name: Union[DeckSlotName, StagingSlotName]) -> Point:
         """Get the absolute coordinate of a slot's center."""
@@ -1085,20 +1071,22 @@ class ProtocolCore(
             display_color=(liquid.displayColor.root if liquid.displayColor else None),
         )
 
-    def define_liquid_class(self, name: str) -> LiquidClass:
+    def define_liquid_class(self, name: str, version: int = 1) -> LiquidClass:
         """Define a liquid class for use in transfer functions."""
         try:
             # Check if we have already loaded this liquid class' definition
-            liquid_class_def = self._defined_liquid_class_defs_by_name[name]
+            liquid_class_def = self._liquid_class_def_cache[(name, version)]
         except KeyError:
             try:
                 # Fetching the liquid class data from file and parsing it
                 # is an expensive operation and should be avoided.
                 # Calling this often will degrade protocol execution performance.
-                liquid_class_def = liquid_classes.load_definition(name)
-                self._defined_liquid_class_defs_by_name[name] = liquid_class_def
+                liquid_class_def = liquid_classes.load_definition(name, version=version)
+                self._liquid_class_def_cache[(name, version)] = liquid_class_def
             except LiquidClassDefinitionDoesNotExist:
-                raise ValueError(f"Liquid class definition not found for '{name}'.")
+                raise ValueError(
+                    f"Liquid class definition not found for '{name}' version {version}."
+                )
 
         return LiquidClass.create(liquid_class_def)
 
@@ -1135,7 +1123,7 @@ class ProtocolCore(
             WasteChute,
             TrashBin,
         ],
-    ) -> LabwareLocation:
+    ) -> LoadableLabwareLocation:
         if isinstance(location, LabwareCore):
             return OnLabwareLocation(labwareId=location.labware_id)
         else:
@@ -1151,7 +1139,7 @@ class ProtocolCore(
             OffDeckType,
             WasteChute,
             TrashBin,
-        ]
+        ],
     ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
             return ModuleLocation(moduleId=location.module_id)

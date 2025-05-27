@@ -1,14 +1,15 @@
 // functions for downloading and storing release files
 
 import path from 'path'
+import { mkdirp, move, readdir, readFile, rm } from 'fs-extra'
 import tempy from 'tempy'
-import { move, readdir, rm, mkdirp, readFile } from 'fs-extra'
+
 import { fetchToFile } from '../../http'
 import { createLogger } from '../../log'
 
-import type { DownloadProgress } from '../../http'
-import type { ReleaseSetUrls, ReleaseSetFilepaths } from '../types'
 import type { Dirent } from 'fs'
+import type { DownloadProgress } from '../../http'
+import type { ReleaseSetFilepaths, ReleaseSetUrls } from '../types'
 
 const log = createLogger('systemUpdate/from-web/release-files')
 const outPath = (dir: string, url: string): string => {

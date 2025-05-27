@@ -1,24 +1,25 @@
 // jog controls component
 import { useState } from 'react'
 import { css } from 'styled-components'
+
 import {
-  Flex,
-  ALIGN_STRETCH,
   ALIGN_CENTER,
+  ALIGN_STRETCH,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
 
+import {
+  DEFAULT_STEP_SIZES,
+  HORIZONTAL_PLANE,
+  LARGE_STEP_SIZE_MM,
+  MEDIUM_STEP_SIZE_MM,
+  SMALL_STEP_SIZE_MM,
+  VERTICAL_PLANE,
+} from './constants'
 import { DirectionControl, TouchDirectionControl } from './DirectionControl'
 import { StepSizeControl, TouchStepSizeControl } from './StepSizeControl'
-import {
-  HORIZONTAL_PLANE,
-  VERTICAL_PLANE,
-  SMALL_STEP_SIZE_MM,
-  MEDIUM_STEP_SIZE_MM,
-  LARGE_STEP_SIZE_MM,
-  DEFAULT_STEP_SIZES,
-} from './constants'
 
 import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'

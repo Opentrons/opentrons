@@ -1,11 +1,14 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { fixture12Trough, fixtureTiprack1000ul } from '@opentrons/shared-data'
-import { addAndSelectStep } from '../thunks'
+
+import * as fileDataSelectors from '../../../../file-data/selectors'
+import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
+import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 import { addHint } from '../../../../tutorial/actions'
-import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
-import * as fileDataSelectors from '../../../../file-data/selectors'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
+import { addAndSelectStep } from '../thunks'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StepType } from '../../../../form-types'
 
@@ -62,6 +65,7 @@ describe('addAndSelectStep', () => {
           slot: 'B2',
           model: 'thermocyclerModuleV1',
           moduleState: {} as any,
+          pythonName: 'mockPythonName',
         },
       },
       labware: {},
@@ -106,6 +110,7 @@ describe('addAndSelectStep', () => {
           slot: '1',
           model: 'magneticModuleV1',
           moduleState: {} as any,
+          pythonName: 'mockPythonName',
         },
       },
       labware: {},
@@ -150,6 +155,7 @@ describe('addAndSelectStep', () => {
           slot: 'B2',
           model: 'temperatureModuleV1',
           moduleState: {} as any,
+          pythonName: 'mockPythonName',
         },
       },
       labware: {},
@@ -194,6 +200,7 @@ describe('addAndSelectStep', () => {
           slot: 'B2',
           model: 'heaterShakerModuleV1',
           moduleState: {} as any,
+          pythonName: 'mockPythonName',
         },
         modId2: {
           type: 'heaterShakerModuleType',
@@ -201,6 +208,7 @@ describe('addAndSelectStep', () => {
           slot: 'A1',
           model: 'heaterShakerModuleV1',
           moduleState: {} as any,
+          pythonName: 'mockPythonName',
         },
       },
       labware: {},
@@ -235,13 +243,15 @@ describe('addAndSelectStep', () => {
           id: 'labware',
           def: fixture12Trough as LabwareDefinition2,
           labwareDefURI: 'mockDefUri',
-          slot: 'A1',
+          stack: ['labware', 'A1'],
+          pythonName: 'mockPythonName',
         },
         labware2: {
           id: 'labware2',
           def: fixtureTiprack1000ul as LabwareDefinition2,
           labwareDefURI: 'mockDefUri',
-          slot: 'B1',
+          stack: ['labware2', 'B1'],
+          pythonName: 'mockPythonName',
         },
       },
       pipettes: {},
@@ -284,13 +294,15 @@ describe('addAndSelectStep', () => {
           id: 'labware',
           def: fixture12Trough as LabwareDefinition2,
           labwareDefURI: 'mockDefUri',
-          slot: 'A1',
+          stack: ['labware', 'A1'],
+          pythonName: 'mockPythonName',
         },
         labware2: {
           id: 'labware2',
           def: fixture12Trough as LabwareDefinition2,
           labwareDefURI: 'mockDefUri',
-          slot: 'B1',
+          stack: ['labware2', 'B1'],
+          pythonName: 'mockPythonName',
         },
       },
       pipettes: {},
@@ -324,7 +336,8 @@ describe('addAndSelectStep', () => {
           id: 'labware2',
           def: fixtureTiprack1000ul as LabwareDefinition2,
           labwareDefURI: 'mockDefUri',
-          slot: 'B1',
+          stack: ['labware2', 'B1'],
+          pythonName: 'mockPythonName',
         },
       },
       pipettes: {},

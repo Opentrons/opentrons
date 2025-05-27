@@ -1,75 +1,78 @@
-import { COLUMN, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
+  absorbanceReaderCollision,
+  formatPyStr,
+  formatPyWellLocation,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getIsSafePipetteMovement,
+  getLabwareSlot,
+  getSlotInLocationStack,
+  indentPyLines,
   modulePipetteCollision,
-  thermocyclerPipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getLabwareSlot,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  thermocyclerPipetteCollision,
   uuid,
-  getIsSafePipetteMovement,
 } from '../../utils'
-import { COLUMN_4_SLOTS } from '../../constants'
+
 import type {
   CreateCommand,
+  DispenseParams,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
-import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
+import type { Point } from '../../utils'
 
-export interface ExtendedDispenseParams extends DispenseParams {
-  xOffset: number
-  yOffset: number
-  tipRack: string
+export interface DispenseAtomicCommandParams extends DispenseParams {
   nozzles: NozzleConfigurationStyle | null
+  tipRack: string
+  isAirGap?: boolean
 }
 /** Dispense with given args. Requires tip. */
-export const dispense: CommandCreator<ExtendedDispenseParams> = (
+export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
   const {
-    pipette,
+    pipetteId,
     volume,
-    labware,
-    well,
-    offsetFromBottomMm,
+    labwareId,
+    wellName,
     flowRate,
     isAirGap,
-    xOffset,
-    yOffset,
+    wellLocation,
     nozzles,
+    tipRack,
+    pushOut,
   } = args
   const actionName = 'dispense'
   const labwareState = prevRobotState.labware
   const errors: CommandCreatorError[] = []
-  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
-  const slotName = getLabwareSlot(
-    labware,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(labwareId, prevRobotState.labware)
 
   if (!pipetteSpec) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
-        pipette,
+        pipette: pipetteId,
       })
     )
   }
 
   if (
     modulePipetteCollision({
-      pipette,
-      labware,
+      pipette: pipetteId,
+      labware: labwareId,
       invariantContext,
       prevRobotState,
     })
@@ -77,32 +80,35 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
     errors.push(errorCreators.modulePipetteCollisionDanger())
   }
 
-  if (!prevRobotState.tipState.pipettes[pipette]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]) {
     errors.push(
       errorCreators.noTipOnPipette({
         actionName,
-        pipette,
-        labware,
-        well,
+        pipette: pipetteId,
+        labware: labwareId,
+        well: wellName,
       })
     )
   }
 
-  if (!labware || !prevRobotState.labware[labware]) {
+  if (!labwareId || !prevRobotState.labware[labwareId]) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
-        labware,
+        labware: labwareId,
       })
     )
-  } else if (prevRobotState.labware[labware]?.slot === 'offDeck') {
+  } else if (
+    getSlotInLocationStack(prevRobotState.labware[labwareId].stack) ===
+    'offDeck'
+  ) {
     errors.push(errorCreators.labwareOffDeck())
   }
 
   if (COLUMN_4_SLOTS.includes(slotName)) {
     errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
   } else if (labwareState[slotName] != null) {
-    const adapterSlot = labwareState[slotName].slot
+    const adapterSlot = getSlotInLocationStack(labwareState[slotName].stack)
     if (COLUMN_4_SLOTS.includes(adapterSlot)) {
       errors.push(
         errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })
@@ -110,20 +116,21 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
     }
   }
 
-  const is96Channel =
-    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
 
   if (
-    is96Channel &&
-    nozzles === COLUMN &&
+    isMultiChannelPipette &&
+    nozzles !== ALL &&
     !getIsSafePipetteMovement(
+      nozzles,
       prevRobotState,
       invariantContext,
-      args.pipette,
-      args.labware,
-      args.tipRack,
-      { x: xOffset, y: yOffset, z: offsetFromBottomMm },
-      args.well
+      pipetteId,
+      labwareId,
+      tipRack,
+      (wellLocation?.offset as Point) ?? { x: 0, y: 0, z: 0 },
+      wellName
     )
   ) {
     errors.push(errorCreators.possiblePipetteCollision())
@@ -133,17 +140,27 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
     thermocyclerPipetteCollision(
       prevRobotState.modules,
       prevRobotState.labware,
-      labware
+      labwareId
     )
   ) {
     errors.push(errorCreators.thermocyclerLidClosed())
   }
 
   if (
+    absorbanceReaderCollision(
+      prevRobotState.modules,
+      prevRobotState.labware,
+      labwareId
+    )
+  ) {
+    errors.push(errorCreators.absorbanceReaderLidClosed())
+  }
+
+  if (
     pipetteIntoHeaterShakerLatchOpen(
       prevRobotState.modules,
       prevRobotState.labware,
-      labware
+      labwareId
     )
   ) {
     errors.push(errorCreators.heaterShakerLatchOpen())
@@ -153,7 +170,7 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
     pipetteIntoHeaterShakerWhileShaking(
       prevRobotState.modules,
       prevRobotState.labware,
-      labware
+      labwareId
     )
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
@@ -188,7 +205,7 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
         prevRobotState.modules,
         slotName,
         pipetteSpec,
-        invariantContext.labwareEntities[labware]
+        invariantContext.labwareEntities[labwareId]
       )
     ) {
       errors.push(
@@ -207,26 +224,39 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
       commandType: 'dispense',
       key: uuid(),
       params: {
-        pipetteId: pipette,
+        pipetteId,
         volume,
-        labwareId: labware,
-        wellName: well,
-        wellLocation: {
-          origin: 'bottom',
-          offset: {
-            z: offsetFromBottomMm,
-            x: xOffset,
-            y: yOffset,
-          },
-        },
+        labwareId,
+        wellName,
+        wellLocation,
         flowRate,
-        //  pushOut will always be undefined in step-generation for now
-        //  since there is no easy way to allow users to  for it in PD
+        ...(pushOut != null ? { pushOut } : {}),
       },
       ...(isAirGap && { meta: { isAirGap } }),
     },
   ]
+
+  const pipettePythonName =
+    invariantContext.pipetteEntities[pipetteId].pythonName
+  const labwarePythonName =
+    invariantContext.labwareEntities[labwareId].pythonName
+  const pythonArgs = [
+    `volume=${volume}`,
+    `location=${labwarePythonName}[${formatPyStr(
+      wellName
+    )}]${formatPyWellLocation(wellLocation)}`,
+    `flow_rate=${flowRate}`,
+    // only pass push_out if it is not null
+    ...(pushOut != null ? [`push_out=${pushOut}`] : []),
+    // PAPI has no way to indicate that we're dispensing air, so we don't do anything
+    // with the isAirGap parameter.
+  ]
+  const python = `${pipettePythonName}.dispense(\n${indentPyLines(
+    pythonArgs.join(',\n')
+  )},\n)`
+
   return {
     commands,
+    python,
   }
 }

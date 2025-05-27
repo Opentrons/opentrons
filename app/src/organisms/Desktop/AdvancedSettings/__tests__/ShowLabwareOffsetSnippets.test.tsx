@@ -1,11 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   updateConfigValue,
 } from '/app/redux/config'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import { ShowLabwareOffsetSnippets } from '../ShowLabwareOffsetSnippets'
 
 vi.mock('/app/redux/config')
@@ -27,7 +29,7 @@ describe('ShowLabwareOffsetSnippets', () => {
     render()
     screen.getByText('Show Labware Offset data code snippets')
     screen.getByText(
-      'Only for users who need to apply labware offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.'
+      'Only for users who need to apply labware offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup after configuring all required offsets.'
     )
     screen.getByRole('switch', { name: 'show_link_to_get_labware_offset_data' })
   })

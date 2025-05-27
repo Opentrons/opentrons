@@ -1,12 +1,13 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { i18n } from '/app/i18n'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { useChainLiveCommands, useRunStatuses } from '/app/resources/runs'
 import { mockThermocyclerGen2 } from '/app/redux/modules/__fixtures__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useRunStatuses } from '/app/resources/runs'
 
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 
@@ -98,7 +99,6 @@ const ROBOT_NAME = 'mockRobot'
 
 describe('ModuleCalibrationOverflowMenu', () => {
   let props: ComponentProps<typeof ModuleCalibrationOverflowMenu>
-  let mockChainLiveCommands = vi.fn()
 
   beforeEach(() => {
     props = {
@@ -108,8 +108,6 @@ describe('ModuleCalibrationOverflowMenu', () => {
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
       robotName: ROBOT_NAME,
     }
-    mockChainLiveCommands = vi.fn()
-    mockChainLiveCommands.mockResolvedValue(null)
     vi.mocked(ModuleWizardFlows).mockReturnValue(<div>module wizard flows</div>)
     vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
@@ -117,9 +115,6 @@ describe('ModuleCalibrationOverflowMenu', () => {
       isRunIdle: false,
       isRunTerminal: false,
     })
-    vi.mocked(useChainLiveCommands).mockReturnValue({
-      chainLiveCommands: mockChainLiveCommands,
-    } as any)
     when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
   })
 
@@ -163,37 +158,6 @@ describe('ModuleCalibrationOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
     fireEvent.click(screen.getByText('Calibrate module'))
-    await waitFor(() => {
-      expect(mockChainLiveCommands).toHaveBeenCalledWith(
-        [
-          {
-            commandType: 'heaterShaker/closeLabwareLatch',
-            params: {
-              moduleId: mockMovingHeaterShaker.id,
-            },
-          },
-          {
-            commandType: 'heaterShaker/deactivateHeater',
-            params: {
-              moduleId: mockMovingHeaterShaker.id,
-            },
-          },
-          {
-            commandType: 'heaterShaker/deactivateShaker',
-            params: {
-              moduleId: mockMovingHeaterShaker.id,
-            },
-          },
-          {
-            commandType: 'heaterShaker/openLabwareLatch',
-            params: {
-              moduleId: mockMovingHeaterShaker.id,
-            },
-          },
-        ],
-        false
-      )
-    })
     screen.getByText('module wizard flows')
   })
 
@@ -205,19 +169,6 @@ describe('ModuleCalibrationOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
     fireEvent.click(screen.getByText('Calibrate module'))
-    await waitFor(() => {
-      expect(mockChainLiveCommands).toHaveBeenCalledWith(
-        [
-          {
-            commandType: 'temperatureModule/deactivate',
-            params: {
-              moduleId: mockTemperatureModuleHeating.id,
-            },
-          },
-        ],
-        false
-      )
-    })
     screen.getByText('module wizard flows')
   })
 
@@ -229,31 +180,6 @@ describe('ModuleCalibrationOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
     fireEvent.click(screen.getByText('Calibrate module'))
-    await waitFor(() => {
-      expect(mockChainLiveCommands).toHaveBeenCalledWith(
-        [
-          {
-            commandType: 'thermocycler/deactivateLid',
-            params: {
-              moduleId: mockTCHeating.id,
-            },
-          },
-          {
-            commandType: 'thermocycler/deactivateBlock',
-            params: {
-              moduleId: mockTCHeating.id,
-            },
-          },
-          {
-            commandType: 'thermocycler/openLid',
-            params: {
-              moduleId: mockTCHeating.id,
-            },
-          },
-        ],
-        false
-      )
-    })
     screen.getByText('module wizard flows')
   })
 

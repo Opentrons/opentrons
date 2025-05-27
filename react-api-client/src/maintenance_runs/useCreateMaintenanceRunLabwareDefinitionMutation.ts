@@ -1,23 +1,23 @@
 import { useMutation, useQueryClient } from 'react-query'
+
 import { createMaintenanceRunLabwareDefinition } from '@opentrons/api-client'
+
 import { useHost } from '../api'
+
 import type {
-  UseMutationResult,
-  UseMutationOptions,
   UseMutateAsyncFunction,
+  UseMutationOptions,
+  UseMutationResult,
 } from 'react-query'
 import type {
-  LabwareDefinitionSummary,
   HostConfig,
+  LabwareDefinitionSummary,
 } from '@opentrons/api-client'
-import type {
-  LabwareDefinition2,
-  LabwareDefinition3,
-} from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 interface CreateMaintenanceRunLabwareDefinitionMutateParams {
   maintenanceRunId: string
-  labwareDef: LabwareDefinition2 | LabwareDefinition3
+  labwareDef: LabwareDefinition
 }
 
 export type UseCreateLabwareDefinitionMutationResult = UseMutationResult<

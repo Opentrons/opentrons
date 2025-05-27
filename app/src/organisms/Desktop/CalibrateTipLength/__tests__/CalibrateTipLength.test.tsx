@@ -1,18 +1,19 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { renderWithProviders } from '/app/__testing-utils__'
 import { getDeckDefinitions } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import {
+  CalibrationError,
+  useCalibrationError,
+} from '/app/organisms/Desktop/CalibrationError'
 import * as Sessions from '/app/redux/sessions'
 import { mockTipLengthCalibrationSessionAttributes } from '/app/redux/sessions/__fixtures__'
+
 import { CalibrateTipLength } from '../index'
-import {
-  useCalibrationError,
-  CalibrationError,
-} from '/app/organisms/Desktop/CalibrationError'
 
 import type { ComponentProps, ComponentType } from 'react'
 import type { TipLengthCalibrationStep } from '/app/redux/sessions/types'

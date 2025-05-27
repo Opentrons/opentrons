@@ -1,7 +1,8 @@
-import { useState, Fragment } from 'react'
-import { useTranslation } from 'react-i18next'
-import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
+import { Fragment, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
+import NiceModal from '@ebay/nice-modal-react'
+
 import {
   Box,
   COLORS,
@@ -9,42 +10,41 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import NiceModal from '@ebay/nice-modal-react'
 
 import { LocalizationProvider } from '/app/LocalizationProvider'
 import { Alerts } from '/app/organisms/Desktop/Alerts'
 import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { SystemLanguagePreferenceModal } from '/app/organisms/Desktop/SystemLanguagePreferenceModal'
+import {
+  EmergencyStopContext,
+  EstopTakeover,
+} from '/app/organisms/EmergencyStop'
+import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ToasterOven } from '/app/organisms/ToasterOven'
+import { AppSettings } from '/app/pages/Desktop/AppSettings'
 import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
 import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
 import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
-import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
-import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
-import { AppSettings } from '/app/pages/Desktop/AppSettings'
 import { Labware } from '/app/pages/Desktop/Labware'
-import { useSoftwareUpdatePoll } from './hooks'
-import { Navbar } from './Navbar'
-import {
-  EstopTakeover,
-  EmergencyStopContext,
-} from '/app/organisms/EmergencyStop'
-import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
+import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
+import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
+import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
-import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
-import { PortalRoot as ModalPortalRoot } from './portal'
-import { DesktopAppFallback } from './DesktopAppFallback'
-import { ReactQueryDevtools } from './tools'
+
 import { useFeatureFlag } from '../redux/config'
+import { DesktopAppFallback } from './DesktopAppFallback'
+import { useSoftwareUpdatePoll } from './hooks'
+import { Navbar } from './Navbar'
+import { PortalRoot as ModalPortalRoot } from './portal'
+import { ReactQueryDevtools } from './tools'
 
 import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
-  const { t } = useTranslation('top_navigation')
   useSoftwareUpdatePoll()
   const [
     isEmergencyStopModalDismissed,
@@ -70,55 +70,55 @@ export const DesktopApp = (): JSX.Element => {
   const desktopRoutes: RouteProps[] = [
     {
       Component: ProtocolsLanding,
-      name: t('protocols'),
+      name: 'protocols',
       navLinkTo: '/protocols',
       path: '/protocols',
     },
     {
       Component: ProtocolDetails,
-      name: t('protocol_details'),
+      name: 'Protocol Details',
       path: '/protocols/:protocolKey',
     },
     {
       Component: ProtocolTimeline,
-      name: t('protocol_timeline'),
+      name: 'Protocol Timeline',
       path: '/protocols/:protocolKey/timeline',
     },
     {
       Component: Labware,
-      name: t('labware'),
+      name: 'labware',
       navLinkTo: '/labware',
       path: '/labware',
     },
     {
       Component: DevicesLanding,
-      name: t('devices'),
+      name: 'devices',
       navLinkTo: '/devices',
       path: '/devices',
     },
     {
       Component: DeviceDetails,
-      name: t('device'),
+      name: 'Device',
       path: '/devices/:robotName',
     },
     {
       Component: RobotSettings,
-      name: t('robot_settings'),
+      name: 'Robot Settings',
       path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
     },
     {
       Component: CalibrationDashboard,
-      name: t('calibration_dashboard'),
+      name: 'Calibration Dashboard',
       path: '/devices/:robotName/robot-settings/calibration/dashboard',
     },
     {
       Component: ProtocolRunDetails,
-      name: t('run_details'),
+      name: 'Run Details',
       path: '/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?',
     },
     {
       Component: AppSettings,
-      name: t('app_settings'),
+      name: 'App Settings',
       path: '/app-settings/:appSettingsTab?',
     },
   ]

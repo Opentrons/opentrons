@@ -1,30 +1,30 @@
-import * as Fixtures from '/app/redux/networking/__fixtures__'
-import { describe, it, expect } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useTranslation } from 'react-i18next'
+import { screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
-import {
-  SECURITY_WPA_EAP,
-  SECURITY_WPA_PSK,
-  SECURITY_NONE,
-} from '/app/redux/networking'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import {
+  SECURITY_NONE,
+  SECURITY_WPA_EAP,
+  SECURITY_WPA_PSK,
+} from '/app/redux/networking'
+import * as Fixtures from '/app/redux/networking/__fixtures__'
 
 import {
+  connectFormToConfigureRequest,
   getConnectFormFields,
   validateConnectFormFields,
-  connectFormToConfigureRequest,
 } from '../form-fields'
 
+import type { ComponentProps } from 'react'
 import type { FieldError } from 'react-hook-form'
 import type {
-  WifiNetwork,
-  WifiKey,
-  EapOption,
   ConnectFormValues,
+  EapOption,
+  WifiKey,
+  WifiNetwork,
 } from '../../types'
-import type { ComponentProps } from 'react'
 
 const TestWrapperConnectFormFields = ({
   network,

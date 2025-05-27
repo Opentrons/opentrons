@@ -1,9 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
-import { Box, SPACING, getFootprintDiagram } from '@opentrons/components'
-import { LabeledValue } from './StyledComponents/LabeledValue'
+
+import { Box, getFootprintDiagram, SPACING } from '@opentrons/components'
+import { getSchema2Dimensions } from '@opentrons/shared-data'
+
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
-import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
+import { LabeledValue } from './StyledComponents/LabeledValue'
+
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
@@ -17,7 +21,9 @@ export function Dimensions(props: DimensionsProps): JSX.Element {
   const { t } = useTranslation('labware_details')
   const { definition, irregular, insertCategory } = props
   const { displayCategory } = definition.metadata
-  const { xDimension, yDimension, zDimension } = definition.dimensions
+  const { xDimension, yDimension, zDimension } = getSchema2Dimensions(
+    definition
+  )
   const dimensions = [
     { label: t('length'), value: toFixed(xDimension) },
     { label: t('width'), value: toFixed(yDimension) },
@@ -27,8 +33,8 @@ export function Dimensions(props: DimensionsProps): JSX.Element {
   const diagram = getFootprintDiagram({
     category: displayCategory,
     guideType: 'footprint',
-    insertCategory: insertCategory,
-    irregular: irregular,
+    insertCategory,
+    irregular,
   })?.map((src, index) => <img width="250px" src={src} key={index} />)
 
   return (

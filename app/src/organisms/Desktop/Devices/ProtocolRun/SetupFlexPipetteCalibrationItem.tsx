@@ -1,25 +1,29 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
   ALIGN_CENTER,
   DIRECTION_ROW,
-  SPACING,
+  Flex,
   JUSTIFY_FLEX_END,
+  SPACING,
   WRAP,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   getPipetteNameSpecs,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+
 import { TertiaryButton } from '/app/atoms/buttons'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+
 import { SetupCalibrationItem } from './SetupCalibrationItem'
+
 import type { PipetteData } from '@opentrons/api-client'
 import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data'
 import type { Mount } from '/app/redux/pipettes/types'

@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
-import last from 'lodash/last'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -16,52 +16,48 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
-  LegacyStyledText,
-  truncateString,
   Tabs,
+  truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
   useHost,
-  useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
+
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { useScrollPosition } from '/app/local-resources/dom-utils'
+import { SmallModalChildren } from '/app/molecules/OddModal'
 import {
-  ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
+  ProtocolDetailsHeaderChipSkeleton,
   ProtocolDetailsSectionContentSkeleton,
 } from '/app/organisms/ODD/ProtocolDetails'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
-import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
-import {
-  getApplyHistoricOffsets,
-  getPinnedQuickTransferIds,
-  updateConfigValue,
-} from '/app/redux/config'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import {
   ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
   ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
 } from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { getPinnedQuickTransferIds, updateConfigValue } from '/app/redux/config'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
+
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
-import { formatTimeWithUtcLabel } from '/app/resources/runs'
-import { useScrollPosition } from '/app/local-resources/dom-utils'
 
 import type { Protocol } from '@opentrons/api-client'
-import type { Dispatch } from '/app/redux/types'
 import type { OnDeviceRouteParams } from '/app/App/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface QuickTransferHeaderProps {
   title?: string | null
@@ -180,10 +176,10 @@ const QuickTransferHeader = ({
 }
 
 const transferSectionTabOptions = [
-  'Summary',
-  'Hardware',
-  'Labware',
-  'Deck',
+  'summary',
+  'hardware',
+  'labware',
+  'deck',
 ] as const
 
 type TabOption = typeof transferSectionTabOptions[number]
@@ -197,13 +193,14 @@ const TransferSectionTabs = ({
   currentOption,
   setCurrentOption,
 }: TransferSectionTabsProps): JSX.Element => {
+  const { t, i18n } = useTranslation('protocol_details')
   const options = transferSectionTabOptions
 
   return (
     <Flex gridGap={SPACING.spacing8}>
       <Tabs
         tabs={options.map(option => ({
-          text: option,
+          text: i18n.format(t(option), 'capitalize'),
           onClick: () => {
             setCurrentOption(option)
           },
@@ -263,7 +260,7 @@ const TransferSectionContent = ({
 
   let protocolSection: JSX.Element | null = null
   switch (currentOption) {
-    case 'Summary':
+    case 'summary':
       protocolSection = (
         <Summary
           date={transferData.data.createdAt ?? null}
@@ -271,20 +268,20 @@ const TransferSectionContent = ({
         />
       )
       break
-    case 'Hardware':
+    case 'hardware':
       protocolSection = <Hardware transferId={transferId} />
       break
-    case 'Labware':
+    case 'labware':
       protocolSection = <Labware transferId={transferId} />
       break
-    case 'Deck':
+    case 'deck':
       protocolSection = <Deck transferId={transferId} />
       break
   }
   return (
     <Flex
       paddingTop={SPACING.spacing32}
-      justifyContent={currentOption === 'Deck' ? JUSTIFY_CENTER : undefined}
+      justifyContent={currentOption === 'deck' ? JUSTIFY_CENTER : undefined}
     >
       {protocolSection}
     </Flex>
@@ -327,27 +324,6 @@ export function QuickTransferDetails(): JSX.Element | null {
   let pinnedTransferIds = useSelector(getPinnedQuickTransferIds) ?? []
   const pinned = pinnedTransferIds.includes(transferId)
 
-  const {
-    data: mostRecentAnalysis,
-  } = useProtocolAnalysisAsDocumentQuery(
-    transferId,
-    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolRecord != null }
-  )
-
-  const shouldApplyOffsets = useSelector(getApplyHistoricOffsets)
-  // I'd love to skip scraping altogether if we aren't applying
-  // conditional offsets, but React won't let us use hooks conditionally.
-  // So, we'll scrape regardless and just toss them if we don't need them.
-  const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(
-    mostRecentAnalysis ?? null
-  ).map(({ vector, location, definitionUri }) => ({
-    vector,
-    location,
-    definitionUri,
-  }))
-  const labwareOffsets = shouldApplyOffsets ? scrapedLabwareOffsets : []
-
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
       queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
@@ -373,7 +349,7 @@ export function QuickTransferDetails(): JSX.Element | null {
     )
   }
   const handleRunTransfer = (): void => {
-    createRun({ protocolId: transferId, labwareOffsets })
+    createRun({ protocolId: transferId })
   }
   const [
     showConfirmDeleteTransfer,

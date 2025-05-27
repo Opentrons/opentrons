@@ -1,11 +1,12 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { InputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+
 import { Mix } from '../../QuickTransferAdvancedSettings/Mix'
 
 import type { ComponentProps } from 'react'
@@ -132,7 +133,7 @@ describe('Mix', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Mix volume (µL)',
-        error: 'Value must be between 1-200',
+        error: 'Value must be between 1 to 200',
         readOnly: true,
         type: 'number',
         value: 0,
@@ -158,7 +159,7 @@ describe('Mix', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Mix repetitions',
-        error: 'Value must be between 1-999',
+        error: 'Value must be between 1 to 999',
         readOnly: true,
         type: 'number',
         value: 0,

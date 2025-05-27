@@ -1,18 +1,20 @@
 import isEqual from 'lodash/isEqual'
-import {
-  getArgsAndErrorsByStepId,
-  getOrderedStepIds,
-  getInvariantContext,
-} from '../step-forms/selectors'
-import { getInitialRobotState } from '../file-data/selectors'
+
 import {
   computeRobotStateTimelineRequest,
   computeRobotStateTimelineSuccess,
 } from '../file-data/actions'
+import { getInitialRobotState } from '../file-data/selectors'
+import {
+  getArgsAndErrorsByStepId,
+  getInvariantContext,
+  getOrderedStepIds,
+} from '../step-forms/selectors'
 import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
-import type { ComputeRobotStateTimelineSuccessAction } from '../file-data/actions'
+
 import type { Middleware } from 'redux'
-import type { BaseState } from '../types'
+import type { ComputeRobotStateTimelineSuccessAction } from '../file-data/actions'
+import type { Action, BaseState } from '../types'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 import type { SubstepsArgsNoTimeline, WorkerResponse } from './types'
 
@@ -51,7 +53,10 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
   let prevSubstepsArgs: SubstepsArgsNoTimeline | null = null
   let prevSuccessAction: ComputeRobotStateTimelineSuccessAction | null = null
 
-  const timelineNeedsRecompute = (state: BaseState): boolean => {
+  const timelineNeedsRecompute = (
+    state: BaseState,
+    actionType: string
+  ): boolean => {
     const nextSelectorResults = getTimelineArgs(state)
 
     if (prevTimelineArgs === null) {
@@ -63,10 +68,13 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
     const needsRecompute = hasChanged(nextSelectorResults, prevTimelineArgs)
     // update memoized values
     prevTimelineArgs = nextSelectorResults
-    return needsRecompute
+    return needsRecompute || actionType === 'LOAD_FILE'
   }
 
-  const substepsNeedsRecompute = (state: BaseState): boolean => {
+  const substepsNeedsRecompute = (
+    state: BaseState,
+    actionType: string
+  ): boolean => {
     if (prevSubstepsArgs === null) {
       // initial call, must populate memoized value
       prevSubstepsArgs = getSubstepsArgs(state)
@@ -80,18 +88,20 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
     )
     prevSubstepsArgs = nextSubstepSelectorResults // update memoized value
 
-    return needsRecompute
+    return needsRecompute || actionType === 'LOAD_FILE'
   }
 
-  return ({ getState, dispatch }) => next => action => {
+  return ({ getState, dispatch }) => next => (action: Action) => {
     // call the next dispatch method in the middleware chain
     const returnValue = next(action)
     const nextState = getState()
     const shouldRecomputeTimeline = timelineNeedsRecompute(
-      nextState as BaseState
+      nextState as BaseState,
+      action.type
     )
     const shouldRecomputeSubsteps = substepsNeedsRecompute(
-      nextState as BaseState
+      nextState as BaseState,
+      action.type
     )
 
     // TODO: how to stop re-assigning this event handler every middleware call? We need

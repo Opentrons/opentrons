@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   FLEX_ROBOT_TYPE,
@@ -10,12 +10,13 @@ import {
 
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
+import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
-import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/config')
 vi.mock('../../Desktop/Devices/hooks')
@@ -32,9 +33,11 @@ const render = (props: ComponentProps<typeof CheckItem>) => {
 describe('CheckItem', () => {
   let props: ComponentProps<typeof CheckItem>
   let mockChainRunCommands: Mock
+  let mockApplyMostRecentWorkingOffset: Mock
 
   beforeEach(() => {
     mockChainRunCommands = vi.fn().mockImplementation(() => Promise.resolve([]))
+    mockApplyMostRecentWorkingOffset = vi.fn()
     props = {
       section: SECTIONS.CHECK_LABWARE,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
@@ -52,6 +55,8 @@ describe('CheckItem', () => {
       isRobotMoving: false,
       robotType: FLEX_ROBOT_TYPE,
       shouldUseMetalProbe: false,
+      calculateAndApplyOffset: mockApplyMostRecentWorkingOffset,
+      isApplyingOffsets: false,
     }
   })
   afterEach(() => {
@@ -430,6 +435,7 @@ describe('CheckItem', () => {
       location: { slotName: 'D1' },
       position: mockEndPosition,
     })
+    expect(mockApplyMostRecentWorkingOffset).toHaveBeenCalled()
   })
 
   it('executes heater shaker open latch command on component mount if step is on HS', async () => {
@@ -613,6 +619,8 @@ describe('CheckItem', () => {
       location: { slotName: 'D1', moduleModel: HEATERSHAKER_MODULE_V1 },
       position: mockEndPosition,
     })
+
+    expect(mockApplyMostRecentWorkingOffset).toHaveBeenCalled()
   })
 
   it('executes thermocycler open lid command on mount if checking labware on thermocycler', () => {

@@ -1,19 +1,22 @@
-import { createProtocolAnalysis } from '@opentrons/api-client'
 import { useMutation, useQueryClient } from 'react-query'
+
+import { createProtocolAnalysis } from '@opentrons/api-client'
+
 import { useHost } from '../api'
+
+import type { AxiosError } from 'axios'
+import type {
+  UseMutateFunction,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
 import type {
   ErrorResponse,
   HostConfig,
+  ProtocolAnalysisSummaryResult,
   RunTimeParameterFilesCreateData,
   RunTimeParameterValuesCreateData,
 } from '@opentrons/api-client'
-import type { ProtocolAnalysisSummary } from '@opentrons/shared-data'
-import type { AxiosError } from 'axios'
-import type {
-  UseMutationResult,
-  UseMutationOptions,
-  UseMutateFunction,
-} from 'react-query'
 
 export interface CreateProtocolAnalysisVariables {
   protocolKey: string
@@ -22,19 +25,19 @@ export interface CreateProtocolAnalysisVariables {
   forceReAnalyze?: boolean
 }
 export type UseCreateProtocolMutationResult = UseMutationResult<
-  ProtocolAnalysisSummary[],
+  ProtocolAnalysisSummaryResult,
   AxiosError<ErrorResponse>,
   CreateProtocolAnalysisVariables
 > & {
   createProtocolAnalysis: UseMutateFunction<
-    ProtocolAnalysisSummary[],
+    ProtocolAnalysisSummaryResult,
     AxiosError<ErrorResponse>,
     CreateProtocolAnalysisVariables
   >
 }
 
 export type UseCreateProtocolAnalysisMutationOptions = UseMutationOptions<
-  ProtocolAnalysisSummary[],
+  ProtocolAnalysisSummaryResult,
   AxiosError<ErrorResponse>,
   CreateProtocolAnalysisVariables
 >
@@ -50,7 +53,7 @@ export function useCreateProtocolAnalysisMutation(
   const queryClient = useQueryClient()
 
   const mutation = useMutation<
-    ProtocolAnalysisSummary[],
+    ProtocolAnalysisSummaryResult,
     AxiosError<ErrorResponse>,
     CreateProtocolAnalysisVariables
   >(

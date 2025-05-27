@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect'
+
 import { getFlagsFromQueryParams } from './utils'
+
 import type { BaseState, Selector } from '../types'
 import type { Flags } from './types'
 
@@ -25,10 +27,6 @@ export const getAllowAllTipracks: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
 )
-export const getEnableAbsorbanceReader: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_ABSORBANCE_READER ?? false
-)
 export const getEnableComment: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_COMMENT ?? false
@@ -48,4 +46,24 @@ export const getEnableReactScan: Selector<boolean> = createSelector(
 export const getEnableLiquidClasses: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_LIQUID_CLASSES ?? false
+)
+export const getEnableMutlipleTempsOT2: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_MULTIPLE_TEMPS_OT2 ?? false
+)
+export const getEnableTimelineScrubber: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_TIMELINE_SCRUBBER ?? false
+)
+export const getEnablePythonExport: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_PYTHON_EXPORT ?? false
+)
+export const getEnablePartialTipSupport: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_PARTIAL_TIP_SUPPORT ?? false
+)
+export const getEnableStacking: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_STACKING ?? false
 )

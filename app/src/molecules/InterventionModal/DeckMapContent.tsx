@@ -1,22 +1,27 @@
 import { useEffect } from 'react'
 import { css } from 'styled-components'
+
 import {
-  Box,
   BaseDeck,
-  RobotCoordsForeignDiv,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   JUSTIFY_FLEX_END,
+  RobotCoordsForeignDiv,
   useDeckLocationSelect,
 } from '@opentrons/components'
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
 
 import type { ComponentProps } from 'react'
 import type {
-  LabwareDefinition2,
-  RobotType,
-  ModuleLocation,
+  LabwareDefinition,
   LabwareLocation,
+  ModuleLocation,
+  RobotType,
 } from '@opentrons/shared-data'
 
 export type MapKind = 'intervention' | 'deck-config'
@@ -119,15 +124,17 @@ export function LabwareHighlight({
   definition,
 }: {
   highlight: boolean
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }): JSX.Element {
-  const width = definition.dimensions.xDimension
-  const height = definition.dimensions.yDimension
+  const { xDimension: width, yDimension: height } = getSchema2Dimensions(
+    definition
+  )
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
 
   return (
     <RobotCoordsForeignDiv
-      x={definition.cornerOffsetFromSlot.x}
-      y={definition.cornerOffsetFromSlot.y}
+      x={cornerOffsetFromSlot.x}
+      y={cornerOffsetFromSlot.y}
       {...{ width, height }}
       innerDivProps={{
         display: DISPLAY_FLEX,

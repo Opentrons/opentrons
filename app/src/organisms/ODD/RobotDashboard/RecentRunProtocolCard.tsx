@@ -1,41 +1,42 @@
 import { useState } from 'react'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
 import last from 'lodash/last'
+import { css } from 'styled-components'
 
 import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
+import {
   BORDERS,
-  COLORS,
   Chip,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-} from '@opentrons/api-client'
 
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
-import {
-  useTrackEvent,
-  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '/app/redux/analytics'
 import { Skeleton } from '/app/atoms/Skeleton'
-import { useMissingProtocolHardware } from '/app/transformations/commands'
+import {
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  useTrackEvent,
+} from '/app/redux/analytics'
 import { useCloneRun } from '/app/resources/runs'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
+
 import { useRerunnableStatusText } from './hooks'
 
 import type { RunData, RunStatus } from '@opentrons/api-client'
@@ -158,15 +159,22 @@ export function ProtocolWithLastRun({
     [RUN_STATUS_SUCCEEDED]: t('completed'),
     [RUN_STATUS_FAILED]: t('failed'),
   }
-  // TODO(BC, 2023-06-05): see if addSuffix false allow can remove usage of .replace here
-  const formattedLastRunTime = formatDistance(
-    // Fallback to current date if completedAt is null, though this should never happen since runs must be completed to appear in dashboard
-    new Date(runData.completedAt ?? new Date()),
-    new Date(),
-    {
-      addSuffix: true,
+  const formattedLastRunTime =
+    runData.completedAt != null
+      ? formatDistance(new Date(runData.completedAt), new Date(), {
+          addSuffix: true,
+        }).replace('about ', '')
+      : null
+  const buildLastRunCopy = (): string => {
+    if (formattedLastRunTime != null) {
+      return i18n.format(
+        `${terminationTypeMap[runData.status] ?? ''} ${formattedLastRunTime}`,
+        'capitalize'
+      )
+    } else {
+      return ''
     }
-  ).replace('about ', '')
+  }
 
   return isProtocolFetching || isLookingForHardware ? (
     <Skeleton
@@ -227,10 +235,7 @@ export function ProtocolWithLastRun({
         lineHeight={TYPOGRAPHY.lineHeight28}
         color={COLORS.grey60}
       >
-        {i18n.format(
-          `${terminationTypeMap[runData.status] ?? ''} ${formattedLastRunTime}`,
-          'capitalize'
-        )}
+        {buildLastRunCopy()}
       </LegacyStyledText>
     </Flex>
   )

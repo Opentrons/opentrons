@@ -1,33 +1,37 @@
 import last from 'lodash/last'
+
 import {
+  ABSORBANCE_READER_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import { PAUSE_UNTIL_TEMP } from '../../../../constants'
+import * as fileDataSelectors from '../../../../file-data/selectors'
 import {
-  getUnsavedForm,
-  getUnsavedFormIsPristineSetTempForm,
-  getUnsavedFormIsPristineHeaterShakerForm,
-  getOrderedStepIds,
   getInitialDeckSetup,
+  getOrderedStepIds,
+  getUnsavedForm,
+  getUnsavedFormIsPristineHeaterShakerForm,
+  getUnsavedFormIsPristineSetTempForm,
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
 import { PRESAVED_STEP_ID } from '../../../../steplist/types'
-import { PAUSE_UNTIL_TEMP } from '../../../../constants'
-import { uuid } from '../../../../utils'
-import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
-import { addStep, selectDropdownItem } from '../actions'
 import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
 } from '../../../../tutorial'
-import * as fileDataSelectors from '../../../../file-data/selectors'
-import type { StepType, StepIdType, FormData } from '../../../../form-types'
+import { uuid } from '../../../../utils'
+import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
+import { addStep, selectDropdownItem } from '../actions'
+
+import type { FormData, StepIdType, StepType } from '../../../../form-types'
 import type { ThunkAction } from '../../../../types'
 import type {
-  DuplicateStepAction,
   DuplicateMultipleStepsAction,
+  DuplicateStepAction,
   SelectMultipleStepsAction,
 } from '../types'
 
@@ -105,6 +109,26 @@ export const addAndSelectStep: (arg: {
         selectDropdownItem({
           selection: {
             id: hsId,
+            text: 'Selected',
+            field: '1',
+          },
+          mode: 'add',
+        })
+      )
+    }
+  } else if (payload.stepType === 'absorbanceReader') {
+    const abosrbanceReaderModules = Object.entries(modules).filter(
+      ([, module]) => module.type === ABSORBANCE_READER_TYPE
+    )
+    const absorbanceReaderId =
+      abosrbanceReaderModules.length === 1
+        ? abosrbanceReaderModules[0][0]
+        : null
+    if (abosrbanceReaderModules != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: {
+            id: absorbanceReaderId,
             text: 'Selected',
             field: '1',
           },

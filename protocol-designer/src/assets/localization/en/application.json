@@ -1,5 +1,6 @@
 {
   "are_you_sure": "Are you sure you want to remove liquids from all selected wells?",
+  "are_you_sure_clear_all_wells": "Are you sure you want to remove liquids from all wells?",
   "are_you_sure_delete_well": "Are you sure you want to delete well {{well}}?",
   "blowout": "Blowout",
   "cancel": "cancel",
@@ -48,7 +49,7 @@
   "select": "Select",
   "selected": "Selected",
   "source": "Source",
-  "temperature": "Temperature (˚C)",
+  "temperature": "Temperature (°C)",
   "time": "Time",
   "units": {
     "cycles": "cycles",
@@ -57,10 +58,12 @@
     "microliter": "µL",
     "microliterPerSec": "µL/s",
     "millimeter": "mm",
+    "millimeterPerSec": "mm/s",
     "nanometer": "nm",
     "minutes": "m",
     "rpm": "rpm",
     "seconds": "s",
+    "seconds_long": "seconds",
     "time": "mm:ss",
     "time_hms": "hh:mm:ss",
     "times": "x"

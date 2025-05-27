@@ -51,6 +51,7 @@
   },
   "compatibleWith": [],
   "incompatibleWithDecks": [],
+  "uniqueModuleData": {},
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",

@@ -1,21 +1,21 @@
-import { describe, it, expect } from 'vitest'
-import { thermocyclerSetTargetBlockTemperature } from '../commandCreators/atomic/thermocyclerSetTargetBlockTemperature'
-import { thermocyclerSetTargetLidTemperature } from '../commandCreators/atomic/thermocyclerSetTargetLidTemperature'
-import { thermocyclerWaitForBlockTemperature } from '../commandCreators/atomic/thermocyclerWaitForBlockTemperature'
-import { thermocyclerWaitForLidTemperature } from '../commandCreators/atomic/thermocyclerWaitForLidTemperature'
+import { describe, expect, it } from 'vitest'
+
+import { thermocyclerCloseLid } from '../commandCreators/atomic/thermocyclerCloseLid'
 import { thermocyclerDeactivateBlock } from '../commandCreators/atomic/thermocyclerDeactivateBlock'
 import { thermocyclerDeactivateLid } from '../commandCreators/atomic/thermocyclerDeactivateLid'
-import { thermocyclerRunProfile } from '../commandCreators/atomic/thermocyclerRunProfile'
-import { thermocyclerCloseLid } from '../commandCreators/atomic/thermocyclerCloseLid'
 import { thermocyclerOpenLid } from '../commandCreators/atomic/thermocyclerOpenLid'
+import { thermocyclerRunProfile } from '../commandCreators/atomic/thermocyclerRunProfile'
+import { thermocyclerSetTargetBlockTemperature } from '../commandCreators/atomic/thermocyclerSetTargetBlockTemperature'
+import { thermocyclerSetTargetLidTemperature } from '../commandCreators/atomic/thermocyclerSetTargetLidTemperature'
 import { getSuccessResult } from '../fixtures'
+
 import type {
   AtomicProfileStep,
   ModuleOnlyParams,
-  TemperatureParams,
   TCProfileParams,
+  TemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { CommandCreator } from '../types'
+import type { CommandCreator, ModuleEntities } from '../types'
 
 const getRobotInitialState = (): any => {
   // This particular state shouldn't matter for these command creators
@@ -23,7 +23,7 @@ const getRobotInitialState = (): any => {
 }
 
 // neither should InvariantContext
-const invariantContext: any = {}
+let invariantContext: any = {}
 const module: ModuleOnlyParams['module'] = 'someTCModuleId'
 const temperature: TemperatureParams['temperature'] = 42
 const holdTime: AtomicProfileStep['holdTime'] = 10
@@ -34,6 +34,17 @@ const profile = [
     holdSeconds: holdTime,
   },
 ]
+invariantContext = {
+  ...invariantContext,
+  moduleEntities: {
+    [module]: {
+      id: module,
+      type: 'thermocyclerModuleType',
+      model: 'thermocyclerModuleV1',
+      pythonName: 'mock_thermocycler',
+    },
+  } as ModuleEntities,
+}
 describe('thermocycler atomic commands', () => {
   const testCasesSetBlock = [
     {
@@ -52,20 +63,6 @@ describe('thermocycler atomic commands', () => {
       params: {
         moduleId: module,
         celsius: temperature,
-      },
-    },
-    {
-      commandCreator: thermocyclerWaitForBlockTemperature,
-      expectedType: 'thermocycler/waitForBlockTemperature',
-      params: {
-        moduleId: module,
-      },
-    },
-    {
-      commandCreator: thermocyclerWaitForLidTemperature,
-      expectedType: 'thermocycler/waitForLidTemperature',
-      params: {
-        moduleId: module,
       },
     },
   ]

@@ -1,11 +1,12 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { InputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+
 import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
 
 import type { ComponentProps } from 'react'
@@ -133,7 +134,7 @@ describe('FlowRate', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Aspirate flow rate (µL/s)',
-        error: 'Value must be between 1-92',
+        error: 'Value must be between 1 to 92',
         readOnly: true,
         type: 'number',
         value: 0,

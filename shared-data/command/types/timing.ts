@@ -1,4 +1,4 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 
 export type TimingCreateCommand =
   | WaitForResumeCreateCommand
@@ -22,7 +22,7 @@ export interface WaitForResumeRunTimeCommand
   result?: any
 }
 
-interface WaitForResumeParams {
+export interface WaitForResumeParams {
   message?: string
 }
 
@@ -37,7 +37,7 @@ export interface WaitForDurationRunTimeCommand
   result?: any
 }
 
-interface WaitForDurationParams {
+export interface WaitForDurationParams {
   seconds: number
   message?: string
 }

@@ -1,25 +1,38 @@
 import { Fragment } from 'react'
 import { useSelector } from 'react-redux'
+
 import {
   COLORS,
   FixedTrash,
   FlexTrash,
+  Module,
   SingleSlotFixture,
   StagingAreaFixture,
   WasteChuteFixture,
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
-import { OT2_ROBOT_TYPE, getPositionFromSlotId } from '@opentrons/shared-data'
+import {
+  getModuleDef2,
+  getPositionFromSlotId,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
+import {
+  getLabwareSlot,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
+
+import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../organisms'
-import { lightFill, darkFill } from './DeckSetupContainer'
-import { getAdjacentLabware } from './utils'
+import { darkFill, lightFill } from './DeckSetupContainer'
+import { getAdjacentSlots } from './utils'
+
 import type {
-  TrashCutoutId,
-  StagingAreaLocation,
   DeckLabelProps,
+  StagingAreaLocation,
+  TrashCutoutId,
 } from '@opentrons/components'
 import type {
+  AddressableAreaName,
   CutoutId,
   DeckDefinition,
   RobotType,
@@ -38,17 +51,54 @@ interface FixtureRenderProps {
 export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
   const { fixture, cutout, deckDef, robotType, showHighlight, tagInfo } = props
   const deckSetup = useSelector(getInitialDeckSetup)
-  const { labware } = deckSetup
-  const adjacentLabware = getAdjacentLabware(fixture, cutout, labware)
+  const { labware, modules } = deckSetup
+  const adjacentSlots = getAdjacentSlots(fixture, cutout)
 
+  // magnetic block in column 3 if staging area is used
+  const adjacentModule = Object.values(modules).find(({ slot }) =>
+    adjacentSlots?.includes(slot as AddressableAreaName)
+  )
+
+  // labware in column 3 or 4, possibly on a magnetic block in column 3
+  const adjacentLabwares = Object.values(labware).filter(
+    ({ stack }) =>
+      adjacentSlots?.includes(
+        getSlotInLocationStack(stack) as AddressableAreaName
+      ) ||
+      (adjacentModule != null && stack.includes(adjacentModule?.id))
+  )
   const renderLabwareOnDeck = (): JSX.Element | null => {
-    if (!adjacentLabware) return null
-    const slotPosition = getPositionFromSlotId(adjacentLabware.slot, deckDef)
     return (
-      <LabwareOnDeckComponent
+      <>
+        {adjacentLabwares.map(adjacentLabware => {
+          const slot = getLabwareSlot(adjacentLabware.id, labware)
+          const slotPosition = getPositionFromSlotId(slot, deckDef)
+          return (
+            <LabwareOnDeckComponent
+              key={adjacentLabware.id}
+              x={slotPosition != null ? slotPosition[0] : 0}
+              y={slotPosition != null ? slotPosition[1] : 0}
+              labwareOnDeck={adjacentLabware}
+            />
+          )
+        })}
+      </>
+    )
+  }
+  const renderModuleOnDeck = (): JSX.Element | null => {
+    if (adjacentModule == null) {
+      return null
+    }
+    const slotPosition = getPositionFromSlotId(adjacentModule.slot, deckDef)
+
+    return (
+      <Module
+        key={adjacentModule.id}
         x={slotPosition != null ? slotPosition[0] : 0}
         y={slotPosition != null ? slotPosition[1] : 0}
-        labwareOnDeck={adjacentLabware}
+        def={getModuleDef2(adjacentModule.model)}
+        targetSlotId={adjacentModule.slot}
+        targetDeckId={deckDef.otId}
       />
     )
   }
@@ -56,13 +106,18 @@ export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
   switch (fixture) {
     case 'stagingArea': {
       return (
-        <Fragment key={`fixtureRender_${fixture}_${adjacentLabware?.id ?? 0}`}>
+        <Fragment
+          key={`fixtureRender_${fixture}_${
+            adjacentLabwares.length > 0 ? adjacentLabwares[0]?.id : 0
+          }`}
+        >
           <StagingAreaFixture
             cutoutId={cutout as StagingAreaLocation}
             deckDefinition={deckDef}
             slotClipColor={darkFill}
             fixtureBaseColor={lightFill}
           />
+          {renderModuleOnDeck()}
           {renderLabwareOnDeck()}
         </Fragment>
       )
@@ -105,7 +160,11 @@ export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
     }
     case 'wasteChuteAndStagingArea': {
       return (
-        <Fragment key={`fixtureRender_${fixture}_${adjacentLabware?.id ?? 0}`}>
+        <Fragment
+          key={`fixtureRender_${fixture}_${
+            adjacentLabwares.length > 0 ? adjacentLabwares[0]?.id : 0
+          }`}
+        >
           <WasteChuteStagingAreaFixture
             cutoutId={cutout as typeof WASTE_CHUTE_CUTOUT}
             deckDefinition={deckDef}

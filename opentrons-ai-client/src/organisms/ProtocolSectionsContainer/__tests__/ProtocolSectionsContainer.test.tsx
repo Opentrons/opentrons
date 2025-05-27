@@ -1,14 +1,17 @@
+import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
+import { ProtocolSectionsContainer } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { ProtocolSectionsContainer } from '..'
-import { FormProvider, useForm } from 'react-hook-form'
-import { fillApplicationSectionAndClickConfirm } from '../../../resources/utils/createProtocolTestUtils'
+import { PROTOCOL_FORMAT, PYTHON } from '../../../resources/constants'
+import { fillProtocolFormatSectionAndClickConfirm } from '../../../resources/utils/createProtocolTestUtils'
+import { OPENTRONS_FLEX, ROBOT_FIELD_NAME } from '../../InstrumentsSection'
 
-const TestFormProviderComponent = () => {
+const TestFormProviderComponent = ({ defaultValues = {} } = {}) => {
   const methods = useForm({
-    defaultValues: {},
+    defaultValues,
   })
 
   return (
@@ -18,16 +21,19 @@ const TestFormProviderComponent = () => {
   )
 }
 
-const render = (): ReturnType<typeof renderWithProviders> => {
-  return renderWithProviders(<TestFormProviderComponent />, {
-    i18nInstance: i18n,
-  })
+const render = (defaultValues = {}): ReturnType<typeof renderWithProviders> => {
+  return renderWithProviders(
+    <TestFormProviderComponent defaultValues={defaultValues} />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 describe('ProtocolSectionsContainer', () => {
   it('should render all five accordions for each step of Protocol Creation', () => {
     render()
-
+    expect(screen.getByText('Protocol Format')).toBeInTheDocument()
     expect(screen.getByText('Application')).toBeInTheDocument()
     expect(screen.getByText('Instruments')).toBeInTheDocument()
     expect(screen.getByText('Modules')).toBeInTheDocument()
@@ -35,13 +41,12 @@ describe('ProtocolSectionsContainer', () => {
     expect(screen.getByText('Steps')).toBeInTheDocument()
   })
 
-  it('should render the ApplicationSection opened by default', () => {
+  it('should render the Protocol Format section opened by default', () => {
     render()
 
-    expect(screen.getByRole('button', { name: 'Application' })).toHaveAttribute(
-      'aria-expanded',
-      'true'
-    )
+    expect(
+      screen.getByRole('button', { name: 'Protocol Format' })
+    ).toHaveAttribute('aria-expanded', 'true')
   })
 
   it('should render all the other sections closed by default', () => {
@@ -67,20 +72,20 @@ describe('ProtocolSectionsContainer', () => {
   it('should go back to previous section when clicking on the previous section', async () => {
     render()
 
-    const applicationButton = screen.getByRole('button', {
-      name: 'Application',
+    const protocolFormatButton = screen.getByRole('button', {
+      name: 'Protocol Format',
     })
-    expect(applicationButton).toHaveAttribute('aria-expanded', 'true')
+    expect(protocolFormatButton).toHaveAttribute('aria-expanded', 'true')
 
-    await fillApplicationSectionAndClickConfirm()
+    await fillProtocolFormatSectionAndClickConfirm()
 
     await waitFor(() => {
-      expect(applicationButton).toHaveAttribute('aria-expanded', 'false')
+      expect(protocolFormatButton).toHaveAttribute('aria-expanded', 'false')
     })
-    fireEvent.click(applicationButton)
+    fireEvent.click(protocolFormatButton)
 
     await waitFor(() => {
-      expect(applicationButton).toHaveAttribute('aria-expanded', 'true')
+      expect(protocolFormatButton).toHaveAttribute('aria-expanded', 'true')
     })
   })
 
@@ -97,5 +102,26 @@ describe('ProtocolSectionsContainer', () => {
     await waitFor(() => {
       expect(instrumentsButton).toHaveAttribute('aria-expanded', 'false')
     })
+  })
+
+  it('should include Runtime Parameters section between Labware & Liquids and Steps', () => {
+    render({
+      [PROTOCOL_FORMAT]: PYTHON,
+      [ROBOT_FIELD_NAME]: OPENTRONS_FLEX,
+    })
+
+    // Get all accordion buttons
+    const buttons = screen.getAllByRole('button', {
+      name: /Protocol Format|Application|Instruments|Modules|Labware & Liquids|Runtime Parameters|Steps/,
+    })
+
+    // Verify order of sections by their headings
+    expect(buttons[0]).toHaveTextContent('Protocol Format')
+    expect(buttons[1]).toHaveTextContent('Application')
+    expect(buttons[2]).toHaveTextContent('Instruments')
+    expect(buttons[3]).toHaveTextContent('Modules')
+    expect(buttons[4]).toHaveTextContent('Labware & Liquids')
+    expect(buttons[5]).toHaveTextContent('Runtime Parameters')
+    expect(buttons[6]).toHaveTextContent('Steps')
   })
 })

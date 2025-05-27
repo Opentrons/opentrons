@@ -14,27 +14,28 @@ import {
   Modal,
   NewPrimaryBtn,
   NewSecondaryBtn,
+  ReleaseNotes,
   SPACING,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 
-import {
-  getRobotUpdateDisplayInfo,
-  robotUpdateChangelogSeen,
-  OT2_BALENA,
-  UPGRADE,
-  REINSTALL,
-  DOWNGRADE,
-  getRobotUpdateVersion,
-} from '/app/redux/robot-update'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
+import {
+  DOWNGRADE,
+  getRobotUpdateDisplayInfo,
+  getRobotUpdateVersion,
+  OT2_BALENA,
+  REINSTALL,
+  robotUpdateChangelogSeen,
+  UPGRADE,
+} from '/app/redux/robot-update'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
+import { useIsOEMMode } from '/app/resources/robot-settings'
 
-import type { State, Dispatch } from '/app/redux/types'
 import type { RobotSystemType } from '/app/redux/robot-update/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export const RELEASE_NOTES_URL_BASE =
   'https://github.com/Opentrons/opentrons/releases/tag/v'
@@ -73,6 +74,7 @@ export function UpdateRobotModal({
 }: UpdateRobotModalProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const { t } = useTranslation('device_settings')
+  const isOEMMode = useIsOEMMode()
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
   // TODO(jh 08-29-2023): revisit reasons that are/are not captured by this selector.
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
@@ -159,7 +161,7 @@ export function UpdateRobotModal({
         <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
           {t('update_requires_restarting_robot')}
         </UpdateAppBanner>
-        <ReleaseNotes source={releaseNotes} />
+        <ReleaseNotes source={releaseNotes} isOEMMode={isOEMMode} />
       </Flex>
     </Modal>
   )

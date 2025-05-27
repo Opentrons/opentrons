@@ -1,23 +1,34 @@
 import { LPCWizardContainer } from '/app/organisms/LabwarePositionCheck/LPCWizardContainer'
 
+import type { LabwareOffset } from '@opentrons/api-client'
 import type {
-  RobotType,
   CompletedProtocolAnalysis,
   DeckConfiguration,
+  LabwareDefinition,
+  RobotType,
 } from '@opentrons/shared-data'
-import type { LabwareOffset } from '@opentrons/api-client'
+import type { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck'
+import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
+
+// Inject the props specific to the legacy LPC flows, too.
+export interface LegacySupportLPCFlowsProps extends LPCFlowsProps {
+  ot2Offsets: LabwareOffset[]
+}
 
 export interface LPCFlowsProps {
   onCloseClick: () => void
+  isClosing: boolean
   runId: string
   robotType: RobotType
   deckConfig: DeckConfiguration
-  existingOffsets: LabwareOffset[]
-  mostRecentAnalysis: CompletedProtocolAnalysis
+  labwareDefs: LabwareDefinition[]
+  labwareInfo: LPCLabwareInfo
+  analysis: CompletedProtocolAnalysis
   protocolName: string
   maintenanceRunId: string
+  analytics: ReturnType<typeof useLPCAnalytics>
 }
 
-export function LPCFlows(props: LPCFlowsProps): JSX.Element {
+export function LPCFlows(props: LegacySupportLPCFlowsProps): JSX.Element {
   return <LPCWizardContainer {...props} />
 }

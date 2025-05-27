@@ -1,42 +1,44 @@
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useModulesQuery } from '@opentrons/react-api-client'
+
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  FixtureOption,
   Flex,
   Icon,
-  SPACING,
-  SecondaryButton,
   LegacyStyledText,
+  Modal,
+  SecondaryButton,
+  SPACING,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
-  Modal,
 } from '@opentrons/components'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import {
-  getFixtureDisplayName,
   getCutoutFixturesForModuleModel,
-  MAGNETIC_BLOCK_V1,
+  getFixtureDisplayName,
   getModuleDisplayName,
+  MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
-import { FixtureOption } from '/app/organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
-import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'
 import type { AttachedModule } from '@opentrons/api-client'
+import type { DeckDefinition, ModuleModel } from '@opentrons/shared-data'
 
 const EQUIPMENT_POLL_MS = 5000
 interface ModuleFixtureOption {
   moduleModel: ModuleModel
-  usbPort?: number
+  usbPort?: number | string
   serialNumber?: string
 }
 interface ChooseModuleToConfigureModalProps {
@@ -82,11 +84,17 @@ export const ChooseModuleToConfigureModal = (
     ) ?? []
 
   const connectedOptions: ModuleFixtureOption[] = unconfiguredModuleMatches.map(
-    attachedMod => ({
-      moduleModel: attachedMod.moduleModel,
-      usbPort: attachedMod.usbPort.port,
-      serialNumber: attachedMod.serialNumber,
-    })
+    attachedMod => {
+      const portDisplay =
+        attachedMod.usbPort.hubPort != null
+          ? `${attachedMod.usbPort.port}.${attachedMod.usbPort.hubPort}`
+          : attachedMod.usbPort.port
+      return {
+        moduleModel: attachedMod.moduleModel,
+        usbPort: portDisplay,
+        serialNumber: attachedMod.serialNumber,
+      }
+    }
   )
   const passiveOptions: ModuleFixtureOption[] =
     requiredModuleModel === MAGNETIC_BLOCK_V1

@@ -1,10 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
-  PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from '../../../../constants'
 import { pauseFormToArgs } from '../pauseFormToArgs'
+
 import type { HydratedPauseFormData } from '../../../../form-types'
 
 describe('pauseFormToArgs', () => {
@@ -41,7 +43,6 @@ describe('pauseFormToArgs', () => {
     const expected = {
       commandCreatorFnName: 'delay',
       name: 'pause step',
-      wait: true,
       message: 'some message',
       description: 'some details',
       meta: {
@@ -66,7 +67,7 @@ describe('pauseFormToArgs', () => {
     const expected = {
       commandCreatorFnName: 'delay',
       name: 'pause step',
-      wait: 3600 + 20 * 60 + 5,
+      seconds: 3600 + 20 * 60 + 5,
       message: 'some message',
       description: 'some details',
       meta: {

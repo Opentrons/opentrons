@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { getInitialSummaryState } from '../../utils'
 
 describe('getInitialSummaryState', () => {
@@ -36,6 +37,7 @@ describe('getInitialSummaryState', () => {
       destinationWells: ['A1'],
       transferType: 'transfer',
       volume: 25,
+      path: 'single',
     } as any,
     deckConfig: [
       {

@@ -1,5 +1,5 @@
-import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
@@ -7,6 +7,7 @@ import { LiquidDefinitions } from '../LiquidDefinitions'
 
 import type { ComponentProps } from 'react'
 import type { InfoScreen } from '@opentrons/components'
+import type { LiquidEntities } from '@opentrons/step-generation'
 
 vi.mock('../../../feature-flags/selectors')
 
@@ -18,30 +19,28 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 
-const mockAllIngredientGroupFields = {
+const mockAllIngredientGroupFields: LiquidEntities = {
   '0': {
-    name: 'EtOH',
+    displayName: 'EtOH',
     displayColor: '#b925ff',
     description: 'Immer fisch Hergestllter EtOH',
-    liquidClass: null,
-    serialize: false,
     liquidGroupId: '0',
+    pythonName: 'liquid_1',
   },
   '1': {
-    name: '10mM Tris pH8,5',
+    displayName: '10mM Tris pH8,5',
     displayColor: '#ffd600',
     description: null,
-    liquidClass: null,
-    serialize: false,
     liquidGroupId: '1',
+    pythonName: 'liquid_2',
   },
   '2': {
-    name: 'Amplicon PCR sample + AMPure XP beads',
+    displayName: 'Amplicon PCR sample + AMPure XP beads',
     displayColor: '#9dffd8',
     description: '25µl Amplicon PCR + 20 µl AMPure XP beads',
     liquidClass: 'Water',
-    serialize: false,
     liquidGroupId: '2',
+    pythonName: 'liquid_3',
   },
 }
 

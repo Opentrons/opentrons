@@ -4,17 +4,18 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import type {
-  LabwareDefinition2,
-  PipetteV2Specs,
-  DeckConfiguration,
-} from '@opentrons/shared-data'
 import type { Mount } from '@opentrons/api-client'
 import type {
+  DeckConfiguration,
+  LabwareDefinition2,
+  LiquidClass,
+  PipetteV2Specs,
+} from '@opentrons/shared-data'
+import type {
+  ChangeTipOptions,
+  PathOption,
   QuickTransferSummaryState,
   TransferType,
-  PathOption,
-  ChangeTipOptions,
 } from '../types'
 
 interface InitialSummaryStateProps {
@@ -28,6 +29,8 @@ interface InitialSummaryStateProps {
     destinationWells: string[]
     transferType: TransferType
     volume: number
+    path: PathOption
+    liquidClass: LiquidClass
   }
   deckConfig: DeckConfiguration
 }
@@ -48,7 +51,7 @@ export function getInitialSummaryState(
   // this is the max amount of liquid that can be held in the tip at any time
   const maxTipCapacity = Math.min(maxPipetteVolume, tipVolume)
 
-  let path: PathOption = 'single'
+  let path: PathOption = state.path
   // for multiDispense the volume capacity must be at least 3x the volume per well
   // to account for the 1x volume per well disposal volume default
   if (
@@ -99,5 +102,6 @@ export function getInitialSummaryState(
     tipPositionDispense: 1,
     changeTip,
     dropTipLocation: trashConfigCutout,
+    liquidClass: state.liquidClass,
   }
 }

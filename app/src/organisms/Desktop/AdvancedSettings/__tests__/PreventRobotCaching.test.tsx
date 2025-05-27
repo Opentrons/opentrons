@@ -1,11 +1,11 @@
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
 import { getConfig, toggleConfigValue } from '/app/redux/config'
+
 import { PreventRobotCaching } from '../PreventRobotCaching'
 
 import type { State } from '/app/redux/types'
@@ -37,13 +37,13 @@ describe('PreventRobotCaching', () => {
     screen.queryByText(
       'The app will immediately clear unavailable robots and will not remember unavailable robots while this is enabled. On networks with many robots, preventing caching may improve network performance at the expense of slower and less reliable robot discovery on app launch.'
     )
-    screen.getByRole('switch', { name: 'display_unavailable_robots' })
+    screen.getByRole('switch', { name: 'disable_robot_cache' })
   })
 
   it('should call mock toggleConfigValue when clicking the toggle button', () => {
     render()
     const toggleButton = screen.getByRole('switch', {
-      name: 'display_unavailable_robots',
+      name: 'disable_robot_cache',
     })
     fireEvent.click(toggleButton)
     expect(vi.mocked(toggleConfigValue)).toHaveBeenCalledWith(

@@ -1,5 +1,5 @@
-import mapValues from 'lodash/mapValues'
 import { useQuery } from 'react-query'
+import mapValues from 'lodash/mapValues'
 
 import { getCommandsAsPreSerializedList } from '@opentrons/api-client'
 
@@ -7,9 +7,9 @@ import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
+  CommandsData,
   GetRunCommandsParams,
   HostConfig,
-  CommandsData,
   RunCommandSummary,
 } from '@opentrons/api-client'
 

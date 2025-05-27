@@ -1,11 +1,12 @@
-import { describe, it, expect, vi } from 'vitest'
-import { when } from 'vitest-when'
 import { renderHook, waitFor } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
-import { useNotifyAllRunsQuery } from '/app/resources/runs/useNotifyAllRunsQuery'
-import { useHistoricRunDetails } from '../useHistoricRunDetails'
 import { mockRunningRun } from '/app/resources/runs/__fixtures__'
+import { useNotifyAllRunsQuery } from '/app/resources/runs/useNotifyAllRunsQuery'
+
 import { mockSuccessQueryResults } from '../../../../__fixtures__'
+import { useHistoricRunDetails } from '../useHistoricRunDetails'
 
 import type { FunctionComponent, ReactNode } from 'react'
 import type { RunData } from '@opentrons/api-client'
@@ -31,7 +32,7 @@ const MOCK_RUN_EARLIER: RunData = {
 
 describe('useHistoricRunDetails', () => {
   when(useNotifyAllRunsQuery)
-    .calledWith({}, {}, undefined)
+    .calledWith({}, undefined, undefined)
     .thenReturn(
       mockSuccessQueryResults({
         data: [MOCK_RUN_LATER, MOCK_RUN_EARLIER],
@@ -50,7 +51,7 @@ describe('useHistoricRunDetails', () => {
   })
   it('returns historical run details with newest first to specific host', async () => {
     when(useNotifyAllRunsQuery)
-      .calledWith({}, {}, { hostname: 'fakeIp' })
+      .calledWith({}, undefined, { hostname: 'fakeIp' })
       .thenReturn(
         mockSuccessQueryResults({
           data: [MOCK_RUN_EARLIER, MOCK_RUN_EARLIER, MOCK_RUN_LATER],

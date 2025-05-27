@@ -1,6 +1,6 @@
-import { describe, it } from 'vitest'
-import { screen, render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { render, screen } from '@testing-library/react'
+import { describe, it } from 'vitest'
 
 import { Navbar } from '../Navbar'
 

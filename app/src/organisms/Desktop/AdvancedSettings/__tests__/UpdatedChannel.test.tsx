@@ -1,13 +1,15 @@
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  getUpdateChannelOptions,
   getUpdateChannel,
+  getUpdateChannelOptions,
   // updateConfigValue,
 } from '/app/redux/config'
+
 import { UpdatedChannel } from '../UpdatedChannel'
-import { renderWithProviders } from '/app/__testing-utils__'
 
 vi.mock('/app/redux/config')
 

@@ -1,7 +1,10 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useIsFlex } from '/app/redux-resources/robots'
+
 import { useEstopQuery } from '@opentrons/react-api-client'
+
+import { useIsFlex } from '/app/redux-resources/robots'
+
 import { useIsEstopNotDisengaged } from '../useIsEstopNotDisengaged'
 
 vi.mock('@opentrons/react-api-client')

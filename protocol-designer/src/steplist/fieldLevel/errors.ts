@@ -1,5 +1,7 @@
 import isArray from 'lodash/isArray'
 
+import type { HydratedFormData } from '../../form-types'
+
 /*******************
  ** Error Messages **
  ********************/
@@ -30,9 +32,17 @@ const FIELD_ERRORS: Record<FieldError, string> = {
 /*******************
  ** Error Checkers **
  ********************/
-export type ErrorChecker = (value: unknown) => string | null
+export type ErrorChecker = (
+  value: unknown,
+  hydratedFormData?: HydratedFormData
+) => string | null
+
 export const requiredField: ErrorChecker = (value: unknown) =>
   !value ? FIELD_ERRORS.REQUIRED : null
+
+export const greaterThanZero: ErrorChecker = (value: unknown) =>
+  !value ? 'Enter an integer value greater than 0' : null
+
 export const isTimeFormat: ErrorChecker = (value: unknown): string | null => {
   const timeRegex = new RegExp(/^\d{1,2}:(?:[0-5]?\d):(?:[0-5]?\d)$/g)
   return (typeof value === 'string' && timeRegex.test(value)) || !value
@@ -49,6 +59,44 @@ export const isTimeFormatMinutesSeconds: ErrorChecker = (
 }
 export const nonZero: ErrorChecker = (value: unknown) =>
   value && Number(value) === 0 ? FIELD_ERRORS.NON_ZERO : null
+
+export const transferVolumeMax: ErrorChecker = (
+  value: unknown,
+  hydratedFormData?: HydratedFormData
+) => {
+  if (hydratedFormData == null) {
+    return null
+  }
+
+  let labware
+  if (
+    'dispense_labware' in hydratedFormData &&
+    hydratedFormData.dispense_labware != null &&
+    hydratedFormData.stepType === 'moveLiquid'
+  ) {
+    labware = hydratedFormData.dispense_labware
+  } else if (
+    'labware' in hydratedFormData &&
+    hydratedFormData.labware != null &&
+    hydratedFormData.stepType === 'mix'
+  ) {
+    labware = hydratedFormData.labware
+  }
+
+  if (labware == null) {
+    return null
+  }
+
+  const dispenseLabwareMaxVolume =
+    'def' in labware ? labware.def?.wells.A1.totalLiquidVolume : null
+
+  return dispenseLabwareMaxVolume != null &&
+    typeof value === 'string' &&
+    parseInt(value) > dispenseLabwareMaxVolume
+    ? 'Enter a value within the specified range'
+    : null
+}
+
 export const minimumWellCount = (minimum: number): ErrorChecker => (
   wells: unknown
 ): string | null =>
@@ -67,13 +115,15 @@ export const maxFieldValue = (maximum: number): ErrorChecker => (
   !value || Number(value) <= maximum
     ? null
     : `${FIELD_ERRORS.OVER_RANGE_MAXIMUM} ${maximum}`
-export const temperatureRangeFieldValue = (
+
+export const enterValueWithinRange = (
   minimum: number,
   maximum: number
 ): ErrorChecker => (value: unknown): string | null =>
   !value || (Number(value) <= maximum && Number(value) >= minimum)
     ? null
-    : `${FIELD_ERRORS.OUTSIDE_OF_RANGE} ${minimum} and ${maximum} °C`
+    : `Enter a value within the specified range`
+
 export const realNumber: ErrorChecker = (value: unknown) =>
   isNaN(Number(value)) ? FIELD_ERRORS.NOT_A_REAL_NUMBER : null
 
@@ -82,13 +132,13 @@ export const realNumber: ErrorChecker = (value: unknown) =>
  ********************/
 type ComposeErrors = (
   ...errorCheckers: ErrorChecker[]
-) => (value: unknown) => string[]
+) => (value: unknown, hydratedFormData?: HydratedFormData) => string[]
 
 export const composeErrors: ComposeErrors = (
   ...errorCheckers: ErrorChecker[]
-) => value =>
+) => (value, hydratedFormData) =>
   errorCheckers.reduce<string[]>((accumulatedErrors, errorChecker) => {
-    const possibleError = errorChecker(value)
+    const possibleError = errorChecker(value, hydratedFormData)
     return possibleError
       ? [...accumulatedErrors, possibleError]
       : accumulatedErrors

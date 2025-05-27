@@ -815,6 +815,9 @@ class OT3Simulator(FlexBackend):
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await asyncio.sleep(0)
 
+    def get_status_bar_enabled(self) -> bool:
+        return True
+
     def get_status_bar_state(self) -> StatusBarState:
         return self._sim_status_bar_state
 
@@ -871,3 +874,6 @@ class OT3Simulator(FlexBackend):
         """This is something we only use in the simulator.
         It is required so that PE simulations using ot3api don't break."""
         self._sim_tip_state[mount] = status
+
+    async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
+        pass

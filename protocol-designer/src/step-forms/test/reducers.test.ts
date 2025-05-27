@@ -1,62 +1,45 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
 
 import {
-  orderedStepIds,
+  INITIAL_DECK_SETUP_STEP_ID,
+  PAUSE_UNTIL_TEMP,
+  SPAN7_8_10_11_SLOT,
+} from '../../constants'
+import { moveDeckItem } from '../../labware-ingred/actions'
+import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import {
+  batchEditFormChanges,
   labwareInvariantProperties,
   moduleInvariantProperties,
+  orderedStepIds,
   presavedStepForm,
   savedStepForms,
   unsavedForm,
-  batchEditFormChanges,
 } from '../reducers'
 import {
-  _getPipetteEntitiesRootState,
-  _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
+  _getLabwareEntitiesRootState,
+  _getPipetteEntitiesRootState,
 } from '../selectors'
-import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
-import { moveDeckItem } from '../../labware-ingred/actions'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  SPAN7_8_10_11_SLOT,
-  PAUSE_UNTIL_TEMP,
-} from '../../constants'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 
 import type { ModuleEntity } from '@opentrons/step-generation'
-import type { DeckSlot } from '../../types'
+import type { FormData, StepType } from '../../form-types'
 import type { DeleteContainerAction } from '../../labware-ingred/actions/actions'
 import type {
   ChangeFormInputAction,
   DeleteMultipleStepsAction,
 } from '../../steplist/actions'
-import type { FormData, StepType } from '../../form-types'
-import type {
-  SavedStepFormsActions,
-  UnsavedFormActions,
-  RootState,
-  PresavedStepFormState,
-  PresavedStepFormAction,
-} from '../reducers'
-import type {
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
-} from '../actions/pipettes'
-import type {
-  CreateModuleAction,
-  DeleteModuleAction,
-  EditModuleAction,
-} from '../actions/modules'
+import type { DeckSlot } from '../../types'
 import type {
   AddStepAction,
   DuplicateMultipleStepsAction,
@@ -67,9 +50,21 @@ import type {
 } from '../../ui/steps'
 import type {
   ChangeBatchEditFieldAction,
-  SaveStepFormsMultiAction,
   ResetBatchEditFieldChangesAction,
+  SaveStepFormsMultiAction,
 } from '../actions'
+import type { CreateModuleAction, DeleteModuleAction } from '../actions/modules'
+import type {
+  DeletePipettesAction,
+  SubstituteStepFormPipettesAction,
+} from '../actions/pipettes'
+import type {
+  PresavedStepFormAction,
+  PresavedStepFormState,
+  RootState,
+  SavedStepFormsActions,
+  UnsavedFormActions,
+} from '../reducers'
 
 vi.mock('../../labware-defs/utils')
 vi.mock('../selectors')
@@ -274,12 +269,18 @@ describe('labwareInvariantProperties reducer', () => {
     const prevState = {
       labwareIdA1: {
         labwareDefURI: 'foo/a/1',
+        pythonName: 'mockPythonName',
+        displayCategory: 'wellPlate',
       },
       labwareIdA2: {
         labwareDefURI: 'foo/a/1',
+        pythonName: 'mockPythonName',
+        displayCategory: 'wellPlate',
       },
       labwareIdB: {
         labwareDefURI: 'foo/b/1',
+        pythonName: 'mockPythonName',
+        displayCategory: 'wellPlate',
       },
     }
     const result = labwareInvariantProperties(prevState, {
@@ -292,6 +293,9 @@ describe('labwareInvariantProperties reducer', () => {
           },
           version: 2,
           namespace: 'foo',
+          metadata: {
+            displayCategory: 'wellPlate',
+          },
         },
         isOverwriteMismatched: false,
       },
@@ -300,13 +304,17 @@ describe('labwareInvariantProperties reducer', () => {
       // changed
       labwareIdA1: {
         labwareDefURI: 'foo/a/2',
+        displayCategory: 'wellPlate',
       },
       labwareIdA2: {
         labwareDefURI: 'foo/a/2',
+        displayCategory: 'wellPlate',
       },
       // unchanged
       labwareIdB: {
         labwareDefURI: 'foo/b/1',
+        displayCategory: 'wellPlate',
+        pythonName: 'mockPythonName',
       },
     })
   })
@@ -345,19 +353,6 @@ describe('moduleInvariantProperties reducer', () => {
         type: newModuleData.type,
         model: newModuleData.model,
       },
-    })
-  })
-  it('edit module (change its model)', () => {
-    const newModel = 'someDifferentModel'
-    const result = moduleInvariantProperties(prevState, {
-      type: 'EDIT_MODULE',
-      payload: {
-        id: existingModuleId,
-        model: newModel,
-      },
-    })
-    expect(result).toEqual({
-      [existingModuleId]: { ...prevState.existingModuleId, model: newModel },
     })
   })
   it('delete module', () => {
@@ -412,6 +407,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             duplicateLabwareId: newLabwareId,
             duplicateLabwareNickname: 'new labware nickname',
             slot: newSlot,
+            displayCategory: 'wellPlate',
           },
         },
       },
@@ -423,6 +419,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             slot: newSlot,
             labwareDefURI: 'fixtures/foo/1',
             id: newLabwareId,
+            displayCategory: 'adapter',
           },
         },
       },
@@ -1089,22 +1086,6 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
         expectedModuleLocations: {},
       },
-      {
-        testName:
-          'delete occupied module in span7_8_10_11 slot -> labware goes into slot 7',
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [labwareOnModuleId]: moduleId,
-          },
-          moduleLocationUpdate: {
-            [moduleId]: SPAN7_8_10_11_SLOT,
-          },
-        },
-        expectedLabwareLocations: {
-          [labwareOnModuleId]: '7',
-        },
-        expectedModuleLocations: {},
-      },
     ]
     testCases.forEach(
       ({
@@ -1367,95 +1348,6 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       ).toEqual(expectedState)
     })
   })
-  describe('EDIT_MODULE', () => {
-    it('should set engageHeight to null for all Magnet > Engage steps when a magnet module has its model changed, unless height matches default', () => {
-      vi.mocked(_getInitialDeckSetupRootState).mockReturnValue({
-        labware: {
-          magPlateId: {
-            id: 'magPlateId',
-            slot: 'magModuleId',
-            def: {
-              // @ts-expect-error(sa, 2021-6-14): add missing parameters to fixture
-              parameters: {
-                magneticModuleEngageHeight: 12,
-              },
-            },
-          },
-        },
-        pipettes: {},
-        modules: {
-          // @ts-expect-error(sa, 2021-6-14): add missing parameters to fixture
-          magModuleId: {
-            id: 'magModuleId',
-            type: MAGNETIC_MODULE_TYPE,
-            model: MAGNETIC_MODULE_V1,
-            slot: '1',
-          },
-        },
-      })
-      const action: EditModuleAction = {
-        type: 'EDIT_MODULE',
-        payload: {
-          id: 'magModuleId',
-          model: 'magneticModuleV2',
-        },
-      }
-      const prevRootState: RootState = {
-        savedStepForms: {
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          magnetEngageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'engage',
-            moduleId: 'magModuleId',
-            engageHeight: '24', // = 12 * 2 b/c we're going V1 -> V2
-          },
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          magnetDisengageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'disengage',
-            engageHeight: null,
-            moduleId: 'magModuleId',
-          },
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          nonDefaultMagnetEngageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'engage',
-            moduleId: 'magModuleId',
-            engageHeight: '8',
-          },
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          unrelatedMagnetEngageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'engage',
-            moduleId: 'otherMagModuleId',
-            // not 'magModuleId'
-            engageHeight: '8',
-          },
-        },
-      }
-      const result = savedStepForms(prevRootState, action)
-      expect(result).toEqual({
-        magnetEngageStepId: {
-          stepType: 'magnet',
-          magnetAction: 'engage',
-          engageHeight: '12',
-          // V2 units default
-          moduleId: 'magModuleId',
-        },
-        magnetDisengageStepId:
-          prevRootState.savedStepForms.magnetDisengageStepId,
-        nonDefaultMagnetEngageStepId: {
-          stepType: 'magnet',
-          magnetAction: 'engage',
-          moduleId: 'magModuleId',
-          engageHeight: null,
-        },
-        // module id not matching, unchanged
-        unrelatedMagnetEngageStepId:
-          prevRootState.savedStepForms.unrelatedMagnetEngageStepId,
-      })
-    })
-  })
   describe('saving multiple steps', () => {
     it('should apply the form patch to all of the step ids', () => {
       const prevState: RootState = {
@@ -1626,7 +1518,6 @@ describe('unsavedForm reducer', () => {
     'DELETE_MODULE',
     'DELETE_STEP',
     'DELETE_MULTIPLE_STEPS',
-    'EDIT_MODULE',
     'SAVE_STEP_FORM',
     'SELECT_TERMINAL_ITEM',
     'SELECT_MULTIPLE_STEPS',

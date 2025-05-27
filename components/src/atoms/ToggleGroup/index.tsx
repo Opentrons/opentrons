@@ -1,7 +1,8 @@
 import { css } from 'styled-components'
+
+import { PrimaryButton } from '../../atoms/buttons/PrimaryButton'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
-import { PrimaryButton } from '../../atoms/buttons/PrimaryButton'
 import { spacing8 } from '../../ui-style-constants/spacing'
 import { StyledText } from '../StyledText'
 
@@ -40,7 +41,6 @@ export const ToggleGroup = (props: ToggleGroupProps): JSX.Element => {
 
 const BUTTON_GROUP_STYLES = css`
   border-radius: ${BORDERS.borderRadius8};
-  margin-top: -1px;
   width: fit-content;
 
   button {

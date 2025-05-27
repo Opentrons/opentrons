@@ -1,5 +1,6 @@
 import { OLDEST_MIGRATEABLE_VERSION } from '../load-file/migration'
 import { setMixpanelTracking } from './mixpanel'
+
 import type { AnalyticsEvent } from './mixpanel'
 
 export interface SetOptIn {

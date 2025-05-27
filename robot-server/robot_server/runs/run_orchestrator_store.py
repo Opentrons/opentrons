@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from typing import Dict, List, Optional, Callable, Mapping
+from typing import Dict, List, Optional, Callable, Mapping, Sequence
 
 from opentrons.types import NozzleMapInterface
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
@@ -33,6 +33,7 @@ from opentrons.protocol_runner.run_orchestrator import ParseMode
 from opentrons.protocol_engine import (
     DeckType,
     LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
     StateSummary,
     CommandSlice,
     CommandErrorSlice,
@@ -54,6 +55,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 
 _log = logging.getLogger(__name__)
 
@@ -192,7 +194,7 @@ class RunOrchestratorStore:
     async def create(
         self,
         run_id: str,
-        labware_offsets: List[LabwareOffsetCreate],
+        labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
         initial_error_recovery_policy: error_recovery_policy.ErrorRecoveryPolicy,
         deck_configuration: DeckConfigurationType,
         file_provider: FileProvider,
@@ -244,7 +246,7 @@ class RunOrchestratorStore:
             notify_publishers=notify_publishers,
         )
 
-        self._run_orchestrator = RunOrchestrator.build_orchestrator(
+        orchestrator = RunOrchestrator.build_orchestrator(
             run_id=run_id,
             protocol_engine=engine,
             hardware_api=self._hardware_api,
@@ -256,19 +258,21 @@ class RunOrchestratorStore:
         # they will both "succeed" (with undefined results) instead of one
         # raising RunConflictError.
         if protocol:
-            await self.run_orchestrator.load(
+            await orchestrator.load(
                 protocol.source,
                 run_time_param_values=run_time_param_values,
                 run_time_param_paths=run_time_param_paths,
                 parse_mode=ParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
             )
         else:
-            self.run_orchestrator.prepare()
+            orchestrator.prepare()
 
         for offset in labware_offsets:
-            self.run_orchestrator.add_labware_offset(offset)
+            orchestrator.add_labware_offset(offset)
 
-        return self.run_orchestrator.get_state_summary()
+        summary = orchestrator.get_state_summary()
+        self._run_orchestrator = orchestrator
+        return summary
 
     async def clear(self) -> RunResult:
         """Remove the current run orchestrator.
@@ -347,6 +351,10 @@ class RunOrchestratorStore:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
         return self.run_orchestrator.get_run_time_parameters()
 
+    def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
+        """Get the current (if any) Flex Stacker Substates keyed by modile id."""
+        return self.run_orchestrator.get_flex_stacker_substate()
+
     def get_current_command(self) -> Optional[CommandPointer]:
         """Get the current running command, if any."""
         return self.run_orchestrator.get_current_command()
@@ -408,7 +416,9 @@ class RunOrchestratorStore:
         """Get whether the run has started."""
         return self.run_orchestrator.run_has_started()
 
-    def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
+    def add_labware_offset(
+        self, request: LabwareOffsetCreate | LegacyLabwareOffsetCreate
+    ) -> LabwareOffset:
         """Add a new labware offset to state."""
         return self.run_orchestrator.add_labware_offset(request)
 

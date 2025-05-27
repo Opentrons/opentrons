@@ -1,17 +1,17 @@
 import { css } from 'styled-components'
 
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { RESPONSIVENESS } from '../../ui-style-constants'
-import { BORDERS, COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
+  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_2_X_ADJUSTMENT,
+  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_3_X_ADJUSTMENT,
   FIXTURE_HEIGHT,
   Y_ADJUSTMENT,
@@ -86,6 +86,7 @@ export function EmptyConfigFixture(
         onClick={() => {
           handleClickAdd(fixtureLocation)
         }}
+        data-testid={fixtureLocation}
       >
         <Icon name="add" color={COLORS.blue50} size="2rem" />
       </Btn>

@@ -15,9 +15,9 @@ export default mergeConfig(
       exclude: [...configDefaults.exclude, '**/node_modules/**', '**/dist/**'],
       setupFiles: ['./setup-vitest.mts'],
       coverage: {
-        exclude: ['**/node_modules/**', '**/dist/**', '**/__tests__/**'],
+        exclude: ['**/node_modules/**', '**/dist/**', '**/__tests__/**', 'protocol-designer/cypress/**/*', 'labware-library/cypress/**/*', ...configDefaults.exclude],
         provider: 'v8',
-        reporter: ['text', 'json', 'html'],
+        reporter: ['text', 'json', 'html', 'lcov'],
       },
     },
     resolve: {
@@ -34,6 +34,9 @@ export default mergeConfig(
         ),
         '@opentrons/shared-data/labware/fixtures/2': path.resolve(
           './shared-data/labware/fixtures/2/index.ts'
+        ),
+        '@opentrons/shared-data/labware/fixtures/3': path.resolve(
+          './shared-data/labware/fixtures/3/index.ts'
         ),
         '@opentrons/shared-data': path.resolve('./shared-data/js/index.ts'),
         '@opentrons/step-generation': path.resolve(

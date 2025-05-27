@@ -1,5 +1,6 @@
-import { platform } from 'process'
 import { exec } from 'child_process'
+import { platform } from 'process'
+
 // Provide systemd when possible and a default mocked instance, used only during
 // dev workflows, when not.
 

@@ -1,4 +1,5 @@
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   Box,
@@ -6,13 +7,13 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
-import type { IconName } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
+import type { IconName } from '@opentrons/components'
 
 interface CollapsibleProps {
   expanded: boolean

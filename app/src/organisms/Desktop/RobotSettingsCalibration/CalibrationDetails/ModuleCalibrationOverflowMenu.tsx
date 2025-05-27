@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -17,14 +16,14 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { useChainLiveCommands, useRunStatuses } from '/app/resources/runs'
-import { getModulePrepCommands } from '/app/local-resources/modules'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { getModuleTooHot } from '/app/transformations/modules'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useRunStatuses } from '/app/resources/runs'
+import { getModuleTooHot } from '/app/transformations/modules'
 
 import type { AttachedModule } from '/app/redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
+
 interface ModuleCalibrationOverflowMenuProps {
   isCalibrated: boolean
   attachedModule: AttachedModule
@@ -62,27 +61,15 @@ export function ModuleCalibrationOverflowMenu({
       setShowOverflowMenu(false)
     },
   })
-  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
 
   const requiredAttachOrCalibratePipette =
     formattedPipetteOffsetCalibrations.length === 0 ||
     (formattedPipetteOffsetCalibrations[0].lastCalibrated == null &&
       formattedPipetteOffsetCalibrations[1].lastCalibrated == null)
 
-  const [
-    prepCommandErrorMessage,
-    setPrepCommandErrorMessage,
-  ] = useState<string>('')
-
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const handleCalibration = (): void => {
-    chainLiveCommands(getModulePrepCommands(attachedModule), false).catch(
-      (e: Error) => {
-        setPrepCommandErrorMessage(e.message)
-      }
-    )
-    setShowOverflowMenu(false)
     setShowModuleWizard(true)
   }
 
@@ -106,10 +93,7 @@ export function ModuleCalibrationOverflowMenu({
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
-          isPrepCommandLoading={isCommandMutationLoading}
-          prepCommandErrorMessage={
-            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
-          }
+          robotName={robotName}
         />
       ) : null}
       {showOverflowMenu ? (

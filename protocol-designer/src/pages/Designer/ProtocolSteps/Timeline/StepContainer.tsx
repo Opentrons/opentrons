@@ -1,6 +1,8 @@
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useEffect, useState, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -20,28 +22,32 @@ import {
   StyledText,
   useConditionalConfirm,
 } from '@opentrons/components'
+
+import { LINE_CLAMP_TEXT_STYLE } from '../../../../components/atoms'
 import {
   ConfirmDeleteModal,
   DELETE_MULTIPLE_STEP_FORMS,
   DELETE_STEP_FORM,
   getMainPagePortalEl,
-} from '../../../../organisms'
+} from '../../../../components/organisms'
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import { actions as steplistActions } from '../../../../steplist'
+import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import {
   deselectAllSteps,
   populateForm,
 } from '../../../../ui/steps/actions/actions'
 import { getMultiSelectItemIds } from '../../../../ui/steps/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../../../atoms'
+import { getHasTrash } from '../../../../utils'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
+import type { ThunkDispatch } from 'redux-thunk'
 import type {
-  SetStateAction,
   Dispatch,
   MouseEvent as ReactMouseEvent,
+  SetStateAction,
 } from 'react'
-import type { ThunkDispatch } from 'redux-thunk'
 import type { IconName } from '@opentrons/components'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
@@ -49,7 +55,7 @@ import type { BaseState } from '../../../../types'
 const STARTING_DECK_STATE = 'Starting deck'
 const FINAL_DECK_STATE = 'Ending deck'
 const PX_HEIGHT_TO_TOP_OF_CONTAINER = 32
-const PX_SIDEBAR_MIN_WIDTH_FOR_ICON = 179
+export const PX_SIDEBAR_MIN_WIDTH_FOR_ICON = 170
 
 export interface StepContainerProps {
   title: string
@@ -89,12 +95,16 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     openedOverflowMenuId,
     sidebarWidth,
   } = props
+  const { t } = useTranslation('starting_deck_state')
+  const { makeSnackbar } = useKitchen()
   const [top, setTop] = useState<number>(0)
   const menuRootRef = useRef<HTMLDivElement | null>(null)
   const isStartingOrEndingState =
     title === STARTING_DECK_STATE || title === FINAL_DECK_STATE
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
+  const { additionalEquipmentOnDeck } = useSelector(getDeckSetupForActiveItem)
+  const hasTrash = getHasTrash(additionalEquipmentOnDeck)
 
   const hasText = sidebarWidth > PX_SIDEBAR_MIN_WIDTH_FOR_ICON
   let backgroundColor = isStartingOrEndingState ? COLORS.blue20 : COLORS.grey20
@@ -107,9 +117,13 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     backgroundColor = isStartingOrEndingState ? COLORS.blue30 : COLORS.grey30
     color = COLORS.black90
   }
-  if (hasError) {
+  if (hasError && selected) {
     backgroundColor = COLORS.red50
     color = COLORS.white
+  }
+  if (hasError && !selected) {
+    backgroundColor = COLORS.red30
+    color = COLORS.red60
   }
 
   const handleClick = (event: MouseEvent): void => {
@@ -187,6 +201,17 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     cancel: cancelDelete,
   } = useConditionalConfirm(handleDelete, true)
 
+  const handleOpenForm = (clickNum: number, e: ReactMouseEvent): void => {
+    if (!hasTrash) {
+      makeSnackbar(t('trash_required') as string)
+    }
+
+    if (clickNum === 0) {
+      onClick?.(e)
+    } else {
+      onDoubleClick?.(e)
+    }
+  }
   return (
     <>
       {showDeleteConfirmation === true && (
@@ -214,8 +239,13 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       >
         <Box
           role="button"
-          onDoubleClick={onDoubleClick}
-          onClick={onClick}
+          data-testid={`StepContainer_${stepId}`}
+          onDoubleClick={(e: ReactMouseEvent) => {
+            handleOpenForm(1, e)
+          }}
+          onClick={(e: ReactMouseEvent) => {
+            handleOpenForm(0, e)
+          }}
           padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
           borderRadius={BORDERS.borderRadius8}
           width="100%"
@@ -294,6 +324,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
               confirmDelete={confirmDelete}
               confirmMultiDelete={confirmMultiDelete}
               multiSelectItemIds={multiSelectItemIds}
+              sidebarWidth={sidebarWidth}
             />,
             getMainPagePortalEl()
           )

@@ -1,4 +1,4 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 
 export type AnnotationCreateCommand = CommentCreateCommand | CustomCreateCommand
 
@@ -17,7 +17,7 @@ export interface CommentRunTimeCommand
   result?: any
 }
 
-interface CommentParams {
+export interface CommentParams {
   message: string
 }
 

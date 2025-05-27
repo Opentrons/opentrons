@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -12,7 +13,8 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+
+import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { getEnableLiquidClasses } from '../../feature-flags/selectors'
 import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
 
@@ -26,7 +28,7 @@ const getLiquidDescription = (
   enableLiquidClasses: boolean
 ): JSX.Element | null => {
   const { description, liquidClass } = liquid
-  const liquidClassDisplayName = getLiquidClassDisplayName(liquidClass)
+  const liquidClassDisplayName = getLiquidClassDisplayName(liquidClass ?? null)
   const liquidClassInfo =
     !enableLiquidClasses || liquidClassDisplayName == null ? null : (
       <Tag text={liquidClassDisplayName} type="default" shrinkToContent />
@@ -67,8 +69,8 @@ export function LiquidDefinitions({
           Object.values(allIngredientGroupFields).map((liquid, index) => {
             return (
               <ListItem
-                type="noActive"
-                key={`${liquid.name}_${liquid.displayColor}_${index}`}
+                type="default"
+                key={`${liquid.displayName}_${liquid.displayColor}_${index}`}
               >
                 <ListItemDescriptor
                   type="large"
@@ -85,7 +87,7 @@ export function LiquidDefinitions({
                         id="liquid-name"
                         css={LINE_CLAMP_TEXT_STYLE(3)}
                       >
-                        {liquid.name}
+                        {liquid.displayName}
                       </StyledText>
                     </Flex>
                   }

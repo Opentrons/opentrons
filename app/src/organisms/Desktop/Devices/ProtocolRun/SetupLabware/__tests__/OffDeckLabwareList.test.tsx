@@ -1,14 +1,15 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockLabwareDef } from '/app/organisms/LegacyLabwarePositionCheck/__fixtures__/mockLabwareDef'
+
 import { LabwareListItem } from '../LabwareListItem'
 import { OffDeckLabwareList } from '../OffDeckLabwareList'
 
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('../LabwareListItem')
 
@@ -33,7 +34,8 @@ describe('OffDeckLabwareList', () => {
     render({
       labwareItems: [],
       isFlex: false,
-      commands: [],
+      definitionsByURI: {},
+      setSelectedStack: vi.fn(),
     })
     expect(screen.queryAllByText('Additional Off-Deck Labware')).toHaveLength(0)
   })
@@ -41,15 +43,14 @@ describe('OffDeckLabwareList', () => {
     render({
       labwareItems: [
         {
-          nickName: 'nickName',
-          definition: mockLabwareDef,
-          initialLocation: 'offDeck',
-          moduleModel: null,
-          moduleLocation: null,
+          displayName: 'nickName',
+          definitionUri: 'mock def uri',
+          labwareId: '1234',
         },
       ],
       isFlex: false,
-      commands: [],
+      definitionsByURI: { 'mock def uri': {} as LabwareDefinition },
+      setSelectedStack: vi.fn(),
     })
     screen.getByText('Additional Off-Deck Labware')
     screen.getByText('mock labware list item')

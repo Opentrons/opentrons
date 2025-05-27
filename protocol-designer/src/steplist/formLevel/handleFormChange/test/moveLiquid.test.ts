@@ -1,24 +1,27 @@
-import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import {
+  fixtureP10SingleV2Specs,
+  fixtureP300SingleV2Specs,
+} from '@opentrons/shared-data'
 import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
 import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+
 import {
   dependentFieldsUpdateMoveLiquid,
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'
-import {
-  fixtureP10SingleV2Specs,
-  fixtureP300SingleV2Specs,
-} from '@opentrons/shared-data'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
-  PipetteEntities,
   LabwareEntities,
+  PipetteEntities,
 } from '@opentrons/step-generation'
 import type { FormData } from '../../../../form-types'
 
@@ -37,6 +40,7 @@ beforeEach(() => {
       // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
       tiprackModel: ['tiprack-10ul'],
       tiprackLabwareDef: [fixtureTiprack10ul],
+      pythonName: 'mockPythonName',
     },
     otherPipetteId: {
       name: 'p300_single_gen2',
@@ -44,6 +48,7 @@ beforeEach(() => {
       // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
       tiprackModel: ['tiprack-300ul'],
       tiprackLabwareDef: [fixtureTiprack300ul],
+      pythonName: 'mockPythonName',
     },
   }
   labwareEntities = {}
@@ -253,6 +258,8 @@ describe('disposal volume should update...', () => {
       path: 'single',
       disposalVolume_checkbox: false,
       disposalVolume_volume: null,
+      conditioning_volume: null,
+      conditioning_checkbox: false,
     })
   })
 

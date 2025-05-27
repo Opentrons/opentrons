@@ -1,32 +1,33 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
-  SPACING,
+  COLORS,
   DIRECTION_COLUMN,
+  Flex,
   POSITION_FIXED,
   RadioButton,
-  COLORS,
+  SPACING,
 } from '@opentrons/components'
 import {
-  WASTE_CHUTE_FIXTURES,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { getTopPortalEl } from '/app/App/portal'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { Dispatch } from 'react'
-import type {
-  QuickTransferSummaryState,
-  QuickTransferSummaryAction,
-} from '../types'
 import type { CutoutConfig } from '@opentrons/shared-data'
+import type {
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
+} from '../types'
 
 interface TipDropLocationProps {
   onBack: () => void

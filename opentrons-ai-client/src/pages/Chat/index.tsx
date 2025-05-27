@@ -1,20 +1,21 @@
-import { useForm, FormProvider } from 'react-hook-form'
+import { useEffect, useRef } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+import { useAtom } from 'jotai'
+import styled from 'styled-components'
+
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
-import { useAtom } from 'jotai'
-import { useRef, useEffect } from 'react'
+import { ChatDisplay } from '../../molecules/ChatDisplay'
+import { ChatFooter } from '../../molecules/ChatFooter'
+import { FeedbackModal } from '../../molecules/FeedbackModal'
 import {
   chatDataAtom,
+  createProtocolChatAtom,
   feedbackModalAtom,
   scrollToBottomAtom,
   updateProtocolChatAtom,
-  createProtocolChatAtom,
 } from '../../resources/atoms'
-import { ChatDisplay } from '../../molecules/ChatDisplay'
-import { ChatFooter } from '../../molecules/ChatFooter'
-import styled from 'styled-components'
-import { FeedbackModal } from '../../molecules/FeedbackModal'
-import { useNavigate } from 'react-router-dom'
 
 export interface InputType {
   userPrompt: string

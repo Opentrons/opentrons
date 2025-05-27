@@ -1,6 +1,5 @@
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
+
 import {
   ALIGN_FLEX_START,
   Box,
@@ -12,18 +11,20 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   RobotCoordsForeignDiv,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { OffsetVector } from '/app/molecules/OffsetVector'
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import { useLabwareOffsetForLabware } from './useLabwareOffsetForLabware'
+import type { LabwareDefinition } from '@opentrons/shared-data'
+
 interface LabwareInfoProps {
-  displayName: string | null
-  definitionDisplayName: string
+  displayName: string
   labwareId: string
   runId: string
   labwareHasLiquid?: boolean
@@ -40,9 +41,7 @@ const labwareDisplayNameStyle = css`
   -webkit-box-orient: vertical;
 `
 const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
-  const { displayName, definitionDisplayName, labwareId, runId, hover } = props
-  const { t } = useTranslation('protocol_setup')
-  const vector = useLabwareOffsetForLabware(runId, labwareId)?.vector
+  const { displayName, labwareId, hover } = props
 
   return (
     <Box
@@ -62,49 +61,50 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
         <LegacyStyledText
           as="h6"
           css={labwareDisplayNameStyle}
-          title={definitionDisplayName}
+          title={displayName}
         >
-          {displayName ?? definitionDisplayName}
+          {displayName}
         </LegacyStyledText>
         {props.labwareHasLiquid && (
           <Icon name="water" color={COLORS.white} width="0" minWidth="1rem" />
         )}
       </Flex>
-      {vector != null && (
-        <>
-          <LegacyStyledText
-            as="h6"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            textTransform="uppercase"
-          >
-            {t('offset_data')}
-          </LegacyStyledText>
-          <OffsetVector {...vector} />
-        </>
-      )}
     </Box>
   )
 }
 
 interface LabwareInfoOverlayProps {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   labwareId: string
-  displayName: string | null
+  displayName: string
   runId: string
-  hover?: boolean
   labwareHasLiquid?: boolean
+  hover?: boolean
+  xOffset?: number
+  yOffset?: number
 }
 export const LabwareInfoOverlay = (
   props: LabwareInfoOverlayProps
 ): JSX.Element => {
-  const { definition, labwareId, displayName, runId } = props
-  const width = definition.dimensions.xDimension
-  const height = definition.dimensions.yDimension
+  const {
+    definition,
+    labwareId,
+    displayName,
+    runId,
+    labwareHasLiquid,
+    xOffset,
+    yOffset,
+  } = props
+
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
+  const dimensions = getSchema2Dimensions(definition)
+
   return (
     <RobotCoordsForeignDiv
-      x={definition.cornerOffsetFromSlot.x}
-      y={definition.cornerOffsetFromSlot.y}
-      {...{ width, height }}
+      x={cornerOffsetFromSlot.x + (xOffset ?? 0)}
+      y={cornerOffsetFromSlot.y + (yOffset ?? 0)}
+      width={dimensions.xDimension}
+      height={dimensions.yDimension}
       innerDivProps={{
         display: DISPLAY_FLEX,
         flexDirection: DIRECTION_COLUMN,
@@ -113,11 +113,10 @@ export const LabwareInfoOverlay = (
     >
       <LabwareInfo
         displayName={displayName}
-        definitionDisplayName={getLabwareDisplayName(definition)}
         labwareId={labwareId}
         runId={runId}
         hover={props.hover}
-        labwareHasLiquid={props.labwareHasLiquid}
+        labwareHasLiquid={labwareHasLiquid}
       />
     </RobotCoordsForeignDiv>
   )

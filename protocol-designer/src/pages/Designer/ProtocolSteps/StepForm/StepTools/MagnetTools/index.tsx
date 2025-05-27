@@ -1,22 +1,24 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
+
+import {
+  DropdownStepFormField,
+  ToggleExpandStepFormField,
+} from '../../../../../../components/molecules'
 import {
   MAX_ENGAGE_HEIGHT_V1,
   MAX_ENGAGE_HEIGHT_V2,
   MIN_ENGAGE_HEIGHT_V1,
   MIN_ENGAGE_HEIGHT_V2,
 } from '../../../../../../constants'
-import {
-  getMagnetLabwareEngageHeight,
-  getMagneticLabwareOptions,
-} from '../../../../../../ui/modules/selectors'
-import {
-  DropdownStepFormField,
-  ToggleExpandStepFormField,
-} from '../../../../../../molecules'
 import { getModuleEntities } from '../../../../../../step-forms/selectors'
+import {
+  getMagneticLabwareOptions,
+  getMagnetLabwareEngageHeight,
+} from '../../../../../../ui/modules/selectors'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 import type { StepFormProps } from '../../types'
@@ -28,7 +30,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const moduleEntities = useSelector(getModuleEntities)
   const defaultEngageHeight = useSelector(getMagnetLabwareEngageHeight)
 
-  const moduleModel = moduleEntities[formData.moduleId].model
+  const moduleModel = moduleEntities[formData.moduleId]?.model
 
   const mmUnits = t('units.millimeter')
   const isGen1 = moduleModel === MAGNETIC_MODULE_V1
@@ -54,14 +56,19 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      paddingY={SPACING.spacing16}
+      gridGap={SPACING.spacing12}
+    >
       <DropdownStepFormField
         {...propsForFields.moduleId}
         options={moduleLabwareOptions}
         title={t('protocol_steps:module')}
+        errorToShow={getFormLevelError('moduleId', mappedErrorsToField)}
       />
       <Divider marginY="0" />
-      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+      <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacing16}>
         <ToggleExpandStepFormField
           {...propsForFields.engageHeight}
           toggleValue={propsForFields.magnetAction.value}

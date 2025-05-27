@@ -38,7 +38,9 @@ from opentrons.protocol_engine.state.update_types import (
     StateUpdate,
 )
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    labware_definition_type_adapter,
+)
 from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
 
 
@@ -632,13 +634,21 @@ class LegacyCommandMapper:
         count = self._command_count["LOAD_LABWARE"]
         slot = labware_load_info.deck_slot
         location: pe_types.LabwareLocation
+        location_sequence: pe_types.LabwareLocationSequence = []
         if labware_load_info.on_module:
-            location = pe_types.ModuleLocation.model_construct(
-                moduleId=self._module_id_by_slot[slot]
+            module_id = self._module_id_by_slot[slot]
+            location = pe_types.ModuleLocation.model_construct(moduleId=module_id)
+            location_sequence.append(
+                pe_types.OnModuleLocationSequenceComponent(moduleId=module_id)
             )
         else:
             location = pe_types.DeckSlotLocation.model_construct(slotName=slot)
 
+        location_sequence.append(
+            pe_types.OnAddressableAreaLocationSequenceComponent(
+                addressableAreaName=slot.value
+            )
+        )
         command_id = f"commands.LOAD_LABWARE-{count}"
         labware_id = f"labware-{count}"
 
@@ -659,10 +669,11 @@ class LegacyCommandMapper:
             notes=[],
             result=pe_commands.LoadLabwareResult.model_construct(
                 labwareId=labware_id,
-                definition=LabwareDefinition.model_validate(
+                definition=labware_definition_type_adapter.validate_python(
                     labware_load_info.labware_definition
                 ),
                 offsetId=labware_load_info.offset_id,
+                locationSequence=location_sequence,
             ),
         )
         queue_action = pe_actions.QueueCommandAction(

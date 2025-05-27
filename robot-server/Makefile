@@ -99,7 +99,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)
@@ -124,6 +124,10 @@ test:
 .PHONY: test-cov
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
+
+.PHONT: test-fast
+test-fast:
+	$(pytest) $(tests) $(test_opts) -m 'not slow'
 
 .PHONY: lint
 lint:

@@ -9,9 +9,9 @@ import re
 
 from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
 from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
+    LabwareDefinition2,
     LabwareRole,
-    Parameters as LabwareDefinitionParameters,
+    Parameters2 as LabwareDefinition2Parameters,
 )
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
@@ -246,30 +246,30 @@ def test_ensure_lowercase_name_invalid() -> None:
     ("definition", "expected_raise"),
     [
         (
-            LabwareDefinition.model_construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.labware],
-                parameters=LabwareDefinitionParameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             do_not_raise(),
         ),
         (
-            LabwareDefinition.model_construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[],
-                parameters=LabwareDefinitionParameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             do_not_raise(),
         ),
         (
-            LabwareDefinition.model_construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.adapter],
-                parameters=LabwareDefinitionParameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             pytest.raises(subject.LabwareDefinitionIsNotLabwareError),
         ),
     ],
 )
 def test_ensure_definition_is_labware(
-    definition: LabwareDefinition, expected_raise: ContextManager[Any]
+    definition: LabwareDefinition2, expected_raise: ContextManager[Any]
 ) -> None:
     """It should check if the Labware Definition is defined as a regular labware."""
     with expected_raise:
@@ -280,30 +280,30 @@ def test_ensure_definition_is_labware(
     ("definition", "expected_raise"),
     [
         (
-            LabwareDefinition.model_construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.adapter],
-                parameters=LabwareDefinitionParameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             do_not_raise(),
         ),
         (
-            LabwareDefinition.model_construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[],
-                parameters=LabwareDefinitionParameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             pytest.raises(subject.LabwareDefinitionIsNotAdapterError),
         ),
         (
-            LabwareDefinition.model_construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.labware],
-                parameters=LabwareDefinitionParameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             pytest.raises(subject.LabwareDefinitionIsNotAdapterError),
         ),
     ],
 )
 def test_ensure_definition_is_adapter(
-    definition: LabwareDefinition, expected_raise: ContextManager[Any]
+    definition: LabwareDefinition2, expected_raise: ContextManager[Any]
 ) -> None:
     """It should check if the Labware Definition is defined as an adapter."""
     with expected_raise:
@@ -579,6 +579,40 @@ def test_validate_last_location_with_labware(decoy: Decoy) -> None:
     result = subject.validate_location(location=None, last_location=input_last_location)
 
     assert result == subject.PointTarget(location=input_last_location, in_place=True)
+
+
+def test_validate_location_with_trash_bin(decoy: Decoy) -> None:
+    """Should return a Trash Bin object."""
+    mock_trash = decoy.mock(cls=TrashBin)
+
+    result = subject.validate_location(location=None, last_location=mock_trash)
+    assert result.location is mock_trash
+    assert result.in_place
+
+    result = subject.validate_location(location=mock_trash, last_location=None)
+    assert result.location is mock_trash
+    assert not result.in_place
+
+    result = subject.validate_location(location=mock_trash, last_location=mock_trash)
+    assert result.location is mock_trash
+    assert result.in_place
+
+
+def test_validate_location_with_waste_chute(decoy: Decoy) -> None:
+    """Should return a waste chute object."""
+    mock_chute = decoy.mock(cls=WasteChute)
+
+    result = subject.validate_location(location=None, last_location=mock_chute)
+    assert result.location is mock_chute
+    assert result.in_place
+
+    result = subject.validate_location(location=mock_chute, last_location=None)
+    assert result.location is mock_chute
+    assert not result.in_place
+
+    result = subject.validate_location(location=mock_chute, last_location=mock_chute)
+    assert result.location is mock_chute
+    assert result.in_place
 
 
 def test_ensure_boolean() -> None:

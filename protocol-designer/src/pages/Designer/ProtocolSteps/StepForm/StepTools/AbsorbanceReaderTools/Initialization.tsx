@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -11,9 +12,11 @@ import {
   DropdownMenu,
   EmptySelectorButton,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
   InputField,
   JUSTIFY_SPACE_BETWEEN,
+  ListButton,
   ListItem,
   RadioButton,
   SPACING,
@@ -22,6 +25,8 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+
+import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
   ABSORBANCE_READER_MAX_WAVELENGTH_NM,
   ABSORBANCE_READER_MIN_WAVELENGTH_NM,
@@ -29,12 +34,12 @@ import {
 import { maskToInteger } from '../../../../../../steplist/fieldLevel/processing'
 import { getFormErrorsMappedToField } from '../../utils'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { TFunction } from 'i18next'
+import type { Dispatch, SetStateAction } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { FormData } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
 import type { InitializationMode } from '../../../../../../step-forms/types'
+import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldProps, FieldPropsByName } from '../../types'
 import type { ErrorMappedToField } from '../../utils'
 
@@ -192,7 +197,7 @@ function IntializationEditor(props: InitializationEditorProps): JSX.Element {
     const wavelength = i <= wavelengths.length ? wavelengths[i] : null
     wavelengthItems.push(
       <ListItem
-        type="noActive"
+        type="default"
         padding={SPACING.spacing12}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
@@ -236,12 +241,15 @@ function IntializationEditor(props: InitializationEditorProps): JSX.Element {
           {wavelengthItems}
         </Flex>
         {mode === 'multi' && wavelengths.length < MAX_WAVELENGTHS ? (
-          <EmptySelectorButton
-            onClick={handleAddWavelength}
-            text={t('step_edit_form.absorbanceReader.add_wavelength.label')}
-            textAlignment="left"
-            disabled={numWavelengths === MAX_WAVELENGTHS}
-          />
+          <Flex width={FLEX_MAX_CONTENT}>
+            <EmptySelectorButton
+              onClick={handleAddWavelength}
+              text={t('step_edit_form.absorbanceReader.add_wavelength.label')}
+              textAlignment="left"
+              disabled={numWavelengths === MAX_WAVELENGTHS}
+              iconName="plus"
+            />
+          </Flex>
         ) : null}
       </Flex>
       {mode === 'single' ? (
@@ -278,6 +286,7 @@ function WavelengthItem(props: WavelengthItemProps): JSX.Element {
     handleDeleteWavelength,
     index,
     error,
+    mode,
   } = props
   const { t } = useTranslation('form')
   const showCustom = !DEFINED_OPTIONS.some(({ value }) => value === wavelength)
@@ -328,18 +337,17 @@ function WavelengthItem(props: WavelengthItemProps): JSX.Element {
           error={!isFocused ? error : null}
         />
       ) : null}
-      {wavelengths.length > 1 ? (
+      {wavelengths.length > 1 && mode === 'multi' ? (
         <Btn
           onClick={() => {
             handleDeleteWavelength(index)
           }}
-          alignSelf={ALIGN_FLEX_END}
           padding={SPACING.spacing4}
+          css={LINK_BUTTON_STYLE}
+          alignSelf={ALIGN_FLEX_END}
+          textDecoration={TEXT_DECORATION_UNDERLINE}
         >
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            textDecoration={TEXT_DECORATION_UNDERLINE}
-          >
+          <StyledText desktopStyle="bodyDefaultRegular">
             {t('step_edit_form.absorbanceReader.delete')}
           </StyledText>
         </Btn>
@@ -383,28 +391,29 @@ function ReferenceWavelength(props: ReferenceWavelengthProps): JSX.Element {
           {t('step_edit_form.absorbanceReader.reference_wavelength.tooltip')}
         </Tooltip>
       </Flex>
-      <ListItem
+      <ListButton
         type="noActive"
         padding={SPACING.spacing12}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
+        onClick={() => {
+          propsForFields.referenceWavelengthActive.updateValue(!isExpanded)
+        }}
       >
-        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_CENTER}
+        >
           <StyledText desktopStyle="bodyDefaultRegular">
             {t(
               'step_edit_form.field.absorbanceReader.referenceWavelengthActive'
             )}
           </StyledText>
-          <Btn
-            onClick={() => {
-              propsForFields.referenceWavelengthActive.updateValue(!isExpanded)
-            }}
-          >
-            <Check
-              color={COLORS.blue50}
-              isChecked={formData.referenceWavelengthActive === true}
-            />
-          </Btn>
+          <Check
+            color={COLORS.blue50}
+            isChecked={formData.referenceWavelengthActive === true}
+          />
         </Flex>
         {isExpanded ? (
           <>
@@ -446,6 +455,9 @@ function ReferenceWavelength(props: ReferenceWavelengthProps): JSX.Element {
                     maskToInteger(e.target.value)
                   )
                 }}
+                onClick={e => {
+                  e.stopPropagation()
+                }}
                 onBlur={() => {
                   setIsFocused(false)
                 }}
@@ -457,7 +469,7 @@ function ReferenceWavelength(props: ReferenceWavelengthProps): JSX.Element {
             ) : null}
           </>
         ) : null}
-      </ListItem>
+      </ListButton>
     </Flex>
   )
 }

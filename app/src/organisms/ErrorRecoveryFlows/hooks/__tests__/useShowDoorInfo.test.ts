@@ -1,5 +1,5 @@
-import { renderHook, act } from '@testing-library/react'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
   RUN_STATUS_AWAITING_RECOVERY,
@@ -7,11 +7,12 @@ import {
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
 
-import { useShowDoorInfo } from '../useShowDoorInfo'
 import {
-  RECOVERY_MAP,
   GRIPPER_MOVE_STEPS,
+  RECOVERY_MAP,
 } from '/app/organisms/ErrorRecoveryFlows/constants'
+
+import { useShowDoorInfo } from '../useShowDoorInfo'
 
 import type { IRecoveryMap, RouteStep } from '../../types'
 
@@ -139,10 +140,10 @@ describe('useShowDoorInfo', () => {
       useShowDoorInfo(
         props,
         {
-          route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
-          step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL,
+          route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+          step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.MANUAL_FILL,
         },
-        RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.MANUAL_FILL
       )
     )
 

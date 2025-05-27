@@ -1,20 +1,20 @@
 // well dimensions and spacing for details page
 import round from 'lodash/round'
+
 import { getSpacingDiagram } from '@opentrons/components'
+
 import {
-  SPACING,
-  X_OFFSET,
-  Y_OFFSET,
-  X_SPACING,
-  Y_SPACING,
-  NA,
-  VARIOUS,
   MM,
+  NA,
+  SPACING,
+  VARIOUS,
+  X_OFFSET,
+  X_SPACING,
+  Y_OFFSET,
+  Y_SPACING,
 } from '../../localization'
-
-import styles from './styles.module.css'
-
 import { LabeledValueTable, LowercaseText } from '../ui'
+import styles from './styles.module.css'
 
 import type { LabwareWellGroupProperties } from '../../types'
 
@@ -43,7 +43,7 @@ export function WellSpacing(props: WellSpacingProps): JSX.Element {
   const { labelSuffix, wellProperties, className, category, isMultiRow } = props
   const spacing = [
     { label: X_OFFSET, value: toFixed(wellProperties.xOffsetFromLeft) },
-    { label: Y_OFFSET, value: toFixed(wellProperties.yOffsetFromTop) },
+    { label: Y_OFFSET, value: toFixed(wellProperties.yOffsetFromBack) },
     { label: X_SPACING, value: spacingValue(wellProperties.xSpacing) },
     { label: Y_SPACING, value: spacingValue(wellProperties.ySpacing) },
   ]

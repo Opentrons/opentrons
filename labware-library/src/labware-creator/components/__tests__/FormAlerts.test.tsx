@@ -1,14 +1,16 @@
-import { vi, describe, it, expect, afterEach } from 'vitest'
-import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
-import { getIsHidden } from '../../formSelectors'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import {
   IRREGULAR_LABWARE_ERROR,
-  LOOSE_TIP_FIT_ERROR,
-  LABWARE_TOO_SMALL_ERROR,
   LABWARE_TOO_LARGE_ERROR,
+  LABWARE_TOO_SMALL_ERROR,
+  LOOSE_TIP_FIT_ERROR,
 } from '../../fields'
+import { getIsHidden } from '../../formSelectors'
 import { FormAlerts } from '../alerts/FormAlerts'
+
 import type { Props as FormAlertProps } from '../alerts/FormAlerts'
 
 vi.mock('../../formSelectors')
@@ -60,7 +62,7 @@ describe('FormAlerts', () => {
     render(<FormAlerts {...props} />)
     const alertItem = screen.getByTestId('alert_item_title')
     expect(alertItem).toHaveTextContent(
-      'Your labware is not compatible with the Labware Creator. Please fill out this form to request a custom labware definition.'
+      'Your labware is not compatible with the Labware Creator. Please contact Opentrons Support to request a custom labware definition.'
     )
   })
 
@@ -108,7 +110,7 @@ describe('FormAlerts', () => {
     render(<FormAlerts {...props} />)
     const alertItem = screen.getByTestId('alert_item_title')
     expect(alertItem).toHaveTextContent(
-      'Your labware is too small to fit in a slot properly. Please fill out this form to request an adapter.'
+      'Your labware is too small to fit in a slot properly. Please contact Opentrons Support to request an adapter.'
     )
   })
 
@@ -132,7 +134,7 @@ describe('FormAlerts', () => {
     render(<FormAlerts {...props} />)
     const alertItem = screen.getByTestId('alert_item_title')
     expect(alertItem).toHaveTextContent(
-      'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
+      'Your labware is too large to fit in a single slot properly. Please contact Opentrons Support to request a custom labware definition.'
     )
   })
 })

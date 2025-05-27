@@ -1,10 +1,11 @@
 import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import noop from 'lodash/noop'
+
 import {
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
   DeckInfoLabel,
+  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
@@ -12,9 +13,10 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
-import { formatVolume } from './utils'
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 
+import { formatVolume } from './utils'
+
+import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type { SubstepIdentifier, SubstepWellData } from '../../../../steplist'
 
 interface SubstepProps {
@@ -71,7 +73,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
       gridGap={SPACING.spacing4}
     >
       {isMix ? (
-        <ListItem type="noActive">
+        <ListItem type="default">
           <Flex
             gridGap={SPACING.spacing4}
             padding={SPACING.spacing12}
@@ -101,7 +103,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
       ) : (
         <>
           {source != null ? (
-            <ListItem type="noActive">
+            <ListItem type="default">
               <Flex
                 gridGap={SPACING.spacing4}
                 padding={SPACING.spacing12}
@@ -130,7 +132,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
             </ListItem>
           ) : null}
           {dest != null ? (
-            <ListItem type="noActive">
+            <ListItem type="default">
               <Flex
                 gridGap={SPACING.spacing4}
                 padding={SPACING.spacing12}

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import {
   RUN_STATUS_IDLE,
@@ -9,14 +9,15 @@ import {
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 
+import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { getMissingSetupSteps } from '/app/redux/protocol-runs'
-import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
+
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
 import {
   isRecoveryStatus,
@@ -25,9 +26,9 @@ import {
 } from '../../../utils'
 
 import type { IconName } from '@opentrons/components'
-import type { BaseActionButtonProps } from '..'
-import type { State } from '/app/redux/types'
 import type { StepKey } from '/app/redux/protocol-runs'
+import type { State } from '/app/redux/types'
+import type { BaseActionButtonProps } from '..'
 
 interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isProtocolNotReady: boolean
@@ -48,6 +49,7 @@ export function useActionButtonProperties({
   runStatus,
   robotName,
   runId,
+  currentRunId,
   confirmAttachment,
   confirmMissingSteps,
   robotAnalyticsData,
@@ -82,7 +84,7 @@ export function useActionButtonProperties({
     buttonText = t('analyzing_on_robot')
   } else if (isClosingCurrentRun) {
     buttonIconName = 'ot-spinner'
-    buttonText = t('canceling_run')
+    buttonText = t('shared:robot_is_busy')
   } else if (runStatus === RUN_STATUS_RUNNING || isRecoveryStatus(runStatus)) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')

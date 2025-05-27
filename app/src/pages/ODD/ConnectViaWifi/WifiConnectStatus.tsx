@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import {
   ConnectingNetwork,

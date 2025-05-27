@@ -1,8 +1,12 @@
-import { getAllDefinitions } from '@opentrons/shared-data'
 import {
-  SINGLE_CHANNEL_COMPATIBLE_LABWARE,
+  getAllDefinitions,
+  LABWAREV2_DO_NOT_LIST,
+} from '@opentrons/shared-data'
+
+import {
   EIGHT_CHANNEL_COMPATIBLE_LABWARE,
   NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE,
+  SINGLE_CHANNEL_COMPATIBLE_LABWARE,
 } from '../constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -12,7 +16,7 @@ export function getCompatibleLabwareByCategory(
   pipetteChannels: 1 | 8 | 96,
   category: LabwareFilter
 ): LabwareDefinition2[] | undefined {
-  const allLabwareDefinitions = getAllDefinitions()
+  const allLabwareDefinitions = getAllDefinitions(LABWAREV2_DO_NOT_LIST)
   let compatibleLabwareUris: string[] = SINGLE_CHANNEL_COMPATIBLE_LABWARE
   if (pipetteChannels === 8) {
     compatibleLabwareUris = EIGHT_CHANNEL_COMPATIBLE_LABWARE

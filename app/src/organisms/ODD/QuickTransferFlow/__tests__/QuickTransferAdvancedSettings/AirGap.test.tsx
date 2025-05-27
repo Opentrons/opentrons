@@ -1,11 +1,12 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { InputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+
 import { AirGap } from '../../QuickTransferAdvancedSettings/AirGap'
 
 import type { ComponentProps } from 'react'
@@ -123,7 +124,7 @@ describe('AirGap', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Air gap volume (µL)',
-        error: 'Value must be between 1-180',
+        error: 'Value must be between 1 to 180',
         readOnly: true,
         type: 'number',
         value: 0,
@@ -152,7 +153,7 @@ describe('AirGap', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Air gap volume (µL)',
-        error: 'Value must be between 1-80',
+        error: 'Value must be between 1 to 80',
         readOnly: true,
         type: 'number',
         value: 0,
@@ -179,7 +180,7 @@ describe('AirGap', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Air gap volume (µL)',
-        error: 'Value must be between 1-140',
+        error: 'Value must be between 1 to 140',
         readOnly: true,
         type: 'number',
         value: 0,
@@ -204,7 +205,7 @@ describe('AirGap', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Air gap volume (µL)',
-        error: 'Value must be between 1-200',
+        error: 'Value must be between 1 to 200',
         readOnly: true,
         type: 'number',
         value: 0,

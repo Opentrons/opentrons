@@ -1,16 +1,18 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../assets/localization'
-import {
-  getMagneticLabwareOptions,
-  getMagnetLabwareEngageHeight,
-} from '../../../../../../ui/modules/selectors'
 import {
   getInitialDeckSetup,
   getModuleEntities,
 } from '../../../../../../step-forms/selectors'
+import {
+  getMagneticLabwareOptions,
+  getMagnetLabwareEngageHeight,
+} from '../../../../../../ui/modules/selectors'
 import { MagnetTools } from '../MagnetTools'
+
 import type { ComponentProps } from 'react'
 import type * as ModulesSelectors from '../../../../../../ui/modules/selectors'
 
@@ -59,6 +61,15 @@ describe('MagnetTools', () => {
           updateValue: vi.fn(),
           value: 'engage',
         },
+        moduleId: {
+          onFieldFocus: vi.fn(),
+          onFieldBlur: vi.fn(),
+          errorToShow: null,
+          disabled: false,
+          name: 'magnetAction',
+          updateValue: vi.fn(),
+          value: 'engage',
+        },
         engageHeight: {
           onFieldFocus: vi.fn(),
           onFieldBlur: vi.fn(),
@@ -81,6 +92,7 @@ describe('MagnetTools', () => {
         id: 'magnetId',
         model: 'magneticModuleV2',
         type: 'magneticModuleType',
+        pythonName: 'mockPythonName',
       },
     })
     vi.mocked(getMagnetLabwareEngageHeight).mockReturnValue(null)
@@ -93,6 +105,7 @@ describe('MagnetTools', () => {
           type: 'magneticModuleType',
           moduleState: { engaged: false, type: 'magneticModuleType' },
           model: 'magneticModuleV1',
+          pythonName: 'mockPythonName',
         },
       },
       additionalEquipmentOnDeck: {},
@@ -103,7 +116,7 @@ describe('MagnetTools', () => {
   it('renders the text and a switch button for v2', () => {
     render(props)
     screen.getByText('Module')
-    screen.getByText('Magnet state')
+    screen.getByText('Magnets')
     screen.getByLabelText('Engage')
     const toggleButton = screen.getByRole('switch')
     screen.getByText('Engage height')
@@ -118,6 +131,7 @@ describe('MagnetTools', () => {
         id: 'magnetId',
         model: 'magneticModuleV1',
         type: 'magneticModuleType',
+        pythonName: 'mockPythonName',
       },
     })
     render(props)

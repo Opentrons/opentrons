@@ -6,8 +6,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
@@ -17,10 +17,12 @@ import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
 } from '/app/organisms/ODD/RobotDashboard'
-import { getOnDeviceDisplaySettings } from '/app/redux/config'
-import { WelcomeModal } from './WelcomeModal'
 import { ServerInitializing } from '/app/organisms/ODD/RobotDashboard/ServerInitializing'
+import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
+
+import { WelcomeModal } from './WelcomeModal'
+
 import type { RunData } from '@opentrons/api-client'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8

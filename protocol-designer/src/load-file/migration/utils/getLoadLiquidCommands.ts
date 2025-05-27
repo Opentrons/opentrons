@@ -1,6 +1,9 @@
 import reduce from 'lodash/reduce'
+
 import { uuid } from '../../../utils'
+
 import type { LoadLiquidCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { LiquidEntities } from '@opentrons/step-generation'
 import type { DismissedWarningState } from '../../../dismiss/reducers'
 
 export interface DesignerApplicationData {
@@ -9,6 +12,7 @@ export interface DesignerApplicationData {
     {
       name?: string | null
       description?: string | null
+      liquidClass?: string
       serialize: boolean
     }
   >
@@ -24,7 +28,7 @@ export interface DesignerApplicationData {
 }
 
 export const getLoadLiquidCommands = (
-  ingredients?: DesignerApplicationData['ingredients'],
+  ingredients?: DesignerApplicationData['ingredients'] | LiquidEntities,
   ingredLocations?: DesignerApplicationData['ingredLocations']
 ): LoadLiquidCreateCommand[] => {
   let loadLiquidCommands: LoadLiquidCreateCommand[] = []

@@ -1,25 +1,37 @@
-import { useCallback, useRef, useEffect } from 'react'
-import difference from 'lodash/difference'
+import { useCallback, useContext, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
+import difference from 'lodash/difference'
 
-import { useInterval, truncateString } from '@opentrons/components'
+import { getProtocol } from '@opentrons/api-client'
+import {
+  truncateString,
+  useInterval,
+  useScrolling,
+} from '@opentrons/components'
 import {
   useAllProtocolIdsQuery,
-  useHost,
   useCreateLiveCommandMutation,
+  useHost,
 } from '@opentrons/react-api-client'
-import { getProtocol } from '@opentrons/api-client'
 
-import { checkShellUpdate } from '/app/redux/shell'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { checkShellUpdate } from '/app/redux/shell'
 
+import { useNotifyDeckConfigurationQuery } from '../resources/deck_configuration'
+import { useAttachedPipettes } from '../resources/instruments'
+import { useAttachedModules } from '../resources/modules'
+import { SharedScrollRefContext } from './ODDProviders/ScrollRefProvider'
+
+import type { AttachedModule } from '@opentrons/api-client'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '/app/redux/types'
 
 const UPDATE_RECHECK_INTERVAL_MS = 60000
 const PROTOCOL_IDS_RECHECK_INTERVAL_MS = 3000
+const ATTACHED_MODULE_POLL_MS = 5000
+const DECK_CONFIG_POLL_MS = 5000
 
 export function useSoftwareUpdatePoll(): void {
   const dispatch = useDispatch<Dispatch>()
@@ -31,7 +43,7 @@ export function useSoftwareUpdatePoll(): void {
 
 export function useProtocolReceiptToast(): void {
   const host = useHost()
-  const { t } = useTranslation('protocol_info')
+  const { t, i18n } = useTranslation(['protocol_info', 'shared'])
   const { makeToast } = useToaster()
   const queryClient = useQueryClient()
   const protocolIdsQuery = useAllProtocolIdsQuery(
@@ -83,7 +95,7 @@ export function useProtocolReceiptToast(): void {
               }) as string,
               'success',
               {
-                closeButton: true,
+                buttonText: i18n.format(t('shared:close'), 'capitalize'),
                 disableTimeout: true,
                 displayType: 'odd',
               }
@@ -112,4 +124,85 @@ export function useProtocolReceiptToast(): void {
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [protocolIds])
+}
+
+export function useGetNewModules(): AttachedModule[] {
+  const attachedModules =
+    useAttachedModules({
+      refetchInterval: ATTACHED_MODULE_POLL_MS,
+    }) ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery({
+    enabled: attachedModules.length > 0,
+    refetchInterval: DECK_CONFIG_POLL_MS,
+  }).data
+  if (deckConfig != null && attachedModules.length > 0) {
+    const modulesInDeckConfig = deckConfig
+      ?.filter(c => c.opentronsModuleSerialNumber)
+      .map(m => m.opentronsModuleSerialNumber)
+    const newModules = attachedModules.filter(
+      m =>
+        m.moduleOffset === undefined &&
+        !modulesInDeckConfig.includes(m.serialNumber)
+    )
+    return newModules
+  }
+  return []
+}
+
+export function useModuleAttachedToast(
+  launchModuleSetupCallback: () => void
+): void {
+  const newModules = useGetNewModules()
+  const attachedPipettes = useAttachedPipettes(newModules.length > 0)
+  const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
+  const { makeToast } = useToaster()
+  const moduleSerials = newModules.map(m => m.serialNumber)
+  const moduleSerialsRef = useRef(moduleSerials)
+
+  useEffect(() => {
+    const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
+    const hasPipette =
+      attachedPipettes.left != null || attachedPipettes.right != null
+    if (hasPipette && newModuleSerials.length > 0) {
+      makeToast(t('module_added') as string, 'info', {
+        buttonText: i18n.format(t('shared:close'), 'capitalize'),
+        linkText: t('module_added_link'),
+        onLinkClick: launchModuleSetupCallback,
+        disableTimeout: true,
+        displayType: 'odd',
+      })
+    }
+    moduleSerialsRef.current = moduleSerials
+    // dont want this hook to rerun when other deps change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [moduleSerials])
+}
+
+export function useScrollRef(): {
+  isScrolling: boolean
+  refCallback: (node: HTMLElement | null) => void
+  element: HTMLElement | null
+} {
+  const refData = useContext(SharedScrollRefContext)
+  const isScrolling = useScrolling(refData?.element ?? null) // Assuming useScrolling is properly handling scroll state
+
+  if (refData == null) {
+    // log non critical error instead of throwing error to prevent white screens
+    console.error(
+      'useScrollRef must be used within a SharedScrollRefProvider. Falling back to dummy refs.'
+    )
+    return {
+      refCallback: () => null,
+      isScrolling: false,
+      element: null,
+    }
+  }
+
+  const { refCallback, element } = refData
+
+  return {
+    refCallback,
+    isScrolling,
+    element,
+  }
 }

@@ -1,7 +1,7 @@
 """Manage current and historical run data."""
 
 from datetime import datetime
-from typing import Dict, List, Optional, Callable, Union, Mapping
+from typing import Dict, List, Optional, Callable, Union, Mapping, Sequence
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
@@ -10,6 +10,7 @@ from opentrons.types import NozzleMapInterface
 from opentrons.protocol_engine import (
     EngineStatus,
     LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
     StateSummary,
     CommandSlice,
     CommandErrorSlice,
@@ -34,6 +35,7 @@ from .run_models import Run, BadRun, RunDataError
 
 from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParameter
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
@@ -181,7 +183,7 @@ class RunDataManager:
         self,
         run_id: str,
         created_at: datetime,
-        labware_offsets: List[LabwareOffsetCreate],
+        labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
         file_provider: FileProvider,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
@@ -526,6 +528,15 @@ class RunDataManager:
         """Get current tip attached states, keyed by pipette id."""
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_tip_attached()
+
+        raise RunNotCurrentError()
+
+    def get_flex_stacker_substate(
+        self, run_id: str
+    ) -> Mapping[str, FlexStackerSubState]:
+        """Get current Flex Stacker Substates by module id."""
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_flex_stacker_substate()
 
         raise RunNotCurrentError()
 

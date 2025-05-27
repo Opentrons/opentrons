@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,14 +8,15 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { getAllDefinitions } from '@opentrons/shared-data'
+
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import type { ComponentProps, Dispatch } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
 
 interface SelectTipRackProps {
@@ -29,7 +31,7 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
-  const allLabwareDefinitionsByUri = getAllDefinitions()
+  const allLabwareDefinition2sByUri = getAllDefinitions()
   const selectedPipetteDefaultTipracks =
     state.pipette?.liquids.default.defaultTipracks ?? []
 
@@ -66,7 +68,7 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
         width="100%"
       >
         {selectedPipetteDefaultTipracks.map(tipRack => {
-          const tipRackDef = allLabwareDefinitionsByUri[tipRack]
+          const tipRackDef = allLabwareDefinition2sByUri[tipRack]
 
           return tipRackDef != null ? (
             <RadioButton

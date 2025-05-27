@@ -22,16 +22,17 @@ import {
   useMenuHandleClickOutside,
 } from '@opentrons/components'
 
+import { getTopPortalEl } from '/app/App/portal'
+import { Divider } from '/app/atoms/structure'
+import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
 import { CONNECTABLE, removeRobot } from '/app/redux/discovery'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { Divider } from '/app/atoms/structure'
-import { getTopPortalEl } from '/app/App/portal'
-import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { useCurrentRunId } from '/app/resources/runs'
-import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
-import { useIsRobotBusy } from '/app/redux-resources/robots'
 
-import type { MouseEventHandler, MouseEvent, ReactNode } from 'react'
+import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
+
+import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { Dispatch } from '/app/redux/types'

@@ -1,7 +1,8 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { GRIPPER_LOCATION } from '@opentrons/step-generation'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
@@ -70,6 +71,7 @@ const mockAdditionalEquipment = {
   'mock:gripper': {
     name: 'gripper',
     id: 'mock:gripper',
+    location: GRIPPER_LOCATION,
   },
 } as AdditionalEquipmentEntities
 

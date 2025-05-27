@@ -1,11 +1,12 @@
-import type * as React from 'react'
-import reduce from 'lodash/reduce'
 import keyBy from 'lodash/keyBy'
+import reduce from 'lodash/reduce'
+
 import { getAllPipetteNames, getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import { InstrumentGroup as InstrumentGroupComponent } from './InstrumentGroup'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 const allPipetteSpecsByDisplayNames = keyBy(
   getAllPipetteNames().map(getPipetteNameSpecs),

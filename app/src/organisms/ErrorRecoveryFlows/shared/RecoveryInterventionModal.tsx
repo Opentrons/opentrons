@@ -9,8 +9,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { InterventionModal } from '/app/molecules/InterventionModal'
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
+import { InterventionModal } from '/app/molecules/InterventionModal'
 
 import type { ComponentProps } from 'react'
 import type { ModalType } from '/app/molecules/InterventionModal'
@@ -38,7 +38,7 @@ export function RecoveryInterventionModal({
   }
 
   return createPortal(
-    <InterventionModal {...restProps}>
+    <InterventionModal {...restProps} iconSize={isOnDevice ? '28px' : '16px'}>
       <Flex
         css={
           desktopType === 'desktop-small'

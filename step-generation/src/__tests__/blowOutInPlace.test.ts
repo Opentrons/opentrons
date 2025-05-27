@@ -1,18 +1,20 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { blowOutInPlace } from '../commandCreators/atomic/blowOutInPlace'
 import {
-  makeContext,
+  DEFAULT_PIPETTE,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeContext,
 } from '../fixtures'
-import type { RobotState, InvariantContext } from '../types'
+
 import type { BlowoutInPlaceParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 describe('blowOutInPlace', () => {
   let invariantContext: InvariantContext
   let robotStateWithTip: RobotState
 
-  const mockId = 'mockId'
   const mockFlowRate = 10
   beforeEach(() => {
     invariantContext = makeContext()
@@ -20,7 +22,7 @@ describe('blowOutInPlace', () => {
   })
   it('blowOut in place', () => {
     const params: BlowoutInPlaceParams = {
-      pipetteId: mockId,
+      pipetteId: DEFAULT_PIPETTE,
       flowRate: mockFlowRate,
     }
     const result = blowOutInPlace(params, invariantContext, robotStateWithTip)
@@ -30,10 +32,16 @@ describe('blowOutInPlace', () => {
         commandType: 'blowOutInPlace',
         key: expect.any(String),
         params: {
-          pipetteId: mockId,
+          pipetteId: DEFAULT_PIPETTE,
           flowRate: mockFlowRate,
         },
       },
     ])
+    expect(res.python).toBe(
+      `
+mock_pipette.flow_rate.blow_out = 10
+mock_pipette.blow_out()
+`.trim()
+    )
   })
 })

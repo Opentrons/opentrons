@@ -1,19 +1,22 @@
 import type {
+  LabwareDefinition,
   Liquid,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
   ModuleModel,
+  NozzleLayoutConfig,
+  OnDeckLabwareLocation,
   RunCommandError,
   RunTimeCommand,
   RunTimeParameter,
-  NozzleLayoutConfig,
-  OnDeckLabwareLocation,
-  LabwareDefinition1,
-  LabwareDefinition2,
-  LabwareDefinition3,
 } from '@opentrons/shared-data'
-import type { ResourceLink, ErrorDetails } from '../types'
+import type {
+  ErrorDetails,
+  LabwareOffsetLocationSequence,
+  ResourceLink,
+} from '../types'
+
 export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
@@ -85,12 +88,13 @@ export interface LabwareOffset {
   id: string
   createdAt: string
   definitionUri: string
-  location: LabwareOffsetLocation
+  location: LegacyLabwareOffsetLocation
+  locationSequence?: LabwareOffsetLocationSequence
   vector: VectorOffset
 }
 
 export interface RunLoadedLabwareDefinitions {
-  data: Array<LabwareDefinition1 | LabwareDefinition2 | LabwareDefinition3>
+  data: LabwareDefinition[]
 }
 
 export interface Run {
@@ -129,6 +133,7 @@ export interface RunCurrentStateData {
   activeNozzleLayouts: Record<string, NozzleLayoutValues> // keyed by pipetteId
   tipStates: Record<string, TipStates> // keyed by pipetteId
   placeLabwareState?: PlaceLabwareState
+  flexStackerStates?: Record<string, FlexStackerState> // keyed by moduleId
 }
 
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'
@@ -156,14 +161,20 @@ export interface CreateRunActionData {
   actionType: RunActionType
 }
 
-export interface LabwareOffsetLocation {
+export interface LegacyLabwareOffsetLocation {
   slotName: string
   moduleModel?: ModuleModel
   definitionUri?: string
 }
+export interface LegacyLabwareOffsetCreateData {
+  definitionUri: string
+  location: LegacyLabwareOffsetLocation
+  vector: VectorOffset
+}
+
 export interface LabwareOffsetCreateData {
   definitionUri: string
-  location: LabwareOffsetLocation
+  locationSequence: LabwareOffsetLocationSequence
   vector: VectorOffset
 }
 
@@ -230,4 +241,12 @@ export interface PlaceLabwareState {
 
 export interface TipStates {
   hasTip: boolean
+}
+
+export interface FlexStackerState {
+  primaryLabwareURI: string
+  adapterLabwareURI?: string
+  lidLabwareURI?: string
+  count: number
+  maxCount: number
 }

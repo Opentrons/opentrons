@@ -1,12 +1,13 @@
 // tests for the app-shell's discovery module
 import { app } from 'electron'
 import Store from 'electron-store'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as DiscoveryClient from '@opentrons/discovery-client'
-import { startDiscovery, finishDiscovery } from '../actions'
-import { registerDiscovery } from '../discovery'
+
+import { finishDiscovery, startDiscovery } from '../actions'
 import * as Cfg from '../config'
+import { registerDiscovery } from '../discovery'
 
 vi.mock('electron')
 vi.mock('electron-store')

@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
+
 import { getSpacingDiagram } from '@opentrons/components'
-import { LabeledValue } from './StyledComponents/LabeledValue'
+
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
+import { LabeledValue } from './StyledComponents/LabeledValue'
 
 import type { LabwareWellGroupProperties } from '/app/local-resources/labware'
 
@@ -22,7 +24,7 @@ export function WellSpacing(props: WellSpacingProps): JSX.Element {
 
   const spacing = [
     { label: t('x_offset'), value: toFixed(wellProperties.xOffsetFromLeft) },
-    { label: t('y_offset'), value: toFixed(wellProperties.yOffsetFromTop) },
+    { label: t('y_offset'), value: toFixed(wellProperties.yOffsetFromBack) },
     {
       label: t('x_spacing'),
       value:

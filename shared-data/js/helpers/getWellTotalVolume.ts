@@ -1,6 +1,7 @@
-import type { LabwareDefinition2 } from '../types'
+import type { LabwareDefinition } from '../types'
+
 export const getWellTotalVolume = (
-  labwareDef: LabwareDefinition2,
+  labwareDef: LabwareDefinition,
   wellName: string
 ): number | null | undefined => {
   const well = labwareDef.wells[wellName]

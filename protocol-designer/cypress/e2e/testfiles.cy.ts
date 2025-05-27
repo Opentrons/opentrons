@@ -1,4 +1,4 @@
-import { TestFilePath, getTestFile } from '../support/testFiles'
+import { getTestFile, TestFilePath } from '../support/TestFiles'
 
 describe('Validate Test Files', () => {
   it('should load and validate all test files', () => {

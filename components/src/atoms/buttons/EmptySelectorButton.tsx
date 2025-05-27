@@ -1,18 +1,20 @@
 import styled from 'styled-components'
-import { Flex } from '../../primitives'
+
+import { BORDERS, COLORS } from '../../helix-design-system'
 import {
   ALIGN_CENTER,
   CURSOR_DEFAULT,
   CURSOR_POINTER,
-  FLEX_MAX_CONTENT,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_START,
   SPACING,
   StyledText,
 } from '../../index'
-import { BORDERS, COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
+
 import type { IconName } from '../../index'
+
 interface EmptySelectorButtonProps {
   onClick: () => void
   text: string
@@ -28,7 +30,11 @@ export function EmptySelectorButton(
   const { onClick, text, iconName, textAlignment, disabled = false } = props
 
   return (
-    <StyledButton onClick={onClick} disabled={disabled}>
+    <StyledButton
+      onClick={onClick}
+      disabled={disabled}
+      data-testid="EmptySelectorButton_click"
+    >
       <Flex
         gridGap={SPACING.spacing4}
         padding={SPACING.spacing12}
@@ -62,8 +68,8 @@ interface ButtonProps {
 
 const StyledButton = styled.button<ButtonProps>`
   border: none;
-  width: ${FLEX_MAX_CONTENT};
-  height: ${FLEX_MAX_CONTENT};
+  width: 100%;
+  height: 100%;
   cursor: ${CURSOR_POINTER};
   background-color: ${COLORS.blue30};
   border-radius: ${BORDERS.borderRadius8};
