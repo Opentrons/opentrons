@@ -178,7 +178,7 @@ def _get_parent_origin_to_bottom_center(
         bounding_box = lw_parent_location_info.bounding_box
         return Point(
             x=bounding_box.x / 2,
-            y=-1 * bounding_box.y / 2,
+            y=bounding_box.y / 2,
             z=0,
         )
 
@@ -186,7 +186,7 @@ def _get_parent_origin_to_bottom_center(
         dimensions = lw_parent_location_info.dimensions
         return Point(
             x=dimensions.labwareInterfaceXDimension / 2,
-            y=-1 * dimensions.labwareInterfaceYDimension / 2,
+            y=dimensions.labwareInterfaceYDimension / 2,
             z=0,
         )
 
@@ -241,7 +241,7 @@ def _get_parent_origin_to_right_center_bottom(
         bounding_box = lw_parent_location_info.bounding_box
         return Point(
             x=bounding_box.x,
-            y=-1 * bounding_box.y / 2,
+            y=bounding_box.y / 2,
             z=0,
         )
 
@@ -249,7 +249,7 @@ def _get_parent_origin_to_right_center_bottom(
         dimensions = lw_parent_location_info.dimensions
         return Point(
             x=dimensions.labwareInterfaceXDimension,
-            y=-1 * dimensions.labwareInterfaceYDimension / 2,
+            y=dimensions.labwareInterfaceYDimension / 2,
             z=0,
         )
 

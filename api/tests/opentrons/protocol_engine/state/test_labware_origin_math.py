@@ -387,7 +387,7 @@ def test_no_custom_offset_falls_back_to_locating_feature() -> None:
     )
 
     assert result.x == pytest.approx(5000.0)
-    assert result.y == pytest.approx(-5000)
+    assert result.y == pytest.approx(10000.5)
     assert result.z == pytest.approx(0.0)
 
 
@@ -441,7 +441,7 @@ def test_labware_definition_3_on_addressable_area_bottom_center() -> None:
     )
 
     assert result.x == pytest.approx(5000.0)
-    assert result.y == pytest.approx(-5000)
+    assert result.y == pytest.approx(10000.5)
     assert result.z == pytest.approx(0.0)
 
 
@@ -457,7 +457,7 @@ def test_labware_definition_3_on_module_bottom_center() -> None:
     )
 
     assert result.x == pytest.approx(6500.0)
-    assert result.y == pytest.approx(-6500)
+    assert result.y == pytest.approx(11500.5)
     assert result.z == pytest.approx(0.0)
 
 
@@ -487,7 +487,7 @@ def test_labware_definition_3_with_offset_origin_bottom_center() -> None:
     )
 
     assert result.x == pytest.approx(3449.875)
-    assert result.y == pytest.approx(-3350.125)
+    assert result.y == pytest.approx(11650.375)
     assert result.z == pytest.approx(-300.125)
 
 
@@ -583,7 +583,7 @@ def test_labware_definition_3_on_addressable_area_right_center_bottom() -> None:
     )
 
     assert result.x == pytest.approx(10000.0)
-    assert result.y == pytest.approx(-5000.0)
+    assert result.y == pytest.approx(10000.5)
     assert result.z == pytest.approx(0.0)
 
 
@@ -599,7 +599,7 @@ def test_labware_definition_3_on_module_right_center_bottom() -> None:
     )
 
     assert result.x == pytest.approx(13000.0)
-    assert result.y == pytest.approx(-6500.0)
+    assert result.y == pytest.approx(11500.5)
     assert result.z == pytest.approx(0.0)
 
 
