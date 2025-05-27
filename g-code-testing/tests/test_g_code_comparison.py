@@ -23,14 +23,26 @@ def test_http(g_code_configuration: HTTPGCodeConfirmConfig):
     ).get_html_diff()
 
 
+param_idx = 1
+
+
+def _param_note(param):
+    global param_idx
+    print(f"building param {param_idx}")
+    param_idx += 1
+    return param
+
+
 @pytest.mark.parametrize(
     "g_code_configuration,version",
     [
-        pytest.param(
-            conf,
-            version,
-            marks=conf.marks,
-            id=f"test_{conf.name}_api_version_{version}",
+        _param_note(
+            pytest.param(
+                conf,
+                version,
+                marks=conf.marks,
+                id=f"test_{conf.name}_api_version_{version}",
+            )
         )
         for conf in PROTOCOL_CONFIGURATIONS
         for version in conf.versions
@@ -39,8 +51,12 @@ def test_http(g_code_configuration: HTTPGCodeConfirmConfig):
 async def test_protocols(
     g_code_configuration: ProtocolGCodeConfirmConfig, version: APIVersion
 ):
+    print(f"beginning test for {g_code_configuration}")
     expected_output = g_code_configuration.get_comparison_file(version)
+    print(f"got comparison for {g_code_configuration}, starting execute")
     actual_output = await g_code_configuration.execute(version)
+    print("finished execute")
     assert actual_output == expected_output, GCodeDiffer(
         actual_output, expected_output
     ).get_html_diff()
+    print("ending test")
