@@ -89,7 +89,7 @@ class GCodeEngine:
         proc.daemon = True
         proc.start()
 
-        ready_proc = Process(target=_run_wait_ready)
+        ready_proc = Process(target=_run_wait_ready, args=(self._config,))
         ready_proc.daemon = True
         ready_proc.start()
         ready_proc.join()
@@ -103,8 +103,13 @@ class GCodeEngine:
             feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
         # Wait for modules to be present
+        wait_begins = time.time()
         while len(emulator.attached_modules) != len(modules):
             time.sleep(0.1)
+            if (time.time() - wait_begins) > 30:
+                raise RuntimeError(
+                    f"Failed to start {emulator.attached_modules} after 30 seconds"
+                )
 
         yield emulator
 
