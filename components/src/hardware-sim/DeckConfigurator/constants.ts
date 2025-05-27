@@ -17,6 +17,7 @@ export const THERMOCYCLER_FIXTURE_WIDTH = 243.5
 
 export const COLUMN_1_X_ADJUSTMENT = -100
 export const COLUMN_DEFAULT_X_ADJUSTMENT = -15.5
+export const STACKER_X_ADJUSTMENT = -12.5
 export const Y_ADJUSTMENT = -8
 
 // common config styles for staging area, trash bin, waste chute
