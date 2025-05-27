@@ -391,8 +391,8 @@ class FlexStacker(mod_abc.AbstractModule):
     async def dispense_labware(
         self,
         labware_height: float,
-        enforce_hopper_lw_sensing: bool = True,
-        enforce_shuttle_lw_sensing: bool = True,
+        enforce_hopper_lw_sensing: bool = False,
+        enforce_shuttle_lw_sensing: bool = False,
     ) -> bool:
         """Dispenses the next labware in the stacker."""
         if enforce_hopper_lw_sensing:
@@ -429,7 +429,7 @@ class FlexStacker(mod_abc.AbstractModule):
     async def store_labware(
         self,
         labware_height: float,
-        enforce_shuttle_lw_sensing: bool = True,
+        enforce_shuttle_lw_sensing: bool = False,
     ) -> bool:
         """Stores a labware in the stacker."""
         await self._prepare_for_action()
