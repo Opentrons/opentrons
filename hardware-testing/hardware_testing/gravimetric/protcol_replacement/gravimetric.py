@@ -21,6 +21,7 @@ from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
 )
 from opentrons.config import infer_config_base_dir
+from opentrons.types import Point
 
 metadata = {"protocolName": "Gravimetric QC"}
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
@@ -367,13 +368,18 @@ def remove_tip(fixture_settings: FixtureSettings) -> None:
     else:
         fixture_settings.pipette.drop_tip()
 
+def _get_offset_for_channel(fixture_settings: FixtureSettings, channel: int) -> Point:
+    offset = Point()
+    if fixture_settings.channels == 8 and not fixture_settings.increment:
+        offset = Point(y=channel * 9.0)
+    return offset
 
 def pick_up_tip_for_channel(
     fixture_settings: FixtureSettings, tip: Well, channel: int
 ) -> None:
     """Do channel offset if needed."""
-    # TODO handle 8 channel
-    fixture_settings.pipette.pick_up_tip(tip)
+    offset = _get_offset_for_channel(fixture_settings, channel)
+    fixture_settings.pipette.pick_up_tip(tip.top().move(offset))
 
 
 def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
@@ -543,6 +549,8 @@ def run_one_test(
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
+    transfer_properties.aspirate.aspirate_position.offset = _get_offset_for_channel(fixture_settings, channel)
+    transfer_properties.dispense.dispense_position.offset = _get_offset_for_channel(fixture_settings, channel)
     fixture_settings.pipette._core.load_liquid_class(  # type: ignore [attr-defined]
         name=fixture_settings.liquid_class.name,
         transfer_properties=transfer_properties,
