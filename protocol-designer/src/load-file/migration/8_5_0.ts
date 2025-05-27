@@ -227,6 +227,19 @@ export const migrateFile = (
           labware as string,
           'mix'
         )
+
+        const migratedBlowoutFlowRate =
+          (form.blowout_checkbox || form.disposalVolume_checkbox) &&
+          !form.blowout_flowRate &&
+          pipetteSpecs != null &&
+          tipRackDef != null
+            ? getDefaultBlowoutFlowRate(
+                Number(form.volume),
+                pipetteSpecs,
+                tipRackDef
+              )
+            : null
+
         return {
           ...acc,
           [id]: {
@@ -249,6 +262,9 @@ export const migrateFile = (
             pushOut_checkbox:
               defaultPushOutVolume != null && defaultPushOutVolume > 0,
             pushOut_volume: defaultPushOutVolume,
+            ...(migratedBlowoutFlowRate != null
+              ? { blowout_flowRate: migratedBlowoutFlowRate }
+              : {}),
           },
         }
       }
