@@ -51,9 +51,9 @@ describe('HoldingLabware', () => {
 
   it('renders appropriate latch title copy', () => {
     props.recoveryMap = {
-      route: RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+      route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
       step:
-        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS
           .CONFIRM_LABWARE_IN_LATCH,
     }
     render(props)
@@ -68,13 +68,13 @@ describe('HoldingLabware', () => {
       expect(screen.getAllByText(capitalize(option))[0])
     })
   })
-  ;[true, false].forEach(isOnDevice => {
-    it(`renders options when isOnDevice is ${isOnDevice}`, () => {
-      render(props)
+    ;[true, false].forEach(isOnDevice => {
+      it(`renders options when isOnDevice is ${isOnDevice}`, () => {
+        render(props)
 
-      expect(screen.getAllByText(capitalize(HOLDING_LABWARE_OPTIONS[0]))[0])
+        expect(screen.getAllByText(capitalize(HOLDING_LABWARE_OPTIONS[0]))[0])
+      })
     })
-  })
 
   it('proceeds to next step when the yes option is clicked', async () => {
     render(props)
@@ -137,12 +137,12 @@ describe('HoldingLabware', () => {
     })
   })
 
-  it(`proceeds to the correct step when the no option is clicked for ${RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE}`, async () => {
+  it(`proceeds to the correct step when the no option is clicked for ${RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE}`, async () => {
     render({
       ...props,
       currentRecoveryOptionUtils: {
         selectedRecoveryOption:
-          RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+          RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
       } as any,
     })
 
@@ -163,18 +163,18 @@ describe('HoldingLabware', () => {
 
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
-        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.CONFIRM_RETRY
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_RETRY
       )
     })
   })
 
-  it(`proceeds to the correct step when the no option is clicked for ${RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE}`, async () => {
+  it(`proceeds to the correct step when the no option is clicked for ${RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE}`, async () => {
     render({
       ...props,
       currentRecoveryOptionUtils: {
         selectedRecoveryOption:
-          RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+          RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
       } as any,
     })
 
@@ -195,8 +195,8 @@ describe('HoldingLabware', () => {
 
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-        RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
-        RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
       )
     })
   })

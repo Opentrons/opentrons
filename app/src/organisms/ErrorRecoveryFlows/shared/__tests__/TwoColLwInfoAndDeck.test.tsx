@@ -95,7 +95,7 @@ describe('TwoColLwInfoAndDeck', () => {
 
   it('calls manualRetrieve and then proceedNextStep when primary button is clicked for flex stacker retrieve options', async () => {
     props.recoveryMap.step =
-      RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOPPER_MANUAL_REPLACE
+      RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE
     render(props)
     clickButtonLabeled('Continue')
     await waitFor(() => {
@@ -164,9 +164,9 @@ describe('TwoColLwInfoAndDeck', () => {
     )
   })
 
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE}`, () => {
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE}`, () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+      RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -179,11 +179,11 @@ describe('TwoColLwInfoAndDeck', () => {
     )
   })
 
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE} with manual replace step`, () => {
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE} with manual replace step`, () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE
+      RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
     props.recoveryMap.step =
-      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
+      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -195,11 +195,11 @@ describe('TwoColLwInfoAndDeck', () => {
     )
   })
 
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE} with NOT manual replace step`, () => {
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE} with NOT manual replace step`, () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE
+      RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
     props.recoveryMap.step =
-      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
+      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -212,11 +212,11 @@ describe('TwoColLwInfoAndDeck', () => {
     )
   })
 
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE} with NOT manual replace step`, () => {
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE} with NOT manual replace step`, () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE
+      RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
     props.recoveryMap.step =
-      RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
+      RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
       expect.objectContaining({

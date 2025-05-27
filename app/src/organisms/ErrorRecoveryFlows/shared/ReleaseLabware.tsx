@@ -29,8 +29,8 @@ export function ReleaseLabware({
   const { handleMotionRouting, goBackPrevStep } = routeUpdateActions
   const { route } = recoveryMap
   const {
-    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
-    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    STACKER_SHUTTLE_EMPTY_RETRY,
+    STACKER_SHUTTLE_EMPTY_SKIP,
   } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
@@ -38,8 +38,8 @@ export function ReleaseLabware({
     // Because the actual release command is executed on a delay, the execution behavior is deferred to the
     // motion route.
     switch (route) {
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         void handleMotionRouting(
           true,
           RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
@@ -56,8 +56,8 @@ export function ReleaseLabware({
 
   const buildTitle = (): string => {
     switch (route) {
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         return t('release_labware_from_latch')
       default:
         return t('release_labware_from_gripper')

@@ -36,7 +36,7 @@ export function useShowDoorInfo(
     !isDoorPermittedOpen(recoveryMap) &&
     !GRIPPER_MOVE_STEPS.includes(currentStep)
   // TODO(tz, 03-25-25): add logic for stacker door open when getting it from the server
-  // || recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+  // || recoveryMap.route === RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE
 
   return { isDoorOpen, isProhibitedDoorOpen }
 }

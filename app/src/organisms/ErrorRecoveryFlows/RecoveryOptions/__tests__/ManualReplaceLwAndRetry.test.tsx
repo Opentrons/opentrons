@@ -89,35 +89,35 @@ describe('ManualReplaceLwAndRetry', () => {
     screen.getByText('MOCK_RETRY_STEP_INFO')
   })
 
-  it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY} step`, () => {
+  it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY} step`, () => {
     props.recoveryMap.step =
-      RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
+      RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY
     render(props)
     screen.getByText('MOCK_TWO_COL_LW_INFO_AND_DECK')
   })
 
-  it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE} step`, () => {
+  it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE} step`, () => {
     props.recoveryMap.step =
-      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
+      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE
     render(props)
     screen.getByText('MOCK_TWO_COL_LW_INFO_AND_DECK')
   })
 
-  it(`renders TwoColTextAndImage for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE} step`, () => {
+  it(`renders TwoColTextAndImage for ${RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.MANUAL_REPLACE} step`, () => {
     props.recoveryMap.step =
-      RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE
-    props.recoveryMap.route = RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE
+      RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.MANUAL_REPLACE
+    props.recoveryMap.route = RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE
     render(props)
     const button = screen.getAllByRole('button')[0]
     expect(button).toBeEnabled()
     screen.getByText('Load labware shuttle onto track')
   })
 
-  it(`renders TwoColTextAndFailedStepNextStep for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING} step`, async () => {
+  it(`renders TwoColTextAndFailedStepNextStep for ${RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING} step`, async () => {
     props.recoveryMap.step =
-      RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING
+      RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING
 
-    props.recoveryMap.route = RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE
+    props.recoveryMap.route = RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE
     render(props)
 
     const button = screen.getAllByRole('button')[1]
