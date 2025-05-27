@@ -88,10 +88,10 @@ The Python API has a `mix()` that implements both aspirate and dispense. We can 
 ]
 
 const pythonMix: CommandCreator<...> = (...) => {
-    return {
-        commands: [],  // emits no JSON
-        python: `some_pipette.mix(...)`,
-    }
+  return {
+    commands: [],  // emits no JSON
+    python: `some_pipette.mix(...)`,
+  }
 }
 ```
 
