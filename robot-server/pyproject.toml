@@ -18,9 +18,9 @@ keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "A server providing access to the Opentrons API"
 
 dependencies = [
-    "opentrons==0.0.0-dev.0",
-    "opentrons-shared-data==0.0.0-dev.0",
-    "server-utils==0.0.0-dev.0",
+    "opentrons==0.0.0",
+    "opentrons-shared-data==0.0.0",
+    "server-utils==0.0.0",
     "anyio==3.7.1",
     "fastapi==0.100.0",
     "python-dotenv==1.0.1",
@@ -41,7 +41,7 @@ dynamic = ['version', 'hatch-dependency-coversion']
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/robot-server"
 
 [build-system]
-requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency-coversion==0.0.1a3']
+requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency-coversion==0.0.1a4']
 build-backend = 'hatchling.build'
 
 [tool.hatch.metadata.hooks.dependency-coversion]
