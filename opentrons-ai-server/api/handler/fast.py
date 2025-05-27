@@ -260,20 +260,23 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
                 f"JSON parsing error: {str(e)}",
                 extra={"pd_json_content_preview": str(pd_json_content)[:250] if pd_json_content else "None", "comments": comments},
             )
-            error_message = f"Failed to generate a protocol (JSON error): {str(e)}."
-            if comments:  # Append comments if they exist, avoid f"... {None}"
-                error_message += f"\nAdditional notes: {comments}"
+            if comments:
+                error_message = f"\nComments: {comments}"
+            else:
+                error_message = "Failed to generate a protocol. Please try again."
+
             return ChatResponse(reply=error_message, fake=bool(is_fake))
 
-        except Exception as e:  # Catch other potential errors from claude.fillup_pd or other operations
+        except Exception as e:
             logger.error(
                 f"Error processing PD content: {str(e)}",
                 extra={"pd_json_content_preview": str(pd_json_content)[:250] if pd_json_content else "None", "comments": comments},
                 exc_info=True,
             )
-            error_message = f"An unexpected error occurred while preparing the protocol: {str(e)}."
             if comments:
-                error_message += f"\nAdditional notes: {comments}"
+                error_message = f"\nComments: {comments}"
+            else:
+                error_message = "An unexpected error occurred while preparing the protocol. Please try again."
             return ChatResponse(reply=error_message, fake=bool(is_fake))
 
     return ChatResponse(reply=response, fake=bool(is_fake))
