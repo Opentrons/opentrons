@@ -30,6 +30,7 @@ concurrency:
 jobs:
   confirm-g-code:
     strategy:
+      fail-fast: false
       matrix:
         command: ['2-modules', 'swift-smoke', 'swift-turbo', 'omega', 'fast']
     name: 'Confirm G-Code (${{ matrix.command }})'
@@ -52,4 +53,13 @@ jobs:
         run: make -C g-code-testing check-for-missing-comparison-files
 
       - name: 'Run & Compare to comparison files'
+        id: run_tests
         run: make -C g-code-testing test-g-code-${{ matrix.command }} test_opts="-s"
+
+      - name: 'Upload test results'
+        if: failure() && steps.run_tests.conclusion == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-code-test-results-${{ matrix.command }}
+          path: g-code-testing/results
+          retention-days: 14
