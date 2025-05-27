@@ -19,7 +19,7 @@ from opentrons.protocol_reader.protocol_source import (
     ProtocolSource,
     PythonProtocolConfig,
 )
-from opentrons.protocol_runner.protocol_runner import create_protocol_runner
+from opentrons.protocol_runner import RunOrchestrator
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution import execute
 from opentrons.protocols.api_support import deck_type
@@ -150,7 +150,6 @@ class GCodeEngine:
 
         # TODO(mm, 2023-05-16): robot_type should be automatically derived from the protocol file.
         robot_type: RobotType = "OT-2 Standard"
-
         with self._emulate() as hardware:
             if (isinstance(version, APIVersion) and version >= APIVersion(2, 14)) or (
                 isinstance(version, int)
@@ -176,8 +175,8 @@ class GCodeEngine:
                     content_hash=path,
                 )
 
-                protocol_runner = create_protocol_runner(
-                    protocol_config=config,
+                protocol_orchestrator = RunOrchestrator.build_orchestrator(
+                    hardware_api=hardware,
                     protocol_engine=await create_protocol_engine.create_protocol_engine(
                         hardware_api=hardware,
                         config=Config(
@@ -190,10 +189,10 @@ class GCodeEngine:
                         error_recovery_policy=error_recovery_policy.never_recover,
                         load_fixed_trash=deck_type.should_load_fixed_trash(config),
                     ),
-                    hardware_api=hardware,
+                    protocol_config=config,
                 )
                 with GCodeWatcher(emulator_settings=self._config) as watcher:
-                    await protocol_runner.run(
+                    await protocol_orchestrator.run(
                         deck_configuration=[], protocol_source=protocol_source
                     )
                     yield GCodeProgram.from_g_code_watcher(watcher)
