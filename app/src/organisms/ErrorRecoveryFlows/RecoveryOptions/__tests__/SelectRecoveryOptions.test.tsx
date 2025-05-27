@@ -407,7 +407,7 @@ describe('RecoveryOptions', () => {
     screen.getByRole('label', { name: 'Cancel run' })
   })
 
-  it(`renders valid recovery options for a ${ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE} errorKind`, () => {
+  it(`renders valid recovery options for a ${ERROR_KINDS.STACKER_SHUTTLE_EMPTY} errorKind`, () => {
     props = {
       ...props,
       validRecoveryOptions: LABWARE_MISSING_IN_SHUTTLE_OPTIONS,
@@ -552,9 +552,9 @@ describe('getRecoveryOptions', () => {
     expect(stallOrCollisionOptions).toBe(STALL_OR_COLLISION_OPTIONS)
   })
 
-  it(`returns valid options when the errorKind is ${ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE}`, () => {
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.STACKER_SHUTTLE_EMPTY}`, () => {
     const labwareMissingInShuttleOptions = getRecoveryOptions(
-      ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE
+      ERROR_KINDS.STACKER_SHUTTLE_EMPTY
     )
     expect(labwareMissingInShuttleOptions).toBe(
       LABWARE_MISSING_IN_SHUTTLE_OPTIONS
