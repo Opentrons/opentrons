@@ -10,6 +10,7 @@ import { openIngredientSelector } from '../../../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
+import { EditLabwareQuantityModal } from '../../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../../LabwareCardOverflowMenu'
 import { getLiquidIdsOnLabware } from '../../utils'
 import { LabwareCard } from '../index'
@@ -27,6 +28,7 @@ vi.mock('../../../../top-selectors/well-contents')
 vi.mock('../../utils')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
+vi.mock('../../EditLabwareQuantityModal')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
@@ -56,6 +58,9 @@ describe('LabwareCard', () => {
       lidDisplayName: 'mock lid',
       quantity: 1,
     }
+    vi.mocked(EditLabwareQuantityModal).mockReturnValue(
+      <div>mock EditLabwareQuantityModal</div>
+    )
     vi.mocked(LabwareCardOverflowMenu).mockReturnValue(
       <div>mock LabwareCardOverflowMenu</div>
     )
@@ -117,7 +122,7 @@ describe('LabwareCard', () => {
     screen.getByText('Quantity: 2')
     screen.getByText('Edit liquid and quantity')
   })
-  it('renders a labware card with edit quantity copy', () => {
+  it('renders a labware card with edit quantity copy and pressing button renders modal', () => {
     props.labware = {
       ...props.labware,
       def: {
@@ -127,6 +132,7 @@ describe('LabwareCard', () => {
       } as LabwareDefinition2,
     }
     render(props)
-    screen.getByText('Edit quantity')
+    fireEvent.click(screen.getByText('Edit quantity'))
+    screen.getByText('mock EditLabwareQuantityModal')
   })
 })
