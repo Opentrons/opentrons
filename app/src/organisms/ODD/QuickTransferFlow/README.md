@@ -22,7 +22,7 @@ export interface QuickTransferSummaryState {
   preWetTip: boolean
   mixOnAspirate?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   delayAspirate?: {
     delayDuration: number
@@ -33,7 +33,7 @@ export interface QuickTransferSummaryState {
   tipPositionDispense: number
   mixOnDispense?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   delayDispense?: {
     delayDuration: number
@@ -98,7 +98,7 @@ export interface QuickTransferSummaryState {
   preWetTip: boolean
   mixOnAspirate?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   submergeAspirate?: {
     // this has been added
@@ -120,7 +120,7 @@ export interface QuickTransferSummaryState {
   tipPositionDispense: number
   mixOnDispense?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   submergeDispense?: {
     // this has been added

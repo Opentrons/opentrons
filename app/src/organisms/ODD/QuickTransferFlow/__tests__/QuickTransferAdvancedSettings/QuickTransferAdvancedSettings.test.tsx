@@ -224,7 +224,7 @@ describe('QuickTransferAdvancedSettings', () => {
         transferType: 'transfer',
         mixOnAspirate: {
           mixVolume: 15,
-          repititions: 25,
+          repetitions: 25,
         },
       },
     }
@@ -334,7 +334,7 @@ describe('QuickTransferAdvancedSettings', () => {
         transferType: 'transfer',
         mixOnDispense: {
           mixVolume: 18,
-          repititions: 20,
+          repetitions: 20,
         },
       },
     }

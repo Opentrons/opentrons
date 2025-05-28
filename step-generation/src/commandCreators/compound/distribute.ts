@@ -144,8 +144,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
 
   // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (
-    !prevRobotState.pipettes[pipette] ||
-    !invariantContext.pipetteEntities[pipette]
+    prevRobotState.pipettes[pipette] == null ||
+    invariantContext.pipetteEntities[pipette] == null
   ) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
@@ -378,10 +378,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
     (destWellChunk: string[], chunkIndex: number): CurriedCommandCreator[] => {
       const numDestsPerAsp = destWellChunk.length // can differ on final chunk
       const totalSampleAspirateVolume = volume * numDestsPerAsp
+      const isFirstChunk = chunkIndex === 0
       const isLastChunk = chunkIndex === destWellChunks.length - 1
       const changeTipNow =
         // path is in ['always', 'once', 'never']
-        changeTip === 'always' || (changeTip === 'once' && isLastChunk)
+        changeTip === 'always' || (changeTip === 'once' && isFirstChunk)
 
       const configureForVolumeCommand = LOW_VOLUME_PIPETTES.includes(
         pipetteName
@@ -430,7 +431,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
         liquidHandlingAction: 'multiDispense',
       })
       const voidDispenseAirGapCommand =
-        dispenseAirGapVolume > 0 && !changeTipNow && chunkIndex > 0
+        dispenseAirGapVolume > 0 &&
+        !changeTipNow &&
+        !isFirstChunk &&
+        disposalVolume === 0 &&
+        blowoutLocation == null
           ? [
               curryCommandCreator(dispenseInPlace, {
                 pipetteId: pipette,
@@ -441,9 +446,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
                       correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
                     }
                   : {}),
+                pushOut: 0,
               }),
             ]
           : []
+
       const preAspirateSubmergeCommands = [
         ...moveToSourceWellTopCommand,
         ...voidDispenseAirGapCommand,
@@ -646,22 +653,33 @@ export const distribute: CommandCreator<DistributeArgs> = (
             ]
           : []),
       ]
-      const dispenseCorrectionVolumeForAspirateAirGap = getCorrectionVolume({
-        liquidClass,
-        pipetteSpecs,
-        tiprackDefUri: tipRack,
-        targetVolume: aspirateAirGapVolume,
-        liquidHandlingAction: 'multiDispense',
-      })
       const dispenseChunkCommands = flatMap(
         destWellChunk,
         (
           destinationWell: string,
           wellIndex: number
         ): CurriedCommandCreator[] => {
+          const isFirstWellInChunk = wellIndex === 0
           const isLastWellInChunk = wellIndex === destWellChunk.length - 1
           const isOverallUltimateDispense = isLastChunk && isLastWellInChunk
 
+          let airGapInTip = 0
+          if (isFirstWellInChunk && aspirateAirGapVolume > 0) {
+            airGapInTip = aspirateAirGapVolume
+          } else if (
+            !isFirstWellInChunk &&
+            dispenseAirGapVolume > 0 &&
+            (conditioningVolume == null || conditioningVolume === 0)
+          ) {
+            airGapInTip = dispenseAirGapVolume
+          }
+          const dispenseCorrectionVolumeForAirGap = getCorrectionVolume({
+            liquidClass,
+            pipetteSpecs,
+            tiprackDefUri: tipRack,
+            targetVolume: airGapInTip,
+            liquidHandlingAction: 'multiDispense',
+          })
           const dispenseSubmergeCommands =
             destinationWell != null
               ? [
@@ -671,14 +689,14 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     wellName: destinationWell,
                     wellLocation: dispenseSubmergeLocation,
                   }),
-                  ...(aspirateAirGapVolume > 0 && wellIndex === 0
+                  ...(airGapInTip > 0
                     ? [
                         curryCommandCreator(dispenseInPlace, {
                           pipetteId: pipette,
-                          volume: aspirateAirGapVolume,
+                          volume: airGapInTip,
                           flowRate: dispenseFlowRateUlSec,
                           pushOut: 0,
-                          correctionVolume: dispenseCorrectionVolumeForAspirateAirGap,
+                          correctionVolume: dispenseCorrectionVolumeForAirGap,
                         }),
                         ...delayAfterDispenseCommands,
                       ]
@@ -787,12 +805,22 @@ export const distribute: CommandCreator<DistributeArgs> = (
             considerUltimateSubtransfer: boolean
           ): CurriedCommandCreator[] =>
             dispenseAirGapVolume > 0 &&
+            // don't air gap if not last well in chunk and conditioning volume is present
+            !(
+              wellIndex < destWellChunk.length - 1 &&
+              conditioningVolume != null &&
+              conditioningVolume > 0
+            ) &&
+            // don't air gap if end of full transfer and not changing tip
             !(
               changeTip === 'never' &&
               isOverallUltimateDispense &&
               considerUltimateSubtransfer
-            ) // don't air gap if end of full transfer and not changing tip
+            )
               ? [
+                  curryCommandCreator(prepareToAspirate, {
+                    pipetteId: pipette,
+                  }),
                   curryCommandCreator(airGapInPlace, {
                     pipetteId: pipette,
                     volume: dispenseAirGapVolume,
@@ -855,8 +883,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
               ...getAirGapAfterDispenseCommands(true),
             ]
           } else if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
+            const finalAirGapAfterDispenseCommands = getAirGapAfterDispenseCommands(
+              true
+            )
             advancedDispenseArgsCommands = [
-              ...getTouchTipAfterDispenseRetractCommands(true),
+              ...getTouchTipAfterDispenseRetractCommands(false),
               ...getAirGapAfterDispenseCommands(false),
               curryCommandCreator(moveToWell, {
                 pipetteId: pipette,
@@ -884,7 +915,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     }),
                   ]
                 : []),
-              ...(getAirGapAfterDispenseCommands(true).length > 0
+              ...(finalAirGapAfterDispenseCommands.length > 0
                 ? [
                     curryCommandCreator(moveToWell, {
                       pipetteId: pipette,
@@ -894,6 +925,23 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     }),
                   ]
                 : []),
+              ...finalAirGapAfterDispenseCommands,
+            ]
+          } else {
+            // trash or waste chute
+            advancedDispenseArgsCommands = [
+              ...getTouchTipAfterDispenseRetractCommands(false),
+              ...getAirGapAfterDispenseCommands(false),
+              curryCommandCreator(moveToAddressableArea, {
+                pipetteId: pipette,
+                fixtureId: blowoutLocation,
+                offset: {
+                  x: 0,
+                  y: 0,
+                  z: 0,
+                },
+              }),
+              ...blowoutInPlaceCommand,
               ...getAirGapAfterDispenseCommands(true),
             ]
           }

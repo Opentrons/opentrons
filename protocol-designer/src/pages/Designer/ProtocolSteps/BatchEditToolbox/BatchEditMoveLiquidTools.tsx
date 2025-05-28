@@ -112,12 +112,13 @@ export function BatchEditMoveLiquidTools(
         labwareId={getLabwareIdForPositioningField(
           addFieldNamePrefix('mmFromBottom')
         )}
+        referenceField={`${tab}_position_reference`}
       />
       <Divider marginY="0" />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={`0 ${SPACING.spacing16}`}
-        gridGap={SPACING.spacing8}
+        gridGap={SPACING.spacing4}
       >
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('protocol_steps:advanced_settings')}
@@ -180,14 +181,6 @@ export function BatchEditMoveLiquidTools(
                 title={t('protocol_steps:delay_duration')}
                 {...propsForFields[`${tab}_delay_seconds`]}
                 units={t('application:units.seconds')}
-              />
-              <PositionField
-                prefix={tab}
-                propsForFields={propsForFields}
-                zField={`${tab}_delay_mmFromBottom`}
-                labwareId={getLabwareIdForPositioningField(
-                  addFieldNamePrefix('delay_mmFromBottom')
-                )}
               />
             </Flex>
           ) : null}
