@@ -446,12 +446,6 @@ function ReferenceWavelength(props: ReferenceWavelengthProps): JSX.Element {
                 onClick={e => {
                   e.stopPropagation()
                 }}
-                // onBlur={() => {
-                //   setIsFocused(false)
-                // }}
-                // onFocus={() => {
-                //   setIsFocused(true)
-                // }}
                 error={propsForFields.referenceWavelength.errorToShow}
               />
             ) : null}
