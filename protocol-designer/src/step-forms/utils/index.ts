@@ -184,9 +184,9 @@ export const getSlotIsEmpty = (
   ) {
     return false
   }
+  const mappedCutout = OT2_CUTOUT_BY_SLOT_ID[slot]
   const modulesInSlot = values(initialDeckSetup.modules).filter(
     (moduleOnDeck: ModuleOnDeck) => {
-      const mappedCutout = OT2_CUTOUT_BY_SLOT_ID[slot]
       return mappedCutout != null
         ? moduleOnDeck.slot === slot
         : slot.includes(moduleOnDeck.slot)
