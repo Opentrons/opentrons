@@ -183,6 +183,8 @@
   "touch_tip_position": "Touch tip position from top",
   "transfer": "Transfer",
   "unknown_module": "Unknown module",
+  "unoccupied_stack_plural": "{{name}} in stack in slot {{slot}}",
+  "unoccupied_stack": "{{name}} in slot {{slot}}",
   "valid_range": "Must be between 0.1 and {{max}} {{unit}}",
   "view_details": "View details",
   "volume_per_well": "Volume per well",

@@ -18,6 +18,8 @@ import {
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
+  getFullStackFromLabwares,
+  getSlotInLocationStack,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
@@ -46,7 +48,7 @@ import type { RobotState } from '@opentrons/step-generation'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
 import type { Selector } from '../../types'
 
-interface Option {
+export interface Option {
   name: string
   value: string
 }
@@ -219,7 +221,7 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
       },
       []
     )
-
+    
     const unoccupiedModuleOptions = Object.entries(modules).reduce<Option[]>(
       (acc, [modId, modOnDeck]) => {
         const moduleHasLabware = Object.entries(labware).some(

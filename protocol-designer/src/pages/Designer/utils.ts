@@ -9,13 +9,20 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getFullStackFromLabwares,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import { getRobotType } from '../../file-data/selectors'
 import { getLabwareEntities } from '../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
+import {
+  getDeckSetupForActiveItem,
+  Option,
+} from '../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import {
+  getAllLabwareIdsOfCertainURIOnStack,
   getFullStackFromLabwaresOnDeck,
   getStagingAreaAddressableAreas,
 } from '../../utils'
@@ -31,6 +38,7 @@ import type {
   AdditionalEquipmentName,
   DeckSlot,
   LabwareEntity,
+  RobotState,
 } from '@opentrons/step-generation'
 import type {
   AllTemporalPropertiesForTimelineFrame,
@@ -271,6 +279,12 @@ export const useLabwareDropdownOptions = (
       const deckSlot = getSlotInLocationStack(
         activeDeckSetup.labware[labwareId].stack
       )
+      const fullStackFromLabwares = getFullStackFromLabwares(
+        activeDeckSetup.labware,
+        deckSlot
+      )
+      const isTopOfStack = fullStackFromLabwares[0] === labwareId
+
       const isLabwareInWasteChute = deckSlot === 'gripperWasteChute'
 
       const isAdapter =
@@ -290,7 +304,8 @@ export const useLabwareDropdownOptions = (
       return isAdapter ||
         isLabwareInWasteChute ||
         (type === 'labware' && isTiprack) ||
-        isOffDeck
+        isOffDeck ||
+        !isTopOfStack
         ? acc
         : [
             ...acc,
@@ -303,4 +318,54 @@ export const useLabwareDropdownOptions = (
     []
   )
   return _sortLabwareDropdownOptions(moveLabwareOptions)
+}
+
+//  used for LabwareLocationField dropdown
+export const getUnoccupiedStackOptions = (
+  robotState: RobotState,
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'],
+  labwareIdFromDropdown: string,
+  t: any
+): Option[] => {
+  if (deckSetupLabware[labwareIdFromDropdown] == null) {
+    return []
+  }
+
+  const { def } = deckSetupLabware[labwareIdFromDropdown]
+  const stackingLimit = def.stackLimit ?? 0
+  const labwareCompatibleParentLabware = def.compatibleParentLabware
+
+  return Object.entries(robotState.labware).reduce<Option[]>(
+    (acc, [labwareId, labwareOnDeck]) => {
+      const slot = getSlotInLocationStack(labwareOnDeck.stack)
+      const fullStack = getFullStackFromLabwares(robotState.labware, slot)
+      const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(
+        deckSetupLabware,
+        deckSetupLabware[labwareId]
+      )
+
+      const isAtLimit = stackingLimit === similarLabwareStackIds.length
+      const isTopOfStack = fullStack[0] === labwareId
+
+      const { displayName } = deckSetupLabware[labwareId].def.metadata
+      const { loadName } = deckSetupLabware[labwareId].def.parameters
+
+      const isCompatible = labwareCompatibleParentLabware?.includes(loadName)
+      const isNotCurrentLabware = labwareId !== labwareIdFromDropdown
+
+      if (isTopOfStack && isCompatible && !isAtLimit && isNotCurrentLabware) {
+        acc.push({
+          name: t('protocol_steps:unoccupied_stack_plural', {
+            count: similarLabwareStackIds.length,
+            name: displayName,
+            slot,
+          }),
+          value: labwareId,
+        })
+      }
+
+      return acc
+    },
+    []
+  )
 }
