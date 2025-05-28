@@ -21,7 +21,6 @@ import { getRobotStateAtActiveItem } from '../../../../../../top-selectors/labwa
 import { getAbsorbanceReaderLabwareOptions } from '../../../../../../ui/modules/selectors'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
 import { useAbsorbanceReaderCommandType } from '../../hooks'
-import { getFormErrorsMappedToField } from '../../utils'
 import { Initialization } from './Initialization'
 import { InitializationSettings } from './InitializationSettings'
 import { LidControls } from './LidControls'
@@ -32,13 +31,7 @@ import type { AbsorbanceReaderFormType } from '../../../../../../form-types'
 import type { StepFormProps } from '../../types'
 
 export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
-  const {
-    formData,
-    propsForFields,
-    toolboxStep,
-    visibleFormErrors,
-    showFormErrors,
-  } = props
+  const { formData, propsForFields, toolboxStep, showFormErrors } = props
   const { moduleId } = formData
   const dispatch = useDispatch()
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
@@ -64,8 +57,6 @@ export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
     }
     isAfterMount.current = true
   }, [formData.moduleId])
-
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
   const lidRadioButton = (
     <RadioButton
@@ -121,7 +112,6 @@ export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
         onExit={() => {
           dispatch(hoverSelection({ id: null, text: null }))
         }}
-        errorToShow={mappedErrorsToField.moduleId?.title}
       />
       {moduleId != null ? (
         <>
@@ -153,17 +143,11 @@ export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
   )
 
   const page2ContentMap = {
-    [ABSORBANCE_READER_READ]: (
-      <ReadSettings
-        propsForFields={propsForFields}
-        visibleFormErrors={visibleFormErrors}
-      />
-    ),
+    [ABSORBANCE_READER_READ]: <ReadSettings propsForFields={propsForFields} />,
     [ABSORBANCE_READER_INITIALIZE]: (
       <Initialization
         formData={formData}
         propsForFields={propsForFields}
-        visibleFormErrors={visibleFormErrors}
         showFormErrors={showFormErrors}
       />
     ),

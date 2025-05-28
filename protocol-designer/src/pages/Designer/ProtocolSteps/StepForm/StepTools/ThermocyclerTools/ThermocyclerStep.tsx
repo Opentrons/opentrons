@@ -24,7 +24,7 @@ import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
   enterValueWithinRange,
   isTimeFormatMinutesSeconds,
-} from '../../../../../../steplist/fieldLevel/errors'
+} from '../../../../../../steplist/fieldLevel/thermocyclerFieldErrors'
 import {
   maskToFloat,
   maskToTime,

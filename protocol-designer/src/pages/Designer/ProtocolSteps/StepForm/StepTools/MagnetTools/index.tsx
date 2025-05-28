@@ -19,12 +19,11 @@ import {
   getMagneticLabwareOptions,
   getMagnetLabwareEngageHeight,
 } from '../../../../../../ui/modules/selectors'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 import type { StepFormProps } from '../../types'
 
 export function MagnetTools(props: StepFormProps): JSX.Element {
-  const { propsForFields, formData, visibleFormErrors } = props
+  const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getMagneticLabwareOptions)
   const moduleEntities = useSelector(getModuleEntities)
@@ -53,8 +52,6 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
       : ''
   const engageHeightCaption = `${engageHeightMinMax} ${engageHeightDefault}`
 
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
-
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -65,7 +62,8 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
         {...propsForFields.moduleId}
         options={moduleLabwareOptions}
         title={t('protocol_steps:module')}
-        errorToShow={getFormLevelError('moduleId', mappedErrorsToField)}
+        width="100%"
+        tooltipContent={null}
       />
       <Divider marginY="0" />
       <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacing16}>
@@ -82,7 +80,6 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
             'form:step_edit_form.field.magnetAction.options.disengage'
           )}
           caption={engageHeightCaption}
-          errorToShow={getFormLevelError('engageHeight', mappedErrorsToField)}
         />
       </Flex>
     </Flex>

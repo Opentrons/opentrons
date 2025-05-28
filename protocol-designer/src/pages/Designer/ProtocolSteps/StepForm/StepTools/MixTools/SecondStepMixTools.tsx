@@ -33,7 +33,6 @@ import {
 } from '../../PipetteFields'
 import {
   getBlowoutLocationOptionsForForm,
-  getFormLevelError,
   getLabwareFieldForPositioningField,
 } from '../../utils'
 import { ResetSettingsField } from '../MoveLiquidTools/ResetSettingsField'
@@ -41,12 +40,10 @@ import { ResetSettingsField } from '../MoveLiquidTools/ResetSettingsField'
 import type { Dispatch, SetStateAction } from 'react'
 import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
-import type { ErrorMappedToField } from '../../utils'
 
 interface SecondStepMixToolsProps {
   propsForFields: FieldPropsByName
   formData: FormData
-  mappedErrorsToField: ErrorMappedToField
   tab: LiquidHandlingTab
   setTab: Dispatch<SetStateAction<LiquidHandlingTab>>
 }
@@ -55,7 +52,6 @@ interface SecondStepMixToolsProps {
 export function SecondStepMixTools({
   propsForFields,
   formData,
-  mappedErrorsToField,
   tab,
   setTab,
 }: SecondStepMixToolsProps): JSX.Element {
@@ -197,10 +193,6 @@ export function SecondStepMixTools({
                 title={t('protocol_steps:delay_duration')}
                 {...propsForFields[`${tab}_delay_seconds`]}
                 units={t('application:units.seconds')}
-                errorToShow={getFormLevelError(
-                  `${tab}_delay_checkbox`,
-                  mappedErrorsToField
-                )}
               />
             ) : null}
           </CheckboxExpandStepFormField>
@@ -226,10 +218,6 @@ export function SecondStepMixTools({
                     )}
                     {...propsForFields.pushOut_volume}
                     units={t('application:units.microliter')}
-                    errorToShow={getFormLevelError(
-                      'pushOut_volume',
-                      mappedErrorsToField
-                    )}
                   />
                 ) : null}
               </CheckboxExpandStepFormField>
@@ -251,10 +239,6 @@ export function SecondStepMixTools({
                       options={getBlowoutLocationOptionsForForm({
                         stepType: formData.stepType,
                       })}
-                      errorToShow={getFormLevelError(
-                        'blowout_location',
-                        mappedErrorsToField
-                      )}
                       padding="0"
                     />
                     <FlowRateField

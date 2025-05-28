@@ -13,13 +13,12 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     toolboxStep,
     propsForFields,
     formData,
-    visibleFormErrors,
     setShowFormErrors,
     tab,
     setTab,
   } = props
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
-
+  console.log('propsForFields', propsForFields)
   const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
     'aspirate_labware',
@@ -34,7 +33,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
           <FirstStepMoveLiquidTools
             propsForFields={propsForFields}
             formData={formData}
-            visibleFormErrors={visibleFormErrors}
           />
         )
       case 1:
@@ -55,7 +53,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
                 tab={tab}
                 setTab={setTab}
                 setShowFormErrors={setShowFormErrors}
-                visibleFormErrors={visibleFormErrors}
               />
             )}
           </>
@@ -68,7 +65,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
             tab={tab}
             setTab={setTab}
             setShowFormErrors={setShowFormErrors}
-            visibleFormErrors={visibleFormErrors}
           />
         )
       default:
@@ -79,7 +75,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
           <FirstStepMoveLiquidTools
             propsForFields={propsForFields}
             formData={formData}
-            visibleFormErrors={visibleFormErrors}
           />
         )
     }

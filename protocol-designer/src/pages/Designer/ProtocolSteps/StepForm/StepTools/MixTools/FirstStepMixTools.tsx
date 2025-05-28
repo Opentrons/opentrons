@@ -21,21 +21,16 @@ import {
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
-import { getFormLevelError } from '../../utils'
 
 import type { PipetteEntities } from '@opentrons/step-generation'
 import type { FormData } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldPropsByName } from '../../types'
-import type { ErrorMappedToField } from '../../utils'
 
 interface FirstStepMixToolsProps {
   propsForFields: FieldPropsByName
   formData: FormData
   enablePartialTip: boolean
   pipettes: PipetteEntities
-  mappedErrorsToField: ErrorMappedToField
-  visibleFormErrors: StepFormErrors
   enableReturnTip: boolean
   userSelectedPickUpTipLocation: boolean
   userSelectedDropTipLocation: boolean
@@ -46,8 +41,6 @@ export function FirstStepMixTools({
   formData,
   enablePartialTip,
   pipettes,
-  mappedErrorsToField,
-  visibleFormErrors,
   enableReturnTip,
   userSelectedPickUpTipLocation,
   userSelectedDropTipLocation,
@@ -79,11 +72,7 @@ export function FirstStepMixTools({
         pipetteId={propsForFields.pipette.value}
       />
       <Divider marginY="0" />
-      <LabwareField
-        {...propsForFields.labware}
-        errorToShow={getFormLevelError('labware', mappedErrorsToField)}
-        tooltipContent={null}
-      />
+      <LabwareField {...propsForFields.labware} tooltipContent={null} />
       <Divider marginY="0" />
       <WellSelectionField
         {...propsForFields.wells}
@@ -94,12 +83,7 @@ export function FirstStepMixTools({
             ? propsForFields.nozzles.value
             : null
         }
-        hasFormError={
-          visibleFormErrors?.some(error =>
-            error.dependentFields.includes('wells')
-          ) ?? false
-        }
-        errorToShow={getFormLevelError('wells', mappedErrorsToField)}
+        hasFormError={propsForFields.wells.errorToShow != null}
       />
       <Divider marginY="0" />
       <VolumeField {...propsForFields.volume} />
@@ -108,7 +92,6 @@ export function FirstStepMixTools({
         {...propsForFields.times}
         units={t('units.times')}
         title={t('protocol_steps:mix_repetitions')}
-        errorToShow={getFormLevelError('times', mappedErrorsToField)}
         showTooltip={false}
       />
       <Divider marginY="0" />

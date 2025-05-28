@@ -24,7 +24,6 @@ export interface StepInputFieldProps {
   fieldTitle: string
   fieldKey: string
   units: string
-  errorToShow?: string | null
 }
 interface MultiInputFieldProps {
   name: string
@@ -77,7 +76,7 @@ export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
         >
-          {fields.map(({ fieldTitle, fieldKey, units, errorToShow }) => (
+          {fields.map(({ fieldTitle, fieldKey, units }) => (
             <InputStepFormField
               key={fieldKey}
               showTooltip={false}
@@ -85,7 +84,6 @@ export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
               title={t(fieldTitle)}
               {...propsForFields[fieldKey]}
               units={t(units)}
-              errorToShow={errorToShow}
             />
           ))}
           {(isWellPosition ?? false) && (

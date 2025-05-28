@@ -15,16 +15,14 @@ import {
 } from '../../../../../../components/molecules'
 import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 import type { StepFormProps } from '../../types'
 
 export function TemperatureTools(props: StepFormProps): JSX.Element {
-  const { propsForFields, formData, visibleFormErrors } = props
+  const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getTemperatureLabwareOptions)
   const dispatch = useDispatch()
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
   return (
     <Flex
@@ -35,6 +33,7 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
       <DropdownStepFormField
         {...propsForFields.moduleId}
         tooltipContent={null}
+        width="100%"
         options={moduleLabwareOptions}
         title={t('protocol_steps:module')}
         onEnter={(id: string) => {
@@ -56,10 +55,6 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
           isSelected={formData.setTemperature === 'true'}
           onLabel={t('form:step_edit_form.field.temperature.toggleOn')}
           offLabel={t('form:step_edit_form.field.temperature.toggleOff')}
-          formLevelError={getFormLevelError(
-            'targetTemperature',
-            mappedErrorsToField
-          )}
         />
       </Flex>
     </Flex>

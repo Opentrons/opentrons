@@ -22,7 +22,6 @@ import { SecondStepMixTools } from '../SecondStepMixTools'
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FormData } from '../../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../../steplist'
 
 vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../../../../../../../feature-flags/selectors')
@@ -49,7 +48,6 @@ describe('MixToolFirstStep', () => {
       } as any,
       formData: {} as FormData,
       toolboxStep: 0,
-      visibleFormErrors: {} as StepFormErrors,
       tab: 'aspirate',
       setTab: vi.fn(),
       setShowFormErrors: vi.fn(),

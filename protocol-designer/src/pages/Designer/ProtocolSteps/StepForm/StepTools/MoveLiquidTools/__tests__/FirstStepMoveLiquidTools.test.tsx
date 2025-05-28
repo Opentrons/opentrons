@@ -49,7 +49,6 @@ describe('FirstStepMoveLiquidTools', () => {
     props = {
       propsForFields: propsForFieldsForSingleStep as any,
       formData: formDataForSingleStep as any,
-      visibleFormErrors: [] as any,
     }
 
     vi.mocked(getLabwareEntities).mockReturnValue({

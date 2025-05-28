@@ -49,7 +49,6 @@ describe('MagnetTools', () => {
         dirtyFields: [],
         focusedField: null,
       },
-      visibleFormErrors: [],
       toolboxStep: 1,
       propsForFields: {
         magnetAction: {

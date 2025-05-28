@@ -27,8 +27,9 @@ export type FormWarning = FormError & {
 const belowMinAirGapVolumeWarning = (min: number): FormWarning => ({
   type: 'BELOW_MIN_AIR_GAP_VOLUME',
   title: `Air gap volume is below pipette minimum (${min} uL)`,
-  body: <>{'Pipettes cannot accurately handle volumes below their minimum.'}</>,
+  body: 'Pipettes cannot accurately handle volumes below their minimum.',
   dependentFields: ['disposalVolume_volume', 'pipette'],
+  location: 'form',
 })
 
 const belowPipetteMinVolumeWarning = (min: number): FormWarning => ({
@@ -37,12 +38,14 @@ const belowPipetteMinVolumeWarning = (min: number): FormWarning => ({
   body:
     'For accuracy in multi-dispense Transfers we recommend you use a disposal volume of at least the pipette`s minimum.',
   dependentFields: ['pipette', 'volume'],
+  location: 'form',
 })
 
 const overMaxWellVolumeWarning = (): FormWarning => ({
   type: 'OVER_MAX_WELL_VOLUME',
   title: 'Dispense volume will overflow a destination well',
   dependentFields: ['dispense_labware', 'dispense_wells', 'volume'],
+  location: 'form',
 })
 
 const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
@@ -51,6 +54,7 @@ const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
   body:
     'For accuracy in multi-dispense Transfers we recommend you use a disposal volume of at least the pipette`s minimum.',
   dependentFields: ['disposalVolume_volume', 'pipette'],
+  location: 'form',
 })
 
 const tipPositionedLowInTube = (): FormWarning => ({
@@ -58,6 +62,7 @@ const tipPositionedLowInTube = (): FormWarning => ({
   title:
     'A tuberack has an aspirate and dispense default height at 1mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
   dependentFields: ['aspirate_labware', 'dispense_labware'],
+  location: 'form',
 })
 
 const mixTipPositionedLowInTube = (): FormWarning => ({
@@ -65,6 +70,7 @@ const mixTipPositionedLowInTube = (): FormWarning => ({
   title:
     'The default mix height is 1mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
   dependentFields: ['labware'],
+  location: 'form',
 })
 
 /*******************

@@ -8,20 +8,15 @@ import {
 } from '@opentrons/components'
 
 import { InputStepFormField } from '../../../../../../components/molecules'
-import { getFormErrorsMappedToField } from '../../utils'
 
-import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldPropsByName } from '../../types'
 
 interface ReadSettingsProps {
   propsForFields: FieldPropsByName
-  visibleFormErrors: StepFormErrors
 }
 
 export function ReadSettings(props: ReadSettingsProps): JSX.Element {
-  const { propsForFields, visibleFormErrors } = props
-
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
+  const { propsForFields } = props
 
   const { t } = useTranslation('form')
   return (
@@ -43,7 +38,6 @@ export function ReadSettings(props: ReadSettingsProps): JSX.Element {
         padding="0"
         {...propsForFields.fileName}
         title={t('step_edit_form.field.absorbanceReader.fileName')}
-        errorToShow={mappedErrorsToField.fileName?.title}
         showTooltip={false}
       />
     </Flex>
