@@ -21,6 +21,8 @@
   "aspirate_volume": "Aspirate volume per well",
   "aspirate": "Aspirate",
   "attach_pipette": "Attach pipette",
+  "select_blow_out_location": "Select blowout location",
+  "blow_out_description": "Blow extra air through the tip",
   "blow_out_after_dispensing": "Blowout after dispensing",
   "blow_out_destination_well": "Destination well",
   "blow_out_into_destination_well": "into destination well",

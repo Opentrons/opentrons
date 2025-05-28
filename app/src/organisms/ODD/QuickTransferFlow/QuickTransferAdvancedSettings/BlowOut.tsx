@@ -10,6 +10,7 @@ import {
   POSITION_FIXED,
   RadioButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
@@ -191,19 +192,24 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing24}
           width="100%"
         >
-          {enableBlowOutDisplayItems.map(displayItem => (
-            <RadioButton
-              key={displayItem.description}
-              isSelected={isBlowOutEnabled === displayItem.option}
-              onChange={displayItem.onClick}
-              buttonValue={displayItem.description}
-              buttonLabel={displayItem.description}
-              radioButtonType="large"
-            />
-          ))}
+          <StyledText oddStyle="level4HeaderRegular">
+            {t('blow_out_description')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {enableBlowOutDisplayItems.map(displayItem => (
+              <RadioButton
+                key={displayItem.description}
+                isSelected={isBlowOutEnabled === displayItem.option}
+                onChange={displayItem.onClick}
+                buttonValue={displayItem.description}
+                buttonLabel={displayItem.description}
+                radioButtonType="large"
+              />
+            ))}
+          </Flex>
         </Flex>
       ) : null}
       {currentStep === 2 ? (
@@ -211,26 +217,31 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing24}
           width="100%"
         >
-          {blowOutLocationItems.map(blowOutLocationItem => (
-            <RadioButton
-              key={blowOutLocationItem.description}
-              isSelected={
-                isEqual(blowOutLocation, blowOutLocationItem.location) ||
-                blowOutLocation === blowOutLocationItem.location
-              }
-              onChange={() => {
-                setBlowOutLocation(
-                  blowOutLocationItem.location as BlowOutLocation
-                )
-              }}
-              buttonValue={blowOutLocationItem.description}
-              buttonLabel={blowOutLocationItem.description}
-              radioButtonType="large"
-            />
-          ))}
+          <StyledText oddStyle="level4HeaderRegular">
+            {t('select_blow_out_location')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {blowOutLocationItems.map(blowOutLocationItem => (
+              <RadioButton
+                key={blowOutLocationItem.description}
+                isSelected={
+                  isEqual(blowOutLocation, blowOutLocationItem.location) ||
+                  blowOutLocation === blowOutLocationItem.location
+                }
+                onChange={() => {
+                  setBlowOutLocation(
+                    blowOutLocationItem.location as BlowOutLocation
+                  )
+                }}
+                buttonValue={blowOutLocationItem.description}
+                buttonLabel={blowOutLocationItem.description}
+                radioButtonType="large"
+              />
+            ))}
+          </Flex>
         </Flex>
       ) : null}
     </Flex>,
