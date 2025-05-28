@@ -99,6 +99,8 @@ const makePythonCommandCreator: (args: {
     `repetitions=${times}`,
     `volume=${volume}`,
     ...(locationPythonArg != null ? [locationPythonArg] : []),
+    `aspirate_flow_rate=${aspirateFlowRateUlSec}`,
+    `dispense_flow_rate=${dispenseFlowRateUlSec}`,
     ...(aspirateDelaySeconds != null && aspirateDelaySeconds !== 0
       ? [`aspirate_delay=${aspirateDelaySeconds}`]
       : []),
@@ -111,10 +113,9 @@ const makePythonCommandCreator: (args: {
     commands: [],
     //  Note: we do not support mix in trashBin or wasteChute so location
     //  will always be a well
-    python:
-      `${pipettePythonName}.flow_rate.aspirate = ${aspirateFlowRateUlSec}\n` +
-      `${pipettePythonName}.flow_rate.dispense = ${dispenseFlowRateUlSec}\n` +
-      `${pipettePythonName}.mix(\n${indentPyLines(pythonArgs.join(',\n'))},\n)`,
+    python: `${pipettePythonName}.mix(\n${indentPyLines(
+      pythonArgs.join(',\n')
+    )},\n)`,
   }
 }
 
