@@ -437,18 +437,22 @@ def _run_trial(
     ) -> Tuple[Callable, Callable]:
         _attr_name = "aspirate" if is_aspirate else "dispense"
         _asp_or_disp = getattr(transfer_properties, _attr_name)
-        _original_submerge_position_reference = _asp_or_disp.submerge.position_reference
-        _original_position_reference = _asp_or_disp.position_reference
-        _original_retract_position_reference = _asp_or_disp.retract.position_reference
-        _original_submerge_offset_z = _asp_or_disp.submerge.offset.z
-        _original_offset_z = _asp_or_disp.offset.z
-        _original_retract_offset_z = _asp_or_disp.retract.offset.z
+        _original_submerge_position_reference = _asp_or_disp.submerge.start_position.position_reference
+        _original_retract_position_reference = _asp_or_disp.retract.end_position.position_reference
+        _original_submerge_offset_z = _asp_or_disp.submerge.start_position.offset.z
+        _original_retract_offset_z = _asp_or_disp.retract.end_position.offset.z
+        if is_aspirate:
+            _original_position_reference = _asp_or_disp.aspirate_position.position_reference
+            _original_offset_z = _asp_or_disp.aspirate_position.offset.z
+        else:
+            _original_position_reference = _asp_or_disp.dispense_position.position_reference
+            _original_offset_z = _asp_or_disp.dispense_position.offset.z
 
         assert _original_position_reference == PositionReference.LIQUID_MENISCUS, \
             f"position reference must be liquid-meniscus, not {_original_position_reference.value}"
 
         _retract_mm = max(
-            0.0, _asp_or_disp.submerge.offset.z, _asp_or_disp.retract.offset.z
+            0.0, _asp_or_disp.submerge.start_position.offset.z, _asp_or_disp.retract.end_position.offset.z
         )
         approach, submerge, retract = _get_approach_submerge_retract_heights(
             trial.well,
@@ -471,26 +475,34 @@ def _run_trial(
 
         def _enable() -> None:
             # NOTE: setting all position references to BOTTOM
-            _asp_or_disp.submerge.position_reference = PositionReference.WELL_TOP
-            _asp_or_disp.retract.position_reference = PositionReference.WELL_TOP
-            _asp_or_disp.position_reference = PositionReference.WELL_BOTTOM
+            _asp_or_disp.submerge.start_position.position_reference = PositionReference.WELL_TOP
+            _asp_or_disp.retract.end_position.position_reference = PositionReference.WELL_TOP
             # update liquid-class offsets based on CALCULATED meniscus height
-            _asp_or_disp.submerge.offset.z = 0.0
-            _asp_or_disp.retract.offset.z = 0.0
-            _asp_or_disp.offset.z = submerge
+            _asp_or_disp.submerge.start_position.offset.z = 0.0
+            _asp_or_disp.retract.end_position.offset.z = 0.0
+            if is_aspirate:
+                _asp_or_disp.aspirate_position.position_reference = PositionReference.WELL_BOTTOM
+                _asp_or_disp.aspirate_position.offset.z = submerge
+            else:
+                _asp_or_disp.dispense_position.position_reference = PositionReference.WELL_BOTTOM
+                _asp_or_disp.dispense_position.offset.z = submerge
 
         def _disable() -> None:
-            _asp_or_disp.submerge.position_reference = (
+            _asp_or_disp.submerge.start_position.position_reference = (
                 _original_submerge_position_reference
             )
-            _asp_or_disp.position_reference = _original_position_reference
-            _asp_or_disp.retract.position_reference = (
+            _asp_or_disp.retract.end_position.position_reference = (
                 _original_retract_position_reference
             )
             # update liquid-class offsets based on CALCULATED meniscus height
-            _asp_or_disp.submerge.offset.z = _original_submerge_offset_z
-            _asp_or_disp.offset.z = _original_offset_z
-            _asp_or_disp.retract.offset.z = _original_retract_offset_z
+            _asp_or_disp.submerge.start_position.offset.z = _original_submerge_offset_z
+            _asp_or_disp.retract.end_position.offset.z = _original_retract_offset_z
+            if is_aspirate:
+                _asp_or_disp.aspirate_position.position_reference = _original_position_reference
+                _asp_or_disp.aspirate_position.offset.z = _original_offset_z
+            else:
+                _asp_or_disp.dispense_position.position_reference = _original_position_reference
+                _asp_or_disp.dispense_position.offset.z = _original_offset_z
 
         return _enable, _disable
 
@@ -572,6 +584,7 @@ def _run_trial(
             transfer_properties=transfer_properties,
             transfer_type=TransferType.ONE_TO_ONE,
             tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=assumed_air_gap)],
+            volume_for_pipette_mode_configuration=trial.volume,
         )
         disable_meniscus_rel()  # TODO: delete this and use actual liquid-height tracking
         trial.liquid_tracker.update_affected_wells(
@@ -943,7 +956,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         else:
             # NOTE: give it a "safe" height near the top, knowing that
             #       we will eventually be probing the liquid
-            liq_height = well.depth - 1
+            liq_height = well.depth - 5
         liquid_tracker.set_start_volume_from_liquid_height(
             well, liq_height, name=cfg.liquid
         )

@@ -60,11 +60,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -144,11 +144,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -0.5
               }
             },
             "flowRateByVolume": [[0.0, 30.0]],
