@@ -23,7 +23,6 @@ import {
 } from '@opentrons/components'
 import { useCsvFileQuery } from '@opentrons/react-api-client'
 import {
-  FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
@@ -273,9 +272,7 @@ export function HistoricalProtocolRunDrawer(
                     seq => seq.kind === 'onLabware'
                   ) && (
                     <DeckInfoLabel
-                      iconName={
-                        MODULE_ICON_NAME_BY_TYPE[FLEX_STACKER_MODULE_TYPE]
-                      }
+                      iconName="stacked"
                       key="stacked-icon"
                     />
                   )}

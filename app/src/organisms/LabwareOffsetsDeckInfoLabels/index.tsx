@@ -4,7 +4,7 @@ import {
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
 } from '@opentrons/components'
-import { FLEX_STACKER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
+import { getModuleType } from '@opentrons/shared-data'
 
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
 
@@ -35,7 +35,7 @@ export function LabwareOffsetsDeckInfoLabels({
       <DeckInfoLabel deckLabel={slotCopy} />
       {isLabwareInLwStackup() && (
         <DeckInfoLabel
-          iconName={MODULE_ICON_NAME_BY_TYPE[FLEX_STACKER_MODULE_TYPE]}
+          iconName='stacked'
           key="stacked-icon"
         />
       )}
