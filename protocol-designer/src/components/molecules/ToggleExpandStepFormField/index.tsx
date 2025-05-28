@@ -48,7 +48,7 @@ export function ToggleExpandStepFormField(
   const resetFieldValue = (): void => {
     restProps.updateValue(null)
   }
-
+  console.log('restProps', restProps, caption)
   //  TODO: refactor this, it is messy
   const onToggleUpdateValue = (): void => {
     if (toggleValue === 'engage' || toggleValue === 'disengage') {

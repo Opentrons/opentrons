@@ -19,7 +19,7 @@ const getStepType = (stepType: StepType): string => {
       return 'absorbance plate reader'
     }
     case 'heaterShaker': {
-      return 'heater-Shaker state'
+      return 'Heater-Shaker'
     }
     case 'moveLabware': {
       return 'move'

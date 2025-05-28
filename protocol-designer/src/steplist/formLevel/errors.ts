@@ -861,19 +861,22 @@ export const shakeTimeRequired = (
   fields: HydratedHeaterShakerFormData
 ): FormError | null => {
   const { heaterShakerTimer, heaterShakerSetTimer } = fields
-  return heaterShakerSetTimer && !heaterShakerTimer ? SHAKE_TIME_REQUIRED : null
+
+  let error = null
+  if (heaterShakerSetTimer && !heaterShakerTimer) {
+    error = SHAKE_TIME_REQUIRED
+  } else if (
+    heaterShakerSetTimer &&
+    !isTimeFormatMinutesSeconds(heaterShakerTimer)
+  ) {
+    error = SHAKER_TIME_FORMAT
+  }
+  return error
 }
+
 const isTimeFormatMinutesSeconds = (value: string | null): boolean => {
   const timeRegex = new RegExp(/^\d+:[0-5]?\d$/g)
   return value != null && timeRegex.test(value)
-}
-export const shakerTimeFormat = (
-  fields: HydratedHeaterShakerFormData
-): FormError | null => {
-  const { heaterShakerTimer } = fields
-  return isTimeFormatMinutesSeconds(heaterShakerTimer)
-    ? null
-    : SHAKER_TIME_FORMAT
 }
 
 export const temperatureRequired = (
