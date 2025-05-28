@@ -34,10 +34,7 @@ export function LabwareOffsetsDeckInfoLabels({
     <Flex gridGap={SPACING.spacing4}>
       <DeckInfoLabel deckLabel={slotCopy} />
       {isLabwareInLwStackup() && (
-        <DeckInfoLabel
-          iconName='stacked'
-          key="stacked-icon"
-        />
+        <DeckInfoLabel iconName="stacked" key="stacked-icon" />
       )}
       {closestBeneathModuleModel != null && (
         <DeckInfoLabel

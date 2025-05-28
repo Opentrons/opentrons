@@ -270,12 +270,7 @@ export function HistoricalProtocolRunDrawer(
                   <DeckInfoLabel deckLabel={slotName} />
                   {offset.locationSequence?.some(
                     seq => seq.kind === 'onLabware'
-                  ) && (
-                    <DeckInfoLabel
-                      iconName="stacked"
-                      key="stacked-icon"
-                    />
-                  )}
+                  ) && <DeckInfoLabel iconName="stacked" key="stacked-icon" />}
                   {offset.location.moduleModel && (
                     <DeckInfoLabel
                       iconName={
