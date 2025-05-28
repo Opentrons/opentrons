@@ -49,11 +49,14 @@ interface ModuleWizardPatchModuleAction {
 export interface ModuleSetupWizardStepProps {
   proceed: () => void
   goBack: () => void
+  restartSetup: () => void
   chainRunCommands?: (
     commands: CreateCommand[],
     continuePastCommandFailure: boolean
   ) => Promise<unknown>
   isRobotMoving: boolean
+  isModuleUpdating: boolean
+  setIsModuleUpdating: (updating: boolean) => void
   maintenanceRunId: string | null
   attachedModule: AttachedModule
   attachedPipette: PipetteInformation

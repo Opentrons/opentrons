@@ -17,8 +17,8 @@ import {
 } from '/app/resources/runs'
 
 import { ACTIONS } from './constants'
+import { useSendIdentifyModule } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
-import { useSendIdentifyModule } from './utils'
 
 import type { SetStateAction } from 'react'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
@@ -43,6 +43,8 @@ export interface UseModuleSetupWizardResult {
       continuePastCommandFailure: boolean
     ) => Promise<CommandData[]>
     isRobotMoving: boolean
+    isModuleUpdating: boolean
+    setIsModuleUpdating: (updating: boolean) => void
     proceed: () => void
     restartSetup: () => void
     maintenanceRunId: string | null
@@ -54,7 +56,6 @@ export interface UseModuleSetupWizardResult {
     isExiting: boolean
   }
   buildFlowForSelectedModule: (module: AttachedModule) => void
-  restartSetup: () => void
   patchModuleAfterUpdate: (module: AttachedModule) => void
   deckConfig: DeckConfiguration
 }
@@ -148,11 +149,8 @@ export function useModuleSetupWizard(
   })
 
   const handleCleanUpAndClose = (): void => {
-    if (attachedModule != null) {
-      sendIdentifyModule(attachedModule, false)
-    }
-
     setIsExiting(true)
+    if (attachedModule != null) sendIdentifyModule(attachedModule, false)
     if (maintenanceRunId == null) handleClose()
     else {
       chainRunCommands(
@@ -181,6 +179,7 @@ export function useModuleSetupWizard(
   }
 
   const [isRobotMoving, setIsRobotMoving] = useState<boolean>(false)
+  const [isModuleUpdating, setIsModuleUpdating] = useState<boolean>(false)
 
   useEffect(() => {
     if (
@@ -214,9 +213,12 @@ export function useModuleSetupWizard(
     attachedPipette,
     chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving,
+    isModuleUpdating,
+    setIsModuleUpdating,
     proceed,
     maintenanceRunId,
     goBack,
+    restartSetup,
     setErrorMessage,
     errorMessage,
     isOnDevice,
@@ -259,7 +261,6 @@ export function useModuleSetupWizard(
     wizardFlowBaseProps: calibrateBaseProps,
     deckConfig,
     buildFlowForSelectedModule,
-    restartSetup,
     patchModuleAfterUpdate,
   }
 }

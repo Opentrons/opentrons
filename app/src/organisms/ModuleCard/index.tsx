@@ -292,7 +292,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     >
       {showCalModal ? (
         <ModuleWizardFlows
-          attachedModule={module}
           closeFlow={() => {
             setShowCalModal(false)
           }}

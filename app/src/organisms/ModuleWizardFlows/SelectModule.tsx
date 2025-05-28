@@ -23,13 +23,15 @@ import {
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
 
-import { useSendIdentifyModule } from './utils'
+import { useSendIdentifyModule } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
 
 interface SelectModuleProps {
   buildFlowForSelectedModule: (module: AttachedModule) => void
   isOnDevice: boolean
+  selectedModule: AttachedModule | null
+  setSelectedModule: (module: AttachedModule | null) => void
 }
 
 interface ModuleNameAndPort {
@@ -38,15 +40,18 @@ interface ModuleNameAndPort {
 }
 
 export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
-  const { buildFlowForSelectedModule, isOnDevice } = props
+  const {
+    buildFlowForSelectedModule,
+    isOnDevice,
+    selectedModule,
+    setSelectedModule,
+  } = props
   const { t } = useTranslation('module_wizard_flows')
 
   const newModules = useGetNewModules()
+  const isSingleModule = newModules.length === 1
   const sendIdentifyModule = useSendIdentifyModule()
   const [stackerNotInstalled, setStackerNotInstalled] = useState(false)
-  const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
-    newModules.length === 1 ? newModules[0] : null
-  )
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
     const usbPort = module.usbPort
@@ -58,12 +63,15 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
     return { name, port }
   }
 
+  // Handler for when there is one module
   useEffect(() => {
-    if (newModules.length === 1) {
-      sendIdentifyModule(newModules[0], true)
+    setSelectedModule(isSingleModule ? newModules[0] : null)
+    if (selectedModule != null) {
+      sendIdentifyModule(selectedModule, true)
     }
   }, [])
 
+  // Handler for when there are multiple modules.
   const handleModuleSelected = (serialNumber: string): void => {
     // stop blinking previous module
     if (selectedModule != null) {
@@ -97,8 +105,10 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
 
   const handleTryAgain = (): void => {
     if (selectedModule != null) {
-      sendIdentifyModule(selectedModule, false)
-      setSelectedModule(null)
+      // Start blinking module, otherwise stop if multiple are available.
+      sendIdentifyModule(selectedModule, isSingleModule)
+      // Clear the selected module
+      if (!isSingleModule) setSelectedModule(null)
     }
     setStackerNotInstalled(false)
   }
@@ -127,12 +137,20 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
           <Trans t={t} i18nKey={t('error_stacker_not_installed_message')} />
         }
       >
-        <PrimaryButton onClick={handleTryAgain}>
-          {i18n.format(t('try_again'), 'capitalize')}
-        </PrimaryButton>
+        {isOnDevice ? (
+          <SmallButton
+            buttonType="primary"
+            onClick={handleTryAgain}
+            buttonText={i18n.format(t('try_again'), 'capitalize')}
+          />
+        ) : (
+          <PrimaryButton onClick={handleTryAgain}>
+            {i18n.format(t('try_again'), 'capitalize')}
+          </PrimaryButton>
+        )}
       </SimpleWizardBody>
     )
-  } else if (newModules.length === 1 && selectedModule != null) {
+  } else if (isSingleModule && selectedModule != null) {
     const m = getModuleNameAndPort(selectedModule)
     return (
       <SimpleWizardBody
@@ -152,7 +170,6 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
         ) : (
           <PrimaryButton
             onClick={() => {
-              sendIdentifyModule(selectedModule, true)
               handleStartSetup(selectedModule)
             }}
           >

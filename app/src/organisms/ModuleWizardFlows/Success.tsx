@@ -3,10 +3,13 @@ import { css } from 'styled-components'
 
 import {
   COLORS,
+  DIRECTION_ROW,
+  Flex,
   JUSTIFY_FLEX_END,
   PrimaryButton,
   RESPONSIVENESS,
   SecondaryButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -15,7 +18,7 @@ import { useGetNewModules } from '/app/App/hooks'
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
-import { useSendIdentifyModule } from './utils'
+import { useSendIdentifyModule } from './hooks'
 
 import type { ModuleSetupWizardStepProps } from './types'
 
@@ -28,9 +31,7 @@ export const BODY_STYLE = css`
   }
 `
 
-interface SuccessProps extends ModuleSetupWizardStepProps {
-  restartSetup: () => void
-}
+interface SuccessProps extends ModuleSetupWizardStepProps {}
 
 export const Success = (props: SuccessProps): JSX.Element | null => {
   const {
@@ -95,8 +96,10 @@ export const Success = (props: SuccessProps): JSX.Element | null => {
       iconColor={COLORS.red50}
       header={t('successfully_setup', { module: moduleDisplayName })}
     >
-      {newModules.length > 0 ? setupAnotherButton : null}
-      {finishButton}
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+        {newModules.length > 0 ? setupAnotherButton : null}
+        {finishButton}
+      </Flex>
     </SimpleWizardBody>
   )
 }

@@ -61,6 +61,7 @@ export const SelectLocation = (
     isLoadedInRun,
     createMaintenanceRun,
     maintenanceRunId,
+    setErrorMessage,
   } = props
 
   const configuredFixtureIdByCutoutId = getFixtureIdByCutoutId(
@@ -72,7 +73,7 @@ export const SelectLocation = (
   const handleOnClick = (): void => {
     if (maintenanceRunId === null) {
       createMaintenanceRun({}).catch(error => {
-        console.error('Could not create maintenance run', error.message)
+        setErrorMessage(error.message as string)
       })
     }
     proceed()

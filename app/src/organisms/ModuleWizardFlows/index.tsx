@@ -14,6 +14,7 @@ import { BeforeBeginning } from './BeforeBeginning'
 import { CloseDoor } from './CloseStackerDoor'
 import { SECTIONS } from './constants'
 import { DetachProbe } from './DetachProbe'
+import { useSendIdentifyModule } from './hooks'
 import { InstallShuttle } from './InstallShuttle'
 import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
@@ -54,7 +55,6 @@ export const ModuleWizardFlows = (
     handleCleanUpAndClose,
     wizardFlowBaseProps,
     buildFlowForSelectedModule,
-    restartSetup,
     patchModuleAfterUpdate,
     deckConfig,
   } = useModuleSetupWizard({ closeFlow, attachedModuleOnLaunch, onComplete })
@@ -66,6 +66,10 @@ export const ModuleWizardFlows = (
     }
   }, [])
 
+  const sendIdentifyModule = useSendIdentifyModule()
+  const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
+    null
+  )
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
 
   if (wizardFlowBaseProps.attachedPipette == null) return null
@@ -73,7 +77,11 @@ export const ModuleWizardFlows = (
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-        handleCleanUpAndClose={handleCleanUpAndClose}
+        isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
+        handleCleanUpAndClose={() => {
+          if (selectedModule != null) sendIdentifyModule(selectedModule, false)
+          handleCleanUpAndClose()
+        }}
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
       >
@@ -81,6 +89,8 @@ export const ModuleWizardFlows = (
           {...currentStep}
           {...wizardFlowBaseProps}
           buildFlowForSelectedModule={buildFlowForSelectedModule}
+          selectedModule={selectedModule}
+          setSelectedModule={setSelectedModule}
         />
       </ModuleWizardScreen>
     )
@@ -92,6 +102,7 @@ export const ModuleWizardFlows = (
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+        isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={handleCleanUpAndClose}
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
@@ -109,6 +120,7 @@ export const ModuleWizardFlows = (
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+        isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={handleCleanUpAndClose}
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
@@ -134,6 +146,7 @@ export const ModuleWizardFlows = (
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+        isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={handleCleanUpAndClose}
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
@@ -149,6 +162,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -165,6 +179,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -184,6 +199,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -202,6 +218,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -220,6 +237,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -237,6 +255,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -252,7 +271,6 @@ export const ModuleWizardFlows = (
             }
             attachedModule={wizardFlowBaseProps.attachedModule}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
-            restartSetup={restartSetup}
           />
         </ModuleWizardScreen>
       )
@@ -260,6 +278,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -277,6 +296,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -294,6 +314,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}

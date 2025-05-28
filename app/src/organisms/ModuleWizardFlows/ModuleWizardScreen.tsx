@@ -10,6 +10,7 @@ import { getIsOnDevice } from '/app/redux/config'
 
 interface ModuleWizardScreenProps {
   isRobotMoving: boolean
+  isModuleUpdating: boolean
   handleCleanUpAndClose: () => void
   currentStepIndex: number
   totalStepCount: number
@@ -21,6 +22,7 @@ export const ModuleWizardScreen = (
 ): JSX.Element | null => {
   const {
     isRobotMoving,
+    isModuleUpdating,
     handleCleanUpAndClose,
     currentStepIndex,
     totalStepCount,
@@ -31,7 +33,7 @@ export const ModuleWizardScreen = (
 
   const wizardHeader = (
     <WizardHeader
-      exitDisabled={isRobotMoving}
+      exitDisabled={isRobotMoving || isModuleUpdating}
       title={t('module_setup')}
       currentStep={currentStepIndex}
       totalSteps={totalStepCount}

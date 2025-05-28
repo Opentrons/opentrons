@@ -19,7 +19,7 @@ import {
   SUCCESS,
 } from '/app/redux/robot-api'
 
-import { useSendIdentifyModule } from './utils'
+import { useSendIdentifyModule } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
@@ -42,6 +42,7 @@ export const UpdateFirmware = (
     attachedModule,
     robotName,
     patchModuleAfterUpdate,
+    setIsModuleUpdating,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
@@ -75,6 +76,7 @@ export const UpdateFirmware = (
       if (moduleRequestTimeoutId != null) {
         clearTimeout(moduleRequestTimeoutId)
       }
+      setIsModuleUpdating(false)
       sendIdentifyModule(matchingModule, true, 'blue')
       patchModuleAfterUpdate(matchingModule)
       proceed()
@@ -87,11 +89,13 @@ export const UpdateFirmware = (
   ])
 
   const handleUpdateFirmware = (): void => {
+    setIsModuleUpdating(true)
     handleModuleApiRequests(robotName, attachedModule.serialNumber)
   }
 
   useEffect(() => {
     if (!attachedModule.hasAvailableUpdate) {
+      setIsModuleUpdating(false)
       setShouldProceed(true)
       setTimeout(() => {
         proceed()
@@ -103,6 +107,7 @@ export const UpdateFirmware = (
     if (requestStatus === PENDING) {
       setInProgress(true)
     } else if (requestStatus === FAILURE) {
+      setIsModuleUpdating(false)
       setInProgress(false)
       setErrorMessage(t('firmware_update_failed') as string)
       if (latestRequestId != null) dispatch(dismissRequest(latestRequestId))
@@ -110,6 +115,7 @@ export const UpdateFirmware = (
       // if the request succeeds but the module doesn't come back online within 30 seconds
       // we should display an error message
       const timeoutId = setTimeout(() => {
+        setIsModuleUpdating(false)
         setErrorMessage(t('firmware_update_failed') as string)
       }, MODULE_TIMEOUT_MS)
       setModuleRequestTimeoutId(timeoutId)
