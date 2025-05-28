@@ -4,6 +4,10 @@ import { createSelector } from 'reselect'
 
 import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
 
+import {
+  TRASH_BIN_DISPLAY_NAME,
+  WASTE_CHUTE_DISPLAY_NAME,
+} from '../../constants'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import * as stepFormSelectors from '../../step-forms/selectors'
 
@@ -43,7 +47,7 @@ export const getWasteChuteOption: Selector<DropdownOption | null> = createSelect
     const wasteChuteOption: DropdownOption | null =
       wasteChuteEntity != null
         ? {
-            name: wasteChuteEntity.name,
+            name: WASTE_CHUTE_DISPLAY_NAME,
             value: wasteChuteEntity.id,
           }
         : null
@@ -67,7 +71,7 @@ export const getDisposalOptions = createSelector(
           ? [
               ...acc,
               {
-                name: additionalEquipment.name,
+                name: TRASH_BIN_DISPLAY_NAME,
                 value: additionalEquipment.id ?? '',
               },
             ]
