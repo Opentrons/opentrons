@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
@@ -38,14 +37,13 @@ export const _sortLabwareDropdownOptions = (
 export const getWasteChuteOption: Selector<DropdownOption | null> = createSelector(
   stepFormSelectors.getAdditionalEquipmentEntities,
   additionalEquipmentEntities => {
-    const { t } = useTranslation('deck_configuration')
     const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
       aE => aE.name === 'wasteChute'
     )
     const wasteChuteOption: DropdownOption | null =
       wasteChuteEntity != null
         ? {
-            name: t('waste'),
+            name: wasteChuteEntity.name,
             value: wasteChuteEntity.id,
           }
         : null
@@ -59,7 +57,6 @@ export const getDisposalOptions = createSelector(
   stepFormSelectors.getAdditionalEquipment,
   getWasteChuteOption,
   (additionalEquipment, wasteChuteOption) => {
-    const { t } = useTranslation('deck_configuration')
     const trashBins = reduce(
       additionalEquipment,
       (
@@ -70,7 +67,7 @@ export const getDisposalOptions = createSelector(
           ? [
               ...acc,
               {
-                name: t('trash_bin'),
+                name: additionalEquipment.name,
                 value: additionalEquipment.id ?? '',
               },
             ]
