@@ -3,7 +3,7 @@ from opentrons.protocol_api import (
     ParameterContext
 )
 # metadata
-metadata = {"protocolName": "Tough Consumables Protocol"}
+metadata = {"protocolName": "Tough Consumables Protocol 200uL 96 Channel Pipette"}
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -32,6 +32,22 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
         ],
     )
+    parameters.add_str(
+        display_name="Tiprack Type",
+        variable_name="tiprack_name",
+        description="The labware that needs to be tested.",
+        default="opentrons_flex_96_tiprack_20ul",
+        choices=[
+            {
+                "display_name": "1000uL_Tiprack",
+                "value": "opentrons_flex_96_tiprack_1000ul",
+            },
+            {
+                "display_name": "20uL_Tiprack",
+                "value": "opentrons_flex_96_tiprack_20ul",
+            },
+        ],
+    )
     parameters.add_int(
         display_name="Cycles",
         variable_name="test_cycles",
@@ -43,6 +59,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext):
     labware_name = protocol.params.labware_name
+    tiprack_name = protocol.params.tiprack_name
+    test_cycles = protocol.params.test_cycles
     trash = protocol.load_trash_bin("A3")   # or "B3"-"D3" if those slots are free
     # Load adapter 
     adapter = protocol.load_adapter(
@@ -51,7 +69,7 @@ def run(protocol: ProtocolContext):
     )
 
     # Load tiprack on the adapter
-    tiprack = adapter.load_labware('opentrons_flex_96_tiprack_1000ul')
+    tiprack = adapter.load_labware(tiprack_name)
 
     # Load the labware
     reservoir = protocol.load_labware(
@@ -61,7 +79,7 @@ def run(protocol: ProtocolContext):
 
     # Load the 96-channel pipette
     pipette_96 = protocol.load_instrument(
-        instrument_name='flex_96channel_1000',
+        instrument_name='flex_96channel_200',
         mount='left'
     )
 
@@ -77,17 +95,17 @@ def run(protocol: ProtocolContext):
         )
 
     protocol.comment("Reservoir moved from C2 to B2 using the gripper.")
+    for x in range(1, test_cycles+1):
+        # Pick up tips (assumes tips are loaded in A1)
+        # tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', location='A1')
+        pipette_96.pick_up_tip(tiprack['A1'])
 
-    # Pick up tips (assumes tips are loaded in A1)
-    # tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', location='A1')
-    pipette_96.pick_up_tip(tiprack['A1'])
+        # Move to the reservoir and aspirate
+        pipette_96.move_to(reservoir.wells()[0].top())
+        protocol.pause("Please check the tip position before continuing.")
+        pipette_96.move_to(reservoir.wells()[0].bottom(5))
+        protocol.pause("Please check the clearance before continuing.")
 
-    # Move to the reservoir and aspirate
-    pipette_96.move_to(reservoir.wells()[0].top())
-    protocol.pause("Please check the tip position before continuing.")
-    pipette_96.move_to(reservoir.wells()[0].bottom(5))
-    protocol.pause("Please check the clearance before continuing.")
+        pipette_96.return_tip()
 
-    pipette_96.return_tip()
-
-    protocol.comment("Protocol complete.")
+        protocol.comment("Protocol complete.")
