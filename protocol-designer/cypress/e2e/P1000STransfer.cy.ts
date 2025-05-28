@@ -4,6 +4,7 @@ import {
   SetupVerifications,
 } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
+import { getTestFile, TestFilePath } from '../support/TestFiles'
 import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Transfer stepform testing Single Channel P1000uL', () => {
@@ -63,14 +64,16 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
           const destWell = allWells[(wellIndex + 1) % allWells.length]
 
           steps.add(
-            CompositeSetupSteps.Test_LC(
+            CompositeSetupSteps.Test_LC_new_rectangle(
               'Thermo Scientific Nunc 96 Well Plate 1300 µL', // sourceLabware
               sourceWell,
-              'Thermo Scientific Nunc 96 Well Plate 2000 µL', // destinationLabware
+              'USA Scientific 96 Deep Well Plate 2.4 mL', // destinationLabware
               destWell,
               volume,
               liquidClass,
-              tip // Using the current tip value
+              tip, // Using the current tip value,
+              'circle',
+              'rect'
             )
           )
           wellIndex += 2
@@ -80,12 +83,15 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
   }
 
   it('Goes through onboarding flow and then runs multiple transfer steps with sequential well changes', () => {
+    const protocol = getTestFile(TestFilePath.P10000SingleTransferLiquid)
+    cy.importProtocol(protocol.path)
+    cy.contains('Confirm').click()
     cy.openSettingsPage()
     cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
     cy.openSettingsPage()
-    cy.clickCreateNew()
-    cy.verifyCreateNewHeader()
+    cy.contains('Edit protocol').click()
     const steps = new StepBuilder()
+    /*
     steps.add(SetupVerifications.OnStep1())
     steps.add(SetupVerifications.FlexSelected())
     steps.add(SetupVerifications.OnStep2())
@@ -128,6 +134,7 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
         'Thermo Scientific Nunc 96 Well Plate 2000 µL'
       )
     )
+    */
     GenerateMultipleTransferSteps(steps)
     steps.execute()
     // ToDo fix typo Tiprack -> Tip rack

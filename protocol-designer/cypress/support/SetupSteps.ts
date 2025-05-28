@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { StepThunk } from './StepBuilder'
+import { StepThunk, StepThunk } from './StepBuilder'
 import { UniversalSteps } from './UniversalSteps' // Adjust the path
 
 declare global {
@@ -154,7 +154,42 @@ function chooseDeckSlot(slot: string): Cypress.Chainable<JQuery<HTMLElement>> {
 /**
  * Helper function to select multiple wells (like A1, B3, H12).
  */
+// cypress/support/SetupSteps.ts
+
 function selectWells(wells: string[]): void {
+  const wellSelectors: Record<
+    string,
+    () => Cypress.Chainable<JQuery<HTMLElement>>
+  > = {}
+
+  // Dynamically populate (A1..H12)
+
+  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+
+  const columns = Array.from({ length: 12 }, (_, i) => (i + 1).toString())
+
+  rows.forEach(row => {
+    columns.forEach(column => {
+      const wellName = `${row}${column}`
+
+      wellSelectors[wellName] = () =>
+        cy.get(`circle[data-wellname="${wellName}"]`).click({ force: true })
+    })
+  })
+
+  wells.forEach(well => {
+    const wellAction = wellSelectors[well]
+
+    if (typeof wellAction === 'function') {
+      wellAction()
+    } else {
+      throw new Error(`Well ${well} not found.`)
+    }
+  })
+}
+
+// For Rectangular wells
+function selectRectWells(wells: string[]): void {
   const wellSelectors: Record<
     string,
     () => Cypress.Chainable<JQuery<HTMLElement>>
@@ -167,8 +202,9 @@ function selectWells(wells: string[]): void {
   rows.forEach(row => {
     columns.forEach(column => {
       const wellName = `${row}${column}`
+      // *** MODIFICATION HERE: Changed 'circle' to 'rect' ***
       wellSelectors[wellName] = () =>
-        cy.get(`circle[data-wellname="${wellName}"]`).click({ force: true })
+        cy.get(`rect[data-wellname="${wellName}"]`).click({ force: true })
     })
   })
 
@@ -177,7 +213,9 @@ function selectWells(wells: string[]): void {
     if (typeof wellAction === 'function') {
       wellAction()
     } else {
-      throw new Error(`Well ${well} not found.`)
+      // This error will occur if a well name outside A1-H12 is passed
+      // or if the wellSelectors map somehow doesn't get populated correctly.
+      throw new Error(`Well ${well} not found in the generated well selectors.`)
     }
   })
 }
@@ -543,7 +581,6 @@ export const SetupSteps = {
   AddLiquid: (): StepThunk => ({
     call: () => {
       cy.contains('button', SetupContent.AddLiquid).click({ force: true })
-
     },
   }),
   /**
@@ -619,6 +656,16 @@ export const SetupSteps = {
     call: () => {
       if (Array.isArray(wells) && wells.length > 0) {
         selectWells(wells)
+      } else {
+        throw new Error('Wells must be a non-empty array of strings.')
+      }
+    },
+  }),
+
+  RectWellSelector: (wells: string[]): StepThunk => ({
+    call: () => {
+      if (Array.isArray(wells) && wells.length > 0) {
+        selectRectWells(wells)
       } else {
         throw new Error('Wells must be a non-empty array of strings.')
       }
@@ -1354,6 +1401,116 @@ export const CompositeSetupSteps = {
       SetupSteps.SelectDestinationWells().call()
       SetupSteps.WellSelector([destWellToUse]).call()
       SetupSteps.WellSelector([destWellToUse]).call()
+      SetupSteps.Save().call()
+      SetupSteps.Continue().call()
+      SetupSteps.SelectLiquidClassT(liquidClassToUse).call()
+      SetupSteps.Continue().call()
+      SetupSteps.Save().call()
+    },
+  }),
+
+  /**
+   * Executes a liquid transfer step within the Cypress automation framework.
+   * This step configures pipette tip, transfer volume, source labware and wells,
+   * destination labware and wells, and the liquid class.
+   *
+   * It supports selecting wells that are represented as either 'circle' or 'rect'
+   * SVG elements, defaulting to 'circle' if no shape is specified.
+   *
+   * @param sourceLabware (Optional) The name of the source labware. Defaults to 'Bio-Rad 96 Well Plate'.
+   * @param sourceWell (Optional) The specific well (e.g., 'A1') on the source labware. Defaults to 'A1'.
+   * @param destinationLabware (Optional) The name of the destination labware. Defaults to 'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'.
+   * @param destWell (Optional) The specific well (e.g., 'A1') on the destination labware. Defaults to 'A1'.
+   * @param volume (Optional) The volume of liquid to transfer. Defaults to '1'.
+   * @param liquidClass (Optional) The liquid class to use for the transfer. Defaults to 'Aqueous'.
+   * @param tip (Optional) The pipette tip size to use. Defaults to '50'.
+   * @param sourceWellShape (Optional) The SVG element shape for the source well selector. Can be 'circle' or 'rect'. Defaults to 'circle'.
+   * @param destWellShape (Optional) The SVG element shape for the destination well selector. Can be 'circle' or 'rect'. Defaults to 'circle'.
+   * @returns A StepThunk object containing the 'call' method to execute the step.
+   *
+   * @remarks
+   * This function relies on `SetupSteps.WellSelector` for 'circle' well selection
+   * and `SetupSteps.RectWellSelector` for 'rect' well selection. Ensure both functions
+   * are defined and accessible in the same file or imported appropriately.
+   *
+   * Note: The intentional double call to `WellSelector` (or `RectWellSelector`) for both
+   * source and destination wells addresses a specific bug in the application under test.
+   */
+  Test_LC_new_rectangle: (
+    sourceLabware?: string | undefined,
+    sourceWell?: string | undefined,
+    destinationLabware?: string | undefined,
+    destWell?: string | undefined,
+    volume?: string | undefined,
+    liquidClass?: string | undefined,
+    tip?: string | undefined,
+    sourceWellShape?: 'circle' | 'rect',
+    destWellShape?: 'circle' | 'rect'
+  ): StepThunk => ({
+    call: () => {
+      const Tip = tip ?? '50'
+      const volumeToUse = volume ?? '1'
+      const sourceLabwareToUse = sourceLabware ?? 'Bio-Rad 96 Well Plate'
+      const sourceWellToUse = sourceWell ?? 'A1'
+      const destinationLabwareToUse =
+        destinationLabware ??
+        'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
+      const destWellToUse = destWell ?? 'A1'
+      const liquidClassToUse = liquidClass ?? 'Aqueous'
+      const sourceShapeToUse = sourceWellShape ?? 'circle'
+      const destShapeToUse = destWellShape ?? 'circle'
+
+      cy.log('Executing Test_LC step with the following parameters:')
+      cy.log(`  tip: ${Tip}`) // Using Tip directly after default is applied
+      cy.log(`  Source Labware: ${sourceLabwareToUse}`)
+      cy.log(`  Source Well: ${sourceWellToUse} (Shape: ${sourceShapeToUse})`)
+      cy.log(`  Destination Labware: ${destinationLabwareToUse}`)
+      cy.log(`  Destination Well: ${destWellToUse} (Shape: ${destShapeToUse})`)
+      cy.log(`  Volume: ${volumeToUse}`)
+      cy.log(`  Liquid Class: ${liquidClassToUse}`)
+
+      SetupSteps.AddStep().call()
+      SetupVerifications.TransferPopOut().call()
+      UniversalSteps.Snapshot()
+      SetupSteps.SelecTip(Tip)
+      SetupSteps.InputTransferVolume(volumeToUse).call()
+
+      // --- Source Well Selection Logic ---
+      SetupSteps.ChoseSourceLabware().call()
+      SetupSteps.selectDropdownLabware(sourceLabwareToUse).call()
+      SetupSteps.SelectSourceWells().call()
+
+      if (sourceShapeToUse === 'circle') {
+        SetupSteps.WellSelector([sourceWellToUse]).call()
+        SetupSteps.WellSelector([sourceWellToUse]).call() // Intentional double call
+      } else if (sourceShapeToUse === 'rect') {
+        SetupSteps.RectWellSelector([sourceWellToUse]).call()
+        SetupSteps.RectWellSelector([sourceWellToUse]).call() // Intentional double call
+      } else {
+        throw new Error(
+          `Invalid sourceWellShape: ${sourceShapeToUse}. Expected 'circle' or 'rect'.`
+        )
+      }
+
+      SetupSteps.Save().call()
+
+      // --- Destination Well Selection Logic ---
+      SetupSteps.ChoseDestinationLabware().call()
+      SetupSteps.selectDropdownLabware(destinationLabwareToUse).call()
+      SetupSteps.SelectDestinationWells().call()
+
+      if (destShapeToUse === 'circle') {
+        SetupSteps.WellSelector([destWellToUse]).call()
+        SetupSteps.WellSelector([destWellToUse]).call() // Intentional double call
+      } else if (destShapeToUse === 'rect') {
+        SetupSteps.RectWellSelector([destWellToUse]).call()
+        SetupSteps.RectWellSelector([destWellToUse]).call() // Intentional double call
+      } else {
+        throw new Error(
+          `Invalid destWellShape: ${destShapeToUse}. Expected 'circle' or 'rect'.`
+        )
+      }
+
       SetupSteps.Save().call()
       SetupSteps.Continue().call()
       SetupSteps.SelectLiquidClassT(liquidClassToUse).call()

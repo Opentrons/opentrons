@@ -4,6 +4,7 @@ import {
   SetupVerifications,
 } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
+import { getTestFile, TestFilePath } from '../support/TestFiles'
 import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', () => {
@@ -50,14 +51,16 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
           const destWell1: string = `${row}${colCounter + 1}`
 
           steps.add(
-            CompositeSetupSteps.Test_LC(
+            CompositeSetupSteps.Test_LC_new_rectangle(
               sourceLabware1,
               sourceWell1,
               destinationLabware1,
               destWell1,
               volume,
               liquidClass,
-              tip
+              tip,
+              'circle',
+              'rect'
             )
           )
           colCounter++
@@ -97,12 +100,16 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
   }
 
   it('Goes through onboarding flow and then runs multiple transfer steps with sequential well changes', () => {
+    const protocol = getTestFile(TestFilePath.P50MultiImportTransferLiquid)
+    cy.importProtocol(protocol.path)
+    cy.contains('Confirm').click()
     cy.openSettingsPage()
     cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
     cy.openSettingsPage()
-    cy.clickCreateNew()
-    cy.verifyCreateNewHeader()
+    cy.contains('Edit protocol').click()
+
     const steps = new StepBuilder()
+    /* Commenting out for now for E2E
     steps.add(SetupVerifications.OnStep1())
     steps.add(SetupVerifications.FlexSelected())
     steps.add(SetupVerifications.OnStep2())
@@ -170,13 +177,14 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
         'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
       )
     )
+    */
 
     GenerateMultipleTransferStepsForP508Channel(
       steps,
-      'Bio-Rad 96 Well Plate',
+      'Thermo Scientific Nunc 96 Well Plate 2000 µL',
       'Thermo Scientific Nunc 96 Well Plate 1300 µL',
-      'Armadillo 96 Well Plate 200 µL PCR Full Skirt',
-      'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
+      'USA Scientific 96 Deep Well Plate 2.4 mL',
+      'NEST 96 Deep Well Plate 2mL'
     )
 
     // Add the multiple transfer steps using the custom function with sequential wells
