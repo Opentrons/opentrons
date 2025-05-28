@@ -423,8 +423,37 @@ export const distribute: CommandCreator<DistributeArgs> = (
           pipetteId: pipette,
         }),
       ]
+      const dispenseCorrectionVolumeForDispenseAirGap = getCorrectionVolume({
+        liquidClass,
+        pipetteSpecs,
+        tiprackDefUri: tipRack,
+        targetVolume: dispenseAirGapVolume,
+        liquidHandlingAction: 'multiDispense',
+      })
+      const voidDispenseAirGapCommand =
+        dispenseAirGapVolume > 0 &&
+        !changeTipNow &&
+        !isFirstChunk &&
+        disposalVolume === 0 &&
+        blowoutLocation == null
+          ? [
+              curryCommandCreator(dispenseInPlace, {
+                pipetteId: pipette,
+                volume: dispenseAirGapVolume,
+                flowRate: dispenseFlowRateUlSec,
+                ...(dispenseCorrectionVolumeForDispenseAirGap > 0
+                  ? {
+                      correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
+                    }
+                  : {}),
+                pushOut: 0,
+              }),
+            ]
+          : []
+
       const preAspirateSubmergeCommands = [
         ...moveToSourceWellTopCommand,
+        ...voidDispenseAirGapCommand,
         // ...liquidProbeCommand, // for menisucs-relative pipetting
         ...configureForVolumeCommand,
         ...prepareToAspirateCommand,
