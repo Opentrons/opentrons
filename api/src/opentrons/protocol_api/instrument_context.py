@@ -538,6 +538,8 @@ class InstrumentContext(publisher.CommandPublisher):
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        aspirate_flow_rate: Optional[float] = None,
+        dispense_flow_rate: Optional[float] = None,
         aspirate_delay: Optional[float] = None,
         dispense_delay: Optional[float] = None,
         final_push_out: Optional[float] = None,
@@ -565,6 +567,10 @@ class InstrumentContext(publisher.CommandPublisher):
                      dispensing flow rate is calculated as ``rate`` multiplied by
                      :py:attr:`flow_rate.dispense <flow_rate>`. See
                      :ref:`new-plunger-flow-rates`.
+        :param aspirate_flow_rate: The flow rate for each aspirate in the mix, in µL/s.
+                                   If this is specified, ``rate`` must not be set.
+        :param dispense_flow_rate: The flow rate for each dispense in the mix, in µL/s.
+                                   If this is specified, ``rate`` must not be set.
         :param aspirate_delay: How long to wait after each aspirate in the mix, in seconds.
         :param dispense_delay: How long to wait after each dispense in the mix, in seconds.
         :param final_push_out: How much to push out after the final mix repetition. The
@@ -584,7 +590,8 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.21
             Does not repeatedly check for liquid presence.
         .. versionchanged:: 2.24
-            Adds the ``aspirate_delay``, ``dispense_delay``, and ``final_push_out`` parameters.
+            Adds the ``aspirate_flow_rate``, ``dispense_flow_rate``, ``aspirate_delay``,
+            ``dispense_delay``, and ``final_push_out`` parameters.
         """
         _log.debug(
             "mixing {}uL with {} repetitions in {} at rate={}".format(
@@ -599,6 +606,28 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
 
+        if aspirate_flow_rate:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="aspirate_flow_rate",
+                    until_version="2.24",
+                    current_version=f"{self._api_version}",
+                )
+            if rate != 1.0:
+                raise ValueError(
+                    "rate must not be set if aspirate_flow_rate is specified"
+                )
+        if dispense_flow_rate:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="dispense_flow_rate",
+                    until_version="2.24",
+                    current_version=f"{self._api_version}",
+                )
+            if rate != 1.0:
+                raise ValueError(
+                    "rate must not be set if dispense_flow_rate is specified"
+                )
         if aspirate_delay and self.api_version < APIVersion(2, 24):
             raise APIVersionError(
                 api_element="aspirate_delay",
@@ -630,12 +659,14 @@ class InstrumentContext(publisher.CommandPublisher):
         def aspirate_with_delay(
             location: Optional[types.Location | labware.Well],
         ) -> None:
-            self.aspirate(volume, location, rate)
+            self.aspirate(volume, location, rate, flow_rate=aspirate_flow_rate)
             if aspirate_delay:
                 delay_with_publish(aspirate_delay)
 
         def dispense_with_delay(push_out: Optional[float]) -> None:
-            self.dispense(volume, None, rate, push_out=push_out)
+            self.dispense(
+                volume, None, rate, flow_rate=dispense_flow_rate, push_out=push_out
+            )
             if dispense_delay:
                 delay_with_publish(dispense_delay)
 
