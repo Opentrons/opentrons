@@ -82,8 +82,7 @@ const LabwareDetailGroup = styled.g`
 /**
  * Similar to the LabwareRender component, but with ODD-specific styling.
  *
- * For example, rendering wells at a scale inaccurate to the labware definition for
- * the sake of making them touch-friendly.
+ * For example, hiding the outline of the labware for certain ODD flows.
  */
 export const Labware = (props: LabwareProps): JSX.Element => {
   const {
