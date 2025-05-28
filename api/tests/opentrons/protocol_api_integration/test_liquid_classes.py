@@ -63,7 +63,7 @@ def test_custom_liquid_class_creation_and_property_fetching(
     )
     custom_water = simulated_protocol_context.define_custom_liquid_class(
         name="water_50",
-        properties_dict=minimal_transfer_properties_dict,
+        properties=minimal_transfer_properties_dict,
         display_name="Custom Aqueous",
     )
     custom_water_props = custom_water.get_for(p50, tiprack)
