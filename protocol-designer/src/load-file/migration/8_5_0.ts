@@ -18,10 +18,25 @@ import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFr
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
 import type {
+  LabwareDefinition2,
   LoadLabwareCreateCommand,
+  PipetteV2Specs,
   ProtocolFile,
 } from '@opentrons/shared-data'
 import type { PDMetadata } from '../../file-types'
+import type { FormData } from '../../form-types'
+
+const getMigratedBlowoutFlowRate = (
+  form: FormData,
+  pipetteSpecs: PipetteV2Specs | null,
+  tipRackDef: LabwareDefinition2 | null
+): number | null =>
+  (form.blowout_checkbox || form.disposalVolume_checkbox) &&
+  !form.blowout_flowRate &&
+  pipetteSpecs != null &&
+  tipRackDef != null
+    ? getDefaultBlowoutFlowRate(Number(form.volume), pipetteSpecs, tipRackDef)
+    : null
 
 export const migrateFile = (
   appData: ProtocolFile<PDMetadata>
@@ -93,17 +108,12 @@ export const migrateFile = (
               pipetteSpecs,
               tipRackDef
             )
-      const migratedBlowoutFlowRate =
-        (form.blowout_checkbox || form.disposalVolume_checkbox) &&
-        !form.blowout_flowRate &&
-        pipetteSpecs != null &&
-        tipRackDef != null
-          ? getDefaultBlowoutFlowRate(
-              Number(form.volume),
-              pipetteSpecs,
-              tipRackDef
-            )
-          : null
+      // blowout flow rate is required, so we attempt to migrate it if it's not present
+      const migratedBlowoutFlowRate = getMigratedBlowoutFlowRate(
+        form,
+        pipetteSpecs,
+        tipRackDef
+      )
       const channelsForSpeed =
         pipetteSpecs?.channels ?? (robotType === FLEX_ROBOT_TYPE ? 96 : 8)
       const maxZSpeed =
@@ -227,6 +237,13 @@ export const migrateFile = (
           labware as string,
           'mix'
         )
+
+        // blowout flow rate is required, so we attempt to migrate it if it's not present
+        const migratedBlowoutFlowRate = getMigratedBlowoutFlowRate(
+          form,
+          pipetteSpecs,
+          tipRackDef
+        )
         return {
           ...acc,
           [id]: {
@@ -249,6 +266,9 @@ export const migrateFile = (
             pushOut_checkbox:
               defaultPushOutVolume != null && defaultPushOutVolume > 0,
             pushOut_volume: defaultPushOutVolume,
+            ...(migratedBlowoutFlowRate != null
+              ? { blowout_flowRate: migratedBlowoutFlowRate }
+              : {}),
           },
         }
       }
