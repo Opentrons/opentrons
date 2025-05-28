@@ -229,12 +229,6 @@ class OT3Simulator(FlexBackend):
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
         self._sim_gantry_load = gantry_load
 
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
-    ) -> None:
-        self._sim_gantry_load = gantry_load
-
     def update_constraints_for_plunger_acceleration(
         self,
         mount: OT3Mount,
