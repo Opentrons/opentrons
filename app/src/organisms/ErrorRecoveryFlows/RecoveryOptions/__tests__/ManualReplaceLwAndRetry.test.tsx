@@ -90,6 +90,7 @@ describe('ManualReplaceLwAndRetry', () => {
   })
 
   it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY} step`, () => {
+    props.recoveryMap.route = RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE
     props.recoveryMap.step =
       RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY
     render(props)

@@ -12,13 +12,13 @@ import {
   GENERAL_ERROR_OPTIONS,
   getRecoveryOptions,
   GRIPPER_ERROR_OPTIONS,
-  STACKER_SHUTTLE_EMPTY_OPTIONS,
   NO_LIQUID_DETECTED_OPTIONS,
   OVERPRESSURE_PREPARE_TO_ASPIRATE,
   OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
   OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
   RecoveryOptions,
   SelectRecoveryOption,
+  STACKER_SHUTTLE_EMPTY_OPTIONS,
   STALL_OR_COLLISION_OPTIONS,
   TIP_DROP_FAILED_OPTIONS,
   TIP_NOT_DETECTED_OPTIONS,
@@ -556,8 +556,6 @@ describe('getRecoveryOptions', () => {
     const labwareMissingInShuttleOptions = getRecoveryOptions(
       ERROR_KINDS.STACKER_SHUTTLE_EMPTY
     )
-    expect(labwareMissingInShuttleOptions).toBe(
-      STACKER_SHUTTLE_EMPTY_OPTIONS
-    )
+    expect(labwareMissingInShuttleOptions).toBe(STACKER_SHUTTLE_EMPTY_OPTIONS)
   })
 })

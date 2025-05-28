@@ -52,8 +52,7 @@ describe('ReleaseLabware', () => {
     props.recoveryMap = {
       route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
       step:
-        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS
-          .CONFIRM_LABWARE_IN_LATCH,
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_LABWARE_IN_LATCH,
     }
     render(props)
 

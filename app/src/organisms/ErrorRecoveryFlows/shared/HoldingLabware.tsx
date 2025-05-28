@@ -192,18 +192,18 @@ function DesktopGripperHoldingLwOptions({
       value={selectedOption}
       options={HOLDING_LABWARE_OPTIONS.map(
         option =>
-        ({
-          value: option,
-          children: (
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              role="label"
-              htmlFor={option}
-            >
-              {getCopyFromOption(option, t)}
-            </StyledText>
-          ),
-        } as const)
+          ({
+            value: option,
+            children: (
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                role="label"
+                htmlFor={option}
+              >
+                {getCopyFromOption(option, t)}
+              </StyledText>
+            ),
+          } as const)
       )}
     />
   )

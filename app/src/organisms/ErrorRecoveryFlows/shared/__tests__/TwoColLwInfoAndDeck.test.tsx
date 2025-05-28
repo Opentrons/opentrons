@@ -94,6 +94,7 @@ describe('TwoColLwInfoAndDeck', () => {
   })
 
   it('calls manualRetrieve and then proceedNextStep when primary button is clicked for flex stacker retrieve options', async () => {
+    props.recoveryMap.route = RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE
     props.recoveryMap.step =
       RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE
     render(props)

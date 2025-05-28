@@ -107,9 +107,7 @@ export function TwoColLwInfoAndDeck(
       case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
         if (
           step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE ||
-          step ===
-          STACKER_HOPPER_EMPTY_SKIP.STEPS
-            .HOPPER_MANUAL_REPLACE ||
+          step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE ||
           step === STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
         ) {
           return t('load_labware_into_labware_shuttle')
@@ -148,8 +146,7 @@ export function TwoColLwInfoAndDeck(
       case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
         if (
           step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE ||
-          step ===
-          STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE
+          step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE
         ) {
           return null
         } else {
@@ -237,7 +234,7 @@ export function TwoColLwInfoAndDeck(
                       orientation={inferModuleOrientationFromXCoordinate(x)}
                     >
                       {nestedLabwareDef != null &&
-                        nestedLabwareId !== failedLwId ? (
+                      nestedLabwareId !== failedLwId ? (
                         <LabwareRender definition={nestedLabwareDef} />
                       ) : null}
                     </Module>

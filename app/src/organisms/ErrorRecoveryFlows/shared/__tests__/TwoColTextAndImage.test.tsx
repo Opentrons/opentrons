@@ -64,8 +64,7 @@ describe('TwoColTextAndImage', () => {
   it(`calls proceedNextStep and closeLabwareLatch when primary button is clicked for ${RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE}`, async () => {
     props.recoveryMap = {
       route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
-      step:
-        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.REENGAGE_LATCH,
+      step: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.REENGAGE_LATCH,
     }
     render(props)
     clickButtonLabeled('Re-engage latch')

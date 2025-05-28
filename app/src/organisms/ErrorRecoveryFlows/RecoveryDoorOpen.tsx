@@ -42,10 +42,7 @@ export function RecoveryDoorOpen({
     resumeRecovery,
     isResumeRecoveryLoading,
   } = recoveryActionMutationUtils
-  const {
-    stashedMap,
-    proceedToRouteAndStep,
-  } = routeUpdateActions
+  const { stashedMap, proceedToRouteAndStep } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { t } = useTranslation('error_recovery')
 
