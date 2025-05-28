@@ -17,9 +17,7 @@ from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     TransferProperties as SharedTransferProperties,
 )
-from opentrons_shared_data.liquid_classes import (
-    DEFAULT_SCHEMA_VERSION as DEFAULT_LC_SCHEMA_VERSION,
-)
+from opentrons_shared_data.liquid_classes import DEFAULT_LC_VERSION, definition_exists
 from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 
@@ -1385,9 +1383,7 @@ class ProtocolContext(CommandPublisher):
 
         :meta private:
         """
-        return self._core.define_liquid_class(
-            name=name, version=DEFAULT_LC_SCHEMA_VERSION
-        )
+        return self._core.define_liquid_class(name=name, version=DEFAULT_LC_VERSION)
 
     @requires_version(2, 24)
     def define_custom_liquid_class(
@@ -1400,7 +1396,7 @@ class ProtocolContext(CommandPublisher):
         """Define a custom liquid class, either a completely new one or based on an existing one.
 
         Args:
-            name: The name to give to the new liquid class
+            name: The name to give to the new liquid class. Cannot use names of existing in-built liquid classes.
             properties: A dict of transfer properties per tip per pipette.
                 Accepts a nested dictionary in the following format:
                 {
@@ -1416,7 +1412,10 @@ class ProtocolContext(CommandPublisher):
             display_name: An optional human-readable name for the liquid. If not provided,
                 will default to title-cased name.
         """
-        # TODO (spp): raise an error if liquid class name already exists in shared data
+        if definition_exists(name, DEFAULT_LC_VERSION):
+            raise ValueError(
+                f"Liquid class named {name} already exists. Please specify a different name."
+            )
         new_liquid_class: LiquidClass
         if base_liquid_class:
             # If base liquid is provided, copy to new class
