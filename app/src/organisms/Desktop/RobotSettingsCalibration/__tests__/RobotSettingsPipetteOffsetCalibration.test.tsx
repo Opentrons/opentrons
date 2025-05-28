@@ -1,21 +1,21 @@
-import { when } from 'vitest-when'
-import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { usePipetteOffsetCalibrations } from '/app/organisms/Desktop/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
 } from '/app/redux/calibration/pipette-offset/__fixtures__'
-import { usePipetteOffsetCalibrations } from '/app/organisms/Desktop/Devices/hooks'
-import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-import { renderWithProviders } from '/app/__testing-utils__'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
-import { useIsFlex } from '/app/redux-resources/robots'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
-import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
+import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 
 import type { ComponentProps } from 'react'
 import type { FormattedPipetteOffsetCalibration } from '..'

@@ -1,20 +1,22 @@
-import type { MutableRefObject } from 'react'
-import { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import head from 'lodash/head'
 
 import { SUCCESS_TOAST, WARNING_TOAST } from '@opentrons/components'
+
+import { useToaster } from '/app/organisms/ToasterOven'
 import * as AppAlerts from '/app/redux/alerts'
 import { getHasJustUpdated, toggleConfigValue } from '/app/redux/config'
 import { getAvailableShellUpdate } from '/app/redux/shell'
-import { useToaster } from '/app/organisms/ToasterOven'
+
+import { useRemoveActiveAppUpdateToast } from '.'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 
-import { useRemoveActiveAppUpdateToast } from '.'
-import type { State, Dispatch } from '/app/redux/types'
+import type { MutableRefObject } from 'react'
 import type { AlertId } from '/app/redux/alerts/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface AlertsModalProps {
   toastIdRef: MutableRefObject<string | null>

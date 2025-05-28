@@ -7,20 +7,20 @@ import {
   ALIGN_CENTER,
   Banner,
   Box,
+  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
-  SPACING_AUTO,
-  SPACING,
   LegacyStyledText,
+  SPACING,
+  SPACING_AUTO,
+  StyledText,
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
-  StyledText,
 } from '@opentrons/components'
 
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { TertiaryButton } from '/app/atoms/buttons'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { remote } from '/app/redux/shell/remote'

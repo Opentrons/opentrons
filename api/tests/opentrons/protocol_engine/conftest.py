@@ -171,7 +171,7 @@ def adapter_def() -> LabwareDefinition:
 def lid_stack_def() -> LabwareDefinition:
     """Get the definition of the opentrons tiprack lid."""
     return labware_definition_type_adapter.validate_python(
-        load_definition("protocol_engine_lid_stack_object", 1, schema=3)
+        load_definition("protocol_engine_lid_stack_object", 1, schema=2)
     )
 
 
@@ -195,7 +195,15 @@ def magdeck_well_plate_def() -> LabwareDefinition:
 def tiprack_lid_def() -> LabwareDefinition:
     """Get the definition of the opentrons tiprack lid."""
     return labware_definition_type_adapter.validate_python(
-        load_definition("opentrons_flex_tiprack_lid", 1, schema=3)
+        load_definition("opentrons_flex_tiprack_lid", 1, schema=2)
+    )
+
+
+@pytest.fixture(scope="session")
+def auto_sealing_lid_def() -> LabwareDefinition:
+    """Get the definition of the opentrons tough auto sealing lid."""
+    return labware_definition_type_adapter.validate_python(
+        load_definition("opentrons_tough_pcr_auto_sealing_lid", 2, schema=2)
     )
 
 

@@ -1,11 +1,11 @@
-import { describe, it, vi, afterEach, expect } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { fixtureTiprack10ul, fixtureTiprack300ul } from '@opentrons/shared-data'
 
-import { getLatestLabwareDef } from '../getLabware'
 import { findLabwareDefWithCustom } from '../findLabware'
+import { getLatestLabwareDef } from '../getLabware'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('../getLabware', async importOriginal => {
   const actual = await importOriginal<typeof getLatestLabwareDef>()
@@ -15,22 +15,22 @@ vi.mock('../getLabware', async importOriginal => {
   }
 })
 
-const fixtureTipRack10ul = fixtureTiprack10ul as LabwareDefinition2
+const fixtureTipRack10ul = fixtureTiprack10ul as LabwareDefinition
 
 const fixtureTipRack10ulCustomBeta = {
   ...fixtureTiprack10ul,
   namespace: 'custom_beta',
-} as LabwareDefinition2
+} as LabwareDefinition
 
 const fixtureTipRack10ulVersion2 = {
   ...fixtureTiprack10ul,
   version: 2,
-} as LabwareDefinition2
+} as LabwareDefinition
 
 const fixtureTipRack300ulOpentrons = {
   ...fixtureTiprack300ul,
   namespace: 'opentrons',
-} as LabwareDefinition2
+} as LabwareDefinition
 
 describe('findLabwareDefWithCustom', () => {
   afterEach(() => {
@@ -129,7 +129,7 @@ describe('findLabwareDefWithCustom', () => {
           spec.namespace,
           spec.loadName,
           spec.version,
-          spec.customLabware as LabwareDefinition2[]
+          spec.customLabware as LabwareDefinition[]
         )
       ).toEqual(spec.expect)
     })

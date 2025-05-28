@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Any, Generic, Optional, TypeVar, Union, List, Tuple
+from typing import Any, Generic, Optional, TypeVar, Union, List, Tuple, Literal
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -11,6 +11,8 @@ from opentrons.protocols.api_support.util import FlowRates
 from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api._liquid import LiquidClass
+from opentrons.protocol_engine.types import LiquidTrackingType
+
 from ..disposal_locations import TrashBin, WasteChute
 from .well import WellCoreType
 from .labware import LabwareCoreType
@@ -45,7 +47,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         rate: float,
         flow_rate: float,
         in_place: bool,
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
@@ -56,6 +58,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
             rate: The rate for how quickly to aspirate.
             flow_rate: The flow rate in µL/s to aspirate at.
             in_place: Whether this is in-place.
+            meniscus_tracking: Optional data about where to aspirate from.
             correction_volume: The correction volume in uL
         """
         ...
@@ -70,7 +73,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         flow_rate: float,
         in_place: bool,
         push_out: Optional[float],
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
@@ -83,6 +86,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
             in_place: Whether this is in-place.
             push_out: The amount to push the plunger below bottom position.
             correction_volume: The correction volume in uL
+            meniscus_tracking: Optional data about where to dispense from.
         """
         ...
 
@@ -186,6 +190,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],
+        check_for_movement_conflicts: bool,
     ) -> None:
         ...
 
@@ -201,7 +206,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
     @abstractmethod
     def resin_tip_unseal(
         self,
-        location: types.Location,
+        location: types.Location | None,
         well_core: WellCoreType,
     ) -> None:
         ...
@@ -246,6 +251,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
 
     @abstractmethod
     def get_current_volume(self) -> float:
+        ...
+
+    @abstractmethod
+    def get_has_clean_tip(self) -> bool:
         ...
 
     @abstractmethod
@@ -351,14 +360,15 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
-    def transfer_liquid(
+    def transfer_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[types.Location, WellCoreType]],
-        dest: List[Tuple[types.Location, WellCoreType]],
+        dest: Union[List[Tuple[types.Location, WellCoreType]], TrashBin, WasteChute],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LabwareCoreType]],
+        starting_tip: Optional[WellCoreType],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -366,14 +376,15 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
-    def distribute_liquid(
+    def distribute_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
         source: Tuple[types.Location, WellCoreType],
         dest: List[Tuple[types.Location, WellCoreType]],
-        new_tip: TransferTipPolicyV2,
+        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[types.Location, LabwareCoreType]],
+        starting_tip: Optional[WellCoreType],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -384,14 +395,15 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
-    def consolidate_liquid(
+    def consolidate_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[types.Location, WellCoreType]],
-        dest: Tuple[types.Location, WellCoreType],
-        new_tip: TransferTipPolicyV2,
+        dest: Union[Tuple[types.Location, WellCoreType], TrashBin, WasteChute],
+        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[types.Location, LabwareCoreType]],
+        starting_tip: Optional[WellCoreType],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -426,7 +438,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
     @abstractmethod
     def liquid_probe_without_recovery(
         self, well_core: WellCoreType, loc: types.Location
-    ) -> float:
+    ) -> LiquidTrackingType:
         """Do a liquid probe to find the level of the liquid in the well."""
         ...
 

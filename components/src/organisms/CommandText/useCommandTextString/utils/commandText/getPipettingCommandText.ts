@@ -1,13 +1,14 @@
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
+import { getAddressableAreaDisplayName } from '../getAddressableAreaDisplayName'
+import { getFinalMoveToAddressableAreaCmd } from '../getFinalAddressableAreaCmd'
 import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
-import { getWellRange } from '../getWellRange'
+import { getLabwareDefinitionsFromCommands } from '../getLabwareDefinitionsFromCommands'
 import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
 import { getLabwareName } from '../getLabwareName'
 import { getLoadedLabware } from '../getLoadedLabware'
-import { getLabwareDefinitionsFromCommands } from '../getLabwareDefinitionsFromCommands'
-import { getFinalMoveToAddressableAreaCmd } from '../getFinalAddressableAreaCmd'
-import { getAddressableAreaDisplayName } from '../getAddressableAreaDisplayName'
+import { getWellRange } from '../getWellRange'
+
 import type { PipetteName, RunTimeCommand } from '@opentrons/shared-data'
 import type { GetCommandText } from '../..'
 
@@ -40,10 +41,10 @@ export const getPipettingCommandText = ({
       : null
 
   const displayLocation = getLabwareDisplayLocation({
-    location: labwareLocation,
+    loadedLabwares: commandTextData?.labware ?? [],
+    location: labwareLocation?.locationSequence ?? labwareLocation?.location,
     robotType,
     allRunDefs,
-    loadedLabwares: commandTextData?.labware ?? [],
     loadedModules: commandTextData?.modules ?? [],
     t,
   })
@@ -169,19 +170,19 @@ export const getPipettingCommandText = ({
       const { volume } = command.params
       return t('air_gap_in_place', { volume })
     }
-    case 'evotipSealPipette': {
+    case 'sealPipetteToTip': {
       return t('sealing_to_location', {
         labware: labwareName,
         location: displayLocation,
       })
     }
-    case 'evotipUnsealPipette': {
+    case 'unsealPipetteFromTip': {
       return t('unsealing_from_location', {
         labware: labwareName,
         location: displayLocation,
       })
     }
-    case 'evotipDispense': {
+    case 'pressureDispense': {
       const { flowRate, volume } = command.params
       return t('pressurizing_to_dispense', { volume, flow_rate: flowRate })
     }

@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from typing_extensions import assert_never
+from typing_extensions import assert_never, assert_type
 
 from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.deck.types import DeckDefinitionV5
@@ -24,11 +24,10 @@ from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     LabwareDefinition,
     LabwareDefinition2,
+    LabwareDefinition3,
     LabwareRole,
     WellDefinition2,
     WellDefinition3,
-    CircularWellDefinition2,
-    RectangularWellDefinition2,
 )
 from opentrons_shared_data.pipette.types import LabwareUri
 
@@ -403,6 +402,10 @@ class LabwareView:
                 f"Labware {labware_id} not found."
             ) from e
 
+    def known(self, labware_id: str) -> bool:
+        """Check if the labware specified by labware_id has been loaded."""
+        return labware_id in self._state.labware_by_id
+
     def get_id_by_module(self, module_id: str) -> str:
         """Return the ID of the labware loaded on the given module."""
         for labware_id, labware in self._state.labware_by_id.items():
@@ -684,19 +687,11 @@ class LabwareView:
     ) -> InnerWellGeometry:
         """Get a well's inner geometry by labware and well name."""
         labware_def = self.get_definition(labware_id)
-        if (
-            isinstance(labware_def, LabwareDefinition2)
-            or labware_def.innerLabwareGeometry is None
-        ):
+        if labware_def.innerLabwareGeometry is None:
             raise errors.IncompleteLabwareDefinitionError(
                 message=f"No innerLabwareGeometry found in labware definition for labware_id: {labware_id}."
             )
         well_def = self.get_well_definition(labware_id, well_name)
-        # Assert for type-checking. We expect the well definitions from schema *3*, specifically.
-        # This should always pass because we exclude LabwareDefinition2 above.
-        assert not isinstance(
-            well_def, (RectangularWellDefinition2, CircularWellDefinition2)
-        )
         geometry_id = well_def.geometryDefinitionId
         if geometry_id is None:
             raise errors.IncompleteWellDefinitionError(
@@ -819,6 +814,27 @@ class LabwareView:
             version=labware_definition.version,
         )
 
+    @overload
+    def get_uri_from_definition_unless_none(
+        self, labware_definition: LabwareDefinition
+    ) -> str:
+        ...
+
+    @overload
+    def get_uri_from_definition_unless_none(self, labware_definition: None) -> None:
+        ...
+
+    def get_uri_from_definition_unless_none(
+        self, labware_definition: LabwareDefinition | None
+    ) -> str | None:
+        """Get the URI from a labware definition, passing None through.
+
+        Don't use unless you're sure you want to accept that the definition might be None.
+        """
+        if labware_definition is None:
+            return None
+        return self.get_uri_from_definition(labware_definition)
+
     def is_tiprack(self, labware_id: str) -> bool:
         """Get whether labware is a tiprack."""
         definition = self.get_definition(labware_id)
@@ -848,13 +864,31 @@ class LabwareView:
             assert labware_id is not None  # From our @overloads.
             labware_definition = self.get_definition(labware_id)
 
-        dims = labware_definition.dimensions
-
-        return Dimensions(
-            x=dims.xDimension,
-            y=dims.yDimension,
-            z=dims.zDimension,
-        )
+        if isinstance(labware_definition, LabwareDefinition2):
+            return Dimensions(
+                x=labware_definition.dimensions.xDimension,
+                y=labware_definition.dimensions.yDimension,
+                z=labware_definition.dimensions.zDimension,
+            )
+        else:
+            assert_type(labware_definition, LabwareDefinition3)
+            back_left_bottom = labware_definition.extents.total.backLeftBottom
+            front_right_top = labware_definition.extents.total.frontRightTop
+            right, front, top = (
+                front_right_top.x,
+                front_right_top.y,
+                front_right_top.z,
+            )
+            left, back, bottom = (
+                back_left_bottom.x,
+                back_left_bottom.y,
+                back_left_bottom.z,
+            )
+            return Dimensions(
+                x=right - left,
+                y=back - front,
+                z=top - bottom,
+            )
 
     def get_labware_overlap_offsets(
         self, definition: LabwareDefinition, below_labware_name: str
@@ -1084,7 +1118,10 @@ class LabwareView:
                 f"Cannot move '{load_name}' into plate reader because the"
                 f" labware contains {number_of_wells} wells where 96 wells is expected."
             )
-        elif labware_definition.dimensions.zDimension > _PLATE_READER_MAX_LABWARE_Z_MM:
+        elif (
+            self.get_dimensions(labware_definition=labware_definition).z
+            > _PLATE_READER_MAX_LABWARE_Z_MM
+        ):
             raise errors.LabwareMovementNotAllowedError(
                 f"Cannot move '{load_name}' into plate reader because the"
                 f" maximum allowed labware height is {_PLATE_READER_MAX_LABWARE_Z_MM}mm."

@@ -1,42 +1,11 @@
-import type {
-  CompletedProtocolAnalysis,
-  LoadedPipette,
-} from '@opentrons/shared-data'
-import type {
-  GripperData,
-  Instruments,
-  PipetteData,
-} from '@opentrons/api-client'
-
+import {
+  getAttachedGripper,
+  getPipetteMatch,
+} from '/app/local-resources/instruments'
 import { getProtocolUsesGripper } from '/app/transformations/commands'
 
-export function getAttachedGripper(
-  attachedInstruments: Instruments
-): GripperData | null {
-  return (
-    (attachedInstruments?.data ?? []).find(
-      (i): i is GripperData =>
-        i.instrumentType === 'gripper' &&
-        i.ok &&
-        i.data.calibratedOffset != null
-    ) ?? null
-  )
-}
-
-export function getPipetteMatch(
-  loadedPipette: LoadedPipette,
-  attachedInstruments: Instruments
-): PipetteData | null {
-  return (
-    (attachedInstruments?.data ?? []).find(
-      (i): i is PipetteData =>
-        i.instrumentType === 'pipette' &&
-        i.ok &&
-        i.mount === loadedPipette.mount &&
-        i.instrumentName === loadedPipette.pipetteName
-    ) ?? null
-  )
-}
+import type { Instruments } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 export function getAreInstrumentsReady(
   analysis: CompletedProtocolAnalysis,
@@ -56,26 +25,4 @@ export function getAreInstrumentsReady(
     : true
 
   return allSpeccedPipettesReady && isExtensionMountReady
-}
-
-export function getIncompleteInstrumentCount(
-  analysis: CompletedProtocolAnalysis,
-  attachedInstruments: Instruments
-): number {
-  const speccedPipettes = analysis?.pipettes ?? []
-
-  const incompleteInstrumentCount = speccedPipettes.filter(loadedPipette => {
-    const attachedPipetteMatch = getPipetteMatch(
-      loadedPipette,
-      attachedInstruments
-    )
-    return attachedPipetteMatch?.data.calibratedOffset?.last_modified == null
-  }).length
-
-  const isExtensionMountReady = getProtocolUsesGripper(analysis)
-    ? getAttachedGripper(attachedInstruments)?.data.calibratedOffset
-        ?.last_modified != null
-    : true
-
-  return incompleteInstrumentCount + (isExtensionMountReady ? 0 : 1)
 }

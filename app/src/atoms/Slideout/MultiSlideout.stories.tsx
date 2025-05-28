@@ -1,13 +1,15 @@
 import * as React from 'react'
+
 import {
   COLORS,
-  PrimaryBtn,
   LegacyStyledText,
+  PrimaryBtn,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { MultiSlideout } from './MultiSlideout'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/MultiSlideout',

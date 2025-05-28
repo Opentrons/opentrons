@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
+import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
 import * as Actions from '../../actions'
 import { fetchResetOptionsEpic } from '../fetchResetOptionsEpic'
 

@@ -1,27 +1,32 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
-import { OT2_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
+
+import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { moveToWell } from '../commandCreators/atomic/moveToWell'
 import {
-  absorbanceReaderCollision,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
-import {
-  getRobotStateWithTipStandard,
-  getInitialRobotStateWithOffDeckLabwareStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
   DEFAULT_PIPETTE,
+  getErrorResult,
+  getInitialRobotStateWithOffDeckLabwareStandard,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
+import {
+  absorbanceReaderCollision,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getSlotInLocationStack,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+
+import type { WellOrigin } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/absorbanceReaderCollision')
@@ -46,6 +51,10 @@ describe('moveToWell', () => {
       pipetteId: DEFAULT_PIPETTE,
       labwareId: SOURCE_LABWARE,
       wellName: 'A1',
+      wellLocation: {
+        origin: 'bottom' as WellOrigin,
+        offset: { z: 1 },
+      },
     }
     const result = moveToWell(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
@@ -56,9 +65,18 @@ describe('moveToWell', () => {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,
           wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom' as any,
+            offset: {
+              z: 1,
+            },
+          },
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_pipette.move_to(mock_source_plate["A1"].bottom(z=1))'
+    )
   })
   it('should apply the optional params to the command', () => {
     const params = {
@@ -98,6 +116,9 @@ describe('moveToWell', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_pipette.move_to(mock_source_plate["A1"].bottom(z=3).move(types.Point(x=1, y=2)), force_direct=True, minimum_z_height=5)'
+    )
   })
   it('should return an error if pipette does not exist', () => {
     const result = moveToWell(
@@ -148,7 +169,7 @@ describe('moveToWell', () => {
     robotStateWithTip = {
       ...robotStateWithTip,
       labware: {
-        [SOURCE_LABWARE]: { slot: 'A4' },
+        [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'A4'] },
       },
     }
     const result = moveToWell(
@@ -459,7 +480,7 @@ describe('moveToWell', () => {
     when(getIsHeaterShakerEastWestWithLatchOpen)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack)
       )
       .thenReturn(true)
 
@@ -481,7 +502,7 @@ describe('moveToWell', () => {
     when(getIsHeaterShakerEastWestMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything()
       )
       .thenReturn(true)
@@ -504,7 +525,7 @@ describe('moveToWell', () => {
     when(pipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         OT2_ROBOT_TYPE
       )
       .thenReturn(true)
@@ -527,7 +548,7 @@ describe('moveToWell', () => {
     when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything(),
         expect.anything()
       )

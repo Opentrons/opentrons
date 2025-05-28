@@ -1,11 +1,14 @@
 import type {
   AddressableAreaName,
-  CommonCommandRunTimeInfo,
+  AspirateProperties,
   CommonCommandCreateInfo,
-  LabwareDefinition2,
+  CommonCommandRunTimeInfo,
+  LabwareDefinition,
   LabwareOffset,
-  PipetteName,
   ModuleModel,
+  MultiDispenseProperties,
+  PipetteName,
+  SingleDispenseProperties,
 } from '../../js'
 
 export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
@@ -87,6 +90,16 @@ export interface LoadLiquidRunTimeCommand
   result?: LoadLiquidResult
 }
 
+export interface LoadLiquidClassCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'loadLiquidClass'
+  params: LoadLiquidClassParams
+}
+export interface LoadLiquidClassRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    LoadLiquidClassCreateCommand {
+  result?: LoadLiquidClassResult
+}
+
 export interface ConfigureNozzleLayoutCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'configureNozzleLayout'
@@ -106,6 +119,7 @@ export type SetupRunTimeCommand =
   | ReloadLabwareRunTimeCommand
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
+  | LoadLiquidClassRunTimeCommand
   | MoveLabwareRunTimeCommand
   | LoadLidRunTimeCommand
   | LoadLidStackRunTimeCommand
@@ -117,6 +131,7 @@ export type SetupCreateCommand =
   | ReloadLabwareCreateCommand
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
+  | LoadLiquidClassCreateCommand
   | MoveLabwareCreateCommand
   | LoadLidCreateCommand
   | LoadLidStackCreateCommand
@@ -165,7 +180,7 @@ export interface OnModuleLocationSequenceComponent {
 
 export interface OnAddressableAreaLocationSequenceComponent {
   kind: 'onAddressableArea'
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
 }
 
 export interface NotOnDeckLocationSequenceComponent {
@@ -207,7 +222,7 @@ interface LoadLabwareParams {
 }
 interface LoadLabwareResult {
   labwareId: string
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   // todo(mm, 2024-08-19): This does not match the server-returned offsetId field.
   // Confirm nothing client-side is trying to use this, then replace it with offsetId.
   offset: LabwareOffset
@@ -251,6 +266,23 @@ interface LoadLiquidParams {
 interface LoadLiquidResult {
   liquidId: string
 }
+interface LoadLiquidClassParams {
+  liquidClassId?: string
+  liquidClassRecord: LiquidClassRecord
+}
+
+interface LiquidClassRecord {
+  aspirate: AspirateProperties
+  liquidClassName: string
+  multiDispense?: MultiDispenseProperties
+  pipetteModel: string
+  singleDispense: SingleDispenseProperties
+  tiprack: string
+}
+
+interface LoadLiquidClassResult {
+  liquidClassId: string
+}
 
 export const COLUMN = 'COLUMN'
 export const SINGLE = 'SINGLE'
@@ -286,13 +318,14 @@ interface LoadLidStackParams {
 interface LoadLidStackResult {
   stackLabwareId: string
   labwareIds: string[]
-  definition: LabwareDefinition2
+  definition?: LabwareDefinition
+  lidStackDefinition: LabwareDefinition
   location: LabwareLocation
   stackLocationSequence?: LabwareLocationSequence
   locationSequences?: LabwareLocationSequence[]
 }
 
-interface LoadLidParams {
+export interface LoadLidParams {
   location: LabwareLocation
   loadName: string
   namespace: string
@@ -301,6 +334,6 @@ interface LoadLidParams {
 
 interface LoadLidResult {
   labwareId: string
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   locationSequence?: LabwareLocationSequence
 }

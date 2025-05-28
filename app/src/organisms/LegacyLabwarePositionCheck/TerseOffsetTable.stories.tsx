@@ -1,4 +1,3 @@
-import type * as React from 'react'
 import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
@@ -14,10 +13,12 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
+
 import { TerseOffsetTable } from './ResultsSummary'
 
-import type { Story, Meta } from '@storybook/react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export default {
   title: 'ODD/Organisms/TerseOffsetTable',
@@ -60,47 +61,47 @@ export const Basic = Template.bind({})
 Basic.args = {
   offsets: [
     {
-      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition),
       location: { slotName: 'A1' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition),
       location: { slotName: 'A2' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition),
       location: { slotName: 'A3' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition),
       location: { slotName: 'B1' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition),
       location: { slotName: 'B2' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition),
       location: { slotName: 'B3' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition),
       location: { slotName: 'C1' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition),
       location: { slotName: 'C2' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition),
       location: { slotName: 'C3' },
       vector: { x: 1, y: 2, z: 3 },
     },

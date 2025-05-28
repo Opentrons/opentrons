@@ -1,6 +1,8 @@
 import mixpanel from 'mixpanel-browser'
+
 import { getIsProduction } from '../networking/opentronsWebApi'
 import { getHasOptedIn } from './selectors'
+
 import type { BaseState } from '../types'
 
 export type AnalyticsEvent =
@@ -62,6 +64,8 @@ export function setMixpanelTracking(optedIn: boolean): void {
         mixpanel.register({
           appVersion: process.env.OT_PD_VERSION,
           appName: 'protocolDesigner',
+          viewportHeight: window.innerHeight,
+          viewportWidth: window.innerWidth,
         })
       } else {
         console.debug(

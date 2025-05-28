@@ -1,10 +1,12 @@
 import { forwardRef } from 'react'
 import styled from 'styled-components'
-import { Box } from '../../primitives'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { RobotCoordsForeignDiv } from '../../hardware-sim'
 
+import { RobotCoordsForeignDiv } from '../../hardware-sim'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { DeckInfoLabel } from '../../molecules'
 import { DeckLabel } from '../../molecules/DeckLabel'
+import { Box } from '../../primitives'
+import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
 import type { ForwardedRef } from 'react'
@@ -17,13 +19,22 @@ interface DeckLabelSetProps {
   width: number
   height: number
   invert?: boolean
+  showModuleIcon?: boolean
 }
 
 const DeckLabelSetComponent = (
   props: DeckLabelSetProps,
   ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element => {
-  const { deckLabels, x, y, width, height, invert = false } = props
+  const {
+    deckLabels,
+    x,
+    y,
+    width,
+    height,
+    invert = false,
+    showModuleIcon = false,
+  } = props
 
   return (
     <RobotCoordsForeignDiv
@@ -35,24 +46,35 @@ const DeckLabelSetComponent = (
         },
       }}
     >
-      <StyledBox
-        width={width}
-        height={height}
-        data-testid="DeckLabeSet"
-        isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
-      />
-      <LabelContainer ref={ref}>
-        {deckLabels.length > 0
-          ? deckLabels.map((deckLabel, index) => (
-              <DeckLabel
-                key={`DeckLabel_${index}`}
-                maxWidth={`calc(${width}px - 8px)`}
-                {...deckLabel}
-                isLast={deckLabels.length - 1 === index}
-              />
-            ))
-          : null}
-      </LabelContainer>
+      <Box position={POSITION_RELATIVE} width="100%" height="100%">
+        <StyledBox
+          width={width}
+          height={height}
+          isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
+          data-testid="DeckLabeSet"
+        />
+        {showModuleIcon && (
+          <IconWrapper leftPosition={width - 16}>
+            <DeckInfoLabel
+              iconName="stacked"
+              highlight
+              transform="scale(0.75)"
+            />
+          </IconWrapper>
+        )}
+        <LabelContainer ref={ref}>
+          {deckLabels.length > 0
+            ? deckLabels.map((deckLabel, index) => (
+                <DeckLabel
+                  key={`DeckLabel_${index}`}
+                  maxWidth={`calc(${width}px - 8px)`}
+                  {...deckLabel}
+                  isLast={deckLabels.length - 1 === index}
+                />
+              ))
+            : null}
+        </LabelContainer>
+      </Box>
     </RobotCoordsForeignDiv>
   )
 }
@@ -90,4 +112,15 @@ const LabelContainer = styled.div`
   & > *:last-child {
     border-bottom-left-radius: ${BORDERS.borderRadius4};
   }
+`
+
+interface IconWrapperProps {
+  leftPosition: number
+}
+
+const IconWrapper = styled(Box)<IconWrapperProps>`
+  position: ${POSITION_ABSOLUTE};
+  top: -${SPACING.spacing8};
+  left: ${props => `${props.leftPosition}px`};
+  z-index: 3;
 `

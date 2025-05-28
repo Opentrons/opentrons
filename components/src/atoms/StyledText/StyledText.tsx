@@ -1,10 +1,11 @@
 import styled, { css } from 'styled-components'
-import { Text } from '../../primitives'
-import { TYPOGRAPHY, RESPONSIVENESS } from '../../ui-style-constants'
-import { TYPOGRAPHY as HELIX_TYPOGRAPHY } from '../../helix-design-system/product'
 
-import type { ComponentProps, ReactNode } from 'react'
+import { TYPOGRAPHY as HELIX_TYPOGRAPHY } from '../../helix-design-system/product'
+import { Text } from '../../primitives'
+import { RESPONSIVENESS, TYPOGRAPHY } from '../../ui-style-constants'
+
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ComponentProps, ReactNode } from 'react'
 
 const helixProductStyleMap = {
   displayBold: {
@@ -100,6 +101,15 @@ const helixProductStyleMap = {
     style: css`
       @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
         font: ${HELIX_TYPOGRAPHY.fontStyleBodyDefaultRegular};
+      }
+    `,
+  },
+  bodyDefaultRegLink: {
+    as: 'p',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleBodyDefaultRegular};
+        text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
       }
     `,
   },

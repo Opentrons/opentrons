@@ -1,36 +1,38 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { animated, easings, useSpring } from '@react-spring/web'
 import styled from 'styled-components'
-import { animated, useSpring, easings } from '@react-spring/web'
+
 import {
   getDeckDefFromRobotType,
   getModuleDef2,
   getPositionFromSlotId,
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
 } from '@opentrons/shared-data'
-import { LabwareRender } from '../Labware'
 
 import { COLORS } from '../../helix-design-system'
-import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 import { BaseDeck } from '../BaseDeck'
-
-import type {
-  LoadedLabware,
-  LoadedModule,
-  Coordinates,
-  LabwareDefinition2,
-  LabwareLocation,
-  RobotType,
-  DeckDefinition,
-  DeckConfiguration,
-} from '@opentrons/shared-data'
+import { LabwareRender } from '../Labware'
+import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 
 import type { ReactNode } from 'react'
+import type {
+  DeckConfiguration,
+  DeckDefinition,
+  LabwareDefinition,
+  LabwareLocation,
+  LoadedLabware,
+  LoadedModule,
+  RobotType,
+  Vector3D,
+} from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 
 const getModulePosition = (
   deckDef: DeckDefinition,
   moduleId: string,
   loadedModules: LoadedModule[]
-): Coordinates | null => {
+): Vector3D | null => {
   const loadedModule = loadedModules.find(m => m.id === moduleId)
   if (loadedModule == null) return null
   const modSlot = deckDef.locations.addressableAreas.find(
@@ -63,7 +65,7 @@ function getLabwareCoordinates({
   location: LabwareLocation
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
-}): Coordinates | null {
+}): Vector3D | null {
   if (location === 'offDeck' || location === 'systemLocation') {
     return null
   } else if ('labwareId' in location) {
@@ -133,7 +135,7 @@ const SPLASH_Y_BUFFER_MM = 10
 
 interface MoveLabwareOnDeckProps extends StyleProps {
   robotType: RobotType
-  movedLabwareDef: LabwareDefinition2
+  movedLabwareDef: LabwareDefinition
   initialLabwareLocation: LabwareLocation
   finalLabwareLocation: LabwareLocation
   loadedModules: LoadedModule[]
@@ -171,11 +173,13 @@ export function MoveLabwareOnDeck(
     0,
   ]
 
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(movedLabwareDef)
+
   const offDeckPosition = {
     x: slotPosition[0],
     y:
       deckDef.cornerOffsetFromOrigin[1] -
-      movedLabwareDef.dimensions.xDimension -
+      getSchema2Dimensions(movedLabwareDef).xDimension -
       SPLASH_Y_BUFFER_MM,
   }
   const initialPosition =
@@ -232,7 +236,7 @@ export function MoveLabwareOnDeck(
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
         <g
-          transform={`translate(${movedLabwareDef.cornerOffsetFromSlot.x}, ${movedLabwareDef.cornerOffsetFromSlot.y})`}
+          transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
         >
           <LabwareRender definition={movedLabwareDef} highlight={true} />
           <AnimatedG style={{ opacity: springProps.splashOpacity }}>

@@ -1,32 +1,32 @@
 import { Fragment } from 'react'
-import styled from 'styled-components'
-import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
+import isEqual from 'lodash/isEqual'
+import styled from 'styled-components'
 
+import {
+  BORDERS,
+  COLORS,
+  DeckInfoLabel,
+  DIRECTION_ROW,
+  Flex,
+  LegacyStyledText,
+  MODULE_ICON_NAME_BY_TYPE,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import {
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleType,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
-import {
-  BORDERS,
-  COLORS,
-  DeckInfoLabel,
-  Flex,
-  MODULE_ICON_NAME_BY_TYPE,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-  DIRECTION_ROW,
-} from '@opentrons/components'
 
 import type { LegacyLabwareOffsetCreateData } from '@opentrons/api-client'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export interface TerseOffsetTableProps {
   offsets: LegacyLabwareOffsetCreateData[]
-  labwareDefinitions: LabwareDefinition2[]
+  labwareDefinitions: LabwareDefinition[]
 }
 
 // Very similar to the OffsetTable, but abbreviates certain things to be optimized

@@ -1,29 +1,39 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
+import debounce from 'lodash/debounce'
 
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
 
-import { moveRelativeCommand } from './commands'
 import { selectActivePipette } from '/app/redux/protocol-runs'
 
-import type { Coordinates } from '@opentrons/shared-data'
+import { moveRelativeCommand, moveToWellCommands } from './commands'
+
+import type { VectorOffset } from '@opentrons/api-client'
+import type { Vector3D } from '@opentrons/shared-data'
 import type {
   Axis,
   Jog,
   Sign,
   StepSize,
 } from '/app/molecules/JogControls/types'
-import type { UseLPCCommandChildProps } from './types'
+import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 const JOG_COMMAND_TIMEOUT_MS = 10000
 const MAX_QUEUED_JOGS = 3
+const DEBOUNCE_TIME_MS = 50
 
-interface UseHandleJogProps extends UseLPCCommandChildProps {
+interface UseHandleJogProps extends UseLPCCommandWithChainRunChildProps {
   setErrorMessage: (msg: string | null) => void
 }
 
 export interface UseHandleJogResult {
   handleJog: Jog
+  resetJog: (
+    offsetLocationDetails: OffsetLocationDetails,
+    pipetteId: string,
+    offset?: VectorOffset | null
+  ) => Promise<void>
 }
 
 // TODO(jh, 01-21-25): Extract the throttling logic into its own hook that lives elsewhere and is used by other Jog flows.
@@ -32,83 +42,123 @@ export function useHandleJog({
   runId,
   maintenanceRunId,
   setErrorMessage,
+  chainLPCCommands,
 }: UseHandleJogProps): UseHandleJogResult {
-  const [isJogging, setIsJogging] = useState(false)
-  const [jogQueue, setJogQueue] = useState<Array<() => Promise<void>>>([])
   const pipette = useSelector(selectActivePipette(runId))
   const pipetteId = pipette?.id
   const {
     createMaintenanceCommand: createSilentCommand,
   } = useCreateMaintenanceCommandMutation()
 
-  const executeJog = useCallback(
-    (
-      axis: Axis,
-      dir: Sign,
-      step: StepSize,
-      onSuccess?: (position: Coordinates | null) => void
-    ): Promise<void> => {
-      return new Promise<void>((resolve, reject) => {
-        if (pipetteId != null) {
-          createSilentCommand({
-            maintenanceRunId,
-            command: moveRelativeCommand({ pipetteId, axis, dir, step }),
-            waitUntilComplete: true,
-            timeout: JOG_COMMAND_TIMEOUT_MS,
-          })
-            .then(data => {
-              onSuccess?.(
-                (data?.data?.result?.position ?? null) as Coordinates | null
-              )
-              resolve()
-            })
-            .catch((e: Error) => {
-              setErrorMessage(`Error issuing jog command: ${e.message}`)
-              reject(e)
-            })
-        } else {
-          const error = new Error(
-            `Could not find pipette to jog with id: ${pipetteId ?? ''}`
-          )
-          setErrorMessage(error.message)
-          reject(error)
-        }
+  const queueRef = useRef<
+    Array<{
+      axis: Axis
+      dir: Sign
+      step: StepSize
+      onSuccess?: (position: Vector3D | null) => void
+    }>
+  >([])
+  const processingRef = useRef(false)
+
+  const processNextInQueue = useCallback(() => {
+    if (processingRef.current || queueRef.current.length === 0) {
+      return
+    }
+
+    processingRef.current = true
+    const nextJog = queueRef.current.shift()
+
+    if (nextJog == null) {
+      processingRef.current = false
+      return
+    }
+
+    const { axis, dir, step, onSuccess } = nextJog
+
+    if (pipetteId != null) {
+      createSilentCommand({
+        maintenanceRunId,
+        command: moveRelativeCommand({ pipetteId, axis, dir, step }),
+        waitUntilComplete: true,
+        timeout: JOG_COMMAND_TIMEOUT_MS,
       })
-    },
-    [pipetteId, maintenanceRunId, createSilentCommand, setErrorMessage]
+        .then(data => {
+          onSuccess?.((data?.data?.result?.position ?? null) as Vector3D | null)
+        })
+        .catch((e: Error) => {
+          setErrorMessage(`Error issuing jog command: ${e.message}`)
+        })
+        .finally(() => {
+          processingRef.current = false
+          // Use setTimeout to ensure we're outside the current call stack.
+          // This helps prevent stack overflow with rapid queue processing.
+          setTimeout(() => {
+            processNextInQueue()
+          }, DEBOUNCE_TIME_MS)
+        })
+    } else {
+      const error = new Error(
+        `Could not find pipette to jog with id: ${pipetteId ?? ''}`
+      )
+      setErrorMessage(error.message)
+      processingRef.current = false
+      setTimeout(() => {
+        processNextInQueue()
+      }, DEBOUNCE_TIME_MS)
+    }
+  }, [pipetteId, maintenanceRunId, createSilentCommand, setErrorMessage])
+
+  const debouncedProcessQueue = useCallback(
+    debounce(
+      () => {
+        processNextInQueue()
+      },
+      DEBOUNCE_TIME_MS,
+      { leading: true, trailing: true }
+    ),
+    [processNextInQueue]
   )
 
-  const processJogQueue = useCallback((): void => {
-    if (jogQueue.length > 0 && !isJogging) {
-      setIsJogging(true)
-      const nextJog = jogQueue[0]
-      setJogQueue(prevQueue => prevQueue.slice(1))
-      void nextJog().finally(() => {
-        setIsJogging(false)
-      })
-    }
-  }, [jogQueue, isJogging])
-
+  // Clear the queue on dismount so the pipette doesn't continue to jog.
   useEffect(() => {
-    processJogQueue()
-  }, [processJogQueue, jogQueue.length, isJogging])
+    return () => {
+      debouncedProcessQueue.cancel()
+    }
+  }, [debouncedProcessQueue])
 
   const handleJog = useCallback(
     (
       axis: Axis,
       dir: Sign,
       step: StepSize,
-      onSuccess?: (position: Coordinates | null) => void
+      onSuccess?: (position: Vector3D | null) => void
     ): void => {
-      setJogQueue(prevQueue => {
-        if (prevQueue.length < MAX_QUEUED_JOGS) {
-          return [...prevQueue, () => executeJog(axis, dir, step, onSuccess)]
-        }
-        return prevQueue
-      })
+      if (queueRef.current.length < MAX_QUEUED_JOGS) {
+        queueRef.current.push({ axis, dir, step, onSuccess })
+        debouncedProcessQueue()
+      }
     },
-    [executeJog]
+    [debouncedProcessQueue]
   )
 
-  return { handleJog }
+  const resetJog = useCallback(
+    (
+      offsetLocationDetails: OffsetLocationDetails,
+      pipetteId: string,
+      offset?: VectorOffset | null
+    ): Promise<void> => {
+      queueRef.current = []
+
+      const resetJogCommands = [
+        ...moveToWellCommands(offsetLocationDetails, pipetteId, offset),
+      ]
+
+      return chainLPCCommands(resetJogCommands, false).then(() =>
+        Promise.resolve()
+      )
+    },
+    [chainLPCCommands]
+  )
+
+  return { handleJog, resetJog }
 }

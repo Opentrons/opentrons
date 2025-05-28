@@ -1,41 +1,44 @@
 import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import {
   DIRECTION_COLUMN,
   Flex,
+  getLabwareDefinitionsFromCommands,
   LegacyStyledText,
   TYPOGRAPHY,
-  getLabwareDefinitionsFromCommands,
 } from '@opentrons/components'
-
 import {
   getLabwareDisplayName,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import { UnorderedList } from '/app/molecules/UnorderedList'
-import { getLabwareDef } from './utils/labware'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
-import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '/app/redux/config'
 
+import { PrepareSpace } from './PrepareSpace'
+import { RobotMotionLoader } from './RobotMotionLoader'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { getLabwareDef } from './utils/labware'
+
+import type { TFunction } from 'i18next'
+import type { VectorOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
-  RobotType,
   MoveLabwareCreateCommand,
+  RobotType,
 } from '@opentrons/shared-data'
-import type { VectorOffset } from '@opentrons/api-client'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type { ReturnTipStep } from './types'
-import type { TFunction } from 'i18next'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   setFatalError: (errorMessage: string) => void
+  onSkip: () => void
   tipPickUpOffset: VectorOffset | null
   isRobotMoving: boolean
   robotType: RobotType
@@ -51,6 +54,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     tipPickUpOffset,
     isRobotMoving,
     chainRunCommands,
+    onSkip,
     setFatalError,
     adapterId,
   } = props
@@ -69,7 +73,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   const instructions = [
-    isOnDevice ? t('clear_all_slots_odd') : t('clear_all_slots'),
+    isOnDevice ? t('legacy_clear_all_slots_odd') : t('legacy_clear_all_slots'),
     <Trans
       key="place_previous_tip_rack_in_location"
       t={t}
@@ -222,6 +226,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         body={<UnorderedList items={instructions} />}
         labwareDef={labwareDef}
         confirmPlacement={handleConfirmPlacement}
+        onSkip={onSkip}
       />
     </Flex>
   )

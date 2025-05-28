@@ -3,6 +3,12 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
+import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
@@ -12,40 +18,37 @@ import {
   DISPLAY_FLEX,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
+  InlineNotification,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   PrimaryButton,
+  RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
-  RESPONSIVENESS,
 } from '@opentrons/components'
-import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-} from '@opentrons/api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
 import { InterventionModal as InterventionModalMolecule } from '/app/molecules/InterventionModal'
-import { getIsOnDevice } from '/app/redux/config'
-import { PauseInterventionContent } from './PauseInterventionContent'
-import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
-import { isInterventionCommand } from './utils'
+import { OddModal } from '/app/molecules/OddModal'
 import { useRobotType } from '/app/redux-resources/robots'
-import { InlineNotification } from '/app/atoms/InlineNotification'
+import { getIsOnDevice } from '/app/redux/config'
+
+import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
+import { PauseInterventionContent } from './PauseInterventionContent'
+import { StackerEmptyInterventionContent } from './StackerEmptyInterventionContent'
+import { StackerFillInterventionContent } from './StackerFillInterventionContent'
+import { isInterventionCommand } from './utils'
 
 import type { ReactNode } from 'react'
-import type { IconName } from '@opentrons/components'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type {
   RunCommandSummary,
   RunData,
   RunStatus,
 } from '@opentrons/api-client'
+import type { IconName } from '@opentrons/components'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,
@@ -156,6 +159,14 @@ export function InterventionModal({
             isOnDevice={isOnDevice}
           />
         )
+      case 'flexStacker/empty':
+        return (
+          <StackerEmptyInterventionContent {...{ command, run, analysis }} />
+        )
+      case 'flexStacker/fill':
+        return (
+          <StackerFillInterventionContent {...{ command, run, analysis }} />
+        )
       default:
         console.warn(
           'Unhandled command passed to InterventionModal: ',
@@ -181,6 +192,20 @@ export function InterventionModal({
           headerTitle: t('move_labware_on', { robot_name: robotName }),
           headerTitleOnDevice: t('move_labware'),
           iconSize: SPACING.spacing32,
+        }
+      case 'flexStacker/empty':
+        return {
+          iconName: 'move-xy-circle' as IconName,
+          headerTitle: t('empty_stacker', { robot_name: robotName }),
+          headerTitleOnDevice: t('empty_stacker'),
+          iconSize: undefined,
+        }
+      case 'flexStacker/fill':
+        return {
+          iconName: 'move-xy-circle' as IconName,
+          headerTitle: t('fill_stacker', { robot_name: robotName }),
+          headerTitleOnDevice: t('fill_stacker'),
+          iconSize: undefined,
         }
       default:
         console.warn(

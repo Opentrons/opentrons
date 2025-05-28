@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   useModulesQuery,
@@ -12,13 +12,14 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { AddFixtureModal } from '../AddFixtureModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+
+import { AddFixtureModal } from '../AddFixtureModal'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { Modules } from '@opentrons/api-client'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')

@@ -18,7 +18,10 @@ class OnLabwareOffsetLocationSequenceComponent(BaseModel):
     kind: Literal["onLabware"] = "onLabware"
     labwareUri: str = Field(
         ...,
-        description="The definition URI of a labware that a labware can be loaded onto.",
+        description=(
+            "The definition URI of another labware, probably an adapter,"
+            " that the labware will be loaded onto."
+        ),
     )
 
 
@@ -27,7 +30,7 @@ class OnModuleOffsetLocationSequenceComponent(BaseModel):
 
     kind: Literal["onModule"] = "onModule"
     moduleModel: ModuleModel = Field(
-        ..., description="The model of a module that a lwbare can be loaded on to."
+        ..., description="The model of a module that a labware can be loaded on to."
     )
 
 
@@ -99,8 +102,8 @@ class LegacyLabwareOffsetLocation(BaseModel):
     definitionUri: Optional[str] = Field(
         None,
         description=(
-            "The definition URI of a labware that a labware can be loaded onto,"
-            " if applicable."
+            "The definition URI of another labware, probably an adapter, that the"
+            " labware will be loaded onto, if applicable."
             "\n\n"
             "This can be combined with moduleModel if the labware is loaded on top of"
             " an adapter that is loaded on a module."

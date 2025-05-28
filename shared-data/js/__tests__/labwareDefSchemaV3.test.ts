@@ -1,10 +1,11 @@
 import path from 'path'
+import Ajv from 'ajv'
 import glob from 'glob'
 import { describe, expect, it, test } from 'vitest'
 
-import type { LabwareDefinition3 } from '../types'
-import Ajv from 'ajv'
 import schema from '../../labware/schemas/3.json'
+
+import type { LabwareDefinition3 } from '../types'
 
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/3')
 const definitionsDir = path.join(__dirname, '../../labware/definitions/3')
@@ -12,6 +13,8 @@ const globPattern = '**/*.json'
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(schema)
+
+// todo(mm, 2025-03-17): Unify these tests with labwareDefSchemaV2.test.ts.
 
 const checkGeometryDefinitions = (labwareDef: LabwareDefinition3): void => {
   test('innerLabwareGeometry sections should be sorted top to bottom', () => {
@@ -41,14 +44,36 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition3): void => {
 
       expect(wellGeometryId in labwareDef.innerLabwareGeometry).toBe(true)
 
-      // FIXME(mm, 2025-02-04):
-      // `wellDepth` != `topFrustumHeight` for ~23/60 definitions.
-      //
-      // const wellDepth = labwareDef.wells[wellName].depth
-      // const topFrustumHeight =
-      //   labwareDef.innerLabwareGeometry[wellGeometryId].sections[0].topHeight
-      // expect(wellDepth).toEqual(topFrustumHeight)
+      const wellDepth = labwareDef.wells[wellName].depth
+      const topFrustumHeight =
+        labwareDef.innerLabwareGeometry[wellGeometryId].sections[0].topHeight
+      expect(wellDepth).toStrictEqual(topFrustumHeight)
     }
+  })
+}
+
+const checkExtents = (labwareDef: LabwareDefinition3): void => {
+  test('extents.total should be oriented correctly', () => {
+    const {
+      total: { backLeftBottom, frontRightTop },
+    } = labwareDef.extents
+    expect(backLeftBottom.x).toBeLessThanOrEqual(frontRightTop.x)
+    expect(backLeftBottom.y).toBeGreaterThanOrEqual(frontRightTop.y)
+    expect(backLeftBottom.z).toBeLessThanOrEqual(frontRightTop.z)
+  })
+  test('extents.footprint should be oriented correctly', () => {
+    const {
+      footprint: { backLeft, frontRight },
+    } = labwareDef.extents
+    expect(backLeft.x).toBeLessThanOrEqual(frontRight.x)
+    expect(backLeft.y).toBeGreaterThanOrEqual(frontRight.y)
+  })
+  test('extents.footprint should be contained inside extents.total', () => {
+    const { footprint, total } = labwareDef.extents
+    expect(footprint.backLeft.x).toBeGreaterThanOrEqual(total.backLeftBottom.x)
+    expect(footprint.backLeft.y).toBeLessThanOrEqual(total.backLeftBottom.y)
+    expect(footprint.frontRight.x).toBeLessThanOrEqual(total.frontRightTop.x)
+    expect(footprint.frontRight.y).toBeGreaterThanOrEqual(total.frontRightTop.y)
   })
 }
 
@@ -65,6 +90,7 @@ describe(`test labware definitions with schema v3`, () => {
 
   test("paths didn't break, which would give false positives", () => {
     expect(definitionPaths.length).toBeGreaterThan(0)
+
     expect(fixturePaths.length).toBeGreaterThan(0)
   })
 
@@ -75,17 +101,32 @@ describe(`test labware definitions with schema v3`, () => {
       const valid = validate(labwareDef)
       const validationErrors = validate.errors
 
-      // FIXME(mm, 2025-02-04): These new definitions have a displayCategory that
-      // the schema does not recognize. Either they need to change or the schema does.
-      const expectFailure = ['protocol_engine_lid_stack_object'].includes(
-        labwareDef.parameters.loadName
-      )
-
-      if (expectFailure) expect(validationErrors).not.toBe(null)
-      else expect(validationErrors).toBe(null)
-      expect(valid).toBe(!expectFailure)
+      expect(validationErrors).toBe(null)
+      expect(valid).toBe(true)
     })
 
+    checkExtents(labwareDef)
     checkGeometryDefinitions(labwareDef)
+  })
+
+  describe.each(allPaths)('%s', labwarePath => {
+    const labwareDef = require(labwarePath) as LabwareDefinition3
+
+    test('extents properly use back-left bottom origin with quadrant IV coordinates', () => {
+      expect(labwareDef.extents.footprint.backLeft.x).toBe(0)
+      expect(labwareDef.extents.footprint.backLeft.y).toBe(0)
+      expect(labwareDef.extents.footprint.frontRight.x).toBeGreaterThan(0)
+      expect(labwareDef.extents.footprint.frontRight.y).toBeLessThan(0)
+    })
+
+    test('all wells have quadrant IV coordinates', () => {
+      for (const wellName in labwareDef.wells) {
+        const well = labwareDef.wells[wellName]
+
+        expect(well.x).toBeGreaterThan(0)
+        expect(well.y).toBeLessThan(0)
+        expect(well.z).toBeGreaterThan(0)
+      }
+    })
   })
 })

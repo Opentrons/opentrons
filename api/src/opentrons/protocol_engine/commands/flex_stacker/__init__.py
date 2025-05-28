@@ -1,13 +1,5 @@
 """Command models for Flex Stacker commands."""
 
-from .configure import (
-    ConfigureCommandType,
-    ConfigureParams,
-    ConfigureResult,
-    Configure,
-    ConfigureCreate,
-)
-
 from .store import (
     StoreCommandType,
     StoreParams,
@@ -37,14 +29,7 @@ from .fill import FillCommandType, FillParams, FillResult, Fill, FillCreate
 
 from .empty import EmptyCommandType, EmptyParams, EmptyResult, Empty, EmptyCreate
 
-
 __all__ = [
-    # flexStacker/configure
-    "ConfigureCommandType",
-    "ConfigureParams",
-    "ConfigureResult",
-    "Configure",
-    "ConfigureCreate",
     # flexStacker/store
     "StoreCommandType",
     "StoreParams",

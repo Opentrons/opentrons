@@ -1,9 +1,10 @@
 import { Box } from '../../primitives'
 import { EmptySelectorButton as EmptySelectorButtonComponent } from './EmptySelectorButton'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof EmptySelectorButtonComponent> = {
-  title: 'Library/Atoms/Buttons/EmptySelectorButton',
+  title: 'Helix/Atoms/Buttons/EmptySelectorButton',
   component: EmptySelectorButtonComponent,
   argTypes: {
     textAlignment: {

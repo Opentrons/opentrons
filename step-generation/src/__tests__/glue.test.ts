@@ -1,15 +1,19 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { DEFAULT_CONFIG } from '../fixtures'
 import {
-  getNextRobotStateAndWarningsSingleCommand,
   getNextRobotStateAndWarnings,
+  getNextRobotStateAndWarningsSingleCommand,
 } from '../getNextRobotStateAndWarnings'
 import {
-  curryCommandCreator,
-  reduceCommandCreators,
   commandCreatorsTimeline,
+  curryCommandCreator,
+  curryWithoutPython,
+  reduceCommandCreators,
 } from '../utils'
-import { DEFAULT_CONFIG } from '../fixtures'
+
 import type { InvariantContext } from '../types'
+
 vi.mock('../getNextRobotStateAndWarnings')
 
 let invariantContext: InvariantContext
@@ -33,6 +37,7 @@ interface CountCommand {
     value: number
   }
 }
+
 const addCreator: any = (
   params: CountParams,
   invariantContext: InvariantContext,
@@ -60,6 +65,17 @@ const addCreatorWithWarning: any = (
     ],
   }
 }
+
+/* This command creator emits both JSON and Python commands. */
+const addHalfCreator: any = (
+  params: CountParams,
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => ({
+  commands: [{ command: 'add', params: { value: params.value / 2 } }],
+  warnings: [],
+  python: `protocol.add_to_count(${params.value / 2})`,
+})
 
 const multiplyCreator: any = (
   params: CountParams,
@@ -178,7 +194,10 @@ beforeEach(() => {
     labwareEntities: {},
     moduleEntities: {},
     pipetteEntities: {},
-    additionalEquipmentEntities: {},
+    trashBinEntities: {},
+    wasteChuteEntities: {},
+    stagingAreaEntities: {},
+    gripperEntities: {},
     liquidEntities: {},
     config: DEFAULT_CONFIG,
   }
@@ -205,6 +224,29 @@ describe('reduceCommandCreators', () => {
       // Note no `python` field here.
       // Existing CommandCreators that don't emit Python should behave exactly the same as before.
       // This test makes sure we do NOT produce results like `python:'undefined'` or `python:''` or `python:'\n'`.
+    })
+  })
+
+  it('curryCommandCreator and curryWithoutPython', () => {
+    const initialState: any = { count: 0 }
+    const result: any = reduceCommandCreators(
+      [
+        // We expect the first addHalfCreator to emit both JSON and Python.
+        // The second addHalfCreator should only emit JSON with no Python.
+        curryCommandCreator(addHalfCreator, { value: 5 }),
+        curryWithoutPython(addHalfCreator, { value: 6 }),
+      ],
+      invariantContext,
+      initialState
+    )
+
+    expect(result).toEqual({
+      commands: [
+        { command: 'add', params: { value: 2.5 } },
+        { command: 'add', params: { value: 3 } },
+      ],
+      warnings: [],
+      python: 'protocol.add_to_count(2.5)',
     })
   })
 

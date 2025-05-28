@@ -1,13 +1,14 @@
-import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import { getModuleState } from '../../robotStateSelectors'
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import { waitForTemperature } from '../atomic'
 import { delay } from '../atomic/delay'
-import { heaterShakerOpenLatch } from '../atomic/heaterShakerOpenLatch'
 import { heaterShakerCloseLatch } from '../atomic/heaterShakerCloseLatch'
 import { heaterShakerDeactivateHeater } from '../atomic/heaterShakerDeactivateHeater'
-import { setTemperature } from '../atomic/setTemperature'
-import { heaterShakerStopShake } from '../atomic/heaterShakerStopShake'
+import { heaterShakerOpenLatch } from '../atomic/heaterShakerOpenLatch'
 import { heaterShakerSetTargetShakeSpeed } from '../atomic/heaterShakerSetTargetShakeSpeed'
+import { heaterShakerStopShake } from '../atomic/heaterShakerStopShake'
+import { setTemperature } from '../atomic/setTemperature'
 
 import type {
   CommandCreator,
@@ -83,6 +84,15 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     (args.timerMinutes != null && args.timerMinutes !== 0) ||
     (args.timerSeconds != null && args.timerSeconds !== 0)
   ) {
+    if (args.targetTemperature !== null) {
+      commandCreators.push(
+        curryCommandCreator(waitForTemperature, {
+          moduleId,
+          celsius: args.targetTemperature,
+        })
+      )
+    }
+
     const totalSeconds =
       (args.timerSeconds ?? 0) + (args.timerMinutes ?? 0) * 60
     commandCreators.push(

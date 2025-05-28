@@ -1,16 +1,17 @@
 import { useTranslation } from 'react-i18next'
+
 import { SelectField } from '@opentrons/components'
 
 import { SECURITY_NONE, SECURITY_WPA_PSK } from '../constants'
 import { useConnectFormField } from './form-state'
 import { FormRow } from './FormRow'
 
-import type { EapOption } from '../types'
 import type {
   ControllerFieldState,
   ControllerRenderProps,
   FieldValues,
 } from 'react-hook-form'
+import type { EapOption } from '../types'
 
 export interface SecurityFieldProps {
   id: string

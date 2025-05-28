@@ -1,13 +1,17 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
+
 import { getLabwareIsCustom } from '../labwareModuleCompatibility'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
 describe('labwareModuleCompatibility', () => {
   describe('getLabwareIsCustom', () => {
     const labwareOnDeck = {
       labwareDefURI: 'fixture/fixture_96_plate',
       id: 'abcef123',
-      slot: '3',
+      stack: ['abcef123', '3'],
       def: fixture_96_plate as LabwareDefinition2,
       pythonName: 'mockPythonName',
     }

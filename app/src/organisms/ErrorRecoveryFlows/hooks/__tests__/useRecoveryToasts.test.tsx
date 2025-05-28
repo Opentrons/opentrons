@@ -1,22 +1,24 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { I18nextProvider } from 'react-i18next'
-import { i18n } from '/app/i18n'
-import { renderHook, render, screen } from '@testing-library/react'
+import { render, renderHook, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import {
-  useRecoveryToasts,
-  useRecoveryToastText,
-  getStepNumber,
-  useRecoveryFullCommandText,
-} from '../useRecoveryToasts'
-import { RECOVERY_MAP } from '../../constants'
-import { useToaster } from '../../../ToasterOven'
+import { i18n } from '/app/i18n'
 import { useCommandTextString } from '/app/local-resources/commands'
 
-import type { ReactElement } from 'react'
+import { useToaster } from '../../../ToasterOven'
+import { RECOVERY_MAP } from '../../constants'
+import {
+  getStepNumber,
+  handleRecoveryOptionAction,
+  useRecoveryFullCommandText,
+  useRecoveryToasts,
+  useRecoveryToastText,
+} from '../useRecoveryToasts'
+
 import type { Mock } from 'vitest'
+import type { ReactElement } from 'react'
 import type { BuildToast } from '../useRecoveryToasts'
 
 vi.mock('../../../ToasterOven')
@@ -287,5 +289,114 @@ describe('useRecoveryFullCommandText', () => {
       })
     )
     expect(result.current).toBe('tc starting profile of 1231231 element steps')
+  })
+})
+
+describe('handleRecoveryOptionAction', () => {
+  const CURRENT_STEP_VALUE = 'currentStepValue'
+  const NEXT_STEP_VALUE = 'nextStepValue'
+
+  // Routes that should return the nextStepReturnVal toasts.
+  const NEXT_STEP_ROUTES = [
+    RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE,
+    RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE,
+    RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE,
+    RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
+    RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE,
+    RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+    RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+  ]
+
+  // Routes that should return the currentStepReturnVal toasts.
+  const CURRENT_STEP_ROUTES = [
+    RECOVERY_MAP.CANCEL_RUN.ROUTE,
+    RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE,
+    RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
+    RECOVERY_MAP.RETRY_STEP.ROUTE,
+    RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+    RECOVERY_MAP.HOME_AND_RETRY.ROUTE,
+    RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+    RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+    RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+    RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE,
+    RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+    RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
+  ]
+
+  // Routes that should return no toasts.
+  const NULL_ROUTES = [
+    RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE,
+    RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE,
+    RECOVERY_MAP.ROBOT_CANCELING.ROUTE,
+    RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
+    RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE,
+    RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE,
+    RECOVERY_MAP.ROBOT_RESUMING.ROUTE,
+    RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE,
+    RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE,
+    RECOVERY_MAP.ROBOT_DOOR_OPEN.ROUTE,
+    RECOVERY_MAP.ROBOT_DOOR_OPEN_SPECIAL.ROUTE,
+    RECOVERY_MAP.OPTION_SELECTION.ROUTE,
+    RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
+  ]
+
+  it.each(NEXT_STEP_ROUTES)('should return nextStepReturnVal for %s', route => {
+    const result = handleRecoveryOptionAction(
+      route,
+      CURRENT_STEP_VALUE,
+      NEXT_STEP_VALUE
+    )
+    expect(result).toBe(NEXT_STEP_VALUE)
+  })
+
+  it.each(CURRENT_STEP_ROUTES)(
+    'should return currentStepReturnVal for %s',
+    route => {
+      const result = handleRecoveryOptionAction(
+        route,
+        CURRENT_STEP_VALUE,
+        NEXT_STEP_VALUE
+      )
+      expect(result).toBe(CURRENT_STEP_VALUE)
+    }
+  )
+
+  it.each(NULL_ROUTES)('should return null for %s', route => {
+    const result = handleRecoveryOptionAction(
+      route,
+      CURRENT_STEP_VALUE,
+      NEXT_STEP_VALUE
+    )
+    expect(result).toBeNull()
+  })
+
+  it('should return null for unknown recovery options', () => {
+    const result = handleRecoveryOptionAction(
+      'UNKNOWN_OPTION' as any,
+      CURRENT_STEP_VALUE,
+      NEXT_STEP_VALUE
+    )
+    expect(result).toBeNull()
+  })
+
+  it('should ensure all routes are tested and there are no duplicated routes', () => {
+    const allRoutes = Object.values(RECOVERY_MAP).map(item => item.ROUTE)
+
+    const testedRoutes = [
+      ...NEXT_STEP_ROUTES,
+      ...CURRENT_STEP_ROUTES,
+      ...NULL_ROUTES,
+    ]
+
+    const untestedRoutes = allRoutes.filter(
+      route => !testedRoutes.includes(route)
+    )
+
+    if (untestedRoutes.length > 0) {
+      throw new Error(`Untested routes: ${untestedRoutes.join(', ')}`)
+    }
+
+    const allTestedRoutesSet = new Set(testedRoutes)
+    expect(allTestedRoutesSet.size).toBe(testedRoutes.length)
   })
 })

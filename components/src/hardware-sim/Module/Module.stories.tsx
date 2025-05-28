@@ -1,21 +1,22 @@
 import {
   fixture96Plate,
   getModuleDef2,
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_V1,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  HEATERSHAKER_MODULE_V1,
-  MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
+
 import { LabwareRender } from '../Labware'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module as ModuleComponent } from './'
 
-import type { Story, Meta } from '@storybook/react'
-import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
+import type { Meta, Story } from '@storybook/react'
+import type { LabwareDefinition, ModuleModel } from '@opentrons/shared-data'
 
 const moduleModels: ModuleModel[] = [
   TEMPERATURE_MODULE_V2,
@@ -48,7 +49,7 @@ const Template: Story<{
         orientation={args.orientation}
       >
         {args.hasLabware ? (
-          <LabwareRender definition={fixture96Plate as LabwareDefinition2} />
+          <LabwareRender definition={fixture96Plate as LabwareDefinition} />
         ) : null}
       </ModuleComponent>
     </RobotCoordinateSpace>

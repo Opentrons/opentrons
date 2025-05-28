@@ -1,19 +1,20 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import {
-  getDisposalOptions,
-  getLabwareOptions,
-} from '../../../../../ui/labware/selectors'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { DropdownStepFormField } from '../../../../../components/molecules'
+import { getDisposalOptions } from '../../../../../ui/labware/selectors'
 import { hoverSelection } from '../../../../../ui/steps/actions/actions'
-import { DropdownStepFormField } from '../../../../../molecules'
+import { useLabwareDropdownOptions } from '../../../utils'
+
 import type { FieldProps } from '../types'
 
 export function LabwareField(props: FieldProps): JSX.Element {
   const { name } = props
   const { i18n, t } = useTranslation(['protocol_steps', 'application'])
   const disposalOptions = useSelector(getDisposalOptions)
-  const options = useSelector(getLabwareOptions)
+  const options = useLabwareDropdownOptions('labware')
   const dispatch = useDispatch()
+
   const allOptions =
     name === 'dispense_labware'
       ? [...options, ...disposalOptions]

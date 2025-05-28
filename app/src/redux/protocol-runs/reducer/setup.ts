@@ -1,5 +1,6 @@
 import * as Constants from '../constants'
-import type { RunSetupStatus, ProtocolRunAction } from '../types'
+
+import type { ProtocolRunAction, RunSetupStatus } from '../types'
 
 const INITIAL_SETUP_STEP_STATE = { complete: false, required: true }
 
@@ -8,7 +9,6 @@ export const INITIAL_RUN_SETUP_STATE: RunSetupStatus = {
   [Constants.MODULE_SETUP_STEP_KEY]: INITIAL_SETUP_STEP_STATE,
   [Constants.LPC_STEP_KEY]: INITIAL_SETUP_STEP_STATE,
   [Constants.LABWARE_SETUP_STEP_KEY]: INITIAL_SETUP_STEP_STATE,
-  [Constants.LIQUID_SETUP_STEP_KEY]: INITIAL_SETUP_STEP_STATE,
 }
 
 export function setupReducer(

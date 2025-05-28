@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { getSuccessResult } from '../fixtures'
+import { describe, expect, it } from 'vitest'
+
 import { configureForVolume } from '../commandCreators/atomic/configureForVolume'
+import { getSuccessResult } from '../fixtures'
 
 const getRobotInitialState = (): any => {
   return {}
@@ -11,6 +12,7 @@ const invariantContext: any = {
     [mockId]: {
       name: 'p50_single_flex',
       id: mockId,
+      pythonName: 'mock_pipette_left',
     },
   },
 }
@@ -35,5 +37,6 @@ describe('configureForVolume', () => {
         },
       },
     ])
+    expect(res.python).toBe('mock_pipette_left.configure_for_volume(1)')
   })
 })

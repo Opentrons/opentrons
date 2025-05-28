@@ -4,37 +4,37 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 
+import { ModalShell, useConditionalConfirm } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 
-import * as Sessions from '/app/redux/sessions'
-import {
-  Introduction,
-  DeckSetup,
-  TipPickUp,
-  TipConfirmation,
-  SaveZPoint,
-  SaveXYPoint,
-  ConfirmExit,
-  LoadingState,
-  CompleteConfirmation,
-} from '/app/organisms/Desktop/CalibrationPanels'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getTopPortalEl } from '/app/App/portal'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 import {
   CalibrationError,
   useCalibrationError,
 } from '/app/organisms/Desktop/CalibrationError'
+import {
+  CompleteConfirmation,
+  ConfirmExit,
+  DeckSetup,
+  Introduction,
+  LoadingState,
+  SaveXYPoint,
+  SaveZPoint,
+  TipConfirmation,
+  TipPickUp,
+} from '/app/organisms/Desktop/CalibrationPanels'
+import * as Sessions from '/app/redux/sessions'
 
 import type { ComponentType } from 'react'
 import type { Mount } from '@opentrons/components'
+import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 import type {
   CalibrationLabware,
   CalibrationSessionStep,
   SessionCommandParams,
 } from '/app/redux/sessions/types'
-import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 import type { CalibrateDeckParentProps } from './types'
 
 const PANEL_BY_STEP: Partial<

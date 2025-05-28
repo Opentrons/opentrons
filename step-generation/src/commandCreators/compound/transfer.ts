@@ -1,44 +1,49 @@
 import assert from 'assert'
 import zip from 'lodash/zip'
+
 import {
-  getWellDepth,
-  LOW_VOLUME_PIPETTES,
+  getCorrectionVolume,
+  getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  LOW_VOLUME_PIPETTES,
+  POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
+  SAFE_MOVE_TO_WELL_LOCATION,
+  WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
+
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
 import {
-  blowoutUtil,
   curryCommandCreator,
-  airGapHelper,
-  reduceCommandCreators,
-  wasteChuteCommandsUtil,
+  DEST_WELL_BLOWOUT_DESTINATION,
+  getSlotInLocationStack,
   getTrashOrLabware,
-  dispenseLocationHelper,
-  moveHelper,
-  getWasteChuteAddressableAreaNamePip,
-  getHasWasteChute,
+  reduceCommandCreators,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../utils'
 import {
   airGapInPlace,
-  aspirate,
+  aspirateInPlace,
+  blowOutInPlace,
   configureForVolume,
   delay,
-  dispense,
-  dropTip,
+  dispenseInPlace,
+  moveToAddressableArea,
   moveToWell,
+  prepareToAspirate,
   touchTip,
 } from '../atomic'
-import { mixUtil } from './mix'
+import { blowOutInTrash } from './blowOutInTrash'
+import { blowOutInWasteChute } from './blowOutInWasteChute'
+import { mixInPlaceUtil } from './mix'
 import { replaceTip } from './replaceTip'
 
+import type { WellLocation } from '@opentrons/shared-data'
 import type {
-  TransferArgs,
-  CurriedCommandCreator,
   CommandCreator,
   CommandCreatorError,
+  CurriedCommandCreator,
+  TransferArgs,
 } from '../../types'
 
 export const transfer: CommandCreator<TransferArgs> = (
@@ -73,23 +78,46 @@ export const transfer: CommandCreator<TransferArgs> = (
     aspirateDelay,
     dispenseDelay,
     aspirateFlowRateUlSec,
-    aspirateOffsetFromBottomMm,
     blowoutFlowRateUlSec,
-    blowoutOffsetFromTopMm,
     dispenseFlowRateUlSec,
-    dispenseOffsetFromBottomMm,
     tipRack,
     aspirateXOffset,
     aspirateYOffset,
+    aspirateZOffset,
     destLabware,
     sourceLabware,
     dispenseXOffset,
     dispenseYOffset,
+    dispenseZOffset,
+    pushOut,
+    aspiratePositionReference,
+    aspirateSubmergeXOffset,
+    aspirateSubmergeYOffset,
+    aspirateSubmergeZOffset,
+    aspirateSubmergePositionReference,
+    aspirateSubmergeDelay,
+    aspirateRetractXOffset,
+    aspirateRetractYOffset,
+    aspirateRetractZOffset,
+    aspirateRetractPositionReference,
+    aspirateRetractDelay,
+    dispenseSubmergePositionReference,
+    dispenseSubmergeXOffset,
+    dispenseSubmergeYOffset,
+    dispenseSubmergeZOffset,
+    dispenseSubmergeDelay,
+    dispensePositionReference,
+    dispenseRetractXOffset,
+    dispenseRetractYOffset,
+    dispenseRetractZOffset,
+    dispenseRetractPositionReference,
+    dispenseRetractDelay,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
     invariantContext.labwareEntities,
-    invariantContext.additionalEquipmentEntities,
+    invariantContext.wasteChuteEntities,
+    invariantContext.trashBinEntities,
     args.destLabware
   )
 
@@ -133,11 +161,21 @@ export const transfer: CommandCreator<TransferArgs> = (
     )
   }
 
-  const initialDestLabwareSlot = prevRobotState.labware[destLabware]?.slot
-  const initialSourceLabwareSlot = prevRobotState.labware[sourceLabware]?.slot
-  const hasWasteChute = getHasWasteChute(
-    invariantContext.additionalEquipmentEntities
+  const initialDestLabwareSlot =
+    prevRobotState.labware[destLabware] != null
+      ? getSlotInLocationStack(prevRobotState.labware[destLabware].stack)
+      : ''
+
+  const initialSourceLabwareSlot = getSlotInLocationStack(
+    prevRobotState.labware[sourceLabware]?.stack
   )
+  const hasWasteChute =
+    Object.keys(invariantContext.wasteChuteEntities).length > 0
+
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
 
   if (
     hasWasteChute &&
@@ -150,15 +188,13 @@ export const transfer: CommandCreator<TransferArgs> = (
   if (
     !args.destLabware ||
     (!invariantContext.labwareEntities[args.destLabware] &&
-      !invariantContext.additionalEquipmentEntities[args.destLabware])
+      !invariantContext.wasteChuteEntities[args.destLabware] &&
+      !invariantContext.trashBinEntities[args.destLabware])
   ) {
     errors.push(errorCreators.equipmentDoesNotExist())
   }
 
-  if (
-    !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  ) {
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
@@ -166,49 +202,65 @@ export const transfer: CommandCreator<TransferArgs> = (
     return {
       errors,
     }
-  const pipetteSpec = invariantContext.pipetteEntities[args.pipette].spec
-
-  const isWasteChute =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'wasteChute'
-  const isTrashBin =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'trashBin'
-
-  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-    pipetteSpec.channels
-  )
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
   const effectiveTransferVol =
     getPipetteWithTipMaxVol(args.pipette, invariantContext, tipRack) -
     aspirateAirGapVolume
-  const liquidMinVolumes = Object.values(pipetteSpec.liquids).map(
-    liquid => liquid.minVolume
-  )
-  //  account for minVolume for lowVolume pipettes
-  const pipetteMinVol = Math.min(...liquidMinVolumes)
-  const chunksPerSubTransfer = Math.ceil(args.volume / effectiveTransferVol)
-  const lastSubTransferVol =
-    args.volume - (chunksPerSubTransfer - 1) * effectiveTransferVol
-  // volume of each chunk in a sub-transfer
-  let subTransferVolumes: number[] = Array(chunksPerSubTransfer - 1)
-    .fill(effectiveTransferVol)
-    .concat(lastSubTransferVol)
 
-  if (chunksPerSubTransfer > 1 && lastSubTransferVol < pipetteMinVol) {
-    // last chunk volume is below pipette min, split the last
-    const splitLastVol = (effectiveTransferVol + lastSubTransferVol) / 2
-    subTransferVolumes = Array(chunksPerSubTransfer - 2)
-      .fill(effectiveTransferVol)
-      .concat(splitLastVol)
-      .concat(splitLastVol)
+  const chunksPerSubTransfer = Math.ceil(args.volume / effectiveTransferVol)
+  const subTransferVol = args.volume / chunksPerSubTransfer
+  // volume of each chunk in a sub-transfer
+  const subTransferVolumes: number[] = Array(chunksPerSubTransfer).fill(
+    subTransferVol
+  )
+
+  const aspirateSubmergeLocation: WellLocation = {
+    origin:
+      POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN[
+        aspirateSubmergePositionReference
+      ],
+    offset: {
+      x: aspirateSubmergeXOffset,
+      y: aspirateSubmergeYOffset,
+      z: aspirateSubmergeZOffset,
+    },
   }
+  const aspirateRetractLocation: WellLocation = {
+    origin:
+      POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN[
+        aspirateRetractPositionReference
+      ],
+    offset: {
+      x: aspirateRetractXOffset,
+      y: aspirateRetractYOffset,
+      z: aspirateRetractZOffset,
+    },
+  }
+  const dispenseSubmergeLocation: WellLocation = {
+    origin:
+      POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN[
+        dispenseSubmergePositionReference
+      ],
+    offset: {
+      x: dispenseSubmergeXOffset,
+      y: dispenseSubmergeYOffset,
+      z: dispenseSubmergeZOffset,
+    },
+  }
+  const dispenseRetractLocation: WellLocation = {
+    origin:
+      POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN[
+        dispenseRetractPositionReference
+      ],
+    offset: {
+      x: dispenseRetractXOffset,
+      y: dispenseRetractYOffset,
+      z: dispenseRetractZOffset,
+    },
+  }
+  const pipetteSpecs = invariantContext.pipetteEntities[args.pipette].spec
 
   // @ts-expect-error(SA, 2021-05-05): zip can return undefined so this really should be Array<[string | undefined, string | undefined]>
   const sourceDestPairs: Array<[string, string | null]> = zip(
@@ -217,6 +269,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   )
   let prevSourceWell: string | null = null
   let prevDestWell: string | null = null
+  // const probedWells: Set<string> = new Set()
   const commandCreators = sourceDestPairs.reduce(
     (
       outerAcc: CurriedCommandCreator[],
@@ -224,19 +277,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       pairIdx: number
     ): CurriedCommandCreator[] => {
       const [sourceWell, destinationWell] = wellPair
-      const sourceLabwareDef =
-        invariantContext.labwareEntities[args.sourceLabware].def
-      const destLabwareDef =
-        trashOrLabware === 'labware'
-          ? invariantContext.labwareEntities[args.destLabware].def
-          : null
-      const wellDepth =
-        destinationWell != null && destLabwareDef != null
-          ? getWellDepth(destLabwareDef, destinationWell)
-          : 0
-      const airGapOffsetSourceWell =
-        getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
-      const airGapOffsetDestWell = wellDepth + AIR_GAP_OFFSET_FROM_TOP
       const commands = subTransferVolumes.reduce(
         (
           innerAcc: CurriedCommandCreator[],
@@ -246,6 +286,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           const isInitialSubtransfer = pairIdx === 0 && chunkIdx === 0
           const isLastPair = pairIdx + 1 === sourceDestPairs.length
           const isLastChunk = chunkIdx + 1 === subTransferVolumes.length
+          const isUltimateSubtransfer = isLastChunk && isLastPair
           let changeTipNow = false // 'never' by default
 
           if (args.changeTip === 'always') {
@@ -259,7 +300,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               isInitialSubtransfer || destinationWell !== prevDestWell
           }
 
-          const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
+          const configureForVolumeCommand = LOW_VOLUME_PIPETTES.includes(
             invariantContext.pipetteEntities[args.pipette].name
           )
             ? [
@@ -270,338 +311,606 @@ export const transfer: CommandCreator<TransferArgs> = (
               ]
             : []
 
-          const tipCommands: CurriedCommandCreator[] = changeTipNow
+          const tipCommands = changeTipNow
             ? [
                 curryCommandCreator(replaceTip, {
                   pipette: args.pipette,
-                  nozzles: args.nozzles ?? undefined,
                   dropTipLocation: args.dropTipLocation,
                   tipRack: args.tipRack,
+                  ...(args.nozzles != null ? { nozzles: args.nozzles } : {}),
                 }),
               ]
             : []
-          const preWetTipCommands =
-            args.preWetTip && chunkIdx === 0
-              ? mixUtil({
-                  pipette: args.pipette,
-                  labware: args.sourceLabware,
-                  well: sourceWell,
-                  volume: subTransferVol,
-                  times: 1,
-                  offsetFromBottomMm: aspirateOffsetFromBottomMm,
-                  aspirateFlowRateUlSec,
-                  dispenseFlowRateUlSec,
-                  aspirateDelaySeconds: aspirateDelay?.seconds,
-                  dispenseDelaySeconds: dispenseDelay?.seconds,
-                  tipRack,
-                  xOffset: aspirateXOffset,
-                  yOffset: aspirateYOffset,
-                  nozzles: args.nozzles,
-                })
+
+          const wellDepth =
+            invariantContext.labwareEntities[sourceLabware]?.def.wells[
+              sourceWell
+            ]?.depth ?? null
+          const aspirateMmFromBottom = getMmFromBottom(
+            aspirateZOffset,
+            aspiratePositionReference,
+            wellDepth
+          )
+          const aspirateSubmergeMmFromBottom = getMmFromBottom(
+            aspirateSubmergeZOffset,
+            aspirateSubmergePositionReference,
+            wellDepth
+          )
+          const aspirateRetractMmFromBottom = getMmFromBottom(
+            aspirateRetractZOffset,
+            aspirateRetractPositionReference,
+            wellDepth
+          )
+          if (
+            aspirateMmFromBottom != null &&
+            aspirateSubmergeMmFromBottom != null &&
+            aspirateMmFromBottom > aspirateSubmergeMmFromBottom
+          ) {
+            errors.push(errorCreators.submergeBelowAspirate())
+          }
+          if (
+            aspirateMmFromBottom != null &&
+            aspirateRetractMmFromBottom != null &&
+            aspirateMmFromBottom > aspirateRetractMmFromBottom
+          ) {
+            errors.push(errorCreators.retractBelowAspirate())
+          }
+
+          const moveToSourceWellTopCommand = [
+            curryCommandCreator(moveToWell, {
+              pipetteId: args.pipette,
+              labwareId: args.sourceLabware,
+              wellName: sourceWell,
+              wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
+            }),
+          ]
+          // TODO (nd, 05/13/2025): uncomment and refine below logic once meniscus-relative pipetting is supported in PD
+          // let liquidProbeCommand: CurriedCommandCreator[] = []
+          // if (changeTipNow && !probedWells.has(sourceWell)) {
+          //   liquidProbeCommand = [
+          //     curryCommandCreator(liquidProbe, {
+          //       pipetteId: args.pipette,
+          //       labwareId: args.sourceLabware,
+          //       wellName: sourceWell,
+          //       wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
+          //     }),
+          //   ]
+          //   probedWells.add(sourceWell)
+          // }
+          const prepareToAspirateCommand = [
+            curryCommandCreator(prepareToAspirate, {
+              pipetteId: args.pipette,
+            }),
+          ]
+          const dispenseCorrectionVolumeForDispenseAirGap = getCorrectionVolume(
+            {
+              liquidClass: args.liquidClass,
+              pipetteSpecs,
+              tiprackDefUri: args.tipRack,
+              targetVolume: dispenseAirGapVolume,
+              liquidHandlingAction: 'singleDispense',
+            }
+          )
+          const voidDispenseAirGapCommand =
+            dispenseAirGapVolume > 0 &&
+            !changeTipNow &&
+            (chunkIdx > 0 || pairIdx > 0)
+              ? [
+                  curryCommandCreator(dispenseInPlace, {
+                    pipetteId: args.pipette,
+                    volume: dispenseAirGapVolume,
+                    flowRate: dispenseFlowRateUlSec,
+                    ...(dispenseCorrectionVolumeForDispenseAirGap > 0
+                      ? {
+                          correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
+                        }
+                      : {}),
+                  }),
+                ]
               : []
+          const preAspirateSubmergeCommands = [
+            ...moveToSourceWellTopCommand,
+            ...voidDispenseAirGapCommand,
+            // ...liquidProbeCommand,
+            ...configureForVolumeCommand,
+            ...prepareToAspirateCommand,
+          ]
+          const aspirateSubmergeCommands = [
+            curryCommandCreator(moveToWell, {
+              pipetteId: args.pipette,
+              labwareId: args.sourceLabware,
+              wellName: sourceWell,
+              wellLocation: aspirateSubmergeLocation,
+            }),
+            curryCommandCreator(moveToWell, {
+              pipetteId: args.pipette,
+              labwareId: args.sourceLabware,
+              ...(args.aspirateSubmergeSpeed != null
+                ? { speed: args.aspirateSubmergeSpeed }
+                : {}),
+              wellName: sourceWell,
+              wellLocation: {
+                origin:
+                  POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN[
+                    args.aspiratePositionReference
+                  ],
+                offset: {
+                  x: aspirateXOffset,
+                  y: aspirateYOffset,
+                  z: aspirateZOffset,
+                },
+              },
+            }),
+            ...(aspirateSubmergeDelay != null &&
+            aspirateSubmergeDelay.seconds > 0
+              ? [
+                  curryCommandCreator(delay, {
+                    seconds: aspirateSubmergeDelay.seconds,
+                  }),
+                ]
+              : []),
+          ]
+          // prewet before each aspirate if enabled
+          const preWetTipCommands = args.preWetTip
+            ? mixInPlaceUtil({
+                pipette: args.pipette,
+                volume: subTransferVol,
+                times: 1,
+                aspirateFlowRateUlSec,
+                dispenseFlowRateUlSec,
+                aspirateDelaySeconds: aspirateDelay?.seconds ?? 0,
+                dispenseDelaySeconds: dispenseDelay?.seconds ?? 0,
+                finalPushOut: 0, // according to transfer_components_executor, don't push out here
+                invariantContext,
+                liquidClass: args.liquidClass,
+                tiprack: args.tipRack,
+              })
+            : []
           const mixBeforeAspirateCommands =
             args.mixBeforeAspirate != null
-              ? mixUtil({
+              ? mixInPlaceUtil({
                   pipette: args.pipette,
-                  labware: args.sourceLabware,
-                  well: sourceWell,
                   volume: args.mixBeforeAspirate.volume,
                   times: args.mixBeforeAspirate.times,
-                  offsetFromBottomMm: aspirateOffsetFromBottomMm,
                   aspirateFlowRateUlSec,
                   dispenseFlowRateUlSec,
                   aspirateDelaySeconds: aspirateDelay?.seconds,
                   dispenseDelaySeconds: dispenseDelay?.seconds,
-                  tipRack,
-                  xOffset: aspirateXOffset,
-                  yOffset: aspirateYOffset,
-                  nozzles: args.nozzles,
+                  finalPushOut: 0, // according to transfer_components_executor, don't push out here
+                  invariantContext,
+                  liquidClass: args.liquidClass,
+                  tiprack: args.tipRack,
                 })
               : []
           const delayAfterAspirateCommands =
             aspirateDelay != null
               ? [
-                  curryCommandCreator(moveToWell, {
-                    pipetteId: args.pipette,
-                    labwareId: args.sourceLabware,
-                    wellName: sourceWell,
-                    wellLocation: {
-                      origin: 'bottom',
-                      offset: {
-                        x: 0,
-                        y: 0,
-                        z: aspirateDelay.mmFromBottom,
-                      },
-                    },
-                  }),
                   curryCommandCreator(delay, {
                     seconds: aspirateDelay.seconds,
                   }),
                 ]
               : []
-          const touchTipAfterAspirateCommands = args.touchTipAfterAspirate
+          const touchTipAfterAspirateRetractCommands = args.touchTipAfterAspirate
             ? [
                 curryCommandCreator(touchTip, {
                   pipetteId: args.pipette,
                   labwareId: args.sourceLabware,
                   wellName: sourceWell,
-                  wellLocation: {
-                    origin: 'top',
-                    offset: {
-                      z: args.touchTipAfterAspirateOffsetMmFromTop,
-                    },
-                  },
+                  ...(args.touchTipAfterAspirateMmFromEdge != null
+                    ? { mmFromEdge: args.touchTipAfterAspirateMmFromEdge }
+                    : {}),
+                  zOffsetFromTop: args.touchTipAfterAspirateOffsetMmFromTop,
                   ...(args.touchTipAfterAspirateSpeed != null
                     ? { speed: args.touchTipAfterAspirateSpeed }
                     : {}),
                 }),
+                // move back to retract position after touch tip if air gap needed
+                ...(aspirateAirGapVolume > 0
+                  ? [
+                      curryCommandCreator(moveToWell, {
+                        pipetteId: args.pipette,
+                        labwareId: args.sourceLabware,
+                        wellName: sourceWell,
+                        wellLocation: aspirateRetractLocation,
+                      }),
+                    ]
+                  : []),
               ]
             : []
-          //  can not touch tip in a waste chute
-          const touchTipAfterDispenseCommands =
-            args.touchTipAfterDispense && destinationWell != null
+          const aspirateCorrectionVolumeForAspirateAirGap = getCorrectionVolume(
+            {
+              liquidClass: args.liquidClass,
+              pipetteSpecs,
+              tiprackDefUri: args.tipRack,
+              targetVolume: aspirateAirGapVolume,
+              liquidHandlingAction: 'aspirate',
+            }
+          )
+          const airGapAfterAspirateRetractCommands =
+            aspirateAirGapVolume > 0
               ? [
-                  curryCommandCreator(touchTip, {
-                    pipetteId: args.pipette,
-                    labwareId: args.destLabware,
-                    wellName: destinationWell,
-                    wellLocation: {
-                      origin: 'top',
-                      offset: {
-                        z: args.touchTipAfterDispenseOffsetMmFromTop,
-                      },
-                    },
-                    ...(args.touchTipAfterDispenseSpeed != null
-                      ? { speed: args.touchTipAfterDispenseSpeed }
-                      : {}),
-                  }),
-                ]
-              : []
-          //  can not mix in a waste chute
-          const mixInDestinationCommands =
-            args.mixInDestination != null && destinationWell != null
-              ? mixUtil({
-                  pipette: args.pipette,
-                  labware: args.destLabware,
-                  well: destinationWell,
-                  volume: args.mixInDestination.volume,
-                  times: args.mixInDestination.times,
-                  offsetFromBottomMm: dispenseOffsetFromBottomMm,
-                  aspirateFlowRateUlSec,
-                  dispenseFlowRateUlSec,
-                  aspirateDelaySeconds: aspirateDelay?.seconds,
-                  dispenseDelaySeconds: dispenseDelay?.seconds,
-                  tipRack,
-                  xOffset: dispenseXOffset,
-                  yOffset: dispenseYOffset,
-                  nozzles: args.nozzles,
-                })
-              : []
-
-          const airGapAfterAspirateCommands =
-            aspirateAirGapVolume && destinationWell != null
-              ? [
-                  curryCommandCreator(moveToWell, {
-                    pipetteId: args.pipette,
-                    labwareId: args.sourceLabware,
-                    wellName: sourceWell,
-                    wellLocation: {
-                      origin: 'bottom',
-                      offset: {
-                        z: airGapOffsetSourceWell,
-                        x: 0,
-                        y: 0,
-                      },
-                    },
-                  }),
                   curryCommandCreator(airGapInPlace, {
                     pipetteId: args.pipette,
                     volume: aspirateAirGapVolume,
                     flowRate: aspirateFlowRateUlSec,
+                    ...(aspirateCorrectionVolumeForAspirateAirGap > 0
+                      ? {
+                          correctionVolume: aspirateCorrectionVolumeForAspirateAirGap,
+                        }
+                      : {}),
                   }),
-                  ...(aspirateDelay != null
-                    ? [
-                        curryCommandCreator(delay, {
-                          seconds: aspirateDelay.seconds,
-                        }),
-                      ]
-                    : []),
-                  curryCommandCreator(dispense, {
-                    pipetteId: args.pipette,
-                    volume: aspirateAirGapVolume,
-                    labwareId: args.destLabware,
-                    wellName: destinationWell,
-                    flowRate: dispenseFlowRateUlSec,
-                    wellLocation: {
-                      origin: 'bottom',
-                      offset: {
-                        z: airGapOffsetDestWell,
-                        x: 0,
-                        y: 0,
-                      },
-                    },
-                    tipRack: args.tipRack,
-                    nozzles: args.nozzles,
-                    isAirGap: true,
-                  }),
-                  ...(dispenseDelay != null
-                    ? [
-                        curryCommandCreator(delay, {
-                          seconds: dispenseDelay.seconds,
-                        }),
-                      ]
-                    : []),
+                  ...delayAfterAspirateCommands,
                 ]
               : []
-          // `willReuseTip` is like changeTipNow, but thinking ahead about
-          //  the NEXT subtransfer and not this current one
-          let willReuseTip = true // never or once --> true
 
-          if (isLastChunk && isLastPair) {
-            // if we're at the end of this step, we won't reuse the tip in this step
-            // so we can discard it (even if changeTip is never, we'll drop it!)
-            willReuseTip = false
-          } else if (args.changeTip === 'always') {
-            willReuseTip = false
-          } else if (args.changeTip === 'perSource' && !isLastPair) {
-            const nextSourceWell = sourceDestPairs[pairIdx + 1][0]
-            willReuseTip = nextSourceWell === sourceWell
-          } else if (args.changeTip === 'perDest' && !isLastPair) {
-            const nextDestWell = sourceDestPairs[pairIdx + 1][1]
-            willReuseTip = nextDestWell === destinationWell
-          }
-
-          const aspirateCommand = [
-            curryCommandCreator(aspirate, {
+          const aspirateCorrectionVolumeForSubtransferTarget = getCorrectionVolume(
+            {
+              liquidClass: args.liquidClass,
+              pipetteSpecs,
+              tiprackDefUri: args.tipRack,
+              targetVolume: subTransferVol,
+              liquidHandlingAction: 'aspirate',
+            }
+          )
+          const aspirateCommands = [
+            curryCommandCreator(aspirateInPlace, {
               pipetteId: args.pipette,
               volume: subTransferVol,
-              labwareId: args.sourceLabware,
-              wellName: sourceWell,
               flowRate: aspirateFlowRateUlSec,
-              wellLocation: {
-                origin: 'bottom',
-                offset: {
-                  z: aspirateOffsetFromBottomMm,
-                  x: aspirateXOffset,
-                  y: aspirateYOffset,
-                },
-              },
-              tipRack,
-              nozzles: args.nozzles,
+              ...(aspirateCorrectionVolumeForSubtransferTarget > 0
+                ? {
+                    correctionVolume: aspirateCorrectionVolumeForSubtransferTarget,
+                  }
+                : {}),
             }),
+            ...delayAfterAspirateCommands,
           ]
-          const dispenseCommand = [
-            curryCommandCreator(dispenseLocationHelper, {
+          const postAspirateRetractCommands = [
+            curryCommandCreator(moveToWell, {
               pipetteId: args.pipette,
-              volume: subTransferVol,
-              destinationId: args.destLabware,
-              well: destinationWell ?? undefined,
-              flowRate: dispenseFlowRateUlSec,
-              offsetFromBottomMm: dispenseOffsetFromBottomMm,
-              xOffset: dispenseXOffset,
-              yOffset: dispenseYOffset,
-              tipRack: args.tipRack,
-              nozzles: args.nozzles,
+              labwareId: args.sourceLabware,
+              ...(args.aspirateRetractSpeed != null
+                ? { speed: args.aspirateRetractSpeed }
+                : {}),
+              wellName: sourceWell,
+              wellLocation: aspirateRetractLocation,
             }),
+            ...(aspirateRetractDelay != null &&
+            aspirateRetractDelay?.seconds > 0
+              ? [
+                  curryCommandCreator(delay, {
+                    seconds: aspirateRetractDelay.seconds,
+                  }),
+                ]
+              : []),
           ]
-
           const delayAfterDispenseCommands =
             dispenseDelay != null
               ? [
-                  curryCommandCreator(moveHelper, {
-                    pipetteId: args.pipette,
-                    destinationId: args.destLabware,
-                    well: destinationWell ?? undefined,
-                    zOffset: dispenseDelay.mmFromBottom,
-                  }),
                   curryCommandCreator(delay, {
                     seconds: dispenseDelay.seconds,
                   }),
                 ]
               : []
-
-          const blowoutCommand = blowoutUtil({
-            pipette: args.pipette,
-            sourceLabwareId: args.sourceLabware,
-            sourceWell: sourceWell,
-            destLabwareId: args.destLabware,
-            destWell: destinationWell,
-            blowoutLocation: args.blowoutLocation,
-            flowRate: blowoutFlowRateUlSec,
-            offsetFromTopMm: blowoutOffsetFromTopMm,
-            invariantContext,
-            prevRobotState,
-          })
-
-          const airGapAfterDispenseCommands =
-            dispenseAirGapVolume && !willReuseTip
+          const dispenseCorrectionVolumeForAspirateAirGap = getCorrectionVolume(
+            {
+              liquidClass: args.liquidClass,
+              pipetteSpecs,
+              tiprackDefUri: args.tipRack,
+              targetVolume: aspirateAirGapVolume,
+              liquidHandlingAction: 'singleDispense',
+            }
+          )
+          const dispenseSubmergeCommands =
+            destinationWell != null
               ? [
-                  curryCommandCreator(airGapHelper, {
-                    sourceWell,
-                    blowOutLocation: args.blowoutLocation,
-                    sourceId: args.sourceLabware,
+                  curryCommandCreator(moveToWell, {
                     pipetteId: args.pipette,
-                    volume: dispenseAirGapVolume,
-                    destinationId: args.destLabware,
-                    destWell: destinationWell,
-                    flowRate: aspirateFlowRateUlSec,
-                    offsetFromBottomMm: airGapOffsetDestWell,
+                    labwareId: args.destLabware,
+                    wellName: destinationWell,
+                    wellLocation: dispenseSubmergeLocation,
                   }),
-                  ...(aspirateDelay != null
+                  ...(aspirateAirGapVolume > 0
+                    ? [
+                        curryCommandCreator(dispenseInPlace, {
+                          pipetteId: args.pipette,
+                          volume: aspirateAirGapVolume,
+                          flowRate: dispenseFlowRateUlSec,
+                          pushOut: 0,
+                          ...(dispenseCorrectionVolumeForAspirateAirGap > 0
+                            ? {
+                                correctionVolume: dispenseCorrectionVolumeForAspirateAirGap,
+                              }
+                            : {}),
+                        }),
+                        ...delayAfterDispenseCommands,
+                      ]
+                    : []),
+                  curryCommandCreator(moveToWell, {
+                    pipetteId: args.pipette,
+                    labwareId: args.destLabware,
+                    ...(args.dispenseSubmergeSpeed != null
+                      ? { speed: args.dispenseSubmergeSpeed }
+                      : {}),
+                    wellName: destinationWell,
+                    wellLocation: {
+                      origin:
+                        POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN[
+                          dispensePositionReference
+                        ],
+                      offset: {
+                        x: dispenseXOffset,
+                        y: dispenseYOffset,
+                        z: dispenseZOffset,
+                      },
+                    },
+                  }),
+                  ...(dispenseSubmergeDelay != null &&
+                  dispenseSubmergeDelay.seconds > 0
                     ? [
                         curryCommandCreator(delay, {
-                          seconds: aspirateDelay.seconds,
+                          seconds: dispenseSubmergeDelay.seconds,
+                        }),
+                      ]
+                    : []),
+                ]
+              : [
+                  curryCommandCreator(moveToAddressableArea, {
+                    fixtureId: args.destLabware,
+                    pipetteId: args.pipette,
+                    offset: {
+                      x: 0,
+                      y: 0,
+                      z: 0,
+                    },
+                  }),
+                ]
+
+          // don't push out if mixing in destination
+          const effectivePushOut =
+            args.mixInDestination != null && destinationWell != null
+              ? 0
+              : pushOut
+          const dispenseCorrectionVolumeForSubtransferTarget = getCorrectionVolume(
+            {
+              liquidClass: args.liquidClass,
+              pipetteSpecs,
+              tiprackDefUri: args.tipRack,
+              targetVolume: subTransferVol,
+              liquidHandlingAction: 'singleDispense',
+            }
+          )
+          const dispenseCommands = [
+            curryCommandCreator(dispenseInPlace, {
+              pipetteId: args.pipette,
+              volume: subTransferVol,
+              flowRate: dispenseFlowRateUlSec,
+              ...(effectivePushOut != null
+                ? { pushOut: effectivePushOut }
+                : {}),
+              ...(dispenseCorrectionVolumeForSubtransferTarget > 0
+                ? {
+                    correctionVolume: dispenseCorrectionVolumeForSubtransferTarget,
+                  }
+                : {}),
+            }),
+            ...delayAfterDispenseCommands,
+          ]
+
+          const mixAfterDispenseCommands =
+            args.mixInDestination != null && destinationWell != null
+              ? mixInPlaceUtil({
+                  pipette: args.pipette,
+                  volume: args.mixInDestination.volume,
+                  times: args.mixInDestination.times,
+                  aspirateFlowRateUlSec,
+                  dispenseFlowRateUlSec,
+                  aspirateDelaySeconds: aspirateDelay?.seconds,
+                  dispenseDelaySeconds: dispenseDelay?.seconds,
+                  finalPushOut: pushOut,
+                  invariantContext,
+                  liquidClass: args.liquidClass,
+                  tiprack: args.tipRack,
+                })
+              : []
+
+          const postDispenseRetractCommands =
+            destinationWell != null
+              ? [
+                  curryCommandCreator(moveToWell, {
+                    pipetteId: args.pipette,
+                    labwareId: args.destLabware,
+                    ...(args.dispenseRetractSpeed != null
+                      ? { speed: args.dispenseRetractSpeed }
+                      : {}),
+                    wellName: destinationWell,
+                    wellLocation: dispenseRetractLocation,
+                  }),
+                  ...(dispenseRetractDelay != null &&
+                  dispenseRetractDelay?.seconds > 0
+                    ? [
+                        curryCommandCreator(delay, {
+                          seconds: dispenseRetractDelay.seconds,
                         }),
                       ]
                     : []),
                 ]
               : []
 
-          let dropTipCommand = [
-            curryCommandCreator(dropTip, {
-              pipette: args.pipette,
-              dropTipLocation: args.dropTipLocation,
-            }),
-          ]
-          if (isWasteChute) {
-            dropTipCommand = wasteChuteCommandsUtil({
-              type: 'dropTip',
-              pipetteId: args.pipette,
-              prevRobotState,
-              addressableAreaName: addressableAreaNameWasteChute,
-            })
-          }
-          if (isTrashBin) {
-            dropTipCommand = movableTrashCommandsUtil({
-              type: 'dropTip',
-              pipetteId: args.pipette,
-              invariantContext,
-              prevRobotState,
-            })
+          const blowoutInPlaceCommand = curryCommandCreator(blowOutInPlace, {
+            pipetteId: args.pipette,
+            flowRate: blowoutFlowRateUlSec,
+          })
+          const aspirateCorrectionVolumeForDispenseAirGap = getCorrectionVolume(
+            {
+              liquidClass: args.liquidClass,
+              pipetteSpecs,
+              tiprackDefUri: args.tipRack,
+              targetVolume: dispenseAirGapVolume,
+              liquidHandlingAction: 'aspirate',
+            }
+          )
+
+          const getAirGapAfterDispenseCommands = (
+            considerUltimateSubtransfer: boolean
+          ): CurriedCommandCreator[] =>
+            dispenseAirGapVolume > 0 &&
+            !(
+              args.changeTip === 'never' &&
+              isUltimateSubtransfer &&
+              considerUltimateSubtransfer
+            ) // don't air gap if end of full transfer and not changing tip
+              ? [
+                  curryCommandCreator(airGapInPlace, {
+                    pipetteId: args.pipette,
+                    volume: dispenseAirGapVolume,
+                    flowRate: aspirateFlowRateUlSec,
+                    ...(aspirateCorrectionVolumeForDispenseAirGap > 0
+                      ? {
+                          correctionVolume: aspirateCorrectionVolumeForDispenseAirGap,
+                        }
+                      : {}),
+                  }),
+                  ...delayAfterAspirateCommands,
+                ]
+              : []
+
+          const getTouchTipAfterDispenseRetractCommands = (
+            considerUltimateSubtransfer: boolean
+          ): CurriedCommandCreator[] =>
+            destinationWell != null && args.touchTipAfterDispense
+              ? [
+                  curryCommandCreator(touchTip, {
+                    pipetteId: args.pipette,
+                    labwareId: args.destLabware,
+                    wellName: destinationWell,
+                    ...(args.touchTipAfterDispenseMmFromEdge != null
+                      ? { mmFromEdge: args.touchTipAfterDispenseMmFromEdge }
+                      : {}),
+                    zOffsetFromTop: args.touchTipAfterDispenseOffsetMmFromTop,
+                    ...(args.touchTipAfterDispenseSpeed != null
+                      ? { speed: args.touchTipAfterDispenseSpeed }
+                      : {}),
+                  }),
+                  // move back to retract position after touch tip if air gap needed
+                  ...(getAirGapAfterDispenseCommands(
+                    considerUltimateSubtransfer
+                  ).length > 0
+                    ? [
+                        curryCommandCreator(moveToWell, {
+                          pipetteId: args.pipette,
+                          labwareId: args.destLabware,
+                          wellName: destinationWell,
+                          wellLocation: dispenseRetractLocation,
+                        }),
+                      ]
+                    : []),
+                ]
+              : []
+          let advancedDispenseArgsCommands: CurriedCommandCreator[] = []
+          switch (args.blowoutLocation) {
+            case null:
+            case undefined:
+              advancedDispenseArgsCommands = [
+                ...getTouchTipAfterDispenseRetractCommands(true),
+                ...getAirGapAfterDispenseCommands(true),
+              ]
+              break
+            case DEST_WELL_BLOWOUT_DESTINATION:
+              advancedDispenseArgsCommands = [
+                blowoutInPlaceCommand,
+                ...getTouchTipAfterDispenseRetractCommands(true),
+                ...getAirGapAfterDispenseCommands(true),
+              ]
+              break
+            case SOURCE_WELL_BLOWOUT_DESTINATION:
+              advancedDispenseArgsCommands = [
+                ...getTouchTipAfterDispenseRetractCommands(true),
+                ...getAirGapAfterDispenseCommands(false),
+                curryCommandCreator(moveToWell, {
+                  pipetteId: args.pipette,
+                  labwareId: args.sourceLabware,
+                  wellName: sourceWell,
+                  wellLocation: {
+                    origin: WELL_ORIGIN_TOP,
+                  },
+                }),
+                blowoutInPlaceCommand,
+                // touch tip at source well with dispense touch tip parameters
+                ...(args.touchTipAfterDispense
+                  ? [
+                      curryCommandCreator(touchTip, {
+                        pipetteId: args.pipette,
+                        labwareId: args.sourceLabware,
+                        wellName: sourceWell,
+                        ...(args.touchTipAfterDispenseMmFromEdge != null
+                          ? { mmFromEdge: args.touchTipAfterDispenseMmFromEdge }
+                          : {}),
+                        zOffsetFromTop:
+                          args.touchTipAfterDispenseOffsetMmFromTop,
+                        ...(args.touchTipAfterDispenseSpeed != null
+                          ? { speed: args.touchTipAfterDispenseSpeed }
+                          : {}),
+                      }),
+                    ]
+                  : []),
+                ...(getAirGapAfterDispenseCommands(true).length > 0
+                  ? [
+                      curryCommandCreator(moveToWell, {
+                        pipetteId: args.pipette,
+                        labwareId: args.sourceLabware,
+                        wellName: sourceWell,
+                        wellLocation: { origin: WELL_ORIGIN_TOP },
+                      }),
+                    ]
+                  : []),
+                ...getAirGapAfterDispenseCommands(true),
+              ]
+              break
+            default:
+              // trash or waste chute
+              if (args.blowoutLocation in invariantContext.trashBinEntities) {
+                advancedDispenseArgsCommands = [
+                  ...getTouchTipAfterDispenseRetractCommands(false),
+                  ...getAirGapAfterDispenseCommands(false),
+                  curryCommandCreator(blowOutInTrash, {
+                    pipetteId: args.pipette,
+                    flowRate: blowoutFlowRateUlSec,
+                    trashId: args.blowoutLocation,
+                  }),
+                  ...getAirGapAfterDispenseCommands(true),
+                ]
+              } else if (
+                args.blowoutLocation in invariantContext.wasteChuteEntities
+              ) {
+                advancedDispenseArgsCommands = [
+                  curryCommandCreator(blowOutInWasteChute, {
+                    pipetteId: args.pipette,
+                    flowRate: blowoutFlowRateUlSec,
+                    wasteChuteId: args.blowoutLocation,
+                  }),
+                  ...getAirGapAfterDispenseCommands(true),
+                ]
+              }
+              break
           }
 
           // if using dispense > air gap, drop or change the tip at the end
-          const dropTipAfterDispenseAirGap =
-            airGapAfterDispenseCommands.length > 0 && isLastChunk && isLastPair
-              ? dropTipCommand
-              : []
-
           const nextCommands = [
             ...tipCommands,
-            ...preWetTipCommands,
-            ...configureForVolumeCommand,
+            ...preAspirateSubmergeCommands,
+            ...aspirateSubmergeCommands,
             ...mixBeforeAspirateCommands,
-            ...aspirateCommand,
-            ...delayAfterAspirateCommands,
-            ...touchTipAfterAspirateCommands,
-            ...airGapAfterAspirateCommands,
-            ...dispenseCommand,
-            ...delayAfterDispenseCommands,
-            ...mixInDestinationCommands,
-            ...blowoutCommand,
-            ...touchTipAfterDispenseCommands,
-            ...airGapAfterDispenseCommands,
-            ...dropTipAfterDispenseAirGap,
+            ...preWetTipCommands,
+            ...aspirateCommands,
+            ...postAspirateRetractCommands,
+            ...touchTipAfterAspirateRetractCommands,
+            ...airGapAfterAspirateRetractCommands,
+            ...dispenseSubmergeCommands,
+            ...dispenseCommands,
+            ...mixAfterDispenseCommands,
+            ...postDispenseRetractCommands,
+            ...advancedDispenseArgsCommands,
           ]
           // NOTE: side-effecting
           prevSourceWell = sourceWell

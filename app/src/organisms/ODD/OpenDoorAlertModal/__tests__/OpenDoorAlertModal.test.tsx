@@ -7,7 +7,7 @@ import { i18n } from '/app/i18n'
 import { OpenDoorAlertModal } from '..'
 
 const render = () => {
-  return renderWithProviders(<OpenDoorAlertModal />, {
+  return renderWithProviders(<OpenDoorAlertModal moduleDoorLocation={null} />, {
     i18nInstance: i18n,
   })
 }

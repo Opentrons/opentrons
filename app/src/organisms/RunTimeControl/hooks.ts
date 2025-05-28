@@ -1,16 +1,16 @@
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
-  useNotifyRunQuery,
-  useCurrentRunId,
-  useRunStatus,
-  useCloneRun,
   DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
+  useCloneRun,
+  useCurrentRunId,
   useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
+  useRunStatus,
 } from '/app/resources/runs'
 
 import type { UseQueryOptions } from 'react-query'
-import type { RunStatus, Run, RunData } from '@opentrons/api-client'
+import type { Run, RunData, RunStatus } from '@opentrons/api-client'
 
 export interface RunControls {
   play: () => void

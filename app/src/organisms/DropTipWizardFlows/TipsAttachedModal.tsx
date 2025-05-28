@@ -1,26 +1,27 @@
-import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Trans, useTranslation } from 'react-i18next'
+import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
-import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 import { useHomePipettes } from '/app/local-resources/instruments'
+import { OddModal } from '/app/molecules/OddModal'
+
+import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 
 import type { HostConfig } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
-import type { PipetteDetails } from '/app/resources/maintenance_runs'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
+import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
 type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSettled'> & {
   aPipetteWithTip: PipetteWithTip

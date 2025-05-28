@@ -8,6 +8,43 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons App Changes in 8.4.0
+
+Welcome to the v8.4.0 release of the Opentrons App! This release includes updates to labware offsets on the Flex, as well as other new features, improvements, and bug fixes.
+
+### New Features
+
+- Run Flex protocols with updated liquid handling commands, including pipetting relative to liquid meniscus.
+- Run protocols that use the Flex Gripper to remove lids from new tip racks on the deck.
+- Run protocols with stacked Opentrons Tough Auto-Sealing Lids.
+
+### Improvements
+
+- More flexible and reliable Labware Position Check workflow. Click **Labware offsets** during run setup to view, apply, and create labware offsets.
+  - Check individual labware, in any order.
+  - Create and apply default labware offsets to the same labware across your Flex deck.
+  - Save and reuse as many offsets as you need from previous runs.
+  - Better compatibility with protocols that have runtime parameters.
+- Error recovery now allows you to resume your Flex protocol when the door is opened or a second error occurs.
+
+### Bug Fixes
+
+- Error recovery no longer lets you select more tips than the pipette can pick up at once.
+
+---
+
+## Opentrons App Changes in 8.3.2
+
+Welcome to the v8.3.2 release of the Opentrons App!
+
+There are no changes to the Opentrons App in v8.3.2, but it is required for updating the robot software to improve some features.
+
+---
+
+## Opentrons App Changes in 8.3.1
+
+The 8.3.1 hotfix release includes a small fix to allow all robots to properly reboot after an upgrade to v8.3.0.
+
 ## Opentrons App Changes in 8.3.0
 
 Welcome to the v8.3.0 release of the Opentrons App! This release adds support for Mandarin in the app or Flex touchscreen and includes other beta features for our commercial partners.

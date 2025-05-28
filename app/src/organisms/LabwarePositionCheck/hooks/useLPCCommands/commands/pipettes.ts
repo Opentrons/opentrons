@@ -1,5 +1,6 @@
 import { fullHomeCommands } from './gantry'
 
+import type { VectorOffset } from '@opentrons/api-client'
 import type {
   CreateCommand,
   LoadedPipette,
@@ -16,9 +17,14 @@ export const savePositionCommands = (pipetteId: string): CreateCommand[] => [
 
 export const moveToWellCommands = (
   offsetLocationDetails: OffsetLocationDetails,
-  pipetteId: string
+  pipetteId: string,
+  vectorOffset?: VectorOffset | null
 ): CreateCommand[] => {
   const { labwareId } = offsetLocationDetails
+  const offset =
+    vectorOffset != null
+      ? { ...vectorOffset, z: vectorOffset.z + PROBE_LENGTH_MM }
+      : { x: 0, y: 0, z: PROBE_LENGTH_MM }
 
   return [
     {
@@ -29,7 +35,7 @@ export const moveToWellCommands = (
         wellName: 'A1',
         wellLocation: {
           origin: 'top' as const,
-          offset: { x: 0, y: 0, z: PROBE_LENGTH_MM },
+          offset,
         },
       },
     },

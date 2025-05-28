@@ -1,4 +1,5 @@
 import { getTimeFromForm } from '../../utils/getTimeFromForm'
+
 import type { HeaterShakerArgs } from '@opentrons/step-generation'
 import type { HydratedHeaterShakerFormData } from '../../../form-types'
 
@@ -25,7 +26,7 @@ export const heaterShakerFormToArgs = (
     setShake ? !Number.isNaN(targetSpeed) : true,
     'heaterShakerFormToArgs expected targeShake to be a number when setShake is true'
   )
-  const { minutes, seconds } = getTimeFromForm(formData, 'heaterShakerTimer')
+  const { minutes, seconds } = getTimeFromForm(formData.heaterShakerTimer)
 
   const isNullTime = minutes === 0 && seconds === 0
 

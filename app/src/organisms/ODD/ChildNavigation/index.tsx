@@ -3,26 +3,29 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   COLORS,
+  CURSOR_DEFAULT,
   DIRECTION_ROW,
   Flex,
   Icon,
+  InlineNotification,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   POSITION_FIXED,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  CURSOR_DEFAULT,
 } from '@opentrons/components'
-import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { InlineNotification } from '/app/atoms/InlineNotification'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
 import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
-import type { IconName, StyleProps } from '@opentrons/components'
-import type { InlineNotificationProps } from '/app/atoms/InlineNotification'
+import type {
+  IconName,
+  InlineNotificationProps,
+  StyleProps,
+} from '@opentrons/components'
 import type {
   IconPlacement,
   SmallButtonTypes,

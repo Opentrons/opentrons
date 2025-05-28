@@ -1,4 +1,5 @@
 import { Box, COLORS, SPACING } from '@opentrons/components'
+
 import type { ComponentProps } from 'react'
 
 type Props = ComponentProps<typeof Box>

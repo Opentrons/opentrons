@@ -1,44 +1,45 @@
 import { useEffect } from 'react'
-import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 
+import {
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+} from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  RESPONSIVENESS,
   DISPLAY_FLEX,
   Flex,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LargeButton,
   OVERFLOW_WRAP_BREAK_WORD,
   POSITION_ABSOLUTE,
   PrimaryButton,
+  RESPONSIVENESS,
   SecondaryButton,
-  LargeButton,
   SPACING,
   StyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
   WARNING_TOAST,
 } from '@opentrons/components'
-import {
-  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
-} from '@opentrons/api-client'
 
-import { useErrorName } from './hooks'
-import { getErrorKind } from './utils'
+import { useToaster } from '../ToasterOven'
 import {
   BANNER_TEXT_CONTAINER_STYLE,
   BANNER_TEXT_CONTENT_STYLE,
   RECOVERY_MAP,
 } from './constants'
+import { useErrorName } from './hooks'
 import { RecoveryInterventionModal, StepInfo } from './shared'
-import { useToaster } from '../ToasterOven'
+import { getErrorKind } from './utils'
 
-import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
+import type { LabwareDefinition, RobotType } from '@opentrons/shared-data'
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { ErrorRecoveryFlowsProps } from '.'
 import type {
   ERUtilsResults,
@@ -46,7 +47,6 @@ import type {
   useRetainedFailedCommandBySource,
 } from './hooks'
 import type { RecoveryRoute, RouteStep } from './types'
-import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 
 export function useRecoverySplash(
   isOnDevice: boolean,
@@ -71,7 +71,7 @@ type RecoverySplashProps = ErrorRecoveryFlowsProps &
     resumePausedRecovery: boolean
     toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
     analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
-    allRunDefs: LabwareDefinition2[]
+    allRunDefs: LabwareDefinition[]
   }
 export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const {

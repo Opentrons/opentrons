@@ -1,13 +1,19 @@
-import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
-import { COLORS } from '../../../helix-design-system'
+import {
+  getSchema2Dimensions,
+  SLOT_RENDER_HEIGHT,
+  SLOT_RENDER_WIDTH,
+} from '@opentrons/shared-data'
 
-import type { SVGProps } from 'react'
+import { COLORS } from '../../../helix-design-system'
+import { getTiprackBackgroundColor } from './getTiprackBackgroundColor'
+
 import type { CSSProperties } from 'styled-components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { SVGProps } from 'react'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export interface LabwareOutlineProps {
   /** Labware definition to outline */
-  definition?: LabwareDefinition2
+  definition?: LabwareDefinition
   /** x dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to 127.76 */
   width?: number
   /** y dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to 85.48 */
@@ -38,17 +44,21 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
     fill,
     showRadius = true,
   } = props
-  const {
-    parameters = { isTiprack },
-    dimensions = { xDimension: width, yDimension: height },
-  } = definition ?? {}
+  const { parameters = { isTiprack, loadName: '' } } = definition ?? {}
+  const dimensions =
+    definition === undefined
+      ? { xDimension: width, yDimension: height }
+      : getSchema2Dimensions(definition)
 
   let backgroundFill
   if (fill != null) {
     backgroundFill = fill
   } else {
-    backgroundFill = parameters.isTiprack ? '#CCCCCC' : COLORS.white
+    backgroundFill = parameters.isTiprack
+      ? getTiprackBackgroundColor(parameters.loadName)
+      : COLORS.white
   }
+
   return (
     <>
       {highlight ? (

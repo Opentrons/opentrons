@@ -1,26 +1,29 @@
 import { isEqual } from 'lodash'
-import { SECTIONS } from '../constants'
+
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
-  getLabwareDefURI,
-  getIsTiprack,
   FIXED_TRASH_ID,
+  getIsTiprack,
+  getLabwareDefURI,
 } from '@opentrons/shared-data'
-import { getLabwareLocationCombos } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLabwareLocationCombos'
+
+import { getLegacyLabwareLocationCombos } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
+
+import { SECTIONS } from '../constants'
 
 import type {
-  LabwarePositionCheckStep,
-  CheckTipRacksStep,
-  PickUpTipStep,
+  PickUpTipRunTimeCommand,
+  ProtocolAnalysisOutput,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { LegacyLabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
+import type {
   CheckLabwareStep,
+  CheckTipRacksStep,
+  LabwarePositionCheckStep,
+  PickUpTipStep,
   ReturnTipStep,
 } from '../types'
-import type {
-  RunTimeCommand,
-  ProtocolAnalysisOutput,
-  PickUpTipRunTimeCommand,
-} from '@opentrons/shared-data'
-import type { LabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLabwareLocationCombos'
 
 interface LPCArgs {
   primaryPipetteId: string
@@ -80,7 +83,7 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
     modules = [],
   } = args
 
-  const labwareLocationCombos = getLabwareLocationCombos(
+  const labwareLocationCombos = getLegacyLabwareLocationCombos(
     commands,
     labware,
     modules
@@ -118,7 +121,7 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
     ...uniqPrimaryPipettePickUpTipCommands,
   ].reduce<CheckTipRacksStep[]>((acc, { params }) => {
     const labwareLocations = labwareLocationCombos.reduce<
-      LabwareLocationCombo[]
+      LegacyLabwareLocationCombo[]
     >((acc, labwareLocationCombo) => {
       // remove labware that isn't accessed by a pickup tip command
       if (labwareLocationCombo.labwareId !== params.labwareId) {
@@ -152,11 +155,11 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
   const { labware, modules, commands, primaryPipetteId } = args
   const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
 
-  const deDupedLabwareLocationCombos = getLabwareLocationCombos(
+  const deDupedLabwareLocationCombos = getLegacyLabwareLocationCombos(
     commands,
     labware,
     modules
-  ).reduce<LabwareLocationCombo[]>((acc, labwareLocationCombo) => {
+  ).reduce<LegacyLabwareLocationCombo[]>((acc, labwareLocationCombo) => {
     const labwareDef = labwareDefinitions.find(
       def => getLabwareDefURI(def) === labwareLocationCombo.definitionUri
     )

@@ -1,11 +1,15 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
-import { makeContext, getInitialRobotStateStandard } from '../fixtures'
+
 import { disengageMagnet } from '../commandCreators/atomic/disengageMagnet'
+import { getInitialRobotStateStandard, makeContext } from '../fixtures'
+
 import type { InvariantContext, RobotState } from '../types'
+
 const moduleId = 'magneticModuleId'
 
 describe('disengageMagnet', () => {
@@ -17,7 +21,7 @@ describe('disengageMagnet', () => {
       id: moduleId,
       type: MAGNETIC_MODULE_TYPE,
       model: MAGNETIC_MODULE_V1,
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_magnetic_module_1',
     }
     robotState = getInitialRobotStateStandard(invariantContext)
     robotState.modules[moduleId] = {
@@ -46,6 +50,7 @@ describe('disengageMagnet', () => {
           },
         },
       ],
+      python: 'mock_magnetic_module_1.disengage()',
     })
   })
 })

@@ -1,10 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
-  TEMPERATURE_MODULE_V2_FIXTURE,
   getModuleDef2,
+  TEMPERATURE_MODULE_V2_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'
+
 import { getAttachedProtocolModuleMatches } from '../getAttachedProtocolModuleMatches'
 
 const temperatureProtocolModule = {

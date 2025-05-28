@@ -1,36 +1,44 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
+  fixture96Plate,
+  fixtureTiprackAdapter,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   WASTE_CHUTE_CUTOUT,
-  fixture96Plate,
 } from '@opentrons/shared-data'
-import { getSlotInformation, formatTime } from '../utils'
+
+import {
+  _sortLabwareDropdownOptions,
+  formatTime,
+  getSlotInformation,
+} from '../utils'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
 
 const mockLabOnDeck1 = {
-  slot: 'mockHsId',
+  stack: ['labId', 'mockHsId', '1'],
   id: 'labId',
   labwareDefURI: 'mockUri',
-  def: fixture96Plate as LabwareDefinition2,
+  def: fixtureTiprackAdapter as LabwareDefinition2,
   pythonName: 'mockPythonName',
 }
 const mockLabOnDeck2 = {
-  slot: 'labId',
+  stack: ['labId2', 'labId', 'mockHsId', '1'],
   id: 'labId2',
   labwareDefURI: 'mockUri2',
   def: fixture96Plate as LabwareDefinition2,
   pythonName: 'mockPythonName',
 }
 const mockLabOnDeck3 = {
-  slot: '2',
+  stack: ['labId3', '2'],
   id: 'labId3',
   labwareDefURI: 'mockUri3',
-  def: fixture96Plate as LabwareDefinition2,
+  def: fixtureTiprackAdapter as LabwareDefinition2,
   pythonName: 'mockPythonName',
 }
 const mockHS = {
@@ -45,8 +53,8 @@ const mockHS = {
 const mockOt2DeckSetup: AllTemporalPropertiesForTimelineFrame = {
   labware: {
     labId: mockLabOnDeck1,
-    lab2: mockLabOnDeck2,
-    lab3: mockLabOnDeck3,
+    labId2: mockLabOnDeck2,
+    labId3: mockLabOnDeck3,
   },
   pipettes: {},
   modules: {
@@ -66,7 +74,7 @@ const mockOt2DeckSetup: AllTemporalPropertiesForTimelineFrame = {
 }
 
 const mockLabOnStagingArea = {
-  slot: 'D4',
+  stack: ['labId3', 'D4'],
   id: 'labId3',
   labwareDefURI: 'mockUri3',
   def: fixture96Plate as LabwareDefinition2,
@@ -95,11 +103,26 @@ const mockStagingArea = {
   id: 'mockStagingAreaId',
   location: WASTE_CHUTE_CUTOUT,
 }
+const mockLabOnDeck1Flex = {
+  stack: ['labId', 'mockHsId', 'D1'],
+  id: 'labId',
+  labwareDefURI: 'mockUri',
+  def: fixtureTiprackAdapter as LabwareDefinition2,
+  pythonName: 'mockPythonName',
+}
+const mockLabOnDeck2Flex = {
+  stack: ['labId2', 'labId', 'mockHsId', 'D1'],
+  id: 'labId2',
+  labwareDefURI: 'mockUri2',
+  def: fixture96Plate as LabwareDefinition2,
+  pythonName: 'mockPythonName',
+}
+
 const mockFlex2DeckSetup: AllTemporalPropertiesForTimelineFrame = {
   labware: {
-    labId: mockLabOnDeck1,
-    lab2: mockLabOnDeck2,
-    lab3: mockLabOnStagingArea,
+    labId: mockLabOnDeck1Flex,
+    labId2: mockLabOnDeck2Flex,
+    labId3: mockLabOnStagingArea,
   },
   pipettes: {},
   modules: {
@@ -127,9 +150,9 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       createdModuleForSlot: mockHS,
-      createdLabwareForSlot: mockLabOnDeck1,
-      createdNestedLabwareForSlot: mockLabOnDeck2,
-      createFixtureForSlots: [],
+      createdAdapterForSlot: mockLabOnDeck1,
+      createdStackForSlot: [mockLabOnDeck2.id],
+      createdFixtureForSlots: [],
       slotPosition: null,
     })
   })
@@ -138,9 +161,10 @@ describe('getSlotInformation', () => {
       getSlotInformation({ deckSetup: mockOt2DeckSetup, slot: '2' })
     ).toEqual({
       matchingLabwareFor4thColumn: null,
-      createdLabwareForSlot: mockLabOnDeck3,
-      createFixtureForSlots: [],
+      createdAdapterForSlot: mockLabOnDeck3,
+      createdFixtureForSlots: [],
       slotPosition: null,
+      createdStackForSlot: [],
     })
   })
   it('renders no items on the slot for a flex', () => {
@@ -155,7 +179,8 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
-      createFixtureForSlots: [],
+      createdFixtureForSlots: [],
+      createdStackForSlot: [],
     })
   })
   it('renders a trashbin for a Flex on slot A3', () => {
@@ -164,8 +189,9 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
-      createFixtureForSlots: [mockTrash],
+      createdFixtureForSlots: [mockTrash],
       preSelectedFixture: 'trashBin',
+      createdStackForSlot: [],
     })
   })
   it('renders a h-s, labware and nested labware for a Flex on slot D1', () => {
@@ -175,9 +201,9 @@ describe('getSlotInformation', () => {
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
       createdModuleForSlot: mockHSFlex,
-      createdLabwareForSlot: mockLabOnDeck1,
-      createdNestedLabwareForSlot: mockLabOnDeck2,
-      createFixtureForSlots: [],
+      createdAdapterForSlot: mockLabOnDeck1Flex,
+      createdStackForSlot: [mockLabOnDeck2Flex.id],
+      createdFixtureForSlots: [],
     })
   })
   it('renders the waste chute and staging area for slot D3 for Flex', () => {
@@ -186,8 +212,9 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: mockLabOnStagingArea,
       slotPosition: null,
-      createFixtureForSlots: [mockWasteChute, mockStagingArea],
+      createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
+      createdStackForSlot: [],
     })
   })
   it('renders the staging area with waste chute and labware in slot D4 for flex', () => {
@@ -196,8 +223,8 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
-      createdLabwareForSlot: mockLabOnStagingArea,
-      createFixtureForSlots: [mockWasteChute, mockStagingArea],
+      createdStackForSlot: [mockLabOnStagingArea.id],
+      createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
     })
   })
@@ -218,5 +245,19 @@ describe('formatTime', () => {
   })
   it('input is 0:03 and output is 00:03', () => {
     expect(formatTime('0:03')).toEqual('00:03')
+  })
+})
+
+describe('_sortLabwareDropdownOptions', () => {
+  const zzzPlateOption = { name: 'Zzz Plate', value: 'zzz' }
+  const aaaPlateOption = { name: 'Aaa Plate', value: 'aaa' }
+  it('should sort labware ids in alphabetical order', () => {
+    const result = _sortLabwareDropdownOptions([aaaPlateOption, zzzPlateOption])
+    expect(result).toEqual([aaaPlateOption, zzzPlateOption])
+  })
+
+  it('should handle {} case', () => {
+    const result = _sortLabwareDropdownOptions([])
+    expect(result).toEqual([])
   })
 })

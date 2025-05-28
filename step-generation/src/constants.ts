@@ -1,27 +1,27 @@
 import {
-  MAGNETIC_MODULE_V1,
-  TEMPERATURE_MODULE_V1,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
   ABSORBANCE_READER_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type {
-  ModuleType,
-  ModuleModel,
   AddressableOffsetVector,
+  ModuleModel,
+  ModuleType,
 } from '@opentrons/shared-data'
 import type {
+  AbsorbanceReaderState,
+  HeaterShakerModuleState,
+  MagneticBlockState,
   MagneticModuleState,
+  ModuleState,
   TemperatureModuleState,
   ThermocyclerModuleState,
-  HeaterShakerModuleState,
-  ModuleState,
-  AbsorbanceReaderState,
-  MagneticBlockState,
 } from './types'
 
 // Temperature statuses
@@ -84,3 +84,5 @@ export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
 export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'
 export const COLUMN_4_SLOTS = ['A4', 'B4', 'C4', 'D4']
 export const ZERO_OFFSET: AddressableOffsetVector = { x: 0, y: 0, z: 0 }
+
+export const GRIPPER_LOCATION: 'mounted' = 'mounted'

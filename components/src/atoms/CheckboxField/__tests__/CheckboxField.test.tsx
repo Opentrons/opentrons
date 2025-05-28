@@ -1,11 +1,13 @@
-import { describe, beforeEach, afterEach, vi, expect, it } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
+import { CheckboxField } from '..'
+import { BORDERS, COLORS } from '../../../helix-design-system'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { renderWithProviders } from '../../../testing/utils'
-import { BORDERS, COLORS } from '../../../helix-design-system'
-import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
-import { CheckboxField } from '..'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 
 import type { ComponentProps } from 'react'
 
@@ -42,15 +44,11 @@ describe('CheckboxField', () => {
     // INNER_STYLE_NO_VALUE
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey50)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.grey50}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(
-      `border-radius: ${String(BORDERS.borderRadius2)}`
-    )
-    expect(checkBoxIcon).toHaveStyle(
-      `justify-content: ${String(JUSTIFY_CENTER)}`
-    )
-    expect(checkBoxIcon).toHaveStyle(`align-items: ${String(ALIGN_CENTER)}`)
+    expect(checkBoxIcon).toHaveStyle(`border-radius: ${BORDERS.borderRadius2}`)
+    expect(checkBoxIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
+    expect(checkBoxIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
 
     // INPUT_STYLE
     expect(checkBoxInput).toHaveStyle(`position: absolute`)
@@ -64,13 +62,11 @@ describe('CheckboxField', () => {
     expect(checkBoxInput).toHaveAttribute('tabindex', '0')
 
     // LABEL_TEXT_STYLE
+    expect(checkBoxFieldBox).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeH3}`)
     expect(checkBoxFieldBox).toHaveStyle(
-      `font-size: ${String(TYPOGRAPHY.fontSizeP)}`
+      `font-weight: ${TYPOGRAPHY.fontWeightRegular}`
     )
-    expect(checkBoxFieldBox).toHaveStyle(
-      `font-weight: ${String(TYPOGRAPHY.fontWeightRegular)}`
-    )
-    expect(checkBoxFieldBox).toHaveStyle(`color: ${String(COLORS.black90)}`)
+    expect(checkBoxFieldBox).toHaveStyle(`color: ${COLORS.black90}`)
     expect(checkBoxFieldBox).toHaveStyle(`flex: 0 0 auto`)
     expect(checkBoxFieldBox).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing8}`
@@ -83,15 +79,11 @@ describe('CheckboxField', () => {
     const checkBoxIcon = screen.getByTestId('CheckboxField_icon')
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blue50)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.blue50}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(
-      `border-radius: ${String(BORDERS.borderRadius2)}`
-    )
-    expect(checkBoxIcon).toHaveStyle(
-      `justify-content: ${String(JUSTIFY_CENTER)}`
-    )
-    expect(checkBoxIcon).toHaveStyle(`align-items: ${String(ALIGN_CENTER)}`)
+    expect(checkBoxIcon).toHaveStyle(`border-radius: ${BORDERS.borderRadius2}`)
+    expect(checkBoxIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
+    expect(checkBoxIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
   })
 
   it('renders label with correct style - value undefined', () => {
@@ -100,15 +92,11 @@ describe('CheckboxField', () => {
     const checkBoxIcon = screen.getByTestId('CheckboxField_icon')
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey50)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.grey50}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(
-      `border-radius: ${String(BORDERS.borderRadius2)}`
-    )
-    expect(checkBoxIcon).toHaveStyle(
-      `justify-content: ${String(JUSTIFY_CENTER)}`
-    )
-    expect(checkBoxIcon).toHaveStyle(`align-items: ${String(ALIGN_CENTER)}`)
+    expect(checkBoxIcon).toHaveStyle(`border-radius: ${BORDERS.borderRadius2}`)
+    expect(checkBoxIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
+    expect(checkBoxIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
   })
 
   it('renders label with correct style - disabled true', () => {
@@ -126,9 +114,7 @@ describe('CheckboxField', () => {
     const checkBoxInput = screen.getByRole('checkbox', {
       name: 'checkMockCheckboxField',
     })
-    const checkBoxFieldBox = screen.getByText('checkMockCheckboxField')
     expect(checkBoxInput).toHaveAttribute('tabindex', '1')
-    expect(checkBoxFieldBox).toHaveAttribute('tabindex', '1')
   })
 
   it('calls mock function when clicking checkboxfield', () => {

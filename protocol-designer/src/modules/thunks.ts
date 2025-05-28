@@ -1,42 +1,10 @@
-import { selectors as stepFormSelectors } from '../step-forms'
-import { getModulePythonName, uuid } from '../utils'
 import { getModuleEntities } from '../step-forms/selectors'
-import { getNextAvailableModuleSlot } from './moduleData'
+import { getModulePythonName } from '../utils'
+
 import type { ModuleEntity } from '@opentrons/step-generation'
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { ModuleEntities } from '../step-forms'
-import type {
-  CreateModuleAction,
-  DeleteModuleAction,
-} from '../step-forms/actions'
+import type { DeleteModuleAction } from '../step-forms/actions'
 import type { ThunkAction } from '../types'
-
-interface CreateModuleWithNoSloArgs {
-  type: ModuleType
-  model: ModuleModel
-  isMagneticBlock: boolean
-}
-export const createModuleWithNoSlot: (
-  args: CreateModuleWithNoSloArgs
-) => ThunkAction<CreateModuleAction> = args => (dispatch, getState) => {
-  const { model, type, isMagneticBlock } = args
-  const state = getState()
-  const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
-  const slot = getNextAvailableModuleSlot(initialDeckSetup, isMagneticBlock)
-  if (slot == null) {
-    console.assert(slot, 'expected to find available slot but could not')
-  }
-
-  dispatch({
-    type: 'CREATE_MODULE',
-    payload: {
-      model,
-      type,
-      slot: slot ?? '',
-      id: `${uuid()}:${type}}`,
-    },
-  })
-}
 
 export interface EditMultipleModulesAction {
   type: 'EDIT_MULTIPLE_MODULES_PYTHON_NAME'

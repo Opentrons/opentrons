@@ -3,8 +3,10 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import * as errorCreators from '../../errorCreators'
+import { uuid } from '../../utils'
+
 import type { TemperatureParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
@@ -15,14 +17,13 @@ export const setTemperature: CommandCreator<TemperatureParams> = (
   prevRobotState
 ) => {
   const { moduleId, celsius } = args
-
   if (moduleId === null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }
   }
-
-  const moduleType = invariantContext.moduleEntities[moduleId]?.type
+  const module = invariantContext.moduleEntities[moduleId]
+  const moduleType = module?.type
 
   if (moduleType === TEMPERATURE_MODULE_TYPE) {
     return {
@@ -36,6 +37,7 @@ export const setTemperature: CommandCreator<TemperatureParams> = (
           },
         },
       ],
+      python: `${module?.pythonName}.start_set_temperature(${celsius})`,
     }
   } else if (moduleType === THERMOCYCLER_MODULE_TYPE) {
     // TODO: Ian 2019-01-24 implement setting thermocycler temp: block vs lid
@@ -55,6 +57,7 @@ export const setTemperature: CommandCreator<TemperatureParams> = (
           },
         },
       ],
+      python: `${module?.pythonName}.set_target_temperature(${celsius})`,
     }
   } else {
     console.error(

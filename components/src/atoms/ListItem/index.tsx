@@ -1,8 +1,9 @@
 import { css } from 'styled-components'
-import { Flex } from '../../primitives'
-import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
 import { FLEX_MAX_CONTENT } from '../../styles'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 import type { ReactNode } from 'react'
 import type { StyleProps } from '../../primitives'
@@ -11,10 +12,14 @@ export * from './ListItemChildren'
 
 export type ListItemType =
   | 'error'
-  | 'noActive'
+  | 'default'
   | 'success'
   | 'warning'
   | 'unavailable'
+  | 'defaultOnColor'
+  | 'successOnColor'
+  | 'warningOnColor'
+  | 'errorOnColor'
 
 interface ListItemProps extends StyleProps {
   /** ListItem state type */
@@ -33,7 +38,7 @@ const LISTITEM_PROPS_BY_TYPE: Record<
   error: {
     backgroundColor: COLORS.red35,
   },
-  noActive: {
+  default: {
     backgroundColor: COLORS.grey20,
   },
   success: {
@@ -45,6 +50,18 @@ const LISTITEM_PROPS_BY_TYPE: Record<
   unavailable: {
     backgroundColor: COLORS.grey20,
     color: COLORS.grey40,
+  },
+  defaultOnColor: {
+    backgroundColor: COLORS.white,
+  },
+  successOnColor: {
+    backgroundColor: COLORS.green20,
+  },
+  warningOnColor: {
+    backgroundColor: COLORS.yellow20,
+  },
+  errorOnColor: {
+    backgroundColor: COLORS.red20,
   },
 }
 
@@ -63,7 +80,7 @@ export function ListItem(props: ListItemProps): JSX.Element {
   const listItemProps = LISTITEM_PROPS_BY_TYPE[type]
 
   const LIST_ITEM_STYLE = css`
-    background-color: ${listItemProps.backgroundColor};
+    background-color: ${props.backgroundColor ?? listItemProps.backgroundColor};
     color: ${listItemProps.color ?? COLORS.black90};
     width: 100%;
     height: ${FLEX_MAX_CONTENT};

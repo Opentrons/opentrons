@@ -1,6 +1,6 @@
 import {
-  ALIGN_CENTER,
   ALIGN_FLEX_START,
+  ALIGN_START,
   BORDERS,
   Box,
   COLORS,
@@ -8,14 +8,14 @@ import {
   Flex,
   InstrumentDiagram,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   OverflowBtn,
-  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useMenuHandleClickOutside,
 } from '@opentrons/components'
+
 import flexGripper from '/app/assets/images/flex_gripper.png'
 
 import { MenuOverlay } from './MenuOverlay'
@@ -65,73 +65,83 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.grey10}
       borderRadius={BORDERS.borderRadius8}
-      gridGap={SPACING.spacing8}
-      padding={SPACING.spacing16}
-      position={POSITION_RELATIVE}
       {...styleProps}
     >
-      {isGripperAttached ? (
-        <Flex justifyContent={JUSTIFY_CENTER} width="3.75rem" height="3.375rem">
-          <img
-            src={flexGripper}
-            alt="Flex Gripper"
-            style={{ maxWidth: '100%', maxHeight: '100%' }}
-          />
-        </Flex>
-      ) : null}
-      {instrumentDiagramProps?.pipetteSpecs != null ? (
-        <Flex
-          alignItems={ALIGN_CENTER}
-          width="3.75rem"
-          height="3.375rem"
-          paddingRight={SPACING.spacing8}
-        >
-          <InstrumentDiagram
-            pipetteSpecs={instrumentDiagramProps.pipetteSpecs}
-            mount={instrumentDiagramProps.mount}
-            transform="scale(0.3)"
-            transformOrigin="-5% 52%"
-          />
-        </Flex>
-      ) : null}
       <Flex
-        alignItems={ALIGN_FLEX_START}
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing2}
-        paddingRight={SPACING.spacing24}
         width="100%"
+        paddingY={SPACING.spacing16}
+        paddingLeft={SPACING.spacing16}
+        gridGap={SPACING.spacing8}
       >
-        {banner}
-        <LegacyStyledText
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey50}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          fontSize={TYPOGRAPHY.fontSizeH6}
+        {isGripperAttached ? (
+          <Flex
+            justifyContent={JUSTIFY_CENTER}
+            width="3.75rem"
+            height="3.375rem"
+          >
+            <img src={flexGripper} alt="Flex Gripper" />
+          </Flex>
+        ) : null}
+        {instrumentDiagramProps?.pipetteSpecs != null ? (
+          <Flex
+            justifyContent={JUSTIFY_CENTER}
+            width="3.75rem"
+            height="3.375rem"
+          >
+            <InstrumentDiagram
+              pipetteSpecs={instrumentDiagramProps.pipetteSpecs}
+              mount={instrumentDiagramProps.mount}
+            />
+          </Flex>
+        ) : null}
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing8}
+          width="100%"
         >
-          {label}
-        </LegacyStyledText>
-        <LegacyStyledText as="p">{description}</LegacyStyledText>
+          {banner}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing4}
+            width="100%"
+          >
+            <StyledText
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              color={COLORS.grey60}
+              desktopStyle="bodyDefaultRegular"
+            >
+              {label}
+            </StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {description}
+            </StyledText>
+          </Flex>
+        </Flex>
       </Flex>
       {menuOverlayItems != null && (
-        <Box
-          position={POSITION_ABSOLUTE}
-          top={SPACING.spacing4}
-          right={SPACING.spacing4}
-        >
-          <OverflowBtn
-            onClick={handleOverflowClick}
-            aria-label="InstrumentCard_overflowMenu"
-            disabled={isEstopNotDisengaged}
-          />
-          {menuOverlay}
-          {showOverflowMenu ? (
-            <MenuOverlay
-              hasDivider={hasDivider}
-              menuOverlayItems={menuOverlayItems}
-              setShowMenuOverlay={setShowOverflowMenu}
+        <>
+          <Box alignSelf={ALIGN_START} padding={SPACING.spacing4}>
+            <OverflowBtn
+              onClick={handleOverflowClick}
+              aria-label="InstrumentCard_overflowMenu"
+              disabled={isEstopNotDisengaged}
             />
+          </Box>
+          {showOverflowMenu ? (
+            <Flex
+              position={POSITION_RELATIVE}
+              top={SPACING.spacing4}
+              right={SPACING.spacing4}
+            >
+              <MenuOverlay
+                hasDivider={hasDivider}
+                menuOverlayItems={menuOverlayItems}
+                setShowMenuOverlay={setShowOverflowMenu}
+              />
+              {menuOverlay}
+            </Flex>
           ) : null}
-        </Box>
+        </>
       )}
     </Flex>
   )

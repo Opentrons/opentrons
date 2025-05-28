@@ -1,12 +1,18 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Union, overload
+from typing import TYPE_CHECKING, List, Sequence, Union, overload
 
 
-from .helpers import stringify_location, stringify_disposal_location, listify
+from .helpers import (
+    stringify_location,
+    stringify_disposal_location,
+    stringify_well_list,
+    listify,
+)
 from . import types as command_types
 
 from opentrons.types import Location
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_api._liquid import LiquidClass
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
@@ -314,6 +320,93 @@ def move_to_disposal_location(
     return {
         "name": command_types.MOVE_TO_DISPOSAL_LOCATION,
         "payload": {"instrument": instrument, "location": location, "text": text},
+    }
+
+
+def transfer_with_liquid_class(
+    instrument: InstrumentContext,
+    liquid_class: LiquidClass,
+    volume: float,
+    source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+    destination: Union[
+        Well, Sequence[Well], Sequence[Sequence[Well]], TrashBin, WasteChute
+    ],
+) -> command_types.TransferWithLiquidClassCommand:
+    if isinstance(destination, (TrashBin, WasteChute)):
+        destination_text = stringify_disposal_location(destination)
+    else:
+        destination_text = stringify_well_list(destination)
+    text = (
+        "Transferring "
+        + f"{volume} uL of {liquid_class.display_name} liquid class from "
+        + f"{stringify_well_list(source)} to {destination_text}"
+    )
+    return {
+        "name": command_types.TRANSFER_WITH_LIQUID_CLASS,
+        "payload": {
+            "instrument": instrument,
+            "liquid_class": liquid_class,
+            "volume": volume,
+            "source": source,
+            "destination": destination,
+            "text": text,
+        },
+    }
+
+
+def distribute_with_liquid_class(
+    instrument: InstrumentContext,
+    liquid_class: LiquidClass,
+    volume: float,
+    source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+    destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+) -> command_types.DistributeWithLiquidClassCommand:
+    text = (
+        "Distributing "
+        + f"{volume} uL of {liquid_class.display_name} liquid class from "
+        + f"{stringify_well_list(source)} to {stringify_well_list(destination)}"
+    )
+    return {
+        "name": command_types.DISTRIBUTE_WITH_LIQUID_CLASS,
+        "payload": {
+            "instrument": instrument,
+            "liquid_class": liquid_class,
+            "volume": volume,
+            "source": source,
+            "destination": destination,
+            "text": text,
+        },
+    }
+
+
+def consolidate_with_liquid_class(
+    instrument: InstrumentContext,
+    liquid_class: LiquidClass,
+    volume: float,
+    source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+    destination: Union[
+        Well, Sequence[Well], Sequence[Sequence[Well]], TrashBin, WasteChute
+    ],
+) -> command_types.ConsolidateWithLiquidClassCommand:
+    if isinstance(destination, (TrashBin, WasteChute)):
+        destination_text = stringify_disposal_location(destination)
+    else:
+        destination_text = stringify_well_list(destination)
+    text = (
+        "Consolidating "
+        + f"{volume} uL of {liquid_class.display_name} liquid class from "
+        + f"{stringify_well_list(source)} to {destination_text}"
+    )
+    return {
+        "name": command_types.CONSOLIDATE_WITH_LIQUID_CLASS,
+        "payload": {
+            "instrument": instrument,
+            "liquid_class": liquid_class,
+            "volume": volume,
+            "source": source,
+            "destination": destination,
+            "text": text,
+        },
     }
 
 

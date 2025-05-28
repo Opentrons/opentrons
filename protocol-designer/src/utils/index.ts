@@ -1,13 +1,30 @@
-import uuidv1 from 'uuid/v4'
+import round from 'lodash/round'
 import snakeCase from 'lodash/snakeCase'
+import uuidv1 from 'uuid/v4'
+
 import {
-  makeWellSetHelpers,
-  getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  isAddressableAreaStandardSlot,
+  getDeckDefFromRobotType,
+  getTiprackVolume,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
+  isAddressableAreaStandardSlot,
   LOW_VOLUME_PIPETTES,
+  makeWellSetHelpers,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+} from '@opentrons/shared-data'
+import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
+
+import type { WellGroup } from '@opentrons/components'
+import type {
+  AddressableAreaName,
+  CutoutId,
+  DeckSlotId,
+  LabwareDefinition2,
+  LabwareDisplayCategory,
+  ModuleType,
+  PipetteV2Specs,
+  SupportedTip,
+  WellSetHelpers,
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntity,
@@ -15,18 +32,13 @@ import type {
   PipetteEntities,
   PipetteEntity,
 } from '@opentrons/step-generation'
-import type {
-  WellSetHelpers,
-  AddressableAreaName,
-  CutoutId,
-  CutoutFixtureId,
-  RobotType,
-  SupportedTip,
-  ModuleType,
-  LabwareDisplayCategory,
-} from '@opentrons/shared-data'
-import type { WellGroup } from '@opentrons/components'
 import type { BoundingRect, GenericRect } from '../collision-types'
+import type {
+  AllTemporalPropertiesForTimelineFrame,
+  InitialDeckSetup,
+  LabwareOnDeck,
+  ModuleEntities,
+} from '../step-forms'
 
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware
@@ -132,10 +144,11 @@ export const getIsAdapter = (
   labwareEntities: LabwareEntities
 ): boolean => {
   if (labwareEntities[labwareId] == null) return false
-  return (
-    labwareEntities[labwareId].def.allowedRoles?.includes('adapter') ?? false
-  )
+  return getIsAdapterFromDef(labwareEntities[labwareId].def)
 }
+
+export const getIsAdapterFromDef = (labwareDef: LabwareDefinition2): boolean =>
+  labwareDef.allowedRoles?.includes('adapter') ?? false
 
 export const getStagingAreaSlots = (
   stagingAreas?: AdditionalEquipmentEntity[]
@@ -168,44 +181,6 @@ export const getStagingAreaAddressableAreas = (
     )
   }
   return addressableAreasRaw
-}
-
-export const getCutoutIdByAddressableArea = (
-  addressableAreaName: AddressableAreaName,
-  cutoutFixtureId: CutoutFixtureId,
-  robotType: RobotType
-): CutoutId => {
-  const deckDef = getDeckDefFromRobotType(robotType)
-  const cutoutFixtures = deckDef.cutoutFixtures
-  const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
-    cutoutFixture => cutoutFixture.id.includes(cutoutFixtureId)
-  )?.providesAddressableAreas
-
-  const findCutoutIdByAddressableArea = (
-    addressableAreaName: AddressableAreaName
-  ): CutoutId | null => {
-    if (providesAddressableAreasForAddressableArea != null) {
-      for (const cutoutId in providesAddressableAreasForAddressableArea) {
-        if (
-          providesAddressableAreasForAddressableArea[
-            cutoutId as keyof typeof providesAddressableAreasForAddressableArea
-          ].includes(addressableAreaName)
-        ) {
-          return cutoutId as CutoutId
-        }
-      }
-    }
-    return null
-  }
-
-  const cutoutId = findCutoutIdByAddressableArea(addressableAreaName)
-
-  if (cutoutId == null) {
-    throw Error(
-      `expected to find cutoutId from addressableAreaName ${addressableAreaName} but could not`
-    )
-  }
-  return cutoutId
 }
 
 export function getMatchingTipLiquidSpecs(
@@ -305,4 +280,189 @@ export const getLabwarePythonName = (
   typeCount: number
 ): string => {
   return `${snakeCase(labwareDisplayCategory)}_${typeCount}`
+}
+
+export const getAdditionalEquipmentPythonName = (
+  fixtureName: 'wasteChute' | 'trashBin',
+  typeCount: number,
+  location?: string
+): string => {
+  switch (fixtureName) {
+    case 'wasteChute': {
+      return snakeCase(fixtureName)
+    }
+    case 'trashBin': {
+      if (location === 'cutout12') {
+        return `${PROTOCOL_CONTEXT_NAME}.fixed_trash`
+      } else {
+        return `${snakeCase(fixtureName)}_${typeCount}`
+      }
+    }
+  }
+}
+
+export const getDefaultBlowoutFlowRate = (
+  transferVolume: number,
+  pipetteSpecs: PipetteV2Specs,
+  tiprackDef: LabwareDefinition2
+): number | null => {
+  const { liquids } = pipetteSpecs
+  const isInLowVolumeMode =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const liquidsObject = isInLowVolumeMode
+    ? liquids.lowVolumeDefault
+    : liquids.default
+  return liquidsObject.supportedTips[
+    `t${tiprackDef.wells.A1.totalLiquidVolume}`
+  ].defaultBlowOutFlowRate.default
+}
+
+/**
+ * Gets maximum pushout volume for a given transfer plan given transfer volume and pipette spec
+ *
+ * @param {number} transferVolume - The transfer volume for the transfer plan
+ * @param {PipetteV2Specs} - The specs for the pipette used for the transfer
+ * @returns {number} - The maximum supported push out volume for each dispense
+ */
+export const getMaxPushOutVolume = (
+  transferVolume: number,
+  pipetteSpecs: PipetteV2Specs
+): number => {
+  const { liquids, plungerPositionsConfigurations, shaftULperMM } = pipetteSpecs
+  const isInLowVolumeMode =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const { bottom, blowout } = isInLowVolumeMode
+    ? plungerPositionsConfigurations.lowVolumeDefault ??
+      plungerPositionsConfigurations.default
+    : plungerPositionsConfigurations.default
+  // absolute value to account for flipped z-axis on OT-2 vs. Flex pipettes
+  return round(Math.abs(blowout - bottom) * shaftULperMM, 1)
+}
+
+export const getDefaultPushOutVolume = (
+  transferVolume: number,
+  pipetteSpecs: PipetteV2Specs,
+  tiprackDefinition: LabwareDefinition2
+): number => {
+  const { liquids } = pipetteSpecs
+  if (tiprackDefinition == null) {
+    return 0
+  }
+  console.assert(
+    tiprackDefinition.metadata.displayCategory === 'tipRack',
+    'Specified labware entity must be tiprack'
+  )
+  const tipVolume = Object.values(tiprackDefinition.wells)[0].totalLiquidVolume
+  const lookupKey =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+      ? 'lowVolumeDefault'
+      : 'default'
+  const tipVolumeKey = `t${tipVolume}`
+  return (
+    liquids[lookupKey].supportedTips[tipVolumeKey]?.defaultPushOutVolume ?? 0
+  )
+}
+
+export const getMaxConditioningVolume = (args: {
+  transferVolume: number
+  disposalVolume: number
+  tiprackDefUri: string
+  labwareEntities: LabwareEntities
+  pipetteSpecs: PipetteV2Specs
+}): number => {
+  const {
+    transferVolume,
+    disposalVolume,
+    labwareEntities,
+    tiprackDefUri,
+    pipetteSpecs,
+  } = args
+  const { liquids } = pipetteSpecs
+  const isInLowVolumeMode =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const tiprack = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
+  )
+  const tipMaxVolume = tiprack != null ? getTiprackVolume(tiprack.def) : null
+
+  const maxWorkingVolume = Math.min(
+    isInLowVolumeMode
+      ? liquids.lowVolumeDefault.maxVolume
+      : liquids.default.maxVolume,
+    ...(tipMaxVolume != null ? [tipMaxVolume] : [])
+  )
+  return maxWorkingVolume - disposalVolume - transferVolume
+}
+
+// for stacking
+export function getLocationStackTopToBottom(
+  labwareId: string,
+  labwareLocationUpdate: Record<string, string>,
+  moduleLocationUpdate: Record<string, string>
+): string[] {
+  const stack = []
+  let current = labwareId
+
+  //  while parent still exists
+  while (true) {
+    stack.push(current)
+    const parent =
+      labwareLocationUpdate[current] || moduleLocationUpdate[current]
+    if (!parent) break
+    current = parent
+  }
+
+  return stack
+}
+
+export const getTopmostLabwareOnModuleFromStack = (
+  moduleId: string,
+  labware: LabwareOnDeck[]
+): string => {
+  return labware
+    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
+}
+
+export const getFullStackFromLabwaresOnDeck = (
+  labwareOnDeck: LabwareOnDeck[],
+  slot: DeckSlotId
+): string[] => {
+  return labwareOnDeck
+    .filter(lw => lw.stack.includes(slot))
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+}
+
+export const getModuleIdFromStack = (
+  stack: string[],
+  modulesById: InitialDeckSetup['modules'] | ModuleEntities
+): string | null => {
+  return stack.find(id => modulesById[id] != null) ?? null
+}
+
+export const getLabwareIdAfterModuleIdInStack = (
+  moduleId: string,
+  labware: {
+    [labwareId: string]: LabwareOnDeck
+  }
+): string | null => {
+  const matchingLabware = Object.values(labware).find(lw =>
+    lw.stack.includes(moduleId)
+  )
+  if (!matchingLabware) {
+    return null
+  }
+
+  const index = matchingLabware.stack.indexOf(moduleId)
+  const indexAfter = index + 1
+
+  return matchingLabware.stack[indexAfter] ?? null
+}
+
+export const getHasTrash = (
+  additionalEquipment: AllTemporalPropertiesForTimelineFrame['additionalEquipmentOnDeck']
+): boolean => {
+  return Object.values(additionalEquipment).some(
+    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
+  )
 }

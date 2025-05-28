@@ -1,10 +1,10 @@
-import type { SECTIONS } from './constants'
-import type { useCreateCommandMutation } from '@opentrons/react-api-client'
 import type {
   LegacyLabwareOffsetLocation,
   VectorOffset,
 } from '@opentrons/api-client'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { useCreateCommandMutation } from '@opentrons/react-api-client'
+import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { SECTIONS } from './constants'
 
 export type LabwarePositionCheckStep =
   | BeforeBeginningStep
@@ -108,7 +108,7 @@ export interface WorkingOffset {
 }
 
 export interface LabwareToOrder {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   labwareId: string
   slot: string
 }

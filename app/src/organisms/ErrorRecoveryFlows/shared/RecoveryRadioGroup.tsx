@@ -1,5 +1,6 @@
-import type { ChangeEventHandler, ReactNode, ComponentProps } from 'react'
-import { RadioGroup, SPACING, Flex } from '@opentrons/components'
+import { Flex, RadioGroup, SPACING } from '@opentrons/components'
+
+import type { ChangeEventHandler, ComponentProps, ReactNode } from 'react'
 
 // note: this typescript stuff is so that e.currentTarget.value in the ChangeEventHandler
 // is deduced to a union of the values of the options passed to the radiogroup rather than

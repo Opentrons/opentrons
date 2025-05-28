@@ -1,4 +1,21 @@
-"""Commands that will cause inaccuracy or incorrect behavior but are still necessary."""
+"""Commands that are "unsafe".
+
+"Unsafe" means that they can cause inaccuracy or incorrect behavior. They should
+therefore never be used in protocols, and should only be used otherwise as a last
+resort.
+
+These exist as a necessary evil for implementing things like error recovery.
+Even in those narrow contexts, these commands must be used with care.
+e.g. after an `UpdatePositionEstimators` command, there must be a `Home` command,
+or positioning will be subtly wrong. Each unsafe command should document its intended
+use case and its caveats.
+
+Because we don't expect unsafe commands to be used in any protocols whose behavior we
+must preserve, we may change the commands' semantics over time. We may also change
+their shapes if we're confident that it won't break something in robot-server's
+persistent storage.
+"""
+
 
 from .unsafe_blow_out_in_place import (
     UnsafeBlowOutInPlaceCommandType,
@@ -48,6 +65,37 @@ from .unsafe_place_labware import (
     UnsafePlaceLabwareCreate,
 )
 
+from .unsafe_stacker_manual_retrieve import (
+    UnsafeFlexStackerManualRetrieveCommandType,
+    UnsafeFlexStackerManualRetrieveParams,
+    UnsafeFlexStackerManualRetrieveResult,
+    UnsafeFlexStackerManualRetrieve,
+    UnsafeFlexStackerManualRetrieveCreate,
+)
+
+from .unsafe_stacker_close_latch import (
+    UnsafeFlexStackerCloseLatchCommandType,
+    UnsafeFlexStackerCloseLatchParams,
+    UnsafeFlexStackerCloseLatchResult,
+    UnsafeFlexStackerCloseLatch,
+    UnsafeFlexStackerCloseLatchCreate,
+)
+
+from .unsafe_stacker_open_latch import (
+    UnsafeFlexStackerOpenLatchCommandType,
+    UnsafeFlexStackerOpenLatchParams,
+    UnsafeFlexStackerOpenLatchResult,
+    UnsafeFlexStackerOpenLatch,
+    UnsafeFlexStackerOpenLatchCreate,
+)
+
+from .unsafe_stacker_prepare_shuttle import (
+    UnsafeFlexStackerPrepareShuttleCommandType,
+    UnsafeFlexStackerPrepareShuttleParams,
+    UnsafeFlexStackerPrepareShuttleResult,
+    UnsafeFlexStackerPrepareShuttle,
+    UnsafeFlexStackerPrepareShuttleCreate,
+)
 
 __all__ = [
     # Unsafe blow-out-in-place command models
@@ -86,4 +134,28 @@ __all__ = [
     "UnsafePlaceLabwareResult",
     "UnsafePlaceLabware",
     "UnsafePlaceLabwareCreate",
+    # Unsafe manual retrieve
+    "UnsafeFlexStackerManualRetrieveCommandType",
+    "UnsafeFlexStackerManualRetrieveParams",
+    "UnsafeFlexStackerManualRetrieveResult",
+    "UnsafeFlexStackerManualRetrieve",
+    "UnsafeFlexStackerManualRetrieveCreate",
+    # Unsafe flex stacker close latch
+    "UnsafeFlexStackerCloseLatchCommandType",
+    "UnsafeFlexStackerCloseLatchParams",
+    "UnsafeFlexStackerCloseLatchResult",
+    "UnsafeFlexStackerCloseLatch",
+    "UnsafeFlexStackerCloseLatchCreate",
+    # Unsafe flex stacker open latch
+    "UnsafeFlexStackerOpenLatchCommandType",
+    "UnsafeFlexStackerOpenLatchParams",
+    "UnsafeFlexStackerOpenLatchResult",
+    "UnsafeFlexStackerOpenLatch",
+    "UnsafeFlexStackerOpenLatchCreate",
+    # Unsafe flex stacker prepare shuttle
+    "UnsafeFlexStackerPrepareShuttleCommandType",
+    "UnsafeFlexStackerPrepareShuttleParams",
+    "UnsafeFlexStackerPrepareShuttleResult",
+    "UnsafeFlexStackerPrepareShuttle",
+    "UnsafeFlexStackerPrepareShuttleCreate",
 ]

@@ -1,5 +1,6 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+
 import {
   Box,
   COLORS,
@@ -8,20 +9,25 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
+
 import { TimelineToolbox } from './Timeline/TimelineToolbox'
 
+import type { Dispatch, SetStateAction } from 'react'
+
 const INITIAL_SIDEBAR_WIDTH = 235
-const MIN_SIDEBAR_WIDTH = 80
+const MIN_SIDEBAR_WIDTH = 170
 const MAX_SIDEBAR_WIDTH = 350
 
 interface DraggableSidebarProps {
   setTargetWidth: (width: number) => void
+  showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
 }
 
 // Note (kk:2024/12/20 the designer will revisit responsive sidebar design in 2025
 // we will need to update the details to align with the updated design
 export function DraggableSidebar({
   setTargetWidth,
+  showLiquidOverflowMenu,
 }: DraggableSidebarProps): JSX.Element {
   const sidebarRef = useRef<HTMLDivElement>(null)
   const [isResizing, setIsResizing] = useState(false)
@@ -69,7 +75,10 @@ export function DraggableSidebar({
     >
       <SidebarContainer ref={sidebarRef} resizedWidth={sidebarWidth}>
         <SidebarContent>
-          <TimelineToolbox sidebarWidth={sidebarWidth} />
+          <TimelineToolbox
+            sidebarWidth={sidebarWidth}
+            showLiquidOverflowMenu={showLiquidOverflowMenu}
+          />
         </SidebarContent>
         <SidebarResizer dragging={isResizing} onMouseDown={startResizing} />
       </SidebarContainer>

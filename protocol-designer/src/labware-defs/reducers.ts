@@ -1,20 +1,23 @@
 import omit from 'lodash/omit'
+import pickBy from 'lodash/pickBy'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import pickBy from 'lodash/pickBy'
+
 import {
-  getLabwareDefURI,
   getLabwareDefIsStandard,
+  getLabwareDefURI,
 } from '@opentrons/shared-data'
+
+import type { Reducer } from 'redux'
+import type { LoadFileAction } from '../load-file'
 import type { Action } from '../types'
-import type { LabwareUploadMessage, LabwareDefByDefURI } from './types'
 import type {
   CreateCustomLabwareDef,
   LabwareUploadMessageAction,
   ReplaceCustomLabwareDef,
 } from './actions'
-import type { Reducer } from 'redux'
-import type { LoadFileAction } from '../load-file'
+import type { LabwareDefByDefURI, LabwareUploadMessage } from './types'
+
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const customDefs: Reducer<LabwareDefByDefURI, Action> = handleActions(
@@ -34,10 +37,13 @@ const customDefs: Reducer<LabwareDefByDefURI, Action> = handleActions(
       [getLabwareDefURI(action.payload.newDef)]: action.payload.newDef,
     }),
     LOAD_FILE: (state: LabwareDefByDefURI, action: LoadFileAction) => {
-      const customDefsFromFile = pickBy(
-        action.payload.file.labwareDefinitions,
-        def => !getLabwareDefIsStandard(def) // assume if it's not standard, it's custom
-      )
+      const customDefsFromFile =
+        action.payload.file?.labwareDefinitions != null
+          ? pickBy(
+              action.payload.file.labwareDefinitions,
+              def => !getLabwareDefIsStandard(def) // assume if it's not standard, it's custom
+            )
+          : {}
       return { ...state, ...customDefsFromFile }
     },
   },

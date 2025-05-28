@@ -7,8 +7,8 @@ import {
 } from './constants'
 
 import type {
+  LabwareDefinition,
   LabwareDefinition1,
-  LabwareDefinition2,
   WellDefinition,
 } from './types'
 
@@ -44,11 +44,15 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_ot3_96_tiprack_1000ul',
   'opentrons_ot3_96_tiprack_50ul',
   'opentrons_flex_lid_absorbance_plate_reader_module',
-  //  temporarily blocking evotips until it is out of beta
-  'evotips_flex_96_tiprack_adapter',
-  'evotips_opentrons_96_labware',
-  //  temporarily block tiprack lids until stacker launches
-  'opentrons_flex_tiprack_lid',
+  'protocol_engine_lid_stack_object',
+  // temporarily blocking 20 uL Flex tip racks until they launch
+  'opentrons_flex_96_tiprack_20ul',
+  'opentrons_flex_96_filtertiprack_20ul',
+  // temporarily blocking tough labware until geometry and collateral is finalized
+  'opentrons_tough_1_reservoir_300ml',
+  'opentrons_tough_4_reservoir_72ml',
+  'opentrons_tough_12_reservoir_22ml',
+  'opentrons_tough_universal_lid',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
 // or the adapter/labware combos since we migrated to splitting them up
@@ -62,21 +66,27 @@ export const PD_DO_NOT_LIST = [
   'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
   'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
   'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
-  //  temporarily blocking TC lid adapter and deck riser until it is supported in PD
-  'opentrons_tough_pcr_auto_sealing_lid',
-  'opentrons_flex_deck_riser',
-  //  temporarily blocking evotips until it is supported in PD
-  'evotips_flex_96_tiprack_adapter',
-  'evotips_opentrons_96_labware',
-  // temporarily blocking tiprack lids until stacker launches
-  'opentrons_flex_tiprack_lid',
+  'protocol_engine_lid_stack_object',
+  // evotip is not supported in PD
+  'ev_resin_tips_flex_96_tiprack_adapter',
+  'ev_resin_tips_flex_96_labware',
+  'ev_resin_tips_flex_tall_adapter',
+  'ev_resin_tips_flex_short_adapter',
+  // temporarily blocking 20 uL Flex tip racks until they launch
+  'opentrons_flex_96_tiprack_20ul',
+  'opentrons_flex_96_filtertiprack_20ul',
+  // temporarily blocking tough labware until geometry and collateral is finalized
+  'opentrons_tough_1_reservoir_300ml',
+  'opentrons_tough_4_reservoir_72ml',
+  'opentrons_tough_12_reservoir_22ml',
+  'opentrons_tough_universal_lid',
 ]
 
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
   return Boolean(def?.metadata?.isTiprack)
 }
 
-export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
+export function getIsTiprack(labwareDef: LabwareDefinition): boolean {
   return labwareDef.parameters.isTiprack
 }
 
@@ -101,7 +111,7 @@ const _SHORT_MM_LABWARE_DEF_LOADNAMES = [
 const ENGAGE_HEIGHT_OFFSET = -4
 
 export function getLabwareDefaultEngageHeight(
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
 ): number | null {
   const rawEngageHeight: number | null | undefined =
     labwareDef.parameters.magneticModuleEngageHeight

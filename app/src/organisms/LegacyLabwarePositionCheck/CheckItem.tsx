@@ -1,17 +1,16 @@
 import { useEffect } from 'react'
-import omit from 'lodash/omit'
-import isEqual from 'lodash/isEqual'
 import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import isEqual from 'lodash/isEqual'
+import omit from 'lodash/omit'
+
 import {
   DIRECTION_COLUMN,
   Flex,
+  getLabwareDefinitionsFromCommands,
   LegacyStyledText,
   TYPOGRAPHY,
-  getLabwareDefinitionsFromCommands,
 } from '@opentrons/components'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
-import { JogToWell } from './JogToWell'
 import {
   FLEX_ROBOT_TYPE,
   getIsTiprack,
@@ -22,30 +21,38 @@ import {
   IDENTITY_VECTOR,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useSelector } from 'react-redux'
-import { getLabwareDef } from './utils/labware'
-import { UnorderedList } from '/app/molecules/UnorderedList'
-import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
-import { getIsOnDevice } from '/app/redux/config'
-import { getDisplayLocation } from './utils/getDisplayLocation'
 
+import { UnorderedList } from '/app/molecules/UnorderedList'
+import { getIsOnDevice } from '/app/redux/config'
+import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
+
+import { JogToWell } from './JogToWell'
+import { PrepareSpace } from './PrepareSpace'
+import { RobotMotionLoader } from './RobotMotionLoader'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { getLabwareDef } from './utils/labware'
+
+import type { TFunction } from 'i18next'
 import type { Dispatch } from 'react'
-import type { LabwareOffset } from '@opentrons/api-client'
+import type {
+  LabwareOffset,
+  LegacyLabwareOffsetLocation,
+} from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
   LabwareLocation,
   MoveLabwareCreateCommand,
   RobotType,
+  Vector3D,
 } from '@opentrons/shared-data'
+import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type {
   CheckLabwareStep,
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { Jog } from '/app/molecules/JogControls/types'
-import type { TFunction } from 'i18next'
 
 const PROBE_LENGTH_MM = 44.5
 
@@ -55,6 +62,13 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   proceed: () => void
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   setFatalError: (errorMessage: string) => void
+  isApplyingOffsets: boolean
+  calculateAndApplyOffset: (
+    initialPosition: Vector3D | null,
+    finalPosition: Vector3D | null,
+    labwareId: string,
+    location: LegacyLabwareOffsetLocation
+  ) => Promise<void>
   registerPosition: Dispatch<RegisterPositionAction>
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
@@ -63,6 +77,7 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   robotType: RobotType
   shouldUseMetalProbe: boolean
 }
+
 export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const {
     labwareId,
@@ -80,7 +95,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     existingOffsets,
     setFatalError,
     robotType,
+    isApplyingOffsets,
     shouldUseMetalProbe,
+    calculateAndApplyOffset,
   } = props
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
@@ -355,7 +372,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           },
         ]
 
-  const handleConfirmPosition = (): void => {
+  const handleConfirmPositionAndApply = (): void => {
     const heaterShakerPrepCommands: CreateCommand[] =
       moduleId != null &&
       moduleType != null &&
@@ -403,10 +420,21 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             location,
             position,
           })
-          proceed()
+          return calculateAndApplyOffset(
+            initialPosition ?? null,
+            position,
+            labwareId,
+            location
+          )
         } else {
           setFatalError('CheckItem failed to save final position with message')
+          return Promise.reject(
+            new Error('CheckItem failed to save final position with message')
+          )
         }
+      })
+      .then(() => {
+        proceed()
       })
       .catch((e: Error) => {
         setFatalError(
@@ -414,6 +442,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         )
       })
   }
+
   const handleGoBack = (): void => {
     chainRunCommands(
       [
@@ -479,7 +508,8 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           }
           labwareDef={labwareDef}
           pipetteName={pipetteName}
-          handleConfirmPosition={handleConfirmPosition}
+          handleConfirmPositionAndApply={handleConfirmPositionAndApply}
+          isApplyingOffsets={isApplyingOffsets}
           handleGoBack={handleGoBack}
           handleJog={handleJog}
           initialPosition={initialPosition}
@@ -496,7 +526,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           body={
             <UnorderedList
               items={[
-                isOnDevice ? t('clear_all_slots_odd') : t('clear_all_slots'),
+                isOnDevice
+                  ? t('legacy_clear_all_slots_odd')
+                  : t('legacy_clear_all_slots'),
                 placeItemInstruction,
               ]}
             />
@@ -504,6 +536,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           labwareDef={labwareDef}
           confirmPlacement={handleConfirmPlacement}
           robotType={robotType}
+          onSkip={proceed}
         />
       )}
     </Flex>

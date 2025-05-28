@@ -14,6 +14,12 @@ from .pipetting_common import (
     TipPhysicallyAttachedError,
 )
 from .movement_common import StallOrCollisionError
+from .flex_stacker.common import (
+    FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
+    FlexStackerHopperError,
+    FlexStackerLabwareRetrieveError,
+)
 
 from . import absorbance_reader
 from . import flex_stacker
@@ -377,28 +383,36 @@ from .liquid_probe import (
     TryLiquidProbeCommandType,
 )
 
-from .evotip_seal_pipette import (
-    EvotipSealPipette,
-    EvotipSealPipetteParams,
-    EvotipSealPipetteCreate,
-    EvotipSealPipetteResult,
-    EvotipSealPipetteCommandType,
+from .seal_pipette_to_tip import (
+    SealPipetteToTip,
+    SealPipetteToTipParams,
+    SealPipetteToTipCreate,
+    SealPipetteToTipResult,
+    SealPipetteToTipCommandType,
 )
 
-from .evotip_dispense import (
-    EvotipDispense,
-    EvotipDispenseParams,
-    EvotipDispenseCreate,
-    EvotipDispenseResult,
-    EvotipDispenseCommandType,
+from .pressure_dispense import (
+    PressureDispense,
+    PressureDispenseParams,
+    PressureDispenseCreate,
+    PressureDispenseResult,
+    PressureDispenseCommandType,
 )
 
-from .evotip_unseal_pipette import (
-    EvotipUnsealPipette,
-    EvotipUnsealPipetteParams,
-    EvotipUnsealPipetteCreate,
-    EvotipUnsealPipetteResult,
-    EvotipUnsealPipetteCommandType,
+from .unseal_pipette_from_tip import (
+    UnsealPipetteFromTip,
+    UnsealPipetteFromTipParams,
+    UnsealPipetteFromTipCreate,
+    UnsealPipetteFromTipResult,
+    UnsealPipetteFromTipCommandType,
+)
+
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleParams,
+    IdentifyModuleCreate,
+    IdentifyModuleResult,
+    IdentifyModuleCommandType,
 )
 
 Command = Annotated[
@@ -425,6 +439,7 @@ Command = Annotated[
         LoadLiquid,
         LoadLiquidClass,
         LoadModule,
+        IdentifyModule,
         LoadPipette,
         LoadLidStack,
         LoadLid,
@@ -447,9 +462,9 @@ Command = Annotated[
         GetNextTip,
         LiquidProbe,
         TryLiquidProbe,
-        EvotipSealPipette,
-        EvotipDispense,
-        EvotipUnsealPipette,
+        SealPipetteToTip,
+        PressureDispense,
+        UnsealPipetteFromTip,
         heater_shaker.WaitForTemperature,
         heater_shaker.SetTargetTemperature,
         heater_shaker.DeactivateHeater,
@@ -476,7 +491,6 @@ Command = Annotated[
         absorbance_reader.OpenLid,
         absorbance_reader.Initialize,
         absorbance_reader.ReadAbsorbance,
-        flex_stacker.Configure,
         flex_stacker.Retrieve,
         flex_stacker.Store,
         flex_stacker.SetStoredLabware,
@@ -492,11 +506,15 @@ Command = Annotated[
         unsafe.UnsafeEngageAxes,
         unsafe.UnsafeUngripLabware,
         unsafe.UnsafePlaceLabware,
+        unsafe.UnsafeFlexStackerManualRetrieve,
+        unsafe.UnsafeFlexStackerCloseLatch,
+        unsafe.UnsafeFlexStackerOpenLatch,
+        unsafe.UnsafeFlexStackerPrepareShuttle,
         robot.MoveTo,
         robot.MoveAxesRelative,
         robot.MoveAxesTo,
-        robot.openGripperJaw,
-        robot.closeGripperJaw,
+        robot.OpenGripperJaw,
+        robot.CloseGripperJaw,
     ],
     Field(discriminator="commandType"),
 ]
@@ -526,6 +544,7 @@ CommandParams = Union[
     LoadLiquidParams,
     LoadLiquidClassParams,
     LoadModuleParams,
+    IdentifyModuleParams,
     LoadPipetteParams,
     MoveLabwareParams,
     MoveRelativeParams,
@@ -546,9 +565,9 @@ CommandParams = Union[
     GetNextTipParams,
     LiquidProbeParams,
     TryLiquidProbeParams,
-    EvotipSealPipetteParams,
-    EvotipDispenseParams,
-    EvotipUnsealPipetteParams,
+    SealPipetteToTipParams,
+    PressureDispenseParams,
+    UnsealPipetteFromTipParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -575,7 +594,6 @@ CommandParams = Union[
     absorbance_reader.OpenLidParams,
     absorbance_reader.InitializeParams,
     absorbance_reader.ReadAbsorbanceParams,
-    flex_stacker.ConfigureParams,
     flex_stacker.RetrieveParams,
     flex_stacker.StoreParams,
     flex_stacker.SetStoredLabwareParams,
@@ -591,11 +609,15 @@ CommandParams = Union[
     unsafe.UnsafeEngageAxesParams,
     unsafe.UnsafeUngripLabwareParams,
     unsafe.UnsafePlaceLabwareParams,
+    unsafe.UnsafeFlexStackerManualRetrieveParams,
+    unsafe.UnsafeFlexStackerCloseLatchParams,
+    unsafe.UnsafeFlexStackerOpenLatchParams,
+    unsafe.UnsafeFlexStackerPrepareShuttleParams,
     robot.MoveAxesRelativeParams,
     robot.MoveAxesToParams,
     robot.MoveToParams,
-    robot.openGripperJawParams,
-    robot.closeGripperJawParams,
+    robot.OpenGripperJawParams,
+    robot.CloseGripperJawParams,
 ]
 
 CommandType = Union[
@@ -621,6 +643,7 @@ CommandType = Union[
     LoadLiquidCommandType,
     LoadLiquidClassCommandType,
     LoadModuleCommandType,
+    IdentifyModuleCommandType,
     LoadPipetteCommandType,
     LoadLidStackCommandType,
     LoadLidCommandType,
@@ -643,9 +666,9 @@ CommandType = Union[
     GetNextTipCommandType,
     LiquidProbeCommandType,
     TryLiquidProbeCommandType,
-    EvotipSealPipetteCommandType,
-    EvotipDispenseCommandType,
-    EvotipUnsealPipetteCommandType,
+    SealPipetteToTipCommandType,
+    PressureDispenseCommandType,
+    UnsealPipetteFromTipCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -672,7 +695,6 @@ CommandType = Union[
     absorbance_reader.OpenLidCommandType,
     absorbance_reader.InitializeCommandType,
     absorbance_reader.ReadAbsorbanceCommandType,
-    flex_stacker.ConfigureCommandType,
     flex_stacker.RetrieveCommandType,
     flex_stacker.StoreCommandType,
     flex_stacker.SetStoredLabwareCommandType,
@@ -688,11 +710,15 @@ CommandType = Union[
     unsafe.UnsafeEngageAxesCommandType,
     unsafe.UnsafeUngripLabwareCommandType,
     unsafe.UnsafePlaceLabwareCommandType,
+    unsafe.UnsafeFlexStackerManualRetrieveCommandType,
+    unsafe.UnsafeFlexStackerCloseLatchCommandType,
+    unsafe.UnsafeFlexStackerOpenLatchCommandType,
+    unsafe.UnsafeFlexStackerPrepareShuttleCommandType,
     robot.MoveAxesRelativeCommandType,
     robot.MoveAxesToCommandType,
     robot.MoveToCommandType,
-    robot.openGripperJawCommandType,
-    robot.closeGripperJawCommandType,
+    robot.OpenGripperJawCommandType,
+    robot.CloseGripperJawCommandType,
 ]
 
 CommandCreate = Annotated[
@@ -719,6 +745,7 @@ CommandCreate = Annotated[
         LoadLiquidCreate,
         LoadLiquidClassCreate,
         LoadModuleCreate,
+        IdentifyModuleCreate,
         LoadPipetteCreate,
         LoadLidStackCreate,
         LoadLidCreate,
@@ -741,9 +768,9 @@ CommandCreate = Annotated[
         GetNextTipCreate,
         LiquidProbeCreate,
         TryLiquidProbeCreate,
-        EvotipSealPipetteCreate,
-        EvotipDispenseCreate,
-        EvotipUnsealPipetteCreate,
+        SealPipetteToTipCreate,
+        PressureDispenseCreate,
+        UnsealPipetteFromTipCreate,
         heater_shaker.WaitForTemperatureCreate,
         heater_shaker.SetTargetTemperatureCreate,
         heater_shaker.DeactivateHeaterCreate,
@@ -770,7 +797,6 @@ CommandCreate = Annotated[
         absorbance_reader.OpenLidCreate,
         absorbance_reader.InitializeCreate,
         absorbance_reader.ReadAbsorbanceCreate,
-        flex_stacker.ConfigureCreate,
         flex_stacker.RetrieveCreate,
         flex_stacker.StoreCreate,
         flex_stacker.SetStoredLabwareCreate,
@@ -786,11 +812,15 @@ CommandCreate = Annotated[
         unsafe.UnsafeEngageAxesCreate,
         unsafe.UnsafeUngripLabwareCreate,
         unsafe.UnsafePlaceLabwareCreate,
+        unsafe.UnsafeFlexStackerManualRetrieveCreate,
+        unsafe.UnsafeFlexStackerCloseLatchCreate,
+        unsafe.UnsafeFlexStackerOpenLatchCreate,
+        unsafe.UnsafeFlexStackerPrepareShuttleCreate,
         robot.MoveAxesRelativeCreate,
         robot.MoveAxesToCreate,
         robot.MoveToCreate,
-        robot.openGripperJawCreate,
-        robot.closeGripperJawCreate,
+        robot.OpenGripperJawCreate,
+        robot.CloseGripperJawCreate,
     ],
     Field(discriminator="commandType"),
 ]
@@ -825,6 +855,7 @@ CommandResult = Union[
     LoadLiquidResult,
     LoadLiquidClassResult,
     LoadModuleResult,
+    IdentifyModuleResult,
     LoadPipetteResult,
     LoadLidStackResult,
     LoadLidResult,
@@ -847,9 +878,9 @@ CommandResult = Union[
     GetNextTipResult,
     LiquidProbeResult,
     TryLiquidProbeResult,
-    EvotipSealPipetteResult,
-    EvotipDispenseResult,
-    EvotipUnsealPipetteResult,
+    SealPipetteToTipResult,
+    PressureDispenseResult,
+    UnsealPipetteFromTipResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
@@ -876,7 +907,6 @@ CommandResult = Union[
     absorbance_reader.OpenLidResult,
     absorbance_reader.InitializeResult,
     absorbance_reader.ReadAbsorbanceResult,
-    flex_stacker.ConfigureResult,
     flex_stacker.RetrieveResult,
     flex_stacker.StoreResult,
     flex_stacker.SetStoredLabwareResult,
@@ -892,11 +922,15 @@ CommandResult = Union[
     unsafe.UnsafeEngageAxesResult,
     unsafe.UnsafeUngripLabwareResult,
     unsafe.UnsafePlaceLabwareResult,
+    unsafe.UnsafeFlexStackerManualRetrieveResult,
+    unsafe.UnsafeFlexStackerCloseLatchResult,
+    unsafe.UnsafeFlexStackerOpenLatchResult,
+    unsafe.UnsafeFlexStackerPrepareShuttleResult,
     robot.MoveAxesRelativeResult,
     robot.MoveAxesToResult,
     robot.MoveToResult,
-    robot.openGripperJawResult,
-    robot.closeGripperJawResult,
+    robot.OpenGripperJawResult,
+    robot.CloseGripperJawResult,
 ]
 
 
@@ -908,6 +942,10 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[LiquidNotFoundError],
     DefinedErrorData[GripperMovementError],
     DefinedErrorData[StallOrCollisionError],
+    DefinedErrorData[FlexStackerStallOrCollisionError],
+    DefinedErrorData[FlexStackerShuttleError],
+    DefinedErrorData[FlexStackerHopperError],
+    DefinedErrorData[FlexStackerLabwareRetrieveError],
 ]
 
 

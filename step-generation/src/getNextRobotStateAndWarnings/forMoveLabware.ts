@@ -8,19 +8,25 @@ export function forMoveLabware(
 ): void {
   const { labwareId, newLocation } = params
   const { robotState } = robotStateAndWarnings
+  const { modules, labware } = robotState
 
-  let newLocationString = ''
+  const newLocationStack = [labwareId]
   if (newLocation === 'offDeck' || newLocation === 'systemLocation') {
-    newLocationString = newLocation
+    newLocationStack.push(newLocation)
   } else if ('moduleId' in newLocation) {
-    newLocationString = newLocation.moduleId
+    newLocationStack.push(
+      newLocation.moduleId,
+      modules[newLocation.moduleId].slot
+    )
   } else if ('slotName' in newLocation) {
-    newLocationString = newLocation.slotName
+    newLocationStack.push(newLocation.slotName)
   } else if ('labwareId' in newLocation) {
-    newLocationString = newLocation.labwareId
+    const labwareId = newLocation.labwareId
+    const labwareIdStack = labware[labwareId].stack
+    newLocationStack.push(labwareId, ...labwareIdStack)
   } else if ('addressableAreaName' in newLocation) {
-    newLocationString = newLocation.addressableAreaName
+    newLocationStack.push(newLocation.addressableAreaName)
   }
 
-  robotState.labware[labwareId].slot = newLocationString
+  robotState.labware[labwareId].stack = newLocationStack
 }

@@ -1,19 +1,19 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { i18n } from '../../../assets/localization'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { SlotDetailsContainer } from '../../../organisms'
+import { i18n } from '../../../assets/localization'
+import { SlotDetailsContainer } from '../../../components/organisms'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { StartingDeck } from '../StartingDeck'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('../DeckThumbnail')
-vi.mock('OffDeckThumbnail')
-vi.mock('../../../organisms')
+vi.mock('../OffDeckThumbnail')
+vi.mock('../../../components/organisms')
 vi.mock('../../../step-forms/selectors')
 
 vi.mock('../DeckThumbnail', () => ({

@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -24,6 +23,7 @@ import {
   useConditionalConfirm,
   useHoverTooltip,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getModuleDisplayName,
   HS_RPM_MAX,
@@ -31,11 +31,12 @@ import {
   RPM,
 } from '@opentrons/shared-data'
 
-import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { getTopPortalEl } from '/app/App/portal'
-import { Slideout } from '/app/atoms/Slideout'
 import { TertiaryButton } from '/app/atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
 import { Divider } from '/app/atoms/structure'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
+
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { ModuleSetupModal } from './ModuleSetupModal'
@@ -300,6 +301,7 @@ export const TestShakeSlideout = (
             setShowModuleSetupModal(false)
           }}
           moduleDisplayName={getModuleDisplayName(module.moduleModel)}
+          moduleModel={module.moduleModel}
         />
       )}
       <Link

@@ -1,8 +1,9 @@
 import styled, { css } from 'styled-components'
 
+import { StyledText } from '../atoms'
+import { COLORS } from '../helix-design-system'
 import { Icon } from '../icons'
 import { Box, Btn, Flex } from '../primitives'
-import { StyledText } from '../atoms'
 import {
   ALIGN_CENTER,
   DISPLAY_FLEX,
@@ -10,7 +11,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '../styles'
 import { SPACING } from '../ui-style-constants'
-import { COLORS } from '../helix-design-system'
 
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconProps } from '../icons'
@@ -20,6 +20,7 @@ export interface ModalHeaderProps {
   onClose?: MouseEventHandler
   titleElement1?: JSX.Element
   titleElement2?: JSX.Element
+  tagElement?: JSX.Element
   backgroundColor?: string
   color?: string
   icon?: IconProps
@@ -34,6 +35,7 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
     titleElement1,
     titleElement2,
     backgroundColor,
+    tagElement,
     color = COLORS.black90,
     closeButton,
   } = props
@@ -52,23 +54,26 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
             {title}
           </StyledText>
         </Flex>
-        {closeButton != null ||
-          (onClose != null && (
-            <Btn
-              onClick={onClose}
-              css={closeIconStyles}
-              data-testid={`ModalHeader_icon_close${
-                typeof title === 'string' ? `_${title}` : ''
-              }`}
-            >
-              <Icon
-                name="close"
-                width={SPACING.spacing24}
-                height={SPACING.spacing24}
-                color={color}
-              />
-            </Btn>
-          ))}
+        <Flex gridGap={SPACING.spacing4}>
+          {tagElement}
+          {closeButton != null ||
+            (onClose != null && (
+              <Btn
+                onClick={onClose}
+                css={closeIconStyles}
+                data-testid={`ModalHeader_icon_close${
+                  typeof title === 'string' ? `_${title}` : ''
+                }`}
+              >
+                <Icon
+                  name="close"
+                  width={SPACING.spacing24}
+                  height={SPACING.spacing24}
+                  color={color}
+                />
+              </Btn>
+            ))}
+        </Flex>
       </StyledModalHeader>
       <StyledDivider data-testid="divider" />
     </>

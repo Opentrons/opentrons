@@ -68,6 +68,7 @@ from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT3_DECK,
 )
 from opentrons.protocol_engine.resources import deck_configuration_provider
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Vector3D
 
 
 @pytest.fixture(scope="session")
@@ -2011,3 +2012,77 @@ def test_is_flex_deck_with_thermocycler(
         deck_type=deck_type,
     )
     assert subject.is_flex_deck_with_thermocycler() == expected_result
+
+
+@pytest.mark.parametrize(
+    argnames=["labware_def", "lid_def", "expected_pool_count"],
+    argvalues=[
+        (
+            lazy_fixture("flex_50uL_tiprack"),
+            lazy_fixture("tiprack_lid_def"),
+            6,
+        ),
+        (
+            lazy_fixture("auto_sealing_lid_def"),
+            None,
+            96,
+        ),
+    ],
+)
+def test_stacker_max_pool_count_by_height(
+    labware_def: LabwareDefinition,
+    lid_def: LabwareDefinition | None,
+    expected_pool_count: float,
+    flex_stacker_v1_def: ModuleDefinition,
+) -> None:
+    """It should return the maximum stacker fill count for a given labware."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_D3,
+        },
+        requested_model_by_module_id={
+            "module-1": ModuleModel.FLEX_STACKER_MODULE_V1,
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
+                serial_number="serial-1",
+                definition=flex_stacker_v1_def,
+            ),
+        },
+    )
+
+    # The following math relies on properties only in labware schema 2
+    # (this test predates labware schema 3).
+    assert labware_def.schemaVersion == 2
+    assert lid_def is None or lid_def.schemaVersion == 2
+
+    lid_overlap = (
+        lid_def.stackingOffsetWithLabware.get(
+            labware_def.parameters.loadName, Vector3D(x=0, y=0, z=0)
+        )
+        if lid_def is not None
+        else Vector3D(x=0, y=0, z=0)
+    )
+    pool_height = (
+        labware_def.dimensions.zDimension
+        + lid_def.dimensions.zDimension
+        - lid_overlap.z
+        if lid_def is not None
+        else labware_def.dimensions.zDimension
+    )
+    pool_overlap = (
+        labware_def.stackingOffsetWithLabware.get(
+            lid_def.parameters.loadName, Vector3D(x=0, y=0, z=0)
+        )
+        if lid_def is not None
+        else labware_def.stackingOffsetWithLabware.get(
+            labware_def.parameters.loadName, Vector3D(x=0, y=0, z=0)
+        )
+    )
+
+    assert (
+        subject.stacker_max_pool_count_by_height(
+            "module-1", pool_height, pool_overlap.z
+        )
+        == expected_pool_count
+    )

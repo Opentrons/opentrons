@@ -1,6 +1,6 @@
-import { vi, describe, expect, afterEach, beforeEach, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { reduxActionToAnalyticsEvent } from '../middleware'
+
 import {
   getFileMetadata,
   getRobotStateTimeline,
@@ -10,6 +10,8 @@ import {
   getPipetteEntities,
   getSavedStepForms,
 } from '../../step-forms/selectors'
+import { reduxActionToAnalyticsEvent } from '../middleware'
+
 import type { SaveStepFormsMultiAction } from '../../step-forms/actions'
 
 vi.mock('../../file-data/selectors')

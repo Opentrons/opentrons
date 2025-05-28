@@ -1,8 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as React from 'react-remove-scroll'
+
+import { COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
 import { InfoScreen as InfoScreenComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -15,7 +16,7 @@ const mockContent = [
 ]
 
 const meta: Meta<typeof InfoScreenComponent> = {
-  title: 'Library/Molecules/InfoScreen',
+  title: 'Helix/Molecules/InfoScreen',
   component: InfoScreenComponent,
   argTypes: {
     content: {

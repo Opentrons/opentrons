@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { TakeoverModal } from './TakeoverModal'
 import { MaintenanceRunStatusProvider } from './MaintenanceRunStatusProvider'
+import { TakeoverModal } from './TakeoverModal'
 import { useMaintenanceRunTakeover } from './useMaintenanceRunTakeover'
 
 import type { ReactNode } from 'react'

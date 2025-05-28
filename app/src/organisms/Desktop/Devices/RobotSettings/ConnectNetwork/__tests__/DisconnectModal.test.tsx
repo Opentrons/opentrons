@@ -1,12 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import { when } from 'vitest-when'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useRobot } from '/app/redux-resources/robots'
-import { useWifiList } from '/app/resources/networking/hooks'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -20,12 +21,14 @@ import {
 import { mockWifiNetwork } from '/app/redux/networking/__fixtures__'
 import {
   dismissRequest,
-  getRequestById,
-  useDispatchApiRequest,
-  PENDING,
   FAILURE,
+  getRequestById,
+  PENDING,
   SUCCESS,
+  useDispatchApiRequest,
 } from '/app/redux/robot-api'
+import { useWifiList } from '/app/resources/networking/hooks'
+
 import { DisconnectModal } from '../DisconnectModal'
 
 import type { DispatchApiRequestType } from '/app/redux/robot-api'

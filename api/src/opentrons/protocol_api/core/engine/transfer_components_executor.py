@@ -1,9 +1,10 @@
 """Executor for liquid class based complex commands."""
 from __future__ import annotations
 
+import logging
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union, Literal
 from dataclasses import dataclass, field
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
@@ -21,12 +22,20 @@ from opentrons.protocol_api._liquid_properties import (
     TouchTipProperties,
 )
 from opentrons.protocol_engine.errors import TouchTipDisabledError
-from opentrons.types import Location, Point
+from opentrons.types import Location, Point, Mount
+from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
+    LocationCheckDescriptors,
+)
+from opentrons.protocols.advanced_control.transfers import (
+    transfer_liquid_utils as tx_utils,
+)
 
 if TYPE_CHECKING:
     from .well import WellCore
     from .instrument import InstrumentCore
     from ... import TrashBin, WasteChute
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -89,6 +98,14 @@ class TipState:
         ), "Last air gap volume doe not match the volume being removed"
         self.last_liquid_and_air_gap_in_tip.air_gap = 0
 
+    def delete_last_air_gap_and_liquid(self) -> None:
+        air_gap_in_tip = self.last_liquid_and_air_gap_in_tip.air_gap
+        liquid_in_tip = self.last_liquid_and_air_gap_in_tip.liquid
+        if air_gap_in_tip:
+            self.delete_air_gap(air_gap_in_tip)
+        if liquid_in_tip:
+            self.delete_liquid(volume=liquid_in_tip)
+
 
 class TransferType(Enum):
     ONE_TO_ONE = "one_to_one"
@@ -101,11 +118,32 @@ class TransferComponentsExecutor:
         self,
         instrument_core: InstrumentCore,
         transfer_properties: TransferProperties,
-        target_location: Location,
-        target_well: WellCore,
+        target_location: Union[Location, TrashBin, WasteChute],
+        target_well: Optional[WellCore],
         tip_state: TipState,
         transfer_type: TransferType,
     ) -> None:
+        """Create a TransferComponentsExecutor instance.
+
+        One instance should be created to execute all the steps inside each of the
+        liquid class' transfer components- aspirate, dispense and multi-dispense.
+        The state of the TransferComponentsExecutor instance is expected to be valid
+        only for the component it was created.
+
+        For example, if we want to execute all the steps (submerge, dispense, retract, etc)
+        related to the 'dispense' component of a liquid-class based transfer, the class
+        will be used to initialize info about the dispense by assigning values
+        to class attributes as follows-
+        - target_location: the dispense location
+        - target_well: the well associated with dispense location, will be None when the
+                        target_location argument is a TrashBin or WasteChute
+        - tip_state: the state of the tip before dispense component steps are executed
+        - transfer_type: whether the dispense component is being called as a part of a
+                        1-to-1 transfer or a consolidation or a distribution
+
+        These attributes will remain the same throughout the component's execution,
+        except `tip_state`, which will keep updating as fluids are handled.
+        """
         self._instrument = instrument_core
         self._transfer_properties = transfer_properties
         self._target_location = target_location
@@ -121,6 +159,7 @@ class TransferComponentsExecutor:
     def submerge(
         self,
         submerge_properties: Submerge,
+        post_submerge_action: Literal["aspirate", "dispense"],
     ) -> None:
         """Execute submerge steps.
 
@@ -128,18 +167,38 @@ class TransferComponentsExecutor:
         Should raise an error if this point is inside the liquid?
             For liquid meniscus this is easy to tell. Can’t be below meniscus
             For reference pos of anything else, do not allow submerge position to be below aspirate position
-        2. move to aspirate position at desired speed
+        2. move to aspirate/dispense position at desired speed
         3. delay
+
+        If target location is a trash bin or waste chute, the pipette will move to the disposal location given,
+        remove air gap and delay
         """
-        # TODO: compare submerge start position and aspirate position and raise error if incompatible
-        submerge_start_point = absolute_point_from_position_reference_and_offset(
-            well=self._target_well,
-            position_reference=submerge_properties.position_reference,
-            offset=submerge_properties.offset,
-        )
-        submerge_start_location = Location(
-            point=submerge_start_point, labware=self._target_location.labware
-        )
+        submerge_start_location: Union[Location, TrashBin, WasteChute]
+        if isinstance(self._target_location, Location):
+            assert self._target_well is not None
+            submerge_start_point = absolute_point_from_position_reference_and_offset(
+                well=self._target_well,
+                well_volume_difference=0,
+                position_reference=submerge_properties.start_position.position_reference,
+                offset=submerge_properties.start_position.offset,
+                mount=self._instrument.get_mount(),
+            )
+            submerge_start_location = Location(
+                point=submerge_start_point, labware=self._target_location.labware
+            )
+            tx_utils.raise_if_location_inside_liquid(
+                location=submerge_start_location,
+                well_location=self._target_location,
+                well_core=self._target_well,
+                location_check_descriptors=LocationCheckDescriptors(
+                    location_type="submerge start",
+                    pipetting_action=post_submerge_action,
+                ),
+                logger=log,
+            )
+        else:
+            submerge_start_location = self._target_location
+
         self._instrument.move_to(
             location=submerge_start_location,
             well_core=self._target_well,
@@ -148,25 +207,27 @@ class TransferComponentsExecutor:
             speed=None,
         )
         self._remove_air_gap(location=submerge_start_location)
-        self._instrument.move_to(
-            location=self._target_location,
-            well_core=self._target_well,
-            force_direct=True,
-            minimum_z_height=None,
-            speed=submerge_properties.speed,
-        )
-        if submerge_properties.delay.enabled:
-            assert submerge_properties.delay.duration is not None
+        if isinstance(self._target_location, Location):
+            self._instrument.move_to(
+                location=self._target_location,
+                well_core=self._target_well,
+                force_direct=True,
+                minimum_z_height=None,
+                speed=submerge_properties.speed,
+            )
+
+        if submerge_properties.delay.enabled and submerge_properties.delay.duration:
             self._instrument.delay(submerge_properties.delay.duration)
 
     def aspirate_and_wait(self, volume: float) -> None:
         """Aspirate according to aspirate properties and wait if enabled."""
         # TODO: handle volume correction
+        assert (
+            isinstance(self._target_location, Location)
+            and self._target_well is not None
+        )
         aspirate_props = self._transfer_properties.aspirate
         correction_volume = aspirate_props.correction_by_volume.get_for_volume(volume)
-        is_meniscus = bool(
-            aspirate_props.position_reference == PositionReference.LIQUID_MENISCUS
-        )
         self._instrument.aspirate(
             location=self._target_location,
             well_core=None,
@@ -174,14 +235,11 @@ class TransferComponentsExecutor:
             rate=1,
             flow_rate=aspirate_props.flow_rate_by_volume.get_for_volume(volume),
             in_place=True,
-            is_meniscus=is_meniscus,
             correction_volume=correction_volume,
         )
         self._tip_state.append_liquid(volume)
         delay_props = aspirate_props.delay
-        if delay_props.enabled:
-            # Assertion only for mypy purposes
-            assert delay_props.duration is not None
+        if delay_props.enabled and delay_props.duration:
             self._instrument.delay(delay_props.duration)
 
     def dispense_and_wait(
@@ -194,9 +252,6 @@ class TransferComponentsExecutor:
         correction_volume = dispense_properties.correction_by_volume.get_for_volume(
             volume
         )
-        is_meniscus = bool(
-            dispense_properties.position_reference == PositionReference.LIQUID_MENISCUS
-        )
         self._instrument.dispense(
             location=self._target_location,
             well_core=None,
@@ -205,7 +260,6 @@ class TransferComponentsExecutor:
             flow_rate=dispense_properties.flow_rate_by_volume.get_for_volume(volume),
             in_place=True,
             push_out=push_out_override,
-            is_meniscus=is_meniscus,
             correction_volume=correction_volume,
         )
         if push_out_override:
@@ -213,8 +267,7 @@ class TransferComponentsExecutor:
             self._tip_state.ready_to_aspirate = False
         self._tip_state.delete_liquid(volume)
         dispense_delay = dispense_properties.delay
-        if dispense_delay.enabled:
-            assert dispense_delay.duration is not None
+        if dispense_delay.enabled and dispense_delay.duration:
             self._instrument.delay(dispense_delay.duration)
 
     def mix(self, mix_properties: MixProperties, last_dispense_push_out: bool) -> None:
@@ -228,11 +281,15 @@ class TransferComponentsExecutor:
         NOTE: For most of our built-in definitions, we will keep _mix_ off because it is a very application specific thing.
         We should mention in our docs that users should adjust this property according to their application.
         """
-        if not mix_properties.enabled:
+        if not mix_properties.enabled or not isinstance(
+            self._target_location, Location
+        ):
             return
         # Assertion only for mypy purposes
         assert (
-            mix_properties.repetitions is not None and mix_properties.volume is not None
+            mix_properties.repetitions is not None
+            and mix_properties.volume is not None
+            and self._target_well is not None
         )
         push_out_vol = (
             self._transfer_properties.dispense.push_out_by_volume.get_for_volume(
@@ -290,14 +347,30 @@ class TransferComponentsExecutor:
                          during a multi-dispense.
         """
         # TODO: Raise error if retract is below the meniscus
+        assert (
+            isinstance(self._target_location, Location)
+            and self._target_well is not None
+        )
         retract_props = self._transfer_properties.aspirate.retract
         retract_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
-            position_reference=retract_props.position_reference,
-            offset=retract_props.offset,
+            well_volume_difference=0,
+            position_reference=retract_props.end_position.position_reference,
+            offset=retract_props.end_position.offset,
+            mount=self._instrument.get_mount(),
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
+        )
+        tx_utils.raise_if_location_inside_liquid(
+            location=retract_location,
+            well_location=self._target_location,
+            well_core=self._target_well,
+            location_check_descriptors=LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="aspirate",
+            ),
+            logger=log,
         )
         self._instrument.move_to(
             location=retract_location,
@@ -307,15 +380,14 @@ class TransferComponentsExecutor:
             speed=retract_props.speed,
         )
         retract_delay = retract_props.delay
-        if retract_delay.enabled:
-            assert retract_delay.duration is not None
+        if retract_delay.enabled and retract_delay.duration:
             self._instrument.delay(retract_delay.duration)
         touch_tip_props = retract_props.touch_tip
         if touch_tip_props.enabled:
             assert (
                 touch_tip_props.speed is not None
                 and touch_tip_props.z_offset is not None
-                and touch_tip_props.mm_to_edge is not None
+                and touch_tip_props.mm_from_edge is not None
             )
             self._instrument.touch_tip(
                 location=retract_location,
@@ -323,7 +395,7 @@ class TransferComponentsExecutor:
                 radius=1,
                 z_offset=touch_tip_props.z_offset,
                 speed=touch_tip_props.speed,
-                mm_from_edge=touch_tip_props.mm_to_edge,
+                mm_from_edge=touch_tip_props.mm_from_edge,
             )
             self._instrument.move_to(
                 location=retract_location,
@@ -375,28 +447,49 @@ class TransferComponentsExecutor:
             - Prepare-to-aspirate (top of well)
             - Do air-gap (top of well)
         7. If drop tip, move to drop tip location, drop tip
+
+        If target location is a trash bin or waste chute, the retract movement step is skipped along with touch tip,
+        even if it is enabled.
         """
         # TODO: Raise error if retract is below the meniscus
-
         retract_props = self._transfer_properties.dispense.retract
-        retract_point = absolute_point_from_position_reference_and_offset(
-            well=self._target_well,
-            position_reference=retract_props.position_reference,
-            offset=retract_props.offset,
-        )
-        retract_location = Location(
-            retract_point, labware=self._target_location.labware
-        )
-        self._instrument.move_to(
-            location=retract_location,
-            well_core=self._target_well,
-            force_direct=True,
-            minimum_z_height=None,
-            speed=retract_props.speed,
-        )
+
+        retract_location: Union[Location, TrashBin, WasteChute]
+        if isinstance(self._target_location, Location):
+            assert self._target_well is not None
+            retract_point = absolute_point_from_position_reference_and_offset(
+                well=self._target_well,
+                well_volume_difference=0,
+                position_reference=retract_props.end_position.position_reference,
+                offset=retract_props.end_position.offset,
+                mount=self._instrument.get_mount(),
+            )
+            retract_location = Location(
+                retract_point, labware=self._target_location.labware
+            )
+            tx_utils.raise_if_location_inside_liquid(
+                location=retract_location,
+                well_location=self._target_location,
+                well_core=self._target_well,
+                location_check_descriptors=LocationCheckDescriptors(
+                    location_type="retract end",
+                    pipetting_action="dispense",
+                ),
+                logger=log,
+            )
+            self._instrument.move_to(
+                location=retract_location,
+                well_core=self._target_well,
+                force_direct=True,
+                minimum_z_height=None,
+                speed=retract_props.speed,
+            )
+        else:
+            retract_location = self._target_location
+
+        # TODO should we delay here for a trash despite not having a "retract"?
         retract_delay = retract_props.delay
-        if retract_delay.enabled:
-            assert retract_delay.duration is not None
+        if retract_delay.enabled and retract_delay.duration:
             self._instrument.delay(retract_delay.duration)
 
         blowout_props = retract_props.blowout
@@ -422,7 +515,9 @@ class TransferComponentsExecutor:
         # then skip the final air gap if we have been told to do so.
         self._do_touch_tip_and_air_gap(
             touch_tip_properties=retract_props.touch_tip,
-            location=retract_location,
+            location=retract_location
+            if isinstance(retract_location, Location)
+            else None,
             well=self._target_well,
             add_air_gap=False if is_final_air_gap and not add_final_air_gap else True,
         )
@@ -468,6 +563,9 @@ class TransferComponentsExecutor:
                     if isinstance(trash_location, Location)
                     else None
                 )
+            # A non-multi-dispense blowout will only have air and maybe droplets in the tip
+            # since we only blowout after dispensing the full tip contents.
+            # So delete the air gap from tip state
             last_air_gap = self._tip_state.last_liquid_and_air_gap_in_tip.air_gap
             self._tip_state.delete_air_gap(last_air_gap)
             self._tip_state.ready_to_aspirate = False
@@ -505,17 +603,32 @@ class TransferComponentsExecutor:
         and whether we are moving to another dispense or going back to the source.
         """
         # TODO: Raise error if retract is below the meniscus
-
+        assert (
+            isinstance(self._target_location, Location)
+            and self._target_well is not None
+        )
         assert self._transfer_properties.multi_dispense is not None
 
         retract_props = self._transfer_properties.multi_dispense.retract
         retract_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
-            position_reference=retract_props.position_reference,
-            offset=retract_props.offset,
+            well_volume_difference=0,
+            position_reference=retract_props.end_position.position_reference,
+            offset=retract_props.end_position.offset,
+            mount=self._instrument.get_mount(),
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
+        )
+        tx_utils.raise_if_location_inside_liquid(
+            location=retract_location,
+            well_location=self._target_location,
+            well_core=self._target_well,
+            location_check_descriptors=LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="dispense",
+            ),
+            logger=log,
         )
         self._instrument.move_to(
             location=retract_location,
@@ -525,8 +638,7 @@ class TransferComponentsExecutor:
             speed=retract_props.speed,
         )
         retract_delay = retract_props.delay
-        if retract_delay.enabled:
-            assert retract_delay.duration is not None
+        if retract_delay.enabled and retract_delay.duration:
             self._instrument.delay(retract_delay.duration)
 
         blowout_props = retract_props.blowout
@@ -542,6 +654,10 @@ class TransferComponentsExecutor:
                 well_core=None,
                 in_place=True,
             )
+            # A blowout will remove all air gap and liquid (disposal volume) from the tip
+            # so delete them from tip state (although practically, there will not be
+            # any air gaps in the tip before blowing out in the destination well)
+            self._tip_state.delete_last_air_gap_and_liquid()
             self._tip_state.ready_to_aspirate = False
 
         # A retract will perform total of two air gaps if we need to blow out in source or trash:
@@ -629,8 +745,9 @@ class TransferComponentsExecutor:
                     if isinstance(trash_location, Location)
                     else None
                 )
-            last_air_gap = self._tip_state.last_liquid_and_air_gap_in_tip.air_gap
-            self._tip_state.delete_air_gap(last_air_gap)
+            # A blowout will remove all air gap and liquid (disposal volume) from the tip
+            # so delete them from tip state
+            self._tip_state.delete_last_air_gap_and_liquid()
             self._tip_state.ready_to_aspirate = False
 
             # Do touch tip and air gap again after blowing out into source well or trash
@@ -658,7 +775,7 @@ class TransferComponentsExecutor:
             assert (
                 touch_tip_properties.speed is not None
                 and touch_tip_properties.z_offset is not None
-                and touch_tip_properties.mm_to_edge is not None
+                and touch_tip_properties.mm_from_edge is not None
             )
             # TODO:, check that when blow out is a non-dest-well,
             #  whether the touch tip params from transfer props should be used for
@@ -671,7 +788,7 @@ class TransferComponentsExecutor:
                         radius=1,
                         z_offset=touch_tip_properties.z_offset,
                         speed=touch_tip_properties.speed,
-                        mm_from_edge=touch_tip_properties.mm_to_edge,
+                        mm_from_edge=touch_tip_properties.mm_from_edge,
                     )
                 except TouchTipDisabledError:
                     # TODO: log a warning
@@ -706,8 +823,8 @@ class TransferComponentsExecutor:
         correction_volume = aspirate_props.correction_by_volume.get_for_volume(
             air_gap_volume
         )
-        # The maximum flow rate should be air_gap_volume per second
-        flow_rate = min(
+        # The minimum flow rate should be air_gap_volume per second
+        flow_rate = max(
             aspirate_props.flow_rate_by_volume.get_for_volume(air_gap_volume),
             air_gap_volume,
         )
@@ -717,51 +834,37 @@ class TransferComponentsExecutor:
             correction_volume=correction_volume,
         )
         delay_props = aspirate_props.delay
-        if delay_props.enabled:
-            # Assertion only for mypy purposes
-            assert delay_props.duration is not None
+        if delay_props.enabled and delay_props.duration:
             self._instrument.delay(delay_props.duration)
         self._tip_state.append_air_gap(air_gap_volume)
 
-    def _remove_air_gap(self, location: Location) -> None:
+    def _remove_air_gap(self, location: Union[Location, TrashBin, WasteChute]) -> None:
         """Remove a previously added air gap."""
         last_air_gap = self._tip_state.last_liquid_and_air_gap_in_tip.air_gap
-        if last_air_gap == 0:
-            return
-
         dispense_props = self._transfer_properties.dispense
-        correction_volume = dispense_props.correction_by_volume.get_for_volume(
-            last_air_gap
-        )
-        # The maximum flow rate should be air_gap_volume per second
-        flow_rate = min(
-            dispense_props.flow_rate_by_volume.get_for_volume(last_air_gap),
-            last_air_gap,
-        )
-        self._instrument.dispense(
+        self._instrument.remove_air_gap_during_transfer_with_liquid_class(
+            last_air_gap=last_air_gap,
+            dispense_props=dispense_props,
             location=location,
-            well_core=None,
-            volume=last_air_gap,
-            rate=1,
-            flow_rate=flow_rate,
-            in_place=True,
-            is_meniscus=False,
-            push_out=0,
-            correction_volume=correction_volume,
         )
         self._tip_state.delete_air_gap(last_air_gap)
-        dispense_delay = dispense_props.delay
-        if dispense_delay.enabled:
-            assert dispense_delay.duration is not None
-            self._instrument.delay(dispense_delay.duration)
 
 
 def absolute_point_from_position_reference_and_offset(
     well: WellCore,
+    well_volume_difference: float,
     position_reference: PositionReference,
     offset: Coordinate,
+    mount: Mount,
 ) -> Point:
-    """Return the absolute point, given the well, the position reference and offset."""
+    """Return the absolute point, given the well, the position reference and offset.
+
+    If using meniscus as the position reference, well_volume_difference should be specified.
+    `well_volume_difference` is the expected *difference* in well volume we want to consider
+    when estimating the height of the liquid meniscus after an aspirate/ dispense.
+    So, for liquid height estimation after an aspirate, well_volume_difference is
+    expected to be a -ve value while for a dispense, it will be a +ve value.
+    """
     match position_reference:
         case PositionReference.WELL_TOP:
             reference_point = well.get_top(0)
@@ -770,7 +873,17 @@ def absolute_point_from_position_reference_and_offset(
         case PositionReference.WELL_CENTER:
             reference_point = well.get_center()
         case PositionReference.LIQUID_MENISCUS:
-            reference_point = well.get_meniscus()
+            estimated_liquid_height = well.estimate_liquid_height_after_pipetting(
+                mount=mount,
+                operation_volume=well_volume_difference,
+            )
+            if isinstance(estimated_liquid_height, (float, int)):
+                reference_point = well.get_bottom(z_offset=estimated_liquid_height)
+            else:
+                # If estimated liquid height gives a SimulatedProbeResult then
+                # assume meniscus is at well center.
+                # Will this cause more harm than good? Is there a better alternative to this?
+                reference_point = well.get_center()
         case _:
             raise ValueError(f"Unknown position reference {position_reference}")
     return reference_point + Point(offset.x, offset.y, offset.z)

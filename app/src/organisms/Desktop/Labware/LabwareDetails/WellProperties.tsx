@@ -1,23 +1,23 @@
 import { useTranslation } from 'react-i18next'
+
 import {
+  BORDERS,
   Box,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   Icon,
-  BORDERS,
-  SPACING,
-  DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 import { getDisplayVolume } from '@opentrons/shared-data'
 
-import type { LabwareWellGroupProperties } from '/app/local-resources/labware'
-
 import type {
-  LabwareDefinition2 as LabwareDefinition,
+  LabwareDefinition,
   LabwareVolumeUnits,
 } from '@opentrons/shared-data'
+import type { LabwareWellGroupProperties } from '/app/local-resources/labware'
 
 export interface AllWellPropertiesProps {
   definition: LabwareDefinition

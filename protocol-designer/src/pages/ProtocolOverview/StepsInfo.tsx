@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
+  COLORS,
   DIRECTION_COLUMN,
-  SPACING,
-  StyledText,
+  Flex,
   InfoScreen,
   ListItem,
   ListItemDescriptor,
-  COLORS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import type { SavedStepFormState } from '../../step-forms'
@@ -31,7 +31,7 @@ export function StepsInfo({ savedStepForms }: StepsInfoProps): JSX.Element {
         {Object.keys(savedStepForms).length <= 1 ? (
           <InfoScreen content={t('no_steps')} />
         ) : (
-          <ListItem type="noActive" key="ProtocolOverview_Step">
+          <ListItem type="default" key="ProtocolOverview_Step">
             <ListItemDescriptor
               type="large"
               description={

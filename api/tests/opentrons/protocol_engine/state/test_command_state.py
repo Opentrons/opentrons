@@ -389,6 +389,112 @@ def test_nonfatal_command_failure() -> None:
     assert subject_view.get_running_command_id() is None
 
 
+def test_fixit_command_failure_handling_by_recovery_type() -> None:
+    """Test that fixit command failures are handled differently based on error recovery type.
+
+    When a fixit command fails with permissible error recovery types, other queued fixit
+    commands should remain in the queue as is.
+
+    When a fixit command fails with other error recovery types, all queued fixit commands
+    should be marked as failed.
+    """
+
+    def test_with_recovery_type(
+        recovery_type: ErrorRecoveryType, should_fail_queued_cmds: bool
+    ) -> None:
+        subject = CommandStore(
+            is_door_open=False,
+            config=_make_config(),
+            error_recovery_policy=_placeholder_error_recovery_policy,
+        )
+        subject_view = CommandView(subject.state)
+
+        protocol_cmd = actions.QueueCommandAction(
+            request=commands.CommentCreate(
+                params=commands.CommentParams(message=""),
+                key="protocol-cmd",
+            ),
+            request_hash=None,
+            created_at=datetime(year=2021, month=1, day=1),
+            command_id="protocol-cmd-id",
+        )
+        subject.handle_action(protocol_cmd)
+        subject.handle_action(
+            actions.RunCommandAction(
+                command_id="protocol-cmd-id",
+                started_at=datetime(year=2021, month=1, day=2),
+            )
+        )
+        subject.handle_action(
+            actions.FailCommandAction(
+                command_id="protocol-cmd-id",
+                running_command=subject_view.get("protocol-cmd-id"),
+                error_id="error-1",
+                failed_at=datetime(year=2021, month=1, day=3),
+                error=errors.ProtocolEngineError(message="recovery needed"),
+                notes=[],
+                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            )
+        )
+
+        for i in range(1, 4):
+            subject.handle_action(
+                actions.QueueCommandAction(
+                    request=commands.CommentCreate(
+                        params=commands.CommentParams(message=f"fixit {i}"),
+                        key=f"fixit-{i}",
+                        intent=commands.CommandIntent.FIXIT,
+                    ),
+                    request_hash=None,
+                    created_at=datetime(year=2021, month=2, day=i),
+                    command_id=f"fixit-id-{i}",
+                )
+            )
+
+        subject.handle_action(
+            actions.RunCommandAction(
+                command_id="fixit-id-1",
+                started_at=datetime(year=2021, month=2, day=10),
+            )
+        )
+        subject.handle_action(
+            actions.FailCommandAction(
+                command_id="fixit-id-1",
+                running_command=subject_view.get("fixit-id-1"),
+                error_id="error-2",
+                failed_at=datetime(year=2021, month=2, day=11),
+                error=errors.ProtocolEngineError(
+                    message=f"fixit failed with {recovery_type}"
+                ),
+                notes=[],
+                type=recovery_type,
+            )
+        )
+
+        if should_fail_queued_cmds:
+            assert all(
+                c.status == commands.CommandStatus.FAILED
+                for c in subject_view.get_all()
+            )
+        else:
+            assert [(c.id, c.status) for c in subject_view.get_all()] == [
+                ("protocol-cmd-id", commands.CommandStatus.FAILED),
+                ("fixit-id-1", commands.CommandStatus.FAILED),
+                ("fixit-id-2", commands.CommandStatus.QUEUED),
+                ("fixit-id-3", commands.CommandStatus.QUEUED),
+            ]
+            assert subject_view.get_next_to_execute() == "fixit-id-2"
+
+    test_with_recovery_type(
+        ErrorRecoveryType.CONTINUE_WITH_ERROR, should_fail_queued_cmds=False
+    )
+    test_with_recovery_type(
+        ErrorRecoveryType.ASSUME_FALSE_POSITIVE_AND_CONTINUE,
+        should_fail_queued_cmds=False,
+    )
+    test_with_recovery_type(ErrorRecoveryType.FAIL_RUN, should_fail_queued_cmds=True)
+
+
 def test_door_during_setup_phase() -> None:
     """Test behavior when the door is opened during the setup phase."""
     subject = CommandStore(

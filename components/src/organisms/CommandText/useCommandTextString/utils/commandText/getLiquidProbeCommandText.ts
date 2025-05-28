@@ -1,6 +1,7 @@
 import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
 import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
 import { getLabwareName } from '../getLabwareName'
+
 import type {
   LiquidProbeRunTimeCommand,
   RunTimeCommand,
@@ -36,7 +37,7 @@ export function getLiquidProbeCommandText({
 
   const displayLocation = getLabwareDisplayLocation({
     loadedLabwares: commandTextData?.labware ?? [],
-    location: labwareLocation,
+    location: labwareLocation?.locationSequence ?? labwareLocation?.location,
     robotType,
     allRunDefs,
     loadedModules: commandTextData?.modules ?? [],

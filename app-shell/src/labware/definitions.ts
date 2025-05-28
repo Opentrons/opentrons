@@ -1,7 +1,6 @@
 import path from 'path'
-import fs from 'fs-extra'
-
 import { shell } from 'electron'
+import fs from 'fs-extra'
 
 import type { Dirent } from 'fs'
 import type { UncheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
@@ -38,7 +37,7 @@ export function parseLabwareFiles(
       try {
         const data = JSON.parse(filesOrContent)
         const modified = Date.now()
-        const filename = `${data.parameters?.loadName}.json` ?? 'unknown_file'
+        const filename = `${data?.parameters?.loadName}.json` ?? 'unknown_file'
 
         resolve([{ filename, modified, data }])
       } catch (error) {
@@ -61,7 +60,7 @@ export function parseLabwareFiles(
   } else {
     return Promise.reject(
       new Error(
-        'Invalid input: expected an inported file or data from App Labware Creator'
+        'Invalid input: expected an imported file or data from App Labware Creator'
       )
     )
   }

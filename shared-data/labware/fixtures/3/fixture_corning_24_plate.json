@@ -16,17 +16,36 @@
   },
   "schemaVersion": 3,
   "version": 3,
-  "namespace": "opentrons",
+  "namespace": "fixture",
   "metadata": {
     "displayName": "Corning 24 Well Plate 3.4 mL Flat",
     "displayVolumeUnits": "mL",
     "displayCategory": "wellPlate",
     "tags": []
   },
-  "dimensions": {
-    "xDimension": 127.76,
-    "yDimension": 85.47,
-    "zDimension": 20.27
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.76,
+        "y": -85.47,
+        "z": 20.27
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": 0,
+        "y": 0
+      },
+      "frontRight": {
+        "x": 127.76,
+        "y": -85.47
+      }
+    }
   },
   "wells": {
     "D1": {
@@ -35,7 +54,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 17.48,
-      "y": 13.77,
+      "y": -71.7,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -45,7 +64,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 17.48,
-      "y": 33.07,
+      "y": -52.4,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -55,7 +74,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 17.48,
-      "y": 52.37,
+      "y": -33.1,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -65,7 +84,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 17.48,
-      "y": 71.67,
+      "y": -13.8,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -75,7 +94,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 36.78,
-      "y": 13.77,
+      "y": -71.7,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -85,7 +104,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 36.78,
-      "y": 33.07,
+      "y": -52.4,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -95,7 +114,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 36.78,
-      "y": 52.37,
+      "y": -33.1,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -105,7 +124,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 36.78,
-      "y": 71.67,
+      "y": -13.8,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -115,7 +134,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 56.08,
-      "y": 13.77,
+      "y": -71.7,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -125,7 +144,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 56.08,
-      "y": 33.07,
+      "y": -52.4,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -135,7 +154,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 56.08,
-      "y": 52.37,
+      "y": -33.1,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -145,7 +164,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 56.08,
-      "y": 71.67,
+      "y": -13.8,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -155,7 +174,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 75.38,
-      "y": 13.77,
+      "y": -71.7,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -165,7 +184,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 75.38,
-      "y": 33.07,
+      "y": -52.4,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -175,7 +194,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 75.38,
-      "y": 52.37,
+      "y": -33.1,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -185,7 +204,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 75.38,
-      "y": 71.67,
+      "y": -13.8,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -195,7 +214,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 94.68,
-      "y": 13.77,
+      "y": -71.7,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -205,7 +224,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 94.68,
-      "y": 33.07,
+      "y": -52.4,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -215,7 +234,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 94.68,
-      "y": 52.37,
+      "y": -33.1,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -225,7 +244,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 94.68,
-      "y": 71.67,
+      "y": -13.8,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -235,7 +254,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 113.98,
-      "y": 13.77,
+      "y": -71.7,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -245,7 +264,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 113.98,
-      "y": 33.07,
+      "y": -52.4,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -255,7 +274,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 113.98,
-      "y": 52.37,
+      "y": -33.1,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     },
@@ -265,7 +284,7 @@
       "diameter": 16.26,
       "totalLiquidVolume": 3400,
       "x": 113.98,
-      "y": 71.67,
+      "y": -13.8,
       "z": 2.87,
       "geometryDefinitionId": "venirhgerug"
     }
@@ -309,11 +328,6 @@
       }
     }
   ],
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "stackingOffsetWithLabware": {
     "opentrons_aluminum_flat_bottom_plate": {
       "x": 0,

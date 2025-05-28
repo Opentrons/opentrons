@@ -1,12 +1,13 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getRobotSettings } from '@opentrons/api-client'
-import { useHost } from '../../api'
-import { useRobotSettingsQuery } from '..'
 
+import { useRobotSettingsQuery } from '..'
+import { useHost } from '../../api'
+
+import type * as React from 'react'
 import type {
   HostConfig,
   Response,

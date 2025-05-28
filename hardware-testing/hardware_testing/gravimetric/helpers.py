@@ -1,4 +1,5 @@
 """Opentrons helper methods."""
+
 import asyncio
 from types import MethodType
 from typing import Any, List, Dict, Optional, Tuple, Union
@@ -20,6 +21,7 @@ from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocol_api._types import OffDeckType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.hardware_control.thread_manager import ThreadManager
 from opentrons.hardware_control.types import OT3Mount, Axis, HardwareFeatureFlags
 from opentrons.hardware_control.ot3api import OT3API
@@ -409,7 +411,7 @@ def _drop_tip(
         pipette.drop_tip(home_after=False)
     if minimum_z_height > 0:
         cur_location = pipette._get_last_location_by_api_version()
-        if cur_location is not None:
+        if isinstance(cur_location, Location):
             pipette.move_to(cur_location.move(Point(0, 0, minimum_z_height)))
 
 
@@ -479,7 +481,12 @@ def _load_pipette(
         pipette_movement_conflict.check_safe_for_pipette_movement = (
             _override_check_safe_for_pipette_movement
         )
-    pipette.trash_container = trash
+    try:
+        trash = pipette.trash_container
+    except NoTrashDefinedError:
+        trash = ctx.load_trash_bin("A3")
+        pipette.trash_container = trash
+        pass
     return pipette
 
 

@@ -2,16 +2,17 @@ import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { SelectField } from '@opentrons/components'
+
+import { useConnectFormField } from './form-state'
 import { FormRow } from './FormRow'
 import { UploadKeyInput } from './UploadKeyInput'
-import { useConnectFormField } from './form-state'
 
-import type { WifiKey } from '../types'
 import type {
   ControllerFieldState,
   ControllerRenderProps,
   FieldValues,
 } from 'react-hook-form'
+import type { WifiKey } from '../types'
 
 export interface KeyFileFieldProps {
   id: string

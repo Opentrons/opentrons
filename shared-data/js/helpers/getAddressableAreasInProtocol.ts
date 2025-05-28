@@ -1,8 +1,9 @@
 import { MOVABLE_TRASH_A3_ADDRESSABLE_AREA } from '../constants'
 import {
-  getAddressableAreaNamesFromLoadedModule,
   getAddressableAreaFromSlotId,
+  getAddressableAreaNamesFromLoadedModule,
 } from '../fixtures'
+
 import type { AddressableAreaName } from '../../deck'
 import type { ProtocolAnalysisOutput } from '../../protocol'
 import type { CompletedProtocolAnalysis, DeckDefinition } from '../types'
@@ -74,8 +75,7 @@ export function getAddressableAreasInProtocol(
           params.location.slotName,
           deckDef
         )
-
-        return [...acc, ...addressableAreaNames]
+        return [...acc, addressableAreaNames[0]]
       } else if (
         (commandType === 'loadLabware' ||
           commandType === 'loadLid' ||

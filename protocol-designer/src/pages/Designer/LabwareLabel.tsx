@@ -1,7 +1,12 @@
-import { useRef, useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
+
 import { DeckLabelSet } from '@opentrons/components'
-import { getDesignerTab } from '../../file-data/selectors'
+
+import { selectors } from '../../labware-ingred/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../steplist'
+import { getSelectedTerminalItemId } from '../../ui/steps'
+
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
@@ -13,6 +18,7 @@ interface LabwareLabelProps {
   labwareDef: LabwareDefinition2
   isSelected: boolean
   isLast: boolean
+  showModuleIcon: boolean
   nestedLabwareInfo?: DeckLabelProps[]
   labelText?: string
 }
@@ -22,19 +28,24 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
     position,
     isSelected,
     isLast,
+    showModuleIcon,
     nestedLabwareInfo = [],
     labelText = labwareDef.metadata.displayName,
   } = props
   const labelContainerRef = useRef<HTMLDivElement>(null)
-  const designerTab = useSelector(getDesignerTab)
+  const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
+  const { selectedTopLabware } = selectedSlotInfo
+  const terminalItemId = useSelector(getSelectedTerminalItemId)
   const [labelContainerHeight, setLabelContainerHeight] = useState(0)
-
+  const greaterThan1 = selectedTopLabware.amount > 1
   const deckLabels = [
     {
-      text: labelText,
+      text: greaterThan1
+        ? `${labelText} (${selectedTopLabware.amount})`
+        : labelText,
       isSelected: isSelected,
       isLast: isLast,
-      isZoomed: designerTab === 'startingDeck',
+      isZoomed: terminalItemId === START_TERMINAL_ITEM_ID,
     },
     ...nestedLabwareInfo,
   ]
@@ -53,6 +64,7 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
       y={position[1] + labwareDef.cornerOffsetFromSlot.y - labelContainerHeight}
       width={labwareDef.dimensions.xDimension}
       height={labwareDef.dimensions.yDimension}
+      showModuleIcon={showModuleIcon}
     />
   )
 }

@@ -1,8 +1,10 @@
-import { getCurrentMaintenanceRun } from '@opentrons/api-client'
 import { useQuery, useQueryClient } from 'react-query'
+
+import { getCurrentMaintenanceRun } from '@opentrons/api-client'
+
 import { useHost } from '../api'
 
-import type { UseQueryResult, UseQueryOptions } from 'react-query'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { HostConfig, MaintenanceRun } from '@opentrons/api-client'
 
 export function useCurrentMaintenanceRun<TError = Error>(

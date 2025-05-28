@@ -2,8 +2,8 @@ import { useSelector } from 'react-redux'
 
 import { LPC_STEP, selectActivePipette } from '/app/redux/protocol-runs'
 
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { UseLPCCommandsResult } from '/app/organisms/LabwarePositionCheck/hooks'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 export type UseLPCHeaderCommandsProps = Omit<
   LPCWizardContentProps,
@@ -16,7 +16,9 @@ export interface UseLPCHeaderCommandsResult {
   handleProceed: () => void
   handleAttachProbeCheck: () => void
   handleNavToDetachProbe: () => void
-  handleClose: () => void
+  handleCloseAndHome: () => void
+  handleCloseWithoutHome: () => void
+  handleUnableToDetectProbe: () => void
 }
 
 // Wraps core LPC command functionality, since the header component reuses many of the same commands.
@@ -32,8 +34,10 @@ export function useLPCHeaderCommands({
     handleStartLPC,
     toggleRobotMoving,
     handleValidMoveToMaintenancePosition,
-    handleCleanUpAndClose,
+    handleCloseNoHome,
+    handleHomeAndClose,
     handleProbeAttachment,
+    toggleUnableToDetectProbe,
   } = LPCHandlerUtils
 
   const handleProceed = (): void => {
@@ -43,15 +47,19 @@ export function useLPCHeaderCommands({
   }
 
   // If the maintenance run fails, we cannot move the gantry, so just clean up LPC.
-  const handleClose = (): void => {
+  const handleCloseWithoutHome = (): void => {
+    void handleCloseNoHome()
+  }
+
+  const handleCloseAndHome = (): void => {
     void toggleRobotMoving(true).then(() => {
-      void handleCleanUpAndClose()
+      void handleHomeAndClose()
     })
   }
 
   const handleAttachProbeCheck = (): void => {
     void toggleRobotMoving(true)
-      .then(() => handleProbeAttachment(pipette, proceedStep))
+      .then(() => handleProbeAttachment(pipette))
       .then(() => {
         proceedStep()
       })
@@ -71,6 +79,8 @@ export function useLPCHeaderCommands({
     handleProceed,
     handleAttachProbeCheck,
     handleNavToDetachProbe,
-    handleClose,
+    handleCloseAndHome,
+    handleCloseWithoutHome,
+    handleUnableToDetectProbe: toggleUnableToDetectProbe,
   }
 }

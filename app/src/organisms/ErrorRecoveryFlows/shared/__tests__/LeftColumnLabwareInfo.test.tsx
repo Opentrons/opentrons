@@ -1,11 +1,13 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { i18n } from '/app/i18n'
-import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
 import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
+
+import { mockRecoveryContentProps } from '../../__fixtures__'
+import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
 
 import type { ComponentProps } from 'react'
 
@@ -25,15 +27,29 @@ describe('LeftColumnLabwareInfo', () => {
       ...mockRecoveryContentProps,
       title: 'MOCK_TITLE',
       failedLabwareUtils: {
-        failedLabwareName: 'MOCK_LW_NAME',
-        failedLabwareNickname: 'MOCK_LW_NICKNAME',
+        failedLabwareNames: {
+          name: 'MOCK_LW_NAME',
+          nickName: 'MOCK_LW_NICKNAME',
+        },
+        relevantPickUpTipLwNames: {
+          name: 'MOCK_PICKUP_LW_NAME',
+          nickName: 'MOCK_PICKUP_LW_NICKNAME',
+        },
         failedLabwareLocations: {
           displayNameCurrentLoc: 'slot A1',
           displayNameNewLoc: 'slot B2',
         },
+        relevantPickUpTipLwLocs: {
+          displayNameCurrentLoc: 'slot C3',
+        },
       } as any,
       type: 'location',
+      layout: 'default',
       bannerText: 'MOCK_BANNER_TEXT',
+      recoveryMap: {
+        step: '',
+        route: '',
+      } as any,
     }
 
     vi.mocked(InterventionContent).mockReturnValue(
@@ -41,7 +57,7 @@ describe('LeftColumnLabwareInfo', () => {
     )
   })
 
-  it('renders the InterventionContent component with correct props', () => {
+  it('renders the InterventionContent component with correct props for default case', () => {
     render(props)
 
     screen.getByText('MOCK_INTERVENTION_CONTENT')
@@ -55,11 +71,51 @@ describe('LeftColumnLabwareInfo', () => {
           labwareNickname: 'MOCK_LW_NICKNAME',
           currentLocationProps: { deckLabel: 'SLOT A1' },
           newLocationProps: { deckLabel: 'SLOT B2' },
+          subText: undefined,
+          tagText: null,
         },
         notificationProps: {
           type: 'alert',
           heading: 'MOCK_BANNER_TEXT',
         },
+      }),
+      {}
+    )
+  })
+
+  it(`renders with correct props for ${RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS} step`, () => {
+    props.recoveryMap = {
+      route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+      step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS,
+    }
+    render(props)
+
+    expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        infoProps: expect.objectContaining({
+          labwareName: 'MOCK_PICKUP_LW_NAME',
+          labwareNickname: 'MOCK_PICKUP_LW_NICKNAME',
+          currentLocationProps: { deckLabel: 'SLOT C3' },
+        }),
+      }),
+      {}
+    )
+  })
+
+  it(`renders with correct props for ${RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.SELECT_TIPS} step`, () => {
+    props.recoveryMap = {
+      route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+      step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.SELECT_TIPS,
+    }
+    render(props)
+
+    expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        infoProps: expect.objectContaining({
+          labwareName: 'MOCK_PICKUP_LW_NAME',
+          labwareNickname: 'MOCK_PICKUP_LW_NICKNAME',
+          currentLocationProps: { deckLabel: 'SLOT C3' },
+        }),
       }),
       {}
     )

@@ -91,6 +91,8 @@ from .types import (
     GripperProbe,
     UpdateStatus,
     StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
     SubSystemState,
     TipStateType,
     EstopOverallStatus,
@@ -127,6 +129,7 @@ from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
     target_position_from_plunger,
+    target_positions_from_plunger_tracking,
     offset_for_mount,
     deck_from_machine,
     machine_from_deck,
@@ -243,6 +246,7 @@ class OT3API(
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
+        self._module_door_serial: str | None = None
         self._pause_manager = PauseManager()
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
@@ -277,6 +281,14 @@ class OT3API(
     @door_state.setter
     def door_state(self, door_state: DoorState) -> None:
         self._door_state = door_state
+
+    @property
+    def module_door_serial(self) -> str | None:
+        return self._module_door_serial
+
+    @module_door_serial.setter
+    def module_door_serial(self, module_serial: str | None = None) -> None:
+        self._module_door_serial = module_serial
 
     @property
     def gantry_load(self) -> GantryLoad:
@@ -317,11 +329,16 @@ class OT3API(
         async with self._backend.grab_pressure(instrument.channels, mount):
             yield
 
-    def _update_door_state(self, door_state: DoorState) -> None:
-        mod_log.info(f"Updating the window switch status: {door_state}")
+    def _update_door_state(
+        self, door_state: DoorState, module_serial: str | None = None
+    ) -> None:
+        mod_log.info(f"Updating the window or module switch status: {door_state}")
         self.door_state = door_state
+        self.module_door_serial = module_serial
         for cb in self._callbacks:
-            hw_event = DoorStateNotification(new_state=door_state)
+            hw_event = DoorStateNotification(
+                new_state=door_state, module_serial=module_serial
+            )
             try:
                 cb(hw_event)
             except Exception:
@@ -451,9 +468,11 @@ class OT3API(
             checked_config = config
 
         backend = await OT3Simulator.build(
-            {OT3Mount.from_mount(k): v for k, v in attached_instruments.items()}
-            if attached_instruments
-            else {},
+            (
+                {OT3Mount.from_mount(k): v for k, v in attached_instruments.items()}
+                if attached_instruments
+                else {}
+            ),
             checked_modules,
             checked_config,
             checked_loop,
@@ -572,13 +591,22 @@ class OT3API(
         await self.set_lights(button=True)
 
     async def set_status_bar_state(self, state: StatusBarState) -> None:
+        self._log.info(f"Setting status bar state to {state}")
         await self._backend.set_status_bar_state(state)
 
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await self._backend.set_status_bar_enabled(enabled)
 
+    def get_status_bar_enabled(self) -> bool:
+        return self._backend.get_status_bar_enabled()
+
     def get_status_bar_state(self) -> StatusBarState:
         return self._backend.get_status_bar_state()
+
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        return self._backend.add_status_bar_listener(listener)
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -2099,6 +2127,7 @@ class OT3API(
         rate: float = 1.0,
         push_out: Optional[float] = None,
         correction_volume: float = 0.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette."""
@@ -2108,6 +2137,7 @@ class OT3API(
             volume=volume,
             rate=rate,
             push_out=push_out,
+            is_full_dispense=is_full_dispense,
             correction_volume=correction_volume,
         )
         if not dispense_spec:
@@ -2994,6 +3024,103 @@ class OT3API(
 
     AMKey = TypeVar("AMKey")
 
+    async def aspirate_while_tracking(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        z_distance: float,
+        volume: float,
+        flow_rate: float = 1.0,
+    ) -> None:
+        """
+        Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during apsiration.
+        :param volume: The volume of liquid to be aspirated.
+        :param flow_rate: The flow rate to aspirate with.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        aspirate_spec = self._pipette_handler.plan_check_aspirate(
+            realmount, volume, flow_rate
+        )
+        if not aspirate_spec:
+            return
+        target_pos = target_positions_from_plunger_tracking(
+            realmount,
+            aspirate_spec.plunger_distance,
+            z_distance,
+            self._current_position,
+        )
+        try:
+            await self._backend.set_active_current(
+                {aspirate_spec.axis: aspirate_spec.current}
+            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, aspirate_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
+        except Exception:
+            self._log.exception("Aspirate failed")
+            aspirate_spec.instr.set_current_volume(0)
+            raise
+        else:
+            aspirate_spec.instr.add_current_volume(aspirate_spec.volume)
+
+    async def dispense_while_tracking(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        z_distance: float,
+        volume: float,
+        push_out: Optional[float],
+        flow_rate: float = 1.0,
+        is_full_dispense: bool = False,
+    ) -> None:
+        """
+        Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during dispensing.
+        :param volume: The volume of liquid to be dispensed.
+        :param flow_rate: The flow rate to dispense with.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        dispense_spec = self._pipette_handler.plan_check_dispense(
+            realmount, volume, flow_rate, push_out, is_full_dispense
+        )
+        if not dispense_spec:
+            return
+        target_pos = target_positions_from_plunger_tracking(
+            realmount,
+            dispense_spec.plunger_distance,
+            z_distance,
+            self._current_position,
+        )
+
+        try:
+            await self._backend.set_active_current(
+                {dispense_spec.axis: dispense_spec.current}
+            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, dispense_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=dispense_spec.speed,
+                    home_flagged_axes=False,
+                )
+        except Exception:
+            self._log.exception("dispense failed")
+            dispense_spec.instr.set_current_volume(0)
+            raise
+        else:
+            dispense_spec.instr.remove_current_volume(dispense_spec.volume)
+
     @property
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
         """Get a view of the state of the currently-attached subsystems."""
@@ -3030,3 +3157,11 @@ class OT3API(
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         return await self._backend.get_hepa_uv_state()
+
+    async def increase_evo_disp_count(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+    ) -> None:
+        """Tell a pipette to increase its evo-tip-dispense-count in eeprom."""
+        realmount = OT3Mount.from_mount(mount)
+        await self._backend.increase_evo_disp_count(realmount)

@@ -1,6 +1,7 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -18,8 +19,9 @@ import {
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
 import { getNetworkInterfaces } from '/app/redux/networking'
-import { ChooseRobotSlideout } from '..'
 import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
+
+import { ChooseRobotSlideout } from '..'
 
 import type { ComponentProps } from 'react'
 import type { RunTimeParameter } from '@opentrons/shared-data'
@@ -28,6 +30,10 @@ vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/networking')
 vi.mock('/app/resources/useNotifyDataReady')
+
+// note for auto scroll to top
+window.HTMLElement.prototype.scrollIntoView = vi.fn()
+
 const render = (props: ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
     <MemoryRouter>

@@ -1,12 +1,14 @@
 import { Fragment } from 'react'
 import { action } from '@storybook/addon-actions'
+
 import {
   COLORS,
-  PrimaryBtn,
+  PrimaryButton,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { Slideout as SlideoutComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -25,26 +27,20 @@ type Story = StoryObj<typeof SlideoutComponent>
 
 const Children = (
   <Fragment>
-    <LegacyStyledText
-      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      fontSize={TYPOGRAPHY.fontSizeP}
+    <StyledText
+      desktopStyle="bodyDefaultSemiBold"
       paddingTop={SPACING.spacing4}
     >
       {'this is where the slideout body goes'}
-    </LegacyStyledText>
+    </StyledText>
 
-    <PrimaryBtn
+    <PrimaryButton
       backgroundColor={COLORS.blue50}
       marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >
-      <LegacyStyledText
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        fontSize={TYPOGRAPHY.fontSizeP}
-      >
-        {'btn text'}
-      </LegacyStyledText>
-    </PrimaryBtn>
+      <StyledText desktopStyle="bodyDefaultRegular">{'btn text'}</StyledText>
+    </PrimaryButton>
   </Fragment>
 )
 

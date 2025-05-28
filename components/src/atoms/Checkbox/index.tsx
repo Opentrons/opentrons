@@ -1,7 +1,8 @@
 import { css } from 'styled-components'
-import { COLORS, BORDERS } from '../../helix-design-system'
-import { Flex } from '../../primitives'
+
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
+import { Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
   CURSOR_AUTO,

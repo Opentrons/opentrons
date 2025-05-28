@@ -1,51 +1,54 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import {
-  useConditionalConfirm,
-  Flex,
-  DIRECTION_COLUMN,
-  POSITION_ABSOLUTE,
-  COLORS,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   ModalShell,
+  POSITION_ABSOLUTE,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
+
+import { getTopPortalEl } from '/app/App/portal'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
-import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { getIsOnDevice } from '/app/redux/config'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
-import { getGripperWizardSteps } from './getGripperWizardSteps'
-import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
-import { BeforeBeginning } from './BeforeBeginning'
-import { MovePin } from './MovePin'
-import { MountGripper } from './MountGripper'
-import { UnmountGripper } from './UnmountGripper'
-import { Success } from './Success'
-import { ExitConfirmation } from './ExitConfirmation'
 
-import type { UseMutateFunction } from 'react-query'
-import type { GripperWizardFlowType } from './types'
+import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+import { BeforeBeginning } from './BeforeBeginning'
+import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
+import { ExitConfirmation } from './ExitConfirmation'
+import { getGripperWizardSteps } from './getGripperWizardSteps'
+import { MountGripper } from './MountGripper'
+import { MovePin } from './MovePin'
+import { Success } from './Success'
+import { UnmountGripper } from './UnmountGripper'
+
 import type { AxiosError } from 'axios'
+import type { UseMutateFunction } from 'react-query'
 import type {
+  CommandData,
   CreateMaintenanceRunData,
   InstrumentData,
   MaintenanceRun,
-  CommandData,
   RunStatus,
 } from '@opentrons/api-client'
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
-import type { Coordinates, CreateCommand } from '@opentrons/shared-data'
+import type { CreateCommand, Vector3D } from '@opentrons/shared-data'
+import type { GripperWizardFlowType } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -242,7 +245,7 @@ export const GripperWizard = (
   const { t } = useTranslation('gripper_wizard_flows')
   const gripperWizardSteps = getGripperWizardSteps(flowType)
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
-  const [frontJawOffset, setFrontJawOffset] = useState<Coordinates | null>(null)
+  const [frontJawOffset, setFrontJawOffset] = useState<Vector3D | null>(null)
 
   const totalStepCount = gripperWizardSteps.length - 1
   const currentStep = gripperWizardSteps?.[currentStepIndex]

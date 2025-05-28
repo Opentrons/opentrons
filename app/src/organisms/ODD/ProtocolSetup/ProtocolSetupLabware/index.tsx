@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -14,57 +14,59 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_SPACE_EVENLY,
-  LegacyStyledText,
+  ListButton,
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
+  StyledText,
+  Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  FLEX_ROBOT_TYPE,
-  getDeckDefFromRobotType,
-  getModuleDisplayName,
-  getTopLabwareInfo,
-  HEATERSHAKER_MODULE_TYPE,
-  TC_MODULE_LOCATION_OT3,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
 import {
   useCreateLiveCommandMutation,
   useModulesQuery,
 } from '@opentrons/react-api-client'
+import {
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
+  HEATERSHAKER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
-import {
-  getLocationInfoNames,
-  getLabwareSetupItemGroups,
-} from '/app/transformations/commands'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { LabwareStackModal } from '/app/molecules/LabwareStackModal'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import {
+  getLabwareInfoByLiquidId,
+  getLabwareLiquidRenderInfoFromStack,
+  getModuleFromStack,
+  getStackedItemsOnStartingDeck,
+  getStacksWithLabware,
+} from '/app/transformations/commands'
+
 import { LabwareMapView } from './LabwareMapView'
-import { SingleLabwareModal } from './SingleLabwareModal'
+import { SetupLabwareStackView } from './SetupLabwareStackView'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-  LabwareDefinition2,
-  LoadLabwareRunTimeCommand,
-  LabwareLocation,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
-import type { LabwareSetupItem } from '/app/transformations/commands'
-import type { SetupScreens } from '../types'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
+import type {
+  LabwareByLiquidId,
+  LabwareInStack,
+  StackItem,
+} from '/app/transformations/commands'
+import type { SetupScreens } from '../types'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
@@ -84,17 +86,8 @@ export function ProtocolSetupLabware({
 }: ProtocolSetupLabwareProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const [showMapView, setShowMapView] = useState<boolean>(true)
-  const [
-    showLabwareDetailsModal,
-    setShowLabwareDetailsModal,
-  ] = useState<boolean>(false)
-  const [selectedLabware, setSelectedLabware] = useState<
-    | (LabwareDefinition2 & {
-        location: LabwareLocation
-        nickName: string | null
-        id: string
-      })
-    | null
+  const [selectedLabwareStack, setSelectedLabwareStack] = useState<
+    [string, StackItem[]] | null
   >(null)
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -102,9 +95,26 @@ export function ProtocolSetupLabware({
   const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_POLL_MS,
   })
-  const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
+  const startingDeck = useMemo(
+    () =>
+      getStackedItemsOnStartingDeck(
+        mostRecentAnalysis?.commands ?? [],
+        mostRecentAnalysis?.labware ?? [],
+        mostRecentAnalysis?.modules ?? []
+      ),
+    [mostRecentAnalysis]
+  )
+  const labwareByLiquidId = getLabwareInfoByLiquidId(
     mostRecentAnalysis?.commands ?? []
   )
+  const stacksWithLaware = getStacksWithLabware(startingDeck)
+  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .filter(([key, value]) => key !== 'offDeck')
+  const offDeckItems = Object.keys(stacksWithLaware).includes('offDeck')
+    ? startingDeck.offDeck
+    : null
+
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL_MS,
   })
@@ -120,153 +130,107 @@ export function ProtocolSetupLabware({
     deckConfig
   )
 
-  const handleLabwareClick = (
-    labwareDef: LabwareDefinition2,
-    labwareId: string
-  ): void => {
-    const foundLabware = mostRecentAnalysis?.labware.find(
-      labware => labware.id === labwareId
-    )
-    if (foundLabware != null) {
-      const nickName = onDeckItems.find(
-        item => item.labwareId === foundLabware.id
-      )?.nickName
-
-      const location = onDeckItems.find(
-        item => item.labwareId === foundLabware.id
-      )?.initialLocation
-      if (location != null) {
-        setSelectedLabware({
-          ...labwareDef,
-          location,
-          nickName: nickName ?? null,
-          id: labwareId,
-        })
-        setShowLabwareDetailsModal(true)
-      } else {
-        console.warn('no initial labware location found')
-      }
-    }
-  }
-  const selectedLabwareIsStacked = mostRecentAnalysis?.commands.some(
-    command =>
-      command.commandType === 'loadLabware' &&
-      command.result?.labwareId === selectedLabware?.id &&
-      typeof command.params.location === 'object' &&
-      ('moduleId' in command.params.location ||
-        'labwareId' in command.params.location)
-  )
-
   return (
     <>
-      {showLabwareDetailsModal &&
-      !selectedLabwareIsStacked &&
-      selectedLabware != null ? (
-        <SingleLabwareModal
-          selectedLabware={selectedLabware}
-          onOutsideClick={() => {
-            setShowLabwareDetailsModal(false)
-            setSelectedLabware(null)
+      {selectedLabwareStack != null && mostRecentAnalysis != null ? (
+        <SetupLabwareStackView
+          onClickBack={() => {
+            setSelectedLabwareStack(null)
           }}
+          slotName={selectedLabwareStack[0]}
+          labwareByLiquidId={labwareByLiquidId}
+          stackedItems={selectedLabwareStack[1]}
           mostRecentAnalysis={mostRecentAnalysis}
         />
-      ) : null}
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
-        <ODDBackButton
-          label={t('labware')}
-          onClick={() => {
-            setSetupScreen('prepare to run')
-          }}
-        />
-        {isConfirmed ? (
-          <Chip
-            background
-            iconName="ot-check"
-            text={t('placements_confirmed')}
-            type="success"
-          />
-        ) : (
-          <SmallButton
-            buttonText={t('confirm_placements')}
+      ) : (
+        <>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <ODDBackButton
+              label={t('labware_liquids_setup_step_title')}
+              onClick={() => {
+                setSetupScreen('prepare to run')
+              }}
+            />
+            {isConfirmed ? (
+              <Chip
+                background
+                iconName="ot-check"
+                text={t('placements_confirmed')}
+                type="success"
+              />
+            ) : (
+              <SmallButton
+                buttonText={t('confirm_placements')}
+                onClick={() => {
+                  setIsConfirmed(true)
+                  setSetupScreen('prepare to run')
+                }}
+                buttonCategory="rounded"
+              />
+            )}
+          </Flex>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            marginTop={SPACING.spacing32}
+          >
+            {showMapView ? (
+              <LabwareMapView
+                mostRecentAnalysis={mostRecentAnalysis}
+                startingDeck={startingDeck}
+                labwareByLiquidId={labwareByLiquidId}
+                handleLabwareClick={setSelectedLabwareStack}
+              />
+            ) : (
+              <>
+                <Flex gridGap={SPACING.spacing8} color={COLORS.grey60}>
+                  <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
+                    <StyledText oddStyle="bodyTextSemiBold">
+                      {t('location')}
+                    </StyledText>
+                  </Flex>
+                  <Flex>
+                    <StyledText oddStyle="bodyTextSemiBold">
+                      {t('labware_name')}
+                    </StyledText>
+                  </Flex>
+                </Flex>
+                {sortedStartingDeckEntries.map(([key, value], index) => (
+                  <RowLabware
+                    key={index}
+                    attachedProtocolModules={attachedProtocolModuleMatches}
+                    refetchModules={moduleQuery.refetch}
+                    slotName={key}
+                    stackedItems={value}
+                    labwareByLiquidId={labwareByLiquidId}
+                    onClick={setSelectedLabwareStack}
+                  />
+                ))}
+                {offDeckItems?.map((item, index) => (
+                  <RowLabware
+                    key={index}
+                    attachedProtocolModules={attachedProtocolModuleMatches}
+                    refetchModules={moduleQuery.refetch}
+                    slotName={'offDeck'}
+                    stackedItems={[item]}
+                    labwareByLiquidId={labwareByLiquidId}
+                    onClick={setSelectedLabwareStack}
+                  />
+                ))}
+              </>
+            )}
+          </Flex>
+          <FloatingActionButton
+            buttonText={showMapView ? t('list_view') : t('map_view')}
             onClick={() => {
-              setIsConfirmed(true)
-              setSetupScreen('prepare to run')
-            }}
-            buttonCategory="rounded"
-          />
-        )}
-      </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing8}
-        marginTop={SPACING.spacing32}
-      >
-        {showMapView ? (
-          <LabwareMapView
-            mostRecentAnalysis={mostRecentAnalysis}
-            deckDef={deckDef}
-            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-            handleLabwareClick={handleLabwareClick}
-          />
-        ) : (
-          <>
-            <Flex
-              gridGap={SPACING.spacing8}
-              color={COLORS.grey60}
-              fontSize={TYPOGRAPHY.fontSize22}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              lineHeight={TYPOGRAPHY.lineHeight28}
-            >
-              <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
-                <LegacyStyledText>{t('location')}</LegacyStyledText>
-              </Flex>
-              <Flex>
-                <LegacyStyledText>{t('labware_name')}</LegacyStyledText>
-              </Flex>
-            </Flex>
-            {[...onDeckItems, ...offDeckItems].map((labware, i) => {
-              const labwareOnAdapter = onDeckItems.find(
-                item =>
-                  labware.initialLocation !== 'offDeck' &&
-                  labware.initialLocation !== 'systemLocation' &&
-                  'labwareId' in labware.initialLocation &&
-                  item.labwareId === labware.initialLocation.labwareId
-              )
-              return mostRecentAnalysis?.commands != null &&
-                labwareOnAdapter == null ? (
-                <RowLabware
-                  key={i}
-                  labware={labware}
-                  attachedProtocolModules={attachedProtocolModuleMatches}
-                  refetchModules={moduleQuery.refetch}
-                  commands={mostRecentAnalysis.commands}
-                />
-              ) : null
-            })}
-          </>
-        )}
-        {showLabwareDetailsModal &&
-        selectedLabware != null &&
-        selectedLabwareIsStacked ? (
-          <LabwareStackModal
-            labwareIdTop={selectedLabware?.id}
-            commands={mostRecentAnalysis?.commands ?? null}
-            closeModal={() => {
-              setSelectedLabware(null)
-              setShowLabwareDetailsModal(false)
+              setShowMapView(mapView => !mapView)
             }}
           />
-        ) : null}
-      </Flex>
-      <FloatingActionButton
-        buttonText={showMapView ? t('list_view') : t('map_view')}
-        onClick={() => {
-          setShowMapView(mapView => !mapView)
-        }}
-      />
+        </>
+      )}
     </>
   )
 }
@@ -300,6 +264,7 @@ function LabwareLatch({
   const isLatchClosed =
     matchedHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
     matchedHeaterShaker.data.labwareLatchStatus === 'opening'
+  const { reportModuleCommand } = useModuleCommandAnalytics()
 
   let icon: 'latch-open' | 'latch-closed' | null = null
 
@@ -312,18 +277,37 @@ function LabwareLatch({
     params: { moduleId: matchedHeaterShaker.id },
   }
 
-  const toggleLatch = (): void => {
+  const toggleLatch = (e: TouchEvent): void => {
+    e.stopPropagation()
     createLiveCommand({
       command: latchCommand,
       waitUntilComplete: true,
     })
       .then(() => {
+        reportModuleCommand({
+          kind: 'liveCommand',
+          moduleType: matchedHeaterShaker.moduleType,
+          analyticCommand: latchCommand.commandType,
+          result: { status: 'succeeded', data: undefined },
+          errorDetails: '',
+          serialNumber: matchedHeaterShaker.serialNumber,
+          firmwareVersion: matchedHeaterShaker.firmwareVersion,
+        })
         setIsRefetchingModules(true)
         refetchModules()
           .then(() => {
             setIsRefetchingModules(false)
           })
           .catch((e: Error) => {
+            reportModuleCommand({
+              kind: 'liveCommand',
+              moduleType: matchedHeaterShaker.moduleType,
+              analyticCommand: latchCommand.commandType,
+              result: { status: 'succeeded', data: undefined },
+              serialNumber: matchedHeaterShaker.serialNumber,
+              errorDetails: e.message,
+              firmwareVersion: matchedHeaterShaker.firmwareVersion,
+            })
             console.error(
               `error refetching modules after toggle latch: ${e.message}`
             )
@@ -331,6 +315,15 @@ function LabwareLatch({
           })
       })
       .catch((e: Error) => {
+        reportModuleCommand({
+          kind: 'liveCommand',
+          moduleType: matchedHeaterShaker.moduleType,
+          analyticCommand: latchCommand.commandType,
+          serialNumber: matchedHeaterShaker.serialNumber,
+          errorDetails: e.message,
+          result: { status: 'failed', data: undefined },
+          firmwareVersion: matchedHeaterShaker.firmwareVersion,
+        })
         console.error(
           `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
         )
@@ -381,9 +374,9 @@ function LabwareLatch({
       onClick={toggleLatch}
       padding={SPACING.spacing12}
     >
-      <LegacyStyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <StyledText oddStyle="bodyTextSemiBold">
         {t('protocol_setup:labware_latch')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -391,9 +384,7 @@ function LabwareLatch({
       >
         {hsLatchText != null && icon != null ? (
           <>
-            <LegacyStyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
-              {hsLatchText}
-            </LegacyStyledText>
+            <StyledText oddStyle="bodyTextRegular">{hsLatchText}</StyledText>
             <Icon
               name={icon}
               size="2.5rem"
@@ -411,39 +402,34 @@ function LabwareLatch({
 }
 
 interface RowLabwareProps {
-  labware: LabwareSetupItem
   attachedProtocolModules: AttachedProtocolModuleMatch[]
   refetchModules: UseQueryResult<Modules>['refetch']
-  commands: RunTimeCommand[]
+  slotName: string
+  stackedItems: StackItem[]
+  onClick: Dispatch<SetStateAction<[string, StackItem[]] | null>>
+  labwareByLiquidId: LabwareByLiquidId
 }
 
 function RowLabware({
-  labware,
   attachedProtocolModules,
   refetchModules,
-  commands,
+  slotName,
+  stackedItems,
+  onClick,
+  labwareByLiquidId,
 }: RowLabwareProps): JSX.Element | null {
-  const {
-    initialLocation,
-    nickName: bottomLabwareNickname,
-    labwareId: bottomLabwareId,
-  } = labware
-  const loadLabwareCommands = commands?.filter(
-    (command): command is LoadLabwareRunTimeCommand =>
-      command.commandType === 'loadLabware'
+  const moduleInStack = getModuleFromStack(stackedItems)
+  const labwareInStack = stackedItems.filter(
+    (lw): lw is LabwareInStack => 'labwareId' in lw
   )
 
-  const { topLabwareId } = getTopLabwareInfo(
-    bottomLabwareId ?? '',
-    loadLabwareCommands
+  const labwareLiquidRenderInfo = getLabwareLiquidRenderInfoFromStack(
+    labwareInStack,
+    labwareByLiquidId
   )
-  const {
-    slotName: slot,
-    labwareName: topLabwareName,
-    labwareNickname: topLabwareNickname,
-    labwareQuantity: topLabwareQuantity,
-    adapterName,
-  } = getLocationInfoNames(topLabwareId, commands)
+  const isStacked =
+    labwareLiquidRenderInfo.length > 1 ||
+    labwareLiquidRenderInfo.some(labware => labware.quantity > 1)
 
   const { t, i18n } = useTranslation([
     'protocol_command_text',
@@ -451,12 +437,9 @@ function RowLabware({
   ])
 
   const matchedModule =
-    initialLocation !== 'offDeck' &&
-    initialLocation !== 'systemLocation' &&
-    'moduleId' in initialLocation &&
-    attachedProtocolModules.length > 0
+    moduleInStack != null && attachedProtocolModules.length > 0
       ? attachedProtocolModules.find(
-          mod => mod.moduleId === initialLocation.moduleId
+          mod => mod.moduleId === moduleInStack.moduleId
         )
       : null
   const matchingHeaterShaker =
@@ -464,112 +447,96 @@ function RowLabware({
     matchedModule.attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
       ? matchedModule.attachedModuleMatch
       : null
-  const isStacked = topLabwareQuantity > 1 || adapterName != null
 
-  let slotName: string = slot
-  let location: JSX.Element = <DeckInfoLabel deckLabel={slotName} />
-  if (initialLocation === 'offDeck' || initialLocation === 'systemLocation') {
-    location = (
-      <DeckInfoLabel deckLabel={i18n.format(t('off_deck'), 'upperCase')} />
-    )
-  } else if (
-    matchedModule != null &&
-    matchedModule.attachedModuleMatch?.moduleType === THERMOCYCLER_MODULE_TYPE
-  ) {
-    slotName = TC_MODULE_LOCATION_OT3
-    location = <DeckInfoLabel deckLabel={slotName} />
-  }
+  const location: JSX.Element = (
+    <DeckInfoLabel
+      deckLabel={
+        slotName === 'offDeck'
+          ? i18n.format(t('off_deck'), 'upperCase')
+          : slotName
+      }
+    />
+  )
   return (
-    <Flex
+    <ListButton
+      type="noActive"
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.grey35}
-      borderRadius={BORDERS.borderRadius8}
-      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      gridGap={SPACING.spacing32}
+      gridGap={SPACING.spacing24}
+      onClick={() => {
+        onClick([slotName, labwareInStack])
+      }}
     >
-      <Flex gridGap={SPACING.spacing4} width="7.6875rem">
+      <Flex gridGap={SPACING.spacing4} flexWrap="wrap" width="11rem">
         {location}
+        {matchedModule != null ? (
+          <DeckInfoLabel
+            iconName={
+              MODULE_ICON_NAME_BY_TYPE[matchedModule.moduleDef.moduleType]
+            }
+          />
+        ) : null}
         {isStacked ? <DeckInfoLabel iconName="stacked" /> : null}
       </Flex>
       <Flex
-        alignSelf={ALIGN_FLEX_START}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         flexDirection={DIRECTION_ROW}
-        width="86%"
+        width="100%"
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_SPACE_EVENLY}
-            gridGap={SPACING.spacing4}
-          >
-            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {topLabwareName}
-            </LegacyStyledText>
-            <LegacyStyledText color={COLORS.grey60} as="p">
-              {topLabwareQuantity > 1
-                ? t('protocol_setup:labware_quantity', {
-                    quantity: topLabwareQuantity,
-                  })
-                : topLabwareNickname}
-            </LegacyStyledText>
-          </Flex>
-          {adapterName != null ? (
+        <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
+          {labwareLiquidRenderInfo.map((labware, index) => (
             <>
-              <Box
-                borderBottom={`1px solid ${COLORS.grey60}`}
-                marginY={SPACING.spacing16}
-                width={matchingHeaterShaker != null ? '33rem' : '46rem'}
-              />
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <LegacyStyledText
-                  as="p"
+                <StyledText
+                  oddStyle="bodyTextSemiBold"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
-                  {adapterName}
-                </LegacyStyledText>
-                <LegacyStyledText as="p" color={COLORS.grey60}>
-                  {bottomLabwareNickname}
-                </LegacyStyledText>
-              </Flex>
-            </>
-          ) : null}
-          {matchedModule != null ? (
-            <>
-              <Box
-                borderBottom={`1px solid ${COLORS.grey60}`}
-                marginY={SPACING.spacing16}
-                width={matchingHeaterShaker != null ? '33rem' : '46rem'}
-              />
-              <Flex
-                flexDirection={DIRECTION_ROW}
-                gridGap={SPACING.spacing12}
-                alignItems={ALIGN_CENTER}
-              >
-                <DeckInfoLabel
-                  iconName={
-                    MODULE_ICON_NAME_BY_TYPE[matchedModule.moduleDef.moduleType]
-                  }
-                />
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing4}
-                >
-                  <LegacyStyledText
-                    as="p"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  {labware.displayName}
+                </StyledText>
+                {labware.lidDisplayName != null ? (
+                  <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
+                    {labware.lidDisplayName}
+                  </StyledText>
+                ) : null}
+                {labware.quantity > 1 || labware.liquids > 0 ? (
+                  <Flex
+                    flexDirection={DIRECTION_ROW}
+                    paddingTop={SPACING.spacing4}
+                    gridGap={SPACING.spacing8}
                   >
-                    {getModuleDisplayName(matchedModule.moduleDef.model)}
-                  </LegacyStyledText>
-                  {matchingHeaterShaker != null ? (
-                    <LegacyStyledText as="p" color={COLORS.grey60}>
-                      {t('protocol_setup:labware_latch_instructions')}
-                    </LegacyStyledText>
-                  ) : null}
-                </Flex>
+                    {labware.quantity > 1 ? (
+                      <Tag
+                        type="default"
+                        text={t('protocol_setup:labware_quantity', {
+                          quantity: labware.quantity,
+                        })}
+                      />
+                    ) : null}
+                    {labware.liquids > 0 ? (
+                      <Tag
+                        type="default"
+                        text={
+                          labware.quantity > 1
+                            ? t('protocol_setup:multiple_liquid_layouts')
+                            : t('protocol_setup:number_of_liquids', {
+                                number: labware.liquids,
+                                count: labware.liquids,
+                              })
+                        }
+                      />
+                    ) : null}
+                  </Flex>
+                ) : null}
+                {index !== labwareLiquidRenderInfo.length - 1 ? (
+                  <Box
+                    borderBottom={`1px solid ${COLORS.grey60}`}
+                    marginY={SPACING.spacing16}
+                    width={matchingHeaterShaker != null ? '26rem' : '40rem'}
+                  />
+                ) : null}
               </Flex>
             </>
-          ) : null}
+          ))}
         </Flex>
         {matchingHeaterShaker != null ? (
           <LabwareLatch
@@ -578,6 +545,7 @@ function RowLabware({
           />
         ) : null}
       </Flex>
-    </Flex>
+      <Icon name="more" size={SPACING.spacing40} />
+    </ListButton>
   )
 }

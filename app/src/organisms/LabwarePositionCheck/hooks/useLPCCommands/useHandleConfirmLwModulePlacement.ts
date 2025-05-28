@@ -4,13 +4,15 @@ import {
   savePositionCommands,
 } from './commands'
 
+import type { VectorOffset } from '@opentrons/api-client'
 import type {
-  MoveLabwareCreateCommand,
-  Coordinates,
   CreateCommand,
+  LabwareLocation,
+  MoveLabwareCreateCommand,
+  Vector3D,
 } from '@opentrons/shared-data'
-import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 export interface UseHandleConfirmPlacementProps
   extends UseLPCCommandWithChainRunChildProps {
@@ -22,30 +24,44 @@ export interface UseHandleConfirmPlacementResult {
    before moving the pipette to the initial LPC position. */
   handleConfirmLwModulePlacement: (
     offsetLocationDetails: OffsetLocationDetails,
-    pipetteId: string
-  ) => Promise<Coordinates | null>
+    pipetteId: string,
+    initialVectorOffset?: VectorOffset | null
+  ) => Promise<Vector3D>
+  handleMoveToInitialOffsetPosition: (
+    offsetLocationDetails: OffsetLocationDetails,
+    pipetteId: string,
+    initialVectorOffset: VectorOffset | null
+  ) => Promise<Vector3D>
 }
 
 export function useHandleConfirmLwModulePlacement({
   chainLPCCommands,
-  mostRecentAnalysis,
+  analysis,
   setErrorMessage,
 }: UseHandleConfirmPlacementProps): UseHandleConfirmPlacementResult {
   const handleConfirmLwModulePlacement = (
     offsetLocationDetails: OffsetLocationDetails,
-    pipetteId: string
-  ): Promise<Coordinates | null> => {
+    pipetteId: string,
+    initialVectorOffset?: VectorOffset | null
+  ): Promise<Vector3D> => {
     const confirmCommands: CreateCommand[] = [
       ...buildMoveLabwareCommand(offsetLocationDetails),
-      ...moduleInitDuringLPCCommands(mostRecentAnalysis),
-      ...moveToWellCommands(offsetLocationDetails, pipetteId),
+      ...moduleInitDuringLPCCommands(analysis),
+      ...moveToWellCommands(
+        offsetLocationDetails,
+        pipetteId,
+        initialVectorOffset
+      ),
       ...savePositionCommands(pipetteId),
     ]
 
     return chainLPCCommands(confirmCommands, false).then(responses => {
       const finalResponse = responses[responses.length - 1]
-      if (finalResponse.data.commandType === 'savePosition') {
-        const { position } = finalResponse.data.result ?? { position: null }
+      if (
+        finalResponse.data.commandType === 'savePosition' &&
+        finalResponse.data.result != null
+      ) {
+        const { position } = finalResponse.data.result
 
         return Promise.resolve(position)
       } else {
@@ -59,54 +75,88 @@ export function useHandleConfirmLwModulePlacement({
     })
   }
 
-  return { handleConfirmLwModulePlacement }
+  const handleMoveToInitialOffsetPosition = (
+    offsetLocationDetails: OffsetLocationDetails,
+    pipetteId: string,
+    initialVectorOffset: VectorOffset | null
+  ): Promise<Vector3D> => {
+    const moveCommands: CreateCommand[] = [
+      ...moveToWellCommands(
+        offsetLocationDetails,
+        pipetteId,
+        initialVectorOffset
+      ),
+      ...savePositionCommands(pipetteId),
+    ]
+
+    return chainLPCCommands(moveCommands, false).then(responses => {
+      const finalResponse = responses[responses.length - 1]
+      if (
+        finalResponse.data.commandType === 'savePosition' &&
+        finalResponse.data.result != null
+      ) {
+        const { position } = finalResponse.data.result
+
+        return Promise.resolve(position)
+      } else {
+        setErrorMessage(
+          'CheckItem failed to save position for initial placement.'
+        )
+        return Promise.reject(
+          new Error('CheckItem failed to save position for initial placement.')
+        )
+      }
+    })
+  }
+
+  return { handleConfirmLwModulePlacement, handleMoveToInitialOffsetPosition }
 }
 
 function buildMoveLabwareCommand(
   offsetLocationDetails: OffsetLocationDetails
 ): MoveLabwareCreateCommand[] {
-  const { labwareId, moduleId, adapterId, slotName } = offsetLocationDetails
+  return offsetLocationDetails.lwModOnlyStackupDetails.reduce<
+    MoveLabwareCreateCommand[]
+  >((acc, component, idx, lwModOnlyLocSeqsWithIds) => {
+    if (component.kind === 'module') {
+      return acc
+    } else {
+      // If the previous item in the lw stackup is a module, we need to move the
+      // labware on top of the module.
+      const closestBeneathModuleId =
+        idx > 0 && lwModOnlyLocSeqsWithIds[idx - 1].kind === 'module'
+          ? lwModOnlyLocSeqsWithIds[idx - 1].id
+          : null
+      // If the previous item in the lw stackup is a lw, we need to move the
+      // labware on top of the lw.
+      const closestBeneathLwId =
+        idx > 0 && lwModOnlyLocSeqsWithIds[idx - 1].kind === 'labware'
+          ? lwModOnlyLocSeqsWithIds[idx - 1].id
+          : null
 
-  // TODO(jh, 01-29-25): Once default offsets are implemented, we'll have to load them
-  //  into a slot somehow. Talk to Design.
-  const locationSpecificSlotName = slotName as string
+      const buildNewLocation = (): LabwareLocation => {
+        if (closestBeneathModuleId != null) {
+          return { moduleId: closestBeneathModuleId }
+        } else if (closestBeneathLwId != null) {
+          return { labwareId: closestBeneathLwId }
+        } else {
+          return {
+            addressableAreaName: offsetLocationDetails.addressableAreaName,
+          }
+        }
+      }
 
-  const newLocationLabware =
-    moduleId != null ? { moduleId } : { slotName: locationSpecificSlotName }
-  const newLocationAdapter =
-    adapterId != null
-      ? { labwareId: adapterId }
-      : { slotName: locationSpecificSlotName }
-
-  if (adapterId != null) {
-    return [
-      {
-        commandType: 'moveLabware' as const,
-        params: {
-          labwareId: adapterId,
-          newLocation: newLocationLabware,
-          strategy: 'manualMoveWithoutPause',
+      return [
+        ...acc,
+        {
+          commandType: 'moveLabware',
+          params: {
+            labwareId: component.id,
+            newLocation: buildNewLocation(),
+            strategy: 'manualMoveWithoutPause',
+          },
         },
-      },
-      {
-        commandType: 'moveLabware' as const,
-        params: {
-          labwareId,
-          newLocation: newLocationAdapter,
-          strategy: 'manualMoveWithoutPause',
-        },
-      },
-    ]
-  } else {
-    return [
-      {
-        commandType: 'moveLabware' as const,
-        params: {
-          labwareId,
-          newLocation: newLocationLabware,
-          strategy: 'manualMoveWithoutPause',
-        },
-      },
-    ]
-  }
+      ]
+    }
+  }, [])
 }

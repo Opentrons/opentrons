@@ -1,13 +1,5 @@
-import type {
-  CheckCalibrationSessionDetails,
-  CalibrationCheckComparisonsPerCalibration,
-  CalibrationCheckComparisonMap,
-  CalibrationCheckComparison,
-  CheckCalibrationSessionParams,
-  CalibrationLabware,
-} from '../types'
-
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
+
 import {
   CHECK_STEP_COMPARING_HEIGHT,
   CHECK_STEP_COMPARING_POINT_ONE,
@@ -15,6 +7,15 @@ import {
   CHECK_STEP_COMPARING_POINT_TWO,
   CHECK_STEP_COMPARING_TIP,
 } from '../calibration-check/constants'
+
+import type {
+  CalibrationCheckComparison,
+  CalibrationCheckComparisonMap,
+  CalibrationCheckComparisonsPerCalibration,
+  CalibrationLabware,
+  CheckCalibrationSessionDetails,
+  CheckCalibrationSessionParams,
+} from '../types'
 
 export const mockCalibrationCheckLabware: CalibrationLabware = {
   slot: '8',

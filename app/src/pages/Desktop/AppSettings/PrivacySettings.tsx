@@ -1,21 +1,21 @@
 import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SIZE_2,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import {
-  toggleAnalyticsOptedIn,
-  getAnalyticsOptedIn,
-} from '/app/redux/analytics'
 import { ToggleButton } from '/app/atoms/buttons'
+import {
+  getAnalyticsOptedIn,
+  toggleAnalyticsOptedIn,
+} from '/app/redux/analytics'
 
 import type { Dispatch, State } from '/app/redux/types'
 

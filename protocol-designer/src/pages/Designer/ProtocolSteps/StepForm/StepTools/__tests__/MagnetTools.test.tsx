@@ -1,16 +1,18 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../assets/localization'
-import {
-  getMagneticLabwareOptions,
-  getMagnetLabwareEngageHeight,
-} from '../../../../../../ui/modules/selectors'
 import {
   getInitialDeckSetup,
   getModuleEntities,
 } from '../../../../../../step-forms/selectors'
+import {
+  getMagneticLabwareOptions,
+  getMagnetLabwareEngageHeight,
+} from '../../../../../../ui/modules/selectors'
 import { MagnetTools } from '../MagnetTools'
+
 import type { ComponentProps } from 'react'
 import type * as ModulesSelectors from '../../../../../../ui/modules/selectors'
 
@@ -114,7 +116,7 @@ describe('MagnetTools', () => {
   it('renders the text and a switch button for v2', () => {
     render(props)
     screen.getByText('Module')
-    screen.getByText('Magnet state')
+    screen.getByText('Magnets')
     screen.getByLabelText('Engage')
     const toggleButton = screen.getByRole('switch')
     screen.getByText('Engage height')

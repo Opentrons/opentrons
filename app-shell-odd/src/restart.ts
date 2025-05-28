@@ -1,8 +1,9 @@
 import { APP_RESTART } from './constants'
-import systemd from './systemd'
 import { createLogger } from './log'
+import systemd from './systemd'
 
 import type { Action, Logger } from './types'
+
 let _log: Logger | undefined
 const log = (): Logger => _log ?? (_log = createLogger('config'))
 

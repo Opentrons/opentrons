@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InlineNotification,
   JUSTIFY_CENTER,
   LegacyStyledText,
   SPACING,
@@ -15,30 +18,29 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
-import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { FloatingActionButton } from '/app/atoms/buttons'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedModules } from '/app/resources/modules'
 import {
-  getProtocolModulesInfo,
-  getAttachedProtocolModuleMatches,
-} from '/app/transformations/analysis'
-import {
-  useRunStatus,
   useMostRecentCompletedAnalysis,
+  useRunStatus,
 } from '/app/resources/runs'
-import { getUnmatchedModulesForProtocol } from './utils'
-import { SetupInstructionsModal } from './SetupInstructionsModal'
+import {
+  getAttachedProtocolModuleMatches,
+  getProtocolModulesInfo,
+} from '/app/transformations/analysis'
+
 import { FixtureTable } from './FixtureTable'
-import { ModuleTable } from './ModuleTable'
 import { ModulesAndDeckMapView } from './ModulesAndDeckMapView'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { ModuleTable } from './ModuleTable'
+import { SetupInstructionsModal } from './SetupInstructionsModal'
+import { getUnmatchedModulesForProtocol } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'
 
 const ATTACHED_MODULE_POLL_MS = 5000

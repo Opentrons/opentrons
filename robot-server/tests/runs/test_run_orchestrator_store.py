@@ -1,10 +1,11 @@
 """Tests for the EngineStore interface."""
 
 from datetime import datetime
+from textwrap import dedent
+from pathlib import Path
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data import get_shared_data_root
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.protocol_engine.error_recovery_policy import never_recover
@@ -17,7 +18,8 @@ from opentrons.protocol_engine import (
     types as pe_types,
 )
 from opentrons.protocol_runner import RunResult, RunOrchestrator
-from opentrons.protocol_reader import ProtocolReader, ProtocolSource
+from opentrons.protocol_reader import ProtocolReader
+from opentrons.protocol_engine.resources import FileProvider
 
 from robot_server.runs.run_orchestrator_store import (
     RunOrchestratorStore,
@@ -25,7 +27,8 @@ from robot_server.runs.run_orchestrator_store import (
     NoRunOrchestrator,
     handle_estop_event,
 )
-from opentrons.protocol_engine.resources import FileProvider
+from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.protocols.protocol_models import ProtocolKind
 
 
 def mock_notify_publishers() -> None:
@@ -48,12 +51,31 @@ async def subject(
 
 
 @pytest.fixture
-async def json_protocol_source() -> ProtocolSource:
-    """Get a protocol source fixture."""
-    simple_protocol = (
-        get_shared_data_root() / "protocol" / "fixtures" / "6" / "simpleV6.json"
+async def bad_python_protocol_source(tmp_path: Path) -> ProtocolResource:
+    """Get a protocol source for a bad python protocol."""
+    with open(tmp_path / "bad_protocol.py", "w") as proto:
+        proto.write(
+            dedent(
+                """
+    requirements = {'apiLevel': '2.20', 'robotType': 'Flex'}
+    a = 1/0
+
+    def run(ctx):
+        pass
+    """
+            )
+        )
+    return ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime.now(),
+        source=(
+            await ProtocolReader().read_saved(
+                files=[tmp_path / "bad_protocol.py"], directory=None
+            )
+        ),
+        protocol_kind=ProtocolKind.STANDARD,
+        protocol_key="some-name",
     )
-    return await ProtocolReader().read_saved(files=[simple_protocol], directory=None)
 
 
 async def test_create_engine(decoy: Decoy, subject: RunOrchestratorStore) -> None:
@@ -164,6 +186,23 @@ async def test_archives_state_if_engine_already_exists(
     assert subject.current_run_id == "run-id-1"
 
 
+async def test_create_does_not_store_orchestrator_on_load_failure(
+    subject: RunOrchestratorStore, bad_python_protocol_source: ProtocolResource
+) -> None:
+    """It should not store an orchestrator unless it could be loaded."""
+    with pytest.raises(ZeroDivisionError):
+        await subject.create(
+            run_id="run-id",
+            labware_offsets=[],
+            initial_error_recovery_policy=never_recover,
+            deck_configuration=[],
+            protocol=bad_python_protocol_source,
+            file_provider=FileProvider(),
+            notify_publishers=mock_notify_publishers,
+        )
+    assert subject.current_run_id is None
+
+
 async def test_clear_engine(subject: RunOrchestratorStore) -> None:
     """It should clear a stored engine entry."""
     await subject.create(
@@ -185,9 +224,7 @@ async def test_clear_engine(subject: RunOrchestratorStore) -> None:
         subject.run_orchestrator
 
 
-async def test_clear_engine_not_stopped_or_idle(
-    subject: RunOrchestratorStore, json_protocol_source: ProtocolSource
-) -> None:
+async def test_clear_engine_not_stopped_or_idle(subject: RunOrchestratorStore) -> None:
     """It should raise a conflict if the engine is not stopped."""
     await subject.create(
         run_id="run-id",

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+
 import {
   COLORS,
   JUSTIFY_FLEX_END,
@@ -8,9 +8,12 @@ import {
   RESPONSIVENESS,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-import type { ModuleCalibrationWizardStepProps } from './types'
+
+import type { ModuleSetupWizardStepProps } from './types'
 
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
@@ -22,7 +25,7 @@ export const BODY_STYLE = css`
 `
 
 export const Success = (
-  props: ModuleCalibrationWizardStepProps
+  props: ModuleSetupWizardStepProps
 ): JSX.Element | null => {
   const { proceed, attachedModule, isRobotMoving, isOnDevice } = props
   const { t } = useTranslation('module_wizard_flows')
@@ -41,8 +44,7 @@ export const Success = (
 
   return (
     <SimpleWizardBody
-      header={t('successfully_calibrated', { module: moduleDisplayName })}
-      // TODO: iconColor unused, change SimpleWizardBody props interface
+      header={t('successfully_setup', { module: moduleDisplayName })}
       iconColor={COLORS.red50}
       isSuccess
       justifyContentForOddButton={JUSTIFY_FLEX_END}

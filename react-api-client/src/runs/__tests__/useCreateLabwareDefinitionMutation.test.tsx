@@ -1,13 +1,15 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { createLabwareDefinition } from '@opentrons/api-client'
-import { useHost } from '../../api'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { createLabwareDefinition } from '@opentrons/api-client'
+
+import { useHost } from '../../api'
 import { useCreateLabwareDefinitionMutation } from '../useCreateLabwareDefinitionMutation'
+
+import type * as React from 'react'
 import type { HostConfig } from '@opentrons/api-client'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')
@@ -17,7 +19,7 @@ const RUN_ID = 'run_id'
 
 describe('useCreateLabwareDefinitionMutation hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
-  let labwareDefinition: LabwareDefinition2
+  let labwareDefinition: LabwareDefinition
 
   beforeEach(() => {
     const queryClient = new QueryClient()

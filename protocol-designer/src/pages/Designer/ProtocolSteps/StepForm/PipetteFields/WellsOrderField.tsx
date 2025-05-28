@@ -1,22 +1,24 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  useHoverTooltip,
-  Tooltip,
-  ListButton,
-  StyledText,
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  COLORS,
-  Icon,
-  ALIGN_CENTER,
-} from '@opentrons/components'
-import { WellOrderModal } from '../../../../../organisms'
 
-import type { FieldProps } from '../types'
+import {
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  ListButton,
+  SPACING,
+  StyledText,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
+
+import { WellOrderModal } from '../../../../../components/organisms'
+
 import type { WellOrderOption } from '../../../../../form-types'
 import type { MoveLiquidPrefixType } from '../../../../../resources/types'
+import type { FieldProps } from '../types'
 
 export interface WellsOrderFieldProps {
   prefix: MoveLiquidPrefixType

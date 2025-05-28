@@ -1,34 +1,27 @@
 import { useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { ModalShell } from '@opentrons/components'
-
-import { getTopPortalEl } from '/app/App/portal'
+import { useLPCCommands } from '/app/organisms/LabwarePositionCheck/hooks'
+import { useLPCHeaderCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/useLPCHeaderCommands'
 import {
-  BeforeBeginning,
-  HandleLabware,
   AttachProbe,
+  BeforeBeginning,
   DetachProbe,
+  HandleLabware,
   LPCComplete,
 } from '/app/organisms/LabwarePositionCheck/steps'
-import { LPCRobotInMotion } from './LPCRobotInMotion'
-import { LPCErrorModal } from './LPCErrorModal'
-import { LPCProbeNotAttached } from './LPCProbeNotAttached'
-import {
-  useLPCCommands,
-  useLPCInitialState,
-} from '/app/organisms/LabwarePositionCheck/hooks'
 import {
   closeLPC,
-  proceedStep as proceedStepDispatch,
   goBackLastStep as goBackStepDispatch,
   LPC_STEP,
+  proceedStep as proceedStepDispatch,
   selectCurrentStep,
 } from '/app/redux/protocol-runs'
-import { getIsOnDevice } from '/app/redux/config'
-import { useLPCHeaderCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/useLPCHeaderCommands'
+
+import { LPCFatalError } from './LPCFatalError'
+import { LPCProbeNotAttached } from './LPCProbeNotAttached'
+import { LPCRobotInMotion } from './LPCRobotInMotion'
 
 import type { LPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
@@ -37,8 +30,6 @@ import type { LPCStep } from '/app/redux/protocol-runs'
 export interface LPCWizardFlexProps extends Omit<LPCFlowsProps, 'robotType'> {}
 
 export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
-  const { onCloseClick, ...rest } = props
-
   const proceedStep = (toStep?: LPCStep): void => {
     dispatch(proceedStepDispatch(props.runId, toStep))
   }
@@ -49,10 +40,7 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
   const dispatch = useDispatch()
   const LPCHandlerUtils = useLPCCommands({
     ...props,
-    onCloseClick,
   })
-
-  useLPCInitialState({ ...rest })
 
   // Clean up state on LPC close.
   useEffect(() => {
@@ -69,29 +57,12 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
   })
 
   return (
-    <LPCWizardFlexComponent
+    <LPCWizardContent
       {...props}
       proceedStep={proceedStep}
       goBackLastStep={goBackLastStep}
       commandUtils={{ ...LPCHandlerUtils, headerCommands }}
     />
-  )
-}
-
-function LPCWizardFlexComponent(props: LPCWizardContentProps): JSX.Element {
-  const isOnDevice = useSelector(getIsOnDevice)
-
-  return isOnDevice ? (
-    <>
-      <LPCWizardContent {...props} />
-    </>
-  ) : (
-    createPortal(
-      <ModalShell width="47rem">
-        <LPCWizardContent {...props} />
-      </ModalShell>,
-      getTopPortalEl()
-    )
   )
 }
 
@@ -110,7 +81,7 @@ function LPCWizardContent(props: LPCWizardContentProps): JSX.Element {
     )
   }
   if (errorMessage != null) {
-    return <LPCErrorModal {...props} />
+    return <LPCFatalError {...props} />
   }
   if (unableToDetect) {
     return <LPCProbeNotAttached {...props} />

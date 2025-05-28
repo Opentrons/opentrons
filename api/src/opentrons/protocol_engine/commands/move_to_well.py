@@ -8,7 +8,7 @@ from .pipetting_common import (
     PipetteIdMixin,
 )
 from .movement_common import (
-    WellLocationMixin,
+    LiquidHandlingWellLocationMixin,
     MovementMixin,
     DestinationPositionResult,
     StallOrCollisionError,
@@ -21,7 +21,6 @@ from .command import (
     SuccessData,
     DefinedErrorData,
 )
-from ..errors import LabwareIsTipRackError
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -31,7 +30,7 @@ if TYPE_CHECKING:
 MoveToWellCommandType = Literal["moveToWell"]
 
 
-class MoveToWellParams(PipetteIdMixin, WellLocationMixin, MovementMixin):
+class MoveToWellParams(PipetteIdMixin, LiquidHandlingWellLocationMixin, MovementMixin):
     """Payload required to move a pipette to a specific well."""
 
     pass
@@ -70,14 +69,9 @@ class MoveToWellImplementation(
         labware_id = params.labwareId
         well_name = params.wellName
         well_location = params.wellLocation
-
-        if (
-            self._state_view.labware.is_tiprack(labware_id)
-            and well_location.volumeOffset
-        ):
-            raise LabwareIsTipRackError(
-                "Cannot specify a WellLocation with a volumeOffset with movement to a tip rack"
-            )
+        # TODO(cm): implement move_to_well with meniscus + volume offset
+        if well_location.volumeOffset and well_location.volumeOffset != 0:
+            raise ValueError("volume offset not supported with MoveToWell")
 
         move_result = await move_to_well(
             model_utils=self._model_utils,

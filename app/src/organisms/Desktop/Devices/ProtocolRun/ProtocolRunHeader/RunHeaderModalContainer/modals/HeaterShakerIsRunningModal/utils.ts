@@ -1,5 +1,5 @@
-import type { HeaterShakerModule } from '/app/redux/modules/types'
 import type { AttachedModule } from '@opentrons/api-client'
+import type { HeaterShakerModule } from '/app/redux/modules/types'
 
 export function getActiveHeaterShaker(
   attachedModules: any[]

@@ -1,56 +1,57 @@
-import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   getSimplestDeckConfigForProtocol,
-  parseAllRequiredModuleModels,
-  parseLiquidsInLoadOrder,
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   simple_v4 as noModulesProtocol,
+  parseAllRequiredModuleModels,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   test_modules_protocol as withModulesProtocol,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import {
+  getMissingSetupSteps,
+  selectAreOffsetsApplied,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+  selectTotalCountLocationSpecificOffsets,
+} from '/app/redux/protocol-runs'
+import * as ReduxRuns from '/app/redux/protocol-runs'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
 import {
-  useMostRecentCompletedAnalysis,
-  useRunCalibrationStatus,
-  useRunPipetteInfoByMount,
-  useNotifyRunQuery,
-  useRunHasStarted,
-  useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
+  useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
   useProtocolAnalysisErrors,
+  useRunCalibrationStatus,
+  useRunHasStarted,
+  useRunPipetteInfoByMount,
+  useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
-import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { getMissingSetupSteps } from '/app/redux/protocol-runs'
-import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 
-import { SetupLabware } from '../SetupLabware'
-import { SetupRobotCalibration } from '../SetupRobotCalibration'
-import { SetupLiquids } from '../SetupLiquids'
-import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
-import * as ReduxRuns from '/app/redux/protocol-runs'
-
-import type { State } from '/app/redux/types'
+import { SetupLabware } from '../SetupLabware'
+import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
+import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
 import type * as SharedData from '@opentrons/shared-data'
+import type { State } from '/app/redux/types'
 
 vi.mock('../SetupLabware')
 vi.mock('../SetupRobotCalibration')
 vi.mock('../SetupModuleAndDeck')
-vi.mock('../SetupLiquids')
 vi.mock('../EmptySetupStep')
 vi.mock('/app/resources/runs/useNotifyRunQuery')
 vi.mock('/app/resources/runs/useMostRecentCompletedAnalysis')
@@ -69,16 +70,17 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux-resources/runs')
 vi.mock('/app/resources/analysis')
 vi.mock('/app/organisms/LabwarePositionCheck')
+vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {
     ...actualSharedData,
     parseAllRequiredModuleModels: vi.fn(),
-    parseLiquidsInLoadOrder: vi.fn(),
     parseProtocolData: vi.fn(),
     getSimplestDeckConfigForProtocol: vi.fn(),
   }
 })
+vi.mock('/app/redux/protocol-runs')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -129,18 +131,15 @@ describe('ProtocolRunSetup', () => {
           ReduxRuns.MODULE_SETUP_STEP_KEY,
           ReduxRuns.LPC_STEP_KEY,
           ReduxRuns.LABWARE_SETUP_STEP_KEY,
-          ReduxRuns.LIQUID_SETUP_STEP_KEY,
         ],
         orderedApplicableSteps: [
           ReduxRuns.ROBOT_CALIBRATION_STEP_KEY,
           ReduxRuns.MODULE_SETUP_STEP_KEY,
           ReduxRuns.LPC_STEP_KEY,
           ReduxRuns.LABWARE_SETUP_STEP_KEY,
-          ReduxRuns.LIQUID_SETUP_STEP_KEY,
         ],
       })
     vi.mocked(parseAllRequiredModuleModels).mockReturnValue([])
-    vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([])
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockConnectedRobot)
@@ -172,7 +171,6 @@ describe('ProtocolRunSetup', () => {
       <div>Mock SetupRobotCalibration</div>
     )
     vi.mocked(SetupModuleAndDeck).mockReturnValue(<div>Mock SetupModules</div>)
-    vi.mocked(SetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
     vi.mocked(EmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
     vi.mocked(getSimplestDeckConfigForProtocol).mockReturnValue([])
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
@@ -193,7 +191,15 @@ describe('ProtocolRunSetup', () => {
       lpcProps: null,
       showLPC: false,
       isLaunchingLPC: false,
+      isFlexLPCInitializing: false,
     })
+    vi.mocked(
+      selectIsAnyNecessaryDefaultOffsetMissing
+    ).mockImplementation(() => () => false)
+    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
+    vi.mocked(
+      selectTotalCountLocationSpecificOffsets
+    ).mockImplementation(() => () => 3)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -265,19 +271,19 @@ describe('ProtocolRunSetup', () => {
       fireEvent.click(robotCalibrationSetup)
       expect(screen.getByText('Mock SetupRobotCalibration')).toBeVisible()
     })
-    it('renders labware setup', () => {
+    it('renders labware and liquid setup', () => {
       render()
 
       screen.getByText(
-        'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
+        'Gather your labware & liquids and place them on the deck to finish setting up your protocol.'
       )
-      const labwareSetup = screen.getByText('Labware')
+      const labwareSetup = screen.getByText('Labware & Liquids')
       fireEvent.click(labwareSetup)
       expect(screen.getByText('Mock SetupLabware')).toBeVisible()
     })
-    it('renders the empty states for modules and liquids when no modules in protocol', () => {
+    it('renders the empty state for modules when no modules in protocol', () => {
       render()
-      screen.getAllByText('Mock EmptySetupStep')
+      screen.getByText('Mock EmptySetupStep')
     })
 
     it('defaults to no step expanded', () => {
@@ -306,7 +312,6 @@ describe('ProtocolRunSetup', () => {
         .calledWith(RUN_ID)
         .thenReturn({
           ...withModulesProtocol,
-          ...MOCK_PROTOCOL_LIQUID_KEY,
         } as any)
       when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
       when(vi.mocked(useModuleCalibrationStatus))
@@ -317,14 +322,14 @@ describe('ProtocolRunSetup', () => {
       vi.clearAllMocks()
     })
 
-    it('renders calibration ready if robot is Flex and modules are calibrated', () => {
+    it('renders proper copy if robot is Flex and modules are calibrated', () => {
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: true })
 
       render()
-      expect(screen.getAllByText('Calibration ready').length).toEqual(2)
+      expect(screen.getAllByText('Instruments attached').length).toEqual(1)
     })
 
     it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
@@ -334,7 +339,7 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText('Calibration needed')
     })
 
@@ -358,7 +363,7 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText('Action needed')
     })
 
@@ -391,13 +396,13 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText('Action needed')
     })
 
     it('renders module setup and allows the user to proceed to labware setup', () => {
       render()
-      const moduleSetup = screen.getByText('Deck hardware')
+      const moduleSetup = screen.getByText('Deck Hardware')
       fireEvent.click(moduleSetup)
       screen.getByText('Mock SetupModules')
     })
@@ -409,13 +414,13 @@ describe('ProtocolRunSetup', () => {
       screen.getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
 
       screen.getByText('Install the required modules.')
-      screen.getByText('Labware')
+      screen.getByText('Labware & Liquids')
 
       screen.getByText(
-        'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
+        'Gather your labware & liquids and place them on the deck to finish setting up your protocol.'
       )
     })
 
@@ -442,12 +447,12 @@ describe('ProtocolRunSetup', () => {
       screen.getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
 
       screen.getByText('Install the required module.')
-      screen.getByText('Labware')
+      screen.getByText('Labware & Liquids')
       screen.getByText(
-        'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
+        'Gather your labware & liquids and place them on the deck to finish setting up your protocol.'
       )
     })
 
@@ -471,7 +476,7 @@ describe('ProtocolRunSetup', () => {
       ])
       render()
 
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText(
         'Install and calibrate the required modules. Install the required fixtures.'
       )

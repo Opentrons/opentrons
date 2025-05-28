@@ -5,7 +5,7 @@ from __future__ import annotations
 import inspect
 import pytest
 from datetime import datetime
-from decoy import Decoy
+from decoy import Decoy, matchers
 from typing import TYPE_CHECKING
 
 from opentrons.hardware_control import ot3_calibration
@@ -93,6 +93,7 @@ async def test_calibrate_gripper_saves_calibration(
         status=CalibrationStatus(markedBad=False),
         last_modified=datetime(year=3000, month=1, day=1),
     )
+    saved_delta_captor = matchers.Captor()
     decoy.when(
         await ot3_calibration.calibrate_gripper_jaw(
             ot3_hardware_api, probe=GripperProbe.REAR
@@ -100,11 +101,13 @@ async def test_calibrate_gripper_saves_calibration(
     ).then_return(Point(1.1, 2.2, 3.3))
     decoy.when(
         await ot3_hardware_api.save_instrument_offset(
-            mount=OT3Mount.GRIPPER, delta=Point(x=2.75, y=3.85, z=4.95)
+            mount=OT3Mount.GRIPPER, delta=saved_delta_captor
         )
     ).then_return(expected_calibration_data)
     result = await subject.execute(params)
+    saved_delta: Point = saved_delta_captor.value
     assert result.public.jawOffset == Vec3f(x=1.1, y=2.2, z=3.3)
+    assert saved_delta.elementwise_isclose(Point(x=2.75, y=3.85, z=4.95))
     assert result.public.savedCalibration == expected_calibration_data
 
 

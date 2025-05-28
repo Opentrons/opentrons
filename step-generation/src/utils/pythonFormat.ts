@@ -8,6 +8,12 @@ import type { WellLocation } from '@opentrons/shared-data/command/types/support'
  */
 export const PROTOCOL_CONTEXT_NAME = 'protocol'
 
+/** The variable name for defining a labware that is off-deck or being moved to off-deck */
+export const OFF_DECK = 'protocol_api.OFF_DECK'
+
+/** The variable name for the Python dict containing the custom labware defintions. */
+export const CUSTOM_LABWARE_DICT_NAME = 'CUSTOM_LABWARE'
+
 const INDENT = '    '
 
 /** Indent each of the lines in `text`. */

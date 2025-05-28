@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -25,23 +25,23 @@ import {
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { SmallButton } from '/app/atoms/buttons'
+import { AlphanumericKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { StepMeter } from '/app/atoms/StepMeter'
+import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'
 import {
-  removeRobot,
   getConnectableRobots,
+  getLocalRobot,
   getReachableRobots,
   getUnreachableRobots,
-  getLocalRobot,
+  removeRobot,
 } from '/app/redux/discovery'
-import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '/app/redux/analytics'
-import { AlphanumericKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { SmallButton } from '/app/atoms/buttons'
-import { StepMeter } from '/app/atoms/StepMeter'
-import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
-import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
 
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
-import type { State, Dispatch } from '/app/redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface FormValues {
   newRobotName: string

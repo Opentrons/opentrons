@@ -1,26 +1,26 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  POSITION_FIXED,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  POSITION_FIXED,
   RadioButton,
+  SPACING,
 } from '@opentrons/components'
 
-import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { getTopPortalEl } from '/app/App/portal'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import type { Dispatch } from 'react'
 import type {
   ChangeTipOptions,
-  QuickTransferSummaryState,
   QuickTransferSummaryAction,
+  QuickTransferSummaryState,
 } from '../types'
 
 interface ChangeTipProps {

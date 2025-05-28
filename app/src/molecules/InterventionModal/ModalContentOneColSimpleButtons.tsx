@@ -1,12 +1,14 @@
 import { useState } from 'react'
+
 import {
-  Flex,
   DIRECTION_COLUMN,
-  SPACING,
+  Flex,
   LegacyStyledText,
   RadioButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { OneColumn } from './OneColumn'
 
 import type { ChangeEventHandler } from 'react'
@@ -19,9 +21,7 @@ export interface ButtonProps {
 
 export interface ModalContentOneColSimpleButtonsProps {
   headline: string
-  firstButton: ButtonProps
-  secondButton: ButtonProps
-  furtherButtons?: ButtonProps[]
+  buttons: ButtonProps[]
   onSelect?: ChangeEventHandler<HTMLInputElement>
   initialSelected?: string
 }
@@ -32,8 +32,6 @@ export function ModalContentOneColSimpleButtons(
   const [selected, setSelected] = useState<string | null>(
     props.initialSelected ?? null
   )
-  const furtherButtons = props.furtherButtons ?? []
-  const buttons = [props.firstButton, props.secondButton, ...furtherButtons]
   return (
     <OneColumn>
       <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
@@ -45,7 +43,7 @@ export function ModalContentOneColSimpleButtons(
           {props.headline}
         </LegacyStyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
-          {buttons.map((buttonProps, idx) => (
+          {props.buttons.map((buttonProps, idx) => (
             <RadioButton
               key={`button${idx}-${buttonProps.value}`}
               buttonLabel={buttonProps.label}

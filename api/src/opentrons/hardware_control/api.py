@@ -399,6 +399,10 @@ class API(
         """The status bar does not exist on OT-2!"""
         return None
 
+    def get_status_bar_enabled(self) -> bool:
+        """There is no status bar on OT-2, return False at all times."""
+        return False
+
     def get_status_bar_state(self) -> StatusBarState:
         """There is no status bar on OT-2, return IDLE at all times."""
         return StatusBarState.IDLE
@@ -1077,6 +1081,7 @@ class API(
         rate: float = 1.0,
         push_out: Optional[float] = None,
         correction_volume: float = 0.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette.

@@ -1,13 +1,15 @@
+import styled from 'styled-components'
+
 import {
   ALIGN_FLEX_START,
   DIRECTION_ROW,
   Flex,
   SPACING,
 } from '@opentrons/components'
+
 import { RecentRunProtocolCard } from './RecentRunProtocolCard'
 
 import type { RunData } from '@opentrons/api-client'
-import styled from 'styled-components'
 
 interface RecentRunProtocolCarouselProps {
   recentRunsOfUniqueProtocols: RunData[]

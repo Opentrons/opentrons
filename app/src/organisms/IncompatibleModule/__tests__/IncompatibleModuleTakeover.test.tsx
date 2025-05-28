@@ -1,23 +1,26 @@
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import '@testing-library/jest-dom/vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
-import { IncompatibleModuleTakeover } from '../IncompatibleModuleTakeover'
-import { IncompatibleModuleODDModalBody } from '../IncompatibleModuleODDModalBody'
-import { IncompatibleModuleDesktopModalBody } from '../IncompatibleModuleDesktopModalBody'
-import { useIncompatibleModulesAttached } from '../hooks'
-import type { AttachedModule } from '@opentrons/api-client'
 import {
-  PortalRoot,
-  TopPortalRoot,
   MODAL_PORTAL_ID,
+  PortalRoot,
   TOP_PORTAL_ID,
+  TopPortalRoot,
 } from '/app/App/portal'
+import { i18n } from '/app/i18n'
+
 import * as Fixtures from '../__fixtures__'
+import { useIncompatibleModulesAttached } from '../hooks'
+import { IncompatibleModuleDesktopModalBody } from '../IncompatibleModuleDesktopModalBody'
+import { IncompatibleModuleODDModalBody } from '../IncompatibleModuleODDModalBody'
+import { IncompatibleModuleTakeover } from '../IncompatibleModuleTakeover'
 
 import type { ComponentProps } from 'react'
+import type { AttachedModule } from '@opentrons/api-client'
 
 vi.mock('../hooks')
 vi.mock('../IncompatibleModuleODDModalBody')

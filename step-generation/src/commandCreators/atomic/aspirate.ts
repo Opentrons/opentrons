@@ -1,34 +1,39 @@
-import { COLUMN, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
   absorbanceReaderCollision,
-  modulePipetteCollision,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getLabwareSlot,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  uuid,
-  getIsSafePipetteMovement,
   formatPyStr,
   formatPyWellLocation,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getIsSafePipetteMovement,
+  getLabwareSlot,
+  getSlotInLocationStack,
   indentPyLines,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+  uuid,
 } from '../../utils'
-import { COLUMN_4_SLOTS } from '../../constants'
+
 import type {
+  AspDispAirgapParams,
   CreateCommand,
   NozzleConfigurationStyle,
-  AspDispAirgapParams,
 } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { Point } from '../../utils'
+
 export interface ExtendedAspirateParams extends AspDispAirgapParams {
   tipRack: string
   nozzles: NozzleConfigurationStyle | null
+  isAirGap?: boolean
 }
 /** Aspirate with given args. Requires tip. */
 export const aspirate: CommandCreator<ExtendedAspirateParams> = (
@@ -42,6 +47,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     labwareId,
     wellName,
     flowRate,
+    isAirGap,
     tipRack,
     wellLocation,
     nozzles,
@@ -54,11 +60,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
 
-  const slotName = getLabwareSlot(
-    labwareId,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(labwareId, prevRobotState.labware)
 
   if (!pipetteSpec) {
     errors.push(
@@ -67,7 +69,6 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
       })
     )
   }
-
   if (!labwareId || !prevRobotState.labware[labwareId]) {
     errors.push(
       errorCreators.labwareDoesNotExist({
@@ -75,14 +76,16 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
         labware: labwareId,
       })
     )
-  } else if (prevRobotState.labware[labwareId].slot === 'offDeck') {
+  } else if (
+    getSlotInLocationStack(prevRobotState.labware[labwareId].stack) ===
+    'offDeck'
+  ) {
     errors.push(errorCreators.labwareOffDeck())
   }
-
   if (COLUMN_4_SLOTS.includes(slotName)) {
     errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
   } else if (labwareState[slotName] != null) {
-    const adapterSlot = labwareState[slotName].slot
+    const adapterSlot = getSlotInLocationStack(labwareState[slotName].stack)
     if (COLUMN_4_SLOTS.includes(adapterSlot)) {
       errors.push(
         errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })
@@ -112,13 +115,14 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     )
   }
 
-  const is96Channel =
-    invariantContext.pipetteEntities[pipetteId]?.spec.channels === 96
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
 
   if (
-    is96Channel &&
-    nozzles === COLUMN &&
+    isMultiChannelPipette &&
+    nozzles !== ALL &&
     !getIsSafePipetteMovement(
+      nozzles,
       prevRobotState,
       invariantContext,
       pipetteId,
@@ -258,6 +262,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
         wellLocation,
         flowRate,
       },
+      ...(isAirGap && { meta: { isAirGap } }),
     },
   ]
 
@@ -270,9 +275,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     `location=${labwarePythonName}[${formatPyStr(
       wellName
     )}]${formatPyWellLocation(wellLocation)}`,
-    // rate= is a ratio in the PAPI, and we have no good way to figure out what
-    // flowrate the PAPI has set the pipette to, so we just have to do a division:
-    `rate=${flowRate} / ${pipettePythonName}.flow_rate.aspirate`,
+    `flow_rate=${flowRate}`,
   ]
   const python = `${pipettePythonName}.aspirate(\n${indentPyLines(
     pythonArgs.join(',\n')

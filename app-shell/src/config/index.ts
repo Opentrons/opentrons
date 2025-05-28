@@ -5,7 +5,6 @@ import get from 'lodash/get'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
 
-import { createLogger } from '../log'
 import {
   ADD_UNIQUE_VALUE,
   RESET_VALUE,
@@ -14,15 +13,15 @@ import {
   UI_INITIALIZED,
   UPDATE_VALUE,
 } from '../constants'
-import { DEFAULTS_V0, migrate } from './migrate'
-import { shouldUpdate, getNextValue } from './update'
+import { createLogger } from '../log'
 import { configInitialized, configValueUpdated } from './actions'
+import { DEFAULTS_V0, migrate } from './migrate'
+import { getNextValue, shouldUpdate } from './update'
 
 import type {
   ConfigV0,
   ConfigValueChangeAction,
 } from '@opentrons/app/src/redux/config/types'
-
 import type { Action, Dispatch, Logger } from '../types'
 import type { Config, Overrides } from './types'
 

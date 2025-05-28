@@ -1,12 +1,12 @@
 import type { CreateCommand } from '../../../command/types'
+import type { CommandAnnotation } from '../../../commandAnnotation/types'
 import type {
-  LoadedPipette,
+  Liquid,
   LoadedLabware,
   LoadedModule,
-  Liquid,
+  LoadedPipette,
   RunTimeParameter,
 } from '../../../js'
-import type { CommandAnnotation } from '../../../commandAnnotation/types'
 import type { LabwareDefinition2, RobotType } from '../../../js/types'
 import type { RunTimeCommand } from '../schemaV8'
 
@@ -24,6 +24,11 @@ export interface CommandV8Mixin {
 
 export interface CommandV9Mixin {
   commandSchemaId: 'opentronsCommandSchemaV9'
+  commands: CreateCommand[]
+}
+
+export interface CommandV10Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV10'
   commands: CreateCommand[]
 }
 
@@ -100,6 +105,7 @@ export interface ProtocolBase<DesignerApplicationData> {
     category?: string | null | undefined
     subcategory?: string | null | undefined
     tags?: string[]
+    source?: string | null
   }
   designerApplication?: {
     name?: string
@@ -115,7 +121,7 @@ export type ProtocolFile<
   (OT2RobotMixin | OT3RobotMixin) &
   LabwareV2Mixin &
   LiquidV1Mixin &
-  (CommandV8Mixin | CommandV9Mixin) &
+  (CommandV8Mixin | CommandV9Mixin | CommandV10Mixin) &
   CommandAnnotationV1Mixin
 
 export type ProtocolStructure = ProtocolBase<{}> &

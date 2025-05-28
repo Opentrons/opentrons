@@ -1,12 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
+
 import { RunningProtocolCommandList } from '../RunningProtocolCommandList'
 
 import type { ComponentProps } from 'react'

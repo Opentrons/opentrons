@@ -2,13 +2,8 @@
 
 from dataclasses import dataclass
 from typing import Optional, overload, List
-from typing_extensions import assert_type
 
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-    LabwareDefinition2,
-    LabwareDefinition3,
-)
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -52,6 +47,8 @@ from ..types import (
     ModuleModel,
     ModuleDefinition,
     AddressableAreaLocation,
+    LoadedLabware,
+    OnLabwareLocation,
 )
 
 
@@ -98,6 +95,15 @@ class LoadedConfigureForVolumeData:
     serial_number: str
     volume: float
     static_config: pipette_data_provider.LoadedStaticPipetteData
+
+
+@dataclass(frozen=True)
+class LoadedLabwarePoolData:
+    """The result of loading a labware pool with details for batch loads and location sequencing."""
+
+    primary_labware: LoadedLabware
+    adapter_labware: Optional[LoadedLabware] = None
+    lid_labware: Optional[LoadedLabware] = None
 
 
 class EquipmentHandler:
@@ -170,6 +176,7 @@ class EquipmentHandler:
         definition: LabwareDefinition,
         location: LabwareLocation,
         labware_id: Optional[str],
+        labware_pending_load: dict[str, LoadedLabware] | None = None,
     ) -> LoadedLabwareData:
         """Load labware from already-found definition."""
         definition_uri = uri_from_details(
@@ -178,7 +185,7 @@ class EquipmentHandler:
             version=definition.version,
         )
         return await self._load_labware_from_def_and_uri(
-            definition, definition_uri, location, labware_id
+            definition, definition_uri, location, labware_id, labware_pending_load
         )
 
     async def _load_labware_from_def_and_uri(
@@ -186,7 +193,8 @@ class EquipmentHandler:
         definition: LabwareDefinition,
         definition_uri: str,
         location: LabwareLocation,
-        labware_id: Optional[str],
+        labware_id: str | None,
+        labware_pending_load: dict[str, LoadedLabware] | None,
     ) -> LoadedLabwareData:
         labware_id = (
             labware_id if labware_id is not None else self._model_utils.generate_id()
@@ -196,10 +204,106 @@ class EquipmentHandler:
         offset_id = self.find_applicable_labware_offset_id(
             labware_definition_uri=definition_uri,
             labware_location=location,
+            labware_pending_load=labware_pending_load,
         )
 
         return LoadedLabwareData(
             labware_id=labware_id, definition=definition, offsetId=offset_id
+        )
+
+    async def load_labware_pool_from_definitions(
+        self,
+        pool_primary_definition: LabwareDefinition,
+        pool_adapter_definition: Optional[LabwareDefinition],
+        pool_lid_definition: Optional[LabwareDefinition],
+        location: LabwareLocation,
+        primary_id: Optional[str],
+        adapter_id: Optional[str],
+        lid_id: Optional[str],
+    ) -> LoadedLabwarePoolData:
+        """Load a pool of labware from already-found definitions."""
+        adapter_labware: LoadedLabware | None = None
+        lid_labware: LoadedLabware | None = None
+        adapter_lw = None
+        labware_by_id: dict[str, LoadedLabware] = {}
+        if pool_adapter_definition is not None:
+            adapter_location = location
+            adapter_lw = await self.load_labware_from_definition(
+                definition=pool_adapter_definition,
+                location=adapter_location,
+                labware_id=adapter_id,
+                labware_pending_load=labware_by_id,
+            )
+            adapter_uri = str(
+                uri_from_details(
+                    namespace=adapter_lw.definition.namespace,
+                    load_name=adapter_lw.definition.parameters.loadName,
+                    version=adapter_lw.definition.version,
+                )
+            )
+            adapter_labware = LoadedLabware.model_construct(
+                id=adapter_lw.labware_id,
+                location=adapter_location,
+                loadName=adapter_lw.definition.parameters.loadName,
+                definitionUri=adapter_uri,
+                offsetId=None,
+            )
+            labware_by_id[adapter_labware.id] = adapter_labware
+
+        primary_location: LabwareLocation = (
+            location
+            if adapter_lw is None
+            else OnLabwareLocation(labwareId=adapter_lw.labware_id)
+        )
+        loaded_labware = await self.load_labware_from_definition(
+            definition=pool_primary_definition,
+            location=primary_location,
+            labware_id=primary_id,
+            labware_pending_load={lw_id: lw for lw_id, lw in labware_by_id.items()},
+        )
+        primary_uri = str(
+            uri_from_details(
+                namespace=loaded_labware.definition.namespace,
+                load_name=loaded_labware.definition.parameters.loadName,
+                version=loaded_labware.definition.version,
+            )
+        )
+        primary_labware = LoadedLabware.model_construct(
+            id=loaded_labware.labware_id,
+            location=primary_location,
+            loadName=loaded_labware.definition.parameters.loadName,
+            definitionUri=primary_uri,
+        )
+        labware_by_id[primary_labware.id] = primary_labware
+
+        # If there is a lid load it
+        if pool_lid_definition is not None:
+            lid_location = OnLabwareLocation(labwareId=loaded_labware.labware_id)
+            lid_lw = await self.load_labware_from_definition(
+                definition=pool_lid_definition,
+                location=lid_location,
+                labware_id=lid_id,
+                labware_pending_load={lw_id: lw for lw_id, lw in labware_by_id.items()},
+            )
+            lid_uri = str(
+                uri_from_details(
+                    namespace=lid_lw.definition.namespace,
+                    load_name=lid_lw.definition.parameters.loadName,
+                    version=lid_lw.definition.version,
+                )
+            )
+            lid_labware = LoadedLabware.model_construct(
+                id=lid_lw.labware_id,
+                location=lid_location,
+                loadName=lid_lw.definition.parameters.loadName,
+                definitionUri=lid_uri,
+                offsetId=None,
+            )
+            labware_by_id[lid_labware.id] = lid_labware
+        return LoadedLabwarePoolData(
+            primary_labware=primary_labware,
+            adapter_labware=adapter_labware,
+            lid_labware=lid_labware,
         )
 
     async def load_labware(
@@ -231,7 +335,7 @@ class EquipmentHandler:
             load_name, namespace, version
         )
         return await self._load_labware_from_def_and_uri(
-            definition, definition_uri, location, labware_id
+            definition, definition_uri, location, labware_id, None
         )
 
     async def reload_labware(self, labware_id: str) -> ReloadedLabwareData:
@@ -437,7 +541,7 @@ class EquipmentHandler:
             definition=attached_module.definition,
         )
 
-    async def load_lids(  # noqa: C901
+    async def load_lids(
         self,
         load_name: str,
         namespace: str,
@@ -485,15 +589,11 @@ class EquipmentHandler:
                 f"Requested quantity {quantity} is greater than the stack limit of {stack_limit} provided by definition for {load_name}."
             )
 
-        if isinstance(definition, LabwareDefinition2):
-            is_deck_slot_compatible = True
-        else:
-            assert_type(definition, LabwareDefinition3)
-            is_deck_slot_compatible = (
-                True
-                if definition.parameters.isDeckSlotCompatible is None
-                else definition.parameters.isDeckSlotCompatible
-            )
+        is_deck_slot_compatible = (
+            True
+            if definition.parameters.isDeckSlotCompatible is None
+            else definition.parameters.isDeckSlotCompatible
+        )
 
         if isinstance(location, DeckSlotLocation) and not is_deck_slot_compatible:
             raise ValueError(
@@ -681,8 +781,11 @@ class EquipmentHandler:
         )
 
     def find_applicable_labware_offset_id(
-        self, labware_definition_uri: str, labware_location: LabwareLocation
-    ) -> Optional[str]:
+        self,
+        labware_definition_uri: str,
+        labware_location: LabwareLocation,
+        labware_pending_load: dict[str, LoadedLabware] | None = None,
+    ) -> str | None:
         """Figure out what offset would apply to a labware in the given location.
 
         Raises:
@@ -694,7 +797,9 @@ class EquipmentHandler:
             or None if no labware offset will apply.
         """
         labware_offset_location = (
-            self._state_store.geometry.get_projected_offset_location(labware_location)
+            self._state_store.geometry.get_projected_offset_location(
+                labware_location, labware_pending_load
+            )
         )
 
         if labware_offset_location is None:

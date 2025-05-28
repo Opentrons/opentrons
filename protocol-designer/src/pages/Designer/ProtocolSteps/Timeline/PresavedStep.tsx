@@ -1,8 +1,9 @@
-import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { PRESAVED_STEP_ID } from '../../../../steplist/types'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { stepIconsByType } from '../../../../form-types'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,

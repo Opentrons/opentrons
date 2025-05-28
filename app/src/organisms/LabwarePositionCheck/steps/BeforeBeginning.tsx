@@ -3,12 +3,12 @@ import { useSelector } from 'react-redux'
 
 import { LegacyStyledText } from '@opentrons/components'
 
+import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
-import type { State } from '/app/redux/types'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import type { State } from '/app/redux/types'
 
 export function BeforeBeginning(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation(['labware_position_check', 'shared'])
@@ -26,7 +26,7 @@ export function BeforeBeginning(props: LPCWizardContentProps): JSX.Element {
         protocol_name: protocolName,
       }),
     },
-    { loadName: t('calibration_probe'), displayName: t('calibration_probe') },
+    { loadName: 'calibration_probe', displayName: t('calibration_probe') },
   ]
 
   return (
@@ -39,7 +39,7 @@ export function BeforeBeginning(props: LPCWizardContentProps): JSX.Element {
         buttonText: t('exit'),
         buttonCategory: 'rounded',
         buttonType: 'tertiaryLowLight',
-        onClick: commandUtils.headerCommands.handleNavToDetachProbe,
+        onClick: commandUtils.headerCommands.handleCloseWithoutHome,
       }}
     >
       <TwoColumn>
