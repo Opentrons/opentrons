@@ -291,7 +291,17 @@ def reshape_glob(
     ],
     property_name: str,
 ) -> Any:
-    """Move any params specified as top-level keys into the 'params' value."""
+    """Move any params specified as top-level keys into the 'params' value.
+
+    Also move value of 'enabled' key into 'enable' key.
+    """
+    # NOTE: This does not check that the input dictionary is strictly in the shape of
+    # a TransferPropertiesDict. Specifically, it doesn't check that it receives the
+    # 'enabled' key when params are specified as top-level keys. So something like this
+    # dict will still convert successfully- {'enable': True, 'repetitions': 1, 'volume': 1}
+    # To conform to TransferPropertiesDict, the enable key should be 'enabled'.
+    # I am allowing this since it still can be converted to a valid LC params model.
+
     if isinstance(data, dict):
         if None not in (data.get("enable"), data.get("enabled")):
             raise ValueError(
