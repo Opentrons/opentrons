@@ -26,16 +26,19 @@ import type {
   DuplicateLabwareAction,
   EditLiquidGroupAction,
   EditMultipleLiquidGroupsAction,
+  EditSlotInfoAction,
   GenerateNewProtocolAction,
   OpenAddLabwareModalAction,
   OpenIngredientSelectorAction,
   RemoveWellsContentsAction,
   RenameLabwareAction,
+  SelectAdapterAction,
   SelectFixtureAction,
-  SelectLabwareAction,
+  SelectLidAction,
   SelectLiquidAction,
   SelectModuleAction,
-  SelectNestedLabwareAction,
+  SelectTopLabwareAction,
+  SelectTopLabwareAmountAction,
   SetWellContentsAction,
   ZoomedIntoSlotAction,
 } from '../actions'
@@ -302,30 +305,40 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
 )
 
 const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
-  selectedLabwareDefUri: null,
-  selectedNestedLabwareDefUri: null,
+  selectedTopLabware: { labwareDefURI: null, amount: 1 },
+  selectedAdapterDefURI: null,
   selectedModuleModel: null,
   selectedFixture: null,
+  selectedLidLabware: null,
   selectedSlot: { slot: null, cutout: null },
 }
 
 export const zoomedInSlotInfo = (
   state: ZoomedIntoSlotInfoState = selectedSlotInfoInitialState,
   action:
-    | SelectLabwareAction
-    | SelectNestedLabwareAction
+    | SelectTopLabwareAction
+    | SelectAdapterAction
     | SelectModuleAction
     | SelectFixtureAction
     | ZoomedIntoSlotAction
+    | SelectLidAction
+    | SelectTopLabwareAmountAction
+    | EditSlotInfoAction
 ): ZoomedIntoSlotInfoState => {
   switch (action.type) {
-    case 'SELECT_LABWARE': {
-      const { labwareDefUri } = action.payload
-      return { ...state, selectedLabwareDefUri: labwareDefUri }
+    case 'SELECT_TOP_LABWARE': {
+      const { labwareDefURI } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI,
+          amount: state.selectedTopLabware.amount,
+        },
+      }
     }
-    case 'SELECT_NESTED_LABWARE': {
-      const { nestedLabwareDefUri } = action.payload
-      return { ...state, selectedNestedLabwareDefUri: nestedLabwareDefUri }
+    case 'SELECT_ADAPTER': {
+      const { adapterDefURI } = action.payload
+      return { ...state, selectedAdapterDefURI: adapterDefURI }
     }
     case 'SELECT_MODULE': {
       const { moduleModel } = action.payload
@@ -343,6 +356,44 @@ export const zoomedInSlotInfo = (
           slot,
           cutout,
         },
+      }
+    }
+    case 'SELECT_LID': {
+      const { labwareDefURI } = action.payload
+      return {
+        ...state,
+        selectedLidLabware: labwareDefURI,
+      }
+    }
+    case 'SELECT_TOP_LABWARE_AMOUNT': {
+      const { amount } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI: state.selectedTopLabware.labwareDefURI,
+          amount,
+        },
+      }
+    }
+    case 'EDIT_SLOT_INFO': {
+      const {
+        labwareDefURI,
+        adapterDefURI,
+        moduleModel,
+        fixture,
+        lidDefURI,
+        amount,
+      } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI: labwareDefURI ?? null,
+          amount: amount ?? 1,
+        },
+        selectedAdapterDefURI: adapterDefURI ?? null,
+        selectedModuleModel: moduleModel ?? null,
+        selectedFixture: fixture ?? null,
+        selectedLidLabware: lidDefURI ?? null,
       }
     }
     default:

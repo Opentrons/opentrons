@@ -13,12 +13,16 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '../../components/organisms'
-import { getSlotIdsBlockedBySpanningForThermocycler } from '../../step-forms'
+import {
+  getSlotIdsBlockedBySpanningForThermocycler,
+  getSlotIsEmpty,
+} from '../../step-forms'
 import {
   getStagingAreaAddressableAreas,
   getTopmostLabwareOnModuleFromStack,
 } from '../../utils'
 import { SlotHover } from './SlotHover'
+import { getShowTCLid } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -106,8 +110,7 @@ export const DeckThumbnailDetails = (
                     slotId={slotId}
                   />
                 </>
-              ) : null}
-              {labwareLoadedOnModuleId == null ? (
+              ) : (
                 <SlotHover
                   robotType={robotType}
                   hover={hover}
@@ -115,7 +118,7 @@ export const DeckThumbnailDetails = (
                   slotPosition={[0, 0, 0]}
                   slotId={slotId}
                 />
-              ) : null}
+              )}
             </Module>
           </Fragment>
         )
@@ -124,7 +127,8 @@ export const DeckThumbnailDetails = (
       {allLabware.map(labware => {
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
-          allModules.some(m => labware.stack.includes(m.id))
+          allModules.some(m => labware.stack.includes(m.id)) ||
+          getShowTCLid(labware)
         ) {
           return null
         }
@@ -166,7 +170,8 @@ export const DeckThumbnailDetails = (
             stagingAreaAddressableAreas.includes(addressableArea.id)
           return (
             addressableAreas &&
-            !slotIdsBlockedBySpanning.includes(addressableArea.id)
+            !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
+            getSlotIsEmpty(initialDeckSetup, addressableArea.id, false)
           )
         })
         .map(addressableArea => {

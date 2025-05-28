@@ -277,8 +277,7 @@ stages:
               latchState: !anystr
               platformState: !anystr
               hopperDoorState: !anystr
-              axisStateX: !anystr
-              axisStateZ: !anystr
+              installDetected: !anybool
           - id: !anystr
             serialNumber: !anystr
             firmwareVersion: !anystr
@@ -297,8 +296,7 @@ stages:
               latchState: !anystr
               platformState: !anystr
               hopperDoorState: !anystr
-              axisStateX: !anystr
-              axisStateZ: !anystr
+              installDetected: !anybool
           - id: !anystr
             serialNumber: !anystr
             firmwareVersion: !anystr

@@ -35,6 +35,10 @@ export interface LabwareTemporalProperties {
 
 export interface PipetteTemporalProperties {
   mount: Mount
+  //  entityId is either a labwareId or a trashBin/wasteChute id
+  entityId?: string
+  //  primary nozzle's wellName if over a labware
+  wellName?: string
   nozzles?: NozzleConfigurationStyle
 }
 
@@ -216,6 +220,8 @@ export type ChangeTipOptions =
   | 'perDest'
   | 'perSource'
 
+export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
+
 export interface InnerMixArgs {
   volume: number
   times: number
@@ -280,6 +286,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   touchTipAfterDispense: boolean
   /** Optional offset for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseOffsetMmFromTop: number
+  /** Optional offset for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterDispenseMmFromEdge: number | null
   /** Optional speed for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseSpeed: number | null
   /** Flow rate in uL/sec for all dispenses */
@@ -292,6 +300,11 @@ export type SharedTransferLikeArgs = CommonArgs & {
   dispenseYOffset: number
   /** will be non-null once introduced to quick transfer */
   pushOut: number | null
+
+  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
+  blowoutLocation: string | null | undefined
+  blowoutFlowRateUlSec: number
+  blowoutOffsetFromTopMm: number
 
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
   liquidClass: string | null
@@ -309,16 +322,20 @@ export type SharedTransferLikeArgs = CommonArgs & {
   aspirateRetractZOffset: number
   aspirateRetractPositionReference: PositionReference
   aspirateRetractDelay: InnerDelayArgs | null
+  dispensePositionReference: PositionReference
+  dispenseZOffset: number
   dispenseSubmergeSpeed: number | null
   dispenseSubmergeXOffset: number
   dispenseSubmergeYOffset: number
   dispenseSubmergeZOffset: number
   dispenseSubmergePositionReference: PositionReference
+  dispenseSubmergeDelay: InnerDelayArgs | null
   dispenseRetractSpeed: number | null
   dispenseRetractXOffset: number
   dispenseRetractYOffset: number
   dispenseRetractZOffset: number
   dispenseRetractPositionReference: PositionReference
+  dispenseRetractDelay: InnerDelayArgs | null
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {
@@ -326,11 +343,6 @@ export type ConsolidateArgs = SharedTransferLikeArgs & {
 
   sourceWells: string[]
   destWell: string | null
-
-  /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
-  blowoutLocation: string | null | undefined
-  blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
 
   /** Mix in first well in chunk */
   mixFirstAspirate: InnerMixArgs | null | undefined
@@ -343,11 +355,6 @@ export type TransferArgs = SharedTransferLikeArgs & {
 
   sourceWells: string[]
   destWells: string[] | null
-
-  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
-  blowoutLocation: string | null | undefined
-  blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: InnerMixArgs | null | undefined
@@ -363,11 +370,8 @@ export type DistributeArgs = SharedTransferLikeArgs & {
 
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
   disposalVolume: number | null | undefined
-  /** pass to blowout **/
-  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
-  blowoutLocation: string | null | undefined
-  blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
+  /** Volume to condition the tip with during aspiration sequence */
+  conditioningVolume: number | null
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: InnerMixArgs | null | undefined
@@ -686,6 +690,7 @@ export type ErrorType =
   | 'MISSING_MODULE'
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
+  | 'MULTI_DISPENSE_VALUES_NOT_FOUND'
   | 'NO_TIP_ON_PIPETTE'
   | 'NO_TIP_SELECTED'
   | 'PIPETTE_DOES_NOT_EXIST'

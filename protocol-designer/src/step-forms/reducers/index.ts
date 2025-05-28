@@ -619,12 +619,26 @@ export const savedStepForms = (
       return mapValues(savedStepForms, (savedForm: FormData) => {
         if (savedForm.stepType === 'manualIntervention') {
           // remove instances of labware from all manualIntervention steps
+          const updatedLabwareLocation = Object.entries(
+            savedForm.labwareLocationUpdate as Record<string, string>
+          ).reduce((acc: Record<string, string>, [labwareId, locationId]) => {
+            if (labwareId === labwareIdToDelete) {
+              return acc
+            }
+
+            // If labware is on an adapter and adapter was deleted, update labwareId's location
+            const newLocationId =
+              locationId === labwareIdToDelete
+                ? savedForm.labwareLocationUpdate[labwareIdToDelete]
+                : locationId
+
+            acc[labwareId] = newLocationId
+            return acc
+          }, {})
+
           return {
             ...savedForm,
-            labwareLocationUpdate: omit(
-              savedForm.labwareLocationUpdate,
-              labwareIdToDelete
-            ),
+            labwareLocationUpdate: updatedLabwareLocation,
           }
         }
 

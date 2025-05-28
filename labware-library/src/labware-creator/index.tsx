@@ -16,10 +16,7 @@ import {
   ModalShell,
   PrimaryButton,
 } from '@opentrons/components'
-import {
-  getAllDefinitions,
-  labwareSchemaV2 as labwareSchema,
-} from '@opentrons/shared-data'
+import { getAllDefinitions, labwareSchemaV2 } from '@opentrons/shared-data'
 
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
@@ -74,8 +71,11 @@ import type {
 } from './fields'
 import type { LabwareCreatorErrors } from './formLevelValidation'
 
+// todo(mm, 2025-05-16): Deduplicate with app and shared-data for schema 3 support and
+// better type-guarding.
 const ajv = new Ajv()
-const validateLabwareSchema = ajv.compile(labwareSchema)
+const validateLabwareSchema2 = ajv.compile(labwareSchemaV2)
+
 type WizardStep =
   | 'intro'
   | 'regularity'
@@ -284,13 +284,13 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
             return
           }
 
-          if (!Boolean(validateLabwareSchema(parsedLabwareDef))) {
-            console.warn(validateLabwareSchema.errors)
+          if (!Boolean(validateLabwareSchema2(parsedLabwareDef))) {
+            console.warn(validateLabwareSchema2.errors)
 
             setImportError({
               key: 'INVALID_LABWARE_DEF',
               // @ts-expect-error(IL, 2021-03-24): ajv def mixup
-              messages: validateLabwareSchema.errors.map(
+              messages: validateLabwareSchema2.errors.map(
                 ajvError =>
                   `${ajvError.schemaPath}: ${
                     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

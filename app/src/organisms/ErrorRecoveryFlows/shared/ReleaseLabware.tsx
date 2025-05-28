@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
+  InlineNotification,
   JUSTIFY_CENTER,
   RESPONSIVENESS,
   SPACING,
@@ -11,7 +12,6 @@ import {
 } from '@opentrons/components'
 
 import gripperReleaseAnimation from '/app/assets/videos/error-recovery/Gripper_Release.webm'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { TwoColumn } from '/app/molecules/InterventionModal'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 

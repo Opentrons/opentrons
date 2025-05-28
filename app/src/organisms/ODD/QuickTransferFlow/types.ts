@@ -66,9 +66,13 @@ export interface QuickTransferSummaryState {
   preWetTip: boolean
   mixOnAspirate?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   submergeAspirate?: {
+    speed: number
+    positionFromBottom: number
+  }
+  retractAspirate?: {
     speed: number
     positionFromBottom: number
   }
@@ -82,9 +86,13 @@ export interface QuickTransferSummaryState {
   tipPositionDispense: number
   mixOnDispense?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   submergeDispense?: {
+    speed: number
+    positionFromBottom: number
+  }
+  retractDispense?: {
     speed: number
     positionFromBottom: number
   }
@@ -131,6 +139,7 @@ export type QuickTransferSummaryAction =
   | SetTouchTipAspirate
   | SetAirGapAspirate
   | SetSubmergeAspirate
+  | SetRetractAspirate
   | SetDispenseTipPosition
   | SetMixOnDispense
   | SetDelayDispense
@@ -138,6 +147,7 @@ export type QuickTransferSummaryAction =
   | SetBlowOut
   | SetAirGapDispense
   | SetSubmergeDispense
+  | SetRetractDispense
   | SetChangeTip
   | SetDropTipLocation
 
@@ -165,7 +175,7 @@ interface SetPreWetTip {
 }
 interface SetMixOnAspirate {
   type: typeof ACTIONS.SET_MIX_ON_ASPIRATE
-  mixSettings?: { mixVolume: number; repititions: number }
+  mixSettings?: { mixVolume: number; repetitions: number }
 }
 interface SetDelayAspirate {
   type: typeof ACTIONS.SET_DELAY_ASPIRATE
@@ -189,13 +199,20 @@ interface SetSubmergeAspirate {
     positionFromBottom: number
   }
 }
+interface SetRetractAspirate {
+  type: typeof ACTIONS.SET_RETRACT_ASPIRATE
+  retractSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
+}
 interface SetDispenseTipPosition {
   type: typeof ACTIONS.SET_DISPENSE_TIP_POSITION
   position: number
 }
 interface SetMixOnDispense {
   type: typeof ACTIONS.SET_MIX_ON_DISPENSE
-  mixSettings?: { mixVolume: number; repititions: number }
+  mixSettings?: { mixVolume: number; repetitions: number }
 }
 interface SetDelayDispense {
   type: typeof ACTIONS.SET_DELAY_DISPENSE
@@ -219,6 +236,13 @@ interface SetAirGapDispense {
 interface SetSubmergeDispense {
   type: typeof ACTIONS.SET_SUBMERGE_DISPENSE
   submergeSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
+}
+interface SetRetractDispense {
+  type: typeof ACTIONS.SET_RETRACT_DISPENSE
+  retractSettings?: {
     speed: number
     positionFromBottom: number
   }

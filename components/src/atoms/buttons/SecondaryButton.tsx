@@ -13,8 +13,7 @@ interface SecondaryButtonProps extends StyleProps {
   'aria-disabled'?: boolean
 }
 export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
-  shouldForwardProp: p =>
-    isntStyleProp(p) && p !== 'isDangerous' && p !== 'aria-disabled',
+  shouldForwardProp: p => isntStyleProp(p) && p !== 'isDangerous',
 })<SecondaryButtonProps>`
   appearance: none;
   cursor: ${props =>
@@ -92,3 +91,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
 
   ${styleProps}
 `
+
+SecondaryButton.defaultProps = {
+  'aria-disabled': false,
+}

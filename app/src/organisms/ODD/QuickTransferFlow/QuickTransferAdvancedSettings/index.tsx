@@ -162,7 +162,7 @@ export function QuickTransferAdvancedSettings(
         state.mixOnAspirate !== undefined
           ? t('mix_value', {
               volume: state.mixOnAspirate?.mixVolume,
-              reps: state.mixOnAspirate?.repititions,
+              reps: state.mixOnAspirate?.repetitions,
             })
           : '',
       enabled:
@@ -245,7 +245,7 @@ export function QuickTransferAdvancedSettings(
         state.mixOnDispense !== undefined
           ? t('mix_value', {
               volume: state.mixOnDispense?.mixVolume,
-              reps: state.mixOnDispense?.repititions,
+              reps: state.mixOnDispense?.repetitions,
             })
           : '',
       enabled:

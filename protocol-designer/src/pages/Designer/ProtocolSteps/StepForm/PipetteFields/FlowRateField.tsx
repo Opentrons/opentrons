@@ -7,15 +7,17 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
   linearInterpolate,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
+import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
 import { InputStepFormField } from '../../../../../components/molecules'
 import { getRobotType } from '../../../../../file-data/selectors'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
-import { getReferenceVolumesForByVolumeInterpolation } from '../../../../../steplist/formLevel/handleFormChange/utils'
 import { getMatchingTipLiquidSpecs } from '../../../../../utils'
 import { getMaxUiFlowRate } from './utils'
 
+import type { PathOption } from '@opentrons/step-generation'
 import type { FormData } from '../../../../../form-types'
 import type { FlowRateType } from '../../../../../resources/types'
 import type { FieldProps } from '../types'
@@ -50,7 +52,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassDef =
     allLiquidClassDefs[formData?.liquidClass ?? ''] ??
-    allLiquidClassDefs.waterV1
+    allLiquidClassDefs[WATER_LIQUID_CLASS_NAME]
   const convertedPipetteName =
     pipette != null ? getFlexNameConversion(pipette.spec) : null
   const liquidClassValuesForPipette = liquidClassDef.byPipette.find(
@@ -68,17 +70,31 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
     Object.values(labwareEntities).find(
       ({ labwareDefURI }) => labwareDefURI === tiprack
     )?.def ?? null
+
+  // if form type is 'mix', we will use single path
   const referenceVolumesForByVolumeInterpolation =
     pipette != null && tiprackDef != null && formData != null
-      ? getReferenceVolumesForByVolumeInterpolation({
-          rawForm: formData,
+      ? getTransferPlanAndReferenceVolumes({
+          volume: Number(formData.volume),
+          path: (formData.path as PathOption) ?? 'single',
+          numDispenseWells:
+            formData.stepType === 'moveLiquid'
+              ? formData.dispense_wells.length
+              : 1,
           pipetteSpecs: pipette?.spec,
           tiprackDefinition: tiprackDef,
-          conditioningByVolume: (liquidClassValuesForTip?.multiDispense
-            ?.conditioningByVolume ?? []) as Array<[number, number]>,
-          disposalByVolume: (liquidClassValuesForTip?.multiDispense
-            ?.disposalByVolume ?? []) as Array<[number, number]>,
-        })
+          conditioningByVolume:
+            (liquidClassValuesForTip?.multiDispense
+              ?.conditioningByVolume as Array<[number, number]>) ?? null,
+          disposalByVolume:
+            (liquidClassValuesForTip?.multiDispense?.disposalByVolume as Array<
+              [number, number]
+            >) ?? null,
+          aspirateAirGap:
+            formData.aspirate_airGap_checkbox === true
+              ? formData.aspirate_airGap_volume
+              : null,
+        }).referenceVolumes
       : null
   const [referenceVolumeFlowRate, referenceVolumeCorrection] =
     flowRateType === 'aspirate'
@@ -144,10 +160,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
     (isPristine && flowRateNum === 0)
   ) {
     errorMessage = i18n.format(
-      t('step_edit_form.field.flow_rate.error_out_of_bounds', {
-        min: 0.1,
-        max: maxFlowRate,
-      }),
+      t('step_edit_form.field.flow_rate.error_out_of_bounds'),
       'capitalize'
     )
   }
@@ -173,7 +186,6 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
       caption={
         maxFlowRate != null
           ? t('protocol_steps:valid_range', {
-              min: 0.1,
               max: maxFlowRate,
               unit: t('application:units.microliterPerSec'),
             })

@@ -190,6 +190,18 @@ export function useModuleOverflowMenu(
       {t('heater_shaker:show_attachment_instructions')}
     </MenuItem>
   )
+  const setupBtn = (
+    <MenuItem
+      key={`setup_${String(module.moduleModel)}`}
+      data-testid={`setup_${String(module.moduleModel)}`}
+      onClick={() => {
+        handleInstructionsClick()
+      }}
+      whiteSpace={NO_WRAP}
+    >
+      {t('overflow_menu_setup_instructions')}
+    </MenuItem>
+  )
   const testShakeBtn =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
     module.data.speedStatus !== 'idle' ? (
@@ -456,7 +468,7 @@ export function useModuleOverflowMenu(
         setSetting: t('overflow_menu_home_shuttle'),
         isSecondary: false,
         isSettingDisabled: isDisabled,
-        menuButtons: [aboutModuleBtn],
+        menuButtons: [aboutModuleBtn, setupBtn],
         onClick: homeShuttle,
       },
     ],

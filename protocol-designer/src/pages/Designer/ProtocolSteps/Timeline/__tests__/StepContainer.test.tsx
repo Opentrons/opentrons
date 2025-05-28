@@ -9,6 +9,7 @@ import { COLORS } from '@opentrons/components'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'
 import { getUnsavedForm } from '../../../../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../../../../top-selectors/labware-locations'
 import { StepContainer } from '../StepContainer'
 import { StepOverflowMenu } from '../StepOverflowMenu'
 
@@ -19,6 +20,7 @@ vi.mock('../../../../../step-forms/selectors')
 vi.mock('../../../../../ui/steps/actions/actions')
 vi.mock('../../../../../ui/steps/selectors')
 vi.mock('../StepOverflowMenu')
+vi.mock('../../../../../top-selectors/labware-locations')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OverflowBtn>()
   return {
@@ -52,6 +54,14 @@ describe('StepContainer', () => {
       <div>mock StepOverflowMenu</div>
     )
     vi.mocked(getUnsavedForm).mockReturnValue(null)
+    vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
+      labware: {},
+      modules: {},
+      additionalEquipmentOnDeck: {
+        trash: { id: 'trash', name: 'trashBin', location: 'cutoutA3' },
+      },
+      pipettes: {},
+    })
   })
 
   it('renders the starting deck state step', () => {

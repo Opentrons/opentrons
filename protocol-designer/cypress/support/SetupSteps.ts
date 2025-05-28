@@ -53,7 +53,7 @@ export enum SetupContent {
   WellPlatesCat = 'Well plates',
   AddLiquid = 'Add liquid',
   DefineALiquid = 'Define a liquid',
-  LiquidButton = 'Liquid',
+  LiquidButton = 'Liquids',
   SampleLiquidName = 'My liquid!',
   ProtocolSteps = 'Protocol steps',
   AddStep = 'Add Step',
@@ -76,7 +76,7 @@ export enum SetupLocators {
   LiquidNameInput = 'input[name="displayName"]',
   ModalShellArea = 'div[aria-label="ModalShell_ModalArea"]',
   SaveButton = 'button[type="submit"]',
-  LiquidsDropdown = 'div[tabindex="0"].sc-ksBlkl',
+  LiquidsDropdown = '[data-testid="dropdownMenu"]',
   Div = 'div',
   Button = 'button',
   TempdeckTempInput = 'input[name="targetTemperature"]',
@@ -397,7 +397,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Adds hardware/labware to a deck slot.
+   * Adds labware to a deck slot.
    */
   AddHardwareLabware: (): StepThunk => ({
     call: () => {
@@ -464,7 +464,7 @@ export const SetupSteps = {
    */
   AddLiquid: (): StepThunk => ({
     call: () => {
-      cy.contains('button', SetupContent.AddLiquid).click()
+      cy.get('button[data-testid="LabwareCard_addLiquid_button"]').click()
     },
   }),
   /**
@@ -717,7 +717,7 @@ export const SetupSteps = {
   // Continue to the next part of the transfer form
   Continue: (): StepThunk => ({
     call: () => {
-      cy.contains('Continue').click()
+      cy.contains('Continue').click({ force: true })
     },
   }),
 
@@ -1111,14 +1111,14 @@ export const CompositeSetupSteps = {
     heatershaker?: boolean
     magblock?: boolean
     tempdeck?: boolean
-    platereader?: boolean
+    plateReader?: boolean
   }): StepThunk => ({
     call: () => {
       const thermocycler = options.thermocycler ?? false
       const heatershaker = options.heatershaker ?? false
       const magblock = options.magblock ?? false
       const tempdeck = options.tempdeck ?? false
-      const platereader = options.platereader ?? false
+      const plateReader = options.plateReader ?? false
       cy.log(`Running FlexSetup with options: ${JSON.stringify(options)}`)
       SetupVerifications.OnStep1().call()
       SetupVerifications.FlexSelected().call()
@@ -1159,7 +1159,7 @@ export const CompositeSetupSteps = {
         SetupSteps.AddTempdeck2().call()
       }
 
-      if (platereader) {
+      if (plateReader) {
         SetupSteps.AddPlateReader().call()
       }
 

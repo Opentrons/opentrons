@@ -210,6 +210,7 @@ jobs:
           VERSION_STRING=$(echo ${{ github.ref }} | sed 's/refs\/tags\/components@//')
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
+          json -I -f ./components/package.json -e "delete this.dependencies['@opentrons/step-generation']"
       - uses: 'actions/setup-node@v4'
         with:
           node-version: '22.11.0'

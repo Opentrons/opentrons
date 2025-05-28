@@ -8,31 +8,16 @@ import { getLabwareEntities } from '../../step-forms/selectors'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getLabwarePythonName, uuid } from '../../utils'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import {
-  selectFixture,
-  selectLabware,
-  selectModule,
-  selectNestedLabware,
-} from './actions'
 
 import type { LabwareEntities } from '@opentrons/step-generation'
-import type {
-  LabwareOnDeck,
-  ModuleOnDeck,
-  NormalizedLabware,
-  NormalizedLabwareById,
-} from '../../step-forms'
+import type { NormalizedLabware, NormalizedLabwareById } from '../../step-forms'
 import type { ThunkAction } from '../../types'
-import type { Fixture } from '../types'
 import type {
   CreateContainerAction,
   CreateContainerArgs,
   DeleteContainerAction,
   DuplicateLabwareAction,
-  SelectFixtureAction,
-  SelectLabwareAction,
-  SelectModuleAction,
-  SelectNestedLabwareAction,
+  ZoomedIntoSlotAction,
 } from './actions'
 
 export interface RenameLabwareAction {
@@ -44,10 +29,9 @@ export interface RenameLabwareAction {
 }
 export const renameLabware: (
   args: RenameLabwareAction['payload']
-) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
-  dispatch,
-  getState
-) => {
+) => ThunkAction<
+  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+> = args => (dispatch, getState) => {
   const { labwareId } = args
   const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(
     getState()
@@ -70,65 +54,55 @@ export const renameLabware: (
 }
 export const createContainer: (
   args: CreateContainerArgs
-) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
-  dispatch,
-  getState
-) => {
+) => ThunkAction<
+  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+> = args => (dispatch, getState) => {
+  const { labwareDefURIStack, slot } = args
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
-  const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
-    args.labwareDefURI
+  const labwareDefForOt2HS = labwareDefSelectors.getLabwareDefsByURI(state)[
+    labwareDefURIStack[0]
   ]
-  const labwareDisplayCategory = labwareDef.metadata.displayCategory
-  const slot =
-    args.slot ||
-    getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDef)
-  const isTiprack = getIsTiprack(labwareDef)
-  if (slot) {
-    const id = `${uuid()}:${args.labwareDefURI}`
-    const adapterId =
-      args.adapterUnderLabwareDefURI != null
-        ? `${uuid()}:${args.adapterUnderLabwareDefURI}`
-        : null
-
-    if (adapterId != null && args.adapterUnderLabwareDefURI != null) {
-      const adapterDef = labwareDefSelectors.getLabwareDefsByURI(state)[
-        args.adapterUnderLabwareDefURI
+  const availableSlot =
+    slot ||
+    getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDefForOt2HS)
+  if (availableSlot) {
+    let currentSlot = availableSlot
+    labwareDefURIStack.forEach(labwareUri => {
+      const id = `${uuid()}:${labwareUri}`
+      const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
+        labwareUri
       ]
+      const labwareDisplayCategory = labwareDef.metadata.displayCategory
+      const isTiprack = getIsTiprack(labwareDef)
+
       dispatch({
         type: 'CREATE_CONTAINER',
         payload: {
-          ...args,
-          labwareDefURI: args.adapterUnderLabwareDefURI,
-          id: adapterId,
-          slot,
-          displayCategory: adapterDef.metadata.displayCategory,
-        },
-      })
-      dispatch({
-        type: 'CREATE_CONTAINER',
-        payload: {
-          ...args,
           id,
-          slot: adapterId,
+          labwareDefURI: labwareUri,
+          slot: currentSlot,
           displayCategory: labwareDisplayCategory,
         },
       })
-    } else {
-      dispatch({
-        type: 'CREATE_CONTAINER',
-        payload: { ...args, id, slot, displayCategory: labwareDisplayCategory },
-      })
-    }
-    if (isTiprack) {
-      // Tipracks cannot be named, but should auto-increment.
-      // We can't rely on reducers to do that themselves bc they don't have access
-      // to both the nickname state and the isTiprack condition
-      renameLabware({
-        labwareId: id,
-      })(dispatch, getState)
-    }
+
+      if (isTiprack) {
+        // Tipracks cannot be named, but should auto-increment.
+        // We can't rely on reducers to do that themselves bc they don't have access
+        // to both the nickname state and the isTiprack condition
+        renameLabware({
+          labwareId: id,
+        })(dispatch, getState)
+      }
+      if (availableSlot === 'offDeck') {
+        dispatch({
+          type: 'ZOOMED_INTO_SLOT',
+          payload: { slot: id, cutout: null },
+        })
+      }
+      currentSlot = id
+    })
   } else {
     console.warn('no slots available, cannot create labware')
   }
@@ -200,42 +174,6 @@ export const duplicateLabware: (
       },
     })
   }
-}
-
-interface EditSlotInfo {
-  createdLabwareForSlot?: LabwareOnDeck | null
-  createdNestedLabwareForSlot?: LabwareOnDeck | null
-  createdModuleForSlot?: ModuleOnDeck | null
-  preSelectedFixture?: Fixture | null
-}
-
-export const editSlotInfo: (
-  args: EditSlotInfo
-) => ThunkAction<
-  | SelectNestedLabwareAction
-  | SelectLabwareAction
-  | SelectModuleAction
-  | SelectFixtureAction
-> = args => dispatch => {
-  const {
-    createdModuleForSlot,
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
-    preSelectedFixture,
-  } = args
-
-  dispatch(
-    selectNestedLabware({
-      nestedLabwareDefUri: createdNestedLabwareForSlot?.labwareDefURI ?? null,
-    })
-  )
-  dispatch(
-    selectLabware({
-      labwareDefUri: createdLabwareForSlot?.labwareDefURI ?? null,
-    })
-  )
-  dispatch(selectModule({ moduleModel: createdModuleForSlot?.model ?? null }))
-  dispatch(selectFixture({ fixture: preSelectedFixture ?? null }))
 }
 
 export interface EditMultipleLabwareAction {

@@ -12,23 +12,23 @@ import { LabwareRender } from './LabwareRender'
 
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
-const fixture96Plate = _fixture96Plate as LabwareDefinition2
-const fixture24Tuberack = _fixture24Tuberack as LabwareDefinition2
-const fixture12Trough = _fixture12Trough as LabwareDefinition2
+const fixture96Plate = _fixture96Plate as LabwareDefinition
+const fixture24Tuberack = _fixture24Tuberack as LabwareDefinition
+const fixture12Trough = _fixture12Trough as LabwareDefinition
 
-const fixtureTiprack10 = _fixtureTiprack10ul as LabwareDefinition2
-const fixtureTiprack300 = _fixtureTiprack300ul as LabwareDefinition2
-const fixtureTiprack1000 = _fixtureTiprack1000ul as LabwareDefinition2
+const fixtureTiprack10 = _fixtureTiprack10ul as LabwareDefinition
+const fixtureTiprack300 = _fixtureTiprack300ul as LabwareDefinition
+const fixtureTiprack1000 = _fixtureTiprack1000ul as LabwareDefinition
 
-const labwareDefMap: Record<string, LabwareDefinition2> = {
+const labwareDefMap: Record<string, LabwareDefinition> = {
   [fixture96Plate.metadata.displayName]: fixture96Plate,
   [fixture24Tuberack.metadata.displayName]: fixture24Tuberack,
   [fixture12Trough.metadata.displayName]: fixture12Trough,
 }
 
-const tipRackDefMap: Record<string, LabwareDefinition2> = {
+const tipRackDefMap: Record<string, LabwareDefinition> = {
   [fixtureTiprack10.metadata.displayName]: fixtureTiprack10,
   [fixtureTiprack300.metadata.displayName]: fixtureTiprack300,
   [fixtureTiprack1000.metadata.displayName]: fixtureTiprack1000,

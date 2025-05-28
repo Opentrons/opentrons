@@ -313,7 +313,11 @@ export interface LabwareDefinition3 {
   innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
-export interface LabwareDefByDefURI {
+// LabwareDefinition1 deliberately excluded.
+// I'm pretty sure nothing in the frontend needs to deal with it anymore.
+export type LabwareDefinition = LabwareDefinition2 | LabwareDefinition3
+
+export interface LabwareDef2ByDefURI {
   [defUri: string]: LabwareDefinition2
 }
 export interface LegacyLabwareDefByName {

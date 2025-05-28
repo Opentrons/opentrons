@@ -199,8 +199,8 @@ class AbstractFlexStackerDriver(Protocol):
         color: Optional[LEDColor] = None,
         external: Optional[bool] = None,
         pattern: Optional[LEDPattern] = None,
-        duration: Optional[int] = None,
-        reps: Optional[int] = None,
+        duration: Optional[int] = None,  # Default firmware duration is 500ms
+        reps: Optional[int] = None,  # Default firmware reps is 0
     ) -> None:
         """Set LED Status bar color and pattern."""
         ...

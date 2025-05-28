@@ -13,13 +13,11 @@ import {
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
+import { getEnableStacking } from '../../../../feature-flags/selectors'
 import { getRobotType } from '../../../../file-data/selectors'
 import { createCustomLabwareDef } from '../../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import {
-  selectLabware,
-  selectNestedLabware,
-} from '../../../../labware-ingred/actions'
+import { selectTopLabware } from '../../../../labware-ingred/actions'
 import { selectors } from '../../../../labware-ingred/selectors'
 import {
   getInitialDeckSetup,
@@ -30,6 +28,7 @@ import { getHas96Channel } from '../../../../utils'
 import { SelectLabwareModal } from '../index'
 
 import type { ComponentProps } from 'react'
+import type { InfoScreen } from '@opentrons/components'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 
 vi.mock('../../../../step-forms/selectors')
@@ -39,6 +38,15 @@ vi.mock('../../../../labware-defs/selectors')
 vi.mock('../../../../labware-defs/actions')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../labware-ingred/actions')
+vi.mock('../../../../feature-flags/selectors')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InfoScreen>()
+  return {
+    ...actual,
+    InfoScreen: vi.fn(() => <div>mock InfoScreen</div>),
+  }
+})
+
 const render = (props: ComponentProps<typeof SelectLabwareModal>) => {
   return renderWithProviders(<SelectLabwareModal {...props} />, {
     i18nInstance: i18n,
@@ -53,7 +61,9 @@ describe('SelectLabwareModal', () => {
       slot: 'D3',
       onClose: vi.fn(),
       onConfirm: vi.fn(),
+      slotFull: false,
     }
+    vi.mocked(getEnableStacking).mockReturnValue(true)
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getPermittedTipracks).mockReturnValue([])
@@ -68,8 +78,9 @@ describe('SelectLabwareModal', () => {
       },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: null,
-      selectedNestedLabwareDefUri: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
+      selectedAdapterDefURI: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -96,12 +107,13 @@ describe('SelectLabwareModal', () => {
     fireEvent.click(
       screen.getByText('Opentrons Calibration Block - Short Side: Left')
     )
-    expect(vi.mocked(selectLabware)).toHaveBeenCalled()
+    expect(vi.mocked(selectTopLabware)).toHaveBeenCalled()
   })
   it('renders deck slot and selects an adapter and labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: 'fixture/fixture_universal_flat_bottom_adapter/1',
-      selectedNestedLabwareDefUri: null,
+      selectedAdapterDefURI: 'fixture/fixture_universal_flat_bottom_adapter/1',
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -114,7 +126,7 @@ describe('SelectLabwareModal', () => {
     fireEvent.click(
       screen.getByText('Fixture Corning 96 Well Plate 360 µL Flat')
     )
-    expect(vi.mocked(selectNestedLabware)).toHaveBeenCalled()
+    expect(vi.mocked(selectTopLabware)).toHaveBeenCalled()
   })
 
   it('renders the custom labware flow', () => {
@@ -126,8 +138,9 @@ describe('SelectLabwareModal', () => {
 
   it('renders the filter checkbox if there is a module on the slot and is checked by default', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: null,
-      selectedNestedLabwareDefUri: null,
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: THERMOCYCLER_MODULE_V1,
       selectedSlot: { slot: 'B1', cutout: 'cutoutB1' },
@@ -135,5 +148,12 @@ describe('SelectLabwareModal', () => {
     render(props)
     screen.getByText('Only display recommended labware')
     expect(screen.getByRole('checkbox')).toBeChecked()
+  })
+
+  it('renders infoscreen component if slot is full', () => {
+    props.slotFull = true
+    render(props)
+    screen.getByText('mock InfoScreen')
+    expect(screen.queryByText('Upload custom labware')).not.toBeInTheDocument()
   })
 })

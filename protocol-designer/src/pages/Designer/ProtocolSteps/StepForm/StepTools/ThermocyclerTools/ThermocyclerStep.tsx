@@ -22,8 +22,8 @@ import {
 
 import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
+  enterValueWithinRange,
   isTimeFormatMinutesSeconds,
-  temperatureRangeFieldValue,
 } from '../../../../../../steplist/fieldLevel/errors'
 import {
   maskToFloat,
@@ -63,7 +63,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
     readOnly = true,
     setIsInEdit,
   } = props
-  const { i18n, t } = useTranslation(['application', 'form'])
+  const { i18n, t } = useTranslation(['application', 'form', 'protocol_steps'])
   const [hover, setHover] = useState<boolean>(false)
   const [showEdit, setShowEditCurrentStep] = useState<boolean>(!readOnly)
   const [stepState, setStepState] = useState({
@@ -287,7 +287,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
             handleValueUpdate(
               'temp',
               maskToFloat(e.target.value),
-              temperatureRangeFieldValue(4, 99)
+              enterValueWithinRange(4, 99)
             )
           }}
           onBlur={() => {
@@ -296,6 +296,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
               temp: { ...stepState.temp, wasAccessed: true },
             })
           }}
+          caption={t('protocol_steps:captions_for_fields.blockTargetTemp')}
           error={stepState.temp.wasAccessed ? stepState.temp.error : null}
         />
       </Flex>

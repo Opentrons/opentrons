@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -29,7 +29,6 @@ import {
   LabwareCard,
   SelectLabwareModal,
 } from '../../../components/organisms'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import {
   createContainer,
@@ -57,7 +56,6 @@ export function DeckSetupToolbox(
   props: DeckSetupToolsProps
 ): JSX.Element | null {
   const { onCloseClick, position = POSITION_FIXED } = props
-  const { makeSnackbar } = useKitchen()
   const { t, i18n } = useTranslation(['starting_deck_state', 'shared'])
   const [
     showDeleteEntityInUseModal,
@@ -68,128 +66,121 @@ export function DeckSetupToolbox(
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const {
-    selectedLabwareDefUri,
+    selectedTopLabware,
     selectedModuleModel,
     selectedSlot,
-    selectedNestedLabwareDefUri,
+    selectedAdapterDefURI,
+    selectedLidLabware,
   } = selectedSlotInfo
   const { slot } = selectedSlot
   const [showSelectLabwareModal, setShowSelectLabwareModal] = useState<boolean>(
     false
   )
 
+  const {
+    createdAdapterForSlot,
+    createdModuleForSlot,
+    createdFixtureForSlots,
+    createdStackForSlot,
+    createdLidForSlot,
+  } = useMemo(() => {
+    return getSlotInformation({
+      deckSetup,
+      slot: slot ?? 'A1',
+    })
+  }, [deckSetup, slot])
+
   if (slot == null) {
     return null
   }
 
-  const {
-    createdNestedLabwareForSlot,
-    createdLabwareForSlot,
-    createdModuleForSlot,
-    createdFixtureForSlots,
-  } = getSlotInformation({ deckSetup, slot })
+  const offDeckLabware = deckSetup.labware[slot]
   const handleResetToolbox = (): void => {
     dispatch(
       editSlotInfo({
-        createdLabwareForSlot: null,
-        createdNestedLabwareForSlot: null,
-        createdModuleForSlot,
-        preSelectedFixture:
+        labwareDefURI: null,
+        adapterDefURI: null,
+        moduleModel: createdModuleForSlot?.model,
+        fixture:
           createdFixtureForSlots != null &&
           Object.values(createdFixtureForSlots).some(
             fixture => fixture.name === 'stagingArea'
           )
             ? 'stagingArea'
             : undefined,
+        lidDefURI: null,
+        amount: 1,
       })
     )
   }
 
   const slotFull =
-    (createdLabwareForSlot != null &&
-      !createdLabwareForSlot.def.allowedRoles?.includes('adapter')) ||
-    (createdLabwareForSlot != null && createdNestedLabwareForSlot != null)
+    (createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
+    (createdStackForSlot.length > 0 && deckSetup.labware[slot] != null)
 
   const hasNoLabware =
-    createdLabwareForSlot == null && createdNestedLabwareForSlot == null
-
-  const handleClear = (keepExistingLabware = false): void => {
-    if (slot !== 'offDeck') {
-      //  clear labware from slot
-      if (
-        createdLabwareForSlot != null &&
-        (!keepExistingLabware ||
-          createdLabwareForSlot.labwareDefURI !== selectedLabwareDefUri ||
-          //  if nested labware changes but labware doesn't, still delete both
-          (createdLabwareForSlot.labwareDefURI === selectedLabwareDefUri &&
-            selectedNestedLabwareDefUri != null &&
-            createdNestedLabwareForSlot?.labwareDefURI !==
-              selectedNestedLabwareDefUri))
-      ) {
-        dispatch(deleteContainer({ labwareId: createdLabwareForSlot.id }))
+    (createdAdapterForSlot == null && createdStackForSlot.length === 0) ||
+    (createdStackForSlot.length === 0 && deckSetup.labware[slot] != null)
+  const handleClear = (): void => {
+    if (slot !== 'offDeck' && offDeckLabware == null) {
+      if (createdAdapterForSlot != null) {
+        dispatch(deleteContainer({ labwareId: createdAdapterForSlot.id }))
       }
-      //  clear nested labware from slot
-      if (
-        createdNestedLabwareForSlot != null &&
-        (!keepExistingLabware ||
-          createdNestedLabwareForSlot.labwareDefURI !==
-            selectedNestedLabwareDefUri)
-      ) {
-        dispatch(deleteContainer({ labwareId: createdNestedLabwareForSlot.id }))
-      }
+      createdStackForSlot.forEach(itemId =>
+        dispatch(deleteContainer({ labwareId: itemId }))
+      )
+    } else {
+      createdStackForSlot.forEach(itemId =>
+        dispatch(deleteContainer({ labwareId: itemId }))
+      )
+      dispatch(selectZoomedIntoSlot({ slot: 'offDeck', cutout: null }))
     }
     handleResetToolbox()
   }
   const handleConfirm = (): void => {
-    handleClear(true)
-    if (
-      (slot === 'offDeck' && selectedLabwareDefUri != null) ||
-      (selectedModuleModel == null &&
-        selectedLabwareDefUri != null &&
-        (createdLabwareForSlot?.labwareDefURI !== selectedLabwareDefUri ||
-          (selectedNestedLabwareDefUri != null &&
-            selectedNestedLabwareDefUri !==
-              createdNestedLabwareForSlot?.labwareDefURI)))
-    ) {
-      //  create adapter + labware on deck
-      dispatch(
-        createContainer({
-          slot,
-          labwareDefURI: selectedNestedLabwareDefUri ?? selectedLabwareDefUri,
-          adapterUnderLabwareDefURI:
-            selectedNestedLabwareDefUri == null
-              ? undefined
-              : selectedLabwareDefUri,
-        })
-      )
+    const isOffDeck = slot === 'offDeck'
+    const hasModule = selectedModuleModel != null
+    //  handle clear for if you are changing the adapter/labware combo
+    if (!isOffDeck) {
+      handleClear()
     }
-    if (
-      selectedModuleModel != null &&
-      selectedLabwareDefUri != null &&
-      (createdLabwareForSlot?.labwareDefURI !== selectedLabwareDefUri ||
-        //  if nested labware changes but labware doesn't, still create both
-        (createdLabwareForSlot.labwareDefURI === selectedLabwareDefUri &&
-          createdNestedLabwareForSlot?.labwareDefURI !==
-            selectedNestedLabwareDefUri &&
-          (createdNestedLabwareForSlot?.labwareDefURI != null ||
-            selectedNestedLabwareDefUri != null)))
-    ) {
-      //   create adapter + labware on module
+    if (hasModule) {
       dispatch(
         createContainerAboveModule({
           slot,
-          labwareDefURI: selectedLabwareDefUri,
-          nestedLabwareDefURI: selectedNestedLabwareDefUri ?? undefined,
+          labwareDefURIStack: [
+            ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
+            ...(selectedTopLabware.labwareDefURI != null
+              ? [selectedTopLabware.labwareDefURI]
+              : []),
+            ...(selectedLidLabware != null ? [selectedLidLabware] : []),
+          ],
+        })
+      )
+    } else {
+      dispatch(
+        createContainer({
+          slot,
+          labwareDefURIStack: [
+            ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
+            ...(selectedTopLabware.labwareDefURI != null
+              ? Array(selectedTopLabware.amount).fill(
+                  selectedTopLabware.labwareDefURI.toString()
+                )
+              : []),
+            ...(selectedLidLabware != null ? [selectedLidLabware] : []),
+          ],
         })
       )
     }
+
     setShowSelectLabwareModal(false)
   }
 
   const isLabwareOnSlotInUse = getIsLabwareOnSlotInUse(
     savedSteps,
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot
+    createdAdapterForSlot,
+    deckSetup.labware[createdStackForSlot[0]]
   )
 
   const positionStyles =
@@ -230,6 +221,7 @@ export function DeckSetupToolbox(
             setShowSelectLabwareModal(false)
           }}
           onConfirm={handleConfirmSelection}
+          slotFull={slotFull}
         />
       ) : null}
       {isLabwareOnSlotInUse && showDeleteEntityInUseModal ? (
@@ -249,7 +241,7 @@ export function DeckSetupToolbox(
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <DeckInfoLabel
               deckLabel={
-                slot === 'offDeck'
+                slot === 'offDeck' || deckSetup.labware[slot] != null
                   ? i18n.format(t('off_deck_title'), 'upperCase')
                   : slot
               }
@@ -282,11 +274,7 @@ export function DeckSetupToolbox(
               text={t('add_labware')}
               iconName="plus"
               onClick={() => {
-                if (slotFull) {
-                  makeSnackbar(t('no_space') as string)
-                } else {
-                  setShowSelectLabwareModal(true)
-                }
+                setShowSelectLabwareModal(true)
               }}
             />
           </Flex>
@@ -297,8 +285,7 @@ export function DeckSetupToolbox(
             />
           ) : (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              {createdNestedLabwareForSlot != null &&
-              createdLabwareForSlot != null ? (
+              {slotFull ? (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}
@@ -306,17 +293,26 @@ export function DeckSetupToolbox(
                   {t('top_slot')}
                 </StyledText>
               ) : null}
-              {createdNestedLabwareForSlot != null ? (
+              {createdStackForSlot.length > 0 ? (
                 <LabwareCard
-                  labware={createdNestedLabwareForSlot}
-                  //  TODO: add logic for the lid display name
+                  labware={
+                    deckSetup.labware[
+                      createdStackForSlot[createdStackForSlot.length - 1]
+                    ]
+                  }
+                  lidDisplayName={
+                    createdLidForSlot != null &&
+                    createdStackForSlot.includes(createdLidForSlot?.id)
+                      ? undefined
+                      : createdLidForSlot?.def.metadata.displayName
+                  }
+                  quantity={createdStackForSlot.length}
                 />
               ) : null}
-              {createdLabwareForSlot != null ? (
-                <LabwareCard labware={createdLabwareForSlot} />
+              {createdAdapterForSlot != null ? (
+                <LabwareCard labware={createdAdapterForSlot} quantity={1} />
               ) : null}
-              {createdNestedLabwareForSlot != null &&
-              createdLabwareForSlot != null ? (
+              {slotFull ? (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}

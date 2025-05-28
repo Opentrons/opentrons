@@ -5,13 +5,13 @@ import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
+  InlineNotification,
   LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { DescriptionContent } from '/app/molecules/InterventionModal'
 import { UnorderedList } from '/app/molecules/UnorderedList'
 import {

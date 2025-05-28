@@ -13,13 +13,13 @@ import {
 import { findWellAt } from '../getWellNamePerMultiTip'
 import { makeWellSetHelpers } from '../wellSets'
 
-import type { LabwareDefinition2 } from '../../types'
+import type { LabwareDefinition } from '../../types'
 import type { WellSetHelpers } from '../wellSets'
 
-const fixture12Trough = fixture_12_trough as LabwareDefinition2
-const fixture96Plate = fixture_96_plate as LabwareDefinition2
-const fixture384Plate = fixture_384_plate as LabwareDefinition2
-const fixtureOverlappyWellplate = fixture_overlappy_wellplate as LabwareDefinition2
+const fixture12Trough = fixture_12_trough as LabwareDefinition
+const fixture96Plate = fixture_96_plate as LabwareDefinition
+const fixture384Plate = fixture_384_plate as LabwareDefinition
+const fixtureOverlappyWellplate = fixture_overlappy_wellplate as LabwareDefinition
 const EIGHT_CHANNEL = 8
 const NINETY_SIX_CHANNEL = 96
 const wellsForReservoir = [

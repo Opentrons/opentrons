@@ -13,7 +13,7 @@ import type { InvariantContext, RobotState } from '../types'
 describe('aspirateInPlace', () => {
   let robotStateWithTip: RobotState
   let invariantContext: InvariantContext
-  const mockId = 'p10SingleId'
+  const mockId = 'p300SingleId'
   const mockFlowRate = 20
   const mockVolume = 10
   beforeEach(() => {
@@ -40,11 +40,7 @@ describe('aspirateInPlace', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `
-mock_pipette_p10.aspirate(
-    volume=10,
-    rate=20 / mock_pipette_p10.flow_rate.aspirate,
-)`.trimStart()
+      `mock_pipette.aspirate(volume=10, flow_rate=20)`
     )
   })
 })

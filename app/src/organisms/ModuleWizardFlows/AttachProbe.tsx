@@ -17,18 +17,14 @@ import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attac
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import type {
-  CreateCommand,
-  CutoutFixtureId,
-  CutoutId,
-  DeckConfiguration,
-} from '@opentrons/shared-data'
-import type { ModuleCalibrationWizardStepProps } from './types'
+import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 
-interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
+import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
+import type { ModuleSetupWizardStepProps } from './types'
+
+interface AttachProbeProps extends ModuleSetupWizardStepProps {
   adapterId: string | null
   deckConfig: DeckConfiguration
-  fixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
 }
 
 const BODY_STYLE = css`
@@ -51,13 +47,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     attachedPipette,
     isOnDevice,
     deckConfig,
-    fixtureIdByCutoutId,
   } = props
   const { t, i18n } = useTranslation([
     'module_wizard_flows',
     'pipette_wizard_flows',
   ])
-
+  const fixtureIdByCutoutId = getFixtureIdByCutoutId(attachedModule, deckConfig)
   const attachedPipetteChannels = attachedPipette.data.channels
   let pipetteAttachProbeVideoSource, probeLocation
   switch (attachedPipetteChannels) {

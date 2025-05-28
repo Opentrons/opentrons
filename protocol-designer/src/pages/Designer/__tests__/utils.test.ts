@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   fixture96Plate,
+  fixtureTiprackAdapter,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   TEMPERATURE_MODULE_TYPE,
@@ -23,7 +24,7 @@ const mockLabOnDeck1 = {
   stack: ['labId', 'mockHsId', '1'],
   id: 'labId',
   labwareDefURI: 'mockUri',
-  def: fixture96Plate as LabwareDefinition2,
+  def: fixtureTiprackAdapter as LabwareDefinition2,
   pythonName: 'mockPythonName',
 }
 const mockLabOnDeck2 = {
@@ -37,7 +38,7 @@ const mockLabOnDeck3 = {
   stack: ['labId3', '2'],
   id: 'labId3',
   labwareDefURI: 'mockUri3',
-  def: fixture96Plate as LabwareDefinition2,
+  def: fixtureTiprackAdapter as LabwareDefinition2,
   pythonName: 'mockPythonName',
 }
 const mockHS = {
@@ -102,11 +103,26 @@ const mockStagingArea = {
   id: 'mockStagingAreaId',
   location: WASTE_CHUTE_CUTOUT,
 }
+const mockLabOnDeck1Flex = {
+  stack: ['labId', 'mockHsId', 'D1'],
+  id: 'labId',
+  labwareDefURI: 'mockUri',
+  def: fixtureTiprackAdapter as LabwareDefinition2,
+  pythonName: 'mockPythonName',
+}
+const mockLabOnDeck2Flex = {
+  stack: ['labId2', 'labId', 'mockHsId', 'D1'],
+  id: 'labId2',
+  labwareDefURI: 'mockUri2',
+  def: fixture96Plate as LabwareDefinition2,
+  pythonName: 'mockPythonName',
+}
+
 const mockFlex2DeckSetup: AllTemporalPropertiesForTimelineFrame = {
   labware: {
-    labId: mockLabOnDeck1,
-    lab2: mockLabOnDeck2,
-    lab3: mockLabOnStagingArea,
+    labId: mockLabOnDeck1Flex,
+    labId2: mockLabOnDeck2Flex,
+    labId3: mockLabOnStagingArea,
   },
   pipettes: {},
   modules: {
@@ -128,14 +144,14 @@ const mockFlex2DeckSetup: AllTemporalPropertiesForTimelineFrame = {
 }
 
 describe('getSlotInformation', () => {
-  it.only('renders a heater-shaker with a labware and nested labware for an ot-2 in slot 1 with other mods added', () => {
+  it('renders a heater-shaker with a labware and nested labware for an ot-2 in slot 1 with other mods added', () => {
     expect(
       getSlotInformation({ deckSetup: mockOt2DeckSetup, slot: '1' })
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       createdModuleForSlot: mockHS,
-      createdLabwareForSlot: mockLabOnDeck1,
-      createdNestedLabwareForSlot: mockLabOnDeck2,
+      createdAdapterForSlot: mockLabOnDeck1,
+      createdStackForSlot: [mockLabOnDeck2.id],
       createdFixtureForSlots: [],
       slotPosition: null,
     })
@@ -145,9 +161,10 @@ describe('getSlotInformation', () => {
       getSlotInformation({ deckSetup: mockOt2DeckSetup, slot: '2' })
     ).toEqual({
       matchingLabwareFor4thColumn: null,
-      createdLabwareForSlot: mockLabOnDeck3,
+      createdAdapterForSlot: mockLabOnDeck3,
       createdFixtureForSlots: [],
       slotPosition: null,
+      createdStackForSlot: [],
     })
   })
   it('renders no items on the slot for a flex', () => {
@@ -163,6 +180,7 @@ describe('getSlotInformation', () => {
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
       createdFixtureForSlots: [],
+      createdStackForSlot: [],
     })
   })
   it('renders a trashbin for a Flex on slot A3', () => {
@@ -173,6 +191,7 @@ describe('getSlotInformation', () => {
       slotPosition: null,
       createdFixtureForSlots: [mockTrash],
       preSelectedFixture: 'trashBin',
+      createdStackForSlot: [],
     })
   })
   it('renders a h-s, labware and nested labware for a Flex on slot D1', () => {
@@ -182,8 +201,8 @@ describe('getSlotInformation', () => {
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
       createdModuleForSlot: mockHSFlex,
-      createdLabwareForSlot: mockLabOnDeck1,
-      createdNestedLabwareForSlot: mockLabOnDeck2,
+      createdAdapterForSlot: mockLabOnDeck1Flex,
+      createdStackForSlot: [mockLabOnDeck2Flex.id],
       createdFixtureForSlots: [],
     })
   })
@@ -195,6 +214,7 @@ describe('getSlotInformation', () => {
       slotPosition: null,
       createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
+      createdStackForSlot: [],
     })
   })
   it('renders the staging area with waste chute and labware in slot D4 for flex', () => {
@@ -203,7 +223,7 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
-      createdLabwareForSlot: mockLabOnStagingArea,
+      createdStackForSlot: [mockLabOnStagingArea.id],
       createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
     })

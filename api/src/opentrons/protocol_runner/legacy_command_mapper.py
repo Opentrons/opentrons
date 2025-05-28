@@ -634,13 +634,21 @@ class LegacyCommandMapper:
         count = self._command_count["LOAD_LABWARE"]
         slot = labware_load_info.deck_slot
         location: pe_types.LabwareLocation
+        location_sequence: pe_types.LabwareLocationSequence = []
         if labware_load_info.on_module:
-            location = pe_types.ModuleLocation.model_construct(
-                moduleId=self._module_id_by_slot[slot]
+            module_id = self._module_id_by_slot[slot]
+            location = pe_types.ModuleLocation.model_construct(moduleId=module_id)
+            location_sequence.append(
+                pe_types.OnModuleLocationSequenceComponent(moduleId=module_id)
             )
         else:
             location = pe_types.DeckSlotLocation.model_construct(slotName=slot)
 
+        location_sequence.append(
+            pe_types.OnAddressableAreaLocationSequenceComponent(
+                addressableAreaName=slot.value
+            )
+        )
         command_id = f"commands.LOAD_LABWARE-{count}"
         labware_id = f"labware-{count}"
 
@@ -665,8 +673,7 @@ class LegacyCommandMapper:
                     labware_load_info.labware_definition
                 ),
                 offsetId=labware_load_info.offset_id,
-                # These legacy json protocols don't get location sequences because
-                # to do so we'd have to go back and look up where the module gets loaded
+                locationSequence=location_sequence,
             ),
         )
         queue_action = pe_actions.QueueCommandAction(

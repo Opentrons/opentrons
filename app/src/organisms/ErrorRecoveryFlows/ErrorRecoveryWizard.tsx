@@ -32,7 +32,7 @@ import {
 } from './shared'
 import { getErrorKind } from './utils'
 
-import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
+import type { LabwareDefinition, RobotType } from '@opentrons/shared-data'
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { ErrorRecoveryFlowsProps } from '.'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from './hooks'
@@ -71,7 +71,7 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
     isOnDevice: boolean
     analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
-    allRunDefs: LabwareDefinition2[]
+    allRunDefs: LabwareDefinition[]
   }
 
 export function ErrorRecoveryWizard(

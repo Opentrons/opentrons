@@ -6,6 +6,7 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { DeckInfoLabel } from '../../molecules'
 import { DeckLabel } from '../../molecules/DeckLabel'
 import { Box } from '../../primitives'
+import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
 import type { ForwardedRef } from 'react'
@@ -45,16 +46,20 @@ const DeckLabelSetComponent = (
         },
       }}
     >
-      <BoxAndIconContainer width={width} height={height}>
+      <Box position={POSITION_RELATIVE} width="100%" height="100%">
         <StyledBox
-          width="100%"
-          height="100%"
+          width={width}
+          height={height}
           isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
           data-testid="DeckLabeSet"
         />
         {showModuleIcon && (
-          <IconWrapper>
-            <DeckInfoLabel iconName="stacked" highlight />
+          <IconWrapper leftPosition={width - 16}>
+            <DeckInfoLabel
+              iconName="stacked"
+              highlight
+              transform="scale(0.75)"
+            />
           </IconWrapper>
         )}
         <LabelContainer ref={ref}>
@@ -69,7 +74,7 @@ const DeckLabelSetComponent = (
               ))
             : null}
         </LabelContainer>
-      </BoxAndIconContainer>
+      </Box>
     </RobotCoordsForeignDiv>
   )
 }
@@ -109,15 +114,13 @@ const LabelContainer = styled.div`
   }
 `
 
-const IconWrapper = styled(Box)<StyledBoxProps>`
-  position: absolute;
-  top: -${SPACING.spacing8};
-  right: -${SPACING.spacing8};
-  z-index: 1;
-`
+interface IconWrapperProps {
+  leftPosition: number
+}
 
-const BoxAndIconContainer = styled(Box)<StyledBoxProps>`
-  position: relative;
-  width: ${(props: { width: number }) => props.width}px;
-  height: ${(props: { height: number }) => props.height}px;
+const IconWrapper = styled(Box)<IconWrapperProps>`
+  position: ${POSITION_ABSOLUTE};
+  top: -${SPACING.spacing8};
+  left: ${props => `${props.leftPosition}px`};
+  z-index: 3;
 `

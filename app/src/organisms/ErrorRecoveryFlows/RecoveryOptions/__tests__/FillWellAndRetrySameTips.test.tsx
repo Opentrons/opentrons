@@ -1,8 +1,9 @@
 import { screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { InlineNotification } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { i18n } from '/app/i18n'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
 import {
@@ -27,7 +28,13 @@ vi.mock('../SelectRecoveryOption')
 vi.mock('/app/organisms/ErrorRecoveryFlows/shared/SelectRecoveryOption')
 vi.mock('/app/organisms/ErrorRecoveryFlows/shared/FillWell')
 vi.mock('/app/organisms/ErrorRecoveryFlows/shared/RetryWithSameTips')
-vi.mock('/app/atoms/InlineNotification')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InlineNotification>()
+  return {
+    ...actual,
+    InlineNotification: vi.fn(),
+  }
+})
 
 const render = (props: ComponentProps<typeof FillWellAndRetrySameTips>) => {
   return renderWithProviders(<FillWellAndRetrySameTips {...props} />, {
