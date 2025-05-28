@@ -6,11 +6,15 @@ import json
 import sys
 import pandas as pd
 import google_sheets_helper
+import re
 
 def get_configs():
     configurations = None
-    configs_file = None
-    while not configs_file:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = 'config.ini'
+    configs_file = os.path.join(script_dir, filename)
+    print(configs_file)
+    while not os.path.exists(configs_file):
         configs_file = input("Please enter path to config.ini: ")
         if os.path.exists(configs_file):
             break
@@ -22,11 +26,16 @@ def get_configs():
         configurations.read(configs_file)
     except configparser.ParsingError as e:
         print("Cannot read configuration file\n" + str(e))
-    credentials_path = configurations['Drive']['credentials']
-    drive_folder = configurations['Drive']['folder']
-    email = configurations['Drive']['email']
-    sheet = configurations['Drive']['sheet']
-    return(drive_folder, credentials_path, email, sheet)
+
+    if configurations['Settings']['local_files']:
+        file_path = configurations['Settings']['file_path']
+        return(True, file_path, None, None, None)
+    else:
+        credentials_path = configurations['Drive']['credentials']
+        drive_folder = configurations['Drive']['folder']
+        email = configurations['Drive']['email']
+        sheet = configurations['Drive']['sheet']
+        return(False, drive_folder, credentials_path, email, sheet)
 
 def generate_hash(values):
     combined_string = "".join(values)
@@ -191,19 +200,91 @@ def update_sheet(data: dict, sheet_name):
     values = list(data.values())
     sheet.write_to_row(values, 'TOF_raw_data_df')
 
+def create_df_csv(df_name, drive_folder_path):
+    columns = [
+        "Hash_id",
+        "Labware_Name",
+        "Stacker_SN",
+        "Axis",
+        "Platform_Position",
+        "Labware_Num_X",
+        "Labware_Num_Z",
+        "Sample",
+        "Zone",
+    ]
+    df = pd.DataFrame(columns=columns)
+
+    # Baseline data
+    Labware_Name = "baseline"
+    Labware_Num_X = 0
+    baseline_path = os.path.join(drive_folder_path, "TOF BASELINE")
+    baseline_files = os.listdir(baseline_path)
+    for file in baseline_files:
+        full_path = os.path.join(baseline_path, file)
+        if os.path.isdir(full_path):
+            Stacker_SN = file
+            stacker_files = os.listdir(full_path)
+            for stacker_file in stacker_files:
+                print(stacker_file)
+                if not stacker_file.endswith('.csv'):
+                    continue
+
+                # Read the downloaded file into a DataFrame
+                csv_file_path = os.path.join(full_path, stacker_file)
+                print(csv_file_path)
+                file_df = pd.read_csv(csv_file_path, skiprows=1, header=None)
+                bin_labels = ['Time', 'Sample', 'Zone'] + [str(i) for i in range(1, 129)]
+                # print(file_df.shape)
+                file_df.columns = bin_labels
+
+                # new_row = {col: None for col in columns}
+                file_df['Hash_id'] = generate_hash(stacker_file)
+                file_df['Labware_Name'] = Labware_Name
+                file_df['Stacker_SN'] = Stacker_SN
+
+                pattern = r"_(x|z)-axis_"
+                match = re.search(pattern, stacker_file)
+                file_df['Axis'] = match.group(1)
+
+                if "extend" in stacker_file:
+                    file_df['Platform_Position'] = "extend"
+                elif "retract" in stacker_file:
+                    file_df['Platform_Position'] = "retract"
+                else:
+                    file_df['Platform_Position'] = "unknown"
+
+                file_df['Labware_Num_X'] = Labware_Num_X
+
+                pattern = r"lab(\d+)"
+                match = re.search(pattern, stacker_file)
+                file_df['Labware_Num_Z'] = match.group(1)  
+
+                df = pd.concat([df, file_df], ignore_index=True)
+
+
+    df.to_csv(df_name, index=False)
+    print(f"Created {df_name} with shape: {df.shape}")
 
 
 if __name__ == '__main__':
-    drive_folder, credentials_path, email, sheet = get_configs()
+    local_files, drive_folder, credentials_path, email, sheet = get_configs()
     df_name = 'TOF_raw_data_df.csv'
     df_path = os.path.join(os.curdir, df_name)
     if(not os.path.exists(df_path)):
-       df_file = open(df_path, 'w+')
-       df_file.flush()
-    print(drive_folder)
-    print(credentials_path)
-    print(email)
-    download_data(df_name, credentials_path, sheet)
+        print("Dataframe CSV Found")
+        # df_file = open(df_path, 'w+')
+        # df_file.flush()
+    else:
+        print("Dataframe CSV not Found")
+        if local_files:
+            print("Creating Dataframe CSV from Local files")
+            create_df_csv(df_name, drive_folder)
+        else:
+            print(drive_folder)
+            print(credentials_path)
+            print(email)
+            download_data(df_name, credentials_path, sheet)
+
     df = pd.read_csv(df_name)
-    stackers = df['Stacker Name']
+    stackers = df['Stacker_SN'].unique()
     print(stackers)
