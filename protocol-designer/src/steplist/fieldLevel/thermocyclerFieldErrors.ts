@@ -5,6 +5,8 @@ export type ErrorChecker = (
   hydratedFormData?: HydratedFormData
 ) => string | null
 
+//  TODO: audit these errors.the thermocycler form works a bit differently since there is the thermocycler
+//  modal. i guess these fields are for that? otherwise, these should probably be deprecated?
 export const isTimeFormatMinutesSeconds: ErrorChecker = (
   value: unknown
 ): string | null => {
