@@ -663,7 +663,9 @@ def _get_test_channels(cfg: config.GravimetricConfig) -> List[int]:
 
 
 def _get_channel_divider(cfg: config.GravimetricConfig) -> float:
-    if cfg.pipette_channels == 8 and not cfg.increment:
+    if cfg.pipette_channels == 8 and (not cfg.increment or cfg.isolate_channels):
+        return 1.0
+    elif cfg.pipette_channels == 96 and cfg.isolate_channels == [1]:
         return 1.0
     else:
         return float(cfg.pipette_channels)
@@ -889,10 +891,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     if (trial_total + 1) > total_tips:
         if not support_tip_resupply:
             raise ValueError(f"more trials ({trial_total}) than tips ({total_tips})")
-        elif not resources.ctx.is_simulating():
-            ui.get_user_ready(
-                f"prepare {(trial_total + 1) - total_tips} extra tip-racks"
-            )
     assert resources.recorder is not None
     recorder = resources.recorder
     if resources.ctx.is_simulating():

@@ -721,7 +721,7 @@ if __name__ == "__main__":
         hw.retract(hw_mount)
 
         for tip, volumes in run_args.volumes:
-            if args.channels == 96 and not run_args.ctx.is_simulating():
+            if args.channels == 96 and not run_args.ctx.is_simulating() and not args.skip_input:
                 ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
             _main(args, run_args, tip, volumes)
     except Exception as e:
