@@ -1836,6 +1836,9 @@ def test_customize_existing_liquid_class(
     subject: ProtocolContext,
     robot_type: RobotType,
     minimal_transfer_properties_dict: Dict[str, Dict[str, TransferPropertiesDict]],
+    custom_pip_n_tip_transfer_properties_dict: Dict[
+        str, Dict[str, TransferPropertiesDict]
+    ],
 ) -> None:
     """It should create a new liquid class by modifying the existing liquid class."""
     existing_glycerol_class = LiquidClass.create(
@@ -1872,6 +1875,44 @@ def test_customize_existing_liquid_class(
             "flex_8channel_50", "opentrons/opentrons_flex_96_tiprack_50ul/1"
         ).aspirate.submerge.speed
         == 4
+    )
+
+    # Test that new entries are created for pipettes and tipracks not present in the base liquid class
+    lc_with_custom_pip_n_tip = subject.define_custom_liquid_class(
+        name="my_liquid_2",
+        properties=custom_pip_n_tip_transfer_properties_dict,
+        base_liquid_class=existing_glycerol_class,
+        display_name="My liquid 2",
+    )
+    assert (
+        lc_with_custom_pip_n_tip.get_for(
+            "a_custom_pipette_type", "a_custom_tiprack_uri"
+        ).aspirate.submerge.speed
+        == 100
+    )
+
+    # Test that only specified tiprack's props are updated when there are
+    # properties for multiple tipracks in the liquid class
+    modified_custom_dict = custom_pip_n_tip_transfer_properties_dict.copy()
+    modified_custom_dict["a_custom_pipette_type"] = {
+        "some_new_tiprack": minimal_transfer_properties_dict["flex_1channel_50"][
+            "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ]
+    }
+    lc_with_new_tip_entry = subject.define_custom_liquid_class(
+        name="my_liquid_3",
+        properties=modified_custom_dict,
+        base_liquid_class=lc_with_custom_pip_n_tip,
+        display_name="My liquid 3",
+    )
+    assert (
+        lc_with_new_tip_entry.get_for(
+            "a_custom_pipette_type", "a_custom_tiprack_uri"
+        ).aspirate.submerge.speed
+        == lc_with_new_tip_entry.get_for(
+            "a_custom_pipette_type", "some_new_tiprack"
+        ).aspirate.submerge.speed
+        == 100
     )
 
 

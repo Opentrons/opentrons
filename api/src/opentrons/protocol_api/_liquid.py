@@ -98,8 +98,12 @@ class LiquidClass:
         pipette_name, tiprack_uri = self._get_pipette_and_tiprack_names(
             pipette, tip_rack
         )
-
-        self._by_pipette_setting[pipette_name][tiprack_uri] = transfer_properties
+        try:
+            self._by_pipette_setting[pipette_name].update(
+                {tiprack_uri: transfer_properties}
+            )
+        except KeyError:
+            self._by_pipette_setting[pipette_name] = {tiprack_uri: transfer_properties}
 
     def get_for(
         self, pipette: Union[str, InstrumentContext], tip_rack: Union[str, Labware]
