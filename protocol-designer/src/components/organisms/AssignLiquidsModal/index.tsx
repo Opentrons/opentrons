@@ -16,7 +16,6 @@ import {
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_AUTO,
-  PrimaryButton,
   SPACING,
   StyledText,
   WELL_LABEL_OPTIONS,
@@ -75,16 +74,6 @@ export function AssignLiquidsModal(
 
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
-
-  const handleSave = (): void => {
-    if (Object.keys(selectedWells).length > 0) {
-      setShowBadFormState(true)
-    } else {
-      dispatch(deselectAllWells())
-      setShowBadFormState(false)
-      navigate('/designer')
-    }
-  }
 
   return (
     <Flex
@@ -173,9 +162,6 @@ export function AssignLiquidsModal(
               nozzleType={null}
             />
           </Box>
-          <PrimaryButton width="20rem" onClick={handleSave}>
-            {t('shared:done')}
-          </PrimaryButton>
         </Flex>
       </Flex>
       <Flex padding={SPACING.spacing12} height="100%">
