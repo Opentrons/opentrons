@@ -19,6 +19,7 @@ import { getLabwareEntities } from '../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import {
+  getAllLabwareIdsOfCertainURIOnStack,
   getFullStackFromLabwaresOnDeck,
   getStagingAreaAddressableAreas,
 } from '../../utils'
@@ -242,7 +243,7 @@ function resolveSlotLocation(
   }
 }
 
-const getNickname = (
+const getLabwareInfo = (
   nicknamesById: Record<string, string>,
   activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
   labwareId: string,
@@ -252,21 +253,18 @@ const getNickname = (
   const stack = activeDeckSetup.labware[labwareId].stack
   const latestSlot = resolveSlotLocation(modules, stack, robotType)
 
-  let nickName: string = nicknamesById[labwareId]
-  if (latestSlot != null && latestSlot !== 'offDeck') {
-    nickName = nicknamesById[labwareId]
-  }
-  return { nickName, latestSlot }
+  return { nickName: nicknamesById[labwareId], latestSlot }
 }
 
 export const useLabwareDropdownOptions = (
-  type: 'moveLabware' | 'labware'
+  type: 'moveLabware' | 'labware',
+  usingGripper: boolean
 ): DropdownOption[] => {
   const labwareEntities = useSelector(getLabwareEntities)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const nicknamesById = useSelector(getLabwareNicknamesById)
   const robotType = useSelector(getRobotType)
-  const moveLabwareOptions = reduce(
+  const labwareOptions = reduce(
     labwareEntities,
     (
       acc: DropdownOption[],
@@ -276,11 +274,26 @@ export const useLabwareDropdownOptions = (
       const deckSlot = getSlotInLocationStack(
         activeDeckSetup.labware[labwareId].stack
       )
+      const fullStackFromLabwares = getFullStackFromLabwares(
+        activeDeckSetup.labware,
+        deckSlot
+      )
+      const labwareStack = fullStackFromLabwares.filter(
+        id =>
+          activeDeckSetup.labware[id] != null &&
+          !activeDeckSetup.labware[id].def.allowedRoles?.includes('adapter')
+      )
+      const bottomOfStack = labwareStack[labwareStack.length - 1]
+
+      const showStackOption = !usingGripper && type === 'moveLabware'
+      console.log(showStackOption, bottomOfStack)
+      const isTopOfStack = fullStackFromLabwares[0] === labwareId
+
       const isLabwareInWasteChute = deckSlot === 'gripperWasteChute'
 
       const isAdapter =
         labwareEntity.def.allowedRoles?.includes('adapter') ?? false
-      const { nickName, latestSlot } = getNickname(
+      const { nickName, latestSlot } = getLabwareInfo(
         nicknamesById,
         activeDeckSetup,
         labwareId,
@@ -289,26 +302,41 @@ export const useLabwareDropdownOptions = (
       const isTiprack = getIsTiprack(labwareEntity.def)
       const isOffDeck = deckSlot === 'offDeck'
 
+      const bottomOfStackOption: DropdownOption[] =
+        showStackOption && bottomOfStack != null
+          ? [
+              {
+                name: `Stack of ${nickName}`,
+                value: bottomOfStack,
+                deckLabel: latestSlot,
+              },
+            ]
+          : acc
+
+      const restOfOptions: DropdownOption[] =
+        isAdapter ||
+        isLabwareInWasteChute ||
+        (type === 'labware' && isTiprack) ||
+        isOffDeck ||
+        !isTopOfStack
+          ? acc
+          : [
+              ...acc,
+              {
+                name: nickName,
+                value: labwareId,
+                deckLabel: latestSlot,
+              },
+            ]
+
       //  filter out moving adapters, and labware in
       //  waste chute for moveLabware, labware off-deck and
       //  labware that is a tiprack for the labware dropdown only
-      return isAdapter ||
-        isLabwareInWasteChute ||
-        (type === 'labware' && isTiprack) ||
-        isOffDeck
-        ? acc
-        : [
-            ...acc,
-            {
-              name: nickName,
-              value: labwareId,
-              deckLabel: isOffDeck ? 'Off-deck' : latestSlot,
-            },
-          ]
+      return [...restOfOptions, ...bottomOfStackOption]
     },
     []
   )
-  return _sortLabwareDropdownOptions(moveLabwareOptions)
+  return _sortLabwareDropdownOptions(labwareOptions)
 }
 
 //  used for LabwareLocationField dropdown

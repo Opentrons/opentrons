@@ -46,7 +46,7 @@ import type { RobotState } from '@opentrons/step-generation'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
 import type { Selector } from '../../types'
 
-interface Option {
+export interface Option {
   name: string
   value: string
   deckLabel: string
