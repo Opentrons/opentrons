@@ -253,7 +253,7 @@ async def _test_plunger(
     for current in currents:
         ui.print_title(f"CURRENT = {current}")
         # start at LOWEST (easiest) speed
-        speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=True)
+        speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
         for speed in speeds:
             for trial in range(trials):
                 ui.print_header(
