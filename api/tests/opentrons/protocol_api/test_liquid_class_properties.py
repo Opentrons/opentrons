@@ -453,6 +453,22 @@ def test_liquid_handling_property_by_volume() -> None:
     assert subject.get_for_volume(1) == 50.0
     assert subject.get_for_volume(1000) == 250.0
 
+    # Test fixed overrides
+    subject.set_for_all_volumes(4321)
+    for volume in (0, 1, 7, 100):
+        assert subject.get_for_volume(volume) == 4321
+
+    # Test resetting to default
+    subject.reset_values()
+    assert subject.as_dict() == {5.0: 50, 10.0: 250}
+    assert subject.get_for_volume(7) == 130.0
+
+    # Test clearing all values
+    subject.clear_values()
+    assert subject.as_dict() == {}
+    with pytest.raises(ValueError, match="No properties found for any volumes"):
+        subject.get_for_volume(7)
+
 
 def test_non_existent_property_raises_error() -> None:
     """It should raise an attribute error if the set property does not exist."""
