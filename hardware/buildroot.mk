@@ -25,7 +25,6 @@ endef
 ot_hardware_name := python-opentrons-hardware
 
 export OPENTRONS_GIT_DIR=$(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)
-export HATCH_VCS_TUNABLE_FALLBACK_VERSION=$(call OTHARDWARE_CALL_PBU,normalize_version)
 
 # Calling inner-python-package directly instead of using python-package macro
 # because our directory layout doesn’t conform to buildroot’s expectation of
