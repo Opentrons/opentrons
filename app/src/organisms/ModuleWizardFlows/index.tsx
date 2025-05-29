@@ -271,6 +271,7 @@ export const ModuleWizardFlows = (
             }
             attachedModule={wizardFlowBaseProps.attachedModule}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
+            setSelectedModule={setSelectedModule}
           />
         </ModuleWizardScreen>
       )

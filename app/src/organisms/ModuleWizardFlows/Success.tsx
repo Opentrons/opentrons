@@ -20,6 +20,7 @@ import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 import { useSendIdentifyModule } from './hooks'
 
+import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleSetupWizardStepProps } from './types'
 
 export const BODY_STYLE = css`
@@ -31,7 +32,9 @@ export const BODY_STYLE = css`
   }
 `
 
-interface SuccessProps extends ModuleSetupWizardStepProps {}
+interface SuccessProps extends ModuleSetupWizardStepProps {
+  setSelectedModule: (module: AttachedModule | null) => void
+}
 
 export const Success = (props: SuccessProps): JSX.Element | null => {
   const {
@@ -40,6 +43,7 @@ export const Success = (props: SuccessProps): JSX.Element | null => {
     isRobotMoving,
     isOnDevice,
     restartSetup,
+    setSelectedModule,
   } = props
   const { t } = useTranslation('module_wizard_flows')
   const sendIdentifyModule = useSendIdentifyModule()
@@ -47,8 +51,13 @@ export const Success = (props: SuccessProps): JSX.Element | null => {
   const newModules = useGetNewModules()
 
   const handleOnClick = (restart: boolean): void => {
-    sendIdentifyModule(attachedModule, false)
-    restart ? restartSetup() : proceed()
+    if (restart) {
+      setSelectedModule(null)
+      sendIdentifyModule(attachedModule, false)
+      restartSetup()
+      return
+    }
+    proceed()
   }
 
   const finishButton = isOnDevice ? (

@@ -65,9 +65,9 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
 
   // Handler for when there is one module
   useEffect(() => {
-    setSelectedModule(isSingleModule ? newModules[0] : null)
-    if (selectedModule != null) {
-      sendIdentifyModule(selectedModule, true)
+    if (isSingleModule) {
+      setSelectedModule(newModules[0])
+      sendIdentifyModule(newModules[0], true)
     }
   }, [])
 
