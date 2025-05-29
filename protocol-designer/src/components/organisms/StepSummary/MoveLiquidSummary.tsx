@@ -9,10 +9,9 @@ import {
   Tag,
   WRAP,
 } from '@opentrons/components'
-import { AIR } from '@opentrons/step-generation'
 
 import { getLiquidDisplay } from './getLiquidDisplay'
-import { getWellsForStepSummary } from './utils'
+import { getLiquidIdsForStepSummary, getWellsForStepSummary } from './utils'
 
 import type {
   AdditionalEquipmentEntities,
@@ -75,17 +74,10 @@ export function MoveLiquidSummary(props: MoveLiquidSummaryProps): JSX.Element {
     moveLiquidType = 'distribute'
   }
 
-  const liquidIds = Array.from(
-    aspirateWells.reduce<Set<string>>((acc, well) => {
-      for (const [liquidId, { volume }] of Object.entries(
-        liquidState.labware[aspirate_labware][well]
-      )) {
-        if (liquidId !== AIR && volume > 0) {
-          acc.add(liquidId)
-        }
-      }
-      return acc
-    }, new Set<string>())
+  const liquidIds = getLiquidIdsForStepSummary(
+    liquidState,
+    aspirate_labware as string,
+    aspirateWells
   )
 
   const liquidInfo = liquidIds.map(id => liquidEntities[id])
