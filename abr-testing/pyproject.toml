@@ -37,7 +37,7 @@ source = 'vcs-tunable'
 
 [tool.hatch.version.raw-options]
 root = '..'
-git_describe_command = 'git describe --dirty --tags --long --match v*'
+git_describe_command = 'git describe --dirty --tags --long --match=v*'
 fallback_version = '0.0.0-dev'
 version_scheme = 'only-version'
 local_scheme = 'no-local-version'
@@ -53,4 +53,4 @@ exclude = [
 include = ['abr_testing', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
 
 [tool.hatch.build.targets.wheel.force_include]
-'LICENSE' = 'abr_testing/LICENSE' 
+'LICENSE' = 'abr_testing/LICENSE'
