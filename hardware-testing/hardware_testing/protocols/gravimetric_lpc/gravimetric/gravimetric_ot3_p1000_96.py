@@ -5,15 +5,15 @@ from opentrons.protocol_api._types import OffDeckType
 metadata = {"protocolName": "gravimetric-ot3-p1000-96"}
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.23",
+    "apiLevel": "2.22",
 }  # NOTE: apiLevel is ignored by script
 
 SLOT_SCALE = 4
 SLOTS_TIPRACK = {
     # TODO: add slot 12 when tipracks are disposable
-    20: [2, 3, 5, 6, 7, 8, 9, 10, 11],
-    50: [2, 3, 5, 6, 7, 8, 9, 10, 11],
-    200: [2, 3, 5, 6, 7, 8, 9, 10, 11],
+    # 20: [2, 3, 5, 6, 7, 8, 9, 10, 11],
+    # 50: [2, 3, 5, 6, 7, 8, 9, 10, 11],
+    # 200: [2, 3, 5, 6, 7, 8, 9, 10, 11],
     1000: [2, 3, 5, 6, 7, 8, 9, 10, 11],
 }
 SLOT_DE_STATIC = 1
@@ -22,11 +22,12 @@ LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
+    ctx.load_trash_bin("A3")
     scale_labware = ctx.load_labware(LABWARE_ON_SCALE, SLOT_SCALE)
     pipette = ctx.load_instrument("flex_96channel_1000", "left")
     adapters = [
         ctx.load_adapter("opentrons_flex_96_tiprack_adapter", slot)
-        for slot in SLOTS_TIPRACK[50]
+        for slot in SLOTS_TIPRACK[1000]
     ]
     for tip_size in SLOTS_TIPRACK.keys():
         tipracks = [
