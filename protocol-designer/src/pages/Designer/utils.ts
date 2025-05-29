@@ -283,12 +283,17 @@ export const useLabwareDropdownOptions = (
           activeDeckSetup.labware[id] != null &&
           !activeDeckSetup.labware[id].def.allowedRoles?.includes('adapter')
       )
-      const bottomOfStack = labwareStack[labwareStack.length - 1]
-
+      const allowStacking =
+        activeDeckSetup.labware[labwareId].def.stackLimit != null &&
+        activeDeckSetup.labware[labwareId].def.stackLimit > 1
       const showStackOption = !usingGripper && type === 'moveLabware'
-      console.log(showStackOption, bottomOfStack)
-      const isTopOfStack = fullStackFromLabwares[0] === labwareId
 
+      const isTopOfStack = fullStackFromLabwares[0] === labwareId
+      const isBottomOfStack =
+        labwareStack[labwareStack.length - 1] === labwareId && allowStacking
+      const bottomOfStack = isBottomOfStack
+        ? labwareStack[labwareStack.length - 1]
+        : null
       const isLabwareInWasteChute = deckSlot === 'gripperWasteChute'
 
       const isAdapter =
@@ -311,8 +316,8 @@ export const useLabwareDropdownOptions = (
                 deckLabel: latestSlot,
               },
             ]
-          : acc
-
+          : []
+      console.log('bottomOfStackOption',labwareStack,  bottomOfStackOption)
       const restOfOptions: DropdownOption[] =
         isAdapter ||
         isLabwareInWasteChute ||
