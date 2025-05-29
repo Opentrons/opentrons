@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Banner,
@@ -68,6 +69,7 @@ export function LiquidToolbox({
 }: LiquidToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
   const liquids = useSelector(getLiquidEntities)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
@@ -254,6 +256,15 @@ export function LiquidToolbox({
     })
     .filter(Boolean)
 
+  const handleConfirmClick = (): void => {
+    if (selectedWells.length > 0) {
+      setShowBadFormState(true)
+      return
+    }
+    dispatch(deselectAllWells())
+    navigate('/designer')
+  }
+
   return (
     <>
       {showDefineLiquidModal ? (
@@ -273,6 +284,8 @@ export function LiquidToolbox({
         onCloseClick={handleClearAllWells}
         height="100%"
         width="21.875rem"
+        confirmButtonText={t('shared:done')}
+        onConfirmClick={handleConfirmClick}
         closeButton={
           <StyledText desktopStyle="bodyDefaultRegular">
             {t('clear_wells')}

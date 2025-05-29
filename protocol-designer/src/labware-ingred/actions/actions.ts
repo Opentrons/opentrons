@@ -148,17 +148,13 @@ export const deleteLiquidGroup: (
   const liquidEntities = getLiquidEntities(getState())
   const liquidIsOnDeck = allLiquidGroups.includes(liquidGroupId)
 
-  if (!Object.keys(allLiquidGroups).includes(liquidGroupId)) {
-    return
-  }
-
   const okToDelete = liquidIsOnDeck
     ? global.confirm(
         'This liquid has been placed on the deck, are you sure you want to delete it?'
       )
     : true
-
   if (!okToDelete) {
+    console.error(`problem with deleting liquid id ${liquidGroupId}`)
     return
   }
 

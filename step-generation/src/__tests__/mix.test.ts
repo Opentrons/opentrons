@@ -107,30 +107,30 @@ describe('mix: change tip', () => {
       `
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 2.1
-mock_pipette.flow_rate.dispense = 2.2
 mock_pipette.mix(
     repetitions=2,
     volume=5,
     location=mock_source_plate["A1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
 )
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 2.1
-mock_pipette.flow_rate.dispense = 2.2
 mock_pipette.mix(
     repetitions=2,
     volume=5,
     location=mock_source_plate["B1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
 )
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 2.1
-mock_pipette.flow_rate.dispense = 2.2
 mock_pipette.mix(
     repetitions=2,
     volume=5,
     location=mock_source_plate["C1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
 )`.trimStart()
     )
   })
@@ -392,12 +392,12 @@ describe('mix: advanced options', () => {
         `
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 2.1
-mock_pipette.flow_rate.dispense = 2.2
 mock_pipette.mix(
     repetitions=2,
     volume=8,
     location=mock_source_plate["A1"].bottom(z=3.2).move(types.Point(y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
     aspirate_delay=10,
     dispense_delay=12,
     final_push_out=2,
@@ -407,12 +407,12 @@ mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 2.1
-mock_pipette.flow_rate.dispense = 2.2
 mock_pipette.mix(
     repetitions=2,
     volume=8,
     location=mock_source_plate["B1"].bottom(z=3.2).move(types.Point(y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
     aspirate_delay=10,
     dispense_delay=12,
     final_push_out=2,
@@ -422,12 +422,12 @@ mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["B1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 2.1
-mock_pipette.flow_rate.dispense = 2.2
 mock_pipette.mix(
     repetitions=2,
     volume=8,
     location=mock_source_plate["C1"].bottom(z=3.2).move(types.Point(y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
     aspirate_delay=10,
     dispense_delay=12,
     final_push_out=2,
@@ -459,36 +459,36 @@ mock_pipette.touch_tip(mock_source_plate["C1"], v_offset=-3.4)
       `
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 2.1
-mock_pipette.flow_rate.dispense = 2.2
 mock_pipette.mix(
     repetitions=2,
     volume=8,
     location=mock_source_plate["A1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
 )
 mock_pipette.flow_rate.blow_out = 2.3
 mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 2.1
-mock_pipette.flow_rate.dispense = 2.2
 mock_pipette.mix(
     repetitions=2,
     volume=8,
     location=mock_source_plate["B1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
 )
 mock_pipette.flow_rate.blow_out = 2.3
 mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["B1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 2.1
-mock_pipette.flow_rate.dispense = 2.2
 mock_pipette.mix(
     repetitions=2,
     volume=8,
     location=mock_source_plate["C1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
 )
 mock_pipette.flow_rate.blow_out = 2.3
 mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))

@@ -104,7 +104,7 @@ export function useDispenseSettingsConfig({
         state.mixOnDispense !== undefined
           ? t('mix_value', {
               volume: state.mixOnDispense?.mixVolume,
-              reps: state.mixOnDispense?.repititions,
+              reps: state.mixOnDispense?.repetitions,
             })
           : '',
       enabled:
@@ -169,7 +169,7 @@ export function useDispenseSettingsConfig({
       value:
         state.airGapDispense !== undefined
           ? t('air_gap_value', { volume: state.airGapDispense })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_air_gap')

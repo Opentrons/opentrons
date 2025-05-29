@@ -491,14 +491,14 @@ export function generateQuickTransferArgs(
           quickTransferState.mixOnAspirate != null
             ? {
                 volume: quickTransferState.mixOnAspirate.mixVolume,
-                times: quickTransferState.mixOnAspirate.repititions,
+                times: quickTransferState.mixOnAspirate.repetitions,
               }
             : null,
         mixInDestination:
           quickTransferState.mixOnDispense != null
             ? {
                 volume: quickTransferState.mixOnDispense.mixVolume,
-                times: quickTransferState.mixOnDispense.repititions,
+                times: quickTransferState.mixOnDispense.repetitions,
               }
             : null,
       }
@@ -517,14 +517,14 @@ export function generateQuickTransferArgs(
           quickTransferState.mixOnAspirate != null
             ? {
                 volume: quickTransferState.mixOnAspirate.mixVolume,
-                times: quickTransferState.mixOnAspirate.repititions,
+                times: quickTransferState.mixOnAspirate.repetitions,
               }
             : null,
         mixInDestination:
           quickTransferState.mixOnDispense != null
             ? {
                 volume: quickTransferState.mixOnDispense.mixVolume,
-                times: quickTransferState.mixOnDispense.repititions,
+                times: quickTransferState.mixOnDispense.repetitions,
               }
             : null,
         sourceWells,
@@ -546,7 +546,7 @@ export function generateQuickTransferArgs(
           quickTransferState.mixOnAspirate != null
             ? {
                 volume: quickTransferState.mixOnAspirate.mixVolume,
-                times: quickTransferState.mixOnAspirate.repititions,
+                times: quickTransferState.mixOnAspirate.repetitions,
               }
             : null,
         sourceWell: sourceWells[0],

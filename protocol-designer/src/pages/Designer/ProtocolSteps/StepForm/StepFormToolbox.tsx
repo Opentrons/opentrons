@@ -17,6 +17,7 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { analyticsEvent } from '../../../../analytics/actions'
 import {
@@ -34,7 +35,10 @@ import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import { RenameStepModal } from '../../../../components/organisms/RenameStepModal'
 import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import { getEnableLiquidClasses } from '../../../../feature-flags/selectors'
-import { getRobotStateTimeline } from '../../../../file-data/selectors'
+import {
+  getRobotStateTimeline,
+  getRobotType,
+} from '../../../../file-data/selectors'
 import { stepIconsByType } from '../../../../form-types'
 import {
   getAdditionalEquipmentEntities,
@@ -75,6 +79,7 @@ import {
 } from './utils'
 
 import type { ComponentType } from 'react'
+import type { RobotType } from '@opentrons/shared-data'
 import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
 import type {
   FormData,
@@ -177,6 +182,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const savedStepForm = useSelector(getSavedStepForms)[formData.id]
+  const robotType = useSelector(getRobotType)
 
   // state used to track fields that have been confirmed through the modal but before saving the step form
   const [confirmedFieldUpdates, setConfirmedFieldUpdates] = useState<
@@ -290,7 +296,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const numStepFormPages = getStepFormNumPages(
     formData.stepType,
     enableReadOrInitialization != null,
-    enableLiquidClasses
+    enableLiquidClasses,
+    robotType
   )
   const isMultiStepToolbox =
     formData.stepType === 'absorbanceReader'
@@ -526,12 +533,13 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 const getStepFormNumPages = (
   stepType: StepType,
   enableReadOrInitialization: boolean,
-  enableLiquidClasses: boolean
+  enableLiquidClasses: boolean,
+  robotType: RobotType
 ): number => {
   switch (stepType) {
     case 'mix':
     case 'moveLiquid':
-      return enableLiquidClasses ? 3 : 2
+      return enableLiquidClasses && robotType === FLEX_ROBOT_TYPE ? 3 : 2
     case 'thermocycler':
       return 2
     case 'absorbanceReader':

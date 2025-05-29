@@ -112,6 +112,7 @@ export function BatchEditMixTools(props: BatchEditMixToolsProps): JSX.Element {
             xField="mix_x_position"
             yField="mix_y_position"
             labwareId={getLabwareIdForPositioningField('mix_mmFromBottom')}
+            referenceField="mix_position_reference"
           />
           <Divider marginY="0" />
         </>
@@ -119,7 +120,7 @@ export function BatchEditMixTools(props: BatchEditMixToolsProps): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={`0 ${SPACING.spacing16}`}
-        gridGap={SPACING.spacing8}
+        gridGap={SPACING.spacing4}
       >
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('protocol_steps:advanced_settings')}

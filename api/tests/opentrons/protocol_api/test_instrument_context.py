@@ -1856,6 +1856,96 @@ def test_mix_with_lpd(
     )
 
 
+def test_mix_with_flow_rates(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should mix with aspirate_flow_rate and dispense_flow_rate."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        input_location,
+    )  # last location same as input_location, so in_place should be true
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate()).then_return(100.0)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate()).then_return(100.0)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+
+    subject.mix(
+        repetitions=1,
+        volume=10.0,
+        location=input_location,
+        aspirate_flow_rate=300.0,
+        dispense_flow_rate=400.0,
+    )
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=3.0,  # requested aspirate_flow_rate is 3x default flow rate of 100
+            flow_rate=300.0,
+            in_place=True,
+            meniscus_tracking=None,
+        ),
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=4.0,  # requested dispense_flow_rate is 4x default flow rate of 100
+            flow_rate=400.0,
+            in_place=True,
+            push_out=None,
+            meniscus_tracking=None,
+        ),
+    )
+
+    # Should fail if you try to set both rate and aspirate_flow_rate/dispense_flow_rate:
+    with pytest.raises(ValueError):
+        subject.mix(
+            repetitions=1,
+            volume=10.0,
+            location=input_location,
+            rate=1.23,
+            aspirate_flow_rate=300.0,
+            dispense_flow_rate=400.0,
+        )
+
+    # Bonus: If you only set aspirate_flow_rate, the dispense should use the pipette's
+    # default flow rate:
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1)).then_return(100.0)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1)).then_return(100.0)
+    subject.mix(
+        repetitions=1,
+        volume=10.0,
+        location=input_location,
+        aspirate_flow_rate=300.0,
+    )
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=3.0,  # requested aspirate_flow_rate is 3x default flow rate of 100
+            flow_rate=300.0,
+            in_place=True,
+            meniscus_tracking=None,
+        ),
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,  # the default dispense flow rate
+            in_place=True,
+            push_out=None,
+            meniscus_tracking=None,
+        ),
+    )
+
+
 def test_mix_with_delay_and_final_push_out(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,

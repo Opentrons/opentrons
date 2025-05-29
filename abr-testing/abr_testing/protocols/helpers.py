@@ -247,7 +247,7 @@ def create_disposable_lid_trash_location(parameters: ParameterContext) -> None:
         variable_name="trash_lid",
         display_name="Trash Disposable Lid",
         description="True means trash lid, false means keep on deck.",
-        default=False,
+        default=True,
     )
 
 

@@ -599,7 +599,7 @@ class LegacyProtocolCore(
         """Define a liquid to load into a well."""
         assert False, "define_liquid only supported on engine core"
 
-    def define_liquid_class(self, name: str) -> LiquidClass:
+    def define_liquid_class(self, name: str, version: int) -> LiquidClass:
         """Define a liquid class."""
         assert False, "define_liquid_class is only supported on engine core"
 
