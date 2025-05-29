@@ -16,10 +16,7 @@ import {
 
 import { getRobotType } from '../../file-data/selectors'
 import { getLabwareEntities } from '../../step-forms/selectors'
-import {
-  getDeckSetupForActiveItem,
-  Option,
-} from '../../top-selectors/labware-locations'
+import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import {
   getAllLabwareIdsOfCertainURIOnStack,
@@ -46,6 +43,7 @@ import type {
   LabwareOnDeck,
   ModuleOnDeck,
 } from '../../step-forms'
+import type { Option } from '../../top-selectors/labware-locations'
 import type { Fixture } from './DeckSetup/constants'
 
 export const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
@@ -250,16 +248,16 @@ const getNickname = (
   activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
   labwareId: string,
   robotType: RobotType
-): string => {
+): { nickName: string; latestSlot: string } => {
   const { modules } = activeDeckSetup
   const stack = activeDeckSetup.labware[labwareId].stack
   const latestSlot = resolveSlotLocation(modules, stack, robotType)
 
   let nickName: string = nicknamesById[labwareId]
   if (latestSlot != null && latestSlot !== 'offDeck') {
-    nickName = `${nicknamesById[labwareId]} in ${latestSlot}`
+    nickName = nicknamesById[labwareId]
   }
-  return nickName
+  return { nickName, latestSlot }
 }
 
 export const useLabwareDropdownOptions = (
@@ -289,7 +287,7 @@ export const useLabwareDropdownOptions = (
 
       const isAdapter =
         labwareEntity.def.allowedRoles?.includes('adapter') ?? false
-      const nickName = getNickname(
+      const { nickName, latestSlot } = getNickname(
         nicknamesById,
         activeDeckSetup,
         labwareId,
@@ -312,6 +310,7 @@ export const useLabwareDropdownOptions = (
             {
               name: nickName,
               value: labwareId,
+              deckLabel: isOffDeck ? 'Off-deck' : latestSlot,
             },
           ]
     },
@@ -332,35 +331,35 @@ export const getUnoccupiedStackOptions = (
   }
 
   const { def } = deckSetupLabware[labwareIdFromDropdown]
-  const stackingLimit = def.stackLimit ?? 0
   const labwareCompatibleParentLabware = def.compatibleParentLabware
 
   return Object.entries(robotState.labware).reduce<Option[]>(
-    (acc, [labwareId, labwareOnDeck]) => {
-      const slot = getSlotInLocationStack(labwareOnDeck.stack)
+    (acc, [labwareId, temporalLabwareOnDeck]) => {
+      const slot = getSlotInLocationStack(temporalLabwareOnDeck.stack)
       const fullStack = getFullStackFromLabwares(robotState.labware, slot)
-      const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(
-        deckSetupLabware,
-        deckSetupLabware[labwareId]
-      )
-
-      const isAtLimit = stackingLimit === similarLabwareStackIds.length
+      const labwareOnDeck = deckSetupLabware[labwareId]
       const isTopOfStack = fullStack[0] === labwareId
-
-      const { displayName } = deckSetupLabware[labwareId].def.metadata
-      const { loadName } = deckSetupLabware[labwareId].def.parameters
+      const { def: labwareOnDeckDef } = labwareOnDeck
+      const { displayName } = labwareOnDeckDef.metadata
+      const { loadName } = labwareOnDeckDef.parameters
 
       const isCompatible = labwareCompatibleParentLabware?.includes(loadName)
       const isNotCurrentLabware = labwareId !== labwareIdFromDropdown
 
-      if (isTopOfStack && isCompatible && !isAtLimit && isNotCurrentLabware) {
+      if (isTopOfStack && isCompatible && isNotCurrentLabware) {
+        const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(
+          deckSetupLabware,
+          labwareOnDeck
+        )
         acc.push({
-          name: t('protocol_steps:unoccupied_stack_plural', {
-            count: similarLabwareStackIds.length,
-            name: displayName,
-            slot,
-          }),
+          name:
+            similarLabwareStackIds.length > 1
+              ? t('protocol_steps:unoccupied_stack', {
+                  name: displayName,
+                })
+              : displayName,
           value: labwareId,
+          deckLabel: slot,
         })
       }
 

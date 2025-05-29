@@ -11,11 +11,11 @@ import {
   getDeckSetupForActiveItem,
   getRobotStateAtActiveItem,
   getUnoccupiedLabwareLocationOptions,
-  Option,
 } from '../../../../../../top-selectors/labware-locations'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
 import { getUnoccupiedStackOptions } from '../../../../utils'
 
+import type { Option } from '../../../../../../top-selectors/labware-locations'
 import type { FieldProps } from '../../types'
 
 interface LabwareLocationFieldProps extends FieldProps {
@@ -49,8 +49,8 @@ export function LabwareLocationField(
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []
 
   let unoccupiedLabwareLocationsOptions = [
-    ...unoccupiedLabwareLocationsOptionsSelector,
     ...unoccupiedLabwareStackOptions,
+    ...unoccupiedLabwareLocationsOptionsSelector,
   ]
 
   if (useGripper || isLabwareOffDeck) {

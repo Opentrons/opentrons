@@ -137,12 +137,14 @@ export function DropdownStepFormField(
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={options[0].subtext != null ? SPACING.spacing4 : '0'}
               >
-                <StyledText
-                  desktopStyle="captionRegular"
-                  css={LINE_CLAMP_TEXT_STYLE(3, true)}
-                >
-                  {options[0].name}
-                </StyledText>
+                {options[0].name !== options[0].deckLabel ? (
+                  <StyledText
+                    desktopStyle="captionRegular"
+                    css={LINE_CLAMP_TEXT_STYLE(3, true)}
+                  >
+                    {options[0].name}
+                  </StyledText>
+                ) : null}
                 <StyledText
                   desktopStyle="captionRegular"
                   color={COLORS.black70}

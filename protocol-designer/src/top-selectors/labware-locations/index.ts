@@ -18,8 +18,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
-  getFullStackFromLabwares,
-  getSlotInLocationStack,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
@@ -51,6 +49,7 @@ import type { Selector } from '../../types'
 export interface Option {
   name: string
   value: string
+  deckLabel: string
 }
 
 export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSelector(
@@ -212,16 +211,18 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
               {
                 name:
                   modIdWithAdapter != null
-                    ? `${moduleUnderAdapter} on ${moduleSlotInfo} with ${adapterDisplayName}`
-                    : `${adapterSlotInfo} with ${adapterDisplayName}`,
+                    ? `${moduleUnderAdapter} with ${adapterDisplayName}`
+                    : adapterDisplayName,
                 value: labwareId,
+                deckLabel:
+                  modIdWithAdapter != null ? moduleSlotInfo : adapterSlotInfo,
               },
             ]
           : acc
       },
       []
     )
-    
+
     const unoccupiedModuleOptions = Object.entries(modules).reduce<Option[]>(
       (acc, [modId, modOnDeck]) => {
         const moduleHasLabware = Object.entries(labware).some(
@@ -239,10 +240,9 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
           : [
               ...acc,
               {
-                name: `${getModuleDisplayName(
-                  moduleEntities[modId].model
-                )} on ${tcLocations != null ? tcLocations : slot}`,
+                name: getModuleDisplayName(moduleEntities[modId].model),
                 value: modId,
+                deckLabel: tcLocations != null ? tcLocations : slot,
               },
             ]
       },
@@ -282,11 +282,16 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
           !FLEX_STACKER_ADDRESSABLE_AREAS.includes(slotId)
         )
       })
-      .map(slotId => ({ name: slotId, value: slotId }))
-    const offDeck = { name: 'Off-deck', value: 'offDeck' }
+      .map(slotId => ({ name: slotId, value: slotId, deckLabel: slotId }))
+    const offDeck = {
+      name: 'Off-deck',
+      value: 'offDeck',
+      deckLabel: 'Off-deck',
+    }
     const wasteChuteSlot = {
       name: 'Waste Chute in D3',
       value: WASTE_CHUTE_CUTOUT,
+      deckLabel: 'D3',
     }
 
     return hasWasteChute
