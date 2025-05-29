@@ -1402,13 +1402,13 @@ class ProtocolContext(CommandPublisher):
 
                 .. code-block:: python
 
-                {
-                <pipette_name>: {
-                    <tiprack_uri>: <properties in the shape of TransferPropertiesDict>
+                    {
+                    <pipette_name>: {
+                        <tiprack_uri>: <properties in the shape of TransferPropertiesDict>
 
-                    # TransferPropertiesDict is a dictionary representation of the
-                    # transfer properties returned by the `LiquidClass.get_for(..)` function.
-                }}
+                        # TransferPropertiesDict is a dictionary representation of the
+                        # transfer properties returned by the `LiquidClass.get_for(..)` function.
+                    }}
 
             base_liquid_class: A LiquidClass to base this liquid class on. The properties
                 specified in transfer_properties will override any existing ones
