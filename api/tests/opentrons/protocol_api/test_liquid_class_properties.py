@@ -454,8 +454,8 @@ def test_liquid_handling_property_by_volume() -> None:
     assert subject.get_for_volume(1000) == 250.0
 
     # Test fixed overrides
-    subject.set_fixed_override(4321)
-    for volume in (0, 1, 10, 100):
+    subject.set_for_all_volumes(4321)
+    for volume in (0, 1, 7, 100):
         assert subject.get_for_volume(volume) == 4321
 
     # Test resetting to default
