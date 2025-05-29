@@ -14,10 +14,14 @@ import {
   _sortLabwareDropdownOptions,
   formatTime,
   getSlotInformation,
+  getUnoccupiedStackOptions,
 } from '../utils'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type {
+  AdditionalEquipmentName,
+  RobotState,
+} from '@opentrons/step-generation'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
 
 const mockLabOnDeck1 = {
@@ -259,5 +263,48 @@ describe('_sortLabwareDropdownOptions', () => {
   it('should handle {} case', () => {
     const result = _sortLabwareDropdownOptions([])
     expect(result).toEqual([])
+  })
+})
+
+const mockT = (key: string) => key
+
+describe('getUnoccupiedStackOptions', () => {
+  const mockRobotState: RobotState = {
+    labware: { labId: { stack: ['labId', 'mockHsId', 'D1'] } },
+    pipettes: {},
+    modules: {},
+    tipState: {} as any,
+    liquidState: {} as any,
+  }
+
+  it('should render a labware on a stack', () => {
+    const mockLabware: AllTemporalPropertiesForTimelineFrame['labware'] = {
+      labId: mockLabOnDeck1Flex,
+      labId2: {
+        ...mockLabOnDeck2Flex,
+        def: {
+          ...fixture96Plate,
+          compatibleParentLabware: [fixtureTiprackAdapter.parameters.loadName],
+        } as LabwareDefinition2,
+      },
+      labId3: mockLabOnStagingArea,
+    }
+    expect(
+      getUnoccupiedStackOptions(mockRobotState, mockLabware, 'labId2', mockT)
+    ).toEqual([
+      {
+        name: 'Fixture Flex 96 Tip Rack Adapter',
+        value: 'labId',
+        deckLabel: 'D1',
+      },
+    ])
+  })
+  it('should render no labware', () => {
+    const mockLabware: AllTemporalPropertiesForTimelineFrame['labware'] = {
+      labId: mockLabOnDeck1Flex,
+    }
+    expect(
+      getUnoccupiedStackOptions(mockRobotState, mockLabware, 'labId', mockT)
+    ).toEqual([])
   })
 })

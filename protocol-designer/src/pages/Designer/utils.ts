@@ -9,7 +9,10 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getFullStackFromLabwares,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import { getRobotType } from '../../file-data/selectors'
 import { getLabwareEntities } from '../../step-forms/selectors'
@@ -31,6 +34,7 @@ import type {
   AdditionalEquipmentName,
   DeckSlot,
   LabwareEntity,
+  RobotState,
 } from '@opentrons/step-generation'
 import type {
   AllTemporalPropertiesForTimelineFrame,
@@ -38,6 +42,7 @@ import type {
   LabwareOnDeck,
   ModuleOnDeck,
 } from '../../step-forms'
+import type { Option } from '../../top-selectors/labware-locations'
 import type { Fixture } from './DeckSetup/constants'
 
 export const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
@@ -242,16 +247,16 @@ const getNickname = (
   activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
   labwareId: string,
   robotType: RobotType
-): string => {
+): { nickName: string; latestSlot: string } => {
   const { modules } = activeDeckSetup
   const stack = activeDeckSetup.labware[labwareId].stack
   const latestSlot = resolveSlotLocation(modules, stack, robotType)
 
   let nickName: string = nicknamesById[labwareId]
   if (latestSlot != null && latestSlot !== 'offDeck') {
-    nickName = `${nicknamesById[labwareId]} in ${latestSlot}`
+    nickName = nicknamesById[labwareId]
   }
-  return nickName
+  return { nickName, latestSlot }
 }
 
 export const useLabwareDropdownOptions = (
@@ -275,7 +280,7 @@ export const useLabwareDropdownOptions = (
 
       const isAdapter =
         labwareEntity.def.allowedRoles?.includes('adapter') ?? false
-      const nickName = getNickname(
+      const { nickName, latestSlot } = getNickname(
         nicknamesById,
         activeDeckSetup,
         labwareId,
@@ -297,10 +302,61 @@ export const useLabwareDropdownOptions = (
             {
               name: nickName,
               value: labwareId,
+              deckLabel: isOffDeck ? 'Off-deck' : latestSlot,
             },
           ]
     },
     []
   )
   return _sortLabwareDropdownOptions(moveLabwareOptions)
+}
+
+//  used for LabwareLocationField dropdown
+export const getUnoccupiedStackOptions = (
+  robotState: RobotState,
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'],
+  labwareIdFromDropdown: string,
+  t: any
+): Option[] => {
+  if (deckSetupLabware[labwareIdFromDropdown] == null) {
+    return []
+  }
+
+  const { def } = deckSetupLabware[labwareIdFromDropdown]
+  const labwareCompatibleParentLabware = def.compatibleParentLabware
+
+  return Object.entries(robotState.labware).reduce<Option[]>(
+    (acc, [labwareId, temporalLabwareOnDeck]) => {
+      const slot = getSlotInLocationStack(temporalLabwareOnDeck.stack)
+      const fullStack = getFullStackFromLabwares(robotState.labware, slot)
+      const labwareOnDeck = deckSetupLabware[labwareId]
+      const isTopOfStack = fullStack[0] === labwareId
+      const { def: labwareOnDeckDef } = labwareOnDeck
+      const { displayName } = labwareOnDeckDef.metadata
+      const { loadName } = labwareOnDeckDef.parameters
+
+      const isCompatible = labwareCompatibleParentLabware?.includes(loadName)
+      const isNotCurrentLabware = labwareId !== labwareIdFromDropdown
+
+      if (isTopOfStack && isCompatible && isNotCurrentLabware) {
+        const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(
+          deckSetupLabware,
+          labwareOnDeck
+        )
+        acc.push({
+          name:
+            similarLabwareStackIds.length > 1
+              ? t('protocol_steps:unoccupied_stack', {
+                  name: displayName,
+                })
+              : displayName,
+          value: labwareId,
+          deckLabel: slot,
+        })
+      }
+
+      return acc
+    },
+    []
+  )
 }

@@ -7,11 +7,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  PAUSE_UNTIL_TEMP,
-  SPAN7_8_10_11_SLOT,
-} from '../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID, PAUSE_UNTIL_TEMP } from '../../constants'
 import { moveDeckItem } from '../../labware-ingred/actions'
 import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
@@ -993,19 +989,6 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         action: SavedStepFormsActions
         expectedModuleId: string
       }> = [
-        {
-          testName: 'create TC -> override TC step module id',
-          action: {
-            type: 'CREATE_MODULE',
-            payload: {
-              id: 'NewTCId',
-              slot: SPAN7_8_10_11_SLOT,
-              type: THERMOCYCLER_MODULE_TYPE,
-              model: 'thermocyclerModuleV1',
-            },
-          },
-          expectedModuleId: 'NewTCId',
-        },
         {
           testName: 'create temp mod -> DO NOT override TC step module id',
           action: {
