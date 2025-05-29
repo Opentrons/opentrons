@@ -14,6 +14,6 @@
 /api-client @Opentrons/js
 /react-api-client @Opentrons/js
 /app-shell @Opentrons/js
-/components @Opentrons/js
+/components @Opentrons/js @Opentrons/components-devs
 /api @Opentrons/py
 /shared-data/js @Opentrons/js

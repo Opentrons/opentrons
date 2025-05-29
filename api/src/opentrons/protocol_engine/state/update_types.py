@@ -61,16 +61,6 @@ Unfortunately, mypy doesn't let us write `Literal[CLEAR]`. Use this instead.
 """
 
 
-class _SimulatedEnum(enum.Enum):
-    SIMULATED = enum.auto()
-
-
-SIMULATED: typing.Final = _SimulatedEnum.SIMULATED
-"""A sentinel value to indicate that a liquid probe return value is simulated.
-
-Useful to avoid throwing unnecessary errors in protocol analysis."""
-
-
 @dataclasses.dataclass(frozen=True)
 class Well:
     """Designates a well in a labware."""
@@ -127,6 +117,7 @@ class BatchLabwareLocationUpdate:
     """The new offsets of each id."""
 
 
+# todo(mm, 2025-04-28): Combine with BatchLoadedLabwareUpdate.
 @dataclasses.dataclass
 class LoadedLabwareUpdate:
     """An update that loads a new labware."""
@@ -250,16 +241,14 @@ class PipetteAspirateReadyUpdate:
 class TipsUsedUpdate:
     """Represents an update that marks tips in a tip rack as used."""
 
-    pipette_id: str
-    """The pipette that did the tip pickup."""
-
     labware_id: str
+    """The labware ID of the tip rack."""
 
-    well_name: str
-    """The well that the pipette's primary nozzle targeted.
+    well_names: list[str]
+    """The exact wells in the tip rack that should be marked as used.
 
-    Wells in addition to this one will also be marked as used, depending on the
-    pipette's nozzle layout.
+    This is the *full* list, which is probably more than what appeared in the pickUpTip
+    command's params, for multi-channel reasons.
     """
 
 
@@ -701,13 +690,9 @@ class StateUpdate:
         )
         return self
 
-    def mark_tips_as_used(
-        self: Self, pipette_id: str, labware_id: str, well_name: str
-    ) -> Self:
+    def mark_tips_as_used(self: Self, labware_id: str, well_names: list[str]) -> Self:
         """Mark tips in a tip rack as used. See `TipsUsedUpdate`."""
-        self.tips_used = TipsUsedUpdate(
-            pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
-        )
+        self.tips_used = TipsUsedUpdate(labware_id=labware_id, well_names=well_names)
         return self
 
     def set_liquid_loaded(

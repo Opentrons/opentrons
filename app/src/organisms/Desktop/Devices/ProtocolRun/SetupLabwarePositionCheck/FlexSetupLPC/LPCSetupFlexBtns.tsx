@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
 import {
   Flex,
   JUSTIFY_CENTER,
@@ -13,14 +12,17 @@ import {
   TOOLTIP_BOTTOM,
   useHoverTooltip,
 } from '@opentrons/components'
+import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useLPCDisabledReason } from '/app/resources/runs'
 import {
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectLabwareOffsetsToAddToRun,
   selectTotalCountNonHardCodedLSOffsets,
 } from '/app/redux/protocol-runs'
+import { useLPCDisabledReason } from '/app/resources/runs'
 
 import type { SetupLabwarePositionCheckProps } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck'
 
@@ -39,6 +41,10 @@ export function LPCSetupFlexBtns({
 }: LPCSetupFlexBtnsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const { makeSnackbar } = useToaster()
+  const { reportApplyOffsets } = useLPCAnalytics({
+    runId,
+    robotType: FLEX_ROBOT_TYPE,
+  })
   const lpcDisabledReason = useLPCDisabledReason({
     robotName,
     runId,
@@ -103,6 +109,7 @@ export function LPCSetupFlexBtns({
       )
         .then(() => {
           setOffsetsConfirmed(true)
+          reportApplyOffsets()
         })
         .catch(() => {
           makeSnackbar(t('failed_to_apply_offsets') as string)

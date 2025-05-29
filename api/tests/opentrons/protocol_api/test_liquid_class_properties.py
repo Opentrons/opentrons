@@ -22,14 +22,21 @@ def test_build_aspirate_settings() -> None:
 
     aspirate_properties = build_aspirate_properties(aspirate_data)
 
-    assert aspirate_properties.submerge.position_reference.value == "liquid-meniscus"
-    assert aspirate_properties.submerge.offset == Coordinate(x=0, y=0, z=-5)
+    assert (
+        aspirate_properties.submerge.start_position.position_reference.value
+        == "liquid-meniscus"
+    )
+    assert aspirate_properties.submerge.start_position.offset == Coordinate(
+        x=0, y=0, z=-5
+    )
     assert aspirate_properties.submerge.speed == 100
     assert aspirate_properties.submerge.delay.enabled is True
     assert aspirate_properties.submerge.delay.duration == 1.5
 
-    assert aspirate_properties.retract.position_reference.value == "well-top"
-    assert aspirate_properties.retract.offset == Coordinate(x=0, y=0, z=5)
+    assert (
+        aspirate_properties.retract.end_position.position_reference.value == "well-top"
+    )
+    assert aspirate_properties.retract.end_position.offset == Coordinate(x=0, y=0, z=5)
     assert aspirate_properties.retract.speed == 100
     assert aspirate_properties.retract.air_gap_by_volume.as_dict() == {
         5.0: 3.0,
@@ -37,13 +44,15 @@ def test_build_aspirate_settings() -> None:
     }
     assert aspirate_properties.retract.touch_tip.enabled is True
     assert aspirate_properties.retract.touch_tip.z_offset == 2
-    assert aspirate_properties.retract.touch_tip.mm_to_edge == 1
+    assert aspirate_properties.retract.touch_tip.mm_from_edge == 1
     assert aspirate_properties.retract.touch_tip.speed == 50
     assert aspirate_properties.retract.delay.enabled is True
     assert aspirate_properties.retract.delay.duration == 1
 
-    assert aspirate_properties.position_reference.value == "well-bottom"
-    assert aspirate_properties.offset == Coordinate(x=0, y=0, z=-5)
+    assert (
+        aspirate_properties.aspirate_position.position_reference.value == "well-bottom"
+    )
+    assert aspirate_properties.aspirate_position.offset == Coordinate(x=0, y=0, z=-5)
     assert aspirate_properties.flow_rate_by_volume.as_dict() == {10: 50.0}
     assert aspirate_properties.correction_by_volume.as_dict() == {
         1.0: -2.5,
@@ -66,10 +75,15 @@ def test_aspirate_settings_overrides() -> None:
 
     aspirate_properties = build_aspirate_properties(aspirate_data)
 
-    aspirate_properties.submerge.position_reference = "well-bottom"  # type: ignore[assignment]
-    assert aspirate_properties.submerge.position_reference.value == "well-bottom"
-    aspirate_properties.submerge.offset = 5, 0, 0  # type: ignore[assignment]
-    assert aspirate_properties.submerge.offset == Coordinate(x=5, y=0, z=0)
+    aspirate_properties.submerge.start_position.position_reference = "well-bottom"  # type: ignore[assignment]
+    assert (
+        aspirate_properties.submerge.start_position.position_reference.value
+        == "well-bottom"
+    )
+    aspirate_properties.submerge.start_position.offset = 5, 0, 0  # type: ignore[assignment]
+    assert aspirate_properties.submerge.start_position.offset == Coordinate(
+        x=5, y=0, z=0
+    )
     aspirate_properties.submerge.speed = 123
     assert aspirate_properties.submerge.speed == 123
     aspirate_properties.submerge.delay.enabled = False
@@ -77,18 +91,21 @@ def test_aspirate_settings_overrides() -> None:
     aspirate_properties.submerge.delay.duration = 5.1
     assert aspirate_properties.submerge.delay.duration == 5.1
 
-    aspirate_properties.retract.position_reference = "well-center"  # type: ignore[assignment]
-    assert aspirate_properties.retract.position_reference.value == "well-center"
-    aspirate_properties.retract.offset = 0, 50, 0  # type: ignore[assignment]
-    assert aspirate_properties.retract.offset == Coordinate(x=0, y=50, z=0)
+    aspirate_properties.retract.end_position.position_reference = "well-center"  # type: ignore[assignment]
+    assert (
+        aspirate_properties.retract.end_position.position_reference.value
+        == "well-center"
+    )
+    aspirate_properties.retract.end_position.offset = 0, 50, 0  # type: ignore[assignment]
+    assert aspirate_properties.retract.end_position.offset == Coordinate(x=0, y=50, z=0)
     aspirate_properties.retract.speed = 987
     assert aspirate_properties.retract.speed == 987
     aspirate_properties.retract.touch_tip.enabled = False
     assert aspirate_properties.retract.touch_tip.enabled is False
     aspirate_properties.retract.touch_tip.z_offset = 2.34
     assert aspirate_properties.retract.touch_tip.z_offset == 2.34
-    aspirate_properties.retract.touch_tip.mm_to_edge = 4.56
-    assert aspirate_properties.retract.touch_tip.mm_to_edge == 4.56
+    aspirate_properties.retract.touch_tip.mm_from_edge = 4.56
+    assert aspirate_properties.retract.touch_tip.mm_from_edge == 4.56
     aspirate_properties.retract.touch_tip.speed = 501
     assert aspirate_properties.retract.touch_tip.speed == 501
     aspirate_properties.retract.delay.enabled = False
@@ -96,10 +113,13 @@ def test_aspirate_settings_overrides() -> None:
     aspirate_properties.retract.delay.duration = 0.5
     assert aspirate_properties.retract.delay.duration == 0.5
 
-    aspirate_properties.position_reference = "liquid-meniscus"  # type: ignore[assignment]
-    assert aspirate_properties.position_reference.value == "liquid-meniscus"
-    aspirate_properties.offset = -1, -2, -3  # type: ignore[assignment]
-    assert aspirate_properties.offset == Coordinate(x=-1, y=-2, z=-3)
+    aspirate_properties.aspirate_position.position_reference = "liquid-meniscus"  # type: ignore[assignment]
+    assert (
+        aspirate_properties.aspirate_position.position_reference.value
+        == "liquid-meniscus"
+    )
+    aspirate_properties.aspirate_position.offset = -1, -2, -3  # type: ignore[assignment]
+    assert aspirate_properties.aspirate_position.offset == Coordinate(x=-1, y=-2, z=-3)
     aspirate_properties.pre_wet = False
     assert aspirate_properties.pre_wet is False
     aspirate_properties.mix.enabled = False
@@ -123,16 +143,23 @@ def test_build_single_dispense_settings() -> None:
     single_dispense_properties = build_single_dispense_properties(single_dispense_data)
 
     assert (
-        single_dispense_properties.submerge.position_reference.value
+        single_dispense_properties.submerge.start_position.position_reference.value
         == "liquid-meniscus"
     )
-    assert single_dispense_properties.submerge.offset == Coordinate(x=0, y=0, z=-5)
+    assert single_dispense_properties.submerge.start_position.offset == Coordinate(
+        x=0, y=0, z=-5
+    )
     assert single_dispense_properties.submerge.speed == 100
     assert single_dispense_properties.submerge.delay.enabled is True
     assert single_dispense_properties.submerge.delay.duration == 1.5
 
-    assert single_dispense_properties.retract.position_reference.value == "well-top"
-    assert single_dispense_properties.retract.offset == Coordinate(x=0, y=0, z=5)
+    assert (
+        single_dispense_properties.retract.end_position.position_reference.value
+        == "well-top"
+    )
+    assert single_dispense_properties.retract.end_position.offset == Coordinate(
+        x=0, y=0, z=5
+    )
     assert single_dispense_properties.retract.speed == 100
     assert single_dispense_properties.retract.air_gap_by_volume.as_dict() == {
         5.0: 3.0,
@@ -140,7 +167,7 @@ def test_build_single_dispense_settings() -> None:
     }
     assert single_dispense_properties.retract.touch_tip.enabled is True
     assert single_dispense_properties.retract.touch_tip.z_offset == 2
-    assert single_dispense_properties.retract.touch_tip.mm_to_edge == 1
+    assert single_dispense_properties.retract.touch_tip.mm_from_edge == 1
     assert single_dispense_properties.retract.touch_tip.speed == 50
     assert single_dispense_properties.retract.blowout.enabled is True
     assert single_dispense_properties.retract.blowout.location is not None
@@ -149,8 +176,13 @@ def test_build_single_dispense_settings() -> None:
     assert single_dispense_properties.retract.delay.enabled is True
     assert single_dispense_properties.retract.delay.duration == 1
 
-    assert single_dispense_properties.position_reference.value == "well-bottom"
-    assert single_dispense_properties.offset == Coordinate(x=0, y=0, z=-5)
+    assert (
+        single_dispense_properties.dispense_position.position_reference.value
+        == "well-bottom"
+    )
+    assert single_dispense_properties.dispense_position.offset == Coordinate(
+        x=0, y=0, z=-5
+    )
     assert single_dispense_properties.flow_rate_by_volume.as_dict() == {
         10.0: 40.0,
         20.0: 30.0,
@@ -179,10 +211,15 @@ def test_single_dispense_settings_override() -> None:
 
     single_dispense_properties = build_single_dispense_properties(single_dispense_data)
 
-    single_dispense_properties.submerge.position_reference = "well-bottom"  # type: ignore[assignment]
-    assert single_dispense_properties.submerge.position_reference.value == "well-bottom"
-    single_dispense_properties.submerge.offset = 3, -2, 1  # type: ignore[assignment]
-    assert single_dispense_properties.submerge.offset == Coordinate(x=3, y=-2, z=1)
+    single_dispense_properties.submerge.start_position.position_reference = "well-bottom"  # type: ignore[assignment]
+    assert (
+        single_dispense_properties.submerge.start_position.position_reference.value
+        == "well-bottom"
+    )
+    single_dispense_properties.submerge.start_position.offset = 3, -2, 1  # type: ignore[assignment]
+    assert single_dispense_properties.submerge.start_position.offset == Coordinate(
+        x=3, y=-2, z=1
+    )
     single_dispense_properties.submerge.speed = 111
     assert single_dispense_properties.submerge.speed == 111
     single_dispense_properties.submerge.delay.enabled = False
@@ -190,18 +227,23 @@ def test_single_dispense_settings_override() -> None:
     single_dispense_properties.submerge.delay.duration = 5.1
     assert single_dispense_properties.submerge.delay.duration == 5.1
 
-    single_dispense_properties.retract.position_reference = "well-center"  # type: ignore[assignment]
-    assert single_dispense_properties.retract.position_reference.value == "well-center"
-    single_dispense_properties.retract.offset = -9, -8, -7  # type: ignore[assignment]
-    assert single_dispense_properties.retract.offset == Coordinate(x=-9, y=-8, z=-7)
+    single_dispense_properties.retract.end_position.position_reference = "well-center"  # type: ignore[assignment]
+    assert (
+        single_dispense_properties.retract.end_position.position_reference.value
+        == "well-center"
+    )
+    single_dispense_properties.retract.end_position.offset = -9, -8, -7  # type: ignore[assignment]
+    assert single_dispense_properties.retract.end_position.offset == Coordinate(
+        x=-9, y=-8, z=-7
+    )
     single_dispense_properties.retract.speed = 222
     assert single_dispense_properties.retract.speed == 222
     single_dispense_properties.retract.touch_tip.enabled = False
     assert single_dispense_properties.retract.touch_tip.enabled is False
     single_dispense_properties.retract.touch_tip.z_offset = 2.34
     assert single_dispense_properties.retract.touch_tip.z_offset == 2.34
-    single_dispense_properties.retract.touch_tip.mm_to_edge = 1.11
-    assert single_dispense_properties.retract.touch_tip.mm_to_edge == 1.11
+    single_dispense_properties.retract.touch_tip.mm_from_edge = 1.11
+    assert single_dispense_properties.retract.touch_tip.mm_from_edge == 1.11
     single_dispense_properties.retract.touch_tip.speed = 543
     assert single_dispense_properties.retract.touch_tip.speed == 543
     single_dispense_properties.retract.blowout.enabled = False
@@ -216,10 +258,15 @@ def test_single_dispense_settings_override() -> None:
     single_dispense_properties.retract.delay.duration = 0.1
     assert single_dispense_properties.retract.delay.duration == 0.1
 
-    single_dispense_properties.position_reference = "liquid-meniscus"  # type: ignore[assignment]
-    assert single_dispense_properties.position_reference.value == "liquid-meniscus"
-    single_dispense_properties.offset = 11, 22, -33  # type: ignore[assignment]
-    assert single_dispense_properties.offset == Coordinate(x=11, y=22, z=-33)
+    single_dispense_properties.dispense_position.position_reference = "liquid-meniscus"  # type: ignore[assignment]
+    assert (
+        single_dispense_properties.dispense_position.position_reference.value
+        == "liquid-meniscus"
+    )
+    single_dispense_properties.dispense_position.offset = 11, 22, -33  # type: ignore[assignment]
+    assert single_dispense_properties.dispense_position.offset == Coordinate(
+        x=11, y=22, z=-33
+    )
     single_dispense_properties.mix.enabled = False
     assert single_dispense_properties.mix.enabled is False
     single_dispense_properties.mix.repetitions = 15
@@ -243,15 +290,23 @@ def test_build_multi_dispense_settings() -> None:
     assert multi_dispense_properties is not None
 
     assert (
-        multi_dispense_properties.submerge.position_reference.value == "liquid-meniscus"
+        multi_dispense_properties.submerge.start_position.position_reference.value
+        == "liquid-meniscus"
     )
-    assert multi_dispense_properties.submerge.offset == Coordinate(x=0, y=0, z=-5)
+    assert multi_dispense_properties.submerge.start_position.offset == Coordinate(
+        x=0, y=0, z=-5
+    )
     assert multi_dispense_properties.submerge.speed == 100
     assert multi_dispense_properties.submerge.delay.enabled is True
     assert multi_dispense_properties.submerge.delay.duration == 1.5
 
-    assert multi_dispense_properties.retract.position_reference.value == "well-top"
-    assert multi_dispense_properties.retract.offset == Coordinate(x=0, y=0, z=5)
+    assert (
+        multi_dispense_properties.retract.end_position.position_reference.value
+        == "well-top"
+    )
+    assert multi_dispense_properties.retract.end_position.offset == Coordinate(
+        x=0, y=0, z=5
+    )
     assert multi_dispense_properties.retract.speed == 100
     assert multi_dispense_properties.retract.air_gap_by_volume.as_dict() == {
         5.0: 3.0,
@@ -259,7 +314,7 @@ def test_build_multi_dispense_settings() -> None:
     }
     assert multi_dispense_properties.retract.touch_tip.enabled is True
     assert multi_dispense_properties.retract.touch_tip.z_offset == 2
-    assert multi_dispense_properties.retract.touch_tip.mm_to_edge == 1
+    assert multi_dispense_properties.retract.touch_tip.mm_from_edge == 1
     assert multi_dispense_properties.retract.touch_tip.speed == 50
     assert multi_dispense_properties.retract.blowout.enabled is False
     assert multi_dispense_properties.retract.blowout.location is None
@@ -267,8 +322,13 @@ def test_build_multi_dispense_settings() -> None:
     assert multi_dispense_properties.retract.delay.enabled is True
     assert multi_dispense_properties.retract.delay.duration == 1
 
-    assert multi_dispense_properties.position_reference.value == "well-bottom"
-    assert multi_dispense_properties.offset == Coordinate(x=0, y=0, z=-5)
+    assert (
+        multi_dispense_properties.dispense_position.position_reference.value
+        == "well-bottom"
+    )
+    assert multi_dispense_properties.dispense_position.offset == Coordinate(
+        x=0, y=0, z=-5
+    )
     assert multi_dispense_properties.flow_rate_by_volume.as_dict() == {
         10.0: 40.0,
         20.0: 30.0,
@@ -297,10 +357,15 @@ def test_multi_dispense_settings_override() -> None:
     multi_dispense_properties = build_multi_dispense_properties(multi_dispense_data)
     assert multi_dispense_properties is not None
 
-    multi_dispense_properties.submerge.position_reference = "well-bottom"  # type: ignore[assignment]
-    assert multi_dispense_properties.submerge.position_reference.value == "well-bottom"
-    multi_dispense_properties.submerge.offset = 3, -2, 1  # type: ignore[assignment]
-    assert multi_dispense_properties.submerge.offset == Coordinate(x=3, y=-2, z=1)
+    multi_dispense_properties.submerge.start_position.position_reference = "well-bottom"  # type: ignore[assignment]
+    assert (
+        multi_dispense_properties.submerge.start_position.position_reference.value
+        == "well-bottom"
+    )
+    multi_dispense_properties.submerge.start_position.offset = 3, -2, 1  # type: ignore[assignment]
+    assert multi_dispense_properties.submerge.start_position.offset == Coordinate(
+        x=3, y=-2, z=1
+    )
     multi_dispense_properties.submerge.speed = 111
     assert multi_dispense_properties.submerge.speed == 111
     multi_dispense_properties.submerge.delay.enabled = False
@@ -308,18 +373,23 @@ def test_multi_dispense_settings_override() -> None:
     multi_dispense_properties.submerge.delay.duration = 5.1
     assert multi_dispense_properties.submerge.delay.duration == 5.1
 
-    multi_dispense_properties.retract.position_reference = "well-center"  # type: ignore[assignment]
-    assert multi_dispense_properties.retract.position_reference.value == "well-center"
-    multi_dispense_properties.retract.offset = -9, -8, -7  # type: ignore[assignment]
-    assert multi_dispense_properties.retract.offset == Coordinate(x=-9, y=-8, z=-7)
+    multi_dispense_properties.retract.end_position.position_reference = "well-center"  # type: ignore[assignment]
+    assert (
+        multi_dispense_properties.retract.end_position.position_reference.value
+        == "well-center"
+    )
+    multi_dispense_properties.retract.end_position.offset = -9, -8, -7  # type: ignore[assignment]
+    assert multi_dispense_properties.retract.end_position.offset == Coordinate(
+        x=-9, y=-8, z=-7
+    )
     multi_dispense_properties.retract.speed = 222
     assert multi_dispense_properties.retract.speed == 222
     multi_dispense_properties.retract.touch_tip.enabled = False
     assert multi_dispense_properties.retract.touch_tip.enabled is False
     multi_dispense_properties.retract.touch_tip.z_offset = 2.34
     assert multi_dispense_properties.retract.touch_tip.z_offset == 2.34
-    multi_dispense_properties.retract.touch_tip.mm_to_edge = 1.11
-    assert multi_dispense_properties.retract.touch_tip.mm_to_edge == 1.11
+    multi_dispense_properties.retract.touch_tip.mm_from_edge = 1.11
+    assert multi_dispense_properties.retract.touch_tip.mm_from_edge == 1.11
     multi_dispense_properties.retract.touch_tip.speed = 543
     assert multi_dispense_properties.retract.touch_tip.speed == 543
     multi_dispense_properties.retract.blowout.enabled = False
@@ -334,10 +404,15 @@ def test_multi_dispense_settings_override() -> None:
     multi_dispense_properties.retract.delay.duration = 0.1
     assert multi_dispense_properties.retract.delay.duration == 0.1
 
-    multi_dispense_properties.position_reference = "liquid-meniscus"  # type: ignore[assignment]
-    assert multi_dispense_properties.position_reference.value == "liquid-meniscus"
-    multi_dispense_properties.offset = 11, 22, -33  # type: ignore[assignment]
-    assert multi_dispense_properties.offset == Coordinate(x=11, y=22, z=-33)
+    multi_dispense_properties.dispense_position.position_reference = "liquid-meniscus"  # type: ignore[assignment]
+    assert (
+        multi_dispense_properties.dispense_position.position_reference.value
+        == "liquid-meniscus"
+    )
+    multi_dispense_properties.dispense_position.offset = 11, 22, -33  # type: ignore[assignment]
+    assert multi_dispense_properties.dispense_position.offset == Coordinate(
+        x=11, y=22, z=-33
+    )
     multi_dispense_properties.delay.enabled = False
     assert multi_dispense_properties.delay.enabled is False
     multi_dispense_properties.delay.duration = 25.25
@@ -377,6 +452,22 @@ def test_liquid_handling_property_by_volume() -> None:
     # Test bounds
     assert subject.get_for_volume(1) == 50.0
     assert subject.get_for_volume(1000) == 250.0
+
+    # Test fixed overrides
+    subject.set_for_all_volumes(4321)
+    for volume in (0, 1, 7, 100):
+        assert subject.get_for_volume(volume) == 4321
+
+    # Test resetting to default
+    subject.reset_values()
+    assert subject.as_dict() == {5.0: 50, 10.0: 250}
+    assert subject.get_for_volume(7) == 130.0
+
+    # Test clearing all values
+    subject.clear_values()
+    assert subject.as_dict() == {}
+    with pytest.raises(ValueError, match="No properties found for any volumes"):
+        subject.get_for_volume(7)
 
 
 def test_non_existent_property_raises_error() -> None:

@@ -473,7 +473,8 @@ async def get_run_commands_error(
             description=(
                 "The starting index of the desired first command error in the list."
                 " If unspecified, a cursor will be selected automatically"
-                " based on the last error added."
+                " based on the last error added, and the slice of errors returned "
+                " is the previous `pageLength` errors."
             ),
         ),
     ] = None,
@@ -490,12 +491,9 @@ async def get_run_commands_error(
         all_errors_count = run_data_manager.get_command_errors_count(run_id=runId)
 
         if cursor is None:
-            if all_errors_count > 0:
-                # Get the most recent error,
-                # which we can find just at the end of the list.
-                cursor = all_errors_count - 1
-            else:
-                cursor = 0
+            cursor = max(all_errors_count - 1, 0)
+            cursor = max(cursor - pageLength + 1, 0)
+            cursor = min(cursor, all_errors_count)
 
         command_error_slice = run_data_manager.get_command_error_slice(
             run_id=runId,

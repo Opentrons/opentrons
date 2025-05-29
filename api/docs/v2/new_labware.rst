@@ -156,13 +156,17 @@ Use the ``adapter`` argument of ``load_labware()`` to load an adapter at the sam
 .. versionadded:: 2.15
     The ``adapter`` parameter.
 
-The API also has some "combination" labware definitions, which treat the adapter and labware as a unit::
+.. note::
 
-    hs_combo = hs_mod.load_labware(
-        "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat"
-    )
+    The API also has some "combination" labware definitions, which treat the adapter and labware as a unit::
 
-Loading labware this way prevents you from :ref:`moving the labware <moving-labware>` onto or off of the adapter, so it's less flexible than loading the two separately. Avoid using combination definitions unless your protocol specifies an ``apiLevel`` of 2.14 or lower.
+        hs_combo = hs_mod.load_labware(
+            "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat"
+        )
+
+    .. deprecated:: 2.15
+
+    Labware loaded with combination adapters no longer support all API features, such as moving the top labware or pipetting relative to liquid meniscus. These definitions are marked as "Retired" in version 8.5.0 of the Opentrons App and later. Avoid using combination definitions unless your protocol specifies an ``apiLevel`` of 2.14 or lower, in which case they are required.
 
 .. _new-well-access:
 

@@ -1,4 +1,5 @@
 """Opentrons helper methods."""
+
 import asyncio
 from random import random, randint
 from types import MethodType
@@ -18,6 +19,7 @@ from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocol_api._types import OffDeckType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.hardware_control.thread_manager import ThreadManager
 from opentrons.hardware_control.types import OT3Mount, Axis, HardwareFeatureFlags
 from opentrons.hardware_control.ot3api import OT3API
@@ -365,22 +367,10 @@ def _drop_tip(
     if return_tip:
         pipette.return_tip(home_after=False)
     else:
-        if offset is not None:
-            # we don't actually need the offset, if this is an 8 channel we always center channel
-            # a1 over the back of the trash
-            trash_well = pipette.trash_container.well(0)  # type: ignore[union-attr]
-            trash_container = trash_well.center().move(
-                Point(0, trash_well.width / 2, 0)  # type: ignore[union-attr, operator]
-            )
-            pipette.drop_tip(
-                trash_container,
-                home_after=False,
-            )
-        else:
-            pipette.drop_tip(home_after=False)
+        pipette.drop_tip(home_after=False)
     if minimum_z_height > 0:
         cur_location = pipette._get_last_location_by_api_version()
-        if cur_location is not None:
+        if isinstance(cur_location, Location):
             pipette.move_to(cur_location.move(Point(0, 0, minimum_z_height)))
 
 
@@ -439,7 +429,6 @@ def _load_pipette(
     if pipette_mount in loaded_pipettes.keys():
         return loaded_pipettes[pipette_mount]
 
-    trash = ctx.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
     pipette = ctx.load_instrument(pip_name, pipette_mount)
     loaded_pipettes = ctx.loaded_instruments
     assert pipette.max_volume == pipette_volume, (
@@ -462,7 +451,12 @@ def _load_pipette(
         pipette_movement_conflict.check_safe_for_pipette_movement = (
             _override_check_safe_for_pipette_movement
         )
-    pipette.trash_container = trash
+    try:
+        trash = pipette.trash_container
+    except NoTrashDefinedError:
+        trash = ctx.load_trash_bin("A3")
+        pipette.trash_container = trash
+        pass
     return pipette
 
 

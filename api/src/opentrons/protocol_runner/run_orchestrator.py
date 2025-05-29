@@ -429,7 +429,7 @@ class RunOrchestrator:
 
     def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""
-        return self._protocol_engine.state_view.tips.get_pipette_nozzle_maps()
+        return self._protocol_engine.state_view.pipettes.get_nozzle_configurations()
 
     def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
