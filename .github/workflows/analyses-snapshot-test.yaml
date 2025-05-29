@@ -91,16 +91,14 @@ jobs:
         working-directory: analyses-snapshot-testing
         run: make build-opentrons-analysis BASE_IMAGE_NAME=${{ env.BASE_IMAGE_NAME }} ANALYSIS_REF=${{ env.ANALYSIS_REF }} CACHEBUST=${{ github.run_number }}
 
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.13.0'
-          cache: 'pipenv'
-          cache-dependency-path: analyses-snapshot-testing/Pipfile.lock
-
-      - name: Setup Python Dependencies
-        working-directory: analyses-snapshot-testing
-        run: make setup
+          enable-cache: true
+          cache-dependency-glob: "./analyses-snapshot-testing/uv.lock"
+      - name: Sync the project
+        working-directory: ./analyses-snapshot-testing
+        run: make ci-setup
 
       - name: Run Test
         id: run_test

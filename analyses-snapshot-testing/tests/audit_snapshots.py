@@ -16,7 +16,6 @@ class AuditResult:
 
 
 def audit_snapshots() -> AuditResult:  # noqa: C901
-
     theme = Theme({"error": "bold red", "success": "bold green", "info": "bold blue", "path": "yellow"})
     console = Console(theme=theme)
 
