@@ -3,6 +3,7 @@
 # python-opentrons-api
 #
 ################################################################################
+include ../scripts/python.mk
 
 define OTAPI_CALL_PBU
 	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py api $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
@@ -17,7 +18,10 @@ PYTHON_OPENTRONS_API_SITE = $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)
 PYTHON_OPENTRONS_API_SUBDIR = api
 PYTHON_OPENTRONS_API_POST_INSTALL_TARGET_HOOKS = PYTHON_OPENTRONS_API_INSTALL_VERSION PYTHON_OPENTRONS_API_INSTALL_RELEASE_NOTES
 PYTHON_OPENTRONS_API_DEPENDENCIES = host-python-hatch-vcs-tunable host-python-hatch-dependency-coversion
-PYTHON_OPENTRONS_API_ENV = HATCH_VCS_TUNABLE_RAW_OPTIONS="root=$(shell realpath --relative-to=$(PYTHON_OPENTRONS_API_BUILDDIR) $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH))"
+PYTHON_OPENTRONS_API_ENV = \
+  HATCH_VCS_TUNABLE_RAW_OPTIONS="root=$(shell realpath --relative-to=$(PYTHON_OPENTRONS_API_BUILDDIR) $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH))" \
+  HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT)) \
+  HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 
 define PYTHON_OPENTRONS_API_INSTALL_VERSION
 	echo '$(call OTAPI_CALL_PBU,dump_br_version)' > $(BINARIES_DIR)/opentrons-api-version.json
