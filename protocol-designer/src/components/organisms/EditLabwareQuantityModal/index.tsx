@@ -21,6 +21,7 @@ import {
   deleteContainer,
 } from '../../../labware-ingred/actions'
 import { getLabwareEntities } from '../../../step-forms/selectors'
+import { maskToPositiveInteger } from '../../../steplist/fieldLevel/processing'
 import { HandleEnter } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
 
@@ -70,8 +71,8 @@ export function EditLabwareQuantityModal(
   }
 
   let errorText: string | null = null
-  if (parseInt(quantity) > stackingLimit) {
-    errorText = t('quantity_above_limit')
+  if (parseInt(quantity) > stackingLimit || parseInt(quantity) < 1) {
+    errorText = t('quantity_out_of_limit')
   } else if (quantity === '') {
     errorText = t('enter_integer')
   }
@@ -123,10 +124,10 @@ export function EditLabwareQuantityModal(
             error={showError ? errorText : null}
             name="changeQuantity"
             onChange={e => {
-              setQuantity(e.target.value)
+              const maskedValue = maskToPositiveInteger(e.target.value)
+              setQuantity(maskedValue)
             }}
             value={quantity}
-            type="text"
             autoFocus
             caption={t('valid_range', { max: stackingLimit })}
           />

@@ -66,7 +66,7 @@
   "only_display_rec": "Only display recommended labware",
   "plate_reader_no_labware": "Load labware onto Absorbance Plate Reader using a move step",
   "protocol_starting_deck": "Protocol starting deck",
-  "quantity_above_limit": "Enter a value within the specified range",
+  "quantity_out_of_limit": "Enter a value within the specified range",
   "read_more_gen1_gen2": "Read more about the differences between GEN1 and GEN2 Magnetic Modules",
   "remove_existing_labware": "Remove existing labware to add new labware",
   "rename_lab": "Rename labware",
