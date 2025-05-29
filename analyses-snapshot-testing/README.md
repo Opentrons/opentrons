@@ -2,11 +2,11 @@
 
 ## Setup
 
-1. Follow the instructions in [DEV_SETUP.md](../DEV_SETUP.md)
+1. Follow the instructions in [DEV_SETUP.md](../DEV_SETUP.md) for javascript
 1. `cd analyses-snapshot-testing`
-1. use pyenv to install python 3.13 and set it as the local python version for this directory
+1. have uv installed
 1. `make setup`
-1. Have docker installed and ready
+1. Have docker installed and the daemon running
 
 ## Concepts
 
@@ -70,12 +70,9 @@ cd analyses-snapshot-testing \
 
 ## Running the Analyses Battery against your local code
 
-> This copies in your local code to the container and runs the analyses battery against it.
+> This copies in your local code to the container and runs the analyses battery against it. Must have uv installed.
 
-`cd PYENV_ROOT && git pull` - make sure pyenv is up to date so you may install python 3.13.0
-`pyenv install 3.13.0` - install python 3.13.0
 `cd <OPENTRONS_REPO_ROOT>/analyses-snapshot-testing` - navigate to the analyses-snapshot-testing directory
-`pyenv local 3.13.0` - set the local python version to 3.13.0
 `make setup` - install the requirements
 `make snapshot-test-local` - this target builds the base image, builds the local code into the base image, then runs the analyses battery against the image you just created
 
