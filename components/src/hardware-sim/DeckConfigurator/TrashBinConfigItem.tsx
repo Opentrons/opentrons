@@ -1,77 +1,82 @@
+import { useTranslation } from 'react-i18next'
+
+import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+
+import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import { Btn, Text } from '../../primitives'
+import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_3_X_ADJUSTMENT,
+  COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_1_X_ADJUSTMENT,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  STAGING_AREA_FIXTURE_WIDTH,
+  LARGE_SINGLE_ITEM_SLOT_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
 import type {
-  CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface FlexStackerFixtureProps {
+interface TrashBinConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  cutoutFixtureId: CutoutFixtureId
-  hasWasteChute: boolean
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
   selected?: boolean
 }
 
-const FLEX_STACKER_FIXTURE_DISPLAY_NAME = 'Stacker'
-const FLEX_STACKER_WASTE_CHUTE_DISPLAY_NAME = 'Stacker + Waste chute'
-const FLEX_STACKER_MAG_BLOCK_DISPLAY_NAME = 'Stacker + Mag Block'
-
-export function FlexStackerFixture(
-  props: FlexStackerFixtureProps
+export function TrashBinConfigItem(
+  props: TrashBinConfigItemProps
 ): JSX.Element {
+  const { t } = useTranslation('deck_configuration')
+
   const {
     deckDefinition,
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
-    hasWasteChute,
     selected = false,
   } = props
 
-  const cutoutDef = deckDefinition.locations.cutouts.find(
+  const trashBinCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
-  let displayName = FLEX_STACKER_FIXTURE_DISPLAY_NAME
-  if (hasWasteChute) {
-    displayName = FLEX_STACKER_WASTE_CHUTE_DISPLAY_NAME
-  } else if (cutoutFixtureId === 'flexStackerModuleV1WithMagneticBlockV1') {
-    displayName = FLEX_STACKER_MAG_BLOCK_DISPLAY_NAME
-  }
 
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
    * the adjustment for x is different for right side/left side
    */
-  const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
+  const [xSlotPosition = 0, ySlotPosition = 0] = trashBinCutout?.position ?? []
 
-  const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
+  const isColumnOne = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
+  const xAdjustment = isColumnOne
+    ? COLUMN_1_X_ADJUSTMENT
+    : COLUMN_DEFAULT_X_ADJUSTMENT
+  const x = xSlotPosition + xAdjustment
 
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={STAGING_AREA_FIXTURE_WIDTH}
+      width={
+        isColumnOne
+          ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
+          : LARGE_SINGLE_ITEM_SLOT_WIDTH
+      }
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
@@ -89,7 +94,13 @@ export function FlexStackerFixture(
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{displayName}</Text>
+        <StyledText
+          oddStyle="smallBodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
+          css={TYPOGRAPHY.smallBodyTextSemiBold}
+        >
+          {t('trash_bin')}
+        </StyledText>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

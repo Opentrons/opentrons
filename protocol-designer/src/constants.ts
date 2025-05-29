@@ -64,6 +64,8 @@ export const PSEUDO_DECK_SLOTS: Record<DeckSlot, DeckDefSlot> = {
 }
 export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
 export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
+export const WASTE_CHUTE_DISPLAY_NAME = 'Waste chute'
+export const TRASH_BIN_DISPLAY_NAME = 'Trash bin'
 // special ID for invisible deck setup step-form
 export const INITIAL_DECK_SETUP_STEP_ID = '__INITIAL_DECK_SETUP_STEP__'
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'

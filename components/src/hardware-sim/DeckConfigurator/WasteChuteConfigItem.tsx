@@ -1,40 +1,44 @@
+import { useTranslation } from 'react-i18next'
+
+import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import { Btn, Text } from '../../primitives'
+import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_3_X_ADJUSTMENT,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  STAGING_AREA_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
 import type {
-  CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface AbsorbanceReaderFixtureProps {
+interface WasteChuteConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  cutoutFixtureId: CutoutFixtureId
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
+  hasStagingAreas?: boolean
   selected?: boolean
 }
 
-const ABSORBANCE_READER_FIXTURE_DISPLAY_NAME = 'Absorbance'
-
-export function AbsorbanceReaderFixture(
-  props: AbsorbanceReaderFixtureProps
+export function WasteChuteConfigFixture(
+  props: WasteChuteConfigItemProps
 ): JSX.Element {
+  const { t } = useTranslation('deck_configuration')
+
   const {
     deckDefinition,
     handleClickRemove,
@@ -43,25 +47,24 @@ export function AbsorbanceReaderFixture(
     selected = false,
   } = props
 
-  const cutoutDef = deckDefinition.locations.cutouts.find(
+  const wasteChuteCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
 
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
-   * the adjustment for x is different for right side/left side
    */
-  const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
+  const [xSlotPosition = 0, ySlotPosition = 0] =
+    wasteChuteCutout?.position ?? []
 
-  const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
-
+  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={STAGING_AREA_FIXTURE_WIDTH}
+      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
@@ -79,9 +82,14 @@ export function AbsorbanceReaderFixture(
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {ABSORBANCE_READER_FIXTURE_DISPLAY_NAME}
-        </Text>
+        <StyledText
+          oddStyle="smallBodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
+          css={TYPOGRAPHY.smallBodyTextSemiBold}
+        >
+          {t('waste')}
+        </StyledText>
+
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

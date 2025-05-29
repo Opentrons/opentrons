@@ -1,108 +1,77 @@
+import { useTranslation } from 'react-i18next'
+
+import { getAALocationForCutoutAndFixtureId } from '@opentrons/shared-data'
+
+import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import { Btn, Text } from '../../primitives'
+import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_1_X_ADJUSTMENT,
-  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_2_X_ADJUSTMENT,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_3_X_ADJUSTMENT,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  STAGING_AREA_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
 import type {
-  CutoutFixtureId,
+  AddressableAreaNamesWithFakes,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface MagneticBlockFixtureProps {
+interface StagingAreaConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  cutoutFixtureId: CutoutFixtureId
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
+  addressableArea: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
-  hasStagingArea?: boolean
   selected?: boolean
 }
 
-const MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME = 'Mag Block'
-const STAGING_AREA_WITH_MAGNETIC_BLOCK_DISPLAY_NAME = 'Mag + staging'
-
-export function MagneticBlockFixture(
-  props: MagneticBlockFixtureProps
+export function StagingAreaConfigItem(
+  props: StagingAreaConfigItemProps
 ): JSX.Element {
+  const { t } = useTranslation('deck_configuration')
+
   const {
     deckDefinition,
-    fixtureLocation,
     handleClickRemove,
+    fixtureLocation,
     cutoutFixtureId,
-    hasStagingArea,
+    addressableArea,
     selected = false,
   } = props
 
-  const standardSlotCutout = deckDefinition.locations.cutouts.find(
+  const stagingAreaCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
-
+  const offsetVector = getAALocationForCutoutAndFixtureId(
+    addressableArea,
+    deckDefinition
+  )
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
-   * the adjustment for x is different for right side/left side
    */
   const [xSlotPosition = 0, ySlotPosition = 0] =
-    standardSlotCutout?.position ?? []
-  let x = xSlotPosition
-  let width = 0
-  let displayName = hasStagingArea
-    ? STAGING_AREA_WITH_MAGNETIC_BLOCK_DISPLAY_NAME
-    : MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME
-  switch (fixtureLocation) {
-    case 'cutoutA1':
-    case 'cutoutB1':
-    case 'cutoutC1':
-    case 'cutoutD1': {
-      x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
-      width = COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
-      break
-    }
-    case 'cutoutA2':
-    case 'cutoutB2':
-    case 'cutoutC2':
-    case 'cutoutD2': {
-      x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
-      width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
-      displayName = 'Mag'
-      break
-    }
-    case 'cutoutA3':
-    case 'cutoutB3':
-    case 'cutoutC3':
-    case 'cutoutD3': {
-      x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
-      width = hasStagingArea
-        ? STAGING_AREA_FIXTURE_WIDTH
-        : COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
-      break
-    }
-  }
+    stagingAreaCutout?.position ?? []
 
+  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT + offsetVector[0]
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={width}
+      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
@@ -120,7 +89,14 @@ export function MagneticBlockFixture(
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{displayName}</Text>
+        <StyledText
+          oddStyle="smallBodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
+          css={TYPOGRAPHY.smallBodyTextSemiBold}
+        >
+          {t('staging_area')}
+        </StyledText>
+
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

@@ -7,17 +7,16 @@ import {
   ABSORBANCE_READER_V1_FIXTURE,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getReplacementFixtureForFakeFixture,
+  getReplacementFixtureForFixtureRemoval,
   HEATER_SHAKER_CUTOUTS,
   HEATERSHAKER_MODULE_V1,
   HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_MODELS,
-  SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_CUTOUTS,
-  SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_CUTOUTS,
-  SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
@@ -40,6 +39,7 @@ import type { ReactNode } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
   DeckDefinition,
@@ -57,7 +57,7 @@ interface DeckConfigurationEditingProps {
   addFixtureToCutout: (cutoutId: CutoutId) => void
   removeFixtureFromCutout: (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
   addFixtureModal: ReactNode
 }
@@ -84,7 +84,7 @@ export function useDeckConfigurationEditing(
   //  onboarding flow where state is stored using react-hook-form
   const removeFixtureFromCutoutForOnboarding = (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ): void => {
     const thermocyclerCutoutFixtureId =
       cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
@@ -118,42 +118,52 @@ export function useDeckConfigurationEditing(
     dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
   }
 
-  //  removing fixture from changing configuration in the
-  //  edit hardware sections where state is stored using redux
-  const removeFixtureFromCutoutForEditing = (
-    cutoutId: CutoutId,
+  const getCutoutFixtureType = (
     cutoutFixtureId: CutoutFixtureId
-  ): void => {
+  ): CutoutConfigExtended['type'] => {
     const thermocyclerCutoutFixtureId =
       cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
       cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
 
+    if (MODULE_MODELS.includes(cutoutFixtureId as ModuleModel)) {
+      return cutoutFixtureId as ModuleModel
+    } else {
+      if (cutoutFixtureId === 'trashBinAdapter') {
+        return 'trashBin'
+      } else if (cutoutFixtureId === 'wasteChuteRightAdapterNoCover') {
+        return 'wasteChute'
+      } else if (thermocyclerCutoutFixtureId) {
+        return 'thermocyclerModuleV2'
+      } else if (cutoutFixtureId === 'stagingAreaRightSlot') {
+        return 'stagingArea'
+      } else if (
+        cutoutFixtureId === 'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
+      ) {
+        return 'stagingAreaAndWasteChute'
+      }
+      return 'stagingAreaAndMagneticBlock'
+    }
+  }
+
+  //  removing fixture from changing configuration in the
+  //  edit hardware sections where state is stored using redux
+  const removeFixtureFromCutoutForEditing = (
+    cutoutId: CutoutId,
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
+  ): void => {
     const newDeckConfig = getNewConfig(
       cutoutId,
       deckConfig,
       cutoutFixtureId,
       deckDef
     )
-    let type = 'stagingAreaAndMagneticBlock' as CutoutConfigExtended['type']
-    if (MODULE_MODELS.includes(cutoutFixtureId as ModuleModel)) {
-      type = cutoutFixtureId as ModuleModel
-    } else {
-      if (cutoutFixtureId === 'trashBinAdapter') {
-        type = 'trashBin'
-      } else if (cutoutFixtureId === 'wasteChuteRightAdapterNoCover') {
-        type = 'wasteChute'
-      } else if (thermocyclerCutoutFixtureId) {
-        type = 'thermocyclerModuleV2'
-      } else if (cutoutFixtureId === 'stagingAreaRightSlot') {
-        type = 'stagingArea'
-      } else if (
-        cutoutFixtureId === 'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
-      ) {
-        type = 'stagingAreaAndWasteChute'
-      }
-    }
+    // if cutoutFixtureId is a fake one get the translation
+    const replacementFixtureId = getReplacementFixtureForFakeFixture(
+      cutoutFixtureId
+    )
+    const type = getCutoutFixtureType(replacementFixtureId)
     updateInitialDeckState?.(
-      [{ cutoutId, cutoutFixtureId, type }],
+      [{ cutoutId, cutoutFixtureId: replacementFixtureId, type }],
       newDeckConfig
     )
   }
@@ -318,15 +328,13 @@ export const getAvailableOptions = (
 export const getNewConfig = (
   cutoutId: CutoutId,
   deckConfig: DeckConfiguration,
-  cutoutFixtureId: CutoutFixtureId,
+  cutoutFixtureId: CutoutFixtureIdsWithFakes,
   deckDef: DeckDefinition
 ): DeckConfiguration => {
-  let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
-  if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-    replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
-    replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
-  }
+  const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
+    cutoutFixtureId,
+    cutoutId
+  )
 
   const fixtureGroup =
     deckDef.cutoutFixtures.find(({ id }) => id === cutoutFixtureId)

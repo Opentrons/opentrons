@@ -4,6 +4,10 @@ import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
+  AddressableAreaNamesWithFakes,
+  AddressableAreaWithFakes,
+  AreaTypeWithFakes,
+  CutoutFixtureIdsWithFakes,
   EXTENSION,
   FLEX,
   FLEX_STACKER_MODULE_TYPE,
@@ -418,13 +422,30 @@ export interface CutoutFixture {
   height: number
 }
 
-type AreaType =
+export interface FakeCutoutFixture
+  extends Omit<CutoutFixture, 'id' | 'providesAddressableAreas'> {
+  id: CutoutFixtureIdsWithFakes
+  providesAddressableAreas: Record<
+    CutoutId,
+    AddressableAreaNamesWithFakes[] | AddressableAreaName[]
+  >
+}
+
+export type CutoutFixtureWithFakes = FakeCutoutFixture | CutoutFixture
+
+export type AreaType =
   | 'slot'
   | 'movableTrash'
   | 'wasteChute'
   | 'fixedTrash'
   | 'stagingSlot'
   | 'lidDock'
+  | 'thermocycler'
+  | 'heaterShaker'
+  | 'temperatureModule'
+  | 'magneticBlock'
+  | 'absorbanceReader'
+  | 'flexStacker'
 
 export interface AddressableArea {
   id: AddressableAreaName
@@ -436,6 +457,12 @@ export interface AddressableArea {
   ableToDropLabware?: boolean
   ableToDropTips?: boolean
   matingSurfaceUnitVector?: UnitVectorTuple
+}
+
+export interface FakeAddressableArea
+  extends Omit<AddressableArea, 'id' | 'areaType'> {
+  id: AddressableAreaNamesWithFakes
+  areaType: AreaTypeWithFakes
 }
 
 export interface DeckMetadata {
@@ -463,6 +490,14 @@ export interface DeckLocations {
   legacyFixtures: LegacyFixture[]
 }
 
+export interface DeckLocationsWithFakes
+  extends Omit<
+    DeckLocations,
+    'addressableAreas' | 'calibrationPoints' | 'legacyFixtures'
+  > {
+  addressableAreas: AddressableAreaWithFakes[]
+}
+
 export interface DeckDefinition {
   otId: string
   cornerOffsetFromOrigin: CoordinateTuple
@@ -471,6 +506,21 @@ export interface DeckDefinition {
   locations: DeckLocations
   metadata: DeckMetadata
   cutoutFixtures: CutoutFixture[]
+}
+
+export interface DeckDefinitionWithFakes
+  extends Omit<
+    DeckDefinition,
+    | 'locations'
+    | 'cutoutFixtures'
+    | 'otId'
+    | 'cornerOffsetFromOrigin'
+    | 'dimensions'
+    | 'metadata'
+    | 'robot'
+  > {
+  locations: DeckLocationsWithFakes
+  cutoutFixtures: CutoutFixtureWithFakes[]
 }
 
 export interface ModuleDimensions {
@@ -1036,6 +1086,13 @@ export interface CutoutConfig {
 }
 
 export type DeckConfiguration = CutoutConfig[]
+
+type CutoutConfigWithoutCutoutFixtureId = Omit<CutoutConfig, 'cutoutFixtureId'>
+
+export interface CutoutConfigMap extends CutoutConfigWithoutCutoutFixtureId {
+  addressableAreaId: AddressableAreaNamesWithFakes
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
+}
 
 export type NozzleLayoutConfig =
   | 'single'

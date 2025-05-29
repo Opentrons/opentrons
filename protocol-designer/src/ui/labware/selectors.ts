@@ -2,12 +2,12 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 
+import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
+
 import {
   TRASH_BIN_DISPLAY_NAME,
   WASTE_CHUTE_DISPLAY_NAME,
-} from '@opentrons/components'
-import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
-
+} from '../../constants'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import * as stepFormSelectors from '../../step-forms/selectors'
 
