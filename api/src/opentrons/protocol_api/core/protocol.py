@@ -297,7 +297,7 @@ class AbstractProtocol(
         """Define a liquid to load into a well."""
 
     @abstractmethod
-    def define_liquid_class(self, name: str) -> LiquidClass:
+    def define_liquid_class(self, name: str, version: int) -> LiquidClass:
         """Define a liquid class for use in transfer functions."""
 
     @abstractmethod

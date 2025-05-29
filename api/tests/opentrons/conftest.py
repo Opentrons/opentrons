@@ -27,6 +27,19 @@ import pytest
 from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
+from opentrons_shared_data.liquid_classes.types import (
+    TransferPropertiesDict,
+    AspiratePropertiesDict,
+    SingleDispensePropertiesDict,
+    SubmergeDict,
+    RetractAspirateDict,
+    RetractDispenseDict,
+    MixPropertiesDict,
+    BlowoutPropertiesDict,
+    TouchTipPropertiesDict,
+    TipPositionDict,
+    DelayPropertiesDict,
+)
 from opentrons.protocol_engine.types import PostRunHardwareState
 
 try:
@@ -1055,3 +1068,153 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
             )
         ],
     )
+
+
+@pytest.fixture
+def minimal_transfer_properties_dict() -> Dict[str, Dict[str, TransferPropertiesDict]]:
+    """A minimal dictionary representation of transfer properties of a liquid class."""
+    return {
+        "flex_1channel_50": {
+            "opentrons/opentrons_flex_96_tiprack_50ul/1": TransferPropertiesDict(
+                aspirate=AspiratePropertiesDict(
+                    submerge=SubmergeDict(
+                        start_position=TipPositionDict(
+                            position_reference="well-bottom",
+                            offset={"x": 1, "y": 2, "z": 3},
+                        ),
+                        speed=100,
+                        delay=DelayPropertiesDict(
+                            enabled=False,
+                        ),
+                    ),
+                    retract=RetractAspirateDict(
+                        end_position=TipPositionDict(
+                            position_reference="well-bottom",
+                            offset={"x": 1, "y": 2, "z": 3},
+                        ),
+                        speed=40,
+                        air_gap_by_volume=[(5.0, 3.0), (10.0, 4.0)],
+                        touch_tip=TouchTipPropertiesDict(enabled=False),
+                        delay=DelayPropertiesDict(enabled=False),
+                    ),
+                    aspirate_position=TipPositionDict(
+                        position_reference="well-bottom",
+                        offset={"x": 1, "y": 2, "z": 3},
+                    ),
+                    flow_rate_by_volume=[(10.0, 40.0), (20.0, 30.0)],
+                    correction_by_volume=[(0.0, 0.0)],
+                    pre_wet=True,
+                    mix=MixPropertiesDict(enabled=False),
+                    delay=DelayPropertiesDict(enabled=False),
+                ),
+                dispense=SingleDispensePropertiesDict(
+                    submerge=SubmergeDict(
+                        start_position=TipPositionDict(
+                            position_reference="well-bottom",
+                            offset={"x": 1, "y": 2, "z": 3},
+                        ),
+                        speed=100,
+                        delay=DelayPropertiesDict(
+                            enabled=False,
+                        ),
+                    ),
+                    retract=RetractDispenseDict(
+                        end_position=TipPositionDict(
+                            position_reference="well-bottom",
+                            offset={"x": 1, "y": 2, "z": 3},
+                        ),
+                        speed=40,
+                        air_gap_by_volume=[(5.0, 3.0), (10.0, 4.0)],
+                        touch_tip=TouchTipPropertiesDict(enabled=False),
+                        delay=DelayPropertiesDict(enabled=False),
+                        blowout=BlowoutPropertiesDict(enabled=False),
+                    ),
+                    dispense_position=TipPositionDict(
+                        position_reference="well-bottom",
+                        offset={"x": 1, "y": 2, "z": 3},
+                    ),
+                    flow_rate_by_volume=[(10.0, 40.0), (20.0, 30.0)],
+                    correction_by_volume=[(0.0, 0.0)],
+                    push_out_by_volume=[(10.0, 7.0), (20.0, 10.0)],
+                    mix=MixPropertiesDict(enabled=False),
+                    delay=DelayPropertiesDict(enabled=False),
+                ),
+            )
+        }
+    }
+
+
+@pytest.fixture
+def custom_pip_n_tip_transfer_properties_dict() -> Dict[
+    str, Dict[str, TransferPropertiesDict]
+]:
+    """A minimal dictionary representation of transfer properties for a custom pipette and tiprack."""
+    return {
+        "a_custom_pipette_type": {
+            "a_custom_tiprack_uri": TransferPropertiesDict(
+                aspirate=AspiratePropertiesDict(
+                    submerge=SubmergeDict(
+                        start_position=TipPositionDict(
+                            position_reference="well-bottom",
+                            offset={"x": 1, "y": 2, "z": 3},
+                        ),
+                        speed=100,
+                        delay=DelayPropertiesDict(
+                            enabled=False,
+                        ),
+                    ),
+                    retract=RetractAspirateDict(
+                        end_position=TipPositionDict(
+                            position_reference="well-bottom",
+                            offset={"x": 1, "y": 2, "z": 3},
+                        ),
+                        speed=40,
+                        air_gap_by_volume=[(5.0, 3.0), (10.0, 4.0)],
+                        touch_tip=TouchTipPropertiesDict(enabled=False),
+                        delay=DelayPropertiesDict(enabled=False),
+                    ),
+                    aspirate_position=TipPositionDict(
+                        position_reference="well-bottom",
+                        offset={"x": 1, "y": 2, "z": 3},
+                    ),
+                    flow_rate_by_volume=[(10.0, 40.0), (20.0, 30.0)],
+                    correction_by_volume=[(0.0, 0.0)],
+                    pre_wet=True,
+                    mix=MixPropertiesDict(enabled=False),
+                    delay=DelayPropertiesDict(enabled=False),
+                ),
+                dispense=SingleDispensePropertiesDict(
+                    submerge=SubmergeDict(
+                        start_position=TipPositionDict(
+                            position_reference="well-bottom",
+                            offset={"x": 1, "y": 2, "z": 3},
+                        ),
+                        speed=100,
+                        delay=DelayPropertiesDict(
+                            enabled=False,
+                        ),
+                    ),
+                    retract=RetractDispenseDict(
+                        end_position=TipPositionDict(
+                            position_reference="well-bottom",
+                            offset={"x": 1, "y": 2, "z": 3},
+                        ),
+                        speed=40,
+                        air_gap_by_volume=[(5.0, 3.0), (10.0, 4.0)],
+                        touch_tip=TouchTipPropertiesDict(enabled=False),
+                        delay=DelayPropertiesDict(enabled=False),
+                        blowout=BlowoutPropertiesDict(enabled=False),
+                    ),
+                    dispense_position=TipPositionDict(
+                        position_reference="well-bottom",
+                        offset={"x": 1, "y": 2, "z": 3},
+                    ),
+                    flow_rate_by_volume=[(10.0, 40.0), (20.0, 30.0)],
+                    correction_by_volume=[(0.0, 0.0)],
+                    push_out_by_volume=[(10.0, 7.0), (20.0, 10.0)],
+                    mix=MixPropertiesDict(enabled=False),
+                    delay=DelayPropertiesDict(enabled=False),
+                ),
+            )
+        }
+    }
