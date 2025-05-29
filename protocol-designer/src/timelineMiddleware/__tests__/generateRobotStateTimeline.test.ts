@@ -330,13 +330,9 @@ mock_pipette_p300_multi.drop_tip()
       // Step c:
       `
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 3.78
-mock_pipette.flow_rate.dispense = 3.78
 mock_pipette.mix(...)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 3.78
-mock_pipette.flow_rate.dispense = 3.78
 mock_pipette.mix(...)
 mock_pipette.drop_tip()
 `.trim(),
