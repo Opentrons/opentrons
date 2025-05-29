@@ -70,22 +70,22 @@ def _get_approach_submerge_retract_heights(
         dispense=dispense,
         channels=channel_count,
     )
-    if blank:
-        # force the pipette to move above the well
-        liquid_before = well.depth + (well.depth - liquid_before)
-        liquid_after = well.depth + (well.depth - liquid_after)
 
-    if dispense and submerge_mm > 0:
-        # guarantee NON-contact dispensing does not touch liquid
-        submerge = liquid_after + submerge_mm
-    else:
-        # guarantee CONTACT dispensing and aspirates stay submerged
-        submerge = min(liquid_before, liquid_after) + submerge_mm
-    # also make sure it doesn't hit the well's bottom
-    submerge = max(submerge, config.LABWARE_BOTTOM_CLEARANCE)
+    submerge = max(liquid_after + submerge_mm, config.LABWARE_BOTTOM_CLEARANCE)
     approach = max(liquid_before + retract_mm, submerge)
     retract = max(liquid_after + retract_mm, submerge)
-    return approach, submerge, retract
+
+    if not blank:
+        return approach, submerge, retract
+
+    # force the pipette to move above the well
+    old_submerge_distance = approach - submerge
+    old_retract_distance = retract - submerge
+    blank_submerge = approach  # "submerge" above the current liquid height
+    blank_approach = blank_submerge + old_submerge_distance
+    blank_retract = blank_submerge + old_retract_distance
+
+    return blank_approach, blank_submerge, blank_retract
 
 
 def _submerge(

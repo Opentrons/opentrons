@@ -475,11 +475,11 @@ def _run_trial(
 
         def _enable() -> None:
             # NOTE: setting all position references to BOTTOM
-            _asp_or_disp.submerge.start_position.position_reference = PositionReference.WELL_TOP
-            _asp_or_disp.retract.end_position.position_reference = PositionReference.WELL_TOP
+            _asp_or_disp.submerge.start_position.position_reference = PositionReference.WELL_BOTTOM
+            _asp_or_disp.retract.end_position.position_reference = PositionReference.WELL_BOTTOM
             # update liquid-class offsets based on CALCULATED meniscus height
-            _asp_or_disp.submerge.start_position.offset.z = 0.0
-            _asp_or_disp.retract.end_position.offset.z = 0.0
+            _asp_or_disp.submerge.start_position.offset.z = approach
+            _asp_or_disp.retract.end_position.offset.z = retract
             if is_aspirate:
                 _asp_or_disp.aspirate_position.position_reference = PositionReference.WELL_BOTTOM
                 _asp_or_disp.aspirate_position.offset.z = submerge
