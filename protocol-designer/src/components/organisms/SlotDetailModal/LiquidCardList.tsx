@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 

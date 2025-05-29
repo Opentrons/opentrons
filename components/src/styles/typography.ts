@@ -1,4 +1,4 @@
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { C_DARK_GRAY, C_WHITE } from './colors'
 

@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
-import styled, { css } from 'styled-components'
+import { css } from '@linaria/core'
+import { styled } from '@linaria/react''
 import { v4 as uuidv4 } from 'uuid'
 
 import {

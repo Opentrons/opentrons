@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'

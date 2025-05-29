@@ -1,4 +1,4 @@
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { Btn, COLORS, Icon } from '@opentrons/components'
 

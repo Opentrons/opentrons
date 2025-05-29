@@ -8,7 +8,7 @@ import isEmpty from 'lodash/isEmpty'
 import map from 'lodash/map'
 import omit from 'lodash/omit'
 import startCase from 'lodash/startCase'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import {
   ALIGN_CENTER,

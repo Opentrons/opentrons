@@ -1,4 +1,4 @@
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { Tooltip } from '../../atoms'
 import { BORDERS, COLORS } from '../../helix-design-system'

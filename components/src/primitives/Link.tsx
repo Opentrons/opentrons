@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import { CURSOR_POINTER } from '../styles'
 import { isntStyleProp, styleProps } from './style-props'

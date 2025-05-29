@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import head from 'lodash/head'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import {
   DIRECTION_COLUMN,

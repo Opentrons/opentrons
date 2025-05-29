@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import startCase from 'lodash/startCase'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import {
   ALIGN_CENTER,

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { HashRouter } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useAtom } from 'jotai'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import {
   ALIGN_CENTER,

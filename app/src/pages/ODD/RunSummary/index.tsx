@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import styled, { css } from 'styled-components'
+import { css } from '@linaria/core'
+import { styled } from '@linaria/react''
 
 import {
   RUN_STATUS_FAILED,

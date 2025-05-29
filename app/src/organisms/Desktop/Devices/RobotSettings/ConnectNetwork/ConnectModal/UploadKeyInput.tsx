@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import { getWifiKeyByRequestId, postWifiKeys } from '/app/redux/networking'
 import { useDispatchApiRequest } from '/app/redux/robot-api'

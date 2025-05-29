@@ -1,5 +1,5 @@
 import { uniq } from 'lodash'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { BORDERS, Box, RESPONSIVENESS } from '@opentrons/components'
 

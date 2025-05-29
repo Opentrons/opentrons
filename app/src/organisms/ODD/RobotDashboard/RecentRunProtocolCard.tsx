@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
 import last from 'lodash/last'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import {
   RUN_STATUS_FAILED,

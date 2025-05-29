@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import { BORDERS, COLORS } from '../helix-design-system'
 import { styleProps } from '../primitives'

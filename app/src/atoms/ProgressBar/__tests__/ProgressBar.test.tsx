@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { screen } from '@testing-library/react'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { COLORS } from '@opentrons/components'
 

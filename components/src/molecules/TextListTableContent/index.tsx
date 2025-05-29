@@ -1,4 +1,4 @@
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { StyledText } from '../../atoms'
 import { ListTable } from '../../atoms/ListTable'

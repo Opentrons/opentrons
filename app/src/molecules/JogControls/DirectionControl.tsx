@@ -1,7 +1,8 @@
 // jog controls component
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import { css } from '@linaria/core'
+import { styled } from '@linaria/react''
 
 import {
   ALIGN_CENTER,

@@ -1,7 +1,7 @@
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import {
   ALIGN_CENTER,

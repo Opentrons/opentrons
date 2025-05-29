@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import {
   ALIGN_FLEX_START,

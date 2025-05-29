@@ -1,5 +1,6 @@
 import { forwardRef } from 'react'
-import styled, { css } from 'styled-components'
+import { css } from '@linaria/core'
+import { styled } from '@linaria/react''
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'

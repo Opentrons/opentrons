@@ -1,4 +1,4 @@
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { SPACING } from '@opentrons/components'
 import { LEFT, RIGHT } from '@opentrons/shared-data'

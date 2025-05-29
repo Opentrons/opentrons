@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import { LegacyStyledText, SPACING } from '@opentrons/components'
 

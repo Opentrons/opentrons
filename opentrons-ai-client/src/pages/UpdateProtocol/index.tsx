@@ -3,7 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { CSSTransition } from 'react-transition-group'
 import { useAtom } from 'jotai'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import {
   COLORS,

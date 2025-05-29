@@ -1,7 +1,7 @@
 // Render labware definition to SVG. XY is in robot coordinates.
 import { Fragment, memo } from 'react'
 import flatMap from 'lodash/flatMap'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import { COLORS } from '../../../helix-design-system'
 import { LabwareOutline } from './LabwareOutline'

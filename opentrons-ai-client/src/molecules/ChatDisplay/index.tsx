@@ -4,7 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
 import { useAtom } from 'jotai'
 import { delay } from 'lodash'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import {
   ALIGN_CENTER,

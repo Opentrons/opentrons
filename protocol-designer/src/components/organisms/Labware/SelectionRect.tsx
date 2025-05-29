@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { DragRect, GenericRect } from '../../../collision-types'

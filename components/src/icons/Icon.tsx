@@ -1,5 +1,5 @@
+import { css } from '@linaria/core'
 import cx from 'classnames'
-import { css, keyframes } from 'styled-components'
 
 import { Svg } from '../primitives'
 import { ICON_DATA_BY_NAME } from './icon-data'
@@ -31,16 +31,16 @@ export interface IconProps extends SvgProps {
   id?: string
 }
 
-const spinAnimation = keyframes`
-  100% {
-    transform: rotate(360deg);
-  }
-`
-
 const spinStyle = css`
   &.spin {
-    animation: ${spinAnimation} 0.8s steps(8) infinite;
+    animation: spin-animation 0.8s steps(8) infinite;
     transform-origin: center;
+  }
+
+  @keyframes spin-animation {
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `
 

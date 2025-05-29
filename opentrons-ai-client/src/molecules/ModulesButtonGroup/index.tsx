@@ -1,5 +1,5 @@
 import { Controller, useFormContext } from 'react-hook-form'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 import { v4 as uuid } from 'uuid'
 
 import { EmptySelectorButton, Flex, SPACING, WRAP } from '@opentrons/components'

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import last from 'lodash/last'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import {
   ALIGN_CENTER,

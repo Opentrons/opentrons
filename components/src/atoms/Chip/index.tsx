@@ -1,4 +1,5 @@
-import { css } from 'styled-components'
+// import { css } from '@linaria/core''
+import { css } from '@linaria/core'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
@@ -7,7 +8,6 @@ import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { LegacyStyledText } from '../StyledText'
 
-import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
@@ -150,10 +150,7 @@ const WEB_SMALL_TEXT_STYLE = css`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 `
 
-const ICON_STYLE = (
-  chipSize: ChipSize,
-  smallSize: string
-): FlattenSimpleInterpolation => css`
+const ICON_STYLE = (chipSize: ChipSize, smallSize: string): string => css`
   width: ${chipSize === 'medium' ? '1rem' : smallSize};
   height: ${chipSize === 'medium' ? '1rem' : smallSize};
 
@@ -163,19 +160,17 @@ const ICON_STYLE = (
   }
 `
 
-const TEXT_STYLE = (chipSize: ChipSize): FlattenSimpleInterpolation => css`
+const TEXT_STYLE = (chipSize: ChipSize): string => css`
   ${chipSize === 'medium' ? WEB_MEDIUM_TEXT_STYLE : WEB_SMALL_TEXT_STYLE}
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${chipSize === 'medium'
-      ? TYPOGRAPHY.bodyTextSemiBold
-      : TYPOGRAPHY.smallBodyTextSemiBold}
+    font-size: ${chipSize === 'medium' ? '1.375rem' : '1.25rem'};
+    line-height: ${chipSize === 'medium' ? '1.75rem' : '1.5rem'};
+    font-weight: 600;
   }
 `
 
-const MEDIUM_CONTAINER_STYLE = (
-  background?: boolean
-): FlattenSimpleInterpolation => css`
+const MEDIUM_CONTAINER_STYLE = (background?: boolean): string => css`
   padding: ${SPACING.spacing2} ${background === false ? 0 : SPACING.spacing8};
   grid-gap: ${SPACING.spacing4};
 
@@ -185,9 +180,7 @@ const MEDIUM_CONTAINER_STYLE = (
   }
 `
 
-const SMALL_CONTAINER_STYLE = (
-  background?: boolean
-): FlattenSimpleInterpolation => css`
+const SMALL_CONTAINER_STYLE = (background?: boolean): string => css`
   padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing6};
   grid-gap: ${SPACING.spacing4};
 

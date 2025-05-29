@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { animated, easings, useSpring } from '@react-spring/web'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import {
   getDeckDefFromRobotType,

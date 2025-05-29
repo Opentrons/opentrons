@@ -3,7 +3,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import {
   Box,
@@ -190,7 +190,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname="127.0.0.1">
+    <ApiHostProvider hostname="10.14.19.224">
       <ReactQueryDevtools />
       <InitialLoadingScreen>
         <LocalizationProvider>

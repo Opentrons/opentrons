@@ -42,7 +42,9 @@
     "react-select": "5.4.0",
     "react-viewport-list": "6.3.0",
     "redux": "4.0.5",
-    "styled-components": "5.3.6"
+    "styled-components": "5.3.6",
+    "@linaria/core": "^6.3.0",
+    "@linaria/react": "^6.3.0"
   },
   "devDependencies": {
     "react-redux": "8.1.2"

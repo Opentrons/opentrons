@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import { COLORS } from '../../helix-design-system'
 import { ALIGN_CENTER, CURSOR_POINTER } from '../../styles'

@@ -1,5 +1,5 @@
 import { forwardRef } from 'react'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import { RobotCoordsForeignDiv } from '../../hardware-sim'
 import { BORDERS, COLORS } from '../../helix-design-system'

@@ -4,7 +4,7 @@ import { Manager, Popper, Reference } from 'react-popper'
 import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import {
   BORDERS,

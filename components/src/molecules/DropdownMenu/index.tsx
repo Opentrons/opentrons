@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { StyledText } from '../../atoms/StyledText'

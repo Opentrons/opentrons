@@ -1,6 +1,6 @@
+import React from 'react'
 import { I18nextProvider } from 'react-i18next'
 
-import { GlobalStyle } from '../app/src/atoms/GlobalStyle'
 import { i18n } from '../app/src/i18n'
 
 global.APP_SHELL_REMOTE = {
@@ -85,7 +85,6 @@ export const parameters = {
 export const decorators = [
   Story => (
     <I18nextProvider i18n={i18n}>
-      <GlobalStyle />
       <Story />
     </I18nextProvider>
   ),

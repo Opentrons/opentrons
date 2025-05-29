@@ -4,6 +4,8 @@
 import path from 'path'
 import { configDefaults, defineConfig, mergeConfig } from 'vitest/config'
 import viteConfig from './vite.config.mts'
+import linaria from 'vite-plugin-linaria';
+
 
 // eslint-disable-next-line import/no-default-export
 export default mergeConfig(

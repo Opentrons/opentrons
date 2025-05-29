@@ -1,4 +1,5 @@
-import styled, { css } from 'styled-components'
+import { css } from '@linaria/core'
+import { styled } from '@linaria/react''
 
 import { TYPOGRAPHY as HELIX_TYPOGRAPHY } from '../../helix-design-system/product'
 import { Text } from '../../primitives'

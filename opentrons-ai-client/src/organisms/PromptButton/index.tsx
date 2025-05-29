@@ -1,5 +1,5 @@
 import { useFormContext } from 'react-hook-form'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import { BORDERS, PrimaryButton } from '@opentrons/components'
 

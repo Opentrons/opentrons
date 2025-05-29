@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { NavLink, useLocation } from 'react-router-dom'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import {
   ALIGN_CENTER,

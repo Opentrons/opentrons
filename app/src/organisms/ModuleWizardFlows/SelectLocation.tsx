@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import {
   Banner,

@@ -1,13 +1,15 @@
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
 import path from 'path'
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import postCssImport from 'postcss-import'
+import linaria from '@wyw-in-js/vite'
+import lostCss from 'lost'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
+import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
-import lostCss from 'lost'
+import { defineConfig } from 'vite'
+import linaria from '@linaria/vite'
 
 export default defineConfig({
   build: {
@@ -22,6 +24,7 @@ export default defineConfig({
         configFile: true,
       },
     }),
+    linaria(),
   ],
   optimizeDeps: {
     esbuildOptions: {

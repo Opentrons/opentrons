@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import {
   DIRECTION_COLUMN,

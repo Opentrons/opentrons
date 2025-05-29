@@ -1,4 +1,4 @@
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { PrimaryButton } from '../../atoms/buttons/PrimaryButton'
 import { BORDERS, COLORS } from '../../helix-design-system'

@@ -1,6 +1,6 @@
 import { Fragment, memo } from 'react'
 import map from 'lodash/map'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import {
   getSchema2CornerOffsetFromSlot,

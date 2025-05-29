@@ -63,7 +63,8 @@
     "rxjs": "^6.5.1",
     "semver": "5.7.2",
     "simple-keyboard-layouts": "3.4.41",
-    "styled-components": "5.3.6",
+    "@linaria/core": "^6.3.0",
+    "@linaria/react": "^6.3.0",
     "typeface-open-sans": "0.0.75",
     "uuid": "3.2.1"
   },
@@ -74,7 +75,6 @@
     "@types/jszip": "3.1.7",
     "@types/mixpanel-browser": "^2.35.6",
     "@types/node-fetch": "2.6.11",
-    "@types/styled-components": "^5.1.26",
     "axios": "^0.21.1",
     "electron-updater": "6.3.9",
     "postcss-apply": "0.12.0",

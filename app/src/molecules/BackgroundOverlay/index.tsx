@@ -1,4 +1,4 @@
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { COLORS, Flex, POSITION_FIXED } from '@opentrons/components'
 

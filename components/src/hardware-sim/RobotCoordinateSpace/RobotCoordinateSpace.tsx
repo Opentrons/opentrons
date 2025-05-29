@@ -1,5 +1,5 @@
 import { animated } from '@react-spring/web'
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import { Svg } from '../../primitives'
 

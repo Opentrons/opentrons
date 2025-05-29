@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import {
   Flex,

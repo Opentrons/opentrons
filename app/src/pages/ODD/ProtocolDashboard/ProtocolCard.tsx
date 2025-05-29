@@ -3,7 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import last from 'lodash/last'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {

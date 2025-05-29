@@ -1,5 +1,5 @@
 // presentational components for the wifi connect form
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 
 import { FONT_WEIGHT_SEMIBOLD, SPACING } from '@opentrons/components'
 

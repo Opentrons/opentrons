@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
-import styled, { css } from 'styled-components'
+import { css } from '@linaria/core'
+import { styled } from '@linaria/react''
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {

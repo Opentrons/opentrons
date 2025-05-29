@@ -1,5 +1,5 @@
 import find from 'lodash/find'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import {
   COLORS,

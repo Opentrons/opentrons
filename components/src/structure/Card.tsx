@@ -1,5 +1,6 @@
 // Card component with drop shadow
-import styled, { css } from 'styled-components'
+import { css } from '@linaria/core'
+import { styled } from '@linaria/react''
 
 import { isntStyleProp, styleProps } from '../primitives'
 import * as styles from '../styles'

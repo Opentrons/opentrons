@@ -167,7 +167,7 @@ If you find yourself in a place where...
 ...you can create your own primitive with the style props above using `styleProps` (to apply the styles based on props) and `isntStyleProp` (to ensure style props don't get passed down to the DOM):
 
 ```js static
-import styled from 'styled-components'
+import { styled } from '@linaria/react''
 import { C_DARK_GRAY, isntStyleProp, styleProps } from '@opentrons/components'
 import type { PrimitiveComponent } from '@opentrons/components'
 export const Gray: PrimitiveComponent<'div'> = styled.div.withConfig({

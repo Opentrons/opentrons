@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import {
   ALIGN_FLEX_END,

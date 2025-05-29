@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
-import { css } from 'styled-components'
+import { css } from '@linaria/core''
 
 import { ModalShell, useConditionalConfirm } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
