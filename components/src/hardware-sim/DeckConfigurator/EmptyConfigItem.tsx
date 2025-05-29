@@ -81,7 +81,7 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
         onClick={() => {
           handleClickAdd(fixtureLocation)
         }}
-        data-testid={fixtureLocation}
+        data-testid={addressableArea}
       >
         <Icon name="add" color={COLORS.blue50} size="2rem" />
       </Btn>
