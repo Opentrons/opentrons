@@ -398,7 +398,7 @@ jobs:
         uses: 'actions/checkout@v4'
         with:
           path: ./monorepo
-      - uses: ./.github/actions/js/setup
+      - uses: ./monorepo/.github/actions/js/setup
       - name: 'update internal-releases releases.json'
         if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         run: |
