@@ -142,7 +142,7 @@ def load_tip_racks(
         s for n, s in SLOTS.items() for i in range(10) if f"tips_{i}" in n
     ]
     assert num_racks_needed <= len(available_rack_slot_names), (
-        f"protocol requires {num_racks_needed}, "
+        f"protocol requires {num_racks_needed} tip-racks, "
         f"but {len(available_rack_slot_names)} are available"
     )
     accessible_rack_slot_names = [s for s in available_rack_slot_names if "4" not in s]
@@ -256,7 +256,7 @@ def load_liquid_dye(
     reservoirs_dye: List[Labware],
     volumes: List[float],
     tip_ul: int,
-) -> Dict[float, List[Well]]:
+) -> Dict[float, Well]:
     """Load dye into wells of reservoir.
 
     Each supplied volume is matched to a dye type, and a total ul for
@@ -277,38 +277,22 @@ def load_liquid_dye(
     critical_ul = CRITICAL_UL_BY_LABWARE[reservoirs_dye[0].load_name]
     well_working_ul = critical_ul["setup_max"] - critical_ul["dead"]
 
-    src_wells: List[Well] = []
+    src_well_names: List[str] = reservoir_cfg[2]
     if pipette.channels == 96:
-        src_wells: List[Well] = [r[w] for w, r in zip(reservoir_cfg[2], reservoirs_dye)]
+        src_wells_by_volume: Dict[float, Well] = {
+            ul: reservoir[well_name]
+            for ul, well_name, reservoir in zip(volumes, src_well_names, reservoirs_dye)
+        }
     else:
-        src_wells: List[Well] = [reservoirs_dye[0][w] for w in reservoir_cfg[2]]
-    ret: Dict[float, List[Well]] = {
-        v: []
-        for i, v in enumerate(volumes)
-    }
-    # FIXME: use runtime-parameters to set well locations
-    current_src_well = src_wells.pop(0)  # initial pop!
-    for test_ul, (liquid, trials) in liquid_and_trials_by_volume.items():
-        ul_per_aspirate = test_ul * pipette.channels
-        total_ul_aspirated_per_test_ul = 0.0
-
-        def _load_liquid_and_pop_to_next_well() -> None:
-            nonlocal total_ul_aspirated_per_test_ul, current_src_well
-            assert total_ul_aspirated_per_test_ul > 0, \
-                f"total_ul_aspirated_per_test_ul={total_ul_aspirated_per_test_ul}"
-            ul_in_well = critical_ul["dead"] + total_ul_aspirated_per_test_ul
-            current_src_well.load_liquid(liquid, ul_in_well)
-            total_ul_aspirated_per_test_ul = 0.0
-            if len(src_wells):
-                current_src_well = src_wells.pop(0)  # pop!
-
-        for _ in range(trials):
-            if total_ul_aspirated_per_test_ul + ul_per_aspirate > well_working_ul:
-                _load_liquid_and_pop_to_next_well()
-            ret[test_ul].append(current_src_well)
-            total_ul_aspirated_per_test_ul += ul_per_aspirate
-        _load_liquid_and_pop_to_next_well()
-    return ret
+        src_wells_by_volume: Dict[float, Well] = {
+            ul: reservoirs_dye[0][well_name]
+            for ul, well_name in zip(volumes, src_well_names)
+        }
+    for ul, well in src_wells_by_volume.items():
+        liquid, trials = liquid_and_trials_by_volume[ul]
+        well_start_ul = critical_ul["dead"] + (ul * trials)
+        src_wells_by_volume[ul].load_liquid(liquid, well_start_ul)
+    return src_wells_by_volume
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -353,7 +337,7 @@ def run(ctx: ProtocolContext) -> None:
     )
 
     # LOAD LIQUID
-    dye_wells_by_volume = load_liquid_dye(
+    dye_well_by_volume = load_liquid_dye(
         ctx, test_pipette, reservoirs_dye, volumes, tip_ul
     )
     load_liquid_diluent(ctx, test_pipette, reservoir_diluent, volumes, tip_ul)
@@ -406,7 +390,7 @@ def run(ctx: ProtocolContext) -> None:
     # FIXME: add LLD here
     # FIXME: add meniscus-relative pipetting to shared-data
     for ul in volumes:
-        source = dye_wells_by_volume[ul]
+        source = [dye_well_by_volume[ul]]  # NOTE: currently expects exactly 1x well per volume
         dest = dest_wells_by_volume[ul]
         if test_class:
             if len(dest) > len(source):
