@@ -26,6 +26,8 @@ define PYTHON_OPENTRONS_UPDATE_SERVER_INSTALL_VERSION
 	echo '$(call OTUPDATESERVER_CALL_PBU,dump_br_version)' > $(BINARIES_DIR)/opentrons-update-server-version.json
 endef
 
+export HATCH_VCS_TUNABLE_FALLBACK_VERSION=$(call OTUPDATESERVER_CALL_PBU,normalize_version)
+
 otupdate_name := python-opentrons-update-server
 
 define PYTHON_OPENTRONS_UPDATE_SERVER_INSTALL_INIT_SYSTEMD
