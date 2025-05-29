@@ -47,9 +47,24 @@
       "x": 0,
       "y": 0,
       "z": 6.6
+    },
+    "opentrons_96_wellplate_200ul_pcr_full_skirt": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "protocol_engine_lid_stack_object": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "opentrons_tough_universal_lid": {
+      "x": 0,
+      "y": 0,
+      "z": 0
     }
   },
-  "stackLimit": 1,
+  "stackLimit": 2,
   "gripForce": 10,
   "gripHeightFromLabwareBottom": 5.3,
   "gripperOffsets": {
