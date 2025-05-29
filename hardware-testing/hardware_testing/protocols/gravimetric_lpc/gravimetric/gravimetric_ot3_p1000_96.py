@@ -12,8 +12,8 @@ SLOT_SCALE = 4
 SLOTS_TIPRACK = {
     # TODO: add slot 12 when tipracks are disposable
     # 20: [2, 3, 5, 6, 7, 8, 9, 10, 11],
-    # 50: [2, 3, 5, 6, 7, 8, 9, 10, 11],
-    # 200: [2, 3, 5, 6, 7, 8, 9, 10, 11],
+    50: [2, 3, 5, 6, 7, 8, 9, 10, 11],
+    200: [2, 3, 5, 6, 7, 8, 9, 10, 11],
     1000: [2, 3, 5, 6, 7, 8, 9, 10, 11],
 }
 SLOT_DE_STATIC = 1
@@ -27,7 +27,7 @@ def run(ctx: ProtocolContext) -> None:
     pipette = ctx.load_instrument("flex_96channel_1000", "left")
     adapters = [
         ctx.load_adapter("opentrons_flex_96_tiprack_adapter", slot)
-        for slot in SLOTS_TIPRACK[1000]
+        for slot in SLOTS_TIPRACK[50]
     ]
     for tip_size in SLOTS_TIPRACK.keys():
         tipracks = [
