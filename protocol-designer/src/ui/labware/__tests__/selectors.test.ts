@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest'
-
 import { getDisposalOptions } from '../selectors'
 
 describe('labware selectors', () => {
