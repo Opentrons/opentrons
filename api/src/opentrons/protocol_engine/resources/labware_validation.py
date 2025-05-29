@@ -48,7 +48,10 @@ def validate_labware_can_be_stacked(
     top_labware_definition: LabwareDefinition, below_labware_load_name: str
 ) -> bool:
     """Validate that the labware being loaded onto is in the above labware's stackingOffsetWithLabware definition."""
-    return below_labware_load_name in top_labware_definition.stackingOffsetWithLabware
+    return (
+        below_labware_load_name in top_labware_definition.stackingOffsetWithLabware
+        or "default" in top_labware_definition.stackingOffsetWithLabware
+    )
 
 
 def validate_labware_can_be_ondeck(definition: LabwareDefinition) -> bool:
