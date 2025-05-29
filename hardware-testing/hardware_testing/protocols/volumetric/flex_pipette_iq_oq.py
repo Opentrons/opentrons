@@ -201,7 +201,7 @@ def load_labware(
     # FIXME: support a stack of plates
     if num_plates_needed > 1:
         raise NotImplementedError("multiple plates not implemented yet")
-    plates = [ctx.load_labware("corning_96_wellplate_360ul_flat", SLOTS[f"plate"])]
+    plates = [ctx.load_labware("corning_96_wellplate_360ul_flat", SLOTS["stack_start"])]
     for plate in plates:
         plate.load_empty(plate.wells())
 
@@ -301,6 +301,11 @@ def run(ctx: ProtocolContext) -> None:
     #       see about adding support for just the trash-bin
     trash = ctx.load_waste_chute()
 
+    # MODULES
+    heater_shaker = ctx.load_module("heaterShakerModuleV1", SLOTS["plate"])
+    adapter = heater_shaker.load_adapter("opentrons_universal_flat_adapter")
+    heater_shaker.close_labware_latch()
+
     # PIPETTES
     test_pipette = ctx.load_instrument(ctx.params.pipette, "left")  # type: ignore[attr-defined]
     diluent_pipette: Optional[InstrumentContext] = None
@@ -309,7 +314,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # LABWARE
     tip_ul = int(str(ctx.params.tips).split("_")[-1].replace("ul", ""))
-    inaccessible_racks = load_tip_racks(ctx, test_pipette, diluent_pipette, tip_ul)
+    inaccessible_racks = load_tip_racks(ctx, test_pipette, diluent_pipette, num_racks_needed=1)
     # NOTE: configuring for MAX tip uL before calculate test volumes
     test_pipette.configure_for_volume(tip_ul)
     # NOTE: limiting 96ch to only test <=200uL, b/c 1000uL requires too many plates
@@ -385,6 +390,11 @@ def run(ctx: ProtocolContext) -> None:
                 new_tip="never",
             )
     pip_for_dil.drop_tip()
+
+    # MOVE 1st PLATE TO HEATER-SHAKER
+    heater_shaker.open_labware_latch()
+    ctx.move_labware(plates[0], adapter, use_gripper=True)
+    heater_shaker.close_labware_latch()
 
     # TRANSFER DYE
     # FIXME: add LLD here
