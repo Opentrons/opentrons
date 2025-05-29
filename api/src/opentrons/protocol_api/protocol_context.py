@@ -1399,18 +1399,23 @@ class ProtocolContext(CommandPublisher):
             name: The name to give to the new liquid class. Cannot use names of existing in-built liquid classes.
             properties: A dict of transfer properties per tip per pipette.
                 Accepts a nested dictionary in the following format:
+
+                .. code-block:: python
+
                 {
-                    <pipette_name>: {
-                        <tiprack_uri>: <properties in the shape of TransferPropertiesDict>
-                    }
-                }
-                TransferPropertiesDict is a dictionary representation of the
-                transfer properties returned by the `LiquidClass.get_for(..)` function.
+                <pipette_name>: {
+                    <tiprack_uri>: <properties in the shape of TransferPropertiesDict>
+
+                    # TransferPropertiesDict is a dictionary representation of the
+                    # transfer properties returned by the `LiquidClass.get_for(..)` function.
+                }}
+
             base_liquid_class: A LiquidClass to base this liquid class on. The properties
                 specified in transfer_properties will override any existing ones
                 for the specified pipettes & tips.
             display_name: An optional human-readable name for the liquid. If not provided,
                 will default to title-cased name.
+
         """
         if definition_exists(name, DEFAULT_LC_VERSION):
             raise ValueError(
