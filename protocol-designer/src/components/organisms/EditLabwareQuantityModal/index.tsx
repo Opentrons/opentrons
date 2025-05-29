@@ -82,6 +82,14 @@ export function EditLabwareQuantityModal(
     }
   }, [errorText])
 
+  const handleConfirmClick = (): void => {
+    if (errorText) {
+      setError(true)
+    } else {
+      saveQuantity(quantity)
+    }
+  }
+
   return createPortal(
     <HandleEnter
       onEnter={() => {
@@ -90,7 +98,7 @@ export function EditLabwareQuantityModal(
     >
       <Modal
         marginLeft="0"
-        width="594px"
+        width="37.125rem"
         title={t('edit_labware_quantity')}
         type="info"
         onClose={onClose}
@@ -104,15 +112,7 @@ export function EditLabwareQuantityModal(
               >
                 {t('shared:cancel')}
               </SecondaryButton>
-              <PrimaryButton
-                onClick={() => {
-                  if (errorText) {
-                    setError(true)
-                  } else {
-                    saveQuantity(quantity)
-                  }
-                }}
-              >
+              <PrimaryButton onClick={handleConfirmClick}>
                 {t('confirm_quantity')}
               </PrimaryButton>
             </Flex>
@@ -127,7 +127,6 @@ export function EditLabwareQuantityModal(
           </Flex>
           <InputField
             error={showError ? errorText : null}
-            data-testid="changeQuantity_inputField"
             name="changeQuantity"
             onChange={e => {
               setQuantity(e.target.value)
