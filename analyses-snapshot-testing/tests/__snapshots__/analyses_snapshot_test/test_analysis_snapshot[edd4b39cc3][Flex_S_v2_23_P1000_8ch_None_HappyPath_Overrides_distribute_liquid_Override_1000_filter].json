@@ -5355,6 +5355,14 @@
       "params": {
         "liquidClassRecord": {
           "aspirate": {
+            "aspiratePosition": {
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": 2
+              },
+              "positionReference": "well-bottom"
+            },
             "correctionByVolume": [
               [
                 0.0,
@@ -5380,12 +5388,6 @@
                 "volume": 50
               }
             },
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": 2
-            },
-            "positionReference": "well-bottom",
             "preWet": false,
             "retract": {
               "airGapByVolume": [
@@ -5408,17 +5410,19 @@
                   "duration": 0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
               },
-              "positionReference": "well-top",
               "speed": 50,
               "touchTip": {
                 "enable": false,
                 "params": {
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30,
                   "zOffset": -1
                 }
@@ -5431,13 +5435,15 @@
                   "duration": 0.0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
-              "positionReference": "well-top",
-              "speed": 100
+              "speed": 100,
+              "startPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
+              }
             }
           },
           "liquidClassName": "water",
@@ -5468,6 +5474,14 @@
                 "duration": 0.0
               }
             },
+            "dispensePosition": {
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": 2
+              },
+              "positionReference": "well-top"
+            },
             "disposalByVolume": [
               [
                 0.0,
@@ -5488,12 +5502,6 @@
                 716.0
               ]
             ],
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": 2
-            },
-            "positionReference": "well-top",
             "retract": {
               "airGapByVolume": [
                 [
@@ -5522,17 +5530,19 @@
                   "duration": 0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
               },
-              "positionReference": "well-top",
               "speed": 50,
               "touchTip": {
                 "enable": false,
                 "params": {
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30,
                   "zOffset": -1
                 }
@@ -5545,13 +5555,15 @@
                   "duration": 0.0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
-              "positionReference": "well-top",
-              "speed": 100
+              "speed": 100,
+              "startPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
+              }
             }
           },
           "pipetteModel": "flex_8channel_1000",
@@ -5568,6 +5580,14 @@
                 "duration": 0.0
               }
             },
+            "dispensePosition": {
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": 2
+              },
+              "positionReference": "well-top"
+            },
             "flowRateByVolume": [
               [
                 1.0,
@@ -5581,12 +5601,6 @@
                 "volume": 50
               }
             },
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": 2
-            },
-            "positionReference": "well-top",
             "pushOutByVolume": [
               [
                 1.0,
@@ -5617,17 +5631,19 @@
                   "duration": 0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
               },
-              "positionReference": "well-top",
               "speed": 50,
               "touchTip": {
                 "enable": false,
                 "params": {
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30,
                   "zOffset": -1
                 }
@@ -5640,13 +5656,15 @@
                   "duration": 0.0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
-              "positionReference": "well-top",
-              "speed": 100
+              "speed": 100,
+              "startPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
+              }
             }
           },
           "tiprack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
@@ -6611,6 +6629,14 @@
       "params": {
         "liquidClassRecord": {
           "aspirate": {
+            "aspiratePosition": {
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": 2
+              },
+              "positionReference": "well-bottom"
+            },
             "correctionByVolume": [
               [
                 -32.2,
@@ -6652,12 +6678,6 @@
                 "volume": 50
               }
             },
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": 2
-            },
-            "positionReference": "well-bottom",
             "preWet": false,
             "retract": {
               "airGapByVolume": [
@@ -6680,17 +6700,19 @@
                   "duration": 0.5
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
               },
-              "positionReference": "well-top",
               "speed": 100,
               "touchTip": {
                 "enable": false,
                 "params": {
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30,
                   "zOffset": -1
                 }
@@ -6703,13 +6725,15 @@
                   "duration": 0.0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
-              "positionReference": "well-top",
-              "speed": 100
+              "speed": 100,
+              "startPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
+              }
             }
           },
           "liquidClassName": "ethanol_80",
@@ -6752,6 +6776,14 @@
                 "duration": 0.2
               }
             },
+            "dispensePosition": {
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": 2
+              },
+              "positionReference": "well-top"
+            },
             "disposalByVolume": [
               [
                 0.0,
@@ -6776,12 +6808,6 @@
                 250.0
               ]
             ],
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": 2
-            },
-            "positionReference": "well-top",
             "retract": {
               "airGapByVolume": [
                 [
@@ -6810,17 +6836,19 @@
                   "duration": 0.5
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
               },
-              "positionReference": "well-top",
               "speed": 100,
               "touchTip": {
                 "enable": false,
                 "params": {
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30,
                   "zOffset": -1
                 }
@@ -6833,13 +6861,15 @@
                   "duration": 0.0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
-              "positionReference": "well-top",
-              "speed": 100
+              "speed": 100,
+              "startPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
+              }
             }
           },
           "pipetteModel": "flex_8channel_1000",
@@ -6864,6 +6894,14 @@
                 "duration": 0.2
               }
             },
+            "dispensePosition": {
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": 2
+              },
+              "positionReference": "well-top"
+            },
             "flowRateByVolume": [
               [
                 0.0,
@@ -6877,12 +6915,6 @@
                 "volume": 50
               }
             },
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": 2
-            },
-            "positionReference": "well-top",
             "pushOutByVolume": [
               [
                 3.0,
@@ -6921,17 +6953,19 @@
                   "duration": 0.5
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
               },
-              "positionReference": "well-top",
               "speed": 100,
               "touchTip": {
                 "enable": false,
                 "params": {
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30,
                   "zOffset": -1
                 }
@@ -6944,13 +6978,15 @@
                   "duration": 0.0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
-              "positionReference": "well-top",
-              "speed": 100
+              "speed": 100,
+              "startPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
+              }
             }
           },
           "tiprack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
@@ -8041,6 +8077,14 @@
       "params": {
         "liquidClassRecord": {
           "aspirate": {
+            "aspiratePosition": {
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": 2
+              },
+              "positionReference": "well-bottom"
+            },
             "correctionByVolume": [
               [
                 -2.5,
@@ -8082,12 +8126,6 @@
                 "volume": 50
               }
             },
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": 2
-            },
-            "positionReference": "well-bottom",
             "preWet": false,
             "retract": {
               "airGapByVolume": [
@@ -8102,17 +8140,19 @@
                   "duration": 0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
               },
-              "positionReference": "well-top",
               "speed": 4,
               "touchTip": {
                 "enable": false,
                 "params": {
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30,
                   "zOffset": -1
                 }
@@ -8125,13 +8165,15 @@
                   "duration": 0.0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
-              "positionReference": "well-top",
-              "speed": 4
+              "speed": 4,
+              "startPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
+              }
             }
           },
           "liquidClassName": "glycerol_50",
@@ -8174,6 +8216,14 @@
                 "duration": 0.5
               }
             },
+            "dispensePosition": {
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": 2
+              },
+              "positionReference": "well-top"
+            },
             "disposalByVolume": [
               [
                 0.0,
@@ -8198,12 +8248,6 @@
                 250.0
               ]
             ],
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": 2
-            },
-            "positionReference": "well-top",
             "retract": {
               "airGapByVolume": [
                 [
@@ -8224,17 +8268,19 @@
                   "duration": 0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
               },
-              "positionReference": "well-top",
               "speed": 4,
               "touchTip": {
                 "enable": false,
                 "params": {
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30,
                   "zOffset": -1
                 }
@@ -8247,13 +8293,15 @@
                   "duration": 0.0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
-              "positionReference": "well-top",
-              "speed": 4
+              "speed": 4,
+              "startPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
+              }
             }
           },
           "pipetteModel": "flex_8channel_1000",
@@ -8278,6 +8326,14 @@
                 "duration": 0.5
               }
             },
+            "dispensePosition": {
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": 2
+              },
+              "positionReference": "well-top"
+            },
             "flowRateByVolume": [
               [
                 0.0,
@@ -8291,12 +8347,6 @@
                 "volume": 50
               }
             },
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": 2
-            },
-            "positionReference": "well-top",
             "pushOutByVolume": [
               [
                 0.0,
@@ -8319,17 +8369,19 @@
                   "duration": 0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
               },
-              "positionReference": "well-top",
               "speed": 4,
               "touchTip": {
                 "enable": false,
                 "params": {
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30,
                   "zOffset": -1
                 }
@@ -8342,13 +8394,15 @@
                   "duration": 0.0
                 }
               },
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
-              "positionReference": "well-top",
-              "speed": 4
+              "speed": 4,
+              "startPosition": {
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                },
+                "positionReference": "well-top"
+              }
             }
           },
           "tiprack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
@@ -9201,6 +9255,14 @@
   "liquidClasses": [
     {
       "aspirate": {
+        "aspiratePosition": {
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 2
+          },
+          "positionReference": "well-bottom"
+        },
         "correctionByVolume": [
           [
             0.0,
@@ -9226,12 +9288,6 @@
             "volume": 50
           }
         },
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 2
-        },
-        "positionReference": "well-bottom",
         "preWet": false,
         "retract": {
           "airGapByVolume": [
@@ -9254,17 +9310,19 @@
               "duration": 0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
+          "endPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
           },
-          "positionReference": "well-top",
           "speed": 50,
           "touchTip": {
             "enable": false,
             "params": {
-              "mmToEdge": 0.5,
+              "mmFromEdge": 0.5,
               "speed": 30,
               "zOffset": -1
             }
@@ -9277,13 +9335,15 @@
               "duration": 0.0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          },
-          "positionReference": "well-top",
-          "speed": 100
+          "speed": 100,
+          "startPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
+          }
         }
       },
       "liquidClassId": "UUID",
@@ -9315,6 +9375,14 @@
             "duration": 0.0
           }
         },
+        "dispensePosition": {
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 2
+          },
+          "positionReference": "well-top"
+        },
         "disposalByVolume": [
           [
             0.0,
@@ -9335,12 +9403,6 @@
             716.0
           ]
         ],
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 2
-        },
-        "positionReference": "well-top",
         "retract": {
           "airGapByVolume": [
             [
@@ -9369,17 +9431,19 @@
               "duration": 0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
+          "endPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
           },
-          "positionReference": "well-top",
           "speed": 50,
           "touchTip": {
             "enable": false,
             "params": {
-              "mmToEdge": 0.5,
+              "mmFromEdge": 0.5,
               "speed": 30,
               "zOffset": -1
             }
@@ -9392,13 +9456,15 @@
               "duration": 0.0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          },
-          "positionReference": "well-top",
-          "speed": 100
+          "speed": 100,
+          "startPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
+          }
         }
       },
       "pipetteModel": "flex_8channel_1000",
@@ -9415,6 +9481,14 @@
             "duration": 0.0
           }
         },
+        "dispensePosition": {
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 2
+          },
+          "positionReference": "well-top"
+        },
         "flowRateByVolume": [
           [
             1.0,
@@ -9428,12 +9502,6 @@
             "volume": 50
           }
         },
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 2
-        },
-        "positionReference": "well-top",
         "pushOutByVolume": [
           [
             1.0,
@@ -9464,17 +9532,19 @@
               "duration": 0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
+          "endPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
           },
-          "positionReference": "well-top",
           "speed": 50,
           "touchTip": {
             "enable": false,
             "params": {
-              "mmToEdge": 0.5,
+              "mmFromEdge": 0.5,
               "speed": 30,
               "zOffset": -1
             }
@@ -9487,19 +9557,29 @@
               "duration": 0.0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          },
-          "positionReference": "well-top",
-          "speed": 100
+          "speed": 100,
+          "startPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
+          }
         }
       },
       "tiprack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
     },
     {
       "aspirate": {
+        "aspiratePosition": {
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 2
+          },
+          "positionReference": "well-bottom"
+        },
         "correctionByVolume": [
           [
             -32.2,
@@ -9541,12 +9621,6 @@
             "volume": 50
           }
         },
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 2
-        },
-        "positionReference": "well-bottom",
         "preWet": false,
         "retract": {
           "airGapByVolume": [
@@ -9569,17 +9643,19 @@
               "duration": 0.5
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
+          "endPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
           },
-          "positionReference": "well-top",
           "speed": 100,
           "touchTip": {
             "enable": false,
             "params": {
-              "mmToEdge": 0.5,
+              "mmFromEdge": 0.5,
               "speed": 30,
               "zOffset": -1
             }
@@ -9592,13 +9668,15 @@
               "duration": 0.0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          },
-          "positionReference": "well-top",
-          "speed": 100
+          "speed": 100,
+          "startPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
+          }
         }
       },
       "liquidClassId": "UUID",
@@ -9642,6 +9720,14 @@
             "duration": 0.2
           }
         },
+        "dispensePosition": {
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 2
+          },
+          "positionReference": "well-top"
+        },
         "disposalByVolume": [
           [
             0.0,
@@ -9666,12 +9752,6 @@
             250.0
           ]
         ],
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 2
-        },
-        "positionReference": "well-top",
         "retract": {
           "airGapByVolume": [
             [
@@ -9700,17 +9780,19 @@
               "duration": 0.5
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
+          "endPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
           },
-          "positionReference": "well-top",
           "speed": 100,
           "touchTip": {
             "enable": false,
             "params": {
-              "mmToEdge": 0.5,
+              "mmFromEdge": 0.5,
               "speed": 30,
               "zOffset": -1
             }
@@ -9723,13 +9805,15 @@
               "duration": 0.0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          },
-          "positionReference": "well-top",
-          "speed": 100
+          "speed": 100,
+          "startPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
+          }
         }
       },
       "pipetteModel": "flex_8channel_1000",
@@ -9754,6 +9838,14 @@
             "duration": 0.2
           }
         },
+        "dispensePosition": {
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 2
+          },
+          "positionReference": "well-top"
+        },
         "flowRateByVolume": [
           [
             0.0,
@@ -9767,12 +9859,6 @@
             "volume": 50
           }
         },
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 2
-        },
-        "positionReference": "well-top",
         "pushOutByVolume": [
           [
             3.0,
@@ -9811,17 +9897,19 @@
               "duration": 0.5
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
+          "endPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
           },
-          "positionReference": "well-top",
           "speed": 100,
           "touchTip": {
             "enable": false,
             "params": {
-              "mmToEdge": 0.5,
+              "mmFromEdge": 0.5,
               "speed": 30,
               "zOffset": -1
             }
@@ -9834,19 +9922,29 @@
               "duration": 0.0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          },
-          "positionReference": "well-top",
-          "speed": 100
+          "speed": 100,
+          "startPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
+          }
         }
       },
       "tiprack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
     },
     {
       "aspirate": {
+        "aspiratePosition": {
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 2
+          },
+          "positionReference": "well-bottom"
+        },
         "correctionByVolume": [
           [
             -2.5,
@@ -9888,12 +9986,6 @@
             "volume": 50
           }
         },
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 2
-        },
-        "positionReference": "well-bottom",
         "preWet": false,
         "retract": {
           "airGapByVolume": [
@@ -9908,17 +10000,19 @@
               "duration": 0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
+          "endPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
           },
-          "positionReference": "well-top",
           "speed": 4,
           "touchTip": {
             "enable": false,
             "params": {
-              "mmToEdge": 0.5,
+              "mmFromEdge": 0.5,
               "speed": 30,
               "zOffset": -1
             }
@@ -9931,13 +10025,15 @@
               "duration": 0.0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          },
-          "positionReference": "well-top",
-          "speed": 4
+          "speed": 4,
+          "startPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
+          }
         }
       },
       "liquidClassId": "UUID",
@@ -9981,6 +10077,14 @@
             "duration": 0.5
           }
         },
+        "dispensePosition": {
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 2
+          },
+          "positionReference": "well-top"
+        },
         "disposalByVolume": [
           [
             0.0,
@@ -10005,12 +10109,6 @@
             250.0
           ]
         ],
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 2
-        },
-        "positionReference": "well-top",
         "retract": {
           "airGapByVolume": [
             [
@@ -10031,17 +10129,19 @@
               "duration": 0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
+          "endPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
           },
-          "positionReference": "well-top",
           "speed": 4,
           "touchTip": {
             "enable": false,
             "params": {
-              "mmToEdge": 0.5,
+              "mmFromEdge": 0.5,
               "speed": 30,
               "zOffset": -1
             }
@@ -10054,13 +10154,15 @@
               "duration": 0.0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          },
-          "positionReference": "well-top",
-          "speed": 4
+          "speed": 4,
+          "startPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
+          }
         }
       },
       "pipetteModel": "flex_8channel_1000",
@@ -10085,6 +10187,14 @@
             "duration": 0.5
           }
         },
+        "dispensePosition": {
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 2
+          },
+          "positionReference": "well-top"
+        },
         "flowRateByVolume": [
           [
             0.0,
@@ -10098,12 +10208,6 @@
             "volume": 50
           }
         },
-        "offset": {
-          "x": 0,
-          "y": 0,
-          "z": 2
-        },
-        "positionReference": "well-top",
         "pushOutByVolume": [
           [
             0.0,
@@ -10126,17 +10230,19 @@
               "duration": 0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
+          "endPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
           },
-          "positionReference": "well-top",
           "speed": 4,
           "touchTip": {
             "enable": false,
             "params": {
-              "mmToEdge": 0.5,
+              "mmFromEdge": 0.5,
               "speed": 30,
               "zOffset": -1
             }
@@ -10149,13 +10255,15 @@
               "duration": 0.0
             }
           },
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 2
-          },
-          "positionReference": "well-top",
-          "speed": 4
+          "speed": 4,
+          "startPosition": {
+            "offset": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "positionReference": "well-top"
+          }
         }
       },
       "tiprack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
