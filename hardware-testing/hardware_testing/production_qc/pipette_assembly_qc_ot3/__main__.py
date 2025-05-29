@@ -1735,7 +1735,7 @@ async def _test_liquid_probe(
             # )
             probe_settings = DEFAULT_LIQUID_PROBE_SETTINGS
             try:
-                end_z = await api.liquid_probe(mount, probe_settings, probe=probe)
+                end_z = await api.liquid_probe(mount, max_z_distance_machine_coords, probe_settings, probe=probe)
             except Exception as eee:
                 #print(f"Error {eee}")
                 LOG_GING.critical(f'senser err {eee}')
