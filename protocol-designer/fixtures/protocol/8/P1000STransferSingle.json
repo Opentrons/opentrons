@@ -6,7 +6,7 @@
     "author": "QA",
     "description": "",
     "created": 1748467626797,
-    "lastModified": 1748473591241,
+    "lastModified": 1748537905948,
     "source": "Protocol Designer",
     "category": null,
     "subcategory": null,
@@ -1021,20 +1021,25 @@
             "1f67d792-5c23-46d2-9ccb-8843abdf28fa:opentrons/thermoscientificnunc_96_wellplate_2000ul/2": "C3",
             "860aba5d-7e4f-4cb1-9f8e-1ee5e13795df:opentrons/usascientific_96_wellplate_2.4ml_deep/2": "D1",
             "b59a0fb8-cb94-4941-886e-d7c089b0db89:opentrons/nest_96_wellplate_2ml_deep/3": "D2",
-            "a3ec9992-9b00-4451-a077-578ef21b975c:opentrons/opentrons_flex_96_filtertiprack_50ul/1": "D3",
+            "a3ec9992-9b00-4451-a077-578ef21b975c:opentrons/opentrons_flex_96_filtertiprack_50ul/1": "A3",
             "45987d82-d88e-425e-befd-8114611744f6:opentrons/opentrons_flex_96_filtertiprack_200ul/1": "B1",
-            "58cf7241-6587-4c42-9df4-e9f3cb5a6c89:opentrons/opentrons_flex_96_filtertiprack_1000ul/1": "B3"
+            "58cf7241-6587-4c42-9df4-e9f3cb5a6c89:opentrons/opentrons_flex_96_filtertiprack_1000ul/1": "B3",
+            "2b51e1b5-af62-4d51-96f6-e53f5ac55c20:opentrons/opentrons_flex_96_filtertiprack_1000ul/1": "offDeck",
+            "3da54e81-41a7-40bb-ae7a-21c46b932b73:opentrons/opentrons_flex_96_filtertiprack_200ul/1": "offDeck",
+            "d6d34253-6094-432e-bb99-7279bc1b67a7:opentrons/opentrons_flex_96_filtertiprack_50ul/1": "offDeck"
           },
           "moduleLocationUpdate": {},
           "pipetteLocationUpdate": {
             "88360a6e-7a23-4d95-ad2d-14418627f746": "left"
           },
-          "trashBinLocationUpdate": {
-            "f250ee15-2fde-4eb5-817c-51a7d026e482:trashBin": "cutoutA3"
+          "trashBinLocationUpdate": {},
+          "wasteChuteLocationUpdate": {
+            "b01e5418-14ca-4846-b141-e33813d60829:wasteChute": "cutoutD3"
           },
-          "wasteChuteLocationUpdate": {},
           "stagingAreaLocationUpdate": {},
-          "gripperLocationUpdate": {},
+          "gripperLocationUpdate": {
+            "b4db7cd0-6375-4476-a37a-f3aefc8f30fc:gripper": "mounted"
+          },
           "stepType": "manualIntervention",
           "id": "__INITIAL_DECK_SETUP_STEP__"
         }
@@ -1086,6 +1091,18 @@
         "58cf7241-6587-4c42-9df4-e9f3cb5a6c89:opentrons/opentrons_flex_96_filtertiprack_1000ul/1": {
           "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL (1)",
           "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        },
+        "2b51e1b5-af62-4d51-96f6-e53f5ac55c20:opentrons/opentrons_flex_96_filtertiprack_1000ul/1": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL (2)",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        },
+        "3da54e81-41a7-40bb-ae7a-21c46b932b73:opentrons/opentrons_flex_96_filtertiprack_200ul/1": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 200 µL (2)",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_200ul/1"
+        },
+        "d6d34253-6094-432e-bb99-7279bc1b67a7:opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL (2)",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
         }
       }
     }
@@ -9724,7 +9741,7 @@
   "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
-      "key": "a07b8db1-fa1a-4803-96fa-f4d622d9af7c",
+      "key": "1c461c40-8681-465b-a82e-4b1ee8c561f7",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p1000_multi_flex",
@@ -9733,7 +9750,7 @@
       }
     },
     {
-      "key": "4b70c027-348b-4889-824e-6792d18db38d",
+      "key": "69b06afc-7144-44a9-a635-762cfebffc7a",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
@@ -9747,7 +9764,7 @@
       }
     },
     {
-      "key": "bf6c43ec-29ad-4c38-a402-2a7c98c75b04",
+      "key": "9e462932-9ae1-4aa6-8620-82254ddef19d",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Filter Tip Rack 200 µL",
@@ -9761,7 +9778,7 @@
       }
     },
     {
-      "key": "3a548f2d-4dbd-42b7-b17a-d53a8adbaf97",
+      "key": "0aee9bb8-f505-43cd-a642-6596caffbaba",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
@@ -9775,7 +9792,7 @@
       }
     },
     {
-      "key": "e1f234e6-4abc-41f8-8017-37afa5aff180",
+      "key": "92021672-717b-41b6-bf46-668f8f44069f",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Thermo Scientific Nunc 96 Well Plate 1300 µL",
@@ -9789,7 +9806,7 @@
       }
     },
     {
-      "key": "d1f78403-824f-4e37-9488-e5c852cf6712",
+      "key": "864b772f-637d-42a6-9164-f501ac79d969",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Thermo Scientific Nunc 96 Well Plate 2000 µL",
@@ -9803,7 +9820,7 @@
       }
     },
     {
-      "key": "993b4b6a-218b-459e-a170-8aa495ac3805",
+      "key": "eeb39a28-6958-40dd-b59e-8f69844ddd75",
       "commandType": "loadLabware",
       "params": {
         "displayName": "USA Scientific 96 Deep Well Plate 2.4 mL",
@@ -9817,7 +9834,7 @@
       }
     },
     {
-      "key": "af4816b2-e960-4382-bf6d-7ddb2f2effcb",
+      "key": "b089ac22-f40d-4210-8bbc-c14d184d2d65",
       "commandType": "loadLabware",
       "params": {
         "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -9831,7 +9848,7 @@
       }
     },
     {
-      "key": "158cf6c3-e9d8-4522-b981-44bd69bbdc9e",
+      "key": "c7434dcf-8080-4c3b-b64c-df24cc280289",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL (1)",
@@ -9840,12 +9857,12 @@
         "namespace": "opentrons",
         "version": 1,
         "location": {
-          "slotName": "D3"
+          "slotName": "A3"
         }
       }
     },
     {
-      "key": "ba53d727-50a7-4591-9a7c-c9a75dba519f",
+      "key": "4498f857-00a3-4649-8ed0-c456ace2be7e",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Filter Tip Rack 200 µL (1)",
@@ -9859,7 +9876,7 @@
       }
     },
     {
-      "key": "e0cd9684-c44b-4a16-9d97-0c758ae07a05",
+      "key": "c6b36bb4-72cf-463f-aac8-c15d157fb7a8",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL (1)",
@@ -9873,8 +9890,44 @@
       }
     },
     {
+      "key": "0d96753d-ab7f-482f-9ba8-c968401e084b",
+      "commandType": "loadLabware",
+      "params": {
+        "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL (2)",
+        "labwareId": "2b51e1b5-af62-4d51-96f6-e53f5ac55c20:opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+        "loadName": "opentrons_flex_96_filtertiprack_1000ul",
+        "namespace": "opentrons",
+        "version": 1,
+        "location": "offDeck"
+      }
+    },
+    {
+      "key": "dd27a72b-17a0-49b4-8f35-92b5b3c9d5be",
+      "commandType": "loadLabware",
+      "params": {
+        "displayName": "Opentrons Flex 96 Filter Tip Rack 200 µL (2)",
+        "labwareId": "3da54e81-41a7-40bb-ae7a-21c46b932b73:opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+        "loadName": "opentrons_flex_96_filtertiprack_200ul",
+        "namespace": "opentrons",
+        "version": 1,
+        "location": "offDeck"
+      }
+    },
+    {
+      "key": "2c61bdb5-9ecf-46b4-9d65-6fadafd4fb87",
+      "commandType": "loadLabware",
+      "params": {
+        "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL (2)",
+        "labwareId": "d6d34253-6094-432e-bb99-7279bc1b67a7:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+        "loadName": "opentrons_flex_96_filtertiprack_50ul",
+        "namespace": "opentrons",
+        "version": 1,
+        "location": "offDeck"
+      }
+    },
+    {
       "commandType": "loadLiquid",
-      "key": "07702682-a3a9-44cc-b043-0d30c5628baa",
+      "key": "35240422-cb9d-440d-b3fd-e0339a92e88d",
       "params": {
         "liquidId": "1",
         "labwareId": "1f67d792-5c23-46d2-9ccb-8843abdf28fa:opentrons/thermoscientificnunc_96_wellplate_2000ul/2",
@@ -9980,7 +10033,7 @@
     },
     {
       "commandType": "loadLiquid",
-      "key": "68e03630-4f8c-4eff-8c9a-4d78ceab4cd9",
+      "key": "ade54a85-c2a9-4034-8d5e-a85be8223fe3",
       "params": {
         "liquidId": "0",
         "labwareId": "663098b8-8aff-44d9-814c-73efa91ee976:opentrons/thermoscientificnunc_96_wellplate_1300ul/2",

@@ -239,6 +239,40 @@ export const SetupSteps = {
       cy.contains(slotToUse + tip).click()
     },
   }),
+  /**
+   * Defines a step to move labware from a source deck slot to a destination deck slot.
+   * This involves clicking "Add Step", selecting "Move", and then choosing
+   * the source labware and its new destination using dropdowns.
+   *
+   * @param sourcedeckslot The name of the source deck slot (e.g., 'A1').
+   * @param destdeckslot The name of the destination deck slot (e.g., 'B2').
+   * @returns A StepThunk object that, when its `call` method is invoked,
+   * executes the Cypress commands to perform the labware move.
+   */
+  MoveLabware: (sourcedeckslot: string, destdeckslot: string): StepThunk => ({
+    call: () => {
+      cy.contains('Add Step').click()
+      cy.contains('Move').click()
+
+      // Source Labware Selection
+      cy.contains('p', 'Select labware') // Find the paragraph with "Select labware"
+        .parent() // Go up one level
+        .parent() // Go up another level (to the common container that has the dropdown)
+        .contains('Choose option') // Find the "Choose option" text within that container
+        .click() // Click to open the dropdown
+      cy.contains(sourcedeckslot).click() // Select the source deck slot
+
+      // Destination Location Selection
+      cy.contains('p', 'New location') // Find the paragraph with "New location"
+        .parent() // Go up one level
+        .parent() // Go up another level (to the common container that has the dropdown)
+        .contains('Choose option') // Find the "Choose option" text within that container
+        .click() // Click to open the dropdown
+      cy.contains(destdeckslot).click() // Select the destination deck slot
+
+      cy.contains('Save').click({ force: true })
+    },
+  }),
 
   SelectLiquidClassT: (LiquidClass: string): StepThunk => ({
     call: () => {

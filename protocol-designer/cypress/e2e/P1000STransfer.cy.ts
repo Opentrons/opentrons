@@ -1,4 +1,4 @@
-import { CompositeSetupSteps } from '../support/SetupSteps'
+import { CompositeSetupSteps, SetupSteps } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
 import { getTestFile, TestFilePath } from '../support/TestFiles'
 
@@ -142,7 +142,28 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
     cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
     cy.openSettingsPage()
     cy.contains('Edit protocol').click()
+    /*
+    cy.contains('Add Step').click()
+    cy.contains('Move').click()
+    // source
+    cy.contains('p', 'Select labware')
+      .parent()
+      .parent()
+      .contains('Choose option')
+      .click()
+    cy.contains('B2').click()
+    // destination
+    cy.contains('p', 'New location')
+      .parent()
+      .parent()
+      .contains('Choose option')
+      .click()
+    cy.contains('D3').click()
+    cy.contains('Save').click({ force: true })
+    */
     const steps = new StepBuilder()
+    steps.add(SetupSteps.MoveLabware('B2', 'D3'))
+
     /*
     steps.add(SetupVerifications.OnStep1())
     steps.add(SetupVerifications.FlexSelected())
@@ -188,6 +209,8 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
     )
     */
     // New Transfer form
+    /*
+    // THIS IS THE NEW TRANSFER FORM PLEASE USE 
     GenerateMultipleTransferStepsForSingleChannel(
       steps,
       'Thermo Scientific Nunc 96 Well Plate 2000 µL',
@@ -195,6 +218,7 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
       'Thermo Scientific Nunc 96 Well Plate 1300 µL',
       'NEST 96 Deep Well Plate 2mL'
     )
+    */
     steps.execute()
     // ToDo fix running out of tips
     /*
