@@ -76,12 +76,11 @@ export function PreWetTip(props: PreWetTipProps): JSX.Element {
     onBack()
   }
 
-  const setSaveOrContinueButtonText = t('shared:save')
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
         header={t('pre_wet_tip_before_aspirating')}
-        buttonText={i18n.format(setSaveOrContinueButtonText, 'capitalize')}
+        buttonText={i18n.format(t('shared:save'), 'capitalize')}
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
