@@ -19,6 +19,18 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
       }
     })
   })
+  /**
+   * Generates multiple transfer steps specifically for a P50 8-channel pipette.
+   * It covers all combinations of the predefined liquid classes and volumes (12 total transfers).
+   * Each transfer uses a sequential well from A1 to A12.
+   * The source and destination labware sets alternate for each transfer.
+   *
+   * @param steps The StepBuilder instance to add steps to.
+   * @param sourceLabware1 The first source labware name (e.g., 'Thermo Scientific Nunc 96 Well Plate 2000 µL').
+   * @param sourceLabware2 The second source labware name (e.g., 'Thermo Scientific Nunc 96 Well Plate 1300 µL').
+   * @param destinationLabware1 The first destination labware name (e.g., 'USA Scientific 96 Deep Well Plate 2.4 mL').
+   * @param destinationLabware2 The second destination labware name (e.g., 'NEST 96 Deep Well Plate 2mL').
+   */
   const GenerateMultipleTransferStepsForP508Channel = (
     steps: StepBuilder,
     sourceLabware1: string,
@@ -26,60 +38,55 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     destinationLabware1: string,
     destinationLabware2: string
   ) => {
-    const tip: string = '50' // Explicitly typed as string
-    const volumes: string[] = ['5', '20', '50'] // Explicitly typed as string array
+    const tip: string = '50' // Fixed tip for P50
+    const volumes: string[] = ['5', '20', '50'] // Fixed volumes for P50
     const liquidClasses: string[] = [
       "Don't use a liquid class",
       'Aqueous',
       'Viscous',
       'Volatile',
-    ] // Explicitly typed as string array
-    const row: string = 'A'
-    const colsLength: number = 12
-    let colCounter: number = 0
+    ]
+
+    const row: string = 'A' // Fixed row for 8-channel operation
+    const colsLength: number = 12 // Max columns in a row (A1-A12)
+
+    // Define the two labware pairs for alternation
+    const labwarePairs = [
+      { source: sourceLabware1, dest: destinationLabware1 }, // Pair for odd-indexed transfers
+      { source: sourceLabware2, dest: destinationLabware2 }, // Pair for even-indexed transfers
+    ]
+
+    let transferCounter = 0 // This counter will go from 0 to 11 (for 12 total transfers)
 
     for (const liquidClass of liquidClasses) {
       for (const volume of volumes) {
-        if (colCounter >= 0 && colCounter < colsLength) {
-          // Adjusted condition to start from the beginning
-          const sourceWell1: string = `${row}${colCounter + 1}`
-          const destWell1: string = `${row}${colCounter + 1}`
+        // Determine which labware pair to use for this specific transfer
+        // (0 for the first pair, 1 for the second, then back to 0, etc.)
+        const currentLabwarePair = labwarePairs[transferCounter % 2]
 
-          steps.add(
-            CompositeSetupSteps.Test_LC_new_rectangle(
-              sourceLabware1,
-              sourceWell1,
-              destinationLabware1,
-              destWell1,
-              volume,
-              liquidClass,
-              tip,
-              'circle',
-              'rect'
-            )
+        // Determine the current well within the 'A' row (A1, A2, ..., A12)
+        const colIndex = (transferCounter % colsLength) + 1
+        const currentWell = `${row}${colIndex}`
+
+        // Add the transfer step
+        steps.add(
+          CompositeSetupSteps.Test_LC_new_rectangle(
+            // Use Test_LC (assuming it's the updated version with shape params)
+            currentLabwarePair.source,
+            currentWell,
+            currentLabwarePair.dest,
+            currentWell,
+            volume,
+            liquidClass,
+            tip,
+            'circle', // Assuming source wells are circles for this test
+            'rect' // Assuming destination wells are rectangles for this test
           )
-          colCounter++
-        }
-
-        if (colCounter >= colsLength && colCounter < 2 * colsLength) {
-          const sourceWell2: string = `${row}${colCounter - colsLength}`
-          const destWell2: string = `${row}${colCounter - colsLength}`
-
-          steps.add(
-            CompositeSetupSteps.Test_LC(
-              sourceLabware2,
-              sourceWell2,
-              destinationLabware2,
-              destWell2,
-              volume,
-              liquidClass,
-              tip
-            )
-          )
-          colCounter++
-        }
+        )
+        transferCounter++ // Increment the counter for the next transfer
       }
     }
+    // After these loops, transferCounter will be 12, indicating 12 steps were added.
   }
 
   const getAllWells = (): string[] => {
@@ -102,7 +109,6 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
     cy.openSettingsPage()
     cy.contains('Edit protocol').click()
-
     const steps = new StepBuilder()
     /* Commenting out for now for E2E
     steps.add(SetupVerifications.OnStep1())
@@ -172,7 +178,7 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
         'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
       )
     )
-    */
+   */
 
     GenerateMultipleTransferStepsForP508Channel(
       steps,
