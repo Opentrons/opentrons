@@ -2094,6 +2094,9 @@ class OT3API(
         if not aspirate_spec:
             return
 
+        input(f"aspirate(volume={volume}, "
+              f"correction_volume={correction_volume}) [{aspirate_spec.instr.current_volume}]")
+
         target_pos = target_position_from_plunger(
             realmount,
             aspirate_spec.plunger_distance,
@@ -2142,6 +2145,10 @@ class OT3API(
         )
         if not dispense_spec:
             return
+        input(f"dispense(volume={volume}, "
+              f"push_out={push_out}, "
+              f"correction_volume={correction_volume}, "
+              f"is_full_dispense={is_full_dispense}) [{[{dispense_spec.instr.current_volume}]}]")
         target_pos = target_position_from_plunger(
             realmount,
             dispense_spec.plunger_distance,
@@ -2169,6 +2176,7 @@ class OT3API(
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
             bottom = dispense_spec.instr.plunger_positions.bottom
             plunger_target_pos = target_pos[Axis.of_main_tool_actuator(realmount)]
+            input(f"plunger_target_pos={plunger_target_pos}, bottom={bottom}")
             if plunger_target_pos > bottom:
                 dispense_spec.instr.ready_to_aspirate = False
 
