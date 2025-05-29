@@ -4,10 +4,6 @@ from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
 from opentrons_shared_data.liquid_classes import LiquidClassDefinitionDoesNotExist
-
-from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.commands import LoadModuleResult
-
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
@@ -35,7 +31,8 @@ from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
 
-
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.commands import LoadModuleResult
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     AddressableAreaLocation,
@@ -1071,7 +1068,7 @@ class ProtocolCore(
             display_color=(liquid.displayColor.root if liquid.displayColor else None),
         )
 
-    def define_liquid_class(self, name: str, version: int = 1) -> LiquidClass:
+    def define_liquid_class(self, name: str, version: int) -> LiquidClass:
         """Define a liquid class for use in transfer functions."""
         try:
             # Check if we have already loaded this liquid class' definition

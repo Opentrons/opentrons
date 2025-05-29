@@ -11,7 +11,7 @@ from opentrons_shared_data.load import get_shared_data_root
 
 def generate_command_schema(version: str) -> str:
     """Generate a JSON Schema that all valid create commands can validate against."""
-    schema_as_dict = CommandCreateAdapter.json_schema(mode="validation")
+    schema_as_dict = CommandCreateAdapter.json_schema(mode="validation", by_alias=False)
     schema_as_dict["$id"] = f"opentronsCommandSchemaV{version}"
     schema_as_dict["$schema"] = "http://json-schema.org/draft-07/schema#"
     return json.dumps(schema_as_dict, indent=2, sort_keys=True)
