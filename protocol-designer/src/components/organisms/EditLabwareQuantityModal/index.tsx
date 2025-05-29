@@ -105,11 +105,7 @@ export function EditLabwareQuantityModal(
         footer={
           <Flex justifyContent={JUSTIFY_END} padding={SPACING.spacing24}>
             <Flex gridGap={SPACING.spacing8}>
-              <SecondaryButton
-                onClick={() => {
-                  onClose()
-                }}
-              >
+              <SecondaryButton onClick={onClose}>
                 {t('shared:cancel')}
               </SecondaryButton>
               <PrimaryButton onClick={handleConfirmClick}>
@@ -120,11 +116,9 @@ export function EditLabwareQuantityModal(
         }
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-          <Flex color={COLORS.grey60}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('labware_quantity')}
-            </StyledText>
-          </Flex>
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+            {t('labware_quantity')}
+          </StyledText>
           <InputField
             error={showError ? errorText : null}
             name="changeQuantity"
