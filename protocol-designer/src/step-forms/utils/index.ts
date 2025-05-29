@@ -5,13 +5,18 @@ import values from 'lodash/values'
 import {
   FLEX_ROBOT_TYPE,
   GEN_ONE_MULTI_PIPETTES,
+  getCutoutDisplayName,
   getPipetteSpecsV2,
+  OT2_CUTOUT_BY_SLOT_ID,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getCutoutIdByAddressableArea } from '@opentrons/step-generation'
+import {
+  getCutoutIdByAddressableArea,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import { hydrateField } from '../../steplist/fieldLevel'
 
@@ -80,21 +85,6 @@ const MOVABLE_TRASH_CUTOUTS = [
     slot: 'D3',
   },
 ]
-
-const slotToCutoutOt2Map: { [key: string]: string } = {
-  '1': 'cutout1',
-  '2': 'cutout2',
-  '3': 'cutout3',
-  '4': 'cutout4',
-  '5': 'cutout5',
-  '6': 'cutout6',
-  '7': 'cutout7',
-  '8': 'cutout8',
-  '9': 'cutout9',
-  '10': 'cutout10',
-  '11': 'cutout11',
-  '12': 'cutout12',
-}
 
 export function getIdsInRange<T extends string | number>(
   orderedIds: T[],
@@ -182,40 +172,33 @@ export const getSlotIsEmpty = (
   slot: string,
   discountTrash: boolean
 ): boolean => {
-  //  special-casing the TC's slot A1 for the Flex
+  //  filter out trash slots only when selecting slot but not when
+  //  dragging/dropping
   if (
-    slot === 'cutoutA1' &&
-    Object.values(initialDeckSetup.modules).find(
-      module => module.type === THERMOCYCLER_MODULE_TYPE
-    )
-  ) {
-    return false
-  } else if (
     Object.values(initialDeckSetup.additionalEquipmentOnDeck).some(
       ae =>
         (ae.name === 'trashBin' || ae.name === 'wasteChute') &&
-        ae.location.includes(slot)
+        getCutoutDisplayName(ae.location as CutoutId) === slot
     ) &&
     discountTrash
   ) {
     return false
   }
-
-  return (
-    [
-      ...values(initialDeckSetup.modules).filter(
-        (moduleOnDeck: ModuleOnDeck) => {
-          const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
-          return cutoutForSlotOt2 != null
-            ? moduleOnDeck.slot === slot
-            : slot.includes(moduleOnDeck.slot)
-        }
-      ),
-      ...values(initialDeckSetup.labware).filter((labware: LabwareOnDeckType) =>
-        labware.stack.includes(slot)
-      ),
-    ].length === 0
+  const mappedCutout = OT2_CUTOUT_BY_SLOT_ID[slot]
+  const modulesInSlot = values(initialDeckSetup.modules).filter(
+    (moduleOnDeck: ModuleOnDeck) => {
+      return mappedCutout != null
+        ? moduleOnDeck.slot === slot
+        : slot.includes(moduleOnDeck.slot)
+    }
   )
+
+  const labwareInSlot = values(initialDeckSetup.labware).filter(
+    (labware: LabwareOnDeckType) =>
+      getSlotInLocationStack(labware.stack) === slot
+  )
+
+  return modulesInSlot.length === 0 && labwareInSlot.length === 0
 }
 
 export const getIsCrashablePipetteSelected = (
