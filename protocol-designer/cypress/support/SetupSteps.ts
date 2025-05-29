@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { StepThunk, StepThunk } from './StepBuilder'
+import { StepThunk } from './StepBuilder'
 import { UniversalSteps } from './UniversalSteps' // Adjust the path
 
 declare global {

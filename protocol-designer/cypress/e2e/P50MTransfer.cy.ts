@@ -1,11 +1,6 @@
-import {
-  CompositeSetupSteps,
-  SetupSteps,
-  SetupVerifications,
-} from '../support/SetupSteps'
+import { CompositeSetupSteps } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
 import { getTestFile, TestFilePath } from '../support/TestFiles'
-import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', () => {
   beforeEach(() => {

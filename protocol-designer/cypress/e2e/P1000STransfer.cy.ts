@@ -1,11 +1,6 @@
-import {
-  CompositeSetupSteps,
-  SetupSteps,
-  SetupVerifications,
-} from '../support/SetupSteps'
+import { CompositeSetupSteps } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
 import { getTestFile, TestFilePath } from '../support/TestFiles'
-import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Transfer stepform testing Single Channel P1000uL', () => {
   beforeEach(() => {
@@ -37,16 +32,56 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
     return allWells
   }
 
-  const GenerateMultipleTransferSteps = (steps: StepBuilder) => {
-    const liquidClasses = [
+  /**
+   * Generates multiple transfer steps for a single-channel pipette,
+   * covering combinations of liquid classes, tip sizes, and volumes.
+   * It iterates through wells sequentially (A1, A2, A3, etc.) and
+   * alternates between two predefined sets of source and destination labware
+   * for each transfer step, mimicking the provided spreadsheet.
+   *
+   * @param steps The StepBuilder instance to add steps to.
+   * @param sourceLabware1 The first source labware name (e.g., 'Thermo Scientific Nunc 96 Well Plate 2000 µL').
+   * @param destinationLabware1 The first destination labware name (e.g., 'USA Scientific 96 Deep Well Plate 2.4 mL').
+   * @param sourceLabware2 The second source labware name (e.g., 'Thermo Scientific Nunc 96 Well Plate 1300 µL').
+   * @param destinationLabware2 The second destination labware name (e.g., 'NEST 96 Deep Well Plate 2mL').
+   */
+  const GenerateMultipleTransferStepsForSingleChannel = (
+    steps: StepBuilder,
+    sourceLabware1: string,
+    destinationLabware1: string,
+    sourceLabware2: string,
+    destinationLabware2: string
+  ) => {
+    const liquidClasses: string[] = [
       "Don't use a liquid class",
       'Aqueous',
       'Viscous',
       'Volatile',
     ]
     const tips = ['50', '200', '1000']
+
+    // Helper function to get all A1-H12 wells
+    const getAllWells = (): string[] => {
+      const wells: string[] = []
+      const rows = 'ABCDEFGH'
+      const cols = Array.from({ length: 12 }, (_, i) => i + 1)
+      for (const row of rows) {
+        for (const col of cols) {
+          wells.push(`${row}${col}`)
+        }
+      }
+      return wells
+    }
+
     const allWells = getAllWells()
-    let wellIndex = 0
+
+    // Define the two labware pairs as per the spreadsheet's alternating pattern
+    const labwarePairs = [
+      { source: sourceLabware1, dest: destinationLabware1 },
+      { source: sourceLabware2, dest: destinationLabware2 },
+    ]
+
+    let transferCounter = 0 // This counter will control well indexing and labware alternation
 
     for (const liquidClass of liquidClasses) {
       for (const tip of tips) {
@@ -60,23 +95,40 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
         }
 
         for (const volume of volumes) {
-          const sourceWell = allWells[wellIndex % allWells.length]
-          const destWell = allWells[(wellIndex + 1) % allWells.length]
+          // Determine which labware pair to use for this specific transfer
+          // (0 for the first pair, 1 for the second, then back to 0, etc.)
+          const currentLabwarePair = labwarePairs[transferCounter % 2]
 
-          steps.add(
-            CompositeSetupSteps.Test_LC_new_rectangle(
-              'Thermo Scientific Nunc 96 Well Plate 1300 µL', // sourceLabware
-              sourceWell,
-              'USA Scientific 96 Deep Well Plate 2.4 mL', // destinationLabware
-              destWell,
-              volume,
-              liquidClass,
-              tip, // Using the current tip value,
-              'circle',
-              'rect'
+          // Determine the current well for both source and destination
+          // The spreadsheet shows source and destination wells incrementing sequentially
+          // and being the same for a given transfer (e.g., A1 -> A1, A2 -> A2).
+          const currentWell = allWells[transferCounter]
+
+          // Ensure we don't go out of bounds if somehow more combinations
+          // are generated than there are wells (though for 36 steps and 96 wells, this won't happen).
+          if (currentWell) {
+            // Check if the well exists in our allWells array
+            steps.add(
+              CompositeSetupSteps.Test_LC_new_rectangle(
+                // Using Test_LC as per your last full function
+                currentLabwarePair.source,
+                currentWell,
+                currentLabwarePair.dest,
+                currentWell,
+                volume,
+                liquidClass,
+                tip,
+                'circle', // Assuming source wells are circles as per the spreadsheet's context
+                'rect' // Assuming destination wells are rectangles as per the spreadsheet's context
+              )
             )
-          )
-          wellIndex += 2
+            transferCounter++ // Increment the counter for the next transfer
+          } else {
+            cy.log(
+              `Warning: Ran out of wells. Skipping transfers after ${transferCounter} steps.`
+            )
+            break // Exit the volumes loop if we run out of wells
+          }
         }
       }
     }
@@ -135,9 +187,16 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
       )
     )
     */
-    GenerateMultipleTransferSteps(steps)
+    // New Transfer form
+    GenerateMultipleTransferStepsForSingleChannel(
+      steps,
+      'Thermo Scientific Nunc 96 Well Plate 2000 µL',
+      'USA Scientific 96 Deep Well Plate 2.4 mL',
+      'Thermo Scientific Nunc 96 Well Plate 1300 µL',
+      'NEST 96 Deep Well Plate 2mL'
+    )
     steps.execute()
-    // ToDo fix typo Tiprack -> Tip rack
+    // ToDo fix running out of tips
     /*
     cy.contains('Opentrons Flex 96 Filter Tip Rack').click()
     const slotToUse = 'Tip Rack '

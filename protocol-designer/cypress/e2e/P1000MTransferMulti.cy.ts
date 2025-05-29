@@ -24,7 +24,20 @@ describe('Transfer stepform testing P1000M', () => {
       }
     })
   })
-  const GenerateMultipleTransferStepsForP508Channel = (
+  /**
+   * Generates multiple transfer steps for a P1000 8-channel pipette.
+   * It iterates through all combinations of liquid classes, tip sizes, and volumes (36 total).
+   * For wells, it uses row 'A' and increments columns (A1, A2,...A12, then loops back to A1 for the next set).
+   * It alternates between two predefined source/destination labware sets every 12 transfers,
+   * simulating switching labware for subsequent 'columns' of transfers.
+   *
+   * @param steps The StepBuilder instance to add steps to.
+   * @param sourceLabware1 The first source labware name.
+   * @param sourceLabware2 The second source labware name.
+   * @param destinationLabware1 The first destination labware name.
+   * @param destinationLabware2 The second destination labware name.
+   */
+  const GenerateMultipleTransferStepsForP10008Channel = (
     steps: StepBuilder,
     sourceLabware1: string,
     sourceLabware2: string,
@@ -38,9 +51,16 @@ describe('Transfer stepform testing P1000M', () => {
       'Viscous',
       'Volatile',
     ]
-    const row = 'A'
-    const colsLength = 12
-    let colCounter = 0
+    const row = 'A' // P1000 8-channel typically operates on a single row (or all rows simultaneously)
+
+    // Define the two labware sets to alternate between
+    const labwareSets = [
+      { source: sourceLabware1, dest: destinationLabware1 },
+      { source: sourceLabware2, dest: destinationLabware2 },
+    ]
+
+    const colsLength = 12 // Number of columns in a 96-well plate row
+    let transferCounter = 0 // This will count from 0 to 35 (for 36 total steps)
 
     for (const liquidClass of liquidClasses) {
       for (const tip of tips) {
@@ -54,36 +74,33 @@ describe('Transfer stepform testing P1000M', () => {
         }
 
         for (const volume of volumes) {
-          if (colCounter < 2 * colsLength) {
-            // Prevent overflow
-            const isFirstLabware = colCounter < colsLength
+          // --- Logic for labware alternation and well indexing ---
+          // Determine which labware set to use based on blocks of 'colsLength' transfers
+          // (e.g., transfers 0-11 use set 0, transfers 12-23 use set 1, transfers 24-35 use set 0)
+          const currentLabwareSetIndex =
+            Math.floor(transferCounter / colsLength) % labwareSets.length
+          const currentLabwarePair = labwareSets[currentLabwareSetIndex]
 
-            const sourceLabware = isFirstLabware
-              ? sourceLabware1
-              : sourceLabware2
-            const destLabware = isFirstLabware
-              ? destinationLabware1
-              : destinationLabware2
+          // Determine the column index for the well within the current row 'A'
+          const colIndex = (transferCounter % colsLength) + 1
+          const well = `${row}${colIndex}` // Well will be A1, A2, ..., A12, then A1, A2, ... A12 again, etc.
 
-            const colIndex = (colCounter % colsLength) + 1
-            const well = `${row}${colIndex}`
-
-            steps.add(
-              CompositeSetupSteps.Test_LC_new_rectangle(
-                sourceLabware,
-                well,
-                destLabware,
-                well,
-                volume,
-                liquidClass,
-                tip,
-                'circle',
-                'rect'
-              )
+          steps.add(
+            CompositeSetupSteps.Test_LC_new_rectangle(
+              // Assuming Test_LC is the updated function you're using
+              currentLabwarePair.source,
+              well,
+              currentLabwarePair.dest,
+              well,
+              volume,
+              liquidClass,
+              tip,
+              'circle', // Assuming source wells are circles for this test
+              'rect' // Assuming destination wells are rectangles for this test
             )
+          )
 
-            colCounter++
-          }
+          transferCounter++ // Increment the counter for the next transfer
         }
       }
     }
@@ -197,7 +214,7 @@ describe('Transfer stepform testing P1000M', () => {
     )
     */
 
-    GenerateMultipleTransferStepsForP508Channel(
+    GenerateMultipleTransferStepsForP10008Channel(
       steps,
       'Thermo Scientific Nunc 96 Well Plate 2000 µL',
       'Thermo Scientific Nunc 96 Well Plate 1300 µL',
