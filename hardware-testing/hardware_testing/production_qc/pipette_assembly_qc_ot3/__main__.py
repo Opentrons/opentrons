@@ -57,6 +57,8 @@ from hardware_testing.opentrons_api.types import (
     Axis,
 )
 
+from opentrons.config.defaults_ot3 import DEFAULT_LIQUID_PROBE_SETTINGS
+
 DEFAULT_SLOT_TIP_RACK_1000 = 7
 DEFAULT_SLOT_TIP_RACK_200 = 4
 DEFAULT_SLOT_TIP_RACK_50 = 1
