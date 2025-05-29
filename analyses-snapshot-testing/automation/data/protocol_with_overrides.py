@@ -5,7 +5,11 @@ from typing import Any, Optional
 
 from pydantic import Field
 
-from automation.data.protocol import GENERATED_PROTOCOLS_FOLDER, OVERRIDE_MONIKER, Protocol
+from automation.data.protocol import (
+    GENERATED_PROTOCOLS_FOLDER,
+    OVERRIDE_MONIKER,
+    Protocol,
+)
 
 
 class ProtocolWithOverrides(Protocol):

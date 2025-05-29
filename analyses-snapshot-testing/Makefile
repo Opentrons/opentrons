@@ -10,39 +10,22 @@ export ANALYSIS_REF # tag, branch or commit for the opentrons repository. Used a
 export PROTOCOL_NAMES # tell the test which protocols to run
 export OVERRIDE_PROTOCOL_NAMES # tell the test which override protocols to run
 
-ifeq ($(CI), true)
-	PYTHON=python
-else
-	PYTHON=pyenv exec python
-endif
-
-.PHONY: black
-black:
-	$(PYTHON) -m pipenv run python -m black .
-
-.PHONY: black-check
-black-check:
-	$(PYTHON) -m pipenv run python -m black . --check
-
 .PHONY: ruff
 ruff:
-	$(PYTHON) -m pipenv run python -m ruff check . --fix
+	uv run ruff format
+	uv run ruff check . --fix
 
 .PHONY: ruff-check
 ruff-check:
-	$(PYTHON) -m pipenv run python -m ruff check .
+	uv run ruff format --check
+	uv run ruff check .
 
-.PHONY: mypy
-mypy:
-	$(PYTHON) -m pipenv run python -m mypy automation tests citools
-
-.PHONY: lint
-lint: black-check ruff-check mypy
+.PHONY: ty
+ty:
+	uv run ty check ./automation ./citools
 
 .PHONY: format
 format: 
-	@echo "Running black"
-	$(MAKE) black
 	@echo "Running ruff"
 	$(MAKE) ruff
 	@echo "Formatting the readme with yarn prettier"
@@ -50,50 +33,48 @@ format:
 
 .PHONY: test-ci
 test-ci:
-	$(PYTHON) -m pipenv run python -m pytest -m "emulated_alpha"
+	$uv run python -m pytest -m "emulated_alpha"
 
 .PHONY: audit
 audit:
-	pipenv run python tests/audit_snapshots.py
+	uv run python tests/audit_snapshots.py
 
 .PHONY: test-protocol-analysis
 test-protocol-analysis:
-	pipenv run python -m pytest -v tests/protocol_analyze_test.py
+	uv run python -m pytest -v tests/protocol_analyze_test.py
+
+.PHONY: ci-setup
+ci-setup:
+	uv sync --locked --all-extras
 
 .PHONY: setup
-setup: install-pipenv
-	$(PYTHON) -m pipenv install
-
-.PHONY: teardown
-teardown:
-	-$(PYTHON) -m pipenv --rm
+setup:
+	@echo "You must have uv installed to run this Makefile"
+	uv sync
 
 .PHONY: format-readme
 format-readme:
 	yarn prettier --ignore-path .eslintignore --write analyses-snapshot-testing/**/*.md .github/workflows/analyses-snapshot-test.yaml
 
-.PHONY: install-pipenv
-install-pipenv:
-	$(PYTHON) -m pip install -U pipenv
 
 .PHONY: snapshot-test
 snapshot-test:
 	@echo "ANALYSIS_REF is $(ANALYSIS_REF)"
 	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
 	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
-	$(PYTHON) -m pipenv run pytest -k analyses_snapshot_test -vv
+	uv run python -m pytest -k analyses_snapshot_test -vv
 
 .PHONY: snapshot-audit-test
 snapshot-audit-test:
 	@echo "validate that analysis outcome matches the test intention"
-	$(PYTHON) -m pipenv run pytest -k audit_snapshot_test -vv
+	uv run python -m pytest -k audit_snapshot_test -vv
 
 .PHONY: snapshot-test-update
 snapshot-test-update:
 	@echo "ANALYSIS_REF is $(ANALYSIS_REF)"
 	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
 	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
-	$(PYTHON) -m pipenv run pytest -k analyses_snapshot_test --snapshot-update
+	uv run python -m pytest -k analyses_snapshot_test --snapshot-update
 
 .PHONY: build-base-image
 build-base-image:
@@ -122,7 +103,7 @@ snapshot-test-local: build-base-image build-local
 	@echo "The image the test will use is $(ANALYZER_IMAGE_NAME):$(LOCAL_IMAGE_TAG)"
 	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
 	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
-	$(PYTHON) -m pipenv run pytest -k analyses_snapshot_test -vv
+	uv run python -m pytest -k analyses_snapshot_test -vv
 
 .PHONY: snapshot-test-update-local
 snapshot-test-update-local: ANALYSIS_REF=$(LOCAL_IMAGE_TAG)
@@ -132,15 +113,15 @@ snapshot-test-update-local: build-base-image build-local
 	@echo "The image the test will use is $(ANALYZER_IMAGE_NAME):$(LOCAL_IMAGE_TAG)"
 	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
 	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
-	$(PYTHON) -m pipenv run pytest -k analyses_snapshot_test --snapshot-update
+	uv run python -m pytest -k analyses_snapshot_test --snapshot-update
 
 .PHONY: generate-protocols
 generate-protocols:
-	$(PYTHON) -m pipenv run python -m automation.data.protocol_registry
+	uv run python -m automation.data.protocol_registry
 
 .PHONY: matrix
 matrix:
-	$(PYTHON) -m pipenv run python -m automation.analysis_matrix
+	uv run python -m automation.analysis_matrix
 
 # Tools for running the robot server in a container
 

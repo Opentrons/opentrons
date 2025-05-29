@@ -23,26 +23,14 @@ jobs:
     steps:
       - name: Checkout opentrons repo
         uses: 'actions/checkout@v4'
-
-      - name: Setup Python
-        uses: 'actions/setup-python@v5'
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.13.0'
-          cache: 'pipenv'
-          cache-dependency-path: analyses-snapshot-testing/Pipfile.lock
-      - name: Setup
-        id: install
+          enable-cache: true
+          cache-dependency-glob: "./analyses-snapshot-testing/uv.lock"
+      - name: Sync the project
         working-directory: ./analyses-snapshot-testing
-        run: make setup
-      - name: black-check
-        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
-        working-directory: ./analyses-snapshot-testing
-        run: make black-check
-      - name: ruff
-        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        run: make ci-setup
+      - name: ruff-check
         working-directory: ./analyses-snapshot-testing
         run: make ruff-check
-      - name: mypy
-        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
-        working-directory: ./analyses-snapshot-testing
-        run: make mypy
