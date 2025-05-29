@@ -240,6 +240,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
                 max-height: 15rem;
               `}
               autoPlay={true}
+              muted={true}
               loop={true}
               controls={false}
               aria-label={`${mount} ${

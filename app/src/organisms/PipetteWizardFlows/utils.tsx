@@ -88,6 +88,7 @@ export function getPipetteAnimations(
           : `12rem`};
       `}
       autoPlay={true}
+      muted={true}
       loop={true}
       controls={false}
       data-testid={
@@ -128,6 +129,7 @@ export function getPipetteAnimations96(
   }
   return (
     <video
+      muted={true}
       css={css`
         padding-top: ${SPACING.spacing4};
         max-width: 100%;
