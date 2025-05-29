@@ -17,9 +17,9 @@ export function forMoveLabware(
     initialDeckSlot
   )
   const index = fullStackFromLabwares.indexOf(labwareId)
-  const restOfStack = index !== -1 ? fullStackFromLabwares.slice(0, index) : []
+  const labwareToMove = fullStackFromLabwares.slice(0, index + 1) // includes labwareId you're moving
 
-  const newLocationStack = [labwareId]
+  const newLocationStack: string[] = []
   if (newLocation === 'offDeck' || newLocation === 'systemLocation') {
     newLocationStack.push(newLocation)
   } else if ('moduleId' in newLocation) {
@@ -32,17 +32,14 @@ export function forMoveLabware(
   } else if ('labwareId' in newLocation) {
     const labwareId = newLocation.labwareId
     const labwareIdStack = labware[labwareId].stack
-    newLocationStack.push(labwareId, ...labwareIdStack)
+    newLocationStack.push(...labwareIdStack)
   } else if ('addressableAreaName' in newLocation) {
     newLocationStack.push(newLocation.addressableAreaName)
   }
-
-  // robotState.labware[labwareId].stack = [...restOfStack, ...newLocationStack]
-  fullStackFromLabwares.forEach((id, i) => {
+  labwareToMove.forEach((id, i) => {
     if (labware[id] != null) {
-      const idStackSuffix =
-        index !== -1 ? fullStackFromLabwares.slice(0, i) : [] // part after this labware
-      robotState.labware[id].stack = [...idStackSuffix, ...newLocationStack]
+      const stackBelow = labwareToMove.slice(i + 1) // what's under labware you're moving
+      robotState.labware[id].stack = [id, ...stackBelow, ...newLocationStack]
     }
   })
 }

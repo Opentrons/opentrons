@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { reduce } from 'lodash'
 
@@ -249,8 +250,8 @@ const getLabwareInfo = (
   labwareId: string,
   robotType: RobotType
 ): { nickName: string; latestSlot: string } => {
-  const { modules } = activeDeckSetup
-  const stack = activeDeckSetup.labware[labwareId].stack
+  const { modules, labware } = activeDeckSetup
+  const stack = labware[labwareId].stack
   const latestSlot = resolveSlotLocation(modules, stack, robotType)
 
   return { nickName: nicknamesById[labwareId], latestSlot }
@@ -260,8 +261,10 @@ export const useLabwareDropdownOptions = (
   type: 'moveLabware' | 'labware',
   usingGripper: boolean
 ): DropdownOption[] => {
+  const { t } = useTranslation('protocol_steps')
   const labwareEntities = useSelector(getLabwareEntities)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+  const { labware: deckSetupLabware } = activeDeckSetup
   const nicknamesById = useSelector(getLabwareNicknamesById)
   const robotType = useSelector(getRobotType)
   const labwareOptions = reduce(
@@ -271,53 +274,52 @@ export const useLabwareDropdownOptions = (
       labwareEntity: LabwareEntity,
       labwareId: string
     ): DropdownOption[] => {
-      const deckSlot = getSlotInLocationStack(
-        activeDeckSetup.labware[labwareId].stack
-      )
+      const { def } = labwareEntity
+      const deckSlot = getSlotInLocationStack(deckSetupLabware[labwareId].stack)
       const fullStackFromLabwares = getFullStackFromLabwares(
-        activeDeckSetup.labware,
+        deckSetupLabware,
         deckSlot
       )
       const labwareStack = fullStackFromLabwares.filter(
         id =>
-          activeDeckSetup.labware[id] != null &&
-          !activeDeckSetup.labware[id].def.allowedRoles?.includes('adapter')
+          deckSetupLabware[id] != null &&
+          !deckSetupLabware[id].def.allowedRoles?.includes('adapter')
       )
-      const allowStacking =
-        activeDeckSetup.labware[labwareId].def.stackLimit != null &&
-        activeDeckSetup.labware[labwareId].def.stackLimit > 1
+      const labwareStackLength = labwareStack.length - 1
+      const allowStacking = def.stackLimit != null && def.stackLimit > 1
       const showStackOption = !usingGripper && type === 'moveLabware'
 
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
       const isBottomOfStack =
-        labwareStack[labwareStack.length - 1] === labwareId && allowStacking
+        labwareStack[labwareStackLength] === labwareId &&
+        allowStacking &&
+        labwareStack.length > 1
       const bottomOfStack = isBottomOfStack
-        ? labwareStack[labwareStack.length - 1]
+        ? labwareStack[labwareStackLength]
         : null
       const isLabwareInWasteChute = deckSlot === 'gripperWasteChute'
 
-      const isAdapter =
-        labwareEntity.def.allowedRoles?.includes('adapter') ?? false
+      const isAdapter = def.allowedRoles?.includes('adapter') ?? false
       const { nickName, latestSlot } = getLabwareInfo(
         nicknamesById,
         activeDeckSetup,
         labwareId,
         robotType
       )
-      const isTiprack = getIsTiprack(labwareEntity.def)
+      const isTiprack = getIsTiprack(def)
       const isOffDeck = deckSlot === 'offDeck'
 
+      //  show full stack option if moving labware manually
       const bottomOfStackOption: DropdownOption[] =
         showStackOption && bottomOfStack != null
           ? [
               {
-                name: `Stack of ${nickName}`,
+                name: t('unoccupied_stack', { name: nickName }),
                 value: bottomOfStack,
                 deckLabel: latestSlot,
               },
             ]
           : []
-      console.log('bottomOfStackOption',labwareStack,  bottomOfStackOption)
       const restOfOptions: DropdownOption[] =
         isAdapter ||
         isLabwareInWasteChute ||
@@ -369,9 +371,11 @@ export const getUnoccupiedStackOptions = (
       const { loadName } = labwareOnDeckDef.parameters
 
       const isCompatible = labwareCompatibleParentLabware?.includes(loadName)
-      const isNotCurrentLabware = labwareId !== labwareIdFromDropdown
+      const isNotCurrentLabwareStack = !fullStack.includes(
+        labwareIdFromDropdown
+      )
 
-      if (isTopOfStack && isCompatible && isNotCurrentLabware) {
+      if (isTopOfStack && isCompatible && isNotCurrentLabwareStack) {
         const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(
           deckSetupLabware,
           labwareOnDeck
