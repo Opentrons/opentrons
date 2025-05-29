@@ -50,7 +50,10 @@ export function MoveLabwareTools(props: StepFormProps): JSX.Element {
           <Divider marginY="0" />
         </>
       ) : null}
-      <MoveLabwareField {...propsForFields.labware} />
+      <MoveLabwareField
+        {...propsForFields.labware}
+        useGripper={propsForFields.useGripper.value === true}
+      />
       <Divider marginY="0" />
       <LabwareLocationField
         {...propsForFields.newLocation}
