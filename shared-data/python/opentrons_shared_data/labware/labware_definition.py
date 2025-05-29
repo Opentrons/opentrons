@@ -34,6 +34,7 @@ from .constants import (
 )
 
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
+RECURSIVE_SEARCH_VOLUME_TOLERANCE = 0.001
 
 
 _StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
@@ -186,29 +187,70 @@ class ConicalFrustum(BaseModel):
     xCount: _StrictNonNegativeInt = 1
     yCount: _StrictNonNegativeInt = 1
 
-    @cached_property
-    def height_to_volume_table(self) -> dict[float, float]:
-        """Return a lookup table of heights to volumes."""
-        # the accuracy of this method is approximately +- 10*dx so for dx of 0.001 we have a +- 0.01 ul
-        dx = 0.005
+    def height_from_volume_search(self, target_volume: float) -> float:
         total_height = self.topHeight - self.bottomHeight
-        y = 0.0
-        table: dict[float, float] = {}
-        # fill in the table
-        a = self.topDiameter / 2
-        b = self.bottomDiameter / 2
-        while y < total_height:
-            r_y = (y / total_height) * (a - b) + b
-            table[y] = (pi * y / 3) * (b**2 + b * r_y + r_y**2)
-            y = y + dx
+        max_height, min_height = total_height, 0.0
+        volume_at_max_height = self.volume_from_height_circular(
+            top_radius=self.topDiameter / 2,
+            bottom_radius=self.bottomDiameter / 2,
+            target_height=total_height,
+            total_height=total_height,
+        )
+        if target_volume == volume_at_max_height:
+            return max_height
+        volume_at_min_height = self.volume_from_height_circular(
+            top_radius=self.topDiameter / 2,
+            bottom_radius=self.bottomDiameter / 2,
+            target_height=0,
+            total_height=total_height,
+        )
+        if target_volume == volume_at_min_height:
+            return min_height
 
-        # we always want to include the volume at the max height
-        table[total_height] = (pi * total_height / 3) * (b**2 + a * b + a**2)
-        return table
+        y = total_height / 2
+        volume_at_y = self.volume_from_height_circular(
+            top_radius=self.topDiameter / 2,
+            bottom_radius=self.bottomDiameter / 2,
+            target_height=y,
+            total_height=total_height,
+        )
+        guesses = [
+            (volume_at_min_height, min_height),
+            (volume_at_max_height, max_height),
+        ]
+        while abs(volume_at_y - target_volume) > RECURSIVE_SEARCH_VOLUME_TOLERANCE:
+            max_height, max_volume = guesses[-1][1], guesses[-1][0]
+            min_height, min_volume = guesses[0][1], guesses[0][0]
 
-    @cached_property
-    def volume_to_height_table(self) -> dict[float, float]:
-        return dict((v, k) for k, v in self.height_to_volume_table.items())
+            # between volume_at_y and max value- undershot
+            if volume_at_y < target_volume < max_volume:
+                guesses = [(volume_at_y, y), (max_volume, max_height)]
+            # overshot
+            elif min_volume < target_volume < volume_at_y:
+                guesses = [(min_volume, min_height), (volume_at_y, y)]
+            y = (guesses[0][1] + guesses[1][1]) / 2
+
+            volume_at_y = self.volume_from_height_circular(
+                top_radius=self.topDiameter / 2,
+                bottom_radius=self.bottomDiameter / 2,
+                target_height=y,
+                total_height=total_height,
+            )
+        return y
+
+    def volume_from_height_circular(
+        self,
+        top_radius: float,
+        bottom_radius: float,
+        target_height: float,
+        total_height: float,
+    ) -> float:
+        r_y = (target_height / total_height) * (
+            top_radius - bottom_radius
+        ) + bottom_radius
+        return (pi * target_height / 3) * (
+            bottom_radius**2 + bottom_radius * r_y + r_y**2
+        )
 
     @cached_property
     def count(self) -> int:

@@ -36,6 +36,11 @@ export type OffsetSources =
   | typeof OFFSETS_SOURCE_INITIALIZING
   | typeof OFFSETS_PENDING_SELECTION
 
+export type ResolvedOffsetSource = Extract<
+  OffsetSources,
+  typeof OFFSETS_FROM_DATABASE | typeof OFFSETS_FROM_RUN_RECORD
+>
+
 export interface ConflictTimestampInfo {
   isInitialized: boolean
   timestamp: string | null

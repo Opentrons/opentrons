@@ -58,6 +58,20 @@
       "required": ["x", "y", "z"],
       "additionalProperties": false
     },
+    "tipPosition": {
+      "type": "object",
+      "description": "Positional reference and relative offset for where a tip should go.",
+      "properties": {
+        "positionReference": {
+          "$ref": "#/definitions/positionReference"
+        },
+        "offset": {
+          "$ref": "#/definitions/coordinate"
+        }
+      },
+      "required": ["positionReference", "offset"],
+      "additionalProperties": false
+    },
     "touchTip": {
       "type": "object",
       "description": "Shared properties for the touch-tip function.",
@@ -73,7 +87,7 @@
               "type": "number",
               "description": "Offset from the top of the well for touch-tip, in millimeters."
             },
-            "mmToEdge": {
+            "mmFromEdge": {
               "type": "number",
               "description": "Offset away from the the well edge, in millimeters."
             },
@@ -82,7 +96,7 @@
               "description": "Touch-tip speed, in millimeters per second."
             }
           },
-          "required": ["zOffset", "mmToEdge", "speed"],
+          "required": ["zOffset", "mmFromEdge", "speed"],
           "additionalProperties": false
         }
       },
@@ -214,11 +228,8 @@
       "type": "object",
       "description": "Shared properties for the submerge function before aspiration or dispense.",
       "properties": {
-        "positionReference": {
-          "$ref": "#/definitions/positionReference"
-        },
-        "offset": {
-          "$ref": "#/definitions/coordinate"
+        "startPosition": {
+          "$ref": "#/definitions/tipPosition"
         },
         "speed": {
           "$ref": "#/definitions/positiveNumber",
@@ -228,18 +239,15 @@
           "$ref": "#/definitions/delay"
         }
       },
-      "required": ["positionReference", "offset", "speed", "delay"],
+      "required": ["startPosition", "speed", "delay"],
       "additionalProperties": false
     },
     "retractAspirate": {
       "type": "object",
       "description": "Shared properties for the retract function after aspiration or dispense.",
       "properties": {
-        "positionReference": {
-          "$ref": "#/definitions/positionReference"
-        },
-        "offset": {
-          "$ref": "#/definitions/coordinate"
+        "endPosition": {
+          "$ref": "#/definitions/tipPosition"
         },
         "speed": {
           "$ref": "#/definitions/positiveNumber",
@@ -255,24 +263,15 @@
           "$ref": "#/definitions/delay"
         }
       },
-      "required": [
-        "positionReference",
-        "offset",
-        "speed",
-        "airGapByVolume",
-        "delay"
-      ],
+      "required": ["endPosition", "speed", "airGapByVolume", "delay"],
       "additionalProperties": false
     },
     "retractDispense": {
       "type": "object",
       "description": "Shared properties for the retract function after aspiration or dispense.",
       "properties": {
-        "positionReference": {
-          "$ref": "#/definitions/positionReference"
-        },
-        "offset": {
-          "$ref": "#/definitions/coordinate"
+        "endPosition": {
+          "$ref": "#/definitions/tipPosition"
         },
         "speed": {
           "$ref": "#/definitions/positiveNumber",
@@ -292,8 +291,7 @@
         }
       },
       "required": [
-        "positionReference",
-        "offset",
+        "endPosition",
         "speed",
         "airGapByVolume",
         "blowout",
@@ -312,11 +310,8 @@
         "retract": {
           "$ref": "#/definitions/retractAspirate"
         },
-        "positionReference": {
-          "$ref": "#/definitions/positionReference"
-        },
-        "offset": {
-          "$ref": "#/definitions/coordinate"
+        "aspiratePosition": {
+          "$ref": "#/definitions/tipPosition"
         },
         "flowRateByVolume": {
           "$ref": "#/definitions/flowRateByVolume"
@@ -338,8 +333,7 @@
       "required": [
         "submerge",
         "retract",
-        "positionReference",
-        "offset",
+        "aspiratePosition",
         "flowRateByVolume",
         "correctionByVolume",
         "preWet",
@@ -358,11 +352,8 @@
         "retract": {
           "$ref": "#/definitions/retractDispense"
         },
-        "positionReference": {
-          "$ref": "#/definitions/positionReference"
-        },
-        "offset": {
-          "$ref": "#/definitions/coordinate"
+        "dispensePosition": {
+          "$ref": "#/definitions/tipPosition"
         },
         "flowRateByVolume": {
           "$ref": "#/definitions/flowRateByVolume"
@@ -383,8 +374,7 @@
       "required": [
         "submerge",
         "retract",
-        "positionReference",
-        "offset",
+        "dispensePosition",
         "flowRateByVolume",
         "correctionByVolume",
         "mix",
@@ -403,11 +393,8 @@
         "retract": {
           "$ref": "#/definitions/retractDispense"
         },
-        "positionReference": {
-          "$ref": "#/definitions/positionReference"
-        },
-        "offset": {
-          "$ref": "#/definitions/coordinate"
+        "dispensePosition": {
+          "$ref": "#/definitions/tipPosition"
         },
         "flowRateByVolume": {
           "$ref": "#/definitions/flowRateByVolume"
@@ -428,8 +415,7 @@
       "required": [
         "submerge",
         "retract",
-        "positionReference",
-        "offset",
+        "dispensePosition",
         "flowRateByVolume",
         "correctionByVolume",
         "conditioningByVolume",
@@ -456,6 +442,11 @@
       "description": "Which schema version a liquid class is using",
       "type": "number",
       "enum": [1]
+    },
+    "version": {
+      "description": "Version of the liquid class definition itself (eg water v1/v2/v3). An incrementing integer",
+      "type": "integer",
+      "minimum": 1
     },
     "namespace": {
       "$ref": "#/definitions/safeString"
@@ -506,6 +497,7 @@
     "displayName",
     "description",
     "schemaVersion",
+    "version",
     "namespace",
     "byPipette"
   ],

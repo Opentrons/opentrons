@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Dict, Union, TYPE_CHECKING
+from typing import Optional, Dict, Union, TYPE_CHECKING, Tuple
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
@@ -63,6 +63,20 @@ class LiquidClass:
             _by_pipette_setting=by_pipette_settings,
         )
 
+    @classmethod
+    def create_from(
+        cls,
+        name: str,
+        display_name: str,
+        by_pipette_setting: Dict[str, Dict[str, TransferProperties]],
+    ) -> "LiquidClass":
+        """Create a liquid class from the passed in args."""
+        return cls(
+            _name=name,
+            _display_name=display_name,
+            _by_pipette_setting=by_pipette_setting,
+        )
+
     @property
     def name(self) -> str:
         return self._name
@@ -71,10 +85,54 @@ class LiquidClass:
     def display_name(self) -> str:
         return self._display_name
 
+    def update_for(
+        self,
+        pipette: Union[str, InstrumentContext],
+        tip_rack: Union[str, Labware],
+        transfer_properties: TransferProperties,
+    ) -> None:
+        """Update the transfer properties for the given pipette and tip combo.
+
+        If an entry does not exist, it will be created.
+        """
+        pipette_name, tiprack_uri = self._get_pipette_and_tiprack_names(
+            pipette, tip_rack
+        )
+        try:
+            self._by_pipette_setting[pipette_name].update(
+                {tiprack_uri: transfer_properties}
+            )
+        except KeyError:
+            self._by_pipette_setting[pipette_name] = {tiprack_uri: transfer_properties}
+
     def get_for(
         self, pipette: Union[str, InstrumentContext], tip_rack: Union[str, Labware]
     ) -> TransferProperties:
         """Get liquid class transfer properties for the specified pipette and tip."""
+        pipette_name, tiprack_uri = self._get_pipette_and_tiprack_names(
+            pipette, tip_rack
+        )
+
+        try:
+            settings_for_pipette = self._by_pipette_setting[pipette_name]
+        except KeyError:
+            raise NoLiquidClassPropertyError(
+                f"No properties found for {pipette_name} in {self._name} liquid class"
+            )
+        try:
+            transfer_properties = settings_for_pipette[tiprack_uri]
+        except KeyError:
+            raise NoLiquidClassPropertyError(
+                f"No properties found for {tiprack_uri} for {pipette_name} in {self._name} liquid class"
+            )
+        return transfer_properties
+
+    @staticmethod
+    def _get_pipette_and_tiprack_names(
+        pipette: Union[str, InstrumentContext],
+        tip_rack: Union[str, Labware],
+    ) -> Tuple[str, str]:
+        """Return the pipette and tip rack name strings from the given pipette and tip rack."""
         from . import InstrumentContext, Labware
 
         if isinstance(pipette, InstrumentContext):
@@ -96,17 +154,4 @@ class LiquidClass:
                 f"{tip_rack} should either be a tiprack Labware object"
                 f" or a tiprack URI string."
             )
-
-        try:
-            settings_for_pipette = self._by_pipette_setting[pipette_name]
-        except KeyError:
-            raise NoLiquidClassPropertyError(
-                f"No properties found for {pipette_name} in {self._name} liquid class"
-            )
-        try:
-            transfer_properties = settings_for_pipette[tiprack_uri]
-        except KeyError:
-            raise NoLiquidClassPropertyError(
-                f"No properties found for {tiprack_uri} for {pipette_name} in {self._name} liquid class"
-            )
-        return transfer_properties
+        return pipette_name, tiprack_uri

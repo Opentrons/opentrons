@@ -230,7 +230,7 @@ class AbstractProtocol(
     def get_last_location(
         self,
         mount: Optional[Mount] = None,
-    ) -> Optional[Location]:
+    ) -> Optional[Union[Location, TrashBin, WasteChute]]:
         ...
 
     @abstractmethod
@@ -311,7 +311,7 @@ class AbstractProtocol(
         """Define a liquid to load into a well."""
 
     @abstractmethod
-    def define_liquid_class(self, name: str) -> LiquidClass:
+    def define_liquid_class(self, name: str, version: int) -> LiquidClass:
         """Define a liquid class for use in transfer functions."""
 
     @abstractmethod
