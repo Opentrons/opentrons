@@ -3,14 +3,20 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   FixtureOption,
   Flex,
+  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  ListItem,
   Modal,
   SPACING,
+  StyledText,
+  TertiaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -327,7 +333,7 @@ export function AddFixtureModal({
           <FixtureOption
             key="fixturesOption"
             optionName="Fixtures"
-            buttonText={t('select_options')}
+            buttonText={t('add')}
             onClickHandler={() => {
               setOptionStage('fixtureOptions')
             }}
@@ -337,7 +343,7 @@ export function AddFixtureModal({
         <FixtureOption
           key="modulesOption"
           optionName="Modules"
-          buttonText={t('select_options')}
+          buttonText={t('add')}
           onClickHandler={() => {
             setOptionStage('moduleOptions')
           }}

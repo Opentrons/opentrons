@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 
+import { ListItem } from '../..'
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
@@ -34,13 +35,13 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
       <StyledText oddStyle="bodyTextRegular">{buttonText}</StyledText>
     </FixtureButtonODD>
   ) : (
-    <Flex
+    <ListItem
+      type="default"
+      gridGap={SPACING.spacing24} // why is this not working
+      css="padding: 16px"
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-      backgroundColor={COLORS.grey20}
-      borderRadius={BORDERS.borderRadius4}
     >
       <StyledText desktopStyle="bodyDefaultSemiBold">{optionName}</StyledText>
       <TertiaryButton
@@ -50,7 +51,7 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
       >
         {buttonText}
       </TertiaryButton>
-    </Flex>
+    </ListItem>
   )
 }
 
