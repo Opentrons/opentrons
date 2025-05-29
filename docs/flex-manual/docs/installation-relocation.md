@@ -1,108 +1,47 @@
 # Installation and Relocation
 
-This chapter describes how to prepare your lab for Opentrons Flex, how
-to set up the robot, and how to move it if necessary. Before taking
-delivery of your Flex, make sure that your lab or facility meets all the
-criteria in the Safety and Operating Requirements section. When it's
-time to get your Flex up and running, follow the detailed instructions
-in the Unboxing, First Run, and Instrument Installation and Calibration
-sections, or use the Opentrons . And if you ever need to move your Flex
-to a new location, near or far, follow the steps in the Relocation
-section.
+This chapter describes how to prepare your lab for Opentrons Flex, how to set up the robot, and how to move it if necessary. Before taking delivery of your Flex, make sure that your lab or facility meets all the criteria in the Safety and Operating Requirements section. When it's time to get your Flex up and running, follow the detailed instructions in the Unboxing, First Run, and Instrument Installation and Calibration sections, or use the Opentrons [On-Site Installation service](https://shop.opentrons.com/onsite-support-set-up/). And if you ever need to move your Flex to a new location, near or far, follow the steps in the Relocation section.
 
-1.  **Safety and operating requirements**
+## Safety and operating requirements
 
 ### Where to place Opentrons Flex
 
-Space is a valuable commodity in almost every lab. Your Flex is going to
-need some---but not too much, as it's designed to fit on half of a
-standard lab bench. Make sure that you have a space that meets the
-following criteria.
+Space is a valuable commodity in almost every lab. Your Flex is going to need some—but not too much, as it's designed to fit on half of a standard lab bench. Make sure that you have a space that meets the following criteria.
 
-- **Bench surface:** Stationary, sturdy, level, water-resistant surface.
-  Tables or benches with wheels (even locking wheels) are not
-  recommended. Flex moves quickly and has a lot of mass, which can shake
-  or imbalance lightweight or movable tables.
+- **Bench surface:** Stationary, sturdy, level, water-resistant surface. Tables or benches with wheels (even locking wheels) are not recommended. Flex moves quickly and has a lot of mass, which can shake or imbalance lightweight or movable tables.
 
-- **Weight bearing:** The robot alone weighs 88.5 kg (195 lb) and should
-  only be lifted by two people working together. Place the robot on a
-  surface that can readily support its weight plus the weight of any
-  modules, labware, liquids, or other lab equipment to be used in your
-  applications.
+- **Weight bearing:** The robot alone weighs 88.5 kg (195 lb) and should only be lifted by two people working together. Place the robot on a surface that can readily support its weight plus the weight of any modules, labware, liquids, or other lab equipment to be used in your applications.
 
-- **Operating space:** The robot's base dimensions are 87 cm W x 69 cm D
-  x 84 cm H (about 34" x 27" x 33"). Flex needs 20 cm (8") of side and
-  back clearance for cables, USB connections, and to dissipate exhaust
-  from modules that heat and cool.
+- **Operating space:** The robot's base dimensions are 87 cm W x 69 cm D x 84 cm H (about 34" x 27" x 33"). Flex needs 20 cm (8") of side and back clearance for cables, USB connections, and to dissipate exhaust from modules that heat and cool.
 
-**Warning:** *Do not* position the sides or back of the Flex flush
-against a wall.
+!!! warning
+    *Do not* position the sides or back of the Flex flush against a wall.
 
-![image](f1be3f18339c80edb6ff7a8ae1ec700988e4ce83.png){width="10.270833333333334in"
-height="8.09375in"}**84 cm**
-
-**33**"
-
-**87 cm**
-
-**34**"
-
-#### 69 cm
-
-**27**"
-
+![Opentrons Flex with arrows labeling width, height, and depth](images/flex-dimensions.png "Opentrons Flex base dimensions")
 Opentrons Flex base dimensions.
 
-![image](475bd92dd1af0a24bc08646b1aa4ff739e07a09e.png){width="9.583333333333334in"
-height="7.614583333333333in"}**20 cm**
-
-**8**"
-
-**20 cm**
-
-**8**"
-
-**20 cm**
-
-**8**"
-
+![Top view of Opentrons Flex, showing minimum side and back clearance.](images/flex-clearance.png "Flex minimum clearance")
 Top view of Opentrons Flex, showing minimum side and back clearance.
 
 ### Power consumption
 
-Opentrons Flex should be connected to a wall outlet at or near the bench
-location where you install it. Only connect Flex to circuits that can
-accommodate its peak power draw:
+Opentrons Flex should be connected to a wall outlet at or near the bench location where you install it. Only connect Flex to circuits that can accommodate its peak power draw:
 
 - **Input power:** 36 VDC, 6.1 A
 
-- **Idle consumption:** 30--40 W
+- **Idle consumption:** 30–40 W
 
-- **Typical consumption:** 40--120 W
+- **Typical consumption:** 40–120 W
 
 - **Peak consumption:** Up to 250 W
 
-**Power Consumption Type Description**
+| Power Consumption Type | Description |
+| :--------------------- | :---------- |
+| Idle                   | The amount of power the robot uses while on and inactive (not running a protocol). Flex does not have a low-power sleep or standby mode.                                                                                                                               |
+| Typical                | The average power the robot and attached instruments use when running a protocol. Different protocols and instruments can cause variations within the typical power consumption range. This range does not account for separately powered modules used in protocols. |
+| Peak                   | The highest instantaneous power draw. For example, during fast gantry acceleration, or other high-energy movements, the robot can draw more power and exceed typical power consumption values. The peak consumption value may also be useful for estimating current handling capacity (and circuit breaker selection) for an AC circuit that powers multiple robots. |
 
-#### Idle
-
-The amount of power the robot uses while on and inactive (not running a
-protocol). Flex does not have a low-power sleep or standby mode.
-
-**Typical** The average power the robot and attached instruments use
-when running a protocol. Different protocols and instruments can cause
-variations within the typical power consumption range. This range does
-not account for separately powered modules used in protocols.
-
-**Peak** The highest instantaneous power draw. For example, during fast
-gantry acceleration, or other high-energy movements, the robot can draw
-more power and exceed typical power consumption values. The peak
-consumption value may also be useful for estimating current handling
-capacity (and circuit breaker selection) for an AC circuit that powers
-multiple robots.
-
-Along with the conditions described above, total power consumption also
-depends on:
+Along with the conditions described above, total power consumption also depends on:
 
 - The amount and type of movement executed during a protocol.
 
@@ -112,187 +51,156 @@ depends on:
 
 - How many instruments are attached.
 
-**Note:** Always account for other electronics that consume power on the
-same circuit, including Flex modules with their own power supplies. For
-example, the Thermocycler Module has a peak power consumption (630 W)
-that is much greater than the Flex robot itself. If necessary, consult
-the manager of your facility to make sure it meets your equipment's peak
-power requirements.
+!!! note
+    Always account for other electronics that consume power on the same circuit, including Flex modules with their own power supplies. For example, the Thermocycler Module has a peak power consumption (630 W) that is much greater than the Flex robot itself. If necessary, consult the manager of your facility to make sure it meets your equipment's peak power requirements.
 
 ### Environmental conditions
 
-Environmental conditions for recommended use, acceptable use, and
-storage vary:
+Environmental conditions for recommended use, acceptable use, and storage vary:
 
-  ------------------------- -------------------------------------- ------------------------------------- --------------------------------
-                            **Recommended for system operation**   **Acceptable for system operation**   **Storage and transportation**
-  **Ambient temperature**   +20 to +25 °C                          +2 to +40 °C                          −10 to +60 °C
-  **Relative humidity**     40--60%,                               30--80%,                              10--85%,
-                            non-condensing                         non-condensing                        non-condensing
-                                                                   (below 30 °C)                         (below 30 °C)
-  **Altitude**              Approximately 500 m                    Up to 2000 m                          Up to 2000 m
-                            above sea level                        above sea level                       above sea level
-  ------------------------- -------------------------------------- ------------------------------------- --------------------------------
+|                 | Recommended for system operation | Acceptable for system operation | Storage and transportation |
+| :---------------------- | :----------------------------------- | :---------------------------------- | :----------------------------- |
+| **Ambient temperature** | +20 to +25 °C                        | +2 to +40 °C                        | −10 to +60 °C                  |
+| **Relative humidity** | 40–60%, non-condensing            | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
+| **Altitude** | Approximately 500 m above sea level | Up to 2000 m above sea level    | Up to 2000 m above sea level |
 
-Opentrons has validated the performance of Opentrons Flex in the
-conditions recommended for system operation, and operation in those
-conditions should provide optimal results. Flex is safe to use in
-conditions acceptable for system operation, but results may vary. Do not
-power on or use Flex in conditions outside
-
-of those bounds. The storage and transportation conditions only apply
-when the robot is completely disconnected from power and other
-equipment.
+Opentrons has validated the performance of Opentrons Flex in the conditions recommended for system operation, and operation in those conditions should provide optimal results. Flex is safe to use in conditions acceptable for system operation, but results may vary. Do not power on or use Flex in conditions outside of those bounds. The storage and transportation conditions only apply when the robot is completely disconnected from power and other equipment.
 
 ### Network ports
 
-Flex requires an internet connection for initial setup. After setup,
-it's possible to run Flex without a network connection, although some
-features of Flex and the Opentrons App expect local area network access
-over certain ports.
+Flex requires an internet connection for initial setup. After setup, it's possible to run Flex without a network connection, although some features of Flex and the Opentrons App expect local area network access over certain ports.
 
-Network ports are software-defined connections between devices on a
-network. Each numbered port handles data for a specific network protocol
-or service. Flex uses these ports for services like software updates,
-file transfers, or to accept command-line instructions from a terminal.
+Network ports are software-defined connections between devices on a network. Each numbered port handles data for a specific network protocol or service. Flex uses these ports for services like software updates, file transfers, or to accept command-line instructions from a terminal.
 
-The following table lists the network ports used by Flex, along with
-their function. All listed ports use TCP, except for port 5353, which
-uses UDP.
+The following table lists the network ports used by Flex, along with their function. All listed ports use TCP, except for port 5353, which uses UDP.
 
-**Port number Description**
-
-**22**
-
-**80**
-
-**443**
-
-Used to make a Secure Shell (SSH) connection. See
-
-Used for HTTP traffic.
-
-Used for HTTPS traffic. The Opentrons App uses this port to check for
-and download software updates.
-
-**1883** Used for . Flex sends realtime notifications to the Opentrons
-App using MQTT. This reduces network traffic and shortens delays within
-the app, compared to polling.
-
-**5353** Used for Multicast DNS (). The Opentrons App relies on mDNS to
-find Flex robots on a network.
-
-**31950** Used by the robot server for .
-
-**48888** Used for the built-in , which you can connect to with your web
-browser.
+| Port number | Description |
+| :---------- | :---------- |
+| **22** | Used to make a Secure Shell (SSH) connection. See [Command-line operation over SSH][command-line-operation-over-ssh].
+| **80** | Used for HTTP traffic. |
+| **443** | Used for HTTPS traffic. The Opentrons App uses this port to check for and download software updates. |
+| **1883** | Used for [MQTT messages](https://mqtt.org). Flex sends realtime notifications to the Opentrons App using MQTT. This reduces network traffic and shortens delays within the app, compared to polling. |
+| **5353** | Used for Multicast DNS ([mDNS or zero-configuration networking](https://en.wikipedia.org/wiki/Zero-configuration_networking)). The Opentrons App relies on mDNS to find Flex robots on a network. |
+| **31950** | Used by the robot server for [HTTP API commands](https://docs.opentrons.com/http/api_reference.html). |
+| **48888** | Used for the built-in [Jupyter Notebook server][jupyter-notebook], which you can connect to with your web browser. |
 
 If you're having trouble with these services, consult your facility's IT
 documentation or contact your IT manager for assistance with your
 network setup.
 
-1.  **Unboxing**
+## Unboxing
 
-Congratulations! Your Opentrons Flex has arrived and you've prepared a
-space for it in your lab. Let's open that monster crate, remove the
-robot, and prepare it for operation. The information in this section
-provides a parts list and instructions that walk you through the steps
-required to get the Flex unboxed, set up, and ready for use. We've
-divided the setup procedure into three parts:
+Congratulations! Your Opentrons Flex has arrived and you've prepared a space for it in your lab. Let's open that monster crate, remove the robot, and prepare it for operation. The information in this section provides a parts list and instructions that walk you through the steps required to get the Flex unboxed, set up, and ready for use. We've divided the setup procedure into three parts:
 
 - Part 1 covers disassembling the crate.
 
-- Part 2 covers detaching the Flex from the crate and moving it to a
-  final assembly location.
+- Part 2 covers detaching the Flex from the crate and moving it to a final assembly location.
 
-- Part 3 covers final assembly and powering on the robot for the first
-  time.
+- Part 3 covers final assembly and powering on the robot for the first time.
 
-### Efort and time required
+### Effort and time required
 
-You'll want to ask a lab partner to assist with the unboxing, lifting,
-moving, and assembly process. You'll need to budget about 30 minutes to
-an hour for this effort.
+You'll want to ask a lab partner to assist with the unboxing, lifting, moving, and assembly process. You'll need to budget about 30 minutes to an hour for this effort.
 
-**Note:** The Flex requires two people to lift it properly. Also,
-lifting and carrying the Flex by its handles is the best way to move the
-robot.
+!!! note
+    The Flex requires two people to lift it properly. Also, lifting and carrying the Flex by its handles is the best way to move the robot.
 
 ### Crate and packing material
 
-Unpacking a Flex gives you an awesome robot, but you're also left with
-several large crate panels along with assorted shipping components and
-padding. While you could discard this material, we encourage you to keep
-these items if storage space is available. The packaging is reusable,
-which helps prepare your Flex for shipping if you ever need to send it
-somewhere else (e.g., to a conference or a new facility) in the future.
+Unpacking a Flex gives you an awesome robot, but you're also left with several large crate panels along with assorted shipping components and padding. While you could discard this material, we encourage you to keep these items if storage space is available. The packaging is reusable, which helps prepare your Flex for shipping if you ever need to send it somewhere else (e.g., to a conference or a new facility) in the future.
 
 ### Product elements
 
-![image](0cffd1164fa3bfe8fd383b2d461f41fa5c801bed.png){width="3.0833333333333335in"
-height="3.03125in"}
+The Flex ships with the components listed below. Pipettes, the gripper, and modules come in separate packaging from the main Flex crate, even if you purchased them together as a workstation.
 
-The Flex ships with the components listed below. Pipettes, the gripper,
-and modules come in separate packaging from the main Flex crate, even if
-you purchased them together as a workstation.
+<div class="parts-list" markdown>
 
-![image](241cd52e443cd79b5e012914bcce2a503277cec7.png){width="1.15625in"
-height="0.5in"}![image](577351e565a17a044fd1fad69c7acad0ad113374.png){width="0.34375in"
-height="0.2708333333333333in"}![image](f62f03cc5f996db57b31c770c92d3b2b7917cc39.png){width="1.0625in"
-height="0.5208333333333334in"}![image](ace2798b8ab39698986dc816827848a288edd653.png){width="1.0416666666666667in"
-height="0.5208333333333334in"}
+<figure markdown>
+![Opentrons Flex robot](images/parts-list/flex-robot.svg "Opentrons Flex robot")
+<figcaption>(1) Opentrons Flex robot</figcaption>
+</figure>
 
-![image](ff4ea41c4a3fb7ab4d2e7a8be37f21ac605cf559.png){width="1.28125in"
-height="0.6145833333333334in"}**(1) USB cable**
+<figure markdown>
+![USB cable](images/parts-list/usb-cable.svg "USB cable")
+<figcaption>(1) USB cable</figcaption>
+</figure>
 
-**(1) Opentrons Flex robot**
+<figure markdown>
+![Ethernet cable](images/parts-list/ethernet-cable.svg "Ethernet cable")
+<figcaption>(1) Ethernet cable</figcaption>
+</figure>
 
-![image](997bfc502a3247f5bc0dbc81164168e65ebdcff5.png){width="1.2604166666666667in"
-height="0.625in"}
+<figure markdown>
+![Power cable](images/parts-list/power-cable.svg "Power cable")
+<figcaption>(1) Power cable</figcaption>
+</figure>
 
-#### (1) Ethernet cable
+<figure markdown>
+![L-keys](images/parts-list/l-keys.svg "L-keys")
+<figcaption>(5) L-keys<br />(12 mm hex, 1.5 mm hex,<br />2.5 mm hex, 3 mm hex,<br />T10 Torx)</figcaption>
+</figure>
 
-**(1) Power cable ^(5)^^\ ^^L-^^keys^**
+<figure markdown>
+![Emergency Stop Pendant](images/parts-list/emergency-stop.svg "Emergency Stop Pendant")
+<figcaption>(1) Emergency Stop Pendant</figcaption>
+</figure>
 
-(12 mm hex, 1.5 mm hex,
+<figure markdown>
+![Deck slot with labware clips](images/parts-list/deck-plate.svg "Deck slot with labware clips")
+<figcaption>(1) Deck slot with labware clips</figcaption>
+</figure>
 
-2.5 mm hex, 3 mm hex, T10 Torx)
+<figure markdown>
+![Spare labware clips](images/parts-list/labware-clips.svg "Spare labware clips")
+<figcaption>(4) Spare labware clips</figcaption>
+</figure>
 
-^\ \ ^![image](7284b37596adb72ccfabfd83f519c17a5652ff97.png){width="2.4583333333333335in"
-height="1.5520833333333333in"} ^\ \ \ ^
+<figure markdown>
+![Pipette calibration probe](images/parts-list/calibration-probe.svg "Pipette calibration probe")
+<figcaption>(1) Pipette calibration probe</figcaption>
+</figure>
 
-**^(1)^^\ ^^Emergency^^\ ^^Stop^^\ ^^Pendant^^\ ^(1) Deck slot with
-labware clips (4) Spare labware clips**
+<figure markdown>
+![Carrying handles and caps](images/parts-list/carrying-handles.svg "Carrying handles and caps")
+<figcaption>(4) Carrying handles and caps</figcaption>
+</figure>
 
-![image](c9a2b4fa19e83af6ea12dea524760e644c9f48df.png){width="0.4166666666666667in"
-height="1.3125in"}
+<figure markdown>
+![Top window panel](images/parts-list/top-window-panel.svg "Top window panel")
+<figcaption>(1) Top window panel</figcaption>
+</figure>
 
-![image](db9c2f8e8342fb24379d994a40b618c593fb5b26.png){width="2.0208333333333335in"
-height="0.7083333333333334in"}
+<figure markdown>
+![Side window panels](images/parts-list/side-window-panels.svg "Side window panels")
+<figcaption>(4) Side window panels</figcaption>
+</figure>
 
-**(1) Pipette calibration probe (4) Carrying handles and caps (1) Top
-window panel**
+<figure markdown>
+![2.5 mm hex screwdriver](images/parts-list/2-5-mm-hex-screwdriver.svg "2.5 mm hex screwdriver")
+<figcaption>(1) 2.5 mm hex screwdriver</figcaption>
+</figure>
 
-**![image](f0e41834a827706fb82eb5fc228f56061f51ff1c.png){width="0.2916666666666667in"
-height="0.2708333333333333in"}![image](39f69087f5e981e2a1dbf2237be7b3dca5e55179.png){width="0.19791666666666666in"
-height="0.28125in"}![image](ca82dc2a5fbb8afa9087a933fcefa58e8eeb44dc.png){width="0.3229166666666667in"
-height="0.19791666666666666in"}**
+<figure markdown>
+![19 mm wrench](images/parts-list/19-mm-wrench.svg "19 mm wrench")
+<figcaption>(1) 19 mm wrench</figcaption>
+</figure>
 
-**(4) Side window panels (1) 2.5 mm hex screwdriver (1) 19 mm wrench**
+<figure markdown>
+![Window screws](images/parts-list/window-screw.svg "Window screws")
+<figcaption>(16 + spares) Window screws<br />(M4x8 mm flat head)</figcaption>
+</figure>
 
-![image](5d8d3e6ff6c2efc053c729c80a1cec926feea622.png){width="0.375in"
-height="0.46875in"}
+<figure markdown>
+![Spare deck slot screws](images/parts-list/deck-plate-screw.svg "Spare deck slot screws")
+<figcaption>(10) Spare deck slot screws<br />(M4x10 mm socket head)</figcaption>
+</figure>
 
-![image](a966b4a1ddad021172ba94f24144557a0094f472.png){width="0.3020833333333333in"
-height="0.6145833333333334in"}
+<figure markdown>
+![Spare deck clip screws](images/parts-list/deck-clip-screw.svg "Spare deck clip screws")
+<figcaption>(12) Spare deck clip screws<br />(M3x6 mm socket head)</figcaption>
+</figure>
 
-![image](cece0b9e4b0bb6338d3599738dfc3bc27a6eec2d.png){width="0.34375in"
-height="0.6145833333333334in"}
-
-  --------------------------------- --------------------------------- ---------------------------------
-  **(16 + spares) Window screws**   **(10) Spare deck slot screws**   **(12) Spare deck clip screws**
-  (M4x8 mm flat head)               (M4x10 mm socket head)            (M3x6 mm socket head)
-  --------------------------------- --------------------------------- ---------------------------------
+</div>
 
 ### Part 1: Remove the crate
 
