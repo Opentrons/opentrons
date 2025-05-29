@@ -58,6 +58,8 @@ from hardware_testing.opentrons_api.types import (
     Axis,
 )
 
+from opentrons.config.defaults_ot3 import DEFAULT_LIQUID_PROBE_SETTINGS
+
 DEFAULT_SLOT_TIP_RACK_1000 = 7
 DEFAULT_SLOT_TIP_RACK_200 = 4
 DEFAULT_SLOT_TIP_RACK_50 = 1
@@ -1717,20 +1719,21 @@ async def _test_liquid_probe(
             await _move_to_above_plate_liquid(api, mount, probe, height_mm=hover_mm)
             start_pos = await api.gantry_position(mount)
             probe_cfg = PROBE_SETTINGS[pip_vol][tip_volume]
-            probe_settings = LiquidProbeSettings(
-                starting_mount_height=start_pos.z,
-                max_z_distance=max_z_distance_machine_coords,  # FIXME: deck coords
-                min_z_distance=0,  # FIXME: remove
-                mount_speed=probe_cfg.mount_speed,
-                plunger_speed=probe_cfg.plunger_speed,
-                sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
-                expected_liquid_height=0,  # FIXME: remove
-                log_pressure=False,  # FIXME: remove
-                aspirate_while_sensing=False,  # FIXME: I heard this doesn't work
-                auto_zero_sensor=True,  # TODO: when would we want to adjust this?
-                num_baseline_reads=10,  # TODO: when would we want to adjust this?
-                data_file="",  # FIXME: remove
-            )
+            # probe_settings = LiquidProbeSettings(
+            #     starting_mount_height=start_pos.z,
+            #     max_z_distance=max_z_distance_machine_coords,  # FIXME: deck coords
+            #     min_z_distance=0,  # FIXME: remove
+            #     mount_speed=probe_cfg.mount_speed,
+            #     plunger_speed=probe_cfg.plunger_speed,
+            #     sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
+            #     expected_liquid_height=0,  # FIXME: remove
+            #     log_pressure=False,  # FIXME: remove
+            #     aspirate_while_sensing=False,  # FIXME: I heard this doesn't work
+            #     auto_zero_sensor=True,  # TODO: when would we want to adjust this?
+            #     num_baseline_reads=10,  # TODO: when would we want to adjust this?
+            #     data_file="",  # FIXME: remove
+            # )
+            probe_settings = DEFAULT_LIQUID_PROBE_SETTINGS
             try:
                 end_z = await api.liquid_probe(mount, probe_settings, probe=probe)
             except Exception as eee:
