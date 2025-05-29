@@ -12,6 +12,13 @@ export const maskToInteger = (rawValue: unknown): string => {
       : String(rawValue)
   return rawNumericValue
 }
+export const maskToPositiveInteger = (rawValue: unknown): string => {
+  const rawNumericValue =
+    typeof rawValue === 'string'
+      ? rawValue.replace(/\D/g, '')
+      : String(rawValue)
+  return rawNumericValue
+}
 export const maskToTime = (rawValue: unknown): string => {
   if (rawValue == null) {
     return ''
