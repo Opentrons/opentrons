@@ -157,7 +157,7 @@ export function useAspirateSettingsConfig({
       value:
         state.airGapAspirate !== undefined
           ? t('air_gap_value', { volume: state.airGapAspirate })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_AIR_GAP)

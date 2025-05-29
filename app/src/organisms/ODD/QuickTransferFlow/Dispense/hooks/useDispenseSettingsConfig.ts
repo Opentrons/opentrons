@@ -169,7 +169,7 @@ export function useDispenseSettingsConfig({
       value:
         state.airGapDispense !== undefined
           ? t('air_gap_value', { volume: state.airGapDispense })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_air_gap')
