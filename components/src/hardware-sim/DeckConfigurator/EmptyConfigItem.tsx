@@ -83,7 +83,7 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
         }}
         data-testid={addressableArea}
       >
-        <Icon name="add" color={COLORS.blue50} size="2rem" />
+        <Icon name="add-circle" color={COLORS.blue50} size="2rem" />
       </Btn>
     </RobotCoordsForeignObject>
   )
