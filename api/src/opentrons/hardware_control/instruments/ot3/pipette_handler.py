@@ -650,15 +650,23 @@ class OT3PipetteHandler:
         # of the OT-2 version of this class. Protocol Engine does its own clamping,
         # so we don't expect this to trigger in practice.
         disp_vol = min(instrument.current_volume, disp_vol)
+        remaining_vol = instrument.current_volume - disp_vol
 
         # TODO (Ryan): Remove this check in the future.
         # we moved this logic up to protocol_engine but replacing with this check to make sure
         # we don't accidentally call this incorrectly from somewhere else.
-        if not is_full_dispense and numpy.isclose(
-            instrument.current_volume - disp_vol, 0
-        ):
+        if not is_full_dispense and numpy.isclose(remaining_vol, 0):
             raise CommandPreconditionViolated(
                 message="Command created a full-dispense without the full dispense argument",
+                detail={
+                    "command": "dispense",
+                    "current-volume": str(instrument.current_volume),
+                    "dispense-volume": str(disp_vol),
+                },
+            )
+        elif is_full_dispense and not numpy.isclose(remaining_vol, 0):
+            raise CommandPreconditionViolated(
+                message="Command ran with a full dispense argument but without a full-dispense",
                 detail={
                     "command": "dispense",
                     "current-volume": str(instrument.current_volume),
@@ -670,6 +678,7 @@ class OT3PipetteHandler:
             return None
 
         if is_full_dispense:
+            remaining_vol = 0.0  # NOTE: avoiding unnecessary rounding errors
             if push_out is None:
                 push_out_ul = instrument.push_out_volume
             else:
@@ -680,7 +689,7 @@ class OT3PipetteHandler:
                     message="Cannot push_out on a dispense that does not leave the pipette empty",
                     detail={
                         "command": "dispense",
-                        "remaining-volume": str(instrument.current_volume - disp_vol),
+                        "remaining-volume": str(remaining_vol),
                     },
                 )
             push_out_ul = 0
@@ -697,7 +706,7 @@ class OT3PipetteHandler:
 
         dist = self.plunger_position(
             instr=instrument,
-            ul=instrument.current_volume - disp_vol,
+            ul=remaining_vol,
             action="dispense",
             correction_volume=correction_volume,
         )
