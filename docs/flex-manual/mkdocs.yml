@@ -1,0 +1,35 @@
+site_name: Opentrons Flex Instruction Manual
+
+nav: 
+  - Preface: preface.md
+  - Introduction: introduction.md
+  - Installation and Relocation: installation-relocation.md
+  - System Description: system-description.md
+  - Modules: modules.md
+  - Labware: labware.md
+  - Protocol Development: protocol-development.md
+  - Software and Operation: software-operation.md
+  - Maintenance and Service: maintenance-service.md
+  - Appendices:
+    - Glossary: glossary.md
+    - Additional Documentation: additional-documentation.md
+    - Open-Source Software: open-source-software.md
+    - Support and Contact Information: support-contact-information.md
+
+theme:
+  name: material
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
+
+plugins:
+  - search
+  - autorefs
+
+markdown_extensions:
+  - admonition
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg      
+  - toc:
+      permalink: true
