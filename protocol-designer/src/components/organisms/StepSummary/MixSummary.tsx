@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 
 import { getLiquidDisplay } from './getLiquidDisplay'
-import { getWellsForStepSummary } from './utils'
+import { getLiquidIdsForStepSummary, getWellsForStepSummary } from './utils'
 
 import type {
   LabwareEntities,
@@ -45,16 +45,11 @@ export function MixSummary(props: MixSummaryProps): JSX.Element {
   } = currentStep
   const mixLabwareDisplayName = labwareNicknamesById[mixLabwareId]
   const mixWells: string[] = mix_wells
-  const liquidIds =
-    liquidState.labware[mixLabwareId] != null
-      ? [
-          ...new Set(
-            mixWells.flatMap(well =>
-              Object.keys(liquidState.labware[mixLabwareId][well])
-            )
-          ),
-        ]
-      : []
+  const liquidIds = getLiquidIdsForStepSummary(
+    liquidState,
+    mixLabwareId as string,
+    mixWells
+  )
   const liquidInfo = liquidIds.map(id => liquidEntities[id])
   const mixWellsDisplay = getWellsForStepSummary(
     mixWells,
