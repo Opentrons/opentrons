@@ -230,7 +230,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       )}
       <Flex
         id={stepId}
-        {...(isStepAfterError
+        {...(!isStepAfterError
           ? {
               onMouseEnter,
               onMouseLeave,
