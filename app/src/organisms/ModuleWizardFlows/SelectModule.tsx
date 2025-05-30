@@ -32,6 +32,7 @@ interface SelectModuleProps {
   isOnDevice: boolean
   selectedModule: AttachedModule | null
   setSelectedModule: (module: AttachedModule | null) => void
+  attachedModuleOnLaunch?: AttachedModule | null
 }
 
 interface ModuleNameAndPort {
@@ -45,10 +46,14 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
     isOnDevice,
     selectedModule,
     setSelectedModule,
+    attachedModuleOnLaunch = null,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
-  const newModules = useGetNewModules()
+  const newModules = attachedModuleOnLaunch !== null
+  ? [attachedModuleOnLaunch]
+  : useGetNewModules();
+
   const isSingleModule = newModules.length === 1
   const sendIdentifyModule = useSendIdentifyModule()
   const [stackerNotInstalled, setStackerNotInstalled] = useState(false)
