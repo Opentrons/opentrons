@@ -50,10 +50,10 @@ def validate_labware_can_be_stacked(
     """Validate that the labware being loaded onto is in the above labware's stackingOffsetWithLabware definition."""
     return (
         below_labware_load_name in top_labware_definition.stackingOffsetWithLabware
-        and top_labware_definition.compatibleParentLabware is not None
-    ) or (
-        "default" in top_labware_definition.stackingOffsetWithLabware
-        and top_labware_definition.compatibleParentLabware is None
+        or (
+            "default" in top_labware_definition.stackingOffsetWithLabware
+            and top_labware_definition.compatibleParentLabware is None
+        )
     )
 
 
