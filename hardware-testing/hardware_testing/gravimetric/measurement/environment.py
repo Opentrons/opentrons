@@ -5,7 +5,7 @@ from typing import Callable, List
 from hardware_testing.drivers import asair_sensor
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 from opentrons.protocol_api import ProtocolContext
-
+from opentrons.types import Mount
 
 @dataclass
 class EnvironmentData:
@@ -24,8 +24,9 @@ def read_environment_data(
 ) -> EnvironmentData:
     """Read blank environment data."""
     ot3api = get_sync_hw_api(ctx)
-    celsius_pipette = ot3api.read_stem_temperature(mount, True)
-    humidity_pipette = ot3api.read_stem_humidity(mount, True)
+    mount_t = Mount.string_to_mount(mount)
+    celsius_pipette = ot3api.read_stem_temperature(mount_t, True)
+    humidity_pipette = ot3api.read_stem_humidity(mount_t, True)
     env_data = env_sensor.get_reading()
     d = EnvironmentData(
         celsius_pipette=celsius_pipette,
