@@ -73,7 +73,7 @@ export type OffsetLocationDetails =
 
 export interface DefaultOffsetLocationDetails
   extends BaseOffsetLocationDetails {
-  addressableAreaName: 'C2'
+  addressableAreaName: FlexAddressableAreaName
   kind: 'default'
   lwOffsetLocSeq: typeof ANY_LOCATION
   hardCodedOffsetId?: undefined
