@@ -2,6 +2,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  AnimationVideo,
   Flex,
   LegacyStyledText,
   RESPONSIVENESS,
@@ -36,18 +37,14 @@ export const InstallShuttle = (
 
   const shuttleInstallVid = (
     <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-      <video
+      <AnimationVideo
         css={css`
           max-width: 100%;
           max-height: 100%;
         `}
-        autoPlay={true}
-        muted={true}
-        loop={true}
-        controls={false}
       >
         <source src={videoPlaceholder} />
-      </video>
+      </AnimationVideo>
     </Flex>
   )
 

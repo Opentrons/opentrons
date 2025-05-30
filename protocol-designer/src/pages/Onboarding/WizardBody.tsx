@@ -5,6 +5,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_END,
+  AnimationVideo,
   BORDERS,
   Btn,
   COLORS,
@@ -181,7 +182,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
           `}
         >
           {robotType === FLEX_ROBOT_TYPE || stepNumber === 1 ? (
-            <video
+            <AnimationVideo
               preload="auto"
               css={css`
                 width: 100%;
@@ -189,15 +190,11 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
                 object-fit: cover;
                 border-radius: ${BORDERS.borderRadius16};
               `}
-              autoPlay
-              muted={true}
               key={`video-${subStepNumber ?? 1}`}
-              loop={false}
-              controls={false}
               aria-label={`onboarding animation for page ${stepNumber}`}
             >
               <source src={asset ?? ''} type="video/webm" />
-            </video>
+            </AnimationVideo>
           ) : (
             <img
               src={OT2_GIFS[stepNumber]}

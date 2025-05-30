@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  AnimationVideo,
   DIRECTION_COLUMN,
   Flex,
   InlineNotification,
@@ -84,19 +85,12 @@ export function ReleaseLabware({
           />
         </Flex>
         <Flex css={ANIMATION_CONTAINER_STYLE}>
-          <video
-            autoPlay={true}
-            muted={true}
-            loop={true}
-            controls={false}
-            role="presentation"
-            css={ANIMATION_STYLE}
-          >
+          <AnimationVideo role="presentation" css={ANIMATION_STYLE}>
             <source
               src={gripperReleaseAnimation}
               data-testid="gripper-animation"
             />
-          </video>
+          </AnimationVideo>
         </Flex>
       </TwoColumn>
       <RecoveryFooterButtons
