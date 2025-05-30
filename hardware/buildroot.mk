@@ -3,7 +3,7 @@
 # python-opentrons-hardware
 #
 ################################################################################
-include ../scripts/python.mk
+include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
 define OTHARDWARE_CALL_PBU
 	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py hardware $(or $(OPENTRONS_PROJECT),robot-stack) $(1))

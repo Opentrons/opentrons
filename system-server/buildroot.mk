@@ -3,7 +3,7 @@
 # python-opentrons-system-server
 #
 ################################################################################
-include ../scripts/python.mk
+include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
 define OTSYSTEMSERVER_CALL_PBU
 	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py system-server $(or $(OPENTRONS_PROJECT),robot-stack) $(1))

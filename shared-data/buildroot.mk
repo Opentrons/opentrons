@@ -3,7 +3,7 @@
 # python-opentrons-shared-data
 #
 ################################################################################
-include ../scripts/python.mk
+include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
 define OTSHAREDDATA_CALL_PBU
 	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py shared-data $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
