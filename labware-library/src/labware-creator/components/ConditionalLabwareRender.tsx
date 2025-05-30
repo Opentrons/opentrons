@@ -84,7 +84,14 @@ const PopulatedPreview = (props: {
   ])
 
   return (
-    <RobotWorkSpace viewBox={bBox == null ? '0 0 0 0' : calculateViewBox(bBox)}>
+    <RobotWorkSpace
+      viewBox={
+        // If we haven't calculated a zoom-to-fit viewBox yet, we can use any arbitrary
+        // value. Our useLayoutEffect will ensure it gets replaced with a real value
+        // before the user sees it.
+        bBox == null ? '0 0 0 0' : calculateViewBox(bBox)
+      }
+    >
       {() => <LabwareRender definition={definition} gRef={gRef} />}
     </RobotWorkSpace>
   )
