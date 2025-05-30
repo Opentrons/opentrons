@@ -555,10 +555,10 @@ def run_one_test(
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
-    transfer_properties.aspirate.offset = _get_offset_for_channel(
+    transfer_properties.aspirate._aspirate_position.offset = _get_offset_for_channel(
         fixture_settings, channel
     )
-    transfer_properties.dispense.offset = _get_offset_for_channel(
+    transfer_properties.dispense._dispense_position.offset = _get_offset_for_channel(
         fixture_settings, channel
     )
     fixture_settings.pipette._core.load_liquid_class(  # type: ignore [attr-defined]
