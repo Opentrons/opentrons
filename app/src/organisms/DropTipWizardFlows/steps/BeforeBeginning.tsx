@@ -172,6 +172,7 @@ function DropTipOption({
           max-width: 8.96rem;
         `}
         autoPlay={true}
+        muted={true}
         loop={true}
         controls={false}
         aria-label={flowType}

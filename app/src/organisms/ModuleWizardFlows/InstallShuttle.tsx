@@ -42,6 +42,7 @@ export const InstallShuttle = (
           max-height: 100%;
         `}
         autoPlay={true}
+        muted={true}
         loop={true}
         controls={false}
       >

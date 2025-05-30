@@ -148,6 +148,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           max-height: 100%;
         `}
         autoPlay={true}
+        muted={true}
         loop={true}
         controls={false}
         data-testid={src}

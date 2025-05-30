@@ -156,6 +156,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
               max-height: 100%;
             `}
             autoPlay={true}
+            muted={true}
             loop={true}
             controls={false}
             aria-label="calibrating front jaw"
@@ -169,6 +170,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       buttonText: t('begin_calibration'),
       prepImage: (
         <video
+          muted={true}
           css={css`
             max-width: 100%;
             max-height: 20rem;
@@ -187,6 +189,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       inProgressImage: (
         <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
           <video
+            muted={true}
             css={css`
               max-width: 100%;
               max-height: 100%;
@@ -205,6 +208,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       buttonText: t('continue_calibration'),
       prepImage: (
         <video
+          muted={true}
           css={css`
             max-width: 100%;
             max-height: 20rem;
@@ -225,6 +229,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       buttonText: t('complete_calibration'),
       prepImage: (
         <video
+          muted={true}
           css={css`
             max-width: 100%;
             max-height: 20rem;
