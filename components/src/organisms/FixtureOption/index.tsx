@@ -39,7 +39,6 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
       type="default"
       gridGap={SPACING.spacing24} // why is this not working
       css="padding: 16px"
-      flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >

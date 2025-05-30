@@ -3,20 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  ALIGN_CENTER,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   FixtureOption,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
-  ListItem,
   Modal,
   SPACING,
-  StyledText,
-  TertiaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -34,6 +28,7 @@ import {
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   getCutoutDisplayName,
   getFixtureDisplayName,
+  getModuleOptionsForCutoutId,
   HEATER_SHAKER_CUTOUTS,
   HEATERSHAKER_MODULE_V1,
   HEATERSHAKER_MODULE_V1_FIXTURE,
@@ -126,204 +121,7 @@ export function AddFixtureModal({
     width: '26.75rem',
   }
 
-  let availableOptions: CutoutConfig[][] = []
-
-  if (providedFixtureOptions != null) {
-    availableOptions = providedFixtureOptions?.map(o => [
-      {
-        cutoutId,
-        cutoutFixtureId: o,
-        opentronsModuleSerialNumber: undefined,
-      },
-    ])
-  } else if (optionStage === 'fixtureOptions') {
-    if (
-      SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
-      SINGLE_LEFT_CUTOUTS.includes(cutoutId)
-    ) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
-          },
-        ],
-      ]
-    }
-    if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
-          },
-        ],
-      ]
-    }
-  } else if (optionStage === 'moduleOptions') {
-    availableOptions = [
-      ...availableOptions,
-      [
-        {
-          cutoutId,
-          cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
-        },
-      ],
-    ]
-    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-          },
-        ],
-      ]
-    }
-    if (unconfiguredMods.length > 0) {
-      if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
-        const unconfiguredTCs = unconfiguredMods
-          .filter(mod => mod.moduleModel === THERMOCYCLER_MODULE_V2)
-          .map(mod => [
-            {
-              cutoutId: THERMOCYCLER_MODULE_CUTOUTS[0],
-              cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-            {
-              cutoutId: THERMOCYCLER_MODULE_CUTOUTS[1],
-              cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        availableOptions = [...availableOptions, ...unconfiguredTCs]
-      }
-      if (
-        HEATER_SHAKER_CUTOUTS.includes(cutoutId) &&
-        unconfiguredMods.some(m => m.moduleModel === HEATERSHAKER_MODULE_V1)
-      ) {
-        const unconfiguredHeaterShakers = unconfiguredMods
-          .filter(mod => mod.moduleModel === HEATERSHAKER_MODULE_V1)
-          .map(mod => [
-            {
-              cutoutId,
-              cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        availableOptions = [...availableOptions, ...unconfiguredHeaterShakers]
-      }
-      if (
-        TEMPERATURE_MODULE_CUTOUTS.includes(cutoutId) &&
-        unconfiguredMods.some(m => m.moduleModel === TEMPERATURE_MODULE_V2)
-      ) {
-        const unconfiguredTemperatureModules = unconfiguredMods
-          .filter(mod => mod.moduleModel === TEMPERATURE_MODULE_V2)
-          .map(mod => [
-            {
-              cutoutId,
-              cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        availableOptions = [
-          ...availableOptions,
-          ...unconfiguredTemperatureModules,
-        ]
-      }
-      if (
-        ABSORBANCE_READER_CUTOUTS.includes(cutoutId) &&
-        unconfiguredMods.some(m => m.moduleModel === ABSORBANCE_READER_V1)
-      ) {
-        const unconfiguredAbsorbanceReaders = unconfiguredMods
-          .filter(mod => mod.moduleModel === ABSORBANCE_READER_V1)
-          .map(mod => [
-            {
-              cutoutId,
-              cutoutFixtureId: ABSORBANCE_READER_V1_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        availableOptions = [
-          ...availableOptions,
-          ...unconfiguredAbsorbanceReaders,
-        ]
-      }
-    }
-    if (
-      cutoutId === 'cutoutD3' &&
-      unconfiguredMods.some(m => m.moduleModel === FLEX_STACKER_MODULE_V1)
-    ) {
-      const unconfiguredFlexStackers: CutoutConfig[][] = []
-      unconfiguredMods
-        .filter(mod => mod.moduleModel === FLEX_STACKER_MODULE_V1)
-        .forEach(mod => {
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        })
-      availableOptions.push(...unconfiguredFlexStackers)
-    } else if (
-      STAGING_AREA_CUTOUTS.includes(cutoutId) &&
-      unconfiguredMods.some(m => m.moduleModel === FLEX_STACKER_MODULE_V1)
-    ) {
-      const unconfiguredFlexStackers: CutoutConfig[][] = []
-      unconfiguredMods
-        .filter(mod => mod.moduleModel === FLEX_STACKER_MODULE_V1)
-        .forEach(mod => {
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        })
-      availableOptions = [...availableOptions, ...unconfiguredFlexStackers]
-    }
-  } else if (optionStage === 'wasteChuteOptions') {
-    availableOptions = WASTE_CHUTE_FIXTURES.map(fixture => [
-      {
-        cutoutId,
-        cutoutFixtureId: fixture,
-      },
-    ])
-  }
+  const availableOptions = getOptions(cutoutId, providedFixtureOptions, unconfiguredMods, optionStage)
 
   let nextStageOptions = null
   if (optionStage === 'modulesOrFixtures') {
@@ -466,3 +264,208 @@ const GO_BACK_BUTTON_STYLE = css`
     opacity: 70%;
   }
 `
+
+export const getOptions = (cutoutId: CutoutId, providedFixtureOptions: CutoutFixtureId[], unconfiguredMods: AttachedModule[], optionStage: string): CutoutConfig[][] => {
+  let availableOptions: CutoutConfig[][] = []
+
+  if (providedFixtureOptions != null) {
+    availableOptions = providedFixtureOptions?.map(o => [
+      {
+        cutoutId,
+        cutoutFixtureId: o,
+        opentronsModuleSerialNumber: undefined,
+      },
+    ])
+  } else if (optionStage === 'fixtureOptions') {
+    if (
+      SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
+      SINGLE_LEFT_CUTOUTS.includes(cutoutId)
+    ) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+          },
+        ],
+      ]
+    }
+    if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+          },
+        ],
+      ]
+    }
+  } else if (optionStage === 'moduleOptions') {
+    // let availableOptions2 = getModuleOptionsForCutoutId(cutoutId)
+    // console.log("availableOptions: ", availableOptions)
+    availableOptions = [
+      ...availableOptions,
+      [
+        {
+          cutoutId,
+          cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
+        },
+      ],
+    ]
+    // console.log("availableOptions 2: ", availableOptions)
+    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+          },
+        ],
+      ]
+    }
+    if (unconfiguredMods.length > 0) {
+      if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
+        const unconfiguredTCs = unconfiguredMods
+          .filter(mod => mod.moduleModel === THERMOCYCLER_MODULE_V2)
+          .map(mod => [
+            {
+              cutoutId: THERMOCYCLER_MODULE_CUßTOUTS[0],
+              cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+            {
+              cutoutId: THERMOCYCLER_MODULE_CUTOUTS[1],
+              cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+        availableOptions = [...availableOptions, ...unconfiguredTCs]
+      }
+      if (
+        HEATER_SHAKER_CUTOUTS.includes(cutoutId) &&
+        unconfiguredMods.some(m => m.moduleModel === HEATERSHAKER_MODULE_V1)
+      ) {
+        const unconfiguredHeaterShakers = unconfiguredMods
+          .filter(mod => mod.moduleModel === HEATERSHAKER_MODULE_V1)
+          .map(mod => [
+            {
+              cutoutId,
+              cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+        availableOptions = [...availableOptions, ...unconfiguredHeaterShakers]
+      }
+      if (
+        TEMPERATURE_MODULE_CUTOUTS.includes(cutoutId) &&
+        unconfiguredMods.some(m => m.moduleModel === TEMPERATURE_MODULE_V2)
+      ) {
+        const unconfiguredTemperatureModules = unconfiguredMods
+          .filter(mod => mod.moduleModel === TEMPERATURE_MODULE_V2)
+          .map(mod => [
+            {
+              cutoutId,
+              cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+        availableOptions = [
+          ...availableOptions,
+          ...unconfiguredTemperatureModules,
+        ]
+      }
+      if (
+        ABSORBANCE_READER_CUTOUTS.includes(cutoutId) &&
+        unconfiguredMods.some(m => m.moduleModel === ABSORBANCE_READER_V1)
+      ) {
+        const unconfiguredAbsorbanceReaders = unconfiguredMods
+          .filter(mod => mod.moduleModel === ABSORBANCE_READER_V1)
+          .map(mod => [
+            {
+              cutoutId,
+              cutoutFixtureId: ABSORBANCE_READER_V1_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+        availableOptions = [
+          ...availableOptions,
+          ...unconfiguredAbsorbanceReaders,
+        ]
+      }
+    }
+    if (
+      cutoutId === 'cutoutD3' &&
+      unconfiguredMods.some(m => m.moduleModel === FLEX_STACKER_MODULE_V1)
+    ) {
+      const unconfiguredFlexStackers: CutoutConfig[][] = []
+      unconfiguredMods
+        .filter(mod => mod.moduleModel === FLEX_STACKER_MODULE_V1)
+        .forEach(mod => {
+          unconfiguredFlexStackers.push([
+            {
+              cutoutId,
+              cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+          unconfiguredFlexStackers.push([
+            {
+              cutoutId,
+              cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+          unconfiguredFlexStackers.push([
+            {
+              cutoutId,
+              cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+          unconfiguredFlexStackers.push([
+            {
+              cutoutId,
+              cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+        })
+      availableOptions.push(...unconfiguredFlexStackers)
+    } else if (
+      STAGING_AREA_CUTOUTS.includes(cutoutId) &&
+      unconfiguredMods.some(m => m.moduleModel === FLEX_STACKER_MODULE_V1)
+    ) {
+      const unconfiguredFlexStackers: CutoutConfig[][] = []
+      unconfiguredMods
+        .filter(mod => mod.moduleModel === FLEX_STACKER_MODULE_V1)
+        .forEach(mod => {
+          unconfiguredFlexStackers.push([
+            {
+              cutoutId,
+              cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+          unconfiguredFlexStackers.push([
+            {
+              cutoutId,
+              cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+        })
+      availableOptions = [...availableOptions, ...unconfiguredFlexStackers]
+    }
+  } else if (optionStage === 'wasteChuteOptions') {
+    availableOptions = WASTE_CHUTE_FIXTURES.map(fixture => [
+      {
+        cutoutId,
+        cutoutFixtureId: fixture,
+      },
+    ])
+  }
+  return availableOptions
+}

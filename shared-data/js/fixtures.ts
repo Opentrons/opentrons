@@ -54,7 +54,7 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from './constants'
-import { getCutoutIdForSlotName } from './helpers'
+import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
 import { getModuleDisplayName } from './modules'
 
 import type { ModuleLocation } from '../command'
@@ -656,3 +656,10 @@ export const isAddressableAreaStandardSlot = (
     ? STANDARD_FLEX_SLOTS
     : STANDARD_OT2_SLOTS
   ).includes(addressableAreaName)
+
+
+// export const getModuleOptionsForCutoutId = (cutoutId: CutoutId): CutoutConfigMap[][] => {
+//   const deck_def = getDeckDefFromRobotType('OT-3 Standard')
+//   const cutoutFixturesAllowed = deck_def.cutoutFixtures.filter(item => item.mayMountTo.includes(cutoutId))
+//   console.log("cutoutFixturesAllowed: ", cutoutFixturesAllowed)
+// }
