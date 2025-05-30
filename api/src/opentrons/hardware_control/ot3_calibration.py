@@ -380,7 +380,6 @@ async def _probe_deck_at(
     mount: OT3Mount,
     target: Point,
     settings: CapacitivePassSettings,
-    speed: float = 50,
     probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
 ) -> Tuple[float, bool]:
     here = await api.gantry_position(mount)
@@ -389,7 +388,7 @@ async def _probe_deck_at(
     )
     safe_height = max(here.z, target.z, abs_transit_height)
     await api.move_to(mount, here._replace(z=safe_height))
-    await api.move_to(mount, target._replace(z=safe_height), speed=speed)
+    await api.move_to(mount, target._replace(z=safe_height))
     await api.move_to(mount, target._replace(z=abs_transit_height))
     _found_pos, contact = await api.capacitive_probe(
         mount, Axis.by_mount(mount), target.z, settings, probe=probe
