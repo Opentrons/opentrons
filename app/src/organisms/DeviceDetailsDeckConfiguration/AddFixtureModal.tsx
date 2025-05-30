@@ -28,7 +28,6 @@ import {
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   getCutoutDisplayName,
   getFixtureDisplayName,
-  getModuleOptionsForCutoutId,
   HEATER_SHAKER_CUTOUTS,
   HEATERSHAKER_MODULE_V1,
   HEATERSHAKER_MODULE_V1_FIXTURE,
@@ -61,6 +60,7 @@ import type {
   CutoutId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { AttachedModule } from '@opentrons/api-client'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -265,7 +265,7 @@ const GO_BACK_BUTTON_STYLE = css`
   }
 `
 
-export const getOptions = (cutoutId: CutoutId, providedFixtureOptions: CutoutFixtureId[], unconfiguredMods: AttachedModule[], optionStage: string): CutoutConfig[][] => {
+export const getOptions = (cutoutId: CutoutId, providedFixtureOptions: CutoutFixtureId[] | undefined, unconfiguredMods: AttachedModule[], optionStage: string): CutoutConfig[][] => {
 
   if (providedFixtureOptions != null) {
     return providedFixtureOptions?.map(o => [
@@ -474,4 +474,6 @@ export const getOptions = (cutoutId: CutoutId, providedFixtureOptions: CutoutFix
       },
     ])
   }
+  console.error(`Was not able to find options for ${cutoutId}`)
+  return []
 }
