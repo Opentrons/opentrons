@@ -78,7 +78,7 @@ endef
 # parameter 4: any extra version tags
 # parameter 5: override python_build_utils.py path (default: ../scripts/python_build_utils.py)
 define python_get_wheelname
-$(3)-$(call python_package_version,$(1),$(2),$(4),$(5))-py2.py3-none-any.whl
+$(3)-$(call python_package_version,$(1),$(2),$(4),$(5))-py3-none-any.whl
 endef
 
 # get the name of the sdist that setup.py will build
