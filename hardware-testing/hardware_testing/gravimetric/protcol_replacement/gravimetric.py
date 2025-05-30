@@ -17,6 +17,7 @@ from opentrons.protocol_api import (
 )
 from opentrons import version
 from opentrons.protocol_api._liquid_properties import TransferProperties
+from opentrons_shared_data.liquid_classes.liquid_class_definition import Coordinate
 from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
 )
@@ -368,18 +369,23 @@ def remove_tip(fixture_settings: FixtureSettings) -> None:
     else:
         fixture_settings.pipette.drop_tip()
 
-def _get_offset_for_channel(fixture_settings: FixtureSettings, channel: int) -> Point:
-    offset = Point()
+
+def _get_offset_for_channel(
+    fixture_settings: FixtureSettings, channel: int
+) -> Coordinate:
+    offset = Coordinate(x=0, y=0, z=0)
     if fixture_settings.channels == 8 and not fixture_settings.increment:
-        offset = Point(y=channel * 9.0)
+        offset.y = channel * 9.0
     return offset
+
 
 def pick_up_tip_for_channel(
     fixture_settings: FixtureSettings, tip: Well, channel: int
 ) -> None:
     """Do channel offset if needed."""
     offset = _get_offset_for_channel(fixture_settings, channel)
-    fixture_settings.pipette.pick_up_tip(tip.top().move(offset))
+    point_offset = Point(x=offset.x, y=offset.y, z=offset.z)
+    fixture_settings.pipette.pick_up_tip(tip.top().move(point_offset))
 
 
 def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
@@ -549,8 +555,12 @@ def run_one_test(
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
-    transfer_properties.aspirate.aspirate_position.offset = _get_offset_for_channel(fixture_settings, channel)
-    transfer_properties.dispense.dispense_position.offset = _get_offset_for_channel(fixture_settings, channel)
+    transfer_properties.aspirate.offset = _get_offset_for_channel(
+        fixture_settings, channel
+    )
+    transfer_properties.dispense.offset = _get_offset_for_channel(
+        fixture_settings, channel
+    )
     fixture_settings.pipette._core.load_liquid_class(  # type: ignore [attr-defined]
         name=fixture_settings.liquid_class.name,
         transfer_properties=transfer_properties,
