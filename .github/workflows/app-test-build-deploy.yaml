@@ -221,10 +221,11 @@ jobs:
         run: |
           make -C app dist
 
-      - name: Invoke Trusted Signing on dummy executable
+      - name: Install and Invoke TrustedSigning @0.5.3 on dummy executable
         if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
         shell: pwsh
         run: |
+            Install-Module -Name TrustedSigning -RequiredVersion 0.5.3 -Force -Repository PSGallery
             # Create a dummy executable file
             $dummyExePath = Join-Path -Path $env:GITHUB_WORKSPACE -ChildPath "dummy.exe"
             Set-Content -Path $dummyExePath -Value "This is a dummy executable for testing purposes."
