@@ -106,6 +106,8 @@ const Placeholder = (): JSX.Element => {
       {() => (
         <>
           <LabwareOutline
+            minX={0}
+            minY={0}
             width={DEFAULT_X_DIMENSION}
             height={DEFAULT_Y_DIMENSION}
           />
