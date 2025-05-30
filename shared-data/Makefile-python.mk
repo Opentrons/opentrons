@@ -12,7 +12,7 @@ ssh_opts ?= $(default_ssh_opts)
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd ../.. && yarn bin):$(PATH)
+PATH := $(shell cd ../ && yarn bin):$(PATH)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -28,8 +28,8 @@ OT_PYTHON ?= python
 BUILD_DIR := dist
 
 
-wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,$(PROJECT),opentrons_shared_data,$(BUILD_NUMBER),../../scripts/python_build_utils.py)
-sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,$(PROJECT),opentrons_shared_data,,../../scripts/python_build_utils.py)
+wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,$(PROJECT),opentrons_shared_data,$(BUILD_NUMBER),../scripts/python_build_utils.py)
+sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,$(PROJECT),opentrons_shared_data,,../scripts/python_build_utils.py)
 
 py_sources = $(filter %.py,$(shell $(SHX) find python/opentrons_shared_data)) python/opentrons_shared_data/py.typed
 deck_sources = $(wildcard deck/definitions/*/*.json) $(wildcard deck/schemas/*.json)
@@ -128,7 +128,7 @@ test:
 
 .PHONY: generate-schema
 generate-schema:
-	$(python) -c "from opentrons_shared_data.$(target) import generate_schema; print(generate_schema())" > ../${target}/schemas/${version}.json
+	$(python) -c "from opentrons_shared_data.$(target) import generate_schema; print(generate_schema())" > ./${target}/schemas/${version}.json
 
 %-schema:
 	$(MAKE) generate-schema target=$*
