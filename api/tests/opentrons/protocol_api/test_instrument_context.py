@@ -2769,7 +2769,6 @@ def test_distribute_liquid_raises_for_incompatible_tip_policies(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
     with pytest.raises(ValueError, match="Incompatible `new_tip` value"):
         subject.distribute_with_liquid_class(
             liquid_class=test_liq_class,

@@ -62,6 +62,11 @@ class LiquidHandlingPropertyByVolume:
                 interp(validated_volume, self._sorted_volumes, self._sorted_values)
             )
 
+    def set_for_all_volumes(self, value: float) -> None:
+        """Override all existing volume-dependent values with the given value."""
+        self.clear_values()
+        self.set_for_volume(0, value)
+
     def set_for_volume(self, volume: float, value: float) -> None:
         """Add a new volume and value for the property for the interpolation curve."""
         validated_volume = validation.ensure_positive_float(volume)
