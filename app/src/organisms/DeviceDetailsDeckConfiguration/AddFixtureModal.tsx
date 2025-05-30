@@ -266,17 +266,18 @@ const GO_BACK_BUTTON_STYLE = css`
 `
 
 export const getOptions = (cutoutId: CutoutId, providedFixtureOptions: CutoutFixtureId[], unconfiguredMods: AttachedModule[], optionStage: string): CutoutConfig[][] => {
-  let availableOptions: CutoutConfig[][] = []
 
   if (providedFixtureOptions != null) {
-    availableOptions = providedFixtureOptions?.map(o => [
+    return providedFixtureOptions?.map(o => [
       {
         cutoutId,
         cutoutFixtureId: o,
         opentronsModuleSerialNumber: undefined,
       },
     ])
-  } else if (optionStage === 'fixtureOptions') {
+  }  
+  if (optionStage === 'fixtureOptions') {
+    let availableOptions: CutoutConfig[][] = []
     if (
       SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
       SINGLE_LEFT_CUTOUTS.includes(cutoutId)
@@ -302,7 +303,11 @@ export const getOptions = (cutoutId: CutoutId, providedFixtureOptions: CutoutFix
         ],
       ]
     }
-  } else if (optionStage === 'moduleOptions') {
+    return availableOptions
+  } 
+  if (optionStage === 'moduleOptions') {
+    let availableOptions: CutoutConfig[][] = []
+
     // let availableOptions2 = getModuleOptionsForCutoutId(cutoutId)
     // console.log("availableOptions: ", availableOptions)
     availableOptions = [
@@ -332,7 +337,7 @@ export const getOptions = (cutoutId: CutoutId, providedFixtureOptions: CutoutFix
           .filter(mod => mod.moduleModel === THERMOCYCLER_MODULE_V2)
           .map(mod => [
             {
-              cutoutId: THERMOCYCLER_MODULE_CUßTOUTS[0],
+              cutoutId: THERMOCYCLER_MODULE_CUTOUTS[0],
               cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
               opentronsModuleSerialNumber: mod.serialNumber,
             },
@@ -459,13 +464,14 @@ export const getOptions = (cutoutId: CutoutId, providedFixtureOptions: CutoutFix
         })
       availableOptions = [...availableOptions, ...unconfiguredFlexStackers]
     }
-  } else if (optionStage === 'wasteChuteOptions') {
-    availableOptions = WASTE_CHUTE_FIXTURES.map(fixture => [
+    return availableOptions
+  }
+  if (optionStage === 'wasteChuteOptions') {
+    return WASTE_CHUTE_FIXTURES.map(fixture => [
       {
         cutoutId,
         cutoutFixtureId: fixture,
       },
     ])
   }
-  return availableOptions
 }
