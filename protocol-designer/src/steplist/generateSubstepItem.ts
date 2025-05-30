@@ -12,7 +12,10 @@ import {
 } from '@opentrons/step-generation'
 
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
-import { substepTimeline } from './substepTimeline'
+import {
+  substepTimelineMultiChannel,
+  substepTimelineSingleChannel,
+} from './substepTimeline'
 import * as steplistUtils from './utils'
 
 import type {
@@ -116,12 +119,8 @@ export const mergeSubstepRowsSingleChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[] => {
   const { substepRows, showDispenseVol } = args
-  //  TODO(jr, 5/2/24): filtering out air gap steps for now since a refactor would be required
-  //  to figure out if the air gap is for the aspirate or dispense labware. Otherwise, a white screen
-  //  was happening with an air gap step trying to happen in an aspirate labware well that did not exist
-  const filteredSubstepRows = substepRows.filter(row => !row.isAirGap)
   return steplistUtils.mergeWhen(
-    filteredSubstepRows,
+    substepRows,
     (
       currentRow,
       nextRow // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
@@ -139,7 +138,8 @@ export const mergeSubstepRowsSingleChannel = (args: {
         preIngreds: nextRow.dest && nextRow.dest.preIngreds,
         postIngreds: nextRow.dest && nextRow.dest.postIngreds,
       },
-      volume: showDispenseVol ? nextRow.volume : currentRow.volume,
+      aspirateVolume: currentRow.volume,
+      dispenseVolume: nextRow.volume,
     }),
     currentRow => {
       const source = currentRow.source && {
@@ -168,12 +168,8 @@ export const mergeSubstepRowsMultiChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[][] => {
   const { substepRows, channels, isMixStep, showDispenseVol } = args
-  //  TODO(jr, 5/2/24): filtering out air gap steps for now since a refactor would be required
-  //  to figure out if the air gap is for the aspirate or dispense labware. Otherwise, a white screen
-  //  was happening with an air gap step trying to happen in an aspirate labware well that did not exist
-  const filteredSubstepRows = substepRows.filter(row => !row.isAirGap)
   return steplistUtils.mergeWhen(
-    filteredSubstepRows,
+    substepRows,
     (
       currentMultiRow: SubstepTimelineFrame,
       nextMultiRow: SubstepTimelineFrame
@@ -294,12 +290,11 @@ function transferLikeSubsteps(args: {
 
   // Multichannel substeps
   if (pipetteSpec.channels > 1) {
-    const substepRows: SubstepTimelineFrame[] = substepTimeline(
+    console.log('hit here for multichannel')
+    const substepRows: SubstepTimelineFrame[] = substepTimelineMultiChannel(
       substepCommandCreator,
       invariantContext,
-      initialRobotState,
-      pipetteSpec.channels,
-      stepArgs.nozzles
+      initialRobotState
     )
     const mergedMultiRows: StepItemSourceDestRow[][] = mergeSubstepRowsMultiChannel(
       {
@@ -318,17 +313,19 @@ function transferLikeSubsteps(args: {
     }
   } else {
     // single channel
-    const substepRows = substepTimeline(
+    console.log('hit here for single channel')
+    const substepRows = substepTimelineSingleChannel(
       substepCommandCreator,
       invariantContext,
-      initialRobotState,
-      1,
-      null
+      initialRobotState
     )
+    console.log('substepRows', substepRows)
     const mergedRows: StepItemSourceDestRow[] = mergeSubstepRowsSingleChannel({
       substepRows,
       showDispenseVol,
     })
+    console.log('mergedRows', mergedRows)
+
     return {
       substepType: 'sourceDest',
       multichannel: false,

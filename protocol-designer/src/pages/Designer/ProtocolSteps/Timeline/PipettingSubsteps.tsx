@@ -32,7 +32,7 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
       : null
 
   const isSameLabware = formData.aspirate_labware === formData.dispense_labware
-
+  console.log('substeps', substeps)
   const renderSubsteps = substeps.multichannel
     ? substeps.multiRows.map((rowGroup, groupKey) => {
         const filteredRowGroup = rowGroup.filter(
@@ -65,6 +65,8 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
           stepId={substeps.parentStepId}
           substepIndex={substepIndex}
           volume={row.volume}
+          aspirateVolume={row.aspirateVolume}
+          dispenseVolume={row.dispenseVolume}
           source={row.source}
           dest={row.dest}
           isSameLabware={isSameLabware}
