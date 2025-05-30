@@ -1,4 +1,5 @@
 """Opentrons Flex Pipette IQ/OQ."""
+from datetime import datetime
 from math import ceil, inf
 from typing import List, Optional, Tuple, Dict, cast
 
@@ -9,6 +10,9 @@ from opentrons.protocol_api import (
     Labware,
     Well,
     LiquidClass,
+    HeaterShakerContext,
+    AbsorbanceReaderContext,
+    OFF_DECK,
 )
 from opentrons.protocol_api.labware import OutOfTipsError
 
@@ -36,20 +40,46 @@ DYE_CONFIGS = {
 
 DILUENT_RESERVOIR = "nest_1_reservoir_290ml"
 
+DYE_WELL_BY_LABWARE = {
+    # 2ml deep can reduce wasted dye, but source wells are needed
+    # when testing target volumes >100 uL (assuming 12x trials)
+    # and so for this reason we do not default to using this labware
+    # (reducing efficiency but improving simplicity)
+    "nest_96_wellplate_2ml_deep": {
+        "dye_e": "E1",
+        "dye_d": "D1",
+        "dye_c": "C1",
+        "dye_b": "B1",
+        "dye_a": "A1",
+        "dye_hv": "H1",
+    },
+    "usascientific_12_reservoir_22ml": {
+        "dye_e": "A5",
+        "dye_d": "A4",
+        "dye_c": "A3",
+        "dye_b": "A2",
+        "dye_a": "A1",
+        "dye_hv": "A8",
+    },
+    "nest_1_reservoir_290ml": {
+        dye_name: "A1"
+        for dye_name in DYE_CONFIGS.keys()
+    },
+}
 DYE_RESERVOIRS_BY_CHANNELS_AND_TIP = {
-    (1, 50): (1, "nest_12_reservoir_15ml", ["A4", "A2", "A1"]),  # Artel [D-or-C, B, A]
-    (1, 200): (1, "nest_12_reservoir_15ml", ["A3", "A2", "A1"]),  # Artel [C, B, A]
-    (1, 1000): (1, "nest_12_reservoir_15ml", ["A2", "A1", "A8"]),  # Artel [B, A, HV]
-    (8, 50): (1, "nest_12_reservoir_15ml", ["A4", "A2", "A1"]),  # Artel [D-or-C, B, A]
-    (8, 200): (1, "nest_12_reservoir_15ml", ["A3", "A2", "A1"]),  # Artel [C, B, A]
-    (8, 1000): (2, "nest_12_reservoir_15ml", ["A2", "A1", "A8"]),  # Artel [B, A, HV]
-    (96, 50): (3, "nest_1_reservoir_290ml", ["A1", "A1", "A1"]),  # Artel [C, B, A]
-    (96, 200): (3, "nest_1_reservoir_290ml", ["A1", "A1", "A1"]),  # Artel [C, B, A]
-    (96, 1000): (3, "nest_1_reservoir_290ml", ["A1", "A1", "A1"]),  # Artel [B, A, HV]
+    (1, 50): (1, "usascientific_12_reservoir_22ml", ["dye_d", "dye_b", "dye_a"]),
+    (1, 200): (1, "usascientific_12_reservoir_22ml", ["dye_c", "dye_b", "dye_a"]),
+    (1, 1000): (1, "usascientific_12_reservoir_22ml", ["dye_b", "dye_a", "dye_hv"]),
+    (8, 50): (1, "usascientific_12_reservoir_22ml", ["dye_d", "dye_b", "dye_a"]),
+    (8, 200): (1, "usascientific_12_reservoir_22ml", ["dye_c", "dye_b", "dye_a"]),
+    (8, 1000): (2, "usascientific_12_reservoir_22ml", ["dye_b", "dye_a", "dye_hv"]),
+    (96, 50): (3, "nest_1_reservoir_290ml", ["dye_c", "dye_b", "dye_a"]),
+    (96, 200): (3, "nest_1_reservoir_290ml", ["dye_c", "dye_b", "dye_a"]),
+    (96, 1000): (3, "nest_1_reservoir_290ml", ["dye_b", "dye_a", "dye_hv"]),
 }
 CRITICAL_UL_BY_LABWARE = {
     "nest_1_reservoir_290ml": {"dead": 10000, "setup_min": 30000, "setup_max": 200000},
-    "nest_12_reservoir_15ml": {"dead": 3000, "setup_min": 3000, "setup_max": 12000},
+    "usascientific_12_reservoir_22ml": {"dead": 1000, "setup_min": 3000, "setup_max": 21000},
     "nest_96_wellplate_2ml_deep": {"dead": 300, "setup_min": 300, "setup_max": 1700},
 }
 
@@ -129,6 +159,26 @@ def add_parameters(params: ParameterContext) -> None:
             {"display_name": "legacy", "value": "legacy"},
         ],
     )
+    params.add_bool(
+        display_name="use_artel",
+        variable_name="use_artel",
+        default=True,
+    )
+
+
+def get_volumes(ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float) -> List[float]:
+    # NOTE: configuring for MAX tip uL before calculate test volumes
+    pipette.configure_for_volume(tip_ul)
+    # NOTE: limiting 96ch to only test <=200uL, b/c 1000uL requires too many plates
+    max_possible_ul = (
+        DYE_SHAKER_MAX_UL if pipette.channels == 96 else pipette.max_volume
+    )
+    # NOTE: configuring for MINIMUM tip uL before calculate test volumes
+    pipette.configure_for_volume(1)
+    return [
+        min(max(v, pipette.min_volume), tip_ul, max_possible_ul)
+        for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]  # type: ignore[attr-defined]
+    ]
 
 
 def load_tip_racks(
@@ -175,10 +225,19 @@ def load_tip_racks(
     return inaccessible_racks
 
 
-def load_labware(
-    ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: int, num_wells_needed: int,
+def load_most_labware(
+    ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: int, volumes: List[float], trials: List[int],
 ) -> Tuple[Labware, List[Labware], List[Labware]]:
     """Load and return a diluent reservoir, list of dye reservoirs, list of plates."""
+    num_wells_needed = (
+        sum(
+            [
+                ceil(ul / DYE_SHAKER_MAX_UL) * t
+                for ul, t in zip(volumes, trials)
+            ]
+        )
+        * pipette.channels
+    )
     # diluent reservoir
     reservoir_diluent = ctx.load_labware(DILUENT_RESERVOIR, SLOTS["diluent"])
     if len(reservoir_diluent.wells()) > 1:
@@ -199,12 +258,16 @@ def load_labware(
     # empty plates
     num_plates_needed = ceil(num_wells_needed / 96)
     # FIXME: support a stack of plates
-    if num_plates_needed > 1:
-        raise NotImplementedError("multiple plates not implemented yet")
-    plates = [ctx.load_labware("corning_96_wellplate_360ul_flat", SLOTS["stack_start"])]
-    for plate in plates:
+    if num_plates_needed > 5:
+        raise NotImplementedError(f"plate count of {num_plates_needed} not implemented yet")
+    plates: List[Labware] = []
+    for i in range(num_plates_needed):
+        if i == 0:
+            plate = ctx.load_labware("corning_96_wellplate_360ul_flat", SLOTS["stack_start"])
+        else:
+            plate = plates[-1].load_labware("corning_96_wellplate_360ul_flat")
         plate.load_empty(plate.wells())
-
+        plates.append(plate)
     return reservoir_diluent, reservoirs_dye, plates
 
 
@@ -234,6 +297,8 @@ def load_liquid_diluent(
             for v, t in zip(volumes, trials)
         ]
     )
+    if not total_diluent_aspirated_ul:
+        return
     critical_ul = CRITICAL_UL_BY_LABWARE[reservoir.load_name]
     assert (
         total_diluent_aspirated_ul < critical_ul["setup_max"] - critical_ul["dead"]
@@ -274,10 +339,13 @@ def load_liquid_dye(
         if cfg[0] <= v <= cfg[1]
     }
 
-    critical_ul = CRITICAL_UL_BY_LABWARE[reservoirs_dye[0].load_name]
-    well_working_ul = critical_ul["setup_max"] - critical_ul["dead"]
+    load_name = reservoirs_dye[0].load_name
+    critical_ul = CRITICAL_UL_BY_LABWARE[load_name]
+    src_well_names: List[str] = [
+        DYE_WELL_BY_LABWARE[load_name][d]
+        for d in reservoir_cfg[2]
+    ]
 
-    src_well_names: List[str] = reservoir_cfg[2]
     if pipette.channels == 96:
         src_wells_by_volume: Dict[float, Well] = {
             ul: reservoir[well_name]
@@ -295,69 +363,16 @@ def load_liquid_dye(
     return src_wells_by_volume
 
 
-def run(ctx: ProtocolContext) -> None:
-    """Run."""
-    # TODO: (sigler) once this Protocol is stable,
-    #       see about adding support for just the trash-bin
-    trash = ctx.load_waste_chute()
-
-    # MODULES
-    heater_shaker = ctx.load_module("heaterShakerModuleV1", SLOTS["plate"])
-    adapter = heater_shaker.load_adapter("opentrons_universal_flat_adapter")
-    heater_shaker.close_labware_latch()
-
-    # PIPETTES
-    test_pipette = ctx.load_instrument(ctx.params.pipette, "left")  # type: ignore[attr-defined]
-    diluent_pipette: Optional[InstrumentContext] = None
-    if test_pipette.channels != 96:
-        diluent_pipette = ctx.load_instrument("flex_8channel_1000", "right")
-
-    # LABWARE
-    tip_ul = int(str(ctx.params.tips).split("_")[-1].replace("ul", ""))
-    inaccessible_racks = load_tip_racks(ctx, test_pipette, diluent_pipette, num_racks_needed=1)
-    # NOTE: configuring for MAX tip uL before calculate test volumes
-    test_pipette.configure_for_volume(tip_ul)
-    # NOTE: limiting 96ch to only test <=200uL, b/c 1000uL requires too many plates
-    max_possible_ul = (
-        DYE_SHAKER_MAX_UL if test_pipette.channels == 96 else test_pipette.max_volume
-    )
-    # NOTE: configuring for MINIMUM tip uL before calculate test volumes
-    test_pipette.configure_for_volume(1)
-    volumes = [
-        min(max(v, test_pipette.min_volume), tip_ul, max_possible_ul)
-        for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]  # type: ignore[attr-defined]
-    ]
-    trials_list = TRIALS_BY_PIPETTE_BY_TIP[test_pipette.name][tip_ul]
-    num_wells_needed = (
-            sum(
-                [
-                    ceil(ul / DYE_SHAKER_MAX_UL) * trials
-                    for ul, trials in zip(volumes, trials_list)
-                ]
-            )
-            * test_pipette.channels
-    )
-    reservoir_diluent, reservoirs_dye, plates = load_labware(
-        ctx, test_pipette, tip_ul, num_wells_needed
-    )
-
-    # LOAD LIQUID
-    dye_well_by_volume = load_liquid_dye(
-        ctx, test_pipette, reservoirs_dye, volumes, tip_ul
-    )
-    load_liquid_diluent(ctx, test_pipette, reservoir_diluent, volumes, tip_ul)
-    # liquid-classes
-    diluent_class = ctx.define_liquid_class("water")
-    test_class: Optional[LiquidClass] = None
-    if str(ctx.params.liquid) != "legacy":  # type: ignore[attr-defined]
-        test_class = ctx.define_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
-
+def gather_dest_wells(pipette, plates, volumes, trials) -> Dict[float, List[Well]]:
     # GATHER TARGET WELLS
-    all_columns = [c for p in plates for c in p.columns()]
-    trials_list = TRIALS_BY_PIPETTE_BY_TIP[test_pipette.name][tip_ul]
+    # NOTE: any volumes greater than 250 will be split between
+    #       multiple wells, and since the only high volume we
+    #       test is 1000ul, this ends up meaning DEST wells are
+    #       either 1x or 4x per aspirate
+    all_columns = [c for p in reversed(plates) for c in p.columns()]
     num_wells_by_volumes = {
-        ul: ceil(ul / DYE_SHAKER_MAX_UL) * test_pipette.channels * trials
-        for ul, trials in zip(volumes, trials_list)
+        ul: ceil(ul / DYE_SHAKER_MAX_UL) * pipette.channels * trials
+        for ul, trials in zip(volumes, trials)
     }
     dest_wells_by_volume: Dict[float, List[Well]] = {ul: [] for ul in volumes}
     for ul, num in num_wells_by_volumes.items():
@@ -365,62 +380,172 @@ def run(ctx: ProtocolContext) -> None:
             remain = num - len(dest_wells_by_volume[ul])
             next_column = all_columns.pop(0)
             dest_wells_by_volume[ul] += next_column[:remain]
+    return dest_wells_by_volume
 
-    # TRANSFER DILUENT
+
+def shake_and_read_plate(
+        ctx: ProtocolContext,
+        plate: Labware,
+        shaker: HeaterShakerContext,
+        reader: AbsorbanceReaderContext,
+        filename: str,
+) -> None:
+
+    # SHAKE FOR 60 SECONDS
+    shaker.close_labware_latch()
+    shaker.set_and_wait_for_shake_speed(1100)
+    ctx.delay(seconds=60)
+    shaker.deactivate_shaker()
+    shaker.open_labware_latch()
+
+    # READ ABSORBANCE
+    reader.open_lid()
+    ctx.move_labware(plate, new_location=reader, use_gripper=True)
+    reader.close_lid()
+    reader.read(
+        export_filename=f"{filename}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
+    )
+    reader.open_lid()
+
+    # ADD TO STACK
+    plate_in_stack: Optional[Labware] = ctx.deck[SLOTS["stack_end"]]
+    if not plate_in_stack:
+        plate_dest = SLOTS["stack_end"]
+    else:
+        while plate_in_stack.child:
+            plate_in_stack = plate_in_stack.child
+        plate_dest = plate_in_stack
+    ctx.move_labware(plate, plate_dest, use_gripper=True)
+
+
+def run(ctx: ProtocolContext) -> None:
+    """Run."""
+    trash = ctx.load_waste_chute()
+
+    # LOAD MODULES
+    heater_shaker = ctx.load_module("heaterShakerModuleV1", SLOTS["plate"])
+    heater_shaker.close_labware_latch()
+    heater_shaker.deactivate_shaker()
+    heater_shaker.deactivate_heater()
+    heater_shaker.open_labware_latch()
+    adapter = heater_shaker.load_adapter("opentrons_universal_flat_adapter")
+    plate_reader = None
+    if not ctx.params.use_artel:
+        plate_reader = ctx.load_module("absorbanceReaderV1", SLOTS["reader"])
+        plate_reader.close_lid()
+        plate_reader.initialize(mode="single", wavelengths=[450])
+
+    # LOAD PIPETTES
+    test_pip = ctx.load_instrument(ctx.params.pipette, "left")  # type: ignore[attr-defined]
+    diluent_pipette: Optional[InstrumentContext] = None
+    if test_pip.channels != 96:
+        diluent_pipette = ctx.load_instrument("flex_8channel_1000", "right")
     pip_for_dil: InstrumentContext = (
-        diluent_pipette if diluent_pipette else test_pipette
+        diluent_pipette if diluent_pipette else test_pip
+    )
+
+    # LOAD LABWARE & TIP-RACKS
+    tip_ul = int(str(ctx.params.tips).split("_")[-1].replace("ul", ""))
+    trials_list = TRIALS_BY_PIPETTE_BY_TIP[test_pip.name][tip_ul]
+    volumes = get_volumes(ctx, test_pip, tip_ul)
+    reservoir_diluent, reservoirs_dye, plates = load_most_labware(
+        ctx, test_pip, tip_ul, volumes, trials_list
+    )
+    inaccessible_racks = load_tip_racks(
+        ctx, test_pip, diluent_pipette, num_racks_needed=1
+    )
+    dest_wells_by_volume: Dict[float, List[Well]] = gather_dest_wells(
+        test_pip, plates, volumes, trials_list
     )
     diluent_tips = cast(Labware, ctx.deck[SLOTS["tips_diluent"]])
     if diluent_tips.is_adapter:
         diluent_tips = cast(Labware, diluent_tips.child)
-    pip_for_dil.pick_up_tip(diluent_tips)
-    pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
+
+    # LOAD LIQUIDS & LIQUID-CLASS
+    dye_well_by_volume = load_liquid_dye(
+        ctx, test_pip, reservoirs_dye, volumes, tip_ul
+    )
+    load_liquid_diluent(ctx, test_pip, reservoir_diluent, volumes, tip_ul)
+    diluent_class = ctx.define_liquid_class("water")
+    test_class: Optional[LiquidClass] = None
+    if str(ctx.params.liquid) != "legacy":  # type: ignore[attr-defined]
+        test_class = ctx.define_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
+
+    # PROBE ALL SRC WELLS
+    if reservoir_diluent["A1"].current_liquid_volume():
+        pip_for_dil.pick_up_tip(diluent_tips)
+        pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
+        pip_for_dil.drop_tip()
     for ul in volumes:
-        if ul < DYE_READER_IDEAL_UL:
+        well: Well = dye_well_by_volume[ul]
+        test_pip.pick_up_tip()
+        test_pip.require_liquid_presence(well)
+        test_pip.drop_tip()
+
+    # TEST EACH VOLUME
+    plate: Optional[Labware] = None
+    ul_in_this_plate: List[float] = []
+
+    def filename() -> str:
+        ul_sub_string = "ul_".join([str(old_ul) for old_ul in ul_in_this_plate])
+        return f"{test_pip.name}_t{tip_ul}_{ul_sub_string}ul"
+
+    for ul in volumes:
+
+        # PROCESS FULL PLATE
+        dest_wells: List[Well] = dest_wells_by_volume[ul]
+        if plate and dest_wells[0] not in plate.wells():
+            if not plate_reader:
+                # REMOVE AND TAKE TO ARTEL READER
+                ctx.move_labware(plate, OFF_DECK, use_gripper=False)  # HUMAN
+            else:
+                shake_and_read_plate(
+                    ctx, plate, heater_shaker, plate_reader, filename()
+                )
+            plate = None
+            ul_in_this_plate = []
+
+        # GET NEW (EMPTY) PLATE
+        if not plate:
+            heater_shaker.open_labware_latch()
+            plate = plates.pop(-1)
+            assert dest_wells[0] in plate.wells(), \
+                f"dest well {dest_wells[0]} not in {plate} on top of {plate.parent}"
+            ul_in_this_plate.append(ul)
+            ctx.move_labware(plate, adapter, use_gripper=True)
+            heater_shaker.close_labware_latch()
+
+        # TRANSFER DILUENT TO PLATE
+        dil_ul = DYE_READER_IDEAL_UL - ul
+        if dil_ul > 0:
+            pip_for_dil.pick_up_tip(diluent_tips)
             dest_columns = [
                 w.parent.columns_by_name()[w.well_name[1:]]
                 for w in dest_wells_by_volume[ul]
                 if "A" in w.well_name  # new column
             ]
+            src_wells = [reservoir_diluent["A1"]] * len(dest_columns)
             pip_for_dil.transfer_with_liquid_class(
-                liquid_class=diluent_class,
-                volume=DYE_READER_IDEAL_UL - ul,
-                source=[reservoir_diluent["A1"]] * len(dest_columns),
-                dest=dest_columns,
-                new_tip="never",
+                diluent_class, dil_ul, src_wells, dest_columns, new_tip="never"
             )
-    pip_for_dil.drop_tip()
+            pip_for_dil.drop_tip()
 
-    # MOVE 1st PLATE TO HEATER-SHAKER
-    heater_shaker.open_labware_latch()
-    ctx.move_labware(plates[0], adapter, use_gripper=True)
-    heater_shaker.close_labware_latch()
+        # TRANSFER DYE TO PLATE
+        src_well: Well = dye_well_by_volume[ul]
+        args = [ul / len(dest_wells), src_well, dest_wells]
+        if test_class and len(dest_wells) == 1:
+            test_pip.transfer_with_liquid_class(test_class, *args, new_tip="always")
+        elif test_class and len(dest_wells) == 4:
+            test_pip.distribute_with_liquid_class(test_class, *args, new_tip="always")
+        elif not test_class and len(dest_wells) == 1:
+            test_pip.transfer(*args, new_tip="always")
+        elif not test_class and len(dest_wells) == 4:
+            test_pip.distribute(*args, new_tip="always")
 
-    # TRANSFER DYE
-    # FIXME: add LLD here
-    # FIXME: add meniscus-relative pipetting to shared-data
-    for ul in volumes:
-        source = [dye_well_by_volume[ul]]  # NOTE: currently expects exactly 1x well per volume
-        dest = dest_wells_by_volume[ul]
-        if test_class:
-            if len(dest) > len(source):
-                num_dispense_per_aspirate = ceil(len(dest) / len(source))
-                split_ul = ul / num_dispense_per_aspirate
-                for src_well in source:
-                    dest_wells = [dest.pop(0) for _ in range(num_dispense_per_aspirate)]
-                    test_pipette.distribute_with_liquid_class(
-                        test_class, split_ul, src_well, dest_wells, new_tip="once"
-                    )
-            else:
-                test_pipette.transfer_with_liquid_class(
-                    test_class, ul, source, dest, new_tip="always"
-                )
-        else:
-            test_pipette.transfer(ul, source, dest, new_tip="always")
-
+        # SWAP INACCESSIBLE TIP-RACKS
         new_racks: List[Labware] = []
-        for rack in test_pipette.tip_racks:
-            if rack.next_tip(test_pipette.channels):
+        for rack in test_pip.tip_racks:
+            if rack.next_tip(test_pip.channels):
                 new_racks.append(rack)
                 continue
             if not inaccessible_racks:
@@ -429,4 +554,9 @@ def run(ctx: ProtocolContext) -> None:
             prev_parent = rack.parent
             ctx.move_labware(rack, trash, use_gripper=True)
             ctx.move_labware(new_racks[-1], prev_parent, use_gripper=True)
-        test_pipette.tip_racks = new_racks
+        test_pip.tip_racks = new_racks
+
+    # don't forget final plate
+    shake_and_read_plate(
+        ctx, plate, heater_shaker, plate_reader, filename()
+    )

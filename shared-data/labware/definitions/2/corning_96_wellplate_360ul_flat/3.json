@@ -66,6 +66,12 @@
     "y": 0,
     "z": 0
   },
+  "stackLimit": 11,
+  "compatibleParentLabware": [
+    "stackable_corning_96_wellplate_360ul_flat",
+    "corning_96_wellplate_360ul_flat",
+    "plate_lid"
+  ],
   "gripForce": 15,
   "gripHeightFromLabwareBottom": 12.2,
   "wells": {
@@ -1139,10 +1145,10 @@
     "format": "96Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "corning_96_wellplate_360ul_flat"
+    "loadName": "stackable_corning_96_wellplate_360ul_flat"
   },
-  "namespace": "opentrons",
-  "version": 3,
+  "namespace": "custom_beta",
+  "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {
     "opentrons_universal_flat_adapter": {
@@ -1154,6 +1160,21 @@
       "x": 0,
       "y": 0,
       "z": 5.45
+    },
+    "plate_lid": {
+      "x": 0,
+      "y": 0,
+      "z": 1.1
+    },
+    "stackable_corning_96_wellplate_360ul_flat": {
+      "x": 0,
+      "y": 0,
+      "z": 1.3
+    },
+    "corning_96_wellplate_360ul_flat": {
+      "x": 0,
+      "y": 0,
+      "z": 1.3
     }
   },
   "innerLabwareGeometry": {
