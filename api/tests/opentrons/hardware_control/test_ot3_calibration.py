@@ -183,11 +183,13 @@ async def test_find_edge(
 ) -> None:
     await ot3_hardware.home()
     mock_capacitive_probe.side_effect = probe_results
+    edge_settings = ot3_hardware.config.calibration.edge_sense
     result = await find_edge_binary(
         ot3_hardware,
         OT3Mount.RIGHT,
         Point(0, 0, 0),
         Axis.X,
+        edge_settings,
         direction_if_hit,
         False,
     )
@@ -238,12 +240,14 @@ async def test_find_edge_early_trigger(
 ) -> None:
     await ot3_hardware.home()
     mock_capacitive_probe.side_effect = ((3, True), ())
+    edge_settings = ot3_hardware.config.calibration.edge_sense
     with pytest.raises(EarlyCapacitiveSenseTrigger):
         await find_edge_binary(
             ot3_hardware,
             OT3Mount.RIGHT,
             Point(0.0, 0.0, 0.0),
             Axis.Y,
+            edge_settings,
             -1,
         )
 

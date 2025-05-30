@@ -1,7 +1,7 @@
 """Functions and utilites for OT3 calibration."""
 from __future__ import annotations
 from functools import lru_cache
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing_extensions import Final, Literal, TYPE_CHECKING
 from typing import Tuple, List, Dict, Any, Optional, Union
 import datetime
@@ -181,6 +181,7 @@ async def find_edge_binary(
     mount: OT3Mount,
     slot_edge_nominal: Point,
     search_axis: Union[Literal[Axis.X, Axis.Y]],
+    edge_settings: EdgeSenseSettings,
     direction_if_hit: Literal[1, -1],
     raise_verify_error: bool = True,
     probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -209,7 +210,6 @@ async def find_edge_binary(
     The absolute position at which the center of the effector is inside the slot
     and its edge is aligned with the calibration slot edge.
     """
-    edge_settings = hcapi.config.calibration.edge_sense
     # Our first search position is at the slot edge nominal at the probe's edge
     checking_pos = slot_edge_nominal + critical_edge_offset(
         search_axis, direction_if_hit
@@ -281,12 +281,14 @@ async def find_slot_center_binary(
     """Find the center of the calibration slot by binary-searching its edges.
     Returns the XY-center of the slot.
     """
+    edge_settings = hcapi.config.calibration.edge_sense
     # Find all four edges of the calibration slot
     plus_x_edge = await find_edge_binary(
         hcapi,
         mount,
         estimated_center + EDGES["right"],
         Axis.X,
+        edge_settings,
         -1,
         raise_verify_error,
         probe=probe,
@@ -299,6 +301,7 @@ async def find_slot_center_binary(
         mount,
         estimated_center + EDGES["top"],
         Axis.Y,
+        edge_settings,
         -1,
         raise_verify_error,
         probe=probe,
@@ -306,11 +309,18 @@ async def find_slot_center_binary(
     LOG.info(f"Found +y edge at {plus_y_edge.y}mm")
     estimated_center = estimated_center._replace(y=plus_y_edge.y - EDGES["top"].y)
 
+    # since we have a good idea where the edges are now we can reduce the second set of sweeps
+    fast_edge_settings = replace(
+        edge_settings,
+        search_initial_tolerance_mm=edge_settings.search_initial_tolerance_mm / 4,
+        search_iteration_limit=edge_settings.search_iteration_limit - 2,
+    )
     minus_x_edge = await find_edge_binary(
         hcapi,
         mount,
         estimated_center + EDGES["left"],
         Axis.X,
+        fast_edge_settings,
         1,
         raise_verify_error,
         probe=probe,
@@ -323,6 +333,7 @@ async def find_slot_center_binary(
         mount,
         estimated_center + EDGES["bottom"],
         Axis.Y,
+        fast_edge_settings,
         1,
         raise_verify_error,
         probe=probe,
