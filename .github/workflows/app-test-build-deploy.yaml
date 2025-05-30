@@ -221,6 +221,13 @@ jobs:
         run: |
           make -C app dist
 
+      - name: Install TrustedSigning module @ 0.5.0
+        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
+        shell: pwsh
+        run: |
+          Install-Module -Name TrustedSigning -RequiredVersion 0.5.0 -Force -Repository PSGallery
+          Get-Module -ListAvailable -Name TrustedSigning
+
       # build the desktop app and deploy it
       - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
         if: matrix.target == 'desktop'
