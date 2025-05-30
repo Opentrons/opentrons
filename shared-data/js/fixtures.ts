@@ -657,7 +657,6 @@ export const isAddressableAreaStandardSlot = (
     : STANDARD_OT2_SLOTS
   ).includes(addressableAreaName)
 
-
 // export const getModuleOptionsForCutoutId = (cutoutId: CutoutId): CutoutConfigMap[][] => {
 //   const deck_def = getDeckDefFromRobotType('OT-3 Standard')
 //   const cutoutFixturesAllowed = deck_def.cutoutFixtures.filter(item => item.mayMountTo.includes(cutoutId))
