@@ -7,7 +7,6 @@ describe('AnimationVideo', () => {
 	it('should have default props', () => {
 		render(<AnimationVideo data-testid="subject"></AnimationVideo>)
 		const videoNode = screen.getByTestId('subject')
-		// expect(videoNode).toHaveClass('video')
 		expect(videoNode).toHaveAttribute('autoplay')
 		expect(videoNode).toHaveAttribute('loop')
 		expect(videoNode).not.toHaveAttribute('controls')
@@ -23,7 +22,6 @@ describe('AnimationVideo', () => {
 			></AnimationVideo>
 		)
 		const videoNode = screen.getByTestId('subject')
-		// expect(videoNode).toHaveClass('video')
 		expect(videoNode).toHaveAttribute('autoplay')
 		expect(videoNode).not.toHaveAttribute('loop') // Default overridden by custom.
 		expect(videoNode).not.toHaveAttribute('controls')
