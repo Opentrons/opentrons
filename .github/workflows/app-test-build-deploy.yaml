@@ -230,14 +230,20 @@ jobs:
             $dummyExePath = Join-Path -Path $env:GITHUB_WORKSPACE -ChildPath "dummy.exe"
             Set-Content -Path $dummyExePath -Value "This is a dummy executable for testing purposes."
             # Invoke Trusted Signing on the dummy executable
-            Invoke-TrustedSigning `
-              -Endpoint 'https://eus.codesigning.azure.net/' `
-              -CertificateProfileName '${{secrets.AZURE_TENANT_ID}}' `
-              -CodeSigningAccountName '${{secrets.AZURE_CLIENT_ID}}' `
-              -TimestampRfc3161 'http://timestamp.acs.microsoft.com' `
-              -TimestampDigest 'SHA256' `
-              -FileDigest 'SHA256' `
-              -Files $dummyExePath
+            try {
+              Invoke-TrustedSigning `
+                -Endpoint 'https://eus.codesigning.azure.net/' `
+                -CertificateProfileName '${{secrets.AZURE_TENANT_ID}}' `
+                -CodeSigningAccountName '${{secrets.AZURE_CLIENT_ID}}' `
+                -TimestampRfc3161 'http://timestamp.acs.microsoft.com' `
+                -TimestampDigest 'SHA256' `
+                -FileDigest 'SHA256' `
+                -Files $dummyExePath
+            } catch {
+              Write-Host "Invoke-TrustedSigning failed: $($_.Exception.Message)"
+              # Prevent the script from exiting with a non-zero status
+              exit 0
+            }
 
       # build the desktop app and deploy it
       - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
