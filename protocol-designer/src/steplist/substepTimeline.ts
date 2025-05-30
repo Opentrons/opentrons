@@ -99,7 +99,6 @@ export const substepTimelineSingleChannel = (
             }
           }
           const { volume, pipetteId } = command.params
-          console.log('command volume', volume, command.commandType)
           const pipetteEntity = pipettes[pipetteId]
           const entityId = pipetteEntity.entityId ?? ''
           const wellName = pipetteEntity.wellName ?? ''
@@ -173,7 +172,6 @@ export const substepTimelineSingleChannel = (
         prevRobotState: initialRobotState,
       }
     )
-    console.log('timeline.timeline', timeline.timeline)
     return timeline.timeline
   } else {
     return []
@@ -235,7 +233,6 @@ export const substepTimelineMultiChannel = (
           } else if (nozzles === SINGLE) {
             numChannels = 1
           }
-
           if (isMoveToWell) {
             const {
               def: labwareDef,
@@ -250,16 +247,10 @@ export const substepTimelineMultiChannel = (
               labwareId,
               wells: wellsForTips || [],
               preIngreds: wellsForTips
-                ? pick(
-                    acc.prevRobotState.liquidState.labware[labwareId],
-                    wellsForTips
-                  )
+                ? pick(liquidState.labware[labwareId], wellsForTips)
                 : {},
               postIngreds: wellsForTips
-                ? pick(
-                    nextRobotState.liquidState.labware[labwareId],
-                    wellsForTips
-                  )
+                ? pick(liquidState.labware[labwareId], wellsForTips)
                 : {},
             }
 
@@ -315,6 +306,7 @@ export const substepTimelineMultiChannel = (
         prevRobotState: initialRobotState,
       }
     )
+    console.log('timeline.timeline', timeline.timeline)
     return timeline.timeline
   } else {
     return []

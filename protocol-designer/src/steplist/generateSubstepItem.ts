@@ -31,6 +31,7 @@ import type { StepIdType } from '../form-types'
 import type {
   LabwareNamesByModuleId,
   NamedIngred,
+  SourceDestData,
   SourceDestSubstepItem,
   StepArgsAndErrors,
   StepItemSourceDestRow,
@@ -116,9 +117,8 @@ function getCommandCreatorForTransferlikeSubsteps(
 
 export const mergeSubstepRowsSingleChannel = (args: {
   substepRows: SubstepTimelineFrame[]
-  showDispenseVol: boolean
 }): StepItemSourceDestRow[] => {
-  const { substepRows, showDispenseVol } = args
+  const { substepRows } = args
   return steplistUtils.mergeWhen(
     substepRows,
     (
@@ -290,8 +290,7 @@ function transferLikeSubsteps(args: {
 
   // Multichannel substeps
   if (pipetteSpec.channels > 1) {
-    console.log('hit here for multichannel')
-    const substepRows: SubstepTimelineFrame[] = substepTimelineMultiChannel(
+    const substepRows = substepTimelineMultiChannel(
       substepCommandCreator,
       invariantContext,
       initialRobotState
@@ -304,6 +303,7 @@ function transferLikeSubsteps(args: {
         showDispenseVol,
       }
     )
+    console.log('mergedMultiRows', mergedMultiRows)
     return {
       substepType: 'sourceDest',
       multichannel: true,
@@ -313,18 +313,14 @@ function transferLikeSubsteps(args: {
     }
   } else {
     // single channel
-    console.log('hit here for single channel')
     const substepRows = substepTimelineSingleChannel(
       substepCommandCreator,
       invariantContext,
       initialRobotState
     )
-    console.log('substepRows', substepRows)
     const mergedRows: StepItemSourceDestRow[] = mergeSubstepRowsSingleChannel({
       substepRows,
-      showDispenseVol,
     })
-    console.log('mergedRows', mergedRows)
 
     return {
       substepType: 'sourceDest',

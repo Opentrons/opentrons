@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import { getCutoutDisplayName } from '@opentrons/shared-data'
 
 import {
   getAdditionalEquipment,
@@ -35,11 +36,6 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
   console.log('substeps', substeps)
   const renderSubsteps = substeps.multichannel
     ? substeps.multiRows.map((rowGroup, groupKey) => {
-        const filteredRowGroup = rowGroup.filter(
-          item => item.source !== undefined
-        )
-        if (filteredRowGroup.length === 0) return null
-
         return (
           <MultichannelSubstep
             trashName={trashName}
@@ -49,7 +45,7 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
               hoveredSubstep.stepId === substeps.parentStepId &&
               hoveredSubstep.substepIndex === groupKey
             }
-            rowGroup={filteredRowGroup}
+            rowGroup={rowGroup}
             stepId={substeps.parentStepId}
             substepIndex={groupKey}
             selectSubstep={selectSubstep}

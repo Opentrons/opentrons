@@ -59,7 +59,7 @@ export function MultichannelSubstep(
   const destWellRange = `${
     firstChannelDest ? firstChannelDest.well ?? 'Trash' : ''
   }:${lastChannelDest ? lastChannelDest.well : ''}`
-
+  console.log('rowGroup', rowGroup)
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
