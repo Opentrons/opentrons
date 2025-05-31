@@ -206,6 +206,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                     <FirmwareUpdateTakeover />
                     {showModuleSetupModal && localRobot?.name != null ? (
                       <ModuleWizardFlows
+                        showSetupLauncher={true}
                         closeFlow={() => {
                           setShowModuleSetupModal(false)
                         }}
