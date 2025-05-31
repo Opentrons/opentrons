@@ -42,7 +42,7 @@ export const ModuleWizardFlows = (
     attachedModule: attachedModuleOnLaunch,
     robotName,
     isLoadedInRun = false,
-    showSetupLauncher = true,
+    showSetupLauncher = false,
     closeFlow,
     onComplete,
   } = props
