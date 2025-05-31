@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
+import { AttachedModule } from '@opentrons/api-client'
 import {
   Btn,
   COLORS,
@@ -13,6 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { CUSTOM_LABWARE_PROMPT_W_RESULTS } from '@opentrons/labware-library/src/localization'
 import {
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
@@ -48,7 +50,8 @@ import {
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
-  WASTE_CHUTE_FIXTURES} from '@opentrons/shared-data'
+  WASTE_CHUTE_FIXTURES,
+} from '@opentrons/shared-data'
 
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
@@ -60,8 +63,6 @@ import type {
   CutoutId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import { AttachedModule } from '@opentrons/api-client'
-import { CUSTOM_LABWARE_PROMPT_W_RESULTS } from '@opentrons/labware-library/src/localization'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -122,7 +123,12 @@ export function AddFixtureModal({
     width: '26.75rem',
   }
 
-  const availableOptions = getOptions(cutoutId, providedFixtureOptions, unconfiguredMods, optionStage)
+  const availableOptions = getOptions(
+    cutoutId,
+    providedFixtureOptions,
+    unconfiguredMods,
+    optionStage
+  )
 
   let nextStageOptions = null
   if (optionStage === 'modulesOrFixtures') {
@@ -268,62 +274,83 @@ const GO_BACK_BUTTON_STYLE = css`
 
 export const getFixtureOptions = (cutoutId: CutoutId): CutoutConfig[][] => {
   let availableOptions: CutoutConfig[][] = []
-    if (
-      SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
-      SINGLE_LEFT_CUTOUTS.includes(cutoutId)
-    ) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
-          },
-        ],
-      ]
-    }
-    if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
-          },
-        ],
-      ]
-    }
-    return availableOptions
+  if (
+    SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
+    SINGLE_LEFT_CUTOUTS.includes(cutoutId)
+  ) {
+    availableOptions = [
+      ...availableOptions,
+      [
+        {
+          cutoutId,
+          cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+        },
+      ],
+    ]
+  }
+  if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
+    availableOptions = [
+      ...availableOptions,
+      [
+        {
+          cutoutId,
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+        },
+      ],
+    ]
+  }
+  return availableOptions
 }
 
-export const getThermoUnconfiguredFixtures=(unconfiguredMods: AttachedModule[], cutoutId: CutoutId): CutoutConfig[][] => {
+const MODULE_CUTOUT_FIXTURE_ID = [
+  'heaterShakerModuleV1',
+  'temperatureModuleV2',
+  'magneticBlockV1',
+  'stagingAreaSlotWithMagneticBlockV1',
+  'thermocyclerModuleV2Rear',
+  'thermocyclerModuleV2Front',
+  'absorbanceReaderV1',
+  'flexStackerModuleV1',
+  'flexStackerModuleV1WithMagneticBlockV1',
+]
+
+export const getThermoUnconfiguredFixtures = (
+  unconfiguredMods: AttachedModule[],
+  cutoutId: CutoutId
+): CutoutConfig[][] => {
   const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-  const flexModuleCutoutFixtureId = [
-  'heaterShakerModuleV1', 'temperatureModuleV2'
-  ,'magneticBlockV1'
-  ,'stagingAreaSlotWithMagneticBlockV1'
-  ,'thermocyclerModuleV2Rear'
-  ,'thermocyclerModuleV2Front'
-  ,'absorbanceReaderV1'
-  ,'flexStackerModuleV1'
-  ,'flexStackerModuleV1WithMagneticBlockV1']
-  const availableCutoutFixtuers = deckDef.cutoutFixtures.filter(cf => cf.mayMountTo.includes(cutoutId) && flexModuleCutoutFixtureId.includes(cf.id))
-  console.log("availableCutoutFixtuers: ", availableCutoutFixtuers)
-  const tt = availableCutoutFixtuers.map(mod => mod.fixtureGroup[cutoutId] ?? [])
-console.log("unconfiguredMods: ", unconfiguredMods)
-  const mt = Object.keys(tt[0][0]).map((mod => (      {
-    cutoutId: mod,
-    cutoutFixtureId: tt[0][0][mod],
-    opentronsModuleSerialNumber: unconfiguredMods[0].serialNumber,
-  })))
-  console.log("mt: ", mt)
-  return mt
+
+  const availableCutoutFixtuers = deckDef.cutoutFixtures.filter(
+    cf =>
+      cf.mayMountTo.includes(cutoutId) &&
+      MODULE_CUTOUT_FIXTURE_ID.includes(cf.id)
+  )
+  const fixtureGroup = availableCutoutFixtuers.map(
+    mod => mod.fixtureGroup[cutoutId] ?? []
+  )
+  const fixtureGroupItem = fixtureGroup[0][0]
+  const matrix = unconfiguredMods
+    .filter(f => f.moduleModel === THERMOCYCLER_MODULE_V2)
+    .map(item =>
+      Object.keys(fixtureGroupItem).map((mod: string) => ({
+        cutoutId: mod,
+        cutoutFixtureId: fixtureGroupItem[mod as keyof typeof fixtureGroupItem],
+        opentronsModuleSerialNumber: item.serialNumber,
+      }))
+    )
+  return matrix
 }
 
-export const getUnconfiguredMods = (cutoutId: CutoutId, unconfiguredMods: AttachedModule[]): CutoutConfig[][] => {
+export const getUnconfiguredMods = (
+  cutoutId: CutoutId,
+  unconfiguredMods: AttachedModule[]
+): CutoutConfig[][] => {
   let availableOptions: CutoutConfig[][] = []
   if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
-    const unconfiguredTCs = getThermoUnconfiguredFixtures(unconfiguredMods, cutoutId)
+    const unconfiguredTCs = getThermoUnconfiguredFixtures(
+      unconfiguredMods,
+      cutoutId
+    )
     availableOptions = [...availableOptions, ...unconfiguredTCs]
   }
   if (
@@ -354,10 +381,7 @@ export const getUnconfiguredMods = (cutoutId: CutoutId, unconfiguredMods: Attach
           opentronsModuleSerialNumber: mod.serialNumber,
         },
       ])
-    availableOptions = [
-      ...availableOptions,
-      ...unconfiguredTemperatureModules,
-    ]
+    availableOptions = [...availableOptions, ...unconfiguredTemperatureModules]
   }
   if (
     ABSORBANCE_READER_CUTOUTS.includes(cutoutId) &&
@@ -372,15 +396,15 @@ export const getUnconfiguredMods = (cutoutId: CutoutId, unconfiguredMods: Attach
           opentronsModuleSerialNumber: mod.serialNumber,
         },
       ])
-    availableOptions = [
-      ...availableOptions,
-      ...unconfiguredAbsorbanceReaders,
-    ]
+    availableOptions = [...availableOptions, ...unconfiguredAbsorbanceReaders]
   }
   return availableOptions
 }
 
-export const getModuleOptions = (cutoutId: CutoutId, unconfiguredMods: AttachedModule[]): CutoutConfig[][] => {
+export const getModuleOptions = (
+  cutoutId: CutoutId,
+  unconfiguredMods: AttachedModule[]
+): CutoutConfig[][] => {
   // let availableOptions2 = getModuleOptionsForCutoutId(cutoutId)
   // console.log("availableOptions: ", availableOptions)
   let availableOptions: CutoutConfig[][] = [
@@ -404,7 +428,10 @@ export const getModuleOptions = (cutoutId: CutoutId, unconfiguredMods: AttachedM
     ]
   }
   if (unconfiguredMods.length > 0) {
-    availableOptions = [...availableOptions, ...getUnconfiguredMods(cutoutId, unconfiguredMods)]
+    availableOptions = [
+      ...availableOptions,
+      ...getUnconfiguredMods(cutoutId, unconfiguredMods),
+    ]
   }
   if (
     cutoutId === 'cutoutD3' &&
@@ -472,8 +499,12 @@ export const getModuleOptions = (cutoutId: CutoutId, unconfiguredMods: AttachedM
   return availableOptions
 }
 
-export const getOptions = (cutoutId: CutoutId, providedFixtureOptions: CutoutFixtureId[] | undefined, unconfiguredMods: AttachedModule[], optionStage: string): CutoutConfig[][] => {
-
+export const getOptions = (
+  cutoutId: CutoutId,
+  providedFixtureOptions: CutoutFixtureId[] | undefined,
+  unconfiguredMods: AttachedModule[],
+  optionStage: string
+): CutoutConfig[][] => {
   if (providedFixtureOptions != null) {
     return providedFixtureOptions?.map(o => [
       {
@@ -482,10 +513,10 @@ export const getOptions = (cutoutId: CutoutId, providedFixtureOptions: CutoutFix
         opentronsModuleSerialNumber: undefined,
       },
     ])
-  }  
+  }
   if (optionStage === 'fixtureOptions') {
     return getFixtureOptions(cutoutId)
-  } 
+  }
   if (optionStage === 'moduleOptions') {
     return getModuleOptions(cutoutId, unconfiguredMods)
   }
