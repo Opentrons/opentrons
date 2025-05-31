@@ -72,10 +72,13 @@ export const ModuleWizardFlows = (
   const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
     null
   )
+  const [showLaunchSetup, setShowLaunchSetup] = useState<boolean>(
+    showSetupLauncher
+  )
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
 
   if (wizardFlowBaseProps.attachedPipette == null) return null
-  if (showSetupLauncher || wizardFlowBaseProps.attachedModule == null) {
+  if (showLaunchSetup || wizardFlowBaseProps.attachedModule == null) {
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
@@ -93,6 +96,7 @@ export const ModuleWizardFlows = (
           buildFlowForSelectedModule={buildFlowForSelectedModule}
           selectedModule={selectedModule}
           setSelectedModule={setSelectedModule}
+          setShowLaunchSetup={setShowLaunchSetup}
           attachedModuleOnLaunch={attachedModuleOnLaunch}
         />
       </ModuleWizardScreen>
@@ -273,6 +277,7 @@ export const ModuleWizardFlows = (
                 : handleCleanUpAndClose
             }
             attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedModuleOnLaunch={attachedModuleOnLaunch}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
             setSelectedModule={setSelectedModule}
           />

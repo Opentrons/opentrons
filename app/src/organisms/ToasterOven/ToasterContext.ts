@@ -8,7 +8,7 @@ import type {
 
 export type MakeToastOptions = Omit<
   ToastProps,
-  'id' | 'message' | 'type' | 'exitNow'
+  'id' | 'message' | 'type'
 >
 
 type MakeToast = (

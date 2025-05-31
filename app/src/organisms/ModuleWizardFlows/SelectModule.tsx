@@ -32,6 +32,7 @@ interface SelectModuleProps {
   isOnDevice: boolean
   selectedModule: AttachedModule | null
   setSelectedModule: (module: AttachedModule | null) => void
+  setShowLaunchSetup: (show: boolean) => void
   attachedModuleOnLaunch?: AttachedModule | null
 }
 
@@ -46,13 +47,16 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
     isOnDevice,
     selectedModule,
     setSelectedModule,
+    setShowLaunchSetup,
     attachedModuleOnLaunch = null,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
-  const newModules = attachedModuleOnLaunch !== null
-  ? [attachedModuleOnLaunch]
-  : useGetNewModules();
+  const availableModules = useGetNewModules()
+  const newModules =
+    attachedModuleOnLaunch !== null
+      ? [attachedModuleOnLaunch]
+      : availableModules
 
   const isSingleModule = newModules.length === 1
   const sendIdentifyModule = useSendIdentifyModule()
@@ -105,6 +109,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
       }
       // Proceed to module setup
       buildFlowForSelectedModule(module)
+      setShowLaunchSetup(false)
     }
   }
 
