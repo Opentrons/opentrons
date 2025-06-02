@@ -1859,7 +1859,7 @@ class OT3Controller(FlexBackend):
         assert sensor_data is None or isinstance(sensor_data, EnvironmentSensorDataType)
         return sensor_data
 
-    async def _read_env_temp_sensor(
+    async def read_env_temp_sensor(
         self, mount: OT3Mount, primary: bool
     ) -> Optional[float]:
         """Read and return the current sensor information."""
@@ -1868,7 +1868,7 @@ class OT3Controller(FlexBackend):
             return None
         return s_data.temperature.to_float()
 
-    async def _read_env_hum_sensor(
+    async def read_env_hum_sensor(
         self, mount: OT3Mount, primary: bool
     ) -> Optional[float]:
         """Read and return the current sensor information."""
@@ -1877,7 +1877,7 @@ class OT3Controller(FlexBackend):
             return None
         return s_data.humidity.to_float()
 
-    async def _read_pressure_sensor(
+    async def read_pressure_sensor(
         self, mount: OT3Mount, primary: bool
     ) -> Optional[float]:
         """Read and return the current sensor information."""
@@ -1894,7 +1894,7 @@ class OT3Controller(FlexBackend):
         assert sensor_data is None or isinstance(sensor_data, SensorDataType)
         return sensor_data.to_float() if sensor_data else None
 
-    async def _read_capacitive_sensor(
+    async def read_capacitive_sensor(
         self, mount: OT3Mount, primary: bool
     ) -> Optional[float]:
         """Read and return the current sensor information."""

@@ -229,7 +229,8 @@ class FixtureSettings:
         pipette = ctx.load_instrument(
             f"flex_{pipette_channels}channel_{pipette_volume}", mount
         )
-        simulating = ctx.is_simulating()
+        #simulating = ctx.is_simulating()
+        simulating = True
         run_id = create_run_id()
         scale = Scale.build(simulating)
         scale_serial = scale.read_serial_number()

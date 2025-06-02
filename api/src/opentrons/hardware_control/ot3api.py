@@ -3146,7 +3146,7 @@ class OT3API(
     ) -> float:
         """Read and return the current stem temperature."""
         realmount = OT3Mount.from_mount(mount)
-        s_data = await self._backend._read_env_temp_sensor(realmount, primary)
+        s_data = await self._backend.read_env_temp_sensor(realmount, primary)
         return s_data if s_data else 0.0
 
     async def read_stem_humidity(
@@ -3154,7 +3154,7 @@ class OT3API(
     ) -> float:
         """Read and return the current primary stem humidity."""
         realmount = OT3Mount.from_mount(mount)
-        s_data = await self._backend._read_env_hum_sensor(realmount, primary)
+        s_data = await self._backend.read_env_hum_sensor(realmount, primary)
         return s_data if s_data else 0.0
 
     async def read_stem_pressure(
@@ -3162,7 +3162,7 @@ class OT3API(
     ) -> float:
         """Read and return the current primary stem pressure."""
         realmount = OT3Mount.from_mount(mount)
-        s_data = await self._backend._read_pressure_sensor(realmount, primary)
+        s_data = await self._backend.read_pressure_sensor(realmount, primary)
         return s_data if s_data else 0.0
 
     async def read_stem_capacitance(
@@ -3170,5 +3170,5 @@ class OT3API(
     ) -> float:
         """Read and return the current primary stem capacitance."""
         realmount = OT3Mount.from_mount(mount)
-        s_data = await self._backend._read_capacitive_sensor(realmount, primary)
+        s_data = await self._backend.read_capacitive_sensor(realmount, primary)
         return s_data if s_data else 0.0

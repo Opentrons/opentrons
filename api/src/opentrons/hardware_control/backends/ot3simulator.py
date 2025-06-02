@@ -876,27 +876,27 @@ class OT3Simulator(FlexBackend):
     async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
         pass
 
-    async def _read_env_temp_sensor(
+    async def read_env_temp_sensor(
         self, mount: OT3Mount, primary: bool
     ) -> Optional[float]:
         """Read and return the current sensor information."""
 
         return 0.0
 
-    async def _read_env_hum_sensor(
+    async def read_env_hum_sensor(
         self, mount: OT3Mount, primary: bool
     ) -> Optional[float]:
         """Read and return the current sensor information."""
 
         return 0.0
 
-    async def _read_pressure_sensor(
+    async def read_pressure_sensor(
         self, mount: OT3Mount, primary: bool
     ) -> Optional[float]:
         """Read and return the current sensor information."""
         return 0.0
 
-    async def _read_capacitive_sensor(
+    async def read_capacitive_sensor(
         self, mount: OT3Mount, primary: bool
     ) -> Optional[float]:
         """Read and return the current sensor information."""
