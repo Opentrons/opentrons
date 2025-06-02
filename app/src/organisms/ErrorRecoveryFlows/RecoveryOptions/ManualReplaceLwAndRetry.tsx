@@ -29,62 +29,15 @@ export function ManualReplaceLwAndRetry(
     STACKER_SHUTTLE_MISSING_RETRY,
     STACKER_HOPPER_EMPTY_RETRY,
     STACKER_HOPPER_EMPTY_SKIP,
-    ROBOT_IN_MOTION,
     STACKER_SHUTTLE_EMPTY_RETRY,
     STACKER_SHUTTLE_EMPTY_SKIP,
   } = RECOVERY_MAP
-
-  const { t } = useTranslation('error_recovery')
-  const { routeUpdateActions, recoveryCommands } = props
-  const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
-  const { homeShuttle } = recoveryCommands
 
   const buildUnexpectedStep = (): JSX.Element => {
     console.warn(
       `ManualReplaceLwAndRetry: ${step} in ${route} not explicitly handled. Rerouting.`
     )
     return <SelectRecoveryOption {...props} />
-  }
-
-  function PrepareStackerHomeStep(): JSX.Element {
-    const buildNextStep = (): RouteStep => {
-      switch (route) {
-        case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
-          return RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS
-            .CLEAR_TRACK_OF_OBSTRUCTIONS
-        case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
-          return RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.MANUAL_REPLACE
-        case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
-          return STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_LABWARE_IN_LATCH
-        case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
-          return STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_LABWARE_IN_LATCH
-        default:
-          return STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS
-      }
-    }
-    const buildBodyText = (): JSX.Element => (
-      <Trans
-        t={t}
-        i18nKey="carefully_clear_track"
-        components={{ block: <LegacyStyledText as="p" /> }}
-      />
-    )
-    const primaryBtnOnClick = (): Promise<void> => {
-      return handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
-        void homeShuttle().then(() => {
-          proceedToRouteAndStep(route, buildNextStep())
-        })
-      })
-    }
-    return (
-      <TwoColTextAndFailedStepNextStep
-        {...props}
-        leftColTitle={t('prepare_track_for_homing')}
-        leftColBodyText={buildBodyText()}
-        primaryBtnCopy={t('home_now')}
-        primaryBtnOnClick={primaryBtnOnClick}
-      />
-    )
   }
 
   const buildManualReplaceLwAndRetry = (): JSX.Element => {
@@ -237,4 +190,62 @@ export function ManualReplaceLwAndRetry(
   }
 
   return buildContent()
+}
+
+export function PrepareStackerHomeStep(
+  props: RecoveryContentProps
+): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+  const { recoveryMap } = props
+  const { route } = recoveryMap
+
+  const {
+    ROBOT_IN_MOTION,
+    STACKER_STALLED_SKIP,
+    STACKER_SHUTTLE_EMPTY_RETRY,
+    STACKER_SHUTTLE_EMPTY_SKIP,
+  } = RECOVERY_MAP
+
+  const { routeUpdateActions, recoveryCommands } = props
+  const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
+  const { homeShuttle } = recoveryCommands
+
+  const buildNextStep = (): RouteStep => {
+    switch (route) {
+      case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
+        return RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS
+          .CLEAR_TRACK_OF_OBSTRUCTIONS
+      case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
+        return RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.MANUAL_REPLACE
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+        return STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_LABWARE_IN_LATCH
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+        return STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_LABWARE_IN_LATCH
+      default:
+        return STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS
+    }
+  }
+  const buildBodyText = (): JSX.Element => (
+    <Trans
+      t={t}
+      i18nKey="carefully_clear_track"
+      components={{ block: <LegacyStyledText as="p" /> }}
+    />
+  )
+  const primaryBtnOnClick = (): Promise<void> => {
+    return handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
+      void homeShuttle().then(() => {
+        proceedToRouteAndStep(route, buildNextStep())
+      })
+    })
+  }
+  return (
+    <TwoColTextAndFailedStepNextStep
+      {...props}
+      leftColTitle={t('prepare_track_for_homing')}
+      leftColBodyText={buildBodyText()}
+      primaryBtnCopy={t('home_now')}
+      primaryBtnOnClick={primaryBtnOnClick}
+    />
+  )
 }
