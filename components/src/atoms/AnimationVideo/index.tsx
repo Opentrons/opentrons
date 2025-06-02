@@ -20,7 +20,7 @@ export function AnimationVideo(props: AnimationVideoProps): JSX.Element {
     // It prevents the browser from trying to play audio on connected Bluetooth
     // headphones, which would interrupt audio coming from other devices.
     //
-    // Bcause of some React nonsense, the rendered DOM node will not have a `muted`
+    // Because of some React nonsense, the rendered DOM node will not have a `muted`
     // attribute, but its `muted` property will be true, which is good enough.
     // https://github.com/facebook/react/issues/10389
     muted = true,
