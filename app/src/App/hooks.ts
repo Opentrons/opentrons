@@ -174,7 +174,6 @@ export function useModuleAttachedToast(
         onLinkClick: launchModuleSetupCallback,
         disableTimeout: true,
         displayType: 'odd',
-        exitNow: runInProgress,
       })
     }
     moduleSerialsRef.current = moduleSerials
