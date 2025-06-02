@@ -77,7 +77,7 @@ export function DeckSetupToolbox(
   const [showSelectLabwareModal, setShowSelectLabwareModal] = useState<boolean>(
     false
   )
-  const onPlateReader = selectedModuleModel === ABSORBANCE_READER_V1
+  const isOnPlateReader = selectedModuleModel === ABSORBANCE_READER_V1
 
   const {
     createdAdapterForSlot,
@@ -270,7 +270,7 @@ export function DeckSetupToolbox(
         confirmButtonText={t('done')}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          {onPlateReader ? null : (
+          {isOnPlateReader ? null : (
             <Flex width={FLEX_MAX_CONTENT}>
               <EmptySelectorButton
                 textAlignment="left"
@@ -285,10 +285,12 @@ export function DeckSetupToolbox(
           {hasNoLabware ? (
             <InfoScreen
               content={t(
-                onPlateReader ? 'cant_add_labware' : 'no_labware_added'
+                isOnPlateReader ? 'cant_add_labware' : 'no_labware_added'
               )}
               subContent={t(
-                onPlateReader ? 'plate_reader_labware' : 'select_labware_to_add'
+                isOnPlateReader
+                  ? 'plate_reader_labware'
+                  : 'select_labware_to_add'
               )}
             />
           ) : (
