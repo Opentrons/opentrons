@@ -1,13 +1,26 @@
+import head from 'lodash/head'
+
 import { ANY_LOCATION } from '@opentrons/api-client'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  A1_ADDRESSABLE_AREA,
+  B1_ADDRESSABLE_AREA,
+  C2_ADDRESSABLE_AREA,
+  getLabwareDefURI,
+  STANDARD_FLEX_SLOTS,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
+} from '@opentrons/shared-data'
 
 import { OFFSET_KIND_DEFAULT } from '/app/redux/protocol-runs'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  FlexAddressableAreaName,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type {
   DefaultOffsetDetails,
-  LocationSpecificOffsetDetails,
   LabwareModuleStackupDetails,
+  LocationSpecificOffsetDetails,
 } from '/app/redux/protocol-runs'
 import type { GetLPCLabwareInfoForURI } from '.'
 
@@ -42,7 +55,7 @@ export function getDefaultOffsetDetailsForLabware(
       definitionUri: uri,
       kind: OFFSET_KIND_DEFAULT,
       // We always do default offset LPCing in this slot.
-      addressableAreaName: 'C2',
+      addressableAreaName: getValidDefaultOffsetLocation(params.protocolData),
       lwOffsetLocSeq: ANY_LOCATION,
       closestBeneathAdapterId,
       // The only labware present on deck when configuring the default offset is the top-most labware itself.
@@ -127,4 +140,40 @@ function getFirstAdapterIdFrom(
   return lsOffsets.find(
     lsOffset => lsOffset.locationDetails.closestBeneathAdapterId != null
   )?.locationDetails.closestBeneathAdapterId
+}
+
+// Find a valid location for setting a default offset slot.
+// A slot is valid if it does not contain a module.
+// This util works under the assumption that modules cannot be added or removed
+// from the deck mid-protocol run and that currently there is at least one
+// slot on the deck without a module (true as of 8.4.0, since launching LPC requires
+// the presence of a tiprack, which must occupy a non-module deck slot).
+// NOTE: This util is meant to be temporary until product/design devise
+// an alternative method for default offset location selection.
+function getValidDefaultOffsetLocation(
+  protocolData: GetStackingInfoParams['protocolData']
+): FlexAddressableAreaName {
+  const validLocations = new Set<FlexAddressableAreaName>(
+    STANDARD_FLEX_SLOTS as FlexAddressableAreaName[]
+  )
+
+  protocolData?.modules.forEach(mod => {
+    if (
+      mod.model === THERMOCYCLER_MODULE_V2 ||
+      mod.model === THERMOCYCLER_MODULE_V1
+    ) {
+      validLocations.delete(A1_ADDRESSABLE_AREA)
+      validLocations.delete(B1_ADDRESSABLE_AREA)
+    } else {
+      const slotName = mod.location.slotName as FlexAddressableAreaName
+      validLocations.delete(slotName)
+    }
+  })
+
+  if (validLocations.has(C2_ADDRESSABLE_AREA)) {
+    return C2_ADDRESSABLE_AREA
+  } else {
+    // The fallback should never occur in practice.
+    return head(Array.from(validLocations)) ?? C2_ADDRESSABLE_AREA
+  }
 }
