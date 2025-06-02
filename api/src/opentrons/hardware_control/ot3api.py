@@ -3140,3 +3140,35 @@ class OT3API(
         """Tell a pipette to increase its evo-tip-dispense-count in eeprom."""
         realmount = OT3Mount.from_mount(mount)
         await self._backend.increase_evo_disp_count(realmount)
+
+    async def read_stem_temperature(
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    ) -> float:
+        """Read and return the current stem temperature."""
+        realmount = OT3Mount.from_mount(mount)
+        s_data = await self._backend.read_env_temp_sensor(realmount, primary)
+        return s_data if s_data else 0.0
+
+    async def read_stem_humidity(
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    ) -> float:
+        """Read and return the current primary stem humidity."""
+        realmount = OT3Mount.from_mount(mount)
+        s_data = await self._backend.read_env_hum_sensor(realmount, primary)
+        return s_data if s_data else 0.0
+
+    async def read_stem_pressure(
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    ) -> float:
+        """Read and return the current primary stem pressure."""
+        realmount = OT3Mount.from_mount(mount)
+        s_data = await self._backend.read_pressure_sensor(realmount, primary)
+        return s_data if s_data else 0.0
+
+    async def read_stem_capacitance(
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    ) -> float:
+        """Read and return the current primary stem capacitance."""
+        realmount = OT3Mount.from_mount(mount)
+        s_data = await self._backend.read_capacitive_sensor(realmount, primary)
+        return s_data if s_data else 0.0
