@@ -43,7 +43,7 @@ export function MultichannelSubstep(
     trashName,
     isSameLabware,
   } = props
-  const { t } = useTranslation('application')
+  const { t } = useTranslation(['application', 'protocol_steps', 'shared'])
   const [collapsed, setCollapsed] = useState<Boolean>(true)
   const handleToggleCollapsed = (): void => {
     setCollapsed(!collapsed)
@@ -57,9 +57,18 @@ export function MultichannelSubstep(
   const firstChannelDest = rowGroup[0].dest
   const lastChannelDest = rowGroup[rowGroup.length - 1].dest
   const destWellRange = `${
-    firstChannelDest ? firstChannelDest.well ?? 'Trash' : ''
+    firstChannelDest ? firstChannelDest.well ?? t('shared:trash') : ''
   }:${lastChannelDest ? lastChannelDest.well : ''}`
-  console.log('rowGroup', rowGroup)
+
+  let titleCopy = t('protocol_steps:aspirated')
+  let deckLabel = <DeckInfoLabel deckLabel={sourceWellRange} />
+  if (firstChannelSource != null && firstChannelDest != null) {
+    titleCopy = t('protocol_steps:mix')
+  } else if (firstChannelSource == null && firstChannelDest != null) {
+    titleCopy = t('protocol_steps:dispensed')
+    deckLabel = <DeckInfoLabel deckLabel={destWellRange} />
+  }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -72,7 +81,6 @@ export function MultichannelSubstep(
         selectSubstep(null)
       }}
     >
-      {/* TODO: need to update this to match designs! */}
       <ListButton type="noActive" onClick={handleToggleCollapsed}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -83,12 +91,12 @@ export function MultichannelSubstep(
             padding={SPACING.spacing12}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             width="100%"
+            gridGap={SPACING.spacing8}
             alignItems={ALIGN_CENTER}
           >
-            <StyledText desktopStyle="bodyDefaultRegular">Multi</StyledText>
-            {firstChannelSource != null ? (
-              <DeckInfoLabel deckLabel={sourceWellRange} />
-            ) : null}
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {titleCopy}
+            </StyledText>
             <Tag
               text={`${formatVolume(rowGroup[0].volume)} ${t(
                 'units.microliter'
@@ -96,9 +104,12 @@ export function MultichannelSubstep(
               type="default"
               shrinkToContent
             />
-            {firstChannelDest != null ? (
-              <DeckInfoLabel deckLabel={destWellRange} />
-            ) : null}
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {firstChannelSource != null && firstChannelDest == null
+                ? t('protocol_steps:from')
+                : t('protocol_steps:into')}
+            </StyledText>
+            {deckLabel}
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {!collapsed &&

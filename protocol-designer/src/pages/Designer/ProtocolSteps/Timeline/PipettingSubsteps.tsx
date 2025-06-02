@@ -1,7 +1,6 @@
 import { useSelector } from 'react-redux'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
-import { getCutoutDisplayName } from '@opentrons/shared-data'
 
 import {
   getAdditionalEquipment,
@@ -26,14 +25,14 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
   const stepId = substeps.parentStepId
   const formData = useSelector(getSavedStepForms)[stepId]
   const additionalEquipment = useSelector(getAdditionalEquipment)
+
   const destLocationId = formData.dispense_labware
   const trashName =
     additionalEquipment[destLocationId] != null
       ? additionalEquipment[destLocationId]?.name
       : null
 
-  const isSameLabware = formData.aspirate_labware === formData.dispense_labware
-  console.log('substeps', substeps)
+  const isSameLabware = formData.aspirate_labware === destLocationId
   const renderSubsteps = substeps.multichannel
     ? substeps.multiRows.map((rowGroup, groupKey) => {
         return (

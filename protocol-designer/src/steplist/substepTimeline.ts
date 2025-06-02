@@ -1,5 +1,4 @@
 import last from 'lodash/last'
-import pick from 'lodash/pick'
 
 import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
 import {
@@ -243,29 +242,29 @@ export const substepTimelineMultiChannel = (
               labwareDef &&
               getWellsForTips(numChannels, labwareDef, wellName).wellsForTips
 
-            const wellInfo = {
-              labwareId,
-              wells: wellsForTips || [],
-              preIngreds: wellsForTips
-                ? pick(liquidState.labware[labwareId], wellsForTips)
-                : {},
-              postIngreds: wellsForTips
-                ? pick(liquidState.labware[labwareId], wellsForTips)
-                : {},
-            }
+            const newTimelineEntries: SubstepTimelineFrame[] = []
+            for (const well of wellsForTips) {
+              const wellInfo = {
+                labwareId,
+                wells: [well],
+                preIngreds: liquidState.labware[labwareId][well],
+                postIngreds:
+                  nextRobotState.liquidState.labware[labwareId][well],
+              }
 
-            return {
-              ...acc,
-              timeline: [
-                ...acc.timeline,
+              newTimelineEntries.push(
                 _createNextTimelineFrame({
                   volume,
                   index,
                   nextFrame,
                   command,
                   wellInfo,
-                }),
-              ],
+                })
+              )
+            }
+            return {
+              ...acc,
+              timeline: [...acc.timeline, ...newTimelineEntries],
               prevRobotState: nextRobotState,
             }
           } else {
@@ -296,9 +295,8 @@ export const substepTimelineMultiChannel = (
               prevRobotState: nextRobotState,
             }
           }
-        } else {
-          return { ...acc, prevRobotState: nextRobotState }
         }
+        return { ...acc, prevRobotState: nextRobotState }
       },
       {
         timeline: [],
@@ -306,7 +304,6 @@ export const substepTimelineMultiChannel = (
         prevRobotState: initialRobotState,
       }
     )
-    console.log('timeline.timeline', timeline.timeline)
     return timeline.timeline
   } else {
     return []

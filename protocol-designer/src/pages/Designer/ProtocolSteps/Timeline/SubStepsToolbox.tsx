@@ -2,14 +2,18 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
+  COLORS,
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
   PrimaryButton,
+  SPACING,
   StyledText,
   Toolbox,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { NAV_BAR_HEIGHT_REM } from '../../../../components/atoms'
 import { THERMOCYCLER_PROFILE } from '../../../../constants'
 import { getSubsteps } from '../../../../file-data/selectors'
 import { getSavedStepForms } from '../../../../step-forms/selectors'
@@ -61,7 +65,8 @@ export function SubStepsToolbox(
       substeps.commandCreatorFnName === 'mix')) ||
     substeps.substepType === THERMOCYCLER_PROFILE ? (
     <Toolbox
-      height="calc(100vh - 6rem)"
+      maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem - 2 * ${SPACING.spacing12})`}
+      height="100%"
       width={FLEX_MAX_CONTENT}
       closeButton={<Icon size="2rem" name="close" />}
       onCloseClick={handleClose}
@@ -69,6 +74,19 @@ export function SubStepsToolbox(
         <PrimaryButton onClick={handleClose} width="100%">
           {t('shared:done')}
         </PrimaryButton>
+      }
+      subHeader={
+        substeps.substepType === THERMOCYCLER_PROFILE ? null : (
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            color={COLORS.grey60}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+          >
+            {'commandCreatorFnName' in substeps
+              ? substeps.commandCreatorFnName
+              : ''}
+          </StyledText>
+        )
       }
       title={
         <StyledText desktopStyle="bodyLargeSemiBold">

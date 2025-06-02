@@ -303,7 +303,9 @@ export function ProtocolSteps({
             overflow={OVERFLOW_AUTO}
             flexDirection={DIRECTION_COLUMN}
           >
-            {isZoomedIn || formData != null ? null : (
+            {isZoomedIn ||
+            formData != null ||
+            selectedSubstep != null ? null : (
               <Flex justifyContent={JUSTIFY_END}>
                 <ExportButton onClick={handleExporting} />
               </Flex>
@@ -404,7 +406,9 @@ export function ProtocolSteps({
           ) : null}
         </Flex>
         {formData == null && selectedSubstep ? (
-          <SubStepsToolbox stepId={selectedSubstep} />
+          <Flex paddingY={SPACING.spacing12}>
+            <SubStepsToolbox stepId={selectedSubstep} />
+          </Flex>
         ) : null}
         <Flex
           padding={
