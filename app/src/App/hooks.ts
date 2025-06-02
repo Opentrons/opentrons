@@ -22,12 +22,12 @@ import { checkShellUpdate } from '/app/redux/shell'
 import { useNotifyDeckConfigurationQuery } from '../resources/deck_configuration'
 import { useAttachedPipettes } from '../resources/instruments'
 import { useAttachedModules } from '../resources/modules'
+import { useCurrentRunId } from '../resources/runs'
 import { SharedScrollRefContext } from './ODDProviders/ScrollRefProvider'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '/app/redux/types'
-import { useCurrentRunId } from '../resources/runs'
 
 const UPDATE_RECHECK_INTERVAL_MS = 60000
 const PROTOCOL_IDS_RECHECK_INTERVAL_MS = 3000
