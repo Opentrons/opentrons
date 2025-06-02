@@ -162,7 +162,10 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
     cy.contains('Save').click({ force: true })
     */
     const steps = new StepBuilder()
-    steps.add(SetupSteps.MoveLabware('B2', 'D3'))
+    steps.add(SetupSteps.MoveLabware('A2', 'D3', true))
+    steps.add(SetupSteps.MoveLabware('B2', 'D3', false))
+    steps.add(SetupSteps.MoveLabware('C2', 'D3', false))
+    steps.add(SetupSteps.MoveLabwareNoGripper('off deck Flex', 'A2'))
 
     /*
     steps.add(SetupVerifications.OnStep1())
