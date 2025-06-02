@@ -164,6 +164,22 @@ export function useDispenseSettingsConfig({
       },
     },
     {
+      option: 'dispense_touch_tip',
+      copy: t('touch_tip'),
+      value:
+        state.touchTipDispense !== undefined
+          ? t('touch_tip_value', {
+              // speed: state.touchTipDispense.speed,
+              // position: state.touchTipDispense.positionFromBottom,
+            })
+          : '',
+      enabled: false,
+      onClick: () => {
+        console.log('will be implemented soon')
+        // setSelectedSetting('dispense_touch_tip')
+      },
+    },
+    {
       option: 'dispense_air_gap',
       copy: t('air_gap'),
       value:
