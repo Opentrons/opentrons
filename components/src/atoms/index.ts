@@ -1,3 +1,4 @@
+export * from './AnimationVideo'
 export * from './buttons'
 export * from './Checkbox'
 export * from './CheckboxField'

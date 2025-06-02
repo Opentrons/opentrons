@@ -5,6 +5,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_FLEX_END,
   ALIGN_STRETCH,
+  AnimationVideo,
   Box,
   DIRECTION_COLUMN,
   Flex,
@@ -114,22 +115,18 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
             />
           </Flex>
           <Box flex="1">
-            <video
+            <AnimationVideo
               key={demoAsset}
               css={css`
                 max-width: 100%;
                 max-height: 15rem;
               `}
-              autoPlay={true}
-              muted={true}
-              loop={true}
-              controls={false}
               aria-label={`${mount} ${
                 isMulti ? 'multi' : 'single'
               } channel pipette moving to slot 5`}
             >
               <source src={demoAsset} />
-            </video>
+            </AnimationVideo>
           </Box>
         </Flex>
         <JogControls
