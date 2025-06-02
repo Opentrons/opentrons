@@ -61,16 +61,16 @@ export function TwoColLwInfoAndDeck(
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
-    switch (route) {
-      case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
-      case STACKER_STALLED_SKIP.ROUTE:
-        switch (step) {
-          case STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
-          case STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE:
-            void manualRetrieve().then(() => proceedNextStep())
-        }
+    if (
+      (route === STACKER_HOPPER_EMPTY_SKIP.ROUTE &&
+        step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE) ||
+      (route === STACKER_STALLED_SKIP.ROUTE &&
+        step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE)
+    ) {
+      void manualRetrieve().then(() => proceedNextStep())
+    } else {
+      void proceedNextStep()
     }
-    void proceedNextStep()
   }
 
   const {
