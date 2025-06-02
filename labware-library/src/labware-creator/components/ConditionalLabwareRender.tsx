@@ -76,7 +76,9 @@ const PopulatedPreview = (props: {
   // Once the viewBox is re-calculated, we use setState to force a re-render.
   useLayoutEffect((): void => {
     const nextBBox = gRef.current?.getBBox()
-    if (!areBBoxesEqual(bBox, nextBBox)) updateBBox(nextBBox)
+    if (!areBBoxesEqual(bBox, nextBBox)) { 
+       updateBBox(nextBBox)
+    }
   }, [
     bBox,
     // This dep array needs to include anything that can affect the contents of the rendered SVG.
