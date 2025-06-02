@@ -13,7 +13,7 @@ from typing import List, Any
 from abr_testing.protocols import helpers
 
 metadata = {
-    "protocolName": "Olink Target 96/ 48",
+    "protocolName": "Olink Target 96/ 48 v3",
     "author": "Zachary Galluzzo <zachary.galluzzo@opentrons.com>",
 }
 
@@ -155,7 +155,7 @@ def run(protocol: ProtocolContext) -> None:
     ifp_plate.load_empty(ifp_plate.wells())
     # used to be fluidigm_ifp_96.96
     product_plate = protocol.load_labware(
-        "nest_96_wellplate_2ml_deep", "C1", "Extension Product Plate"
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "C1", "Extension Product Plate"
     )  # Would typically be semi-skirt plate with adapter
     # used to be olinksemiskirt_96_wellplate_300ul
     mm_plate = protocol.load_labware(
@@ -193,7 +193,7 @@ def run(protocol: ProtocolContext) -> None:
         ifp_primer_dests.append(ifp_plate.wells()[well])
 
     samp_dest_list = (
-        [95, 97, 112, 113, 128, 129, 144, 145, 160, 161, 176, 177]
+        [96, 97, 112, 113, 128, 129, 144, 145, 160, 161, 176, 177]
         if ninety_six
         else [48, 49, 64, 65, 80, 81]
     )
@@ -265,18 +265,19 @@ def run(protocol: ProtocolContext) -> None:
         """Mixing Function."""
         pip.aspirate(1, well.top(1))
         for m in range(reps):
-            pip.aspirate(vol, well.bottom(1.25))
+            pip.aspirate(vol, well.meniscus(z=-1, target="end"))
             pip.dispense(
                 vol if m != reps - 1 else pip.current_volume,
-                well.bottom(6),
+                well.meniscus(z=1, target="end"),
                 rate=1 if m == reps - 1 else 0.2,
             )
         if blow_out:
             protocol.delay(seconds=delay_time)
-            pip.blow_out(well.top(-3))
+            pip.blow_out(well.meniscus(z=2, target="end"))
             protocol.delay(seconds=delay_time)
         else:
             pip.move_to(well.top())
+        pip.touch_tip(well)
 
     def transfer_mm(
         src: Well, destination: List[Any], volume: float, multi_disp: bool = False
@@ -299,7 +300,7 @@ def run(protocol: ProtocolContext) -> None:
             for i in range(2 if ninety_six else 1):
                 pip.aspirate(
                     49 - pip.current_volume,
-                    src.meniscus(z=-1.5, target="end"),
+                    src.meniscus(z=-1, target="end"),
                     rate=0.2,
                 )  # aspirate extra (backlash compensation)
                 protocol.delay(seconds=delay_time)
@@ -310,7 +311,7 @@ def run(protocol: ProtocolContext) -> None:
                 pip.move_to(src.top())
                 for well in destination[i]:
                     pip.dispense(volume, well.bottom(2))
-                    pip.blow_out(well.bottom(3))
+                    pip.blow_out(well.meniscus(z=2, target="end"))
                     protocol.delay(seconds=delay_time)
                     pip.touch_tip()
                     pip.move_to(well.top())
@@ -326,7 +327,7 @@ def run(protocol: ProtocolContext) -> None:
                 protocol.comment(f"\nVOLUME: {volume}")
                 pip.aspirate(
                     volume + 1.5 if i == 0 else volume,
-                    src.meniscus(z=-1.5, target="end"),
+                    src.meniscus(z=-1, target="end"),
                     rate=0.35,
                 )
                 protocol.delay(seconds=delay_time)
@@ -335,11 +336,11 @@ def run(protocol: ProtocolContext) -> None:
                 pip.move_to(destination[i].top(10))
                 pip.dispense(
                     volume,
-                    destination[i].meniscus(z=-1.5, target="end"),
+                    destination[i].meniscus(z=-1, target="end"),
                     rate=0.2 if volume <= 5 else 1,
                     push_out=0,
                 )
-                pip.blow_out(destination[i].top(-3))
+                pip.blow_out(destination[i].meniscus(z=2, target="end"))
                 pip.touch_tip()
                 protocol.delay(seconds=delay_time)
                 pip.move_to(destination[i].top())
@@ -356,10 +357,10 @@ def run(protocol: ProtocolContext) -> None:
             pip.configure_nozzle_layout(style=ALL)
             pip.configure_for_volume(volume)
             pip.pick_up_tip(full_tips)
-            pip.aspirate(volume, src.meniscus(z=-1.5, target="end"))
+            pip.aspirate(volume, src.meniscus(z=-1, target="end"))
             protocol.delay(seconds=delay_time)
             pip.dispense(
-                volume, destination.meniscus(z=-1.5, target="end")
+                volume, destination.meniscus(z=-1, target="end")
             )  # reverse pipetting slightly more than actual volume
             protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tip
@@ -374,10 +375,10 @@ def run(protocol: ProtocolContext) -> None:
             pip.pick_up_tip(
                 col_tips[0].wells()[5 * 8 if mmx_to_sample_plate else 6 * 8]
             )
-            pip.aspirate(volume, src.meniscus(z=-1.5, target="end"), rate=0.2)
+            pip.aspirate(volume, src.meniscus(z=-1, target="end"), rate=0.2)
             protocol.delay(seconds=delay_time)
-            pip.dispense(volume, destination.meniscus(z=-1.5, target="end"), rate=0.2)
-            pip.blow_out(destination.top(-3))
+            pip.dispense(volume, destination.meniscus(z=-1, target="end"), rate=0.2)
+            pip.blow_out(destination.meniscus(z=2, target="end"))
             protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tips
             pip.move_to(destination.top(-2))
@@ -398,6 +399,7 @@ def run(protocol: ProtocolContext) -> None:
         length = (
             12 if ninety_six else 6
         )  # determines how many iterations should be run through
+
         for i in range(length):
             if ninety_six:
                 try:
@@ -439,20 +441,21 @@ def run(protocol: ProtocolContext) -> None:
                 pip.pick_up_tip(ifp_tips.pop(0))
             pip.aspirate(
                 volume + 4,
-                src[i].meniscus(z=-1.5, target="end"),
+                src[i].meniscus(z=-1, target="end"),
                 rate=0.2 if volume <= 5 else 1,
             )
             protocol.delay(seconds=delay_time)
             pip.dispense(
-                2, src[i].meniscus(z=-1.5, target="end")
+                2, src[i].meniscus(z=-1, target="end")
             )  # compensate for backlash
             # Retract
             pip.dispense(
                 volume + 1,
-                destination[i].meniscus(z=-1.5, target="end"),
+                destination[i].meniscus(z=-1, target="end"),
                 rate=0.2 if volume <= 5 else 1,
             )
-            pip.blow_out(destination[i].top(-3))
+            pip.blow_out(destination[i].meniscus(z=2, target="end"))
+            pip.touch_tip()
             protocol.delay(seconds=delay_time)
             pip.aspirate(
                 10
@@ -498,8 +501,9 @@ def run(protocol: ProtocolContext) -> None:
         liquid_heights = {}
         pip.pick_up_tip()
         for ifp_plate_well in ifp_plate.wells():
-            pip.measure_liquid_height(ifp_plate[ifp_plate_well.well_name])
-            height = ifp_plate[ifp_plate_well.well_name].current_liquid_height
+            if ifp_plate_well.current_liquid_height() is not None:
+                pip.measure_liquid_height(ifp_plate[ifp_plate_well.well_name])
+            height = ifp_plate[ifp_plate_well.well_name].current_liquid_height()
             liquid_heights[ifp_plate_well.well_name] = height
         protocol.comment(str(liquid_heights))
 

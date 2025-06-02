@@ -356,7 +356,7 @@ def run(protocol: ProtocolContext) -> None:
     if dvt2abr6:
         protocol.pause("SET UP DVT2ABR6")
         extension_product_plate = protocol.load_labware(
-            "nest_96_wellplate_2ml_deep",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
             str(SLOTS["LABWARE"][0]),
             "Extension Product Plate",
         )
