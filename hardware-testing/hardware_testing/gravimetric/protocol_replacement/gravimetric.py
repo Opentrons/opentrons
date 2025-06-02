@@ -229,7 +229,7 @@ class FixtureSettings:
         pipette = ctx.load_instrument(
             f"flex_{pipette_channels}channel_{pipette_volume}", mount
         )
-        #simulating = ctx.is_simulating()
+        # simulating = ctx.is_simulating()
         simulating = True
         run_id = create_run_id()
         scale = Scale.build(simulating)
@@ -512,7 +512,7 @@ def run_blank_test(
         tiprack_uri=tiprack_uri,
     )
 
-    pre_aspriate = retract_and_wait(
+    pre_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, blank=True
     )
     aspirate_with_liquid_class(
@@ -539,7 +539,7 @@ def run_blank_test(
     post_dispense = retract_and_wait(
         fixture_settings, MeasurementType.DISPENSE, tip, volume, trial, blank=True
     )
-    return [pre_aspriate, post_aspirate, post_dispense]
+    return [pre_aspirate, post_aspirate, post_dispense]
 
 
 def run_one_test(
@@ -568,7 +568,7 @@ def run_one_test(
         tiprack_uri=tiprack_uri,
     )
     pick_up_tip_for_channel(fixture_settings, tip_well, channel)
-    pre_aspriate = retract_and_wait(
+    pre_aspirate = retract_and_wait(
         fixture_settings,
         MeasurementType.INIT,
         tip,
@@ -588,7 +588,7 @@ def run_one_test(
         fixture_settings, MeasurementType.DISPENSE, tip, volume, trial
     )
     remove_tip(fixture_settings)
-    return [pre_aspriate, post_aspirate, post_dispense]
+    return [pre_aspirate, post_aspirate, post_dispense]
 
 
 def run(ctx: ProtocolContext) -> None:
