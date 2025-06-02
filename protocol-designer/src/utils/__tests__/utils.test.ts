@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { fixture96Plate, LabwareDefinition2 } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data'
 
 import {
   getAllLabwareIdsOfCertainURIOnStack,
@@ -8,7 +8,9 @@ import {
   getMaxPushOutVolume,
   removeOpentronsPhrases,
 } from '..'
-import {
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
   AllTemporalPropertiesForTimelineFrame,
   LabwareOnDeck,
 } from '../../step-forms'
