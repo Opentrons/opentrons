@@ -19,7 +19,7 @@ from opentrons.protocol_api.labware import OutOfTipsError
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 
-metadata = {"protocolName": "Opentrons Flex Pipette IQ/OQ"}
+metadata = {"protocolName": "NEW Opentrons Flex Pipette IQ/OQ"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"], \
@@ -490,18 +490,21 @@ def run(ctx: ProtocolContext) -> None:
         ul_sub_string = "ul_".join([str(old_ul) for old_ul in ul_in_this_plate])
         return f"{test_pip.name}_t{tip_ul}_{ul_sub_string}ul"
 
+    def _on_plate_done():
+        if not plate_reader:
+            # REMOVE AND TAKE TO ARTEL READER
+            ctx.move_labware(plate, OFF_DECK, use_gripper=False)  # HUMAN
+        else:
+            shake_and_read_plate(
+                ctx, plate, heater_shaker, plate_reader, filename()
+            )
+
     for ul in volumes:
 
         # PROCESS FULL PLATE
         dest_wells: List[Well] = dest_wells_by_volume[ul]
         if plate and dest_wells[0] not in plate.wells():
-            if not plate_reader:
-                # REMOVE AND TAKE TO ARTEL READER
-                ctx.move_labware(plate, OFF_DECK, use_gripper=False)  # HUMAN
-            else:
-                shake_and_read_plate(
-                    ctx, plate, heater_shaker, plate_reader, filename()
-                )
+            _on_plate_done()
             plate = None
             ul_in_this_plate = []
 
@@ -557,6 +560,4 @@ def run(ctx: ProtocolContext) -> None:
         test_pip.tip_racks = new_racks
 
     # don't forget final plate
-    shake_and_read_plate(
-        ctx, plate, heater_shaker, plate_reader, filename()
-    )
+    _on_plate_done()
