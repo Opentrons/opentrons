@@ -14,7 +14,6 @@ port ?= 34000
 tests ?= tests
 test_opts ?=
 wheel_file = $(call python_get_wheelname,update-server,$(project_rs_default),otupdate)
-sdist_file = $(call python_get_sdistname,update-server,$(project_rs_default),otupdate)
 # Find the branch, sha, version that will be used to update the VERSION.json file
 version_file = $(call python_get_git_version,update-server,$(project_rs_default),update-server)
 # Host key location for robot
@@ -71,15 +70,6 @@ wheel: clean
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
-.PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(PROJECT)
-sdist: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
-sdist: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
-sdist: clean
-	$(python) -m build --sdist .
-	$(SHX) rm -rf build
-	$(SHX) ls dist
-
 .PHONY: bootstrap
 bootstrap: wheel
 	curl -X POST \
@@ -93,12 +83,12 @@ restart:
 
 .PHONY: push
 push: wheel
-	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),dist/$(wheel_file))
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),dist/$(wheel_file),/usr/lib/python3.10/site-packages/)
 	$(call push-systemd-unit,$(host),$(ssh_key),$(ssh_opts),./opentrons-update-server.service)
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-update-server)
 
 
 .PHONY: push-ot3
-push-ot3: sdist
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),dist/$(sdist_file),/opt/opentrons-update-server,"otupdate",,,$(version_file))
+push-ot3: wheel
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),dist/$(wheel_file),/opt/opentrons-update-server/)
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-update-server)
