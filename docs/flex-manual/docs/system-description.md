@@ -109,32 +109,16 @@ Staging area slots are compatible with the Flex instruments, modules, and labwar
 
 ### Movement system
 
-Attached to the frame is the *gantry*, which is the robot's movement and
-positioning system.
+Attached to the frame is the *gantry*, which is the robot's movement and positioning system.
 
-The gantry moves separately along the x- and y-axis to position the
-pipettes and gripper at precise locations for protocol execution.
-Movement along these axes is precise to the nearest 0.1 mm. The gantry
-is controlled by 36 VDC hybrid bipolar stepper motors.
+The gantry moves separately along the x- and y-axis to position the pipettes and gripper at precise locations for protocol execution. Movement along these axes is precise to the nearest 0.1 mm. The gantry is controlled by 36 VDC hybrid bipolar stepper motors.
 
-In turn, attached to the gantry are the *pipette mounts* and the
-*extension mount*. These move along the z-axis to position the pipettes
-and gripper at precise locations for protocol execution. Movement along
-this axis is controlled by 36 VDC hybrid bipolar stepper motors.
+In turn, attached to the gantry are the *pipette mounts* and the *extension mount*. These move along the z-axis to position the pipettes and gripper at precise locations for protocol execution. Movement along this axis is controlled by 36 VDC hybrid bipolar stepper motors.
 
-The electronics contained in the gantry provide 36 VDC power and
-communications to the pipettes and gripper, when attached.
+The electronics contained in the gantry provide 36 VDC power and communications to the pipettes and gripper, when attached.
 
-![image](d16ca34af7202469968dae79033df1f57c251837.png){width="7.520833333333333in"
-height="6.4375in"}
-
-Gantry
-
-Pipette Mounts
-
+![Diagram of the horizontal gantry and its attached pipette and extension mounts.](images/gantry-diagram.svg "Gantry components")
 Location of instrument mounts on Flex.
-
-Extension Mount
 
 ### Touchscreen and LED displays
 
