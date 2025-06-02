@@ -105,6 +105,7 @@ export function TwoColLwInfoAndDeck(
         return t('ensure_stacker_has_labware')
       case STACKER_STALLED_SKIP.ROUTE:
       case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         if (
           step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE ||
           step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE ||

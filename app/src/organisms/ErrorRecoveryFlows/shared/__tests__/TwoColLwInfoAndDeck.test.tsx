@@ -188,7 +188,7 @@ describe('TwoColLwInfoAndDeck', () => {
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: 'Load labware into labware shuttle',
+        title: 'Load labware onto labware shuttle',
         type: 'location',
         bannerText: null,
       }),

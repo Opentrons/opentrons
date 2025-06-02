@@ -203,7 +203,7 @@ export function useRecoveryCommands({
         ? storeOrRetriveFailedCommandParams.moduleId
         : ''
     return {
-      commandType: 'flexStacker/openLatch',
+      commandType: 'unsafe/flexStacker/openLatch',
       params: {
         moduleId: moduleId,
       },
@@ -223,7 +223,7 @@ export function useRecoveryCommands({
         ? storeOrRetriveFailedCommandParams.moduleId
         : ''
     return {
-      commandType: 'flexStacker/closeLatch',
+      commandType: 'unsafe/flexStacker/closeLatch',
       params: {
         moduleId: moduleId,
       },

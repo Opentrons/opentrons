@@ -63,6 +63,15 @@ export function ReleaseLabware({
         return t('release_labware_from_gripper')
     }
   }
+  const buildContent = (): string => {
+    switch (route) {
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+        return t('take_any_necessary_precautions_for_latch_release')
+      default:
+        return t('take_any_necessary_precautions')
+    }
+  }
   return (
     <RecoverySingleColumnContentWrapper>
       <TwoColumn>
@@ -77,7 +86,7 @@ export function ReleaseLabware({
             oddStyle="bodyTextRegular"
             desktopStyle="bodyDefaultRegular"
           >
-            {t('take_any_necessary_precautions')}
+            {buildContent()}
           </StyledText>
           <InlineNotification
             type="alert"

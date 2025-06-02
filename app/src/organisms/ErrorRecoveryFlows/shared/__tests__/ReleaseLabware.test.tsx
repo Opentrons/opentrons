@@ -58,7 +58,7 @@ describe('ReleaseLabware', () => {
 
     screen.getByText('Release labware from latch')
     screen.getByText(
-      'Take any necessary precautions before positioning yourself to stabilize or catch the labware. Once confirmed, a countdown will begin before the gripper releases.'
+      'Take any necessary precautions before positioning yourself to stabilize or catch the labware if needed. Once confirmed, a countdown will begin before the latch releases.'
     )
     screen.getByText('The labware will be released from its current height.')
   })
