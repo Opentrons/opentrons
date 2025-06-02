@@ -6,6 +6,7 @@ import { COLORS, JUSTIFY_FLEX_END, PrimaryButton } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import { SmallButton } from '/app/atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -43,6 +44,7 @@ export const UpdateFirmware = (
     robotName,
     patchModuleAfterUpdate,
     setIsModuleUpdating,
+    isOnDevice,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
@@ -150,13 +152,17 @@ export const UpdateFirmware = (
         module: getModuleDisplayName(attachedModule.moduleModel),
       })}
     >
-      <PrimaryButton
-        onClick={() => {
-          handleUpdateFirmware()
-        }}
-      >
-        {t('install_update')}
-      </PrimaryButton>
+      {isOnDevice ? (
+        <SmallButton
+          buttonType="primary"
+          onClick={handleUpdateFirmware}
+          buttonText={t('install_update')}
+        />
+      ) : (
+        <PrimaryButton onClick={handleUpdateFirmware}>
+          {t('install_update')}
+        </PrimaryButton>
+      )}
     </SimpleWizardBody>
   )
 }
