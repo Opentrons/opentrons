@@ -47,7 +47,7 @@ def run(protocol: ProtocolContext) -> None:
 
     reservoir = protocol.load_labware("nest_12_reservoir_15ml", "B3")
     waste_reservoir = protocol.load_labware(
-        "nest_1_reservoir_195ml", "C1", "Liquid Waste"
+        "opentrons_tough_1_reservoir_300ml", "C1", "Liquid Waste"
     )
     waste_reservoir.load_empty(waste_reservoir.wells())
     sample_plate_2 = protocol.load_labware(
@@ -65,14 +65,14 @@ def run(protocol: ProtocolContext) -> None:
 
     protocol.load_trash_bin("A3")
 
-    # reagentg146
+    # reagents
+    reservoir.load_empty(reservoir.wells()[6:])
     Dye_1 = reservoir["A1"]
     Dye_2 = reservoir["A2"]
     Dye_3 = reservoir["A3"]
     Diluent_1 = reservoir["A4"]
     Diluent_2 = reservoir["A5"]
     Diluent_3 = reservoir["A6"]
-
     # pipette
     p1000 = protocol.load_instrument(
         "flex_8channel_1000", "left", tip_racks=[tiprack_x_1]
@@ -100,7 +100,7 @@ def run(protocol: ProtocolContext) -> None:
         else:
             helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
 
-        for X in range(1):
+        for X in range(10):
             protocol.comment("==============================================")
             protocol.comment("Adding Dye Sample Plate 1")
             protocol.comment("==============================================")
@@ -111,7 +111,7 @@ def run(protocol: ProtocolContext) -> None:
             while current < len(data):
                 CurrentWell = str(data[current][0])
                 DyeVol = float(data[current][1])
-                while Dye_1.current_liquid_volume() < DyeVol:
+                while Dye_1.current_liquid_volume() < (DyeVol * 8):
                     p1000.transfer(
                         DyeVol,
                         Dye_1.meniscus(z=meniscus_z, target="end"),
@@ -155,7 +155,7 @@ def run(protocol: ProtocolContext) -> None:
             while current < len(data):
                 CurrentWell = str(data[current][0])
                 DyeVol = float(data[current][1])
-                while Dye_2.current_liquid_volume() < DyeVol:
+                while Dye_2.current_liquid_volume() < (DyeVol * 8):
                     p1000_single.transfer(
                         DyeVol,
                         Dye_2.meniscus(z=meniscus_z, target="end"),
@@ -198,7 +198,7 @@ def run(protocol: ProtocolContext) -> None:
             while current < len(data):
                 CurrentWell = str(data[current][0])
                 DyeVol = float(data[current][1])
-                if Dye_3.current_liquid_volume() < DyeVol:
+                if Dye_3.current_liquid_volume() < (DyeVol * 8):
                     p1000_single.transfer(
                         DyeVol,
                         Dye_3.meniscus(z=meniscus_z, target="end"),
@@ -285,7 +285,7 @@ def run(protocol: ProtocolContext) -> None:
         helpers.clean_up_plates(
             protocol,
             p1000,
-            [sample_plate_1, sample_plate_2, sample_plate_3, sample_plate_4],
+            [sample_plate_1, sample_plate_2, sample_plate_3, sample_plate_4, reservoir],
             waste_reservoir["A1"],
         )
         helpers.find_liquid_height_of_all_wells(

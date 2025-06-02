@@ -301,6 +301,11 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** will be non-null once introduced to quick transfer */
   pushOut: number | null
 
+  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
+  blowoutLocation: string | null | undefined
+  blowoutFlowRateUlSec: number
+  blowoutOffsetFromTopMm: number
+
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
   liquidClass: string | null
   aspiratePositionReference: PositionReference
@@ -339,11 +344,6 @@ export type ConsolidateArgs = SharedTransferLikeArgs & {
   sourceWells: string[]
   destWell: string | null
 
-  /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
-  blowoutLocation: string | null | undefined
-  blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
-
   /** Mix in first well in chunk */
   mixFirstAspirate: InnerMixArgs | null | undefined
   /** Mix in destination well after dispense */
@@ -355,11 +355,6 @@ export type TransferArgs = SharedTransferLikeArgs & {
 
   sourceWells: string[]
   destWells: string[] | null
-
-  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
-  blowoutLocation: string | null | undefined
-  blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: InnerMixArgs | null | undefined
@@ -377,11 +372,6 @@ export type DistributeArgs = SharedTransferLikeArgs & {
   disposalVolume: number | null | undefined
   /** Volume to condition the tip with during aspiration sequence */
   conditioningVolume: number | null
-  /** pass to blowout **/
-  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
-  blowoutLocation: string | null | undefined
-  blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: InnerMixArgs | null | undefined

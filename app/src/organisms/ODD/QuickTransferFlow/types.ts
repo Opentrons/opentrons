@@ -66,7 +66,7 @@ export interface QuickTransferSummaryState {
   preWetTip: boolean
   mixOnAspirate?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   submergeAspirate?: {
     speed: number
@@ -86,7 +86,7 @@ export interface QuickTransferSummaryState {
   tipPositionDispense: number
   mixOnDispense?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   submergeDispense?: {
     speed: number
@@ -175,7 +175,7 @@ interface SetPreWetTip {
 }
 interface SetMixOnAspirate {
   type: typeof ACTIONS.SET_MIX_ON_ASPIRATE
-  mixSettings?: { mixVolume: number; repititions: number }
+  mixSettings?: { mixVolume: number; repetitions: number }
 }
 interface SetDelayAspirate {
   type: typeof ACTIONS.SET_DELAY_ASPIRATE
@@ -212,7 +212,7 @@ interface SetDispenseTipPosition {
 }
 interface SetMixOnDispense {
   type: typeof ACTIONS.SET_MIX_ON_DISPENSE
-  mixSettings?: { mixVolume: number; repititions: number }
+  mixSettings?: { mixVolume: number; repetitions: number }
 }
 interface SetDelayDispense {
   type: typeof ACTIONS.SET_DELAY_DISPENSE

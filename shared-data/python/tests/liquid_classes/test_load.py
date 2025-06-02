@@ -1,7 +1,7 @@
 import json
 
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.liquid_classes import load_definition
+from opentrons_shared_data.liquid_classes import load_definition, definition_exists
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
     PositionReference,
@@ -35,3 +35,11 @@ def test_load_definition() -> None:
         speed=100,
         delay=DelayProperties(enable=False, params=DelayParams(duration=0)),
     )
+
+
+def test_definition_exists() -> None:
+    """Should return whether specified definition exists in shared data or not."""
+    assert definition_exists(name="water", version=1) is True
+    assert definition_exists(name="glycerol_50", version=1) is True
+    assert definition_exists(name="glycerol_oh_no", version=1) is False
+    assert definition_exists(name="glycerol_50", version=2) is False

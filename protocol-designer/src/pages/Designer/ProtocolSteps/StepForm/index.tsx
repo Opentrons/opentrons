@@ -135,7 +135,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
 
   return (
     <>
-      {/* TODO: update these modals to match new modal design */}
       {showConfirmDeleteModal && (
         <ConfirmDeleteModal
           modalType={DELETE_STEP_FORM}
