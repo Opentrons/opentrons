@@ -22,9 +22,6 @@ sphinx_build_allow_warnings := $(pipenv) run sphinx-build
 # used to create the wheel.
 wheel_file = dist/$(call python_get_wheelname,api,$(PROJECT),opentrons,$(BUILD_NUMBER))
 
-# Find the version of the sdist file from git using a helper script.
-sdist_file = dist/$(call python_get_sdistname,api,$(PROJECT),opentrons)
-
 # Find the branch, sha, version that will be used to update the VERSION.json file
 version_file = $(call python_get_git_version,api,$(PROJECT),opentrons)
 
@@ -60,13 +57,12 @@ twine_repository_url ?= $(pypi_test_upload_url)
 clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info'
 clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
-clean_sdist_cmd = $(clean_cmd) dist/*.tar.gz
 clean_all_cmd = $(clean_cmd) dist
 
 plot_type ?=
 
 .PHONY: all
-all: clean sdist wheel
+all: clean wheel
 
 .PHONY: setup
 setup:
@@ -172,16 +168,15 @@ local-shell:
 
 .PHONY: push-no-restart
 push-no-restart: wheel
-	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/usr/lib/python3.10/site-packages/)
 
 .PHONY: push
 push: push-no-restart
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: sdist
-	echo $(sdist_file)
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src,,$(version_file))
+push-no-restart-ot3: wheel
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server)
 	ssh $(ssh_helper) root@$(host) "mount -o remount,rw / && mkdir -p /usr/local/bin"
 	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/
 	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3gripper root@$(host):/usr/local/bin/

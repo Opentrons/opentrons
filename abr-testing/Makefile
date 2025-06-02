@@ -28,10 +28,10 @@ ot_sources := $(ot_py_sources)
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
-
+wheel_file = $(call python_get_wheelname,abr-testing,$(project_rs_default),abr_testing)
 
 .PHONY: all
-all: clean sdist wheel
+all: clean wheel
 
 .PHONY: setup
 setup:
@@ -56,16 +56,6 @@ wheel:
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
-.PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(PROJECT)
-sdist: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
-sdist: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
-sdist:
-	$(clean_cmd)
-	$(python) -m build --sdist .
-	$(SHX) rm -rf build
-	$(SHX) ls dist
-
 .PHONY: lint
 lint:
 	$(python) -m mypy abr_testing tests
@@ -81,8 +71,8 @@ test:
 	@echo "No tests yet"
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: sdist Pipfile.lock
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"abr_testing",,,$(version_file))
+push-no-restart-ot3: wheel Pipfile.lock
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3

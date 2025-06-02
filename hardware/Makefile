@@ -128,15 +128,15 @@ dev:
 
 .PHONY: push-no-restart
 push-no-restart: wheel
-	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/usr/lib/python3.10/site-packages/)
 
 .PHONY: push
 push: push-no-restart
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: sdist Pipfile.lock
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"opentrons_hardware",,,$(version_file))
+push-no-restart-ot3: wheel Pipfile.lock
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
