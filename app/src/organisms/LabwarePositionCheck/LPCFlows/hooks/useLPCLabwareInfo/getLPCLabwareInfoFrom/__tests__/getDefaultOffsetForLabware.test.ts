@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { ANY_LOCATION } from '@opentrons/api-client'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { C2_ADDRESSABLE_AREA, getLabwareDefURI } from '@opentrons/shared-data'
 
 import { OFFSET_KIND_DEFAULT } from '/app/redux/protocol-runs'
 
@@ -72,6 +72,24 @@ describe('getDefaultOffsetDetailsForLabware', () => {
         definitionUri: ADAPTER_URI,
       },
     ],
+    modules: [],
+  }
+
+  const MOCK_PROTOCOL_DATA_WITH_MODULES = {
+    labware: [
+      {
+        id: ADAPTER_ID,
+        definitionUri: ADAPTER_URI,
+      },
+    ],
+    modules: [
+      {
+        location: { slotName: 'C2' },
+      },
+      {
+        location: { slotName: 'A1' },
+      },
+    ],
   }
 
   it('should return default offset details with minimal params', () => {
@@ -91,7 +109,7 @@ describe('getDefaultOffsetDetailsForLabware', () => {
         labwareId: LABWARE_ID,
         definitionUri: LABWARE_URI,
         kind: OFFSET_KIND_DEFAULT,
-        addressableAreaName: 'C2',
+        addressableAreaName: C2_ADDRESSABLE_AREA,
         lwOffsetLocSeq: ANY_LOCATION,
         closestBeneathAdapterId: undefined,
         lwModOnlyStackupDetails: [
@@ -203,5 +221,76 @@ describe('getDefaultOffsetDetailsForLabware', () => {
     } as any)
 
     expect(result.locationDetails.closestBeneathAdapterId).toBeUndefined()
+  })
+
+  it('should use C2 when available and no modules are present', () => {
+    const result = getDefaultOffsetDetailsForLabware({
+      uri: LABWARE_URI,
+      lwLocInfo: MOCK_LW_LOC_COMBOS,
+      currentOffsets: [],
+      labwareDefs: [MOCK_LABWARE_DEF],
+      locationSpecificOffsetDetails: [],
+      protocolData: MOCK_PROTOCOL_DATA,
+    } as any)
+
+    expect(result.locationDetails.addressableAreaName).toBe(C2_ADDRESSABLE_AREA)
+  })
+
+  it('should use alternative slot when C2 is occupied by a module', () => {
+    const result = getDefaultOffsetDetailsForLabware({
+      uri: LABWARE_URI,
+      lwLocInfo: MOCK_LW_LOC_COMBOS,
+      currentOffsets: [],
+      labwareDefs: [MOCK_LABWARE_DEF],
+      locationSpecificOffsetDetails: [],
+      protocolData: MOCK_PROTOCOL_DATA_WITH_MODULES,
+    } as any)
+
+    expect(result.locationDetails.addressableAreaName).not.toBe(
+      C2_ADDRESSABLE_AREA
+    )
+    expect([
+      'A2',
+      'A3',
+      'B1',
+      'B2',
+      'B3',
+      'C1',
+      'C3',
+      'D1',
+      'D2',
+      'D3',
+    ]).toContain(result.locationDetails.addressableAreaName)
+  })
+
+  it('should fallback to C2 when all slots are occupied', () => {
+    const protocolDataWithAllModules = {
+      labware: [],
+      modules: [
+        { location: { slotName: 'A1' } },
+        { location: { slotName: 'A2' } },
+        { location: { slotName: 'A3' } },
+        { location: { slotName: 'B1' } },
+        { location: { slotName: 'B2' } },
+        { location: { slotName: 'B3' } },
+        { location: { slotName: 'C1' } },
+        { location: { slotName: 'C2' } },
+        { location: { slotName: 'C3' } },
+        { location: { slotName: 'D1' } },
+        { location: { slotName: 'D2' } },
+        { location: { slotName: 'D3' } },
+      ],
+    }
+
+    const result = getDefaultOffsetDetailsForLabware({
+      uri: LABWARE_URI,
+      lwLocInfo: MOCK_LW_LOC_COMBOS,
+      currentOffsets: [],
+      labwareDefs: [MOCK_LABWARE_DEF],
+      locationSpecificOffsetDetails: [],
+      protocolData: protocolDataWithAllModules,
+    } as any)
+
+    expect(result.locationDetails.addressableAreaName).toBe(C2_ADDRESSABLE_AREA)
   })
 })

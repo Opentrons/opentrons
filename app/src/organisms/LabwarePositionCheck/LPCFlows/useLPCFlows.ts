@@ -1,21 +1,22 @@
-import { useEffect, useMemo, useState } from 'react'
-
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { RobotType } from '@opentrons/shared-data'
 import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
-import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
+import type {
+  LegacySupportLPCFlowsProps,
+  LPCFlowsProps,
+} from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   useCreateTargetedMaintenanceRunMutation,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
 } from '/app/resources/runs'
-
+import { useEffect, useMemo, useState } from 'react'
 import {
   useCompatibleAnalysis,
   useHandleClientAppliedOffsets,
@@ -26,12 +27,6 @@ import {
   useUpdateLabware,
 } from './hooks'
 import { useLPCAnalytics } from './useLPCAnalytics'
-
-import type { RobotType } from '@opentrons/shared-data'
-import type {
-  LegacySupportLPCFlowsProps,
-  LPCFlowsProps,
-} from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
 
 interface UseLPCFlowsBase {
   showLPC: boolean
@@ -158,14 +153,12 @@ export function useLPCFlows({
     if (!isLaunching) {
       analytics.reportLaunchLpcWizard()
       setIsLaunching(true)
-      const labwareOffsets = getRelevantOffsets(
-        robotType,
-        ot2Offsets,
-        flexOffsets ?? []
-      )
-      const createRunData = labwareOffsets != null ? { labwareOffsets } : {}
+      // Inject OT-2 offsets into the maintenance run upon creation.
+      // The Flex injects offsets directly in LPC commands and therefore should not load them into the maintenance run.
+      const injectedOffsets =
+        robotType === OT2_ROBOT_TYPE ? { labwareOffsets: ot2Offsets } : {}
 
-      return createTargetedMaintenanceRun(createRunData).then(
+      return createTargetedMaintenanceRun(injectedOffsets).then(
         maintenanceRun => {
           setMaintenanceRunId(maintenanceRun.data.id)
         }
