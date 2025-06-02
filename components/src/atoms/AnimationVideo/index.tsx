@@ -34,8 +34,7 @@ export function AnimationVideo(props: AnimationVideoProps): JSX.Element {
       muted={muted}
       controls={controls}
       {...restProps}
-    >
-      {/* Child <source> rendered via {...restProps} spreading above. */}
-    </video>
+      // Child <source>s rendered via {...restProps} spreading above.
+    />
   )
 }

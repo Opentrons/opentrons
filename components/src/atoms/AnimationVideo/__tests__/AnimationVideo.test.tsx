@@ -5,7 +5,7 @@ import { AnimationVideo } from '..'
 
 describe('AnimationVideo', () => {
   it('should have default props', () => {
-    render(<AnimationVideo data-testid="subject"></AnimationVideo>)
+    render(<AnimationVideo data-testid="subject" />)
     const videoNode = screen.getByTestId('subject')
     expect(videoNode).toHaveAttribute('autoplay')
     expect(videoNode).toHaveAttribute('loop')
@@ -14,13 +14,7 @@ describe('AnimationVideo', () => {
   })
 
   it('should merge default props with custom props', () => {
-    render(
-      <AnimationVideo
-        data-testid="subject"
-        preload="auto"
-        loop={false}
-      ></AnimationVideo>
-    )
+    render(<AnimationVideo data-testid="subject" preload="auto" loop={false} />)
     const videoNode = screen.getByTestId('subject')
     expect(videoNode).toHaveAttribute('autoplay')
     expect(videoNode).not.toHaveAttribute('loop') // Default overridden by custom.
