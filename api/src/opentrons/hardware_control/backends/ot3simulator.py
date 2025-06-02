@@ -67,11 +67,6 @@ from .flex_protocol import (
     FlexBackend,
 )
 
-from opentrons_hardware.sensors.types import (
-    SensorDataType,
-    EnvironmentSensorDataType,
-)
-from opentrons_hardware.firmware_bindings.constants import SensorType
 
 log = logging.getLogger(__name__)
 
@@ -881,25 +876,28 @@ class OT3Simulator(FlexBackend):
     async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
         pass
 
-    async def _read_env_sensor(
+    async def _read_env_temp_sensor(
         self, mount: OT3Mount, primary: bool
-    ) -> Optional[EnvironmentSensorDataType]:
+    ) -> Optional[float]:
         """Read and return the current sensor information."""
-        return EnvironmentSensorDataType.build(
-            [
-                SensorDataType.build(25.0, SensorType.temperature),
-                SensorDataType.build(50, SensorType.humidity),
-            ]
-        )
+
+        return 0.0
+
+    async def _read_env_hum_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+
+        return 0.0
 
     async def _read_pressure_sensor(
         self, mount: OT3Mount, primary: bool
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[float]:
         """Read and return the current sensor information."""
-        return SensorDataType.build(0, SensorType.pressure)
+        return 0.0
 
     async def _read_capacitive_sensor(
         self, mount: OT3Mount, primary: bool
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[float]:
         """Read and return the current sensor information."""
-        return SensorDataType.build(0, SensorType.capacitive)
+        return 0.0

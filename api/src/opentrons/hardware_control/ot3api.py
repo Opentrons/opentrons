@@ -3146,18 +3146,16 @@ class OT3API(
     ) -> float:
         """Read and return the current stem temperature."""
         realmount = OT3Mount.from_mount(mount)
-        s_data = await self._backend._read_env_sensor(realmount, primary)
-        assert s_data.temperature is not None  # type: ignore [union-attr]
-        return s_data.temperature.to_float()  # type: ignore [union-attr]
+        s_data = await self._backend._read_env_temp_sensor(realmount, primary)
+        return s_data if s_data else 0.0
 
     async def read_stem_humidity(
         self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
     ) -> float:
         """Read and return the current primary stem humidity."""
         realmount = OT3Mount.from_mount(mount)
-        s_data = await self._backend._read_env_sensor(realmount, primary)
-        assert s_data.humidity is not None  # type: ignore [union-attr]
-        return s_data.humidity.to_float()  # type: ignore [union-attr]
+        s_data = await self._backend._read_env_hum_sensor(realmount, primary)
+        return s_data if s_data else 0.0
 
     async def read_stem_pressure(
         self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
@@ -3165,8 +3163,7 @@ class OT3API(
         """Read and return the current primary stem pressure."""
         realmount = OT3Mount.from_mount(mount)
         s_data = await self._backend._read_pressure_sensor(realmount, primary)
-        assert s_data is not None
-        return s_data.to_float()
+        return s_data if s_data else 0.0
 
     async def read_stem_capacitance(
         self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
@@ -3174,5 +3171,4 @@ class OT3API(
         """Read and return the current primary stem capacitance."""
         realmount = OT3Mount.from_mount(mount)
         s_data = await self._backend._read_capacitive_sensor(realmount, primary)
-        assert s_data is not None
-        return s_data.to_float()
+        return s_data if s_data else 0.0
