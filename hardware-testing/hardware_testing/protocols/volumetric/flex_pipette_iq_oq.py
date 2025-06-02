@@ -491,6 +491,7 @@ def run(ctx: ProtocolContext) -> None:
         return f"{test_pip.name}_t{tip_ul}_{ul_sub_string}ul"
 
     def _on_plate_done():
+        heater_shaker.open_labware_latch()
         if not plate_reader:
             # REMOVE AND TAKE TO ARTEL READER
             ctx.move_labware(plate, OFF_DECK, use_gripper=False)  # HUMAN
