@@ -93,7 +93,7 @@ For exact installation instructions, consult the Quickstart Guide or
 Instruction Manual for the specific module. Cable connections and method
 of attachment to the caddy vary by module.
 
-1.  **Module calibration**
+## Module calibration
 
 When you first install a module on Flex, you need to run automated
 positional calibration. This process is similar to positional

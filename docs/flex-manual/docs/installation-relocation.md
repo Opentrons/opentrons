@@ -227,31 +227,35 @@ Perform basic setup on the touchscreen before connecting any other hardware to y
 
 When you power on Flex, the Opentrons logo will appear on the touchscreen. After a few moments, it will show the "Welcome to your Opentrons Flex" screen.
 
-![image](a7c25a0f7c7bed8d970fe453ebd04e86ece9e446.jpg){width="5.041666666666667in" height="3.71875in"}The Opentrons Flex welcome screen. You should only see this screen when you start your Flex for the first time.
+<figure class="screenshot" markdown>
+![The Opentrons Flex welcome screen.](images/welcome-to-flex.png "Welcome to your Opentrons Flex!")
+<figcaption>The Opentrons Flex welcome screen. You should only see this screen when you start your Flex for the first time.</<figcaption>
+</figure>
 
 ### Connect to a network or computer
 
 Follow the prompts on the touchscreen to get your robot connected so it can check for software updates and receive protocol files. There are three connection methods: Wi-Fi, Ethernet, and USB.
 
-![image](f079e734f284f49069e2db50abb8f2ed1f641c6e.png){width="10.666666666666666in" height="5.625in"}
-
-Network connection options. You need to have internet connectivity to set up Flex.
+<figure class="screenshot" markdown>
+![Network connection options.](images/choose-network-type.png "Network connection options")
+<figcaption>Network connection options. You need to have internet connectivity to set up Flex.</figcaption>
+</figure>
 
 **Wi-Fi:** Use the touchscreen to connect to Wi-Fi networks that are secured with WPA2 Personal authentication (most networks that only require a password to join fall under this category).
 
-!!! note Flex does not support captive portals (networks that don't have
-
-a password but load a webpage to authenticate users after connecting).
+!!! note 
+    Flex does not support captive portals (networks that don't have a password but load a webpage to authenticate users after connecting).
 
 You can also connect to an open Wi-Fi network, but this is not recommended.
 
-**Warning:** Connecting to an open Wi-Fi network will allow anyone in range of the network signal to control your Opentrons Flex robot without authentication.
+!!! warning
+    Connecting to an open Wi-Fi network will allow anyone in range of the network signal to control your Opentrons Flex robot without authentication.
 
 If you need to connect to a Wi-Fi network that uses enterprise authentication (including "eduroam" and similar academic networks that require a username and password), first connect to the Opentrons App by Ethernet or USB to complete initial setup. Then connect to the enterprise Wi-Fi network in the networking settings for your Flex. To access the networking settings:
 
 1.  Click **Devices** in the left sidebar of the Opentrons App.
 
-2.  Click the three-dot menu (**⋮**) for your Flex and choose **Robot Settings**.
+2.  Click the three-dot menu (⋮) for your Flex and choose **Robot Settings**.
 
 3.  Click the **Networking** tab.
 
@@ -273,7 +277,7 @@ Each of these methods requires a username and password, and depending on your ex
 
 **USB:** Connect the provided USB A-to-B cable to the robot's USB-B port and an open port on your computer. Use a USB B-to-C cable or a USB A-to-C adapter if your computer does not have a USB-A port.
 
-To proceed with setup, the connected computer must have the Opentrons App installed *and running*. For details on installing the Opentrons App, see the of the Software and Operation chapter.
+To proceed with setup, the connected computer must have the Opentrons App installed *and running*. For details on installing the Opentrons App, see the [App Installation section][app-installation] of the Software and Operation chapter.
 
 ### Install software updates
 
@@ -283,9 +287,11 @@ Now that you've connected to a network or computer, the robot can check for soft
 
 Connect the included Emergency Stop Pendant (E-stop) to an auxiliary port (AUX-1 or AUX-2) on the back of the robot.
 
-![image](369ae37a6ee2c821c8629ea0f83015370eab558c.jpg){width="9.59375in" height="5.260416666666667in"}![image](e514d4ec3994039ef14d00bcaafd4bb31abc6ab8.png){width="9.59375in" height="5.260416666666667in"}
-
-Before and after connecting the Emergency Stop Pendant.
+<figure class="screenshot side-by-side" markdown>
+![Screen showing how to connect the E-stop.](images/install-e-stop-before.png "Before connecting the E-stop.png")
+![Screen showing succesful E-stop connection.](images/install-e-stop-after.png "After connecting the E-stop.png")
+<figcaption>Before and after connecting the Emergency Stop Pendant.</figcaption>
+</figure>
 
 Attaching and enabling the E-stop is *mandatory* for attaching instruments and running protocols on Flex. For more information on using the E-stop during robot operation, see the of the System Description chapter.
 
@@ -293,11 +299,16 @@ Attaching and enabling the E-stop is *mandatory* for attaching instruments and r
 
 Naming your robot lets you easily identify it in your lab environment. If you have multiple Opentrons robots on your network, make sure to give them unique names. Once you've confirmed your robot's name, you'll be taken to your Opentrons Flex Dashboard. Likely the next step you'll want to take is attaching instruments, which is covered in the next section.
 
-1.  **Instrument installation and calibration**
+## Instrument installation and calibration
 
 After initial robot setup, the next step is to attach instruments to the robot and calibrate them.
 
 To install an instrument, first tap on **Instruments** on the touchscreen or go to the **Pipettes and Modules** section of the device detail screen in the Opentrons App. Choose an empty mount and select either **Attach Pipette** or **Attach Gripper**. If the mount you want to use is already occupied, you need to detach the pipette or gripper first.
+
+!!! note
+    The overall installation process is the same regardless of whether you use the touchscreen or the Opentrons App. Whatever device you begin on will control the installation process until you complete or cancel it.
+    
+    If you begin on the touchscreen, the app will show the robot as being “busy”. If you begin in the app, the touchscreen will show a modal indicating that instrument installation is in progress.
 
 The exact installation process varies depending on the instrument you are attaching, as covered in the sections below. All instruments have an automated calibration procedure, which you should perform immediately after installation.
 
@@ -305,41 +316,41 @@ The exact installation process varies depending on the instrument you are attach
 
 When you install a pipette, you will be guided through the following steps on the touchscreen or in the Opentrons App.
 
-1.  CHOOSE PIPETTE TYPE
+1. Choose pipette type
 
-Choose between **1- or 8-Channel Pipette** and **96-Channel Pipette**. Attaching the 96-Channel Pipette requires a few additional steps because it attaches to a special mounting plate that spans both pipette mounts.
+    Choose between **1- or 8-Channel Pipette** and **96-Channel Pipette**. Attaching the 96-Channel Pipette requires a few additional steps because it attaches to a special mounting plate that spans both pipette mounts.
 
-1.  PREPARE FOR INSTALLATION
+2. Prepare for installation
 
-Remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment, such as the calibration probe, hex screwdriver, and mounting plate (for the 96-Channel Pipette).
+    Remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment, such as the calibration probe, hex screwdriver, and mounting plate (for the 96-Channel Pipette).
 
-1.  CONNECT AND SECURE THE PIPETTE
+3. Connect and secure the pipette
 
-The gantry will move to the front of the robot so you can attach the pipette.
+    The gantry will move to the front of the robot so you can attach the pipette.
 
-1- and 8-Channel Pipettes connect directly to a pipette mount. The 96-Channel Pipette requires a mounting plate. In order to attach the mounting plate, you must first disconnect the z-axis carriage for the right pipette mount.
+    1- and 8-Channel Pipettes connect directly to a pipette mount. The 96-Channel Pipette requires a mounting plate. In order to attach the mounting plate, you must first disconnect the z-axis carriage for the right pipette mount.
 
-Connect the pipette to the chosen pipette mount and secure its screws.
+    Connect the pipette to the chosen pipette mount and secure its screws.
 
-1.  RUN AUTOMATED CALIBRATION
+4. Run automated calibration
 
-To calibrate the pipette, attach the calibration probe to the appropriate pipette nozzle. The pipette will automatically move to touch certain points on the deck and save these calibration values for future use. Once calibration is complete and you've removed the probe, the pipette will be ready for use in protocols.
+    To calibrate the pipette, attach the calibration probe to the appropriate pipette nozzle. The pipette will automatically move to touch certain points on the deck and save these calibration values for future use. Once calibration is complete and you've removed the probe, the pipette will be ready for use in protocols.
 
 ### Gripper installation
 
 When you install the gripper, you will be guided through the following steps on the touchscreen or in the Opentrons App.
 
-1.  PREPARE FOR INSTALLATION
+1. Prepare for installation
 
-Remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the required hex screwdriver and make sure that the calibration pin is in its storage area on the gripper.
+    Remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the required hex screwdriver and make sure that the calibration pin is in its storage area on the gripper.
 
-1.  CONNECT AND SECURE THE GRIPPER
+2. Connect and secure the gripper
 
-The gantry will move to the front of the robot so you can attach the gripper. Connect the gripper to the extension mount and secure its screws.
+    The gantry will move to the front of the robot so you can attach the gripper. Connect the gripper to the extension mount and secure its screws.
 
-1.  RUN AUTOMATED CALIBRATION
+3. Run automated calibration
 
-To calibrate the gripper, insert the calibration pin in the front jaw. The gripper will automatically move to touch certain points on the deck and save these calibration values for future use. Then repeat the same process with the calibration pin in the back jaw. Once calibration is complete and you've put the pin back in its storage location, the gripper will be ready for use in protocols.
+    To calibrate the gripper, insert the calibration pin in the front jaw. The gripper will automatically move to touch certain points on the deck and save these calibration values for future use. Then repeat the same process with the calibration pin in the back jaw. Once calibration is complete and you've put the pin back in its storage location, the gripper will be ready for use in protocols.
 
 ## Relocation
 
@@ -349,7 +360,8 @@ This section provides advice and instructions about how to move your Opentrons F
 
 A short move spans a range of distances from "let's just move it over a little bit" to across the lab, down the hall, or another floor in your building. In these cases, you can move your Flex by hand. Transporting it on a hand cart is also a good option.
 
-**Warning:** The Flex weighs 88.5 kg. As a result, it requires two people to lift and move it safely.
+!!! warning
+    The Flex weighs 88.5 kg. As a result, it requires two people to lift and move it safely.
 
 Reattach the lift handles to move your Flex to a new, nearby location. Lifting and carrying the Flex by its handles is the right way to move the robot short distances. Remove the handles and store them in the User Kit after the move is complete. To prevent damaging the robot, always use the lift handles to pick it up and move it. Do not grab the frame to lift or move your robot.
 
@@ -357,7 +369,7 @@ Reattach the lift handles to move your Flex to a new, nearby location. Lifting a
 
 A long-distance move transports your Flex off the grounds of your university, facility, or institution. Across town, to a new city, state, province, or country are all examples of a long-distance move. In this case, you'll need to pack the Flex to protect it from the elements, shocks, and rough movements that may occur while in transit.
 
-If you've kept the shipping crate and internal supports that came with your Flex, you can repackage it in these materials for a long-distance move. Follow the in reverse order to prepare your Flex for a long-distance move. Basically, you should:
+If you've kept the shipping crate and internal supports that came with your Flex, you can repackage it in these materials for a long-distance move. Follow the [unboxing steps][unboxing] in reverse order to prepare your Flex for a long-distance move. Basically, you should:
 
 - Disconnect the power and network cable, if attached.
 
@@ -365,7 +377,7 @@ If you've kept the shipping crate and internal supports that came with your Flex
 
 - Reattach the deck plates.
 
-- Lock the gantry (see the below).
+- Lock the gantry (see the [General Moving Advice section][general-moving-advice] below).
 
 - Remove and store the window panels.
 
@@ -379,7 +391,7 @@ If you don't have the original crate and related material, contact a reputable s
 
 ### General moving advice
 
-##### DISCONNECT POWER AND NETWORK CABLES
+#### Disconnect power and network cables
 
 Before moving your Flex, don't forget to:
 
@@ -387,7 +399,7 @@ Before moving your Flex, don't forget to:
 
 - Disconnect the Ethernet or USB cable, if used.
 
-##### LOCK THE GANTRY
+#### Lock the gantry
 
 Before moving your Flex, reinsert the locking screws to hold the gantry in place. The gantry locking points are located:
 
@@ -397,37 +409,38 @@ Before moving your Flex, reinsert the locking screws to hold the gantry in place
 
 - On the right side rail near the front of the robot. Locking this part of the gantry requires the small orange bracket and two locking screws.
 
-![image](aedd8ba08776f235408d21a2e851f2b050b938c4.png){width="5.677083333333333in" height="5.510416666666667in"}
+![Locations of gantry locking screws.](images/unboxing/14-unlock-gantry.svg "Locations of gantry locking screws")
 
-##### HOME THE GANTRY
+#### Home the gantry
 
 You may not want to lock the gantry if you're only moving the robot to a nearby location. If you decide not to lock it, at least use the touchscreen or the Opentrons App to send the gantry to its home position before powering it down.
 
-To home the gantry via the touchscreen, tap the three-dot menu (**⋮**) and then tap **Home gantry**. To home the gantry via the Opentrons App:
+To home the gantry via the touchscreen, tap the three-dot menu (⋮) and then tap **Home gantry**. 
+
+To home the gantry via the Opentrons App:
 
 - Click **Devices**.
 
 - Click on your Flex in the device list.
 
-- Click the three-dot menu (**⋮**) and then click **Home gantry**.
+- Click the three-dot menu (⋮) and then click **Home gantry**.
 
-##### REMOVE MODULES
+#### Remove modules
 
 In-deck modules and other attachments add extra weight to your Flex. They also affect the robot's center of gravity, which can make it feel "tippy" when lifting it. To help lighten and balance the robot, remove any attached instruments and labware before you pick it up.
 
-##### REINSTALL DECK SLOTS
+#### Reinstall deck slots
 
 We recommend reattaching the deck slots for a long-distance move. Securing the slots in their original locations helps prevent accidental loss.
 
 Reattaching the deck slots for short moves around the lab is optional.
 
-##### POST-MOVE RECALIBRATION
+#### Post-move recalibration
 
-You should recalibrate any instruments and modules after reinstalling them. For more details on , see the Modules chapter.
+You should recalibrate any instruments and modules after reinstalling them. For more details on [module calibration][module-calibration], see the Modules chapter.
 
 ### Final thoughts about moving
 
 Your Flex is a sturdy and well-built machine, but it is also a precise scientific instrument designed to exacting tolerances. As a result, you should treat it with care when relocating it within your local work area or sending it across the country. This means following the guidance provided here *and* using your own common sense about how to transport an expensive piece of laboratory equipment. Bottom line: when moving your Flex, err on the side of caution and extra padding.
 
-If you have questions or concerns about relocating your Flex, contact us at
-
+If you have questions or concerns about relocating your Flex, contact us at <support@opentrons.com>.

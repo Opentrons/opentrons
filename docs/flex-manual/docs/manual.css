@@ -1,12 +1,25 @@
 div.parts-list {
-  display: flex; /* Establishes a flex container */
-  flex-wrap: wrap; /* Allows items to wrap to the next line */
-  align-items: flex-start; /* Aligns items to the start of the cross axis (top for rows) */
-                            /* This prevents shorter items from stretching if others are taller,
-                               but they will still start on the same "line" */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start; 
   gap: 5px; 
 }
 
 div.parts-list figure {
   width: 200px;
+}
+
+figure.screenshot img {
+  border: 1px solid #888;
+}
+
+figure.side-by-side p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start; 
+  gap: 20px; 
+}
+
+figure.side-by-side img {
+  width: 300px;
 }
