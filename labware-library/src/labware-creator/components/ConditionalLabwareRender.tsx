@@ -34,6 +34,8 @@ const calculateViewBox = (bBox: DOMRect): string => {
 }
 
 const areBBoxesEqual = (a: DOMRect | null, b: DOMRect | null): boolean => {
+  // isEqual appears to always return false for native DOMRects/SVGRects,
+  // so we need to break them down into primitives.
   return isEqual(
     {
       x: a?.x,
