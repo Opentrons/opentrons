@@ -170,7 +170,7 @@
   "touch_tip_after_aspirating": "Touch tip after aspirating",
   "touch_tip_after_dispensing": "Touch tip after dispensing",
   "touch_tip_position_mm": "Touch tip position from top of well (mm)",
-  "touch_tip_value": "{{position}} mm from bottom",
+  "touch_tip_value": "{{speed}}mm/s, {{position}} mm from bottom",
   "touch_tip": "Touch tip",
   "transfer_analysis_failed": "quick transfer analysis failed",
   "transfer_name": "Transfer Name",

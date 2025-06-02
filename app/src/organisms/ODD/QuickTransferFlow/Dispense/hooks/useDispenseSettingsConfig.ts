@@ -169,14 +169,13 @@ export function useDispenseSettingsConfig({
       value:
         state.touchTipDispense !== undefined
           ? t('touch_tip_value', {
-              // speed: state.touchTipDispense.speed,
-              // position: state.touchTipDispense.positionFromBottom,
+              speed: state.touchTipDispense,
+              position: state.touchTipDispense,
             })
           : '',
-      enabled: false,
+      enabled: true,
       onClick: () => {
-        console.log('will be implemented soon')
-        // setSelectedSetting('dispense_touch_tip')
+        setSelectedSetting('dispense_touch_tip')
       },
     },
     {
