@@ -222,6 +222,7 @@ jobs:
           make -C app dist
 
       - name: Install and Invoke TrustedSigning @0.5.3 on dummy executable
+        # Work around from https://github.com/electron-userland/electron-builder/issues/9076#issuecomment-2855541018
         if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
         shell: pwsh
         run: |
@@ -230,6 +231,7 @@ jobs:
             $dummyExePath = Join-Path -Path $env:GITHUB_WORKSPACE -ChildPath "dummy.exe"
             Set-Content -Path $dummyExePath -Value "This is a dummy executable for testing purposes."
             # Invoke Trusted Signing on the dummy executable
+            # Necessary to force dependency resolution
             try {
               Invoke-TrustedSigning `
                 -Endpoint 'https://eus.codesigning.azure.net/' `
