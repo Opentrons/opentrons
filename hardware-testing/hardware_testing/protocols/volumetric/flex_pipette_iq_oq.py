@@ -263,9 +263,12 @@ def load_most_labware(
     plates: List[Labware] = []
     for i in range(num_plates_needed):
         if i == 0:
-            plate = ctx.load_labware("corning_96_wellplate_360ul_flat", SLOTS["stack_start"])
+            plate = ctx.load_labware(
+                "stackable_corning_96_wellplate_360ul_flat",
+                SLOTS["stack_start"]
+            )
         else:
-            plate = plates[-1].load_labware("corning_96_wellplate_360ul_flat")
+            plate = plates[-1].load_labware("stackable_corning_96_wellplate_360ul_flat")
         plate.load_empty(plate.wells())
         plates.append(plate)
     return reservoir_diluent, reservoirs_dye, plates
