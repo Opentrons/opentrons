@@ -59,23 +59,23 @@ describe('getErrorKind', () => {
     },
     {
       commandType: 'flexStacker/retrieve',
-      errorType: DEFINED_ERROR_TYPES.LABWARE_MISSING_IN_SHUTTLE,
-      expectedError: ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE,
+      errorType: DEFINED_ERROR_TYPES.STACKER_SHUTTLE_EMPTY,
+      expectedError: ERROR_KINDS.STACKER_SHUTTLE_EMPTY,
     },
     {
       commandType: 'flexStacker/retrieve',
       errorType: DEFINED_ERROR_TYPES.HOPPER_LABWARE_MISSING,
-      expectedError: ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
+      expectedError: ERROR_KINDS.STACKER_HOPPER_EMPTY,
     },
     {
       commandType: 'flexStacker/retrieve',
-      errorType: DEFINED_ERROR_TYPES.SHUTTLE_MISSING,
-      expectedError: ERROR_KINDS.SHUTTLE_MISSING,
+      errorType: DEFINED_ERROR_TYPES.STACKER_SHUTTLE_MISSING,
+      expectedError: ERROR_KINDS.STACKER_SHUTTLE_MISSING,
     },
     {
       commandType: 'flexStacker/retrieve',
       errorType: DEFINED_ERROR_TYPES.STACKER_STALL,
-      expectedError: ERROR_KINDS.STALL_WHILE_STACKING,
+      expectedError: ERROR_KINDS.STACKER_STALLED,
     },
     {
       commandType: 'aspirate',
