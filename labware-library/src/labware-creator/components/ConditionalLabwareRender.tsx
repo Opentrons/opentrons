@@ -33,10 +33,7 @@ const calculateViewBox = (bBox: DOMRect): string => {
   return `${x} ${y} ${xDimension} ${yDimension}`
 }
 
-const areBBoxesEqual = (
-  a: DOMRect | undefined,
-  b: DOMRect | undefined
-): boolean => {
+const areBBoxesEqual = (a: DOMRect | null, b: DOMRect | null): boolean => {
   return isEqual(
     {
       x: a?.x,
@@ -67,17 +64,17 @@ const PopulatedPreview = (props: {
 }): JSX.Element => {
   const { definition } = props
   const gRef = useRef<SVGGElement>(null)
-  const [bBox, updateBBox] = useState<DOMRect | undefined>(
-    gRef.current?.getBBox()
+  const [bBox, updateBBox] = useState<DOMRect | null>(
+    gRef.current?.getBBox() ?? null
   )
 
   // In order to implement "zoom to fit", we're calculating the desired viewBox based on getBBox of the child.
   // So we have to actually render the child to get its bounding box. After that, we re-calculate the viewBox.
   // Once the viewBox is re-calculated, we use setState to force a re-render.
   useLayoutEffect((): void => {
-    const nextBBox = gRef.current?.getBBox()
-    if (!areBBoxesEqual(bBox, nextBBox)) { 
-       updateBBox(nextBBox)
+    const nextBBox = gRef.current?.getBBox() ?? null
+    if (!areBBoxesEqual(bBox, nextBBox)) {
+      updateBBox(nextBBox)
     }
   }, [
     bBox,
