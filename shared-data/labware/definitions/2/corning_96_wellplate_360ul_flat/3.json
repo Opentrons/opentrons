@@ -68,7 +68,6 @@
   },
   "stackLimit": 11,
   "compatibleParentLabware": [
-    "stackable_corning_96_wellplate_360ul_flat",
     "corning_96_wellplate_360ul_flat",
     "plate_lid"
   ],
@@ -1145,7 +1144,7 @@
     "format": "96Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "stackable_corning_96_wellplate_360ul_flat"
+    "loadName": "corning_96_wellplate_360ul_flat"
   },
   "namespace": "custom_beta",
   "version": 1,
@@ -1165,11 +1164,6 @@
       "x": 0,
       "y": 0,
       "z": 1.1
-    },
-    "stackable_corning_96_wellplate_360ul_flat": {
-      "x": 0,
-      "y": 0,
-      "z": 1.3
     },
     "corning_96_wellplate_360ul_flat": {
       "x": 0,
