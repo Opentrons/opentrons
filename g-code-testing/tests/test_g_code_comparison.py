@@ -2,13 +2,13 @@ import pytest
 from opentrons import APIVersion
 from pathlib import Path
 
-RESULTS_PATH = Path(__file__).parent.parent / "results"
-
 from g_code_parsing.g_code_differ import GCodeDiffer
 from g_code_test_data.g_code_configuration import ProtocolGCodeConfirmConfig
 from g_code_test_data.protocol.protocol_configurations import PROTOCOL_CONFIGURATIONS
 from g_code_test_data.g_code_configuration import HTTPGCodeConfirmConfig
 from g_code_test_data.http.http_configurations import HTTP_CONFIGURATIONS
+
+RESULTS_PATH = Path(__file__).parent.parent / "results"
 
 
 @pytest.mark.parametrize(
