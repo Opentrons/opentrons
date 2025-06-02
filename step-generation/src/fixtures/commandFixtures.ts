@@ -258,6 +258,7 @@ export const aspirateHelperLiquidClass = (submergeParams: {
               volume: dispenseAirGap,
               flowRate: dispenseFlowRate,
             },
+            meta: AIR_GAP_META,
           },
         ]
       : []),
@@ -649,6 +650,7 @@ export const dispenseHelperLiquidClass = (params: {
               flowRate: dispenseFlowRate,
               pushOut: 0,
             },
+            meta: AIR_GAP_META,
           },
           ...(dispenseDelay > 0
             ? [
