@@ -162,7 +162,7 @@ def add_parameters(params: ParameterContext) -> None:
     params.add_bool(
         display_name="use_artel",
         variable_name="use_artel",
-        default=True,
+        default=False,
     )
 
 
