@@ -27,7 +27,7 @@ import type { Dispatch, State } from '/app/redux/types'
 import type { ModuleSetupWizardStepProps } from './types'
 
 const EQUIPMENT_POLL_MS = 3000
-const MODULE_TIMEOUT_MS = 30000
+const MODULE_TIMEOUT_MS = 60000
 const NO_UPDATE_FOUND_TIMEOUT_MS = 2000
 interface UpdateFirmwareProps extends ModuleSetupWizardStepProps {
   robotName: string
@@ -114,7 +114,7 @@ export const UpdateFirmware = (
       setErrorMessage(t('firmware_update_failed') as string)
       if (latestRequestId != null) dispatch(dismissRequest(latestRequestId))
     } else if (requestStatus === SUCCESS) {
-      // if the request succeeds but the module doesn't come back online within 30 seconds
+      // if the request succeeds but the module doesn't come back online within 60 seconds
       // we should display an error message
       const timeoutId = setTimeout(() => {
         setIsModuleUpdating(false)
