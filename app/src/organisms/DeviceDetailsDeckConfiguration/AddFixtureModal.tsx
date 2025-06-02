@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { cpSync } from 'original-fs'
+import { createEpicMiddleware } from 'redux-observable'
 import { css } from 'styled-components'
 
 import { AttachedModule } from '@opentrons/api-client'
@@ -23,6 +25,8 @@ import {
   ABSORBANCE_READER_CUTOUTS,
   ABSORBANCE_READER_V1,
   ABSORBANCE_READER_V1_FIXTURE,
+  AddressableAreaName,
+  CutoutFixture,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
@@ -46,8 +50,6 @@ import {
   TEMPERATURE_MODULE_V2_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-  THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_FIXTURES,
@@ -333,11 +335,52 @@ export const getThermoUnconfiguredFixtures = (
     .filter(f => f.moduleModel === THERMOCYCLER_MODULE_V2)
     .map(item =>
       Object.keys(fixtureGroupItem).map((mod: string) => ({
-        cutoutId: mod,
-        cutoutFixtureId: fixtureGroupItem[mod as keyof typeof fixtureGroupItem],
+        cutoutId: mod as CutoutId,
+        // how can I fix this to only pull the ones that are set?
+        cutoutFixtureId:
+          fixtureGroupItem[mod as keyof typeof fixtureGroupItem] ??
+          ('' as CutoutFixtureId),
         opentronsModuleSerialNumber: item.serialNumber,
       }))
     )
+  return matrix
+}
+
+const getModuleUnconfiguredFixtures = (
+  unconfiguredMods: AttachedModule[],
+  cutoutId: CutoutId,
+  moduleModel: string
+): CutoutConfig[][] => {
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const availableCutoutFixtuers = deckDef.cutoutFixtures.filter(
+    cf =>
+      cf.mayMountTo.includes(cutoutId) &&
+      MODULE_CUTOUT_FIXTURE_ID.includes(cf.id)
+  )
+
+  const addressableAreasById = availableCutoutFixtuers.reduce(
+    (acc, { id, providesAddressableAreas }) => {
+      return { ...acc, [id]: providesAddressableAreas[cutoutId] }
+    },
+    {} as Record<CutoutFixtureId, AddressableAreaName[]>
+  )
+
+  console.log('addressableAreasById: ', addressableAreasById)
+  const keys = Object.keys(addressableAreasById)
+
+  const filteredMods = unconfiguredMods.filter(
+    mod => mod.moduleModel === moduleModel
+  )
+  console.log('unconfiguredMods: ', unconfiguredMods)
+  console.log('filteredMods: ', filteredMods)
+  const matrix = filteredMods.map(({ serialNumber, moduleModel }) => [
+    {
+      cutoutId,
+      cutoutFixtureId: keys.find(key => key == moduleModel) as CutoutFixtureId,
+      opentronsModuleSerialNumber: serialNumber,
+    },
+  ])
+
   return matrix
 }
 
@@ -353,51 +396,36 @@ export const getUnconfiguredMods = (
     )
     availableOptions = [...availableOptions, ...unconfiguredTCs]
   }
-  if (
-    HEATER_SHAKER_CUTOUTS.includes(cutoutId) &&
-    unconfiguredMods.some(m => m.moduleModel === HEATERSHAKER_MODULE_V1)
-  ) {
-    const unconfiguredHeaterShakers = unconfiguredMods
-      .filter(mod => mod.moduleModel === HEATERSHAKER_MODULE_V1)
-      .map(mod => [
-        {
-          cutoutId,
-          cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
-          opentronsModuleSerialNumber: mod.serialNumber,
-        },
-      ])
-    availableOptions = [...availableOptions, ...unconfiguredHeaterShakers]
-  }
-  if (
-    TEMPERATURE_MODULE_CUTOUTS.includes(cutoutId) &&
-    unconfiguredMods.some(m => m.moduleModel === TEMPERATURE_MODULE_V2)
-  ) {
-    const unconfiguredTemperatureModules = unconfiguredMods
-      .filter(mod => mod.moduleModel === TEMPERATURE_MODULE_V2)
-      .map(mod => [
-        {
-          cutoutId,
-          cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
-          opentronsModuleSerialNumber: mod.serialNumber,
-        },
-      ])
-    availableOptions = [...availableOptions, ...unconfiguredTemperatureModules]
-  }
-  if (
-    ABSORBANCE_READER_CUTOUTS.includes(cutoutId) &&
-    unconfiguredMods.some(m => m.moduleModel === ABSORBANCE_READER_V1)
-  ) {
-    const unconfiguredAbsorbanceReaders = unconfiguredMods
-      .filter(mod => mod.moduleModel === ABSORBANCE_READER_V1)
-      .map(mod => [
-        {
-          cutoutId,
-          cutoutFixtureId: ABSORBANCE_READER_V1_FIXTURE,
-          opentronsModuleSerialNumber: mod.serialNumber,
-        },
-      ])
-    availableOptions = [...availableOptions, ...unconfiguredAbsorbanceReaders]
-  }
+  const unconfiguredHeaterShakers = getModuleUnconfiguredFixtures(
+    unconfiguredMods,
+    cutoutId,
+    HEATERSHAKER_MODULE_V1
+  )
+  availableOptions = [...availableOptions, ...unconfiguredHeaterShakers]
+  console.log('unconfiguredHeaterShakers: ', unconfiguredHeaterShakers)
+
+  const unconfiguredTemperatureModules = getModuleUnconfiguredFixtures(
+    unconfiguredMods,
+    cutoutId,
+    TEMPERATURE_MODULE_V2
+  )
+  availableOptions = [...availableOptions, ...unconfiguredTemperatureModules]
+
+  const unconfiguredAbsorbanceReaders = getModuleUnconfiguredFixtures(
+    unconfiguredMods,
+    cutoutId,
+    ABSORBANCE_READER_V1
+  )
+  availableOptions = [...availableOptions, ...unconfiguredAbsorbanceReaders]
+
+  // need to add FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE, FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE, FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE
+  const unconfiguredFlexStacker = getModuleUnconfiguredFixtures(
+    unconfiguredMods,
+    cutoutId,
+    FLEX_STACKER_MODULE_V1
+  )
+  availableOptions = [...availableOptions, ...unconfiguredFlexStacker]
+
   return availableOptions
 }
 
@@ -433,69 +461,69 @@ export const getModuleOptions = (
       ...getUnconfiguredMods(cutoutId, unconfiguredMods),
     ]
   }
-  if (
-    cutoutId === 'cutoutD3' &&
-    unconfiguredMods.some(m => m.moduleModel === FLEX_STACKER_MODULE_V1)
-  ) {
-    const unconfiguredFlexStackers: CutoutConfig[][] = []
-    unconfiguredMods
-      .filter(mod => mod.moduleModel === FLEX_STACKER_MODULE_V1)
-      .forEach(mod => {
-        unconfiguredFlexStackers.push([
-          {
-            cutoutId,
-            cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
-            opentronsModuleSerialNumber: mod.serialNumber,
-          },
-        ])
-        unconfiguredFlexStackers.push([
-          {
-            cutoutId,
-            cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-            opentronsModuleSerialNumber: mod.serialNumber,
-          },
-        ])
-        unconfiguredFlexStackers.push([
-          {
-            cutoutId,
-            cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-            opentronsModuleSerialNumber: mod.serialNumber,
-          },
-        ])
-        unconfiguredFlexStackers.push([
-          {
-            cutoutId,
-            cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-            opentronsModuleSerialNumber: mod.serialNumber,
-          },
-        ])
-      })
-    availableOptions.push(...unconfiguredFlexStackers)
-  } else if (
-    STAGING_AREA_CUTOUTS.includes(cutoutId) &&
-    unconfiguredMods.some(m => m.moduleModel === FLEX_STACKER_MODULE_V1)
-  ) {
-    const unconfiguredFlexStackers: CutoutConfig[][] = []
-    unconfiguredMods
-      .filter(mod => mod.moduleModel === FLEX_STACKER_MODULE_V1)
-      .forEach(mod => {
-        unconfiguredFlexStackers.push([
-          {
-            cutoutId,
-            cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
-            opentronsModuleSerialNumber: mod.serialNumber,
-          },
-        ])
-        unconfiguredFlexStackers.push([
-          {
-            cutoutId,
-            cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-            opentronsModuleSerialNumber: mod.serialNumber,
-          },
-        ])
-      })
-    availableOptions = [...availableOptions, ...unconfiguredFlexStackers]
-  }
+  // if (
+  //   cutoutId === 'cutoutD3' &&
+  //   unconfiguredMods.some(m => m.moduleModel === FLEX_STACKER_MODULE_V1)
+  // ) {
+  //   const unconfiguredFlexStackers: CutoutConfig[][] = []
+  //   unconfiguredMods
+  //     .filter(mod => mod.moduleModel === FLEX_STACKER_MODULE_V1)
+  //     .forEach(mod => {
+  //       unconfiguredFlexStackers.push([
+  //         {
+  //           cutoutId,
+  //           cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+  //           opentronsModuleSerialNumber: mod.serialNumber,
+  //         },
+  //       ])
+  //       unconfiguredFlexStackers.push([
+  //         {
+  //           cutoutId,
+  //           cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+  //           opentronsModuleSerialNumber: mod.serialNumber,
+  //         },
+  //       ])
+  //       unconfiguredFlexStackers.push([
+  //         {
+  //           cutoutId,
+  //           cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  //           opentronsModuleSerialNumber: mod.serialNumber,
+  //         },
+  //       ])
+  //       unconfiguredFlexStackers.push([
+  //         {
+  //           cutoutId,
+  //           cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  //           opentronsModuleSerialNumber: mod.serialNumber,
+  //         },
+  //       ])
+  //     })
+  //   availableOptions.push(...unconfiguredFlexStackers)
+  // } else if (
+  //   STAGING_AREA_CUTOUTS.includes(cutoutId) &&
+  //   unconfiguredMods.some(m => m.moduleModel === FLEX_STACKER_MODULE_V1)
+  // ) {
+  //   const unconfiguredFlexStackers: CutoutConfig[][] = []
+  //   unconfiguredMods
+  //     .filter(mod => mod.moduleModel === FLEX_STACKER_MODULE_V1)
+  //     .forEach(mod => {
+  //       unconfiguredFlexStackers.push([
+  //         {
+  //           cutoutId,
+  //           cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+  //           opentronsModuleSerialNumber: mod.serialNumber,
+  //         },
+  //       ])
+  //       unconfiguredFlexStackers.push([
+  //         {
+  //           cutoutId,
+  //           cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  //           opentronsModuleSerialNumber: mod.serialNumber,
+  //         },
+  //       ])
+  //     })
+  //   availableOptions = [...availableOptions, ...unconfiguredFlexStackers]
+  // }
   return availableOptions
 }
 

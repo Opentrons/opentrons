@@ -4,7 +4,7 @@ import { ListItem } from '../..'
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { Btn, Flex } from '../../primitives'
+import { Btn } from '../../primitives'
 import {
   ALIGN_CENTER,
   CURSOR_DEFAULT,
