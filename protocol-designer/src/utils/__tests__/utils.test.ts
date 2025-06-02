@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
+import { fixture96Plate, LabwareDefinition2 } from '@opentrons/shared-data'
+
 import {
+  getAllLabwareIdsOfCertainURIOnStack,
   getMaxConditioningVolume,
   getMaxPushOutVolume,
   removeOpentronsPhrases,
 } from '..'
+import {
+  AllTemporalPropertiesForTimelineFrame,
+  LabwareOnDeck,
+} from '../../step-forms'
 
 describe('removeOpentronsPhrases', () => {
   it('should remove "Opentrons Flex 96"', () => {
@@ -244,5 +251,77 @@ describe('getMaxConditioningVolume', () => {
 
     const result = getMaxConditioningVolume(args)
     expect(result).toBe(200 - 10)
+  })
+})
+
+describe('getAllLabwareIdsOfCertainURIOnStack', () => {
+  it('returns an 1 item in string when there are no duplicates on the stack', () => {
+    const mockDeckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'] = {
+      labware: {
+        stack: ['labware', 'adapter', 'module', 'A2'],
+        id: 'labware',
+        def: fixture96Plate as LabwareDefinition2,
+        pythonName: 'mockPythonName',
+        labwareDefURI: 'mockLabwareDefUri',
+      },
+      adapter: {
+        stack: ['adapter', 'module', 'A2'],
+        id: 'adapter',
+        def: fixture96Plate as LabwareDefinition2,
+        pythonName: 'mockPythonName',
+        labwareDefURI: 'mockAdapterDefUri',
+      },
+    }
+    const mockLabwareOnDeck: LabwareOnDeck = {
+      stack: ['labware', 'adapter', 'module', 'A2'],
+      id: 'labware',
+      def: fixture96Plate as LabwareDefinition2,
+      pythonName: 'mockPythonName',
+      labwareDefURI: 'mockLabwareDefUri',
+    }
+    expect(
+      getAllLabwareIdsOfCertainURIOnStack(
+        mockDeckSetupLabware,
+        mockLabwareOnDeck
+      )
+    ).toEqual(['labware'])
+  })
+  it('returns an 3 items in string when there are duplicates on the stack', () => {
+    const mockDeckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'] = {
+      labware: {
+        stack: ['labware', 'module', 'A2'],
+        id: 'labware',
+        def: fixture96Plate as LabwareDefinition2,
+        pythonName: 'mockPythonName',
+        labwareDefURI: 'mockLabwareDefUri',
+      },
+      labware2: {
+        stack: ['labware2', 'labware', 'module', 'A2'],
+        id: 'labware2',
+        def: fixture96Plate as LabwareDefinition2,
+        pythonName: 'mockPythonName',
+        labwareDefURI: 'mockLabwareDefUri',
+      },
+      labware3: {
+        stack: ['labware3', 'labware2', 'labware', 'module', 'A2'],
+        id: 'labware3',
+        def: fixture96Plate as LabwareDefinition2,
+        pythonName: 'mockPythonName',
+        labwareDefURI: 'mockLabwareDefUri',
+      },
+    }
+    const mockLabwareOnDeck: LabwareOnDeck = {
+      stack: ['labware', 'adapter', 'module', 'A2'],
+      id: 'labware',
+      def: fixture96Plate as LabwareDefinition2,
+      pythonName: 'mockPythonName',
+      labwareDefURI: 'mockLabwareDefUri',
+    }
+    expect(
+      getAllLabwareIdsOfCertainURIOnStack(
+        mockDeckSetupLabware,
+        mockLabwareOnDeck
+      )
+    ).toEqual(['labware', 'labware2', 'labware3'])
   })
 })

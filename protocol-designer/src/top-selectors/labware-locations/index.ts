@@ -21,6 +21,7 @@ import {
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
+import { OFFDECK } from '../../constants'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { getRobotType } from '../../file-data/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -285,7 +286,7 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
       .map(slotId => ({ name: slotId, value: slotId, deckLabel: slotId }))
     const offDeck = {
       name: 'Off-deck',
-      value: 'offDeck',
+      value: OFFDECK,
       deckLabel: 'Off-deck',
     }
     const wasteChuteSlot = {

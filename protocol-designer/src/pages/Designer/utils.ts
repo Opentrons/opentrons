@@ -310,16 +310,14 @@ export const useLabwareDropdownOptions = (
       const isOffDeck = deckSlot === 'offDeck'
 
       //  show full stack option if moving labware manually
-      const bottomOfStackOption: DropdownOption[] =
+      const bottomOfStackOption: DropdownOption | null =
         showStackOption && bottomOfStack != null
-          ? [
-              {
-                name: t('unoccupied_stack', { name: nickName }),
-                value: bottomOfStack,
-                deckLabel: latestSlot,
-              },
-            ]
-          : []
+          ? {
+              name: t('unoccupied_stack', { name: nickName }),
+              value: bottomOfStack,
+              deckLabel: latestSlot,
+            }
+          : null
       const restOfOptions: DropdownOption[] =
         isAdapter ||
         isLabwareInWasteChute ||
@@ -339,7 +337,10 @@ export const useLabwareDropdownOptions = (
       //  filter out moving adapters, and labware in
       //  waste chute for moveLabware, labware off-deck and
       //  labware that is a tiprack for the labware dropdown only
-      return [...restOfOptions, ...bottomOfStackOption]
+      return [
+        ...restOfOptions,
+        ...(bottomOfStackOption != null ? [bottomOfStackOption] : []),
+      ]
     },
     []
   )
