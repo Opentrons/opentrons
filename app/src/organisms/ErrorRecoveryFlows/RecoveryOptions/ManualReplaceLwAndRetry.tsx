@@ -57,136 +57,57 @@ export function ManualReplaceLwAndRetry(
     }
   }
 
-  const buildStackerStalledRetry = (): JSX.Element => {
+  const buildStackerContent = (): JSX.Element => {
     switch (step) {
       case STACKER_STALLED_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
-        return <PrepareStackerHomeStep />
-      case STACKER_STALLED_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
-        return <TwoColTextAndImage {...props} />
-      case STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY:
-        return <TwoColLwInfoAndDeck {...props} />
-      case STACKER_STALLED_RETRY.STEPS.RETRY:
-        return <RetryStepInfo {...props} />
-      default:
-        return buildUnexpectedStep()
-    }
-  }
-
-  const buildStackerStalledSkip = (): JSX.Element => {
-    switch (step) {
       case STACKER_STALLED_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING:
-        return <PrepareStackerHomeStep />
-      case STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
-        return <TwoColTextAndImage {...props} />
-      case STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE:
-      case STACKER_STALLED_SKIP.STEPS.CONFIRM_RETRY:
-        return <TwoColLwInfoAndDeck {...props} />
-      case STACKER_STALLED_SKIP.STEPS.SKIP:
-        return <SkipStepInfo {...props} />
-      default:
-        return buildUnexpectedStep()
-    }
-  }
-  const buildStackerShuttleMissingRetry = (): JSX.Element => {
-    switch (step) {
       case STACKER_SHUTTLE_MISSING_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
-        return <PrepareStackerHomeStep />
-      case STACKER_SHUTTLE_MISSING_RETRY.STEPS.MANUAL_REPLACE:
-        return <TwoColTextAndImage {...props} />
-      case STACKER_SHUTTLE_MISSING_RETRY.STEPS.CONFIRM_RETRY:
-        return <TwoColLwInfoAndDeck {...props} />
-      case STACKER_SHUTTLE_MISSING_RETRY.STEPS.RETRY:
-        return <RetryStepInfo {...props} />
-      default:
-        return buildUnexpectedStep()
-    }
-  }
-
-  const buildStackerHopperEmptyRetry = (): JSX.Element => {
-    switch (step) {
-      case STACKER_HOPPER_EMPTY_RETRY.STEPS.CONFIRM_RETRY:
-        return <TwoColLwInfoAndDeck {...props} />
-      case STACKER_HOPPER_EMPTY_RETRY.STEPS.RETRY:
-        return <RetryStepInfo {...props} />
-      default:
-        return buildUnexpectedStep()
-    }
-  }
-  const buildStackerHopperEmptySkip = (): JSX.Element => {
-    switch (step) {
-      case STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
-      case STACKER_HOPPER_EMPTY_SKIP.STEPS.CONFIRM_RETRY:
-        return <TwoColLwInfoAndDeck {...props} />
-      case STACKER_HOPPER_EMPTY_SKIP.STEPS.SKIP:
-        return <SkipStepInfo {...props} />
-      default:
-        return buildUnexpectedStep()
-    }
-  }
-
-  const buildStackerShuttleEmptyRetry = (): JSX.Element => {
-    switch (step) {
-      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.EMPTY_STACKER:
-        return <TwoColTextAndImage {...props} />
       case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
-        return <PrepareStackerHomeStep />
-      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_LABWARE_IN_LATCH:
-        return <HoldingLabware {...props} />
-      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.RELEASE_FROM_LATCH:
-        return <ReleaseLabware {...props} />
-      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.REENGAGE_LATCH:
-        return <TwoColTextAndImage {...props} />
-      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_RETRY:
-        return <TwoColLwInfoAndDeck {...props} />
-      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.RETRY:
-        return <RetryStepInfo {...props} />
-      default:
-        return buildUnexpectedStep()
-    }
-  }
-
-  const buildStackerShuttleEmptySkip = (): JSX.Element => {
-    switch (step) {
-      case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.EMPTY_STACKER:
-        return <TwoColTextAndImage {...props} />
       case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING:
-        return <PrepareStackerHomeStep />
-      case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_LABWARE_IN_LATCH:
-        return <HoldingLabware {...props} />
-      case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.RELEASE_FROM_LATCH:
-        return <ReleaseLabware {...props} />
+        return <PrepareStackerHomeStep {...props} />
+      case STACKER_STALLED_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
+      case STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
+      case STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE:
+      case STACKER_SHUTTLE_MISSING_RETRY.STEPS.MANUAL_REPLACE:
+      case STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
+      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.EMPTY_STACKER:
+      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.REENGAGE_LATCH:
+      case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.EMPTY_STACKER:
       case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.REENGAGE_LATCH:
         return <TwoColTextAndImage {...props} />
+      case STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY:
+      case STACKER_STALLED_SKIP.STEPS.CONFIRM_RETRY:
+      case STACKER_SHUTTLE_MISSING_RETRY.STEPS.CONFIRM_RETRY:
+      case STACKER_HOPPER_EMPTY_RETRY.STEPS.CONFIRM_RETRY:
+      case STACKER_HOPPER_EMPTY_SKIP.STEPS.CONFIRM_RETRY:
+      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_RETRY:
       case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY:
         return <TwoColLwInfoAndDeck {...props} />
+      case STACKER_STALLED_RETRY.STEPS.RETRY:
+      case STACKER_SHUTTLE_MISSING_RETRY.STEPS.RETRY:
+      case STACKER_HOPPER_EMPTY_RETRY.STEPS.RETRY:
+      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.RETRY:
+        return <RetryStepInfo {...props} />
+      case STACKER_STALLED_SKIP.STEPS.SKIP:
+      case STACKER_HOPPER_EMPTY_SKIP.STEPS.SKIP:
       case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.SKIP:
         return <SkipStepInfo {...props} />
+      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_LABWARE_IN_LATCH:
+      case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_LABWARE_IN_LATCH:
+        return <HoldingLabware {...props} />
+      case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.RELEASE_FROM_LATCH:
+      case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.RELEASE_FROM_LATCH:
+        return <ReleaseLabware {...props} />
       default:
         return buildUnexpectedStep()
     }
   }
 
   const buildContent = (): JSX.Element => {
-    switch (route) {
-      case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
-        return buildManualReplaceLwAndRetry()
-      case STACKER_STALLED_RETRY.ROUTE:
-        return buildStackerStalledRetry()
-      case STACKER_STALLED_SKIP.ROUTE:
-        return buildStackerStalledSkip()
-      case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
-        return buildStackerShuttleMissingRetry()
-      case STACKER_HOPPER_EMPTY_RETRY.ROUTE:
-        return buildStackerHopperEmptyRetry()
-      case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
-        return buildStackerHopperEmptySkip()
-      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
-        return buildStackerShuttleEmptyRetry()
-      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
-        return buildStackerShuttleEmptySkip()
-      default:
-        return buildUnexpectedStep()
+    if (route === RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE) {
+      return buildManualReplaceLwAndRetry()
     }
+    return buildStackerContent()
   }
 
   return buildContent()
