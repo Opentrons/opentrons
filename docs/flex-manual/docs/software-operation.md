@@ -831,7 +831,7 @@ be useful for troubleshooting or testing pre-release features.
 - **Developer Tools:** Enable additional tools and features designed for
   developers. Not recommended unless instructed by Opentrons Support.
 
-### Deck confguration
+### Deck configuration
 
 Deck configuration tells your Flex what fixtures are attached to the
 deck, in what locations. You need to inform the robot about installed

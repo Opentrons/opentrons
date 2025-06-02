@@ -1,142 +1,55 @@
 # System Description
 
-This chapter describes the hardware systems of Opentrons Flex, which
-underlie its core lab automation features. The deck, gantry, and
-instrument mounts of Opentrons Flex enable the use of precision liquid-
-and labware-handling components. The on-device touchscreen enables
-running protocols and checking on the robot's status without needing to
-bring your computer to the lab bench. Wired and wireless connectivity
-enables additional control from the Opentrons App (see the for more
-details) and extending the system's features by attaching peripherals
-(see the ).
+This chapter describes the hardware systems of Opentrons Flex, which underlie its core lab automation features. The deck, gantry, and instrument mounts of Opentrons Flex enable the use of precision liquid- and labware-handling components. The on-device touchscreen enables running protocols and checking on the robot's status without needing to bring your computer to the lab bench. Wired and wireless connectivity enables additional control from the Opentrons App (see the [Software and Operation chapter](software-operation.md) for more details) and extending the system's features by attaching peripherals (see the [Modules chapter](modules.md)).
 
-1.  **Physical components**
+## Physical components
 
-Camera Status Light Touchscreen
-
-![image](5bab48e61d3ce9a7d70932bed52772a7de64b789.png){width="17.125in"
-height="10.375in"}![image](4e6f23d4926a102f972dabd6449115b7fbe8bf3c.png){width="0.4479166666666667in"
-height="0.4479166666666667in"}Frame
-
-Gantry
-
-Side Windows
-
-Deck
-
-Front Door
-
-Handle Caps
-
-Locations of the physical components of Opentrons Flex.
+<figure markdown>
+![The frame, front door, and side windows enclose Flex. The deck is the inside bottom surface of the robot. The gantry runs across the working space of the robot. The status light is on the front top, and the touchscreen is on the front right. The internal camera is located in the top right corner. Handle caps are on the side of the robot on each outside bottom corner.](images/flex-physical-components.png "flex-physical-components.svg")
+<figcaption>Locations of the physical components of Opentrons Flex.</figcaption>
+</figure>
 
 ### Frame and enclosure
 
-The *frame* of the Opentrons Flex robot provides rigidity and structural
-support for its deck and gantry. All of the mechanical subsystems are
-situated on and mounted to the main frame. The frame is constructed
-primarily of sheet metal and aluminum extrusions.
+The *frame* of the Opentrons Flex robot provides rigidity and structural support for its deck and gantry. All of the mechanical subsystems are situated on and mounted to the main frame. The frame is constructed primarily of sheet metal and aluminum extrusions.
 
-The metal frame has openings for *side windows* and a *front door* made
-of transparent polycarbonate that let you see what's going on inside
-Flex. The front door hinges open for access to the interior of the
-system. With the front door open, you can attach instruments, modules,
-and deck fixtures; prepare the deck before a protocol; or manipulate the
-state of the deck during a protocol.
+The metal frame has openings for *side windows* and a *front door* made of transparent polycarbonate that let you see what's going on inside Flex. The front door hinges open for access to the interior of the system. With the front door open, you can attach instruments, modules, and deck fixtures; prepare the deck before a protocol; or manipulate the state of the deck during a protocol.
 
-White LED strips on the inside top edges of the frame provide
-software-controllable ambient lighting. A 2-megapixel camera can
-photograph the deck and working area for recording and tracking protocol
-execution.
+White LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A 2-megapixel camera can photograph the deck and working area for recording and tracking protocol execution.
 
 ### Deck and working area
 
-The deck is the machined aluminum surface on which automated science
-protocols are executed. The deck has 12 main ANSI/SLAS-format slots that
-can be reconfigured to hold labware, modules, and consumables. The deck
-slots are identified by a coordinate system, with slot A1 at the back
-left and slot D3 at the front right.
+The deck is the machined aluminum surface on which automated science protocols are executed. The deck has 12 main ANSI/SLAS-format slots that can be reconfigured to hold labware, modules, and consumables. The deck slots are identified by a coordinate system, with slot A1 at the back left and slot D3 at the front right.
 
-Expansion Slot (for Thermocycler)
+<figure markdown>
+![Areas of the deck within Flex.](images/deck-diagram.png "Areas of the deck within Flex")
+<figcaption>Areas of the deck within Flex.</figcaption>
+</figure>
 
-![image](afb6a39fa46df33659990ccab99342601a684e1b.png){width="0.4166666666666667in"
-height="0.4166666666666667in"}
+The *working area* is the physical space above the deck that is accessible for pipetting. Labware placed in slots A1 through D3 are in the working area.
 
-![image](1db51642b1cc7a72a3e99aeefbb45e5d79101961.png){width="0.3958333333333333in"
-height="0.4270833333333333in"}
+Opentrons Flex comes with *removable deck slots* for all 12 positions in the working area. Each deck slot has corner *labware clips* for securely placing labware on the deck.
 
-![image](b9f4d25d5abf8c3f25b2379ea87926e8a59d490f.png){width="0.4166666666666667in"
-height="0.4270833333333333in"}
+You can reconfigure the deck by replacing slots with other *deck fixtures*, including the *movable trash, waste chute,* and *module caddies*. The *expansion slot* behind A1 is only used to make additional room for the Thermocycler Module, which occupies slots A1 and B1.
 
-![image](72bdc3fb8260799dacf99609b2c97fc4468fc7cd.png){width="7.177083333333333in"
-height="5.520833333333333in"}Working Area
+!!! note
+    Deck slots are interchangeable within a column (1, 2, or 3) but not across columns; column 1 and column 3 slots are distinct pieces despite their similar size. You can tell which column a slot goes in by orienting the blue labware clip to the back left.
 
-Staging Area
-
-![image](c38659df5814ceb89c3b33aed897c94be0a070d6.png){width="0.4166666666666667in"
-height="0.4270833333333333in"}
-
-Areas of the deck within Flex.
-
-![image](ba0a71bbd102e5aebdc97955d854ac87d7483eec.png){width="0.3854166666666667in"
-height="0.4270833333333333in"}
-
-The *working area* is the physical space above the deck that is
-accessible for pipetting. Labware placed in slots A1 through D3 are in
-the working area.
-
-Opentrons Flex comes with *removable deck slots* for all 12 positions in
-the working area. Each deck slot has corner *labware clips* for securely
-placing labware on the deck.
-
-You can reconfigure the deck by replacing slots with other *deck
-fixtures*, including the *movable trash, waste chute,* and *module
-caddies*. The *expansion slot* behind A1 is only used to make additional
-room for the Thermocycler Module, which occupies slots A1 and B1.
-
-**Note:** Deck slots are interchangeable within a column (1, 2, or 3)
-but not across columns; column 1 and column 3 slots are distinct pieces
-despite their similar size. You can tell which column a slot goes in by
-orienting the blue labware clip to the back left.
-
-You should leave deck slots installed in locations where you want to
-place standalone labware. The deck and items placed on it remain static,
-unless moved by the gripper or manual intervention.
+You should leave deck slots installed in locations where you want to place standalone labware. The deck and items placed on it remain static, unless moved by the gripper or manual intervention.
 
 ### Staging area
 
-The *staging area* is additional space along the right side of the deck.
-You can store labware in this location after installing *staging area
-slots*. Labware placed in slots A4 through D4 are in the staging area.
-Flex pipettes cannot reach into the staging area, but the gripper can
-pick up and move labware to and from this location. Adding extra slots
-helps keep the working area available for the equipment used in your
-automated protocols.
+The *staging area* is additional space along the right side of the deck. You can store labware in this location after installing *staging area slots*. Labware placed in slots A4 through D4 are in the staging area. Flex pipettes cannot reach into the staging area, but the gripper can pick up and move labware to and from this location. Adding extra slots helps keep the working area available for the equipment used in your automated protocols.
 
 Staging area slots are included in certain workstation configurations.
-You can also purchase a from Opentrons.
+You can also purchase a [set of four slots](https://opentrons.com/products/opentrons-flex-deck-expansion-set-4-count) from Opentrons.
 
-![image](bd16394696c5736bf3128c03579387d030ef5074.png){width="0.40625in"
-height="0.4270833333333333in"}
+<figure markdown>
+![Staging area slots in column 4.](images/deck-staging-area.png "Staging area slots")
+<figcaption>Staging Area with Slots Installed</figcaption>
+</figure>
 
-![image](b9f62a4fa6c55ff7b903b091e5a12a9aeca04031.png){width="0.40625in"
-height="0.4270833333333333in"}
-
-![image](d5072c4ee19051bffc3f6c8e10f585751359fcc0.png){width="0.40625in"
-height="0.4270833333333333in"}
-
-![image](8866be2a8c3af1260e9c0611376a32c0627bfa18.png){width="0.3854166666666667in"
-height="0.4270833333333333in"}
-![image](6b7f4f36fb536322b8afe762fb0459f7ae7d538d.png){width="0.3854166666666667in"
-height="0.4270833333333333in"}
-
-![image](9cb3255b98eed4c8f2b9ee77e5f93dbdb5ee482f.png){width="0.40625in"
-height="0.4270833333333333in"}
-
-![image](2f63bae8fee183df4323846bb2f4187953011239.png){width="8.052083333333334in"
-height="5.520833333333333in"}Staging Area with Slots Installed
-
-### Deck fxtures
+### Deck fixtures
 
 Fixtures are hardware items that replace standard deck slots. They let
 you customize the deck layout and add functionality to your Flex.
@@ -145,106 +58,54 @@ trash bin, and the external waste chute. You can only install fixtures
 in a few specific deck slots. The following table lists the deck
 locations for each fixture.
 
-**Fixture Slots**
+| **Fixture**                        | **Slots**         |
+|------------------------------------|-------------------|
+| Staging area slots                 | A3–D3             |
+| Trash bin                          | A1–D1 and A3–D3   |
+| Waste chute                        | D3 only           |
+| Waste chute with staging area slot | D3 only           |
 
-**Staging area slots** A3--D3
+Fixtures are unpowered. They do not contain electronic or mechanical components that communicate their current state and deck location to the robot. This means you have to use the deck configuration feature to let the Flex know what fixtures are attached to the deck and where they're located.
 
-**Trash bin** A1--D1 and A3-D3
+You can access the deck configuration settings from the touchscreen via the three-dot (⋮) menu and from the Opentrons App. See the [Deck Configuration section][deck-configuration] of the Software and Operation chapter for information on how to configure the deck from the touchscreen.
 
-**Waste chute** D3 only
+### Waste chute
 
-#### **Waste chute with staging area slot** D3 only
+The Opentrons Flex Waste Chute transfers liquids, tips, tip racks, and well plates from the Flex enclosure to a trash receptacle placed below its external opening. The waste chute attaches to a deck plate adapter that fits in slot D3. It also comes with a special window half panel that lets the chute extend out of the front of the robot.
 
-Fixtures are unpowered. They do not contain electronic or mechanical
-components that communicate their current state and deck location to the
-robot. This means you have to use the deck configuration feature to let
-the Flex know what fixtures are attached to the deck and where they're
-located.
-
-You can access the deck configuration settings from the touchscreen via
-the three-dot (**⋮**) menu and from the Opentrons App. See the of the
-Software and Operation chapter for information on how to configure the
-deck from the touchscreen.
-
-![image](3b5674475e72d5183c5040bca59cf6f6d05da466.png){width="12.270833333333334in"
-height="9.083333333333334in"}Waste chute
-
-The Opentrons Flex Waste Chute transfers liquids, tips, tip racks, and
-well plates from the Flex enclosure to a trash receptacle placed below
-its external opening. The waste chute attaches to a deck plate adapter
-that fits in slot D3. It also comes with a special window half panel
-that lets the chute extend out of the front of the robot.
-
-Components of the waste chute.
+<figure markdown>
+![The waste chute, deck plate adapter, and deck plate adapter with staging area.](images/waste-chute-elements.png "Components of the waste chute")
+<figcaption>Components of the waste chute.</figcaption>
+</figure>
 
 ### Staging area slots
 
-**Deck Plate Adapter**
+Staging area slots are ANSI/SLAS compatible deck pieces that replace standard slots in column 3 and add new slots to the staging area — all without losing space in the working area. You can install a single slot or a maximum of four slots to create a new column (A4 to D4) along the right side of the deck. Note, however, that replacing deck slot A3 requires moving the trash bin. By adding staging area slots to the deck, your Flex robot can store more labware and operate more efficiently.
 
-**Waste Chute**
+<figure markdown>
+![Flex staging area slot.](images/staging-slot.png "Flex staging area slot")
+<figcaption>Flex staging area slot.</figcaption>
+</figure>
 
-**Deck Plate Adapter with Staging Area**
+#### Slot installation
 
-Staging area slots are ANSI/SLAS compatible deck pieces that replace
-standard slots in column 3 and add new slots to the staging area --- all
-without losing space in the working area. You can install a single slot
-or a maximum of four slots to create a new column (A4 to D4) along the
-right side of the deck. Note, however, that replacing deck slot A3
-requires moving the trash bin. By adding staging area slots to the deck,
-your Flex robot can store more labware and operate more efficiently.
+To install, remove the screws that attach a standard slot to the deck and replace it with the staging area slot. After installation, use the touchscreen or Opentrons App to tell the robot you've added a staging area slot to the deck.
 
-![image](bef199d2bfa7492a5f962bbe2d91d5812cc22b5e.jpg){width="14.572916666666666in"
-height="6.40625in"}Flex staging area slot.
+<figure markdown>
+![Attachment points of the two staging slot screws. One is at the left edge of the slot and one is inside the right calibration square.](images/staging-slot-installation.svg "Staging slot screw locations")
+<figcaption>Installing a staging area slot.</figcaption>
+</figure>
 
-![image](4fcd88a356c79b70f37e89536b9703a5955c2a71.png){width="0.5520833333333334in"
-height="0.16666666666666666in"}![image](9a5037f70e1b9e3774c41172a97645642b4f9a8a.png){width="0.5104166666666666in"
-height="0.14583333333333334in"}![image](a999d59e9b5ca1e3aab25792ff80967c7f738f5a.png){width="0.28125in"
-height="0.21875in"}![image](da6208dc8227530a46796ec222ea7cf2b6685d52.png){width="0.5520833333333334in"
-height="0.15625in"}![image](30beb308be757efaa3c9df3a89d169d178aa6f34.png){width="0.5104166666666666in"
-height="0.2708333333333333in"}![image](f2e5557480be4cdfa75ef8339a73fbd7db88b9ee.png){width="0.59375in"
-height="0.46875in"}![image](e2d0b73702813b2dd436a5e4ab4d03a5b8fae457.png){width="0.59375in"
-height="0.4791666666666667in"}![image](55d3cc0965219224a4fa3429e61daaebe96899e0.png){width="0.375in"
-height="0.5729166666666666in"}![image](e0edd3e0e34ed3c43fd0bbffe188a38489a2999c.png){width="0.375in"
-height="0.5729166666666666in"}![image](8ab65059326986ab1463b54156df4ef2e452a65c.png){width="0.59375in"
-height="0.46875in"}![image](8cc66ddb37c7e9d0b768647c7bd162b842d1c5a6.png){width="0.59375in"
-height="0.46875in"}![image](90a5f05225e4948a6de675d2680d64f368ba66f7.png){width="0.375in"
-height="0.5729166666666666in"}![image](7467c90b9c16bc8518992a87074986a2169ed593.png){width="0.375in"
-height="0.5729166666666666in"}![image](073c1b1e78458c4db2784143bf698a7cbef4542b.png){width="0.15625in"
-height="0.3020833333333333in"}![image](e69efa9a05951d2844fe2b2c369ce676353db2b9.png){width="0.15625in"
-height="0.3020833333333333in"}SLOT INSTALLATION
+#### Slot compatibility
 
-To install, remove the screws that attach a standard slot to the deck
-and replace it with the staging area slot. After installation, use the
-touchscreen or Opentrons App to
+Staging area slots are compatible with the Flex instruments, modules, and labware listed below.
 
-tell the robot you've added a staging area slot to the deck.
-
-Installing a staging area slot.
-
-##### SLOT COMPATIBILITY
-
-Staging area slots are compatible with the Flex instruments, modules,
-and labware listed below.
-
-**Flex component Staging area compatibility**
-
-**Gripper** The Flex Gripper can move labware to or from staging area
-slots.
-
-**Pipettes** Flex pipettes cannot reach the staging area. Use the
-gripper to move tip racks and labware from the staging area to the
-working area before pipetting.
-
-**Modules** The Magnetic Block GEN1 can be placed in column 3 on top of
-a staging area slot. Modules are not supported in column 4.
-
-Powered modules such as the Heater-Shaker and Temperature Module fit
-into caddies that can be placed in column 3. You can't add a staging
-area slot to a position occupied by a module caddy.
-
-**Labware** Staging area slots have the same ANSI/SLAS dimensions as
-standard deck slots. Use in the staging area, or manually add and remove
-labware from this location.
+| Flex component | Staging area compatibility |
+|:-------------- |:------------|
+| **Gripper**        | The Flex Gripper can move labware to or from staging area slots.                                                     |
+| **Pipettes**       | Flex pipettes cannot reach the staging area. Use the gripper to move tip racks and labware from the staging area to the working area before pipetting. |
+| **Modules**        | The Magnetic Block GEN1 can be placed in column 3 on top of a staging area slot. Modules are not supported in column 4.<br><br>Powered modules such as the Heater-Shaker and Temperature Module fit into caddies that can be placed in column 3. You can't add a staging area slot to a position occupied by a module caddy. |
+| **Labware**        | Staging area slots have the same ANSI/SLAS dimensions as standard deck slots. Use in the staging area, or manually add and remove labware from this location. |
 
 ### Movement system
 
@@ -458,7 +319,8 @@ Keep this accuracy information in mind when choosing tips for your
 pipette. In general, for best results you should use the smallest tips
 that meet the needs of your protocol.
 
-**Note:** Opentrons performs volumetric testing of Flex pipettes to
+!!! note
+    Opentrons performs volumetric testing of Flex pipettes to
 ensure that they meet the accuracy and precision specifications listed
 above. You *do not* have to calibrate the volume that your pipettes
 dispense before use. You only have to perform positional calibration.
@@ -577,7 +439,7 @@ App.
 You can view the currently installed firmware version of any attached
 pipette. On the touchscreen, go to **Instruments** and tap the pipette
 name. In the Opentrons App, find the pipette card under Instruments and
-Modules, click the three-dot menu (**⋮**), and then click **About
+Modules, click the three-dot menu (⋮), and then click **About
 pipette**.
 
 1.  **Gripper**
@@ -653,7 +515,7 @@ App.
 You can view the currently installed firmware version of the gripper. On
 the touchscreen, go to **Instruments** and tap the gripper. In the
 Opentrons App, find the gripper card under Instruments and Modules,
-click the three-dot menu (**⋮**), and then click **About gripper**.
+click the three-dot menu (⋮), and then click **About gripper**.
 
 1.  **Emergency Stop Pendant**
 
@@ -788,7 +650,8 @@ computer, to establish communication with the Opentrons App running on
 the connected computer. The front USB-A port (USB-9), located below the
 touchscreen display, has the same functionality as the rear USB-A ports.
 
-**Note:** The USB ports are power-limited to protect the robot and
+!!! note
+    The USB ports are power-limited to protect the robot and
 connected devices. Power delivery is split internally into three port
 groups: the left rear USB-A ports (USB-1 through USB-4), the right rear
 USB-A ports (USB-5 through USB-8), and the front USB-A port. Each of
