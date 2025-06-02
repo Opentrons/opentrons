@@ -80,11 +80,9 @@ const LabwareDetailGroup = styled.g`
 `
 
 /**
- * a refactor of the legacy LabwareRender component intended to provide predictable styling
- * initial use in ODD well selection component with ODD-specific well label styling
- * consider adding additional styled wells props if used elsewhere
- * @param props
- * @returns
+ * Similar to the LabwareRender component, but with ODD-specific styling.
+ *
+ * For example, hiding the outline of the labware for certain ODD flows.
  */
 export const Labware = (props: LabwareProps): JSX.Element => {
   const {

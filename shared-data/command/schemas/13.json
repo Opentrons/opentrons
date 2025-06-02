@@ -2336,9 +2336,9 @@
         }
       },
       "required": [
-        "tiprack",
         "aspirate",
         "singleDispense",
+        "tiprack",
         "liquidClassName",
         "pipetteModel"
       ],

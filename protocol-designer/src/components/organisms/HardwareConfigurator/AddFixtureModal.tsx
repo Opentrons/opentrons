@@ -189,18 +189,16 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       makeSnackbar(t('add_gripper_for_plate') as string)
       //  block thermocycler from being added if there is something in slot A1
     } else if (
-      (addedCutoutConfigs.some(
+      addedCutoutConfigs.some(
         cutoutConfig => cutoutConfig.type === THERMOCYCLER_MODULE_V2
       ) &&
-        (Object.values(modules).some(
-          module => module.cutoutId === 'cutoutA1'
+      (Object.values(modules).some(module => module.cutoutId === 'cutoutA1') ||
+        Object.values(fixtures).some(
+          fixture => fixture.cutoutId === 'cutoutA1'
         ) ||
-          Object.values(fixtures).some(
-            fixture => fixture.cutoutId === 'cutoutA1'
-          ))) ||
-      Object.values(labware).some(
-        lw => getSlotInLocationStack(lw.stack) === 'A1'
-      )
+        Object.values(labware).some(
+          lw => getSlotInLocationStack(lw.stack) === 'A1'
+        ))
     ) {
       makeSnackbar(t('thermocycler_blocked') as string)
     } else {

@@ -1,9 +1,10 @@
-import { Btn, Text } from '../../primitives'
+import { StyledText } from '../../atoms/StyledText/StyledText'
+import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_2_X_ADJUSTMENT,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_READ_ONLY,
   FIXTURE_HEIGHT,
   Y_ADJUSTMENT,
@@ -22,7 +23,7 @@ interface StaticFixtureProps {
  * config map
  */
 
-export function StaticFixture(props: StaticFixtureProps): JSX.Element {
+export function StaticItem(props: StaticFixtureProps): JSX.Element {
   const { deckDefinition, fixtureLocation, label } = props
 
   const staticCutout = deckDefinition.locations.cutouts.find(
@@ -35,11 +36,11 @@ export function StaticFixture(props: StaticFixtureProps): JSX.Element {
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = staticCutout?.position ?? []
   const y = ySlotPosition + Y_ADJUSTMENT
-  const x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
+  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
 
   return (
     <RobotCoordsForeignObject
-      width={COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH}
+      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
@@ -47,7 +48,13 @@ export function StaticFixture(props: StaticFixtureProps): JSX.Element {
       foreignObjectProps={{ flex: '1' }}
     >
       <Btn css={CONFIG_STYLE_READ_ONLY} cursor={'default'} onClick={() => {}}>
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{label}</Text>
+        <StyledText
+          oddStyle="smallBodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
+          css={TYPOGRAPHY.smallBodyTextSemiBold}
+        >
+          {label}
+        </StyledText>
       </Btn>
     </RobotCoordsForeignObject>
   )

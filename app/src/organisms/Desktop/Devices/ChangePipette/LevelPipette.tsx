@@ -40,6 +40,7 @@ export function LevelingVideo(props: {
         margin-left: ${SPACING.spacing16};
       `}
       autoPlay={true}
+      muted={true}
       loop={true}
       controls={true}
     >

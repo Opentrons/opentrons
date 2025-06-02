@@ -1,5 +1,10 @@
 import { css } from 'styled-components'
 
+import {
+  getAALocationForCutoutAndFixtureId,
+  SINGLE_LEFT_CUTOUTS,
+} from '@opentrons/shared-data'
+
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
@@ -9,31 +14,36 @@ import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
-  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_2_X_ADJUSTMENT,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_3_X_ADJUSTMENT,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   FIXTURE_HEIGHT,
   Y_ADJUSTMENT,
 } from './constants'
 
-import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type {
+  AddressableAreaNamesWithFakes,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
-interface EmptyConfigFixtureProps {
+interface EmptyConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
+  addressableArea: AddressableAreaNamesWithFakes
   handleClickAdd: (fixtureLocation: CutoutId) => void
 }
 
-export function EmptyConfigFixture(
-  props: EmptyConfigFixtureProps
-): JSX.Element {
-  const { deckDefinition, handleClickAdd, fixtureLocation } = props
+export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
+  const {
+    deckDefinition,
+    handleClickAdd,
+    fixtureLocation,
+    addressableArea,
+  } = props
 
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
-
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
@@ -41,35 +51,20 @@ export function EmptyConfigFixture(
    */
   const [xSlotPosition = 0, ySlotPosition = 0] =
     standardSlotCutout?.position ?? []
-  let x = xSlotPosition
-  let width = 0
-  switch (fixtureLocation) {
-    case 'cutoutA1':
-    case 'cutoutB1':
-    case 'cutoutC1':
-    case 'cutoutD1': {
-      x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
-      width = COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
-      break
-    }
-    case 'cutoutA2':
-    case 'cutoutB2':
-    case 'cutoutC2':
-    case 'cutoutD2': {
-      x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
-      width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
-      break
-    }
-    case 'cutoutA3':
-    case 'cutoutB3':
-    case 'cutoutC3':
-    case 'cutoutD3': {
-      x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
-      width = COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
-      break
-    }
-  }
+  const offsetVector = getAALocationForCutoutAndFixtureId(
+    addressableArea,
+    deckDefinition
+  )
 
+  const x =
+    xSlotPosition +
+    (SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
+      ? COLUMN_1_X_ADJUSTMENT
+      : COLUMN_DEFAULT_X_ADJUSTMENT) +
+    offsetVector[0]
+  const width = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
+    ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
+    : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
   const y = ySlotPosition + Y_ADJUSTMENT
 
   return (
@@ -86,9 +81,9 @@ export function EmptyConfigFixture(
         onClick={() => {
           handleClickAdd(fixtureLocation)
         }}
-        data-testid={fixtureLocation}
+        data-testid={addressableArea}
       >
-        <Icon name="add" color={COLORS.blue50} size="2rem" />
+        <Icon name="add-circle" color={COLORS.blue50} size="2rem" />
       </Btn>
     </RobotCoordsForeignObject>
   )
@@ -99,7 +94,7 @@ const EMPTY_CONFIG_STYLE = css`
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
   background-color: ${COLORS.blue30};
-  border: 3px dashed ${COLORS.blue50};
+  border: 4px dashed ${COLORS.blue50};
   border-radius: ${BORDERS.borderRadius4};
   width: 100%;
 

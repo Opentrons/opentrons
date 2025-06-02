@@ -145,6 +145,7 @@ export const UnmountGripper = (
             max-height: 20rem;
           `}
           autoPlay={true}
+          muted={true}
           loop={true}
           controls={false}
           aria-label="unscrew and disconnect gripper"

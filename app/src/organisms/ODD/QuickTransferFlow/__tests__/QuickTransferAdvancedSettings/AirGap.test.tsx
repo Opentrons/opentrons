@@ -195,7 +195,7 @@ describe('AirGap', () => {
       kind: 'dispense',
     }
     render(props)
-    screen.getByText('Air gap before dispensing')
+    screen.getByText('Air gap after dispensing')
     const enabledBtn = screen.getByText('Enabled')
     fireEvent.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')

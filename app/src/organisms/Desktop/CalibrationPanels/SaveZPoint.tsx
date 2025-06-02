@@ -121,6 +121,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
                 max-height: 15rem;
               `}
               autoPlay={true}
+              muted={true}
               loop={true}
               controls={false}
               aria-label={`${mount} ${

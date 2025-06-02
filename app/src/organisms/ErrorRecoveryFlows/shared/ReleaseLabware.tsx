@@ -86,6 +86,7 @@ export function ReleaseLabware({
         <Flex css={ANIMATION_CONTAINER_STYLE}>
           <video
             autoPlay={true}
+            muted={true}
             loop={true}
             controls={false}
             role="presentation"

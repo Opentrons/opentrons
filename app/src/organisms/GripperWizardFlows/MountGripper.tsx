@@ -135,6 +135,7 @@ export const MountGripper = (
             max-height: 20rem;
           `}
           autoPlay={true}
+          muted={true}
           loop={true}
           controls={false}
           aria-label="connect and screw in gripper"

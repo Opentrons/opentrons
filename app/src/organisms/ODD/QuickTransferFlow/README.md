@@ -144,5 +144,6 @@ export interface QuickTransferSummaryState {
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
   liquidClass: LiquidClass // this has been added
+  pushOut: boolean // this has been added
 }
 ```

@@ -190,6 +190,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
                 border-radius: ${BORDERS.borderRadius16};
               `}
               autoPlay
+              muted={true}
               key={`video-${subStepNumber ?? 1}`}
               loop={false}
               controls={false}
