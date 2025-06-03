@@ -28,6 +28,7 @@ import type { AddressableArea } from '@opentrons/shared-data'
 import type { CalibrationPanelProps } from './types'
 
 const TIPRACK = 'tip rack'
+const DECK_VIEW_BOX = '-46 -10 488 390'
 
 export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
   const deckDef = useMemo(() => getDeckDefinitions().ot2_standard, [])
@@ -109,7 +110,7 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
             ]}
             deckDef={deckDef}
             showDeckLayers
-            viewBox={`-46 -10 ${488} ${390}`} // TODO: put these in variables
+            viewBox={DECK_VIEW_BOX}
           >
             {({ deckSlotsById }) =>
               map(deckSlotsById, (slot: AddressableArea, slotId) => {
