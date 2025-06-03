@@ -2226,6 +2226,7 @@ def test_aspirate_liquid_class_using_volume_config_without_lpd(
     decoy.when(
         transfer_components_executor.TransferComponentsExecutor(
             instrument_core=subject,
+            engine_client=mock_engine_client,
             transfer_properties=test_transfer_properties,
             target_location=Location(Point(1, 2, 3), labware=None),
             target_well=source_well,
@@ -2337,6 +2338,7 @@ def test_aspirate_liquid_class_using_volume_config_and_lpd(
     decoy.when(
         transfer_components_executor.TransferComponentsExecutor(
             instrument_core=instrument_core_with_lpd,
+            engine_client=mock_engine_client,
             transfer_properties=test_transfer_properties,
             target_location=Location(Point(1, 2, 3), labware=None),
             target_well=source_well,
@@ -2449,6 +2451,7 @@ def test_aspirate_liquid_class_does_not_do_lpd_for_consolidate(
     decoy.when(
         transfer_components_executor.TransferComponentsExecutor(
             instrument_core=subject,
+            engine_client=mock_engine_client,
             transfer_properties=test_transfer_properties,
             target_location=Location(Point(1, 2, 3), labware=None),
             target_well=source_well,
