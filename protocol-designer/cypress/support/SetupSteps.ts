@@ -406,15 +406,6 @@ export const SetupSteps = {
   }),
 
   /**
-   * Edits existing labware/hardware on a deck slot.
-   */
-  EditHardwareLabwareOnDeck: (): StepThunk => ({
-    call: () => {
-      cy.get('button[data-testid="SlotOverflowMenu_openTools"]').click()
-    },
-  }),
-
-  /**
    * Clicks the "Labware" header.
    */
   ClickLabwareHeader: (): StepThunk => ({
@@ -1182,7 +1173,7 @@ export const CompositeSetupSteps = {
         `Running AddLabwareToDeckSlot with slot ${deckSlot} and labware ${labwareName}`
       )
       SetupSteps.ChoseDeckSlotWithLabware(slotToUse).call()
-      SetupSteps.AddHardwareLabware().call()
+      // SetupSteps.AddHardwareLabware().call()
       SetupSteps.OpenSelectLabwareModal().call()
       SetupSteps.ClickWellPlatesSection().call()
       SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()
