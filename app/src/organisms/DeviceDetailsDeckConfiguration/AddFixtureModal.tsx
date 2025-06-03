@@ -112,15 +112,15 @@ export function AddFixtureModal({
   const [optionStage, setOptionStage] = useState<OptionStage>(initialStage)
 
   const modalHeader: OddModalHeaderBaseProps = {
-    title: t('add_to_slot', {
-      slotName: getCutoutDisplayName(cutoutId),
+    title: t('add_to', {
+      slotName: getAADisplayName(addressableArea),
     }),
     hasExitIcon: providedFixtureOptions == null,
     onClick: closeModal,
   }
 
   const modalProps: ModalProps = {
-    title: t('add_to_slot', {
+    title: t('add_to', {
       slotName: getAADisplayName(addressableArea),
     }),
     onClose: closeModal,
@@ -138,6 +138,7 @@ export function AddFixtureModal({
 
   let nextStageOptions = null
   if (optionStage === 'modulesOrFixtures') {
+    console.log("inside modulesOrFixtures")
     nextStageOptions = (
       <>
         {SINGLE_CENTER_CUTOUTS.includes(cutoutId) ? null : (
@@ -162,6 +163,7 @@ export function AddFixtureModal({
         />
       </>
     )
+    console.log("nextStageOptions: ", nextStageOptions)
   } else if (
     optionStage === 'fixtureOptions' &&
     cutoutId === WASTE_CHUTE_CUTOUT
@@ -540,6 +542,9 @@ export const getOptions = (
       },
     ])
   }
-  console.error(`Was not able to find options for ${cutoutId}`)
+  //d3
+  console.log("providedFixtureOptions: ", providedFixtureOptions)
+  console.log("optionStage: ", optionStage)
+  console.error(`Was not able to find options for ${cutoutId} and ${optionStage}`)
   return []
 }
