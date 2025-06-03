@@ -122,10 +122,7 @@ Location of instrument mounts on Flex.
 
 ### Touchscreen and LED displays
 
-The primary user interface is the 7-inch LCD *touchscreen*, located on
-the front right of the robot. The touchscreen is covered with Gorilla
-Glass 3 for scratch and damage resistance. Access many features of Flex
-right on the touchscreen, including:
+The primary user interface is the 7-inch LCD *touchscreen*, located on the front right of the robot. The touchscreen is covered with Gorilla Glass 3 for scratch and damage resistance. Access many features of Flex right on the touchscreen, including:
 
 - Protocol management
 
@@ -139,113 +136,81 @@ right on the touchscreen, including:
 
 - Operation logs and error notifications
 
-For more information on using Flex via the touchscreen, see the of the
-Software and Operation chapter.
+For more information on using Flex via the touchscreen, see the of the Software and Operation chapter.
 
-The *status light* is a strip of LEDs along the top front of the robot
-that provides at-a-glance information about the robot. Different colors
-and patterns of illumination can communicate various success, failure,
-or idle states:
+The *status light* is a strip of LEDs along the top front of the robot that provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states:
 
-**LED color LED pattern Robot status**
-
-+--------------------------------------------------------------------------------------+----------------------+----------------------+
-| ![image](220a273a78e3ac5d455d08b891cfcd09d1899a2a.png){width="0.23958333333333334in" | Solid                | Powered on and not   |
-| height="0.23958333333333334in"}^\ ^**^White^**                                       |                      | running a protocol   |
-+--------------------------------------------------------------------------------------+----------------------+----------------------+
-| **Neutral states**                                                                   |                      |                      |
-+--------------------------------------------------------------------------------------+----------------------+----------------------+
-|                                                                                      | Pulsing              | Robot is busy (e.g., |
-|                                                                                      |                      | updating software or |
-|                                                                                      |                      | firmware,            |
-+--------------------------------------------------------------------------------------+----------------------+----------------------+
-|                                                                                      |                      | setting up protocol  |
-|                                                                                      |                      | run, canceling       |
-|                                                                                      |                      | protocol run)        |
-+--------------------------------------------------------------------------------------+----------------------+----------------------+
-| ![image](ef24f977e1f342376eb7d5d8561b291f49c0a7be.png){width="0.22916666666666666in" | Blinks twice         | Action is complete   |
-| height="0.22916666666666666in"}^\ ^**^Green^**                                       |                      | (e.g., protocol      |
-|                                                                                      |                      | stored, software     |
-| **Normal states**                                                                    |                      | updated, instrument  |
-|                                                                                      |                      | attached or          |
-|                                                                                      |                      | detached)            |
-+--------------------------------------------------------------------------------------+----------------------+----------------------+
-|                                                                                      | Solid                | Protocol is running  |
-+--------------------------------------------------------------------------------------+----------------------+----------------------+
-|                                                                                      | Pulsing              | Protocol is complete |
-+--------------------------------------------------------------------------------------+----------------------+----------------------+
-| ![image](327387992ba8a84a74feb1a0923eb2d195084f43.png){width="0.22916666666666666in" | Pulsing              | Protocol is paused   |
-| height="0.22916666666666666in"}^\ ^**^Blue^**                                        |                      |                      |
-|                                                                                      |                      |                      |
-| **Mandatory states**                                                                 |                      |                      |
-+--------------------------------------------------------------------------------------+----------------------+----------------------+
-| ![image](85f6b99e028409be25d1054946cbca5962cd101d.png){width="0.22916666666666666in" | Solid                | Software error       |
-| height="0.22916666666666666in"}^\ ^**^Yellow^^\ ^Abnormal states**                   |                      |                      |
-+--------------------------------------------------------------------------------------+----------------------+----------------------+
-| ![image](c773fa26c09df75744c65c30a79a508cc93becf2.png){width="0.22916666666666666in" | Blinks three times,  | Physical error       |
-| height="0.22916666666666666in"}^\ ^**^Red^**                                         | repeatedly           | (e.g., instrument    |
-|                                                                                      |                      | crash)               |
-| **Emergency states**                                                                 |                      |                      |
-+--------------------------------------------------------------------------------------+----------------------+----------------------+
+<table>
+  <thead>
+    <tr>
+      <th>LED color</th>
+      <th>LED pattern</th>
+      <th>Robot status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="2" markdown>⚪️ White<br>Neutral states</td>
+      <td>Solid</td>
+      <td>Powered on and not running a protocol</td>
+    </tr>
+    <tr>
+      <td>Pulsing</td>
+      <td>Robot is busy (e.g., updating software or firmware, setting up protocol run, canceling protocol run)</td>
+    </tr>
+    <tr>
+      <td rowspan="3">🟢 Green<br>Normal states</td>
+      <td>Blinks twice</td>
+      <td>Action is complete (e.g., protocol stored, software updated, instrument attached or detached)</td>
+    </tr>
+    <tr>
+      <td>Solid</td>
+      <td>Protocol is running</td>
+    </tr>
+    <tr>
+      <td>Pulsing</td>
+      <td>Protocol is complete</td>
+    </tr>
+    <tr>
+      <td>🔵 Blue<br>Mandatory states</td>
+      <td>Pulsing</td>
+      <td>Protocol is paused</td>
+    </tr>
+    <tr>
+      <td>🟡 Yellow<br>Abnormal states</td>
+      <td>Solid</td>
+      <td>Software error</td>
+    </tr>
+    <tr>
+      <td>🔴 Red<br>Emergency states</td>
+      <td>Blinks three times, repeatedly</td>
+      <td>Physical error (e.g., instrument crash)</td>
+    </tr>
+  </tbody>
+</table>
 
 The status light can also be disabled in the robot settings.
 
-1.  **Pipettes**
+## Pipettes
 
-Opentrons *pipettes* are configurable devices used to move liquids
-throughout the working area during the execution of protocols. There are
-several Opentrons Flex pipettes, which can handle volumes from 1 µL to
-1000 µL in 1, 8, or 96 channels:
+Opentrons *pipettes* are configurable devices used to move liquids throughout the working area during the execution of protocols. There are several Opentrons Flex pipettes, which can handle volumes from 1 µL to 1000 µL in 1, 8, or 96 channels:
 
-- Opentrons Flex 1-Channel Pipette (1--50 µL)
+- Opentrons Flex 1-Channel Pipette (1–50 µL)
 
-- Opentrons Flex 1-Channel Pipette (5--1000 µL)
+- Opentrons Flex 1-Channel Pipette (5–1000 µL)
 
-- Opentrons Flex 8-Channel Pipette (1--50 µL)
+- Opentrons Flex 8-Channel Pipette (1–50 µL)
 
-- Opentrons Flex 8-Channel Pipette (5--1000 µL)
+- Opentrons Flex 8-Channel Pipette (5–1000 µL)
 
-- Opentrons Flex 96-Channel Pipette (5--1000 µL)
+- Opentrons Flex 96-Channel Pipette (5–1000 µL)
 
-Pipettes attach to the gantry using captive screws on the front of the
-pipette. 1-channel and 8-channel pipettes each occupy one *pipette
-mount* (left or right); the 96-channel pipette occupies both mounts. For
-details on installing pipettes, see .
+Pipettes attach to the gantry using captive screws on the front of the pipette. 1-channel and 8-channel pipettes each occupy one *pipette mount* (left or right); the 96-channel pipette occupies both mounts. For details on installing pipettes, see [Instrument Installation and Calibration][instrument-installation-and-calibration].
 
-Captive Attachment
-
-Screws
-
-Ejector
-
-Captive Attachment Screws
-
-![image](c45952994675c4e896e0fc23224fbdd4bbceff86.png){width="5.46875in"
-height="10.697916666666666in"}Ejector
-
-![image](29725220cbe8ff603e72b7500924c7e87ee1298c.png){width="2.4479166666666665in"
-height="10.697916666666666in"}![image](b16084cd2de1882b07104d9e198a973801f0e055.png){width="2.4479166666666665in"
-height="10.697916666666666in"}Nozzles (Replaceable O-rings)
-
-Nozzles (Fixed O-rings)
-
+![Each capacity of pipette has captive attachment screws on its front. Pipette ejectors are at the bottom of each pipette, above the nozzles. The 1- and 8-channel pipettes have replaceable O-rings, and the 96-channel pipette has fixed O-rings.](images/pipette-components.png "Pipette components")
 Locations of components of the 1-, 8-, and 96-channel pipettes.
 
-The pipettes pick up disposable plastic *tips* by pressing them onto the
-pipette *nozzles*, and then use the tips to aspirate and dispense
-liquids. The amount of total force required for pickup increases as more
-tips get picked up simultaneously. For smaller numbers of tips, the
-pipette attaches tips by pushing each
-
-pipette nozzle down into a tip. To achieve the necessary force to pick
-up a full rack of tips, the 96-channel pipette also pulls the tips
-upward onto the nozzles. This pulling action requires placing tip racks
-into a
-
-*tip rack adapter*, rather than directly in a deck slot. To discard tips
-(or return them to their rack), the pipette
-
-*ejector* mechanism pushes the tips off of the nozzles.
+The pipettes pick up disposable plastic *tips* by pressing them onto the pipette *nozzles*, and then use the tips to aspirate and dispense liquids. The amount of total force required for pickup increases as more tips get picked up simultaneously. For smaller numbers of tips, the pipette attaches tips by pushing each pipette nozzle down into a tip. To achieve the necessary force to pick up a full rack of tips, the 96-channel pipette also pulls the tips upward onto the nozzles. This pulling action requires placing tip racks into a *tip rack adapter*, rather than directly in a deck slot. To discard tips (or return them to their rack), the pipette *ejector* mechanism pushes the tips off of the nozzles.
 
 ### Pipette specifcations
 
@@ -255,65 +220,141 @@ tips, which affect their liquid-handling characteristics. Opentrons has
 tested Flex pipettes for accuracy and precision in a number of tip and
 liquid volume combinations:
 
-**Pipette Tip Capacity Tested Volume Accuracy %D Precision %CV**
-
-  --------------- ------- ------- ------- -------
-  **Flex**        50 µL   1 µL    8.00%   7.00%
-  **1-Channel**   50 µL   10 µL   1.50%   0.50%
-  **50 µL**       50 µL   50 µL   1.25%   0.40%
-  --------------- ------- ------- ------- -------
-
-50 µL 5 µL 5.00% 2.50%
-
-  --------------- -------- -------- ------- -------
-  **Flex**        50 µL    50 µL    0.50%   0.30%
-  **1-Channel**                             
-  **1000 µL**     200 µL   200 µL   0.50%   0.15%
-  --------------- -------- -------- ------- -------
-
-1000 µL 1000 µL 0.50% 0.15%
-
-  --------------- ------- ------- -------- -------
-  **Flex**        50 µL   1 µL    10.00%   8.00%
-  **8-Channel**   50 µL   10 µL   2.50%    1.00%
-  **50 µL**       50 µL   50 µL   1.25%    0.60%
-  --------------- ------- ------- -------- -------
-
-50 µL 5 µL 8.00% 4.00%
-
-  --------------- -------- -------- ------- -------
-  **Flex**        50 µL    50 µL    2.50%   0.60%
-  **8-Channel**                             
-  **1000 µL**     200 µL   200 µL   1.00%   0.25%
-  --------------- -------- -------- ------- -------
-
-1000 µL 1000 µL 0.70% 0.15%
-
-50 µL 5 µL 10.00% 5.00%
-
-  ---------------- -------- -------- ------- -------
-  **Flex**         50 µL    50 µL    2.50%   1.25%
-  **96-Channel**                             
-  **1000 µL**      200 µL   200 µL   1.50%   1.25%
-  ---------------- -------- -------- ------- -------
-
-1000 µL 1000 µL 1.50% 1.50%
+<table>
+  <thead>
+    <tr>
+      <th>Pipette</th>
+      <th>Tip Capacity</th>
+      <th>Tested Volume</th>
+      <th>Accuracy %D</th>
+      <th>Precision %CV</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><b>Flex 1-Channel 50 µL</b></td>
+      <td>50 µL</td>
+      <td>1 µL</td>
+      <td>8.00%</td>
+      <td>7.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>10 µL</td>
+      <td>1.50%</td>
+      <td>0.50%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>1.25%</td>
+      <td>0.40%</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><b>Flex 1-Channel 1000 µL</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>5.00%</td>
+      <td>2.50%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>0.50%</td>
+      <td>0.30%</td>
+    </tr>
+    <tr>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>0.50%</td>
+      <td>0.15%</td>
+    </tr>
+    <tr>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>0.50%</td>
+      <td>0.15%</td>
+    </tr>
+    <tr>
+      <td rowspan="3"><b>Flex 8-Channel 50 µL</b></td>
+      <td>50 µL</td>
+      <td>1 µL</td>
+      <td>10.00%</td>
+      <td>8.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>10 µL</td>
+      <td>2.50%</td>
+      <td>1.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>1.25%</td>
+      <td>0.60%</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><b>Flex 8-Channel 1000 µL</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>8.00%</td>
+      <td>4.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>2.50%</td>
+      <td>0.60%</td>
+    </tr>
+    <tr>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>1.00%</td>
+      <td>0.25%</td>
+    </tr>
+    <tr>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>0.70%</td>
+      <td>0.15%</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><b>Flex 96-Channel 1000 µL</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>10.00%</td>
+      <td>5.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>2.50%</td>
+      <td>1.25%</td>
+    </tr>
+    <tr>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>1.50%</td>
+      <td>1.25%</td>
+    </tr>
+    <tr>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>1.50%</td>
+      <td>1.50%</td>
+    </tr>
+  </tbody>
+</table>
 
 Keep this accuracy information in mind when choosing tips for your
 pipette. In general, for best results you should use the smallest tips
 that meet the needs of your protocol.
 
 !!! note
-    Opentrons performs volumetric testing of Flex pipettes to
-ensure that they meet the accuracy and precision specifications listed
-above. You *do not* have to calibrate the volume that your pipettes
-dispense before use. You only have to perform positional calibration.
-See the next section, as well as the of the Installation and Relocation
-chapter, for details.
+    Opentrons performs volumetric testing of Flex pipettes to ensure that they meet the accuracy and precision specifications listed above. You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See the next section, as well as the of the [Pipette Installation section][pipette-installation] Installation and Relocation chapter, for details.
 
-The Opentrons Care and Opentrons Care Plus services include yearly
-pipette replacement and certificates of calibration. See the of the
-Maintenance and Service chapter for details.
+    The Opentrons Care and Opentrons Care Plus services include yearly pipette replacement and certificates of calibration. See the [Servicing Flex section][servicing-flex] of the Maintenance and Service chapter for details.
 
 ### Pipette calibration
 
@@ -355,7 +396,7 @@ pipette, which occupies both pipette mounts.
 
 Currently, the 96-channel pipette supports partial tip pickup for a
 column, a row, or a single tip. The 8-channel pipettes support a partial
-column (2--7 consecutive tips) or a single tip.
+column (2–7 consecutive tips) or a single tip.
 
 When picking up fewer than 96 tips from a tip rack with any pipette, the
 rack must be placed directly on the deck, not in the tip rack adapter.
@@ -605,7 +646,7 @@ AUX-1, AUX-2, USB-B, Ethernet
 
 Opentrons Flex connects to a power source via a standard IEC-C14 inlet.
 The robot contains an internal full-range AC/DC power supply, accepting
-100--240 VAC, 50/60 Hz input and converting it to 36 VDC. All other
+100–240 VAC, 50/60 Hz input and converting it to 36 VDC. All other
 internal electronics are powered by the 36 VDC supply.
 
 **Warning:** Only use the power cord provided with the robot. Do not use
@@ -640,7 +681,7 @@ connected devices. Power delivery is split internally into three port
 groups: the left rear USB-A ports (USB-1 through USB-4), the right rear
 USB-A ports (USB-5 through USB-8), and the front USB-A port. Each of
 these groups will deliver a maximum of 500 mA to connected USB
-2.0--compatible devices.
+2.0–compatible devices.
 
 ### Network connections
 
@@ -683,7 +724,7 @@ damage-resistant Gorilla Glass 3
 
 **Camera** 2MP, photo and video
 
-**Robot power input** ■ 100--240 VAC, 50--60 Hz, 1φ
+**Robot power input** ■ 100–240 VAC, 50–60 Hz, 1φ
 
 - 4.0 A/115 VAC, 2.0 A/230 VAC
 
@@ -713,7 +754,7 @@ a wall
 
 **Ambient temperature** +20 to +25 °C (recommended)
 
-**Relative humidity** 40--60%, non-condensing (recommended)
+**Relative humidity** 40–60%, non-condensing (recommended)
 
 **Pollution degree** 2 (non-conductive pollution only)
 

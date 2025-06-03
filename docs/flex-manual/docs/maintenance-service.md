@@ -340,7 +340,7 @@ open at 121 °C, 20 min)
 If you're using labware from a manufacturer that's not listed here,
 refer to their website to see whether those items can be autoclaved.
 
-1.  **Servicing Flex**
+## Servicing Flex
 
 Opentrons Flex is designed for years of full-time operation. Unlike
 cleaning, you should not attempt to service or repair Flex yourself.
