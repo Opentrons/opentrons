@@ -160,7 +160,7 @@ async def test_aspirate_while_tracking_implementation(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=None,
+            operation_volume=-123,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -300,7 +300,7 @@ async def test_aspirate_raises_volume_error(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=None,
+            operation_volume=-50,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -404,7 +404,7 @@ async def test_overpressure_error(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=None,
+            operation_volume=-50,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
