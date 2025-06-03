@@ -396,13 +396,41 @@ export const savedStepForms = (
       return mapValues(
         savedStepForms,
         (form: FormData): FormData => {
-          const updatedLocation = omit(form[locationUpdate] || {}, id)
+          if (form.stepType === 'manualIntervention') {
+            const updatedLocation = omit(form[locationUpdate] || {}, id)
 
-          return {
-            ...form,
-            [locationUpdate]:
-              Object.keys(updatedLocation).length > 0 ? updatedLocation : {},
+            return {
+              ...form,
+              [locationUpdate]:
+                Object.keys(updatedLocation).length > 0 ? updatedLocation : {},
+            }
+          } else if (id.includes(form.dropTip_location as string)) {
+            return {
+              ...form,
+              ...handleFormChange(
+                {
+                  dropTip_location: null,
+                },
+                form,
+                _getPipetteEntitiesRootState(rootState),
+                _getLabwareEntitiesRootState(rootState)
+              ),
+            }
+          } else if (id.includes(form.newLocation as string)) {
+            return {
+              ...form,
+              ...handleFormChange(
+                {
+                  newLocation: null,
+                },
+                form,
+                _getPipetteEntitiesRootState(rootState),
+                _getLabwareEntitiesRootState(rootState)
+              ),
+            }
           }
+
+          return form
         }
       )
     }
@@ -668,7 +696,6 @@ export const savedStepForms = (
         return { ...savedForm, ...deleteLabwareUpdate }
       })
     }
-
     case 'DELETE_PIPETTES': {
       // remove references to pipettes that have been deleted
       const deletedPipetteIds = action.payload
