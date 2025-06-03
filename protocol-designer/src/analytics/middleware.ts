@@ -424,6 +424,7 @@ export const reduxActionToAnalyticsEvent = (
         ({ liquidClass }) => liquidClass
       ),
     }
+    console.log(liquidClasses)
 
     const fixtureInfo = {
       trashBin: trashCommands,
