@@ -166,11 +166,11 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
     buttonIsDisabled = position == null || positionError != null
   }
 
-  const handleSpeedChange = (e: string): void => {
-    if (e === '') {
+  const handleSpeedChange = (userInput: string): void => {
+    if (userInput === '') {
       setSpeed(null)
     }
-    const parsedSpeed = parseInt(e)
+    const parsedSpeed = parseInt(userInput)
     setSpeed(!isNaN(parsedSpeed) ? parsedSpeed : null)
   }
 

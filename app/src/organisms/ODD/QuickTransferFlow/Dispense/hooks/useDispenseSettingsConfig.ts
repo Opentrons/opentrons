@@ -169,7 +169,7 @@ export function useDispenseSettingsConfig({
       value:
         state.touchTipDispense !== undefined
           ? t('touch_tip_value', {
-              speed: state.touchTipDispense,
+              speed: state.touchTipDispenseSpeed,
               position: state.touchTipDispense,
             })
           : '',
