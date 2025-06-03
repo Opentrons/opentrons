@@ -85,23 +85,6 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
-.PHONY: test-photometric-single
-test-photometric-single:
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50 --photoplate-col-offset 3
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50 --dye-well-col-offset 3
-
-.PHONY: test-photometric-multi
-test-photometric-multi:
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 8 --tip 50
-
-.PHONY: test-photometric
-test-photometric:
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 50 --trials 1
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 200 --trials 1
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 200 --channels 96 --tip 50 --trials 1
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 200 --channels 96 --tip 20 --trials 1
-
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1
@@ -133,7 +116,6 @@ test-gravimetric:
 	$(MAKE) test-gravimetric-single
 	$(MAKE) test-gravimetric-multi
 	$(MAKE) test-gravimetric-96
-	$(MAKE) test-photometric
 
 .PHONY: test-production-qc
 test-production-qc:

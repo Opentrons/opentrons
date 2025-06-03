@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { reduce } from 'lodash'
 
@@ -241,22 +242,27 @@ const getNickname = (
   nicknamesById: Record<string, string>,
   activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
   labwareId: string,
-  robotType: RobotType
+  robotType: RobotType,
+  t: any
 ): string => {
   const { modules } = activeDeckSetup
   const stack = activeDeckSetup.labware[labwareId].stack
   const latestSlot = resolveSlotLocation(modules, stack, robotType)
-
-  let nickName: string = nicknamesById[labwareId]
+  const name = nicknamesById[labwareId]
+  let nickName: string = name
   if (latestSlot != null && latestSlot !== 'offDeck') {
-    nickName = `${nicknamesById[labwareId]} in ${latestSlot}`
+    nickName = t('labware_in_slot', { name, slot: latestSlot })
+  } else if (latestSlot != null && latestSlot === 'offDeck') {
+    nickName = t('labware_offdeck', { name })
   }
   return nickName
 }
 
 export const useLabwareDropdownOptions = (
-  type: 'moveLabware' | 'labware'
+  type: 'moveLabware' | 'labware',
+  useGripper: boolean
 ): DropdownOption[] => {
+  const { t } = useTranslation('shared')
   const labwareEntities = useSelector(getLabwareEntities)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const nicknamesById = useSelector(getLabwareNicknamesById)
@@ -279,10 +285,13 @@ export const useLabwareDropdownOptions = (
         nicknamesById,
         activeDeckSetup,
         labwareId,
-        robotType
+        robotType,
+        t
       )
       const isTiprack = getIsTiprack(labwareEntity.def)
-      const isOffDeck = deckSlot === 'offDeck'
+      const isFilterOffDeck =
+        deckSlot === 'offDeck' &&
+        (type === 'labware' || (type === 'moveLabware' && useGripper))
 
       //  filter out moving adapters, and labware in
       //  waste chute for moveLabware, labware off-deck and
@@ -290,7 +299,7 @@ export const useLabwareDropdownOptions = (
       return isAdapter ||
         isLabwareInWasteChute ||
         (type === 'labware' && isTiprack) ||
-        isOffDeck
+        isFilterOffDeck
         ? acc
         : [
             ...acc,

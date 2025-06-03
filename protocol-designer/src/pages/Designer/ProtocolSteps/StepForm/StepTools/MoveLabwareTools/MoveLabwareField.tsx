@@ -7,8 +7,11 @@ import { useLabwareDropdownOptions } from '../../../../utils'
 
 import type { FieldProps } from '../../types'
 
-export function MoveLabwareField(props: FieldProps): JSX.Element {
-  const options = useLabwareDropdownOptions('moveLabware')
+interface MoveLabwareFieldProps extends FieldProps {
+  useGripper: boolean
+}
+export function MoveLabwareField(props: MoveLabwareFieldProps): JSX.Element {
+  const options = useLabwareDropdownOptions('moveLabware', props.useGripper)
   const dispatch = useDispatch()
   const { t } = useTranslation(['protocol_steps', 'application'])
   return (
