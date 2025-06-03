@@ -69,7 +69,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
       setSelectedModule(newModules[0])
       sendIdentifyModule(newModules[0], true)
     }
-  }, [])
+  }, [isSingleModule])
 
   // Handler for when there are multiple modules.
   const handleModuleSelected = (serialNumber: string): void => {
