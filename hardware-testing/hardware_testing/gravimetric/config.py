@@ -11,7 +11,6 @@ class ConfigType(Enum):
     """Substitute for Literal which isn't available until 3.8.0."""
 
     gravimetric = 1
-    photometric = 2
 
 
 @dataclass
@@ -51,22 +50,7 @@ class GravimetricConfig(VolumetricConfig):
     liquid: str
 
 
-@dataclass
-class PhotometricConfig(VolumetricConfig):
-    """Execute photometric Setup Config."""
-
-    photoplate: str
-    photoplate_slot: int
-    reservoir: str
-    reservoir_slot: int
-    touch_tip: bool
-    refill: bool
-    photoplate_column_offset: List[int]
-    dye_well_column_offset: List[int]
-
-
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
-PHOTO_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
 
 NUM_BLANK_TRIALS: Final = 10
 NUM_MIXES_BEFORE_ASPIRATE = 5
@@ -274,51 +258,11 @@ QC_VOLUMES_EXTRA_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     },
 }
 
-QC_VOLUMES_P: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
-    1: {
-        50: [  # P50
-            (50, [1.0]),
-        ],
-        1000: [  # P1000
-            (50, [5.0]),  # T50
-            (200, [200.0]),  # T200
-            (1000, []),  # T1000
-        ],
-    },
-    8: {
-        50: [  # P50
-            (50, [1.0]),
-        ],
-        1000: [  # P1000
-            (50, [5.0]),  # T50
-            (200, [200.0]),  # T200
-            (1000, []),  # T1000
-        ],
-    },
-    96: {
-        200: [
-            (20, [1.0, 0.5]),  # T50
-            (50, [50.0]),  # T50
-            (200, [200.0]),  # T200
-        ],
-        1000: [  # P1000
-            (50, [5.0]),  # T50
-            (200, [200.0]),  # T200
-            (1000, []),  # T1000
-        ],
-    },
-}
-
 QC_DEFAULT_TRIALS: Dict[ConfigType, Dict[int, int]] = {
     ConfigType.gravimetric: {
         1: 10,
         8: 10,
         96: 9,
-    },
-    ConfigType.photometric: {
-        1: 8,
-        8: 12,
-        96: 5,
     },
 }
 
@@ -438,15 +382,12 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
 
 
 def get_tip_volumes_for_qc(
-    pipette_volume: int, pipette_channels: int, extra: bool, photometric: bool
+    pipette_volume: int, pipette_channels: int, extra: bool
 ) -> List[int]:
     """Build the default testing volumes for qc."""
     config: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {}
     tip_volumes: List[int] = []
-    if photometric:
-        config = QC_VOLUMES_P
-    else:
-        config = QC_VOLUMES_G
+    config = QC_VOLUMES_G
     for t, vls in config[pipette_channels][pipette_volume]:
         if len(vls) > 0 and t not in tip_volumes:
             tip_volumes.append(t)
