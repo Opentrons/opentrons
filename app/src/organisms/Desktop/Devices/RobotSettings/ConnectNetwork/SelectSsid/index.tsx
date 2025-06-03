@@ -1,10 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import { CONTEXT_MENU } from '@opentrons/components'
-import { SelectField } from '/app/atoms/SelectField'
-import { NetworkOptionLabel, NetworkActionLabel } from './NetworkOptionLabel'
 
-import type { ComponentProps } from 'react'
+import { CONTEXT_MENU } from '@opentrons/components'
+
+import { SelectField } from '/app/atoms/SelectField'
+
+import { NetworkActionLabel, NetworkOptionLabel } from './NetworkOptionLabel'
+
 import type { TFunction } from 'i18next'
+import type { ComponentProps } from 'react'
 import type { SelectOptionOrGroup } from '@opentrons/components'
 import type { WifiNetwork } from '../types'
 

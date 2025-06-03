@@ -34,6 +34,8 @@ def test_labware_from_paths(
         lwtemp.write("asdjkashdkajvka")
     with open(path_2 / "notevenjson", "w") as lwtemp:
         lwtemp.write("bgbbabcba")
+    with open(path_2 / "not_an_object.json", "w") as lwtemp:
+        lwtemp.write('["hello", "world"]')
 
     res = labware_from_paths(
         [

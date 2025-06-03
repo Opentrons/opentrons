@@ -4,8 +4,8 @@ import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type {
   LabwareOffset,
-  LegacyLabwareOffsetCreateData,
   LabwareOffsetCreateData,
+  LegacyLabwareOffsetCreateData,
 } from './types'
 
 export function addLabwareOffsetToRun(

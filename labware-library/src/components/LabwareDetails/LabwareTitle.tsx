@@ -1,8 +1,8 @@
 // labware details page title and category
-import { LabelText, Value, LABEL_LEFT } from '../ui'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { CATEGORY, CATEGORY_LABELS_BY_CATEGORY } from '../../localization'
-
+import { LABEL_LEFT, LabelText, Value } from '../ui'
 import styles from './styles.module.css'
 
 import type { LabwareDefinition } from '../../types'
@@ -14,10 +14,9 @@ export interface LabwareTitleProps {
 
 export function LabwareTitle(props: LabwareTitleProps): JSX.Element {
   const { definition, className } = props
-  const { metadata } = definition
-  const { displayCategory } = definition.metadata
+  const displayName = getLabwareDisplayName(definition)
   const category =
-    CATEGORY_LABELS_BY_CATEGORY[displayCategory] ||
+    CATEGORY_LABELS_BY_CATEGORY[definition.metadata.displayCategory] ||
     CATEGORY_LABELS_BY_CATEGORY.other
 
   return (
@@ -26,7 +25,7 @@ export function LabwareTitle(props: LabwareTitleProps): JSX.Element {
         <LabelText position={LABEL_LEFT}>{CATEGORY}</LabelText>
         <Value>{category}</Value>
       </div>
-      <h2 className={styles.title}>{metadata.displayName}</h2>
+      <h2 className={styles.title}>{displayName}</h2>
     </div>
   )
 }

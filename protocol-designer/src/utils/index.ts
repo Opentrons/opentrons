@@ -1,25 +1,27 @@
 import round from 'lodash/round'
 import snakeCase from 'lodash/snakeCase'
 import uuidv1 from 'uuid/v4'
+
 import {
-  makeWellSetHelpers,
-  getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  isAddressableAreaStandardSlot,
+  getDeckDefFromRobotType,
+  getTiprackVolume,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
+  isAddressableAreaStandardSlot,
   LOW_VOLUME_PIPETTES,
+  makeWellSetHelpers,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
-import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
-import type {
-  AdditionalEquipmentEntity,
-  LabwareEntities,
-  PipetteEntities,
-  PipetteEntity,
+import {
+  getSlotInLocationStack,
+  PROTOCOL_CONTEXT_NAME,
 } from '@opentrons/step-generation'
+
+import type { WellGroup } from '@opentrons/components'
 import type {
   AddressableAreaName,
   CutoutId,
+  DeckSlotId,
   LabwareDefinition2,
   LabwareDisplayCategory,
   ModuleType,
@@ -27,8 +29,19 @@ import type {
   SupportedTip,
   WellSetHelpers,
 } from '@opentrons/shared-data'
-import type { WellGroup } from '@opentrons/components'
+import type {
+  AdditionalEquipmentEntity,
+  LabwareEntities,
+  PipetteEntities,
+  PipetteEntity,
+} from '@opentrons/step-generation'
 import type { BoundingRect, GenericRect } from '../collision-types'
+import type {
+  AllTemporalPropertiesForTimelineFrame,
+  InitialDeckSetup,
+  LabwareOnDeck,
+  ModuleEntities,
+} from '../step-forms'
 
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware
@@ -291,6 +304,22 @@ export const getAdditionalEquipmentPythonName = (
   }
 }
 
+export const getDefaultBlowoutFlowRate = (
+  transferVolume: number,
+  pipetteSpecs: PipetteV2Specs,
+  tiprackDef: LabwareDefinition2
+): number | null => {
+  const { liquids } = pipetteSpecs
+  const isInLowVolumeMode =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const liquidsObject = isInLowVolumeMode
+    ? liquids.lowVolumeDefault
+    : liquids.default
+  return liquidsObject.supportedTips[
+    `t${tiprackDef.wells.A1.totalLiquidVolume}`
+  ].defaultBlowOutFlowRate.default
+}
+
 /**
  * Gets maximum pushout volume for a given transfer plan given transfer volume and pipette spec
  *
@@ -309,7 +338,8 @@ export const getMaxPushOutVolume = (
     ? plungerPositionsConfigurations.lowVolumeDefault ??
       plungerPositionsConfigurations.default
     : plungerPositionsConfigurations.default
-  return round((blowout - bottom) * shaftULperMM, 1)
+  // absolute value to account for flipped z-axis on OT-2 vs. Flex pipettes
+  return round(Math.abs(blowout - bottom) * shaftULperMM, 1)
 }
 
 export const getDefaultPushOutVolume = (
@@ -328,10 +358,130 @@ export const getDefaultPushOutVolume = (
   const tipVolume = Object.values(tiprackDefinition.wells)[0].totalLiquidVolume
   const lookupKey =
     transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
-      ? 'lowVolumeDefalt'
+      ? 'lowVolumeDefault'
       : 'default'
   const tipVolumeKey = `t${tipVolume}`
   return (
     liquids[lookupKey].supportedTips[tipVolumeKey]?.defaultPushOutVolume ?? 0
+  )
+}
+
+export const getMaxConditioningVolume = (args: {
+  transferVolume: number
+  disposalVolume: number
+  tiprackDefUri: string
+  labwareEntities: LabwareEntities
+  pipetteSpecs: PipetteV2Specs
+}): number => {
+  const {
+    transferVolume,
+    disposalVolume,
+    labwareEntities,
+    tiprackDefUri,
+    pipetteSpecs,
+  } = args
+  const { liquids } = pipetteSpecs
+  const isInLowVolumeMode =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const tiprack = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
+  )
+  const tipMaxVolume = tiprack != null ? getTiprackVolume(tiprack.def) : null
+
+  const maxWorkingVolume = Math.min(
+    isInLowVolumeMode
+      ? liquids.lowVolumeDefault.maxVolume
+      : liquids.default.maxVolume,
+    ...(tipMaxVolume != null ? [tipMaxVolume] : [])
+  )
+  return maxWorkingVolume - disposalVolume - transferVolume
+}
+
+// for stacking
+export function getLocationStackTopToBottom(
+  labwareId: string,
+  labwareLocationUpdate: Record<string, string>,
+  moduleLocationUpdate: Record<string, string>
+): string[] {
+  const stack = []
+  let current = labwareId
+
+  //  while parent still exists
+  while (true) {
+    stack.push(current)
+    const parent =
+      labwareLocationUpdate[current] || moduleLocationUpdate[current]
+    if (!parent) break
+    current = parent
+  }
+
+  return stack
+}
+
+export const getTopmostLabwareOnModuleFromStack = (
+  moduleId: string,
+  labware: LabwareOnDeck[]
+): string => {
+  return labware
+    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
+}
+
+export const getFullStackFromLabwaresOnDeck = (
+  labwareOnDeck: LabwareOnDeck[],
+  slot: DeckSlotId
+): string[] => {
+  return labwareOnDeck
+    .filter(lw => lw.stack.includes(slot))
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+}
+
+export const getModuleIdFromStack = (
+  stack: string[],
+  modulesById: InitialDeckSetup['modules'] | ModuleEntities
+): string | null => {
+  return stack.find(id => modulesById[id] != null) ?? null
+}
+
+export const getLabwareIdAfterModuleIdInStack = (
+  moduleId: string,
+  labware: {
+    [labwareId: string]: LabwareOnDeck
+  }
+): string | null => {
+  const matchingLabware = Object.values(labware).find(lw =>
+    lw.stack.includes(moduleId)
+  )
+  if (!matchingLabware) {
+    return null
+  }
+
+  const index = matchingLabware.stack.indexOf(moduleId)
+  const indexAfter = index + 1
+
+  return matchingLabware.stack[indexAfter] ?? null
+}
+
+export const getHasTrash = (
+  additionalEquipment: AllTemporalPropertiesForTimelineFrame['additionalEquipmentOnDeck']
+): boolean => {
+  return Object.values(additionalEquipment).some(
+    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
+  )
+}
+
+export const getAllLabwareIdsOfCertainURIOnStack = (
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'],
+  labwareOnDeck: LabwareOnDeck
+): string[] => {
+  return Object.values(deckSetupLabware).reduce<string[]>(
+    (acc, { labwareDefURI, stack, id }) => {
+      return labwareDefURI === labwareOnDeck.labwareDefURI &&
+        getSlotInLocationStack(stack) ===
+          getSlotInLocationStack(labwareOnDeck.stack)
+        ? [...acc, id]
+        : acc
+    },
+    []
   )
 }

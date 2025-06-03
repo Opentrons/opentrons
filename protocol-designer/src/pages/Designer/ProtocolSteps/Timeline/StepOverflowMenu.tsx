@@ -11,12 +11,8 @@ import {
   NO_WRAP,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
+
 import { analyticsEvent } from '../../../../analytics/actions'
-import { actions as stepsActions } from '../../../../ui/steps'
-import {
-  hoverOnStep,
-  toggleViewSubstep,
-} from '../../../../ui/steps/actions/actions'
 import { OPEN_STEP_DETAILS_EVENT } from '../../../../analytics/constants'
 import {
   getBatchEditFormHasUnsavedChanges,
@@ -25,12 +21,17 @@ import {
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
+import { actions as stepsActions } from '../../../../ui/steps'
+import {
+  hoverOnStep,
+  toggleViewSubstep,
+} from '../../../../ui/steps/actions/actions'
 
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
-import type { BaseState } from '../../../../types'
-import type { StepIdType } from '../../../../form-types'
+import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
 import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
+import type { StepIdType } from '../../../../form-types'
+import type { BaseState } from '../../../../types'
 
 interface StepOverflowMenuProps {
   stepId: string

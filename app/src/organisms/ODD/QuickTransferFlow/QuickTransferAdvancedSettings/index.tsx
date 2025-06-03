@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -9,11 +9,8 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
-  SIZE_2,
   SPACING,
   StyledText,
-  TEXT_ALIGN_LEFT,
-  TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -21,24 +18,26 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { ACTIONS } from '../constants'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { FlowRateEntry } from './FlowRate'
-import { PipettePath } from './PipettePath'
-import { TipPositionEntry } from './TipPosition'
-import { Mix } from './Mix'
-import { Delay } from './Delay'
-import { TouchTip } from './TouchTip'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analytics'
+
+import { ACTIONS } from '../constants'
 import { AirGap } from './AirGap'
 import { BlowOut } from './BlowOut'
+import { Delay } from './Delay'
+import { FlowRateEntry } from './FlowRate'
+import { Mix } from './Mix'
+import { PipettePath } from './PipettePath'
+import { TipPositionEntry } from './TipPosition'
+import { TouchTip } from './TouchTip'
 
 import type { Dispatch } from 'react'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
+
 interface QuickTransferAdvancedSettingsProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
@@ -163,7 +162,7 @@ export function QuickTransferAdvancedSettings(
         state.mixOnAspirate !== undefined
           ? t('mix_value', {
               volume: state.mixOnAspirate?.mixVolume,
-              reps: state.mixOnAspirate?.repititions,
+              reps: state.mixOnAspirate?.repetitions,
             })
           : '',
       enabled:
@@ -246,7 +245,7 @@ export function QuickTransferAdvancedSettings(
         state.mixOnDispense !== undefined
           ? t('mix_value', {
               volume: state.mixOnDispense?.mixVolume,
-              reps: state.mixOnDispense?.repititions,
+              reps: state.mixOnDispense?.repetitions,
             })
           : '',
       enabled:
@@ -353,12 +352,12 @@ export function QuickTransferAdvancedSettings(
                       color={
                         displayItem.enabled ? COLORS.grey60 : COLORS.grey50
                       }
-                      textAlign={TEXT_ALIGN_RIGHT}
+                      textAlign={TYPOGRAPHY.textAlignRight}
                     >
                       {displayItem.value}
                     </StyledText>
                     {displayItem.enabled ? (
-                      <Icon name="more" size={SIZE_2} />
+                      <Icon name="more" size="2rem" />
                     ) : null}
                   </Flex>
                 </Flex>
@@ -402,7 +401,7 @@ export function QuickTransferAdvancedSettings(
           <StyledText
             css={TYPOGRAPHY.level4HeaderSemiBold}
             color={COLORS.grey60}
-            textAlign={TEXT_ALIGN_LEFT}
+            textAlign={TYPOGRAPHY.textAlignLeft}
           >
             {t('aspirate_settings')}
           </StyledText>
@@ -427,11 +426,11 @@ export function QuickTransferAdvancedSettings(
                     </StyledText>
                     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
                       <StyledText
-                        css={TYPOGRAPHY.level4HeaderRegular}
+                        oddStyle="level4HeaderRegular"
                         color={
                           displayItem.enabled ? COLORS.grey60 : COLORS.grey50
                         }
-                        textAlign={TEXT_ALIGN_RIGHT}
+                        textAlign={TYPOGRAPHY.textAlignRight}
                       >
                         {displayItem.value !== ''
                           ? displayItem.value
@@ -441,7 +440,7 @@ export function QuickTransferAdvancedSettings(
                       {displayItem.option !== 'pre_wet_tip' ? (
                         <Icon
                           name="more"
-                          size={SIZE_2}
+                          size="2rem"
                           color={
                             displayItem.enabled ? COLORS.black90 : COLORS.grey50
                           }
@@ -511,7 +510,7 @@ export function QuickTransferAdvancedSettings(
           <StyledText
             css={TYPOGRAPHY.level4HeaderSemiBold}
             color={COLORS.grey60}
-            textAlign={TEXT_ALIGN_LEFT}
+            textAlign={TYPOGRAPHY.textAlignLeft}
           >
             {t('dispense_settings')}
           </StyledText>
@@ -540,7 +539,7 @@ export function QuickTransferAdvancedSettings(
                         color={
                           displayItem.enabled ? COLORS.grey60 : COLORS.grey50
                         }
-                        textAlign={TEXT_ALIGN_RIGHT}
+                        textAlign={TYPOGRAPHY.textAlignRight}
                       >
                         {displayItem.value !== ''
                           ? displayItem.value
@@ -548,7 +547,7 @@ export function QuickTransferAdvancedSettings(
                       </StyledText>
                       <Icon
                         name="more"
-                        size={SIZE_2}
+                        size="2rem"
                         color={
                           displayItem.enabled ? COLORS.black90 : COLORS.grey50
                         }

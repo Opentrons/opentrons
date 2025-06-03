@@ -1,9 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { labwareImages } from '../labware-images'
+
 import { Gallery } from '../Gallery'
+import { labwareImages } from '../labware-images'
 
 import type { ComponentProps } from 'react'
 

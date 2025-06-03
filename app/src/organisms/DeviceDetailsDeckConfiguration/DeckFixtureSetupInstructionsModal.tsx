@@ -1,22 +1,23 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_FLEX_END,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
   SPACING,
-  Modal,
-  LegacyStyledText,
 } from '@opentrons/components'
+
+import imgSrc from '/app/assets/images/on-device-display/deck_fixture_setup_qrcode.png'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { OddModal } from '/app/molecules/OddModal'
 
 import type { ModalProps } from '@opentrons/components'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-
-import imgSrc from '/app/assets/images/on-device-display/deck_fixture_setup_qrcode.png'
 
 const SETUP_INSTRUCTION_URL =
   'https://support.opentrons.com/s/article/Deck-configuration-on-Opentrons-Flex'

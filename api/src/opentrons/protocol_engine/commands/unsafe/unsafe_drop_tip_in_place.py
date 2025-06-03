@@ -81,8 +81,7 @@ class UnsafeDropTipInPlaceImplementation(
             pipette_id=params.pipetteId,
             home_after=params.homeAfter,
             ignore_plunger=(
-                self._state_view.tips.get_pipette_active_channels(params.pipetteId)
-                == 96
+                self._state_view.pipettes.get_active_channels(params.pipetteId) == 96
             ),
         )
 

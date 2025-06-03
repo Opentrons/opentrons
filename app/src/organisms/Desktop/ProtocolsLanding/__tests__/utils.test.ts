@@ -1,5 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { getisFlexProtocol, getRobotTypeDisplayName } from '../utils'
+
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 const mockOT3ProtocolAnalysisOutput = {

@@ -1,9 +1,9 @@
+import type { TFunction } from 'i18next'
 import type {
   AddressableAreaName,
   MoveToAddressableAreaParams,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { TFunction } from 'i18next'
 
 export function getAddressableAreaDisplayName(
   commands: RunTimeCommand[] | undefined,

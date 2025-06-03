@@ -1,16 +1,19 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { it, describe, beforeEach, vi, afterEach, expect } from 'vitest'
-import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
-import { i18n } from '/app/i18n'
-import { useProtocolMetadata } from '/app/resources/protocols'
-import { getIsOnDevice } from '/app/redux/config'
-import { PickUpTip } from '../PickUpTip'
-import { SECTIONS } from '../constants'
-import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
-import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { ComponentProps } from 'react'
+import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
+
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getIsOnDevice } from '/app/redux/config'
+import { useProtocolMetadata } from '/app/resources/protocols'
+
+import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
+import { SECTIONS } from '../constants'
+import { PickUpTip } from '../PickUpTip'
+
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 import type { CommandData } from '@opentrons/api-client'
 
 vi.mock('/app/resources/protocols')
@@ -118,7 +121,9 @@ describe('PickUpTip', () => {
       name: 'Pick up tip from tip rack in Slot D1',
     })
     screen.getByText(
-      "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned."
+      nestedTextMatcher(
+        "Ensure that the pipette nozzle furthest from you is centered and level with the top of the tip in the A1 position. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned."
+      )
     )
     screen.getByRole('link', { name: 'Need help?' })
   })
@@ -140,7 +145,7 @@ describe('PickUpTip', () => {
     })
     screen.getByText(
       nestedTextMatcher(
-        "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, tap Move pipette and then jog the pipette until it is properly aligned."
+        "Ensure that the pipette nozzle furthest from you is centered and level with the top of the tip in the A1 position. If it isn't, tap Move pipette and then jog the pipette until it is properly aligned."
       )
     )
   })

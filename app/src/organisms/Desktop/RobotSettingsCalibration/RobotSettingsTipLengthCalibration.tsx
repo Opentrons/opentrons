@@ -1,22 +1,23 @@
 import { useTranslation } from 'react-i18next'
 
-import { getLabwareDefURI } from '@opentrons/shared-data'
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { useAttachedPipettes } from '/app/resources/instruments'
+
 import { getDefaultTiprackDefForPipetteName } from '../Devices/constants'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
 import type { PipetteName } from '@opentrons/shared-data'
-import type { FormattedPipetteOffsetCalibration } from '.'
 import type { TipLengthCalibration } from '/app/redux/calibration/api-types'
+import type { FormattedPipetteOffsetCalibration } from '.'
 
 interface RobotSettingsTipLengthCalibrationProps {
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]

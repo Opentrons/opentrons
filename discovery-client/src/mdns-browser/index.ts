@@ -1,18 +1,18 @@
 // mdns browser wrapper
 import net from 'net'
+
 import { createBaseBrowser } from './base-browser'
+import * as Ifaces from './interfaces'
 import { repeatCall } from './repeat-call'
 
-import * as Ifaces from './interfaces'
-
 import type { LogLevel } from '../types'
+import type { BaseBrowser, BaseBrowserService } from './base-browser'
+import type { RepeatCallResult } from './repeat-call'
 import type {
   MdnsBrowser,
   MdnsBrowserOptions,
   MdnsBrowserService,
 } from './types'
-import type { BaseBrowser, BaseBrowserService } from './base-browser'
-import type { RepeatCallResult } from './repeat-call'
 
 export type { MdnsBrowser, MdnsBrowserOptions, MdnsBrowserService }
 

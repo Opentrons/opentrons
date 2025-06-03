@@ -1,56 +1,43 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
+
+import {
+  AnimationVideo,
+  Flex,
+  LegacyStyledText,
+  RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import {
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  getCalibrationAdapterLoadName,
+  getModuleDisplayName,
+  HEATERSHAKER_MODULE_MODELS,
+  HEATERSHAKER_MODULE_TYPE,
+  TEMPERATURE_MODULE_MODELS,
+  THERMOCYCLER_MODULE_MODELS,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+} from '@opentrons/shared-data'
+
 import HeaterShaker_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
 import HeaterShaker_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
 import TempModule_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
 import TempModule_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
 import Thermocycler_PlaceAdapter from '/app/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
-
-import {
-  Flex,
-  RESPONSIVENESS,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import {
-  getCalibrationAdapterLoadName,
-  getModuleDisplayName,
-  HEATERSHAKER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_MODELS,
-  TEMPERATURE_MODULE_MODELS,
-  THERMOCYCLER_MODULE_MODELS,
-  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-} from '@opentrons/shared-data'
-
-import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
+
 import { LEFT_SLOTS } from './constants'
 
-import type { DeckConfiguration, CreateCommand } from '@opentrons/shared-data'
-import type { ModuleCalibrationWizardStepProps } from './types'
-import type { AxiosError } from 'axios'
-import type { UseMutateFunction } from 'react-query'
-import type {
-  CreateMaintenanceRunData,
-  MaintenanceRun,
-} from '@opentrons/api-client'
+import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
+import type { ModuleSetupWizardStepProps } from './types'
 
-interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
+interface PlaceAdapterProps extends ModuleSetupWizardStepProps {
   deckConfig: DeckConfiguration
   setCreatedAdapterId: (adapterId: string) => void
-  createMaintenanceRun: UseMutateFunction<
-    MaintenanceRun,
-    AxiosError<any>,
-    CreateMaintenanceRunData,
-    unknown
-  >
-  isCreateLoading: boolean
-  createdMaintenanceRunId: string | null
 }
 
 export const BODY_STYLE = css`
@@ -74,16 +61,9 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     attachedPipette,
     isRobotMoving,
     maintenanceRunId,
-    createMaintenanceRun,
-    isCreateLoading,
-    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation('module_wizard_flows')
-  useEffect(() => {
-    if (createdMaintenanceRunId == null) {
-      createMaintenanceRun({})
-    }
-  }, [])
+
   const mount = attachedPipette.mount
   const cutoutId = deckConfig.find(
     cc =>
@@ -206,17 +186,14 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
 
   const placeAdapterVid = (
     <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-      <video
+      <AnimationVideo
         css={css`
           max-width: 100%;
           max-height: 100%;
         `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
       >
         <source src={attachAdapterVideoSrc} />
-      </video>
+      </AnimationVideo>
     </Flex>
   )
 
@@ -237,7 +214,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       bodyText={bodyText}
       proceedButtonText={t('confirm_placement')}
       proceed={handleOnClick}
-      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
+      proceedIsDisabled={maintenanceRunId == null}
       back={goBack}
     />
   )

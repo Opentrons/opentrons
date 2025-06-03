@@ -83,17 +83,25 @@ def get_latest_offset_for_labware(
     labware_offsets: List[LabwareOffset], labware: Labware
 ) -> Point:
     """Get latest offset for labware."""
+    lw_uri = str(labware.uri)
 
     def _is_offset_present(_o: LabwareOffset) -> bool:
         _v = _o.vector
         return _v.x != 0 or _v.y != 0 or _v.z != 0
 
     def _offset_applies_to_labware(_o: LabwareOffset) -> bool:
-        if (
-            _o.location.slotName.value != labware.parent
-            or _o.definitionUri != labware.uri
-        ):
+        if _o.location.slotName.value != labware.parent:
             return False
+        offset_uri = _o.definitionUri
+        if offset_uri[0:-1] != lw_uri[0:-1]:  # drop schema version number
+            # ui.print_info(f"{_o} does not apply {offset_uri} != {lw_uri}")
+            # NOTE: we're allowing tip-rack adapters to share offsets
+            #       because it doesn't make a difference which volume
+            #       of tip it holds
+            o_is_adp = "custom_beta" in offset_uri and "_adp" in offset_uri
+            l_is_adp = "custom_beta" in lw_uri and "_adp" in lw_uri
+            if not o_is_adp or not l_is_adp:
+                return False
         return _is_offset_present(_o)
 
     lw_offsets = [

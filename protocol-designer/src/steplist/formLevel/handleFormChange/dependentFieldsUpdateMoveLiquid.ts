@@ -1,11 +1,13 @@
 import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
+
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+
 import {
   getMinPipetteVolume,
   getPipetteCapacity,
@@ -15,14 +17,15 @@ import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 import {
   chainPatchUpdaters,
+  DISPOSAL_VOL_DIGITS,
   fieldHasChanged,
+  getAllWellsFromPrimaryWells,
   getChannels,
   getDefaultWells,
-  getAllWellsFromPrimaryWells,
   getMaxDisposalVolumeForMultidispense,
   volumeInCapacityForMulti,
-  DISPOSAL_VOL_DIGITS,
 } from './utils'
+
 import type {
   LabwareEntities,
   PipetteEntities,
@@ -691,6 +694,44 @@ const updatePatchOnNozzleChange = (
   return patch
 }
 
+const updatePatchOnConditioningVolumeChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (
+    fieldHasChanged(rawForm, patch, 'conditioning_checkbox') &&
+    patch.conditioning_checkbox === true
+  ) {
+    return {
+      ...patch,
+      ...getDefaultFields('aspirate_airGap_checkbox', 'aspirate_airGap_volume'),
+    }
+  }
+  return patch
+}
+
+const updatePatchOnPathChange = (
+  patch: FormPatch,
+  rawForm: FormData,
+  pipetteEntities: PipetteEntities
+): FormPatch => {
+  if (
+    fieldHasChanged(rawForm, patch, 'path') &&
+    rawForm.path === 'multiDispense'
+  ) {
+    return {
+      ...patch,
+      ...getDefaultFields(
+        'disposalVolume_checkbox',
+        'disposalVolume_volume',
+        'conditioning_checkbox',
+        'conditioning_volume'
+      ),
+    }
+  }
+  return patch
+}
+
 export function dependentFieldsUpdateMoveLiquid(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
@@ -730,5 +771,7 @@ export function dependentFieldsUpdateMoveLiquid(
       updatePatchOnTiprackChange(chainPatch, rawForm, pipetteEntities),
     chainPatch =>
       updatePatchOnNozzleChange(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchOnConditioningVolumeChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnPathChange(chainPatch, rawForm, pipetteEntities),
   ])
 }

@@ -1,8 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { screen, fireEvent } from '@testing-library/react'
-import { i18n } from '/app/i18n'
+
+import { fireEvent, screen } from '@testing-library/react'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { Slideout } from '..'
 
 import type { ComponentProps } from 'react'

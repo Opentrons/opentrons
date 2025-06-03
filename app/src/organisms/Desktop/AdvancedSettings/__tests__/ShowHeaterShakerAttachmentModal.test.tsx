@@ -1,8 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getIsHeaterShakerAttached, updateConfigValue } from '/app/redux/config'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import { ShowHeaterShakerAttachmentModal } from '../ShowHeaterShakerAttachmentModal'
 
 vi.mock('/app/redux/config')

@@ -1,11 +1,12 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getConnectableRobots,
@@ -14,7 +15,6 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '/app/redux/discovery'
-import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -25,11 +25,12 @@ import {
   storedProtocolData as storedProtocolDataFixture,
   storedProtocolDataWithCsvRunTimeParameter,
 } from '/app/redux/protocol-storage/__fixtures__'
-import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { ChooseRobotToRunProtocolSlideout } from '../'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { useCloseCurrentRun, useCurrentRunId } from '/app/resources/runs'
 import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
-import { useCurrentRunId, useCloseCurrentRun } from '/app/resources/runs'
+
+import { ChooseRobotToRunProtocolSlideout } from '../'
+import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 
 import type { ComponentProps } from 'react'
 import type { State } from '/app/redux/types'
@@ -47,6 +48,9 @@ vi.mock(
 )
 vi.mock('/app/resources/useNotifyDataReady')
 vi.mock('/app/resources/runs')
+
+// note for auto scroll to top
+window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 const render = (
   props: ComponentProps<typeof ChooseRobotToRunProtocolSlideout>

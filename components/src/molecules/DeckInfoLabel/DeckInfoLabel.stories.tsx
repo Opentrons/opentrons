@@ -1,7 +1,7 @@
+import { DeckInfoLabel } from '.'
 import { customViewports } from '../../../../.storybook/preview'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { DeckInfoLabel } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -22,6 +22,12 @@ const meta: Meta<typeof DeckInfoLabel> = {
         'stacked',
       ],
     },
+    size: {
+      control: {
+        type: 'select',
+      },
+      options: ['default', 'large'],
+    },
     deckLabel: {
       control: {
         type: 'text',
@@ -31,7 +37,7 @@ const meta: Meta<typeof DeckInfoLabel> = {
   },
   component: DeckInfoLabel,
   parameters: {
-    controls: { include: ['highlight', 'iconName', 'deckLabel'] },
+    controls: { include: ['highlight', 'iconName', 'deckLabel', 'size'] },
     viewport: {
       viewports: customViewports,
       defaultViewport: 'onDeviceDisplay',

@@ -1,16 +1,18 @@
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_CENTER,
   InfoScreen,
+  JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+
 import { ModuleCard } from '/app/organisms/ModuleCard'
-import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
 import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
+import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
 
 import type { BadPipette, PipetteData } from '@opentrons/api-client'
 

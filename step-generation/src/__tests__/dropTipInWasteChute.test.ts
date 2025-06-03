@@ -1,7 +1,9 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
-import { DEFAULT_PIPETTE, getSuccessResult, makeContext } from '../fixtures'
+
 import { dropTipInWasteChute } from '../commandCreators'
+import { DEFAULT_PIPETTE, getSuccessResult, makeContext } from '../fixtures'
 
 import type { InvariantContext, RobotState } from '../types'
 
@@ -11,9 +13,8 @@ const mockWasteChuteId = 'mockWasteChuteId'
 
 const invariantContext: InvariantContext = {
   ...makeContext(),
-  additionalEquipmentEntities: {
+  wasteChuteEntities: {
     [mockWasteChuteId]: {
-      name: 'wasteChute' as const,
       location: WASTE_CHUTE_CUTOUT,
       id: mockWasteChuteId,
       pythonName: 'mock_waste_chute_1',
@@ -22,6 +23,7 @@ const invariantContext: InvariantContext = {
 }
 const prevRobotState: RobotState = {
   tipState: { pipettes: { [DEFAULT_PIPETTE]: true } } as any,
+  pipettes: { [DEFAULT_PIPETTE]: { entityId: mockWasteChuteId } },
 } as any
 
 describe('dropTipInWasteChute', () => {
@@ -50,7 +52,7 @@ describe('dropTipInWasteChute', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      'mockPythonName.drop_tip(mock_waste_chute_1)'
+      'mock_pipette.drop_tip(mock_waste_chute_1)'
     )
   })
 })

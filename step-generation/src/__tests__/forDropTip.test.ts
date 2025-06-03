@@ -1,13 +1,16 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { makeImmutableStateUpdater } from '../__utils__'
 import {
-  makeContext,
-  getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { makeImmutableStateUpdater } from '../__utils__'
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
+
 import type { InvariantContext, RobotState } from '../types'
+
 const forDropTip = makeImmutableStateUpdater(_forDropTip)
 
 describe('dropTip', () => {

@@ -28,7 +28,7 @@ Labware
 =======
 .. autoclass:: opentrons.protocol_api.Labware
    :members:
-   :exclude-members: next_tip, use_tips, previous_tip, return_tips, load_empty, load_liquid, load_liquid_by_well
+   :exclude-members: next_tip, use_tips, previous_tip, return_tips
 
 ..
    The trailing ()s at the end of TrashBin and WasteChute here hide the __init__()
@@ -47,6 +47,9 @@ Wells and Liquids
    :exclude-members: geometry
 
 .. autoclass:: opentrons.protocol_api.Liquid
+
+.. autoclass:: opentrons.protocol_api.LiquidClass
+   :members:
 
 .. _protocol-api-modules:
 

@@ -1,14 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { SECTIONS } from '../constants'
-import { mockCompletedAnalysis } from '../__fixtures__'
-import { useProtocolMetadata } from '/app/resources/protocols'
 import { getIsOnDevice } from '/app/redux/config'
+import { useProtocolMetadata } from '/app/resources/protocols'
+
+import { mockCompletedAnalysis } from '../__fixtures__'
+import { SECTIONS } from '../constants'
 import { ReturnTip } from '../ReturnTip'
 
 import type { ComponentProps } from 'react'

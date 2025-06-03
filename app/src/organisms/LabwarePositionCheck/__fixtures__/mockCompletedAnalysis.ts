@@ -1,6 +1,7 @@
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { mockTipRackDef } from './mockTipRackDef'
+
 import { mockLabwareDef } from './mockLabwareDef'
+import { mockTipRackDef } from './mockTipRackDef'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 

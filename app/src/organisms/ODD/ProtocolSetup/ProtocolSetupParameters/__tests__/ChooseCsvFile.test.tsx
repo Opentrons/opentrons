@@ -1,16 +1,17 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import { i18n } from '/app/i18n'
 import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { getShellUpdateDataFiles } from '/app/redux/shell'
-import { EmptyFile } from '../EmptyFile'
+
 import { ChooseCsvFile } from '../ChooseCsvFile'
+import { EmptyFile } from '../EmptyFile'
 
 import type { ComponentProps } from 'react'
 import type { CsvFileParameter } from '@opentrons/shared-data'

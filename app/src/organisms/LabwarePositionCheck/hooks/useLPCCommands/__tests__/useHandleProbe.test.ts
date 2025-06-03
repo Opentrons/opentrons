@@ -1,13 +1,14 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
 import { useSelector } from 'react-redux'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { LPC_STEP, selectCurrentStep } from '/app/redux/protocol-runs'
 
 import {
   retractPipetteAxesSequentiallyCommands,
   verifyProbeAttachmentAndHomeCommands,
 } from '../commands'
 import { useHandleProbeCommands } from '../useHandleProbeCommands'
-import { LPC_STEP, selectCurrentStep } from '/app/redux/protocol-runs'
 
 import type { LPCStep } from '/app/redux/protocol-runs'
 
@@ -200,5 +201,18 @@ describe('useHandleProbeCommands', () => {
     expect(retractPipetteAxesSequentiallyCommands).toHaveBeenCalledWith(null)
     expect(mockChainLPCCommands).toHaveBeenCalled()
     expect(mockOnSuccess).toHaveBeenCalled()
+  })
+
+  it('should support toggling the unableToDetectProbe status', () => {
+    const { result, rerender } = renderHook(() =>
+      useHandleProbeCommands(mockProps)
+    )
+
+    expect(result.current.unableToDetect).toBe(false)
+    result.current.toggleUnableToDetectProbe()
+
+    rerender()
+
+    expect(result.current.unableToDetect).toBe(true)
   })
 })

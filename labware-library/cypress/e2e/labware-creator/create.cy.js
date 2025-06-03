@@ -27,12 +27,6 @@ context('The Labware Creator Landing Page', () => {
       cy.contains('Labware Library').should('have.prop', 'href')
     })
 
-    it('contains a link to the request form', () => {
-      cy.contains('request form')
-        .should('have.prop', 'href')
-        .and('equal', 'https://lqilf9ng.paperform.co/')
-    })
-
     it('contains a second link to the labware guide', () => {
       cy.contains('this guide')
         .should('have.prop', 'href')

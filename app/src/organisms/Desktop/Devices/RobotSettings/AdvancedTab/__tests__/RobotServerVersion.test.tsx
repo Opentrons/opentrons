@@ -1,15 +1,18 @@
-import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useRobot } from '/app/redux-resources/robots'
 import { getRobotApiVersion } from '/app/redux/discovery'
-import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+
 import { handleUpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
-import { useRobot } from '/app/redux-resources/robots'
 
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/robot-update/selectors')

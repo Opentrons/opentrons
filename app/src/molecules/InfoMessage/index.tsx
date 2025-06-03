@@ -7,9 +7,9 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

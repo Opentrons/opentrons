@@ -1,24 +1,25 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { useHoverTooltip } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-import { SetupLabwareList } from '../SetupLabwareList'
-import { SetupLabwareMap } from '../SetupLabwareMap'
-import { SetupLabware } from '..'
 import {
+  useLPCDisabledReason,
   useNotifyRunQuery,
   useRunCalibrationStatus,
   useRunHasStarted,
-  useLPCDisabledReason,
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
+
+import { SetupLabware } from '..'
+import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
+import { SetupLabwareList } from '../SetupLabwareList'
+import { SetupLabwareMap } from '../SetupLabwareMap'
 
 vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')

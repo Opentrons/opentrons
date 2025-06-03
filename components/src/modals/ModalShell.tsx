@@ -1,4 +1,7 @@
 import styled from 'styled-components'
+
+import { BORDERS, COLORS } from '../helix-design-system'
+import { styleProps } from '../primitives'
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -11,9 +14,7 @@ import {
   POSITION_RELATIVE,
   POSITION_STICKY,
 } from '../styles'
-import { BORDERS, COLORS } from '../helix-design-system'
 import { RESPONSIVENESS, SPACING } from '../ui-style-constants'
-import { styleProps } from '../primitives'
 
 import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import type { StyleProps } from '../primitives'

@@ -1,23 +1,9 @@
 import {
-  FLEX_ROBOT_TYPE,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
   A3_ADDRESSABLE_AREA,
-  B1_ADDRESSABLE_AREA,
-  B2_ADDRESSABLE_AREA,
-  B3_ADDRESSABLE_AREA,
-  C1_ADDRESSABLE_AREA,
-  C2_ADDRESSABLE_AREA,
-  C3_ADDRESSABLE_AREA,
-  D1_ADDRESSABLE_AREA,
-  D2_ADDRESSABLE_AREA,
-  D3_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_V1,
+  ABSORBANCE_READER_V1_FIXTURE,
   ADDRESSABLE_AREA_1,
   ADDRESSABLE_AREA_2,
   ADDRESSABLE_AREA_3,
@@ -29,26 +15,49 @@ import {
   ADDRESSABLE_AREA_9,
   ADDRESSABLE_AREA_10,
   ADDRESSABLE_AREA_11,
-  HEATERSHAKER_MODULE_V1_FIXTURE,
-  HEATERSHAKER_MODULE_V1,
-  TEMPERATURE_MODULE_V2_FIXTURE,
-  TEMPERATURE_MODULE_V2,
-  MAGNETIC_BLOCK_V1_FIXTURE,
-  MAGNETIC_BLOCK_V1,
-  THERMOCYCLER_V2_REAR_FIXTURE,
-  THERMOCYCLER_MODULE_V2,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-  ABSORBANCE_READER_V1_FIXTURE,
-  ABSORBANCE_READER_V1,
-  MODULE_FIXTURES_BY_MODEL,
-  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  B1_ADDRESSABLE_AREA,
+  B2_ADDRESSABLE_AREA,
+  B3_ADDRESSABLE_AREA,
+  C1_ADDRESSABLE_AREA,
+  C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
+  D1_ADDRESSABLE_AREA,
+  D2_ADDRESSABLE_AREA,
+  D3_ADDRESSABLE_AREA,
+  FAKE_STAGING_AREA_RIGHT_SLOT,
+  FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_V1_FIXTURE,
+  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  HEATERSHAKER_MODULE_V1,
+  HEATERSHAKER_MODULE_V1_FIXTURE,
+  MAGNETIC_BLOCK_V1,
+  MAGNETIC_BLOCK_V1_FIXTURE,
+  MODULE_FIXTURES_BY_MODEL,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_LEFT_CUTOUTS,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_CUTOUTS,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  TEMPERATURE_MODULE_V2,
+  TEMPERATURE_MODULE_V2_FIXTURE,
+  THERMOCYCLER_MODULE_V2,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from './constants'
-import { getModuleDisplayName } from './modules'
 import { getCutoutIdForSlotName } from './helpers'
+import { getModuleDisplayName } from './modules'
+
+import type { ModuleLocation } from '../command'
 import type {
   AddressableAreaName,
   CutoutFixtureId,
@@ -56,13 +65,21 @@ import type {
   OT2CutoutId,
 } from '../deck'
 import type {
+  AddressableAreaNamesWithFakes,
+  AddressableAreaWithFakes,
+  AreaTypeWithFakes,
+  CutoutFixtureIdsWithFakes,
+} from './constants'
+import type {
   AddressableArea,
   CoordinateTuple,
+  CutoutConfig,
+  CutoutConfigMap,
   CutoutFixture,
   DeckDefinition,
+  DeckDefinitionWithFakes,
   ModuleModel,
 } from './types'
-import type { ModuleLocation } from '../command'
 
 export function getCutoutDisplayName(cutout: CutoutId): string {
   return cutout.replace('cutout', '')
@@ -120,6 +137,151 @@ export const FLEX_SINGLE_SLOT_BY_CUTOUT_ID: { [CutoutId: string]: string } = {
   cutoutD3: 'D3',
 }
 
+export const FAKE_FIXTURES_AND_AA: DeckDefinitionWithFakes = {
+  locations: {
+    addressableAreas: [
+      {
+        id: 'fakeA4',
+        areaType: 'fakeStagingSlot',
+        offsetFromCutoutFixture: [164.0, 0.0, 14.5],
+        matingSurfaceUnitVector: [-1, 1, -1],
+        boundingBox: {
+          xDimension: 128.0,
+          yDimension: 86.0,
+          zDimension: 0,
+        },
+        displayName: 'Slot A4',
+        compatibleModuleTypes: [],
+      },
+      {
+        id: 'fakeB4',
+        areaType: 'fakeStagingSlot',
+        offsetFromCutoutFixture: [164.0, 0.0, 14.5],
+        matingSurfaceUnitVector: [-1, 1, -1],
+        boundingBox: {
+          xDimension: 128.0,
+          yDimension: 86.0,
+          zDimension: 0,
+        },
+        displayName: 'Slot A4',
+        compatibleModuleTypes: [],
+      },
+      {
+        id: 'fakeC4',
+        areaType: 'fakeStagingSlot',
+        offsetFromCutoutFixture: [164.0, 0.0, 14.5],
+        matingSurfaceUnitVector: [-1, 1, -1],
+        boundingBox: {
+          xDimension: 128.0,
+          yDimension: 86.0,
+          zDimension: 0,
+        },
+        displayName: 'Slot A4',
+        compatibleModuleTypes: [],
+      },
+      {
+        id: 'fakeD4',
+        areaType: 'fakeStagingSlot',
+        offsetFromCutoutFixture: [164.0, 0.0, 14.5],
+        matingSurfaceUnitVector: [-1, 1, -1],
+        boundingBox: {
+          xDimension: 128.0,
+          yDimension: 86.0,
+          zDimension: 0,
+        },
+        displayName: 'Slot A4',
+        compatibleModuleTypes: [],
+      },
+    ],
+    cutouts: [
+      {
+        id: 'cutoutD1',
+        position: [0.0, 0.0, 0.0],
+        displayName: 'Cutout D1',
+      },
+      {
+        id: 'cutoutD2',
+        position: [164.0, 0.0, 0.0],
+        displayName: 'Cutout D2',
+      },
+      {
+        id: 'cutoutD3',
+        position: [328.0, 0.0, 0.0],
+        displayName: 'Cutout D3',
+      },
+      {
+        id: 'cutoutC1',
+        position: [0.0, 107, 0.0],
+        displayName: 'Cutout C1',
+      },
+      {
+        id: 'cutoutC2',
+        position: [164.0, 107, 0.0],
+        displayName: 'Cutout C2',
+      },
+      {
+        id: 'cutoutC3',
+        position: [328.0, 107, 0.0],
+        displayName: 'Cutout C3',
+      },
+      {
+        id: 'cutoutB1',
+        position: [0.0, 214.0, 0.0],
+        displayName: 'Cutout B1',
+      },
+      {
+        id: 'cutoutB2',
+        position: [164.0, 214.0, 0.0],
+        displayName: 'Cutout B2',
+      },
+      {
+        id: 'cutoutB3',
+        position: [328.0, 214.0, 0.0],
+        displayName: 'Cutout B3',
+      },
+      {
+        id: 'cutoutA1',
+        position: [0.0, 321.0, 0.0],
+        displayName: 'Cutout A1',
+      },
+      {
+        id: 'cutoutA2',
+        position: [164.0, 321.0, 0.0],
+        displayName: 'Cutout A2',
+      },
+      {
+        id: 'cutoutA3',
+        position: [328.0, 321.0, 0.0],
+        displayName: 'Cutout A3',
+      },
+    ],
+  },
+  cutoutFixtures: [
+    {
+      id: 'fakeStagingAreaRightSlot',
+      expectOpentronsModuleSerialNumber: false,
+      mayMountTo: ['cutoutD3', 'cutoutC3', 'cutoutB3', 'cutoutA3'],
+      displayName: 'Standard Slot Right',
+      providesAddressableAreas: {
+        cutoutD1: [],
+        cutoutD2: [],
+        cutoutD3: ['D3', 'fakeD4'],
+        cutoutC1: [],
+        cutoutC2: [],
+        cutoutC3: ['C3', 'fakeC4'],
+        cutoutB1: [],
+        cutoutB2: [],
+        cutoutB3: ['B3', 'fakeB4'],
+        cutoutA1: [],
+        cutoutA2: [],
+        cutoutA3: ['A3', 'fakeA4'],
+      },
+      fixtureGroup: {},
+      height: 0,
+    },
+  ],
+}
+
 // TODO(jh 01-15-25): Instead of typing slotId as `string`, type it as `AddressableAreaName`.
 // returns the position associated with a slot id
 export function getPositionFromSlotId(
@@ -160,6 +322,137 @@ export function getAddressableAreaFromSlotId(
       addressableArea => addressableArea.id === slotId
     ) ?? null
   )
+}
+
+export const getCutoutFixtureReplacementIfNeeded = (
+  cutoutFixtureId: CutoutFixtureId,
+  deckDefinition: DeckDefinition
+): CutoutFixtureIdsWithFakes => {
+  if (
+    cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
+    deckDefinition.robot.model === FLEX_ROBOT_TYPE
+  ) {
+    return FAKE_STAGING_AREA_RIGHT_SLOT
+  }
+  return cutoutFixtureId
+}
+
+export const getReplacementFixtureForFixtureRemoval = (
+  cutoutFixtureId: CutoutFixtureIdsWithFakes,
+  cutoutId: CutoutId
+): CutoutFixtureId => {
+  if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
+  } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
+  } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
+    return SINGLE_LEFT_SLOT_FIXTURE
+  }
+  return SINGLE_CENTER_SLOT_FIXTURE
+}
+
+export const getReplacementFixtureForFakeFixture = (
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
+): CutoutFixtureId => {
+  if (cutoutFixtureId === FAKE_STAGING_AREA_RIGHT_SLOT) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
+  }
+  return cutoutFixtureId
+}
+
+export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
+  cutoutFixtures: CutoutConfig[],
+  deckDefinition: DeckDefinition
+): CutoutConfigMap[] => {
+  return cutoutFixtures.reduce<CutoutConfigMap[]>((acc, obj) => {
+    const cutoutFixtureReplacment = getCutoutFixtureReplacementIfNeeded(
+      obj.cutoutFixtureId,
+      deckDefinition
+    )
+
+    const aaPerCutoutFixture = getAAFromCutoutFixtureId(
+      obj.cutoutId,
+      cutoutFixtureReplacment,
+      deckDefinition
+    )
+    aaPerCutoutFixture?.forEach(item => {
+      acc.push({
+        ...obj,
+        addressableAreaId: item,
+        cutoutFixtureId: cutoutFixtureReplacment,
+      })
+    })
+    return acc
+  }, [])
+}
+
+export const filterAAByAreaType = (
+  cutoutFixtures: CutoutConfigMap[],
+  deckDef: DeckDefinition,
+  areaType: AreaTypeWithFakes
+): CutoutConfigMap[] => {
+  const deckDefWithFakeLocations = getDeckDefAAWithFakeAA(deckDef)
+  return cutoutFixtures.filter(({ addressableAreaId }) => {
+    return deckDefWithFakeLocations.locations.addressableAreas.find(
+      aa => aa.id === addressableAreaId && aa.areaType === areaType
+    )
+  })
+}
+
+const getDeckDefAAWithFakeAA = (
+  deckDefinition: DeckDefinition
+): DeckDefinitionWithFakes => {
+  const locationsWithFakeAA = [
+    ...deckDefinition.locations.addressableAreas,
+    ...FAKE_FIXTURES_AND_AA.locations.addressableAreas,
+  ]
+  return {
+    ...deckDefinition,
+    locations: {
+      ...deckDefinition.locations,
+      addressableAreas: locationsWithFakeAA,
+    },
+  }
+}
+
+export const getAALocationForCutoutAndFixtureId = (
+  addressableArea: AddressableAreaNamesWithFakes,
+  deckDefinition: DeckDefinition
+): CoordinateTuple => {
+  const deckDefWithFakeLocations = getDeckDefAAWithFakeAA(deckDefinition)
+  const addressableAreaItem = deckDefWithFakeLocations.locations.addressableAreas.find(
+    (aaItem: AddressableAreaWithFakes) => aaItem.id === addressableArea
+  )
+  if (addressableAreaItem == null) {
+    console.error(`Addressable area ${addressableArea} location was not found.`)
+  }
+  return addressableAreaItem?.offsetFromCutoutFixture ?? [0, 0, 0]
+}
+
+export const getAAFromCutoutFixtureId = (
+  inputCutoutId: CutoutId,
+  cutoutFixtureId: CutoutFixtureIdsWithFakes,
+  deckDefinition: DeckDefinition
+): AddressableAreaNamesWithFakes[] | null => {
+  /**
+   * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
+   */
+  const cutoutFixturesWithFakeFixtures = [
+    ...deckDefinition.cutoutFixtures,
+    ...FAKE_FIXTURES_AND_AA.cutoutFixtures,
+  ]
+  const deckDefWithFakeCutoutFixtures = {
+    ...deckDefinition,
+    cutoutFixtures: cutoutFixturesWithFakeFixtures,
+  }
+  const cutoutFixture = deckDefWithFakeCutoutFixtures.cutoutFixtures.find(
+    fixture => fixture.id === cutoutFixtureId
+  )
+  if (cutoutFixture == null) {
+    console.error(`Cannot find get addressable areas for ${cutoutFixtureId}`)
+    return null
+  }
+  return cutoutFixture?.providesAddressableAreas[inputCutoutId]
 }
 
 export function getCutoutFixtureIdsForModuleModel(
@@ -315,6 +608,12 @@ export function getFixtureDisplayName(
             FLEX_STACKER_MODULE_V1
           )} in USB-${usbPortNumber} and waste chute`
         : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and waste chute`
+    case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
+      return usbPortNumber != null
+        ? `${getModuleDisplayName(
+            FLEX_STACKER_MODULE_V1
+          )} in USB-${usbPortNumber} and magnetic block`
+        : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and magnetic block`
     default:
       return 'Slot'
   }

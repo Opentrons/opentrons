@@ -1,4 +1,5 @@
 import cx from 'classnames'
+
 import styles from './styles.module.css'
 
 import type { Link } from './types'

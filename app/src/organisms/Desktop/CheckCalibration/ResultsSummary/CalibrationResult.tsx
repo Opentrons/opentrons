@@ -2,14 +2,14 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Flex,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  COLORS,
   BORDERS,
-  SPACING,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { RenderResult } from './RenderResult'

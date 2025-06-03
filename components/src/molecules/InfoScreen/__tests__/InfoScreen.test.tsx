@@ -1,9 +1,9 @@
 import { screen } from '@testing-library/react'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '../../../testing/utils'
-import { BORDERS, COLORS } from '../../../helix-design-system'
 import { InfoScreen } from '..'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 

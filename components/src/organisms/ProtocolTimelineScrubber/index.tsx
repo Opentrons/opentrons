@@ -1,17 +1,20 @@
-import { useMemo, useState, useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import ViewportList from 'react-viewport-list'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
-import ViewportList from 'react-viewport-list'
 
+import {
+  FLEX_ROBOT_TYPE,
+  getSimplestDeckConfigForProtocol,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import {
   constructInvariantContextFromRunCommands,
   getResultingTimelineFrameFromRunCommands,
+  getSlotInLocationStack,
+  getTopmostLabwareOnModuleFromStackRobotState,
 } from '@opentrons/step-generation'
-import {
-  FLEX_ROBOT_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  getSimplestDeckConfigForProtocol,
-} from '@opentrons/shared-data'
+
 import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
@@ -25,13 +28,13 @@ import {
   PrimaryButton,
   SPACING,
 } from '../..'
-import { PipetteMountViz } from './PipetteVisuals'
 import { getLabwareDefinitionsFromCommands } from '../CommandText/useCommandTextString/utils/getLabwareDefinitionsFromCommands'
+import { CommandItem } from './CommandItem'
+import { PipetteMountViz } from './PipetteVisuals'
 import {
   getAllWellContentsForActiveItem,
   wellFillFromWellContents,
 } from './utils'
-import { CommandItem } from './CommandItem'
 
 import type { ComponentProps } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'
@@ -146,11 +149,12 @@ export function ProtocolTimelineScrubber(
             robotType={robotType ?? FLEX_ROBOT_TYPE}
             deckConfig={getSimplestDeckConfigForProtocol(analysis)}
             modulesOnDeck={map(robotState.modules, (module, moduleId) => {
-              const labwareInModuleId =
-                Object.entries(robotState.labware).find(
-                  ([labwareId, labware]) => labware.slot === moduleId
-                )?.[0] ?? null
-
+              const topLabwareId = getTopmostLabwareOnModuleFromStackRobotState(
+                moduleId,
+                robotState.labware
+              )
+              const topLabwareEntity =
+                invariantContext.labwareEntities[topLabwareId]
               const getModuleInnerProps = (
                 moduleState: ModuleTemporalProperties['moduleState']
               ): ComponentProps<typeof Module>['innerProps'] => {
@@ -179,36 +183,9 @@ export function ProtocolTimelineScrubber(
                 }
               }
 
-              const adapterId =
-                labwareInModuleId != null
-                  ? invariantContext.labwareEntities[labwareInModuleId].id
-                  : null
-              const labwareTempProperties =
-                adapterId != null
-                  ? Object.entries(robotState.labware).find(
-                      ([labwareId, labware]) => labware.slot === adapterId
-                    )
-                  : null
-
-              const labwareDef =
-                labwareTempProperties != null
-                  ? invariantContext.labwareEntities[labwareTempProperties[0]]
-                      .def
-                  : null
-              let nestedDef
-              let labwareId = null
-              if (labwareDef != null && labwareTempProperties != null) {
-                labwareId = labwareTempProperties[0]
-                nestedDef = labwareDef
-              } else if (labwareInModuleId != null) {
-                labwareId = labwareInModuleId
-                nestedDef =
-                  invariantContext.labwareEntities[labwareInModuleId]?.def
-              }
-
               const wellContents =
-                allWellContentsForActiveItem && labwareId != null
-                  ? allWellContentsForActiveItem[labwareId]
+                allWellContentsForActiveItem && topLabwareEntity != null
+                  ? allWellContentsForActiveItem[topLabwareEntity.id]
                   : null
               const nestedFill = wellFillFromWellContents(
                 wellContents,
@@ -218,7 +195,7 @@ export function ProtocolTimelineScrubber(
               return {
                 moduleModel: invariantContext.moduleEntities[moduleId].model,
                 moduleLocation: { slotName: module.slot },
-                nestedLabwareDef: nestedDef,
+                nestedLabwareDef: topLabwareEntity?.def,
                 nestedLabwareWellFill: nestedFill,
                 innerProps: getModuleInnerProps(module.moduleState),
               }
@@ -237,7 +214,7 @@ export function ProtocolTimelineScrubber(
                   )
                 : {}
               const labwareLocation: LabwareLocation = {
-                slotName: labware.slot,
+                slotName: getSlotInLocationStack(labware.stack),
               }
               const wellContents =
                 allWellContentsForActiveItem && labwareId != null

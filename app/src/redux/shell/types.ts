@@ -1,6 +1,6 @@
+import type { ReleaseNoteInfo } from 'builder-util-runtime'
 import type { IpcMainEvent } from 'electron'
 import type { UpdateFileInfo } from 'electron-updater'
-import type { ReleaseNoteInfo } from 'builder-util-runtime'
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
 

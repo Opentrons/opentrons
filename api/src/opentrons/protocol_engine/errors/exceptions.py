@@ -1281,3 +1281,15 @@ class FlexStackerLabwarePoolNotYetDefinedError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidLabwarePositionError(ProtocolEngineError):
+    """Raised when a labware position is internally invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)

@@ -1,17 +1,17 @@
 import { useEffect, useMemo } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { useRobot } from '/app/redux-resources/robots'
-import { getAttachedPipettes } from '/app/redux/pipettes'
-import { getRobotSettings, fetchSettings } from '/app/redux/robot-settings'
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
   getRobotSerialNumber,
 } from '/app/redux/discovery'
+import { getAttachedPipettes } from '/app/redux/pipettes'
+import { fetchSettings, getRobotSettings } from '/app/redux/robot-settings'
 
-import type { State, Dispatch } from '/app/redux/types'
 import type { RobotAnalyticsData } from '/app/redux/analytics/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 const FF_PREFIX = 'robotFF_'
 

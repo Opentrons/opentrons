@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import thunk from 'redux-thunk'
 import configureMockStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import { saveStepFormsMulti } from '../actions'
 import { getBatchEditFieldChanges } from '../selectors'
 

@@ -1,15 +1,16 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { SkipStepNewTips } from '../SkipStepNewTips'
+
+import { mockRecoveryContentProps } from '../../__fixtures__'
 import { RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
+import { SkipStepNewTips } from '../SkipStepNewTips'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/molecules/Command')
 vi.mock('../SelectRecoveryOption')

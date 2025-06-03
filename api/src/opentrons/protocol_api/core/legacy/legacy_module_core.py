@@ -1,4 +1,5 @@
 """Legacy Protocol API module implementation logic."""
+
 from __future__ import annotations
 
 import logging
@@ -48,7 +49,7 @@ class CannotPerformModuleAction(RuntimeError):
     """An error raised when attempting to execute an invalid module action."""
 
 
-class LegacyModuleCore(AbstractModuleCore):
+class LegacyModuleCore(AbstractModuleCore[LegacyLabwareCore]):
     """Legacy ModuleCore implementation for pre-ProtocolEngine protocols."""
 
     def __init__(
@@ -108,7 +109,9 @@ class LegacyModuleCore(AbstractModuleCore):
         return labware
 
 
-class LegacyTemperatureModuleCore(LegacyModuleCore, AbstractTemperatureModuleCore):
+class LegacyTemperatureModuleCore(
+    LegacyModuleCore, AbstractTemperatureModuleCore[LegacyLabwareCore]
+):
     """Legacy core control implementation for an attached Temperature Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
@@ -142,7 +145,9 @@ class LegacyTemperatureModuleCore(LegacyModuleCore, AbstractTemperatureModuleCor
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
 
-class LegacyMagneticModuleCore(LegacyModuleCore, AbstractMagneticModuleCore):
+class LegacyMagneticModuleCore(
+    LegacyModuleCore, AbstractMagneticModuleCore[LegacyLabwareCore]
+):
     """Core control interface for an attached Magnetic Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck]
@@ -235,7 +240,9 @@ class LegacyMagneticModuleCore(LegacyModuleCore, AbstractMagneticModuleCore):
         return labware
 
 
-class LegacyThermocyclerCore(LegacyModuleCore, AbstractThermocyclerCore):
+class LegacyThermocyclerCore(
+    LegacyModuleCore, AbstractThermocyclerCore[LegacyLabwareCore]
+):
     """Core control interface for an attached Thermocycler Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
@@ -398,7 +405,9 @@ class LegacyThermocyclerCore(LegacyModuleCore, AbstractThermocyclerCore):
             )
 
 
-class LegacyHeaterShakerCore(LegacyModuleCore, AbstractHeaterShakerCore):
+class LegacyHeaterShakerCore(
+    LegacyModuleCore, AbstractHeaterShakerCore[LegacyLabwareCore]
+):
     """Core control interface for an attached Heater-Shaker Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]

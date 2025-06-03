@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { MigrateTestCase, migrateAndMatchSnapshot } from '../support/Import'
+import { migrateAndMatchSnapshot, MigrateTestCase } from '../support/Import'
 import { TestFilePath } from '../support/TestFiles'
 
 describe('Protocol fixtures migrate and match snapshots', () => {

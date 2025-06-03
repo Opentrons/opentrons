@@ -1,10 +1,10 @@
-import { connectionStore } from './store'
 import {
   sendDeserialized,
   sendDeserializedGenericError,
   sendDeserializedRefetch,
 } from './deserialize'
 import { notifyLog } from './notifyLog'
+import { connectionStore } from './store'
 
 import type mqtt from 'mqtt'
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'

@@ -8,8 +8,9 @@ if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
     from opentrons.protocol_api.labware import Well
     from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+    from opentrons.protocol_api._liquid import LiquidClass
 
-from opentrons.types import Location
+from opentrons.types import Location, Mount, AxisMapType
 
 
 # type for subscriptions
@@ -43,6 +44,9 @@ TOUCH_TIP: Final = "command.TOUCH_TIP"
 RETURN_TIP: Final = "command.RETURN_TIP"
 MOVE_TO: Final = "command.MOVE_TO"
 MOVE_TO_DISPOSAL_LOCATION: Final = "command.MOVE_TO_DISPOSAL_LOCATION"
+TRANSFER_WITH_LIQUID_CLASS: Final = "command.TRANSFER_WITH_LIQUID_CLASS"
+DISTRIBUTE_WITH_LIQUID_CLASS: Final = "command.DISTRIBUTE_WITH_LIQUID_CLASS"
+CONSOLIDATE_WITH_LIQUID_CLASS: Final = "command.CONSOLIDATE_WITH_LIQUID_CLASS"
 SEAL: Final = "command.SEAL"
 UNSEAL: Final = "command.UNSEAL"
 PRESSURIZE: Final = "command.PRESSURIZE"
@@ -81,6 +85,13 @@ THERMOCYCLER_WAIT_FOR_LID_TEMP: Final = "command.THERMOCYCLER_WAIT_FOR_LID_TEMP"
 THERMOCYCLER_SET_LID_TEMP: Final = "command.THERMOCYCLER_SET_LID_TEMP"
 THERMOCYCLER_DEACTIVATE_LID: Final = "command.THERMOCYCLER_DEACTIVATE_LID"
 THERMOCYCLER_DEACTIVATE_BLOCK: Final = "command.THERMOCYCLER_DEACTIVATE_BLOCK"
+
+# Robot #
+ROBOT_MOVE_TO: Final = "command.ROBOT_MOVE_TO"
+ROBOT_MOVE_AXES_TO: Final = "command.ROBOT_MOVE_AXES_TO"
+ROBOT_MOVE_RELATIVE_TO: Final = "command.ROBOT_MOVE_RELATIVE_TO"
+ROBOT_OPEN_GRIPPER_JAW: Final = "command.ROBOT_OPEN_GRIPPER_JAW"
+ROBOT_CLOSE_GRIPPER_JAW: Final = "command.ROBOT_CLOSE_GRIPPER_JAW"
 
 
 class TextOnlyPayload(TypedDict):
@@ -540,6 +551,30 @@ class MoveLabwareCommandPayload(TextOnlyPayload):
     pass
 
 
+class LiquidClassCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    liquid_class: LiquidClass
+    volume: float
+    source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]]
+    destination: Union[
+        Well, Sequence[Well], Sequence[Sequence[Well]], TrashBin, WasteChute
+    ]
+
+
+class TransferWithLiquidClassCommand(TypedDict):
+    name: Literal["command.TRANSFER_WITH_LIQUID_CLASS"]
+    payload: LiquidClassCommandPayload
+
+
+class DistributeWithLiquidClassCommand(TypedDict):
+    name: Literal["command.DISTRIBUTE_WITH_LIQUID_CLASS"]
+    payload: LiquidClassCommandPayload
+
+
+class ConsolidateWithLiquidClassCommand(TypedDict):
+    name: Literal["command.CONSOLIDATE_WITH_LIQUID_CLASS"]
+    payload: LiquidClassCommandPayload
+
+
 class SealCommandPayload(TextOnlyPayload):
     instrument: InstrumentContext
     location: Union[None, Location, Well]
@@ -572,6 +607,49 @@ class UnsealCommand(TypedDict):
 class PressurizeCommand(TypedDict):
     name: Literal["command.PRESSURIZE"]
     payload: PressurizeCommandPayload
+
+
+# Robot Commands and Payloads
+class GripperCommandPayload(TextOnlyPayload):
+    pass
+
+
+class RobotMoveToCommandPayload(TextOnlyPayload):
+    location: Location
+    mount: Mount
+
+
+class RobotMoveAxisToCommandPayload(TextOnlyPayload):
+    absolute_axes: AxisMapType
+
+
+class RobotMoveAxisRelativeCommandPayload(TextOnlyPayload):
+    relative_axes: AxisMapType
+
+
+class RobotMoveToCommand(TypedDict):
+    name: Literal["command.ROBOT_MOVE_TO"]
+    payload: RobotMoveToCommandPayload
+
+
+class RobotMoveAxisToCommand(TypedDict):
+    name: Literal["command.ROBOT_MOVE_AXES_TO"]
+    payload: RobotMoveAxisToCommandPayload
+
+
+class RobotMoveAxisRelativeCommand(TypedDict):
+    name: Literal["command.ROBOT_MOVE_RELATIVE_TO"]
+    payload: RobotMoveAxisRelativeCommandPayload
+
+
+class RobotOpenGripperJawCommand(TypedDict):
+    name: Literal["command.ROBOT_OPEN_GRIPPER_JAW"]
+    payload: GripperCommandPayload
+
+
+class RobotCloseGripperJawCommand(TypedDict):
+    name: Literal["command.ROBOT_CLOSE_GRIPPER_JAW"]
+    payload: GripperCommandPayload
 
 
 Command = Union[
@@ -622,9 +700,18 @@ Command = Union[
     MoveToCommand,
     MoveToDisposalLocationCommand,
     MoveLabwareCommand,
+    TransferWithLiquidClassCommand,
+    DistributeWithLiquidClassCommand,
+    ConsolidateWithLiquidClassCommand,
     SealCommand,
     UnsealCommand,
     PressurizeCommand,
+    # Robot commands
+    RobotMoveToCommand,
+    RobotMoveAxisToCommand,
+    RobotMoveAxisRelativeCommand,
+    RobotOpenGripperJawCommand,
+    RobotCloseGripperJawCommand,
 ]
 
 
@@ -674,9 +761,15 @@ CommandPayload = Union[
     MoveToCommandPayload,
     MoveToDisposalLocationCommandPayload,
     MoveLabwareCommandPayload,
+    LiquidClassCommandPayload,
     SealCommandPayload,
     UnsealCommandPayload,
     PressurizeCommandPayload,
+    # Robot payloads
+    RobotMoveToCommandPayload,
+    RobotMoveAxisRelativeCommandPayload,
+    RobotMoveAxisToCommandPayload,
+    GripperCommandPayload,
 ]
 
 
@@ -917,6 +1010,26 @@ class MoveLabwareMessage(CommandMessageFields, MoveLabwareCommand):
     pass
 
 
+class RobotMoveToMessage(CommandMessageFields, RobotMoveToCommand):
+    pass
+
+
+class RobotMoveAxisToMessage(CommandMessageFields, RobotMoveAxisToCommand):
+    pass
+
+
+class RobotMoveAxisRelativeMessage(CommandMessageFields, RobotMoveAxisRelativeCommand):
+    pass
+
+
+class RobotOpenGripperJawMessage(CommandMessageFields, RobotOpenGripperJawCommand):
+    pass
+
+
+class RobotCloseGripperJawMessage(CommandMessageFields, RobotCloseGripperJawCommand):
+    pass
+
+
 CommandMessage = Union[
     DropTipMessage,
     DropTipInDisposalLocationMessage,
@@ -964,4 +1077,10 @@ CommandMessage = Union[
     MoveToMessage,
     MoveToDisposalLocationMessage,
     MoveLabwareMessage,
+    # Robot Messages
+    RobotMoveToMessage,
+    RobotMoveAxisToMessage,
+    RobotMoveAxisRelativeMessage,
+    RobotOpenGripperJawMessage,
+    RobotCloseGripperJawMessage,
 ]

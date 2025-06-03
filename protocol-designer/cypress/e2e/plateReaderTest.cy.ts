@@ -1,7 +1,7 @@
-import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
 import { ModuleSteps, ModuleVerifications } from '../support/ModuleSteps'
-import { UniversalSteps } from '../support/UniversalSteps'
+import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
+import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Plate Reader Happy Path Single-Wavelength', () => {
   beforeEach(() => {
@@ -23,17 +23,17 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.SelectFlex())
     steps.add(SetupVerifications.FlexSelected())
     steps.add(UniversalSteps.Snapshot())
-    steps.add(SetupSteps.Confirm())
     steps.add(SetupVerifications.OnStep2())
     steps.add(SetupSteps.SingleChannelPipette50())
     steps.add(SetupVerifications.StepTwo50uL())
     steps.add(UniversalSteps.Snapshot())
-    steps.add(SetupSteps.Confirm())
+    steps.add(SetupSteps.Save())
     steps.add(SetupVerifications.StepTwoPart3())
     steps.add(UniversalSteps.Snapshot())
-    steps.add(SetupSteps.Confirm())
     steps.add(SetupVerifications.OnStep3())
     steps.add(SetupSteps.NoGripper())
+    steps.add(SetupSteps.NoThermocycler())
+    steps.add(SetupSteps.NoWasteChute())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupVerifications.AbsorbanceNotSelectable())
     steps.add(SetupSteps.GoBack())
@@ -42,14 +42,14 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.AddPlateReader())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.Confirm())
-    steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.EditProtocolA())
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('C3'))
     steps.add(SetupSteps.AddHardwareLabware())
-    steps.add(SetupSteps.ClickLabwareHeader())
+    steps.add(SetupSteps.OpenSelectLabwareModal())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('C3'))
+    steps.add(SetupSteps.AddHardwareLabware())
     steps.add(SetupSteps.AddLiquid())
     steps.add(SetupSteps.ClickLiquidButton())
     steps.add(SetupSteps.DefineLiquid())
@@ -60,14 +60,14 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(UniversalSteps.Snapshot())
     steps.add(SetupSteps.SelectLiquidWells())
     steps.add(SetupSteps.SetVolumeAndSaveForWells('150'))
+    steps.add(SetupSteps.SelectDone())
     // Add another labware
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('D2'))
 
     steps.add(SetupSteps.AddHardwareLabware())
-    steps.add(SetupSteps.ClickLabwareHeader())
+    steps.add(SetupSteps.OpenSelectLabwareModal())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Armadillo 96 Well Plate'))
-    steps.add(SetupSteps.ProtocolStepsH())
     steps.add(SetupSteps.AddStep())
 
     // Move labware attempt to Plate Reader

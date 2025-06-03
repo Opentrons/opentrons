@@ -1,16 +1,16 @@
 // fetch wrapper to throw if response is not ok
 import fs from 'fs'
-import { remove } from 'fs-extra'
-import pump from 'pump'
-import _fetch from 'node-fetch'
-import FormData from 'form-data'
 import { Transform } from 'stream'
+import FormData from 'form-data'
+import { remove } from 'fs-extra'
+import _fetch from 'node-fetch'
+import pump from 'pump'
 
 import { HTTP_API_VERSION } from './constants'
 import { createLogger } from './log'
 
-import type { Readable } from 'stream'
 import type { Request, RequestInit, Response } from 'node-fetch'
+import type { Readable } from 'stream'
 
 const log = createLogger('http')
 
@@ -72,7 +72,7 @@ export function fetchToFile(
 ): Promise<string> {
   return fetch(input, { signal: options?.signal }).then(response => {
     let downloaded = 0
-    const size = Number(response.headers.get('Content-Length')) || null
+    const size = Number(response.headers.get('Content-Length')) ?? null
 
     // with node-fetch, response.body will be a Node.js readable stream
     // rather than a browser-land ReadableStream

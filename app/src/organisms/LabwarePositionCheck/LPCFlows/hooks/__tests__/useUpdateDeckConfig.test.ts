@@ -1,9 +1,10 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { updateLPCDeck } from '/app/redux/protocol-runs'
 
 import { useUpdateDeckConfig } from '../useUpdateDeckConfig'
-import { updateLPCDeck } from '/app/redux/protocol-runs'
 
 vi.mock('react-redux')
 vi.mock('/app/redux/protocol-runs')
@@ -24,7 +25,7 @@ describe('useUpdateDeckConfig', () => {
 
   it('should dispatch updateLPCDeck when runId and deckConfig are provided', () => {
     renderHook(() => {
-      useUpdateDeckConfig(RUN_ID, MOCK_DECK_CONFIG)
+      useUpdateDeckConfig(true, RUN_ID, MOCK_DECK_CONFIG)
     })
 
     expect(mockDispatch).toHaveBeenCalledTimes(1)
@@ -36,7 +37,7 @@ describe('useUpdateDeckConfig', () => {
 
   it('should not dispatch when runId is null', () => {
     renderHook(() => {
-      useUpdateDeckConfig(null, MOCK_DECK_CONFIG)
+      useUpdateDeckConfig(true, null, MOCK_DECK_CONFIG)
     })
 
     expect(mockDispatch).not.toHaveBeenCalled()
@@ -45,7 +46,7 @@ describe('useUpdateDeckConfig', () => {
 
   it('should not dispatch when deckConfig is undefined', () => {
     renderHook(() => {
-      useUpdateDeckConfig(RUN_ID, undefined)
+      useUpdateDeckConfig(true, RUN_ID, undefined)
     })
 
     expect(mockDispatch).not.toHaveBeenCalled()
@@ -54,7 +55,7 @@ describe('useUpdateDeckConfig', () => {
 
   it('should not dispatch when both runId and deckConfig are undefined/null', () => {
     renderHook(() => {
-      useUpdateDeckConfig(null, undefined)
+      useUpdateDeckConfig(true, null, undefined)
     })
 
     expect(mockDispatch).not.toHaveBeenCalled()
@@ -64,10 +65,14 @@ describe('useUpdateDeckConfig', () => {
   it('should re-dispatch when deckConfig changes', () => {
     const { rerender } = renderHook(
       props => {
-        useUpdateDeckConfig(props.runId, props.deckConfig)
+        useUpdateDeckConfig(props.isFlex, props.runId, props.deckConfig)
       },
       {
-        initialProps: { runId: RUN_ID, deckConfig: MOCK_DECK_CONFIG },
+        initialProps: {
+          isFlex: true,
+          runId: RUN_ID,
+          deckConfig: MOCK_DECK_CONFIG,
+        },
       }
     )
 
@@ -75,7 +80,7 @@ describe('useUpdateDeckConfig', () => {
     mockDispatch.mockClear()
 
     const NEW_DECK_CONFIG = { id: 'deck-config-2' } as any
-    rerender({ runId: RUN_ID, deckConfig: NEW_DECK_CONFIG })
+    rerender({ isFlex: true, runId: RUN_ID, deckConfig: NEW_DECK_CONFIG })
 
     expect(mockDispatch).toHaveBeenCalledTimes(1)
     expect(updateLPCDeck).toHaveBeenCalledWith(RUN_ID, NEW_DECK_CONFIG)
@@ -84,21 +89,19 @@ describe('useUpdateDeckConfig', () => {
     )
   })
 
-  it('should not re-dispatch when runId changes but deckConfig remains the same', () => {
-    const { rerender } = renderHook(
+  it('should not dispatch if the robot is not a flex', () => {
+    renderHook(
       props => {
-        useUpdateDeckConfig(props.runId, props.deckConfig)
+        useUpdateDeckConfig(props.isFlex, props.runId, props.deckConfig)
       },
       {
-        initialProps: { runId: RUN_ID, deckConfig: MOCK_DECK_CONFIG },
+        initialProps: {
+          isFlex: false,
+          runId: RUN_ID,
+          deckConfig: MOCK_DECK_CONFIG,
+        },
       }
     )
-
-    expect(mockDispatch).toHaveBeenCalledTimes(1)
-    mockDispatch.mockClear()
-
-    const NEW_RUN_ID = 'run-456'
-    rerender({ runId: NEW_RUN_ID, deckConfig: MOCK_DECK_CONFIG })
 
     expect(mockDispatch).not.toHaveBeenCalled()
   })

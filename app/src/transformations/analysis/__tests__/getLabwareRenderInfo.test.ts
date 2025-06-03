@@ -1,7 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { transfer_settings, ot2DeckDefV5 } from '@opentrons/shared-data'
+import { ot2DeckDefV5, transfer_settings } from '@opentrons/shared-data'
+
 import { getLabwareRenderInfo } from '../getLabwareRenderInfo'
+
 import type {
   CompletedProtocolAnalysis,
   LoadLabwareRunTimeCommand,

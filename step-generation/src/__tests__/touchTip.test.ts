@@ -1,15 +1,17 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { touchTip } from '../commandCreators/atomic/touchTip'
 import {
+  DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
-  makeContext,
   getSuccessResult,
-  getErrorResult,
-  DEFAULT_PIPETTE,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
+
 import type { InvariantContext, RobotState } from '../types'
 
 describe('touchTip', () => {
@@ -58,7 +60,7 @@ describe('touchTip', () => {
       },
     ])
     expect(res.python).toBe(
-      `mockPythonName.touch_tip(mockPythonName["A1"], v_offset=10, speed=10, mm_from_edge=0.2)`
+      `mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=10, speed=10, mm_from_edge=0.2)`
     )
   })
 
@@ -76,7 +78,7 @@ describe('touchTip', () => {
     const res = getSuccessResult(result)
 
     expect(res.python).toBe(
-      `mockPythonName.touch_tip(mockPythonName["A1"], v_offset=10)`
+      `mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=10)`
     )
   })
 

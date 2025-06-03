@@ -1,34 +1,35 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockDropTipWizardContainerProps } from '../__fixtures__'
-import { DropTipWizardContent, DropTipWizardContainer } from '../DropTipWizard'
-import { DropTipWizardHeader } from '../DropTipWizardHeader'
 import { InProgressModal } from '/app/molecules/InProgressModal'
+
+import { mockDropTipWizardContainerProps } from '../__fixtures__'
+import {
+  BEFORE_BEGINNING,
+  BLOWOUT_SUCCESS,
+  CHOOSE_BLOWOUT_LOCATION,
+  CHOOSE_DROP_TIP_LOCATION,
+  CHOOSE_LOCATION_OPTION,
+  CONFIRM_POSITION,
+  DROP_TIP_SUCCESS,
+  POSITION_AND_BLOWOUT,
+  POSITION_AND_DROP_TIP,
+} from '../constants'
+import { DropTipWizardContainer, DropTipWizardContent } from '../DropTipWizard'
+import { DropTipWizardHeader } from '../DropTipWizardHeader'
+import { ErrorInfo } from '../ErrorInfo'
 import { ExitConfirmation } from '../ExitConfirmation'
 import {
   BeforeBeginning,
+  ChooseDeckLocation,
   ChooseLocation,
+  ConfirmPosition,
   JogToPosition,
   Success,
-  ConfirmPosition,
   useConfirmPosition,
-  ChooseDeckLocation,
 } from '../steps'
-import { ErrorInfo } from '../ErrorInfo'
-import {
-  BEFORE_BEGINNING,
-  CHOOSE_BLOWOUT_LOCATION,
-  CHOOSE_DROP_TIP_LOCATION,
-  POSITION_AND_BLOWOUT,
-  POSITION_AND_DROP_TIP,
-  BLOWOUT_SUCCESS,
-  DROP_TIP_SUCCESS,
-  CHOOSE_LOCATION_OPTION,
-  CONFIRM_POSITION,
-} from '../constants'
 
 import type { ComponentProps } from 'react'
 

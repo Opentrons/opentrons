@@ -209,6 +209,10 @@
         "description": "A list of robot decks (by their definition name) not compatible with this module."
       }
     },
+    "uniqueModuleData": {
+      "type": "object",
+      "description": "Unique data used by the module, (e.g. TOF sensor baseline data)"
+    },
     "twoDimensionalRendering": {
       "type": "object",
       "description": "SVG rendering of the module represented as svgson",

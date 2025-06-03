@@ -1,9 +1,10 @@
-import { describe, it, expect, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { useRunningStepCounts } from '../useRunningStepCounts'
+
 import { useLastRunProtocolCommand } from '../useLastRunProtocolCommand'
+import { useRunningStepCounts } from '../useRunningStepCounts'
 
 vi.mock('../useLastRunProtocolCommand')
 vi.mock('/app/resources/runs')

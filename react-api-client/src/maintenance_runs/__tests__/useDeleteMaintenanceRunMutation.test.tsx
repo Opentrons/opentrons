@@ -1,13 +1,15 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { deleteMaintenanceRun } from '@opentrons/api-client'
-import { useHost } from '../../api'
-import { MAINTENANCE_RUN_ID } from '../__fixtures__'
-import { useDeleteMaintenanceRunMutation } from '..'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { HostConfig, EmptyResponse, Response } from '@opentrons/api-client'
+import { deleteMaintenanceRun } from '@opentrons/api-client'
+
+import { useDeleteMaintenanceRunMutation } from '..'
+import { MAINTENANCE_RUN_ID } from '../__fixtures__'
+import { useHost } from '../../api'
+
+import type * as React from 'react'
+import type { EmptyResponse, HostConfig, Response } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

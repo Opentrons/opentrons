@@ -44,7 +44,7 @@ _log = logging.getLogger(__name__)
 
 class Migration10to11(Migration):  # noqa: D101
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
-        """Migrate the persistence directory from schema 9 to 10."""
+        """Migrate the persistence directory from schema 10 to 11."""
         copy_contents(source_dir=source_dir, dest_dir=dest_dir)
 
         with sql_engine_ctx(

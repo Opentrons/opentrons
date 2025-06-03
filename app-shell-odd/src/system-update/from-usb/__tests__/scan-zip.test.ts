@@ -1,8 +1,9 @@
-import { it, describe, expect, vi } from 'vitest'
-import path from 'path'
 import { exec as _exec } from 'child_process'
+import { mkdir, writeFile } from 'fs/promises'
+import path from 'path'
 import { promisify } from 'util'
-import { writeFile, mkdir } from 'fs/promises'
+import { describe, expect, it, vi } from 'vitest'
+
 import { REASONABLE_VERSION_FILE_SIZE_B } from '../../constants'
 import { directoryWithCleanup } from '../../utils'
 import { getVersionFromZipIfValid } from '../scan-zip'

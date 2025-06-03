@@ -1,18 +1,19 @@
-import { describe, beforeEach, afterEach, it, vi, expect } from 'vitest'
-import { renderHook, act, waitFor } from '@testing-library/react'
-import { useSelector, Provider } from 'react-redux'
-import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
+import { Provider, useSelector } from 'react-redux'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { i18n } from '/app/i18n'
 import { LPC_STEP } from '/app/redux/protocol-runs'
+
 import { useLPCHeaderCommands } from '../useLPCHeaderCommands'
 
+import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { UseLPCCommandsResult } from '/app/organisms/LabwarePositionCheck/hooks'
-import type { UseLPCHeaderCommandsProps } from '../useLPCHeaderCommands'
 import type { State } from '/app/redux/types'
-import type { Store } from 'redux'
+import type { UseLPCHeaderCommandsProps } from '../useLPCHeaderCommands'
 
 vi.mock('react-redux', async importOriginal => {
   const actual = await importOriginal<typeof Provider>()
@@ -37,6 +38,7 @@ describe('useLPCHeaderCommands', () => {
   const mockPipette = { id: 'mock-pipette' }
   const mockRunId = 'mock-run-id'
   const mockProceedStep = vi.fn()
+  const mockHandleUnableToDetectProbe = vi.fn()
 
   beforeEach(() => {
     toggleRobotMovingPromise = Promise.resolve()
@@ -55,6 +57,7 @@ describe('useLPCHeaderCommands', () => {
       ),
       handleHomeAndClose: vi.fn(() => handleHomeAndClose),
       handleCloseNoHome: vi.fn(() => handleCloseNoHome),
+      toggleUnableToDetectProbe: mockHandleUnableToDetectProbe,
     } as any
 
     props = {
@@ -62,9 +65,7 @@ describe('useLPCHeaderCommands', () => {
       proceedStep: mockProceedStep,
       goBackLastStep: vi.fn(),
       runId: mockRunId,
-      bannerUtils: {
-        defaultOffsetInfoBanner: { showBanner: false, toggleBanner: vi.fn() },
-      },
+      analytics: {} as any,
     }
 
     store = createStore(vi.fn(), {})
@@ -195,6 +196,18 @@ describe('useLPCHeaderCommands', () => {
 
     await waitFor(() => {
       expect(mockLPCHandlerUtils.handleCloseNoHome).toHaveBeenCalled()
+    })
+  })
+
+  it('should contain a toggle for unable to detect probe', async () => {
+    const { result } = renderHook(() => useLPCHeaderCommands(props), {
+      wrapper,
+    })
+
+    result.current.handleUnableToDetectProbe()
+
+    await waitFor(() => {
+      expect(mockLPCHandlerUtils.toggleUnableToDetectProbe).toHaveBeenCalled()
     })
   })
 })

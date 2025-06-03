@@ -22,8 +22,7 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
 )
 
-from ..types import DeckPoint
-from ..types.liquid_level_detection import LiquidTrackingType
+from ..types import DeckPoint, LiquidTrackingType
 from .pipetting_common import (
     LiquidNotFoundError,
     PipetteIdMixin,
@@ -188,6 +187,12 @@ async def _execute_common(  # noqa: C901
             labware_id=labware_id,
             well_name=well_name,
             well_location=params.wellLocation,
+        )
+        state_view.geometry.validate_probed_height(
+            labware_id=labware_id,
+            well_name=well_name,
+            pipette_id=pipette_id,
+            probed_height=z_pos,
         )
     except PipetteLiquidNotFoundError as exception:
         move_result.state_update.set_pipette_ready_to_aspirate(

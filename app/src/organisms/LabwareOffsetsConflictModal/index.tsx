@@ -4,28 +4,30 @@ import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
+  ModalHeader,
+  ModalShell,
+  PrimaryButton,
+  SecondaryButton,
   SPACING,
   StyledText,
-  ModalShell,
-  ModalHeader,
-  PrimaryButton,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_END,
-  SecondaryButton,
-  ALIGN_CENTER,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck'
 import {
   selectConflictTimestampInfo,
   sourceOffsetsFromDatabase,
   sourceOffsetsFromRun,
 } from '/app/redux/protocol-runs'
-import { SmallButton } from '/app/atoms/buttons'
-import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
 import { formatTimestamp } from '/app/transformations/runs'
 
 import type { IconProps } from '@opentrons/components'
@@ -43,13 +45,19 @@ export function LabwareOffsetsConflictModal({
   const dispatch = useDispatch()
   const tsInfo = useSelector(selectConflictTimestampInfo(runId))
   const tsFormatted = formatTimestamp(tsInfo.timestamp ?? '')
+  const { reportOffsetSourceResolution } = useLPCAnalytics({
+    runId,
+    robotType: FLEX_ROBOT_TYPE,
+  })
 
   const onRunRecordOffsets = (): void => {
     dispatch(sourceOffsetsFromRun(runId))
+    reportOffsetSourceResolution('fromRunRecord')
   }
 
   const onDatabaseOffsets = (): void => {
     dispatch(sourceOffsetsFromDatabase(runId))
+    reportOffsetSourceResolution('fromDatabase')
   }
 
   return createPortal(

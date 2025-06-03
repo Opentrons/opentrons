@@ -2,16 +2,16 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Flex,
-  StyledText,
-  PrimaryButton,
-  Icon,
-  COLORS,
-  SPACING,
-  BORDERS,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
@@ -30,8 +30,6 @@ export function ManageDefaultOffsetBtn({
     <PrimaryButton
       onClick={onClick}
       css={customButtonStyle(isMissingDefaultOffset)}
-      backgroundColor={isMissingDefaultOffset ? '' : COLORS.blue35}
-      color={isMissingDefaultOffset ? '' : COLORS.black90}
     >
       <Flex css={BUTTON_TEXT_CONTAINER_STYLE}>
         {isMissingDefaultOffset && <Icon name="add" css={ADD_ICON_STYLE} />}
@@ -46,13 +44,18 @@ export function ManageDefaultOffsetBtn({
 const customButtonStyle = (
   isMissingDefaultOffset: boolean
 ): FlattenSimpleInterpolation => css`
+  background-color: ${isMissingDefaultOffset ? '' : 'inherit'};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   border-radius: ${BORDERS.borderRadiusFull};
+  border: 1px solid ${COLORS.blue50};
+  color: ${isMissingDefaultOffset ? '' : COLORS.blue50};
 
   &:hover,
   &:focus {
-    background-color: ${isMissingDefaultOffset ? '' : COLORS.blue40};
+    background-color: ${isMissingDefaultOffset ? '' : 'inherit'};
+    color: ${isMissingDefaultOffset ? '' : COLORS.blue60};
     box-shadow: none;
+    border: 1px solid ${isMissingDefaultOffset ? COLORS.blue50 : COLORS.blue60};
   }
   &:focus-visible {
     box-shadow: 0 0 0 3px ${COLORS.yellow50};
@@ -60,6 +63,18 @@ const customButtonStyle = (
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: ${SPACING.spacing16} ${SPACING.spacing24};
+    background-color: ${isMissingDefaultOffset ? COLORS.blue50 : COLORS.blue35};
+    border: none;
+    color: ${isMissingDefaultOffset ? COLORS.white : COLORS.black90};
+
+    &:hover,
+    &:focus,
+    &:focus-visible {
+      background-color: ${isMissingDefaultOffset ? '' : COLORS.blue40};
+      border: none;
+      color: ${isMissingDefaultOffset ? COLORS.white : COLORS.black90};
+      box-shadow: none;
+    }
   }
 `
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   Btn,
@@ -11,17 +12,18 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Modal,
   PrimaryButton,
-  SPACING,
   SecondaryButton,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../constants'
 import { getIsTouchTipField } from '../../../form-types'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
-import * as utils from './utils'
 import { TOO_MANY_DECIMALS } from './constants'
 import { TipPositionZOnlyView } from './TipPositionZOnlyView'
+import * as utils from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { StepFieldName } from '../../../form-types'
@@ -101,8 +103,6 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
 
   const errorText = utils.getErrorText({
     errors,
-    minMm,
-    maxMm,
     isPristine,
     t,
   })

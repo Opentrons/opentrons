@@ -1,7 +1,8 @@
 import logging
 from logging.config import dictConfig
+from logging.handlers import QueueListener, RotatingFileHandler
 import sys
-from typing import Any, Dict
+from queue import Queue
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 
@@ -12,11 +13,33 @@ else:
     SENSOR_LOG_NAME = "unused"
 
 
-def _host_config(level_value: int) -> Dict[str, Any]:
+# We want this big enough to smooth over any temporary stalls in journald's ability
+# to consume our records--but bounded, so if we consistently outpace journald for
+# some reason, we don't leak memory or get latency from buffer bloat.
+# 50000 is basically an arbitrary guess.
+_LOG_QUEUE_SIZE = 50000
+
+
+log_queue = Queue[logging.LogRecord](maxsize=_LOG_QUEUE_SIZE)
+"""A buffer through which log records will pass.
+
+This is intended to work around problems when our logs are going to journald:
+we think journald can block for a while when it flushes records to the filesystem,
+and the backpressure from that will cause calls like `log.debug()` to block and
+interfere with timing-sensitive hardware control.
+https://github.com/Opentrons/opentrons/issues/18034
+
+`log_init()` will configure all the logs that this package knows about to pass through
+this queue. This queue is exposed so consumers of this package (i.e. robot-server)
+can do the same thing with their own logs, which is important to preserve ordering.
+"""
+
+
+def _config_for_host(level_value: int) -> None:
     serial_log_filename = CONFIG["serial_log_file"]
     api_log_filename = CONFIG["api_log_file"]
     sensor_log_filename = CONFIG["sensor_log_file"]
-    return {
+    config = {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
@@ -90,13 +113,20 @@ def _host_config(level_value: int) -> Dict[str, Any]:
         },
     }
 
+    dictConfig(config)
 
-def _buildroot_config(level_value: int) -> Dict[str, Any]:
+
+def _config_for_robot(level_value: int) -> None:
     # Import systemd.journald here since it is generally unavailble on non
     # linux systems and we probably don't want to use it on linux desktops
     # either
+    from systemd.journal import JournalHandler  # type: ignore
+
     sensor_log_filename = CONFIG["sensor_log_file"]
-    return {
+
+    sensor_log_queue = Queue[logging.LogRecord](maxsize=_LOG_QUEUE_SIZE)
+
+    config = {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
@@ -104,36 +134,38 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
         },
         "handlers": {
             "api": {
-                "class": "systemd.journal.JournalHandler",
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "opentrons-api",
+                "extra": {"SYSLOG_IDENTIFIER": "opentrons-api"},
+                "queue": log_queue,
             },
             "serial": {
-                "class": "systemd.journal.JournalHandler",
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "opentrons-api-serial",
+                "extra": {"SYSLOG_IDENTIFIER": "opentrons-api-serial"},
+                "queue": log_queue,
             },
             "can_serial": {
-                "class": "systemd.journal.JournalHandler",
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "opentrons-api-serial-can",
+                "extra": {"SYSLOG_IDENTIFIER": "opentrons-api-serial-can"},
+                "queue": log_queue,
             },
             "usbbin_serial": {
-                "class": "systemd.journal.JournalHandler",
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "opentrons-api-serial-usbbin",
+                "extra": {"SYSLOG_IDENTIFIER": "opentrons-api-serial-usbbin"},
+                "queue": log_queue,
             },
             "sensor": {
-                "class": "logging.handlers.RotatingFileHandler",
-                "formatter": "message_only",
-                "filename": sensor_log_filename,
-                "maxBytes": 1000000,
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
-                "backupCount": 3,
+                "formatter": "message_only",
+                "queue": sensor_log_queue,
             },
         },
         "loggers": {
@@ -169,12 +201,47 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
         },
     }
 
+    # Start draining from the queue and sending messages to journald.
+    # Then, stash the queue listener in a global variable so it doesn't get garbage-collected.
+    # I don't know if we actually need to do this, but let's not find out the hard way.
+    global _queue_listener
+    if _queue_listener is not None:
+        # In case this log init function was called multiple times for some reason.
+        _queue_listener.stop()
+    _queue_listener = QueueListener(log_queue, JournalHandler())
+    _queue_listener.start()
 
-def _config(arch: SystemArchitecture, level_value: int) -> Dict[str, Any]:
-    return {
-        SystemArchitecture.YOCTO: _buildroot_config,
-        SystemArchitecture.BUILDROOT: _buildroot_config,
-        SystemArchitecture.HOST: _host_config,
+    # Sensor logs are a special one-off thing that go to their own file instead of journald.
+    # We apply the same QueueListener performance workaround for basically the same reasons.
+    sensor_rotating_file_handler = RotatingFileHandler(
+        filename=sensor_log_filename, maxBytes=1000000, backupCount=3
+    )
+    sensor_rotating_file_handler.setLevel(logging.DEBUG)
+    sensor_rotating_file_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
+    global _sensor_queue_listener
+    if _sensor_queue_listener is not None:
+        _sensor_queue_listener.stop()
+    _sensor_queue_listener = QueueListener(
+        sensor_log_queue, sensor_rotating_file_handler
+    )
+    _sensor_queue_listener.start()
+
+    dictConfig(config)
+
+    # TODO(2025-04-15): We need some kind of log_deinit() function to call
+    # queue_listener.stop() before the process ends. Not doing that means we're
+    # dropping some records when the process shuts down.
+
+
+_queue_listener: QueueListener | None = None
+_sensor_queue_listener: QueueListener | None = None
+
+
+def _config(arch: SystemArchitecture, level_value: int) -> None:
+    {
+        SystemArchitecture.YOCTO: _config_for_robot,
+        SystemArchitecture.BUILDROOT: _config_for_robot,
+        SystemArchitecture.HOST: _config_for_host,
     }[arch](level_value)
 
 
@@ -191,6 +258,8 @@ def log_init(level_name: str) -> None:
             f"Defaulting to {fallback_log_level}\n"
         )
         ot_log_level = fallback_log_level
+
+    # todo(mm, 2025-04-14): Use logging.getLevelNamesMapping() when we have Python >=3.11.
     level_value = logging._nameToLevel[ot_log_level]
-    logging_config = _config(ARCHITECTURE, level_value)
-    dictConfig(logging_config)
+
+    _config(ARCHITECTURE, level_value)

@@ -1,7 +1,7 @@
 import {
   ALIGN_CENTER,
-  COLORS,
   Check,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -10,8 +10,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { InputStepFormField } from '../InputStepFormField'
 import { ToggleButton } from '../../atoms'
+import { InputStepFormField } from '../InputStepFormField'
+
 import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
 
 interface ToggleExpandStepFormFieldProps extends FieldProps {
@@ -44,7 +45,6 @@ export function ToggleExpandStepFormField(
     name,
     ...restProps
   } = props
-
   const resetFieldValue = (): void => {
     restProps.updateValue(null)
   }

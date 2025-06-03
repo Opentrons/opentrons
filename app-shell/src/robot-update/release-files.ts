@@ -2,19 +2,19 @@
 import assert from 'assert'
 import path from 'path'
 import { promisify } from 'util'
-import tempy from 'tempy'
-import { move, readdir, remove, readFile } from 'fs-extra'
-import StreamZip from 'node-stream-zip'
+import { move, readdir, readFile, remove } from 'fs-extra'
 import getStream from 'get-stream'
+import StreamZip from 'node-stream-zip'
+import tempy from 'tempy'
 
-import { createLogger } from '../log'
 import { fetchToFile } from '../http'
+import { createLogger } from '../log'
 import { CURRENT_VERSION } from '../update'
 
 import type { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
-import type { Dispatch } from '../types'
 import type { DownloadProgress } from '../http'
-import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
+import type { Dispatch } from '../types'
+import type { ReleaseSetFilepaths, ReleaseSetUrls, UserFileInfo } from './types'
 
 const VERSION_FILENAME = 'VERSION.json'
 

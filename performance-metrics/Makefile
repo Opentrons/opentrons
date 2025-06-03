@@ -50,7 +50,7 @@ setup:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: clean
 clean:

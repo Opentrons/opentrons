@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { ERROR_KINDS, DEFINED_ERROR_TYPES } from '../../constants'
+import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
 import { getErrorKind } from '../getErrorKind'
 
 import type { RunCommandError, RunTimeCommand } from '@opentrons/shared-data'
@@ -58,9 +58,34 @@ describe('getErrorKind', () => {
       expectedError: ERROR_KINDS.GRIPPER_ERROR,
     },
     {
+      commandType: 'flexStacker/retrieve',
+      errorType: DEFINED_ERROR_TYPES.LABWARE_MISSING_IN_SHUTTLE,
+      expectedError: ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE,
+    },
+    {
+      commandType: 'flexStacker/retrieve',
+      errorType: DEFINED_ERROR_TYPES.HOPPER_LABWARE_MISSING,
+      expectedError: ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
+    },
+    {
+      commandType: 'flexStacker/retrieve',
+      errorType: DEFINED_ERROR_TYPES.SHUTTLE_MISSING,
+      expectedError: ERROR_KINDS.SHUTTLE_MISSING,
+    },
+    {
+      commandType: 'flexStacker/retrieve',
+      errorType: DEFINED_ERROR_TYPES.STACKER_STALL,
+      expectedError: ERROR_KINDS.STALL_WHILE_STACKING,
+    },
+    {
       commandType: 'aspirate',
       errorType: DEFINED_ERROR_TYPES.OVERPRESSURE,
       isDefined: false,
+      expectedError: ERROR_KINDS.GENERAL_ERROR,
+    },
+    {
+      commandType: 'aspirate',
+      errorType: 'someHithertoUnknownDefinedErrorType',
       expectedError: ERROR_KINDS.GENERAL_ERROR,
     },
     {

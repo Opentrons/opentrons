@@ -1,9 +1,11 @@
+import path from 'path'
+import cloneDeep from 'lodash/cloneDeep'
+import semver from 'semver'
+
+import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { getTestFile, TestFile, TestFilePath } from './TestFiles'
-import path from 'path'
-import semver from 'semver'
-import cloneDeep from 'lodash/cloneDeep'
-import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
 
 export interface MigrateTestCase {
   title: string
@@ -89,7 +91,6 @@ export const migrateAndMatchSnapshot = ({
     cy.get('div').contains(ContentStrings.unusedHardwareWarning).should('exist')
     cy.contains(ContentStrings.continueWithExport).click({ force: true })
   }
-
   const expectedProtocol: TestFile = getTestFile(expectedTestFile)
 
   cy.readFile(expectedProtocol.path).then(expectedProtocolRead => {

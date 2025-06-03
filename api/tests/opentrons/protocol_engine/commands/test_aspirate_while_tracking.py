@@ -24,7 +24,7 @@ from opentrons.protocol_engine.commands.command import SuccessData, DefinedError
 from opentrons.protocol_engine.errors.exceptions import PipetteNotReadyToAspirateError
 from opentrons.protocol_engine.notes import CommandNoteAdder
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state.state import StateStore
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 from opentrons.protocol_engine.types import (
     CurrentWell,
@@ -41,33 +41,9 @@ from opentrons.protocol_engine.state import update_types
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
-
-
-@pytest.fixture
-def state_store(decoy: Decoy) -> StateStore:
-    """Get a mock in the shape of a StateStore."""
-    return decoy.mock(cls=StateStore)
-
-
-@pytest.fixture
-def pipetting(decoy: Decoy) -> PipettingHandler:
-    """Get a mock in the shape of a PipettingHandler."""
-    return decoy.mock(cls=PipettingHandler)
-
-
-@pytest.fixture
-def movement(decoy: Decoy) -> MovementHandler:
-    """Get a mock in the shape of a MovementHandler."""
-    return decoy.mock(cls=MovementHandler)
-
-
-@pytest.fixture
 def subject(
     pipetting: PipettingHandler,
-    state_store: StateStore,
+    state_view: StateView,
     hardware_api: HardwareAPI,
     mock_command_note_adder: CommandNoteAdder,
     model_utils: ModelUtils,
@@ -78,7 +54,7 @@ def subject(
     return AspirateWhileTrackingImplementation(
         pipetting=pipetting,
         hardware_api=hardware_api,
-        state_view=state_store,
+        state_view=state_view,
         command_note_adder=mock_command_note_adder,
         model_utils=model_utils,
         gantry_mover=gantry_mover,
@@ -110,7 +86,8 @@ async def test_aspirate_while_tracking_implementation(
     decoy: Decoy,
     gantry_mover: GantryMover,
     pipetting: PipettingHandler,
-    state_store: StateStore,
+    movement: MovementHandler,
+    state_view: StateView,
     hardware_api: HardwareAPI,
     mock_command_note_adder: CommandNoteAdder,
     subject: AspirateWhileTrackingImplementation,
@@ -132,15 +109,14 @@ async def test_aspirate_while_tracking_implementation(
         flowRate=1.234,
     )
     decoy.when(
-        state_store.geometry.get_nozzles_per_well(
+        state_view.geometry.get_nozzles_per_well(
             labware_id=stateupdateLabware,
             target_well_name=stateupdateWell,
             pipette_id="pipette-id-abc",
         )
     ).then_return(2)
-
     decoy.when(
-        state_store.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
             stateupdateLabware, stateupdateWell, "pipette-id-abc"
         )
     ).then_return(["A3", "A4"])
@@ -150,9 +126,9 @@ async def test_aspirate_while_tracking_implementation(
         )
     ).then_return(True)
 
-    decoy.when(
-        state_store.pipettes.get_ready_to_aspirate("pipette-id-abc")
-    ).then_return(True)
+    decoy.when(state_view.pipettes.get_ready_to_aspirate("pipette-id-abc")).then_return(
+        True
+    )
 
     decoy.when(
         await pipetting.aspirate_while_tracking(
@@ -169,25 +145,22 @@ async def test_aspirate_while_tracking_implementation(
         Point(1, 2, 3)
     )
 
-    decoy.when(state_store.pipettes.get_current_location()).then_return(location)
+    decoy.when(state_view.pipettes.get_current_location()).then_return(location)
 
     _well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.MENISCUS, offset=WellOffset(x=0.0, y=0.0, z=1.0)
     )
-    _current_well = CurrentWell(
-        pipette_id="pipette-id-abc", labware_id="funky-labware", well_name="funky-well"
-    )
     decoy.when(
-        await subject._movement.move_to_well(
+        await movement.move_to_well(
             pipette_id="pipette-id-abc",
             labware_id="funky-labware",
             well_name="funky-well",
             well_location=_well_location,
-            current_well=_current_well,
+            current_well=None,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=-123.0,
+            operation_volume=-123,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -219,7 +192,12 @@ async def test_aspirate_while_tracking_implementation(
                 pipette_aspirated_fluid=update_types.PipetteAspiratedFluidUpdate(
                     pipette_id="pipette-id-abc",
                     fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=123),
-                )
+                ),
+                liquid_operated=update_types.LiquidOperatedUpdate(
+                    labware_id="funky-labware",
+                    well_names=["A3", "A4"],
+                    volume_added=-246.0,
+                ),
             ),
         )
 
@@ -228,7 +206,7 @@ async def test_handle_aspirate_while_tracking_request_not_ready_to_aspirate(
     decoy: Decoy,
     gantry_mover: GantryMover,
     pipetting: PipettingHandler,
-    state_store: StateStore,
+    state_view: StateView,
     hardware_api: HardwareAPI,
     subject: AspirateWhileTrackingImplementation,
 ) -> None:
@@ -254,9 +232,9 @@ async def test_handle_aspirate_while_tracking_request_not_ready_to_aspirate(
         )
     ).then_return(False)
 
-    decoy.when(
-        state_store.pipettes.get_ready_to_aspirate("pipette-id-abc")
-    ).then_return(False)
+    decoy.when(state_view.pipettes.get_ready_to_aspirate("pipette-id-abc")).then_return(
+        False
+    )
     with pytest.raises(
         PipetteNotReadyToAspirateError,
         match="Pipette cannot aspirate while tracking because of a previous blow out."
@@ -269,10 +247,11 @@ async def test_handle_aspirate_while_tracking_request_not_ready_to_aspirate(
 async def test_aspirate_raises_volume_error(
     decoy: Decoy,
     pipetting: PipettingHandler,
+    movement: MovementHandler,
     subject: AspirateWhileTrackingImplementation,
     mock_command_note_adder: CommandNoteAdder,
     gantry_mover: GantryMover,
-    state_store: StateStore,
+    state_view: StateView,
 ) -> None:
     """Should raise an assertion error for volume larger than working volume."""
     well_location = LiquidHandlingWellLocation(
@@ -294,9 +273,9 @@ async def test_aspirate_raises_volume_error(
         pipetting.get_is_ready_to_aspirate(pipette_id="pipette-id-abc")
     ).then_return(True)
 
-    decoy.when(
-        state_store.pipettes.get_ready_to_aspirate("pipette-id-abc")
-    ).then_return(True)
+    decoy.when(state_view.pipettes.get_ready_to_aspirate("pipette-id-abc")).then_return(
+        True
+    )
     decoy.when(
         await pipetting.aspirate_while_tracking(
             pipette_id="pipette-id-abc",
@@ -311,20 +290,17 @@ async def test_aspirate_raises_volume_error(
     _well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.MENISCUS, offset=WellOffset(x=0.0, y=0.0, z=1.0)
     )
-    _current_well = CurrentWell(
-        pipette_id="pipette-id-abc", labware_id="funky-labware", well_name="funky-well"
-    )
     decoy.when(
-        await subject._movement.move_to_well(
+        await movement.move_to_well(
             pipette_id="pipette-id-abc",
             labware_id="funky-labware",
             well_name="funky-well",
             well_location=_well_location,
-            current_well=_current_well,
+            current_well=None,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=-50.0,
+            operation_volume=-50,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -352,10 +328,11 @@ async def test_overpressure_error(
     decoy: Decoy,
     gantry_mover: GantryMover,
     pipetting: PipettingHandler,
+    movement: MovementHandler,
     subject: AspirateWhileTrackingImplementation,
     model_utils: ModelUtils,
     mock_command_note_adder: CommandNoteAdder,
-    state_store: StateStore,
+    state_view: StateView,
     location: CurrentPipetteLocation | None,
     stateupdateLabware: str,
     stateupdateWell: str,
@@ -368,16 +345,15 @@ async def test_overpressure_error(
     error_id = "error-id"
     error_timestamp = datetime(year=2020, month=1, day=2)
     decoy.when(
-        state_store.geometry.get_nozzles_per_well(
+        state_view.geometry.get_nozzles_per_well(
             labware_id=stateupdateLabware,
             target_well_name=stateupdateWell,
             pipette_id="pipette-id-abc",
         )
     ).then_return(2)
-
     decoy.when(
-        state_store.geometry.get_wells_covered_by_pipette_with_active_well(
-            stateupdateLabware, stateupdateWell, "pipette-id-abc"
+        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+            "funky-labware", "funky-well", "pipette-id-abc"
         )
     ).then_return(["A3", "A4"])
     well_location = LiquidHandlingWellLocation(
@@ -397,7 +373,7 @@ async def test_overpressure_error(
         True
     )
 
-    decoy.when(state_store.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
+    decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
 
     decoy.when(
         await pipetting.aspirate_while_tracking(
@@ -413,25 +389,22 @@ async def test_overpressure_error(
     decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(model_utils.get_timestamp()).then_return(error_timestamp)
     decoy.when(await gantry_mover.get_position(pipette_id)).then_return(position)
-    decoy.when(state_store.pipettes.get_current_location()).then_return(location)
+    decoy.when(state_view.pipettes.get_current_location()).then_return(location)
 
     _well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.MENISCUS, offset=WellOffset(x=0.0, y=0.0, z=1.0)
     )
-    _current_well = CurrentWell(
-        pipette_id="pipette-id-abc", labware_id="funky-labware", well_name="funky-well"
-    )
     decoy.when(
-        await subject._movement.move_to_well(
+        await movement.move_to_well(
             pipette_id=pipette_id,
             labware_id="funky-labware",
             well_name="funky-well",
             well_location=_well_location,
-            current_well=_current_well,
+            current_well=None,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=-50.0,
+            operation_volume=-50,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -443,7 +416,7 @@ async def test_overpressure_error(
                 id=error_id,
                 createdAt=error_timestamp,
                 wrappedErrors=[matchers.Anything()],
-                errorInfo={"retryLocation": (position.x, position.y, position.z)},
+                errorInfo={"retryLocation": (4, 5, 6)},
             ),
             state_update=update_types.StateUpdate(
                 liquid_operated=update_types.LiquidOperatedUpdate(
@@ -462,11 +435,16 @@ async def test_overpressure_error(
                 id=error_id,
                 createdAt=error_timestamp,
                 wrappedErrors=[matchers.Anything()],
-                errorInfo={"retryLocation": (position.x, position.y, position.z)},
+                errorInfo={"retryLocation": (4, 5, 6)},
             ),
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                     pipette_id="pipette-id-abc"
-                )
+                ),
+                liquid_operated=update_types.LiquidOperatedUpdate(
+                    labware_id="funky-labware",
+                    well_names=["A3", "A4"],
+                    volume_added=update_types.CLEAR,
+                ),
             ),
         )

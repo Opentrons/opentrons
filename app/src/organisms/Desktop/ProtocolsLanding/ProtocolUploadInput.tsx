@@ -1,23 +1,25 @@
-import { useTranslation, Trans } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   ERROR_TOAST,
   Flex,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
-import { UploadInput } from '/app/molecules/UploadInput'
-import { addProtocol } from '/app/redux/protocol-storage'
-import {
-  useTrackEvent,
-  ANALYTICS_IMPORT_PROTOCOL_TO_APP,
-} from '/app/redux/analytics'
+
 import { useLogger } from '/app/logger'
+import { UploadInput } from '/app/molecules/UploadInput'
 import { useToaster } from '/app/organisms/ToasterOven'
+import {
+  ANALYTICS_IMPORT_PROTOCOL_TO_APP,
+  useTrackEvent,
+} from '/app/redux/analytics'
+import { addProtocol } from '/app/redux/protocol-storage'
 import { remote } from '/app/redux/shell/remote'
 
 import type { Dispatch } from '/app/redux/types'

@@ -1,9 +1,9 @@
 import {
-  StyledText,
-  RESPONSIVENESS,
-  Flex,
   ALIGN_CENTER,
+  Flex,
   JUSTIFY_FLEX_START,
+  RESPONSIVENESS,
+  StyledText,
 } from '@opentrons/components'
 
 export interface CommandIndexProps {

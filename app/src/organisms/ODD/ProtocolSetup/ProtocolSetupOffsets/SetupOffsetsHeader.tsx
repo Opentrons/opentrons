@@ -1,24 +1,29 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 import {
   Chip,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
-import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { SmallButton } from '/app/atoms/buttons'
-import { useTranslation } from 'react-i18next'
-import type { ProtocolSetupOffsetsProps } from '/app/organisms/ODD/ProtocolSetup'
-import { css } from 'styled-components'
+import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useDispatch, useSelector } from 'react-redux'
 import {
   appliedOffsetsToRun,
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectLabwareOffsetsToAddToRun,
 } from '/app/redux/protocol-runs'
-import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
-import { useState } from 'react'
 import { useUpdateClientLPC } from '/app/resources/client_data'
+
+import type { ProtocolSetupOffsetsProps } from '/app/organisms/ODD/ProtocolSetup'
 
 export function SetupOffsetsHeader({
   runId,
@@ -28,6 +33,10 @@ export function SetupOffsetsHeader({
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
   const { makeSnackbar } = useToaster()
+  const { reportApplyOffsets } = useLPCAnalytics({
+    runId,
+    robotType: FLEX_ROBOT_TYPE,
+  })
   const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
   const isNecessaryDefaultOffsetMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
@@ -50,6 +59,7 @@ export function SetupOffsetsHeader({
         )
           .then(() => {
             dispatch(appliedOffsetsToRun(runId))
+            reportApplyOffsets()
             updateWithRunId(runId)
             setSetupScreen('prepare to run')
           })
@@ -86,6 +96,7 @@ export function SetupOffsetsHeader({
           buttonCategory="rounded"
           iconPlacement="startIcon"
           iconName={isApplyOffsets ? 'ot-spinner' : null}
+          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
         />
       )}
     </Flex>

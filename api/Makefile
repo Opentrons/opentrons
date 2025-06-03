@@ -90,7 +90,7 @@ clean: docs-clean
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)
@@ -124,12 +124,12 @@ test-ot2:
 .PHONY: lint
 lint:
 	$(python) -m mypy src tests
-	$(python) -m black --check src tests setup.py
+	$(python) -m black --check src tests docs/v2/example_protocols setup.py
 	$(python) -m flake8 src tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black src tests setup.py
+	$(python) -m black src tests docs/v2/example_protocols setup.py
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
@@ -155,11 +155,11 @@ docs/dist/%: docs/root/%
 	$(SHX) cp -R docs/root/* docs/dist/
 
 .PHONY: docs
-docs: docs/dist/index.html docs/dist/v1 docs/dist/v2 docs/dist/ot1 docs/dist/hardware
+docs: docs/dist/v2 docs/dist/hardware
 
 .PHONY: docs-clean
 docs-clean:
-	$(SHX) rm -rf docs/dist docs/build
+	$(SHX) rm -rf docs/dist/v2 docs/dist/hardware docs/build
 
 .PHONY: dev
 dev:

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import last from 'lodash/last'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import first from 'lodash/first'
+import last from 'lodash/last'
 import { css } from 'styled-components'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
@@ -23,27 +23,28 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import {
-  useProtocolQuery,
   useInstrumentsQuery,
-  useDoorQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
-  getModuleDisplayName,
   getFixtureDisplayName,
+  getModuleDisplayName,
 } from '@opentrons/shared-data'
 
-import { useRobotType } from '/app/redux-resources/robots'
+import { useScrollPosition } from '/app/local-resources/dom-utils'
+import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import {
-  useRobotAnalyticsData,
-  useTrackProtocolRunEvent,
-} from '/app/redux-resources/analytics'
-import { useAttachedModules } from '/app/resources/modules'
-
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
+  NOT_CONFIGURED,
+  useIsDoorOpen,
+} from '/app/organisms/DoorOpenControl/useIsDoorOpen'
+import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   AnalysisFailedModal,
+  getUnmatchedModulesForProtocol,
   ProtocolSetupDeckConfiguration,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
@@ -52,41 +53,23 @@ import {
   ProtocolSetupStep,
   ProtocolSetupStepSkeleton,
   ProtocolSetupTitleSkeleton,
-  getUnmatchedModulesForProtocol,
-  getIncompleteInstrumentCount,
   ViewOnlyParameters,
 } from '/app/organisms/ODD/ProtocolSetup'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
-import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
+import {
+  useRobotAnalyticsData,
+  useTrackProtocolRunEvent,
+} from '/app/redux-resources/analytics'
+import { useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
-import { ConfirmAttachedModal } from './ConfirmAttachedModal'
-import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
-import { CloseButton, PlayButton } from './Buttons'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
-import {
-  useNotifyRunQuery,
-  useRunStatus,
-  useLPCDisabledReason,
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
-} from '/app/resources/runs'
-import { useScrollPosition } from '/app/local-resources/dom-utils'
-import {
-  getLabwareSetupItemGroups,
-  getProtocolUsesGripper,
-  useRequiredProtocolHardwareFromAnalysis,
-  useMissingProtocolHardwareFromAnalysis,
-} from '/app/transformations/commands'
-import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import {
   OFFSETS_CONFLICT,
   selectAreOffsetsApplied,
@@ -95,22 +78,42 @@ import {
   selectOffsetSource,
   selectTotalCountLocationSpecificOffsets,
 } from '/app/redux/protocol-runs'
-import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { useAttachedModules } from '/app/resources/modules'
+import {
+  useLPCDisabledReason,
+  useModuleCalibrationStatus,
+  useNotifyRunQuery,
+  useProtocolAnalysisErrors,
+  useRunStatus,
+} from '/app/resources/runs'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import {
+  getLabwareSetupItemGroups,
+  getProtocolUsesGripper,
+  useMissingProtocolHardwareFromAnalysis,
+  useRequiredProtocolHardwareFromAnalysis,
+} from '/app/transformations/commands'
 
-import type { Dispatch, SetStateAction } from 'react'
+import { CloseButton, PlayButton } from './Buttons'
+import { ConfirmAttachedModal } from './ConfirmAttachedModal'
+import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
+
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { Run } from '@opentrons/api-client'
+import type { Dispatch, SetStateAction } from 'react'
+import type { Run, RunStatus } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '/app/App/types'
+import type {
+  ProtocolSetupStepProps,
+  SetupScreens,
+} from '/app/organisms/ODD/ProtocolSetup'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type {
-  SetupScreens,
-  ProtocolSetupStepProps,
-} from '/app/organisms/ODD/ProtocolSetup'
-import type {
-  ProtocolHardware,
   ProtocolFixture,
+  ProtocolHardware,
 } from '/app/transformations/commands'
 
 const FETCH_DURATION_MS = 5000
@@ -118,6 +121,7 @@ const FETCH_DURATION_MS = 5000
 const ANALYSIS_POLL_MS = 5000
 interface PrepareToRunProps {
   runId: string
+  runStatus: RunStatus | null
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   confirmAttachment: () => void
   confirmStepsComplete: () => void
@@ -131,6 +135,7 @@ interface PrepareToRunProps {
 
 function PrepareToRun({
   runId,
+  runStatus,
   setSetupScreen,
   confirmAttachment,
   play,
@@ -173,11 +178,6 @@ function PrepareToRun({
       refetchInterval: ANALYSIS_POLL_MS,
     }
   )
-
-  const runStatus = useRunStatus(runId)
-  if (runStatus === RUN_STATUS_STOPPED) {
-    navigate('/protocols')
-  }
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
@@ -353,8 +353,24 @@ function PrepareToRun({
     areFixturesReady &&
     offsetsConfirmed
   const onPlay = (): void => {
-    if (isDoorOpen) {
-      makeSnackbar(t('shared:close_robot_door') as string)
+    if (doorStatus.isDoorOpen) {
+      if (
+        doorStatus.moduleDoorLocation !== null &&
+        doorStatus.moduleDoorLocation !== NOT_CONFIGURED
+      ) {
+        makeSnackbar(
+          t('shared:close_stacker_door', {
+            module_door_location: doorStatus.moduleDoorLocation,
+          }) as string
+        )
+      } else if (
+        doorStatus.moduleDoorLocation !== null &&
+        doorStatus.moduleDoorLocation === NOT_CONFIGURED
+      ) {
+        makeSnackbar(t('shared:close_unconfigured_stacker_door') as string)
+      } else {
+        makeSnackbar(t('shared:close_robot_door') as string)
+      }
     } else {
       if (isReadyToRun) {
         if (runStatus === RUN_STATUS_IDLE && !labwareConfirmed) {
@@ -510,7 +526,10 @@ function PrepareToRun({
       }
     } else if (isAnyNecessaryDefaultOffsetMissing) {
       return {
-        detail: t('num_missing_offsets', { num: numMissingLSOffsets }),
+        detail:
+          numMissingLSOffsets > 1
+            ? t('num_missing_offsets', { num: numMissingLSOffsets })
+            : t('one_missing_offset'),
         status: 'not ready',
       }
     } else {
@@ -521,12 +540,7 @@ function PrepareToRun({
     }
   }
 
-  const { data: doorStatus } = useDoorQuery({
-    refetchInterval: FETCH_DURATION_MS,
-  })
-  const isDoorOpen =
-    doorStatus?.data.status === 'open' &&
-    doorStatus?.data.doorRequiredClosedForProtocol
+  const doorStatus = useIsDoorOpen(robotName)
 
   const parametersDetail = hasRunTimeParameters
     ? hasCustomRunTimeParameters
@@ -591,7 +605,7 @@ function PrepareToRun({
               disabled={isLoading}
               onPlay={!isLoading ? onPlay : undefined}
               ready={!isLoading ? isReadyToRun : false}
-              isDoorOpen={isDoorOpen}
+              isDoorOpen={doorStatus.isDoorOpen}
             />
           </Flex>
         </Flex>
@@ -639,7 +653,7 @@ function PrepareToRun({
               onClickSetupStep={() => {
                 setSetupScreen('offsets')
               }}
-              title={t('labware_position_check')}
+              title={t('labware_offsets')}
               {...lpcSetupStepProps()}
             />
             <ProtocolSetupStep
@@ -709,6 +723,12 @@ export function ProtocolSetup(): JSX.Element {
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
 
+  const navigate = useNavigate()
+  const runStatus = useRunStatus(runId)
+  if (runStatus === RUN_STATUS_STOPPED) {
+    navigate('/protocols')
+  }
+
   const {
     data: mostRecentAnalysis = null,
   } = useProtocolAnalysisAsDocumentQuery(
@@ -747,8 +767,9 @@ export function ProtocolSetup(): JSX.Element {
       : null
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
-    hasMissingModulesForOdd: isMissingModules,
-    hasMissingCalForOdd:
+    robotName,
+    hasMissingModulesForFlex: isMissingModules,
+    hasMissingCalForFlex:
       incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
   })
   const protocolName =
@@ -795,7 +816,6 @@ export function ProtocolSetup(): JSX.Element {
     showConfirmation: showMissingStepsConfirmation,
     cancel: cancelExitMissingStepsConfirmation,
   } = useConditionalConfirm(handleProceedToRunClick, !labwareConfirmed)
-  const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const lpcLaunchProps = useLPCFlows({
     runId,
@@ -810,6 +830,7 @@ export function ProtocolSetup(): JSX.Element {
     'prepare to run': (
       <PrepareToRun
         runId={runId}
+        runStatus={runStatus}
         setSetupScreen={setSetupScreen}
         confirmAttachment={confirmAttachment}
         confirmStepsComplete={confirmMissingSteps}

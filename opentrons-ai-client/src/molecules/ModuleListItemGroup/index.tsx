@@ -1,13 +1,16 @@
+import { useMemo } from 'react'
+import { Controller, useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
-  SPACING,
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  Flex,
   ListItem,
   ListItemCustomize,
+  SPACING,
 } from '@opentrons/components'
-import type { DropdownBorder } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
   getModuleDisplayName,
@@ -17,14 +20,14 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { ModuleType } from '@opentrons/shared-data'
-import { Controller, useFormContext } from 'react-hook-form'
-import { ModuleDiagram } from '../ModelDiagram'
-import { MODULES_FIELD_NAME } from '../../organisms/ModulesSection'
-import type { DisplayModules } from '../../organisms/ModulesSection'
+
+import { MODULES_FIELD_NAME } from '../../organisms/ModulesAndFixturesSection'
 import { getOnlyLatestDefs } from '../../resources/utils'
-import { useTranslation } from 'react-i18next'
-import { useMemo } from 'react'
+import { ModuleDiagram } from '../ModelDiagram'
+
+import type { DropdownBorder } from '@opentrons/components'
+import type { ModuleType } from '@opentrons/shared-data'
+import type { DisplayModule } from '../../organisms/ModulesAndFixturesSection'
 
 export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [
@@ -59,15 +62,13 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'nest_96_wellplate_2ml_deep',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
-  [ABSORBANCE_READER_TYPE]: [
-    'opentrons_flex_lid_absorbance_plate_reader_module',
-  ],
+  [ABSORBANCE_READER_TYPE]: [],
 }
 
 export function ModuleListItemGroup(): JSX.Element | null {
   const { watch, setValue } = useFormContext()
   const { t } = useTranslation('create_protocol')
-  const modulesWatch: DisplayModules[] = watch(MODULES_FIELD_NAME) ?? []
+  const modulesWatch: DisplayModule[] = watch(MODULES_FIELD_NAME) ?? []
 
   const allDefinitionsValues = useMemo(
     () => Object.values(getOnlyLatestDefs()),
@@ -88,15 +89,15 @@ export function ModuleListItemGroup(): JSX.Element | null {
 
         return (
           <Controller
-            key={module.type}
+            key={module.id}
             name={MODULES_FIELD_NAME}
             render={({ field }) => {
               const currentModule = field.value.find(
-                (m: DisplayModules) => m.type === module.type
+                (m: DisplayModule) => m.id === module.id
               )
 
               return (
-                <ListItem type="default" key={module.type}>
+                <ListItem type="default" key={module.id}>
                   <ListItemCustomize
                     label={
                       adapters != null && adapters.length > 0
@@ -108,6 +109,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                       adapters != null && adapters.length > 0
                         ? {
                             title: (null as unknown) as string,
+                            width: '13rem',
                             currentOption: {
                               name:
                                 getDefDisplayName(
@@ -117,8 +119,8 @@ export function ModuleListItemGroup(): JSX.Element | null {
                             },
                             onClick: (value: string) => {
                               field.onChange(
-                                field.value.map((m: DisplayModules) =>
-                                  m.type === module.type
+                                field.value.map((m: DisplayModule) =>
+                                  m.id === module.id
                                     ? {
                                         ...m,
                                         adapter: {
@@ -141,7 +143,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                     onClick={() => {
                       setValue(
                         MODULES_FIELD_NAME,
-                        modulesWatch.filter(m => m.type !== module.type),
+                        modulesWatch.filter(m => m.id !== module.id),
                         { shouldValidate: true }
                       )
                     }}

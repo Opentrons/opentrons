@@ -1,6 +1,6 @@
 """Tip pickup and drop procedures."""
 
-from typing import Optional, Dict
+from typing import Optional, Dict, Tuple
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -201,6 +201,18 @@ async def _available_for_nozzle_layout(  # noqa: C901
     }
 
 
+def tip_on_left_side_96(back_left_nozzle: str) -> bool:
+    """Return if there is a tip on the left edge of the 96 channel."""
+    left_most_column = int(back_left_nozzle[1:])
+    return left_most_column == 1
+
+
+def tip_on_right_side_96(front_right_nozzle: str) -> bool:
+    """Return if there is a tip on the left edge of the 96 channel."""
+    right_most_column = int(front_right_nozzle[1:])
+    return right_most_column == 12
+
+
 class HardwareTipHandler(TipHandler):
     """Pick up and drop tips, using the Hardware API."""
 
@@ -237,6 +249,50 @@ class HardwareTipHandler(TipHandler):
             channels, style, primary_nozzle, front_right_nozzle, back_left_nozzle
         )
 
+    def get_tip_presence_config(
+        self, pipette_id: str
+    ) -> Tuple[bool, Optional[InstrumentProbeType]]:
+        """Return the supported settings for tip presence on a given pipette depending on it's current nozzle map."""
+        follow_singular_sensor = None
+
+        unsupported_layout_types_96 = [NozzleConfigurationType.SINGLE]
+        # NOTE: (09-20-2024) Current on multi-channel pipettes, utilizing less than 4 nozzles risks false positives on the tip presence sensor
+        supported_partial_nozzle_minimum = 4
+
+        nozzle_configuration = self._state_view.pipettes.get_nozzle_configuration(
+            pipette_id=pipette_id
+        )
+
+        match self._state_view.pipettes.get_channels(pipette_id):
+            case 1:
+                tip_presence_supported = True
+            case 8:
+                tip_presence_supported = (
+                    nozzle_configuration.tip_count >= supported_partial_nozzle_minimum
+                )
+            case 96:
+                tip_presence_supported = (
+                    nozzle_configuration.configuration
+                    not in unsupported_layout_types_96
+                    and nozzle_configuration.tip_count
+                    >= supported_partial_nozzle_minimum
+                )
+                if (
+                    nozzle_configuration.configuration != NozzleConfigurationType.FULL
+                    and tip_presence_supported
+                ):
+                    use_left = tip_on_left_side_96(nozzle_configuration.back_left)
+                    use_right = tip_on_right_side_96(nozzle_configuration.front_right)
+                    if not (use_left and use_right):
+                        if use_left:
+                            follow_singular_sensor = InstrumentProbeType.PRIMARY
+                        else:
+                            follow_singular_sensor = InstrumentProbeType.SECONDARY
+            case _:
+                raise ValueError("Unknown pipette type.")
+
+        return (tip_presence_supported, follow_singular_sensor)
+
     async def pick_up_tip(
         self,
         pipette_id: str,
@@ -266,9 +322,18 @@ class HardwareTipHandler(TipHandler):
         await self._hardware_api.tip_pickup_moves(
             mount=hw_mount, presses=None, increment=None
         )
-        if do_not_ignore_tip_presence:
+
+        tip_presence_supported, follow_singular_sensor = self.get_tip_presence_config(
+            pipette_id
+        )
+
+        if do_not_ignore_tip_presence and tip_presence_supported:
             try:
-                await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
+                await self.verify_tip_presence(
+                    pipette_id,
+                    TipPresenceStatus.PRESENT,
+                    follow_singular_sensor=follow_singular_sensor,
+                )
             except TipNotAttachedError as e:
                 raise PickUpTipTipNotAttachedError(tip_geometry=tip_geometry) from e
 
@@ -350,30 +415,6 @@ class HardwareTipHandler(TipHandler):
         follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         """See documentation on abstract base class."""
-        nozzle_configuration = self._state_view.pipettes.get_nozzle_configuration(
-            pipette_id=pipette_id
-        )
-
-        # Configuration metrics by which tip presence checking is ignored
-        unsupported_pipette_types = [8, 96]
-        unsupported_layout_types = [
-            NozzleConfigurationType.SINGLE,
-            NozzleConfigurationType.COLUMN,
-        ]
-        # NOTE: (09-20-2024) Current on multi-channel pipettes, utilizing less than 4 nozzles risks false positives on the tip presence sensor
-        supported_partial_nozzle_minimum = 4
-
-        if (
-            nozzle_configuration is not None
-            and self._state_view.pipettes.get_channels(pipette_id)
-            in unsupported_pipette_types
-            and nozzle_configuration.configuration in unsupported_layout_types
-            and len(nozzle_configuration.map_store) < supported_partial_nozzle_minimum
-        ):
-            # Tip presence sensing is not supported for single tip pick up on the 96ch Flex Pipette, nor with single and some partial layous of the 8ch Flex Pipette.
-            # This is due in part to a press distance tolerance which creates a risk case for false positives. In the case of single tip, the mechanical tolerance
-            # for presses with 100% success is below the minimum average achieved press distance for a given multi channel pipette in that configuration.
-            return
         try:
             ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
             hw_mount = self._get_hw_mount(pipette_id)

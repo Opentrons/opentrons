@@ -1,4 +1,8 @@
-import type { RunTimeCommand, RunCommandError } from '@opentrons/shared-data'
+import type {
+  Failed,
+  RunCommandError,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 export interface GetCommandsParams {
   pageLength: number // the number of items to include
@@ -20,8 +24,10 @@ export interface RunCommandErrors {
 
 // NOTE: this incantation allows us to omit a key from each item in a union distributively
 // this means we can, for example, maintain the associated commandType and params after the Omit is applied
-type DistributiveOmit<T, K extends keyof T> = T extends any ? Omit<T, K> : never
-export type RunCommandSummary = DistributiveOmit<RunTimeCommand, 'result'>
+type DistributiveFailed<CommandT> = CommandT extends RunTimeCommand
+  ? Failed<CommandT>
+  : never
+export type RunCommandSummary = DistributiveFailed<RunTimeCommand>
 
 export interface CommandDetail {
   data: RunTimeCommand

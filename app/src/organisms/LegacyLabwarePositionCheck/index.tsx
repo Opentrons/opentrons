@@ -1,18 +1,21 @@
 import { Component } from 'react'
-import { useLogger } from '../../logger'
-import { LegacyLabwarePositionCheckComponent } from './LegacyLabwarePositionCheckComponent'
-import { FatalErrorModal } from './FatalErrorModal'
-import { getIsOnDevice } from '/app/redux/config'
 import { useSelector } from 'react-redux'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { getIsOnDevice } from '/app/redux/config'
+
+import { useLogger } from '../../logger'
+import { FatalErrorModal } from './FatalErrorModal'
+import { LegacyLabwarePositionCheckComponent } from './LegacyLabwarePositionCheckComponent'
+
 import type { ErrorInfo, ReactNode } from 'react'
+import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
 } from '@opentrons/shared-data'
-import type { LabwareOffset } from '@opentrons/api-client'
+import type { LegacySupportLPCFlowsProps } from '/app/organisms/LabwarePositionCheck'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => void
@@ -22,6 +25,7 @@ interface LabwarePositionCheckModalProps {
   existingOffsets: LabwareOffset[]
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   protocolName: string
+  analytics: LegacySupportLPCFlowsProps['analytics']
   setMaintenanceRunId?: (id: string | null) => void
   isDeletingMaintenanceRun: boolean
   caughtError?: Error

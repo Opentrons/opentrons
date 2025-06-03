@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
   ALIGN_FLEX_START,
   BORDERS,
@@ -12,27 +13,29 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_USB_MODULE_ADDRESSABLE_AREAS,
-  SINGLE_SLOT_FIXTURES,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  SINGLE_SLOT_FIXTURES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
-import { StatusLabel } from '/app/atoms/StatusLabel'
+
 import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
+import { StatusLabel } from '/app/atoms/StatusLabel'
+import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+
 import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
-import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
 import type { DeckDefinition } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'

@@ -1,3 +1,7 @@
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { useAtom } from 'jotai'
+
 import {
   AlertPrimaryButton,
   DIRECTION_COLUMN,
@@ -8,10 +12,8 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { useAtom } from 'jotai'
+
 import { displayExitConfirmModalAtom } from '../../resources/atoms'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 
 export function ExitConfirmModal(): JSX.Element {
   const [

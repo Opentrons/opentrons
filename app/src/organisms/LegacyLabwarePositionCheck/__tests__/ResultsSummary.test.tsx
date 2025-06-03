@@ -1,18 +1,20 @@
-import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '/app/i18n'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-import { ResultsSummary } from '../ResultsSummary'
-import { SECTIONS } from '../constants'
+
 import {
   mockCompletedAnalysis,
   mockExistingOffsets,
   mockWorkingOffsets,
 } from '../__fixtures__'
+import { SECTIONS } from '../constants'
+import { ResultsSummary } from '../ResultsSummary'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/config')
 

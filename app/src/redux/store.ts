@@ -1,10 +1,9 @@
-import { createStore, applyMiddleware, compose } from 'redux'
+import { applyMiddleware, compose, createStore } from 'redux'
+import { createEpicMiddleware } from 'redux-observable'
 import thunk from 'redux-thunk'
 
-import { createEpicMiddleware } from 'redux-observable'
-
-import { rootReducer } from './reducer'
 import { rootEpic } from './epic'
+import { rootReducer } from './reducer'
 
 import type { StoreEnhancer } from 'redux'
 import type { Action, State } from './types'

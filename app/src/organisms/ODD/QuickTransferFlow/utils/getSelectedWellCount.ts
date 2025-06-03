@@ -1,8 +1,8 @@
-import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type { LabwareDefinition, PipetteV2Specs } from '@opentrons/shared-data'
 
 export function getSelectedWellCount(
   pipette: PipetteV2Specs,
-  labware: LabwareDefinition2,
+  labware: LabwareDefinition,
   wells: string[]
 ): number {
   if (pipette.channels === 1) {

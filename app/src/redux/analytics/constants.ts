@@ -82,6 +82,7 @@ export const ANALYTICS_QUICK_TRANSFER_FLOW_STARTED = 'quickTransferFlowStarted'
 export const ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION =
   'quickTransferWellSelectionDuration'
 export const ANALYTICS_QUICK_TRANSFER_EXIT_EARLY = 'quickTransferExitEarly'
+// ToDo(kk:04/11/2025) the following two tab events will be removed when ff is removed
 export const ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB =
   'quickTransferAdvancedSettingsTab'
 export const ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB =
@@ -120,5 +121,18 @@ export const ANALYTICS_LANGUAGE_UPDATED_DESKTOP_APP_SETTINGS: 'languageUpdatedDe
  * LPC Analytics
  */
 
-export const ANALYTICS_LPC_ANALYSIS_KIND: 'analytics:lpcAnalysisKind' =
-  'analytics:lpcAnalysisKind'
+export const ANALYTICS_LPC_ANALYSIS_KIND: 'lpcAnalysisKind' = 'lpcAnalysisKind'
+export const ANALYTICS_LPC_LAUNCH: 'lpcLaunch' = 'lpcLaunch'
+export const ANALYTICS_LPC_APPLY_OFFSETS: 'lpcApplyOffsets' = 'lpcApplyOffsets'
+export const ANALYTICS_LPC_SAVE_OFFSET: 'lpcSaveOffset' = 'lpcSaveOffset'
+export const ANALYTICS_LPC_SAVE_OFFSET_TO_RUN_RECORD: 'lpcSaveOffsetToRunRecord' =
+  'lpcSaveOffsetToRunRecord'
+export const ANALYTICS_LPC_OFFSET_SOURCE_RESOLUTION: 'lpcOffsetSourceResolution' =
+  'lpcOffsetSourceResolution'
+
+/**
+ * Module Actions Analytics
+ */
+
+export const ANALYTICS_MODULE_COMMAND_COMPLETED = 'moduleEventCompleted'
+export const ANALYTICS_MODULE_COMMAND_ERROR = 'moduleCommandError'

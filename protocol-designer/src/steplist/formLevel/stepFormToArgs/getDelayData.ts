@@ -1,50 +1,44 @@
-import { getDefaultMmFromEdge } from '../../../components/organisms/TipPositionModal/utils'
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../constants'
+
 import type { InnerDelayArgs } from '@opentrons/step-generation'
 import type {
-  DelayCheckboxFields,
-  DelaySecondFields,
-  HydratedMoveLiquidFormData,
+  DelayCheckboxBaseFields,
+  DelayCheckboxMoveLiquidFields,
+  DelaySecondsBaseFields,
+  DelaySecondsMoveLiquidFields,
+  DelayZPositionFields,
   HydratedMixFormData,
+  HydratedMoveLiquidFormData,
 } from '../../../form-types'
-export function getMoveLiquidDelayData(
-  hydratedFormData: HydratedMoveLiquidFormData,
-  checkboxField: DelayCheckboxFields,
-  secondsField: DelaySecondFields,
-  mmFromBottomField:
-    | 'aspirate_delay_mmFromBottom'
-    | 'dispense_delay_mmFromBottom'
-): InnerDelayArgs | null {
-  const checkbox = hydratedFormData[checkboxField]
-  const seconds = hydratedFormData[secondsField]
-  let mmFromBottom: number | undefined
-  const mmFromBottomFormValue = hydratedFormData[mmFromBottomField]
-  if (typeof mmFromBottomFormValue === 'number') {
-    mmFromBottom = mmFromBottomFormValue
-  } else if (mmFromBottomFormValue === null) {
-    mmFromBottom = getDefaultMmFromEdge({
-      name: mmFromBottomField,
-    })
-  }
-  if (
-    checkbox &&
-    typeof seconds === 'number' &&
-    seconds > 0 &&
-    typeof mmFromBottom === 'number' &&
-    mmFromBottom >= 0
-  ) {
+
+export const getMoveLiquidDelayData = (args: {
+  hydratedFormData: HydratedMoveLiquidFormData
+  secondsField: DelaySecondsMoveLiquidFields
+  zPositionField: DelayZPositionFields
+  checkboxField?: DelayCheckboxMoveLiquidFields
+}): InnerDelayArgs | null => {
+  const { hydratedFormData, checkboxField, secondsField, zPositionField } = args
+  const checkbox =
+    checkboxField != null ? hydratedFormData[checkboxField] ?? false : true
+  const seconds = hydratedFormData[secondsField] ?? 0
+  const mmFromBottom =
+    hydratedFormData[zPositionField] ?? DEFAULT_MM_OFFSET_FROM_BOTTOM
+
+  if (checkbox && mmFromBottom >= 0 && seconds > 0) {
     return {
       seconds,
-      mmFromBottom,
+      mmFromBottom, // TODO (nd: 04/15/2025) remove once compound creators are finished. We no longer need the individual positions for a delay
     }
   }
 
   return null
 }
-export function getMixDelayData(
+
+export const getMixDelayData = (
   hydratedFormData: HydratedMixFormData,
-  checkboxField: DelayCheckboxFields,
-  secondsField: DelaySecondFields
-): number | null {
+  checkboxField: DelayCheckboxBaseFields,
+  secondsField: DelaySecondsBaseFields
+): number | null => {
   const checkbox = hydratedFormData[checkboxField]
   const seconds = hydratedFormData[secondsField]
 

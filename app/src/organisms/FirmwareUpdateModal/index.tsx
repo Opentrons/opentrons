@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -7,9 +8,9 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -17,6 +18,7 @@ import {
   useSubsystemUpdateQuery,
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
+
 import type { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
 
 interface FirmwareUpdateModalProps {

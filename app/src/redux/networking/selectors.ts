@@ -1,13 +1,13 @@
-import { createSelector } from 'reselect'
 import find from 'lodash/find'
 import map from 'lodash/map'
 import { long2ip } from 'netmask'
+import { createSelector } from 'reselect'
 
-import { INTERFACE_WIFI, INTERFACE_ETHERNET } from './constants'
+import { INTERFACE_ETHERNET, INTERFACE_WIFI } from './constants'
 
+import type { Dictionary } from 'lodash'
 import type { State } from '../types'
 import type * as Types from './types'
-import type { Dictionary } from 'lodash'
 
 export function getInternetStatus(
   state: State,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Dict, Optional, Union, cast
+from typing import List, Dict, Optional, Union, cast, Iterator, Sequence
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
@@ -86,6 +86,9 @@ class ModuleContext(CommandPublisher):
     @requires_version(2, 14)
     def type(self) -> ModuleType:
         """Get the module's general type identifier."""
+        return self._get_type()
+
+    def _get_type(self) -> ModuleType:
         return cast(ModuleType, self._core.MODULE_TYPE.value)
 
     @requires_version(2, 0)
@@ -112,12 +115,13 @@ class ModuleContext(CommandPublisher):
         _log.warning(
             "`ModuleContext.load_labware_object` is an internal, deprecated method. Use `ModuleContext.load_labware` or `load_labware_by_definition` instead."
         )
+        core = cast(LegacyModuleCore, self._core)
 
         assert (
-            labware.parent == self._core.geometry
+            labware.parent == core.geometry
         ), "Labware is not configured with this module as its parent"
 
-        return self._core.geometry.add_labware(labware)
+        return core.geometry.add_labware(labware)
 
     def load_labware(
         self,
@@ -169,8 +173,8 @@ class ModuleContext(CommandPublisher):
         # todo(mm, 2024-11-08): This check belongs in opentrons.protocol_api.core.engine.deck_conflict.
         # We're currently doing it here, at the ModuleContext level, for consistency with what
         # ProtocolContext.load_labware() does. (It should also be moved to the deck_conflict module.)
-        if isinstance(self._core, AbsorbanceReaderCore):
-            if self._core.is_lid_on():
+        if self._get_type() == "absorbanceReaderType":
+            if cast(AbsorbanceReaderCore, self._core).is_lid_on():
                 raise CommandPreconditionViolated(
                     f"Cannot load {name} onto the Absorbance Reader Module when its lid is closed."
                 )
@@ -197,7 +201,9 @@ class ModuleContext(CommandPublisher):
             )
 
         if isinstance(self._core, LegacyModuleCore):
-            labware = self._core.add_labware_core(cast(LegacyLabwareCore, labware_core))
+            labware = cast(LegacyModuleCore, self._core).add_labware_core(
+                cast(LegacyLabwareCore, labware_core)
+            )
         else:
             labware = Labware(
                 core=labware_core,
@@ -273,7 +279,9 @@ class ModuleContext(CommandPublisher):
         )
 
         if isinstance(self._core, LegacyModuleCore):
-            adapter = self._core.add_labware_core(cast(LegacyLabwareCore, labware_core))
+            adapter = cast(LegacyModuleCore, self._core).add_labware_core(
+                cast(LegacyLabwareCore, labware_core)
+            )
         else:
             adapter = Labware(
                 core=labware_core,
@@ -328,7 +336,7 @@ class ModuleContext(CommandPublisher):
             like :py:meth:`model` and :py:meth:`type`
         """
         if isinstance(self._core, LegacyModuleCore):
-            return self._core.geometry
+            return cast(LegacyModuleCore, self._core).geometry
 
         raise UnsupportedAPIError(
             api_element="`ModuleContext.geometry`",
@@ -1127,42 +1135,121 @@ class FlexStackerContext(ModuleContext):
                   call :py:class:`Labware.parent` on the returned labware.
 
         """
-        self._core.retrieve()
+        labware_core = self._core.retrieve()
 
-        labware_core = self._protocol_core.get_labware_on_module(self._core)
-        if labware_core is not None and labware_core.is_adapter():
-            adapter_core = labware_core
-            adapter = Labware(
-                core=adapter_core,
-                api_version=self._api_version,
-                protocol_core=self._protocol_core,
-                core_map=self._core_map,
-            )
-            self._core_map.add(adapter_core, adapter)
-            labware_core = self._protocol_core.get_labware_on_labware(adapter_core)
-
-        # the core retrieve command should have already raised the error
-        # if labware_core is None, this is just to satisfy the type checker
-        assert labware_core is not None, "Retrieve failed to return labware"
-        # check core map first
-        try:
-            labware = self._core_map.get(labware_core)
-        except KeyError:
-            # If the labware is not already in the core map,
-            # create a new Labware object
-            labware = Labware(
-                core=labware_core,
-                api_version=self._api_version,
-                protocol_core=self._protocol_core,
-                core_map=self._core_map,
-            )
-            self._core_map.add(labware_core, labware)
-        return labware
+        return self._core_map.get_or_add(
+            labware_core,
+            Labware._builder_for_core_map(
+                self._api_version, self._protocol_core, self._core_map
+            ),
+        )
 
     @requires_version(2, 23)
     def store(self) -> None:
         """Move the labware currently on the Flex Stacker shuttle into the Flex Stacker."""
         self._core.store()
+
+    def _labware_to_cores(self, labware: Sequence[Labware]) -> list[LabwareCore]:
+        return [labware._core for labware in labware]
+
+    def _cores_to_labware(self, cores: Sequence[LabwareCore]) -> list[Labware]:
+        def _convert() -> Iterator[Labware]:
+            for core in cores:
+                yield self._core_map.get_or_add(
+                    core,
+                    Labware._builder_for_core_map(
+                        self._api_version, self._protocol_core, self._core_map
+                    ),
+                )
+
+        return list(_convert())
+
+    @requires_version(2, 24)
+    def get_max_storable_labware_from_list(
+        self, labware: list[Labware]
+    ) -> list[Labware]:
+        """Limit a list of labware instances to the number that can be stored in a Flex Stacker.
+
+        A Flex Stacker has a limited amount of internal space and computes the number of labware
+        (or labware with lids or adapters) that it can store based on the heights of the labware
+        and the amount they overlap when placed on top of each other. To know how many of a given
+        labware the Flex Stacker can store, the Flex Stacker must know what labware it is.
+
+        You can use this function to take a list of labware and return the elements that the
+        stacker can currently store from it. The returned list is then guaranteed to be suitable
+        for passing to :py:meth:`.set_stored_labware_items`.
+
+        This function limits the list of labware based on the overall maximum number the stacker
+        can hold and will not change as labware is added or removed. To limit a list of labware to
+        the amount that will currently fit in the Flex Stacker, use
+        :py:meth:`.get_current_storable_labware_from_list`.
+        """
+        return self._cores_to_labware(
+            self._core.get_max_storable_labware_from_list(
+                self._labware_to_cores(labware)
+            )
+        )
+
+    @requires_version(2, 24)
+    def get_current_storable_labware_from_list(
+        self, labware: list[Labware]
+    ) -> list[Labware]:
+        """Limit a list of labware instances to the number that the Flex Stacker currently has space for.
+
+        You can use this function to take a list of labware and return the elements that the
+        stacker can currently store from it. The returned list is then guaranteed to be suitable
+        for passing to :py:meth:`.fill` or :py:meth:`.set_stored_labware_items`.
+
+        The number of elements in the returned list will change as labware is added to or removed from
+        the Flex Stacker. To get a list limited to the overall maximum number of labware the Flex Stacker
+        can store, use :py:meth:`.get_max_storable_labware_from_list`.
+        """
+        return self._cores_to_labware(
+            self._core.get_current_storable_labware_from_list(
+                self._labware_to_cores(labware)
+            )
+        )
+
+    @requires_version(2, 24)
+    def get_max_storable_labware(self) -> int:
+        """Get the number of labware that the Flex Stacker can store with its current stored labware configuration.
+
+        You can use this function to get the total number of labware that the Flex Stacker can store. This
+        number is the overall maximum and will not change as labware is added or removed. To get the space
+        currently available in the Flex Stacker, use :py:meth:`.get_current_storable_labware`.
+        """
+        return self._core.get_max_storable_labware()
+
+    @requires_version(2, 24)
+    def get_current_storable_labware(self) -> int:
+        """Get the number of labware that the Flex Stacker currently has space for.
+
+        The number will change as labware is added or removed. To get the overall maximum number of labware the
+        Flex Stacker can store, use :py:meth:`.get_max_storable_labware`.
+        """
+        return self._core.get_current_storable_labware()
+
+    @requires_version(2, 24)
+    def set_stored_labware_items(self, labware: list[Labware]) -> None:
+        """Configure a Flex Stacker by providing an initial list of stored labware objects.
+
+        The kind of labware stored by the Flex Stacker will be calculated from the list of labware
+        specified here. You can use this to store labware objects that you have already created
+        so that, for instance, you can set their liquid state or nicknames. There are several
+        restrictions on the values of the ``labware`` argument:
+        - ``labware`` must have at least one element
+        - Elements of ``labware`` will be stored along with their lid, if any, and an adapter they
+          rest on, if any. These must be compatible with the Flex Stacker.
+        - All elements of ``labware`` must be loaded :py:obj:`OFF_DECK`.
+        - All elements of ``labware`` must be the same kind of labware. If any of them have lids, they
+          must all have lids, and the lids must be the same. If any of them are on adapters, they all
+          must be on adapters, and the adapters must be the same.
+        - The number of labware objects must fit in the stacker physically. To make sure the labware
+          will fit, use the return value of :py:method:`.get_max_storable_labware_from_list`.
+
+        :param labware: A list of labware to load into the stacker.
+        """
+        self._core.set_stored_labware_items(self._labware_to_cores(labware))
 
     @requires_version(2, 23)
     def set_stored_labware(
@@ -1219,17 +1306,48 @@ class FlexStackerContext(ModuleContext):
         )
 
     @requires_version(2, 23)
-    def fill(self, message: str, count: int | None = None) -> None:
+    def fill(self, count: int | None = None, message: str | None = None) -> None:
         """Pause the protocol to add more labware to the Flex Stacker.
 
         :param message: A message to display in the Opentrons App to note what kind of labware to add.
         :param count: The amount of labware the Flex Stacker should hold after this command is executed.
                       If not specified, the Flex Stacker should be full after this command is executed.
         """
-        self._core.fill(message, count)
+        if self.api_version < APIVersion(2, 24):
+            # politeness: the order of the arguments changed in api 2.24. This wasn't released so it isn't
+            # a problem, but anybody using this probably would not like their protocols suddenly breaking
+            if isinstance(count, str):
+                checked_message = count
+                checked_count = message
+            elif (not isinstance(message, str)) and message is not None:
+                checked_count = message
+                checked_message = count
+            else:
+                checked_count = count
+                checked_message = message
+        else:
+            checked_count = count
+            checked_message = message
+
+        self._core.fill(checked_count, checked_message)
+
+    @requires_version(2, 24)
+    def fill_items(self, labware: list[Labware], message: str | None = None) -> None:
+        """Pause the protocol to add a specific list of labware to the Flex Stacker.
+
+        The ``labware`` argument must follow certain rules:
+        - It should have at least one item
+        - Its elements should be the same kind of labware previously passed to
+          :py:meth:`.set_stored_labware_items` or loaded by :py:meth:`.set_stored_labware`
+        - Its elements should all be loaded :py:obj:`OFF_DECK`
+
+        :param message: A message to display in the Opentrons App.
+        :param labware: The list of labware to add, following the rules above.
+        """
+        self._core.fill_items(self._labware_to_cores(labware), message)
 
     @requires_version(2, 23)
-    def empty(self, message: str) -> None:
+    def empty(self, message: str | None = None) -> None:
         """Pause the protocol to remove labware from the Flex Stacker.
 
         :param message: A message to display in the Opentrons App to note what should be removed from
@@ -1238,3 +1356,12 @@ class FlexStackerContext(ModuleContext):
         self._core.empty(
             message,
         )
+
+    @requires_version(2, 24)
+    def get_stored_labware(self) -> list[Labware]:
+        """Get the list of labware currently stored inside the stacker.
+
+        The first element of the list is on the bottom and will be the item retrieved by a call to
+        :py:meth:`.retrieve`.
+        """
+        return self._cores_to_labware(self._core.get_stored_labware())

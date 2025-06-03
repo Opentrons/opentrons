@@ -1,24 +1,21 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { sortRunRecordOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore/sortRunRecordOffsets'
+import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
+import {
+  LPC_STEPS,
+  OFFSETS_SOURCE_INITIALIZING,
+  updateLPC,
+} from '/app/redux/protocol-runs'
+
+import type { Run, StoredLabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
-  LabwareDefinition2,
-  RobotType,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import {
-  updateLPC,
-  LPC_STEPS,
-  OFFSETS_SOURCE_INITIALIZING,
-} from '/app/redux/protocol-runs'
-import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
-import { sortRunRecordOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore/sortRunRecordOffsets'
-
-import type { Run, StoredLabwareOffset } from '@opentrons/api-client'
-import type { LPCWizardState, LPCLabwareInfo } from '/app/redux/protocol-runs'
+import type { LPCLabwareInfo, LPCWizardState } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 
 export interface UseLPCInitialStateProps {
@@ -27,14 +24,14 @@ export interface UseLPCInitialStateProps {
   analysis: CompletedProtocolAnalysis | null
   protocolName: string | undefined
   maintenanceRunId: string | null
-  labwareDefs: LabwareDefinition2[]
+  labwareDefs: LabwareDefinition[]
   labwareInfo: LPCLabwareInfo
   deckConfig: DeckConfiguration | undefined
-  robotType: RobotType
+  isFlex: boolean
   flexStoredOffsets: StoredLabwareOffset[] | undefined
 }
 
-// Initialize the LPC store if underlying store data is sufficiently presen.
+// Initialize the LPC store if underlying store data is sufficiently present.
 export function useInitLPCStore({
   analysis,
   runId,
@@ -42,7 +39,7 @@ export function useInitLPCStore({
   protocolName,
   runRecord,
   deckConfig,
-  robotType,
+  isFlex,
   flexStoredOffsets,
   ...rest
 }: UseLPCInitialStateProps): void {
@@ -63,7 +60,7 @@ export function useInitLPCStore({
 
   // Initialize the store. This effect should only occur once.
   useEffect(() => {
-    if (isReadyToInit && robotType === FLEX_ROBOT_TYPE) {
+    if (isReadyToInit && isFlex) {
       const activePipetteId = getActivePipetteId(analysis.pipettes)
 
       const initialState: LPCWizardState = {
@@ -85,6 +82,10 @@ export function useInitLPCStore({
           all: LPC_STEPS,
           lastStepIndices: null,
           currentSubstep: null,
+        },
+        ui: {
+          showDefaultOffsetInfoBanner: true,
+          showSnackbar: null,
         },
       }
 

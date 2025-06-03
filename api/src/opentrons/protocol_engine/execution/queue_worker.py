@@ -72,7 +72,14 @@ class QueueWorker:
             try:
                 await self._command_executor.execute(command_id=command_id)
             except BaseException:
-                log.exception("Unhandled failure in command executor")
+                log.exception(
+                    # The state can tear if e.g. we've finished updating PipetteStore,
+                    # but the exception came before we could update LabwareStore. Or
+                    # the exception could have interrupted updating a single store.
+                    "Unhandled failure in command executor."
+                    " This is a bug in opentrons.protocol_engine"
+                    " and has probably left the ProtocolEngine in a torn state."
+                )
                 raise
             # Yield to the event loop in case we're executing a long sequence of commands
             # that never yields internally. For example, a long sequence of comment commands.

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -9,16 +10,17 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { RIGHT, LEFT } from '@opentrons/shared-data'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
+
 import { usePipetteSpecsV2 } from '/app/local-resources/instruments'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import type { ComponentProps, Dispatch } from 'react'
-import type { PipetteData, Mount } from '@opentrons/api-client'
+import type { Mount, PipetteData } from '@opentrons/api-client'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
 
 interface SelectPipetteProps {

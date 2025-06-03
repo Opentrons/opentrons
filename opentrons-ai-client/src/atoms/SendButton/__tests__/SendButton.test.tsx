@@ -1,7 +1,7 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { SendButton } from '../index'
 
 import type { ComponentProps } from 'react'

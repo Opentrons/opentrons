@@ -1,6 +1,7 @@
-import { css } from 'styled-components'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -18,9 +19,10 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
-  temperatureRangeFieldValue,
+  enterValueWithinRange,
   isTimeFormatMinutesSeconds,
 } from '../../../../../../steplist/fieldLevel/errors'
 import {
@@ -28,7 +30,7 @@ import {
   maskToTime,
 } from '../../../../../../steplist/fieldLevel/processing'
 import { uuid } from '../../../../../../utils'
-import { getTimeFromString, getStepIndex } from './utils'
+import { getStepIndex, getTimeFromString } from './utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerStepTypeGeneral } from './ThermocyclerProfileModal'
@@ -61,7 +63,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
     readOnly = true,
     setIsInEdit,
   } = props
-  const { i18n, t } = useTranslation(['application', 'form'])
+  const { i18n, t } = useTranslation(['application', 'form', 'protocol_steps'])
   const [hover, setHover] = useState<boolean>(false)
   const [showEdit, setShowEditCurrentStep] = useState<boolean>(!readOnly)
   const [stepState, setStepState] = useState({
@@ -285,7 +287,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
             handleValueUpdate(
               'temp',
               maskToFloat(e.target.value),
-              temperatureRangeFieldValue(4, 99)
+              enterValueWithinRange(4, 99)
             )
           }}
           onBlur={() => {
@@ -294,6 +296,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
               temp: { ...stepState.temp, wasAccessed: true },
             })
           }}
+          caption={t('protocol_steps:captions_for_fields.blockTargetTemp')}
           error={stepState.temp.wasAccessed ? stepState.temp.error : null}
         />
       </Flex>

@@ -1,13 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { i18n } from '/app/i18n'
-import { getPathToPythonOverride } from '/app/redux/config'
-import {
-  useTrackEvent,
-  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
-} from '/app/redux/analytics'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import {
+  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
+  useTrackEvent,
+} from '/app/redux/analytics'
+import { getPathToPythonOverride } from '/app/redux/config'
 import { openPythonInterpreterDirectory } from '/app/redux/protocol-analysis'
 
 import { OverridePathToPython } from '../OverridePathToPython'

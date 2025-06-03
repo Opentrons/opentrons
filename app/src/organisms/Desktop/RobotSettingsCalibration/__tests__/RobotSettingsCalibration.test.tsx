@@ -1,39 +1,43 @@
-import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import '@testing-library/jest-dom/vitest'
+
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { i18n } from '/app/i18n'
-import { CalibrationStatusCard } from '../..//CalibrationStatusCard'
-import { useFeatureFlag } from '/app/redux/config'
-import * as RobotApi from '/app/redux/robot-api'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { usePipetteOffsetCalibrations } from '/app/organisms/Desktop/Devices/hooks'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
 } from '/app/redux/calibration/pipette-offset/__fixtures__'
+import { useFeatureFlag } from '/app/redux/config'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   mockAttachedPipette,
   mockAttachedPipetteInformation,
 } from '/app/redux/pipettes/__fixtures__'
-import { usePipetteOffsetCalibrations } from '/app/organisms/Desktop/Devices/hooks'
+import * as RobotApi from '/app/redux/robot-api'
 import {
   useAttachedPipettes,
   useAttachedPipettesFromInstrumentsQuery,
 } from '/app/resources/instruments'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useRunStatuses } from '/app/resources/runs'
 
+import { RobotSettingsCalibration } from '..'
+import { CalibrationStatusCard } from '../..//CalibrationStatusCard'
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
 import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 import { RobotSettingsGripperCalibration } from '../RobotSettingsGripperCalibration'
+import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
-import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibration'
-import { RobotSettingsCalibration } from '..'
+
 import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 

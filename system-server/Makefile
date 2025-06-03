@@ -58,7 +58,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: test
 test:

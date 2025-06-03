@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional, Union, List, Tuple
+from typing import TYPE_CHECKING, Optional, Union, List, Tuple, Literal
 
 from opentrons import types
 from opentrons.hardware_control import CriticalPoint
@@ -22,7 +22,7 @@ from opentrons.protocols.geometry import planning
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api._liquid import LiquidClass
 
-from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 from ...disposal_locations import TrashBin, WasteChute
 from ..instrument import AbstractInstrument
@@ -332,7 +332,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
 
     def resin_tip_unseal(
         self,
-        location: types.Location,
+        location: types.Location | None,
         well_core: WellCore,
     ) -> None:
         raise APIVersionError(api_element="Unsealing resin tips.")
@@ -367,6 +367,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
+        check_for_movement_conflicts: bool = False,
     ) -> None:
         """Move the instrument.
 
@@ -376,6 +377,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             force_direct: Force a direct movement instead of an arc.
             minimum_z_height: Set a minimum travel height for a movement arc.
             speed: Override the travel speed in mm/s.
+            check_for_movement_conflicts: Not used in legacy implementation
 
         Raises:
             LabwareHeightError: An item on the deck is taller than
@@ -437,32 +439,6 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             self._protocol_interface.set_last_location(
                 location=location, mount=location_cache_mount
             )
-
-    def evotip_seal(
-        self,
-        location: types.Location,
-        well_core: LegacyWellCore,
-        in_place: Optional[bool] = False,
-    ) -> None:
-        """This will never be called because it was added in API 2.22."""
-        assert False, "evotip_seal only supported in API 2.22 & later"
-
-    def evotip_unseal(
-        self, location: types.Location, well_core: WellCore, home_after: Optional[bool]
-    ) -> None:
-        """This will never be called because it was added in API 2.22."""
-        assert False, "evotip_unseal only supported in API 2.22 & later"
-
-    def evotip_dispense(
-        self,
-        location: types.Location,
-        well_core: WellCore,
-        volume: Optional[float] = None,
-        flow_rate: Optional[float] = None,
-        push_out: Optional[float] = None,
-    ) -> None:
-        """This will never be called because it was added in API 2.22."""
-        assert False, "evotip_dispense only supported in API 2.22 & later"
 
     def get_mount(self) -> types.Mount:
         """Get the mount this pipette is attached to."""
@@ -624,42 +600,45 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         """This will never be called because it was added in API 2.16."""
         pass
 
-    def transfer_liquid(
+    def transfer_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[types.Location, LegacyWellCore]],
-        dest: List[Tuple[types.Location, LegacyWellCore]],
+        dest: Union[List[Tuple[types.Location, LegacyWellCore]], TrashBin, WasteChute],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
         """This will never be called because it was added in API 2.23"""
         assert False, "transfer_liquid is not supported in legacy context"
 
-    def distribute_liquid(
+    def distribute_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
         source: Tuple[types.Location, LegacyWellCore],
         dest: List[Tuple[types.Location, LegacyWellCore]],
-        new_tip: TransferTipPolicyV2,
+        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
         """This will never be called because it was added in API 2.23"""
         assert False, "distribute_liquid is not supported in legacy context"
 
-    def consolidate_liquid(
+    def consolidate_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[types.Location, LegacyWellCore]],
-        dest: Tuple[types.Location, LegacyWellCore],
-        new_tip: TransferTipPolicyV2,
+        dest: Union[Tuple[types.Location, LegacyWellCore], TrashBin, WasteChute],
+        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:

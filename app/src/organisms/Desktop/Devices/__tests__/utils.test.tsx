@@ -1,14 +1,18 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import {
-  getIs96ChannelPipetteAttached,
-  getOffsetCalibrationForMount,
-} from '../utils'
+
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
 } from '/app/redux/calibration/pipette-offset/__fixtures__'
+
+import {
+  getIs96ChannelPipetteAttached,
+  getOffsetCalibrationForMount,
+} from '../utils'
+
 import type {
   FetchPipettesResponseBody,
   FetchPipettesResponsePipette,

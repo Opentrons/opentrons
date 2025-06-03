@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Box,
   COLORS,
@@ -9,22 +8,24 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  Modal,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
+import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useAttachedModules } from '/app/resources/modules'
+
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { getActiveHeaterShaker } from './utils'
-import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 
-import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data'
 import type { AttachedModule } from '@opentrons/api-client'
+import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data'
 import type { HeaterShakerModule } from '/app/redux/modules/types'
 
 export type UseHeaterShakerIsRunningModalResult =

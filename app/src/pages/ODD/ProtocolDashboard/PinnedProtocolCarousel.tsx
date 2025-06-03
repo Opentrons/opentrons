@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+
 import {
   ALIGN_FLEX_START,
   DIRECTION_ROW,
@@ -7,6 +8,7 @@ import {
 } from '@opentrons/components'
 
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
+
 import { PinnedProtocol } from './PinnedProtocol'
 
 import type { Dispatch, SetStateAction } from 'react'

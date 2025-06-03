@@ -1,8 +1,10 @@
-import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { TipConfirmation } from '../TipConfirmation'
-import { i18n } from '/app/i18n'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
+import { TipConfirmation } from '../TipConfirmation'
 
 import type { ComponentProps } from 'react'
 

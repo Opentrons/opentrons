@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { capitalizeFirstLetterAfterNumber } from '../utils'
 
 describe('capitalizeFirstLetterAfterNumber', () => {

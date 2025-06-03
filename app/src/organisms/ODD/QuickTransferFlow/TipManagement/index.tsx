@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -16,8 +17,9 @@ import {
 } from '@opentrons/components'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
-import { ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB } from '/app/redux/analytics'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB } from '/app/redux/analytics'
+
 import { ChangeTip } from './ChangeTip'
 import { TipDropLocation } from './TipDropLocation'
 

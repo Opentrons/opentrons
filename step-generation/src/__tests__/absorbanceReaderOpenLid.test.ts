@@ -1,16 +1,18 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
 } from '@opentrons/shared-data'
+
+import { absorbanceReaderOpenLid } from '../commandCreators/atomic/absorbanceReaderOpenLid'
 import {
   getErrorResult,
-  makeContext,
   getInitialRobotStateStandard,
+  makeContext,
 } from '../fixtures'
-import { GRIPPER_LOCATION } from '../constants'
-import { absorbanceReaderOpenLid } from '../commandCreators/atomic/absorbanceReaderOpenLid'
 import { absorbanceReaderStateGetter } from '../robotStateSelectors'
+
 import type {
   AbsorbanceReaderState,
   InvariantContext,
@@ -18,6 +20,7 @@ import type {
 } from '../types'
 
 const moduleId = 'absorbanceReaderId'
+const gripperId = 'gripperId'
 vi.mock('../robotStateSelectors')
 
 describe('absorbanceReaderOpenLid', () => {
@@ -31,12 +34,8 @@ describe('absorbanceReaderOpenLid', () => {
       model: ABSORBANCE_READER_V1,
       pythonName: 'mock_absorbance_plate_reader_1',
     }
-    invariantContext.additionalEquipmentEntities = {
-      gripperId: {
-        name: 'gripper',
-        id: 'gripperId',
-        location: GRIPPER_LOCATION,
-      },
+    invariantContext.gripperEntities[gripperId] = {
+      id: gripperId,
     }
 
     robotState = getInitialRobotStateStandard(invariantContext)
@@ -88,7 +87,7 @@ describe('absorbanceReaderOpenLid', () => {
     })
   })
   it('creates returns error if no gripper', () => {
-    invariantContext.additionalEquipmentEntities = {}
+    invariantContext.gripperEntities = {}
     const result = absorbanceReaderOpenLid(
       {
         moduleId,

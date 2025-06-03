@@ -1,6 +1,6 @@
-import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { BaseDeck } from '@opentrons/components'
 import {
@@ -10,17 +10,18 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+
 import { ProtocolSetupDeckConfiguration } from '..'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { Modules } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { Modules } from '@opentrons/api-client'
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
 vi.mock('@opentrons/react-api-client')

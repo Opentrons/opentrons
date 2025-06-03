@@ -1,17 +1,18 @@
 // Named arguments to createFile selector. This data would be the result of several selectors.
 import type { RobotState, Timeline } from '@opentrons/step-generation'
-import type { SavedStepFormState, ModuleEntities } from '../../../step-forms'
 import type { StepIdType } from '../../../form-types'
+import type { ModuleEntities, SavedStepFormState } from '../../../step-forms'
+
 export const initialRobotState: RobotState = {
   labware: {
     fixedTrash: {
-      slot: '12',
+      stack: ['fixedTrash', '12'],
     },
     tiprackId: {
-      slot: '1',
+      stack: ['tiprackId', '1'],
     },
     plateId: {
-      slot: '7',
+      stack: ['plateId', '7'],
     },
   },
   modules: {},
@@ -23,7 +24,8 @@ export const initialRobotState: RobotState = {
   liquidState: {
     pipettes: {},
     labware: {},
-    additionalEquipment: {},
+    trashBins: {},
+    wasteChute: {},
   },
   tipState: {
     pipettes: {},

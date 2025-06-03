@@ -261,7 +261,7 @@ Let's take a look at how all this works. With automatic liquid detection enabled
 
 Liquid detection takes place prior to aspiration. Upon detecting a liquid, the pipette stops, raises itself above the liquid's surface, and then aspirates according to your protocol. Checking for a liquid adds time to your protocol run, so be aware of that before using it. If Flex doesn't detect liquid, it raises an error and stops the protocol until the problem is resolved.
 
-However, aspiration isn't required for liquid level detection. Two standalone methods, :py:meth:`.detect_liquid_presence` and :py:meth:`.require_liquid_presence`, let you add liquid detection to a protocol with or without aspirating. Automatic detection is the same as calling ``require_liquid_presence()`` before every aspiration. See :ref:`detect-liquid-presence` and :ref:`require-liquid-presence` for details.
+However, aspiration isn't required for liquid level detection. Three standalone methods, :py:meth:`.detect_liquid_presence`, :py:meth:`.require_liquid_presence`, and :py:meth:`.measure_liquid_height`, let you add liquid detection to a protocol with or without aspirating. Automatic detection is the same as calling ``require_liquid_presence()`` before every aspiration. See :ref:`detect-liquid-presence`, :ref:`require-liquid-presence`, or :ref:`measure-liquids` for details.
 
 .. versionadded:: 2.20
 

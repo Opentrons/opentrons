@@ -1,7 +1,11 @@
-import { vi, it, describe, expect } from 'vitest'
-import { getLocationSpecificOffsetDetailsForLabware } from '../getLocationSpecificOffsetDetailsForLabware'
-import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
+import { describe, expect, it, vi } from 'vitest'
+
 import { ANY_LOCATION } from '@opentrons/api-client'
+
+import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
+
+import { getLocationSpecificOffsetDetailsForLabware } from '../getLocationSpecificOffsetDetailsForLabware'
+
 import type { StoredLabwareOffset } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 

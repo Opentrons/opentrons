@@ -1,16 +1,19 @@
 import { screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { fixture96Plate, fixtureTiprackAdapter } from '@opentrons/shared-data'
-import { i18n } from '/app/i18n'
+
 import { renderWithProviders } from '/app/__testing-utils__'
-import { LabwareOffsetTable } from '../LabwareOffsetTable'
+import { i18n } from '/app/i18n'
+
+import { LegacyLabwareOffsetTable } from '../LegacyLabwareOffsetTable'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 
-const mockLabwareDef = fixture96Plate as LabwareDefinition2
-const mockAdapterDef = fixtureTiprackAdapter as LabwareDefinition2
+const mockLabwareDef = fixture96Plate as LabwareDefinition
+const mockAdapterDef = fixtureTiprackAdapter as LabwareDefinition
 
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',
@@ -54,8 +57,8 @@ const mockFourthCandidate: OffsetCandidate = {
   runCreatedAt: '2022-05-12T13:33:51.012179+00:00',
 }
 const render = () =>
-  renderWithProviders<ComponentProps<typeof LabwareOffsetTable>>(
-    <LabwareOffsetTable
+  renderWithProviders<ComponentProps<typeof LegacyLabwareOffsetTable>>(
+    <LegacyLabwareOffsetTable
       labwareDefinitions={[mockLabwareDef, mockAdapterDef]}
       offsetCandidates={[
         mockFirstCandidate,
@@ -82,28 +85,28 @@ describe('LabwareOffsetTable', () => {
     screen.getByText('Slot 1')
     screen.getByText(/7\/11\/2022/i)
     screen.getByText('First Fake Labware Display Name')
-    screen.getByText('1.00')
-    screen.getByText('2.00')
-    screen.getByText('3.00')
+    screen.getByText('1.0')
+    screen.getByText('2.0')
+    screen.getByText('3.0')
     // second candidate
     screen.getByText('Slot 2')
     screen.getByText(/6\/11\/2022/i)
     screen.getByText('Second Fake Labware Display Name')
-    screen.getByText('4.00')
-    screen.getByText('5.00')
-    screen.getByText('6.00')
+    screen.getByText('4.0')
+    screen.getByText('5.0')
+    screen.getByText('6.0')
     // third candidate is adapter on module
     screen.getByText('Heater-Shaker Module GEN1 in Slot 3')
     screen.getByText(/5\/11\/2022/i)
     screen.getByText('Third Fake Labware Display Name')
-    screen.getByText('7.00')
-    screen.getByText('8.00')
-    screen.getByText('9.00')
+    screen.getByText('7.0')
+    screen.getByText('8.0')
+    screen.getByText('9.0')
     //  fourth candidate is labware on adapter on module
     screen.getByText('in Heater-Shaker Module GEN1 in Slot 3')
     screen.getByText('Fourth Fake Labware Display Name')
-    screen.getByText('7.20')
-    screen.getByText('8.10')
-    screen.getByText('7.10')
+    screen.getByText('7.2')
+    screen.getByText('8.1')
+    screen.getByText('7.1')
   })
 })

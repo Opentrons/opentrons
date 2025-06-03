@@ -1,10 +1,11 @@
-import { describe, it, expect } from 'vitest'
-import { generateCompatibleLabwareForPipette } from '../../utils'
+import { describe, expect, it } from 'vitest'
+
 import {
-  SINGLE_CHANNEL_COMPATIBLE_LABWARE,
   EIGHT_CHANNEL_COMPATIBLE_LABWARE,
   NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE,
+  SINGLE_CHANNEL_COMPATIBLE_LABWARE,
 } from '../../constants'
+import { generateCompatibleLabwareForPipette } from '../../utils'
 
 // if one of these fails, it is likely that a new definition has been added
 // and you need to regenerate the lists stored at ../constants

@@ -1,3 +1,5 @@
+import { getFullStackFromLabwares, getSlotInLocationStack } from '../utils'
+
 import type { MoveLabwareParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
@@ -8,19 +10,36 @@ export function forMoveLabware(
 ): void {
   const { labwareId, newLocation } = params
   const { robotState } = robotStateAndWarnings
+  const { modules, labware } = robotState
+  const initialDeckSlot = getSlotInLocationStack(labware[labwareId].stack)
+  const fullStackFromLabwares = getFullStackFromLabwares(
+    labware,
+    initialDeckSlot
+  )
+  const index = fullStackFromLabwares.indexOf(labwareId)
+  const labwareToMove = fullStackFromLabwares.slice(0, index + 1) // includes labwareId you're moving
 
-  let newLocationString = ''
+  const newLocationStack: string[] = []
   if (newLocation === 'offDeck' || newLocation === 'systemLocation') {
-    newLocationString = newLocation
+    newLocationStack.push(newLocation)
   } else if ('moduleId' in newLocation) {
-    newLocationString = newLocation.moduleId
+    newLocationStack.push(
+      newLocation.moduleId,
+      modules[newLocation.moduleId].slot
+    )
   } else if ('slotName' in newLocation) {
-    newLocationString = newLocation.slotName
+    newLocationStack.push(newLocation.slotName)
   } else if ('labwareId' in newLocation) {
-    newLocationString = newLocation.labwareId
+    const labwareId = newLocation.labwareId
+    const labwareIdStack = labware[labwareId].stack
+    newLocationStack.push(...labwareIdStack)
   } else if ('addressableAreaName' in newLocation) {
-    newLocationString = newLocation.addressableAreaName
+    newLocationStack.push(newLocation.addressableAreaName)
   }
-
-  robotState.labware[labwareId].slot = newLocationString
+  labwareToMove.forEach((id, i) => {
+    if (labware[id] != null) {
+      const stackBelow = labwareToMove.slice(i + 1) // what's under labware you're moving
+      robotState.labware[id].stack = [id, ...stackBelow, ...newLocationStack]
+    }
+  })
 }

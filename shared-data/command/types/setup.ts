@@ -1,13 +1,13 @@
 import type {
   AddressableAreaName,
-  CommonCommandRunTimeInfo,
-  CommonCommandCreateInfo,
-  LabwareDefinition2,
-  LabwareOffset,
-  PipetteName,
-  ModuleModel,
   AspirateProperties,
+  CommonCommandCreateInfo,
+  CommonCommandRunTimeInfo,
+  LabwareDefinition,
+  LabwareOffset,
+  ModuleModel,
   MultiDispenseProperties,
+  PipetteName,
   SingleDispenseProperties,
 } from '../../js'
 
@@ -222,7 +222,7 @@ interface LoadLabwareParams {
 }
 interface LoadLabwareResult {
   labwareId: string
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   // todo(mm, 2024-08-19): This does not match the server-returned offsetId field.
   // Confirm nothing client-side is trying to use this, then replace it with offsetId.
   offset: LabwareOffset
@@ -318,8 +318,8 @@ interface LoadLidStackParams {
 interface LoadLidStackResult {
   stackLabwareId: string
   labwareIds: string[]
-  definition?: LabwareDefinition2
-  lidStackDefinition: LabwareDefinition2
+  definition?: LabwareDefinition
+  lidStackDefinition: LabwareDefinition
   location: LabwareLocation
   stackLocationSequence?: LabwareLocationSequence
   locationSequences?: LabwareLocationSequence[]
@@ -334,6 +334,6 @@ export interface LoadLidParams {
 
 interface LoadLidResult {
   labwareId: string
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   locationSequence?: LabwareLocationSequence
 }

@@ -1,18 +1,21 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
+
 import { getMoveLabwareLocationCombo } from '../getMoveLabwareLocationCombo'
 import {
+  getAddressableAreaNameFrom,
   getClosestBeneathAdapterId,
   getClosestBeneathModuleId,
   getClosestBeneathModuleModel,
   getLabwareDefURIFrom,
   getLwModStackupDetails,
-  getAddressableAreaNameFrom,
 } from '../helpers'
-import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
+
 import type {
-  MoveLabwareRunTimeCommand,
   LoadedLabware,
   LoadedModule,
+  MoveLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { AnalysisLwURIsByLwId } from '../getAllPossibleLwURIsInRun'
 

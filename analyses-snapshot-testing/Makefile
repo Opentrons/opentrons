@@ -66,7 +66,7 @@ setup: install-pipenv
 
 .PHONY: teardown
 teardown:
-	$(PYTHON) -m pipenv --rm
+	-$(PYTHON) -m pipenv --rm
 
 .PHONY: format-readme
 format-readme:

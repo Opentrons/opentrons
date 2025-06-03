@@ -1,8 +1,9 @@
-import { MixSteps, MixVerifications } from '../support/MixSteps'
-import { UniversalSteps } from '../support/UniversalSteps'
-import { TestFilePath, getTestFile } from '../support/TestFiles'
 import { verifyImportProtocolPage } from '../support/Import'
+import { MixSteps, MixVerifications } from '../support/MixSteps'
+import { SetupSteps } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
+import { getTestFile, TestFilePath } from '../support/TestFiles'
+import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Redesigned Mixing Steps - Happy Path', () => {
   beforeEach(() => {
@@ -12,7 +13,6 @@ describe('Redesigned Mixing Steps - Happy Path', () => {
     cy.importProtocol(protocol.path)
     verifyImportProtocolPage(protocol)
     cy.contains('Edit protocol').click()
-    cy.contains('Protocol steps').click()
     cy.get('[id="AddStepButton"]').contains('Add Step').click()
     cy.verifyOverflowBtn()
   })
@@ -25,6 +25,7 @@ describe('Redesigned Mixing Steps - Happy Path', () => {
     steps.add(MixSteps.SelectLabware())
     steps.add(MixSteps.SelectWellInputField())
     steps.add(MixVerifications.WellSelectPopout())
+    steps.add(SetupSteps.WellSelector(['A1', 'A2']))
     steps.add(UniversalSteps.Snapshot())
     steps.add(MixSteps.Save())
     steps.add(MixSteps.EnterVolume())
@@ -43,6 +44,7 @@ describe('Redesigned Mixing Steps - Happy Path', () => {
     steps.add(MixVerifications.PartTwoDisp())
     steps.add(MixSteps.DispenseFlowRate())
     steps.add(MixSteps.Delay())
+    steps.add(MixSteps.PushOut())
     steps.add(MixSteps.BlowoutLocation())
     steps.add(MixSteps.BlowoutFlowRate())
     steps.add(MixSteps.BlowoutPosFromTop())

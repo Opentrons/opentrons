@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from copy import deepcopy
 from typing import (
     Callable,
     Dict,
@@ -13,6 +14,11 @@ from typing import (
 )
 
 from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    TransferProperties as SharedTransferProperties,
+)
+from opentrons_shared_data.liquid_classes import DEFAULT_LC_VERSION, definition_exists
+from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
@@ -48,6 +54,7 @@ from opentrons.protocols.api_support.util import (
 )
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons.protocol_engine.errors import LabwareMovementNotAllowedError
+from ._liquid_properties import build_transfer_properties
 
 from ._types import OffDeckType
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
@@ -196,6 +203,7 @@ class ProtocolContext(CommandPublisher):
                 core=self._core.load_robot(),
                 protocol_core=self._core,
                 api_version=self._api_version,
+                broker=broker,
             )
         except APIVersionError:
             self._robot = None
@@ -451,14 +459,14 @@ class ProtocolContext(CommandPublisher):
             choose the adapter's version automatically.
 
                         .. versionadded:: 2.15
+        :param lid: A lid to load on the top of the main labware. Accepts the same
+            values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
+            lid will use the same namespace as the labware, and the API will
+            choose the adapter's version automatically.
+
+                        .. versionadded:: 2.23
         """
-        # TODO: re-include in docstring when 2.23 is ready
-        #         :param lid: A lid to load the on top of the main labware. Accepts the same
-        #             values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
-        #             lid will use the same namespace as the labware, and the API will
-        #             choose the lid's version automatically.
-        #
-        #                         .. versionadded:: 2.23
+
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
             raise APIVersionError(
                 api_element="Loading a labware off-deck",
@@ -1189,9 +1197,16 @@ class ProtocolContext(CommandPublisher):
         self._core.home()
 
     @property
-    def location_cache(self) -> Optional[Location]:
-        """The cache used by the robot to determine where it last was."""
-        return self._core.get_last_location()
+    def location_cache(self) -> Optional[Union[Location, TrashBin, WasteChute]]:
+        """The cache used by the robot to determine where it last was.
+
+        .. versionchanged:: 2.24
+           Can return a ``TrashBin`` or ``WasteChute`` object.
+        """
+        last_loc = self._core.get_last_location()
+        if isinstance(last_loc, Location) or self._api_version >= APIVersion(2, 24):
+            return last_loc
+        return None
 
     @location_cache.setter
     def location_cache(self, loc: Optional[Location]) -> None:
@@ -1363,10 +1378,72 @@ class ProtocolContext(CommandPublisher):
     ) -> LiquidClass:
         """
         Define a liquid class for use in the protocol.
+        ..
+            This is intended for Opentrons internal use only and is not a guaranteed API.
 
         :meta private:
         """
-        return self._core.define_liquid_class(name=name)
+        return self._core.define_liquid_class(name=name, version=DEFAULT_LC_VERSION)
+
+    @requires_version(2, 24)
+    def define_custom_liquid_class(
+        self,
+        name: str,
+        properties: Dict[str, Dict[str, TransferPropertiesDict]],
+        base_liquid_class: Optional[LiquidClass] = None,
+        display_name: Optional[str] = None,
+    ) -> LiquidClass:
+        """Define a custom liquid class, either a completely new one or based on an existing one.
+
+        Args:
+            name: The name to give to the new liquid class. Cannot use names of existing in-built liquid classes.
+            properties: A dict of transfer properties per tip per pipette.
+                Accepts a nested dictionary in the following format:
+
+                .. code-block:: python
+
+                    {
+                    <pipette_name>: {
+                        <tiprack_uri>: <properties in the shape of TransferPropertiesDict>
+
+                        # TransferPropertiesDict is a dictionary representation of the
+                        # transfer properties returned by the `LiquidClass.get_for(..)` function.
+                    }}
+
+            base_liquid_class: A LiquidClass to base this liquid class on. The properties
+                specified in transfer_properties will override any existing ones
+                for the specified pipettes & tips.
+            display_name: An optional human-readable name for the liquid. If not provided,
+                will default to title-cased name.
+
+        """
+        if definition_exists(name, DEFAULT_LC_VERSION):
+            raise ValueError(
+                f"Liquid class named {name} already exists. Please specify a different name."
+            )
+        new_liquid_class: LiquidClass
+        if base_liquid_class:
+            # If base liquid is provided, copy to new class
+            # and replace the entries mentioned in transfer props arg
+            new_liquid_class = deepcopy(base_liquid_class)
+        else:
+            new_liquid_class = LiquidClass.create_from(
+                name=name,
+                display_name=display_name or name.title(),
+                by_pipette_setting={},
+            )
+        for pipette, by_tiprack_props in properties.items():
+            for tiprack, transfer_props in by_tiprack_props.items():
+                new_liquid_class.update_for(
+                    pipette=pipette,
+                    tip_rack=tiprack,
+                    transfer_properties=build_transfer_properties(
+                        transfer_properties=SharedTransferProperties.model_validate(
+                            transfer_props
+                        )
+                    ),
+                )
+        return new_liquid_class
 
     @property
     @requires_version(2, 5)
@@ -1391,13 +1468,13 @@ class ProtocolContext(CommandPublisher):
         version: Optional[int] = None,
     ) -> Labware:
         """
-        Load a stack of Lids onto a valid Deck Location or Adapter.
+        Load a stack of Opentrons Tough Auto-Sealing Lids onto a valid deck location or adapter.
 
         :param str load_name: A string to use for looking up a lid definition.
-            You can find the ``load_name`` for any standard lid on the Opentrons
+            You can find the ``load_name`` for any compatible lid on the Opentrons
             `Labware Library <https://labware.opentrons.com>`_.
         :param location: Either a :ref:`deck slot <deck-slots>`,
-            like ``1``, ``"1"``, or ``"D1"``, or the a valid Opentrons Adapter.
+            like ``1``, ``"1"``, or ``"D1"``, or a valid Opentrons Adapter.
         :param int quantity: The quantity of lids to be loaded in the stack.
         :param adapter: An adapter to load the lid stack on top of. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
@@ -1418,9 +1495,10 @@ class ProtocolContext(CommandPublisher):
             leave this unspecified to let ``load_lid_stack()`` choose a version
             automatically.
 
-        :return:  The initialized and loaded labware object representing the Lid Stack.
+        :return:  The initialized and loaded labware object representing the lid stack.
 
-        :meta private:
+        .. versionadded:: 2.23
+
         """
         if self._api_version < validation.LID_STACK_VERSION_GATE:
             raise APIVersionError(
@@ -1479,9 +1557,9 @@ class ProtocolContext(CommandPublisher):
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> Labware | None:
-        """Move a lid from a valid source to a new location. Can return a Lid Stack if one is created.
+        """Move a compatible lid from a valid source to a new location. Can return a lid stack if one is created.
 
-        :param source_location: Where to take the lid from. This is either:
+        :param source_location: The lid's starting location. This is either:
 
                 * A deck slot like ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
                 * A labware or adapter that's already been loaded on the deck
@@ -1498,7 +1576,7 @@ class ProtocolContext(CommandPublisher):
                   with :py:meth:`load_labware` or :py:meth:`load_adapter`.
                 * The special constant :py:obj:`OFF_DECK`.
 
-        :param use_gripper: Whether to use the Flex Gripper for this movement.
+        :param use_gripper: Whether to use the Flex Gripper to move the lid.
 
                 * If ``True``, use the gripper to perform an automatic
                   movement. This will raise an error in an OT-2 protocol.
@@ -1515,7 +1593,8 @@ class ProtocolContext(CommandPublisher):
         labware's current and new locations are accessible, i.e., open the Thermocycler lid
         or open the Heater-Shaker's labware latch.
 
-        :meta private:
+        .. versionadded:: 2.23
+
         """
         source: Union[LabwareCore, DeckSlotName, StagingSlotName]
         if isinstance(source_location, Labware):

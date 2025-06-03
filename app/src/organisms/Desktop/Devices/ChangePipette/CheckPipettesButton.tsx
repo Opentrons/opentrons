@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { usePipettesQuery } from '@opentrons/react-api-client'
+
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   PrimaryButton,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
+import { usePipettesQuery } from '@opentrons/react-api-client'
+
 import { DETACH } from './constants'
 
 import type { ReactNode } from 'react'

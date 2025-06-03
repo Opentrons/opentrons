@@ -8,12 +8,12 @@ import {
   Box,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
-  Modal,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'

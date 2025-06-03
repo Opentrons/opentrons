@@ -53,7 +53,28 @@ def legacy_offset_location_to_offset_location_sequence(
         cutout_id = deck_configuration_provider.get_cutout_id_by_deck_slot_name(
             location.slotName
         )
-        possible_cutout_fixture_id = location.moduleModel.value
+
+        # Given a module model, try to figure out the equivalent cutout fixture.
+        #
+        # The Thermocycler is special. A single Thermocycler is represented in a deck
+        # configuration as two separate cutout fixtures, because it spans two separate
+        # cutouts. This makes it the only module whose module model string does not map
+        # 1:1 with a cutout fixture ID string.
+        #
+        # TODO(mm, 2025-04-11): This is fragile, and the failure mode when it does the
+        # wrong thing can mean labware offsets don't apply, which is pretty bad. We
+        # either need a more explicit module<->cutout-fixture mapping, or we need to
+        # avoid this mapping entirely.
+        if (
+            # Check for v2 specifically because v1 is OT-2-only and OT-2s don't have
+            # modules in their deck definitions; and v3 does not exist at the time of writing.
+            location.moduleModel
+            == ModuleModel.THERMOCYCLER_MODULE_V2
+        ):
+            possible_cutout_fixture_id = "thermocyclerModuleV2Front"
+        else:
+            possible_cutout_fixture_id = location.moduleModel.value
+
         try:
             addressable_area = deck_configuration_provider.get_labware_hosting_addressable_area_name_for_cutout_and_cutout_fixture(
                 cutout_id, possible_cutout_fixture_id, deck_definition

@@ -5,6 +5,7 @@
   "__dev_internal__lpcRedesign": "LPC 重新设计",
   "__dev_internal__protocolStats": "协议统计",
   "__dev_internal__protocolTimeline": "协议时间线",
+  "__dev_internal__quickTransferExportPython": "启用快速移液的Python导出功能",
   "__dev_internal__reactQueryDevtools": "启用开发者工具",
   "__dev_internal__reactScan": "启用 React 组件扫描",
   "add_folder_button": "添加实验耗材源文件夹",

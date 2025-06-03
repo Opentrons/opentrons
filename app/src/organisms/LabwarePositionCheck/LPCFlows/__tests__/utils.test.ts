@@ -1,7 +1,7 @@
-import { it, describe, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { ANY_LOCATION } from '@opentrons/api-client'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getRelevantOffsets } from '../utils'
 

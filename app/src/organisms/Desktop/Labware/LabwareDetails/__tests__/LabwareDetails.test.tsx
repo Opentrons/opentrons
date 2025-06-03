@@ -1,20 +1,20 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useAllLabware } from '/app/local-resources/labware'
 import { mockOpentronsLabwareDetailsDefinition } from '/app/redux/custom-labware/__fixtures__'
+
+import { LabwareDetails } from '..'
 import { CustomLabwareOverflowMenu } from '../../LabwareCard/CustomLabwareOverflowMenu'
 import { Dimensions } from '../Dimensions'
 import { Gallery } from '../Gallery'
 import { ManufacturerDetails } from '../ManufacturerDetails'
 import { WellCount } from '../WellCount'
-import { WellProperties } from '../WellProperties'
 import { WellDimensions } from '../WellDimensions'
+import { WellProperties } from '../WellProperties'
 import { WellSpacing } from '../WellSpacing'
-
-import { LabwareDetails } from '..'
 
 import type { ComponentProps } from 'react'
 

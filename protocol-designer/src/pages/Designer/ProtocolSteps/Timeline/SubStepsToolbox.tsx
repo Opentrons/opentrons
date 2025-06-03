@@ -1,24 +1,27 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
   PrimaryButton,
   StyledText,
   Toolbox,
 } from '@opentrons/components'
+
+import { THERMOCYCLER_PROFILE } from '../../../../constants'
 import { getSubsteps } from '../../../../file-data/selectors'
+import { getSavedStepForms } from '../../../../step-forms/selectors'
 import { getHoveredSubstep } from '../../../../ui/steps'
 import {
   hoverOnStep,
   hoverOnSubstep,
   toggleViewSubstep,
 } from '../../../../ui/steps/actions/actions'
-import { THERMOCYCLER_PROFILE } from '../../../../constants'
-import { getSavedStepForms } from '../../../../step-forms/selectors'
 import { PipettingSubsteps } from './PipettingSubsteps'
 import { ThermocyclerProfileSubsteps } from './ThermocyclerProfileSubsteps'
+
 import type { SubstepIdentifier } from '../../../../steplist'
 import type { HoverOnSubstepAction } from '../../../../ui/steps'
 

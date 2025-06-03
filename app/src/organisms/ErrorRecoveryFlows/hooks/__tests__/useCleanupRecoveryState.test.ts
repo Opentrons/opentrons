@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useCleanupRecoveryState } from '../useCleanupRecoveryState'
 import { RECOVERY_MAP } from '../../constants'
+import { useCleanupRecoveryState } from '../useCleanupRecoveryState'
 
 describe('useCleanupRecoveryState', () => {
   let props: Parameters<typeof useCleanupRecoveryState>[0]
@@ -14,8 +14,9 @@ describe('useCleanupRecoveryState', () => {
       isActiveUser: false,
       stashedMapRef: {
         current: {
-          route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
-          step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
+          route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+          step:
+            RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
         },
       },
       setRM: mockSetRM,
@@ -26,8 +27,8 @@ describe('useCleanupRecoveryState', () => {
     renderHook(() => useCleanupRecoveryState(props))
 
     expect(props.stashedMapRef.current).toEqual({
-      route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
-      step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
+      route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+      step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
     })
     expect(mockSetRM).not.toHaveBeenCalled()
   })
@@ -38,8 +39,8 @@ describe('useCleanupRecoveryState', () => {
     renderHook(() => useCleanupRecoveryState(props))
 
     expect(props.stashedMapRef.current).toEqual({
-      route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
-      step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
+      route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+      step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
     })
     expect(mockSetRM).not.toHaveBeenCalled()
   })
@@ -85,15 +86,15 @@ describe('useCleanupRecoveryState', () => {
     mockSetRM.mockClear()
 
     props.stashedMapRef.current = {
-      route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
-      step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
+      route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+      step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
     }
 
     rerender({ isActiveUser: false })
 
     expect(props.stashedMapRef.current).toEqual({
-      route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
-      step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
+      route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+      step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
     })
     expect(mockSetRM).not.toHaveBeenCalled()
   })
@@ -107,8 +108,8 @@ describe('useCleanupRecoveryState', () => {
     rerender({ isActiveUser: true })
     expect(mockSetRM).not.toHaveBeenCalled()
     expect(props.stashedMapRef.current).toEqual({
-      route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
-      step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
+      route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+      step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
     })
 
     rerender({ isActiveUser: false })

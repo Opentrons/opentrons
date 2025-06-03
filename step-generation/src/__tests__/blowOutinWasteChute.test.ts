@@ -1,12 +1,15 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
+import { blowOutInWasteChute } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
-  getInitialRobotStateStandard,
+  getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
-import { blowOutInWasteChute } from '../commandCreators/compound'
+
 import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
@@ -14,16 +17,15 @@ vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 const wasteChuteId = 'wasteChuteId'
 const invariantContext: InvariantContext = {
   ...makeContext(),
-  additionalEquipmentEntities: {
+  wasteChuteEntities: {
     [wasteChuteId]: {
       id: wasteChuteId,
-      name: 'wasteChute',
       pythonName: 'mock_waste_chute_1',
       location: WASTE_CHUTE_CUTOUT,
     },
   },
 }
-const prevRobotState: RobotState = getInitialRobotStateStandard(
+const prevRobotState: RobotState = getRobotStateWithTipStandard(
   invariantContext
 )
 
@@ -59,8 +61,9 @@ describe('blowOutInWasteChute', () => {
     ])
     expect(getSuccessResult(result).python).toBe(
       `
-mockPythonName.flow_rate.blow_out = 10
-mockPythonName.blow_out(mock_waste_chute_1)`.trim()
+mock_pipette.flow_rate.blow_out = 10
+mock_pipette.blow_out(mock_waste_chute_1)
+`.trim()
     )
   })
 })

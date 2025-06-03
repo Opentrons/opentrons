@@ -1,46 +1,52 @@
 import floor from 'lodash/floor'
-import { getPipetteSpecsV2 } from '@opentrons/shared-data'
-import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
-import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
-import { getDefaultPushOutVolume } from '../../utils'
-import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
-import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
+import min from 'lodash/min'
+
+import {
+  FLEX_ROBOT_TYPE,
+  getPipetteSpecsV2,
+  POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_TOP,
+} from '@opentrons/shared-data'
+
+import {
+  CHANNELS_MAPPED_TO_MAX_SPEED,
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
+  PROTOCOL_DESIGNER_SOURCE,
+} from '../../constants'
+import { getDefaultBlowoutFlowRate, getDefaultPushOutVolume } from '../../utils'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
+import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
+
 import type {
+  LabwareDefinition2,
   LoadLabwareCreateCommand,
+  PipetteV2Specs,
   ProtocolFile,
 } from '@opentrons/shared-data'
-import type { Ingredients } from '@opentrons/step-generation'
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 import type { PDMetadata } from '../../file-types'
+import type { FormData } from '../../form-types'
+
+const getMigratedBlowoutFlowRate = (
+  form: FormData,
+  pipetteSpecs: PipetteV2Specs | null,
+  tipRackDef: LabwareDefinition2 | null
+): number | null =>
+  (form.blowout_checkbox || form.disposalVolume_checkbox) &&
+  !form.blowout_flowRate &&
+  pipetteSpecs != null &&
+  tipRackDef != null
+    ? getDefaultBlowoutFlowRate(Number(form.volume), pipetteSpecs, tipRackDef)
+    : null
 
 export const migrateFile = (
-  appData: ProtocolFile<DesignerApplicationData>
+  appData: ProtocolFile<PDMetadata>
 ): ProtocolFile<PDMetadata> => {
-  const {
-    designerApplication,
-    commands,
-    labwareDefinitions,
-    liquids,
-    robot,
-  } = appData
+  const { designerApplication, commands, labwareDefinitions, robot } = appData
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
-  const { savedStepForms, ingredients } = designerApplication.data
-  const migratedIngredients: Ingredients = Object.entries(
-    ingredients
-  ).reduce<Ingredients>((acc, [id, ingredient]) => {
-    acc[id] = {
-      displayName: ingredient.name ?? '',
-      liquidClass: ingredient.liquidClass,
-      description: ingredient.description ?? null,
-      liquidGroupId: id,
-      displayColor: liquids[id].displayColor ?? swatchColors(id),
-    }
-    return acc
-  }, {})
-
+  const { savedStepForms } = designerApplication.data
+  const { model: robotType } = robot
   const loadLabwareCommands = commands.filter(
     (command): command is LoadLabwareCreateCommand =>
       command.commandType === 'loadLabware'
@@ -61,8 +67,21 @@ export const migrateFile = (
         aspirate_labware,
         dispense_labware,
         liquidClassesSupported,
+        liquidClass,
+        aspirate_touchTip_checkbox,
+        dispense_touchTip_checkbox,
         ...rest
       } = form
+      const aspirateLabwareUri =
+        equipmentLoadInfoFromCommands.labware[aspirate_labware].labwareDefURI
+      const isAspirateLabwareTouchtipDisabled = labwareDefinitions[
+        aspirateLabwareUri
+      ].parameters.quirks?.includes('touchTipDisabled')
+      const dispenseLabwareUri =
+        equipmentLoadInfoFromCommands.labware[dispense_labware].labwareDefURI
+      const isDispenseLabwareTouchtipDisabled = labwareDefinitions[
+        dispenseLabwareUri
+      ].parameters.quirks?.includes('touchTipDisabled')
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
         labwareDefinitions,
         loadLabwareCommands,
@@ -89,6 +108,20 @@ export const migrateFile = (
               pipetteSpecs,
               tipRackDef
             )
+      // blowout flow rate is required, so we attempt to migrate it if it's not present
+      const migratedBlowoutFlowRate = getMigratedBlowoutFlowRate(
+        form,
+        pipetteSpecs,
+        tipRackDef
+      )
+      const channelsForSpeed =
+        pipetteSpecs?.channels ?? (robotType === FLEX_ROBOT_TYPE ? 96 : 8)
+      const maxZSpeed =
+        CHANNELS_MAPPED_TO_MAX_SPEED[robotType][channelsForSpeed].z
+      const maxXYSpeed = min([
+        CHANNELS_MAPPED_TO_MAX_SPEED[robotType][channelsForSpeed].x,
+        CHANNELS_MAPPED_TO_MAX_SPEED[robotType][channelsForSpeed].y,
+      ])
 
       return {
         ...acc,
@@ -97,16 +130,24 @@ export const migrateFile = (
           id,
           aspirate_labware,
           dispense_labware,
+          aspirate_touchTip_checkbox: isAspirateLabwareTouchtipDisabled
+            ? false
+            : aspirate_touchTip_checkbox,
           aspirate_touchTip_mmFromTop:
-            aspirate_touchTip_mmFromBottom == null
+            aspirate_touchTip_mmFromBottom == null ||
+            isAspirateLabwareTouchtipDisabled
               ? null
               : floor(
                   aspirate_touchTip_mmFromBottom -
                     matchingAspirateLabwareWellDepth,
                   1
                 ),
+          dispense_touchTip_checkbox: isDispenseLabwareTouchtipDisabled
+            ? false
+            : dispense_touchTip_checkbox,
           dispense_touchTip_mmfromTop:
-            dispense_touchTip_mmFromBottom == null
+            dispense_touchTip_mmFromBottom == null ||
+            isDispenseLabwareTouchtipDisabled
               ? null
               : floor(
                   dispense_touchTip_mmFromBottom -
@@ -115,33 +156,44 @@ export const migrateFile = (
                 ),
           aspirate_retract_delay_seconds: null,
           dispense_retract_delay_seconds: null,
-          aspirate_retract_speed: null,
-          dispense_retract_speed: null,
+          aspirate_retract_speed: maxZSpeed,
+          dispense_retract_speed: maxZSpeed,
           aspirate_submerge_delay_seconds: null,
           dispense_submerge_delay_seconds: null,
-          aspirate_submerge_speed: null,
-          dispense_submerge_speed: null,
-          aspirate_touchTip_speed: null,
-          dispense_touchTip_speed: null,
-          aspirate_touchTip_mmFromEdge: 0, // this field and the following were previously not configurable and defaulted to 0mm
-          dispense_touchTip_mmFromEdge: 0,
-          aspirate_position_reference: null,
-          aspirate_retract_position_reference: null,
-          aspirate_submerge_mmFromBottom: null,
+          aspirate_submerge_speed: maxZSpeed,
+          dispense_submerge_speed: maxZSpeed,
+          aspirate_touchTip_speed: maxXYSpeed,
+          dispense_touchTip_speed: maxXYSpeed,
+          aspirate_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE, // this field and the following were previously not configurable and defaulted to 0mm
+          dispense_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
+          aspirate_position_reference: POSITION_REFERENCE_BOTTOM,
+          aspirate_retract_position_reference: POSITION_REFERENCE_TOP,
+          aspirate_retract_mmFromBottom: 0,
+          aspirate_retract_x_position: null,
+          aspirate_retract_y_position: null,
+          aspirate_submerge_mmFromBottom: 0,
           aspirate_submerge_x_position: null,
           aspirate_submerge_y_position: null,
-          aspirate_submerge_position_reference: null,
-          dispense_position_reference: null,
-          dispense_retract_position_reference: null,
-          dispense_submerge_mmFromBottom: null,
+          aspirate_submerge_position_reference: POSITION_REFERENCE_TOP,
+          dispense_position_reference: POSITION_REFERENCE_BOTTOM,
+          dispense_retract_position_reference: POSITION_REFERENCE_TOP,
+          dispense_retract_mmFromBottom: 0,
+          dispense_retract_x_position: null,
+          dispense_retract_y_position: null,
+          dispense_submerge_position_reference: POSITION_REFERENCE_TOP,
+          dispense_submerge_mmFromBottom: 0,
           dispense_submerge_x_position: null,
           dispense_submerge_y_position: null,
-          dispense_submerge_position_reference: null,
           liquidClassesSupported: liquidClassesSupported ?? false,
-          liquidClass: null,
+          liquidClass: 'none',
           pushOut_checkbox:
             defaultPushOutVolume != null && defaultPushOutVolume > 0,
           pushOut_volume: defaultPushOutVolume,
+          conditioning_checkbox: false,
+          conditioning_volume: null,
+          ...(migratedBlowoutFlowRate != null
+            ? { blowout_flowRate: migratedBlowoutFlowRate }
+            : {}),
         },
       }
     }
@@ -156,13 +208,41 @@ export const migrateFile = (
           mix_touchTip_mmFromBottom,
           labware,
           liquidClassesSupported,
+          mix_touchTip_checkbox,
           ...rest
         } = form
+        const tipRackDef = labwareDefinitions[form.tipRack]
+        const mixLabwareUri =
+          equipmentLoadInfoFromCommands.labware[labware].labwareDefURI
+        const isLabwareTouchtipDisabled = labwareDefinitions[
+          mixLabwareUri
+        ].parameters.quirks?.includes('touchTipDisabled')
+        const pipetteName =
+          equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
+          null
+        const pipetteSpecs =
+          pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
+        const defaultPushOutVolume =
+          pipetteSpecs === null
+            ? null
+            : getDefaultPushOutVolume(
+                Number(form.volume),
+                pipetteSpecs,
+                tipRackDef
+              )
+
         const matchingLabwareWellDepth = getMigratedPositionFromTop(
           labwareDefinitions,
           loadLabwareCommands,
           labware as string,
           'mix'
+        )
+
+        // blowout flow rate is required, so we attempt to migrate it if it's not present
+        const migratedBlowoutFlowRate = getMigratedBlowoutFlowRate(
+          form,
+          pipetteSpecs,
+          tipRackDef
         )
         return {
           ...acc,
@@ -170,14 +250,25 @@ export const migrateFile = (
             ...rest,
             id,
             labware,
+            mix_touchTip_checkbox: isLabwareTouchtipDisabled
+              ? false
+              : mix_touchTip_checkbox,
             mix_touchTip_mmFromTop:
-              mix_touchTip_mmFromBottom == null
+              mix_touchTip_mmFromBottom == null || isLabwareTouchtipDisabled
                 ? null
                 : floor(
                     mix_touchTip_mmFromBottom - matchingLabwareWellDepth,
                     1
                   ),
+            mix_position_reference: POSITION_REFERENCE_BOTTOM,
             liquidClassesSupported: liquidClassesSupported ?? false,
+            liquidClass: 'none',
+            pushOut_checkbox:
+              defaultPushOutVolume != null && defaultPushOutVolume > 0,
+            pushOut_volume: defaultPushOutVolume,
+            ...(migratedBlowoutFlowRate != null
+              ? { blowout_flowRate: migratedBlowoutFlowRate }
+              : {}),
           },
         }
       }
@@ -186,26 +277,6 @@ export const migrateFile = (
     {}
   )
 
-  const updatedInitialStep = Object.values(savedStepForms).reduce(
-    (acc, form) => {
-      const { id } = form
-      if (id === '__INITIAL_DECK_SETUP_STEP__') {
-        return {
-          ...acc,
-          [id]: {
-            ...form,
-            ...getAdditionalEquipmentLocationUpdate(
-              commands,
-              robot.model,
-              savedStepForms
-            ),
-          },
-        }
-      }
-      return acc
-    },
-    {}
-  )
   return {
     ...appData,
     metadata: {
@@ -216,11 +287,8 @@ export const migrateFile = (
       ...designerApplication,
       data: {
         ...designerApplication.data,
-        ingredients: migratedIngredients,
-        ...equipmentLoadInfoFromCommands,
         savedStepForms: {
           ...designerApplication.data.savedStepForms,
-          ...updatedInitialStep,
           ...savedStepsWithUpdatedMoveLiquidFields,
           ...savedStepsWithUpdatedMixFields,
         },

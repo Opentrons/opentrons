@@ -135,7 +135,9 @@ async def get_commands_list(
             description=(
                 "The starting index of the desired first command in the list."
                 " If unspecified, a cursor will be selected automatically"
-                " based on the currently running or most recently executed command."
+                " based on the currently running or most recently executed command, "
+                " and the slice of commands returned is the previous `pageLength` commands"
+                " inclusive of the currently running or most recently executed command."
             ),
         ),
     ] = None,

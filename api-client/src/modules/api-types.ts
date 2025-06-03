@@ -1,8 +1,4 @@
-import type {
-  ModuleType,
-  Coordinates,
-  ModuleModel,
-} from '@opentrons/shared-data'
+import type { ModuleModel, ModuleType, Vector3D } from '@opentrons/shared-data'
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
 interface PhysicalPort {
@@ -22,7 +18,7 @@ type ModuleOffsetSource =
   | 'unknown'
 
 export interface ModuleOffset {
-  offset: Coordinates
+  offset: Vector3D
   slot?: string
   source?: ModuleOffsetSource
   last_modified?: string
@@ -89,10 +85,9 @@ export interface AbsorbanceReaderData {
 }
 export interface FlexStackerData {
   latchState: 'opened' | 'closed' | 'unknown'
-  platformState: 'extended' | 'retracted' | 'unknown'
+  platformState: 'extended' | 'retracted' | 'unknown' | 'missing'
   hopperDoorState: 'opened' | 'closed' | 'unknown'
-  axisStateX: 'extended' | 'retracted' | 'unknown'
-  axisStateZ: 'extended' | 'retracted' | 'unknown'
+  installDetected: boolean
   status: FlexStackerStatus
 }
 

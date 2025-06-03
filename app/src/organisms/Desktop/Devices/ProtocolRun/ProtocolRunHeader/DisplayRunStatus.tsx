@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next'
 
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   COLORS,
-  SPACING,
-  Icon,
   Flex,
+  Icon,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import type { RunStatus } from '@opentrons/api-client'
 

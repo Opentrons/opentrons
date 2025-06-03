@@ -1,22 +1,24 @@
-import { when } from 'vitest-when'
-import { it, describe, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
+import { COLORS } from '@opentrons/components'
 import {
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
   useHost,
   useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
-import { COLORS } from '@opentrons/components'
 
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useToaster } from '/app/organisms/ToasterOven'
+
+import { ProtocolSetupParameters } from '..'
+import { mockRunTimeParameterData } from '../../__fixtures__'
+import { ChooseCsvFile } from '../ChooseCsvFile'
 import { ChooseEnum } from '../ChooseEnum'
 import { ChooseNumber } from '../ChooseNumber'
-import { ChooseCsvFile } from '../ChooseCsvFile'
-import { mockRunTimeParameterData } from '../../__fixtures__'
-import { useToaster } from '/app/organisms/ToasterOven'
-import { ProtocolSetupParameters } from '..'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'

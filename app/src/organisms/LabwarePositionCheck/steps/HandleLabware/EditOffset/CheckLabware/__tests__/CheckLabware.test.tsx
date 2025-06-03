@@ -1,30 +1,29 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  mockSelectedLwOverview,
-  mockActivePipette,
-  MockLPCContentContainer,
-} from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { CheckLabware } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware'
 import {
-  selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
+  mockActivePipette,
+  MockLPCContentContainer,
+  mockSelectedLwOverview,
+} from '/app/organisms/LabwarePositionCheck/__fixtures__'
+import { CheckLabware } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware'
+import { getIsOnDevice } from '/app/redux/config'
+import {
+  goBackEditOffsetSubstep,
+  proceedEditOffsetSubstep,
   selectActivePipette,
   selectIsSelectedLwTipRack,
   selectSelectedLwOverview,
-  setFinalPosition,
-  goBackEditOffsetSubstep,
-  proceedEditOffsetSubstep,
+  selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
+  setFinalPosition,
 } from '/app/redux/protocol-runs'
-import { getIsOnDevice } from '/app/redux/config'
-import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
@@ -80,7 +79,6 @@ describe('CheckLabware', () => {
   let mockHandleJog: Mock
   let mockResetJog: Mock
   let mockHandleResetLwModulesOnDeck: Mock
-  let mockMakeSuccessSnackbar: Mock
   let props: ComponentProps<typeof CheckLabware>
 
   beforeEach(() => {
@@ -99,7 +97,6 @@ describe('CheckLabware', () => {
       })
     mockResetJog = vi.fn().mockResolvedValue(undefined)
     mockHandleResetLwModulesOnDeck = vi.fn().mockResolvedValue(undefined)
-    mockMakeSuccessSnackbar = vi.fn()
 
     props = {
       runId: 'test-run-id',
@@ -148,9 +145,6 @@ describe('CheckLabware', () => {
     } as any)
     vi.mocked(goBackEditOffsetSubstep).mockReturnValue({
       type: 'GO_BACK_EDIT_OFFSET_SUBSTEP',
-    } as any)
-    vi.mocked(useLPCSnackbars).mockReturnValue({
-      makeSuccessSnackbar: mockMakeSuccessSnackbar,
     } as any)
   })
 
@@ -234,6 +228,5 @@ describe('CheckLabware', () => {
     primaryButton.click()
 
     expect(props.handleAddConfirmedWorkingVector).toHaveBeenCalled()
-    expect(mockMakeSuccessSnackbar).toHaveBeenCalled()
   })
 })

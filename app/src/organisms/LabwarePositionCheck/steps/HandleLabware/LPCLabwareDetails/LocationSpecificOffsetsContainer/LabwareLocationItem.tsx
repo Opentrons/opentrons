@@ -2,8 +2,12 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
-import { Flex, COLORS, BORDERS, RESPONSIVENESS } from '@opentrons/components'
+import { BORDERS, COLORS, Flex, RESPONSIVENESS } from '@opentrons/components'
 
+import { MultiDeckLabelTagBtns } from '/app/molecules/MultiDeckLabelTagBtns'
+import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckInfoLabels'
+import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import {
   OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
@@ -13,14 +17,10 @@ import {
   selectMostRecentVectorOffsetForLwWithOffsetDetails,
   setSelectedLabware,
 } from '/app/redux/protocol-runs'
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
-import { MultiDeckLabelTagBtns } from '/app/molecules/MultiDeckLabelTagBtns'
-import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckInfoLabels'
-import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 
+import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
-import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 
 interface LabwareLocationItemProps extends LPCWizardContentProps {
   locationSpecificOffsetDetails: LocationSpecificOffsetDetails

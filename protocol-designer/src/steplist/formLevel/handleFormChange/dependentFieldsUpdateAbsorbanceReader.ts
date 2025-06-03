@@ -1,7 +1,9 @@
 import pick from 'lodash/pick'
+
 import { ABSORBANCE_READER_COLOR_BY_WAVELENGTH } from '../../../constants'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { chainPatchUpdaters, fieldHasChanged } from './utils'
+
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 

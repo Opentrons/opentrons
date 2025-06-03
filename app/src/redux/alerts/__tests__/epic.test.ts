@@ -1,5 +1,5 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as Cfg from '../../config'
 import * as Actions from '../actions'

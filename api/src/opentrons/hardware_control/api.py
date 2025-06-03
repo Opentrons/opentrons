@@ -399,6 +399,10 @@ class API(
         """The status bar does not exist on OT-2!"""
         return None
 
+    def get_status_bar_enabled(self) -> bool:
+        """There is no status bar on OT-2, return False at all times."""
+        return False
+
     def get_status_bar_state(self) -> StatusBarState:
         """There is no status bar on OT-2, return IDLE at all times."""
         return StatusBarState.IDLE

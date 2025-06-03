@@ -1,9 +1,15 @@
 import { css } from 'styled-components'
+
 import {
+  ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   OVERFLOW_HIDDEN,
+  SPACING,
 } from '@opentrons/components'
+
 import type { FlattenSimpleInterpolation } from 'styled-components'
 
 export const LINK_BUTTON_STYLE = css`
@@ -62,3 +68,31 @@ export const COLUMN_STYLE = css`
 `
 
 export const NAV_BAR_HEIGHT_REM = 3.75
+
+export const GREY_BUTTON_STYLE = css`
+  display: ${DISPLAY_FLEX};
+  padding: ${SPACING.spacing8} ${SPACING.spacing16};
+  grid-gap: ${SPACING.spacing8};
+  align-items: ${ALIGN_CENTER};
+  border-radius: ${BORDERS.borderRadius8};
+  background-color: ${COLORS.grey30};
+
+  &:focus-visible {
+    outline-offset: 3px;
+    outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+  }
+
+  &:active {
+    background-color: ${COLORS.grey40};
+  }
+
+  &:hover {
+    box-shadow: 0 0 0;
+    background-color: ${COLORS.grey35};
+  }
+
+  &:disabled {
+    background-color: ${COLORS.grey30};
+    color: ${COLORS.grey40};
+  }
+`

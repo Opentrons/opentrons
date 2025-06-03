@@ -1,28 +1,29 @@
-import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { BaseDeck } from '@opentrons/components'
 import {
-  OT2_ROBOT_TYPE,
-  getModuleDef2,
   fixtureTiprack300ul,
+  getModuleDef2,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import {
-  getLabwareRenderInfo,
   getAttachedProtocolModuleMatches,
+  getLabwareRenderInfo,
 } from '/app/transformations/analysis'
+
+import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
 import type { ComponentProps } from 'react'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
@@ -136,7 +137,7 @@ describe('SetupLabwareMap', () => {
   it.skip('should render a deck WITH labware and WITHOUT modules', () => {
     vi.mocked(getLabwareRenderInfo).mockReturnValue({
       '300_ul_tiprack_id': {
-        labwareDef: fixtureTiprack300ul as LabwareDefinition2,
+        labwareDef: fixtureTiprack300ul as LabwareDefinition,
         displayName: 'fresh tips',
         x: MOCK_300_UL_TIPRACK_COORDS[0],
         y: MOCK_300_UL_TIPRACK_COORDS[1],
@@ -173,7 +174,7 @@ describe('SetupLabwareMap', () => {
   it.skip('should render a deck WITH labware and WITH modules', () => {
     vi.mocked(getLabwareRenderInfo).mockReturnValue({
       [MOCK_300_UL_TIPRACK_ID]: {
-        labwareDef: fixtureTiprack300ul as LabwareDefinition2,
+        labwareDef: fixtureTiprack300ul as LabwareDefinition,
         displayName: 'fresh tips',
         x: MOCK_300_UL_TIPRACK_COORDS[0],
         y: MOCK_300_UL_TIPRACK_COORDS[1],

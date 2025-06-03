@@ -1,8 +1,14 @@
 import { useState } from 'react'
-import { round } from 'lodash'
 import { useTranslation } from 'react-i18next'
+import { round } from 'lodash'
+
 import { DropdownMenu } from '@opentrons/components'
-import { WELL_BOTTOM, WELL_CENTER, WELL_TOP } from '@opentrons/shared-data'
+import {
+  POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_CENTER,
+  POSITION_REFERENCE_TOP,
+} from '@opentrons/shared-data'
+
 import type { Dispatch, SetStateAction } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { PositionReference } from '@opentrons/shared-data'
@@ -22,7 +28,7 @@ export function usePositionReference(args: {
   const { initialReference, zValue, updateZValue, wellDepth } = args
   const { t } = useTranslation('modal')
   const [reference, setReference] = useState<PositionReference>(
-    initialReference ?? WELL_BOTTOM
+    initialReference ?? POSITION_REFERENCE_BOTTOM
   )
 
   const handleUpdateReference = (
@@ -31,34 +37,34 @@ export function usePositionReference(args: {
     zValue: number
   ): void => {
     let newZValue = zValue
-    if (oldReference === WELL_BOTTOM) {
+    if (oldReference === POSITION_REFERENCE_BOTTOM) {
       switch (newReference) {
-        case WELL_CENTER:
+        case POSITION_REFERENCE_CENTER:
           newZValue = zValue - wellDepth / 2
           break
-        case WELL_TOP:
+        case POSITION_REFERENCE_TOP:
           newZValue = zValue - wellDepth
           break
         default:
           break
       }
-    } else if (oldReference === WELL_CENTER) {
+    } else if (oldReference === POSITION_REFERENCE_CENTER) {
       switch (newReference) {
-        case WELL_BOTTOM:
+        case POSITION_REFERENCE_BOTTOM:
           newZValue = zValue + wellDepth / 2
           break
-        case WELL_TOP:
+        case POSITION_REFERENCE_TOP:
           newZValue = zValue - wellDepth / 2
           break
         default:
           break
       }
-    } else if (oldReference === WELL_TOP) {
+    } else if (oldReference === POSITION_REFERENCE_TOP) {
       switch (newReference) {
-        case WELL_BOTTOM:
+        case POSITION_REFERENCE_BOTTOM:
           newZValue = zValue + wellDepth
           break
-        case WELL_CENTER:
+        case POSITION_REFERENCE_CENTER:
           newZValue = zValue + wellDepth / 2
           break
         default:
@@ -70,16 +76,16 @@ export function usePositionReference(args: {
 
   const referenceOptions: DropdownOption[] = [
     {
-      name: t(`tip_position.position_references.${WELL_TOP}`),
-      value: WELL_TOP,
+      name: t(`tip_position.position_references.${POSITION_REFERENCE_TOP}`),
+      value: POSITION_REFERENCE_TOP,
     },
     {
-      name: t(`tip_position.position_references.${WELL_CENTER}`),
-      value: WELL_CENTER,
+      name: t(`tip_position.position_references.${POSITION_REFERENCE_CENTER}`),
+      value: POSITION_REFERENCE_CENTER,
     },
     {
-      name: t(`tip_position.position_references.${WELL_BOTTOM}`),
-      value: WELL_BOTTOM,
+      name: t(`tip_position.position_references.${POSITION_REFERENCE_BOTTOM}`),
+      value: POSITION_REFERENCE_BOTTOM,
     },
   ]
   return {

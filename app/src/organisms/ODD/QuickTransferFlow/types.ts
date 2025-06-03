@@ -2,9 +2,17 @@ import type { Mount } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   LabwareDefinition2,
+  LiquidClass,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
-import type { ACTIONS, CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
+import type {
+  ACTIONS,
+  ASPIRATE_SETTING_OPTIONS,
+  CONSOLIDATE,
+  DISPENSE_SETTING_OPTIONS,
+  DISTRIBUTE,
+  TRANSFER,
+} from './constants'
 
 export interface QuickTransferWizardState {
   pipette?: PipetteV2Specs
@@ -16,6 +24,11 @@ export interface QuickTransferWizardState {
   destinationWells?: string[]
   transferType?: TransferType
   volume?: number
+  // Note added for liquid classes in Quick Transfer
+  path?: PathOption
+  changeTip?: ChangeTipOptions
+  dropTipLocation?: CutoutConfig
+  liquidClass?: LiquidClass
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type ChangeTipOptions =
@@ -26,6 +39,15 @@ export type ChangeTipOptions =
   | 'perSource'
 export type FlowRateKind = 'aspirate' | 'dispense' | 'blowout'
 export type BlowOutLocation = 'source_well' | 'dest_well' | CutoutConfig
+export type AspirateSettingOption = typeof ASPIRATE_SETTING_OPTIONS[keyof typeof ASPIRATE_SETTING_OPTIONS]
+export type DispenseSettingOption = typeof DISPENSE_SETTING_OPTIONS[keyof typeof DISPENSE_SETTING_OPTIONS]
+export interface SettingItem {
+  option: string
+  copy: string
+  value: string
+  enabled: boolean
+  onClick: () => void
+}
 
 export interface QuickTransferSummaryState {
   pipette: PipetteV2Specs
@@ -42,9 +64,18 @@ export interface QuickTransferSummaryState {
   path: PathOption
   tipPositionAspirate: number
   preWetTip: boolean
+  pushOut: boolean
   mixOnAspirate?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
+  }
+  submergeAspirate?: {
+    speed: number
+    positionFromBottom: number
+  }
+  retractAspirate?: {
+    speed: number
+    positionFromBottom: number
   }
   delayAspirate?: {
     delayDuration: number
@@ -56,7 +87,15 @@ export interface QuickTransferSummaryState {
   tipPositionDispense: number
   mixOnDispense?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
+  }
+  submergeDispense?: {
+    speed: number
+    positionFromBottom: number
+  }
+  retractDispense?: {
+    speed: number
+    positionFromBottom: number
   }
   delayDispense?: {
     delayDuration: number
@@ -69,6 +108,7 @@ export interface QuickTransferSummaryState {
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
+  liquidClass: LiquidClass
 }
 
 export type TransferType =
@@ -84,6 +124,10 @@ export type QuickTransferWizardAction =
   | SetDestLabwareAction
   | SetDestWellsAction
   | SetVolumeAction
+  | SetPipettePath
+  | SetChangeTip
+  | SetDropTipLocation
+  | SetLiquidClassAction
 
 export type QuickTransferSummaryAction =
   | SetAspirateFlowRateAction
@@ -95,14 +139,19 @@ export type QuickTransferSummaryAction =
   | SetDelayAspirate
   | SetTouchTipAspirate
   | SetAirGapAspirate
+  | SetSubmergeAspirate
+  | SetRetractAspirate
   | SetDispenseTipPosition
   | SetMixOnDispense
   | SetDelayDispense
   | SetTouchTipDispense
   | SetBlowOut
   | SetAirGapDispense
+  | SetSubmergeDispense
+  | SetRetractDispense
   | SetChangeTip
   | SetDropTipLocation
+  | SetPushOut
 
 interface SetAspirateFlowRateAction {
   type: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
@@ -128,7 +177,7 @@ interface SetPreWetTip {
 }
 interface SetMixOnAspirate {
   type: typeof ACTIONS.SET_MIX_ON_ASPIRATE
-  mixSettings?: { mixVolume: number; repititions: number }
+  mixSettings?: { mixVolume: number; repetitions: number }
 }
 interface SetDelayAspirate {
   type: typeof ACTIONS.SET_DELAY_ASPIRATE
@@ -145,13 +194,27 @@ interface SetAirGapAspirate {
   type: typeof ACTIONS.SET_AIR_GAP_ASPIRATE
   volume?: number
 }
+interface SetSubmergeAspirate {
+  type: typeof ACTIONS.SET_SUBMERGE_ASPIRATE
+  submergeSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
+}
+interface SetRetractAspirate {
+  type: typeof ACTIONS.SET_RETRACT_ASPIRATE
+  retractSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
+}
 interface SetDispenseTipPosition {
   type: typeof ACTIONS.SET_DISPENSE_TIP_POSITION
   position: number
 }
 interface SetMixOnDispense {
   type: typeof ACTIONS.SET_MIX_ON_DISPENSE
-  mixSettings?: { mixVolume: number; repititions: number }
+  mixSettings?: { mixVolume: number; repetitions: number }
 }
 interface SetDelayDispense {
   type: typeof ACTIONS.SET_DELAY_DISPENSE
@@ -172,6 +235,20 @@ interface SetAirGapDispense {
   type: typeof ACTIONS.SET_AIR_GAP_DISPENSE
   volume?: number
 }
+interface SetSubmergeDispense {
+  type: typeof ACTIONS.SET_SUBMERGE_DISPENSE
+  submergeSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
+}
+interface SetRetractDispense {
+  type: typeof ACTIONS.SET_RETRACT_DISPENSE
+  retractSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
+}
 interface SetChangeTip {
   type: typeof ACTIONS.SET_CHANGE_TIP
   changeTip: ChangeTipOptions
@@ -180,6 +257,12 @@ interface SetDropTipLocation {
   type: typeof ACTIONS.SET_DROP_TIP_LOCATION
   location: CutoutConfig
 }
+
+interface SetLiquidClassAction {
+  type: typeof ACTIONS.SET_LIQUID_CLASS
+  liquidClass: LiquidClass
+}
+
 interface SelectPipetteAction {
   type: typeof ACTIONS.SELECT_PIPETTE
   mount: Mount
@@ -208,4 +291,9 @@ interface SetDestWellsAction {
 interface SetVolumeAction {
   type: typeof ACTIONS.SET_VOLUME
   volume: number
+}
+
+interface SetPushOut {
+  type: typeof ACTIONS.SET_PUSH_OUT
+  pushOut: boolean
 }

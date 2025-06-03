@@ -1,7 +1,14 @@
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { css } from 'styled-components'
 
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { StyledText } from '../../atoms/StyledText'
+import { LegacyStyledText } from '../../atoms/StyledText/LegacyStyledText'
+import { Tooltip } from '../../atoms/Tooltip'
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { Icon } from '../../icons'
+import { useOnClickOutside } from '../../interaction-enhancers'
+import { Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
   CURSOR_DEFAULT,
@@ -14,23 +21,18 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
 } from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { Flex } from '../../primitives'
-import { Icon } from '../../icons'
 import { useHoverTooltip } from '../../tooltips'
-import { useOnClickOutside } from '../../interaction-enhancers'
-import { LegacyStyledText } from '../../atoms/StyledText/LegacyStyledText'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Tooltip } from '../../atoms/Tooltip'
-import { StyledText } from '../../atoms/StyledText'
-import { LiquidIcon } from '../LiquidIcon'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { DeckInfoLabel } from '../DeckInfoLabel'
+import { LiquidIcon } from '../LiquidIcon'
 
-import type { FocusEventHandler } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { FocusEventHandler } from 'react'
 
 export interface DropdownOption {
+  /** dropdown option name */
   name: string
+  /** dropdown option value */
   value: string
   /** optional dropdown option for adding the liquid color icon */
   liquidColor?: string
@@ -38,11 +40,15 @@ export interface DropdownOption {
   deckLabel?: string
   /** subtext below the name */
   subtext?: string
+  /** optional disabled */
   disabled?: boolean
+  /** optional tooltip text */
   tooltipText?: string | null
 }
 
 export type DropdownBorder = 'rounded' | 'neutral'
+
+type MenuPlacement = 'auto' | 'top' | 'bottom'
 
 export interface DropdownMenuProps {
   /** dropdown options */
@@ -72,8 +78,10 @@ export interface DropdownMenuProps {
   /** optional disabled */
   disabled?: boolean
   /** optional placement of the menu */
-  menuPlacement?: 'auto' | 'top' | 'bottom'
+  menuPlacement?: MenuPlacement
+  /** optional enter handler */
   onEnter?: (id: string) => void
+  /** optional exit handler */
   onExit?: () => void
 }
 
@@ -104,63 +112,97 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     placement: 'top-end',
   })
 
-  const [dropdownPosition, setDropdownPosition] = useState<'top' | 'bottom'>(
-    'bottom'
-  )
+  const [dropdownPosition, setDropdownPosition] = useState<
+    Omit<MenuPlacement, 'auto'>
+  >('bottom')
   const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowDropdownMenu(false)
     },
   })
 
+  const menuItemsContainerRef = useRef<HTMLDivElement | null>(null)
+
   useEffect(() => {
-    if (menuPlacement !== 'auto') {
-      setDropdownPosition(menuPlacement)
+    if (
+      !dropDownMenuWrapperRef.current ||
+      !showDropdownMenu ||
+      !menuItemsContainerRef.current ||
+      menuPlacement !== 'auto'
+    ) {
       return
     }
 
-    const handlePositionCalculation = (): void => {
-      const dropdownRect = dropDownMenuWrapperRef.current?.getBoundingClientRect()
-      if (!dropdownRect) return
+    const dropdownRect = dropDownMenuWrapperRef.current.getBoundingClientRect()
+    let potentialMenuHeight = 0
+    if (menuItemsContainerRef.current) {
+      potentialMenuHeight = menuItemsContainerRef.current.scrollHeight
+    }
 
-      const parentElement = dropDownMenuWrapperRef.current?.parentElement
-      const grandParentElement = parentElement?.parentElement?.parentElement
+    const viewportHeight = window.innerHeight
+    const spaceAbove = dropdownRect.top
+    const spaceBelow = viewportHeight - dropdownRect.bottom
 
-      let availableHeight = window.innerHeight
-      let scrollOffset = 0
+    let newPosition: 'top' | 'bottom' = 'bottom'
 
-      if (grandParentElement) {
-        const grandParentRect = grandParentElement.getBoundingClientRect()
-        availableHeight = grandParentRect.bottom - grandParentRect.top
-        scrollOffset = grandParentRect.top
-      } else if (parentElement) {
-        const parentRect = parentElement.getBoundingClientRect()
-        availableHeight = parentRect.bottom - parentRect.top
-        scrollOffset = parentRect.top
-      }
+    if (menuPlacement === 'auto') {
+      const fitsBelow = spaceBelow >= potentialMenuHeight
+      const fitsAbove = spaceAbove >= potentialMenuHeight
 
-      const dropdownHeight = filterOptions.length * 34 + 10 // note (kk:2024/12/06) need to modify the value since design uses different height in desktop and pd
-      const dropdownBottom = dropdownRect.bottom + dropdownHeight - scrollOffset
-
-      const fitsBelow = dropdownBottom <= availableHeight
-      const fitsAbove = dropdownRect.top - dropdownHeight >= scrollOffset
-
-      if (menuPlacement === 'auto') {
-        setDropdownPosition(fitsBelow ? 'bottom' : fitsAbove ? 'top' : 'bottom')
+      if (fitsBelow) {
+        newPosition = 'bottom'
+      } else if (fitsAbove) {
+        newPosition = 'top'
       } else {
-        setDropdownPosition(menuPlacement)
+        newPosition = spaceBelow >= spaceAbove ? 'bottom' : 'top'
       }
+    } else {
+      newPosition = menuPlacement
+    }
+    setDropdownPosition(newPosition)
+
+    const handlePositionCalculation = (): void => {
+      if (
+        !dropDownMenuWrapperRef.current ||
+        !showDropdownMenu ||
+        !menuItemsContainerRef.current
+      )
+        return
+      const currentTriggerRect = dropDownMenuWrapperRef.current.getBoundingClientRect()
+      const currentMenuHeight = menuItemsContainerRef.current.scrollHeight
+      const currentViewportHeight = window.innerHeight
+      const currentSpaceAbove = currentTriggerRect.top
+      const currentSpaceBelow =
+        currentViewportHeight - currentTriggerRect.bottom
+      let determinedPosition = 'bottom'
+      if (menuPlacement === 'auto') {
+        const currentFitsBelow = currentSpaceBelow >= currentMenuHeight
+        const currentFitsAbove = currentSpaceAbove >= currentMenuHeight
+        if (currentFitsBelow) determinedPosition = 'bottom'
+        else if (currentFitsAbove) determinedPosition = 'top'
+        else
+          determinedPosition =
+            currentSpaceBelow >= currentSpaceAbove ? 'bottom' : 'top'
+      } else {
+        determinedPosition = menuPlacement
+      }
+      setDropdownPosition(determinedPosition as 'top' | 'bottom')
     }
 
     window.addEventListener('resize', handlePositionCalculation)
-    window.addEventListener('scroll', handlePositionCalculation)
-    handlePositionCalculation()
+    window.addEventListener('scroll', handlePositionCalculation, true)
 
     return () => {
       window.removeEventListener('resize', handlePositionCalculation)
-      window.removeEventListener('scroll', handlePositionCalculation)
+      window.removeEventListener('scroll', handlePositionCalculation, true)
     }
-  }, [filterOptions.length, dropDownMenuWrapperRef])
+  }, [
+    showDropdownMenu,
+    filterOptions.length,
+    menuPlacement,
+    dropDownMenuWrapperRef,
+    menuItemsContainerRef,
+  ])
 
   const toggleSetShowDropdownMenu = (): void => {
     if (!isDisabled) {
@@ -250,6 +292,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           onFocus={onFocus}
           onBlur={onBlur}
           css={DROPDOWN_STYLE}
+          data-testId="dropdownMenu"
           tabIndex={tabIndex}
         >
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
@@ -267,33 +310,27 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                   : TYPOGRAPHY.pRegular};
               `}
             >
-              <StyledText
-                desktopStyle="captionRegular"
-                css={LINE_CLAMP_TEXT_STYLE(1)}
-              >
-                {currentOption.name}
-              </StyledText>
+              {currentOption.deckLabel !== currentOption.name ? (
+                <StyledText
+                  desktopStyle="captionRegular"
+                  css={LINE_CLAMP_TEXT_STYLE(1)}
+                >
+                  {currentOption.name}
+                </StyledText>
+              ) : null}
             </Flex>
           </Flex>
-          {showDropdownMenu ? (
-            <Icon size="0.75rem" name="menu-down" transform="rotate(180deg)" />
-          ) : (
-            <Icon size="0.75rem" name="menu-down" />
-          )}
+          <Icon
+            size="0.75rem"
+            name="menu-down"
+            transform={showDropdownMenu ? 'rotate(180deg)' : undefined}
+          />
         </Flex>
         {showDropdownMenu && (
           <Flex
-            zIndex={3}
-            borderRadius={BORDERS.borderRadius8}
-            boxShadow={BORDERS.tinyDropShadow}
-            position={POSITION_ABSOLUTE}
-            backgroundColor={COLORS.white}
-            flexDirection={DIRECTION_COLUMN}
-            width={width}
-            top={dropdownPosition === 'bottom' ? '2.5rem' : undefined}
-            bottom={dropdownPosition === 'top' ? '2.5rem' : undefined}
-            overflowY={OVERFLOW_AUTO}
-            maxHeight="20rem" // Set the maximum display number to 10.
+            ref={menuItemsContainerRef}
+            css={MENU_ITEM_CONTAINER_STYLE(width, dropdownPosition)}
+            role="listbox"
           >
             {filterOptions.map((option, index) => (
               <Fragment key={`${option.name}-${index}`}>
@@ -328,12 +365,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                       flexDirection={DIRECTION_COLUMN}
                       gridGap={option.subtext != null ? SPACING.spacing4 : '0'}
                     >
-                      <StyledText
-                        desktopStyle="captionRegular"
-                        css={LINE_CLAMP_TEXT_STYLE(3, true)}
-                      >
-                        {option.name}
-                      </StyledText>
+                      {option.deckLabel !== option.name ? (
+                        <StyledText
+                          desktopStyle="captionRegular"
+                          css={LINE_CLAMP_TEXT_STYLE(3, true)}
+                        >
+                          {option.name}
+                        </StyledText>
+                      ) : null}
                       <StyledText
                         desktopStyle="captionRegular"
                         color={COLORS.grey60}
@@ -366,6 +405,23 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     </Flex>
   )
 }
+
+const MENU_ITEM_CONTAINER_STYLE = (
+  width: string,
+  dropdownPosition: Omit<MenuPlacement, 'auto'>
+): FlattenSimpleInterpolation => css`
+  position: ${POSITION_ABSOLUTE};
+  z-index: 3;
+  width: ${width};
+  flex-direction: ${DIRECTION_COLUMN};
+  border-radius: ${BORDERS.borderRadius8};
+  background-color: ${COLORS.white};
+  box-shadow: ${BORDERS.tinyDropShadow};
+  top: ${dropdownPosition === 'bottom' ? '2.5rem' : undefined};
+  bottom: ${dropdownPosition === 'top' ? '2.5rem' : undefined};
+  overflow-y: ${OVERFLOW_AUTO};
+  max-height: 20rem;
+`
 
 export const LINE_CLAMP_TEXT_STYLE = (
   lineClamp?: number,

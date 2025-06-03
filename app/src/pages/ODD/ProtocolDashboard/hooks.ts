@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { formatDistance } from 'date-fns'
 import { useTranslation } from 'react-i18next'
+import { formatDistance } from 'date-fns'
 
 import type { TFunction } from 'i18next'
 

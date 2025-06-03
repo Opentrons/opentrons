@@ -35,12 +35,6 @@ class Point(NamedTuple):
     y: float = 0.0
     z: float = 0.0
 
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, Point):
-            return False
-        pairs = ((self.x, other.x), (self.y, other.y), (self.z, other.z))
-        return all(isclose(s, o, rel_tol=1e-05, abs_tol=1e-08) for s, o in pairs)
-
     def __add__(self, other: Any) -> Point:
         if not isinstance(other, Point):
             return NotImplemented
@@ -74,6 +68,12 @@ class Point(NamedTuple):
         y_diff = self.y - other.y
         z_diff = self.z - other.z
         return sqrt(x_diff**2 + y_diff**2 + z_diff**2)
+
+    def elementwise_isclose(
+        self, other: Point, *, rel_tol: float = 1e-05, abs_tol: float = 1e-08
+    ) -> bool:
+        pairs = ((self.x, other.x), (self.y, other.y), (self.z, other.z))
+        return all(isclose(s, o, rel_tol=rel_tol, abs_tol=abs_tol) for s, o in pairs)
 
 
 LocationLabware = Union[
@@ -199,7 +199,11 @@ class Location:
 
         """
 
-        return Location(point=self.point + point, labware=self._given_labware)
+        return Location(
+            point=self.point + point,
+            labware=self._given_labware,
+            _meniscus_tracking=self._meniscus_tracking,
+        )
 
     def __repr__(self) -> str:
         return f"Location(point={repr(self._point)}, labware={self._labware}, meniscus_tracking={self._meniscus_tracking})"

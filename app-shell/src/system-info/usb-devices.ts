@@ -1,9 +1,10 @@
 import assert from 'assert'
+import { createHmac } from 'crypto'
 import execa from 'execa'
 import { usb } from 'usb'
-import { isWindows } from '../os'
+
 import { createLogger } from '../log'
-import { createHmac } from 'crypto'
+import { isWindows } from '../os'
 
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 

@@ -1,4 +1,5 @@
 import execa from 'execa'
+
 import { createLogger } from '../log'
 
 const log = createLogger('protocol-analysis/executeAnalyzeCli')

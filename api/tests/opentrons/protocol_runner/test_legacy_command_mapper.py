@@ -22,12 +22,11 @@ from opentrons.protocol_api.core.legacy.load_info import (
     ModuleLoadInfo as LegacyModuleLoadInfo,
 )
 from opentrons.protocol_engine import (
-    DeckSlotLocation,
-    ModuleLocation,
     ModuleModel,
     ModuleDefinition,
     commands as pe_commands,
     actions as pe_actions,
+    types as pe_types,
 )
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.resources import (
@@ -282,7 +281,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition2) -> None:
 
     expected_id_and_key = "commands.LOAD_LABWARE-0"
     expected_params = pe_commands.LoadLabwareParams(
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         namespace="some_namespace",
         loadName="some_load_name",
         version=123,
@@ -317,6 +316,11 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition2) -> None:
                 # get passed through correctly.
                 definition=matchers.Anything(),
                 offsetId="labware-offset-id-123",
+                locationSequence=[
+                    pe_types.OnAddressableAreaLocationSequenceComponent(
+                        addressableAreaName="1"
+                    )
+                ],
             ),
             notes=[],
         ),
@@ -325,7 +329,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition2) -> None:
                 labware_id="labware-0",
                 definition=matchers.Anything(),
                 offset_id="labware-offset-id-123",
-                new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                new_location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 display_name="My special labware",
             )
         ),
@@ -426,7 +430,7 @@ def test_map_module_load(
     expected_id_and_key = "commands.LOAD_MODULE-0"
     expected_params = pe_commands.LoadModuleParams.model_construct(
         model=ModuleModel.TEMPERATURE_MODULE_V1,
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         moduleId=matchers.IsA(str),
     )
     expected_queue = pe_actions.QueueCommandAction(
@@ -483,7 +487,7 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition2) -> Non
 
     expected_id_and_key = "commands.LOAD_LABWARE-0"
     expected_params = pe_commands.LoadLabwareParams.model_construct(
-        location=ModuleLocation(moduleId="module-123"),
+        location=pe_types.ModuleLocation(moduleId="module-123"),
         namespace="some_namespace",
         loadName="some_load_name",
         version=123,
@@ -518,6 +522,12 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition2) -> Non
                 # get passed through correctly.
                 definition=matchers.Anything(),
                 offsetId="labware-offset-id-123",
+                locationSequence=[
+                    pe_types.OnModuleLocationSequenceComponent(moduleId="module-123"),
+                    pe_types.OnAddressableAreaLocationSequenceComponent(
+                        addressableAreaName="1"
+                    ),
+                ],
             ),
             notes=[],
         ),
@@ -526,7 +536,7 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition2) -> Non
                 labware_id="labware-0",
                 definition=matchers.Anything(),
                 offset_id="labware-offset-id-123",
-                new_location=ModuleLocation(moduleId="module-123"),
+                new_location=pe_types.ModuleLocation(moduleId="module-123"),
                 display_name="My very special module labware",
             )
         ),

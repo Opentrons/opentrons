@@ -1,6 +1,6 @@
-import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
-import { describe, it, afterEach, expect, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useCurrentRunId } from '../useCurrentRunId'
 import { useNotifyAllRunsQuery } from '../useNotifyAllRunsQuery'

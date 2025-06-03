@@ -1,32 +1,31 @@
-import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
-  Flex,
+  AnimationVideo,
   Banner,
+  Flex,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
+
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import type {
-  CreateCommand,
-  DeckConfiguration,
-  CutoutId,
-  CutoutFixtureId,
-} from '@opentrons/shared-data'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 
-import type { ModuleCalibrationWizardStepProps } from './types'
-interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
+import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
+import type { ModuleSetupWizardStepProps } from './types'
+
+interface AttachProbeProps extends ModuleSetupWizardStepProps {
   adapterId: string | null
   deckConfig: DeckConfiguration
-  fixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
 }
 
 const BODY_STYLE = css`
@@ -49,13 +48,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     attachedPipette,
     isOnDevice,
     deckConfig,
-    fixtureIdByCutoutId,
   } = props
   const { t, i18n } = useTranslation([
     'module_wizard_flows',
     'pipette_wizard_flows',
   ])
-
+  const fixtureIdByCutoutId = getFixtureIdByCutoutId(attachedModule, deckConfig)
   const attachedPipetteChannels = attachedPipette.data.channels
   let pipetteAttachProbeVideoSource, probeLocation
   switch (attachedPipetteChannels) {
@@ -80,17 +78,14 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   const pipetteAttachProbeVid = (
     <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-      <video
+      <AnimationVideo
         css={css`
           max-width: 100%;
           max-height: 100%;
         `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
       >
         <source src={pipetteAttachProbeVideoSource} />
-      </video>
+      </AnimationVideo>
     </Flex>
   )
 

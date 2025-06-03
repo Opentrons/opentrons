@@ -1,12 +1,15 @@
-import { describe, it, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
   fixture_96_plate,
-  fixture_trash,
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
+  fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
+
 import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
 import { dependentFieldsUpdateMix } from '../dependentFieldsUpdateMix'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,

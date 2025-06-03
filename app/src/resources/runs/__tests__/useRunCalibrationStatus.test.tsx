@@ -1,18 +1,19 @@
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { vi, it, expect, describe, beforeEach } from 'vitest'
+import { createStore } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { useIsFlex } from '/app/redux-resources/robots'
 import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
+import { useDeckCalibrationStatus } from '/app/resources/calibration'
+
 import {
+  useNotifyRunQuery,
   useRunCalibrationStatus,
   useRunPipetteInfoByMount,
-  useNotifyRunQuery,
 } from '..'
-import { useDeckCalibrationStatus } from '/app/resources/calibration'
-import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { FunctionComponent, ReactNode } from 'react'
 import type { PipetteInfo } from '/app/redux/pipettes'

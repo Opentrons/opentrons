@@ -4,7 +4,7 @@ import logging
 import json
 import os
 from pathlib import Path
-from typing import Any, AnyStr, Dict, Mapping, Optional, Union, List, Sequence, Literal
+from typing import Mapping, Optional, Union, List, Sequence, Literal
 
 import jsonschema  # type: ignore
 
@@ -147,46 +147,51 @@ def save_definition(
 
 
 def verify_definition(  # noqa: C901
-    contents: Union[AnyStr, LabwareDefinition, Dict[str, Any]]
+    contents: str | bytes | LabwareDefinition | object,
 ) -> LabwareDefinition:
     """Verify that an input string is a labware definition and return it.
 
-    If the definition is invalid, an exception is raised; otherwise parse the
-    json and return the valid definition.
+    :param contents: The untrusted input to parse and validate. If str or bytes, it's
+        parsed as JSON. Otherwise, it should be the output of json.load().
 
     :raises NotALabwareError:
-    :returns: The parsed definition
+
+    :returns: The parsed and validated definition
     """
     schemata_by_version = {
         2: json.loads(load_shared_data("labware/schemas/2.json").decode("utf-8")),
         3: json.loads(load_shared_data("labware/schemas/3.json").decode("utf-8")),
     }
 
-    if isinstance(contents, dict):
-        to_return = contents
-    else:
-        try:
-            to_return = json.loads(contents)
-        except json.JSONDecodeError as e:
-            raise NotALabwareError("invalid-json", [e]) from e
     try:
-        schema_version = to_return["schemaVersion"]
-    except KeyError as e:
-        raise NotALabwareError("no-schema-id", [e]) from e
+        parsed_json: object = (
+            json.loads(contents) if isinstance(contents, (str, bytes)) else contents
+        )
+    except json.JSONDecodeError as e:
+        raise NotALabwareError("invalid-json", [e]) from e
+
+    if isinstance(parsed_json, dict):
+        try:
+            schema_version: object = parsed_json["schemaVersion"]
+        except KeyError as e:
+            raise NotALabwareError("no-schema-id", [e]) from e
+    else:
+        raise NotALabwareError("no-schema-id", [])
 
     try:
-        schema = schemata_by_version[schema_version]
+        # we can type ignore this because we handle the KeyError below
+        schema = schemata_by_version[schema_version]  # type: ignore[index]
     except KeyError as e:
         raise NotALabwareError("bad-schema-id", [e]) from e
 
     try:
-        jsonschema.validate(to_return, schema)
+        jsonschema.validate(parsed_json, schema)
     except jsonschema.ValidationError as e:
         raise NotALabwareError("schema-mismatch", [e]) from e
 
     # we can type ignore this because if it passes the jsonschema it has
     # the correct structure
-    return to_return  # type: ignore[return-value]
+    return parsed_json  # type: ignore[return-value]
 
 
 def _get_labware_definition_from_bundle(

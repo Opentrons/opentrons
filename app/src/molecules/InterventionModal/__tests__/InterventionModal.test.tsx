@@ -1,19 +1,21 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import '@testing-library/jest-dom/vitest'
 
-import { screen, fireEvent } from '@testing-library/react'
-import { COLORS, BORDERS } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
 
-import { i18n } from '/app/i18n'
+import { BORDERS, COLORS } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
 
 import { InterventionModal } from '../'
 
 import type { ComponentProps } from 'react'
-import type { ModalType } from '../'
 import type { State } from '/app/redux/types'
+import type { ModalType } from '../'
 
 vi.mock('/app/redux/config')
 

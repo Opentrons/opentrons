@@ -1,8 +1,8 @@
-import { useEffect, useState, Fragment } from 'react'
-import first from 'lodash/first'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import first from 'lodash/first'
 import { css } from 'styled-components'
 
 import {
@@ -29,7 +29,6 @@ import {
   NO_WRAP,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
-  ProtocolDeck,
   SecondaryButton,
   SPACING,
   Tooltip,
@@ -43,25 +42,27 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, sortRuntimeParameters } from '@opentrons/shared-data'
 
+import { ToggleButton } from '/app/atoms/buttons'
+import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
 import { useLogger } from '/app/logger'
+import { MiniCard } from '/app/molecules/MiniCard'
+import { UploadInput } from '/app/molecules/UploadInput'
+import { useCreateRunFromProtocol } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
+import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
+import { getAnalysisStatus } from '/app/organisms/Desktop/ProtocolsLanding/utils'
+import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { ProtocolDeck } from '/app/organisms/ProtocolDeck'
+import { useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
-import { ToggleButton } from '/app/atoms/buttons'
-import { MiniCard } from '/app/molecules/MiniCard'
-import { UploadInput } from '/app/molecules/UploadInput'
-import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
-import { useCreateRunFromProtocol } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
-import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { FileCard } from '../ChooseRobotSlideout/FileCard'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
-import { getAnalysisStatus } from '/app/organisms/Desktop/ProtocolsLanding/utils'
-import { useRobotType } from '/app/redux-resources/robots'
+
+import { FileCard } from '../ChooseRobotSlideout/FileCard'
 
 import type { MouseEventHandler } from 'react'
 import type { DropdownOption } from '@opentrons/components'
@@ -124,6 +125,15 @@ export function ChooseProtocolSlideoutComponent(
     ) ?? false
   )
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
+  const multiSlideoutRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (currentPage === 2 && multiSlideoutRef.current != null) {
+      multiSlideoutRef.current.scrollIntoView({
+        behavior: 'smooth',
+      })
+    }
+  }, [currentPage])
 
   useEffect(() => {
     setRunTimeParametersOverrides(
@@ -528,7 +538,11 @@ export function ChooseProtocolSlideoutComponent(
   }
 
   const pageTwoBody = (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
+    <Flex
+      ref={multiSlideoutRef}
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing10}
+    >
       <Flex justifyContent={JUSTIFY_END}>
         <LinkComponent
           textAlign={TYPOGRAPHY.textAlignRight}

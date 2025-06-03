@@ -2,11 +2,11 @@
 
 import type {
   Method,
-  RobotHost,
   RobotApiRequestMeta,
   RobotApiResponseMeta,
   RobotApiV2Error,
   RobotApiV2ErrorResponseBody,
+  RobotHost,
 } from '../types'
 
 export interface ResponseFixturesOptions<SuccessBody, FailureBody> {

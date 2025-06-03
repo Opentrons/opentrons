@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 

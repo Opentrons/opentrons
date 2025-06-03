@@ -2,21 +2,20 @@ import { ofType } from 'redux-observable'
 import { of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 
-import { POST, fetchRobotApi } from '../../robot-api'
+import { fetchRobotApi, POST } from '../../robot-api'
 import { withRobotHost } from '../../robot-api/operators'
-
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 import { mapActionToRequest as mapActionToFetchSessionRequest } from './fetchSessionEpic'
 
 import type { Observable } from 'rxjs'
-import type { State, Action, Epic } from '../../types'
 import type {
   RobotApiRequestOptions,
-  RobotHost,
   RobotApiResponse,
   RobotApiV2ErrorResponseBody,
+  RobotHost,
 } from '../../robot-api/types'
+import type { Action, Epic, State } from '../../types'
 import type {
   CreateSessionCommandAction,
   CreateSessionCommandFailureAction,

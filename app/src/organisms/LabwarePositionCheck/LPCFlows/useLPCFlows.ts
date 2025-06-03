@@ -7,29 +7,31 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
+import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   useCreateTargetedMaintenanceRunMutation,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
 } from '/app/resources/runs'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
+
 import {
-  useLPCLabwareInfo,
   useCompatibleAnalysis,
-  useUpdateDeckConfig,
   useHandleClientAppliedOffsets,
-  useOffsetConflictTimestamp,
-  useUpdateLabwareInfo,
+  useLPCLabwareInfo,
   useMonitorMaintenanceRunForDeletion,
+  useOffsetConflictTimestamp,
+  useUpdateDeckConfig,
+  useUpdateLabware,
 } from './hooks'
+import { useLPCAnalytics } from './useLPCAnalytics'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type {
   LegacySupportLPCFlowsProps,
   LPCFlowsProps,
 } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
-import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
 
 interface UseLPCFlowsBase {
   showLPC: boolean
@@ -60,6 +62,11 @@ export function useLPCFlows({
   robotType,
   protocolName,
 }: UseLPCFlowsProps): UseLPCFlowsResult {
+  const analytics = useLPCAnalytics({
+    robotType,
+    runId: runId ?? 'UNKNOWN',
+  })
+
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
@@ -97,9 +104,9 @@ export function useLPCFlows({
   })
 
   useOffsetConflictTimestamp(isFlex, runId, runRecord)
-  useUpdateDeckConfig(runId, deckConfig)
-  useUpdateLabwareInfo(runId, maintenanceRunId, labwareInfo)
-  useHandleClientAppliedOffsets(runId)
+  useUpdateDeckConfig(isFlex, runId, deckConfig)
+  useUpdateLabware(isFlex, runId, maintenanceRunId, labwareInfo)
+  useHandleClientAppliedOffsets(isFlex, runId)
   useInitLPCStore({
     runId,
     runRecord,
@@ -109,7 +116,7 @@ export function useLPCFlows({
     labwareDefs,
     labwareInfo,
     deckConfig,
-    robotType,
+    isFlex,
     flexStoredOffsets: flexOffsets,
   })
 
@@ -149,6 +156,7 @@ export function useLPCFlows({
   const launchLPC = (): Promise<void> => {
     // Avoid accidentally creating several maintenance runs if a request is ongoing.
     if (!isLaunching) {
+      analytics.reportLaunchLpcWizard()
       setIsLaunching(true)
       const labwareOffsets = getRelevantOffsets(
         robotType,
@@ -207,6 +215,7 @@ export function useLPCFlows({
           protocolName,
           maintenanceRunId,
           ot2Offsets,
+          analytics,
         },
       }
     : {

@@ -3,7 +3,7 @@ from typing import Optional, Union
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
-from opentrons.types import Point
+from opentrons.types import Point, Mount, MountType
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine import commands as cmd
@@ -13,6 +13,7 @@ from opentrons.protocol_engine.types.liquid_level_detection import (
     SimulatedProbeResult,
     LiquidTrackingType,
 )
+from opentrons.protocol_engine.errors import PipetteNotAttachedError
 
 from . import point_calculations
 from . import stringify
@@ -181,17 +182,29 @@ class WellCore(AbstractWellCore):
 
     def estimate_liquid_height_after_pipetting(
         self,
+        mount: Mount | str,
         operation_volume: float,
     ) -> LiquidTrackingType:
         """Return an estimate of liquid height after pipetting without raising an error."""
         labware_id = self.labware_id
         well_name = self._name
+        if isinstance(mount, Mount):
+            mount_type = MountType.from_hw_mount(mount)
+        else:
+            mount_type = MountType(mount)
+        pipette_from_mount = self._engine_client.state.pipettes.get_by_mount(mount_type)
+        if pipette_from_mount is None:
+            raise PipetteNotAttachedError(f"No pipette present on mount {mount}")
+        pipette_id = pipette_from_mount.id
         starting_liquid_height = self.current_liquid_height()
-        projected_final_height = self._engine_client.state.geometry.get_well_height_after_liquid_handling_no_error(
-            labware_id=labware_id,
-            well_name=well_name,
-            initial_height=starting_liquid_height,
-            volume=operation_volume,
+        projected_final_height = (
+            self._engine_client.state.geometry.get_well_height_after_liquid_handling(
+                labware_id=labware_id,
+                well_name=well_name,
+                pipette_id=pipette_id,
+                initial_height=starting_liquid_height,
+                volume=operation_volume,
+            )
         )
         return projected_final_height
 
@@ -209,4 +222,20 @@ class WellCore(AbstractWellCore):
         well_name = self._name
         return self._engine_client.state.geometry.get_current_well_volume(
             labware_id=labware_id, well_name=well_name
+        )
+
+    def height_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the height in a well corresponding to a given volume."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_well_height_at_volume(
+            labware_id=labware_id, well_name=well_name, volume=volume
+        )
+
+    def volume_from_height(self, height: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the volume contained in a well at any height."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_well_volume_at_height(
+            labware_id=labware_id, well_name=well_name, height=height
         )

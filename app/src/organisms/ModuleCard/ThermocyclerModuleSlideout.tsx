@@ -1,14 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  CELSIUS,
-  getModuleDisplayName,
-  TEMP_LID_MAX,
-  TEMP_LID_MIN,
-  TEMP_BLOCK_MAX,
-  TEMP_MIN,
-} from '@opentrons/shared-data'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -18,9 +10,19 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  CELSIUS,
+  getModuleDisplayName,
+  TEMP_BLOCK_MAX,
+  TEMP_LID_MAX,
+  TEMP_LID_MIN,
+  TEMP_MIN,
+} from '@opentrons/shared-data'
 
-import { Slideout } from '/app/atoms/Slideout'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type {
   TCSetTargetBlockTemperatureCreateCommand,
@@ -45,6 +47,7 @@ export const ThermocyclerModuleSlideout = (
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
+  const { reportModuleCommand } = useModuleCommandAnalytics()
 
   let errorMessage
   if (isSecondaryTemp) {
@@ -79,13 +82,42 @@ export const ThermocyclerModuleSlideout = (
       }
       createLiveCommand({
         command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            saveLidCommand.commandType ?? saveBlockCommand.commandType
-          }: ${e.message}`
-        )
       })
+        .then(() => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand:
+              modulePart === 'Lid'
+                ? saveLidCommand.commandType
+                : saveBlockCommand.commandType,
+            result: { status: 'succeeded', data: undefined },
+            serialNumber: module.serialNumber,
+            temperature: tempValue,
+            errorDetails: '',
+            firmwareVersion: module.firmwareVersion,
+          })
+        })
+        .catch((e: Error) => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand:
+              modulePart === 'Lid'
+                ? saveLidCommand.commandType
+                : saveBlockCommand.commandType,
+            result: { status: 'failed', data: undefined },
+            errorDetails: e.message,
+            serialNumber: module.serialNumber,
+            temperature: tempValue,
+            firmwareVersion: module.firmwareVersion,
+          })
+          console.error(
+            `error setting module status with command type ${
+              saveLidCommand.commandType ?? saveBlockCommand.commandType
+            }: ${e.message}`
+          )
+        })
     }
     setTempValue(null)
     onCloseClick()

@@ -1,13 +1,13 @@
 import { renderHook } from '@testing-library/react'
-import { vi, it, expect, describe, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import {
-  getPipetteNameSpecs,
-  getLoadedLabwareDefinitionsByUri,
-  opentrons96Tiprack10UlV1Uncasted as _tiprack10ul,
-} from '@opentrons/shared-data'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
+import {
+  opentrons96Tiprack10UlV1Uncasted as _tiprack10ul,
+  getLoadedLabwareDefinitionsByUri,
+  getPipetteNameSpecs,
+} from '@opentrons/shared-data'
 
 import {
   mockPipetteOffsetCalibration1,
@@ -21,15 +21,15 @@ import {
   mockLeftProtoPipette,
   mockRightProtoPipette,
 } from '/app/redux/pipettes/__fixtures__'
-import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
-
-import { useRunPipetteInfoByMount } from '../useRunPipetteInfoByMount'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
 } from '/app/resources/instruments'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+
 import { modifiedSimpleV6Protocol as _uncastedModifiedSimpleV6Protocol } from '../__fixtures__'
+import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
+import { useRunPipetteInfoByMount } from '../useRunPipetteInfoByMount'
 
 import type * as SharedData from '@opentrons/shared-data'
 import type { PipetteInfo } from '/app/redux/pipettes'
@@ -68,7 +68,7 @@ const TIP_LENGTH_CALIBRATIONS = [
   mockTipLengthCalibration2,
 ]
 
-const tiprack10ul = _tiprack10ul as SharedData.LabwareDefinition2
+const tiprack10ul = _tiprack10ul as SharedData.LabwareDefinition
 const modifiedSimpleV6Protocol = ({
   ..._uncastedModifiedSimpleV6Protocol,
   labware: [

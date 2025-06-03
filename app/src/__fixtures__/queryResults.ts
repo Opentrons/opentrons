@@ -1,4 +1,5 @@
 import { vi } from 'vitest'
+
 import type { UseQueryResult } from 'react-query'
 
 export function mockSuccessQueryResults<Result>(

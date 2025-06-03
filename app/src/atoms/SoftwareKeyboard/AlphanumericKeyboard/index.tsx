@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import Keyboard from 'react-simple-keyboard'
 import { useSelector } from 'react-redux'
+import Keyboard from 'react-simple-keyboard'
+
 import { getAppLanguage } from '/app/redux/config'
+
 import {
   alphanumericKeyboardLayout,
-  layoutCandidates,
   customDisplay,
+  layoutCandidates,
 } from '../constants'
 
 import type { MutableRefObject } from 'react'

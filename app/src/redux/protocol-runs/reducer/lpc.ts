@@ -1,6 +1,7 @@
 import {
   APPLIED_OFFSETS_TO_RUN,
   APPLY_WORKING_OFFSETS,
+  CLEAR_SNACKBAR_STATUS,
   CLEAR_WORKING_OFFSETS,
   FINISH_LPC,
   GO_BACK_HANDLE_LW_SUBSTEP,
@@ -18,6 +19,7 @@ import {
   SET_SELECTED_LABWARE_URI,
   SOURCE_OFFSETS_FROM_DATABASE,
   SOURCE_OFFSETS_FROM_RUN,
+  TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
   UPDATE_CONFLICT_TIMESTAMP,
   UPDATE_LPC,
   UPDATE_LPC_DECK,
@@ -31,6 +33,7 @@ import {
   proceedToNextHandleLwSubstep,
   updateLPCLabwareInfoFrom,
   updateOffsetsForURI,
+  updateSnackbarState,
 } from './transforms'
 
 import type {
@@ -63,7 +66,10 @@ export function LPCReducer(
       case UPDATE_LPC_LABWARE: {
         return {
           ...state,
-          labwareInfo: action.payload.labware,
+          labwareInfo: {
+            ...state.labwareInfo,
+            labware: action.payload.labware,
+          },
         }
       }
 
@@ -148,6 +154,7 @@ export function LPCReducer(
       case RESET_OFFSET_TO_DEFAULT: {
         const lwUri = action.payload.labwareUri
         const updatedLwDetails = updateOffsetsForURI(state, action)
+        const updatedSnackbarState = updateSnackbarState(state, action)
 
         return {
           ...state,
@@ -160,6 +167,10 @@ export function LPCReducer(
                 ...updatedLwDetails,
               },
             },
+          },
+          ui: {
+            ...state.ui,
+            showSnackbar: updatedSnackbarState,
           },
         }
       }
@@ -193,6 +204,10 @@ export function LPCReducer(
             all: LPC_STEPS,
             lastStepIndices: null,
             currentSubstep: null,
+          },
+          ui: {
+            ...state.ui,
+            showDefaultOffsetInfoBanner: true, // show banner each LPC launch
           },
         }
 
@@ -268,6 +283,26 @@ export function LPCReducer(
             conflictTimestampInfo: info,
             sourcedOffsets: offsetSource(),
             labware: updatedLw(),
+          },
+        }
+      }
+
+      case TOGGLE_DEFAULT_OFFSET_INFO_BANNER: {
+        return {
+          ...state,
+          ui: {
+            ...state.ui,
+            showDefaultOffsetInfoBanner: !state.ui.showDefaultOffsetInfoBanner,
+          },
+        }
+      }
+
+      case CLEAR_SNACKBAR_STATUS: {
+        return {
+          ...state,
+          ui: {
+            ...state.ui,
+            showSnackbar: null,
           },
         }
       }

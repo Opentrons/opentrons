@@ -1,4 +1,5 @@
 import { css } from 'styled-components'
+
 import {
   DISPLAY_INLINE_BLOCK,
   Icon,
@@ -9,6 +10,7 @@ import {
 
 import type { ReactNode } from 'react'
 import type { LinkProps } from '@opentrons/components'
+
 export interface ExternalLinkProps extends LinkProps {
   href: string
   id?: string

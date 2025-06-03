@@ -1,36 +1,45 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   Flex,
   JUSTIFY_END,
   Modal,
   PrimaryButton,
-  SPACING,
   SecondaryButton,
+  SPACING,
 } from '@opentrons/components'
-import { getFileUploadMessages } from '../../../load-file/selectors'
+
+import { getEnablePythonExport } from '../../../feature-flags/selectors'
 import {
   dismissFileUploadMessage,
   undoLoadFile,
 } from '../../../load-file/actions'
+import { getFileUploadMessages } from '../../../load-file/selectors'
 import { useFileUploadModalContents } from './utils'
 
 export function FileUploadMessagesModal(): JSX.Element | null {
   const message = useSelector(getFileUploadMessages)
   const dispatch = useDispatch()
   const { t } = useTranslation('shared')
+  const enableExportPython = useSelector(getEnablePythonExport)
   const modalContents = useFileUploadModalContents({
     uploadResponse: message,
+    enableExportPython,
   })
   const dismissModal = (): void => {
     dispatch(dismissFileUploadMessage())
   }
 
-  if (modalContents == null) return null
+  if (modalContents == null) {
+    return null
+  }
 
   const { title, body } = modalContents
   const showButtons =
-    title !== t('invalid_json_file') && title !== t('incorrect_file_header')
+    title !== t('invalid_json_file') &&
+    title !== t('incorrect_file_header') &&
+    title !== t('incorrect_python_file_header')
 
   return (
     <Modal

@@ -55,7 +55,7 @@ setup:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: clean
 clean:
@@ -229,7 +229,12 @@ push-no-restart-ot3: sdist Pipfile.lock
 	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing",,,$(version_file))
 
 .PHONY: push-ot3
-push-ot3: push-no-restart-ot3 push-plot-webpage-ot3 push-description-ot3 push-labware-ot3
+push-ot3:
+	$(MAKE) push-no-restart-ot3
+	$(MAKE) push-plot-webpage-ot3
+	$(MAKE) push-description-ot3
+	$(MAKE) push-labware-ot3
+	cd ../ && $(MAKE) -C shared-data push-ot3
 
 .PHONE: open-dev-app
 open-dev-app:
@@ -280,26 +285,20 @@ echo "Restarting robot server" &&\
 systemctl restart opentrons-robot-server"
 endef
 
-.PHONY: sync-sw-ot3
-sync-sw-ot3: push-ot3
-	cd .. && $(MAKE) push-ot3 host=$(host)
+.PHONY: push-ot3-factory
+push-ot3-factory: push-ot3
+	cd ../ && $(MAKE) push-ot3 host=$(host)
+	$(MAKE) push-ot3
+
+.PHONY: push-ot3-scripts
+push-ot3-scripts: push-ot3
+	$(MAKE) -C hardware-testing push-ot3
 
 .PHONY: push-ot3-fixture
 push-ot3-fixture:
 	$(MAKE) apply-patches-fixture
-	-$(MAKE) sync-sw-ot3
+	-$(MAKE) push-ot3-factory
 	$(MAKE) remove-patches-fixture
-
-
-.PHONY: push-ot3-lld
-push-ot3-lld:
-	$(MAKE) apply-patches-fixture
-	cd ../ && $(MAKE) -C shared-data push-ot3
-	cd ../ && $(MAKE) -C hardware push-ot3
-	cd ../ && $(MAKE) -C hardware_testing push-ot3
-	cd ../ && $(MAKE) -C api push-ot3
-	$(MAKE) remove-patches-fixture
-
 
 .PHONY: apply-patches-fixture
 apply-patches-fixture:
@@ -315,14 +314,7 @@ sync-fw-ot3:
 	$(call push-and-update-fw,$(host),$(ssh_key),$(ssh_opts),$(zip),$(notdir $(zip)))
 
 .PHONY: sync-ot3
-sync-ot3: sync-sw-ot3 sync-fw-ot3
-
-.PHONY: push-ot3-gravimetric
-push-ot3-gravimetric:
-	$(MAKE) push-ot3
-	$(MAKE) apply-patches-gravimetric
-	cd ../ && $(MAKE) -C shared-data push-ot3
-	$(MAKE) remove-patches-gravimetric
+sync-ot3: push-ot3-factory sync-fw-ot3
 
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:

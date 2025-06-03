@@ -1,15 +1,19 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
   RadioButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useToaster } from '../../../ToasterOven'
+
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+
+import { useToaster } from '../../../ToasterOven'
+
 import type { ChoiceParameter } from '@opentrons/shared-data'
 
 interface ChooseEnumProps {

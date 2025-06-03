@@ -47,6 +47,7 @@
       "blowout_location": "Where to dispose of remaining volume in tip",
       "blowout_z_offset": "The height at which blowout occurs from the top of the well",
       "changeTip": "Choose when the robot picks up fresh tips",
+      "conditioning_checkbox": "First aspirate and dispense liquid into the source well to ensure a more accurate first multi-dispense",
       "dispense_airGap_checkbox": "Draw in air before moving to trash to dispose of tip.",
       "dispense_delay_checkbox": "Delay after each dispense",
       "dispense_delay_mmFromBottom": "Distance from the bottom of the well",
@@ -100,12 +101,13 @@
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",
+        "aspirate_airGap_checkbox": "Air gap after aspirate not available with conditioning volume configured",
         "aspirate_wells": "Select a source labware in order to select wells",
         "aspirate_mix_checkbox": "Advanced setting not compatible with pipette path",
         "aspirate_touchTip_checkbox": "Touch tip is not supported",
         "blowout_checkbox": "Blowout already set with disposal volume",
-        "dispense_mix_checkbox": "Can’t mix in trash container",
-        "dispense_mix_checkbox_2": "Can’t mix after dispense when distributing",
+        "dispense_mix_checkbox": "Can’t mix after dispense when distributing",
+        "dispense_mix_checkbox_2": "Can’t mix in trash container",
         "dropTip_location": "Choose where you would like to drop tip",
         "dispense_wells": "Select a destination labware in order to select wells",
         "aspirate_mmFromBottom": "Tip position adjustment is not supported",

@@ -2,7 +2,6 @@
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
-    Labware,
     Well,
     InstrumentContext,
 )
@@ -14,14 +13,14 @@ from opentrons.protocol_api.module_contexts import (
     MagneticBlockContext,
     ThermocyclerContext,
 )
-from typing import List, Tuple, Dict
+from typing import List, Dict
 
 metadata = {
     "protocolName": "KAPA HyperPlus Library Preparation",
     "author": "Tony Ngumah <tony.ngumah@opentrons.com>",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.21"}
+requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -90,7 +89,6 @@ def run(protocol: ProtocolContext) -> None:
     disposable_lid = protocol.params.disposable_lid  # type: ignore[attr-defined]
     Fragmentation_time = 10
     ligation_tc_time = 15
-    used_lids: List[Labware] = []
     if dry_run:
         trash_tips = False
 
@@ -160,10 +158,9 @@ def run(protocol: ProtocolContext) -> None:
     if trash_tips:
         protocol.load_waste_chute()
 
-    unused_lids: List[Labware] = []
     # Load TC Lids
     if disposable_lid:
-        unused_lids = helpers.load_disposable_lids(protocol, 5, ["C4"], deck_riser)
+        unused_lids = helpers.load_disposable_lids(protocol, 5, "C4", deck_riser)
     # Import Global Variables
 
     global tip50
@@ -247,9 +244,7 @@ def run(protocol: ProtocolContext) -> None:
                 pipette.max_volume
             ] += 8  # Adjust increment based on multi-channel pipette
 
-    def run_tag_profile(
-        unused_lids: List[Labware], used_lids: List[Labware]
-    ) -> Tuple[List[Labware], List[Labware]]:
+    def run_tag_profile() -> None:
         """Run Tag Profile."""
         # Presetting Thermocycler Temps
         protocol.comment(
@@ -263,8 +258,8 @@ def run(protocol: ProtocolContext) -> None:
         protocol.move_labware(sample_plate, tc_mod, use_gripper=USE_GRIPPER)
 
         if disposable_lid:
-            lid_on_plate, unused_lids, used_lids = helpers.use_disposable_lid_with_tc(
-                protocol, unused_lids, used_lids, sample_plate, tc_mod
+            helpers.use_disposable_lid_with_tc(
+                protocol, unused_lids, sample_plate, tc_mod
             )
         else:
             tc_mod.close_lid()
@@ -274,19 +269,14 @@ def run(protocol: ProtocolContext) -> None:
         tc_mod.open_lid()
 
         if disposable_lid:
-            if len(used_lids) <= 1:
-                protocol.move_labware(lid_on_plate, "D4", use_gripper=True)
-            else:
-                protocol.move_labware(lid_on_plate, used_lids[-2], use_gripper=True)
+            protocol.move_lid(sample_plate, "D4", use_gripper=True)
+
         # #Move Plate to H-S
         protocol.comment("****Moving Plate off of TC****")
 
         protocol.move_labware(sample_plate, "D1", use_gripper=USE_GRIPPER)
-        return unused_lids, used_lids
 
-    def run_er_profile(
-        unused_lids: List[Labware], used_lids: List[Labware]
-    ) -> Tuple[List[Labware], List[Labware]]:
+    def run_er_profile() -> None:
         """End Repair Profile."""
         # Presetting Thermocycler Temps
         protocol.comment(
@@ -300,8 +290,8 @@ def run(protocol: ProtocolContext) -> None:
         protocol.move_labware(sample_plate, tc_mod, use_gripper=USE_GRIPPER)
 
         if disposable_lid:
-            lid_on_plate, unused_lids, used_lids = helpers.use_disposable_lid_with_tc(
-                protocol, unused_lids, used_lids, sample_plate, tc_mod
+            helpers.use_disposable_lid_with_tc(
+                protocol, unused_lids, sample_plate, tc_mod
             )
         else:
             tc_mod.close_lid()
@@ -314,19 +304,13 @@ def run(protocol: ProtocolContext) -> None:
 
         if disposable_lid:
             # move lid
-            if len(used_lids) <= 1:
-                protocol.move_labware(lid_on_plate, "C4", use_gripper=True)
-            else:
-                protocol.move_labware(lid_on_plate, used_lids[-2], use_gripper=True)
+            protocol.move_lid(sample_plate, "C4", use_gripper=True)
         # #Move Plate to H-S
         protocol.comment("****Moving Plate off of TC****")
 
         protocol.move_labware(sample_plate, "D1", use_gripper=USE_GRIPPER)
-        return unused_lids, used_lids
 
-    def run_ligation_profile(
-        unused_lids: List[Labware], used_lids: List[Labware]
-    ) -> Tuple[List[Labware], List[Labware]]:
+    def run_ligation_profile() -> None:
         """Run Ligation Profile."""
         # Presetting Thermocycler Temps
         protocol.comment(
@@ -341,8 +325,8 @@ def run(protocol: ProtocolContext) -> None:
         protocol.move_labware(sample_plate, tc_mod, use_gripper=USE_GRIPPER)
 
         if disposable_lid:
-            lid_on_plate, unused_lids, used_lids = helpers.use_disposable_lid_with_tc(
-                protocol, unused_lids, used_lids, sample_plate, tc_mod
+            helpers.use_disposable_lid_with_tc(
+                protocol, unused_lids, sample_plate, tc_mod
             )
         else:
             tc_mod.close_lid()
@@ -356,20 +340,14 @@ def run(protocol: ProtocolContext) -> None:
         # Move lid
         tc_mod.open_lid()
         if disposable_lid:
-            if len(used_lids) <= 1:
-                protocol.move_labware(lid_on_plate, "C4", use_gripper=True)
-            else:
-                protocol.move_labware(lid_on_plate, used_lids[-2], use_gripper=True)
+            protocol.move_lid(sample_plate, "C4", use_gripper=True)
 
         # #Move Plate to H-S
         protocol.comment("****Moving Plate off of TC****")
 
         protocol.move_labware(sample_plate, "D1", use_gripper=USE_GRIPPER)
-        return unused_lids, used_lids
 
-    def run_amplification_profile(
-        unused_lids: List[Labware], used_lids: List[Labware]
-    ) -> Tuple[List[Labware], List[Labware]]:
+    def run_amplification_profile() -> None:
         """Run Amplification Profile."""
         # Presetting Thermocycler Temps
         protocol.comment(
@@ -385,8 +363,8 @@ def run(protocol: ProtocolContext) -> None:
         if not dry_run:
             tc_mod.set_lid_temperature(105)
         if disposable_lid:
-            lid_on_plate, unused_lids, used_lids = helpers.use_disposable_lid_with_tc(
-                protocol, unused_lids, used_lids, sample_plate_2, tc_mod
+            helpers.use_disposable_lid_with_tc(
+                protocol, unused_lids, sample_plate_2, tc_mod
             )
         else:
             tc_mod.close_lid()
@@ -404,10 +382,7 @@ def run(protocol: ProtocolContext) -> None:
             tc_mod.set_block_temperature(4)
         tc_mod.open_lid()
         if disposable_lid:
-            if len(used_lids) <= 1:
-                protocol.move_labware(lid_on_plate, "C4", use_gripper=True)
-            else:
-                protocol.move_labware(lid_on_plate, used_lids[-2], use_gripper=True)
+            protocol.move_lid(sample_plate_2, "C4", use_gripper=True)
 
         # Move Sample Plate to H-S
         protocol.comment("****Moving Sample Plate back to H-S****")
@@ -415,7 +390,6 @@ def run(protocol: ProtocolContext) -> None:
         # get FLP plate out of the way
         protocol.comment("****Moving FLP Plate back to TC****")
         protocol.move_labware(FLP_plate, tc_mod, use_gripper=USE_GRIPPER)
-        return unused_lids, used_lids
 
     def mix_beads(
         pip: InstrumentContext, res: Well, vol: float, reps: int, col: int
@@ -491,9 +465,7 @@ def run(protocol: ProtocolContext) -> None:
                     protocol.comment("****Dropping Tip Back in Tip Box****")
         p200.flow_rate.aspirate = 150
 
-    def Fragmentation(
-        unused_lids: List[Labware], used_lids: List[Labware]
-    ) -> Tuple[List[Labware], List[Labware]]:
+    def Fragmentation() -> None:
         """Fragmentation Function."""
         protocol.comment("-------Starting Fragmentation-------")
 
@@ -520,15 +492,10 @@ def run(protocol: ProtocolContext) -> None:
             else:
                 p50.return_tip()
                 protocol.comment("****Dropping Tip Back in Tip Box****")
+        # Heats TC --> moves plate to TC --> TAG Profile --> removes plate from TC
+        run_tag_profile()
 
-        unused_lids, used_lids = run_tag_profile(
-            unused_lids, used_lids
-        )  # Heats TC --> moves plate to TC --> TAG Profile --> removes plate from TC
-        return unused_lids, used_lids
-
-    def end_repair(
-        unused_lids: List[Labware], used_lids: List[Labware]
-    ) -> Tuple[List[Labware], List[Labware]]:
+    def end_repair() -> None:
         """End Repair Function."""
         protocol.comment("-------Starting end_repair-------")
 
@@ -558,16 +525,11 @@ def run(protocol: ProtocolContext) -> None:
                 p50.return_tip()
                 protocol.comment("****Dropping Tip Back in Tip Box****")
 
-        unused_lids, used_lids = run_er_profile(
-            unused_lids, used_lids
-        )  # Heats TC --> moves plate to TC --> TAG Profile --> removes plate from TC
-        return unused_lids, used_lids
+        run_er_profile()  # Heats TC --> moves plate to TC --> TAG Profile --> removes plate from TC
 
     # Index Ligation
 
-    def index_ligation(
-        unused_lids: List[Labware], used_lids: List[Labware]
-    ) -> Tuple[List[Labware], List[Labware]]:
+    def index_ligation() -> None:
         """Index Ligation."""
         protocol.comment("-------Ligating Indexes-------")
         protocol.comment("-------Adding and Mixing ELM-------")
@@ -612,8 +574,7 @@ def run(protocol: ProtocolContext) -> None:
         p50.flow_rate.aspirate = 150
         p50.flow_rate.dispense = 150
 
-        unused_lids, used_lids = run_ligation_profile(unused_lids, used_lids)
-        return unused_lids, used_lids
+        run_ligation_profile()
 
     def lib_cleanup() -> None:
         """Litigation Clean up."""
@@ -770,9 +731,7 @@ def run(protocol: ProtocolContext) -> None:
         protocol.comment("****Moving FLP Plate off TC****")
         protocol.move_labware(FLP_plate, magblock, use_gripper=USE_GRIPPER)
 
-    def lib_amplification(
-        unused_lids: List[Labware], used_lids: List[Labware]
-    ) -> Tuple[List[Labware], List[Labware]]:
+    def lib_amplification() -> None:
         """Library Amplification."""
         protocol.comment("-------Starting lib_amplification-------")
 
@@ -804,10 +763,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.return_tip()
                 protocol.comment("****Dropping Tip Back in Tip Box****")
 
-        unused_lids, used_lids = run_amplification_profile(
-            unused_lids, used_lids
-        )  # moves plate to TC --> TAG Profile --> removes plate from TC
-        return unused_lids, used_lids
+        run_amplification_profile()  # moves plate to TC --> TAG Profile --> removes plate from TC
 
     def lib_cleanup_2() -> None:
         """Final Library Clean up."""
@@ -951,11 +907,11 @@ def run(protocol: ProtocolContext) -> None:
         # Set Block Temp for Final Plate
         tc_mod.set_block_temperature(4)
 
-    unused_lids, used_lids = Fragmentation(unused_lids, used_lids)
-    unused_lids, used_lids = end_repair(unused_lids, used_lids)
-    unused_lids, used_lids = index_ligation(unused_lids, used_lids)
+    Fragmentation()
+    end_repair()
+    index_ligation()
     lib_cleanup()
-    unused_lids, used_lids = lib_amplification(unused_lids, used_lids)
+    lib_amplification()
     lib_cleanup_2()
 
     # Probe liquid waste

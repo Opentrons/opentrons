@@ -1,28 +1,27 @@
-import type { CalibrationLabware } from '../types'
+import type { LabwareDefinition, PipetteModel } from '@opentrons/shared-data'
 import type { Mount } from '../../pipettes/types'
-import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
-
+import type { CalibrationLabware } from '../types'
 // calibration check session types
 
 import type {
-  CHECK_STEP_SESSION_STARTED,
-  CHECK_STEP_LABWARE_LOADED,
-  CHECK_STEP_INSPECTING_TIP,
-  CHECK_STEP_PREPARING_PIPETTE,
-  CHECK_STEP_COMPARING_NOZZLE,
-  CHECK_STEP_COMPARING_TIP,
-  CHECK_STEP_COMPARING_HEIGHT,
-  CHECK_STEP_COMPARING_POINT_ONE,
-  CHECK_STEP_COMPARING_POINT_TWO,
-  CHECK_STEP_COMPARING_POINT_THREE,
-  CHECK_STEP_RETURNING_TIP,
-  CHECK_STEP_RESULTS_SUMMARY,
-  CHECK_STEP_SESSION_EXITED,
-  CHECK_STEP_CHECK_COMPLETE,
   CHECK_PIPETTE_RANK_FIRST,
   CHECK_PIPETTE_RANK_SECOND,
   CHECK_STATUS_IN_THRESHOLD,
   CHECK_STATUS_OUTSIDE_THRESHOLD,
+  CHECK_STEP_CHECK_COMPLETE,
+  CHECK_STEP_COMPARING_HEIGHT,
+  CHECK_STEP_COMPARING_NOZZLE,
+  CHECK_STEP_COMPARING_POINT_ONE,
+  CHECK_STEP_COMPARING_POINT_THREE,
+  CHECK_STEP_COMPARING_POINT_TWO,
+  CHECK_STEP_COMPARING_TIP,
+  CHECK_STEP_INSPECTING_TIP,
+  CHECK_STEP_LABWARE_LOADED,
+  CHECK_STEP_PREPARING_PIPETTE,
+  CHECK_STEP_RESULTS_SUMMARY,
+  CHECK_STEP_RETURNING_TIP,
+  CHECK_STEP_SESSION_EXITED,
+  CHECK_STEP_SESSION_STARTED,
 } from './constants'
 
 /* Robot Calibration Check Types */
@@ -61,7 +60,7 @@ export interface CalibrationCheckInstrument {
   tipRackDisplay: string
   tipRackUri: string
   serial: string
-  defaultTipracks: LabwareDefinition2[]
+  defaultTipracks: LabwareDefinition[]
 }
 
 export interface CalibrationCheckComparison {

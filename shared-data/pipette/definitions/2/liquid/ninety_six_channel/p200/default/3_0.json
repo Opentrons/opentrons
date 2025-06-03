@@ -2,7 +2,7 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t20": {
-      "uiMaxFlowRate": 45,
+      "uiMaxFlowRate": 23,
       "defaultAspirateFlowRate": {
         "default": 6.5,
         "valuesByApiLevel": { "2.14": 6.5 }
@@ -51,14 +51,14 @@
       "defaultPushOutVolume": 2
     },
     "t50": {
-      "uiMaxFlowRate": 45,
+      "uiMaxFlowRate": 23,
       "defaultAspirateFlowRate": {
-        "default": 6.5,
-        "valuesByApiLevel": { "2.14": 6.5 }
+        "default": 6,
+        "valuesByApiLevel": { "2.14": 6 }
       },
       "defaultDispenseFlowRate": {
-        "default": 6.5,
-        "valuesByApiLevel": { "2.14": 6.5 }
+        "default": 6,
+        "valuesByApiLevel": { "2.14": 6 }
       },
       "defaultBlowOutFlowRate": {
         "default": 10,
@@ -114,14 +114,14 @@
       "defaultPushOutVolume": 7
     },
     "t200": {
-      "uiMaxFlowRate": 45,
+      "uiMaxFlowRate": 23,
       "defaultAspirateFlowRate": {
-        "default": 15,
-        "valuesByApiLevel": { "2.14": 15 }
+        "default": 10,
+        "valuesByApiLevel": { "2.14": 10 }
       },
       "defaultDispenseFlowRate": {
-        "default": 15,
-        "valuesByApiLevel": { "2.14": 15 }
+        "default": 10,
+        "valuesByApiLevel": { "2.14": 10 }
       },
       "defaultBlowOutFlowRate": {
         "default": 10,
@@ -166,7 +166,7 @@
           ]
         }
       },
-      "defaultPushOutVolume": 5
+      "defaultPushOutVolume": 10
     }
   },
   "maxVolume": 200,

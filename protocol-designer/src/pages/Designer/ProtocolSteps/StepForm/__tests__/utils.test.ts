@@ -1,14 +1,26 @@
-import { describe, it, expect } from 'vitest'
+import round from 'lodash/round'
+import { describe, expect, it } from 'vitest'
+
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+
+import {
+  FLEX_HIGH_THROUGHPUT_PLUNGER_MAX_SPEED,
+  FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED,
+  OT2_PLUNGER_MAX_SPEED,
+} from '../../../../../constants'
+import { getMaxUiFlowRate } from '../PipetteFields/utils'
 import {
   capitalizeFirstLetter,
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
   getFormLevelError,
 } from '../utils'
+
+import type { PipetteChannels } from '@opentrons/shared-data'
 
 const BASE_VISIBLE_FORM_ERROR = {
   title: 'form level error title',
@@ -138,5 +150,129 @@ describe('getFormLevelError', () => {
       field1: { ...MAPPED_ERRORS.field1, showAtField: false },
     })
     expect(result).toBeNull()
+  })
+})
+
+describe('getMaxUiFlowRate', () => {
+  const mockTipLiquidSpecs = {
+    aspirate: {
+      default: {
+        '1': [
+          [10, 0.1, 0.5],
+          [100, 0.05, 1],
+        ],
+      },
+    },
+    dispense: {
+      default: {
+        '1': [
+          [10, 0.12, 0.6],
+          [100, 0.06, 1.2],
+        ],
+      },
+    },
+  }
+
+  it('should calculate max flow rate for OT-2', () => {
+    const args = {
+      targetVolume: 50,
+      channels: 1,
+      robotType: OT2_ROBOT_TYPE,
+      tipLiquidSpecs: mockTipLiquidSpecs,
+      flowRateType: 'aspirate',
+      correctionVolume: 0,
+    } as any
+    const expectedAccuracy = 0.05 * 50 + 1
+    const expectedTravelMm = 50 / expectedAccuracy
+    const expectedMaxFlowRate = round(
+      50 / (expectedTravelMm / OT2_PLUNGER_MAX_SPEED)
+    )
+    expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
+  })
+
+  it('should calculate max flow rate for Flex single channel', () => {
+    const args = {
+      targetVolume: 20,
+      channels: 1,
+      robotType: FLEX_ROBOT_TYPE,
+      tipLiquidSpecs: mockTipLiquidSpecs,
+      flowRateType: 'dispense',
+      correctionVolume: 0,
+    } as any
+    const expectedAccuracy = 0.06 * 20 + 1.2
+    const expectedTravelMm = 20 / expectedAccuracy
+    const expectedMaxFlowRate = round(
+      20 / (expectedTravelMm / FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED)
+    )
+    expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
+  })
+
+  it('should calculate max flow rate for Flex 8-channel', () => {
+    const args = {
+      targetVolume: 80,
+      channels: 8,
+      robotType: FLEX_ROBOT_TYPE,
+      tipLiquidSpecs: mockTipLiquidSpecs,
+      flowRateType: 'blowout',
+      correctionVolume: 0,
+    } as any
+    const expectedAccuracy = 0.06 * 80 + 1.2
+    const expectedTravelMm = 80 / expectedAccuracy
+    const expectedMaxFlowRate = round(
+      80 / (expectedTravelMm / FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED)
+    )
+    expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
+  })
+
+  it('should calculate max flow rate for Flex 96-channel', () => {
+    const args = {
+      targetVolume: 5,
+      channels: 96,
+      robotType: FLEX_ROBOT_TYPE,
+      tipLiquidSpecs: mockTipLiquidSpecs,
+      flowRateType: 'aspirate',
+      correctionVolume: 0,
+    } as any
+    const expectedAccuracy = 0.1 * 5 + 0.5
+    const expectedTravelMm = 5 / expectedAccuracy
+    const expectedMaxFlowRate = round(
+      5 / (expectedTravelMm / FLEX_HIGH_THROUGHPUT_PLUNGER_MAX_SPEED)
+    )
+    expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
+  })
+
+  it('should apply correction volume to the calculation', () => {
+    const args = {
+      targetVolume: 50,
+      channels: 1,
+      robotType: OT2_ROBOT_TYPE,
+      tipLiquidSpecs: mockTipLiquidSpecs,
+      flowRateType: 'dispense',
+      correctionVolume: 10,
+    } as any
+    const expectedAccuracy = 0.06 * 50 + 1.2
+    const expectedTravelMm = 50 / expectedAccuracy
+    const correctionMultiplier = 1 + 10 / 50
+    const expectedTravelMmCorrected = expectedTravelMm * correctionMultiplier
+    const expectedMaxFlowRate = round(
+      50 / (expectedTravelMmCorrected / OT2_PLUNGER_MAX_SPEED)
+    )
+    expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
+  })
+
+  it('should use the last entry in flowRateFunction if targetVolume is larger than all defined points', () => {
+    const largeVolumeArgs = {
+      targetVolume: 150,
+      channels: 1 as PipetteChannels,
+      robotType: FLEX_ROBOT_TYPE,
+      tipLiquidSpecs: mockTipLiquidSpecs,
+      flowRateType: 'aspirate',
+      correctionVolume: 0,
+    } as any
+    const expectedAccuracy = 0.05 * 150 + 1 // Using the last entry [100, 0.05, 1]
+    const expectedTravelMm = 150 / expectedAccuracy
+    const expectedMaxFlowRate =
+      150 / (expectedTravelMm / FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED)
+    expect(getMaxUiFlowRate(largeVolumeArgs)).toEqual(expectedMaxFlowRate)
   })
 })

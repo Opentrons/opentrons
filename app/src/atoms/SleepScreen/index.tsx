@@ -1,4 +1,4 @@
-import { Flex, COLORS } from '@opentrons/components'
+import { COLORS, Flex } from '@opentrons/components'
 
 export function SleepScreen(): JSX.Element {
   return (

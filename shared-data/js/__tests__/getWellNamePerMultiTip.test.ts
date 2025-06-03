@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest'
-import fixture_trash from '../../labware/fixtures/2/fixture_trash.json'
-import fixture_96_plate from '../../labware/fixtures/2/fixture_96_plate.json'
-import fixture_384_plate from '../../labware/fixtures/2/fixture_384_plate.json'
+
 import fixture_12_trough from '../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_24_tuberack from '../../labware/fixtures/2/fixture_24_tuberack.json'
-
+import fixture_96_plate from '../../labware/fixtures/2/fixture_96_plate.json'
+import fixture_384_plate from '../../labware/fixtures/2/fixture_384_plate.json'
+import fixture_trash from '../../labware/fixtures/2/fixture_trash.json'
 import { getWellNamePerMultiTip } from '../helpers/getWellNamePerMultiTip'
 
-import type { LabwareDefinition2 } from '../types'
+import type { LabwareDefinition } from '../types'
 
-const fixtureTrash = fixture_trash as LabwareDefinition2
-const fixture96Plate = fixture_96_plate as LabwareDefinition2
-const fixture384Plate = fixture_384_plate as LabwareDefinition2
-const fixture12Trough = fixture_12_trough as LabwareDefinition2
-const fixture24Tuberack = fixture_24_tuberack as LabwareDefinition2
+const fixtureTrash = fixture_trash as LabwareDefinition
+const fixture96Plate = fixture_96_plate as LabwareDefinition
+const fixture384Plate = fixture_384_plate as LabwareDefinition
+const fixture12Trough = fixture_12_trough as LabwareDefinition
+const fixture24Tuberack = fixture_24_tuberack as LabwareDefinition
 const EIGHT_CHANNEL = 8
 
 describe('96 plate', () => {

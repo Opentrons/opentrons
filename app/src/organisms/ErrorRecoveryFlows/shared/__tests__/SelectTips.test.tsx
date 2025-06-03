@@ -1,15 +1,16 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { SelectTips } from '../SelectTips'
+
+import { mockRecoveryContentProps } from '../../__fixtures__'
 import { RECOVERY_MAP } from '../../constants'
+import { SelectTips } from '../SelectTips'
 import { TipSelectionModal } from '../TipSelectionModal'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('../TipSelectionModal')
 vi.mock('../TipSelection')
@@ -56,6 +57,10 @@ describe('SelectTips', () => {
         failedLabwareLocations: {
           displayNameNewLoc: null,
           displayNameCurrentLoc: 'A1',
+        },
+        failedLabwareNames: {
+          name: 'mock name',
+          nickName: 'mock nickname',
         },
       } as any,
     }
@@ -167,6 +172,10 @@ describe('SelectTips', () => {
         failedLabwareLocations: {
           displayNameNewLoc: null,
           displayNameCurrentLoc: '',
+        },
+        failedLabwareNames: {
+          name: 'mock name',
+          nickName: 'mock nickname',
         },
       } as any,
     }

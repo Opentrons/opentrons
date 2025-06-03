@@ -1,14 +1,15 @@
 import styled, { css } from 'styled-components'
 
-import type { ChangeEventHandler, MouseEvent } from 'react'
 import {
+  BORDERS,
+  COLORS,
+  CURSOR_POINTER,
   Flex,
   SPACING,
   StyledText,
-  COLORS,
-  BORDERS,
-  CURSOR_POINTER,
 } from '@opentrons/components'
+
+import type { ChangeEventHandler, MouseEvent } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 interface ListButtonCheckboxProps extends StyleProps {

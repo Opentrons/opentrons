@@ -1,24 +1,25 @@
 import { useTranslation } from 'react-i18next'
+
 import * as utils from './utils'
 
 import type { TFunction } from 'i18next'
 import type {
-  RunTimeCommand,
+  LabwareDefinition,
   RobotType,
-  LabwareDefinition2,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { CommandTextData } from '../../ProtocolTimelineScrubber/types'
 import type {
-  TCProfileStepText,
-  TCProfileCycleText,
   GetDirectTranslationCommandText,
+  TCProfileCycleText,
+  TCProfileStepText,
 } from './utils'
 
 export * from './utils'
 
 export interface UseCommandTextStringParams {
   command: RunTimeCommand | null
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
   commandTextData: CommandTextData | null
   robotType: RobotType
 }
@@ -53,7 +54,7 @@ export function useCommandTextString(
   params: UseCommandTextStringParams
 ): GetCommandTextResult {
   const { command } = params
-  const { t } = useTranslation('protocol_command_text')
+  const { t } = useTranslation(['protocol_command_text', 'branded'])
 
   const fullParams = { ...params, t }
 
@@ -93,9 +94,9 @@ export function useCommandTextString(
     case 'dropTipInPlace':
     case 'pickUpTip':
     case 'airGapInPlace':
-    case 'evotipSealPipette':
-    case 'evotipUnsealPipette':
-    case 'evotipDispense':
+    case 'sealPipetteToTip':
+    case 'unsealPipetteFromTip':
+    case 'pressureDispense':
       return {
         kind: 'generic',
         commandText: utils.getPipettingCommandText(fullParams),
@@ -143,6 +144,18 @@ export function useCommandTextString(
       return {
         kind: 'generic',
         commandText: utils.getAbsorbanceReaderCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+    case 'flexStacker/retrieve':
+    case 'flexStacker/store':
+    case 'flexStacker/setStoredLabware':
+    case 'flexStacker/empty':
+    case 'flexStacker/fill':
+      return {
+        kind: 'generic',
+        commandText: utils.getFlexStackerCommandText({
           ...fullParams,
           command,
         }),
@@ -296,6 +309,16 @@ export function useCommandTextString(
       return {
         kind: 'generic',
         commandText: utils.getRailLightsCommandText({ ...fullParams, command }),
+      }
+
+    case 'robot/moveTo':
+    case 'robot/moveAxesTo':
+    case 'robot/moveAxesRelative':
+    case 'robot/openGripperJaw':
+    case 'robot/closeGripperJaw':
+      return {
+        kind: 'generic',
+        commandText: utils.getRobotCommandText({ ...fullParams, command }),
       }
 
     case undefined:

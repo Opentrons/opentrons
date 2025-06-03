@@ -2,23 +2,25 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import without from 'lodash/without'
+
 import {
   COLORS,
   Flex,
+  JUSTIFY_CENTER,
+  LegacyStyledText,
   POSITION_FIXED,
   SPACING,
-  LegacyStyledText,
-  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { getAllDefinitions } from '@opentrons/shared-data'
-import { ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION } from '/app/redux/analytics'
 
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { WellSelection } from '/app/organisms/WellSelection'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION } from '/app/redux/analytics'
+
 import {
   CIRCULAR_WELL_96_PLATE_DEFINITION_URI,
   RECTANGULAR_WELL_96_PLATE_DEFINITION_URI,
@@ -27,14 +29,14 @@ import {
 import type {
   ComponentProps,
   Dispatch,
-  SetStateAction,
   MouseEvent,
+  SetStateAction,
 } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type {
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
 
 interface SelectDestWellsProps {

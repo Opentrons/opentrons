@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -18,21 +18,22 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton } from '/app/atoms/buttons'
-import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import {
-  useTrackEvent,
   ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import * as Calibration from '/app/redux/calibration'
 import * as Config from '/app/redux/config'
 import * as Pipettes from '/app/redux/pipettes'
 import * as Sessions from '/app/redux/sessions'
-import { useRunStatuses } from '/app/resources/runs'
-import {
-  useAttachedPipettes,
-  useAttachedPipetteCalibrations,
-} from '/app/resources/instruments'
 import { useDeckCalibrationStatus } from '/app/resources/calibration'
+import {
+  useAttachedPipetteCalibrations,
+  useAttachedPipettes,
+} from '/app/resources/instruments'
+import { useRunStatuses } from '/app/resources/runs'
+
+import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 
 import type {
   AttachedPipettesByMount,

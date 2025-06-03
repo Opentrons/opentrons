@@ -88,10 +88,12 @@ def _circular_frustum_polynomial_roots(
 def _volume_from_height_circular(
     target_height: float, segment: ConicalFrustum
 ) -> float:
-    """Find the volume given a height within a circular frustum."""
-    heights = segment.height_to_volume_table.keys()
-    best_fit_height = min(heights, key=lambda x: abs(x - target_height))
-    return segment.height_to_volume_table[best_fit_height]
+    return segment.volume_from_height_circular(
+        top_radius=segment.topDiameter / 2,
+        bottom_radius=segment.bottomDiameter / 2,
+        target_height=target_height,
+        total_height=segment.topHeight - segment.bottomHeight,
+    )
 
 
 def _volume_from_height_rectangular(
@@ -138,9 +140,7 @@ def _height_from_volume_circular(
     target_volume: float, segment: ConicalFrustum
 ) -> float:
     """Find the height given a volume within a squared cone segment."""
-    volumes = segment.volume_to_height_table.keys()
-    best_fit_volume = min(volumes, key=lambda x: abs(x - target_volume))
-    return segment.volume_to_height_table[best_fit_volume]
+    return segment.height_from_volume_search(target_volume)
 
 
 def _height_from_volume_rectangular(
@@ -353,8 +353,9 @@ def _find_volume_in_partial_frustum(
                 section_height=section_height,
             )
     # if we've looked through all sections and can't find the target volume, raise an error
+    # this code should never be reached- an error should be raised by find_volume_at_well_height
     raise InvalidLiquidHeightFound(
-        f"Unable to find volume at given well-height {target_height}."
+        f"Target height {target_height} mm exceeds the well height."
     )
 
 
@@ -369,7 +370,9 @@ def find_volume_at_well_height(
     volumetric_capacity = get_well_volumetric_capacity(well_geometry)
     max_height = volumetric_capacity[-1][0]
     if target_height < 0 or target_height > max_height:
-        raise InvalidLiquidHeightFound("Invalid target height.")
+        raise InvalidLiquidHeightFound(
+            f"Invalid target height {target_height} mm; max well height is {max_height} mm."
+        )
     # volumes in volumetric_capacity are relative to each frustum,
     # so we have to find the volume of all the full sections enclosed
     # beneath the target height
@@ -398,8 +401,12 @@ def _find_height_in_partial_frustum(
 ) -> float:
     """Look through a sorted list of frusta for a target volume, and find the height at that volume."""
     bottom_section_volume = 0.0
+    if target_volume == 0.0:
+        return 0.0
     for section, capacity in zip(sorted_well, volumetric_capacity):
         section_top_height, section_volume = capacity
+        if target_volume == section_volume + bottom_section_volume:
+            return section_top_height
         if (
             bottom_section_volume
             <= target_volume
@@ -417,16 +424,19 @@ def _find_height_in_partial_frustum(
         # viewed section
         bottom_section_volume += section_volume
 
+    # if we finish looping through the whole well, bottom_section will be the well's volume
+    total_well_volume = bottom_section_volume
     # if we've looked through all sections and can't find the target volume, raise an error
+    # also this code should never be reached bc an invalid target volume should be changed
+    # by find_height_at_well_volume
     raise InvalidLiquidHeightFound(
-        f"Unable to find height at given volume {target_volume}."
+        f"Target volume {target_volume} uL exceeds the well volume {total_well_volume} uL."
     )
 
 
 def find_height_at_well_volume(
     target_volume: LiquidTrackingType,
     well_geometry: InnerWellGeometry,
-    raise_error_if_result_invalid: bool = True,
 ) -> LiquidTrackingType:
     """Find the height within a well, at a known volume."""
     # comparisons with SimulatedProbeResult objects aren't meaningful, just
@@ -437,10 +447,10 @@ def find_height_at_well_volume(
     volumetric_capacity = get_well_volumetric_capacity(well_geometry)
     max_volume = sum(row[1] for row in volumetric_capacity)
 
-    if raise_error_if_result_invalid:
-        if target_volume < 0 or target_volume > max_volume:
-            raise InvalidLiquidHeightFound("Invalid target volume.")
-
+    if target_volume < 0:
+        target_volume = 0
+    elif target_volume > max_volume:
+        target_volume = max_volume
     sorted_well = sorted(well_geometry.sections, key=lambda section: section.topHeight)
     # find the section the target volume is in and compute the height
     return _find_height_in_partial_frustum(

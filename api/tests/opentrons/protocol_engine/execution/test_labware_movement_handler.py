@@ -563,7 +563,7 @@ async def test_ensure_movement_obstructed_by_thermocycler_raises(
         state_store.labware.get_parent_location(labware_id="labware-id")
     ).then_return(from_loc)
     decoy.when(
-        await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+        await thermocycler_movement_flagger.ensure_labware_in_open_thermocycler(
             labware_parent=ModuleLocation(moduleId="a-thermocycler-id")
         )
     ).then_raise(ThermocyclerNotOpenError("Thou shall not pass!"))

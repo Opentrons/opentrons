@@ -1,5 +1,7 @@
 import { getLabwareDefIsStandard } from '@opentrons/shared-data'
+
 import { getLabwareCompatibleWithModule } from '../../utils/labwareModuleCompatibility'
+
 import type { LabwareLocation } from '@opentrons/shared-data'
 import type {
   InvariantContext,

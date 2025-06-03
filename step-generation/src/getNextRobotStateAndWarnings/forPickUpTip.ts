@@ -1,7 +1,10 @@
 import assert from 'assert'
-import { ALL, COLUMN, SINGLE, getIsTiprack } from '@opentrons/shared-data'
+
+import { ALL, COLUMN, getIsTiprack, SINGLE } from '@opentrons/shared-data'
+
 import type { PickUpTipParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
+
 export function forPickUpTip(
   params: PickUpTipParams,
   invariantContext: InvariantContext,

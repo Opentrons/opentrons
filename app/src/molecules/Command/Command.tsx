@@ -1,26 +1,27 @@
 import { omit } from 'lodash'
 
 import {
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  CommandText,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
-  ALIGN_CENTER,
-  COLORS,
-  BORDERS,
-  SPACING,
   RESPONSIVENESS,
-  CommandText,
+  SPACING,
 } from '@opentrons/components'
 
-import { CommandIcon } from './CommandIcon'
 import { Skeleton } from '/app/atoms/Skeleton'
 
+import { CommandIcon } from './CommandIcon'
+
+import type { CommandTextData, StyleProps } from '@opentrons/components'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { CommandTextData, StyleProps } from '@opentrons/components'
 
 export type CommandState = NonSkeletonCommandState | 'loading'
 export type NonSkeletonCommandState = 'current' | 'failed' | 'future'
@@ -40,7 +41,7 @@ interface SkeletonCommandProps extends FundamentalProps {
 interface NonSkeletonCommandProps extends FundamentalProps {
   state: NonSkeletonCommandState
   command: RunTimeCommand
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
   commandTextData: CommandTextData
 }
 

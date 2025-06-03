@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -9,10 +10,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
 import type { IconName } from '@opentrons/components'

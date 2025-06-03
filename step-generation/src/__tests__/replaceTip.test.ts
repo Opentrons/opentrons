@@ -1,26 +1,29 @@
-import { beforeEach, describe, it, expect } from 'vitest'
 import merge from 'lodash/merge'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
   COLUMN,
-  fixtureTiprack1000ul,
   fixtureTiprack300ul,
+  fixtureTiprack1000ul,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
-import {
-  getInitialRobotStateStandard,
-  makeContext,
-  getTiprackTipstate,
-  getTipColumn,
-  getSuccessResult,
-  pickUpTipHelper,
-  dropTipHelper,
-  dropTipInPlaceHelper,
-  moveToAddressableAreaHelper,
-  DEFAULT_PIPETTE,
-  PIPETTE_96,
-} from '../fixtures'
+
 import { replaceTip } from '../commandCreators/compound/replaceTip'
 import { FIXED_TRASH_ID } from '../constants'
+import {
+  DEFAULT_PIPETTE,
+  dropTipHelper,
+  dropTipInPlaceHelper,
+  getInitialRobotStateStandard,
+  getSuccessResult,
+  getTipColumn,
+  getTiprackTipstate,
+  makeContext,
+  moveToAddressableAreaHelper,
+  pickUpTipHelper,
+  PIPETTE_96,
+} from '../fixtures'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
@@ -203,9 +206,9 @@ describe('replaceTip', () => {
     it('Single-channel: dropping tips in waste chute', () => {
       invariantContext = {
         ...invariantContext,
-        additionalEquipmentEntities: {
+        wasteChuteEntities: {
           wasteChuteId: {
-            name: 'wasteChute',
+            pythonName: 'waste_chute',
             id: wasteChuteId,
             location: 'cutoutD3',
           },
@@ -318,9 +321,9 @@ describe('replaceTip', () => {
       invariantContext = {
         ...invariantContext,
 
-        additionalEquipmentEntities: {
+        wasteChuteEntities: {
           wasteChuteId: {
-            name: 'wasteChute',
+            pythonName: 'waste_chute',
             id: wasteChuteId,
             location: 'cutoutD3',
           },

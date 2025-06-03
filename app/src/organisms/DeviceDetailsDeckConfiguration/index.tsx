@@ -14,30 +14,31 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   SIZE_4,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import {
+  FLEX_ROBOT_TYPE,
   getCutoutDisplayName,
+  getDeckDefFromRobotType,
   getFixtureDisplayName,
   SINGLE_SLOT_FIXTURES,
-  getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
-import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
-import { useRunStatuses } from '/app/resources/runs'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import {
   useDeckConfigurationEditingTools,
   useNotifyDeckConfigurationQuery,
 } from '/app/resources/deck_configuration'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { useRunStatuses } from '/app/resources/runs'
+
+import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 
 import type { CutoutId } from '@opentrons/shared-data'
 

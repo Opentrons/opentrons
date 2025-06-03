@@ -2,10 +2,11 @@ import {
   getAllDefinitions,
   LABWAREV2_DO_NOT_LIST,
 } from '@opentrons/shared-data'
+
 import {
-  SINGLE_CHANNEL_COMPATIBLE_LABWARE,
   EIGHT_CHANNEL_COMPATIBLE_LABWARE,
   NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE,
+  SINGLE_CHANNEL_COMPATIBLE_LABWARE,
 } from '../constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

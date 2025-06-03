@@ -112,20 +112,6 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
-    def load_labware_to_flex_stacker_hopper(
-        self,
-        module_core: ModuleCoreType,
-        load_name: str,
-        quantity: int,
-        label: Optional[str],
-        namespace: Optional[str],
-        version: Optional[int],
-        lid: Optional[str],
-    ) -> None:
-        """Load one or more labware with or without a lid to the flex stacker hopper."""
-        ...
-
-    @abstractmethod
     def move_labware(
         self,
         labware_core: LabwareCoreType,
@@ -230,7 +216,7 @@ class AbstractProtocol(
     def get_last_location(
         self,
         mount: Optional[Mount] = None,
-    ) -> Optional[Location]:
+    ) -> Optional[Union[Location, TrashBin, WasteChute]]:
         ...
 
     @abstractmethod
@@ -311,7 +297,7 @@ class AbstractProtocol(
         """Define a liquid to load into a well."""
 
     @abstractmethod
-    def define_liquid_class(self, name: str) -> LiquidClass:
+    def define_liquid_class(self, name: str, version: int) -> LiquidClass:
         """Define a liquid class for use in transfer functions."""
 
     @abstractmethod

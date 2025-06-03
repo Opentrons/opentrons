@@ -1,8 +1,14 @@
 """Test protocol engine types."""
-import pytest
-from pydantic import ValidationError
 
-from opentrons.protocol_engine.types import HexColor
+import pytest
+from pydantic import ValidationError, BaseModel
+
+from opentrons.protocol_engine.types import (
+    HexColor,
+    SimulatedProbeResult,
+    LiquidTrackingType,
+    WellInfoSummary,
+)
 
 
 @pytest.mark.parametrize("hex_color", ["#F00", "#FFCC00CC", "#FC0C", "#98e2d1"])
@@ -20,3 +26,51 @@ def test_handles_invalid_hex(invalid_hex_color: str) -> None:
         HexColor(invalid_hex_color)
     with pytest.raises(ValidationError):
         HexColor.model_validate_json(f'"{invalid_hex_color}"')
+
+
+class _TestModel(BaseModel):
+    """Test model for deserializing SimulatedProbeResults."""
+
+    value: LiquidTrackingType
+
+
+def test_roundtrips_simulated_liquid_probe() -> None:
+    """Should be able to roundtrip our simulated results."""
+    base = _TestModel(value=SimulatedProbeResult())
+    serialized = base.model_dump_json()
+    deserialized = _TestModel.model_validate_json(serialized)
+    assert isinstance(deserialized.value, SimulatedProbeResult)
+
+
+def test_roundtrips_nonsimulated_liquid_probe() -> None:
+    """Should be able to roundtrip our simulated results."""
+    base = _TestModel(value=10.0)
+    serialized = base.model_dump_json()
+    deserialized = _TestModel.model_validate_json(serialized)
+    assert deserialized.value == 10.0
+
+
+def test_fails_deser_wrong_string() -> None:
+    """Should fail to deserialize the wrong string."""
+    with pytest.raises(ValidationError):
+        _TestModel.model_validate_json('{"value": "not the right string"}')
+
+
+@pytest.mark.parametrize("height", [None, 10.0, SimulatedProbeResult()])
+def test_roundtrips_well_info_summary(height: LiquidTrackingType | None) -> None:
+    """It should round trip a WellInfoSummary."""
+    inp = WellInfoSummary(
+        labware_id="hi",
+        well_name="lo",
+        loaded_volume=None,
+        probed_height=height,
+        probed_volume=height,
+    )
+    outp = WellInfoSummary.model_validate_json(inp.model_dump_json())
+    if isinstance(height, SimulatedProbeResult):
+        assert outp.labware_id == inp.labware_id
+        assert outp.well_name == inp.well_name
+        assert isinstance(outp.probed_height, SimulatedProbeResult)
+        assert isinstance(outp.probed_volume, SimulatedProbeResult)
+    else:
+        assert outp == inp

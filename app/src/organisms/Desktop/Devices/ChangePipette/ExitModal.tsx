@@ -1,11 +1,13 @@
 import { useTranslation } from 'react-i18next'
+
 import {
-  COLORS,
-  SPACING,
-  SecondaryButton,
   AlertPrimaryButton,
+  COLORS,
+  SecondaryButton,
+  SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
+
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 import type { Direction } from './types'

@@ -164,4 +164,9 @@ mock_dir
 .npm-cache/
 .eslintcache
 
+# include archived API docs
+!api/docs/dist/
+api/docs/dist/hardware/
+api/docs/dist/v2/
+
 package-testing/results

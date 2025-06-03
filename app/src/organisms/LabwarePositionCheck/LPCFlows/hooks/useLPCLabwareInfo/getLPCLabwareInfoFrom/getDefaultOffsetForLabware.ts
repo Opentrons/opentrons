@@ -3,11 +3,11 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { OFFSET_KIND_DEFAULT } from '/app/redux/protocol-runs'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type {
   DefaultOffsetDetails,
-  LocationSpecificOffsetDetails,
   LabwareModuleStackupDetails,
+  LocationSpecificOffsetDetails,
 } from '/app/redux/protocol-runs'
 import type { GetLPCLabwareInfoForURI } from '.'
 
@@ -117,7 +117,7 @@ function getRequiresAdapterId(
   return requiresAdapter(matchingDef)
 }
 
-function requiresAdapter(def: LabwareDefinition2 | null): boolean {
+function requiresAdapter(def: LabwareDefinition | null): boolean {
   return def?.parameters.quirks?.includes('stackingOnly') ?? false
 }
 

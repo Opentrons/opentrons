@@ -39,11 +39,13 @@ from ..protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
     CSVRuntimeParamPaths,
     CommandAnnotation,
+    ModuleModel,
 )
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
 from ..protocols.parse import PythonParseMode
+from ..protocol_engine.state.module_substates import FlexStackerSubState
 
 
 class NoProtocolRunAvailable(RuntimeError):
@@ -429,7 +431,7 @@ class RunOrchestrator:
 
     def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""
-        return self._protocol_engine.state_view.tips.get_pipette_nozzle_maps()
+        return self._protocol_engine.state_view.pipettes.get_nozzle_configurations()
 
     def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
@@ -449,6 +451,19 @@ class RunOrchestrator:
     def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
         """Create error recovery policy for the run."""
         self._protocol_engine.set_error_recovery_policy(policy)
+
+    def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
+        """Get current (if any) Flex Stacker Substates keyed by module id."""
+        modules = self._protocol_engine.state_view.modules.get_all()
+        stackers: Dict[str, FlexStackerSubState] = {}
+        for module in modules:
+            if module.model == ModuleModel.FLEX_STACKER_MODULE_V1:
+                stackers[
+                    module.id
+                ] = self._protocol_engine.state_view.modules.get_flex_stacker_substate(
+                    module.id
+                )
+        return stackers
 
     async def command_generator(self) -> AsyncGenerator[str, None]:
         """Yield next command to execute."""

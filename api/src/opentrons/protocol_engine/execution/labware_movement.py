@@ -61,6 +61,7 @@ class LabwareMovementHandler:
         """Initialize a LabwareMovementHandler instance."""
         self._hardware_api = hardware_api
         self._state_store = state_store
+        self._equipment = equipment
         self._thermocycler_plate_lifter = (
             thermocycler_plate_lifter
             or ThermocyclerPlateLifter(
@@ -72,7 +73,13 @@ class LabwareMovementHandler:
         self._tc_movement_flagger = (
             thermocycler_movement_flagger
             or ThermocyclerMovementFlagger(
-                state_store=self._state_store, hardware_api=self._hardware_api
+                state_store=self._state_store,
+                hardware_api=self._hardware_api,
+                equipment=self._equipment
+                or EquipmentHandler(
+                    hardware_api=self._hardware_api,
+                    state_store=self._state_store,
+                ),
             )
         )
         self._hs_movement_flagger = (
@@ -264,7 +271,7 @@ class LabwareMovementHandler:
             )
         for parent in (current_parent, new_location):
             try:
-                await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+                await self._tc_movement_flagger.ensure_labware_in_open_thermocycler(
                     labware_parent=parent
                 )
                 await self._hs_movement_flagger.raise_if_labware_latched_on_heater_shaker(

@@ -1,6 +1,8 @@
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect } from 'vitest'
+
 import { fireEvent, render, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
 import { CollapsibleSection } from '../'
 
 describe('CollapsibleSection', () => {

@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { removeHint } from '../../../../tutorial/actions'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { BlockingHintModal } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
+import { removeHint } from '../../../../tutorial/actions'
+
 import type { ComponentProps } from 'react'
 
 vi.mock('../../../../tutorial/actions')
@@ -29,9 +31,7 @@ describe('BlockingHintModal', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.handleCancel).toHaveBeenCalled()
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Continue with export' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
     expect(props.handleContinue).toHaveBeenCalled()
     expect(vi.mocked(removeHint)).toHaveBeenCalled()
     screen.getByText('mock content')

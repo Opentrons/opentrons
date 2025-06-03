@@ -1,9 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
+
 import '@testing-library/jest-dom/vitest'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
+
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
+
 import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 
 vi.mock('/app/redux/config')

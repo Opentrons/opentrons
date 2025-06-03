@@ -223,6 +223,7 @@ stages:
             # so we just trust that this is correct.
             definition: !anydict
             offsetId: '{labware_offset_id}'
+            locationSequence: !anylist
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"

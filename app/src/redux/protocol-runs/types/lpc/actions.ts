@@ -1,3 +1,5 @@
+import type { VectorOffset } from '@opentrons/api-client'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
   ConflictTimestampInfo,
   LocationSpecificOffsetLocationDetails,
@@ -7,8 +9,6 @@ import type {
   OffsetLocationDetails,
   SavedOffsets,
 } from '/app/redux/protocol-runs/types/lpc'
-import type { VectorOffset } from '@opentrons/api-client'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export interface PositionParams {
   labwareUri: string
@@ -28,7 +28,7 @@ export interface UpdateLPCDeckAction {
 
 export interface UpdateLPCLabwareAction {
   type: 'UPDATE_LPC_LABWARE'
-  payload: { runId: string; labware: LPCLabwareInfo }
+  payload: { runId: string; labware: LPCLabwareInfo['labware'] }
 }
 
 export interface FinishLPCAction {
@@ -70,7 +70,7 @@ export interface InitialPositionAction {
 
 export interface FinalPositionAction {
   type: 'SET_FINAL_POSITION'
-  payload: PositionParams & { runId: string }
+  payload: PositionParams & { runId: string; isOnDevice: boolean }
 }
 
 export interface ClearSelectedLabwareWorkingOffsetsAction {
@@ -122,6 +122,16 @@ export interface UpdateConflictTimestampAction {
   payload: { runId: string; info: ConflictTimestampInfo }
 }
 
+export interface ToggleDefaultOffsetInfoBanner {
+  type: 'TOGGLE_DEFAULT_OFFSET_INFO_BANNER'
+  payload: { runId: string }
+}
+
+export interface ClearSnackbarStatus {
+  type: 'CLEAR_SNACKBAR_STATUS'
+  payload: { runId: string }
+}
+
 export type LPCWizardAction =
   | UpdateLPCAction
   | UpdateLPCDeckAction
@@ -142,3 +152,5 @@ export type LPCWizardAction =
   | SourceOffsetsFromRunAction
   | SourceOffsetsFromDatabaseAction
   | UpdateConflictTimestampAction
+  | ToggleDefaultOffsetInfoBanner
+  | ClearSnackbarStatus

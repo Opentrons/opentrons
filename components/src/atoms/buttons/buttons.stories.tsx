@@ -1,78 +1,84 @@
-import type * as React from 'react'
-import { SPACING } from '../../ui-style-constants'
+import { Flex, STYLE_PROPS } from '../../primitives'
 import { DIRECTION_ROW } from '../../styles'
-import { Flex } from '../../primitives'
-import { PrimaryButton } from './PrimaryButton'
-import { SecondaryButton } from './SecondaryButton'
-import { AlertPrimaryButton } from './AlertPrimaryButton'
-import { AltPrimaryButton } from './AltPrimaryButton'
+import { SPACING } from '../../ui-style-constants'
+import { AlertPrimaryButton as AlertPrimaryButtonComponent } from './AlertPrimaryButton'
+import { AltPrimaryButton as AltPrimaryButtonComponent } from './AltPrimaryButton'
+import { PrimaryButton as PrimaryButtonComponent } from './PrimaryButton'
+import { SecondaryButton as SecondaryButtonComponent } from './SecondaryButton'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta = {
   title: 'Helix/Atoms/Buttons',
-} as Meta
+  argTypes: {
+    ...Object.fromEntries(
+      [...STYLE_PROPS, 'as', 'ref', 'theme', 'forwardedAs'].map(prop => [
+        prop,
+        { table: { disable: true } },
+      ])
+    ),
+    children: {
+      control: {
+        type: 'text',
+      },
+    },
+    'aria-disabled': {
+      control: {
+        type: 'boolean',
+      },
+    },
+    isDangerous: {
+      control: {
+        type: 'boolean',
+      },
+    },
+  },
+}
 
-const PrimaryButtonTemplate: Story<
-  React.ComponentProps<typeof PrimaryButton>
-> = args => {
-  const { children } = args
-  return (
+export default meta
+
+export const PrimaryButton: StoryObj<typeof PrimaryButtonComponent> = {
+  args: {
+    children: 'primary button',
+  },
+  render: args => (
     <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
-      <PrimaryButton>{children}</PrimaryButton>
+      <PrimaryButtonComponent {...args} />
     </Flex>
-  )
+  ),
 }
 
-export const Primary = PrimaryButtonTemplate.bind({})
-Primary.args = {
-  children: 'primary button',
-}
-
-const SecondaryButtonTemplate: Story<
-  React.ComponentProps<typeof SecondaryButton>
-> = args => {
-  const { children } = args
-  return (
+export const SecondaryButton: StoryObj<typeof SecondaryButtonComponent> = {
+  args: {
+    children: 'secondary button',
+  },
+  render: args => (
     <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
-      <SecondaryButton>{children}</SecondaryButton>
+      <SecondaryButtonComponent {...args} />
     </Flex>
-  )
+  ),
 }
 
-export const Secondary = SecondaryButtonTemplate.bind({})
-Secondary.args = {
-  children: 'secondary button',
-}
-
-const AlertPrimaryButtonTemplate: Story<
-  React.ComponentProps<typeof AlertPrimaryButton>
-> = args => {
-  const { children } = args
-  return (
+export const AlertPrimaryButton: StoryObj<
+  typeof AlertPrimaryButtonComponent
+> = {
+  args: {
+    children: 'alert tertiary button',
+  },
+  render: args => (
     <Flex>
-      <AlertPrimaryButton>{children}</AlertPrimaryButton>
+      <AlertPrimaryButtonComponent {...args} />
     </Flex>
-  )
+  ),
 }
 
-export const AlertPrimary = AlertPrimaryButtonTemplate.bind({})
-AlertPrimary.args = {
-  children: 'alert tertiary button',
-}
-
-const AltPrimaryButtonTemplate: Story<
-  React.ComponentProps<typeof AltPrimaryButton>
-> = args => {
-  const { children } = args
-  return (
+export const AltPrimaryButton: StoryObj<typeof AltPrimaryButtonComponent> = {
+  args: {
+    children: 'alt primary button',
+  },
+  render: args => (
     <Flex>
-      <AltPrimaryButton>{children}</AltPrimaryButton>
+      <AltPrimaryButtonComponent {...args} />
     </Flex>
-  )
-}
-
-export const AltPrimary = AltPrimaryButtonTemplate.bind({})
-AltPrimary.args = {
-  children: 'alt primary button',
+  ),
 }

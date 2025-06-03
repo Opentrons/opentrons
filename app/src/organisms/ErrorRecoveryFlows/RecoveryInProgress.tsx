@@ -1,20 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import { RECOVERY_MAP } from './constants'
 import {
-  Flex,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
   RESPONSIVENESS,
-  DIRECTION_COLUMN,
   SPACING,
 } from '@opentrons/components'
 
 import { InProgressModal } from '/app/molecules/InProgressModal'
 
-import type { RobotMovingRoute, RecoveryContentProps } from './types'
+import { RECOVERY_MAP } from './constants'
+
+import type { RecoveryContentProps, RobotMovingRoute } from './types'
 
 export function RecoveryInProgress({
   recoveryMap,
@@ -31,11 +32,12 @@ export function RecoveryInProgress({
     ROBOT_PICKING_UP_TIPS,
     ROBOT_SKIPPING_STEP,
     ROBOT_RELEASING_LABWARE,
+    ROBOT_RELEASING_LABWARE_LATCH,
   } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { route } = recoveryMap
 
-  const gripperReleaseCountdown = useGripperRelease({
+  const releaseCountdown = useReleaseLabware({
     recoveryMap,
     recoveryCommands,
     routeUpdateActions,
@@ -58,12 +60,21 @@ export function RecoveryInProgress({
       case ROBOT_SKIPPING_STEP.ROUTE:
         return t('stand_back_skipping_to_next_step')
       case ROBOT_RELEASING_LABWARE.ROUTE: {
-        if (gripperReleaseCountdown > 0) {
+        if (releaseCountdown > 0) {
           return t('gripper_will_release_in_s', {
-            seconds: gripperReleaseCountdown,
+            seconds: releaseCountdown,
           })
         } else {
           return t('gripper_releasing_labware')
+        }
+      }
+      case ROBOT_RELEASING_LABWARE_LATCH.ROUTE: {
+        if (releaseCountdown > 0) {
+          return t('latch_will_release_in_s', {
+            seconds: releaseCountdown,
+          })
+        } else {
+          return t('latch_releasing_labware')
         }
       }
       default:
@@ -80,9 +91,9 @@ export function RecoveryInProgress({
   )
 }
 
-export const GRIPPER_RELEASE_COUNTDOWN_S = 3
+export const RELEASE_COUNTDOWN_S = 3
 
-type UseGripperReleaseProps = Pick<
+type useReleaseLabwareProps = Pick<
   RecoveryContentProps,
   | 'currentRecoveryOptionUtils'
   | 'recoveryCommands'
@@ -91,17 +102,21 @@ type UseGripperReleaseProps = Pick<
   | 'recoveryMap'
 >
 
-// Handles the gripper release copy and action, which operates on an interval. At T=0, release the labware then proceed
+// Handles the gripper/latch release copy and action, which operates on an interval. At T=0, release the labware then proceed
 // to the next step in the active route if the door is open (which should be a route to handle the door), or to the next
 // CTA route if the door is closed.
-export function useGripperRelease({
+export function useReleaseLabware({
   currentRecoveryOptionUtils,
   recoveryCommands,
   routeUpdateActions,
   doorStatusUtils,
   recoveryMap,
-}: UseGripperReleaseProps): number {
-  const { releaseGripperJaws, homeExceptPlungers } = recoveryCommands
+}: useReleaseLabwareProps): number {
+  const {
+    releaseGripperJaws,
+    releaseLabwareLatch,
+    homeExceptPlungers,
+  } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
     proceedToRouteAndStep,
@@ -109,8 +124,13 @@ export function useGripperRelease({
     handleMotionRouting,
   } = routeUpdateActions
   const { isDoorOpen } = doorStatusUtils
-  const { MANUAL_MOVE_AND_SKIP, MANUAL_REPLACE_AND_RETRY } = RECOVERY_MAP
-  const [countdown, setCountdown] = useState(GRIPPER_RELEASE_COUNTDOWN_S)
+  const {
+    MANUAL_MOVE_AND_SKIP,
+    MANUAL_REPLACE_AND_RETRY,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+  } = RECOVERY_MAP
+  const [countdown, setCountdown] = useState(RELEASE_COUNTDOWN_S)
 
   const proceedToDoorStep = (): void => {
     switch (selectedRecoveryOption) {
@@ -147,6 +167,18 @@ export function useGripperRelease({
           MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
         )
         break
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+        void proceedToRouteAndStep(
+          REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+          REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.REENGAGE_LATCH
+        )
+        break
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        void proceedToRouteAndStep(
+          MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+          MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.REENGAGE_LATCH
+        )
+        break
       default:
         console.error('Unhandled post grip-release routing.')
         void proceedNextStep()
@@ -155,36 +187,56 @@ export function useGripperRelease({
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null
+    switch (recoveryMap.route) {
+      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
+      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
+        intervalId = setInterval(() => {
+          setCountdown(prevCountdown => {
+            const updatedCountdown = prevCountdown - 1
 
-    if (recoveryMap.route === RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE) {
-      intervalId = setInterval(() => {
-        setCountdown(prevCountdown => {
-          const updatedCountdown = prevCountdown - 1
+            if (updatedCountdown === 0) {
+              if (intervalId != null) {
+                clearInterval(intervalId)
+              }
+              if (
+                recoveryMap.route ===
+                RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
+              ) {
+                void releaseLabwareLatch().then(() => {
+                  if (isDoorOpen) {
+                    return handleMotionRouting(false).then(() => {
+                      proceedToDoorStep()
+                    })
+                  }
 
-          if (updatedCountdown === 0) {
-            if (intervalId != null) {
-              clearInterval(intervalId)
-            }
+                  return handleMotionRouting(true)
+                    .then(() => homeExceptPlungers())
+                    .then(() => handleMotionRouting(false))
+                    .then(() => {
+                      proceedToValidNextStep()
+                    })
+                })
+              } else {
+                void releaseGripperJaws().then(() => {
+                  if (isDoorOpen) {
+                    return handleMotionRouting(false).then(() => {
+                      proceedToDoorStep()
+                    })
+                  }
 
-            void releaseGripperJaws().then(() => {
-              if (isDoorOpen) {
-                return handleMotionRouting(false).then(() => {
-                  proceedToDoorStep()
+                  return handleMotionRouting(true)
+                    .then(() => homeExceptPlungers())
+                    .then(() => handleMotionRouting(false))
+                    .then(() => {
+                      proceedToValidNextStep()
+                    })
                 })
               }
-
-              return handleMotionRouting(true)
-                .then(() => homeExceptPlungers())
-                .then(() => handleMotionRouting(false))
-                .then(() => {
-                  proceedToValidNextStep()
-                })
-            })
-          }
-
-          return updatedCountdown
-        })
-      }, 1000)
+            }
+            return updatedCountdown
+          })
+        }, 1000)
+        break
     }
 
     return () => {

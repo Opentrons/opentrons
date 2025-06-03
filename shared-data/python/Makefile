@@ -69,7 +69,7 @@ teardown: teardown-py
 
 .PHONY: teardown-py
 teardown-py:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 
 .PHONY: clean

@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, Callable, Final, Literal, Optional, Union
+from typing import Annotated, Callable, Final, Literal, Optional, Union, Dict
 
 from fastapi import Depends, status, Query
 from pydantic import BaseModel, Field
@@ -64,6 +64,7 @@ from ..run_models import (
     CommandLinkNoMeta,
     NozzleLayoutConfig,
     TipState,
+    FlexStackerState,
 )
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, BadRun, RunCreate, RunUpdate
@@ -473,7 +474,8 @@ async def get_run_commands_error(
             description=(
                 "The starting index of the desired first command error in the list."
                 " If unspecified, a cursor will be selected automatically"
-                " based on the last error added."
+                " based on the last error added, and the slice of errors returned "
+                " is the previous `pageLength` errors."
             ),
         ),
     ] = None,
@@ -490,12 +492,9 @@ async def get_run_commands_error(
         all_errors_count = run_data_manager.get_command_errors_count(run_id=runId)
 
         if cursor is None:
-            if all_errors_count > 0:
-                # Get the most recent error,
-                # which we can find just at the end of the list.
-                cursor = all_errors_count - 1
-            else:
-                cursor = 0
+            cursor = max(all_errors_count - 1, 0)
+            cursor = max(cursor - pageLength + 1, 0)
+            cursor = min(cursor, all_errors_count)
 
         command_error_slice = run_data_manager.get_command_error_slice(
             run_id=runId,
@@ -626,6 +625,55 @@ async def get_current_state(  # noqa: C901
                 if place_labware:
                     break
 
+    flex_stacker_substates = run_data_manager.get_flex_stacker_substate(run_id=runId)
+    flex_stacker_states: Dict[str, FlexStackerState] | None
+    if len(flex_stacker_substates) > 0:
+        flex_stacker_states = {}
+        for module_id in flex_stacker_substates:
+            primary_uri: str | None = None
+            adapter_uri: str | None = None
+            lid_uri: str | None = None
+            primary_def = flex_stacker_substates[module_id].pool_primary_definition
+            adapter_def = flex_stacker_substates[module_id].pool_adapter_definition
+            lid_def = flex_stacker_substates[module_id].pool_lid_definition
+            if primary_def is not None:
+                primary_uri = (
+                    primary_def.namespace
+                    + "/"
+                    + primary_def.parameters.loadName
+                    + "/"
+                    + str(primary_def.version)
+                )
+            if adapter_def is not None:
+                adapter_uri = (
+                    adapter_def.namespace
+                    + "/"
+                    + adapter_def.parameters.loadName
+                    + "/"
+                    + str(adapter_def.version)
+                )
+            if lid_def is not None:
+                lid_uri = (
+                    lid_def.namespace
+                    + "/"
+                    + lid_def.parameters.loadName
+                    + "/"
+                    + str(lid_def.version)
+                )
+            max_count = flex_stacker_substates[module_id].get_max_pool_count()
+            if max_count is None:
+                max_count = 0
+
+            flex_stacker_states[module_id] = FlexStackerState.model_construct(
+                primaryLabwareURI=primary_uri,
+                adapterLabwareURI=adapter_uri,
+                lidLabwareURI=lid_uri,
+                count=len(flex_stacker_substates[module_id].get_contained_labware()),
+                maxCount=max_count,
+            )
+    else:
+        flex_stacker_states = None
+
     last_completed_command = run_data_manager.get_last_completed_command(run_id=runId)
     links = CurrentStateLinks.model_construct(
         lastCompleted=CommandLinkNoMeta.model_construct(
@@ -643,6 +691,7 @@ async def get_current_state(  # noqa: C901
                 activeNozzleLayouts=nozzle_layouts,
                 tipStates=tip_states,
                 placeLabwareState=place_labware,
+                flexStackerStates=flex_stacker_states,
             ),
             links=links,
         ),

@@ -1,6 +1,7 @@
 // system-info actions
 
 import * as Constants from './constants'
+
 import type * as Types from './types'
 
 export const initialized = (

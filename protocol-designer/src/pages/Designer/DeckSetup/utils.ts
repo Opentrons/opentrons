@@ -1,20 +1,26 @@
-import some from 'lodash/some'
 import { useEffect, useState } from 'react'
+import some from 'lodash/some'
+
 import {
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+  getAreSlotsAdjacent,
+  getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
-  getAreSlotsAdjacent,
-  getModuleType,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { getIsAdapter, getStagingAreaAddressableAreas } from '../../../utils'
+import {
+  getIsAdapter,
+  getModuleIdFromStack,
+  getStagingAreaAddressableAreas,
+} from '../../../utils'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
@@ -44,6 +50,7 @@ import type {
   InitialDeckSetup,
   LabwareOnDeck,
   ModuleOnDeck,
+  SavedStepFormState,
 } from '../../../step-forms'
 import type { Selection } from '../../../ui/steps'
 import type { Fixture } from './constants'
@@ -150,31 +157,51 @@ export const getLabwareIsRecommended = (
       )
 }
 
-const STACKING_LABWARE_LOADNAME_FILTER = [
-  'opentrons_96_wellplate_200ul_pcr_full_skirt',
-]
-
+//  purely for labware<>adapter combos
 export const getLabwareCompatibleWithAdapter = (
   defs: LabwareDefByDefURI,
-  enableStacking: boolean,
+  enableStackingFF: boolean,
   adapterLoadName?: string
 ): string[] => {
-  if (
-    adapterLoadName == null ||
-    (adapterLoadName != null &&
-      !enableStacking &&
-      STACKING_LABWARE_LOADNAME_FILTER.includes(adapterLoadName))
-  ) {
+  if (adapterLoadName == null) {
     return []
   }
-  return Object.entries(defs)
-    .filter(
-      ([, { stackingOffsetWithLabware }]) =>
-        stackingOffsetWithLabware?.[adapterLoadName] != null
-    )
-    .map(([labwareDefUri]) => labwareDefUri)
+
+  if (enableStackingFF) {
+    return Object.entries(defs)
+      .filter(
+        ([, { stackingOffsetWithLabware }]) =>
+          stackingOffsetWithLabware?.[adapterLoadName] != null
+      )
+      .map(([labwareDefUri]) => labwareDefUri)
+  } else {
+    return Object.entries(defs)
+      .filter(
+        ([, { stackingOffsetWithLabware, compatibleParentLabware }]) =>
+          stackingOffsetWithLabware?.[adapterLoadName] != null &&
+          !compatibleParentLabware?.includes(adapterLoadName)
+      )
+      .map(([labwareDefUri]) => labwareDefUri)
+  }
 }
 
+export const getStackerDefinition = (
+  defs: LabwareDefByDefURI,
+  loadName?: string
+): string | null => {
+  if (loadName == null || loadName === 'opentrons_flex_deck_riser') {
+    return null
+  }
+
+  const labwareDefURI = Object.entries(defs)
+    .filter(([, { compatibleParentLabware }]) =>
+      compatibleParentLabware?.includes(loadName)
+    )
+    .reverse()
+    .map(([labwareDefUri]) => labwareDefUri)[0]
+
+  return labwareDefURI
+}
 interface DeckErrorsProps {
   modules: InitialDeckSetup['modules']
   selectedSlot: string
@@ -214,7 +241,7 @@ export const getDeckErrors = (props: DeckErrorsProps): string | null => {
       }
     } else if (getModuleType(selectedModel) === THERMOCYCLER_MODULE_TYPE) {
       const isLabwareInTCSlots = Object.values(labware).some(lw =>
-        OT2_TC_SLOTS.includes(lw.slot)
+        OT2_TC_SLOTS.includes(getSlotInLocationStack(lw.stack))
       )
       if (isLabwareInTCSlots) {
         error = 'tc_slots_occupied_ot2'
@@ -223,7 +250,7 @@ export const getDeckErrors = (props: DeckErrorsProps): string | null => {
   } else {
     if (getModuleType(selectedModel) === THERMOCYCLER_MODULE_TYPE) {
       const isLabwareInTCSlots = Object.values(labware).some(lw =>
-        FLEX_TC_SLOTS.includes(lw.slot)
+        FLEX_TC_SLOTS.includes(getSlotInLocationStack(lw.stack))
       )
       if (isLabwareInTCSlots) {
         error = 'tc_slots_occupied_flex'
@@ -247,9 +274,9 @@ export function zoomInOnCoordinate(props: ZoomInOnCoordinateProps): string {
   const newWidth = width * zoomFactor
   const newHeight = height * zoomFactor
 
-  //  +125 and +50 to get the approximate center of the screen point
+  //  +20 to get the approximate center of the screen point
   const newMinX = x - newWidth / 2 + 20
-  const newMinY = y - newHeight / 2 + 50
+  const newMinY = y - newHeight / 2
 
   return `${newMinX} ${newMinY} ${newWidth} ${newHeight + 70}`
 }
@@ -302,7 +329,8 @@ export const getAdjacentLabware = (
 
     adjacentLabware =
       Object.values(labware).find(
-        lw => lw.slot === stagingAreaAddressableAreaName[0]
+        lw =>
+          getSlotInLocationStack(lw.stack) === stagingAreaAddressableAreaName[0]
       ) ?? null
   }
   return adjacentLabware
@@ -374,10 +402,13 @@ export const getSwapBlockedModule = (args: SwapBlockedModuleArgs): boolean => {
     return false
   }
 
+  const sourceModuleId = getModuleIdFromStack(draggedLabware.stack, modulesById)
+  const destModuleId = getModuleIdFromStack(hoveredLabware.stack, modulesById)
   const sourceModuleType: ModuleType | null =
-    modulesById[draggedLabware.slot]?.type || null
+    sourceModuleId != null ? modulesById[sourceModuleId].type : null
+
   const destModuleType: ModuleType | null =
-    modulesById[hoveredLabware.slot]?.type || null
+    destModuleId != null ? modulesById[destModuleId].type : null
 
   const draggedLabwareIsCustom = getLabwareIsCustom(
     customLabwareDefs,
@@ -417,9 +448,9 @@ export const getSwapBlockedAdapter = (
   }
 
   const adapterSourceToDestLoadname: string | null =
-    labwareById[draggedLabware.slot]?.def.parameters.loadName ?? null
+    labwareById[draggedLabware.stack[1]]?.def.parameters.loadName ?? null
   const adapterDestToSourceLoadname: string | null =
-    labwareById[hoveredLabware.slot]?.def.parameters.loadName ?? null
+    labwareById[hoveredLabware.stack[1]]?.def.parameters.loadName ?? null
 
   const labwareSourceToDestBlocked =
     adapterSourceToDestLoadname != null
@@ -506,13 +537,12 @@ export const getOT2HoverDimensions = (
 
 export const getSVGContainerWidth = (
   robotType: RobotType,
-  tab: string,
   isZoomed: boolean
 ): string => {
-  if (robotType === OT2_ROBOT_TYPE && tab === 'startingDeck' && !isZoomed) {
+  if (robotType === OT2_ROBOT_TYPE && !isZoomed) {
     return '78.5%'
   }
-  if (robotType !== OT2_ROBOT_TYPE && !isZoomed && tab !== 'protocolSteps') {
+  if (robotType !== OT2_ROBOT_TYPE && !isZoomed) {
     return '70%'
   }
   return '100%'
@@ -547,7 +577,7 @@ export function getHighlightLabwareAndModules(
           item.id != null &&
           labware[item.id] != null &&
           getIsAdapter(item.id, labware)
-            ? modules[labware[item.id].slot]?.id
+            ? getModuleIdFromStack(labware[item.id].stack, modules)
             : null
 
         const updatedItem =
@@ -612,4 +642,39 @@ export function getHighlightLabwareAndModules(
     }
   )
   return highlightItems
+}
+
+export const getIsLabwareInUse = (
+  savedSteps: SavedStepFormState,
+  labware?: LabwareOnDeck | null
+): boolean => {
+  return (
+    labware != null &&
+    Object.values(savedSteps).find(
+      step =>
+        //  moveLabware && mixing in the labware
+        ('labware' in step && step.labware === labware.id) ||
+        //  moving labware to new location
+        ('newLocation' in step && step.newLocation === labware.id) ||
+        // moveLiquid in the labware
+        ('aspirate_labware' in step && step.aspirate_labware === labware.id) ||
+        //  moveLiquid in the labware
+        ('dispense_labware' in step && step.dispense_labware === labware.id)
+    ) != null
+  )
+}
+
+export function getIsLabwareOnSlotInUse(
+  savedSteps: SavedStepFormState,
+  createdAdapterForSlot?: LabwareOnDeck,
+  createdTopLabwareForSlot?: LabwareOnDeck
+): boolean {
+  const isCurrentLabwareInUse = [
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
+  ]
+    .map(lw => getIsLabwareInUse(savedSteps, lw))
+    .includes(true)
+
+  return isCurrentLabwareInUse
 }

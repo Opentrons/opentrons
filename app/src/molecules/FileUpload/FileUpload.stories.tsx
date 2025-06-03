@@ -1,8 +1,9 @@
-import type * as React from 'react'
-import testFile from './__tests__/test-file.png'
 import { FileUpload } from '.'
 
-import type { StoryFn, Meta } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
+import type * as React from 'react'
+
+import testFile from './__tests__/test-file.png'
 
 const file = new File([testFile], 'a-file-to-test.png')
 const handleClick = (): void => {

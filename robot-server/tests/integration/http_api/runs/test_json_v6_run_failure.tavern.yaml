@@ -91,9 +91,36 @@ stages:
               key: !anystr
               createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
         meta:
-          cursor: 3
+          cursor: 0
           totalLength: 4
         data:
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            params: !anydict
+            notes: !anylist
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            params: !anydict
+            notes: !anylist
+          - id: !anystr
+            key: !anystr
+            commandType: loadPipette
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            params: !anydict
+            notes: !anylist
           - id: !anystr
             key: !anystr
             commandType: aspirate
@@ -115,12 +142,6 @@ stages:
               pipetteId: pipetteId
               labwareId: tipRackId
               wellName: A1
-              wellLocation:
-                origin: bottom
-                offset:
-                  x: 0
-                  y: 0
-                  z: 1
-                volumeOffset: 0
-              flowRate: 3.78
-              volume: 100
+              wellLocation: !anydict
+              flowRate: !anyfloat
+              volume: !anyfloat

@@ -1,4 +1,4 @@
-import { COLORS, BORDERS } from '../helix-design-system'
+import { BORDERS, COLORS } from '../helix-design-system'
 import { SPACING } from '../ui-style-constants'
 import { Box as BoxComponent } from './Box'
 

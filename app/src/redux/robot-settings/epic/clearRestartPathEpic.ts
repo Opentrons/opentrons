@@ -1,5 +1,6 @@
 import { of } from 'rxjs'
-import { map, filter, switchMap } from 'rxjs/operators'
+import { filter, map, switchMap } from 'rxjs/operators'
+
 import { getRobotRestarting } from '../../robot-admin'
 import { clearRestartPath } from '../actions'
 import { getAllRestartRequiredRobots } from '../selectors'

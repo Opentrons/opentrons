@@ -55,6 +55,7 @@ from ..types import (
     DeckType,
     LabwareMovementOffsetData,
     AddressableAreaLocation,
+    StackerStoredLabwareGroup,
 )
 
 from ..resources import DeckFixedLabware
@@ -387,8 +388,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 pool_primary_definition=None,
                 pool_adapter_definition=None,
                 pool_lid_definition=None,
-                pool_count=0,
+                contained_labware_bottom_first=[],
                 max_pool_count=0,
+                pool_overlap=0,
             )
 
     def _update_additional_slots_occupied_by_thermocycler(
@@ -930,10 +932,39 @@ class ModuleView:
         Includes the slot-specific transform. Does not include the child's
         Labware Position Check offset.
         """
-        if (
-            self._state.deck_type == DeckType.OT2_STANDARD
-            or self._state.deck_type == DeckType.OT2_SHORT_TRASH
-        ):
+        base = self.get_nominal_offset_to_child_from_addressable_area(module_id)
+        if self.get_deck_supports_module_fixtures():
+            module_addressable_area = self.get_provided_addressable_area(module_id)
+            module_addressable_area_position = (
+                addressable_areas.get_addressable_area_offsets_from_cutout(
+                    module_addressable_area
+                )
+            )
+            return base + LabwareOffsetVector(
+                x=module_addressable_area_position.x,
+                y=module_addressable_area_position.y,
+                z=module_addressable_area_position.z,
+            )
+        else:
+            return base
+
+    def get_nominal_offset_to_child_from_addressable_area(
+        self, module_id: str
+    ) -> LabwareOffsetVector:
+        """Get the position offset for a child of this module from the nearest AA.
+
+        On the Flex, this is always (0, 0, 0); on the OT-2, since modules load on top
+        of addressable areas rather than providing addressable areas, the offset is
+        the labwareOffset from the module definition, rotated by the module's
+        slotTransform if appropriate.
+        """
+        if self.get_deck_supports_module_fixtures():
+            return LabwareOffsetVector(
+                x=0,
+                y=0,
+                z=0,
+            )
+        else:
             definition = self.get_definition(module_id)
             slot = self.get_location(module_id).slotName.id
 
@@ -967,18 +998,6 @@ class ModuleView:
                 x=xformed[0],
                 y=xformed[1],
                 z=xformed[2],
-            )
-        else:
-            module_addressable_area = self.get_provided_addressable_area(module_id)
-            module_addressable_area_position = (
-                addressable_areas.get_addressable_area_offsets_from_cutout(
-                    module_addressable_area
-                )
-            )
-            return LabwareOffsetVector(
-                x=module_addressable_area_position.x,
-                y=module_addressable_area_position.y,
-                z=module_addressable_area_position.z,
             )
 
     def get_module_calibration_offset(
@@ -1344,7 +1363,7 @@ class ModuleView:
                 col = (i % 12) + 1  # Convert index to column (1-12)
                 well_key = f"{row}{col}"
                 # Truncate the value to the third decimal place
-                well_map[well_key] = math.floor(value * 1000) / 1000
+                well_map[well_key] = max(0.0, math.floor(value * 1000) / 1000)
             return well_map
         else:
             raise ValueError(
@@ -1431,9 +1450,34 @@ class ModuleView:
             )
 
     def stacker_max_pool_count_by_height(
-        self, module_id: str, pool_height: float
+        self,
+        module_id: str,
+        pool_height: float,
+        pool_overlap: float,
     ) -> int:
         """Get the maximum stack count for the Flex Stacker by stack height."""
         max_fill_height = self.get_stacker_max_fill_height(module_id)
         assert max_fill_height > 0
-        return math.floor(max_fill_height / pool_height)
+        # Subtracting the pool overlap from the stack element (pool height) allows us to account for
+        # elements nesting on one-another, and we must subtract from max height to apply starting offset.
+        # Ex: Let H be the total height of the stack; h be the height of a stack element;
+        # d be the stack overlap; and N be the number of labware. Then for N >= 1,
+        # H = Nh - (N-1)d
+        # H = Nh - Nd + d
+        # H - d = N(h-d)
+        # (H-d)/(h-d) = N
+        return math.floor(
+            (max_fill_height - pool_overlap) / (pool_height - pool_overlap)
+        )
+
+    def stacker_contained_labware(
+        self, module_id: str
+    ) -> list[StackerStoredLabwareGroup]:
+        """Get the labware contained in a Flex Stacker."""
+        substate = self.get_flex_stacker_substate(module_id)
+        return substate.get_contained_labware()
+
+    def stacker_max_pool_count(self, module_id: str) -> int | None:
+        """Get the max stored labware in this stacker configuration."""
+        substate = self.get_flex_stacker_substate(module_id)
+        return substate.get_max_pool_count()

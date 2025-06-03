@@ -1,5 +1,5 @@
 """Protocol engine types to do with positions inside wells."""
-from enum import Enum
+from enum import Enum, auto
 from typing import Union, Literal
 
 from pydantic import BaseModel, Field
@@ -50,6 +50,15 @@ class DropTipWellOrigin(str, Enum):
     BOTTOM = "bottom"
     CENTER = "center"
     DEFAULT = "default"
+
+
+class WellLocationFunction(int, Enum):
+    """The type of well location object to be created."""
+
+    BASE = auto()
+    LIQUID_HANDLING = auto()
+    PICK_UP_TIP = auto()
+    DROP_TIP = auto()
 
 
 # This is deliberately a separate type from Vec3f to let components default to 0.
@@ -105,3 +114,11 @@ class DropTipWellLocation(BaseModel):
 
     origin: DropTipWellOrigin = DropTipWellOrigin.DEFAULT
     offset: WellOffset = Field(default_factory=WellOffset)
+
+
+WellLocationType = Union[
+    WellLocation,
+    LiquidHandlingWellLocation,
+    PickUpTipWellLocation,
+    DropTipWellLocation,
+]

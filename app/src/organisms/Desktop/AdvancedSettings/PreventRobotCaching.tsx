@@ -6,8 +6,8 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -18,7 +18,7 @@ import type { Dispatch, State } from '/app/redux/types'
 
 export function PreventRobotCaching(): JSX.Element {
   const { t } = useTranslation('app_settings')
-  const displayUnavailRobots = useSelector((state: State) => {
+  const disableRobotCache = useSelector((state: State) => {
     return getConfig(state)?.discovery.disableCache ?? false
   })
   const dispatch = useDispatch<Dispatch>()
@@ -29,7 +29,7 @@ export function PreventRobotCaching(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_unavailableRobots"
+          id="AdvancedSettings_disableRobotCache"
         >
           {t('prevent_robot_caching')}
         </LegacyStyledText>
@@ -49,10 +49,10 @@ export function PreventRobotCaching(): JSX.Element {
         </LegacyStyledText>
       </Box>
       <ToggleButton
-        label="display_unavailable_robots"
-        toggledOn={!displayUnavailRobots}
+        label="disable_robot_cache"
+        toggledOn={disableRobotCache}
         onClick={() => dispatch(toggleConfigValue('discovery.disableCache'))}
-        id="AdvancedSettings_unavailableRobotsToggleButton"
+        id="AdvancedSettings_disableRobotCacheToggleButton"
       />
     </Flex>
   )

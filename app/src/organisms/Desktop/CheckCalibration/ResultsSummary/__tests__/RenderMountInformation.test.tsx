@@ -1,5 +1,5 @@
-import { vi, it, describe, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
@@ -7,6 +7,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { LEFT, RIGHT } from '/app/redux/pipettes'
 import * as Fixtures from '/app/redux/sessions/__fixtures__'
+
 import { RenderMountInformation } from '../RenderMountInformation'
 
 import type { ComponentProps } from 'react'

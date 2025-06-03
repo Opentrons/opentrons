@@ -1,11 +1,13 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
-import { getSubsystemUpdate } from '@opentrons/api-client'
-import { useHost } from '../../api'
-import { useSubsystemUpdateQuery } from '..'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getSubsystemUpdate } from '@opentrons/api-client'
+
+import { useSubsystemUpdateQuery } from '..'
+import { useHost } from '../../api'
+
+import type * as React from 'react'
 import type {
   HostConfig,
   Response,

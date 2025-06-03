@@ -79,6 +79,9 @@ dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
+# todo(mm, 2025-05-12): Evaluating $(wheel_file) here means we'll call pipenv and create
+# a virtualenv whenever this Makefile is read--even if you're just doing something
+# like `make teardown`.
 wheel: $(wheel_file)
 
 $(sdist_file): export OPENTRONS_PROJECT=$(project_rs_default)

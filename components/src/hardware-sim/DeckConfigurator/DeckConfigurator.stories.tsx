@@ -1,5 +1,3 @@
-import type * as React from 'react'
-
 import {
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -10,7 +8,8 @@ import {
 
 import { DeckConfigurator } from '.'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 import type { CutoutConfig } from '@opentrons/shared-data'
 
 export default {

@@ -1,12 +1,13 @@
 import { getPositionFromSlotId } from '@opentrons/shared-data'
+
 import type {
   CompletedProtocolAnalysis,
   DeckDefinition,
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadLabwareRunTimeCommand,
-  ProtocolAnalysisOutput,
   LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
 export interface LabwareRenderInfoById {
@@ -14,7 +15,7 @@ export interface LabwareRenderInfoById {
     x: number
     y: number
     z: number
-    labwareDef: LabwareDefinition2
+    labwareDef: LabwareDefinition
     displayName: string | null
     slotName: string
   }

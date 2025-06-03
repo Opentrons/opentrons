@@ -1,5 +1,13 @@
-import type { CutoutFixtureId, CutoutId, AddressableAreaName } from '../deck'
-import type { ModuleModel, ModuleType } from './types'
+import type { WellLocation, WellOrigin } from '../command'
+import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
+import type {
+  AddressableArea,
+  AreaType,
+  FakeAddressableArea,
+  ModuleModel,
+  ModuleType,
+  PositionReference,
+} from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
@@ -288,6 +296,26 @@ export const D2_ADDRESSABLE_AREA: 'D2' = 'D2'
 export const D3_ADDRESSABLE_AREA: 'D3' = 'D3'
 export const D4_ADDRESSABLE_AREA: 'D4' = 'D4'
 
+export type FlexFakeAddressableAreaName =
+  | 'fakeA4'
+  | 'fakeB4'
+  | 'fakeC4'
+  | 'fakeD4'
+
+export type FakeStagingAreaRightSlot = 'fakeStagingAreaRightSlot'
+
+export type AddressableAreaNamesWithFakes =
+  | AddressableAreaName
+  | FlexFakeAddressableAreaName
+
+export type AddressableAreaWithFakes = AddressableArea | FakeAddressableArea
+
+export type CutoutFixtureIdsWithFakes =
+  | CutoutFixtureId
+  | FakeStagingAreaRightSlot
+
+export type AreaTypeWithFakes = AreaType | 'fakeStagingSlot'
+
 export const MOVABLE_TRASH_A1_ADDRESSABLE_AREA: 'movableTrashA1' =
   'movableTrashA1'
 export const MOVABLE_TRASH_A3_ADDRESSABLE_AREA: 'movableTrashA3' =
@@ -550,6 +578,9 @@ export const SINGLE_RIGHT_SLOT_FIXTURE: 'singleRightSlot' = 'singleRightSlot'
 export const STAGING_AREA_RIGHT_SLOT_FIXTURE: 'stagingAreaRightSlot' =
   'stagingAreaRightSlot'
 
+export const FAKE_STAGING_AREA_RIGHT_SLOT: 'fakeStagingAreaRightSlot' =
+  'fakeStagingAreaRightSlot'
+
 export const TRASH_BIN_FIXTURE: 'trashBin' = 'trashBin'
 export const TRASH_BIN_ADAPTER_FIXTURE: 'trashBinAdapter' = 'trashBinAdapter'
 
@@ -610,6 +641,7 @@ export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
 export const MAGNETIC_BLOCK_FIXTURES: CutoutFixtureId[] = [
   MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
 ]
 
 export const SINGLE_SLOT_FIXTURES: CutoutFixtureId[] = [
@@ -670,7 +702,34 @@ export const DEPRECATED_WHALE_GREY = '#9395a0'
 // react code because the web worker context does not play nicely with react
 export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
 
-export const WELL_TOP: 'well-top' = 'well-top'
-export const WELL_CENTER: 'well-center' = 'well-center'
-export const WELL_BOTTOM: 'well-bottom' = 'well-bottom'
-export const LIQUID_MENISCUS: 'liquid-meniscus' = 'liquid-meniscus'
+export const POSITION_REFERENCE_TOP: 'well-top' = 'well-top'
+export const POSITION_REFERENCE_BOTTOM: 'well-bottom' = 'well-bottom'
+export const POSITION_REFERENCE_CENTER: 'well-center' = 'well-center'
+export const POSITION_REFERENCE_LIQUID_MENISCUS: 'liquid-meniscus' =
+  'liquid-meniscus'
+
+export const WELL_ORIGIN_TOP: 'top' = 'top'
+export const WELL_ORIGIN_BOTTOM: 'bottom' = 'bottom'
+export const WELL_ORIGIN_CENTER: 'center' = 'center'
+export const WELL_ORIGIN_MENISCUS: 'meniscus' = 'meniscus'
+
+export const POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN: Record<
+  PositionReference,
+  WellOrigin
+> = {
+  [POSITION_REFERENCE_TOP]: WELL_ORIGIN_TOP,
+  [POSITION_REFERENCE_BOTTOM]: WELL_ORIGIN_BOTTOM,
+  [POSITION_REFERENCE_CENTER]: WELL_ORIGIN_CENTER,
+  [POSITION_REFERENCE_LIQUID_MENISCUS]: WELL_ORIGIN_MENISCUS,
+}
+
+const SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM = 2
+
+export const SAFE_MOVE_TO_WELL_LOCATION: WellLocation = {
+  origin: WELL_ORIGIN_TOP,
+  offset: {
+    x: 0,
+    y: 0,
+    z: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  },
+}

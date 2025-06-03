@@ -1,6 +1,7 @@
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type { AddressableAreaName } from '../../deck'
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 import type { DropTipWellLocation, WellLocation } from './support'
+
 export type PipettingRunTimeCommand =
   | AspirateInPlaceRunTimeCommand
   | AspirateInPlaceRunTimeCommand
@@ -22,9 +23,9 @@ export type PipettingRunTimeCommand =
   | LiquidProbeRunTimeCommand
   | TryLiquidProbeRunTimeCommand
   | AirGapInPlaceRunTimeCommand
-  | EvotipSealRunTimeCommand
-  | EvotipUnsealRunTimeCommand
-  | EvotipPressurizeRunTimeCommand
+  | PipetteSealToTipRunTimeCommand
+  | PipetteUnsealFromTipRunTimeCommand
+  | PressureDispenseRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
@@ -46,9 +47,9 @@ export type PipettingCreateCommand =
   | LiquidProbeCreateCommand
   | TryLiquidProbeCreateCommand
   | AirGapInPlaceCreateCommand
-  | EvotipSealCreateCommand
-  | EvotipUnsealCreateCommand
-  | EvotipPressurizeCreateCommand
+  | PipetteSealToTipCreateCommand
+  | PipetteUnsealFromTipCreateCommand
+  | PressureDispenseCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -68,7 +69,9 @@ export interface ConfigureForVolumeRunTimeCommand
 
 export type AirGapInPlaceParams = FlowRateParams &
   PipetteIdentityParams &
-  VolumeParams
+  VolumeParams & {
+    correctionVolume?: number
+  }
 
 export interface AirGapInPlaceCreateCommand extends CommonCommandCreateInfo {
   commandType: 'airGapInPlace'
@@ -235,9 +238,10 @@ export interface VerifyTipPresenceRunTimeCommand
   result?: any
 }
 
+export type LiquidProbeParams = WellLocationParam & PipetteAccessParams
 export interface LiquidProbeCreateCommand extends CommonCommandCreateInfo {
   commandType: 'liquidProbe'
-  params: WellLocationParam & PipetteAccessParams
+  params: LiquidProbeParams
 }
 export interface LiquidProbeRunTimeCommand
   extends CommonCommandRunTimeInfo,
@@ -255,35 +259,36 @@ export interface TryLiquidProbeRunTimeCommand
   result?: Record<string, unknown>
 }
 
-export interface EvotipSealCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'evotipSealPipette'
+export interface PipetteSealToTipCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'sealPipetteToTip'
   params: PipetteAccessParams & WellLocationParam
 }
-export interface EvotipUnsealCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'evotipUnsealPipette'
+export interface PipetteUnsealFromTipCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'unsealPipetteFromTip'
   params: PipetteAccessParams & WellLocationParam
 }
 
-export interface EvotipPressurizeCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'evotipDispense'
+export interface PressureDispenseCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'pressureDispense'
   params: PipetteAccessParams &
     WellLocationParam &
     FlowRateParams &
     VolumeParams
 }
-export interface EvotipSealRunTimeCommand
+export interface PipetteSealToTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    EvotipSealCreateCommand {
-  result?: EvotipSealResult
+    PipetteSealToTipCreateCommand {
+  result?: PipetteSealToTipResult
 }
-export interface EvotipUnsealRunTimeCommand
+export interface PipetteUnsealFromTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    EvotipUnsealCreateCommand {
-  result?: EvotipUnsealResult
+    PipetteUnsealFromTipCreateCommand {
+  result?: PipetteUnsealFromTipResult
 }
-export interface EvotipPressurizeRunTimeCommand
+export interface PressureDispenseRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    EvotipPressurizeCreateCommand {
+    PressureDispenseCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 export type AspDispAirgapParams = FlowRateParams &
@@ -341,12 +346,14 @@ export interface DispenseInPlaceParams {
   volume: number
   flowRate: number // µL/s
   pushOut?: number
+  correctionVolume?: number
 }
 
 export interface AspirateInPlaceParams {
   pipetteId: string
   volume: number
   flowRate: number // µL/s
+  correctionVolume?: number
 }
 interface FlowRateParams {
   flowRate: number // µL/s
@@ -387,12 +394,12 @@ interface TipPresenceResult {
   status?: 'present' | 'absent' | 'unknown'
 }
 
-interface EvotipSealResult {
+interface PipetteSealToTipResult {
   position: AddressableOffsetVector
   tipVolume: number
   tipLength: number
   tipDiameter: number
 }
-interface EvotipUnsealResult {
+interface PipetteUnsealFromTipResult {
   position: AddressableOffsetVector
 }

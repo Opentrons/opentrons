@@ -10,8 +10,8 @@ on:
       - 'Makefile'
       - 'api/**'
       - 'g-code-testing/**'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
       - '.github/workflows/g-code-testing-lint-test.yaml'
       - '.github/actions/python/**'
     branches:
@@ -23,8 +23,8 @@ on:
       - 'Makefile'
       - 'g-code-testing/**'
       - 'api/**'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
       - '.github/workflows/g-code-testing-lint-test.yaml'
       - '.github/actions/python/**'
   workflow_dispatch:

@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+
 import { createLogger } from '../log'
 
 const log = createLogger('protocol-analysis/getPythonPath')

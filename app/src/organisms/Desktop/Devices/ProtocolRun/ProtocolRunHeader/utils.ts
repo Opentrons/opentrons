@@ -1,16 +1,16 @@
 import {
-  RUN_STATUS_IDLE,
-  RUN_STATUS_PAUSED,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_FAILED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_SUCCEEDED,
-  RUN_STATUS_RUNNING,
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 
 import { getRobotSerialNumber } from '/app/redux/discovery'
@@ -65,6 +65,23 @@ export function isStartRunStatus(runStatus: RunStatus | null): boolean {
 
 export function isRunAgainStatus(runStatus: RunStatus | null): boolean {
   return runStatus !== null && RUN_AGAIN_STATUSES.includes(runStatus)
+}
+
+export function isValidRunAgainStatus(
+  runStatus: RunStatus | null,
+  isClosingCurrentRun: boolean
+): boolean {
+  if (runStatus !== null && RUN_AGAIN_STATUSES.includes(runStatus)) {
+    // The desktop app uncurrents the run when stopped, and to prevent server-side race conditions, we should wait
+    // until the run uncurrenting completes.
+    if (runStatus === RUN_STATUS_STOPPED) {
+      return !isClosingCurrentRun
+    } else {
+      return true
+    }
+  }
+
+  return false
 }
 
 export function isRecoveryStatus(runStatus: RunStatus | null): boolean {

@@ -1,7 +1,9 @@
-import type * as React from 'react'
-import { COLORS, Flex, BORDERS, SPACING, VIEWPORT } from '@opentrons/components'
+import { BORDERS, COLORS, Flex, SPACING, VIEWPORT } from '@opentrons/components'
+
 import { OddModal } from './OddModal'
-import type { Story, Meta } from '@storybook/react'
+
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'ODD/Molecules/OddModal/OddModal',

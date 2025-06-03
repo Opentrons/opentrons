@@ -1,21 +1,22 @@
-import { useRef, useEffect, useCallback } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useCallback, useEffect, useRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { OPENTRONS_USB, UNREACHABLE } from '/app/redux/discovery'
 import {
-  setRobotUpdateSeen,
-  robotUpdateIgnored,
   getRobotUpdateSession,
+  robotUpdateIgnored,
+  setRobotUpdateSeen,
 } from '/app/redux/robot-update'
-import { ViewUpdateModal } from './ViewUpdateModal'
-import { RobotUpdateProgressModal } from './RobotUpdateProgressModal'
-import { UNREACHABLE, OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
 
-import type { Dispatch } from '/app/redux/types'
+import { RobotUpdateProgressModal } from './RobotUpdateProgressModal'
+import { ViewUpdateModal } from './ViewUpdateModal'
+
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface UpdateBuildrootProps {
   robot: DiscoveredRobot | null

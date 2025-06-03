@@ -1,28 +1,30 @@
-import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
+import { applyMiddleware, combineReducers, compose, createStore } from 'redux'
 import thunk from 'redux-thunk'
-import { trackEventMiddleware } from './analytics/middleware'
-import { makePersistSubscriber, rehydratePersistedAction } from './persist'
-import { fileUploadMessage } from './load-file/actions'
-import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
+
 import { rootReducer as analyticsReducer } from './analytics'
+import { trackEventMiddleware } from './analytics/middleware'
 import { rootReducer as dismissReducer } from './dismiss'
 import { rootReducer as featureFlagsReducer } from './feature-flags'
 import { rootReducer as fileDataReducer } from './file-data'
 import { rootReducer as labwareIngredReducer } from './labware-ingred/reducers'
 import { rootReducer as loadFileReducer } from './load-file'
+import { fileUploadMessage } from './load-file/actions'
 import { rootReducer as navigationReducer } from './navigation'
+import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { rootReducer as stepFormsReducer } from './step-forms'
+import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
 import { rootReducer as tutorialReducer } from './tutorial'
 import { rootReducer as uiReducer } from './ui'
 import { rootReducer as wellSelectionReducer } from './well-selection/reducers'
+
 import type {
-  Store,
-  Reducer,
   CombinedState,
-  StoreEnhancer,
   Middleware,
+  Reducer,
+  Store,
+  StoreEnhancer,
 } from 'redux'
-import type { BaseState, Action } from './types'
+import type { Action, BaseState } from './types'
 
 const timelineMiddleware = makeTimelineMiddleware()
 

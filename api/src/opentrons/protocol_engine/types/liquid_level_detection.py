@@ -1,9 +1,10 @@
 """Protocol Engine types to do with liquid level detection."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, List
-from pydantic import BaseModel, model_serializer, field_validator
+from typing import Optional, List, Any
+from pydantic import BaseModel, model_serializer, model_validator
 
 
 class SimulatedProbeResult(BaseModel):
@@ -16,6 +17,14 @@ class SimulatedProbeResult(BaseModel):
     def serialize_model(self) -> str:
         """Serialize instances of this class as a string."""
         return "SimulatedProbeResult"
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_model(cls, data: object) -> Any:
+        """Handle deserializing from a simulated probe result."""
+        if isinstance(data, str) and data == "SimulatedProbeResult":
+            return {}
+        return data
 
     def __add__(
         self, other: float | SimulatedProbeResult
@@ -75,7 +84,9 @@ class SimulatedProbeResult(BaseModel):
         self.operations_after_probe.append(volume)
 
 
-LiquidTrackingType = SimulatedProbeResult | float
+# Work around https://github.com/pydantic/pydantic/issues/6830 - do not change the order of
+# this union
+LiquidTrackingType = float | SimulatedProbeResult
 
 
 class LoadedVolumeInfo(BaseModel):
@@ -103,23 +114,6 @@ class ProbedVolumeInfo(BaseModel):
 
 class WellInfoSummary(BaseModel):
     """Payload for a well's liquid info in StateSummary."""
-
-    # TODO(cm): 3/21/25: refactor SimulatedLiquidProbe in a way that
-    # doesn't require models like this one that are just using it to
-    # need a custom validator
-    @field_validator("probed_height", "probed_volume", mode="before")
-    @classmethod
-    def validate_simulated_probe_result(
-        cls, input_val: object
-    ) -> LiquidTrackingType | None:
-        """Return the appropriate input to WellInfoSummary from json data."""
-        if input_val is None:
-            return None
-        if isinstance(input_val, LiquidTrackingType):
-            return input_val
-        if isinstance(input_val, str) and input_val == "SimulatedProbeResult":
-            return SimulatedProbeResult()
-        raise ValueError(f"Invalid input value {input_val} to WellInfoSummary")
 
     labware_id: str
     well_name: str

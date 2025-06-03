@@ -1,13 +1,13 @@
 import * as Constants from './constants'
 
-import type { RobotHost } from '../robot-api/types'
 import type { ViewableRobot } from '../discovery/types'
+import type { RobotHost } from '../robot-api/types'
 import type {
   RobotUpdateAction,
-  UpdateSessionStep,
-  UpdateSessionStage,
   RobotUpdateStatusAction,
   RobotUpdateTarget,
+  UpdateSessionStage,
+  UpdateSessionStep,
 } from './types'
 
 // analytics tracking action; not consumed by any reducer

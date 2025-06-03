@@ -1,18 +1,19 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RecoveryDoorOpenSpecial } from '../RecoveryDoorOpenSpecial'
+import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
+
 import { RECOVERY_MAP } from '../../constants'
+import { RecoveryDoorOpenSpecial } from '../RecoveryDoorOpenSpecial'
 
 import type { ComponentProps } from 'react'
-import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
 
 describe('RecoveryDoorOpenSpecial', () => {
   let props: ComponentProps<typeof RecoveryDoorOpenSpecial>

@@ -1,4 +1,5 @@
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -13,6 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { ODD_FOCUS_VISIBLE } from './constants'
 
 import type { MouseEventHandler, ReactNode } from 'react'

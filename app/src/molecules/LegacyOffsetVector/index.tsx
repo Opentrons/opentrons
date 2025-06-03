@@ -1,8 +1,8 @@
 import {
   Flex,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import type { ComponentProps } from 'react'
@@ -29,7 +29,7 @@ export function LegacyOffsetVector(
         X
       </LegacyStyledText>
       <LegacyStyledText as={as} marginRight={SPACING.spacing8}>
-        {x.toFixed(2)}
+        {x.toFixed(1)}
       </LegacyStyledText>
       <LegacyStyledText
         as={as}
@@ -39,7 +39,7 @@ export function LegacyOffsetVector(
         Y
       </LegacyStyledText>
       <LegacyStyledText as={as} marginRight={SPACING.spacing8}>
-        {y.toFixed(2)}
+        {y.toFixed(1)}
       </LegacyStyledText>
       <LegacyStyledText
         as={as}
@@ -49,7 +49,7 @@ export function LegacyOffsetVector(
         Z
       </LegacyStyledText>
       <LegacyStyledText as={as} marginRight={SPACING.spacing8}>
-        {z.toFixed(2)}
+        {z.toFixed(1)}
       </LegacyStyledText>
     </Flex>
   )

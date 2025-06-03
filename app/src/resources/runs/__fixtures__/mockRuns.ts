@@ -1,17 +1,17 @@
 import {
-  RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
+  RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_STOP,
+  RUN_STATUS_FAILED,
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
   RUN_STATUS_RUNNING,
-  RUN_STATUS_SUCCEEDED,
-  RUN_STATUS_FAILED,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 
-import type { RunData, CommandDetail } from '@opentrons/api-client'
+import type { CommandDetail, RunData } from '@opentrons/api-client'
 
 export const PROTOCOL_ID = '1'
 export const RUN_ID_1 = '1'

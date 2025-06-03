@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
@@ -9,21 +9,22 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 import {
-  useStopRunMutation,
   useDeleteRunMutation,
   useDismissCurrentRunMutation,
+  useStopRunMutation,
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { useRunStatus } from '/app/resources/runs'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useNotifyRunQuery } from '/app/resources/runs'
+
 import { CancelingRunModal } from './CancelingRunModal'
 
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
@@ -61,8 +62,9 @@ export function ConfirmCancelRunModal({
       }
     },
   })
-  const runStatus = useRunStatus(runId)
   const localRobot = useSelector(getLocalRobot)
+  const { data, isError: isRunFetchError } = useNotifyRunQuery(runId)
+  const runStatus = data?.data.status
   const robotName = localRobot?.name ?? ''
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const navigate = useNavigate()
@@ -85,7 +87,7 @@ export function ConfirmCancelRunModal({
   }
 
   useEffect(() => {
-    if (runStatus === RUN_STATUS_STOPPED) {
+    if (runStatus === RUN_STATUS_STOPPED || isRunFetchError) {
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       if (!isActiveRun) {
         dismissCurrentRun(runId)

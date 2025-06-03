@@ -1,12 +1,10 @@
 import * as Constants from '../constants'
 import { LPCReducer } from './lpc'
+import { setupReducer } from './setup'
 
 import type { Reducer } from 'redux'
-
 import type { Action } from '../../types'
 import type { ProtocolRunState } from '../types'
-
-import { setupReducer } from './setup'
 
 const INITIAL_STATE: ProtocolRunState = {}
 
@@ -47,7 +45,9 @@ export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
     case Constants.APPLY_WORKING_OFFSETS:
     case Constants.SOURCE_OFFSETS_FROM_RUN:
     case Constants.SOURCE_OFFSETS_FROM_DATABASE:
-    case Constants.UPDATE_CONFLICT_TIMESTAMP: {
+    case Constants.UPDATE_CONFLICT_TIMESTAMP:
+    case Constants.TOGGLE_DEFAULT_OFFSET_INFO_BANNER:
+    case Constants.CLEAR_SNACKBAR_STATUS: {
       const runId = action.payload.runId
       const currentRunState = state[runId] || { lpc: undefined }
       const nextLpcState = LPCReducer(currentRunState.lpc, action)

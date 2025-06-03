@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { getModuleImage } from '../getModuleImage'
 
 describe('getModuleImage', () => {
@@ -80,5 +81,10 @@ describe('getModuleImage', () => {
   it('should render the magnetic block v1 image when the module is magneticBlockV1', () => {
     const result = getModuleImage('magneticBlockV1')
     expect(result).toEqual('/app/src/assets/images/magnetic_block_gen_1.png')
+  })
+
+  it('should render the flex stacker image when the module is flexStackerModuleV1', () => {
+    const result = getModuleImage('flexStackerModuleV1')
+    expect(result).toEqual('/app/src/assets/images/flex_stacker_no_labware.png')
   })
 })

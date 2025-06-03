@@ -1,4 +1,4 @@
-import type { UsbDevice, NetworkInterface } from '../types'
+import type { NetworkInterface, UsbDevice } from '../types'
 
 export const mockUsbDevice: UsbDevice = {
   // 0x0001

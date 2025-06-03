@@ -1,6 +1,12 @@
 from typing import Dict, Optional
 from typing_extensions import Protocol
-from ..types import DoorState, StatusBarState, EstopState
+from ..types import (
+    DoorState,
+    StatusBarState,
+    EstopState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
+)
 from .event_sourcer import EventSourcer
 
 
@@ -10,6 +16,11 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
     @property
     def door_state(self) -> DoorState:
         """The current state of the machine's door."""
+        ...
+
+    @property
+    def module_door_serial(self) -> str | None:
+        """The serial number of a module with an open door."""
         ...
 
     async def set_lights(
@@ -59,6 +70,15 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
         """Get the current status bar state.
 
         :returns: The current status bar state enumeration."""
+        ...
+
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        """Add a listener to the status bar state.
+
+        listener: The listener to add.
+        :returns: A callback function that removes the listener."""
         ...
 
     def get_estop_state(self) -> EstopState:

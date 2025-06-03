@@ -332,7 +332,10 @@ async def test_hw_aspirate_while_tracking(
 
     decoy.when(
         mock_state_view.geometry.get_liquid_handling_z_change(
-            labware_id="labware-id", well_name="A1", operation_volume=25.0
+            labware_id="labware-id",
+            well_name="A1",
+            pipette_id="pipette-id",
+            operation_volume=-25.0,
         )
     ).then_return(4.544)
 
@@ -346,6 +349,11 @@ async def test_hw_aspirate_while_tracking(
     )
     # make sure hw aspirate_while_tracking runs without error
     assert result == 25
+    decoy.verify(
+        await mock_hardware_api.aspirate_while_tracking(
+            mount=Mount.LEFT, z_distance=4.544, flow_rate=2.5, volume=25
+        )
+    )
 
 
 async def test_hw_aspirate_in_place(

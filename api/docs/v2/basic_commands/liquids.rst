@@ -48,6 +48,28 @@ You can also aspirate from a location along the center vertical axis within a we
     depth = plate["A1"].bottom(z=2) # tip is 2 mm above well bottom
     pipette.aspirate(200, depth)
 
+
+Use the :py:meth:`.Well.meniscus` method to aspirate relative to the meniscus of liquid in a well with a Flex pipette. First, you'll need to determine the amount of liquid in your well one of two ways: 
+
+- Specify your starting liquid volume with :py:meth:`~.Labware.load_liquid`.
+- Measure the height of the liquid with :py:meth:`~.InstrumentContext.measure_liquid_height`. 
+
+This example measures the liquid height in well A2 of a plate and then immediately aspirates below the meniscus:: 
+
+    pipette.pick_up_tip()
+    pipette.measure_liquid_height(plate["A2"])
+    pipette.aspirate(
+        volume=200, 
+        location=plate["A2"].meniscus(z=-1, target="end")
+        ) 
+    # aspirates at 1 mm below the liquid meniscus
+
+The liquid meniscus changes when you aspirate liquid from a well. Set ``target="end"`` to ensure the pipette stays submerged while aspirating. For more information, see :ref:`well-meniscus`.
+
+``measure_liquid_height()`` works best with a new pipette tip each time. To save time and tips throughout your protocol, use ``Labware.load_liquid`` instead to specify starting liquid volumes.
+
+.. versionadded:: 2.23
+
 See also:
 
 - :ref:`new-default-op-positions` for information about controlling pipette height for a particular pipette.
@@ -104,6 +126,27 @@ You can also dispense from a location along the center vertical axis within a we
 
     depth = plate["B1"].bottom(z=2) # tip is 2 mm above well bottom
     pipette.dispense(200, depth)
+
+
+Use the :py:meth:`.Well.meniscus` method to dispense at the meniscus of liquid in your well with a Flex pipette. First, you'll need to determine the amount of liquid in your well one of two ways: 
+
+- Specify your starting liquid volume with :py:meth:`~.Labware.load_liquid`.
+- Measure the height of liquid with :py:meth:`~.InstrumentContext.measure_liquid_height`.
+
+This example measures the liquid height in well B1 of a plate and then immediately dispenses below the meniscus:: 
+
+    pipette.measure_liquid_height(plate["B1"])
+    pipette.dispense(
+        volume=200, 
+        location=plate["B1"].meniscus(z=-1, target="start")
+        ) 
+    # dispenses at 1 mm below the liquid meniscus
+
+The liquid meniscus changes when you dispense liquid into a well. Set ``target="start"`` to ensure the pipette begins the dispense at the liquid meniscus. For more information, see :ref:`well-meniscus`.
+
+``measure_liquid_height()`` works best with a new pipette tip each time. To save time and tips throughout your protocol, use ``Labware.load_liquid`` instead to specify starting liquid volumes.
+
+.. versionadded:: 2.23
 
 See also:
 
@@ -323,3 +366,22 @@ The :py:meth:`.InstrumentContext.require_liquid_presence` method tells a Flex pi
 You can also require liquid presence for all aspirations performed with a given pipette. See :ref:`lpd`.
 
 .. versionadded:: 2.20
+
+.. _measure-liquids:
+
+Measure Liquids
+===============
+
+The :py:meth:`~.InstrumentContext.measure_liquid_height` method tells a Flex pipette to measure the height of liquid relative to the bottom of a well. When ``measure_liquid_height()`` finds an empty well, it raises and error and pauses the protocol to let you resolve the problem. 
+
+``measure_liquid_height()`` is a standalone method that records the height of liquid in a well during a protocol. You can use the liquid height to aspirate or dispense from, or move to, the liquid meniscus, either immediately after or later in your protocol.
+
+.. code-block:: python
+
+    pipette.pick_up_tip()
+    pipette.measure_liquid_height(plate["A1"])
+    pipette.aspirate(
+        volume=200, location=plate["A1"].meniscus(z=-1, target="end")
+    )  # aspirates from 1 mm below the liquid meniscus
+
+You don't have to aspirate after measuring liquid height, but you should always pick up a tip immediately prior to measuring the liquid height, and either aspirate or drop the tip immediately after. This ensures that the pipette uses a clean, dry tip to check for liquid, and prevents cross-contamination. 

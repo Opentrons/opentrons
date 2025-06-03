@@ -1,10 +1,13 @@
-import { handleActions } from 'redux-actions'
-import mapValues from 'lodash/mapValues'
 import cloneDeep from 'lodash/cloneDeep'
+import mapValues from 'lodash/mapValues'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
+import { handleActions } from 'redux-actions'
+
 import {
+  FLEX_SIMPLEST_DECK_CONFIG,
+  getAllDefinitions,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -13,73 +16,46 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { GRIPPER_LOCATION } from '@opentrons/step-generation'
-import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
+import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
 import {
   getDefaultsForStepType,
   handleFormChange,
 } from '../../steplist/formLevel'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import {
   getAdditionalEquipmentPythonName,
   getLabwarePythonName,
   getModulePythonName,
 } from '../../utils'
-import { nestedCombineReducers } from './nestedCombineReducers'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import {
-  _getPipetteEntitiesRootState,
-  _getLabwareEntitiesRootState,
-  _getInitialDeckSetupRootState,
   _getAdditionalEquipmentEntitiesRootState,
+  _getInitialDeckSetupRootState,
+  _getLabwareEntitiesRootState,
+  _getPipetteEntitiesRootState,
 } from '../selectors'
 import {
   createPresavedStepForm,
   getDeckItemIdInSlot,
   getIdsInRange,
 } from '../utils'
+import { nestedCombineReducers } from './nestedCombineReducers'
 
 import type { Reducer } from 'redux'
 import type { Action as ReduxActionsAction } from 'redux-actions'
+import type { PipetteName } from '@opentrons/shared-data'
 import type {
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
 } from '@opentrons/step-generation'
-import type { PipetteName } from '@opentrons/shared-data'
-import type { RootState as LabwareDefsRootState } from '../../labware-defs'
-import type { LoadFileAction } from '../../load-file'
-import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
-import type {
-  CreateDeckFixtureAction,
-  DeleteDeckFixtureAction,
-  ToggleIsGripperRequiredAction,
-} from '../actions/additionalItems'
-import type {
-  CreateModuleAction,
-  CreatePipettesAction,
-  DeleteModuleAction,
-  DeletePipettesAction,
-  EditModuleAction,
-  SubstituteStepFormPipettesAction,
-  ChangeBatchEditFieldAction,
-  ResetBatchEditFieldChangesAction,
-  SaveStepFormsMultiAction,
-} from '../actions'
-
-import type {
-  CancelStepFormAction,
-  ChangeFormInputAction,
-  ChangeSavedStepFormAction,
-  DeleteStepAction,
-  DeleteMultipleStepsAction,
-  PopulateFormAction,
-  ReorderStepsAction,
-  FormPatch,
-} from '../../steplist/actions'
+import type { PipetteLoadInfo } from '../../file-types'
 import type { FormData, StepIdType, StepType } from '../../form-types'
+import type { RootState as LabwareDefsRootState } from '../../labware-defs'
+import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
 import type {
   CreateContainerAction,
   DeleteContainerAction,
@@ -88,27 +64,54 @@ import type {
   RenameStepAction,
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
-import type {
-  AddStepAction,
-  DuplicateStepAction,
-  DuplicateMultipleStepsAction,
-  ReorderSelectedStepAction,
-  SelectStepAction,
-  SelectTerminalItemAction,
-  SelectMultipleStepsAction,
-} from '../../ui/steps/actions/types'
-import type { Action } from '../../types'
-import type { PipetteLoadInfo } from '../../file-types'
+import type { LoadFileAction } from '../../load-file'
 import type {
   AdditionalEquipmentLocationUpdate,
   LocationUpdate,
 } from '../../load-file/migration/utils/getAdditionalEquipmentLocationUpdate'
+import type { EditMultipleModulesAction } from '../../modules'
 import type {
+  CancelStepFormAction,
+  ChangeFormInputAction,
+  ChangeSavedStepFormAction,
+  DeleteMultipleStepsAction,
+  DeleteStepAction,
+  FormPatch,
+  PopulateFormAction,
+  ReorderStepsAction,
+} from '../../steplist/actions'
+import type { Action } from '../../types'
+import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
+import type {
+  AddStepAction,
+  DuplicateMultipleStepsAction,
+  DuplicateStepAction,
+  ReorderSelectedStepAction,
+  SelectMultipleStepsAction,
+  SelectStepAction,
+  SelectTerminalItemAction,
+} from '../../ui/steps/actions/types'
+import type {
+  ChangeBatchEditFieldAction,
+  CreateModuleAction,
+  CreatePipettesAction,
+  DeckConfigurationState,
+  DeleteModuleAction,
+  DeletePipettesAction,
+  ResetBatchEditFieldChangesAction,
+  SaveStepFormsMultiAction,
+  SubstituteStepFormPipettesAction,
+} from '../actions'
+import type {
+  CreateDeckFixtureAction,
+  DeleteDeckFixtureAction,
+  ToggleIsGripperRequiredAction,
+} from '../actions/additionalItems'
+import type {
+  ModuleEntities,
   NormalizedLabware,
   NormalizedLabwareById,
-  ModuleEntities,
 } from '../types'
-import type { EditMultipleModulesAction } from '../../modules'
 
 type FormState = FormData | null
 const unsavedFormInitialState = null
@@ -124,7 +127,6 @@ export type UnsavedFormActions =
   | CreateModuleAction
   | DeleteModuleAction
   | SelectTerminalItemAction
-  | EditModuleAction
   | SubstituteStepFormPipettesAction
   | SelectMultipleStepsAction
   | ToggleIsGripperRequiredAction
@@ -190,7 +192,6 @@ export const unsavedForm = (
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
-    case 'EDIT_MODULE':
     case 'SAVE_STEP_FORM':
     case 'SELECT_TERMINAL_ITEM':
       return unsavedFormInitialState
@@ -265,7 +266,6 @@ export type SavedStepFormsActions =
   | DuplicateLabwareAction
   | SwapSlotContentsAction
   | ReplaceCustomLabwareDef
-  | EditModuleAction
   | ToggleIsGripperRequiredAction
   | CreateDeckFixtureAction
   | DeleteDeckFixtureAction
@@ -523,19 +523,6 @@ export const savedStepForms = (
       })
     }
 
-    case 'EDIT_MODULE': {
-      const moduleId = action.payload.id
-      return mapValues(savedStepForms, (savedForm: FormData, formId) =>
-        _editModuleFormUpdate({
-          moduleId,
-          savedForm,
-          formId,
-          rootState,
-          nextModuleModel: action.payload.model,
-        })
-      )
-    }
-
     case 'MOVE_DECK_ITEM': {
       const { sourceSlot, destSlot } = action.payload
       return mapValues(
@@ -632,12 +619,26 @@ export const savedStepForms = (
       return mapValues(savedStepForms, (savedForm: FormData) => {
         if (savedForm.stepType === 'manualIntervention') {
           // remove instances of labware from all manualIntervention steps
+          const updatedLabwareLocation = Object.entries(
+            savedForm.labwareLocationUpdate as Record<string, string>
+          ).reduce((acc: Record<string, string>, [labwareId, locationId]) => {
+            if (labwareId === labwareIdToDelete) {
+              return acc
+            }
+
+            // If labware is on an adapter and adapter was deleted, update labwareId's location
+            const newLocationId =
+              locationId === labwareIdToDelete
+                ? savedForm.labwareLocationUpdate[labwareIdToDelete]
+                : locationId
+
+            acc[labwareId] = newLocationId
+            return acc
+          }, {})
+
           return {
             ...savedForm,
-            labwareLocationUpdate: omit(
-              savedForm.labwareLocationUpdate,
-              labwareIdToDelete
-            ),
+            labwareLocationUpdate: updatedLabwareLocation,
           }
         }
 
@@ -1016,35 +1017,45 @@ export const labwareInvariantProperties: Reducer<
     ): NormalizedLabwareById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      const labwareDefinitions = file.labwareDefinitions
+      const labwareDefinitionsFromFile = file.labwareDefinitions
+      const allLabware = getAllDefinitions()
+      let labware: NormalizedLabwareById = {}
 
-      const labware: NormalizedLabwareById = Object.entries(
-        metadata.labware
-      ).reduce((acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
-        if (labwareDefinitions[labwareLoadInfo.labwareDefURI] == null) {
-          console.error(
-            `expected to find matching labware definiton with labwareDefURI ${labwareLoadInfo.labwareDefURI} but could not`
-          )
-        }
-        const displayCategory =
-          labwareDefinitions[labwareLoadInfo.labwareDefURI]?.metadata
-            .displayCategory ?? 'otherLabware'
+      labware = Object.entries(metadata.labware).reduce(
+        (acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
+          const labwareDefURI = labwareLoadInfo.labwareDefURI
+          const definition =
+            //  labwareDefinitionsFromFile from file are either customLabware for py
+            //  or all labwareDefs for JSON
+            labwareDefinitionsFromFile?.[labwareDefURI] ??
+            allLabware[labwareDefURI]
 
-        const displayCategoryCount = Object.values(acc).filter(
-          lw => lw.displayCategory === displayCategory
-        ).length
+          if (definition == null) {
+            console.error(
+              `Expected to find matching labware definition in the JSON file or Opentrons labware library but could not with labwareDefUri ${labwareDefURI}`
+            )
+          }
 
-        acc[id] = {
-          labwareDefURI: labwareLoadInfo.labwareDefURI,
-          pythonName: getLabwarePythonName(
+          const displayCategory =
+            definition?.metadata.displayCategory ?? 'otherLabware'
+
+          const displayCategoryCount = Object.values(acc).filter(
+            lw => lw.displayCategory === displayCategory
+          ).length
+
+          acc[id] = {
+            labwareDefURI,
+            pythonName: getLabwarePythonName(
+              displayCategory,
+              displayCategoryCount + 1
+            ),
             displayCategory,
-            displayCategoryCount + 1
-          ),
-          displayCategory,
-        }
+          }
 
-        return acc
-      }, {})
+          return acc
+        },
+        {}
+      )
 
       return { ...labware, ...state }
     },
@@ -1114,17 +1125,6 @@ export const moduleInvariantProperties: Reducer<
         },
       }
     },
-
-    EDIT_MODULE: (
-      state: ModuleEntities,
-      action: EditModuleAction
-    ): ModuleEntities => ({
-      ...state,
-      [action.payload.id]: {
-        ...state[action.payload.id],
-        model: action.payload.model,
-      },
-    }),
     DELETE_MODULE: (
       state: ModuleEntities,
       action: DeleteModuleAction
@@ -1495,6 +1495,24 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
   },
   initialOrderedStepIdsState
 )
+
+const initialDeckConfiguration: DeckConfigurationState = {
+  deckConfig: FLEX_SIMPLEST_DECK_CONFIG,
+}
+const deckConfigurationProperties: Reducer<
+  DeckConfigurationState,
+  any
+> = handleActions<DeckConfigurationState, any>(
+  {
+    EDIT_DECK_CONFIGURATION: (state, action) => {
+      return {
+        deckConfig: action.payload.deckConfig,
+      }
+    },
+  },
+  initialDeckConfiguration
+)
+
 export type PresavedStepFormState = {
   stepType: StepType
 } | null
@@ -1545,6 +1563,7 @@ export interface RootState {
   savedStepForms: SavedStepFormState
   unsavedForm: FormState
   batchEditFormChanges: BatchEditFormChangesState
+  deckConfiguration: DeckConfigurationState
 }
 // TODO Ian 2018-12-13: find some existing util to do this
 // semi-nested version of combineReducers?
@@ -1584,6 +1603,10 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     batchEditFormChanges: batchEditFormChanges(
       prevStateFallback.batchEditFormChanges,
       action as BatchEditFormActions
+    ),
+    deckConfiguration: deckConfigurationProperties(
+      prevStateFallback.deckConfiguration,
+      action
     ),
   })
 )

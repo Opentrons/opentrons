@@ -1,7 +1,11 @@
 import { screen } from '@testing-library/react'
+
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, beforeEach } from 'vitest'
+
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { SPACING, TYPOGRAPHY } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { LegacyOffsetVector } from '../'
@@ -33,7 +37,7 @@ describe('OffsetVector', () => {
     expect(screen.getByText('X')).toHaveStyle(
       `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
     )
-    const x = screen.getByText('10.00')
+    const x = screen.getByText('10.0')
     expect(x).toHaveStyle(`margin-right: ${SPACING.spacing8}`)
 
     expect(screen.getByText('Y')).toHaveStyle(
@@ -42,7 +46,7 @@ describe('OffsetVector', () => {
     expect(screen.getByText('Y')).toHaveStyle(
       `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
     )
-    const y = screen.getByText('20.00')
+    const y = screen.getByText('20.0')
     expect(y).toHaveStyle(`margin-right: ${SPACING.spacing8}`)
 
     expect(screen.getByText('Z')).toHaveStyle(
@@ -51,7 +55,7 @@ describe('OffsetVector', () => {
     expect(screen.getByText('Z')).toHaveStyle(
       `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
     )
-    const z = screen.getByText('30.00')
+    const z = screen.getByText('30.0')
     expect(z).toHaveStyle(`margin-right: ${SPACING.spacing8}`)
   })
 
@@ -60,9 +64,9 @@ describe('OffsetVector', () => {
     props.y = 111.11111111
     props.z = 99999.99888
     render(props)
-    screen.getByText('1.00')
-    screen.getByText('111.11')
-    screen.getByText('100000.00')
+    screen.getByText('1.0')
+    screen.getByText('111.1')
+    screen.getByText('100000.0')
   })
 
   it('renders text with a specific heading level', () => {

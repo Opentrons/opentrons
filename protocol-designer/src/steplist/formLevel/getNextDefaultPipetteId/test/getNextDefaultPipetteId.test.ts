@@ -1,5 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { getNextDefaultPipetteId } from '../'
+
 import type { FormData, StepIdType } from '../../../../form-types'
 import type { PipetteOnDeck } from '../../../../step-forms'
 

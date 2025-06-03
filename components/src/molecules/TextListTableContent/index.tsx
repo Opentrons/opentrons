@@ -1,10 +1,10 @@
 import { css } from 'styled-components'
 
-import { SPACING, RESPONSIVENESS } from '../../ui-style-constants'
-import { ListTable } from '../../atoms/ListTable'
 import { StyledText } from '../../atoms'
+import { ListTable } from '../../atoms/ListTable'
 import { Flex } from '../../primitives'
 import { DIRECTION_COLUMN } from '../../styles'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 import type { ReactNode } from 'react'
 import type { ListTableProps } from '../../atoms/ListTable'

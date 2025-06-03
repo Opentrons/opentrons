@@ -1,8 +1,10 @@
 import { useSelector } from 'react-redux'
-import { useTrackEvent } from '/app/redux/analytics'
-import { useProtocolRunAnalyticsData } from './useProtocolRunAnalyticsData'
-import { getAppLanguage } from '/app/redux/config'
+
 import { useRobot } from '/app/redux-resources/robots'
+import { useTrackEvent } from '/app/redux/analytics'
+import { getAppLanguage } from '/app/redux/config'
+
+import { useProtocolRunAnalyticsData } from './useProtocolRunAnalyticsData'
 
 interface ProtocolRunAnalyticsEvent {
   name: string

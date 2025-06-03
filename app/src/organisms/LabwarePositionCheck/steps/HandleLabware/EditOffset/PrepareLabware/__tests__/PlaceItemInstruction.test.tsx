@@ -1,18 +1,19 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useSelector } from 'react-redux'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '/app/__testing-utils__'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  selectIsSelectedLwTipRack,
-  selectSelectedLwOverview,
-  OFFSET_KIND_DEFAULT,
-  selectLwDisplayName,
   getFlexSlotNameOnly,
-  selectActivePipetteChannelCount,
+  OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
+  selectActivePipetteChannelCount,
+  selectIsSelectedLwTipRack,
+  selectLwDisplayName,
+  selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
+
 import { PlaceItemInstruction } from '../PlaceItemInstruction'
 
 vi.mock('react-redux', async () => {
@@ -188,6 +189,35 @@ describe('PlaceItemInstruction', () => {
         'Ensure the tip rack is accurately placed in the slot as outlined above to prevent damage to your labware.'
       )
     ).not.toBeInTheDocument()
+  })
+
+  it('should show special copy when calibrating a default offset for a tiprack with a 96ch', () => {
+    const stackUp = {
+      offsetLocationDetails: {
+        kind: OFFSET_KIND_DEFAULT,
+        closestBeneathModuleModel: null,
+        lwModOnlyStackupDetails: [
+          { kind: 'labware', labwareUri: 'labware-uri-1' },
+        ],
+      },
+    } as any
+
+    vi.mocked(selectIsSelectedLwTipRack).mockImplementation(() => () => true)
+    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
+      mockTipRackStackup as any
+    )
+    vi.mocked(selectActivePipetteChannelCount).mockImplementation(() => () =>
+      96
+    )
+    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () => stackUp)
+
+    render()
+
+    screen.getByText(
+      nestedTextMatcher(
+        'Place a full Mock Labware into Slot C2 without the tip rack adapter'
+      )
+    )
   })
 
   it('should show next place labware instruction for the second item in a stackup', () => {

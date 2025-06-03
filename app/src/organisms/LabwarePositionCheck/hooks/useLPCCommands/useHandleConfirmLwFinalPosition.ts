@@ -6,12 +6,12 @@ import {
 } from './commands'
 
 import type {
-  LoadedPipette,
-  Coordinates,
   CreateCommand,
+  LoadedPipette,
+  Vector3D,
 } from '@opentrons/shared-data'
-import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 interface UseHandleConfirmPositionProps
   extends UseLPCCommandWithChainRunChildProps {
@@ -24,7 +24,7 @@ export interface UseHandleConfirmPositionResult {
   handleConfirmLwFinalPosition: (
     offsetLocationDetails: OffsetLocationDetails,
     pipette: LoadedPipette
-  ) => Promise<Coordinates>
+  ) => Promise<Vector3D>
 }
 
 export function useHandleConfirmLwFinalPosition({
@@ -34,7 +34,7 @@ export function useHandleConfirmLwFinalPosition({
   const handleConfirmLwFinalPosition = (
     offsetLocationDetails: OffsetLocationDetails,
     pipette: LoadedPipette
-  ): Promise<Coordinates> => {
+  ): Promise<Vector3D> => {
     const confirmCommands: CreateCommand[] = [
       ...savePositionCommands(pipette.id),
       ...retractPipetteAxesSequentiallyCommands(pipette),

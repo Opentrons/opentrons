@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
+
 import { LEFT, RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+
 import { FLOWS } from './constants'
+
 import type { LoadedPipette, PipetteMount } from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'

@@ -1,8 +1,10 @@
 import Semver from 'semver'
-import { getVersionFromZipIfValid } from './scan-zip'
-import type { FileDetails } from './scan-zip'
 
 import { createLogger } from '../../log'
+import { getVersionFromZipIfValid } from './scan-zip'
+
+import type { FileDetails } from './scan-zip'
+
 const log = createLogger('system-udpate/from-usb/scan-device')
 
 const higherVersion = (a: FileDetails | null, b: FileDetails): FileDetails =>

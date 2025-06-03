@@ -15,20 +15,21 @@ import {
 } from '@opentrons/components'
 
 import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
+import { useRobotType } from '/app/redux-resources/robots'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
-import { useRobotType } from '/app/redux-resources/robots'
 import {
+  useModuleCalibrationStatus,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
-  useModuleCalibrationStatus,
 } from '/app/resources/runs'
-import { SetupModulesMap } from './SetupModulesMap'
-import { SetupModulesList } from './SetupModulesList'
+
 import { SetupFixtureList } from './SetupFixtureList'
+import { SetupModulesList } from './SetupModulesList'
+import { SetupModulesMap } from './SetupModulesMap'
 
 import type {
   CompletedProtocolAnalysis,

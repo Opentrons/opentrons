@@ -1,74 +1,65 @@
 import {
-  requiredField,
-  minimumWellCount,
-  nonZero,
+  MAX_HEATER_SHAKER_MODULE_RPM,
+  MAX_HEATER_SHAKER_MODULE_TEMP,
+  MAX_TC_BLOCK_TEMP,
+  MAX_TC_DURATION_SECONDS,
+  MAX_TC_LID_TEMP,
+  MAX_TC_PROFILE_VOLUME,
+  MAX_TEMP_MODULE_TEMP,
+  MIN_HEATER_SHAKER_MODULE_RPM,
+  MIN_HEATER_SHAKER_MODULE_TEMP,
+  MIN_TC_BLOCK_TEMP,
+  MIN_TC_DURATION_SECONDS,
+  MIN_TC_LID_TEMP,
+  MIN_TC_PROFILE_VOLUME,
+  MIN_TEMP_MODULE_TEMP,
+} from '../../constants'
+import { getStagingAreaAddressableAreas } from '../../utils'
+import {
   composeErrors,
-  minFieldValue,
-  maxFieldValue,
-  temperatureRangeFieldValue,
-  realNumber,
+  enterValueWithinRange,
+  greaterThanZero,
   isTimeFormat,
   isTimeFormatMinutesSeconds,
+  maxFieldValue,
+  minFieldValue,
+  minimumWellCount,
+  nonZero,
+  realNumber,
+  requiredField,
+  transferVolumeMax,
 } from './errors'
 import {
-  maskToInteger,
+  composeMaskers,
+  defaultTo,
   maskToFloat,
+  maskToInteger,
   maskToTime,
   numberOrNull,
   onlyPositiveNumbers,
-  defaultTo,
-  composeMaskers,
   trimDecimals,
 } from './processing'
-import {
-  MIN_TEMP_MODULE_TEMP,
-  MAX_TEMP_MODULE_TEMP,
-  MIN_HEATER_SHAKER_MODULE_TEMP,
-  MAX_HEATER_SHAKER_MODULE_TEMP,
-  MIN_TC_BLOCK_TEMP,
-  MAX_TC_BLOCK_TEMP,
-  MIN_TC_LID_TEMP,
-  MAX_TC_LID_TEMP,
-  MIN_TC_DURATION_SECONDS,
-  MAX_TC_DURATION_SECONDS,
-  MIN_HEATER_SHAKER_MODULE_RPM,
-  MAX_HEATER_SHAKER_MODULE_RPM,
-  MIN_HEATER_SHAKER_DURATION_SECONDS,
-  MAX_HEATER_SHAKER_DURATION_SECONDS,
-  MIN_TC_PROFILE_VOLUME,
-  MAX_TC_PROFILE_VOLUME,
-} from '../../constants'
-import { getStagingAreaAddressableAreas } from '../../utils'
-import type {
-  LabwareEntity,
-  PipetteEntity,
-  InvariantContext,
-  LabwareEntities,
-  AdditionalEquipmentEntities,
-  AdditionalEquipmentEntity,
-} from '@opentrons/step-generation'
-import type { ValueMasker, ValueCaster } from './processing'
-import type { StepFieldName } from '../../form-types'
+
 import type {
   AddressableAreaName,
   CutoutId,
   LabwareLocation,
 } from '@opentrons/shared-data'
+import type {
+  InvariantContext,
+  LabwareEntities,
+  PipetteEntity,
+  StagingAreaEntities,
+  WasteChuteEntities,
+} from '@opentrons/step-generation'
+import type {
+  HydratedFormData,
+  LabwareOrAdditionalEquipmentEntity,
+  StepFieldName,
+} from '../../form-types'
+import type { ValueCaster, ValueMasker } from './processing'
 
 export type { StepFieldName }
-
-interface LabwareEntityWithTouchTip extends LabwareEntity {
-  isTouchTipAllowed: boolean
-}
-
-interface AdditionalEquipmentEntityWithTouchTip
-  extends AdditionalEquipmentEntity {
-  isTouchTipAllowed: boolean
-}
-
-type LabwareOrAdditionalEquipmentEntity =
-  | LabwareEntityWithTouchTip
-  | AdditionalEquipmentEntityWithTouchTip
 
 const getLabwareOrAdditionalEquipmentEntity = (
   state: InvariantContext,
@@ -83,42 +74,44 @@ const getLabwareOrAdditionalEquipmentEntity = (
       ...state.labwareEntities[id],
       isTouchTipAllowed: !labwareDisallowsTouchTip,
     }
-  } else if (state.additionalEquipmentEntities[id] != null) {
+  } else if (state.wasteChuteEntities[id] != null) {
     return {
-      ...state.additionalEquipmentEntities[id],
+      ...state.wasteChuteEntities[id],
       isTouchTipAllowed: false,
+      name: 'wasteChute',
+    }
+  } else if (state.trashBinEntities[id] != null) {
+    return {
+      ...state.trashBinEntities[id],
+      isTouchTipAllowed: false,
+      name: 'trashBin',
     }
   } else return null
 }
 
-const getIsAdapterLocation = (
+const getIsStackingLocation = (
   newLocation: string,
   labwareEntities: LabwareEntities
 ): boolean => {
-  if (labwareEntities[newLocation] == null) return false
-  return (
-    labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
-  )
+  return labwareEntities[newLocation] != null
 }
+
 const getIsAdditionalEquipmentLocation = (
   newLocation: string,
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  wasteChuteEntities: WasteChuteEntities,
+  stagingAreaEntities: StagingAreaEntities
 ): boolean => {
-  const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
-    aE => aE.name === 'wasteChute'
-  )
-  const stagingAreaCutoutIds = Object.values(additionalEquipmentEntities)
-    .filter(aE => aE.name === 'stagingArea')
-    ?.map(equipment => {
+  const stagingAreaCutoutIds = Object.values(stagingAreaEntities).map(
+    equipment => {
       return equipment.location ?? ''
-    })
+    }
+  )
   const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
     stagingAreaCutoutIds as CutoutId[]
   )
 
   const isNewLocationInWasteChute =
-    wasteChuteEntity?.name === 'wasteChute' &&
-    wasteChuteEntity?.location === newLocation
+    Object.values(wasteChuteEntities)[0]?.location === newLocation
 
   const isNewLocationInStagingArea =
     stagingAreaCutoutIds != null &&
@@ -132,8 +125,8 @@ const getLabwareLocation = (
   newLocationString: string
 ): LabwareLocation | null => {
   const isWasteChuteLocation =
-    Object.values(state.additionalEquipmentEntities).find(
-      aE => aE.location === newLocationString && aE.name === 'wasteChute'
+    Object.values(state.wasteChuteEntities).find(
+      aE => aE.location === newLocationString
     ) != null
 
   if (newLocationString === 'offDeck') {
@@ -142,13 +135,14 @@ const getLabwareLocation = (
     return { moduleId: newLocationString }
   } else if (
     newLocationString != null &&
-    getIsAdapterLocation(newLocationString, state.labwareEntities)
+    getIsStackingLocation(newLocationString, state.labwareEntities)
   ) {
     return { labwareId: newLocationString }
   } else if (
     getIsAdditionalEquipmentLocation(
       newLocationString,
-      state.additionalEquipmentEntities
+      state.wasteChuteEntities,
+      state.stagingAreaEntities
     )
   ) {
     return {
@@ -170,7 +164,7 @@ const getPipetteEntity = (
 }
 
 interface StepFieldHelpers {
-  getErrors?: (arg0: unknown) => string[]
+  getErrors?: (arg0: unknown, data?: HydratedFormData) => string[]
   maskValue?: ValueMasker
   castValue?: ValueCaster
   hydrate?: (state: InvariantContext, id: string) => unknown
@@ -254,7 +248,11 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     hydrate: getLabwareOrAdditionalEquipmentEntity,
   },
   aspirate_delay_seconds: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
+    maskValue: composeMaskers(
+      maskToInteger,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   aspirate_delay_mmFromBottom: {
@@ -277,32 +275,39 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   dispense_delay_seconds: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
+    maskValue: composeMaskers(
+      maskToInteger,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   dispense_delay_mmFromBottom: {
     castValue: numberOrNull,
   },
-  pauseHour: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+  aspirate_submerge_delay_seconds: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
   },
-  pauseMinute: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+  aspirate_retract_delay_seconds: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
   },
-  pauseSecond: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+  dispense_submerge_delay_seconds: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+  },
+  dispense_retract_delay_seconds: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
   },
   pipette: {
     getErrors: composeErrors(requiredField),
     hydrate: getPipetteEntity,
   },
   times: {
-    getErrors: composeErrors(requiredField),
+    getErrors: composeErrors(greaterThanZero),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(0)),
     castValue: Number,
   },
   volume: {
-    getErrors: composeErrors(requiredField, nonZero),
+    getErrors: composeErrors(requiredField, nonZero, transferVolumeMax),
     maskValue: composeMaskers(
       maskToFloat,
       onlyPositiveNumbers,
@@ -325,36 +330,27 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   targetTemperature: {
     getErrors: composeErrors(
-      minFieldValue(MIN_TEMP_MODULE_TEMP),
-      maxFieldValue(MAX_TEMP_MODULE_TEMP)
+      enterValueWithinRange(MIN_TEMP_MODULE_TEMP, MAX_TEMP_MODULE_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   targetHeaterShakerTemperature: {
     getErrors: composeErrors(
-      minFieldValue(MIN_HEATER_SHAKER_MODULE_TEMP),
-      maxFieldValue(MAX_HEATER_SHAKER_MODULE_TEMP)
+      enterValueWithinRange(
+        MIN_HEATER_SHAKER_MODULE_TEMP,
+        MAX_HEATER_SHAKER_MODULE_TEMP
+      )
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   targetSpeed: {
     getErrors: composeErrors(
-      minFieldValue(MIN_HEATER_SHAKER_MODULE_RPM),
-      maxFieldValue(MAX_HEATER_SHAKER_MODULE_RPM)
-    ),
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-    castValue: Number,
-  },
-  heaterShakerTimerMinutes: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-    castValue: Number,
-  },
-  heaterShakerTimerSeconds: {
-    getErrors: composeErrors(
-      minFieldValue(MIN_HEATER_SHAKER_DURATION_SECONDS),
-      maxFieldValue(MAX_HEATER_SHAKER_DURATION_SECONDS)
+      enterValueWithinRange(
+        MIN_HEATER_SHAKER_MODULE_RPM,
+        MAX_HEATER_SHAKER_MODULE_RPM
+      )
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
@@ -382,21 +378,21 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   blockTargetTemp: {
     getErrors: composeErrors(
-      temperatureRangeFieldValue(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
+      enterValueWithinRange(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   lidTargetTemp: {
     getErrors: composeErrors(
-      temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
+      enterValueWithinRange(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   profileTargetLidTemp: {
     getErrors: composeErrors(
-      temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
+      enterValueWithinRange(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
     ),
   },
   profileVolume: {
@@ -408,14 +404,14 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   blockTargetTempHold: {
     getErrors: composeErrors(
-      temperatureRangeFieldValue(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
+      enterValueWithinRange(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   lidTargetTempHold: {
     getErrors: composeErrors(
-      temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
+      enterValueWithinRange(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
@@ -442,7 +438,51 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     maskValue: composeMaskers(trimDecimals(1)),
     castValue: numberOrNull,
   },
+  blowout_flowRate: {
+    maskValue: composeMaskers(trimDecimals(1)),
+    castValue: numberOrNull,
+  },
   pushOut_volume: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: numberOrNull,
+  },
+  aspirate_submerge_speed: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: numberOrNull,
+  },
+  aspirate_retract_speed: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: numberOrNull,
+  },
+  dispense_submerge_speed: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: numberOrNull,
+  },
+  dispense_retract_speed: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: numberOrNull,
+  },
+  conditioning_volume: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
     castValue: numberOrNull,
   },
@@ -479,11 +519,15 @@ const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
 }
 export const getFieldErrors = (
   name: StepFieldName,
-  value: unknown
+  value: unknown,
+  hydratedFormData: HydratedFormData
 ): string[] => {
   const fieldErrorGetter =
     stepFieldHelperMap[name] && stepFieldHelperMap[name].getErrors
-  const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
+
+  const errors = fieldErrorGetter
+    ? fieldErrorGetter(value, hydratedFormData)
+    : []
   return errors
 }
 export const getProfileFieldErrors = (

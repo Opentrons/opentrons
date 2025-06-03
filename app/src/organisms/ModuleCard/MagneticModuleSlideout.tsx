@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   BORDERS,
   COLORS,
@@ -15,24 +14,25 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getModuleDisplayName,
   MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT,
-  MAGNETIC_MODULES_MAX_ENGAGE_HEIGHT,
   MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
+  MAGNETIC_MODULES_MAX_ENGAGE_HEIGHT,
   MM,
 } from '@opentrons/shared-data'
 
-import { Slideout } from '/app/atoms/Slideout'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
 
-import type { MagneticModule } from '/app/redux/modules/types'
 import type {
   MagneticModuleEngageMagnetCreateCommand,
   MagneticModuleModel,
 } from '@opentrons/shared-data'
+import type { MagneticModule } from '/app/redux/modules/types'
 
 interface ModelContents {
   version: string

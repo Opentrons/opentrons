@@ -1,26 +1,44 @@
 import * as React from 'react'
+
+import { Snackbar as SnackbarComponent } from '.'
+import { Flex, STYLE_PROPS } from '../../primitives'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Flex,
   JUSTIFY_CENTER,
-  PrimaryButton,
-  SPACING,
-  LegacyStyledText,
-  VIEWPORT,
-} from '@opentrons/components'
+} from '../../styles'
+import { SPACING, VIEWPORT } from '../../ui-style-constants'
+import { PrimaryButton } from '../buttons'
+import { StyledText } from '../StyledText'
 
-import { Snackbar } from './index'
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof SnackbarComponent> = {
   title: 'Helix/Atoms/Snackbar',
-  component: Snackbar,
+  component: SnackbarComponent,
   parameters: VIEWPORT.touchScreenViewport,
-} as Meta
+  argTypes: {
+    // Disable all StyleProps
+    ...Object.fromEntries(
+      [...STYLE_PROPS, 'as', 'ref', 'theme', 'forwardedAs'].map(prop => [
+        prop,
+        { table: { disable: true } },
+      ])
+    ),
+    message: {
+      control: 'text',
+    },
+    duration: {
+      control: 'number',
+    },
+  },
+}
 
-const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
+// Define the render function as a React Functional Component
+const SnackbarRenderComponent: React.FC<
+  React.ComponentProps<typeof SnackbarComponent>
+> = args => {
   const [isShowSnackbar, setIsShowSnackbar] = React.useState<boolean>(false)
 
   const handleClick = (): void => {
@@ -29,15 +47,25 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
 
   return (
     <>
-      <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing16}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        paddingY={SPACING.spacing16}
+        gap={SPACING.spacing8}
+      >
         <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
-        <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing8}>
-          <LegacyStyledText as="p">
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            oddStyle="level4HeaderRegular"
+          >
             When clicking the button, the Snackbar shows up in the bottom.
-          </LegacyStyledText>
-          <LegacyStyledText as="p">
+          </StyledText>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            oddStyle="level4HeaderRegular"
+          >
             By default the Snackbar will disappear after 4 seconds.
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Flex>
       {isShowSnackbar && (
@@ -49,7 +77,7 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
           bottom={SPACING.spacing40}
           zIndex={1000}
         >
-          <Snackbar
+          <SnackbarComponent
             {...args}
             onClose={() => {
               setIsShowSnackbar(false)
@@ -61,7 +89,17 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
   )
 }
 
-export const SnackbarComponent = DefaultTemplate.bind({})
-SnackbarComponent.args = {
-  message: 'Short and sweet message',
+const SnackbarTemplate: Story = {
+  render: args => <SnackbarRenderComponent {...args} />,
+}
+
+export default meta
+type Story = StoryObj<typeof SnackbarComponent>
+
+export const Snackbar: Story = {
+  ...SnackbarTemplate,
+  args: {
+    message: 'Short and sweet message',
+    duration: 4000,
+  },
 }

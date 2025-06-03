@@ -1,13 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { InputPrompt } from '../InputPrompt'
 
 export function ChatFooter(): JSX.Element {

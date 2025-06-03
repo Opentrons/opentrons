@@ -9,8 +9,8 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

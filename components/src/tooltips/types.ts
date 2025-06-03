@@ -1,8 +1,6 @@
+import type { Instance, Modifier, Options } from '@popperjs/core/lib/types'
 import type { CSSProperties, RefCallback } from 'react'
-
-import type { Instance, Options, Modifier } from '@popperjs/core/lib/types'
-
-import type { UseHoverOptions, HoverHandlers } from '../interaction-enhancers'
+import type { HoverHandlers, UseHoverOptions } from '../interaction-enhancers'
 
 export type Placement = Options['placement']
 

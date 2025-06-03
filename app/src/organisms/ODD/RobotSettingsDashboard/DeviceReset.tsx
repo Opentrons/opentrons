@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
@@ -8,8 +8,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
@@ -20,9 +20,9 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { resetConfig } from '/app/redux/robot-admin'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 import type { SetSettingOption } from './types'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface LabelProps {
   isSelected?: boolean
@@ -51,10 +51,10 @@ const OptionLabel = styled.label<LabelProps>`
  * - deckConfiguration
  */
 interface DisplayedResetOptionState extends Record<string, boolean> {
-  pipetteOffsetCalibrations: boolean
   gripperOffsetCalibrations: boolean
-  moduleCalibration: boolean
   labwareOffsets: boolean
+  moduleCalibration: boolean
+  pipetteOffsetCalibrations: boolean
   runsHistory: boolean
 }
 
@@ -78,6 +78,7 @@ function isAnyOptionSelected(
   return Object.values(displayedState).some(value => value)
 }
 
+/** Convert the options selected in the UI to the options we want to send to the server. */
 function buildResetRequest(
   displayedState: DisplayedResetOptionState
 ): ResetConfigRequest {
@@ -85,10 +86,12 @@ function buildResetRequest(
     resetLabwareOffsets: displayedState.labwareOffsets,
 
     settingsResets: {
-      // These keys need to follow the server's HTTP API.
-      pipetteOffsetCalibrations: displayedState.pipetteOffsetCalibrations,
+      // Note: keys inside `settingsResets` need to follow the server's HTTP API.
       gripperOffsetCalibrations: displayedState.gripperOffsetCalibrations,
       moduleCalibration: displayedState.moduleCalibration,
+      pipetteOffsetCalibrations: displayedState.pipetteOffsetCalibrations,
+      runsHistory: displayedState.runsHistory,
+
       // If the user selected every visible option, implicitly select certain additional options.
       ...(isEveryOptionSelected(displayedState)
         ? {

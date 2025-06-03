@@ -1,9 +1,10 @@
 import { CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
+
 import type {
-  QuickTransferWizardState,
+  QuickTransferSummaryAction,
   QuickTransferSummaryState,
   QuickTransferWizardAction,
-  QuickTransferSummaryAction,
+  QuickTransferWizardState,
   TransferType,
 } from './types'
 
@@ -89,6 +90,30 @@ export function quickTransferWizardReducer(
         volume: action.volume,
       }
     }
+    case 'SET_PIPETTE_PATH': {
+      return {
+        ...state,
+        path: action.path,
+      }
+    }
+    case 'SET_CHANGE_TIP': {
+      return {
+        ...state,
+        changeTip: action.changeTip,
+      }
+    }
+    case 'SET_DROP_TIP_LOCATION': {
+      return {
+        ...state,
+        dropTipLocation: action.location,
+      }
+    }
+    case 'SET_LIQUID_CLASS': {
+      return {
+        ...state,
+        liquidClass: action.liquidClass,
+      }
+    }
   }
 }
 
@@ -149,6 +174,18 @@ export function quickTransferSummaryReducer(
         delayAspirate: action.delaySettings,
       }
     }
+    case 'SET_SUBMERGE_ASPIRATE': {
+      return {
+        ...state,
+        submergeAspirate: action.submergeSettings,
+      }
+    }
+    case 'SET_RETRACT_ASPIRATE': {
+      return {
+        ...state,
+        retractAspirate: action.retractSettings,
+      }
+    }
     case 'SET_TOUCH_TIP_ASPIRATE': {
       return {
         ...state,
@@ -179,6 +216,18 @@ export function quickTransferSummaryReducer(
         delayDispense: action.delaySettings,
       }
     }
+    case 'SET_SUBMERGE_DISPENSE': {
+      return {
+        ...state,
+        submergeDispense: action.submergeSettings,
+      }
+    }
+    case 'SET_RETRACT_DISPENSE': {
+      return {
+        ...state,
+        retractDispense: action.retractSettings,
+      }
+    }
     case 'SET_TOUCH_TIP_DISPENSE': {
       return {
         ...state,
@@ -207,6 +256,12 @@ export function quickTransferSummaryReducer(
       return {
         ...state,
         dropTipLocation: action.location,
+      }
+    }
+    case 'SET_PUSH_OUT': {
+      return {
+        ...state,
+        pushOut: action.pushOut,
       }
     }
   }

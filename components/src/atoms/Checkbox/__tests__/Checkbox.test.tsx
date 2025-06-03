@@ -1,8 +1,10 @@
-import { describe, beforeEach, afterEach, vi, expect, it } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../testing/utils'
+
 import { Checkbox } from '..'
+import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 

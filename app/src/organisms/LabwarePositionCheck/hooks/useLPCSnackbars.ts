@@ -1,74 +1,40 @@
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import isEqual from 'lodash/isEqual'
-
-import {
-  OFFSET_KIND_DEFAULT,
-  selectSelectedLwDefaultOffsetDetails,
-  selectSelectedLwOverview,
-  selectSelectedLwWithOffsetDetailsOffsets,
-} from '/app/redux/protocol-runs'
+import { useDispatch } from 'react-redux'
 
 import { useToaster } from '/app/organisms/ToasterOven'
+import { clearSnackbarStatus } from '/app/redux/protocol-runs'
+
+import type { LPCSnackbarType } from '/app/redux/protocol-runs/types/lpc/ui'
 
 export interface UseLPCSnackbarsResult {
-  makeSuccessSnackbar: () => void
+  makeSuccessSnackbar: (status: LPCSnackbarType) => void
   makeHardCodedSnackbar: () => void
 }
 
 export function useLPCSnackbars(runId: string): UseLPCSnackbarsResult {
   const { t } = useTranslation('labware_position_check')
+  const dispatch = useDispatch()
   const { makeSnackbar } = useToaster()
-  const selectedLw = useSelector(selectSelectedLwOverview(runId))
-  const details = useSelector(selectSelectedLwWithOffsetDetailsOffsets(runId))
-  const defaultDetails = useSelector(
-    selectSelectedLwDefaultOffsetDetails(runId)
-  )
 
-  const successText = (): string | null => {
-    if (selectedLw == null || details == null || defaultDetails == null) {
-      return null
-    }
-
-    const { workingOffset, existingOffset } = details
-    const vectorExists =
-      workingOffset?.confirmedVector != null || existingOffset?.vector != null
-    const { offsetLocationDetails } = selectedLw
-
-    if (offsetLocationDetails?.kind === OFFSET_KIND_DEFAULT) {
-      if (vectorExists) {
-        return t('default_location_offset_adjusted')
-      } else {
+  const successText = (status: LPCSnackbarType): string | null => {
+    switch (status) {
+      case 'defaultAdded':
         return t('default_location_offset_added')
-      }
-    } else {
-      const doesLSMatchDefault =
-        isEqual(
-          workingOffset?.confirmedVector,
-          defaultDetails.workingOffset?.confirmedVector
-        ) ||
-        isEqual(
-          workingOffset?.confirmedVector,
-          defaultDetails.existingOffset?.vector
-        )
-
-      if (!doesLSMatchDefault) {
-        if (vectorExists) {
-          return t('applied_location_offset_adjusted')
-        } else {
-          return t('applied_location_offset_added')
-        }
-      } else {
+      case 'defaultAdjusted':
+        return t('default_location_offset_adjusted')
+      case 'locationSpecificAdjusted':
+        return t('applied_location_offset_adjusted')
+      default:
         return null
-      }
     }
   }
 
-  const makeSuccessSnackbar = (): void => {
-    const copy = successText()
+  const makeSuccessSnackbar = (status: LPCSnackbarType): void => {
+    const copy = successText(status)
 
     if (copy != null) {
       makeSnackbar(copy)
+      dispatch(clearSnackbarStatus(runId))
     }
   }
 

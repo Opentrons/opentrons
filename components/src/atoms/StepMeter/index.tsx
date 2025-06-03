@@ -1,9 +1,11 @@
 import { css } from 'styled-components'
-import { Box } from '../../primitives'
-import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
-import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
 
+import { COLORS } from '../../helix-design-system'
+import { Box } from '../../primitives'
+import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { StyleProps } from '../../primitives'
 
 interface StepMeterProps extends StyleProps {
@@ -21,33 +23,40 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
       : (progress / totalSteps) * 100
   }%`
 
-  const StepMeterContainer = css`
-    position: ${styleProps.position ? styleProps.position : POSITION_RELATIVE};
-    height: ${SPACING.spacing4};
-    background-color: ${COLORS.grey30};
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      height: ${SPACING.spacing12};
-    }
-  `
-  const StepMeterBar = css`
-    position: ${POSITION_ABSOLUTE};
-    top: 0;
-    height: 100%;
-    background-color: ${COLORS.blue50};
-    width: ${percentComplete};
-    webkit-transition: width 0.5s ease-in-out;
-    moz-transition: width 0.5s ease-in-out;
-    o-transition: width 0.5s ease-in-out;
-    transition: width 0.5s ease-in-out;
-  `
-
   return (
     <Box
       data-testid="StepMeter_StepMeterContainer"
-      css={StepMeterContainer}
+      css={StepMeterContainer(styleProps)}
       {...styleProps}
     >
-      <Box data-testid="StepMeter_StepMeterBar" css={StepMeterBar} />
+      <Box
+        data-testid="StepMeter_StepMeterBar"
+        css={StepMeterBar(percentComplete)}
+      />
     </Box>
   )
 }
+
+const StepMeterContainer = (
+  styleProps: StyleProps
+): FlattenSimpleInterpolation => css`
+  position: ${styleProps.position ? styleProps.position : POSITION_RELATIVE};
+  height: ${SPACING.spacing4};
+  background-color: ${COLORS.grey30};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: ${SPACING.spacing12};
+  }
+`
+const StepMeterBar = (
+  percentComplete: string
+): FlattenSimpleInterpolation => css`
+  position: ${POSITION_ABSOLUTE};
+  top: 0;
+  height: 100%;
+  background-color: ${COLORS.blue50};
+  width: ${percentComplete};
+  webkit-transition: width 0.5s ease-in-out;
+  moz-transition: width 0.5s ease-in-out;
+  o-transition: width 0.5s ease-in-out;
+  transition: width 0.5s ease-in-out;
+`

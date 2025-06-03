@@ -1,7 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import { COLORS, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
+
+import { Chip, Flex, StyledText } from '@opentrons/components'
 import { MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
-import { StatusLabel } from '/app/atoms/StatusLabel'
+
+import {
+  MODULE_INFO_DETAIL_CONTAINER_STYLE,
+  MODULE_INFO_DETAIL_TEXT_STYLE,
+} from './constants'
+
 import type { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import type { MagneticStatus } from '/app/redux/modules/api-types'
 
@@ -18,15 +24,19 @@ export const MagneticModuleData = (
   const { t } = useTranslation('device_details')
 
   return (
-    <>
-      <StatusLabel
-        status={moduleStatus}
-        backgroundColor={COLORS.blue30}
-        iconColor={COLORS.blue60}
-        pulse={moduleStatus === 'engaged'}
+    <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
+      <Chip
+        text={moduleStatus}
+        chipSize="small"
+        type="info"
+        hasIcon={true}
+        pulseIcon={moduleStatus === 'engaged'}
+        iconName="connection-status"
+        textTransform="capitalize"
+        data-testid="mag_module_chip"
       />
-      <LegacyStyledText
-        fontSize={TYPOGRAPHY.fontSizeCaption}
+      <StyledText
+        css={MODULE_INFO_DETAIL_TEXT_STYLE}
         data-testid="mag_module_data"
       >
         {t(
@@ -37,7 +47,7 @@ export const MagneticModuleData = (
             height: moduleHeight,
           }
         )}
-      </LegacyStyledText>
-    </>
+      </StyledText>
+    </Flex>
   )
 }

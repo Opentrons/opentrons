@@ -3,16 +3,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useIsFlex } from '/app/redux-resources/robots'
 import {
+  mockHeaterShaker,
   mockMagneticModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
-  mockHeaterShaker,
   mockThermocyclerGen2,
 } from '/app/redux/modules/__fixtures__'
 import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
-import { useIsFlex } from '/app/redux-resources/robots'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
+
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
 import type { ComponentProps } from 'react'

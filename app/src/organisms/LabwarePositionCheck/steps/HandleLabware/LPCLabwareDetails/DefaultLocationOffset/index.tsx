@@ -1,20 +1,21 @@
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
-  Flex,
-  StyledText,
-  SPACING,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
-  COLORS,
   BORDERS,
-  RESPONSIVENESS,
+  COLORS,
+  DIRECTION_COLUMN,
   DISPLAY_NONE,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import {
   proceedEditOffsetSubstep,
   selectMostRecentVectorOffsetForLwWithOffsetDetails,
@@ -22,11 +23,11 @@ import {
   selectSelectedLwDisplayName,
   setSelectedLabware,
 } from '/app/redux/protocol-runs'
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
+
 import { ManageDefaultOffsetBtn } from './ManageDefaultOffsetBtn'
 
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/OffsetTag'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { DefaultOffsetDetails } from '/app/redux/protocol-runs'
 
 export function DefaultLocationOffset(

@@ -9,8 +9,8 @@ from contextlib import nullcontext as does_not_raise
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
-    SimulatedProbeResult,
 )
+from opentrons.protocol_engine.errors import LiquidHeightUnknownError
 from opentrons.types import Location, Point
 from opentrons.protocol_api.core.engine import WellCore
 from opentrons.protocol_api.labware import Well, Labware
@@ -244,7 +244,7 @@ def test_raise_only_if_pip_location_below_target(
             ),
         ),
         (
-            SimulatedProbeResult(),
+            None,
             Location(point=Point(5, 6, 7), labware=None),
             Point(10, 11, 12),
             does_not_raise(),
@@ -293,7 +293,7 @@ def test_log_warning_if_pip_location_cannot_be_validated(
     )
     logger = decoy.mock(cls=Logger)
 
-    decoy.when(well_core.current_liquid_height()).then_return(SimulatedProbeResult())
+    decoy.when(well_core.current_liquid_height()).then_raise(LiquidHeightUnknownError())
     decoy.when(well_core.get_bottom(0)).then_return(Point(0, 0, 0))
     decoy.when(well_core.get_display_name()).then_return("Well A1 of test_labware")
     raise_if_location_inside_liquid(

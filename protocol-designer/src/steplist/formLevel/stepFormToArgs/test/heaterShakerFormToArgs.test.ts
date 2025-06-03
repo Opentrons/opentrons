@@ -1,5 +1,7 @@
-import { it, describe, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { heaterShakerFormToArgs } from '../heaterShakerFormToArgs'
+
 import type { HydratedHeaterShakerFormData } from '../../../../form-types'
 
 describe('heaterShakerFormToArgs', () => {

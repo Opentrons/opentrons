@@ -1,40 +1,41 @@
-import { css, keyframes } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { css, keyframes } from 'styled-components'
 
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   ALIGN_FLEX_START,
   BORDERS,
   COLORS,
+  CommandText,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  getCommandTextData,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  getCommandTextData,
-  CommandText,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { RunTimer } from '/app/molecules/RunTimer'
-import { PlayPauseButton } from './PlayPauseButton'
-import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
+import { PlayPauseButton } from './PlayPauseButton'
+import { StopButton } from './StopButton'
+
+import type { RunCommandSummary, RunStatus } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { RunCommandSummary, RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import type { RobotAnalyticsData } from '/app/redux/analytics/types'
 
@@ -123,7 +124,7 @@ interface CurrentRunningProtocolCommandProps {
   lastAnimatedCommand: string | null
   lastRunCommand: RunCommandSummary | null
   updateLastAnimatedCommand: (newCommandKey: string) => void
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
   protocolName?: string
   currentRunCommandIndex?: number
 }

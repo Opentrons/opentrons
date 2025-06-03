@@ -1,5 +1,7 @@
-import { getSession } from '@opentrons/api-client'
 import { useQuery } from 'react-query'
+
+import { getSession } from '@opentrons/api-client'
+
 import { useHost } from '../api'
 
 import type { UseQueryResult } from 'react-query'

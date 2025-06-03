@@ -1,8 +1,10 @@
-import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { C_SELECTED_DARK, C_TRANSPARENT } from '../../../styles'
-import { EmanatingNozzle } from '../EmanatingNozzle'
+import { describe, expect, it } from 'vitest'
+
+import { COLORS } from '../../../helix-design-system'
+import { C_TRANSPARENT } from '../../../styles'
 import { SINGLE_CHANNEL_PIPETTE_HEIGHT } from '../constants'
+import { EmanatingNozzle } from '../EmanatingNozzle'
 
 describe('EmanatingNozzle', () => {
   it('should render an small origin circle', () => {
@@ -15,8 +17,8 @@ describe('EmanatingNozzle', () => {
     expect(originCircle).toHaveAttribute('cx', '5')
     expect(originCircle).toHaveAttribute('cy', '10')
     expect(originCircle).toHaveAttribute('r', '0.5')
-    expect(originCircle).toHaveAttribute('stroke', C_SELECTED_DARK)
-    expect(originCircle).toHaveAttribute('fill', C_SELECTED_DARK)
+    expect(originCircle).toHaveAttribute('stroke', COLORS.blue50)
+    expect(originCircle).toHaveAttribute('fill', COLORS.blue50)
   })
   it('should render a medium sized animating circle', () => {
     render(
@@ -28,7 +30,7 @@ describe('EmanatingNozzle', () => {
     expect(emanatingCircle).toHaveAttribute('cx', '5')
     expect(emanatingCircle).toHaveAttribute('cy', '10')
     expect(emanatingCircle).toHaveAttribute('r', '0.5')
-    expect(emanatingCircle).toHaveAttribute('stroke', C_SELECTED_DARK)
+    expect(emanatingCircle).toHaveAttribute('stroke', COLORS.blue50)
     expect(emanatingCircle).toHaveAttribute('fill', C_TRANSPARENT)
   })
   it('should render a medium sized animating circle that grows', () => {

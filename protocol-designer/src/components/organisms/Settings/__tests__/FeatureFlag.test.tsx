@@ -1,10 +1,10 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { FeatureFlag } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { actions as featureFlagActions } from '../../../../feature-flags'
-import { FeatureFlag } from '..'
 
 import type { ComponentProps } from 'react'
 

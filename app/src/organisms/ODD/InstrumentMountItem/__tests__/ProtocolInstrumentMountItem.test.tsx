@@ -1,10 +1,13 @@
-import { describe, it, vi, beforeEach } from 'vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
-import { LEFT } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+
+import { LEFT } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+
 import { ProtocolInstrumentMountItem } from '..'
 
 import type { ComponentProps } from 'react'

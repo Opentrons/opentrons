@@ -1,18 +1,19 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { MoveLabwareOnDeck } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
-import { TwoColLwInfoAndDeck } from '../TwoColLwInfoAndDeck'
-import { RECOVERY_MAP } from '../../constants'
-import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
-import { getSlotNameAndLwLocFrom } from '../../hooks/useDeckMapUtils'
 
-import type { ComponentProps } from 'react'
+import { RECOVERY_MAP } from '../../constants'
+import { getSlotNameAndLwLocFrom } from '../../hooks/useDeckMapUtils'
+import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
+import { TwoColLwInfoAndDeck } from '../TwoColLwInfoAndDeck'
+
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')
@@ -25,6 +26,7 @@ vi.mock('../LeftColumnLabwareInfo')
 vi.mock('../../hooks/useDeckMapUtils')
 
 let mockProceedNextStep: Mock
+let mockManualRetrieve: Mock
 
 const render = (props: ComponentProps<typeof TwoColLwInfoAndDeck>) => {
   return renderWithProviders(<TwoColLwInfoAndDeck {...props} />, {
@@ -37,7 +39,7 @@ describe('TwoColLwInfoAndDeck', () => {
 
   beforeEach(() => {
     mockProceedNextStep = vi.fn()
-
+    mockManualRetrieve = vi.fn().mockResolvedValue(undefined)
     props = {
       routeUpdateActions: {
         proceedNextStep: mockProceedNextStep,
@@ -48,7 +50,12 @@ describe('TwoColLwInfoAndDeck', () => {
       },
       failedLabwareUtils: {
         relevantWellName: 'A1',
+        relevantPickUpTipWellName: 'A1',
         failedLabware: { location: 'C1' },
+        relevantPickUpTipLabware: { id: 'some-id' },
+        relevantPickUpTipLwLocs: {
+          displayNameCurrentLoc: 'Slot C1',
+        },
         failedLabwareLocations: {
           newLoc: {},
           currentLoc: {},
@@ -64,6 +71,14 @@ describe('TwoColLwInfoAndDeck', () => {
         selectedRecoveryOption: RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
       },
       isOnDevice: true,
+      recoveryMap: {
+        route: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+        step:
+          RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE,
+      },
+      recoveryCommands: {
+        manualRetrieve: mockManualRetrieve,
+      },
     } as any
 
     vi.mocked(LeftColumnLabwareInfo).mockReturnValue(
@@ -76,6 +91,19 @@ describe('TwoColLwInfoAndDeck', () => {
     render(props)
     clickButtonLabeled('Continue')
     expect(mockProceedNextStep).toHaveBeenCalled()
+  })
+
+  it('calls manualRetrieve and then proceedNextStep when primary button is clicked for flex stacker retrieve options', async () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOPPER_MANUAL_REPLACE
+    render(props)
+    clickButtonLabeled('Continue')
+    await waitFor(() => {
+      expect(mockManualRetrieve).toHaveBeenCalled()
+    })
+    await waitFor(() => {
+      expect(mockProceedNextStep).toHaveBeenCalled()
+    })
   })
 
   it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE}`, () => {
@@ -116,6 +144,86 @@ describe('TwoColLwInfoAndDeck', () => {
         type: 'location',
         bannerText:
           "It's best to replace tips and select the last location used for tip pickup.",
+      }),
+      expect.anything()
+    )
+  })
+
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE}`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE
+    render(props)
+    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Replace used tips in rack location A1 in Slot C1',
+        type: 'location',
+        bannerText:
+          "It's best to replace tips and select the last location used for tip pickup.",
+      }),
+      expect.anything()
+    )
+  })
+
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE}`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+    render(props)
+    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Ensure stacker has labware',
+        type: 'location',
+        bannerText:
+          'Make sure you load the correct number of labware into the stacker.',
+      }),
+      expect.anything()
+    )
+  })
+
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE} with manual replace step`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE
+    props.recoveryMap.step =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
+    render(props)
+    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Load labware into labware shuttle',
+        type: 'location',
+        bannerText: null,
+      }),
+      expect.anything()
+    )
+  })
+
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE} with NOT manual replace step`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE
+    props.recoveryMap.step =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
+    render(props)
+    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Ensure stacker has labware',
+        type: 'location',
+        bannerText:
+          'Make sure you load the correct number of labware into the stacker.',
+      }),
+      expect.anything()
+    )
+  })
+
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE} with NOT manual replace step`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE
+    props.recoveryMap.step =
+      RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
+    render(props)
+    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Ensure stacker has labware',
+        type: 'location',
+        bannerText:
+          'Make sure you load the correct number of labware into the stacker.',
       }),
       expect.anything()
     )

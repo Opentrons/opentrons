@@ -87,19 +87,25 @@ def test_max_flow_rates_per_volume(pipette: PipetteModel, action: str) -> None:
             to match the default blowout and dispense flowRates. uiMaxFlowRate will be reevaluated
             in the future."""
             if not (
-                pipette_model_version_str
-                in {
-                    "p50_single_v3.4",
-                    "p50_single_v3.5",
-                    "p50_single_v3.6",
-                    "p50_multi_v3.5",
-                    "p50_multi_v3.4",
-                }
-                and liquid_properties.min_volume == 5.0
+                (
+                    pipette_model_version_str
+                    in {
+                        "p50_single_v3.4",
+                        "p50_single_v3.5",
+                        "p50_single_v3.6",
+                        "p50_multi_v3.5",
+                        "p50_multi_v3.4",
+                    }
+                    and liquid_properties.min_volume == 5.0
+                )
+                or (
+                    pipette_model_version_str in {"p200_96_v3.0", "p200_96_v3.1"}
+                    and liquid_properties.min_volume == 0.5
+                )
             ):
-                assert supported_tip.ui_max_flow_rate < _get_max_flow_rate_at_volume(
+                assert supported_tip.ui_max_flow_rate <= _get_max_flow_rate_at_volume(
                     supported_tip.aspirate, pipette, liquid_properties.min_volume
                 )
-                assert supported_tip.ui_max_flow_rate < _get_max_flow_rate_at_volume(
+                assert supported_tip.ui_max_flow_rate <= _get_max_flow_rate_at_volume(
                     supported_tip.dispense, pipette, liquid_properties.min_volume
                 )

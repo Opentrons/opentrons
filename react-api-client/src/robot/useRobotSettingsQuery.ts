@@ -1,8 +1,10 @@
 import { useQuery } from 'react-query'
+
 import { getRobotSettings } from '@opentrons/api-client'
+
 import { useHost } from '../api'
 
-import type { UseQueryResult, UseQueryOptions } from 'react-query'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { HostConfig, RobotSettingsResponse } from '@opentrons/api-client'
 
 export type UseRobotSettingsQueryOptions = UseQueryOptions<RobotSettingsResponse>

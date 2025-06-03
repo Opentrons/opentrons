@@ -1,19 +1,20 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
+import { createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
 
 import { DECK_CAL_STATUS_OK } from '/app/redux/calibration'
 import { getDiscoverableRobotByName } from '/app/redux/discovery'
-
-import { useDeckCalibrationStatus } from '..'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 
-import type { FunctionComponent, ReactNode } from 'react'
+import { useDeckCalibrationStatus } from '..'
+
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/calibration')

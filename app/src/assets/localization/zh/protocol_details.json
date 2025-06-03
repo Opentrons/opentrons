@@ -96,5 +96,6 @@
   "unsuccessfully_sent": "发送失败",
   "value_out_of_range": "值必须在{{min}}-{{max}}之间",
   "view_run_details": "查看运行详情",
-  "view_unavailable_robots": "在设备页面查看不可用的工作站"
+  "view_unavailable_robots": "在设备页面查看不可用的工作站",
+  "with_lid_name": "和 {{lid}}"
 }

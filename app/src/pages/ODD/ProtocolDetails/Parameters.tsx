@@ -1,23 +1,27 @@
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
+import {
+  BORDERS,
+  COLORS,
+  Flex,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
+  WRAP,
+} from '@opentrons/components'
 import {
   formatRunTimeParameterDefaultValue,
   formatRunTimeParameterMinMax,
   orderRuntimeParameterRangeOptions,
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
-import {
-  BORDERS,
-  COLORS,
-  Flex,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-  WRAP,
-} from '@opentrons/components'
+
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useRunTimeParameters } from '/app/resources/protocols'
+
 import { EmptySection } from './EmptySection'
+
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const Table = styled('table')`

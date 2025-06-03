@@ -1,11 +1,11 @@
 // create logger function
-import { inspect } from 'util'
 import path from 'path'
+import { inspect } from 'util'
 import dateFormat from 'dateformat'
 import winston from 'winston'
 
-import { setUserDataPath } from './early'
 import { getConfig } from './config'
+import { setUserDataPath } from './early'
 
 import type Transport from 'winston-transport'
 import type { Config } from './config'

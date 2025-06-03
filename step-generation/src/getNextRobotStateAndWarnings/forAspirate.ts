@@ -1,24 +1,39 @@
-import range from 'lodash/range'
 import isEmpty from 'lodash/isEmpty'
+import range from 'lodash/range'
 import uniq from 'lodash/uniq'
+
 import { COLUMN, SINGLE } from '@opentrons/shared-data'
+
 import {
   AIR,
+  getLocationTotalVolume,
+  getWellsForTips,
   mergeLiquid,
   splitLiquid,
-  getWellsForTips,
-  getLocationTotalVolume,
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
+
+import type {
+  AspDispAirgapParams,
+  AspirateInPlaceParams,
+} from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
-import type { AspDispAirgapParams } from '@opentrons/shared-data'
+
 export function forAspirate(
-  params: AspDispAirgapParams,
+  params: AspDispAirgapParams | AspirateInPlaceParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { pipetteId, volume, labwareId } = params
+  const { pipetteId, volume } = params
   const { robotState, warnings } = robotStateAndWarnings
+  const labwareId =
+    'labwareId' in params
+      ? params.labwareId
+      : robotState.pipettes[pipetteId].entityId ?? ''
+  const wellName =
+    'wellName' in params
+      ? params.wellName
+      : robotState.pipettes[pipetteId].wellName ?? ''
   const { liquidState } = robotState
   const nozzles = robotState.pipettes[pipetteId].nozzles
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
@@ -34,7 +49,7 @@ export function forAspirate(
   const { allWellsShared, wellsForTips } = getWellsForTips(
     channels,
     labwareDef,
-    params.wellName
+    wellName
   )
 
   console.assert(

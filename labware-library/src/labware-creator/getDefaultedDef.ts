@@ -1,10 +1,12 @@
+import pick from 'lodash/pick'
+
 import {
   SLOT_LENGTH_MM as DEFAULT_X_DIMENSION,
   SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,
 } from '@opentrons/shared-data'
-import pick from 'lodash/pick'
-import { labwareFormSchema } from './labwareFormSchema'
+
 import { fieldsToLabware } from './fieldsToLabware'
+import { labwareFormSchema } from './labwareFormSchema'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareFields, ProcessedLabwareFields } from './fields'

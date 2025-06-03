@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { RUN_STATUS_RUNNING, RUN_STATUS_FINISHING } from '@opentrons/api-client'
+
+import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   ALIGN_START,
   Banner,
@@ -10,14 +11,16 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { Slideout } from '../../atoms/Slideout'
+
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+
+import { Slideout } from '../../atoms/Slideout'
 
 import type { AttachedModule } from '/app/redux/modules/types'
 

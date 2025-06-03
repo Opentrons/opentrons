@@ -1,0 +1,1979 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Labware &#8212; OT-2 Python API Version 1 Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" href="_static/new-nav.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nav.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/banners.css" type="text/css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/OTfavicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Creating a Pipette" href="pipettes.html" />
+    <link rel="prev" title="Using Python In Protocols" href="writing.html" />  
+<link
+  rel="stylesheet"
+  href="_static/custom.css"
+  type="text/css"
+/>
+ 
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=0.9, maximum-scale=0.9"
+/>
+<script src="_static/Akko-Pro-All.js"></script>
+<!-- INTERCOM -->
+<script>
+  window.intercomSettings = {
+    app_id: 'ukpodv2l',
+  }
+</script>
+
+  </head><body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCDX9CX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<header id="nav">
+  <nav class="docs-navbar">
+    <div class="container">
+      <div class="container-div"></div>
+      <ul>
+        <li>
+          <a
+            href="https://docs.opentrons.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="opentrons-api"
+            data-gtm-action="click"
+            >Python API</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://labware.opentrons.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="labware-library"
+            data-gtm-action="click"
+            >Labware Library</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://protocols.opentrons.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="protocol-library"
+            data-gtm-action="click"
+            >Protocol Library</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://designer.opentrons.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="protocol-designer"
+            data-gtm-action="click"
+            >Protocol Designer</a
+          >
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-container">
+        <div class="navbar-logo" onclick="close()">
+          <a
+            href="https://opentrons.com"
+            class="brand"
+            title="Home"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="d-header"
+            data-gtm-label="logo"
+            data-gtm-action="click"
+          >
+            <img
+              class="img-logo"
+              src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png"
+              alt="Opentrons Home"
+            />
+          </a>
+        </div>
+        <div class="schedule-menu mobile-schedule-menu">
+          <div class="schedule-div">
+            <a
+              class="btn schedule-demo"
+              href="https://opentrons.com/contact"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-gtm-category="d-header"
+              data-gtm-label="contact-sales"
+              data-gtm-action="click"
+              >Contact sales</a
+            >
+          </div>
+          <div class="mobile-hamburger">
+            <div id="nav-collapse" onclick="toggleOpen()">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+              <div class="bar3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="navbar-menu">
+        <ul class="main-menu">
+          <li class="main-menu-li about" onclick="toggleMenu(`about`)">
+            <span class="menu-span" id="menu-about">About</span>
+            <ul id="about" class="navbar-ul visible">
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://opentrons.com/about"
+                  data-gtm-category="d-header"
+                  data-gtm-label="about"
+                  data-gtm-action="click"
+                  >Mission</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://opentrons.com/team"
+                  data-gtm-category="d-header"
+                  data-gtm-label="team"
+                  data-gtm-action="click"
+                  >Our Team</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  href="https://blog.opentrons.com/"
+                  data-gtm-category="d-header"
+                  data-gtm-label="blog"
+                  data-gtm-action="click"
+                  >Blog</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="main-menu-li" onclick="toggleMenu(`products`)">
+            <span class="menu-span" id="menu-products">Products</span>
+            <ul class="navbar-ul visible" id="products">
+              <li onclick="closeMenu()">
+                <a
+                  href="https://opentrons.com/ot-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="ot-2"
+                  data-gtm-action="click"
+                  >OT-2 Robot</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://opentrons.com/modules"
+                  data-gtm-category="d-header"
+                  data-gtm-label="modules"
+                  data-gtm-action="click"
+                  >OT-2 Add-ons</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://opentrons.com/pipettes"
+                  data-gtm-category="d-header"
+                  data-gtm-label="ot-2-pipettes"
+                  data-gtm-action="click"
+                  >OT-2 Pipettes</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  href="https://shop.opentrons.com/collections/opentrons-tips"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="tips"
+                  data-gtm-action="click"
+                  >Pipette Tips</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  href="https://shop.opentrons.com/collections/racks-and-adapters"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="tube-racks"
+                  data-gtm-action="click"
+                  >Racks &amp; Adapters</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  href="https://shop.opentrons.com/collections/mag-bead-kits"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="reagents"
+                  data-gtm-action="click"
+                  >Reagents</a
+                >
+              </li>
+              <a
+                onclick="closeMenu()"
+                class="blue blue-products"
+                href="https://shop.opentrons.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-gtm-category="d-header"
+                data-gtm-label="all-products"
+                data-gtm-action="click"
+                >Shop all products ›</a
+              >
+            </ul>
+          </li>
+          <li class="main-menu-li" onclick="toggleMenu(`applications`)">
+            <span class="menu-span" id="menu-applications">Applications</span>
+            <ul class="navbar-ul visible" id="applications">
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://opentrons.com/pcr-sample-prep"
+                  data-gtm-category="d-header"
+                  data-gtm-label="prep"
+                  data-gtm-action="click"
+                  >PCR Sample Prep</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://protocols.opentrons.com/categories/Molecular%20Biology/Nucleic%20Acid%20Purification"
+                  data-gtm-category="d-header"
+                  data-gtm-label="nap"
+                  data-gtm-action="click"
+                  >Nucelic Acid Purification</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://protocols.opentrons.com/categories/Sample%20Prep/PCR"
+                  data-gtm-category="d-header"
+                  data-gtm-label="qpcr"
+                  data-gtm-action="click"
+                  >qPCR/RT-PCR</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://protocols.opentrons.com/protocol/TSH_ELISA_2018-1-25"
+                  data-gtm-category="d-header"
+                  data-gtm-label="elisa"
+                  data-gtm-action="click"
+                  >ELISA</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://protocols.opentrons.com/categories/NGS%20Library%20Prep"
+                  data-gtm-category="d-header"
+                  data-gtm-label="ngs-prep"
+                  data-gtm-action="click"
+                  >NGS Library Prep</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://protocols.opentrons.com/categories/Basic%20Pipetting"
+                  data-gtm-category="d-header"
+                  data-gtm-label="basic"
+                  data-gtm-action="click"
+                  >Basic Pipetting</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="main-menu-li" onclick="toggleMenu(`protocols`)">
+            <span class="menu-span" id="menu-protocols">Protocols</span>
+            <ul class="navbar-ul protocol-nav visible" id="protocols">
+              <div class="navbar-ul-div">
+                <div class="protocol-items">
+                  <li onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://opentrons.com/protocols"
+                      data-gtm-category="d-header"
+                      data-gtm-label="protocol-tools"
+                      data-gtm-action="click"
+                      >Protocol Options</a
+                    >
+                    <span
+                      >Gain an overview of our protocol creation options</span
+                    >
+                  </li>
+                  <li onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://opentrons.com/protocols/designer"
+                      data-gtm-category="d-header"
+                      data-gtm-label="protocol-designer"
+                      data-gtm-action="click"
+                      >Protocol Designer</a
+                    >
+                    <span>
+                      Use our graphical user interface to design protocols
+                    </span>
+                  </li>
+                  <li class="protocol-bottom" onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://protocols.opentrons.com"
+                      data-gtm-category="d-header"
+                      data-gtm-label="protocol-library"
+                      data-gtm-action="click"
+                      >Protocol Library</a
+                    >
+                    <span>Explore our open source database of protocols</span>
+                  </li>
+                </div>
+                <div class="protocol-items">
+                  <li class="protocol-items-li" onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://docs.opentrons.com/"
+                      data-gtm-category="d-header"
+                      data-gtm-label="opentrons-api"
+                      data-gtm-action="click"
+                      >Python API</a
+                    >
+                    <span class="protocol-items-span">
+                      Maximum customization for anyone with python and basic
+                      wetlab skills
+                    </span>
+                  </li>
+                  <li class="protocol-items-li" onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://github.com/Opentrons"
+                      data-gtm-category="d-header"
+                      data-gtm-label="github-protocols"
+                      data-gtm-action="click"
+                      >Github</a
+                    >
+                    <span class="protocol-items-span"
+                      >Contribute to open source protocol repository</span
+                    >
+                  </li>
+                </div>
+              </div>
+              <div onclick="closeMenu()">
+                <a
+                  class="blue"
+                  href="https://opentrons.com/request-protocol"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="request-protocol-protocols"
+                  data-gtm-action="click"
+                  >Request a free custom protocol ›</a
+                >
+              </div>
+            </ul>
+          </li>
+          <li class="main-menu-li" onclick="toggleMenu('sns')">
+            <span class="menu-span" id="menu-sns">Support &amp; Sales</span>
+            <ul class="navbar-ul protocol-nav sns visible" id="sns">
+              <!-- <span>SUPPORT</span> -->
+              <div class="navbar-ul-li">
+                <div class="protocol-items">
+                  <li onclick="closeMenu()">
+                    <span class="support-sales">SUPPORT</span>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://support.opentrons.com/guide-for-getting-started-with-the-ot-2"
+                      data-gtm-category="d-header"
+                      data-gtm-label="start-guide"
+                      data-gtm-action="click"
+                      >OT-2 Start Guide</a
+                    >
+                    <span>You received your robot, here's what's next</span>
+                  </li>
+                  <li onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://support.opentrons.com/"
+                      data-gtm-category="d-header"
+                      data-gtm-label="product-help"
+                      data-gtm-action="click"
+                      >Product Help</a
+                    >
+                    <span>Answer common technical questions</span>
+                  </li>
+                  <li onclick="closeMenu()" class="github">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://github.com/Opentrons"
+                      data-gtm-category="d-header"
+                      data-gtm-label="github-support"
+                      data-gtm-action="click"
+                      >Github</a
+                    >
+                    <span>Contribute to open source protocol repository</span>
+                  </li>
+                </div>
+              </div>
+              <div class="navbar-ul-li">
+                <div class="protocol-items">
+                  <li onclick="closeMenu()">
+                    <span class="support-sales"></span>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://support.opentrons.com/s/article/What-labware-can-I-use-with-the-OT-2"
+                      data-gtm-category="d-header"
+                      data-gtm-label="labware-library"
+                      data-gtm-action="click"
+                      >Labware Library</a
+                    >
+                    <span
+                      >Understand what labware is compatible with the OT-2</span
+                    >
+                  </li>
+                  <li onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://opentrons.com/ot-app"
+                      data-gtm-category="d-header"
+                      data-gtm-label="ot-app"
+                      data-gtm-action="click"
+                      >Install the app</a
+                    >
+                  </li>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="blue-text"
+                    href="https://opentrons.com/contact-support"
+                    data-gtm-category="d-header"
+                    data-gtm-label="contact-support"
+                    data-gtm-action="click"
+                    >Contact support ›</a
+                  >
+                </div>
+                <!-- <div class="number">718-999-9999</div> -->
+              </div>
+              <div class="navbar-ul-li order-online">
+                <div class="protocol-items">
+                  <li onclick="close()">
+                    <span class="support-sales">SALES</span>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://shop.opentrons.com"
+                      data-gtm-category="d-header"
+                      data-gtm-label="shop"
+                      data-gtm-action="click"
+                      >Order online</a
+                    >
+                  </li>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="blue-text"
+                    href="https://opentrons.com/contact"
+                    data-gtm-category="d-header"
+                    data-gtm-label="contact-sales"
+                    data-gtm-action="click"
+                    >Contact sales ›</a
+                  >
+                </div>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="cta-demo-button"
+                  data-gtm-action="click"
+                  class="btn schedule-demo"
+                  href="https://opentrons.com/demo"
+                  >Schedule a demo ›</a
+                >
+                <!-- <div class="number">718-999-9999</div> -->
+              </div>
+            </ul>
+          </li>
+        </ul>
+        <div class="schedule-menu desktop-schedule-menu">
+          <div class="schedule-div">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn schedule-demo"
+              href="https://opentrons.com/contact"
+              data-gtm-category="d-header"
+              data-gtm-label="contact-sales-primary"
+              data-gtm-action="click"
+              >Contact Sales</a
+            >
+          </div>
+        </div>
+      </div>
+      <div class="div-sub-menu">
+        <div class="mobile-menu mobilemenufixed dnone">
+          <ul>
+            <li onclick="showMenu('about')">About</li>
+            <li onclick="showMenu('products')">Products</li>
+            <li onclick="showMenu('applications')">Applications</li>
+            <li onclick="showMenu('protocols')">Protocols</li>
+            <li onclick="showMenu('sns')">Support &amp; Sales</li>
+          </ul>
+          <div class="menu-button" onclick="close()">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn"
+              href="https://opentrons.com/contact"
+              data-gtm-category="d-header"
+              data-gtm-label="contact-sales-primary"
+              data-gtm-action="click"
+              >Contact Sales</a
+            >
+          </div>
+        </div>
+        <div class="sub-menu about sub-menu-about">
+          <div class="sub-menu-div" onclick="closeMenu()">
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
+            <span>About</span>
+          </div>
+          <ul>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/about"
+                data-gtm-category="d-header"
+                data-gtm-label="about"
+                data-gtm-action="click"
+                >Mission ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/team"
+                data-gtm-category="d-header"
+                data-gtm-label="team"
+                data-gtm-action="click"
+                >Our Team ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                href="https://blog.opentrons.com/"
+                data-gtm-category="d-header"
+                data-gtm-label="blog"
+                data-gtm-action="click"
+                >Blog ›</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="sub-menu products sub-menu-products">
+          <div class="sub-menu-div" onclick="closeMenu()">
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
+            <span>Products</span>
+          </div>
+          <ul>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/ot-2"
+                data-gtm-category="d-header"
+                data-gtm-label="ot-2"
+                data-gtm-action="click"
+                >OT-2 Robot ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/modules"
+                data-gtm-category="d-header"
+                data-gtm-label="modules"
+                data-gtm-action="click"
+                >OT-2 Add-ons ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/pipettes"
+                data-gtm-category="d-header"
+                data-gtm-label="ot-2-pipettes"
+                data-gtm-action="click"
+                >OT-2 Pipettes ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                href="https://shop.opentrons.com/collections/opentrons-tips"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-gtm-category="d-header"
+                data-gtm-label="tips"
+                data-gtm-action="click"
+                >Pipette Tips ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                href="https://shop.opentrons.com/collections/racks-and-adapters"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-gtm-category="d-header"
+                data-gtm-label="tube-racks"
+                data-gtm-action="click"
+                >Racks &amp; Adapters ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                href="https://shop.opentrons.com/collections/mag-bead-kits"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-gtm-category="d-header"
+                data-gtm-label="reagents"
+                data-gtm-action="click"
+                >Reagents ›</a
+              >
+            </li>
+            <li class="blue" onclick="close()">
+              <a
+                onclick="close()"
+                class="blue"
+                href="https://shop.opentrons.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-gtm-category="d-header"
+                data-gtm-label="all-products"
+                data-gtm-action="click"
+                >Shop all products ›</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="sub-menu applications sub-menu-applications">
+          <div class="sub-menu-div" onclick="closeMenu()">
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
+            <span>Applications</span>
+          </div>
+          <ul>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/pcr-sample-prep"
+                data-gtm-category="d-header"
+                data-gtm-label="prep"
+                data-gtm-action="click"
+                >PCR Sample Prep ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com/categories/Molecular%20Biology/Nucleic%20Acid%20Purification"
+                data-gtm-category="d-header"
+                data-gtm-label="nap"
+                data-gtm-action="click"
+                >Nucelic Acid Purification ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com/categories/Sample%20Prep/PCR"
+                data-gtm-category="d-header"
+                data-gtm-label="qpcr"
+                data-gtm-action="click"
+                >qPCR/RT-PCR ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com/protocol/TSH_ELISA_2018-1-25"
+                data-gtm-category="d-header"
+                data-gtm-label="elisa"
+                data-gtm-action="click"
+                >ELISA ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com/categories/NGS%20Library%20Prep"
+                data-gtm-category="d-header"
+                data-gtm-label="ngs-prep"
+                data-gtm-action="click"
+                >NGS Library Prep ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com/categories/Basic%20Pipetting"
+                data-gtm-category="d-header"
+                data-gtm-label="basic"
+                data-gtm-action="click"
+                >Basic Pipetting ›</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="sub-menu protocols sub-menu-protocols">
+          <div class="sub-menu-div" onclick="closeMenu()">
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
+            <span>Protocols</span>
+          </div>
+          <ul>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/protocols"
+                data-gtm-category="d-header"
+                data-gtm-label="protocol-tools"
+                data-gtm-action="click"
+                >Protocol Options ›</a
+              >
+              <span>Gain an overview of our protocol creation options</span>
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/protocols/designer"
+                data-gtm-category="d-header"
+                data-gtm-label="protocol-designer"
+                data-gtm-action="click"
+                >Protocol Designer ›</a
+              >
+              <span>Use our graphical user interface to design protocols</span>
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com"
+                data-gtm-category="d-header"
+                data-gtm-label="protocol-library"
+                data-gtm-action="click"
+                >Protocol Library ›</a
+              >
+              <span>Explore our open source database of protocols</span>
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://docs.opentrons.com/"
+                data-gtm-category="d-header"
+                data-gtm-label="opentrons-api"
+                data-gtm-action="click"
+                >Python API ›</a
+              >
+              <span>
+                Maximum customization for anyone with python and basic weblab
+                skills
+              </span>
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://github.com/Opentrons"
+                data-gtm-category="d-header"
+                data-gtm-label="github-protocols"
+                data-gtm-action="click"
+                >Github ›</a
+              >
+              <span>Contribute to open source protocol repository</span>
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                class="blue"
+                href="https://opentrons.com/request-protocol"
+                data-gtm-category="d-header"
+                data-gtm-label="request-protocol-protocols"
+                data-gtm-action="click"
+                >Request a free custom protocol ›</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="sub-menu sns sub-menu-sns">
+          <div class="sub-menu-div" onclick="closeMenu()">
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
+            <span>Support &amp; Sales</span>
+          </div>
+          <ul class="sns-ul">
+            <section class="sns-sales">
+              <!-- <span class="sales">SALES</span> -->
+              <li onclick="close()">
+                <section class="sns-support-section">
+                  <span class="sales-tron">SALES</span>
+                  <div class="support-items">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://shop.opentrons.com"
+                      data-gtm-category="d-header"
+                      data-gtm-label="shop"
+                      data-gtm-action="click"
+                      class="order-line-mobile"
+                      >Order online ›</a
+                    >
+                  </div>
+                </section>
+              </li>
+              <li onclick="close()">
+                <section class="sns-support-section">
+                  <span class="sales-tron mobile-contact"></span>
+                  <div>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="sales-link mobile-contact-sales"
+                      href="https://opentrons.com/contact"
+                      data-gtm-category="d-header"
+                      data-gtm-label="contact-sales"
+                      data-gtm-action="click"
+                      >Contact sales ›</a
+                    >
+                  </div>
+                </section>
+              </li>
+              <li>
+                <section class="sns-support-section">
+                  <span class="sales-tron"></span>
+                  <div>
+                    <!-- <a
+                      class="sales-link schedule-demo-mobile"
+                      data-gtm-category="d-header"
+                      data-gtm-label="schedule-demo"
+                      data-gtm-action="click"
+                      onclick="openModal('demo')"
+                    >Schedule a demo ›</a> -->
+                  </div>
+                </section>
+              </li>
+            </section>
+            <section class="sns-support">
+              <!-- <span class="support">SUPPORT</span> -->
+              <li onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron">SUPPORT</span>
+                  <div class="ot-2-start-guide support-items">
+                    <a
+                      href="https://support.opentrons.com/guide-for-getting-started-with-the-ot-2"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-gtm-category="d-header"
+                      data-gtm-label="start-guide"
+                      data-gtm-action="click"
+                      class="ot-2-guide"
+                      >OT-2 Start Guide ›</a
+                    >
+                    <span class="ot-2-guide"
+                      >You received your robot, here's what's next</span
+                    >
+                  </div>
+                </section>
+              </li>
+              <li class="sns-support-li" onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron"></span>
+                  <div class="support-items">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://support.opentrons.com/"
+                      data-gtm-category="d-header"
+                      data-gtm-label="product-help"
+                      data-gtm-action="click"
+                      >Product Help ›</a
+                    >
+                    <span>Answer common technical questions</span>
+                  </div>
+                </section>
+              </li>
+              <li class="sns-support-li" onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron"></span>
+                  <div class="support-items">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://github.com/Opentrons"
+                      data-gtm-category="d-header"
+                      data-gtm-label="github-support"
+                      data-gtm-action="click"
+                      >Github ›</a
+                    >
+                    <span>Contribute to open source protocol repository</span>
+                  </div>
+                </section>
+              </li>
+              <li class="sns-support-li" onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron"></span>
+                  <div class="support-items">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://support.opentrons.com/s/article/What-labware-can-I-use-with-the-OT-2"
+                      data-gtm-category="d-header"
+                      data-gtm-label="labware-library"
+                      data-gtm-action="click"
+                      >Labware Library ›</a
+                    >
+                    <span
+                      >Understand what labware is compatible with the OT-2</span
+                    >
+                  </div>
+                </section>
+              </li>
+              <li class="sns-support-li" onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron"></span>
+                  <div class="support-items">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://opentrons.com/ot-app"
+                      data-gtm-category="d-header"
+                      data-gtm-label="ot-app"
+                      data-gtm-action="click"
+                      >Install the app ›</a
+                    >
+                  </div>
+                </section>
+              </li>
+              <li class="sns-support-li" onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron"></span>
+                  <div>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="blue-text sales-link"
+                      href="https://opentrons.com/contact-support"
+                      data-gtm-category="d-header"
+                      data-gtm-label="contact-support"
+                      data-gtm-action="click"
+                      >Contact support ›</a
+                    >
+                  </div>
+                </section>
+              </li>
+            </section>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="document">
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="index.html">OT-2 API V1</a></h1>
+
+
+
+<p class="blurb">Python Protocol API</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=opentrons&repo=opentrons&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<!-- Navbar override for specific styling for the v1 sidebar-->
+<h3>Table Of Contents</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="writing.html">Using Python In Protocols</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Labware</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#labware-library">Labware Library</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#labware-versions">Labware Versions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#placing-labware-on-the-robot-deck">Placing labware on the robot deck</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#labware-import-reference">Labware Import Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#load">Load</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create">Create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list-deprecated">List (deprecated)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#accessing-wells">Accessing Wells</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#individual-wells">Individual Wells</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#wells-by-name">Wells by Name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#wells-by-index">Wells by Index</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columns-and-rows">Columns and Rows</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#multiple-wells">Multiple Wells</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#wells">Wells</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#wells-to">Wells To</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#wells-length">Wells Length</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Columns and Rows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slices">Slices</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#deprecated-labware-load-names">Deprecated Labware Load Names</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pipettes.html">Creating a Pipette</a></li>
+<li class="toctree-l1"><a class="reference internal" href="atomic_commands.html">Atomic Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="complex_commands.html">Complex Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware_control.html">Advanced Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+
+<hr />
+<ul>
+    <li class="toctree-l1"><a href="../v2/index.html">OT-2 Python API v2</a></li>
+    <li class="toctree-l1"><a href="../ot1/index.html">OT-1 Python API</a></li>
+</ul>
+<!-- 'extra_nav_links' in the config dict if any, though there probably shoudln't be -->
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="writing.html" title="previous chapter">Using Python In Protocols</a></li>
+      <li>Next: <a href="pipettes.html" title="next chapter">Creating a Pipette</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+  <div class="documentwrapper">
+    <div class="bodywrapper">
+      <div class="body" role="main">
+        
+        <div class="banner_wrapper banner_v1">
+          <p>
+            You are currently viewing the documentation for version 1 of the
+              Opentrons OT-2 Python Protocol API. This version of the API is
+              <b>no longer supported</b> on Opentrons App and Robot Software 4.0.0
+              and later. To view version 2 of the API,
+              <a href="../v2/index.html">click here</a>.
+          </p>
+        </div> 
+  <section id="labware">
+<span id="id1"></span><h1>Labware<a class="headerlink" href="#labware" title="Permalink to this heading">¶</a></h1>
+<p>We spend a fair amount of time organizing and counting wells when writing
+Python protocols. This section describes the different ways we can access
+wells and groups of wells.</p>
+<hr class="docutils" />
+<section id="labware-library">
+<h2>Labware Library<a class="headerlink" href="#labware-library" title="Permalink to this heading">¶</a></h2>
+<p>The Opentrons API comes with many common labware built in. These can be loaded
+into your Python protocol by using the <code class="docutils literal notranslate"><span class="pre">labware.load()</span></code> method with the
+specific load name of the labware you need.</p>
+<p>Please see the <a class="reference external" href="https://labware.opentrons.com">Opentrons Labware Library</a> for a list of currently supported
+labware, along with visualizations, pictures, and load names.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Copy and paste load names directly from the Labware Library to ensure
+your <code class="docutils literal notranslate"><span class="pre">load()</span></code> statements get the correct definitions.</p>
+</div>
+<p>If you are interested in using your own labware that is not included in the
+API, please take a look at how to create custom labware definitions using
+<code class="docutils literal notranslate"><span class="pre">labware.create()</span></code>, or contact Opentrons Support.</p>
+<section id="labware-versions">
+<h3>Labware Versions<a class="headerlink" href="#labware-versions" title="Permalink to this heading">¶</a></h3>
+<p>Some labware on the Opentrons Labware Library have multiple versions of their
+definitions available. Opentrons publishes new versions of a labware definition
+when we find an issue with a labware definition. In general, you should use the
+newest version of a labware definition; however, the older definitions remain
+available for use with previously-written protocols that may have been customized
+to work with the older definition.</p>
+<p>If you do not specify a version when loading labware, version 1 will be used by default.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="placing-labware-on-the-robot-deck">
+<h2>Placing labware on the robot deck<a class="headerlink" href="#placing-labware-on-the-robot-deck" title="Permalink to this heading">¶</a></h2>
+<p>The robot deck is made up of slots labeled 1, 2, 3, 4, and so on.</p>
+<img alt="_images/DeckMapEmpty.png" src="_images/DeckMapEmpty.png" />
+<p>To tell the robot what labware will be on the deck for your protocol, use
+<code class="docutils literal notranslate"><span class="pre">labware.load</span></code> after importing <code class="docutils literal notranslate"><span class="pre">labware</span></code> as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">labware</span>
+
+<span class="c1"># ...</span>
+
+<span class="n">tiprack</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;opentrons_96_tiprack_300ul&quot;</span><span class="p">,</span> <span class="n">slot</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="labware-import-reference">
+<h2>Labware Import Reference<a class="headerlink" href="#labware-import-reference" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Examples in this section require the following</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">labware</span>
+</pre></div>
+</div>
+<section id="load">
+<h3>Load<a class="headerlink" href="#load" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">labware.load</span></code> tells the robot that your protocol will be using a given
+labware in a certain slot.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_labware</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;usascientific_12_reservoir_22ml&quot;</span><span class="p">,</span> <span class="n">slot</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A third optional argument can be used to give a labware a nickname for display
+in the Opentrons App.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_labware</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;usascientific_12_reservoir_22ml&quot;</span><span class="p">,</span>
+                 <span class="n">slot</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+                 <span class="n">label</span><span class="o">=</span><span class="s2">&quot;any-name-you-want&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Sometimes, you may need to place a labware on top of something else on the
+deck, like modules. For this, you should use the <code class="docutils literal notranslate"><span class="pre">share</span></code> parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">labware</span><span class="p">,</span> <span class="n">modules</span>
+
+<span class="n">td</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;tempdeck&quot;</span><span class="p">,</span> <span class="n">slot</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;opentrons_96_aluminumblock_biorad_wellplate_200ul&quot;</span><span class="p">,</span>
+                     <span class="n">slot</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+                     <span class="n">share</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To specify the version of the labware definition to use, you can use the <code class="docutils literal notranslate"><span class="pre">version</span></code>
+parameter:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">labware</span>
+<span class="n">block1</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+             <span class="s2">&quot;opentrons_96_aluminumblock_biorad_wellplate_200ul&quot;</span><span class="p">,</span>
+             <span class="n">slot</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+             <span class="n">version</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># version 2 of the aluminum block definition</span>
+<span class="n">block2</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+             <span class="s2">&quot;opentrons_96_aluminumblock_biorad_wellplate_200ul&quot;</span><span class="p">,</span>
+              <span class="n">slot</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+              <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># version 1 of the aluminum block definition</span>
+<span class="n">block3</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+             <span class="s2">&quot;opentrons_96_aluminumblock_biorad_wellplate_200ul&quot;</span><span class="p">,</span>
+             <span class="n">slot</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>  <span class="c1"># if you don&#39;t specify version, version 1 is used</span>
+</pre></div>
+</div>
+</section>
+<section id="create">
+<h3>Create<a class="headerlink" href="#create" title="Permalink to this heading">¶</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The current custom labware creation mechanisms in the API are fairly
+limited. We’re working on a much more robust system for custom labware
+definitions. If the current API isn’t able to support your labware, please
+reach out to our support team.</p>
+</div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">labware.create</span></code>, you can create your own custom labware. The labware
+created through this method must consist of circular wells arranged in
+regularly-spaced columns and rows.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">custom_plate_name</span> <span class="o">=</span> <span class="s2">&quot;custom_18_wellplate_200ul&quot;</span>
+
+<span class="k">if</span> <span class="n">plate_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">labware</span><span class="o">.</span><span class="n">list</span><span class="p">():</span>
+    <span class="n">labware</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">custom_plate_name</span><span class="p">,</span>  <span class="c1"># name of you labware</span>
+        <span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>        <span class="c1"># number of (columns, rows)</span>
+        <span class="n">spacing</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>   <span class="c1"># distances (mm) between each (column, row)</span>
+        <span class="n">diameter</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>         <span class="c1"># diameter (mm) of each well</span>
+        <span class="n">depth</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>           <span class="c1"># depth (mm) of each well</span>
+        <span class="n">volume</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>         <span class="c1"># volume (µL) of each well</span>
+
+<span class="n">custom_plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">custom_plate_name</span><span class="p">,</span> <span class="n">slot</span><span class="o">=</span><span class="s2">&quot;3&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">well</span> <span class="ow">in</span> <span class="n">custom_plate</span><span class="o">.</span><span class="n">wells</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">well</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The above example will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Well</span> <span class="n">A1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">A2</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B2</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C2</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">A3</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B3</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C3</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">A4</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B4</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C4</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">A5</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B5</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C5</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">A6</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B6</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C6</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>You only need to call <code class="docutils literal notranslate"><span class="pre">labware.create</span></code> once. It will save the labware
+definition on the robot so that your labware will be available to all your
+subsequent protocol runs.</p>
+<p><code class="docutils literal notranslate"><span class="pre">labware.create</span></code> <strong>will throw an error if you try to call it more than once
+with the same load name</strong>. In the example above, the call to <cite>labware.create</cite>
+is wrapped in an if-block so it does not try to add the definition twice, which
+would cause an error.</p>
+<p>If you would like to delete a labware you have already added to the database
+(for example: to make changes to its definition), you can do the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons.data_storage</span> <span class="kn">import</span> <span class="n">database</span>
+
+<span class="n">database</span><span class="o">.</span><span class="n">delete_container</span><span class="p">(</span><span class="s2">&quot;custom_18_wellplate_200ul&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There is some specialty labware that will require you to specify the
+type within your labware name. If you are creating a custom tip rack, it
+must be <code class="docutils literal notranslate"><span class="pre">tiprack-REST-OF-LABWARE-NAME</span></code> in order for the software to act
+reliably.</p>
+</div>
+</section>
+<section id="list-deprecated">
+<h3>List (deprecated)<a class="headerlink" href="#list-deprecated" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">labware.list</span></code> returns an array of all labware load names in the old,
+unsupported format.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">labware</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For a list of all currently supported labware, please visit the Opentrons
+<a class="reference external" href="https://labware.opentrons.com">Labware Library</a></p>
+</div>
+</section>
+</section>
+<section id="accessing-wells">
+<h2>Accessing Wells<a class="headerlink" href="#accessing-wells" title="Permalink to this heading">¶</a></h2>
+<section id="individual-wells">
+<h3>Individual Wells<a class="headerlink" href="#individual-wells" title="Permalink to this heading">¶</a></h3>
+<p>When writing a protocol using the API, you will need to select which wells to
+transfer liquids to and from.</p>
+<p>The OT-2 deck and labware are all set up with the same coordinate system</p>
+<ul class="simple">
+<li><p>Lettered rows <code class="docutils literal notranslate"><span class="pre">[&quot;A&quot;]-[&quot;END&quot;]</span></code></p></li>
+<li><p>Numbered columns <code class="docutils literal notranslate"><span class="pre">[&quot;1&quot;]-[&quot;END&quot;]</span></code>.</p></li>
+</ul>
+<img alt="_images/Well_Iteration.png" src="_images/Well_Iteration.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Examples in this section expect the following</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">labware</span>
+
+<span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;corning_24_wellplate_3.4ml_flat&quot;</span><span class="p">,</span> <span class="n">slot</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="wells-by-name">
+<h4>Wells by Name<a class="headerlink" href="#wells-by-name" title="Permalink to this heading">¶</a></h4>
+<p>Once a labware is loaded into your protocol, you can easily access the many
+wells within it using <code class="docutils literal notranslate"><span class="pre">wells()</span></code> method. <code class="docutils literal notranslate"><span class="pre">wells()</span></code> takes the name of the
+well as an argument, and will return the well at that location.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a1</span> <span class="o">=</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s2">&quot;A1&quot;</span><span class="p">)</span>
+<span class="n">d6</span> <span class="o">=</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s2">&quot;D6&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="wells-by-index">
+<h4>Wells by Index<a class="headerlink" href="#wells-by-index" title="Permalink to this heading">¶</a></h4>
+<p>Wells can be referenced by their “string” name, as demonstrated above.
+However, they can also be referenced with zero-indexing, with the first well in
+a labware being at position 0.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># well A1</span>
+<span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="mi">23</span><span class="p">)</span>  <span class="c1"># well D6</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You may find well names (e.g. <code class="docutils literal notranslate"><span class="pre">B3</span></code>) to be easier to reason with,
+especially with irregular labware (e.g.
+<code class="docutils literal notranslate"><span class="pre">opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical</span></code>). Whichever well
+access method you use, your protocol will be most maintainable if you pick
+one method and don’t use the other one.</p>
+</div>
+</section>
+<section id="columns-and-rows">
+<h4>Columns and Rows<a class="headerlink" href="#columns-and-rows" title="Permalink to this heading">¶</a></h4>
+<p>A labware’s wells are organized within a series of columns and rows, which are
+also labelled on standard labware. In the API, rows are given letter names
+(<code class="docutils literal notranslate"><span class="pre">&quot;A&quot;</span></code> through <code class="docutils literal notranslate"><span class="pre">&quot;D&quot;</span></code> for example) and go left to right, while columns are
+given numbered names (<code class="docutils literal notranslate"><span class="pre">&quot;1&quot;</span></code> through <code class="docutils literal notranslate"><span class="pre">&quot;6&quot;</span></code> for example) and go from front to
+back.</p>
+<p>You can access a specific row or column by using the <code class="docutils literal notranslate"><span class="pre">rows()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">columns()</span></code> methods on a labware. These will return all wells within that row
+or column.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">row</span> <span class="o">=</span> <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+<span class="n">column</span> <span class="o">=</span> <span class="n">plate</span><span class="o">.</span><span class="n">columns</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Column &quot;1&quot; has&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">),</span> <span class="s1">&#39;wells&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Row &quot;A&quot; has&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">),</span> <span class="s1">&#39;wells&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Column</span> <span class="s2">&quot;1&quot;</span> <span class="n">has</span> <span class="mi">4</span> <span class="n">wells</span>
+<span class="n">Row</span> <span class="s2">&quot;A&quot;</span> <span class="n">has</span> <span class="mi">6</span> <span class="n">wells</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">rows()</span></code> or <code class="docutils literal notranslate"><span class="pre">cols()</span></code> methods can be used in combination with the
+<code class="docutils literal notranslate"><span class="pre">wells()</span></code> method to access wells within that row or column. In the example
+below, both lines refer to well <code class="docutils literal notranslate"><span class="pre">&quot;A1&quot;</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plate</span><span class="o">.</span><span class="n">cols</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+<span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The example above works but is a little convoluted. If you can, always get
+individual wells like A1 with <code class="docutils literal notranslate"><span class="pre">wells(&quot;A1&quot;)</span></code> or <code class="docutils literal notranslate"><span class="pre">wells(0)</span></code></p>
+</div>
+</section>
+</section>
+<section id="multiple-wells">
+<h3>Multiple Wells<a class="headerlink" href="#multiple-wells" title="Permalink to this heading">¶</a></h3>
+<p>If we had to reference each well one at a time, our protocols could get very
+long.</p>
+<p>When describing a liquid transfer, we can point to groups of wells for the
+liquid’s source and/or destination. Or, we can get a group of wells and loop
+(or iterate) through them.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Examples in this section expect the following</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">labware</span>
+
+<span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;corning_24_wellplate_3.4ml_flat&quot;</span><span class="p">,</span> <span class="n">slot</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="wells">
+<h4>Wells<a class="headerlink" href="#wells" title="Permalink to this heading">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">wells()</span></code> method can return a single well, or it can return a list of
+wells when multiple arguments are passed.</p>
+<p>Here is an example or accessing a list of wells, each specified by name:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s2">&quot;A1&quot;</span><span class="p">,</span> <span class="s2">&quot;B2&quot;</span><span class="p">,</span> <span class="s2">&quot;C3&quot;</span><span class="p">,</span> <span class="s2">&quot;D4&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">WellSeries</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">Well</span> <span class="n">A1</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B2</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C3</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">D4</span><span class="o">&gt;&gt;</span>
+</pre></div>
+</div>
+<p>Multiple wells can be treated just like a normal Python list, and can be
+iterated through:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s2">&quot;A1&quot;</span><span class="p">,</span> <span class="s2">&quot;B2&quot;</span><span class="p">,</span> <span class="s2">&quot;C3&quot;</span><span class="p">,</span> <span class="s2">&quot;D4&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Well</span> <span class="n">A1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B2</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C3</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">D3</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="wells-to">
+<h4>Wells To<a class="headerlink" href="#wells-to" title="Permalink to this heading">¶</a></h4>
+<p>Instead of having to list the name of every well, we can also create a range of
+wells with a start and end point. The first argument is the starting well, and
+the <code class="docutils literal notranslate"><span class="pre">to=</span></code> argument is the last well.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s2">&quot;A1&quot;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s2">&quot;D1&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Well</span> <span class="n">A1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">D1</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>These lists of wells can also move in the reverse direction along your labware.
+For example, setting the <code class="docutils literal notranslate"><span class="pre">to=</span></code> argument to a well that comes before the
+starting position is allowed:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s2">&quot;D1&quot;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s2">&quot;A1&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Well</span> <span class="n">D1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">A1</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="wells-length">
+<h4>Wells Length<a class="headerlink" href="#wells-length" title="Permalink to this heading">¶</a></h4>
+<p>Another way you can create a list of wells is by specifying the length of the
+well list you need, including the starting well. The example below will
+return 4 wells, starting at well <code class="docutils literal notranslate"><span class="pre">&quot;A1&quot;</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s2">&quot;A1&quot;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Well</span> <span class="n">A1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">D1</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h4>Columns and Rows<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h4>
+<p>The same arguments described above can be used with <code class="docutils literal notranslate"><span class="pre">rows()</span></code> and <code class="docutils literal notranslate"><span class="pre">cols()</span></code>
+to create lists of rows or columns.</p>
+<p>Here is an example of iterating through rows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">WellSeries</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">Well</span> <span class="n">A1</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">A2</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">A3</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">A4</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">A5</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">A6</span><span class="o">&gt;&gt;</span>
+<span class="o">&lt;</span><span class="n">WellSeries</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">Well</span> <span class="n">B1</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B2</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B3</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B4</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B5</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B6</span><span class="o">&gt;&gt;</span>
+<span class="o">&lt;</span><span class="n">WellSeries</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">Well</span> <span class="n">C1</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C2</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C3</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C4</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C5</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C6</span><span class="o">&gt;&gt;</span>
+</pre></div>
+</div>
+<p>And here is an example of iterating through columns:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">cols</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s2">&quot;6&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">WellSeries</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">Well</span> <span class="n">A1</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B1</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C1</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">D1</span><span class="o">&gt;&gt;</span>
+<span class="o">&lt;</span><span class="n">WellSeries</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">Well</span> <span class="n">A2</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B2</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C2</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">D2</span><span class="o">&gt;&gt;</span>
+<span class="o">&lt;</span><span class="n">WellSeries</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">Well</span> <span class="n">A3</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B3</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C3</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">D3</span><span class="o">&gt;&gt;</span>
+<span class="o">&lt;</span><span class="n">WellSeries</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">Well</span> <span class="n">A4</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B4</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C4</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">D4</span><span class="o">&gt;&gt;</span>
+<span class="o">&lt;</span><span class="n">WellSeries</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">Well</span> <span class="n">A5</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B5</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C5</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">D5</span><span class="o">&gt;&gt;</span>
+<span class="o">&lt;</span><span class="n">WellSeries</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">Well</span> <span class="n">A6</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">B6</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">C6</span><span class="o">&gt;&lt;</span><span class="n">Well</span> <span class="n">D6</span><span class="o">&gt;&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="slices">
+<h4>Slices<a class="headerlink" href="#slices" title="Permalink to this heading">¶</a></h4>
+<p>Labware can also be treating similarly to Python lists, and can therefore
+handle slices.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># start at index 0</span>
+<span class="c1"># slice until index 8, without including it</span>
+<span class="c1"># increment by 2</span>
+<span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">:</span><span class="mi">2</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Well</span> <span class="n">A1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">A2</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C2</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The API’s labware are also prepared to take string values for the slice’s
+<code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">stop</span></code> positions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="p">[</span><span class="s2">&quot;A1&quot;</span><span class="p">:</span><span class="s2">&quot;A2&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Well</span> <span class="n">A1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">C1</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="s2">&quot;B&quot;</span><span class="p">][</span><span class="s2">&quot;1&quot;</span><span class="p">::</span><span class="mi">2</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will print out…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Well</span> <span class="n">B1</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B3</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Well</span> <span class="n">B5</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="deprecated-labware-load-names">
+<span id="deprecated-labware"></span><h2>Deprecated Labware Load Names<a class="headerlink" href="#deprecated-labware-load-names" title="Permalink to this heading">¶</a></h2>
+<p>Prior to version <code class="docutils literal notranslate"><span class="pre">3.10.0</span></code> of the Opentrons API, we used a completely
+different set of labware load names. They will continue to work until version
+<code class="docutils literal notranslate"><span class="pre">4.0.0</span></code> is released, but they should be considered deprecated.</p>
+<p>We recommend you switch over to using the load names from the Labware Library
+as soon as possible. The following mapping can be used as a guide:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Deprecated</p></th>
+<th class="head"><p>Recommended</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">6-well-plate</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">corning_6_wellplate_16.8ml_flat</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">12-well-plate</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">corning_12_wellplate_6.9ml_flat</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">24-well-plate</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">corning_24_wellplate_3.4ml_flat</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">48-well-plate</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">corning_48_wellplate_1.6ml_flat</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">384-plate</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">corning_384_wellplate_112ul_flat</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">96-deep-well</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">usascientific_96_wellplate_2.4ml_deep</span></code></p></td>
+<td><p>This labware has square wells</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">96-flat</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">corning_96_wellplate_360ul_flat</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">96-PCR-flat</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">biorad_96_wellplate_200ul_pcr</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">96-PCR-tall</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">biorad_96_wellplate_200ul_pcr</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">alum-block-pcr-strips</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip</span></code></p></td>
+<td><p>This product has been discontinued</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">biorad-hardshell-96-PCR</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">biorad_96_wellplate_200ul_pcr</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">opentrons-aluminum-block-2ml-eppendorf</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_24_aluminumblock_generic_2ml_screwcap</span></code></p></td>
+<td><p>Opentrons Aluminum Block Set</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">opentrons-aluminum-block-2ml-screwcap</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_24_aluminumblock_generic_2ml_screwcap</span></code></p></td>
+<td><p>Opentrons Aluminum Block Set</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">opentrons-aluminum-block-96-PCR-plate</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_96_aluminumblock_biorad_wellplate_200ul</span></code></p></td>
+<td><p>Opentrons Aluminum Block Set</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">opentrons-aluminum-block-PCR-strips-200ul</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_96_aluminumblock_generic_pcr_strip_200ul</span></code></p></td>
+<td><p>Opentrons Aluminum Block Set</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">opentrons-tiprack-300ul</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_96_tiprack_300ul</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">opentrons-tuberack-1.5ml-eppendorf</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap</span></code></p></td>
+<td><p>Opentrons 4-in-1 Tube Rack Set</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">opentrons-tuberack-15_50ml</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical</span></code></p></td>
+<td><p>Opentrons 4-in-1 Tube Rack Set</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">opentrons-tuberack-15ml</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_15_tuberack_falcon_15ml_conical</span></code></p></td>
+<td><p>Opentrons 4-in-1 Tube Rack Set</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">opentrons-tuberack-2ml-eppendorf</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap</span></code></p></td>
+<td><p>Opentrons 4-in-1 Tube Rack Set</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">opentrons-tuberack-2ml-screwcap</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_24_tuberack_generic_2ml_screwcap</span></code></p></td>
+<td><p>Opentrons 4-in-1 Tube Rack Set</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">opentrons-tuberack-50ml</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_6_tuberack_falcon_50ml_conical</span></code></p></td>
+<td><p>Opentrons 4-in-1 Tube Rack Set</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PCR-strip-tall</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_96_aluminumblock_generic_pcr_strip_200ul</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tiprack-10ul</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_96_tiprack_10ul</span></code></p></td>
+<td><p>If possible, please use an Opentrons tip rack rather than a rack with a slot adapter</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tiprack-200ul</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tipone_96_tiprack_200ul</span></code></p></td>
+<td><p>If possible, please use an Opentrons tip rack rather than a rack with a slot adapter</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tiprack-1000ul</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_96_tiprack_1000ul</span></code></p></td>
+<td><p>If possible, please use an Opentrons tip rack rather than a rack with a slot adapter</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">trash-box</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">agilent_1_reservoir_290ml</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">trash-box</span></code> is no longer supported; we recommend using a 1-well reservoir for liquid trash</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">trough-12row</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">usascientific_12_reservoir_22ml</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tube-rack-.75ml</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic</span></code></p></td>
+<td><p>Discontinued; please upgrade to the Opentrons 4-in-1 Tube Rack Set</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tube-rack-2ml</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic</span></code></p></td>
+<td><p>Discontinued; please upgrade to the Opentrons 4-in-1 Tube Rack Set</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tube-rack-15_50ml</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic</span></code></p></td>
+<td><p>Discontinued; please upgrade to the Opentrons 4-in-1 Tube Rack Set</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If your labware is missing from the list above, or you’re unsure how to
+update your protocol’s load names, please contact our support team</p>
+</div>
+<p>The following load names do not have a new definitions available, and could
+eventually be removed. They will continue to function normally for now. If you
+have any concerns about their deprecation and/or removal, please reach out!</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">24-vial-rack</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">48-vial-plate</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">5ml-3x4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">96-well-plate-20mm</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MALDI-plate</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">T25-flask</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">T75-flask</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">e-gelgol</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hampton-1ml-deep-block</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">point</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rigaku-compact-crystallization-plate</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">small_vial_rack_16x45</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">temperature-plate</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tiprack-10ul-H</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trough-12row-short</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trough-1row-25ml</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trough-1row-test</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tube-rack-2ml-9x9</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tube-rack-5ml-96</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tube-rack-80well</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">wheaton_vial_rack</span></code></p></li>
+</ul>
+</section>
+</section>
+
+
+      </div>
+    </div>
+  </div>
+  <div class="clearer"></div>
+</div>
+<footer>
+  <div class="wrapper">
+    <section class="social-signup">
+      <div class="social-links">
+        <a
+          href="https://www.facebook.com/opentronslabworks/"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Facebook"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png"
+            alt="facebook logo"
+        /></a>
+        <a
+          href="https://twitter.com/Opentrons"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Twitter"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png"
+            alt="twitter logo"
+        /></a>
+        <a
+          href="https://www.instagram.com/opentrons_/"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Instagram"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png"
+            alt="instagram logo"
+        /></a>
+        <a
+          href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Youtube"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png"
+            alt="youtube logo"
+        /></a>
+      </div>
+      <h3>Sign Up For Our Newsletter</h3>
+      <div>
+        <script charset="utf-8" type="text/javascript" src="https://js.hsforms.net/forms/v2.js"></script>
+          <script>
+            hbspt.forms.create({
+          	region: "na1",
+          	portalId: "5383285",
+          	formId: "210adc2c-072f-4c9c-a812-6367469358d5",
+          	version: "V2_PRERELEASE"
+            });
+          </script>
+      </div>
+      <p class="copyrite">
+        &#169;&nbsp;OPENTRONS
+        <script type="text/javascript">
+          document.write(new Date().getFullYear())
+        </script>
+      </p>
+    </section>
+    <section class="footer-menu">
+      <ul>
+        <li>Products</li>
+        <li><a href="https://opentrons.com/robots">OT-One</a></li>
+        <li><a href="https://opentrons.com/ot-2">OT-2</a></li>
+        <li><a href="https://opentrons.com/pipettes">OT-2 Pipettes</a></li>
+        <li><a href="https://opentrons.com/modules">Modules</a></li>
+        <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+        <li>
+          <a href="https://protocols.opentrons.com/" target="_blank"
+            >Protocol Library</a
+          >
+        </li>
+      </ul>
+      <ul>
+        <li>Company</li>
+        <li><a href="https://opentrons.com/about">About</a></li>
+        <li><a href="https://opentrons.com/team">Team</a></li>
+        <li><a href="https://blog.opentrons.com/">Blog</a></li>
+        <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+        <li>
+          <a href="https://opentrons.com/jobs" target="_blank" class="hiring"
+            >WE'RE HIRING</a
+          >
+        </li>
+      </ul>
+      <ul>
+        <li>Resources</li>
+        <li>
+          <a href="https://support.opentrons.com" target="_blank">Support</a>
+        </li>
+        <li>
+          <a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a>
+        </li>
+        <li>
+          <a
+            href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md"
+            target="_blank"
+            >Open Source</a
+          >
+        </li>
+      </ul>
+      <ul>
+        <li><a href="https://shop.opentrons.com/" class="buy">Buy</a></li>
+      </ul>
+    </section>
+  </div>
+</footer>
+<script>
+  ;(function(w, d, s, l, i) {
+    w[l] = w[l] || []
+    w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
+    var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s),
+      dl = l != 'dataLayer' ? '&l=' + l : ''
+    j.async = true
+    j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
+    f.parentNode.insertBefore(j, f)
+  })(window, document, 'script', 'dataLayer', 'GTM-WCDX9CX')
+</script>
+<script>
+  function toggleMenu(menu) {
+    var element = document.querySelector(`#${menu}`)
+    var elementList = document.querySelectorAll('.navbar-ul')
+    elementList.forEach(e => {
+      if (e !== element) {
+        e.previousElementSibling.classList.add('notActive')
+        e.classList.add('visible')
+      }
+    })
+    if (!element.classList.contains('visible')) {
+      element.classList.add('visible')
+      elementList.forEach(e => {
+        e.previousElementSibling.classList.remove('notActive')
+      })
+    } else {
+      element.classList.remove('visible')
+      element.previousElementSibling.classList.remove('notActive')
+    }
+  }
+  function close() {
+    var elementList = document.querySelectorAll('.navbar-ul')
+    var subMenu = document.querySelectorAll('.sub-menu')
+    elementList.forEach(e => {
+      e.classList.add('visible')
+      e.previousElementSibling.classList.remove('notActive')
+    })
+    subMenu.forEach(e => {
+      e.classList.remove('showmenu')
+      console.dir(e)
+    })
+  }
+  function toggleOpen() {
+    var mobile = document.querySelector('.mobile-hamburger')
+    var mobileMenu = document.querySelector('.mobile-menu')
+    var subMenu = document.querySelectorAll('.sub-menu')
+    if (mobileMenu.classList.contains('dnone')) {
+      mobileMenu.classList.remove('dnone')
+    } else {
+      mobileMenu.classList.add('dnone')
+    }
+    subMenu.forEach(e => {
+      if (e.classList.contains('showmenu')) {
+        e.classList.remove('showmenu')
+      }
+    })
+    mobile.classList.toggle('open')
+    document.body.classList.toggle('mobile-scrolling')
+  }
+  function showMenu(menu) {
+    var element = document.querySelector(`.sub-menu-${menu}`)
+    if (element.classList.contains('showmenu')) {
+      element.classList.remove('showmenu')
+    } else {
+      element.classList.add('showmenu')
+    }
+  }
+  function closeMenu() {
+    var element = document.querySelectorAll('.sub-menu')
+    element.forEach(e => {
+      if (e.classList.contains('showmenu')) {
+        e.classList.remove('showmenu')
+      }
+    })
+  }
+  var navbar = document.querySelector('.navbar-menu')
+  document.addEventListener('click', function(event) {
+    var isClickInside = navbar.contains(event.target)
+    if (!isClickInside && window.innerWidth >= 1024) {
+      close()
+    }
+  })
+</script>
+
+ 
+  </body>
+</html>

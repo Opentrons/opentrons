@@ -1,29 +1,28 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 
-import { Flex, SPACING, DIRECTION_ROW } from '@opentrons/components'
+import { DIRECTION_ROW, Flex, SPACING } from '@opentrons/components'
 
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
-
-import { getLocalRobot } from '/app/redux/discovery'
+import { MediumButton } from '/app/atoms/buttons'
 import {
-  getRobotUpdateAvailable,
-  clearRobotUpdateSession,
-} from '/app/redux/robot-update'
-import { UNREACHABLE } from '/app/redux/discovery/constants'
+  CheckUpdates,
+  ErrorUpdateSoftware,
+  NoUpdateFound,
+  UpdateRobotSoftware,
+} from '/app/organisms/UpdateRobotSoftware'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '/app/redux/config'
-import { MediumButton } from '/app/atoms/buttons'
+import { getLocalRobot } from '/app/redux/discovery'
+import { UNREACHABLE } from '/app/redux/discovery/constants'
 import {
-  UpdateRobotSoftware,
-  CheckUpdates,
-  NoUpdateFound,
-  ErrorUpdateSoftware,
-} from '/app/organisms/UpdateRobotSoftware'
+  clearRobotUpdateSession,
+  getRobotUpdateAvailable,
+} from '/app/redux/robot-update'
+import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 
 import type { Dispatch, State } from '/app/redux/types'
 
