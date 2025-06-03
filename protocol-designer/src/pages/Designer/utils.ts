@@ -259,9 +259,9 @@ const getLabwareInfo = (
 
 export const useLabwareDropdownOptions = (
   type: 'moveLabware' | 'labware',
-  usingGripper: boolean
+  useGripper: boolean
 ): DropdownOption[] => {
-  const { t } = useTranslation('protocol_steps')
+  const { t } = useTranslation('shared')
   const labwareEntities = useSelector(getLabwareEntities)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const { labware: deckSetupLabware } = activeDeckSetup
@@ -287,7 +287,7 @@ export const useLabwareDropdownOptions = (
       )
       const labwareStackLength = labwareStack.length - 1
       const allowStacking = def.stackLimit != null && def.stackLimit > 1
-      const showStackOption = !usingGripper && type === 'moveLabware'
+      const showStackOption = !useGripper && type === 'moveLabware'
 
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
       const isBottomOfStack =
@@ -307,7 +307,9 @@ export const useLabwareDropdownOptions = (
         robotType
       )
       const isTiprack = getIsTiprack(def)
-      const isOffDeck = deckSlot === 'offDeck'
+      const isFilterOffDeck =
+        deckSlot === 'offDeck' &&
+        (type === 'labware' || (type === 'moveLabware' && useGripper))
 
       //  show full stack option if moving labware manually
       const bottomOfStackOption: DropdownOption | null =
@@ -322,7 +324,7 @@ export const useLabwareDropdownOptions = (
         isAdapter ||
         isLabwareInWasteChute ||
         (type === 'labware' && isTiprack) ||
-        isOffDeck ||
+        isFilterOffDeck ||
         !isTopOfStack
           ? acc
           : [
