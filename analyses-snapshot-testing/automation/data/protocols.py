@@ -1054,29 +1054,29 @@ class Protocols:
         robot="OT2",
     )
 
-    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P50_8ch_None_HappyPath_transfer_all3.py
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P50_8ch_None_HappyPath_transfer_all3.py
     # changed to
-    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P50_8ch_None_HappyPath_all3_liquid.py
-    Flex_S_v2_23_P50_8ch_None_HappyPath_all3_liquid: Protocol = Protocol(
-        file_stem="Flex_S_v2_23_P50_8ch_None_HappyPath_all3_liquid",
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P50_8ch_None_HappyPath_all3_liquid.py
+    Flex_S_v2_24_P50_8ch_None_HappyPath_all3_liquid: Protocol = Protocol(
+        file_stem="Flex_S_v2_24_P50_8ch_None_HappyPath_all3_liquid",
         file_extension="py",
         robot="Flex",
     )
 
-    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P50_P1000_HappyPath_transfer_all3.py
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P50_P1000_HappyPath_transfer_all3.py
     # changed to
-    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P50_P1000_HappyPath_all3_liquid.py
-    Flex_S_v2_23_P50_P1000_HappyPath_all3_liquid: Protocol = Protocol(
-        file_stem="Flex_S_v2_23_P50_P1000_HappyPath_all3_liquid",
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P50_P1000_HappyPath_all3_liquid.py
+    Flex_S_v2_24_P50_P1000_HappyPath_all3_liquid: Protocol = Protocol(
+        file_stem="Flex_S_v2_24_P50_P1000_HappyPath_all3_liquid",
         file_extension="py",
         robot="Flex",
     )
 
-    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P50_8ch_None_HappyPath_transfer_all3_exceeds.py
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P50_8ch_None_HappyPath_transfer_all3_exceeds.py
     # changed to
-    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P50_8ch_None_HappyPath_all3_liquid_exceeds.py
-    Flex_S_v2_23_P50_8ch_None_HappyPath_all3_liquid_exceeds: Protocol = Protocol(
-        file_stem="Flex_S_v2_23_P50_8ch_None_HappyPath_all3_liquid_exceeds",
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P50_8ch_None_HappyPath_all3_liquid_exceeds.py
+    Flex_S_v2_24_P50_8ch_None_HappyPath_all3_liquid_exceeds: Protocol = Protocol(
+        file_stem="Flex_S_v2_24_P50_8ch_None_HappyPath_all3_liquid_exceeds",
         file_extension="py",
         robot="Flex",
     )

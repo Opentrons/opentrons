@@ -108,9 +108,9 @@ class ProtocolsWithOverrides:
         ],
     )
 
-    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_96_HappyPath_Overrides_transfer_liquid.py
-    Flex_S_v2_23_96_HappyPath_Overrides_transfer_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
-        file_stem="Flex_S_v2_23_96_HappyPath_Overrides_transfer_liquid",
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid.py
+    Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid",
         file_extension="py",
         robot="Flex",
         override_variable_name="key",
@@ -131,10 +131,10 @@ class ProtocolsWithOverrides:
         ],
     )
 
-    # Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid.py
+    # Flex_S_v2_24_96_HappyPath_Overrides_distribute_liquid.py
     # https://opentrons.atlassian.net/browse/AUTH-1619 - closed
-    Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
-        file_stem="Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid",
+    Flex_S_v2_24_96_HappyPath_Overrides_distribute_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_96_HappyPath_Overrides_distribute_liquid",
         file_extension="py",
         robot="Flex",
         override_variable_name="key",
@@ -153,10 +153,10 @@ class ProtocolsWithOverrides:
         ],
     )
 
-    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_96_HappyPath_Overrides_consolidate_liquid.py
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_96_HappyPath_Overrides_consolidate_liquid.py
 
-    Flex_S_v2_23_96_HappyPath_Overrides_consolidate_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
-        file_stem="Flex_S_v2_23_96_HappyPath_Overrides_consolidate_liquid",
+    Flex_S_v2_24_96_HappyPath_Overrides_consolidate_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_96_HappyPath_Overrides_consolidate_liquid",
         file_extension="py",
         robot="Flex",
         override_variable_name="key",
@@ -176,10 +176,10 @@ class ProtocolsWithOverrides:
         ],
     )
 
-    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_transfer_liquid.py
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_transfer_liquid.py
 
-    Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_transfer_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
-        file_stem="Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_transfer_liquid",
+    Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_transfer_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_transfer_liquid",
         file_extension="py",
         robot="Flex",
         override_variable_name="key",
@@ -193,10 +193,10 @@ class ProtocolsWithOverrides:
         ],
     )
 
-    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid.py
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid.py
 
-    Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
-        file_stem="Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid",
+    Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid",
         file_extension="py",
         robot="Flex",
         override_variable_name="key",
@@ -210,10 +210,10 @@ class ProtocolsWithOverrides:
         ],
     )
 
-    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_distribute_liquid.py
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_distribute_liquid.py
     # https://opentrons.atlassian.net/browse/AUTH-1602 - closed
-    Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_distribute_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
-        file_stem="Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_distribute_liquid",
+    Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_distribute_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_distribute_liquid",
         file_extension="py",
         robot="Flex",
         override_variable_name="key",
