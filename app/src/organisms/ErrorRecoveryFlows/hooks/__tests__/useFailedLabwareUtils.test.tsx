@@ -194,7 +194,7 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
 
     const retrieveErrorKinds = [
       ['flexStacker/retrieve', DEFINED_ERROR_TYPES.HOPPER_LABWARE_MISSING],
-      ['flexStacker/retrieve', DEFINED_ERROR_TYPES.SHUTTLE_MISSING],
+      ['flexStacker/retrieve', DEFINED_ERROR_TYPES.STACKER_SHUTTLE_MISSING],
       ['flexStacker/retrieve', DEFINED_ERROR_TYPES.STACKER_STALL],
     ]
 
@@ -336,9 +336,9 @@ describe('getFailedLabwareQuantity', () => {
 
   it('should return the quantity for stacker error kinds', () => {
     const errors = [
-      ERROR_KINDS.SHUTTLE_MISSING,
-      ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
-      ERROR_KINDS.STALL_WHILE_STACKING,
+      ERROR_KINDS.STACKER_SHUTTLE_MISSING,
+      ERROR_KINDS.STACKER_HOPPER_EMPTY,
+      ERROR_KINDS.STACKER_STALLED,
     ]
     errors.forEach(errorType => {
       const failedLocalRetriveCommand = {
@@ -405,9 +405,9 @@ describe('getFailedLabwareQuantity', () => {
 
   it('should return the quantity for stacker error kinds based on result property', () => {
     const errors = [
-      ERROR_KINDS.SHUTTLE_MISSING,
-      ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
-      ERROR_KINDS.STALL_WHILE_STACKING,
+      ERROR_KINDS.STACKER_SHUTTLE_MISSING,
+      ERROR_KINDS.STACKER_HOPPER_EMPTY,
+      ERROR_KINDS.STACKER_STALLED,
     ]
     errors.forEach(errorType => {
       const failedLocalRetriveCommand = {
@@ -487,7 +487,7 @@ describe('getFailedLabwareQuantity', () => {
     const result = getFailedLabwareQuantity(
       emptyRunCommands,
       failedRetriveCommand,
-      ERROR_KINDS.STALL_WHILE_STACKING
+      ERROR_KINDS.STACKER_STALLED
     )
     expect(result).toEqual(0)
   })
@@ -496,7 +496,7 @@ describe('getFailedLabwareQuantity', () => {
     const result = getFailedLabwareQuantity(
       undefined,
       failedRetriveCommand,
-      ERROR_KINDS.STALL_WHILE_STACKING
+      ERROR_KINDS.STACKER_STALLED
     )
     expect(result).toBeNull()
   })
@@ -569,7 +569,7 @@ describe('useRelevantFailedLwLocations', () => {
         failedLabware: mockFailedLabware,
         failedCommandByRunRecord: mockFailedCommand,
         runRecord: mockRunRecord,
-        errorKind: ERROR_KINDS.STALL_WHILE_STACKING,
+        errorKind: ERROR_KINDS.STACKER_STALLED,
       })
     )
 

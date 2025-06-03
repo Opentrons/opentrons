@@ -4,6 +4,7 @@ import { BlowOut } from '../QuickTransferAdvancedSettings/BlowOut'
 import { Delay } from '../QuickTransferAdvancedSettings/Delay'
 import { FlowRateEntry } from '../QuickTransferAdvancedSettings/FlowRate'
 import { Mix } from '../QuickTransferAdvancedSettings/Mix'
+import { PushOut } from '../QuickTransferAdvancedSettings/PushOut'
 import { Retract } from '../QuickTransferAdvancedSettings/Retract'
 import { Submerge } from '../QuickTransferAdvancedSettings/Submerge'
 import { TipPositionEntry } from '../QuickTransferAdvancedSettings/TipPosition'
@@ -35,6 +36,7 @@ const SettingComponentMap: Partial<
   [SETTING_OPTIONS.DISPENSE_BLOW_OUT]: BlowOut,
   [SETTING_OPTIONS.DISPENSE_SUBMERGE]: Submerge,
   [SETTING_OPTIONS.DISPENSE_RETRACT]: Retract,
+  [SETTING_OPTIONS.DISPENSE_PUSH_OUT]: PushOut,
 }
 
 interface DispenseSettingDetailProps extends Omit<CommonSettingProps, 'kind'> {

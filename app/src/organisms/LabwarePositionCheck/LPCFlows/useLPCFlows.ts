@@ -5,10 +5,9 @@ import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
-import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   useCreateTargetedMaintenanceRunMutation,
@@ -158,14 +157,12 @@ export function useLPCFlows({
     if (!isLaunching) {
       analytics.reportLaunchLpcWizard()
       setIsLaunching(true)
-      const labwareOffsets = getRelevantOffsets(
-        robotType,
-        ot2Offsets,
-        flexOffsets ?? []
-      )
-      const createRunData = labwareOffsets != null ? { labwareOffsets } : {}
+      // Inject OT-2 offsets into the maintenance run upon creation.
+      // The Flex injects offsets directly in LPC commands and therefore should not load them into the maintenance run.
+      const injectedOffsets =
+        robotType === OT2_ROBOT_TYPE ? { labwareOffsets: ot2Offsets } : {}
 
-      return createTargetedMaintenanceRun(createRunData).then(
+      return createTargetedMaintenanceRun(injectedOffsets).then(
         maintenanceRun => {
           setMaintenanceRunId(maintenanceRun.data.id)
         }

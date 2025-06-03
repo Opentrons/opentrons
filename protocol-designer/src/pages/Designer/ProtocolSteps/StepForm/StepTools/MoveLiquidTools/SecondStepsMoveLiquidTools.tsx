@@ -321,39 +321,47 @@ export const SecondStepsMoveLiquidTools = ({
           showTooltip={false}
           formData={formData}
         />
-        <Divider marginY="0" />
         {hideWellOrderField ? null : (
-          <WellsOrderField
-            prefix={tab}
-            updateFirstWellOrder={
-              propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
-            }
-            updateSecondWellOrder={
-              propsForFields[addFieldNamePrefix('wellOrder_second')].updateValue
-            }
-            firstValue={formData[addFieldNamePrefix('wellOrder_first')]}
-            secondValue={formData[addFieldNamePrefix('wellOrder_second')]}
-            firstName={addFieldNamePrefix('wellOrder_first')}
-            secondName={addFieldNamePrefix('wellOrder_second')}
-          />
+          <>
+            <Divider marginY="0" />
+            <WellsOrderField
+              prefix={tab}
+              updateFirstWellOrder={
+                propsForFields[addFieldNamePrefix('wellOrder_first')]
+                  .updateValue
+              }
+              updateSecondWellOrder={
+                propsForFields[addFieldNamePrefix('wellOrder_second')]
+                  .updateValue
+              }
+              firstValue={formData[addFieldNamePrefix('wellOrder_first')]}
+              secondValue={formData[addFieldNamePrefix('wellOrder_second')]}
+              firstName={addFieldNamePrefix('wellOrder_first')}
+              secondName={addFieldNamePrefix('wellOrder_second')}
+            />
+          </>
         )}
-        <Divider marginY="0" />
-        <PositionField
-          prefix={tab}
-          propsForFields={propsForFields}
-          zField={`${tab}_mmFromBottom`}
-          xField={`${tab}_x_position`}
-          yField={`${tab}_y_position`}
-          labwareId={
-            formData[
-              getLabwareFieldForPositioningField(
-                addFieldNamePrefix('mmFromBottom')
-              )
-            ]
-          }
-          referenceField={`${tab}_position_reference`}
-        />
-        {enableLiquidClasses ? (
+        {isDestinationTrash ? null : (
+          <>
+            <Divider marginY="0" />
+            <PositionField
+              prefix={tab}
+              propsForFields={propsForFields}
+              zField={`${tab}_mmFromBottom`}
+              xField={`${tab}_x_position`}
+              yField={`${tab}_y_position`}
+              labwareId={
+                formData[
+                  getLabwareFieldForPositioningField(
+                    addFieldNamePrefix('mmFromBottom')
+                  )
+                ]
+              }
+              referenceField={`${tab}_position_reference`}
+            />
+          </>
+        )}
+        {enableLiquidClasses && !isDestinationTrash ? (
           <>
             <Divider marginY="0" />
             <MultiInputField
@@ -411,6 +419,7 @@ export const SecondStepsMoveLiquidTools = ({
               toggleUpdateValue={propsForFields.preWetTip.updateValue}
               toggleElement="checkbox"
               tooltipContent={propsForFields.preWetTip.tooltipContent ?? null}
+              isDisabled={propsForFields.preWetTip.disabled}
             />
           ) : null}
           {tab === 'aspirate' ? (

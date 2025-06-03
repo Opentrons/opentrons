@@ -31,6 +31,7 @@ interface InitialSummaryStateProps {
     volume: number
     path: PathOption
     liquidClass: LiquidClass
+    pushOut: boolean
   }
   deckConfig: DeckConfiguration
 }
@@ -103,5 +104,6 @@ export function getInitialSummaryState(
     changeTip,
     dropTipLocation: trashConfigCutout,
     liquidClass: state.liquidClass,
+    pushOut: state.pushOut,
   }
 }

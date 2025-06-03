@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
 
-import { SPACING } from '@opentrons/components'
+import { AnimationVideo, SPACING } from '@opentrons/components'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import attachLeft18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
@@ -78,7 +78,7 @@ export function getPipetteAnimations(
   }
 
   return (
-    <video
+    <AnimationVideo
       css={css`
         padding-top: ${SPACING.spacing4};
         width: 100%;
@@ -87,10 +87,6 @@ export function getPipetteAnimations(
           ? `18rem`
           : `12rem`};
       `}
-      autoPlay={true}
-      muted={true}
-      loop={true}
-      controls={false}
       data-testid={
         section === SECTIONS.ATTACH_PROBE || section === SECTIONS.DETACH_PROBE
           ? sourceProbe
@@ -104,7 +100,7 @@ export function getPipetteAnimations(
             : sourcePipette
         }
       />
-    </video>
+    </AnimationVideo>
   )
 }
 
@@ -128,19 +124,15 @@ export function getPipetteAnimations96(
     src = flowType === FLOWS.ATTACH ? zAxisAttach96 : zAxisDetach96
   }
   return (
-    <video
-      muted={true}
+    <AnimationVideo
       css={css`
         padding-top: ${SPACING.spacing4};
         max-width: 100%;
         max-height: 12rem;
       `}
-      autoPlay={true}
-      loop={true}
-      controls={false}
       data-testid={src}
     >
       <source src={src} />
-    </video>
+    </AnimationVideo>
   )
 }

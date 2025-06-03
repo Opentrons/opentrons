@@ -317,6 +317,20 @@ export const retractBelowAspirate = (): CommandCreatorError => {
   }
 }
 
+export const submergeBelowDispense = (): CommandCreatorError => {
+  return {
+    type: 'SUBMERGE_BELOW_DISPENSE',
+    message: 'The submerge position must be above the dispense position',
+  }
+}
+
+export const retractBelowDispense = (): CommandCreatorError => {
+  return {
+    type: 'RETRACT_BELOW_DISPENSE',
+    message: 'The retract position must be above the dispense position',
+  }
+}
+
 export const multiDispenseValuesNotFound = (): CommandCreatorError => {
   return {
     type: 'MULTI_DISPENSE_VALUES_NOT_FOUND',

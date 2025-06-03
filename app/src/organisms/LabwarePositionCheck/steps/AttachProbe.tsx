@@ -1,8 +1,8 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import styled from 'styled-components'
+import { css } from 'styled-components'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { AnimationVideo, LegacyStyledText } from '@opentrons/components'
 
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
@@ -78,10 +78,8 @@ export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
             />
           }
         />
-        <StyledVideo
-          autoPlay
-          loop
-          controls={false}
+        <AnimationVideo
+          css={VIDEO_STYLE}
           src={probeVideo()}
           data-testid="probe-video"
         />
@@ -90,7 +88,7 @@ export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
   )
 }
 
-const StyledVideo = styled.video`
+const VIDEO_STYLE = css`
   height: 100%;
   width: 100%;
 `

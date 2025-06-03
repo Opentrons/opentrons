@@ -25,13 +25,13 @@ export function useErrorName(errorKind: ErrorKind): string {
       return t('gripper_error')
     case ERROR_KINDS.STALL_OR_COLLISION:
       return t('stall_or_collision_error')
-    case ERROR_KINDS.STALL_WHILE_STACKING:
+    case ERROR_KINDS.STACKER_STALLED:
       return t('stacker_stall_or_collision_error')
-    case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
+    case ERROR_KINDS.STACKER_HOPPER_EMPTY:
       return t('stacker_empty')
-    case ERROR_KINDS.SHUTTLE_MISSING:
+    case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
       return t('shuttle_missing')
-    case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
+    case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
       return t('labware_not_retrieved')
     default:
       return t('error')
