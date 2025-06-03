@@ -377,16 +377,39 @@ export const savedStepForms = (
       const prevInitialDeckSetupStep =
         savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       const locationUpdate = `${name}LocationUpdate`
-      return {
-        ...savedStepForms,
-        [INITIAL_DECK_SETUP_STEP_ID]: {
-          ...prevInitialDeckSetupStep,
-          [locationUpdate]: {
-            ...prevInitialDeckSetupStep[locationUpdate],
-            [id]: location,
-          },
-        },
-      }
+      return mapValues(
+        savedStepForms,
+        (form: FormData): FormData => {
+          if (form.stepType === 'manualIntervention') {
+            return {
+              ...form,
+              [INITIAL_DECK_SETUP_STEP_ID]: {
+                ...prevInitialDeckSetupStep,
+                [locationUpdate]: {
+                  ...prevInitialDeckSetupStep[locationUpdate],
+                  [id]: location,
+                },
+              },
+            }
+          } else if (
+            form.dropTip_location == null &&
+            (name === 'trashBin' || name === 'wasteChute')
+          ) {
+            return {
+              ...form,
+              ...handleFormChange(
+                {
+                  dropTip_location: id,
+                },
+                form,
+                _getPipetteEntitiesRootState(rootState),
+                _getLabwareEntitiesRootState(rootState)
+              ),
+            }
+          }
+          return form
+        }
+      )
     }
     case 'DELETE_DECK_FIXTURE': {
       const { id } = action.payload
