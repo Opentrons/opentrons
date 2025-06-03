@@ -93,6 +93,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     aspirateZOffset,
     blowoutFlowRateUlSec,
     blowoutLocation,
+    blowoutOffsetFromTopMm,
     changeTip,
     conditioningVolume,
     destLabware,
@@ -142,6 +143,12 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const isMultiChannelPipette =
     invariantContext.pipetteEntities[pipette]?.spec.channels !== 1
 
+  const aspirateAirGapVolume = args.aspirateAirGapVolume ?? 0
+  const dispenseAirGapVolume = args.dispenseAirGapVolume ?? 0
+  const disposalVolume =
+    args.disposalVolume != null && args.disposalVolume > 0
+      ? args.disposalVolume
+      : 0
   // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (
     prevRobotState.pipettes[pipette] == null ||
@@ -198,7 +205,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
       })
     )
   }
-  const { def: tiprackDefinition, labwareDefURI: tiprackDefUri } = tiprack ?? {}
+  const { def: tiprackDefinition = null, labwareDefURI: tiprackDefUri } =
+    tiprack ?? {}
   const {
     spec: pipetteSpecs,
     name: pipetteName,
@@ -214,7 +222,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)?.multiDispense
   const { multiWellHandling } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
-    tiprackDefinition: tiprackDefinition ?? null,
+    tiprackDefinition,
     volume,
     path: 'multiDispense',
     numDispenseWells: destWells.length,
@@ -222,6 +230,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       []) as Array<[number, number]>,
     disposalByVolume: (multiDispenseValuesForTip?.disposalByVolume ??
       []) as Array<[number, number]>,
+    aspirateAirGap: aspirateAirGapVolume,
   })
   const { numWellsToFitInTip } = multiWellHandling
 
@@ -290,11 +299,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
   ) {
     errors.push(errorCreators.retractBelowAspirate())
   }
-  if (errors.length > 0)
-    return {
-      errors,
-    }
-
   const moveToSourceWellTopCommand = [
     curryCommandCreator(moveToWell, {
       pipetteId: pipette,
@@ -304,12 +308,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
     }),
   ]
 
-  const aspirateAirGapVolume = args.aspirateAirGapVolume ?? 0
-  const dispenseAirGapVolume = args.dispenseAirGapVolume ?? 0
-  const disposalVolume =
-    args.disposalVolume != null && args.disposalVolume > 0
-      ? args.disposalVolume
-      : 0
   const maxVolume =
     getPipetteWithTipMaxVol(pipette, invariantContext, tipRack) -
     aspirateAirGapVolume
@@ -317,17 +315,20 @@ export const distribute: CommandCreator<DistributeArgs> = (
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol
-    return {
-      errors: [
-        errorCreators.pipetteVolumeExceeded({
-          actionName,
-          volume,
-          maxVolume,
-          disposalVolume,
-        }),
-      ],
-    }
+    errors.push(
+      errorCreators.pipetteVolumeExceeded({
+        actionName,
+        volume,
+        maxVolume,
+        disposalVolume,
+      })
+    )
   }
+  if (errors.length > 0)
+    return {
+      errors,
+    }
+
   const aspirateSubmergeLocation: WellLocation = {
     origin:
       POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN[
@@ -878,6 +879,19 @@ export const distribute: CommandCreator<DistributeArgs> = (
             ]
           } else if (blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION) {
             advancedDispenseArgsCommands = [
+              curryCommandCreator(moveToWell, {
+                pipetteId: pipette,
+                labwareId: destLabware,
+                wellName: destinationWell,
+                wellLocation: {
+                  origin: WELL_ORIGIN_TOP,
+                  offset: {
+                    x: 0,
+                    y: 0,
+                    z: blowoutOffsetFromTopMm,
+                  },
+                },
+              }),
               ...blowoutInPlaceCommand,
               ...getTouchTipAfterDispenseRetractCommands(true),
               ...getAirGapAfterDispenseCommands(true),
@@ -895,6 +909,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 wellName: sourceWell,
                 wellLocation: {
                   origin: WELL_ORIGIN_TOP,
+                  offset: {
+                    x: 0,
+                    y: 0,
+                    z: blowoutOffsetFromTopMm,
+                  },
                 },
               }),
               ...blowoutInPlaceCommand,

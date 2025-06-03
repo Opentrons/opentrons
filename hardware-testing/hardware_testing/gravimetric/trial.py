@@ -1,6 +1,6 @@
 """Dataclass that describes the arguments for trials."""
 from dataclasses import dataclass
-from typing import List, Optional, Union, Dict
+from typing import List, Optional, Dict
 from . import config
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 from .measurement.record import GravimetricRecorder
@@ -48,19 +48,10 @@ class GravimetricTrial(VolumetricTrial):
 
 
 @dataclass
-class PhotometricTrial(VolumetricTrial):
-    """All the arguments for a single photometric trial."""
-
-    source: Well
-    dest: Labware
-    cfg: config.PhotometricConfig
-
-
-@dataclass
 class TrialOrder:
     """A list of all of the trials that a particular QC run needs to run."""
 
-    trials: List[Union[GravimetricTrial, PhotometricTrial]]
+    trials: List[GravimetricTrial]
 
 
 @dataclass
@@ -177,56 +168,6 @@ def build_gravimetric_trials(
                             mode=cfg.mode,
                         )
                     )
-    return trial_list
-
-
-def build_photometric_trials(
-    ctx: ProtocolContext,
-    test_report: CSVReport,
-    pipette: InstrumentContext,
-    sources: List[Well],
-    dest: Labware,
-    test_volumes: List[float],
-    liquid_tracker: LiquidTracker,
-    cfg: config.PhotometricConfig,
-    env_sensor: asair_sensor.AsairSensorBase,
-) -> Dict[float, List[PhotometricTrial]]:
-    """Build a list of all the trials that will be run."""
-    trial_list: Dict[float, List[PhotometricTrial]] = {vol: [] for vol in test_volumes}
-    total_trials = len(test_volumes) * cfg.trials
-    trials_per_src = int(total_trials / len(sources))
-    sources_per_trials = [src for src in sources for _ in range(trials_per_src)]
-    print("sources per trial")
-    print(sources_per_trials)
-    for volume in test_volumes:
-        for trial in range(cfg.trials):
-            d: Optional[float] = None
-            cv: Optional[float] = None
-            if not cfg.increment:
-                d, cv = config.QC_TEST_MIN_REQUIREMENTS[cfg.pipette_channels][
-                    cfg.pipette_volume
-                ][cfg.tip_volume][volume]
-                d = d * (1 - config.QC_TEST_SAFETY_FACTOR)
-                cv = cv * (1 - config.QC_TEST_SAFETY_FACTOR)
-            trial_list[volume].append(
-                PhotometricTrial(
-                    ctx=ctx,
-                    test_report=test_report,
-                    pipette=pipette,
-                    source=sources_per_trials.pop(0),
-                    dest=dest,
-                    tip_volume=cfg.tip_volume,
-                    channel_count=cfg.pipette_channels,
-                    volume=volume,
-                    trial=trial,
-                    liquid_tracker=liquid_tracker,
-                    cfg=cfg,
-                    mix=cfg.mix,
-                    acceptable_cv=cv,
-                    acceptable_d=d,
-                    env_sensor=env_sensor,
-                )
-            )
     return trial_list
 
 

@@ -389,7 +389,7 @@ export const moveLiquidFormToArgs = (
     dispenseRetractYOffset: hydratedFormData.dispense_retract_y_position ?? 0,
     dispenseRetractZOffset: hydratedFormData.dispense_retract_mmFromBottom ?? 0,
     dispenseRetractPositionReference:
-      hydratedFormData.dispense_position_reference,
+      hydratedFormData.dispense_retract_position_reference,
     dispenseRetractXOffset: hydratedFormData.dispense_retract_x_position ?? 0,
     pushOut: pushOut_checkbox ? pushOut_volume : 0,
     liquidClass:
