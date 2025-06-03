@@ -11,10 +11,7 @@ import {
   SPACING,
   SPACING_AUTO,
 } from '@opentrons/components'
-import {
-  getSchema2CornerOffsetFromSlot,
-  getSchema2Dimensions,
-} from '@opentrons/shared-data'
+import { getLabwareViewBox } from '@opentrons/shared-data'
 
 import { labwareImages } from './labware-images'
 
@@ -35,23 +32,26 @@ export interface GalleryProps {
 export function Gallery(props: GalleryProps): JSX.Element {
   const { definition } = props
   const { parameters: params } = definition
-  const dims = getSchema2Dimensions(definition)
-  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
 
-  const xDimension =
+  const { minX, minY, xDimension, yDimension } = getLabwareViewBox(definition)
+  const xDimensionOverride =
     params.loadName === 'opentrons_universal_flat_adapter'
       ? UNIVERSAL_FLAT_ADAPTER_X_DIMENSION
-      : dims.xDimension
+      : xDimension
 
   const [currentImage, setCurrentImage] = useState<number>(0)
   const render = (
     <Box width="100%">
       <RobotWorkSpace
         key="center"
-        // TODO BEFORE MERGE
-        viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${xDimension} ${dims.yDimension}`}
+        viewBox={`${minX} ${minY} ${xDimensionOverride} ${yDimension}`}
       >
-        {() => <LabwareRender definition={definition} />}
+        {() => (
+          <LabwareRender
+            definition={definition}
+            positioningMode="passThrough"
+          />
+        )}
       </RobotWorkSpace>
     </Box>
   )
