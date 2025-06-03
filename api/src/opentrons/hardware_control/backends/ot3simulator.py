@@ -67,6 +67,7 @@ from .flex_protocol import (
     FlexBackend,
 )
 
+
 log = logging.getLogger(__name__)
 
 AXIS_TO_SUBSYSTEM = {
@@ -874,3 +875,29 @@ class OT3Simulator(FlexBackend):
 
     async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
         pass
+
+    async def read_env_temp_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+
+        return 0.0
+
+    async def read_env_hum_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+
+        return 0.0
+
+    async def read_pressure_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        return 0.0
+
+    async def read_capacitive_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        return 0.0
