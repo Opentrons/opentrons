@@ -358,197 +358,108 @@ that meet the needs of your protocol.
 
 ### Pipette calibration
 
-![image](f28efb5943e2e68b89b815a0e5e5159bec3dcd69.jpg){width="5.864583333333333in"
-height="5.895833333333333in"}
-
-The User Kit includes a metal pipette calibration probe, which you use
-during positional calibration. During protocol runs, safely store the
-probe on the magnetic holder on the front pillar of the robot. During
-the calibration process, attach the probe to the appropriate nozzle and
-lock it in place. The robot moves the probe to calibration points on the
-deck to measure the pipette's exact position.
+The User Kit includes a metal pipette calibration probe, which you use during positional calibration. During protocol runs, safely store the probe on the magnetic holder on the front pillar of the robot. During the calibration process, attach the probe to the appropriate nozzle and lock it in place. The robot moves the probe to calibration points on the deck to measure the pipette's exact position.
 
 ### Pipette tip rack adapter
 
-The Opentrons Flex 96-channel pipette ships with four tip rack adapters.
-These are precision formed aluminum brackets that you place on the deck.
-The adapters hold Flex 50 μL, 200 μL, and 1000 µL tip racks.
+![The 96-channel tip rack adapter.](images/96-channel-tip-rack-adapter.png "96-channel tip rack adapter")
 
-Because of the force involved, the 96-channel pipette requires an
-adapter to attach a full tip rack properly. During the attachment
-procedure, the pipette moves over the adapter, lowers itself onto the
-mounting pins, and pulls tips onto the pipettes by lifting the adapter
-and tip rack. Pulling the tips, rather than pushing, provides the
-leverage needed to secure tips to the pipettes and prevents warping the
-deck surface. When finished, the 96-channel pipette lowers the adapter
-and empty tip rack onto the deck. See the section of the Labware chapter
-for more information.
+The Opentrons Flex 96-channel pipette ships with four tip rack adapters. These are precision formed aluminum brackets that you place on the deck. The adapters hold Flex 50 μL, 200 μL, and 1000 µL tip racks.
+
+Because of the force involved, the 96-channel pipette requires an adapter to attach a full tip rack properly. During the attachment procedure, the pipette moves over the adapter, lowers itself onto the mounting pins, and pulls tips onto the pipettes by lifting the adapter and tip rack. Pulling the tips, rather than pushing, provides the leverage needed to secure tips to the pipettes and prevents warping the deck surface. When finished, the 96-channel pipette lowers the adapter and empty tip rack onto the deck. See the [Tips and Tip Racks section][tips-and-tip-racks] of the Labware chapter for more information.
 
 ### Partial tip pickup
 
-By default, multi-channel pipettes use all of their nozzles to pick up
-tips and handle liquids: an 8-channel pipette picks up 8 tips at once,
-and a 96-channel pipette picks up 96 tips at once. Partial tip pickup
-lets you configure a multi-channel pipette to use fewer tips. This
-expands the liquid handling capabilities of your robot without having to
-physically switch pipettes, and is especially useful for the 96-channel
-pipette, which occupies both pipette mounts.
+By default, multi-channel pipettes use all of their nozzles to pick up tips and handle liquids: an 8-channel pipette picks up 8 tips at once, and a 96-channel pipette picks up 96 tips at once. Partial tip pickup lets you configure a multi-channel pipette to use fewer tips. This expands the liquid handling capabilities of your robot without having to physically switch pipettes, and is especially useful for the 96-channel pipette, which occupies both pipette mounts.
 
-Currently, the 96-channel pipette supports partial tip pickup for a
-column, a row, or a single tip. The 8-channel pipettes support a partial
-column (2–7 consecutive tips) or a single tip.
+Currently, the 96-channel pipette supports partial tip pickup for a column, a row, or a single tip. The 8-channel pipettes support a partial column (2–7 consecutive tips) or a single tip.
 
-When picking up fewer than 96 tips from a tip rack with any pipette, the
-rack must be placed directly on the deck, not in the tip rack adapter.
+When picking up fewer than 96 tips from a tip rack with any pipette, the rack must be placed directly on the deck, not in the tip rack adapter.
 
 ### Pipette sensors
 
-Opentrons Flex pipettes have a number of sensors that detect and record
-data about the status of the pipette and any tips it has picked up.
+Opentrons Flex pipettes have a number of sensors that detect and record data about the status of the pipette and any tips it has picked up.
 
-##### CAPACITANCE SENSORS
+#### Capacitance sensors
 
-In combination with a metal probe or conductive tip, the capacitance
-sensors detect when the pipette makes contact with something. Detection
-of contact between the metal probe and the deck is used in the automated
-and processes.
+In combination with a metal probe or conductive tip, the capacitance sensors detect when the pipette makes contact with something. Detection of contact between the metal probe and the deck is used in the automated [pipette calibration][pipette-calibration] and [module calibration][module-calibration] processes.
 
-1-channel pipettes have one capacitance sensor, while multi-channel
-pipettes have two: on channels 1 and 8 of 8-channel pipettes, and on
-channels 1 and 96 (positions A1 and H12) of the 96-channel pipette.
+1-channel pipettes have one capacitance sensor, while multi-channel pipettes have two: on channels 1 and 8 of 8-channel pipettes, and on channels 1 and 96 (positions A1 and H12) of the 96-channel pipette.
 
-##### OPTICAL TIP PRESENCE SENSORS
+#### Optical tip presence sensors
 
-A photointerruptor switch detects the position of the pipette's tip
-ejector mechanism, confirming whether tips were successfully picked up
-or dropped. 1-channel, 8-channel, and 96-channel pipettes all have a
-single optical sensor that monitors tip attachment across all channels.
+A photointerruptor switch detects the position of the pipette's tip ejector mechanism, confirming whether tips were successfully picked up or dropped. 1-channel, 8-channel, and 96-channel pipettes all have a single optical sensor that monitors tip attachment across all channels.
 
-##### PRESSURE SENSORS
+#### Pressure sensors
 
-Flex pipettes use internal pressure sensors to detect liquid in well
-plates, reservoirs, and tubes. Liquid detection takes place as a pipette
-approaches the surface of a liquid. Sensors in the pipettes detect
-pressure changes relative to ambient pressure. A particular change in
-pressure tells the robot that liquid is present in a well and the
-pipette tip is in contact with the liquid's surface.
+Flex pipettes use internal pressure sensors to detect liquid in well plates, reservoirs, and tubes. Liquid detection takes place as a pipette approaches the surface of a liquid. Sensors in the pipettes detect pressure changes relative to ambient pressure. A particular change in pressure tells the robot that liquid is present in a well and the pipette tip is in contact with the liquid's surface.
 
-1-channel pipettes have one pressure sensor. The 8-channel pipette
-pressure sensors are on channels 1 and 8 (positions A1 and H1). The
-96-channel pipette pressure sensors are on channels 1 and 96 (positions
-A1 and H12). Other channels on multi-channel pipettes do not have
-sensors and cannot detect liquid.
+1-channel pipettes have one pressure sensor. The 8-channel pipette pressure sensors are on channels 1 and 8 (positions A1 and H1). The 96-channel pipette pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
 
-### Pipette frmware updates
+### Pipette firmware updates
 
-Opentrons Flex automatically updates pipette firmware to keep it in sync
-with the robot software version. Pipette firmware updates are typically
-quick, and occur whenever:
+Opentrons Flex automatically updates pipette firmware to keep it in sync with the robot software version. Pipette firmware updates are typically quick, and occur whenever:
 
 - You attach a pipette.
 
 - The robot restarts.
 
-If, for any reason, your pipette firmware and robot software versions
-get out of sync, you can manually update the firmware in the Opentrons
-App.
+If, for any reason, your pipette firmware and robot software versions get out of sync, you can manually update the firmware in the Opentrons App.
 
 1.  Click **Devices**.
 
 2.  Click on your Flex in the device list.
 
-3.  Under Instruments and Modules, the out-of-sync pipette will show a
-    warning banner reading "Firmware update available." Click **Update
-    now** to begin the update.
+3.  Under Instruments and Modules, the out-of-sync pipette will show a warning banner reading "Firmware update available." Click **Update now** to begin the update.
 
-You can view the currently installed firmware version of any attached
-pipette. On the touchscreen, go to **Instruments** and tap the pipette
-name. In the Opentrons App, find the pipette card under Instruments and
-Modules, click the three-dot menu (⋮), and then click **About
-pipette**.
+You can view the currently installed firmware version of any attached pipette. On the touchscreen, go to **Instruments** and tap the pipette name. In the Opentrons App, find the pipette card under Instruments and Modules, click the three-dot menu (⋮), and then click **About pipette**.
 
-1.  **Gripper**
+## Gripper
 
-The *gripper* moves labware throughout the working area and staging area
-during the execution of protocols. The gripper attaches to the
-*extension mount*, which is separate from the pipette mounts; the
-gripper can be used with any pipette configuration. For details on
-installing the gripper, see .
+The *gripper* moves labware throughout the working area and staging area during the execution of protocols. The gripper attaches to the *extension mount*, which is separate from the pipette mounts; the gripper can be used with any pipette configuration. For details on installing the gripper, see [Instrument Installation and Calibration][instrument-installation-and-calibration].
 
-The gripper can move labware across the deck and onto or off of modules.
-The gripper can manipulate certain fully skirted well plates, deep well
-plates, and tip racks. For more details on what labware the gripper can
-move, see the of the Labware chapter, or consult the .
+The gripper can move labware across the deck and onto or off of modules. The gripper can manipulate certain fully skirted well plates, deep well plates, and tip racks. For more details on what labware the gripper can move, see the [Labware and the Opentrons Flex Gripper section][labware-and-the-opentrons-flex-gripper] of the Labware chapter, or consult the [Opentrons Labware Library](https://labware.opentrons.com).
 
-![image](0b28407b8067b571bbcbe697ff350d94c1ac1929.png){width="5.458333333333333in"
-height="12.0in"}Gripper specifcations
+### Gripper specifcations
 
-The *jaws* perform the primary motion of the gripper, which is to open
-or close two parallel *paddles* to apply or release force on the sides
-of labware. Movement of the jaws is controlled by a 36 VDC brushed motor
-connected to a rack-and-pinion gear system.
+The *jaws* perform the primary motion of the gripper, which is to open or close two parallel *paddles* to apply or release force on the sides of labware. Movement of the jaws is controlled by a 36 VDC brushed motor connected to a rack-and-pinion gear system.
 
-To move a piece of labware that has ^Attachment\ screws\ ^been gripped
-by the jaws, the gantry
+To move a piece of labware that has been gripped by the jaws, the gantry lifts the gripper along the z-axis, moves it laterally, and then lowers it into the Calibration pin labware's new position.
 
-lifts the gripper along the z-axis, moves
-
-it laterally, and then lowers it into the Calibration pin labware's new
-position.
-
-Jaws
-
-Locations of components of the gripper. Paddles
+<figure markdown>
+![The gripper has attachment screws on its right side. Also on the right side is the storage area for the calibration pin. At the bottom of the gripper are its jaws, each of which has a paddle at its end.](images/gripper-components.png "Gripper components")
+<figcaption>Locations of components of the gripper.</figcaption>
+</figure>
 
 ### Gripper calibration
 
-The gripper includes a metal *calibration pin*. The calibration pin is
-located in a recessed storage area on the lower part of the gripper. A
-magnet holds the pin in place. To remove the calibration pin, grasp it
-with your fingers and pull gently. To replace the pin, put it back in
-the storage slot. You'll know it's secure when it snaps into place.
+The gripper includes a metal *calibration pin*. The calibration pin is located in a recessed storage area on the lower part of the gripper. A magnet holds the pin in place. To remove the calibration pin, grasp it with your fingers and pull gently. To replace the pin, put it back in the storage slot. You'll know it's secure when it snaps into place.
 
-When calibrating the gripper, attach the pin to each jaw in turn. The
-robot moves the pin to calibration points on the deck to measure the
-gripper's exact position.
+When calibrating the gripper, attach the pin to each jaw in turn. The robot moves the pin to calibration points on the deck to measure the gripper's exact position.
 
-During protocol runs, place the pin in its storage area for safekeeping.
-Contact us at if you lose the calibration pin.
+During protocol runs, place the pin in its storage area for safekeeping. Contact us at <support@opentrons.com> if you lose the calibration pin.
 
-### Gripper frmware updates
+### Gripper firmware updates
 
-Opentrons Flex automatically updates the gripper firmware to keep it in
-sync with the robot software version. Gripper firmware updates are
-typically quick, and occur whenever:
+Opentrons Flex automatically updates the gripper firmware to keep it in sync with the robot software version. Gripper firmware updates are typically quick, and occur whenever:
 
 - You attach the gripper.
 
 - The robot restarts.
 
-If, for any reason, your gripper firmware and robot software versions
-get out of sync, you can manually update the firmware in the Opentrons
-App.
+If, for any reason, your gripper firmware and robot software versions get out of sync, you can manually update the firmware in the Opentrons App.
 
 1.  Click **Devices**.
 
 2.  Click on your Flex in the device list.
 
-3.  Under Instruments and Modules, the out-of-sync gripper will show a
-    warning banner reading "Firmware update available." Click **Update
-    now** to begin the update.
+3.  Under Instruments and Modules, the out-of-sync gripper will show a warning banner reading "Firmware update available." Click **Update now** to begin the update.
 
-You can view the currently installed firmware version of the gripper. On
-the touchscreen, go to **Instruments** and tap the gripper. In the
-Opentrons App, find the gripper card under Instruments and Modules,
-click the three-dot menu (⋮), and then click **About gripper**.
+You can view the currently installed firmware version of the gripper. On the touchscreen, go to **Instruments** and tap the gripper. In the Opentrons App, find the gripper card under Instruments and Modules, click the three-dot menu (⋮), and then click **About gripper**.
 
-1.  **Emergency Stop Pendant**
+## Emergency Stop Pendant
 
-The *Emergency Stop Pendant (E-stop)* is a dedicated hardware button for
-quickly stopping robot motion. Opentrons Flex requires a functional,
-disengaged E-stop to be attached at all times. When you press the stop
-button, Flex cancels any running protocol or setup workflow as quickly
-as possible and prevents most robot motion.
+The *Emergency Stop Pendant (E-stop)* is a dedicated hardware button for quickly stopping robot motion. Opentrons Flex requires a functional, disengaged E-stop to be attached at all times. When you press the stop button, Flex cancels any running protocol or setup workflow as quickly as possible and prevents most robot motion.
 
 ### When to use the E-stop
 
@@ -562,231 +473,128 @@ You may need to press the E-stop:
 
 - After a hardware collision.
 
-Ideally you should never have to press the E-stop (except during
-infrequent hardware quality testing).
+Ideally you should never have to press the E-stop (except during infrequent hardware quality testing).
 
-Do not use the E-stop to cancel normal, expected operations. Instead,
-use the software button on the touchscreen or in the Opentrons App.
-Pausing via software will let you resume or cancel your protocol,
-whereas pressing the E-stop always cancels the protocol immediately.
+Do not use the E-stop to cancel normal, expected operations. Instead, use the software button on the touchscreen or in the Opentrons App. Pausing via software will let you resume or cancel your protocol, whereas pressing the E-stop always cancels the protocol immediately.
 
 ### Engaging and releasing the E-stop
 
 The E-stop has a press-to-engage, twist-to-release mechanism.
 
-- **Engage**: Push down firmly on the red button. Flex will enter the
-  stopped state.
+- **Engage**: Push down firmly on the red button. Flex will enter the stopped state.
 
-- **Resolve**: Once stopped, safely address any problems in the working
-  area, such as clearing spills, removing labware, or moving the gantry
-  (it should move freely and easily by hand).
+- **Resolve**: Once stopped, safely address any problems in the working area, such as clearing spills, removing labware, or moving the gantry (it should move freely and easily by hand).
 
-- **Release**: Twist the button clockwise. It will pop up to its
-  disengaged position.
+- **Release**: Twist the button clockwise. It will pop up to its disengaged position.
 
-- **Reset**: On the touchscreen or in the Opentrons App, confirm that
-  you are ready for Flex to resume motion. The gantry will return to its
-  home position and module activity will resume.
+- **Reset**: On the touchscreen or in the Opentrons App, confirm that you are ready for Flex to resume motion. The gantry will return to its home position and module activity will resume.
 
-In the stopped state, Flex and connected hardware will behave as
-follows:
+In the stopped state, Flex and connected hardware will behave as follows:
 
-**Hardware Behavior**
+| **Component**            | **Behavior When E-stop Engaged**                                                                                                                                                                                                                   |
+|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Gantry**              | <ul><li>Automated horizontal motion is halted.</li><li>Manual horizontal motion is allowed.</li></ul>                                                                                                                                              |
+| **Pipettes**            | <ul><li>Vertical motion is halted.</li><li>Motor brakes on vertical axes are engaged to prevent pipettes from falling.</li><li>Plunger motion and tip pickup is halted.</li></ul>                                                                  |
+| **Gripper**             | <ul><li>Vertical motion is halted.</li><li>Motor brake on vertical axis is engaged to prevent the gripper from falling.</li><li>Jaw motors that exert gripping force remain enabled, so the gripper will not drop labware it may be carrying.</li></ul> |
+| **Heater-Shaker Module**| <ul><li>The shaker stops and homes.</li><li>The labware latch opens.</li><li>Heating is disabled.</li></ul>                                                                                                                                        |
+| **Temperature Module**  | <ul><li>Heating or cooling is disabled.</li></ul>                                                                                                                                                                                                                |
+| **Thermocycler Module** | <ul><li>Heating or cooling is disabled.</li></ul>                                                                                                                                                                                                                  |
+| **Status light**        | <ul><li>The light turns red.</li></ul>                                                                                                                                                                                                                     |
+| **Touchscreen**         | <ul><li>A cancellation message takes over the screen.</li><li>An on-screen indicator shows when you have successfully disengaged the stop button.</li></ul>                                                  |
 
-**Gantry** ■ Automated horizontal motion is halted.
+## Connections
 
-- Manual horizontal motion is allowed.
-
-**Pipettes** ■ Vertical motion of pipettes is halted.
-
-- The motor brakes on vertical axes are engaged to prevent pipettes from
-  falling.
-
-- Plunger motion and tip pickup is halted.
-
-**Gripper** ■ Vertical motion of the gripper is halted.
-
-- The motor brake on the vertical axis is engaged to prevent the gripper
-  from falling.
-
-- The jaw motors that exert gripping force remain enabled, so the
-  gripper will not drop labware it may be carrying.
-
-**Heater-Shaker Module** ■ The shaker stops and homes.
-
-- The labware latch opens.
-
-- Heating is disabled.
-
-**Temperature Module** ■ Heating or cooling is disabled. **Thermocycler
-Module** ■ Heating or cooling is disabled. **Status light** ■ The light
-turns red.
-
-**Touchscreen** ■ A cancellation message takes over the screen.
-
-- An on-screen indicator shows when you have successfully disengaged the
-  stop button.
-
-1.  **Connections**
-
-**![image](f2e0c1183a4b8ca0df3b3fe42adc7af2354609f4.png){width="14.729166666666666in"
-height="8.354166666666666in"}**On/Off Switch
-
-Side Covers
-
-USB-A Ports
-
-Ports
-
-IEC Power Inlet
-
-AUX-1, AUX-2, USB-B, Ethernet
+![Locations of connections on Flex. USB-A ports and covers for cable routing are on either side of the robot. Facing the rear of the robot, on the left are the AUX-1, AUX-2, USB-B and Ethernet ports. On the right are the IEC power inlet and on/off switch.](images/flex-connections.png "Flex connections")
 
 ### Power connection
 
-Opentrons Flex connects to a power source via a standard IEC-C14 inlet.
-The robot contains an internal full-range AC/DC power supply, accepting
-100–240 VAC, 50/60 Hz input and converting it to 36 VDC. All other
-internal electronics are powered by the 36 VDC supply.
+Opentrons Flex connects to a power source via a standard IEC-C14 inlet. The robot contains an internal full-range AC/DC power supply, accepting 100–240 VAC, 50/60 Hz input and converting it to 36 VDC. All other internal electronics are powered by the 36 VDC supply.
 
-**Warning:** Only use the power cord provided with the robot. Do not use
-a power cord with inadequate current or voltage ratings.
+!!! warning
+    Only use the power cord provided with the robot. Do not use a power cord with inadequate current or voltage ratings.
 
-Keep the power cord free of obstructions so you can remove it if
-necessary.
+    Keep the power cord free of obstructions so you can remove it if necessary.
 
-There is also a CR1220 coin cell battery to power the robot's real-time
-clock when not connected to mains power. The battery is located inside
-the touchscreen enclosure. Contact Opentrons Support for more
-information if you think you need to replace the battery.
+There is also a CR1220 coin cell battery to power the robot's real-time clock when not connected to mains power. The battery is located inside the touchscreen enclosure. Contact Opentrons Support for more information if you think you need to replace the battery.
 
 ### USB and auxiliary connections
 
-Opentrons Flex has 10 total USB ports located in different areas of the
-robot, which serve different purposes.
+Opentrons Flex has 10 total USB ports located in different areas of the robot, which serve different purposes.
 
-The 8 rear USB-A ports (numbered USB-1 through USB-8) and 2 auxiliary
-ports (M12 connectors numbered AUX-1 and AUX-2) are for connecting
-Opentrons modules and accessories. See the for more information on
-connecting these devices and using them in your protocols.
+The 8 rear USB-A ports (numbered USB-1 through USB-8) and 2 auxiliary ports (M12 connectors numbered AUX-1 and AUX-2) are for connecting Opentrons modules and accessories. See the [Modules chapter](modules.md) for more information on connecting these devices and using them in your protocols.
 
-The rear USB-B port is for connecting the robot to a laptop or desktop
-computer, to establish communication with the Opentrons App running on
-the connected computer. The front USB-A port (USB-9), located below the
-touchscreen display, has the same functionality as the rear USB-A ports.
+The rear USB-B port is for connecting the robot to a laptop or desktop computer, to establish communication with the Opentrons App running on the connected computer. The front USB-A port (USB-9), located below the touchscreen display, has the same functionality as the rear USB-A ports.
 
 !!! note
-    The USB ports are power-limited to protect the robot and
-connected devices. Power delivery is split internally into three port
-groups: the left rear USB-A ports (USB-1 through USB-4), the right rear
-USB-A ports (USB-5 through USB-8), and the front USB-A port. Each of
-these groups will deliver a maximum of 500 mA to connected USB
-2.0–compatible devices.
+    The USB ports are power-limited to protect the robot and connected devices. Power delivery is split internally into three port groups: the left rear USB-A ports (USB-1 through USB-4), the right rear USB-A ports (USB-5 through USB-8), and the front USB-A port. Each of these groups will deliver a maximum of 500 mA to connected USB 2.0–compatible devices.
 
 ### Network connections
 
-Opentrons Flex can connect to a local area network through a wired
-(Ethernet) or wireless (Wi-Fi) connection.
+Opentrons Flex can connect to a local area network through a wired (Ethernet) or wireless (Wi-Fi) connection.
 
-The Ethernet port is located on the rear of the robot. Connect it to an
-Ethernet hub or switch on your network. Or, starting in robot system
-version 7.1.0, connect it directly to an Ethernet port on your computer.
+The Ethernet port is located on the rear of the robot. Connect it to an Ethernet hub or switch on your network. Or, starting in robot system version 7.1.0, connect it directly to an Ethernet port on your computer.
 
-The internal Wi-Fi module supports 802.11 ac/a/b/g/n networks with a
-dual-band 2.4/5 GHz antenna.
+The internal Wi-Fi module supports 802.11 ac/a/b/g/n networks with a dual-band 2.4/5 GHz antenna.
 
-1.  **System specifications**
+## System specifications
 
-### General specifcations
+### General specifications
 
-**Dimensions** 87 × 69 × 84 cm / 34.25 × 27 × 33 in (W, D, H)
+| **Specification**         | **Details**                                                                                                                                         |
+|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Dimensions**           | 87 × 69 × 84 cm / 34.25 × 27 × 33 in (W, D, H)                                                                                                      |
+| **Weight**               | 88.5 kg / 195 lb                                                                                                                                    |
+| **Deck slots**           | <ul><li>12 ANSI/SLAS-compatible slots in working area (accessible to pipettes)</li><li>4 additional slots for staging tips and labware (gripper only)</li></ul> |
+| **Touchscreen**          | 7-inch LCD touchscreen with scratch- and damage-resistant Gorilla Glass 3                                                                            |
+| **Wi-Fi**                | 802.11 ac/a/b/g/n dual-band (2.4/5 GHz)                                                                                                             |
+| **Ethernet**             | 100 Mbps                                                                                                                                            |
+| **USB**                  | <ul><li>9 USB-A ports</li><li>1 USB-B port</li><li>USB 2.0 speed</li></ul>                                                                          |
+| **Camera**               | 2MP, photo and video                                                                                                                                |
+| **Robot power input**    | <ul><li>100–240 VAC, 50–60 Hz, 1φ</li><li>4.0 A/115 VAC, 2.0 A/230 VAC</li></ul>                                                                    |
+| **Mains supply voltage fluctuation** | ±10%                                                                                                                                    |
+| **Mains supply frequency fluctuation** | ±5%                                                                                                                                   |
+| **Distribution system**  | TN-S                                                                                                                                                |
+| **Short-circuit supply current** | 6.3 A                                                                                                                                       |
+| **Frame composition**    | Rigid steel and CNC aluminum design                                                                                                                  |
+| **Window composition**   | Removable polycarbonate side windows and front door                                                                                                  |
+| **Ventilation requirements** | At least 20 cm / 8 in between the unit and a wall                                                                                                |
+| **Connected PC requirements** | The Opentrons App runs on: <ul><li>Windows 10 or later</li><li>macOS 10.10 or later</li><li>Ubuntu 12.04 or later</li></ul>                                               |
 
-**Weight** 88.5 kg / 195 lb
+### Environmental specifications
 
-**Deck slots** ■ 12 ANSI/SLAS-compatible slots in working area
-(accessible to pipettes)
+| **Specification**         | **Details**                          |
+|--------------------------|---------------------------------------|
+| **Environmental conditions** | Indoor use only                  |
+| **Ambient temperature**   | +20 to +25 °C (recommended)          |
+| **Relative humidity**     | 40–60%, non-condensing (recommended) |
+| **Pollution degree**      | 2 (non-conductive pollution only)    |
 
-- 4 additional slots for staging tips and labware (accessible only to
-  gripper)
+For additional information on acceptable environmental conditions for use and transport, see the [Environmental Conditions section][environmental-conditions] of the Installation and Relocation chapter.
 
-**Touchscreen** 7-inch LCD touchscreen with scratch- and
-damage-resistant Gorilla Glass 3
+### Certifications
 
-**Wi-Fi** 802.11 ac/a/b/g/n dual-band (2.4/5 GHz)
+| **Certification**         | **Status**         |
+|--------------------------|--------------------|
+| **Certifications complete** | CE, ETL, FCC, ISO 9001 |
+| **Not certified/validated** | IVD, GMP         |
 
-**Ethernet** 100 Mbps
-
-**USB** ■ 9 USB-A ports
-
-- 1 USB-B port
-
-- USB 2.0 speed
-
-**Camera** 2MP, photo and video
-
-**Robot power input** ■ 100–240 VAC, 50–60 Hz, 1φ
-
-- 4.0 A/115 VAC, 2.0 A/230 VAC
-
-#### **Mains supply voltage fluctuation** ±10% **Mains supply frequency fluctuation** ±5% **Distribution system** TN-S
-
-**Short-circuit supply current** 6.3 A
-
-**Frame composition** Rigid steel and CNC aluminum design
-
-**Window composition** Removable polycarbonate side windows and front
-door
-
-**Ventilation requirements** At least 20 cm / 8 in between the unit and
-a wall
-
-**Connected PC requirements** The Opentrons App runs on:
-
-- Windows 10 or later
-
-- macOS 10.10 or later
-
-- Ubuntu 12.04 or later
-
-### Environmental specifcations
-
-**Environmental conditions** Indoor use only
-
-**Ambient temperature** +20 to +25 °C (recommended)
-
-**Relative humidity** 40–60%, non-condensing (recommended)
-
-**Pollution degree** 2 (non-conductive pollution only)
-
-For additional information on acceptable environmental conditions for
-use and transport, see the of the Installation and Relocation chapter.
-
-### Certifcations
-
-**Certifications complete** CE, ETL, FCC, ISO 9001
-
-**Not certified/validated** IVD, GMP
-
-A summary of certification information is printed on a sticker on the
-back of Flex, near the on/off switch. For detailed certification and
-compliance information, see the in the Introduction.
+A summary of certification information is printed on a sticker on the back of Flex, near the on/off switch. For detailed certification and compliance information, see the [Regulatory Compliance section][regulatory-compliance] in the Introduction.
 
 ### Serial number
 
 Every Flex has a unique serial number. The format of the serial number
 provides additional information, including the robot's date of
-production. For example, the serial number FLXA1020231007001 would
+production. For example, the serial number `FLXA1020231007001` would
 indicate:
 
-  ---------------- -------------- ---------------------------------------------------
-  **Characters**   **Category**   **Meaning**
-  FLX              Model          The robot is an Opentrons Flex.
-  A10              Version        A code for the production version of the robot.
-  2023             Year           The robot was made in 2023.
-  10               Month          The robot was made in October.
-  07               Day            The robot was made on the 7th day of the month.
-  001              Unit           A unique number for robots made on a certain day.
-  ---------------- -------------- ---------------------------------------------------
+| **Characters**  | **Category** | **Meaning**                                      |
+|-----------------|--------------|--------------------------------------------------|
+| `FLX`           | Model        | The robot is an Opentrons Flex.                  |
+| `A10`           | Version      | A code for the production version of the robot.  |
+| `2023`          | Year         | The robot was made in 2023.                      |
+| `10`            | Month        | The robot was made in October.                   |
+| `07`            | Day          | The robot was made on the 7th day of the month.  |
+| `001`           | Unit         | A unique number for robots made on a certain day.|
 
 You can find the serial number for your Flex:
 

@@ -406,7 +406,7 @@ this information to understand
 
 how to work with your custom labware. See the for more information.
 
-1.  **Tips and tip racks**
+## Tips and tip racks
 
 Opentrons Flex tips come in 50 µL, 200 µL, and 1000 µL sizes. These are
 clear, non-conducting polypropylene tips that are available with or
@@ -698,7 +698,7 @@ Bio-Rad well plate 200 µL
 
 Generic PCR strip 200 µL NEST well plate 100 µL
 
-1.  **Labware and the Opentrons Flex Gripper**
+## Labware and the Opentrons Flex Gripper
 
 Although the Opentrons Flex works with all the inventory in the Labware
 Library, the Opentrons Flex Gripper is compatible with specific labware
