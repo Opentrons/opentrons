@@ -229,6 +229,7 @@ export const SlotDetailModal = (
               ) : null}
             </Flex>
             <LabwareThumbnail
+              // TODO BEFORE MERGE
               viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
               width={
                 selectedLiquidId != null && isVariedStack ? '20rem' : '29rem'

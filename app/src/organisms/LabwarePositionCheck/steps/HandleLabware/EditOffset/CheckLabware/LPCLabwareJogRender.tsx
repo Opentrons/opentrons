@@ -40,6 +40,7 @@ export function LPCLabwareJogRender({
 
   return (
     <Flex css={RENDER_CONTAINER_STYLE}>
+      {/* TODO BEFORE MERGE: Is this right? This seems too small to be a deck map viewbox. Is this actually supposed to be a bounding box around the labware? If so, it needs updates for schema 3. */}
       <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
         {() => (
           <>

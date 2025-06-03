@@ -23,6 +23,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
   const render = (
     <RobotWorkSpace
       key="center"
+      // TODO BEFORE MERGE
       viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${dims.xDimension} ${dims.yDimension}`}
       width="100%"
       height="100%"

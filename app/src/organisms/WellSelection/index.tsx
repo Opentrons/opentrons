@@ -163,6 +163,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   })
 
   const labwareRender = (
+    // TODO BEFORE MERGE
     <RobotCoordinateSpace viewBox="0 0 128 86">
       <Labware
         definition={definition}

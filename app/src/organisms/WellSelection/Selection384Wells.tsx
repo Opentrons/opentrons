@@ -129,6 +129,7 @@ export function Selection384Wells({
   }
   return (
     <Flex width="100%">
+      {/* TODO BEFORE MERGE: Not sure how this is working without a parent <svg>. */}
       {labwareRender}
       <Flex
         flex="1 0 0"

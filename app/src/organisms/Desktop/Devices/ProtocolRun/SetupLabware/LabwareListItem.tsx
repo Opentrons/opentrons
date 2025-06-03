@@ -399,6 +399,7 @@ function StandaloneLabware(props: {
   const dimensions = getSchema2Dimensions(definition)
 
   return (
+    // TODO BEFORE MERGE
     <LabwareThumbnail
       viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
     >

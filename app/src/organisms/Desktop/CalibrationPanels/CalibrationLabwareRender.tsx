@@ -30,6 +30,7 @@ export function CalibrationLabwareRender(
 
   return (
     <g
+      // TODO BEFORE MERGE
       transform={`translate(${String(slotDefPosition?.[0])}, ${String(
         slotDefPosition?.[1]
       )})`}
@@ -40,6 +41,7 @@ export function CalibrationLabwareRender(
           <>
             <LabwareRender definition={labwareDef} />
             <RobotCoordsForeignDiv
+              // TODO BEFORE MERGE
               width={dimensions.xDimension}
               height={dimensions.yDimension}
               x={0}

@@ -48,6 +48,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
     <Box width="100%">
       <RobotWorkSpace
         key="center"
+        // TODO BEFORE MERGE
         viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${xDimension} ${dims.yDimension}`}
       >
         {() => <LabwareRender definition={definition} />}

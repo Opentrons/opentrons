@@ -16,6 +16,7 @@ type Props = Omit<ComponentProps<typeof LabwareRender>, 'definition'> & {
 export function SingleLabware(props: Props): JSX.Element {
   return (
     <RobotWorkSpace
+      // TODO BEFORE MERGE
       viewBox={`0 0 ${props.definition.dimensions.xDimension} ${props.definition.dimensions.yDimension}`}
     >
       {() => <LabwareRender {...props} />}

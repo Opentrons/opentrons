@@ -70,6 +70,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     >
       <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing24}>
         <RobotWorkSpace
+          // TODO BEFORE MERGE
           viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${xDimensionOverride} ${dimensions.yDimension}`}
         >
           {() => <LabwareRender definition={definition} />}

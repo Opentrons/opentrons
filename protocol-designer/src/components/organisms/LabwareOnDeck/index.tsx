@@ -37,6 +37,8 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     : null
 
   return (
+    // TODO BEFORE MERGE: This seems OK on its own but we need to audit LabwareOnDeck call sites
+    // to make sure they're passing in the correct schema-agnostic thing for x and y
     <g transform={`translate(${x}, ${y})`}>
       <LabwareRender
         definition={labwareOnDeck.def}

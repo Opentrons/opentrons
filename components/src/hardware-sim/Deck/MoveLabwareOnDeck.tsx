@@ -236,6 +236,7 @@ export function MoveLabwareOnDeck(
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
         <g
+          // TODO BEFORE MERGE
           transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
         >
           <LabwareRender definition={movedLabwareDef} highlight={true} />

@@ -112,6 +112,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
           >
             <>
               <SelectedModuleLabwareRender
+                // TODO BEFORE MERGE: Uhhh I dunno, I'm running out of steam here. Maybe this is fine but look into it.
                 topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
                 adapterDef={selectedAdapterDef}
                 moduleModel={selectedModuleModel}
@@ -132,6 +133,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
         </>
       ) : null}
       <SelectedLabwareRender
+        // TODO BEFORE MERGE: Uhhh I dunno, I'm running out of steam here. Maybe this is fine but look into it.
         showModuleIcon={selectedTopLabware.amount > 1}
         labwareOnDeck={matchingSelectedTopLabwareOnDeck}
         labwareDef={selectedTopLabwareDef ?? selectedAdapterDef}

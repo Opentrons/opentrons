@@ -114,6 +114,7 @@ export const LabwareLiquidsDetailModal = (
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing32}>
         <Flex>
           <LabwareThumbnail
+            // TODO BEFORE MERGE
             viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
           >
             {labwareRender}

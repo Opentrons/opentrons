@@ -111,6 +111,7 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
                   <Flex flexDirection={DIRECTION_COLUMN} key={lw.id}>
                     <RobotWorkSpace
                       key={lw.id}
+                      // TODO BEFORE MERGE
                       viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
                       width="6.875rem"
                       height="3.75rem"

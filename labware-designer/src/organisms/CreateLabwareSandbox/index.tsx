@@ -204,6 +204,7 @@ export function CreateLabwareSandbox(): JSX.Element {
                     (ot2StandardDeckV4 as unknown) as DeckDefinition
                   )
                   return (
+                    // TODO BEFORE MERGE
                     <g
                       transform={`translate(${lwPosition?.[0] ?? 0}, ${
                         lwPosition?.[1] ?? 0
@@ -222,6 +223,7 @@ export function CreateLabwareSandbox(): JSX.Element {
               <svg
                 data-testid="lw_by_itself"
                 width="100%"
+                // TODO BEFORE MERGE
                 viewBox={`0 0 ${labwareToRender.dimensions.xDimension} ${labwareToRender.dimensions.yDimension}`}
                 style={{ transform: 'scale(1, -1)' }}
               >

@@ -39,6 +39,7 @@ export default {
   decorators: [
     Story => (
       <RobotWorkSpace
+        // TODO BEFORE MERGE
         viewBox={`0 0 ${fixture96Plate.dimensions.xDimension} ${fixture96Plate.dimensions.yDimension}`}
       >
         {() => <Story />}
