@@ -3,6 +3,7 @@
 include ../../scripts/python.mk
 include ../../scripts/push.mk
 
+SHX := npx shx
 # Host key location for robot
 ssh_key ?= $(default_ssh_key)
 # Other SSH args for robot
