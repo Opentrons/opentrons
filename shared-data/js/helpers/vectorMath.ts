@@ -1,22 +1,36 @@
 import type { Vector3D } from '../types'
 
-export function getVectorSum(pointA: Vector3D, pointB: Vector3D): Vector3D {
-  return {
-    x: pointA.x + pointB.x,
-    y: pointA.y + pointB.y,
-    z: pointA.z + pointB.z,
-  }
+/**
+ * Add an arbitrary number of vectors.
+ * e.g. `getVectorSum(a, b, c)` is a + b + c.
+ */
+export function getVectorSum(first: Vector3D, ...rest: Vector3D[]): Vector3D {
+  return rest.reduce(
+    (prev, current) => ({
+      x: prev.x + current.x,
+      y: prev.y + current.y,
+      z: prev.z + current.z,
+    }),
+    first
+  )
 }
 
+/**
+ * Subtract an arbitrary number of vectors.
+ * e.g. `getVectorDifference(a, b, c)` is a - b - c.
+ */
 export function getVectorDifference(
-  pointA: Vector3D,
-  pointB: Vector3D
+  first: Vector3D,
+  ...rest: Vector3D[]
 ): Vector3D {
-  return {
-    x: pointA.x - pointB.x,
-    y: pointA.y - pointB.y,
-    z: pointA.z - pointB.z,
-  }
+  return rest.reduce(
+    (prev, current) => ({
+      x: prev.x - current.x,
+      y: prev.y - current.y,
+      z: prev.z - current.z,
+    }),
+    first
+  )
 }
 
 export function getVectorInverse(vector: Vector3D): Vector3D {
