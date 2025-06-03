@@ -2,7 +2,7 @@ import { expect } from 'vitest'
 
 import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-  SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  SAFE_MOVE_TO_WELL_LOCATION,
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
@@ -245,14 +245,7 @@ export const aspirateHelperLiquidClass = (submergeParams: {
         pipetteId,
         labwareId,
         wellName,
-        wellLocation: {
-          origin: WELL_ORIGIN_TOP,
-          offset: {
-            x: 0,
-            y: 0,
-            z: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-          },
-        },
+        wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
       },
     },
     ...(dispenseAirGap > 0

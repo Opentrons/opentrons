@@ -24,7 +24,7 @@ import {
   ConfirmDeleteEntityInUseModal,
   EditNickNameModal,
 } from '../../../components/organisms'
-import { deleteContainer } from '../../../labware-ingred/actions'
+import { deleteContainer, editSlotInfo } from '../../../labware-ingred/actions'
 import { getIsLabwareOnSlotInUse } from '../../../pages/Designer/DeckSetup/utils'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
@@ -36,13 +36,13 @@ import type { Dispatch, MouseEvent, SetStateAction } from 'react'
 import type { ThunkDispatch } from '../../../types'
 
 interface LabwareCardOverflowMenuProps {
-  labwareId: string
+  labwareIds: string[]
   setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
 }
 export function LabwareCardOverflowMenu(
   props: LabwareCardOverflowMenuProps
 ): JSX.Element | null {
-  const { labwareId, setShowOverflowMenu } = props
+  const { labwareIds, setShowOverflowMenu } = props
   const { t } = useTranslation('starting_deck_state')
   const savedSteps = useSelector(getSavedStepForms)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
@@ -67,14 +67,15 @@ export function LabwareCardOverflowMenu(
       }
     },
   })
-  const isAdapter = deckSetupLabware[labwareId].def.allowedRoles?.includes(
+  const topLabwareId = labwareIds[0]
+  const isAdapter = deckSetupLabware[topLabwareId].def.allowedRoles?.includes(
     'adapter'
   )
-  const slotName = getSlotInLocationStack(deckSetupLabware[labwareId].stack)
+  const slotName = getSlotInLocationStack(deckSetupLabware[topLabwareId].stack)
   const fullStack = getFullStackFromLabwares(deckSetupLabware, slotName)
   const moduleId = getModuleIdFromStack(fullStack, deckSetupModules)
   const moduleType = moduleId != null ? deckSetupModules[moduleId].type : null
-  const labwareAboveAdapter = fullStack[fullStack.indexOf(labwareId) - 1]
+  const labwareAboveAdapter = fullStack[fullStack.indexOf(topLabwareId) - 1]
   const loadNameAboveAdapter = Object.values(deckSetupLabware).find(
     lw => lw.labwareDefURI === labwareAboveAdapter
   )?.def.parameters.loadName
@@ -84,24 +85,44 @@ export function LabwareCardOverflowMenu(
     COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType].includes(
       loadNameAboveAdapter
     )
+
   const disallowNickname =
     isAdapter ||
-    deckSetupLabware[labwareId].def.parameters.isTiprack ||
-    deckSetupLabware[labwareId].def.parameters.quirks?.includes(
+    deckSetupLabware[topLabwareId].def.parameters.isTiprack ||
+    deckSetupLabware[topLabwareId].def.parameters.quirks?.includes(
       'tiprackAdapterFor96Channel'
-    )
+    ) ||
+    labwareIds.length > 2
 
   const isLabwareOnSlotInUse = getIsLabwareOnSlotInUse(
     savedSteps,
-    deckSetupLabware[labwareId]
+    deckSetupLabware[topLabwareId]
   )
 
   const handleClear = (): void => {
-    dispatch(deleteContainer({ labwareId }))
+    labwareIds.forEach(labwareId => {
+      dispatch(deleteContainer({ labwareId }))
+    })
+    if (isAdapter) {
+      dispatch(
+        editSlotInfo({
+          adapterDefURI: null,
+        })
+      )
+    } else {
+      dispatch(
+        editSlotInfo({
+          labwareDefURI: null,
+          lidDefURI: null,
+          amount: 1,
+        })
+      )
+    }
   }
-
   const handleConfirmDeleteEntityInUseModal = (): void => {
-    dispatch(deleteContainer({ labwareId }))
+    labwareIds.forEach(labwareId => {
+      dispatch(deleteContainer({ labwareId }))
+    })
     setShowOverflowMenu(false)
     setShowDeleteEntityInUseModal(false)
   }
@@ -144,7 +165,7 @@ export function LabwareCardOverflowMenu(
       ) : null}
       {showNickNameModal ? (
         <EditNickNameModal
-          labwareId={labwareId}
+          labwareId={topLabwareId}
           onClose={() => {
             setShowNickNameModal(false)
             setShowOverflowMenu(false)
@@ -154,7 +175,7 @@ export function LabwareCardOverflowMenu(
       {showNotCompatibleModal ? (
         <LabwareNotCompatibleModal
           onDone={() => {
-            dispatch(deleteContainer({ labwareId }))
+            dispatch(deleteContainer({ labwareId: topLabwareId }))
             dispatch(deleteContainer({ labwareId: labwareAboveAdapter }))
             setShowNotCompatibleModal(false)
           }}

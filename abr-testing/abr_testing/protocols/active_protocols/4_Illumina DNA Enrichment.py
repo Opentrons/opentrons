@@ -107,6 +107,7 @@ def run(protocol: ProtocolContext) -> None:
     reagent_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp_block, "Reagent Plate"
     )
+    lid = protocol.load_lid_stack("custom_opentrons_tough_universal_lid", "B4", 2)
     # ========== SECOND ROW ==========
     MAG_PLATE_SLOT: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
@@ -219,6 +220,7 @@ def run(protocol: ProtocolContext) -> None:
     wells_col_1_to_7 = [well for col in sample_plate_2.columns()[:7] for well in col]
     sample_plate_2.load_empty(wells_col_1_to_7)
     try:
+        protocol.move_lid(lid, reagent_plate, use_gripper=True)
         heatershaker.close_labware_latch()
         thermocycler.open_lid()
         if probe_liquid_height_bool:
@@ -679,6 +681,7 @@ def run(protocol: ProtocolContext) -> None:
 
                 protocol.comment("--> Adding Elute")
                 EluteVol = 23
+                protocol.move_lid(reagent_plate, lid, use_gripper=True)
                 for loop, X in enumerate(column_3_list):
                     p50.pick_up_tip()
                     p50.aspirate(
@@ -691,6 +694,7 @@ def run(protocol: ProtocolContext) -> None:
                     p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                     p50_tips += 1
                     tipcheck()
+                protocol.move_lid(lid, reagent_plate, use_gripper=True)
 
                 # ============================================================================================
                 # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
@@ -729,6 +733,7 @@ def run(protocol: ProtocolContext) -> None:
                 ET2Vol = 4
                 ET2MixRep = 10 if DRYRUN is False else 1
                 ET2MixVol = 20
+                protocol.move_lid(reagent_plate, lid, use_gripper=True)
                 for loop, X in enumerate(column_4_list):
                     p50.pick_up_tip()
                     p50.aspirate(ET2Vol, ET2.bottom(z=dot_bottom))  # original = ()
@@ -742,7 +747,6 @@ def run(protocol: ProtocolContext) -> None:
                     p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                     p50_tips += 1
                     tipcheck()
-
             if STEP_PCR == 1:
                 protocol.comment("==============================================")
                 protocol.comment("--> AMPLIFICATION")
@@ -759,7 +763,6 @@ def run(protocol: ProtocolContext) -> None:
                     p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                     p50_tips += 1
                     tipcheck()
-
                 protocol.comment("--> Adding EPM")
                 EPMVol = 20
                 EPMMixRep = 10 if DRYRUN is False else 1
@@ -776,7 +779,7 @@ def run(protocol: ProtocolContext) -> None:
                     p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                     p50_tips += 1
                     tipcheck()
-
+            protocol.move_lid(lid, reagent_plate, use_gripper=True)
             if DRYRUN is False:
                 heatershaker.deactivate_heater()
 

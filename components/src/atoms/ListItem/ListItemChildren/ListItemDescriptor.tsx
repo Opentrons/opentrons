@@ -1,6 +1,6 @@
 import { Flex } from '../../../primitives'
 import {
-  ALIGN_FLEX_START,
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_FLEX_START,
@@ -35,7 +35,7 @@ export const ListItemDescriptor = (
       flexDirection={changeFlexDirection ? DIRECTION_COLUMN : DIRECTION_ROW}
       gridGap={SPACING.spacing8}
       width="100%"
-      alignItems={ALIGN_FLEX_START}
+      alignItems={ALIGN_CENTER}
       justifyContent={justifyContent}
       padding={type === 'default' ? SPACING.spacing4 : SPACING.spacing12}
     >

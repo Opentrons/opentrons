@@ -1,6 +1,13 @@
-import type { WellOrigin } from '../command'
+import type { WellLocation, WellOrigin } from '../command'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
-import type { ModuleModel, ModuleType, PositionReference } from './types'
+import type {
+  AddressableArea,
+  AreaType,
+  FakeAddressableArea,
+  ModuleModel,
+  ModuleType,
+  PositionReference,
+} from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
@@ -289,6 +296,26 @@ export const D2_ADDRESSABLE_AREA: 'D2' = 'D2'
 export const D3_ADDRESSABLE_AREA: 'D3' = 'D3'
 export const D4_ADDRESSABLE_AREA: 'D4' = 'D4'
 
+export type FlexFakeAddressableAreaName =
+  | 'fakeA4'
+  | 'fakeB4'
+  | 'fakeC4'
+  | 'fakeD4'
+
+export type FakeStagingAreaRightSlot = 'fakeStagingAreaRightSlot'
+
+export type AddressableAreaNamesWithFakes =
+  | AddressableAreaName
+  | FlexFakeAddressableAreaName
+
+export type AddressableAreaWithFakes = AddressableArea | FakeAddressableArea
+
+export type CutoutFixtureIdsWithFakes =
+  | CutoutFixtureId
+  | FakeStagingAreaRightSlot
+
+export type AreaTypeWithFakes = AreaType | 'fakeStagingSlot'
+
 export const MOVABLE_TRASH_A1_ADDRESSABLE_AREA: 'movableTrashA1' =
   'movableTrashA1'
 export const MOVABLE_TRASH_A3_ADDRESSABLE_AREA: 'movableTrashA3' =
@@ -551,6 +578,9 @@ export const SINGLE_RIGHT_SLOT_FIXTURE: 'singleRightSlot' = 'singleRightSlot'
 export const STAGING_AREA_RIGHT_SLOT_FIXTURE: 'stagingAreaRightSlot' =
   'stagingAreaRightSlot'
 
+export const FAKE_STAGING_AREA_RIGHT_SLOT: 'fakeStagingAreaRightSlot' =
+  'fakeStagingAreaRightSlot'
+
 export const TRASH_BIN_FIXTURE: 'trashBin' = 'trashBin'
 export const TRASH_BIN_ADAPTER_FIXTURE: 'trashBinAdapter' = 'trashBinAdapter'
 
@@ -694,3 +724,12 @@ export const POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN: Record<
 }
 
 export const SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM = 2
+
+export const SAFE_MOVE_TO_WELL_LOCATION: WellLocation = {
+  origin: WELL_ORIGIN_TOP,
+  offset: {
+    x: 0,
+    y: 0,
+    z: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  },
+}

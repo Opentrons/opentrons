@@ -104,7 +104,7 @@ export function useDispenseSettingsConfig({
         state.mixOnDispense !== undefined
           ? t('mix_value', {
               volume: state.mixOnDispense?.mixVolume,
-              reps: state.mixOnDispense?.repititions,
+              reps: state.mixOnDispense?.repetitions,
             })
           : '',
       enabled:
@@ -121,26 +121,31 @@ export function useDispenseSettingsConfig({
         }
       },
     },
-    // ToDo replace dummy configs for push out
     {
       option: 'dispense_push_out',
       copy: t('push_out'),
-      value: 'dummy Push Out',
-      enabled: false,
+      value:
+        state.pushOut != null && state.pushOut
+          ? t('option_enabled')
+          : t('option_disabled'),
+      enabled: true,
       onClick: () => {
-        // (kk: 04/07/2025)ToDo add push out
-        // setSelectedSetting('push_out')
+        setSelectedSetting('dispense_push_out')
       },
     },
-    // ToDo replace dummy configs for retract
     {
       option: 'dispense_retract',
       copy: t('retract'),
-      value: 'dummy Retract',
-      enabled: false,
+      value:
+        state.retractDispense !== undefined
+          ? t('retract_value', {
+              speed: state.retractDispense.speed,
+              position: state.retractDispense.positionFromBottom,
+            })
+          : '',
+      enabled: true,
       onClick: () => {
-        // (kk: 04/07/2025)ToDo add retract
-        // setSelectedSetting('retract')
+        setSelectedSetting('dispense_retract')
       },
     },
     {
@@ -165,7 +170,7 @@ export function useDispenseSettingsConfig({
       value:
         state.airGapDispense !== undefined
           ? t('air_gap_value', { volume: state.airGapDispense })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_air_gap')

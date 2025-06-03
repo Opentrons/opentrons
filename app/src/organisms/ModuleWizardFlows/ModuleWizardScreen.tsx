@@ -17,9 +17,9 @@ interface ModuleWizardScreenProps {
   children: JSX.Element
 }
 
-export const ModuleWizardScreen = (
+export function ModuleWizardScreen(
   props: ModuleWizardScreenProps
-): JSX.Element | null => {
+): JSX.Element {
   const {
     isRobotMoving,
     isModuleUpdating,

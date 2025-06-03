@@ -1,6 +1,7 @@
 import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
+  NONE_LIQUID_CLASS_NAME,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
@@ -87,7 +88,10 @@ const getCheckedPath = (
   const { labwareDefURI: tiprackDefUri, def: tiprackDef } = tiprackEntity
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassValuesForTip = allLiquidClassDefs[
-    hydratedFormData.liquidClass ?? WATER_LIQUID_CLASS_NAME
+    hydratedFormData.liquidClass === NONE_LIQUID_CLASS_NAME ||
+    hydratedFormData.liquidClass == null
+      ? WATER_LIQUID_CLASS_NAME
+      : hydratedFormData.liquidClass ?? null
   ]?.byPipette
     .find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
@@ -304,6 +308,12 @@ export const moveLiquidFormToArgs = (
     hydratedFormData.volume,
     tipRack
   )
+  const conditioningVolume =
+    hydratedFormData.conditioning_checkbox === true &&
+    hydratedFormData.conditioning_volume != null &&
+    hydratedFormData.conditioning_volume > 0
+      ? hydratedFormData.conditioning_volume
+      : 0
   const commonFields = {
     pipette: pipetteId,
     volume,
@@ -379,10 +389,13 @@ export const moveLiquidFormToArgs = (
     dispenseRetractYOffset: hydratedFormData.dispense_retract_y_position ?? 0,
     dispenseRetractZOffset: hydratedFormData.dispense_retract_mmFromBottom ?? 0,
     dispenseRetractPositionReference:
-      hydratedFormData.dispense_position_reference,
+      hydratedFormData.dispense_retract_position_reference,
     dispenseRetractXOffset: hydratedFormData.dispense_retract_x_position ?? 0,
     pushOut: pushOut_checkbox ? pushOut_volume : 0,
-    liquidClass: hydratedFormData.liquidClass ?? null,
+    liquidClass:
+      hydratedFormData.liquidClass === NONE_LIQUID_CLASS_NAME // transform "none" (needed in step form) to null
+        ? null
+        : hydratedFormData.liquidClass ?? null,
   }
   console.assert(
     sourceWellsUnordered.length > 0,
@@ -439,6 +452,7 @@ export const moveLiquidFormToArgs = (
         ...commonFields,
         commandCreatorFnName: 'distribute',
         disposalVolume,
+        conditioningVolume,
         // distribute needs blowout location field because disposal volume checkbox might be checked without blowout checkbox being checked
         blowoutLocation: hydratedFormData.blowout_location,
         mixBeforeAspirate,

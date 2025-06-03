@@ -961,6 +961,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
   numDispenseWells: number
   conditioningByVolume: Array<[number, number]> | null
   disposalByVolume: Array<[number, number]> | null
+  aspirateAirGap?: number | null
 }): {
   referenceVolumes: {
     airGap: number
@@ -985,6 +986,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
     conditioningByVolume,
     disposalByVolume,
     numDispenseWells,
+    aspirateAirGap,
   } = args
   const { liquids } = pipetteSpecs
   const isInLowVolumeMode =
@@ -994,9 +996,10 @@ export const getTransferPlanAndReferenceVolumes = (args: {
     : liquids.default.maxVolume
   const maxWorkingVolumeTip = tiprackDefinition?.wells.A1.totalLiquidVolume
   const maxWorkingVolume =
-    maxWorkingVolumeTip == null
+    (maxWorkingVolumeTip == null
       ? maxWorkingVolumePipette
-      : Math.min(maxWorkingVolumePipette, maxWorkingVolumeTip)
+      : Math.min(maxWorkingVolumePipette, maxWorkingVolumeTip)) -
+    (aspirateAirGap ?? 0)
   const numAspirations = Math.ceil(volume / maxWorkingVolume)
   const minVolumeForMultiAspirateDispense = volume * 2
   const isMultiDispenseAvailable =

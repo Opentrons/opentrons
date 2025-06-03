@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
+  AnimationVideo,
   Flex,
   LegacyStyledText,
   RESPONSIVENESS,
@@ -48,7 +49,7 @@ export const BODY_STYLE = css`
   }
 `
 
-export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
+export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
   const {
     proceed,
     goBack,
@@ -77,16 +78,14 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       attachedModule.moduleModel
     )
     if (calibrationAdapterLoadName == null) {
-      console.error(
+      setErrorMessage(
         `could not get calibration adapter load name for ${attachedModule.moduleModel}`
       )
-      return
     }
     if (slotName == null) {
-      console.error(
+      setErrorMessage(
         `could not load module ${attachedModule.moduleModel} into location ${slotName}`
       )
-      return
     }
 
     const calibrationAdapterId = uuidv4()
@@ -94,7 +93,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       {
         commandType: 'loadModule',
         params: {
-          location: { slotName },
+          location: { slotName: slotName ?? '' },
           model: attachedModule.moduleModel,
           moduleId: attachedModule.id,
         },
@@ -106,7 +105,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
           location: { moduleId: attachedModule.id },
           version: 1,
           namespace: 'opentrons',
-          loadName: calibrationAdapterLoadName,
+          loadName: calibrationAdapterLoadName ?? '',
         },
       },
       { commandType: 'home' as const, params: {} },
@@ -118,6 +117,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
         },
       },
     ]
+
     chainRunCommands?.(commands, false)
       .then(() => {
         setCreatedAdapterId(calibrationAdapterId)
@@ -130,28 +130,8 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       })
   }
 
-  const moduleType = attachedModule.moduleType
-  let bodyText = (
-    <LegacyStyledText css={BODY_STYLE}>{t('place_flush')}</LegacyStyledText>
-  )
-  if (moduleType === HEATERSHAKER_MODULE_TYPE) {
-    bodyText = (
-      <LegacyStyledText css={BODY_STYLE}>
-        {t('place_flush_heater_shaker')}
-      </LegacyStyledText>
-    )
-  }
-  if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-    bodyText = (
-      <LegacyStyledText css={BODY_STYLE}>
-        {t('place_flush_thermocycler')}
-      </LegacyStyledText>
-    )
-  }
-
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
   const isInLeftSlot = LEFT_SLOTS.some(slot => slot === slotName)
-
   let attachAdapterVideoSrc
   if (
     THERMOCYCLER_MODULE_MODELS.some(
@@ -176,28 +156,10 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       ? TempModule_PlaceAdapter_L
       : TempModule_PlaceAdapter_R
   } else {
-    attachAdapterVideoSrc = null
-    console.error(
+    setErrorMessage(
       `Invalid module type for calibration: ${attachedModule.moduleModel}`
     )
-    return null
   }
-
-  const placeAdapterVid = (
-    <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-      <video
-        css={css`
-          max-width: 100%;
-          max-height: 100%;
-        `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
-      >
-        <source src={attachAdapterVideoSrc} />
-      </video>
-    </Flex>
-  )
 
   if (isRobotMoving)
     return (
@@ -205,19 +167,46 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
-  return (
-    <GenericWizardTile
-      header={
-        moduleType === HEATERSHAKER_MODULE_TYPE
-          ? t('install_calibration_adapter')
-          : t('install_adapter', { module: moduleDisplayName })
-      }
-      rightHandBody={placeAdapterVid}
-      bodyText={bodyText}
-      proceedButtonText={t('confirm_placement')}
-      proceed={handleOnClick}
-      proceedIsDisabled={maintenanceRunId == null}
-      back={goBack}
-    />
-  )
+  else {
+    return (
+      <GenericWizardTile
+        header={
+          attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE
+            ? t('install_calibration_adapter')
+            : t('install_adapter', { module: moduleDisplayName })
+        }
+        rightHandBody={
+          <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
+            <AnimationVideo
+              css={css`
+                max-width: 100%;
+                max-height: 100%;
+              `}
+            >
+              <source src={attachAdapterVideoSrc} />
+            </AnimationVideo>
+          </Flex>
+        }
+        bodyText={
+          attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE ? (
+            <LegacyStyledText css={BODY_STYLE}>
+              {t('place_flush_heater_shaker')}
+            </LegacyStyledText>
+          ) : attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE ? (
+            <LegacyStyledText css={BODY_STYLE}>
+              {t('place_flush_thermocycler')}
+            </LegacyStyledText>
+          ) : (
+            <LegacyStyledText css={BODY_STYLE}>
+              {t('place_flush')}
+            </LegacyStyledText>
+          )
+        }
+        proceedButtonText={t('confirm_placement')}
+        proceed={handleOnClick}
+        proceedIsDisabled={maintenanceRunId == null}
+        back={goBack}
+      />
+    )
+  }
 }

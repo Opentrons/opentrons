@@ -2,6 +2,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  AnimationVideo,
   Flex,
   LegacyStyledText,
   RESPONSIVENESS,
@@ -28,47 +29,38 @@ const BODY_STYLE = css`
   }
 `
 
-export const InstallShuttle = (
-  props: InstallShuttleProps
-): JSX.Element | null => {
+export function InstallShuttle(props: InstallShuttleProps): JSX.Element {
   const { proceed } = props
   const { t, i18n } = useTranslation(['module_wizard_flows'])
-
-  const shuttleInstallVid = (
-    <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-      <video
-        css={css`
-          max-width: 100%;
-          max-height: 100%;
-        `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
-      >
-        <source src={videoPlaceholder} />
-      </video>
-    </Flex>
-  )
-
-  const bodyText = (
-    <>
-      <LegacyStyledText css={BODY_STYLE}>
-        <Trans
-          t={t}
-          i18nKey="place_shuttle_description"
-          components={{
-            bold: <strong />,
-          }}
-        />
-      </LegacyStyledText>
-    </>
-  )
 
   return (
     <GenericWizardTile
       header={i18n.format(t('place_shuttle'), 'capitalize')}
-      rightHandBody={shuttleInstallVid}
-      bodyText={bodyText}
+      rightHandBody={
+        <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
+          <AnimationVideo
+            css={css`
+              max-width: 100%;
+              max-height: 100%;
+            `}
+          >
+            <source src={videoPlaceholder} />
+          </AnimationVideo>
+        </Flex>
+      }
+      bodyText={
+        <>
+          <LegacyStyledText css={BODY_STYLE}>
+            <Trans
+              t={t}
+              i18nKey="place_shuttle_description"
+              components={{
+                bold: <strong />,
+              }}
+            />
+          </LegacyStyledText>
+        </>
+      }
       proceedButtonText={t('confirm_placement')}
       proceed={proceed}
     />

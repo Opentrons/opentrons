@@ -19,7 +19,7 @@ interface CloseDoorProps extends ModuleSetupWizardStepProps {
   deckConfig: DeckConfiguration
 }
 
-export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
+export function CloseDoor(props: CloseDoorProps): JSX.Element {
   const {
     proceed,
     isRobotMoving,
@@ -39,10 +39,9 @@ export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
     cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null
 
   if (slotName == null) {
-    console.error(
+    setErrorMessage(
       `could not load module ${attachedModule.moduleModel} into location ${slotName}`
     )
-    return null
   }
 
   const handleHomeShuttle = (): void => {
@@ -50,7 +49,7 @@ export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
       {
         commandType: 'loadModule',
         params: {
-          location: { slotName },
+          location: { slotName: slotName ?? '' },
           model: attachedModule.moduleModel,
           moduleId: attachedModule.id,
         },
@@ -70,18 +69,6 @@ export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
       })
   }
 
-  const button = isOnDevice ? (
-    <SmallButton
-      buttonType="primary"
-      onClick={handleHomeShuttle}
-      buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-    />
-  ) : (
-    <PrimaryButton disabled={isRobotMoving} onClick={handleHomeShuttle}>
-      {i18n.format(t('shared:continue'), 'capitalize')}
-    </PrimaryButton>
-  )
-
   if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
@@ -98,7 +85,17 @@ export const CloseDoor = (props: CloseDoorProps): JSX.Element | null => {
         header={t('close_doors')}
         subHeader={t('close_doors_description')}
       >
-        {button}
+        {isOnDevice ? (
+          <SmallButton
+            buttonType="primary"
+            onClick={handleHomeShuttle}
+            buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+          />
+        ) : (
+          <PrimaryButton disabled={isRobotMoving} onClick={handleHomeShuttle}>
+            {i18n.format(t('shared:continue'), 'capitalize')}
+          </PrimaryButton>
+        )}
       </SimpleWizardBody>
     )
   }

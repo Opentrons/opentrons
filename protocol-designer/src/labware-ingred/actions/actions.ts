@@ -65,15 +65,14 @@ export const drillUpFromLabware: () => DrillUpFromLabwareAction = createAction(
 )
 // ==== Create/delete/modify labware =====
 export interface CreateContainerArgs {
-  labwareDefURI: string
-  // NOTE: adapterUnderLabwareDefURI is only for rendering an adapter under the labware/tiprack
-  adapterUnderLabwareDefURI?: string
+  labwareDefURIStack: string[]
   // NOTE: if slot is omitted, next available slot will be used.
   slot?: DeckSlot
 }
 export interface CreateContainerAction {
   type: 'CREATE_CONTAINER'
-  payload: CreateContainerArgs & {
+  payload: {
+    labwareDefURI: string
     slot: DeckSlot
     id: string
     displayCategory: LabwareDisplayCategory
@@ -149,17 +148,13 @@ export const deleteLiquidGroup: (
   const liquidEntities = getLiquidEntities(getState())
   const liquidIsOnDeck = allLiquidGroups.includes(liquidGroupId)
 
-  if (!Object.keys(allLiquidGroups).includes(liquidGroupId)) {
-    return
-  }
-
   const okToDelete = liquidIsOnDeck
     ? global.confirm(
         'This liquid has been placed on the deck, are you sure you want to delete it?'
       )
     : true
-
   if (!okToDelete) {
+    console.error(`problem with deleting liquid id ${liquidGroupId}`)
     return
   }
 
@@ -256,7 +251,7 @@ export const editLiquidGroup: (
 export interface SelectTopLabwareAction {
   type: 'SELECT_TOP_LABWARE'
   payload: {
-    labwareDefUri: string | null
+    labwareDefURI: string | null
   }
 }
 export const selectTopLabware: (
@@ -265,16 +260,43 @@ export const selectTopLabware: (
   type: 'SELECT_TOP_LABWARE',
   payload,
 })
+
+export interface SelectTopLabwareAmountAction {
+  type: 'SELECT_TOP_LABWARE_AMOUNT'
+  payload: {
+    amount: number
+  }
+}
+export const selectTopLabwareAmount: (
+  payload: SelectTopLabwareAmountAction['payload']
+) => SelectTopLabwareAmountAction = payload => ({
+  type: 'SELECT_TOP_LABWARE_AMOUNT',
+  payload,
+})
+
 export interface SelectAdapterAction {
   type: 'SELECT_ADAPTER'
   payload: {
-    adapterDefUri: string | null
+    adapterDefURI: string | null
   }
 }
 export const selectAdapter: (
   payload: SelectAdapterAction['payload']
 ) => SelectAdapterAction = payload => ({
   type: 'SELECT_ADAPTER',
+  payload,
+})
+
+export interface SelectLidAction {
+  type: 'SELECT_LID'
+  payload: {
+    labwareDefURI: string | null
+  }
+}
+export const selectLid: (
+  payload: SelectLidAction['payload']
+) => SelectLidAction = payload => ({
+  type: 'SELECT_LID',
   payload,
 })
 
@@ -301,6 +323,25 @@ export const selectFixture: (
   payload: SelectFixtureAction['payload']
 ) => SelectFixtureAction = payload => ({
   type: 'SELECT_FIXTURE',
+  payload,
+})
+
+export interface EditSlotInfoAction {
+  type: 'EDIT_SLOT_INFO'
+  payload: {
+    labwareDefURI?: string | null
+    adapterDefURI?: string | null
+    moduleModel?: ModuleModel | null
+    fixture?: Fixture | null
+    amount?: number
+    lidDefURI?: string | null
+  }
+}
+
+export const editSlotInfo: (
+  payload: EditSlotInfoAction['payload']
+) => EditSlotInfoAction = payload => ({
+  type: 'EDIT_SLOT_INFO',
   payload,
 })
 

@@ -51,9 +51,7 @@ interface SelectLocationProps extends ModuleSetupWizardStepProps {
   createMaintenanceRun: CreateMaintenanceRunType
   isLoadedInRun: boolean
 }
-export const SelectLocation = (
-  props: SelectLocationProps
-): JSX.Element | null => {
+export function SelectLocation(props: SelectLocationProps): JSX.Element {
   const {
     proceed,
     attachedModule,
@@ -71,7 +69,7 @@ export const SelectLocation = (
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
   const handleOnClick = (): void => {
-    if (maintenanceRunId === null) {
+    if (maintenanceRunId == null) {
       createMaintenanceRun({}).catch(error => {
         setErrorMessage(error.message as string)
       })
@@ -82,16 +80,6 @@ export const SelectLocation = (
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const cutoutConfig = deckConfig.find(
     cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
-  )
-  const bodyText = (
-    <>
-      <LegacyStyledText css={BODY_STYLE}>
-        {t('select_the_slot', { module: moduleName })}
-      </LegacyStyledText>
-      <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
-        {t('module_secured')}
-      </Banner>
-    </>
   )
 
   const moduleFixtures = getCutoutFixturesForModuleModel(
@@ -202,7 +190,16 @@ export const SelectLocation = (
           height="250px"
         />
       }
-      bodyText={bodyText}
+      bodyText={
+        <>
+          <LegacyStyledText css={BODY_STYLE}>
+            {t('select_the_slot', { module: moduleName })}
+          </LegacyStyledText>
+          <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
+            {t('module_secured')}
+          </Banner>
+        </>
+      }
       proceedButtonText={t('confirm_location')}
       proceed={handleOnClick}
       proceedIsDisabled={cutoutConfig == null}

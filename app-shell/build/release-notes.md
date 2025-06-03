@@ -8,6 +8,15 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons App Changes in 8.4.1
+
+The 8.4.1 hotfix release fixes two issues:
+
+- Placing a Magnetic Block in slot C2 no longer prevents Labware Position Check from running.
+- Existing labware offsets are no longer doubled during Labware Position Check.
+
+---
+
 ## Opentrons App Changes in 8.4.0
 
 Welcome to the v8.4.0 release of the Opentrons App! This release includes updates to labware offsets on the Flex, as well as other new features, improvements, and bug fixes.
@@ -44,6 +53,8 @@ There are no changes to the Opentrons App in v8.3.2, but it is required for upda
 ## Opentrons App Changes in 8.3.1
 
 The 8.3.1 hotfix release includes a small fix to allow all robots to properly reboot after an upgrade to v8.3.0.
+
+---
 
 ## Opentrons App Changes in 8.3.0
 

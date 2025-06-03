@@ -35,9 +35,9 @@ interface ModuleWizardFlowsProps {
   onComplete?: () => void
 }
 
-export const ModuleWizardFlows = (
+export function ModuleWizardFlows(
   props: ModuleWizardFlowsProps
-): JSX.Element | null => {
+): JSX.Element | null {
   const {
     attachedModule: attachedModuleOnLaunch,
     robotName,
@@ -84,7 +84,9 @@ export const ModuleWizardFlows = (
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
         isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={() => {
-          if (selectedModule != null) sendIdentifyModule(selectedModule, false)
+          if (selectedModule != null) {
+            sendIdentifyModule(selectedModule, false)
+          }
           handleCleanUpAndClose()
         }}
         currentStepIndex={currentStepIndex}

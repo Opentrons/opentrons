@@ -89,8 +89,9 @@ describe('SelectedItems', () => {
     })
     vi.mocked(LabwareOnDeck).mockReturnValue(<div>mock LabwareOnDeck</div>)
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: null,
-      selectedTopLabwareDefUri: null,
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: 'trashBin',
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -106,8 +107,9 @@ describe('SelectedItems', () => {
   })
   it('renders a selected fixture with a selected labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: mockAdapterURI,
-      selectedTopLabwareDefUri: null,
+      selectedAdapterDefURI: mockAdapterURI,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: 'trashBin',
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -118,8 +120,9 @@ describe('SelectedItems', () => {
   })
   it('renders a selected module', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: null,
-      selectedTopLabwareDefUri: null,
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: HEATERSHAKER_MODULE_V1,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -131,8 +134,9 @@ describe('SelectedItems', () => {
   })
   it('renders a selected module and a selected labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: mockAdapterURI,
-      selectedTopLabwareDefUri: null,
+      selectedAdapterDefURI: mockAdapterURI,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: HEATERSHAKER_MODULE_V1,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -166,8 +170,9 @@ describe('SelectedItems', () => {
       },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: mockAdapterURI,
-      selectedTopLabwareDefUri: mockAdapterURI,
+      selectedAdapterDefURI: mockAdapterURI,
+      selectedTopLabware: { labwareDefURI: mockAdapterURI, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: 'trashBin',
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },

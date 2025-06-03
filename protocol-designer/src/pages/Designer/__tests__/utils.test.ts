@@ -14,10 +14,14 @@ import {
   _sortLabwareDropdownOptions,
   formatTime,
   getSlotInformation,
+  getUnoccupiedStackOptions,
 } from '../utils'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type {
+  AdditionalEquipmentName,
+  RobotState,
+} from '@opentrons/step-generation'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
 
 const mockLabOnDeck1 = {
@@ -151,7 +155,7 @@ describe('getSlotInformation', () => {
       matchingLabwareFor4thColumn: null,
       createdModuleForSlot: mockHS,
       createdAdapterForSlot: mockLabOnDeck1,
-      createdTopLabwareForSlot: mockLabOnDeck2,
+      createdStackForSlot: [mockLabOnDeck2.id],
       createdFixtureForSlots: [],
       slotPosition: null,
     })
@@ -164,6 +168,7 @@ describe('getSlotInformation', () => {
       createdAdapterForSlot: mockLabOnDeck3,
       createdFixtureForSlots: [],
       slotPosition: null,
+      createdStackForSlot: [],
     })
   })
   it('renders no items on the slot for a flex', () => {
@@ -179,6 +184,7 @@ describe('getSlotInformation', () => {
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
       createdFixtureForSlots: [],
+      createdStackForSlot: [],
     })
   })
   it('renders a trashbin for a Flex on slot A3', () => {
@@ -189,6 +195,7 @@ describe('getSlotInformation', () => {
       slotPosition: null,
       createdFixtureForSlots: [mockTrash],
       preSelectedFixture: 'trashBin',
+      createdStackForSlot: [],
     })
   })
   it('renders a h-s, labware and nested labware for a Flex on slot D1', () => {
@@ -199,7 +206,7 @@ describe('getSlotInformation', () => {
       slotPosition: null,
       createdModuleForSlot: mockHSFlex,
       createdAdapterForSlot: mockLabOnDeck1Flex,
-      createdTopLabwareForSlot: mockLabOnDeck2Flex,
+      createdStackForSlot: [mockLabOnDeck2Flex.id],
       createdFixtureForSlots: [],
     })
   })
@@ -211,6 +218,7 @@ describe('getSlotInformation', () => {
       slotPosition: null,
       createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
+      createdStackForSlot: [],
     })
   })
   it('renders the staging area with waste chute and labware in slot D4 for flex', () => {
@@ -219,7 +227,7 @@ describe('getSlotInformation', () => {
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       slotPosition: null,
-      createdTopLabwareForSlot: mockLabOnStagingArea,
+      createdStackForSlot: [mockLabOnStagingArea.id],
       createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
     })
@@ -255,5 +263,48 @@ describe('_sortLabwareDropdownOptions', () => {
   it('should handle {} case', () => {
     const result = _sortLabwareDropdownOptions([])
     expect(result).toEqual([])
+  })
+})
+
+const mockT = (key: string) => key
+
+describe('getUnoccupiedStackOptions', () => {
+  const mockRobotState: RobotState = {
+    labware: { labId: { stack: ['labId', 'mockHsId', 'D1'] } },
+    pipettes: {},
+    modules: {},
+    tipState: {} as any,
+    liquidState: {} as any,
+  }
+
+  it('should render a labware on a stack', () => {
+    const mockLabware: AllTemporalPropertiesForTimelineFrame['labware'] = {
+      labId: mockLabOnDeck1Flex,
+      labId2: {
+        ...mockLabOnDeck2Flex,
+        def: {
+          ...fixture96Plate,
+          compatibleParentLabware: [fixtureTiprackAdapter.parameters.loadName],
+        } as LabwareDefinition2,
+      },
+      labId3: mockLabOnStagingArea,
+    }
+    expect(
+      getUnoccupiedStackOptions(mockRobotState, mockLabware, 'labId2', mockT)
+    ).toEqual([
+      {
+        name: 'Fixture Flex 96 Tip Rack Adapter',
+        value: 'labId',
+        deckLabel: 'D1',
+      },
+    ])
+  })
+  it('should render no labware', () => {
+    const mockLabware: AllTemporalPropertiesForTimelineFrame['labware'] = {
+      labId: mockLabOnDeck1Flex,
+    }
+    expect(
+      getUnoccupiedStackOptions(mockRobotState, mockLabware, 'labId', mockT)
+    ).toEqual([])
   })
 })

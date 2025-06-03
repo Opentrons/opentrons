@@ -5,7 +5,11 @@ import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { css } from 'styled-components'
 
-import { ModalShell, useConditionalConfirm } from '@opentrons/components'
+import {
+  AnimationVideo,
+  ModalShell,
+  useConditionalConfirm,
+} from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
@@ -201,18 +205,15 @@ function TipLengthCalibrationComplete(
 
   const visualAid =
     calBlock != null ? (
-      <video
+      <AnimationVideo
         key={blockRemovalAssetBySlot[calBlock.slot]}
         css={css`
           max-width: 100%;
           max-height: 15rem;
         `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
       >
         <source src={blockRemovalAssetBySlot[calBlock.slot]} />
-      </video>
+      </AnimationVideo>
     ) : null
 
   return (

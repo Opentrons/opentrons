@@ -20,18 +20,16 @@ interface EqipmentItem {
   subtitle?: string
 }
 
-type BeforeBeginningProps = ModuleSetupWizardStepProps
+interface BeforeBeginningProps extends ModuleSetupWizardStepProps {}
 
-export const BeforeBeginning = (
-  props: BeforeBeginningProps
-): JSX.Element | null => {
-  const { proceed, attachedModule } = props
+export function BeforeBeginning(props: BeforeBeginningProps): JSX.Element {
+  const { proceed, attachedModule, setErrorMessage } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
 
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
-  let adapterLoadname: string
-  let adapterDisplaynameKey: string
+  let adapterLoadname: string = ''
+  let adapterDisplaynameKey: string = ''
   const equipmentList = useAddEquipmentToSpecificModules([], attachedModule)
   if (
     THERMOCYCLER_MODULE_MODELS.some(
@@ -55,11 +53,9 @@ export const BeforeBeginning = (
     adapterLoadname = 'calibration_adapter_temperature'
     adapterDisplaynameKey = 'calibration_adapter_temperature'
   } else {
-    adapterLoadname = ''
-    console.error(
+    setErrorMessage(
       `Invalid module type for calibration: ${attachedModule.moduleModel}`
     )
-    return null
   }
   equipmentList.push(
     ...[

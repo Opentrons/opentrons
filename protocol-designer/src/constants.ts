@@ -1,34 +1,13 @@
 import mapValues from 'lodash/mapValues'
 
-import {
-  ABSORBANCE_READER_TYPE,
-  ABSORBANCE_READER_V1,
-  FLEX_ROBOT_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_V1,
-  MAGNETIC_BLOCK_TYPE,
-  MAGNETIC_BLOCK_V1,
-  MAGNETIC_MODULE_TYPE,
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
-  OT2_ROBOT_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_MODULE_V1,
-  TEMPERATURE_MODULE_V2,
-  THERMOCYCLER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import type {
   CutoutId,
-  DeckSlot as DeckDefSlot,
   LabwareDefinition2,
-  ModuleModel,
-  ModuleType,
   RobotType,
 } from '@opentrons/shared-data'
-import type { DeckSlot, WellVolumes } from './types'
+import type { WellVolumes } from './types'
 
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)
@@ -42,28 +21,10 @@ export const FIXED_TRASH_ID: 'fixedTrash' = 'fixedTrash'
 export const STD_SLOT_X_DIM = 128
 export const STD_SLOT_Y_DIM = 86
 export const STD_SLOT_DIVIDER_WIDTH = 4
-// PD-specific slots that don't exist in deck definition.
-// These have no visual representation on the deck themselves,
-// but may contain certain specific items that span (eg thermocycler)
-export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'
-export const TC_SPAN_SLOTS: DeckSlot[] = ['7', '8', '10', '11']
-export const PSEUDO_DECK_SLOTS: Record<DeckSlot, DeckDefSlot> = {
-  [SPAN7_8_10_11_SLOT]: {
-    displayName: 'Spanning slot',
-    id: SPAN7_8_10_11_SLOT,
-    position: [0.0, 181.0, 0.0],
-    // shares origin with OT2 standard slot 7
-    matingSurfaceUnitVector: [-1, 1, -1],
-    boundingBox: {
-      xDimension: STD_SLOT_X_DIM * 2 + STD_SLOT_DIVIDER_WIDTH,
-      yDimension: STD_SLOT_Y_DIM * 2 + STD_SLOT_DIVIDER_WIDTH,
-      zDimension: 0,
-    },
-    compatibleModules: [THERMOCYCLER_MODULE_TYPE],
-  },
-}
 export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
 export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
+export const WASTE_CHUTE_DISPLAY_NAME = 'Waste chute'
+export const TRASH_BIN_DISPLAY_NAME = 'Trash bin'
 // special ID for invisible deck setup step-form
 export const INITIAL_DECK_SETUP_STEP_ID = '__INITIAL_DECK_SETUP_STEP__'
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
@@ -95,74 +56,7 @@ export const MIN_TC_DURATION_SECONDS = 0
 export const MAX_TC_DURATION_SECONDS = 60
 export const MIN_TC_PROFILE_VOLUME = 0
 export const MAX_TC_PROFILE_VOLUME = 100
-// @ts-expect-error Flex stacker not yet supported in PD
-export const MODELS_FOR_MODULE_TYPE: Record<
-  ModuleType,
-  Array<{
-    name: string
-    value: ModuleModel
-    disabled?: boolean
-  }>
-> = {
-  [MAGNETIC_MODULE_TYPE]: [
-    {
-      name: 'GEN1',
-      value: MAGNETIC_MODULE_V1,
-    },
-    {
-      name: 'GEN2',
-      value: MAGNETIC_MODULE_V2,
-    },
-  ],
-  [TEMPERATURE_MODULE_TYPE]: [
-    {
-      name: 'GEN1',
-      value: TEMPERATURE_MODULE_V1,
-    },
-    {
-      name: 'GEN2',
-      value: TEMPERATURE_MODULE_V2,
-    },
-  ],
-  [THERMOCYCLER_MODULE_TYPE]: [
-    {
-      name: 'GEN1',
-      value: THERMOCYCLER_MODULE_V1,
-    },
-    {
-      name: 'GEN2',
-      value: THERMOCYCLER_MODULE_V2,
-    },
-  ],
-  [HEATERSHAKER_MODULE_TYPE]: [
-    {
-      name: 'GEN1',
-      value: HEATERSHAKER_MODULE_V1,
-    },
-  ],
-  [MAGNETIC_BLOCK_TYPE]: [
-    {
-      name: 'GEN1',
-      value: MAGNETIC_BLOCK_V1,
-    },
-  ],
-  [ABSORBANCE_READER_TYPE]: [
-    {
-      name: 'GEN1',
-      value: ABSORBANCE_READER_V1,
-    },
-  ],
-}
 
-// @ts-expect-error Flex stacker not yet supported in PD
-export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
-  [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_V2,
-  [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V2,
-  [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_V2,
-  [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_V1,
-  [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_V1,
-  [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_V1,
-}
 // Values for pauseAction field
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'
 export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'

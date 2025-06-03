@@ -5,9 +5,12 @@ import { fixture96Plate } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
+import { getEnableStacking } from '../../../../feature-flags/selectors'
 import { openIngredientSelector } from '../../../../labware-ingred/actions'
+import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
+import { EditLabwareQuantityModal } from '../../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../../LabwareCardOverflowMenu'
 import { getLiquidIdsOnLabware } from '../../utils'
 import { LabwareCard } from '../index'
@@ -23,6 +26,9 @@ vi.mock('../../LabwareCardOverflowMenu')
 vi.mock('../../../../ui/labware/selectors')
 vi.mock('../../../../top-selectors/well-contents')
 vi.mock('../../utils')
+vi.mock('../../../../feature-flags/selectors')
+vi.mock('../../../../top-selectors/labware-locations')
+vi.mock('../../EditLabwareQuantityModal')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
@@ -50,7 +56,11 @@ describe('LabwareCard', () => {
         def: fixture96Plate as LabwareDefinition2,
       },
       lidDisplayName: 'mock lid',
+      quantity: 1,
     }
+    vi.mocked(EditLabwareQuantityModal).mockReturnValue(
+      <div>mock EditLabwareQuantityModal</div>
+    )
     vi.mocked(LabwareCardOverflowMenu).mockReturnValue(
       <div>mock LabwareCardOverflowMenu</div>
     )
@@ -60,16 +70,31 @@ describe('LabwareCard', () => {
     vi.mocked(
       wellContentsSelectors.getAllWellContentsForActiveItem
     ).mockReturnValue(null)
+    vi.mocked(getEnableStacking).mockReturnValue(true)
     vi.mocked(getLiquidIdsOnLabware).mockReturnValue([])
+    vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
+      modules: {},
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+      labware: {
+        labwareId: {
+          id: 'labwareId',
+          labwareDefURI: 'mockuri',
+          def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+          stack: ['labwareId', 'A1'],
+        },
+      },
+    })
   })
 
   it('renders a labware card with the liquids button and overflow menu', () => {
     render(props)
     screen.getByText('mock NickName')
     screen.getByText('ANSI 96 Standard Microplate')
-    screen.getByText('mock lid')
     screen.getByText('No liquids added')
-    fireEvent.click(screen.getByText('Add liquid'))
+    screen.getByText('with mock lid')
+    fireEvent.click(screen.getByText('Edit liquid'))
     expect(mockNavigate).toHaveBeenCalledWith('/liquids')
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
     fireEvent.click(screen.getByTestId('LabwareCard_overflowBtn'))
@@ -84,5 +109,30 @@ describe('LabwareCard', () => {
     vi.mocked(getLiquidIdsOnLabware).mockReturnValue(['0'])
     render(props)
     screen.getByText('1 liquid')
+  })
+  it('renders a labware card with the quantity tag', () => {
+    props.quantity = 2
+    props.labware = {
+      ...props.labware,
+      def: { ...fixture96Plate, stackLimit: 4 } as LabwareDefinition2,
+    }
+    render(props)
+    screen.getByText('mock NickName')
+    screen.getByText('ANSI 96 Standard Microplate')
+    screen.getByText('Quantity: 2')
+    screen.getByText('Edit liquid and quantity')
+  })
+  it('renders a labware card with edit quantity copy and pressing button renders modal', () => {
+    props.labware = {
+      ...props.labware,
+      def: {
+        ...fixture96Plate,
+        stackLimit: 4,
+        allowedRoles: ['lid'],
+      } as LabwareDefinition2,
+    }
+    render(props)
+    fireEvent.click(screen.getByText('Edit quantity'))
+    screen.getByText('mock EditLabwareQuantityModal')
   })
 })

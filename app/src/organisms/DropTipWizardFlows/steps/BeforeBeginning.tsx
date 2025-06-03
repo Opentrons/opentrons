@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
+  AnimationVideo,
   BORDERS,
   COLORS,
   CURSOR_POINTER,
@@ -167,17 +168,14 @@ function DropTipOption({
           : UNSELECTED_OPTIONS_STYLE
       }
     >
-      <video
+      <AnimationVideo
         css={css`
           max-width: 8.96rem;
         `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
         aria-label={flowType}
       >
         <source src={videoSrc} />
-      </video>
+      </AnimationVideo>
       <LegacyStyledText as="h3">{text}</LegacyStyledText>
     </Flex>
   )

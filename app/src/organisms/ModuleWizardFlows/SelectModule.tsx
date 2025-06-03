@@ -41,7 +41,7 @@ interface ModuleNameAndPort {
   port: string
 }
 
-export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
+export function SelectModule(props: SelectModuleProps): JSX.Element {
   const {
     buildFlowForSelectedModule,
     isOnDevice,
@@ -78,7 +78,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
       setSelectedModule(newModules[0])
       sendIdentifyModule(newModules[0], true)
     }
-  }, [])
+  }, [isSingleModule])
 
   // Handler for when there are multiple modules.
   const handleModuleSelected = (serialNumber: string): void => {
@@ -118,7 +118,9 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
       // Start blinking module, otherwise stop if multiple are available.
       sendIdentifyModule(selectedModule, isSingleModule)
       // Clear the selected module
-      if (!isSingleModule) setSelectedModule(null)
+      if (!isSingleModule) {
+        setSelectedModule(null)
+      }
     }
     setStackerNotInstalled(false)
   }
@@ -188,7 +190,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
         )}
       </SimpleWizardBody>
     )
-  } else if (newModules.length > 1) {
+  } else {
     const moduleButtons = newModules.map(module => {
       const m = getModuleNameAndPort(module)
       return {
@@ -233,7 +235,5 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
         </Flex>
       </SimpleWizardBodyContainer>
     )
-  } else {
-    return null
   }
 }
