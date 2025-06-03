@@ -93,16 +93,17 @@ describe('getIsSafePipetteMovement', () => {
   })
 
   it('returns true when the labware id is a trash bin', () => {
-    const result = getIsSafePipetteMovement(
-      COLUMN,
-      {
+    const result = getIsSafePipetteMovement({
+      nozzleConfiguation: COLUMN,
+      pipetteId: mockPipId,
+      robotState: {
         labware: {},
         pipettes: {},
         modules: {},
         tipState: {},
         liquidState: {},
       } as any,
-      {
+      invariantContext: {
         labwareEntities: {},
         pipetteEntities: {},
         moduleEntities: {},
@@ -119,24 +120,24 @@ describe('getIsSafePipetteMovement', () => {
         gripperEntities: {},
         config: {} as any,
       },
-      'mockId',
-      'mockTrashBin',
-      mockTipUri,
-      { x: 0, y: 0, z: 0 }
-    )
+      labwareId: 'mockId',
+      tipRackDefURI: 'mockTrashBin',
+      wellLocationOffset: { x: 0, y: 0, z: 0 },
+      wellTargetName: mockWellName,
+    })
     expect(result).toEqual(true)
   })
   it('returns false when within pipette extents is false', () => {
-    const result = getIsSafePipetteMovement(
-      COLUMN,
-      mockRobotState,
-      mockInvariantProperties,
-      mockPipId,
-      mockLabwareId,
-      mockTipUri,
-      { x: -12, y: -100, z: 20 },
-      mockWellName
-    )
+    const result = getIsSafePipetteMovement({
+      nozzleConfiguation: COLUMN,
+      robotState: mockRobotState,
+      invariantContext: mockInvariantProperties,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      tipRackDefURI: mockTipUri,
+      wellLocationOffset: { x: -12, y: -100, z: 20 },
+      wellTargetName: mockWellName,
+    })
     expect(result).toEqual(false)
   })
   it('returns true when there are no collisions and a module near it', () => {
@@ -151,16 +152,16 @@ describe('getIsSafePipetteMovement', () => {
         pythonName: 'mockPythonName',
       },
     }
-    const result = getIsSafePipetteMovement(
-      COLUMN,
-      mockRobotState,
-      mockInvariantProperties,
-      mockPipId,
-      mockLabwareId,
-      mockTipUri,
-      { x: -1, y: 5, z: 20 },
-      mockWellName
-    )
+    const result = getIsSafePipetteMovement({
+      nozzleConfiguation: COLUMN,
+      robotState: mockRobotState,
+      invariantContext: mockInvariantProperties,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      tipRackDefURI: mockTipUri,
+      wellLocationOffset: { x: -1, y: 5, z: 20 },
+      wellTargetName: mockWellName,
+    })
     expect(result).toEqual(true)
   })
   it('returns false when there is a tip that collides', () => {
@@ -169,16 +170,16 @@ describe('getIsSafePipetteMovement', () => {
       ...mockRobotState.labware,
       [mockAdapter]: { stack: [mockAdapter, 'D1'] },
     }
-    const result = getIsSafePipetteMovement(
-      COLUMN,
-      mockRobotState,
-      mockInvariantProperties,
-      mockPipId,
-      mockLabwareId,
-      mockTipUri,
-      { x: -1, y: 5, z: 0 },
-      mockWellName
-    )
+    const result = getIsSafePipetteMovement({
+      nozzleConfiguation: COLUMN,
+      robotState: mockRobotState,
+      invariantContext: mockInvariantProperties,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      tipRackDefURI: mockTipUri,
+      wellLocationOffset: { x: -1, y: 5, z: 0 },
+      wellTargetName: mockWellName,
+    })
     expect(result).toEqual(false)
   })
   it('returns false when there is a tall module nearby in a diagonal slot with adapter and labware', () => {
@@ -202,16 +203,16 @@ describe('getIsSafePipetteMovement', () => {
         pythonName: 'mockPythonName',
       },
     }
-    const result = getIsSafePipetteMovement(
-      COLUMN,
-      mockRobotState,
-      mockInvariantProperties,
-      mockPipId,
-      mockLabwareId,
-      mockTipUri,
-      { x: 0, y: 0, z: 0 },
-      mockWellName
-    )
+    const result = getIsSafePipetteMovement({
+      nozzleConfiguation: COLUMN,
+      robotState: mockRobotState,
+      invariantContext: mockInvariantProperties,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      tipRackDefURI: mockTipUri,
+      wellLocationOffset: { x: 0, y: 0, z: 0 },
+      wellTargetName: mockWellName,
+    })
     expect(result).toEqual(false)
   })
   //    todo(jr, 4/23/24): add more test cases, test thermocycler collision - i'll do this in a follow up

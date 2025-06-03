@@ -272,16 +272,26 @@ const getWellPosition = (
 }
 
 //  util to use in step-generation for if the pipette movement is safe
-export const getIsSafePipetteMovement = (
-  nozzleConfiguation: NozzleConfigurationStyle | null,
-  robotState: RobotState,
-  invariantContext: InvariantContext,
-  pipetteId: string,
-  labwareId: string,
-  tipRackDefURI: string,
-  wellLocationOffset: Point,
+export const getIsSafePipetteMovement = (args: {
+  nozzleConfiguation: NozzleConfigurationStyle | null
+  robotState: RobotState
+  invariantContext: InvariantContext
+  pipetteId: string
+  labwareId: string
+  tipRackDefURI: string
+  wellLocationOffset: Point
   wellTargetName?: string
-): boolean => {
+}): boolean => {
+  const {
+    nozzleConfiguation,
+    robotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    tipRackDefURI,
+    wellLocationOffset,
+    wellTargetName,
+  } = args
   const deckDefinition = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const {
     pipetteEntities,
@@ -311,7 +321,7 @@ export const getIsSafePipetteMovement = (
     stagingArea => stagingArea.location as string
   )
   const pipetteEntity = pipetteEntities[pipetteId]
-  const pipetteHasTip = tipState.pipettes[pipetteId]
+  const pipetteHasTip = tipState.pipettes[pipetteId]?.hasTip ?? false
   // account for tip length if picking up tip
   const tipLength = pipetteHasTip ? tiprackTipLength ?? 0 : 0
   const labwareSlot = getSlotInLocationStack(labwareState[labwareId].stack)

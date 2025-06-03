@@ -104,7 +104,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     errors.push(errorCreators.modulePipetteCollisionDanger())
   }
 
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
       errorCreators.noTipOnPipette({
         actionName,
@@ -121,16 +121,20 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
   if (
     isMultiChannelPipette &&
     nozzles !== ALL &&
-    !getIsSafePipetteMovement(
-      nozzles,
-      prevRobotState,
+    !getIsSafePipetteMovement({
+      nozzleConfiguation: nozzles,
+      robotState: prevRobotState,
       invariantContext,
       pipetteId,
       labwareId,
-      tipRack,
-      (wellLocation?.offset as Point) ?? { x: 0, y: 0, z: 0 },
-      wellName
-    )
+      tipRackDefURI: tipRack,
+      wellLocationOffset: (wellLocation?.offset as Point) ?? {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      wellTargetName: wellName,
+    })
   ) {
     errors.push(errorCreators.possiblePipetteCollision())
   }

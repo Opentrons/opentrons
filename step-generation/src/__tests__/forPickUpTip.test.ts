@@ -44,7 +44,7 @@ describe('tip tracking', () => {
             },
           },
           pipettes: {
-            [p300SingleId]: true,
+            [p300SingleId]: { hasTip: true, attachedTipURI: tiprack1Id },
           },
         },
       })
@@ -65,7 +65,7 @@ describe('tip tracking', () => {
             [tiprack1Id]: getTipColumn(1, false),
           },
           pipettes: {
-            [p300MultiId]: true,
+            [p300MultiId]: { hasTip: true, attachedTipURI: tiprack1Id },
           },
         },
       })

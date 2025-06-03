@@ -758,7 +758,10 @@ describe('moveLabware', () => {
           tiprack1Id: { A1: true },
         },
         pipettes: {
-          p10SingleId: true,
+          p10SingleId: {
+            hasTip: true,
+            attachedTipURI: 'tiprackId',
+          },
         },
       },
     } as any) as RobotState

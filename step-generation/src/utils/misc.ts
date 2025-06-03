@@ -548,7 +548,9 @@ export function makeInitialRobotState(args: {
       pipettes: reduce(
         pipetteLocations,
         (acc, pipetteTemporalProperties, id) =>
-          pipetteTemporalProperties.mount ? { ...acc, [id]: false } : acc,
+          pipetteTemporalProperties.mount
+            ? { ...acc, [id]: { hasTip: false, attachedTipURI: null } }
+            : acc,
         {}
       ),
       tipracks: reduce(
@@ -713,6 +715,7 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
           origin: 'bottom',
           offset: { x: 0, y: 0, z: zOffset },
         },
+        nozzles: null,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -746,6 +749,7 @@ interface AirGapLocationArgs {
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
+  nozzles?: NozzleConfigurationStyle | null
 }
 export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
   args,
@@ -761,6 +765,7 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
     sourceId,
     sourceWell,
     volume,
+    nozzles,
   } = args
   const {
     labwareEntities,
@@ -794,6 +799,7 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
         wellName: dispenseAirGapWell,
         volume,
         type: 'dispense',
+        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -857,6 +863,7 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
           origin: 'bottom',
           offset: { x: 0, y: 0, z: zOffset },
         },
+        nozzles: null,
       }),
       curryCommandCreator(delay, {
         seconds: seconds,

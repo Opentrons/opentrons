@@ -35,17 +35,17 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
   if (
     isMultiChannelPipette &&
     nozzles !== ALL &&
-    !getIsSafePipetteMovement(
-      args.nozzles ?? null,
-      prevRobotState,
+    !getIsSafePipetteMovement({
+      nozzleConfiguation: args.nozzles ?? null,
+      robotState: prevRobotState,
       invariantContext,
       pipetteId,
       labwareId,
-      labwareId,
+      tipRackDefURI: labwareId,
       //  we don't adjust the offset when moving to the tiprack
-      { x: 0, y: 0 },
-      wellName
-    )
+      wellLocationOffset: { x: 0, y: 0 },
+      wellTargetName: wellName,
+    })
   ) {
     errors.push(possiblePipetteCollision())
   }

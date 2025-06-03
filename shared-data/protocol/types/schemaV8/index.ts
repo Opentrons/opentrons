@@ -70,6 +70,7 @@ export interface LiquidV1Mixin {
       displayName: string
       description: string
       displayColor?: string
+      liquidClass: string
     }
   }
 }

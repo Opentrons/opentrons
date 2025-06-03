@@ -1,4 +1,4 @@
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -9,6 +9,7 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getIsSafePipetteMovement,
   getLabwareSlot,
   getSlotInLocationStack,
   modulePipetteCollision,
@@ -19,11 +20,20 @@ import {
   uuid,
 } from '../../utils'
 
-import type { CreateCommand, MoveToWellParams } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  MoveToWellParams,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
+import type { Point } from '../../utils'
+
+export type ExtendedMoveToWellParams = MoveToWellParams & {
+  nozzles: NozzleConfigurationStyle | null
+}
 
 /** Move to specified well of labware, with optional offset and pathing options. */
-export const moveToWell: CommandCreator<MoveToWellParams> = (
+export const moveToWell: CommandCreator<ExtendedMoveToWellParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -36,6 +46,7 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
     minimumZHeight,
     forceDirect,
     speed,
+    nozzles,
   } = args
   const actionName = 'moveToWell'
   const errors: CommandCreatorError[] = []
@@ -47,6 +58,9 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
     false
 
   const slotName = getLabwareSlot(labwareId, prevRobotState.labware)
+
+  const attachedTipURI =
+    prevRobotState.tipState.pipettes[pipetteId]?.attachedTipURI ?? null
 
   if (!pipetteSpec) {
     errors.push(
@@ -171,6 +185,30 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
         errorCreators.heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette()
       )
     }
+  }
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
+
+  if (
+    isMultiChannelPipette &&
+    nozzles !== ALL &&
+    attachedTipURI &&
+    !getIsSafePipetteMovement({
+      nozzleConfiguation: nozzles,
+      robotState: prevRobotState,
+      invariantContext,
+      pipetteId,
+      labwareId,
+      tipRackDefURI: attachedTipURI,
+      wellLocationOffset: (wellLocation?.offset as Point) ?? {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      wellTargetName: wellName,
+    })
+  ) {
+    errors.push(errorCreators.possiblePipetteCollision())
   }
   if (errors.length > 0) {
     return {

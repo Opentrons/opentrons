@@ -2,6 +2,7 @@ import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import { curryWithoutPython, reduceCommandCreators } from '../../utils'
 import { airGapInPlace, moveToWell, prepareToAspirate } from '../atomic'
 
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 export type AirGapInWellType = 'aspirate' | 'dispense'
@@ -13,6 +14,7 @@ interface AirGapInWellArgs {
   volume: number
   labwareId: string
   wellName: string
+  nozzles?: NozzleConfigurationStyle | null
 }
 
 export const airGapInWell: CommandCreator<AirGapInWellArgs> = (
@@ -20,7 +22,15 @@ export const airGapInWell: CommandCreator<AirGapInWellArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { labwareId, wellName, flowRate, pipetteId, volume, type } = args
+  const {
+    labwareId,
+    wellName,
+    flowRate,
+    pipetteId,
+    volume,
+    type,
+    nozzles,
+  } = args
   const pipettePythonName =
     invariantContext.pipetteEntities[pipetteId].pythonName
 
@@ -57,6 +67,7 @@ export const airGapInWell: CommandCreator<AirGapInWellArgs> = (
           y: 0,
         },
       },
+      nozzles: nozzles ?? null,
     }),
     ...prepareToAspirateCommand,
     curryWithoutPython(airGapInPlace, {

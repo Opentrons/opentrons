@@ -74,7 +74,7 @@ describe('replaceTip', () => {
               },
             },
             pipettes: {
-              p300SingleId: false,
+              p300SingleId: { hasTip: false },
             },
           },
         })
@@ -89,7 +89,7 @@ describe('replaceTip', () => {
             [tiprack1Id]: getTipColumn(1, false),
           },
           pipettes: {
-            p300SingleId: false,
+            p300SingleId: { hasTip: false },
           },
         },
       })
@@ -114,7 +114,7 @@ describe('replaceTip', () => {
             },
           },
           pipettes: {
-            p300SingleId: true,
+            p300SingleId: { hasTip: true },
           },
         },
       })
@@ -142,7 +142,7 @@ describe('replaceTip', () => {
             },
           },
           pipettes: {
-            [PIPETTE_96]: true,
+            [PIPETTE_96]: { hasTip: true },
           },
         },
         pipettes: {
@@ -183,7 +183,7 @@ describe('replaceTip', () => {
             [tiprack1Id]: getTiprackTipstate(false),
           },
           pipettes: {
-            p300SingleId: false,
+            p300SingleId: { hasTip: false },
           },
         },
       })
@@ -222,7 +222,7 @@ describe('replaceTip', () => {
             },
           },
           pipettes: {
-            p300SingleId: true,
+            p300SingleId: { hasTip: true },
           },
         },
       })
@@ -294,7 +294,10 @@ describe('replaceTip', () => {
         tipState: {
           ...initialRobotState.tipState,
           pipettes: {
-            p300MultiId: true,
+            p300MultiId: {
+              hasTip: true,
+              attachedTipURI: 'tiprackId',
+            },
           },
         },
       }
@@ -338,7 +341,10 @@ describe('replaceTip', () => {
             [tiprack5Id]: getTiprackTipstate(true),
           },
           pipettes: {
-            p100096Id: true,
+            p100096Id: {
+              hasTip: true,
+              attachedTipURI: 'tiprackId',
+            },
           },
         },
       }

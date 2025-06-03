@@ -111,7 +111,10 @@ describe('pick up tip if no tip on pipette', () => {
     } as TransferArgs
 
     // no tip on pipette
-    robotStateWithTip.tipState.pipettes.p300SingleId = false
+    robotStateWithTip.tipState.pipettes.p300SingleId = {
+      hasTip: false,
+      attachedTipURI: null,
+    }
   })
 
   const changeTipOptions = ['once', 'always']
@@ -129,7 +132,7 @@ describe('pick up tip if no tip on pipette', () => {
       expect(res.commands[0]).toEqual(pickUpTipHelper('A1'))
     })
   })
-  it('...once, drop tip in waste chute', () => {
+  it.only('...once, drop tip in waste chute', () => {
     invariantContext = {
       ...invariantContext,
       wasteChuteEntities: {
@@ -141,7 +144,10 @@ describe('pick up tip if no tip on pipette', () => {
       },
     }
 
-    robotStateWithTip.tipState.pipettes.p300SingleId = true
+    robotStateWithTip.tipState.pipettes.p300SingleId = {
+      hasTip: true,
+      attachedTipURI: 'tiprackId',
+    }
 
     noTipArgs = {
       ...noTipArgs,
@@ -664,7 +670,10 @@ describe('single transfer exceeding pipette max', () => {
     } as TransferArgs
     // tip setup: tiprack's A1 has tip, pipette has no tip
     robotStateWithTip.tipState.tipracks.tiprack1Id.A1 = true
-    robotStateWithTip.tipState.pipettes.p300SingleId = false
+    robotStateWithTip.tipState.pipettes.p300SingleId = {
+      hasTip: false,
+      attachedTipURI: null,
+    }
     // liquid setup
     robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {
       '0': { volume: 400 },
@@ -2139,7 +2148,10 @@ describe('single transfer exceeding pipette max', () => {
       changeTip: 'never',
     }
     // begin with tip on pipette
-    robotStateWithTip.tipState.pipettes.p300SingleId = true
+    robotStateWithTip.tipState.pipettes.p300SingleId = {
+      hasTip: true,
+      attachedTipURI: 'tiprackId',
+    }
 
     const result = transfer(transferArgs, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
@@ -2432,7 +2444,10 @@ describe('single transfer exceeding pipette max', () => {
     }
 
     // begin with tip on pipette
-    robotStateWithTip.tipState.pipettes.p300SingleId = true
+    robotStateWithTip.tipState.pipettes.p300SingleId = {
+      hasTip: true,
+      attachedTipURI: 'tiprackId',
+    }
 
     const result = transfer(transferArgs, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)

@@ -31,8 +31,14 @@ describe('dropTip', () => {
       },
     })
 
-    _robotState.tipState.pipettes.p300SingleId = args.singleHasTips
-    _robotState.tipState.pipettes.p300MultiId = args.multiHasTips
+    _robotState.tipState.pipettes.p300SingleId = {
+      hasTip: args.singleHasTips,
+      attachedTipURI: 'tiprackId',
+    }
+    _robotState.tipState.pipettes.p300MultiId = {
+      hasTip: args.multiHasTips,
+      attachedTipURI: 'tiprackId',
+    }
     return _robotState
   }
 

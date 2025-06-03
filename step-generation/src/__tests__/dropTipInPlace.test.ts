@@ -26,7 +26,10 @@ describe('dropTipInPlace', () => {
   })
   it('dropTip in place', () => {
     initialRobotState.tipState.pipettes = {
-      [p300SingleId]: true,
+      [p300SingleId]: {
+        hasTip: true,
+        attachedTipURI: 'tiprackId',
+      },
     }
     const params: DropTipInPlaceParams = {
       pipetteId: DEFAULT_PIPETTE,

@@ -362,6 +362,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               labwareId: args.sourceLabware,
               wellName: sourceWell,
               wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
+              nozzles: args.nozzles,
             }),
           ]
           // TODO (nd, 05/13/2025): uncomment and refine below logic once meniscus-relative pipetting is supported in PD
@@ -421,6 +422,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               labwareId: args.sourceLabware,
               wellName: sourceWell,
               wellLocation: aspirateSubmergeLocation,
+              nozzles: args.nozzles,
             }),
             curryCommandCreator(moveToWell, {
               pipetteId: args.pipette,
@@ -440,6 +442,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   z: aspirateZOffset,
                 },
               },
+              nozzles: args.nozzles,
             }),
             ...(aspirateSubmergeDelay != null &&
             aspirateSubmergeDelay.seconds > 0
@@ -512,6 +515,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                         labwareId: args.sourceLabware,
                         wellName: sourceWell,
                         wellLocation: aspirateRetractLocation,
+                        nozzles: args.nozzles,
                       }),
                     ]
                   : []),
@@ -574,6 +578,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                 : {}),
               wellName: sourceWell,
               wellLocation: aspirateRetractLocation,
+              nozzles: args.nozzles,
             }),
             ...(aspirateRetractDelay != null &&
             aspirateRetractDelay?.seconds > 0
@@ -609,6 +614,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     labwareId: args.destLabware,
                     wellName: destinationWell,
                     wellLocation: dispenseSubmergeLocation,
+                    nozzles: args.nozzles,
                   }),
                   ...(aspirateAirGapVolume > 0
                     ? [
@@ -644,6 +650,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                         z: dispenseZOffset,
                       },
                     },
+                    nozzles: args.nozzles,
                   }),
                   ...(dispenseSubmergeDelay != null &&
                   dispenseSubmergeDelay.seconds > 0
@@ -725,6 +732,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                       : {}),
                     wellName: destinationWell,
                     wellLocation: dispenseRetractLocation,
+                    nozzles: args.nozzles,
                   }),
                   ...(dispenseRetractDelay != null &&
                   dispenseRetractDelay?.seconds > 0
@@ -802,6 +810,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                           labwareId: args.destLabware,
                           wellName: destinationWell,
                           wellLocation: dispenseRetractLocation,
+                          nozzles: args.nozzles,
                         }),
                       ]
                     : []),
@@ -834,6 +843,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   wellLocation: {
                     origin: WELL_ORIGIN_TOP,
                   },
+                  nozzles: args.nozzles,
                 }),
                 blowoutInPlaceCommand,
                 // touch tip at source well with dispense touch tip parameters
@@ -861,6 +871,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                         labwareId: args.sourceLabware,
                         wellName: sourceWell,
                         wellLocation: { origin: WELL_ORIGIN_TOP },
+                        nozzles: args.nozzles,
                       }),
                     ]
                   : []),
