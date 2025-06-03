@@ -134,7 +134,7 @@ dist-posix: clean lib
 
 .PHONY: dist-osx
 dist-osx: clean lib
-	$(builder) --mac --x64
+	$(builder) --mac --universal
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-linux
