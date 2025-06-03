@@ -19,13 +19,6 @@ requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 positions = ["A1", "H1", "A12", "H12"]
 
 
-def move_to_corners(pipette, labware, protocol):
-    for pos in positions:
-        pipette.move_to(labware[pos].top(z=1))  # + 1mm protocol.pause
-        protocol.pause("check the top height with shim")
-        pipette.move_to(labware[pos].bottom(z=1))
-        protocol.pause("check the bottm height with shim")
-
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
@@ -75,7 +68,10 @@ def run(protocol: ProtocolContext) -> None:
     pipette.pick_up_tip()
 
     # tip movement
-    move_to_corners(pipette, labware, protocol)
+    pipette.move_to(labware["A6"].top(z=1))  # + 1mm protocol.pause
+    protocol.pause("check the top height with shim")
+    pipette.move_to(labware["A6"].bottom(z=1))
+    protocol.pause("check the bottom height with shim")
 
     # if heater shaker, move to heatershaker and repeat process
     if heater_shaker:
@@ -88,4 +84,8 @@ def run(protocol: ProtocolContext) -> None:
         protocol.move_labware(labware, heater_shaker_adapter, use_gripper=True)
         heater_shaker.close_labware_latch()
         # repeat tip movement
-        move_to_corners(pipette, labware, protocol)
+        pipette.move_to(labware["A6"].top(z=1))  # + 1mm protocol.pause
+        protocol.pause("check the top height with shim")
+        pipette.move_to(labware["A6"].bottom(z=1))
+        protocol.pause("check the bottom height with shim")
+        
