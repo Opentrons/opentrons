@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -36,7 +35,6 @@ import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { deselectAllWells } from '../../../well-selection/actions'
 import { getSelectedWells } from '../../../well-selection/selectors'
 import { LINK_BUTTON_STYLE } from '../../atoms'
-import { DefineLiquidsModal } from '../DefineLiquidsModal'
 import { LiquidCard } from './LiquidCard'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
