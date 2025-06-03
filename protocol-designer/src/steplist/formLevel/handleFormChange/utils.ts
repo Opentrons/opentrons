@@ -6,6 +6,7 @@ import {
   getFlexNameConversion,
   linearInterpolate,
   POSITION_REFERENCE_TOP,
+  SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
@@ -534,13 +535,13 @@ const getNoLiquidClassValuesMoveLiquid = (
     ...aspirateFlowRateFields,
     ...aspirateOffsetFields,
     ...aspiratePositionReferenceFields,
-    aspirate_submerge_mmFromBottom: 0,
+    aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     aspirate_submerge_position_reference: POSITION_REFERENCE_TOP,
     aspirate_submerge_x_position: 0,
     aspirate_submerge_y_position: 0,
     aspirate_submerge_speed: aspirate.submerge.speed,
     aspirate_retract_speed: aspirate.retract.speed,
-    aspirate_retract_mmFromBottom: 0,
+    aspirate_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     aspirate_retract_position_reference: POSITION_REFERENCE_TOP,
     aspirate_retract_x_position: 0,
     aspirate_retract_y_position: 0,
@@ -552,13 +553,13 @@ const getNoLiquidClassValuesMoveLiquid = (
     ...dispenseFlowRateFields,
     ...dispenseOffsetFields,
     ...dispensePositionReferenceFields,
-    dispense_submerge_mmFromBottom: 0,
+    dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     dispense_submerge_position_reference: POSITION_REFERENCE_TOP,
     dispense_submerge_x_position: 0,
     dispense_submerge_y_position: 0,
     dispense_submerge_speed: dispense.submerge.speed,
     dispense_retract_speed: dispense.retract.speed,
-    dispense_retract_mmFromBottom: 0,
+    dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     dispense_retract_position_reference: POSITION_REFERENCE_TOP,
     dispense_retract_x_position: 0,
     dispense_retract_y_position: 0,
@@ -730,6 +731,10 @@ const getLiquidClassValuesMoveLiquid = (args: {
     volume: Number(rawForm.volume),
     path: rawForm.path as PathOption,
     numDispenseWells: rawForm.dispense_wells.length,
+    aspirateAirGap:
+      rawForm.aspirate_airGap_checkbox === true
+        ? Number(rawForm.aspirate_airGap_volume)
+        : null,
   }).referenceVolumes
   // top-level aspirate fields
   const aspiratePositionReferenceFields = getPositionReferenceFields(

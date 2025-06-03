@@ -109,6 +109,12 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
       return acc
     }
     const labwareSlot = getSlotInLocationStack(labwareOnDeck.stack)
+    const labwareIdsFromFullStack =
+      labwareOnDeck.stack?.filter(
+        id =>
+          labware[id] != null &&
+          !labware[id].def.allowedRoles?.includes('adapter')
+      ) ?? []
     const tcModel = Object.values(modules).find(
       module => module.type === THERMOCYCLER_MODULE_TYPE
     )?.model
@@ -128,6 +134,7 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
           key={`${labwareOnDeck.id}_${index}`}
           isSelected={isSelected}
           isLast
+          showModuleIcon={labwareIdsFromFullStack.length > 1}
           position={
             tcModel != null && (labwareSlot === '7' || labwareSlot === 'B1')
               ? tcPosition

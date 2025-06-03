@@ -92,36 +92,62 @@ def test_expand_for_volume_constraints(
 
 
 @pytest.mark.parametrize(
-    argnames=["volumes", "targets", "max_volume", "expanded_list_result"],
+    argnames=["volumes", "targets", "max_volume", "air_gap", "expanded_list_result"],
     argvalues=[
         (
             [25, 25],
             ["dest1", "dest2"],
             50,
+            24.0,
             [(25, "dest1"), (25, "dest2")],
         ),
         (
             [50, 50],
             ["dest1", "dest2"],
             50,
+            0.0,
             [(50, "dest1"), (50, "dest2")],
+        ),
+        (
+            [50, 50],
+            ["dest1", "dest2"],
+            50,
+            5.0,
+            [(25, "dest1"), (25, "dest1"), (25, "dest2"), (25, "dest2")],
         ),
         (
             [75, 75],
             ["dest1", "dest2"],
             50,
+            5.0,
             [(37.5, "dest1"), (37.5, "dest1"), (37.5, "dest2"), (37.5, "dest2")],
         ),
         (
             [100, 100],
             ["dest1", "dest2"],
             50,
+            0.0,
             [(50, "dest1"), (50, "dest1"), (50, "dest2"), (50, "dest2")],
+        ),
+        (
+            [100, 100],
+            ["dest1", "dest2"],
+            50,
+            5.0,
+            [
+                (100 / 3, "dest1"),
+                (100 / 3, "dest1"),
+                (100 / 3, "dest1"),
+                (100 / 3, "dest2"),
+                (100 / 3, "dest2"),
+                (100 / 3, "dest2"),
+            ],
         ),
         (
             [103, 103],
             ["dest1", "dest2"],
             50,
+            0.0,
             [
                 (103 / 3, "dest1"),
                 (103 / 3, "dest1"),
@@ -137,6 +163,7 @@ def test_expand_for_volume_constraints_for_liquid_classes(
     volumes: Iterable[float],
     targets: Iterable[Target],
     max_volume: float,
+    air_gap: float,
     expanded_list_result: List[Tuple[float, Target]],
 ) -> None:
     """It should create a list of volume and target transfers, splitting volumes equally if required."""
@@ -144,5 +171,6 @@ def test_expand_for_volume_constraints_for_liquid_classes(
         volumes=volumes,
         targets=targets,
         max_volume=max_volume,
+        air_gap=air_gap,
     )
     assert list(result) == expanded_list_result

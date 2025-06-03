@@ -5,6 +5,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_FLEX_END,
   ALIGN_STRETCH,
+  AnimationVideo,
   Box,
   DIRECTION_COLUMN,
   Flex,
@@ -149,18 +150,15 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
             </LegacyStyledText>
           </Flex>
           <Box flex="1">
-            <video
+            <AnimationVideo
               key={demoAsset}
               css={css`
                 max-width: 100%;
                 max-height: 15rem;
               `}
-              autoPlay={true}
-              loop={true}
-              controls={false}
             >
               <source src={demoAsset} />
-            </video>
+            </AnimationVideo>
           </Box>
         </Flex>
         <JogControls

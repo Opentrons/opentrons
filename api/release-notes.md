@@ -8,6 +8,12 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons Robot Software Changes in 8.4.1
+
+There are no changes to the robot software in v8.4.1, but it is required for running protocols in v8.4.1 of the Opentrons App.
+
+---
+
 ## Opentrons Robot Software Changes in 8.4.0
 
 Welcome to the v8.4.0 release of the Opentrons robot software! This release includes updated liquid handling commands for pipetting relative to a liquid meniscus, and other new features, improvements, and bug fixes.

@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
+  AnimationVideo,
   Flex,
   LegacyStyledText,
   RESPONSIVENESS,
@@ -176,17 +177,14 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
         }
         rightHandBody={
           <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-            <video
+            <AnimationVideo
               css={css`
                 max-width: 100%;
                 max-height: 100%;
               `}
-              autoPlay={true}
-              loop={true}
-              controls={false}
             >
               <source src={attachAdapterVideoSrc} />
-            </video>
+            </AnimationVideo>
           </Flex>
         }
         bodyText={

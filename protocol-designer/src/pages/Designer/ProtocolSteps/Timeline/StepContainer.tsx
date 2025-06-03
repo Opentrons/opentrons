@@ -230,13 +230,24 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       )}
       <Flex
         id={stepId}
-        {...{
-          onMouseEnter: isStepAfterError ? undefined : onMouseEnter,
-          onMouseLeave: isStepAfterError ? undefined : onMouseLeave,
-        }}
+        {...(!isStepAfterError
+          ? {
+              onMouseEnter,
+              onMouseLeave,
+            }
+          : {})}
         gridGap={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
       >
+        {dragHovered ? (
+          <Divider
+            marginY="0"
+            height="0.25rem"
+            width="100%"
+            backgroundColor={COLORS.blue50}
+            borderRadius={BORDERS.borderRadius2}
+          />
+        ) : null}
         <Box
           role="button"
           data-testid={`StepContainer_${stepId}`}
@@ -301,15 +312,6 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
             ) : null}
           </Flex>
         </Box>
-        {dragHovered ? (
-          <Divider
-            marginY="0"
-            height="0.25rem"
-            width="100%"
-            backgroundColor={COLORS.blue50}
-            borderRadius={BORDERS.borderRadius2}
-          />
-        ) : null}
       </Flex>
       {stepId != null &&
       openedOverflowMenuId === stepId &&

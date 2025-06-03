@@ -111,7 +111,7 @@ export const getLabwareCompatibleForEditHardware = (
     } else if (labwareDefB1 != null) {
       labwareCompatible = getLabwareIsCompatible(labwareDefB1, moduleType)
     } else {
-      labwareCompatible = false
+      labwareCompatible = true
     }
   } else if (labwareDef != null && moduleType != null) {
     labwareCompatible = getLabwareIsCompatible(labwareDef, moduleType)

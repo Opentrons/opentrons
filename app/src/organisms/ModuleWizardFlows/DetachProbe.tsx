@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  AnimationVideo,
   Flex,
   LegacyStyledText,
   RESPONSIVENESS,
@@ -48,17 +49,14 @@ export function DetachProbe(props: ModuleSetupWizardStepProps): JSX.Element {
       header={i18n.format(t('detach_probe'), 'capitalize')}
       rightHandBody={
         <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-          <video
+          <AnimationVideo
             css={css`
               max-width: 100%;
               max-height: 100%;
             `}
-            autoPlay={true}
-            loop={true}
-            controls={false}
           >
             <source src={pipetteDetachProbeVideoSource} />
-          </video>
+          </AnimationVideo>
         </Flex>
       }
       bodyText={

@@ -56,6 +56,7 @@ export function MoveLabwareTools(props: StepFormProps): JSX.Element {
       <MoveLabwareField
         {...propsForFields.labware}
         errorToShow={getFormLevelError('labware', mappedErrorsToField)}
+        useGripper={propsForFields.useGripper.value === true}
       />
       <Divider marginY="0" />
       <LabwareLocationField

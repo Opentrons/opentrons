@@ -33,10 +33,10 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
     selectedSlot,
+    selectedTopLabware,
+    selectedAdapterDefURI,
     selectedFixture,
-    selectedTopLabwareDefUri,
     selectedModuleModel,
-    selectedAdapterDefUri,
   } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getAllLabwareDefs()
@@ -46,19 +46,19 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     ({ stack, labwareDefURI }) => {
       const matchingSlot = getSlotInLocationStack(stack)
       return (
-        labwareDefURI === selectedTopLabwareDefUri &&
+        labwareDefURI === selectedTopLabware.labwareDefURI &&
         matchingSlot === selectedSlot.slot
       )
     }
   )
   const selectedAdapterDef =
-    selectedAdapterDefUri != null
-      ? defs[selectedAdapterDefUri] ?? customLabwareDefs[selectedAdapterDefUri]
+    selectedAdapterDefURI != null
+      ? defs[selectedAdapterDefURI] ?? customLabwareDefs[selectedAdapterDefURI]
       : null
   const selectedTopLabwareDef =
-    selectedTopLabwareDefUri != null
-      ? defs[selectedTopLabwareDefUri] ??
-        customLabwareDefs[selectedTopLabwareDefUri]
+    selectedTopLabware.labwareDefURI != null
+      ? defs[selectedTopLabware.labwareDefURI] ??
+        customLabwareDefs[selectedTopLabware.labwareDefURI]
       : null
 
   const orientation =
@@ -77,13 +77,13 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     }
     labwareInfos.push(selectedTopLabwareLabel)
   }
-  if (selectedAdapterDefUri != null) {
+  if (selectedAdapterDefURI != null) {
     const def =
-      defs[selectedAdapterDefUri] ?? customLabwareDefs[selectedAdapterDefUri]
+      defs[selectedAdapterDefURI] ?? customLabwareDefs[selectedAdapterDefURI]
     const selectedAdapterLabel = {
       text: def.metadata.displayName,
       isSelected: true,
-      isLast: selectedTopLabwareDefUri == null,
+      isLast: selectedTopLabware.labwareDefURI == null,
       isZoomed: true,
     }
     labwareInfos.push(selectedAdapterLabel)
@@ -120,7 +120,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
           </Module>
           {selectedModuleModel != null ? (
             <ModuleLabel
-              isLast={selectedAdapterDefUri == null}
+              isLast={selectedAdapterDefURI == null}
               moduleModel={selectedModuleModel}
               position={slotPosition}
               orientation={orientation}
@@ -132,10 +132,11 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
         </>
       ) : null}
       <SelectedLabwareRender
+        showModuleIcon={selectedTopLabware.amount > 1}
         labwareOnDeck={matchingSelectedTopLabwareOnDeck}
         labwareDef={selectedTopLabwareDef ?? selectedAdapterDef}
         slotPosition={slotPosition}
-        moduleModel={selectedModuleModel}
+        moduleModel={selectedModuleModel ?? null}
         nestedLabwareInfo={
           selectedAdapterDef != null && selectedTopLabwareDef != null
             ? [

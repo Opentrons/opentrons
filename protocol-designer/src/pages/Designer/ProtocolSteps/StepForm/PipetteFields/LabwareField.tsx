@@ -12,7 +12,7 @@ export function LabwareField(props: FieldProps): JSX.Element {
   const { name } = props
   const { i18n, t } = useTranslation(['protocol_steps', 'application'])
   const disposalOptions = useSelector(getDisposalOptions)
-  const options = useLabwareDropdownOptions('labware')
+  const options = useLabwareDropdownOptions('labware', false)
   const dispatch = useDispatch()
 
   const allOptions =

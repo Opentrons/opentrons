@@ -33,6 +33,7 @@ export function getDisabledFieldsMoveLiquidForm(
   }
   if (hydratedForm.path === 'multiAspirate') {
     disabled.add('aspirate_mix_checkbox')
+    disabled.add('preWetTip')
   } else if (hydratedForm.path === 'multiDispense') {
     disabled.add('dispense_mix_checkbox')
     if (hydratedForm.disposalVolume_checkbox) {

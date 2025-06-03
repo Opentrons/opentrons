@@ -50,16 +50,15 @@ describe('ReleaseLabware', () => {
 
   it('renders latch copy', () => {
     props.recoveryMap = {
-      route: RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+      route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
       step:
-        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS
-          .CONFIRM_LABWARE_IN_LATCH,
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_LABWARE_IN_LATCH,
     }
     render(props)
 
     screen.getByText('Release labware from latch')
     screen.getByText(
-      'Take any necessary precautions before positioning yourself to stabilize or catch the labware. Once confirmed, a countdown will begin before the gripper releases.'
+      'Take any necessary precautions before positioning yourself to stabilize or catch the labware if needed. Once confirmed, a countdown will begin before the latch releases.'
     )
     screen.getByText('The labware will be released from its current height.')
   })
