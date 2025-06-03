@@ -36,48 +36,47 @@ export function CalibrationLabwareRender(
   const dimensions = getSchema2Dimensions(labwareDef)
   const isTiprack = getIsTiprack(labwareDef)
 
-  // TODO: we can change this boolean to check to isCalibrationBlock instead of isTiprack to render any labware
-  return isTiprack ? (
+  return (
     <g
       transform={`translate(${String(slotDefPosition?.[0])}, ${String(
         slotDefPosition?.[1]
       )})`}
     >
-      <LabwareRender definition={labwareDef} />
-      <RobotCoordsForeignDiv
-        width={dimensions.xDimension}
-        height={dimensions.yDimension}
-        x={0}
-        y={0 - dimensions.yDimension}
-        transformWithSVG
-        innerDivProps={{ className: styles.labware_ui_wrapper }}
-      >
-        {/* title is capitalized by CSS, and "µL" capitalized is "ML" */}
-        <LabwareNameOverlay title={title.replace('µL', 'uL')} />
-      </RobotCoordsForeignDiv>
+      {
+        // TODO: we can change this boolean to check to isCalibrationBlock instead of isTiprack to render any labware
+        isTiprack ? (
+          <>
+            <LabwareRender definition={labwareDef} />
+            <RobotCoordsForeignDiv
+              width={dimensions.xDimension}
+              height={dimensions.yDimension}
+              x={0}
+              y={0 - dimensions.yDimension}
+              transformWithSVG
+              innerDivProps={{ className: styles.labware_ui_wrapper }}
+            >
+              {/* title is capitalized by CSS, and "µL" capitalized is "ML" */}
+              <LabwareNameOverlay title={title.replace('µL', 'uL')} />
+            </RobotCoordsForeignDiv>
+          </>
+        ) : (
+          <CalibrationBlockRender labwareDef={labwareDef} />
+        )
+      }
     </g>
-  ) : (
-    <CalibrationBlockRender
-      labwareDef={labwareDef}
-      slotDefPosition={slotDefPosition}
-    />
   )
 }
 
-export function CalibrationBlockRender(
-  props: CalibrationLabwareRenderProps
-): JSX.Element | null {
-  const { labwareDef, slotDefPosition } = props
+function CalibrationBlockRender(props: {
+  labwareDef: LabwareDefinition
+}): JSX.Element | null {
+  const { labwareDef } = props
   const dimensions = getSchema2Dimensions(labwareDef)
 
   switch (labwareDef.parameters.loadName) {
     case 'opentrons_calibrationblock_short_side_right': {
       return (
-        <g
-          transform={`translate(${String(slotDefPosition?.[0])}, ${String(
-            slotDefPosition?.[1]
-          )})`}
-        >
+        <>
           <rect
             width={dimensions.xDimension}
             height={dimensions.yDimension}
@@ -118,16 +117,12 @@ export function CalibrationBlockRender(
               {SHORT}
             </RobotCoordsText>
           </g>
-        </g>
+        </>
       )
     }
     case 'opentrons_calibrationblock_short_side_left': {
       return (
-        <g
-          transform={`translate(${String(slotDefPosition?.[0])}, ${String(
-            slotDefPosition?.[1]
-          )})`}
-        >
+        <>
           <rect
             width={dimensions.xDimension}
             height={dimensions.yDimension}
@@ -168,7 +163,7 @@ export function CalibrationBlockRender(
               {TALL}
             </RobotCoordsText>
           </g>
-        </g>
+        </>
       )
     }
     default: {
