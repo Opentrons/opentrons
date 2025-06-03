@@ -71,7 +71,7 @@ export function Success(props: SuccessProps): JSX.Element {
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
         <>
-          {newModules.length > 0 ? (
+          {newModules.length > 0 && attachedModuleOnLaunch == null ? (
             isOnDevice ? (
               <SmallButton
                 buttonType="secondary"
