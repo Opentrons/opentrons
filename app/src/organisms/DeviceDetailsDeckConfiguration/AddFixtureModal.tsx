@@ -373,12 +373,10 @@ const getModuleUnconfiguredFixtures = (
   )
   console.log('unconfiguredMods: ', unconfiguredMods)
   console.log('filteredMods: ', filteredMods)
-  let stackerWithMagBlock: CutoutConfig[][] = [],
-    stackerWithWasteChute: CutoutConfig[][] = [],
-    stackerOptions: CutoutConfig[][] = []
+  let stackerOptions: CutoutConfig[][] = []
   if (moduleModel === FLEX_STACKER_MODULE_V1) {
     filteredMods.forEach((mod: AttachedModule) => {
-      stackerWithMagBlock.push(
+      stackerOptions.push(
         [
           {
             cutoutId,
@@ -388,7 +386,7 @@ const getModuleUnconfiguredFixtures = (
         ],
       )
       if (cutoutId == 'cutoutD3') {
-        stackerWithWasteChute.push(
+        stackerOptions.push(
           [
             {
               cutoutId,
@@ -411,23 +409,9 @@ const getModuleUnconfiguredFixtures = (
           opentronsModuleSerialNumber: mod.serialNumber,
         },
       ])
-      console.log('module: ', moduleModel)
-      console.log('stackerWithMagBlock: ', stackerWithMagBlock)
-      console.log('stackerWithWasteChute: ', stackerWithWasteChute)
-      return [
-        {
-          cutoutId,
-          cutoutFixtureId: keys.find(
-            key => key == moduleModel
-          ) as CutoutFixtureId,
-          opentronsModuleSerialNumber: mod.serialNumber,
-        },
-        ...stackerWithMagBlock,
-        ...stackerWithWasteChute,
-      ]
     })
     console.log('stackerOptions: ', stackerOptions)
-    return [...stackerOptions, ...stackerWithMagBlock, ...stackerWithWasteChute]
+    return [...stackerOptions]
   } else {
     return filteredMods.map(({ serialNumber, moduleModel }) => {
       return [
@@ -493,8 +477,6 @@ export const getModuleOptions = (
   cutoutId: CutoutId,
   unconfiguredMods: AttachedModule[]
 ): CutoutConfig[][] => {
-  // let availableOptions2 = getModuleOptionsForCutoutId(cutoutId)
-  // console.log("availableOptions: ", availableOptions)
   let availableOptions: CutoutConfig[][] = [
     [
       {
@@ -503,7 +485,6 @@ export const getModuleOptions = (
       },
     ],
   ]
-  // console.log("availableOptions 2: ", availableOptions)
   if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
     availableOptions = [
       ...availableOptions,
