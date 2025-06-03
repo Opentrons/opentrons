@@ -258,6 +258,9 @@ async def repeatablity_test(args) -> None:
                     "home_sg_test": lambda: stacker.home_axis(test_axis, Direction.EXTEND),
                     }
     for c in range(1, args.cycles+1):
+        await asyncio.sleep(1)
+        await stacker._driver.set_stallguard_threshold(test_axis, False, sg_value)
+        await stacker.home_axis(test_axis, Direction.RETRACT)
         await stacker._driver.set_stallguard_threshold(test_axis, True, sg_value)
         if test in test_functions:
             move_task = asyncio.create_task(test_functions[test]())
@@ -278,10 +281,7 @@ async def repeatablity_test(args) -> None:
         except Exception as e:
             print(f"Error in test execution: {e}")
             continue
-        await asyncio.sleep(1)
-        await stacker._driver.set_stallguard_threshold(test_axis, False, sg_value)
-        await stacker.home_axis(test_axis, Direction.RETRACT)
-        await stacker._driver.set_stallguard_threshold(test_axis, True, sg_value)
+        
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description="Motion Parameter Test Script")
