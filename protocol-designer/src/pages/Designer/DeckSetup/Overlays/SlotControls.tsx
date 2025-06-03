@@ -39,6 +39,7 @@ import type {
 import type { DroppedItem, SharedControlsType } from '../types'
 
 interface SlotControlsProps extends SharedControlsType {
+  addEquipment: (slotId: string) => void
   stagingAreaAddressableAreas: AddressableAreaName[]
   deckDef: DeckDefinition
   slotBoundingBox: Dimensions
@@ -57,7 +58,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
     hover,
     handleDragHover,
     setHover,
-    setShowMenuListForId,
+    addEquipment,
     itemId,
     terminalItemId,
     isSelected,
@@ -177,7 +178,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
         },
         onClick: () => {
           if (!isOver) {
-            setShowMenuListForId(itemId)
+            addEquipment(itemId)
           }
         },
       }}
