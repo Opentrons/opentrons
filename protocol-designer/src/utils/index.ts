@@ -12,7 +12,10 @@ import {
   makeWellSetHelpers,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
-import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  PROTOCOL_CONTEXT_NAME,
+} from '@opentrons/step-generation'
 
 import type { WellGroup } from '@opentrons/components'
 import type {
@@ -464,5 +467,21 @@ export const getHasTrash = (
 ): boolean => {
   return Object.values(additionalEquipment).some(
     ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
+  )
+}
+
+export const getAllLabwareIdsOfCertainURIOnStack = (
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'],
+  labwareOnDeck: LabwareOnDeck
+): string[] => {
+  return Object.values(deckSetupLabware).reduce<string[]>(
+    (acc, { labwareDefURI, stack, id }) => {
+      return labwareDefURI === labwareOnDeck.labwareDefURI &&
+        getSlotInLocationStack(stack) ===
+          getSlotInLocationStack(labwareOnDeck.stack)
+        ? [...acc, id]
+        : acc
+    },
+    []
   )
 }

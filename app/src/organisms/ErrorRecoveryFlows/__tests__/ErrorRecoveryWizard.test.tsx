@@ -194,13 +194,13 @@ describe('ErrorRecoveryContent', () => {
     MANUAL_REPLACE_AND_RETRY,
     MANUAL_MOVE_AND_SKIP,
     HOME_AND_RETRY,
-    HOPPER_MANUAL_LOAD_AND_RETRY,
-    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
-    MANUAL_REPLACE_STACKER_AND_RETRY,
-    MANUAL_LOAD_IN_STACKER_AND_SKIP,
-    LOAD_LABWARE_SHUTTLE_AND_RETRY,
-    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
-    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    STACKER_HOPPER_EMPTY_RETRY,
+    STACKER_HOPPER_EMPTY_SKIP,
+    STACKER_STALLED_RETRY,
+    STACKER_STALLED_SKIP,
+    STACKER_SHUTTLE_MISSING_RETRY,
+    STACKER_SHUTTLE_EMPTY_RETRY,
+    STACKER_SHUTTLE_EMPTY_SKIP,
   } = RECOVERY_MAP
 
   let props: ComponentProps<typeof ErrorRecoveryContent>
@@ -393,12 +393,12 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_MOVE_LW_AND_SKIP')
   })
 
-  it(`returns appropriate view when the route is ${HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${STACKER_HOPPER_EMPTY_RETRY.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE,
+        route: STACKER_HOPPER_EMPTY_RETRY.ROUTE,
       },
     }
     renderRecoveryContent(props)
@@ -406,12 +406,12 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
   })
 
-  it(`returns appropriate view when the route is ${HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${STACKER_HOPPER_EMPTY_SKIP.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+        route: STACKER_HOPPER_EMPTY_SKIP.ROUTE,
       },
     }
     renderRecoveryContent(props)
@@ -419,12 +419,12 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
   })
 
-  it(`returns appropriate view when the route is ${HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${STACKER_HOPPER_EMPTY_SKIP.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+        route: STACKER_HOPPER_EMPTY_SKIP.ROUTE,
       },
     }
     renderRecoveryContent(props)
@@ -432,12 +432,12 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
   })
 
-  it(`returns appropriate view when the route is ${LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${STACKER_SHUTTLE_MISSING_RETRY.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
+        route: STACKER_SHUTTLE_MISSING_RETRY.ROUTE,
       },
     }
     renderRecoveryContent(props)
@@ -445,12 +445,12 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
   })
 
-  it(`returns appropriate view when the route is ${MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${STACKER_STALLED_SKIP.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE,
+        route: STACKER_STALLED_SKIP.ROUTE,
       },
     }
     renderRecoveryContent(props)
@@ -458,12 +458,12 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
   })
 
-  it(`returns appropriate view when the route is ${MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${STACKER_STALLED_RETRY.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+        route: STACKER_STALLED_RETRY.ROUTE,
       },
     }
     renderRecoveryContent(props)
@@ -485,8 +485,8 @@ describe('ErrorRecoveryContent', () => {
   })
 
   it.each([
-    REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
-    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+    STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
+    STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
   ])(
     'returns appropriate view when the route is $recoveryOption',
     recoveryOption => {

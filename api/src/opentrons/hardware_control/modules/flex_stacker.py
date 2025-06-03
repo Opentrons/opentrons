@@ -521,22 +521,24 @@ class FlexStacker(mod_abc.AbstractModule):
         await self._reader.get_platform_sensor_state()
 
         # Z axis is unknown, lets move it up in case it is holding a labware
-        if self.limit_switch_status[StackerAxis.Z] == StackerAxisState.UNKNOWN:
-            await self.home_axis(StackerAxis.Z, Direction.EXTEND)
+        if not ignore_latch:
+            if self.limit_switch_status[StackerAxis.Z] == StackerAxisState.UNKNOWN:
+                if self.latch_state == LatchState.OPENED:
+                    # self.latch_state is OPENED, so we need to home Z in the EXTEND direction
+                    await self.home_axis(StackerAxis.Z, Direction.EXTEND)
+                    await self.close_latch()
 
-        # Z must now be either extended or retracted, move on to the X
         if (
+            # if the platform is on the z or if x has not been homed
             self.platform_state == PlatformState.UNKNOWN
             or self.limit_switch_status[StackerAxis.X] == StackerAxisState.UNKNOWN
         ):
-            if self.limit_switch_status[StackerAxis.Z] == StackerAxisState.EXTENDED:
+            # if the z is not retracted, we need to make sure the x is retracted
+            # so we can retract the z properly later
+            if self.limit_switch_status[StackerAxis.Z] != StackerAxisState.RETRACTED:
                 await self.home_axis(StackerAxis.X, Direction.RETRACT)
             else:
                 await self.home_axis(StackerAxis.X, Direction.EXTEND)
-
-        # Z+X must now be either extended or retracted, move on to the latch
-        if not ignore_latch:
-            await self.close_latch()
 
         # Finally, retract Z and extend X if they are not already
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
