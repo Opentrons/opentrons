@@ -69,7 +69,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
   const handleOnClick = (): void => {
-    if (maintenanceRunId === null) {
+    if (maintenanceRunId == null) {
       createMaintenanceRun({}).catch(error => {
         setErrorMessage(error.message as string)
       })

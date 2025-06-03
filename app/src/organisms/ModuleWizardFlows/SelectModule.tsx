@@ -108,7 +108,9 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
       // Start blinking module, otherwise stop if multiple are available.
       sendIdentifyModule(selectedModule, isSingleModule)
       // Clear the selected module
-      if (!isSingleModule) setSelectedModule(null)
+      if (!isSingleModule) {
+        setSelectedModule(null)
+      }
     }
     setStackerNotInstalled(false)
   }
