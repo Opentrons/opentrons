@@ -310,12 +310,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                   : TYPOGRAPHY.pRegular};
               `}
             >
-              <StyledText
-                desktopStyle="captionRegular"
-                css={LINE_CLAMP_TEXT_STYLE(1)}
-              >
-                {currentOption.name}
-              </StyledText>
+              {currentOption.deckLabel !== currentOption.name ? (
+                <StyledText
+                  desktopStyle="captionRegular"
+                  css={LINE_CLAMP_TEXT_STYLE(1)}
+                >
+                  {currentOption.name}
+                </StyledText>
+              ) : null}
             </Flex>
           </Flex>
           <Icon
@@ -363,12 +365,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                       flexDirection={DIRECTION_COLUMN}
                       gridGap={option.subtext != null ? SPACING.spacing4 : '0'}
                     >
-                      <StyledText
-                        desktopStyle="captionRegular"
-                        css={LINE_CLAMP_TEXT_STYLE(3, true)}
-                      >
-                        {option.name}
-                      </StyledText>
+                      {option.deckLabel !== option.name ? (
+                        <StyledText
+                          desktopStyle="captionRegular"
+                          css={LINE_CLAMP_TEXT_STYLE(3, true)}
+                        >
+                          {option.name}
+                        </StyledText>
+                      ) : null}
                       <StyledText
                         desktopStyle="captionRegular"
                         color={COLORS.grey60}

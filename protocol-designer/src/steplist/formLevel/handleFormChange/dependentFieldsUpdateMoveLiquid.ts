@@ -627,7 +627,8 @@ function updatePatchMixFields(patch: FormPatch, rawForm: FormData): FormPatch {
         ...getDefaultFields(
           'aspirate_mix_checkbox',
           'aspirate_mix_times',
-          'aspirate_mix_volume'
+          'aspirate_mix_volume',
+          'preWetTip'
         ),
       }
     }

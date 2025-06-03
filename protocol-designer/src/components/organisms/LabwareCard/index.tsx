@@ -20,13 +20,13 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getEnableStacking } from '../../../feature-flags/selectors'
 import { openIngredientSelector } from '../../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
+import { getAllLabwareIdsOfCertainURIOnStack } from '../../../utils'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
@@ -50,14 +50,9 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const enableStacking = useSelector(getEnableStacking)
   const [showQuantityModal, setShowQuantityModal] = useState<boolean>(false)
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
-  const allLabwareIdsOnStack = Object.values(deckSetupLabware).reduce<string[]>(
-    (acc, { labwareDefURI, stack, id }) => {
-      return labwareDefURI === labware.labwareDefURI &&
-        getSlotInLocationStack(stack) === getSlotInLocationStack(labware.stack)
-        ? [...acc, id]
-        : acc
-    },
-    []
+  const allLabwareIdsOnStack = getAllLabwareIdsOfCertainURIOnStack(
+    deckSetupLabware,
+    labware
   )
   const nickNames = useSelector(getLabwareNicknamesById)
   const allWellContentsForActiveItem = useSelector(

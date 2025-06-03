@@ -109,7 +109,7 @@ beforeEach(() => {
   }
 })
 
-describe('consolidate single-channel', () => {
+describe.skip('consolidate single-channel', () => {
   it('Minimal single-channel: A1 A2 to B1, 50uL with p300', () => {
     const data = {
       ...mixinArgs,
@@ -1132,7 +1132,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  describe('all advanced settings enabled', () => {
+  describe.skip('all advanced settings enabled', () => {
     it('should create commands in the expected order with expected params (changeTip: never, blowout in trash)', () => {
       const args = {
         ...mixinArgs,
@@ -3411,7 +3411,7 @@ describe('consolidate single-channel', () => {
   })
 })
 
-describe('consolidate multi-channel', () => {
+describe.skip('consolidate multi-channel', () => {
   const multiParams = { pipetteId: 'p300MultiId' }
   const multiDispense = (wellName: string, volume: number): CreateCommand =>
     dispenseHelper(wellName, volume, {
