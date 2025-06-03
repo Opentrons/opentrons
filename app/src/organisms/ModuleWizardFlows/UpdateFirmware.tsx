@@ -34,9 +34,7 @@ interface UpdateFirmwareProps extends ModuleSetupWizardStepProps {
   patchModuleAfterUpdate: (module: AttachedModule) => void
 }
 
-export const UpdateFirmware = (
-  props: UpdateFirmwareProps
-): JSX.Element | null => {
+export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
   const {
     proceed,
     setErrorMessage,
@@ -70,6 +68,7 @@ export const UpdateFirmware = (
       refetchInterval: EQUIPMENT_POLL_MS,
       enabled: requestStatus === SUCCESS && inProgress,
     })?.data?.data ?? []
+
   useEffect(() => {
     const matchingModule = attachedModules.find(
       module => module.serialNumber === moduleSerialNumber
@@ -90,11 +89,6 @@ export const UpdateFirmware = (
     moduleSerialNumber,
   ])
 
-  const handleUpdateFirmware = (): void => {
-    setIsModuleUpdating(true)
-    handleModuleApiRequests(robotName, attachedModule.serialNumber)
-  }
-
   useEffect(() => {
     if (!attachedModule.hasAvailableUpdate) {
       setIsModuleUpdating(false)
@@ -112,7 +106,9 @@ export const UpdateFirmware = (
       setIsModuleUpdating(false)
       setInProgress(false)
       setErrorMessage(t('firmware_update_failed') as string)
-      if (latestRequestId != null) dispatch(dismissRequest(latestRequestId))
+      if (latestRequestId != null) {
+        dispatch(dismissRequest(latestRequestId))
+      }
     } else if (requestStatus === SUCCESS) {
       // if the request succeeds but the module doesn't come back online within 60 seconds
       // we should display an error message
@@ -124,14 +120,18 @@ export const UpdateFirmware = (
     }
   }, [requestStatus, setInProgress])
 
-  if (inProgress)
+  const handleUpdateFirmware = (): void => {
+    setIsModuleUpdating(true)
+    handleModuleApiRequests(robotName, attachedModule.serialNumber)
+  }
+
+  if (inProgress) {
     return (
       <SimpleWizardInProgressBody
         description={t('installing_latest_firmware')}
       />
     )
-
-  if (shouldProceed)
+  } else if (shouldProceed) {
     return (
       <SimpleWizardBody
         isSuccess={true}
@@ -141,28 +141,29 @@ export const UpdateFirmware = (
         })}
       />
     )
-
-  return (
-    <SimpleWizardBody
-      justifyContentForOddButton={JUSTIFY_FLEX_END}
-      isSuccess={false}
-      iconColor={COLORS.yellow50}
-      header={t('firmware_update_found')}
-      subHeader={t('firmware_update_to_latest', {
-        module: getModuleDisplayName(attachedModule.moduleModel),
-      })}
-    >
-      {isOnDevice ? (
-        <SmallButton
-          buttonType="primary"
-          onClick={handleUpdateFirmware}
-          buttonText={t('install_update')}
-        />
-      ) : (
-        <PrimaryButton onClick={handleUpdateFirmware}>
-          {t('install_update')}
-        </PrimaryButton>
-      )}
-    </SimpleWizardBody>
-  )
+  } else {
+    return (
+      <SimpleWizardBody
+        justifyContentForOddButton={JUSTIFY_FLEX_END}
+        isSuccess={false}
+        iconColor={COLORS.yellow50}
+        header={t('firmware_update_found')}
+        subHeader={t('firmware_update_to_latest', {
+          module: getModuleDisplayName(attachedModule.moduleModel),
+        })}
+      >
+        {isOnDevice ? (
+          <SmallButton
+            buttonType="primary"
+            onClick={handleUpdateFirmware}
+            buttonText={t('install_update')}
+          />
+        ) : (
+          <PrimaryButton onClick={handleUpdateFirmware}>
+            {t('install_update')}
+          </PrimaryButton>
+        )}
+      </SimpleWizardBody>
+    )
+  }
 }

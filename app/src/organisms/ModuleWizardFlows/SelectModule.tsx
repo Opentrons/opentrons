@@ -39,7 +39,7 @@ interface ModuleNameAndPort {
   port: string
 }
 
-export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
+export function SelectModule(props: SelectModuleProps): JSX.Element {
   const {
     buildFlowForSelectedModule,
     isOnDevice,
@@ -178,7 +178,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
         )}
       </SimpleWizardBody>
     )
-  } else if (newModules.length > 1) {
+  } else {
     const moduleButtons = newModules.map(module => {
       const m = getModuleNameAndPort(module)
       return {
@@ -223,7 +223,5 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
         </Flex>
       </SimpleWizardBodyContainer>
     )
-  } else {
-    return null
   }
 }

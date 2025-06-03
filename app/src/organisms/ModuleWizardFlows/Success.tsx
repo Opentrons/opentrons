@@ -36,7 +36,7 @@ interface SuccessProps extends ModuleSetupWizardStepProps {
   setSelectedModule: (module: AttachedModule | null) => void
 }
 
-export const Success = (props: SuccessProps): JSX.Element | null => {
+export function Success(props: SuccessProps): JSX.Element {
   const {
     proceed,
     attachedModule,
@@ -60,44 +60,6 @@ export const Success = (props: SuccessProps): JSX.Element | null => {
     proceed()
   }
 
-  const finishButton = isOnDevice ? (
-    <SmallButton
-      buttonType="primary"
-      onClick={() => {
-        handleOnClick(false)
-      }}
-      buttonText={t('finish')}
-    />
-  ) : (
-    <PrimaryButton
-      disabled={isRobotMoving}
-      onClick={() => {
-        handleOnClick(false)
-      }}
-    >
-      {t('finish')}
-    </PrimaryButton>
-  )
-
-  const setupAnotherButton = isOnDevice ? (
-    <SmallButton
-      buttonType="secondary"
-      onClick={() => {
-        handleOnClick(true)
-      }}
-      buttonText={t('setup_another_module')}
-    />
-  ) : (
-    <SecondaryButton
-      disabled={isRobotMoving}
-      onClick={() => {
-        handleOnClick(true)
-      }}
-    >
-      {t('setup_another_module')}
-    </SecondaryButton>
-  )
-
   return (
     <SimpleWizardBody
       justifyContentForOddButton={JUSTIFY_FLEX_END}
@@ -106,8 +68,47 @@ export const Success = (props: SuccessProps): JSX.Element | null => {
       header={t('successfully_setup', { module: moduleDisplayName })}
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
-        {newModules.length > 0 ? setupAnotherButton : null}
-        {finishButton}
+        <>
+          {newModules.length > 0 ? (
+            isOnDevice ? (
+              <SmallButton
+                buttonType="secondary"
+                onClick={() => {
+                  handleOnClick(true)
+                }}
+                buttonText={t('setup_another_module')}
+              />
+            ) : (
+              <SecondaryButton
+                disabled={isRobotMoving}
+                onClick={() => {
+                  handleOnClick(true)
+                }}
+              >
+                {t('setup_another_module')}
+              </SecondaryButton>
+            )
+          ) : null}
+
+          {isOnDevice ? (
+            <SmallButton
+              buttonType="primary"
+              onClick={() => {
+                handleOnClick(false)
+              }}
+              buttonText={t('finish')}
+            />
+          ) : (
+            <PrimaryButton
+              disabled={isRobotMoving}
+              onClick={() => {
+                handleOnClick(false)
+              }}
+            >
+              {t('finish')}
+            </PrimaryButton>
+          )}
+        </>
       </Flex>
     </SimpleWizardBody>
   )
