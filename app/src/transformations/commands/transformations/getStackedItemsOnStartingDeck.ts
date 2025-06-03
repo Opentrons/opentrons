@@ -1,6 +1,5 @@
 import {
   getLabwareDefURI,
-  getAllDefinitions,
   getCutoutDisplayName,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
@@ -8,6 +7,8 @@ import {
   THERMOCYCLER_MODULE_V2,
   getSlotFromAddressableAreaName,
 } from '@opentrons/shared-data'
+import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
+
 import { getLiquidsByIdForLabware } from '../../analysis'
 
 import type {
@@ -74,7 +75,7 @@ export function getStackedItemsOnStartingDeck(
   loadedLabware: LoadedLabware[],
   loadedModules: LoadedModule[]
 ): StackedItemsOnDeck {
-  const labwareDefinitions = getAllDefinitions()
+  const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
   const loadLidCommands = commands.filter(
     (command): command is LoadLidOnLabwareCommad =>
       command.commandType === 'loadLid' &&
@@ -186,7 +187,12 @@ export function getStackedItemsOnStartingDeck(
                 lw => lw.id === sequenceItem.labwareId
               )
               if (labware == null) return sequenceAcc
-              const labwareDef = labwareDefinitions[labware.definitionUri]
+              const labwareDef = labwareDefinitions.find(
+                def => labware.definitionUri === getLabwareDefURI(def)
+              )
+              if (labwareDef == null) {
+                return sequenceAcc
+              }
               const labwareStackItem: LabwareInStack = {
                 definitionUri: labware.definitionUri,
                 displayName:
@@ -198,8 +204,11 @@ export function getStackedItemsOnStartingDeck(
                   ? loadedLabware.find(lw => lw.id === sequenceItem.lidId)
                   : null
               if (sequenceItem.lidId != null && lid != null) {
-                const lidDef = labwareDefinitions[lid.definitionUri]
-                labwareStackItem.lidDisplayName = lidDef.metadata.displayName
+                const lidDef = labwareDefinitions.find(
+                  def => lid.definitionUri === getLabwareDefURI(def)
+                )
+                labwareStackItem.lidDisplayName =
+                  lidDef?.metadata.displayName ?? ''
                 labwareStackItem.lidId = sequenceItem.lidId
               }
               sequenceAcc.push(labwareStackItem)
@@ -274,7 +283,12 @@ export function getStackedItemsOnStartingDeck(
               lw => lw.id === sequenceItem.labwareId
             )
             if (labware == null) return sequenceAcc
-            const labwareDef = labwareDefinitions[labware.definitionUri]
+            const labwareDef = labwareDefinitions.find(
+              def => labware.definitionUri === getLabwareDefURI(def)
+            )
+            if (labwareDef == null) {
+              return sequenceAcc
+            }
             const labwareStackItem: LabwareInStack = {
               definitionUri: labware.definitionUri,
               displayName:
