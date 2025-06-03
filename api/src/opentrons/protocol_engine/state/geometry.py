@@ -319,87 +319,9 @@ class GeometryView:
             min_travel_z = max(min_travel_z, minimum_z_height)
         return min_travel_z
 
-    def get_labware_parent_nominal_position(self, labware_id: str) -> Point:
-        """Get the position of the labware's uncalibrated parent (deck slot, module, or another labware)."""
-        addressable_area_name = self._get_addressable_area_name(labware_id)
-        parent_pos = self._addressable_areas.get_addressable_area_position(
-            addressable_area_name
-        )
-
-        offset_from_parent = self._get_offset_from_parent(
-            child_definition=self._labware.get_definition(labware_id),
-            parent=self._labware.get(labware_id).location,
-        )
-        return Point(
-            parent_pos.x + offset_from_parent.x,
-            parent_pos.y + offset_from_parent.y,
-            parent_pos.z + offset_from_parent.z,
-        )
-
-    def _get_addressable_area_name(self, labware_id: str) -> str:
-        try:
-            addressable_area_name = self.get_ancestor_slot_name(labware_id).id
-        except errors.LocationIsStagingSlotError:
-            addressable_area_name = self._get_staging_slot_name(labware_id)
-        except errors.LocationIsLidDockSlotError:
-            addressable_area_name = self._get_lid_dock_slot_name(labware_id)
-
-        return addressable_area_name
-
-    # TODO(jh, 05-22-25): This functionality should be absorbed by the labware origin offset calculation logic.
-    def _get_offset_from_parent(
-        self, child_definition: LabwareDefinition, parent: LabwareLocation
-    ) -> LabwareOffsetVector:
-        """Gets the offset vector of a labware placed on the given location.
-
-        - For labware on Deck Slot: returns an offset of (0, 0, 0)
-        - For labware on a Module: returns the nominal offset for the labware's position
-          when placed on the specified module (using slot-transformed labwareOffset
-          from the module's definition with any stacking overlap).
-          Does not include module calibration offset or LPC offset.
-        - For labware on another labware: returns the nominal offset for the labware
-          as placed on the specified labware, taking into account any offsets for labware
-          on modules as well as stacking overlaps.
-          Does not include module calibration offset or LPC offset.
-        """
-        if isinstance(parent, (AddressableAreaLocation, DeckSlotLocation)):
-            return LabwareOffsetVector(x=0, y=0, z=0)
-        elif isinstance(parent, ModuleLocation):
-            module_id = parent.moduleId
-            module_model = self._modules.get_connected_model(module_id)
-            stacking_overlap = self._labware.get_module_overlap_offsets(
-                child_definition, module_model
-            )
-            module_to_child = self._modules.get_nominal_offset_to_child(
-                module_id=module_id, addressable_areas=self._addressable_areas
-            )
-            return LabwareOffsetVector(
-                x=module_to_child.x - stacking_overlap.x,
-                y=module_to_child.y - stacking_overlap.y,
-                z=module_to_child.z - stacking_overlap.z,
-            )
-        elif isinstance(parent, OnLabwareLocation):
-            on_labware = self._labware.get(parent.labwareId)
-            on_labware_dimensions = self._labware.get_dimensions(
-                labware_id=on_labware.id
-            )
-            stacking_overlap = self._labware.get_labware_overlap_offsets(
-                definition=child_definition, below_labware_name=on_labware.loadName
-            )
-            labware_offset = LabwareOffsetVector(
-                x=stacking_overlap.x,
-                y=stacking_overlap.y,
-                z=on_labware_dimensions.z - stacking_overlap.z,
-            )
-            return labware_offset + self._get_offset_from_parent(
-                self._labware.get_definition(on_labware.id), on_labware.location
-            )
-        else:
-            raise errors.LabwareNotOnDeckError(
-                "Cannot access labware since it is not on the deck. "
-                "Either it has been loaded off-deck or its been moved off-deck."
-            )
-
+    # TOME TODO: I think there's a chance you might not need this anymore with the labware origin stuff, but confirm.
+    #  At the very least, it feels like you can de-dupe some code.
+    #  You can also get rid of get_module_overlap_offsets if you can get rid of this.
     def _get_offset_from_parent_addressable_area(
         self, child_definition: LabwareDefinition, parent: LabwareLocation
     ) -> LabwareOffsetVector:
@@ -483,6 +405,7 @@ class GeometryView:
             )
         return offset
 
+    # TOME TODO: Is there any chance we can refactor this to not be a switch statement based on usage?
     def _get_calibrated_module_offset(
         self, location: LabwareLocation
     ) -> ModuleOffsetVector:
@@ -511,35 +434,125 @@ class GeometryView:
                 " since it is no longer on the deck."
             )
 
-    def get_labware_parent_position(self, labware_id: str) -> Point:
-        """Get the calibrated position of the labware's parent slot (deck slot, module, or another labware)."""
-        parent_pos = self.get_labware_parent_nominal_position(labware_id)
-        labware_data = self._labware.get(labware_id)
-        cal_offset = self._get_calibrated_module_offset(labware_data.location)
-
-        return Point(
-            x=parent_pos.x + cal_offset.x,
-            y=parent_pos.y + cal_offset.y,
-            z=parent_pos.z + cal_offset.z,
-        )
-
+    ## TOME TODO: Is it plausible to throw downstream offsets in here, such as LPC? Where is that handled?
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the deck coordinates of a labware's origin.
 
         This includes module calibration but excludes the calibration of the given labware.
         """
-        slot_front_left_position = self.get_labware_parent_position(labware_id)
+        # TOME TODO: Need to make affordances for:
+        #  * stacking_overlap (get_nominal_offset_to_child - get_module_overlap_offsets
+        #  * labware_stacking_overlap = get_labware_overlap_offsets. Note that z is get_dimensions.z - stacking_overlap.z
+        #      ** I'm pretty sure this can be solved entirely via origin stuff.
+
+        ## TOME TODO: OK, YOU CAN SUPPORT THE STACKING OVERLAP FOR MODULES, SO I THINK YOU CAN SUPPORT IT ALL IN LABWARE_OFFSETS.
+
+        stackup_origin_to_parent_origin = self._get_stackup_origin_to_entity_origin(
+            self._labware.get(labware_id).location,
+        )
+        aa_pos = self._get_addressable_area_position(labware_id)
+        slot_front_left_position = aa_pos + stackup_origin_to_parent_origin
+        parent_origin_to_lw_origin = self._get_parent_origin_to_lw_origin(labware_id)
+
+        module_offsets = self._get_module_specific_offsets(labware_id)
+
+        return slot_front_left_position + parent_origin_to_lw_origin + module_offsets
+
+    def _get_stackup_origin_to_entity_origin(self, entity: LabwareLocation) -> Point:
+        """Get the offset vector from the lowest entity in a stackup to a given entity."""
+
+        # The base case: the entity is the lowest possible entity in a stackup.
+        if isinstance(
+            entity, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
+        ):
+            return Point(x=0, y=0, z=0)
+        elif isinstance(entity, OnLabwareLocation):
+            parent_origin_to_entity_origin = self._get_parent_origin_to_lw_origin(
+                entity.labwareId
+            )
+
+            return (
+                parent_origin_to_entity_origin
+                + self._get_stackup_origin_to_entity_origin(
+                    self._labware.get(entity.labwareId).location
+                )
+            )
+            # TOME TODO: labware offsets needs to absorb this for labware.
+            # on_labware = self._labware.get(parent.labwareId)
+            # on_labware_dimensions = self._labware.get_dimensions(
+            #     labware_id=on_labware.id
+            # )
+            # stacking_overlap = self._labware.get_labware_overlap_offsets(
+            #     definition=child_definition, below_labware_name=on_labware.loadName
+            # )
+            # labware_offset = LabwareOffsetVector(
+            #     x=stacking_overlap.x,
+            #     y=stacking_overlap.y,
+            #     z=on_labware_dimensions.z - stacking_overlap.z,
+            # )
+            # return labware_offset + self._get_aa_origin_to_parent_origin(
+            #     self._labware.get_definition(on_labware.id), on_labware.location
+            # )
+        else:
+            raise errors.LabwareNotOnDeckError(
+                "Cannot access labware since it is not on the deck. "
+                "Either it has been loaded off-deck or its been moved off-deck."
+            )
+
+    def _get_addressable_area_position(self, labware_id: str) -> Point:
+        """Get the position of the labware's underlying addressable area."""
+        try:
+            addressable_area_name = self.get_ancestor_slot_name(labware_id).id
+        except errors.LocationIsStagingSlotError:
+            addressable_area_name = self._get_staging_slot_name(labware_id)
+        except errors.LocationIsLidDockSlotError:
+            addressable_area_name = self._get_lid_dock_slot_name(labware_id)
+
+        return self._addressable_areas.get_addressable_area_position(
+            addressable_area_name
+        )
+
+    def _get_module_specific_offsets(self, labware_id: str) -> Point:
+        """Get the summed module-specific offset vector if a module is present in the stack.
+
+        Includes the module-to-child nominal offset (if applicable) and the module calibration offset.
+        """
+        labware_data = self._labware.get(labware_id)
+        parent = labware_data.location
+
+        if isinstance(parent, ModuleLocation):
+            # Effectively an OT-2 only offset.
+            module_to_child = self._modules.get_nominal_offset_to_child(
+                module_id=parent.moduleId, addressable_areas=self._addressable_areas
+            )
+            cal_offset = self._get_calibrated_module_offset(parent)
+
+            return Point(
+                x=module_to_child.x + cal_offset.x,
+                y=module_to_child.y + cal_offset.y,
+                z=module_to_child.z + cal_offset.z,
+            )
+        elif isinstance(parent, OnLabwareLocation):
+            return self._get_module_specific_offsets(parent.labwareId)
+        elif isinstance(parent, (DeckSlotLocation, AddressableAreaLocation)):
+            return Point(0, 0, 0)
+        else:
+            raise errors.LabwareNotOnDeckError(
+                "Cannot access labware since it is not on the deck. "
+                "Either it has been loaded off-deck or its been moved off-deck."
+            )
+
+    def _get_parent_origin_to_lw_origin(self, labware_id: str) -> Point:
+        # TOME TODO: Worst comes to worst, you can stuff the offsets you can't fit elsewhere here.
         labware_data = self._labware.get(labware_id)
         definition = self._labware.get_definition(labware_id)
         lw_parent_location_info = self._get_parent_location_info(labware_data)
-        parent_origin_to_lw_origin = get_parent_origin_to_lw_origin(
+
+        return get_parent_origin_to_lw_origin(
             labware_data=labware_data,
             definition=definition,
             lw_parent_location_info=lw_parent_location_info,
         )
-        result = slot_front_left_position + parent_origin_to_lw_origin
-
-        return result
 
     def _get_parent_location_info(
         self,
@@ -549,8 +562,7 @@ class GeometryView:
         if isinstance(
             labware_data.location, (DeckSlotLocation, AddressableAreaLocation)
         ):
-            addressable_area_name = self._get_addressable_area_name(labware_data.id)
-            return self._addressable_areas.get_addressable_area(addressable_area_name)
+            return self._get_addressable_area_position(labware_data.id)
 
         elif isinstance(labware_data.location, ModuleLocation):
             module_id = labware_data.location.moduleId
@@ -570,6 +582,7 @@ class GeometryView:
                 f"Cannot get ancestor slot of {self._labware.get_display_name(labware_data.id)} with location {labware_data.location}"
             )
 
+    # TOME TODO: Yeah, this cal offset should definitely move.
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
         origin_pos = self.get_labware_origin_position(labware_id)
@@ -1061,6 +1074,7 @@ class GeometryView:
                 )
         return None
 
+    # TOME TODO: Investigate whether it's feasible to consolidate some of the internals here, too.
     def get_labware_grip_point(
         self,
         labware_definition: LabwareDefinition,

@@ -14,6 +14,8 @@ from ..types import (
     LabwareParentLocationInfo,
     AddressableArea,
     ModuleDefinition,
+    OverlapOffset,
+    ModuleModel,
 )
 
 
@@ -50,6 +52,39 @@ def get_parent_origin_to_lw_origin(
             )
 
             return parent_origin_to_locating_feature + locating_feature_to_lw_origin
+
+
+def get_labware_overlap_offsets(
+    definition: LabwareDefinition, below_labware_name: str
+) -> OverlapOffset:
+    """Get the labware's overlap with requested labware's load name."""
+    if below_labware_name in definition.stackingOffsetWithLabware.keys():
+        stacking_overlap = definition.stackingOffsetWithLabware.get(
+            below_labware_name, OverlapOffset(x=0, y=0, z=0)
+        )
+    else:
+        stacking_overlap = definition.stackingOffsetWithLabware.get(
+            "default", OverlapOffset(x=0, y=0, z=0)
+        )
+    return OverlapOffset(
+        x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
+    )
+
+
+def get_module_overlap_offsets(
+    definition: LabwareDefinition, module_model: ModuleModel
+) -> OverlapOffset:
+    """Get the labware's overlap with requested module model."""
+    stacking_overlap = definition.stackingOffsetWithModule.get(str(module_model.value))
+    if not stacking_overlap:
+        if _is_thermocycler_on_ot2(module_model):
+            return OverlapOffset(x=0, y=0, z=10.7)
+        else:
+            return OverlapOffset(x=0, y=0, z=0)
+
+    return OverlapOffset(
+        x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
+    )
 
 
 def _get_custom_offset(
@@ -290,3 +325,13 @@ def _get_right_center_bottom_to_lw_origin(definition: LabwareDefinition3) -> Poi
     )
 
     return -1 * lw_origin_to_right_center_bottom
+
+
+def _is_thermocycler_on_ot2(self, module_model: ModuleModel) -> bool:
+    """Whether the given module is a thermocycler with the current deck being an OT2 deck."""
+    robot_model = self.get_deck_definition()["robot"]["model"]
+    return (
+        module_model
+        in [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2]
+        and robot_model == "OT-2 Standard"
+    )
