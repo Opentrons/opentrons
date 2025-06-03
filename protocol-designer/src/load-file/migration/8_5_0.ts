@@ -83,7 +83,7 @@ export const migrateFile = (
       const isDispenseLabwareTouchtipDisabled =
         labwareDefinitions[dispenseLabwareUri]?.parameters.quirks?.includes(
           'touchTipDisabled'
-        ) ?? false
+        ) ?? true
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
         labwareDefinitions,
         loadLabwareCommands,
