@@ -1,5 +1,5 @@
 """Test Stall-Guard."""
-from typing import List, Union, Tuple, Optional
+from typing import List, Union
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -11,25 +11,24 @@ from hardware_testing.data.csv_report import (
 from .driver import FlexStackerInterface as FlexStacker, FlexStackerStallError
 from opentrons.drivers.flex_stacker.driver import (
     STACKER_MOTION_CONFIG,
-    STALLGUARD_CONFIG,
 )
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
 
- # The distance from limit switch to limit switch, mm
-TEST_DISTANCE = {StackerAxis.X: 193.5, StackerAxis.Z: 137} 
+# The distance from limit switch to limit switch, mm
+TEST_DISTANCE = {StackerAxis.X: 193.5, StackerAxis.Z: 137}
+
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     return [
-        CSVLine(
-            f"stallguard-{StackerAxis.X}", [CSVResult]
-        ),
-        CSVLine(
-            f"stallguard-{StackerAxis.Z}", [CSVResult]
-        ),
+        CSVLine(f"stallguard-{StackerAxis.X}", [CSVResult]),
+        CSVLine(f"stallguard-{StackerAxis.Z}", [CSVResult]),
     ]
 
-async def test_stallguard(stacker: FlexStacker, test_axis: StackerAxis, report: CSVReport, section: str) -> None: 
+
+async def test_stallguard(
+    stacker: FlexStacker, test_axis: StackerAxis, report: CSVReport, section: str
+) -> None:
     """Test Stall-Guard."""
     ui.print_header(f"Testing {test_axis} Axis")
     stall_detected = False
@@ -42,13 +41,13 @@ async def test_stallguard(stacker: FlexStacker, test_axis: StackerAxis, report: 
             STACKER_MOTION_CONFIG[test_axis]["move"].move_params.acceleration,
             STACKER_MOTION_CONFIG[test_axis]["move"].run_current,
         )
-    except FlexStackerStallError as e:
+    except FlexStackerStallError:
         ui.print_info("Stall Detected")
         stall_detected = True
 
     axis_reset = False
     while not axis_reset:
-        try: 
+        try:
             # Move the axis off the crash block before re-homing
             await stacker.move_axis(
                 test_axis,
@@ -59,11 +58,11 @@ async def test_stallguard(stacker: FlexStacker, test_axis: StackerAxis, report: 
                 STACKER_MOTION_CONFIG[test_axis]["home"].run_current,
             )
             axis_reset = True
-        except FlexStackerStallError as e:
+        except FlexStackerStallError:
             axis_reset = False
 
     await stacker.home_axis(test_axis, Direction.EXTEND)
-    
+
     report(section, f"stallguard-{test_axis}", [CSVResult.from_bool(stall_detected)])
 
     return
@@ -80,12 +79,12 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     # Put the axes in the extended position to prepare for testing
     await stacker.home_axis(StackerAxis.Z, Direction.EXTEND)
     await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
-    
+
     # Prompt operator to place the crash block into the stacker
     if not stacker._simulating:
         ui.get_user_ready("Place the crash block into the stacker")
 
-    # Test Axes 
+    # Test Axes
     await test_stallguard(stacker, StackerAxis.X, report, section)
     await test_stallguard(stacker, StackerAxis.Z, report, section)
     # ui.print_header(f"Testing {StackerAxis.X} Axis")
@@ -99,7 +98,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     # Prompt operator to remove the crash block
     if not stacker._simulating:
         ui.get_user_ready("Remove the crash block from the stacker")
-    
+
     # Attetmpt to rehome
     test_reset = False
     while not test_reset:
@@ -107,11 +106,9 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
             await stacker.home_axis(StackerAxis.X, Direction.RETRACT)
             await stacker.home_axis(StackerAxis.Z, Direction.RETRACT)
             test_reset = True
-        except FlexStackerStallError as e:
+        except FlexStackerStallError:
             # Double check if crash block was actually removed
             await stacker.home_axis(StackerAxis.Z, Direction.EXTEND)
             await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
             if not stacker._simulating:
                 ui.get_user_ready("Remove the crash block from the stacker")
-
-

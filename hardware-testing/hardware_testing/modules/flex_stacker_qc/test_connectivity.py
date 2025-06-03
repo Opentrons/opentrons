@@ -26,7 +26,7 @@ async def test_gcode(stacker: FlexStacker, report: CSVReport) -> None:
     """Send and receive response for GCODE M115."""
     success = True
     info = await stacker._driver.get_device_info()
-    #TODO: update this with PVT/MP revisions 
+    # TODO: update this with PVT/MP revisions
     if info.hw != HardwareRevision.DVT:
         ui.print_warning(f"Hardware Revision is {info.hw}, expected DVT")
     report(
