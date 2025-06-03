@@ -89,4 +89,3 @@ def run(protocol: ProtocolContext) -> None:
         heater_shaker.close_labware_latch()
         # repeat tip movement
         move_to_corners(pipette, labware, protocol)
-        
