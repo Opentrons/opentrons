@@ -1,4 +1,7 @@
 import {
+  AddressableArea,
+  AddressableAreaName,
+  AddressableAreaWithFakes,
   filterAAByAreaType,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -33,7 +36,10 @@ export * from './constants'
 
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
-  handleClickAdd: (cutoutId: CutoutId) => void
+  handleClickAdd: (
+    cutoutId: CutoutId,
+    addressableArea: AddressableAreaWithFakes
+  ) => void
   handleClickRemove: (
     cutoutId: CutoutId,
     cutoutFixtureId: CutoutFixtureIdsWithFakes

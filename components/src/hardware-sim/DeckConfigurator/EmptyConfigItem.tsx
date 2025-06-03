@@ -1,6 +1,9 @@
 import { css } from 'styled-components'
 
 import {
+  AddressableArea,
+  AddressableAreaWithFakes,
+  getAAByAAId,
   getAALocationForCutoutAndFixtureId,
   SINGLE_LEFT_CUTOUTS,
 } from '@opentrons/shared-data'
@@ -30,7 +33,10 @@ interface EmptyConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   addressableArea: AddressableAreaNamesWithFakes
-  handleClickAdd: (fixtureLocation: CutoutId) => void
+  handleClickAdd: (
+    fixtureLocation: CutoutId,
+    addressableArea: AddressableAreaWithFakes
+  ) => void
 }
 
 export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
@@ -56,6 +62,7 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
     deckDefinition
   )
 
+  const aaItem = getAAByAAId(addressableArea, deckDefinition)
   const x =
     xSlotPosition +
     (SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
@@ -79,7 +86,7 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
       <Btn
         css={EMPTY_CONFIG_STYLE}
         onClick={() => {
-          handleClickAdd(fixtureLocation)
+          handleClickAdd(fixtureLocation, aaItem)
         }}
         data-testid={addressableArea}
       >

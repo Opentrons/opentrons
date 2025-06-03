@@ -85,6 +85,10 @@ export function getCutoutDisplayName(cutout: CutoutId): string {
   return cutout.replace('cutout', '')
 }
 
+export function getAADisplayName(aadressableArea: AddressableArea): string {
+  return aadressableArea.displayName
+}
+
 // mapping of OT-2 deck slots to cutouts
 export const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2CutoutId } = {
   1: 'cutout1',
@@ -419,14 +423,25 @@ export const getAALocationForCutoutAndFixtureId = (
   addressableArea: AddressableAreaNamesWithFakes,
   deckDefinition: DeckDefinition
 ): CoordinateTuple => {
-  const deckDefWithFakeLocations = getDeckDefAAWithFakeAA(deckDefinition)
-  const addressableAreaItem = deckDefWithFakeLocations.locations.addressableAreas.find(
-    (aaItem: AddressableAreaWithFakes) => aaItem.id === addressableArea
-  )
+  const addressableAreaItem = getAAByAAId(addressableArea, deckDefinition)
   if (addressableAreaItem == null) {
     console.error(`Addressable area ${addressableArea} location was not found.`)
   }
   return addressableAreaItem?.offsetFromCutoutFixture ?? [0, 0, 0]
+}
+
+export const getAAByAAId = (
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  deckDefinition: DeckDefinition
+): AddressableAreaWithFakes => {
+  const deckDefWithFakeLocations = getDeckDefAAWithFakeAA(deckDefinition)
+  const aaItem = deckDefWithFakeLocations.locations.addressableAreas.find(
+    (aaItem: AddressableAreaWithFakes) => aaItem.id === addressableAreaId
+  )
+  if (aaItem == undefined) {
+    console.error(`Could not find AddressableArea for ${addressableAreaId}`)
+  }
+  return aaItem
 }
 
 export const getAAFromCutoutFixtureId = (
