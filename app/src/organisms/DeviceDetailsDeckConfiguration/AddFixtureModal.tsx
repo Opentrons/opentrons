@@ -378,7 +378,7 @@ const getModuleUnconfiguredFixtures = (
     stackerOptions: CutoutConfig[][] = []
   if (moduleModel === FLEX_STACKER_MODULE_V1) {
     filteredMods.forEach((mod: AttachedModule) => {
-      stackerWithMagBlock = [
+      stackerWithMagBlock.push(
         [
           {
             cutoutId,
@@ -386,22 +386,21 @@ const getModuleUnconfiguredFixtures = (
             opentronsModuleSerialNumber: mod.serialNumber,
           },
         ],
-      ]
+      )
       if (cutoutId == 'cutoutD3') {
-        stackerWithWasteChute = [
+        stackerWithWasteChute.push(
           [
             {
               cutoutId,
               cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
               opentronsModuleSerialNumber: mod.serialNumber,
             },
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
           ],
-        ]
+          [            {
+            cutoutId,
+            cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+            opentronsModuleSerialNumber: mod.serialNumber,
+          }])
       }
       stackerOptions.push([
         {
