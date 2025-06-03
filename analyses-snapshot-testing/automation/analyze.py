@@ -1,21 +1,11 @@
-# /// script
-# requires-python = "==3.10.*"
-# dependencies = [
-#     "opentrons @ /root/github/opentrons2/api",
-#     "opentrons-shared-data @ /root/github/opentrons2/shared-data/python",
-#     "rich",
-# ]
-# ///
-
-
 import asyncio
 import io
 import json
-import random
-from contextlib import redirect_stderr, redirect_stdout
+import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
 import anyio
 
@@ -23,12 +13,10 @@ import anyio
 from opentrons.cli.analyze import _analyze, _Output  # type: ignore[import-not-found]
 
 # Imports for pretty printing with Rich.
-from rich import print as rprint
-from rich.panel import Panel
-from rich.progress import Progress
+from rich.progress import BarColumn, Progress, TextColumn, TimeElapsedColumn
 
 # Constants
-CUSTOM_LABWARE_DIR = Path(__file__).parent.parent / "labware"
+CUSTOM_LABWARE_DIR = Path(__file__).parent.parent / "files" / "labware"
 ANALYSIS_TIMEOUT = 60  # Timeout per protocol in seconds
 
 custom_labware_files = list(CUSTOM_LABWARE_DIR.glob("*.json"))
@@ -39,25 +27,42 @@ class AnalysisResult:
     """Dataclass to hold the analysis result."""
 
     protocol_file: Path
-    result: dict[str, Any] | str
+    analysis: dict[str, Any]
     logs: str = ""
 
+    @property
+    def protocol_name(self) -> str:
+        """Get the name of the protocol file."""
+        return self.protocol_file.name
 
-def run_analyze_in_thread(files: List[Path], rtp_values: str, rtp_files: str, check: bool) -> tuple[int, dict[str, Any], str]:
+    @property
+    def is_successful(self) -> bool:
+        """Check if the analysis result indicates success."""
+        return not bool(self.analysis.get("errors")) if isinstance(self.analysis, dict) else False
+
+
+def _subprocess_entrypoint():
     """
-    Run _analyze in its own event loop in this thread.
-    This helper creates its own BytesIO stream for JSON output, traps any print output,
-    runs _analyze, then reads and returns the exit code, JSON result, and captured logs.
+    Entrypoint for subprocess: runs _analyze for a single protocol file, prints JSON to stdout, and exits.
     """
-    # Capture prints that _analyze might do.
-    captured_output = io.StringIO()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--file", type=str, required=True)
+    parser.add_argument("--rtp_values", type=str, default="{}")
+    parser.add_argument("--rtp_files", type=str, default="{}")
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args()
+    protocol_file = Path(args.file)
+    files = custom_labware_files + [protocol_file]
     json_output_stream = io.BytesIO()
     outputs = [_Output(to_file=json_output_stream, kind="json")]
-
-    with redirect_stdout(captured_output), redirect_stderr(captured_output):
-        exit_code = asyncio.run(_analyze(files, rtp_values, rtp_files, outputs, check))
-
-    # Get the JSON output.
+    try:
+        exit_code = asyncio.run(_analyze(files, args.rtp_values, args.rtp_files, outputs, args.check))
+    except Exception as e:
+        print(json.dumps({"error": f"Exception: {str(e)}"}), file=sys.stdout)
+        # Fail Fast: exit with code 1 if any exception occurs
+        sys.exit(1)
     json_output_stream.seek(0)
     json_bytes = json_output_stream.read()
     try:
@@ -65,9 +70,9 @@ def run_analyze_in_thread(files: List[Path], rtp_values: str, rtp_files: str, ch
         result_json = json.loads(json_str)
     except Exception:
         result_json = {"error": "Failed to decode JSON output"}
-    # Get the captured print output.
-    log_output = captured_output.getvalue()
-    return exit_code, result_json, log_output
+    # Only print the JSON result to stdout!
+    print(json.dumps(result_json), file=sys.stdout)
+    sys.exit(exit_code)
 
 
 async def run_analysis(
@@ -77,97 +82,81 @@ async def run_analysis(
     check: bool = False,
 ) -> AnalysisResult:
     """
-    Run protocol analysis programmatically and return the analysis results as in-memory JSON.
-
-    This function analyzes a given protocol file in conjunction with custom labware files.
-    It traps printed output from _analyze and returns that as well.
-
-    Args:
-        file: The protocol file to analyze.
-        rtp_values: JSON string mapping runtime parameter variable names to values.
-        rtp_files: JSON string mapping runtime parameter variable names to file paths.
-        check: If True, returns a non-zero exit code if the analysis encountered errors.
-
-    Returns:
-        An AnalysisResult containing the protocol file, a dictionary with the analysis result,
-        and any captured log output.
+    Run protocol analysis in a subprocess and return the analysis results as in-memory JSON.
+    This captures all output, including from C extensions and subprocesses.
     """
     protocol_file = file
-    files = custom_labware_files + [protocol_file]
-
+    cmd = [
+        sys.executable,
+        str(Path(__file__).resolve()),
+        "--_subprocess-run",
+        "--file",
+        str(file),
+        "--rtp_values",
+        rtp_values,
+        "--rtp_files",
+        rtp_files,
+    ]
+    if check:
+        cmd.append("--check")
     try:
-        # Run the analysis in a separate thread and enforce a timeout.
-        async with anyio.fail_after(ANALYSIS_TIMEOUT):  # type: ignore
-            exit_code, result_json, log_output = await anyio.to_thread.run_sync(run_analyze_in_thread, files, rtp_values, rtp_files, check)
-    except TimeoutError:
+        proc = await anyio.to_thread.run_sync(lambda: subprocess.run(cmd, capture_output=True, text=True, timeout=ANALYSIS_TIMEOUT))
+        stdout = proc.stdout
+        stderr = proc.stderr
+        try:
+            result_json = json.loads(stdout)
+        except Exception:
+            result_json = {"error": "Failed to decode JSON output", "raw": stdout}
+        logs = stderr
+    except subprocess.TimeoutExpired:
         result_json = {"error": f"Analysis timed out after {ANALYSIS_TIMEOUT} seconds"}
-        return AnalysisResult(protocol_file=protocol_file, result=result_json, logs="")
+        logs = ""
     except Exception as e:
         result_json = {"error": f"Analysis failed with error: {str(e)}"}
-        return AnalysisResult(protocol_file=protocol_file, result=result_json, logs="")
+        logs = ""
+    return AnalysisResult(protocol_file=protocol_file, analysis=result_json, logs=logs)
 
-    return AnalysisResult(protocol_file=protocol_file, result=result_json, logs=log_output)
 
+def analyze_protocol_files(protocol_files: list[Path]) -> list[AnalysisResult]:
+    """
+    Analyze a list of protocol files and return a list of AnalysisResult objects.
+    This is a synchronous wrapper for use in other programs, with progress output.
+    """
+    import asyncio
 
-async def main() -> None:  # noqa: C901
-    current_dir = Path(__file__).parent
-    protocol_files = [
-        file
-        for file in (list(current_dir.glob("*.py")) + list(current_dir.glob("*.json")))
-        if "Overrides" not in file.name and "_X_" not in file.name
-    ]
-    ignored_files = [
-        "Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IDTXgen96Part1to3.py",
-        "Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IlluminaDNAPrep96PART3.py",
-        "pl_sample_dilution_with_96_channel_pipette.py",
-        "pl_langone_ribo_pt1_ramp.py",
-    ]
-    protocol_files = [file for file in protocol_files if file.name not in ignored_files]
+    results: list[AnalysisResult] = []
 
-    # Select 10 random protocol files.
-    protocol_files = random.sample(protocol_files, 10)
-    results: List[AnalysisResult] = []
+    async def _run():
+        nonlocal results
+        total = len(protocol_files)
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            "[progress.percentage]{task.percentage:>3.0f}%",
+            "|",
+            "[cyan]{task.completed}/{task.total}",
+            TimeElapsedColumn(),
+            transient=True,
+        ) as progress:
+            task_id = progress.add_task("Analyzing protocols", total=total)
 
-    # Create a Rich progress bar.
-    with Progress() as progress:
-        task_id = progress.add_task("[cyan]Processing protocols...", total=len(protocol_files))
+            async def run_and_collect(file: Path) -> None:
+                try:
+                    results.append(await run_analysis(file))
+                except Exception:
+                    pass
+                progress.update(task_id, advance=1)
 
-        async def run_and_collect(file: Path) -> None:
-            try:
-                result = await run_analysis(file)
-            except Exception as e:
-                result = AnalysisResult(protocol_file=file, result={"error": str(e)}, logs="")
-            results.append(result)
-            progress.advance(task_id)
+            async with anyio.create_task_group() as tg:
+                for file in protocol_files:
+                    tg.start_soon(run_and_collect, file)
 
-        async with anyio.create_task_group() as tg:
-            for file in protocol_files:
-                tg.start_soon(run_and_collect, file)
-
-    rprint(Panel("[bold cyan]All Protocol Analyses Completed[/bold cyan]"))
-    for result in results:
-        rprint(f"\n[bold blue]Protocol: {result.protocol_file.name}[/bold blue]")
-        if isinstance(result.result, str):
-            rprint(Panel(f"[bold red]Error: {result.result}[/bold red]"))
-        elif isinstance(result.result, dict):
-            status = result.result.get("result", "Unknown status")
-            color = "green" if status == "ok" else "red"
-            rprint(Panel(f"[bold {color}]Status: {status}[/bold {color}]"))
-
-            # Look for errors or warnings in the result
-            if "errors" in result.result and result.result["errors"]:
-                rprint("[bold red]Errors:[/bold red]")
-                for error in result.result["errors"]:
-                    rprint(f"  - {error}")
-            if "warnings" in result.result and result.result["warnings"]:
-                rprint("[bold yellow]Warnings:[/bold yellow]")
-                for warning in result.result["warnings"]:
-                    rprint(f"  - {warning}")
-
-        # Optionally, also print the captured log output
-        # if result.logs:
-        #     rprint(Panel(f"[dim]{result.logs}[/dim]", title="Captured Logs"))
+    asyncio.run(_run())
+    return results
 
 
 if __name__ == "__main__":
-    anyio.run(main)
+    # Check if the script is running as a subprocess and remove the flag to avoid interference.
+    if "--_subprocess-run" in sys.argv:
+        sys.argv.remove("--_subprocess-run")
+        _subprocess_entrypoint()

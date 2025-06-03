@@ -146,3 +146,14 @@ run-ot2:
 	@echo "Running opentrons-robot-server:$(OPENTRONS_VERSION)"
 	@echo "If you want to run a different version, run 'make run-ot2 OPENTRONS_VERSION=chore_release-8.0.0'"
 	docker run -p 31950:31950 --env-file ../robot-server/dev.env opentrons-robot-server:$(OPENTRONS_VERSION)
+
+LIMIT ?= 10
+.PHONY: analyze
+analyze:
+	uv run python -m automation.test_analyze_api --limit $(LIMIT)
+
+.PHONY: install-ot
+install-ot:
+	@echo "Installing the opentrons package from the local codebase"
+	uv pip install -e ../api
+	uv pip install -e ../shared-data/python

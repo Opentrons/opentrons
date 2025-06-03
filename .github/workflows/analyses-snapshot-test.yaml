@@ -95,7 +95,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-          cache-dependency-glob: "./analyses-snapshot-testing/uv.lock"
+          cache-dependency-glob: './analyses-snapshot-testing/uv.lock'
       - name: Sync the project
         working-directory: ./analyses-snapshot-testing
         run: make ci-setup

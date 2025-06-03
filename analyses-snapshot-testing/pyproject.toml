@@ -3,8 +3,9 @@ name = "analyses-snapshot-testing"
 version = "0.1.0"
 description = "Snapshot Testing of Opentrons Protocols"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
+    "anyio>=4.9.0",
     "docker>=7.1.0",
     "httpx>=0.28.1",
     "importlib-metadata>=8.7.0",
@@ -21,7 +22,7 @@ dependencies = [
 [tool.ruff]
 line-length = 140
 indent-width = 4
-target-version = "py313"
+target-version = "py310"
 exclude = ["files"]
 src = ["*.py", "automation", "tests", "citools"]
 
