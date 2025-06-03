@@ -93,7 +93,7 @@ describe('Dispense', () => {
 
   it('renders mock components and reset button', () => {
     render(props)
-    expect(screen.getAllByText('mock DispenseSettingItem').length).toBe(9)
+    expect(screen.getAllByText('mock DispenseSettingItem').length).toBe(10)
     screen.getByText('mock DispenseSettingDetail')
     screen.getByRole('button', { name: 'Reset dispense settings' })
   })
