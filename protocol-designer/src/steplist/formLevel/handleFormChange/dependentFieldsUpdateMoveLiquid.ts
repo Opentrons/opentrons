@@ -512,7 +512,7 @@ const updatePatchOnPipetteChannelChange = (
   )
   const nextChannels =
     typeof patch.pipette === 'string'
-      ? getChannels(patch.pipette as string, pipetteEntities)
+      ? getChannels(patch.pipette, pipetteEntities)
       : null
 
   const { id, stepType, ...stepData } = rawForm
