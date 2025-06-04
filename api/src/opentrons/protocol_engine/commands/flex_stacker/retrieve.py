@@ -225,9 +225,6 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 f"Cannot retrieve a labware from Flex Stacker in {location} if the carriage is occupied"
             )
 
-        labware_height = self._state_view.geometry.get_height_of_stacker_labware_pool(
-            params.moduleId
-        )
         to_retrieve = stacker_state.contained_labware_bottom_first[0]
         remaining = stacker_state.contained_labware_bottom_first[1:]
 
@@ -271,7 +268,9 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         if stacker_hw is not None:
             try:
                 stacker_hw.set_stacker_identify(True)
-                await stacker_hw.dispense_labware(labware_height=labware_height)
+                await stacker_hw.dispense_labware(
+                    labware_height=stacker_state.get_pool_height_minus_overlap()
+                )
             except (
                 FlexStackerStallError,
                 FlexStackerShuttleMissingError,

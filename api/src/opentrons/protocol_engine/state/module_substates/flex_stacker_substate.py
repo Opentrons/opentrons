@@ -80,13 +80,9 @@ class FlexStackerSubState:
             defs.append(self.pool_adapter_definition)
         return defs
 
-    def get_pool_overlap(self) -> float:
-        """Get the pool overlap value."""
-        return self.pool_overlap
-
-    def get_pool_height(self) -> float:
-        """Get the pool height value."""
-        return self.pool_height
+    def get_pool_height_minus_overlap(self) -> float:
+        """Get the height used in dispense/store action."""
+        return self.pool_height - self.pool_overlap
 
     def get_contained_labware(self) -> list[StackerStoredLabwareGroup]:
         """Get the labware inside the hopper."""
