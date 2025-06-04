@@ -14,7 +14,7 @@ requirements = {
 }
 
 
-def add_parameters(parameters: ParameterContext):
+def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters to the protocol."""
     parameters.add_str(
         variable_name="stacker_slot",
