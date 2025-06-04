@@ -16,10 +16,6 @@ metadata = {
 
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
-positions = ["A1", "H1", "A12", "H12"]
-
-
-
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
     parameters.add_str(
@@ -53,39 +49,46 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     labware_type = protocol.params.labware_type  # type: ignore[attr-defined]
-    heater_shaker = protocol.params.heater_shaker  # type: ignore[attr-defined]
+    heater_shaker_enabled = protocol.params.heater_shaker  # type: ignore[attr-defined]
 
-    # first load labware
-    labware = protocol.load_labware(labware_type, "D3")
+    #Lid loading 
+    if labware_type == "corning_96_wellplate_360ul_lid":
+        lid = protocol.load_lid_stack(labware_type, "C3", 1)
+        labware = protocol.load_labware("ibidi_96_square_well_plate_300ul", "D3")
+        for _ in range(3):
+            protocol.move_lid("C3", labware, use_gripper=True)
+            protocol.move_lid(labware, "C3")
+    
+    else: 
+        labware = protocol.load_labware(labware_type, "D3")
 
-    # load pipette and tip rack
-    tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
-    pipette = protocol.load_instrument(
-        "flex_8channel_1000", "left", tip_racks=[tip_rack]
-    )
+        # load pipette and tip rack
+        tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
+        pipette = protocol.load_instrument("flex_8channel_1000", "left", tip_racks=[tip_rack])
 
-    # pick up the tip
-    pipette.pick_up_tip()
+        # pick up tip
+        pipette.pick_up_tip()
 
-    # tip movement
-    pipette.move_to(labware["A6"].top(z=1))  # + 1mm protocol.pause
-    protocol.pause("check the top height with shim")
-    pipette.move_to(labware["A6"].bottom(z=1))
-    protocol.pause("check the bottom height with shim")
-
-    # if heater shaker, move to heatershaker and repeat process
-    if heater_shaker:
-        heater_shaker = protocol.load_module("heaterShakerModuleV1", "D1")
-        heater_shaker.close_labware_latch()
-        heater_shaker_adapter = heater_shaker.load_adapter(
-            "opentrons_universal_flat_adapter"
-        )
-        heater_shaker.open_labware_latch()
-        protocol.move_labware(labware, heater_shaker_adapter, use_gripper=True)
-        heater_shaker.close_labware_latch()
-        # repeat tip movement
-        pipette.move_to(labware["A6"].top(z=1))  # + 1mm protocol.pause
-        protocol.pause("check the top height with shim")
+        # move tip to positions
+        pipette.move_to(labware["A6"].top(z=1))
+        protocol.pause("Check top height with shim")
         pipette.move_to(labware["A6"].bottom(z=1))
-        protocol.pause("check the bottom height with shim")
-        
+        protocol.pause("Check bottom height with shim")
+
+        # Optional heater shaker use
+        if heater_shaker_enabled:
+            hsh = protocol.load_module("heaterShakerModuleV1", "D1")
+            hsh.close_labware_latch()
+            adapter = hsh.load_adapter("opentrons_universal_flat_adapter")
+            hsh.open_labware_latch()
+            protocol.move_labware(labware, adapter, use_gripper=True)
+            hsh.close_labware_latch()
+
+            pipette.move_to(labware["A6"].top(z=1))
+            protocol.pause("Check top height with shim")
+            pipette.move_to(labware["A6"].bottom(z=1))
+            protocol.pause("Check bottom height with shim")
+
+        pipette.return_tip()
+
+    
