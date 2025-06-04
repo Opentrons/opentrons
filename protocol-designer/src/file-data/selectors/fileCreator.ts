@@ -205,7 +205,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
             displayName: liquidData.displayName,
             description: liquidData.description ?? '',
             displayColor: liquidData.displayColor ?? swatchColors(liquidId),
-            liquidClass: liquidData.liquidClass ?? '',
+            liquidClass: liquidData.liquidClass ?? null,
           },
         }
       },
