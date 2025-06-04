@@ -1794,7 +1794,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
-        visit_every_well: bool = False,
+        group_wells: bool = True,
     ) -> InstrumentContext:
         """Move a particular type of liquid from one well or group of wells to another.
 
@@ -1827,6 +1827,9 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
 
         :meta private:
         """
@@ -1844,7 +1847,7 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
-            target_all_wells=visit_every_well,
+            group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
@@ -1913,7 +1916,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
-        visit_every_well: bool = False,
+        group_wells: bool = True,
     ) -> InstrumentContext:
         """
         Distribute a particular type of liquid from one well to a group of wells.
@@ -1943,6 +1946,9 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
 
         :meta private:
         """
@@ -1960,7 +1966,7 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
-            target_all_wells=visit_every_well,
+            group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
@@ -2035,7 +2041,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
-        visit_every_well: bool = False,
+        group_wells: bool = True,
     ) -> InstrumentContext:
         """
         Consolidate a particular type of liquid from a group of wells to one well.
@@ -2066,6 +2072,9 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
 
         :meta private:
         """
@@ -2083,7 +2092,7 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
-            target_all_wells=visit_every_well,
+            group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
