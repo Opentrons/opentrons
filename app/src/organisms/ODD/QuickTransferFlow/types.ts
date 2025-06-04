@@ -189,6 +189,7 @@ interface SetDelayAspirate {
 interface SetTouchTipAspirate {
   type: typeof ACTIONS.SET_TOUCH_TIP_ASPIRATE
   position?: number
+  touchTipAspirateSpeed?: number
 }
 interface SetAirGapAspirate {
   type: typeof ACTIONS.SET_AIR_GAP_ASPIRATE
@@ -226,6 +227,7 @@ interface SetDelayDispense {
 interface SetTouchTipDispense {
   type: typeof ACTIONS.SET_TOUCH_TIP_DISPENSE
   position?: number
+  touchTipDispenseSpeed?: number
 }
 interface SetBlowOut {
   type: typeof ACTIONS.SET_BLOW_OUT

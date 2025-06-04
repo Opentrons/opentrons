@@ -281,7 +281,7 @@ describe('QuickTransferAdvancedSettings', () => {
     }
     render(props)
     const touchtipAspirate = screen.getAllByText('Touch tip')[0]
-    screen.getByText('8 mm from bottom')
+    screen.getByText('10 mm from the bottom')
     fireEvent.click(touchtipAspirate)
     expect(vi.mocked(TouchTip)).toHaveBeenCalled()
   })
@@ -391,7 +391,7 @@ describe('QuickTransferAdvancedSettings', () => {
     }
     render(props)
     const touchtipDispense = screen.getAllByText('Touch tip')[1]
-    screen.getByText('1 mm from bottom')
+    screen.getByText('10 mm from the bottom')
     fireEvent.click(touchtipDispense)
     expect(vi.mocked(TouchTip)).toHaveBeenCalled()
   })
