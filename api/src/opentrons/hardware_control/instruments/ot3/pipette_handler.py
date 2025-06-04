@@ -679,6 +679,7 @@ class OT3PipetteHandler:
 
         if is_full_dispense:
             remaining_vol = 0.0  # NOTE: avoiding unnecessary rounding errors
+            disp_vol = instrument.current_volume
             if push_out is None:
                 push_out_ul = instrument.push_out_volume
             else:
