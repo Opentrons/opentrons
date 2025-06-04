@@ -215,7 +215,7 @@ class SetStoredLabwareImpl(
             x for x in [lid_def, labware_def, adapter_def] if x is not None
         ]
 
-        z_overlap = (
+        pool_overlap = (
             params.poolOverlapOverride
             if params.poolOverlapOverride
             else self._state_view._labware.get_labware_overlap_offsets(
@@ -226,7 +226,7 @@ class SetStoredLabwareImpl(
         max_pool_count = self._state_view.modules.stacker_max_pool_count_by_height(
             params.moduleId,
             pool_height,
-            z_overlap,
+            pool_overlap,
         )
         groups_to_load = build_ids_to_fill(
             params.adapterLabware is not None,
@@ -251,7 +251,8 @@ class SetStoredLabwareImpl(
         state_update = state_update.update_flex_stacker_labware_pool_definition(
             params.moduleId,
             max_pool_count,
-            z_overlap,
+            pool_overlap,
+            pool_height,
             labware_def,
             adapter_def,
             lid_def,

@@ -29,6 +29,7 @@ class FlexStackerSubState:
     pool_adapter_definition: LabwareDefinition | None
     pool_lid_definition: LabwareDefinition | None
     max_pool_count: int
+    pool_height: float
     pool_overlap: float
     contained_labware_bottom_first: list[StackerStoredLabwareGroup]
 
@@ -41,12 +42,14 @@ class FlexStackerSubState:
         pool_lid_definition = self.pool_lid_definition
         max_pool_count = self.max_pool_count
         pool_overlap = self.pool_overlap
+        pool_height = self.pool_height
         if update.pool_constraint != NO_CHANGE:
             max_pool_count = update.pool_constraint.max_pool_count
             pool_primary_definition = update.pool_constraint.primary_definition
             pool_adapter_definition = update.pool_constraint.adapter_definition
             pool_lid_definition = update.pool_constraint.lid_definition
             pool_overlap = update.pool_constraint.pool_overlap
+            pool_height = update.pool_constraint.pool_height
 
         contained_labware = self.contained_labware_bottom_first
 
@@ -61,6 +64,7 @@ class FlexStackerSubState:
             contained_labware_bottom_first=contained_labware,
             max_pool_count=max_pool_count,
             pool_overlap=pool_overlap,
+            pool_height=pool_height,
         )
 
     def get_pool_definition_ordered_list(self) -> list[LabwareDefinition] | None:
@@ -75,6 +79,14 @@ class FlexStackerSubState:
         if self.pool_adapter_definition is not None:
             defs.append(self.pool_adapter_definition)
         return defs
+
+    def get_pool_overlap(self) -> float:
+        """Get the pool overlap value."""
+        return self.pool_overlap
+
+    def get_pool_height(self) -> float:
+        """Get the pool height value."""
+        return self.pool_height
 
     def get_contained_labware(self) -> list[StackerStoredLabwareGroup]:
         """Get the labware inside the hopper."""

@@ -358,6 +358,7 @@ class FlexStackerPoolConstraint:
 
     max_pool_count: int
     pool_overlap: float
+    pool_height: float
     primary_definition: LabwareDefinition
     lid_definition: LabwareDefinition | None
     adapter_definition: LabwareDefinition | None
@@ -824,6 +825,7 @@ class StateUpdate:
         module_id: str,
         max_count: int,
         pool_overlap: float,
+        pool_height: float,
         primary_definition: LabwareDefinition,
         adapter_definition: LabwareDefinition | None,
         lid_definition: LabwareDefinition | None,
@@ -836,6 +838,7 @@ class StateUpdate:
             pool_constraint=FlexStackerPoolConstraint(
                 max_pool_count=max_count,
                 pool_overlap=pool_overlap,
+                pool_height=pool_height,
                 primary_definition=primary_definition,
                 lid_definition=lid_definition,
                 adapter_definition=adapter_definition,
