@@ -27,8 +27,14 @@ describe('dropTip', () => {
         ...prevRobotState,
         tipState: {
           pipettes: {
-            p300SingleId: true,
-            p300MultiId: true,
+            p300SingleId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
+            p300MultiId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
           },
           tipracks: {} as any,
         },
@@ -40,8 +46,14 @@ describe('dropTip', () => {
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
       expect(result.robotState.tipState.pipettes).toEqual({
-        p300SingleId: false,
-        p300MultiId: true,
+        p300SingleId: {
+          hasTip: false,
+          tiprackURI: null,
+        },
+        p300MultiId: {
+          hasTip: true,
+          tiprackURI: 'tiprackId',
+        },
       })
     })
     // TODO: IL 2019-11-20
@@ -53,8 +65,14 @@ describe('dropTip', () => {
         ...prevRobotState,
         tipState: {
           pipettes: {
-            p300SingleId: true,
-            p300MultiId: true,
+            p300SingleId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
+            p300MultiId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
           },
           tipracks: {} as any,
         },
@@ -66,8 +84,14 @@ describe('dropTip', () => {
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
       expect(result.robotState.tipState.pipettes).toEqual({
-        p300SingleId: true,
-        p300MultiId: false,
+        p300SingleId: {
+          hasTip: true,
+          tiprackURI: 'tiprackId',
+        },
+        p300MultiId: {
+          hasTip: false,
+          tiprackURI: null,
+        },
       })
     })
   })
@@ -77,8 +101,14 @@ describe('dropTip', () => {
         ...prevRobotState,
         tipState: {
           pipettes: {
-            p300SingleId: true,
-            p300MultiId: true,
+            p300SingleId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
+            p300MultiId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
           },
           tipracks: {} as any,
         },
