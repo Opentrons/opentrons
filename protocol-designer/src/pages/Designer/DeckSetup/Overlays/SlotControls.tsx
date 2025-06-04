@@ -191,7 +191,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
       >
         <Link role="button">
           <StyledText desktopStyle="bodyLargeSemiBold">
-            {t('starting_deck_state:edit_slot')}
+            {t('starting_deck_state:add_labware')}
           </StyledText>
         </Link>
       </Flex>

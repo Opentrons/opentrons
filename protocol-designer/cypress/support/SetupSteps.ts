@@ -92,7 +92,7 @@ export enum SetupLocators {
 }
 
 export const RegexSetupContent = {
-  slotText: /Edit (slot|labware)/i,
+  slotText: /(Add|Edit) labware/i,
 }
 
 /**
