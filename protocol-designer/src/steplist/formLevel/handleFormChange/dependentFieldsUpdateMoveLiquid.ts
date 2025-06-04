@@ -2,7 +2,11 @@ import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
 
-import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+import {
+  ALL,
+  getPipetteSpecsV2,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -236,10 +240,14 @@ const updatePatchOnPipetteChange = (
   if (fieldHasChanged(rawForm, patch, 'pipette')) {
     const newPipette = patch.pipette
     let airGapVolume: string | null = null
+    let nozzles: NozzleConfigurationStyle | null = null
 
     if (typeof newPipette === 'string' && newPipette in pipetteEntities) {
       const minVolume = getMinPipetteVolume(pipetteEntities[newPipette])
       airGapVolume = minVolume.toString()
+      const hasPartialTipSupportedChannel =
+        pipetteEntities[newPipette].spec.channels !== 1
+      nozzles = hasPartialTipSupportedChannel ? ALL : null
     }
 
     return {
@@ -252,9 +260,9 @@ const updatePatchOnPipetteChange = (
         'disposalVolume_volume',
         'aspirate_mmFromBottom',
         'dispense_mmFromBottom',
-        'nozzles',
         'tipRack'
       ),
+      nozzles,
       aspirate_airGap_volume: airGapVolume,
       dispense_airGap_volume: airGapVolume,
     }
