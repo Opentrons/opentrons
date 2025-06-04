@@ -1,0 +1,278 @@
+{
+  "createdAt": "2025-06-04T14:01:36.643676Z",
+  "files": [
+    {
+      "name": "Flex_X_v2_16_NO_PIPETTES_TM_ModuleInStagingAreaCol3.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      16
+    ]
+  },
+  "metadata": {
+    "protocolName": "QA Protocol - Analysis Error - Module in Staging Area Column 3",
+    "author": "Derek Maggio <derek.maggio@opentrons.com>"
+  },
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "74562412-86fa-4e6a-9368-3ec995cd311a",
+      "createdAt": "2025-06-04T14:01:36.507478Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-06-04T14:01:36.507735Z",
+      "completedAt": "2025-06-04T14:01:36.507892Z",
+      "notes": []
+    },
+    {
+      "id": "3878131f-c2b9-441a-9b6a-10b3578daa32",
+      "createdAt": "2025-06-04T14:01:36.528543Z",
+      "commandType": "loadLabware",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "addressableAreaName": "C4"
+        },
+        "loadName": "nest_1_reservoir_290ml",
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "labwareId": "e95087d5-f047-4fd9-b8b9-b91a78bb99e0",
+        "locationSequence": [
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "C4"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "stagingAreaRightSlot",
+              "stagingAreaSlotWithMagneticBlockV1"
+            ],
+            "cutoutId": "cutoutC3"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 1,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "NEST 1 Well Reservoir 290 mL",
+            "displayCategory": "reservoir",
+            "displayVolumeUnits": "mL",
+            "tags": []
+          },
+          "brand": {
+            "brand": "NEST",
+            "brandId": [
+              "360206",
+              "360266"
+            ],
+            "links": [
+              "https://www.nest-biotech.com/reagent-reserviors"
+            ]
+          },
+          "parameters": {
+            "format": "trough",
+            "quirks": [
+              "centerMultichannelOnWells",
+              "touchTipDisabled"
+            ],
+            "isTiprack": false,
+            "loadName": "nest_1_reservoir_290ml",
+            "isMagneticModuleCompatible": false
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [
+            [
+              "A1"
+            ]
+          ],
+          "dimensions": {
+            "yDimension": 85.47,
+            "zDimension": 44.4,
+            "xDimension": 127.76
+          },
+          "wells": {
+            "A1": {
+              "depth": 39.55,
+              "totalLiquidVolume": 290000,
+              "x": 63.88,
+              "y": 42.74,
+              "z": 4.85,
+              "shape": "rectangular",
+              "xDimension": 106.8,
+              "yDimension": 71.2
+            }
+          },
+          "groups": [
+            {
+              "wells": [
+                "A1"
+              ],
+              "metadata": {
+                "wellBottomShape": "v"
+              }
+            }
+          ],
+          "stackingOffsetWithLabware": {},
+          "stackingOffsetWithModule": {},
+          "allowedRoles": [],
+          "gripperOffsets": {}
+        }
+      },
+      "startedAt": "2025-06-04T14:01:36.528705Z",
+      "completedAt": "2025-06-04T14:01:36.568967Z",
+      "notes": []
+    },
+    {
+      "id": "5a1623f3-e7c4-4fa8-8f18-cc61a42d7210",
+      "createdAt": "2025-06-04T14:01:36.587428Z",
+      "commandType": "loadModule",
+      "key": "a3a7eed460d8d94a91747f23820a180d",
+      "status": "failed",
+      "params": {
+        "model": "temperatureModuleV2",
+        "location": {
+          "slotName": "C3"
+        }
+      },
+      "error": {
+        "id": "50bff86f-deff-4bb3-82bb-8f632914ac00",
+        "createdAt": "2025-06-04T14:01:36.588611Z",
+        "isDefined": false,
+        "errorType": "IncompatibleAddressableAreaError",
+        "errorCode": "4000",
+        "detail": "Cannot use Temperature Module in C3, not compatible with one or more of the following fixtures: Slot C4",
+        "errorInfo": {},
+        "wrappedErrors": []
+      },
+      "startedAt": "2025-06-04T14:01:36.587641Z",
+      "completedAt": "2025-06-04T14:01:36.588611Z",
+      "notes": [
+        {
+          "noteKind": "debugErrorRecovery",
+          "shortMessage": "Handling this command failure with FAIL_RUN.",
+          "longMessage": "Handling this command failure with FAIL_RUN.",
+          "source": "execution"
+        }
+      ]
+    }
+  ],
+  "labware": [
+    {
+      "id": "e95087d5-f047-4fd9-b8b9-b91a78bb99e0",
+      "loadName": "nest_1_reservoir_290ml",
+      "definitionUri": "opentrons/nest_1_reservoir_290ml/1",
+      "location": {
+        "addressableAreaName": "C4"
+      }
+    }
+  ],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "b5bc5aa7-aff3-41ef-a91e-fddd141212be",
+      "createdAt": "2025-06-04T14:01:36.594394Z",
+      "isDefined": false,
+      "errorType": "ExceptionInProtocolError",
+      "errorCode": "4000",
+      "detail": "ProtocolCommandFailedError [line 17]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): IncompatibleAddressableAreaError: Cannot use Temperature Module in C3, not compatible with one or more of the following fixtures: Slot C4",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "b5bc5aa7-aff3-41ef-a91e-fddd141212be",
+          "createdAt": "2025-06-04T14:01:36.594394Z",
+          "isDefined": false,
+          "errorType": "ProtocolCommandFailedError",
+          "errorCode": "4000",
+          "detail": "IncompatibleAddressableAreaError: Cannot use Temperature Module in C3, not compatible with one or more of the following fixtures: Slot C4",
+          "errorInfo": {},
+          "wrappedErrors": [
+            {
+              "id": "50bff86f-deff-4bb3-82bb-8f632914ac00",
+              "createdAt": "2025-06-04T14:01:36.588611Z",
+              "isDefined": false,
+              "errorType": "IncompatibleAddressableAreaError",
+              "errorCode": "4000",
+              "detail": "Cannot use Temperature Module in C3, not compatible with one or more of the following fixtures: Slot C4",
+              "errorInfo": {},
+              "wrappedErrors": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}

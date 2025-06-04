@@ -1,0 +1,651 @@
+{
+  "createdAt": "2025-06-04T14:01:39.425991Z",
+  "files": [
+    {
+      "name": "Flex_S_v2_18_NO_PIPETTES_GoldenRTP.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      18
+    ]
+  },
+  "metadata": {
+    "protocolName": "Golden RTP Examples"
+  },
+  "result": "ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [
+    {
+      "displayName": "int min/max all",
+      "variableName": "min_max_all_fields",
+      "description": "Reused description for all parameters.",
+      "suffix": "unit",
+      "type": "int",
+      "min": 1.0,
+      "max": 12.0,
+      "value": 6.0,
+      "default": 6.0
+    },
+    {
+      "displayName": "int min/max no unit",
+      "variableName": "int_min_max_without_unit",
+      "description": "Reused description for all parameters.",
+      "type": "int",
+      "min": 1.0,
+      "max": 3.0,
+      "value": 1.0,
+      "default": 1.0
+    },
+    {
+      "displayName": "int min/max no description",
+      "variableName": "int_min_max_without_description",
+      "suffix": "unit",
+      "type": "int",
+      "min": 1.0,
+      "max": 3.0,
+      "value": 1.0,
+      "default": 1.0
+    },
+    {
+      "displayName": "int min/max no unit,desc",
+      "variableName": "int_min_max_without_unit_and_description",
+      "type": "int",
+      "min": 1.0,
+      "max": 3.0,
+      "value": 1.0,
+      "default": 1.0
+    },
+    {
+      "displayName": "int choices all",
+      "variableName": "int_choices_all_fields",
+      "description": "Reused description for all parameters.",
+      "type": "int",
+      "choices": [
+        {
+          "displayName": "20",
+          "value": 20
+        },
+        {
+          "displayName": "16",
+          "value": 16
+        }
+      ],
+      "value": 20,
+      "default": 20
+    },
+    {
+      "displayName": "int choice no unit",
+      "variableName": "int_choice_no_unit",
+      "description": "Reused description for all parameters.",
+      "type": "int",
+      "choices": [
+        {
+          "displayName": "1X",
+          "value": 6
+        },
+        {
+          "displayName": "2X",
+          "value": 12
+        }
+      ],
+      "value": 6,
+      "default": 6
+    },
+    {
+      "displayName": "int choice no unit, desc",
+      "variableName": "int_choice_no_unit_desc",
+      "type": "int",
+      "choices": [
+        {
+          "displayName": "10X",
+          "value": 10
+        },
+        {
+          "displayName": "100X",
+          "value": 100
+        }
+      ],
+      "value": 10,
+      "default": 10
+    },
+    {
+      "displayName": "float min/max all fields",
+      "variableName": "float_min_max_all_fields",
+      "description": "Reused description for all parameters.",
+      "suffix": "unit",
+      "type": "float",
+      "min": 20.0,
+      "max": 30.0,
+      "value": 30.0,
+      "default": 30.0
+    },
+    {
+      "displayName": "float min/max no unit",
+      "variableName": "float_min_max_no_unit",
+      "description": "Reused description for all parameters.",
+      "type": "float",
+      "min": 1.5,
+      "max": 3.0,
+      "value": 1.8,
+      "default": 1.8
+    },
+    {
+      "displayName": "float min/max no unit,desc",
+      "variableName": "float_min_max_no_unit_or_desc",
+      "type": "float",
+      "min": 1.5,
+      "max": 3.0,
+      "value": 1.8,
+      "default": 1.8
+    },
+    {
+      "displayName": "float choices all",
+      "variableName": "float_choices_all_fields",
+      "description": "Reused description for all parameters.",
+      "type": "float",
+      "choices": [
+        {
+          "displayName": "Low Volume (10.0\u00b5L)",
+          "value": 10.0
+        },
+        {
+          "displayName": "Medium Volume (20.0\u00b5L)",
+          "value": 20.0
+        },
+        {
+          "displayName": "High Volume (50.0\u00b5L)",
+          "value": 50.0
+        }
+      ],
+      "value": 20.0,
+      "default": 20.0
+    },
+    {
+      "displayName": "float choices no unit",
+      "variableName": "float_choices_no_unit",
+      "description": "Reused description for all parameters.",
+      "type": "float",
+      "choices": [
+        {
+          "displayName": "Low Volume (10.0\u00b5L)",
+          "value": 10.0
+        },
+        {
+          "displayName": "High Volume (50.0\u00b5L)",
+          "value": 50.0
+        }
+      ],
+      "value": 10.0,
+      "default": 10.0
+    },
+    {
+      "displayName": "float choices no description",
+      "variableName": "float_choices_no_description",
+      "type": "float",
+      "choices": [
+        {
+          "displayName": "Low Volume (10.0\u00b5L)",
+          "value": 10.0
+        },
+        {
+          "displayName": "Medium Volume (20.0\u00b5L)",
+          "value": 20.0
+        },
+        {
+          "displayName": "High Volume (50.0\u00b5L)",
+          "value": 50.0
+        }
+      ],
+      "value": 20.0,
+      "default": 20.0
+    },
+    {
+      "displayName": "float choices no unit,desc",
+      "variableName": "float_choices_no_unit_or_desc",
+      "type": "float",
+      "choices": [
+        {
+          "displayName": "Low Volume (10.0\u00b5L)",
+          "value": 10.0
+        },
+        {
+          "displayName": "Medium Volume (20.0\u00b5L)",
+          "value": 20.0
+        },
+        {
+          "displayName": "High Volume (50.0\u00b5L)",
+          "value": 50.0
+        }
+      ],
+      "value": 20.0,
+      "default": 20.0
+    },
+    {
+      "displayName": "bool all fields",
+      "variableName": "bool_all_fields",
+      "description": "When on, skip aspirate and dispense steps.",
+      "type": "bool",
+      "value": false,
+      "default": false
+    },
+    {
+      "displayName": "bool no description",
+      "variableName": "bool_no_desc",
+      "type": "bool",
+      "value": false,
+      "default": false
+    },
+    {
+      "displayName": "str choices all",
+      "variableName": "str_choices_all_fields",
+      "description": "What pipette to use during the protocol.",
+      "type": "str",
+      "choices": [
+        {
+          "displayName": "Single channel 50\u00b5L",
+          "value": "flex_1channel_50"
+        },
+        {
+          "displayName": "Eight Channel 50\u00b5L",
+          "value": "flex_8channel_50"
+        }
+      ],
+      "value": "flex_1channel_50",
+      "default": "flex_1channel_50"
+    },
+    {
+      "displayName": "str choices all many",
+      "variableName": "str_choices_all_many_fields",
+      "description": "Reused description for all parameters.",
+      "type": "str",
+      "choices": [
+        {
+          "displayName": "A",
+          "value": "A"
+        },
+        {
+          "displayName": "B",
+          "value": "B"
+        },
+        {
+          "displayName": "C",
+          "value": "C"
+        },
+        {
+          "displayName": "D",
+          "value": "D"
+        },
+        {
+          "displayName": "E",
+          "value": "E"
+        },
+        {
+          "displayName": "F",
+          "value": "F"
+        }
+      ],
+      "value": "E",
+      "default": "E"
+    },
+    {
+      "displayName": "str choices no desc",
+      "variableName": "str_choices_no_desc",
+      "type": "str",
+      "choices": [
+        {
+          "displayName": "Single channel 50\u00b5L",
+          "value": "flex_1channel_50"
+        },
+        {
+          "displayName": "Eight Channel 50\u00b5L",
+          "value": "flex_8channel_50"
+        }
+      ],
+      "value": "flex_1channel_50",
+      "default": "flex_1channel_50"
+    }
+  ],
+  "commands": [
+    {
+      "id": "b0e2a13a-fa3d-447f-80ab-1c5719c075a9",
+      "createdAt": "2025-06-04T14:01:39.214771Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.215031Z",
+      "completedAt": "2025-06-04T14:01:39.215172Z",
+      "notes": []
+    },
+    {
+      "id": "28ce4284-7ea0-4b70-a734-103fceaf4053",
+      "createdAt": "2025-06-04T14:01:39.229270Z",
+      "commandType": "comment",
+      "key": "c9cac9dba72ab541665f112752004fbc",
+      "status": "succeeded",
+      "params": {
+        "message": "variable min_max_all_fields has value 6"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.229467Z",
+      "completedAt": "2025-06-04T14:01:39.229567Z",
+      "notes": []
+    },
+    {
+      "id": "6a68a6e6-ead1-4b72-94d0-f046657570f2",
+      "createdAt": "2025-06-04T14:01:39.240935Z",
+      "commandType": "comment",
+      "key": "2c70a990bdc4d6e06f98204ffb9f5b3a",
+      "status": "succeeded",
+      "params": {
+        "message": "variable int_min_max_without_unit has value 1"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.241121Z",
+      "completedAt": "2025-06-04T14:01:39.241214Z",
+      "notes": []
+    },
+    {
+      "id": "40958752-b7e5-4e70-9b0b-2b396f2cb4d9",
+      "createdAt": "2025-06-04T14:01:39.242911Z",
+      "commandType": "comment",
+      "key": "c2ca5a8a358795ff36c54b47b04ff5dd",
+      "status": "succeeded",
+      "params": {
+        "message": "variable int_min_max_without_description has value 1"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.243065Z",
+      "completedAt": "2025-06-04T14:01:39.243156Z",
+      "notes": []
+    },
+    {
+      "id": "8299d2ea-b806-479e-91fc-b4258b38d4fc",
+      "createdAt": "2025-06-04T14:01:39.247946Z",
+      "commandType": "comment",
+      "key": "932da4a7e22bed6dc0e9d8368d5c1e13",
+      "status": "succeeded",
+      "params": {
+        "message": "variable int_min_max_without_unit_and_description has value 1"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.248099Z",
+      "completedAt": "2025-06-04T14:01:39.248181Z",
+      "notes": []
+    },
+    {
+      "id": "05a26f2b-3ddf-4dc1-8874-113d1a63fd91",
+      "createdAt": "2025-06-04T14:01:39.253272Z",
+      "commandType": "comment",
+      "key": "d9d6d2044cb052abad52fd971c5ed6f2",
+      "status": "succeeded",
+      "params": {
+        "message": "variable int_choices_all_fields has value 20"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.253427Z",
+      "completedAt": "2025-06-04T14:01:39.253509Z",
+      "notes": []
+    },
+    {
+      "id": "bde6dce9-bf7d-4500-ba8e-325b057dc6bb",
+      "createdAt": "2025-06-04T14:01:39.256931Z",
+      "commandType": "comment",
+      "key": "fff498474415f5f2d18d52844a902bc0",
+      "status": "succeeded",
+      "params": {
+        "message": "variable int_choice_no_unit has value 6"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.257081Z",
+      "completedAt": "2025-06-04T14:01:39.257158Z",
+      "notes": []
+    },
+    {
+      "id": "327a9e39-5db9-4126-aa8d-6b0eb2656c40",
+      "createdAt": "2025-06-04T14:01:39.260495Z",
+      "commandType": "comment",
+      "key": "4528d0588e2eb6fefde59fa436183ec7",
+      "status": "succeeded",
+      "params": {
+        "message": "variable int_choice_no_unit_desc has value 10"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.260649Z",
+      "completedAt": "2025-06-04T14:01:39.260725Z",
+      "notes": []
+    },
+    {
+      "id": "1e094828-1ef4-4db8-a13e-2733ebbc7034",
+      "createdAt": "2025-06-04T14:01:39.261715Z",
+      "commandType": "comment",
+      "key": "7ac9b2d52077fed6f890b6084e2b7fca",
+      "status": "succeeded",
+      "params": {
+        "message": "variable float_min_max_all_fields has value 30.0"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.261854Z",
+      "completedAt": "2025-06-04T14:01:39.261925Z",
+      "notes": []
+    },
+    {
+      "id": "ea7c685a-d641-44ce-b969-292db9b79331",
+      "createdAt": "2025-06-04T14:01:39.265308Z",
+      "commandType": "comment",
+      "key": "d475f05751c57c92ed83131e497bc37c",
+      "status": "succeeded",
+      "params": {
+        "message": "variable float_min_max_no_unit has value 1.8"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.265445Z",
+      "completedAt": "2025-06-04T14:01:39.265516Z",
+      "notes": []
+    },
+    {
+      "id": "9d1f2945-e5b0-45c1-8af4-bc3281c74a48",
+      "createdAt": "2025-06-04T14:01:39.269308Z",
+      "commandType": "comment",
+      "key": "ba460ff1240a904a0301d302b9a10662",
+      "status": "succeeded",
+      "params": {
+        "message": "variable float_min_max_no_unit_or_desc has value 1.8"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.269452Z",
+      "completedAt": "2025-06-04T14:01:39.269526Z",
+      "notes": []
+    },
+    {
+      "id": "4caa5178-4c9c-46e4-a1f6-c461fa315351",
+      "createdAt": "2025-06-04T14:01:39.276922Z",
+      "commandType": "comment",
+      "key": "030e598566d2109cb88b5475c18d8891",
+      "status": "succeeded",
+      "params": {
+        "message": "variable float_choices_all_fields has value 20.0"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.277068Z",
+      "completedAt": "2025-06-04T14:01:39.277144Z",
+      "notes": []
+    },
+    {
+      "id": "bdfb847f-0662-4235-bebb-31f773191afc",
+      "createdAt": "2025-06-04T14:01:39.278752Z",
+      "commandType": "comment",
+      "key": "02c216f1cf65cf814491736f6d7df945",
+      "status": "succeeded",
+      "params": {
+        "message": "variable float_choices_no_unit has value 10.0"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.278885Z",
+      "completedAt": "2025-06-04T14:01:39.278951Z",
+      "notes": []
+    },
+    {
+      "id": "96735e07-1d5b-4b89-997d-7b724c5e379c",
+      "createdAt": "2025-06-04T14:01:39.283004Z",
+      "commandType": "comment",
+      "key": "cb391d760f0e9d37d6ea927abdb76991",
+      "status": "succeeded",
+      "params": {
+        "message": "variable float_choices_no_description has value 20.0"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.283132Z",
+      "completedAt": "2025-06-04T14:01:39.283199Z",
+      "notes": []
+    },
+    {
+      "id": "f534b26b-c2a8-40cd-aaca-8373f8d5d7c5",
+      "createdAt": "2025-06-04T14:01:39.284127Z",
+      "commandType": "comment",
+      "key": "03894b0dd556aaa05985c02077784f66",
+      "status": "succeeded",
+      "params": {
+        "message": "variable float_choices_no_unit_or_desc has value 20.0"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.284250Z",
+      "completedAt": "2025-06-04T14:01:39.284329Z",
+      "notes": []
+    },
+    {
+      "id": "a88d84eb-bdbd-46b2-b1e7-2541935e3462",
+      "createdAt": "2025-06-04T14:01:39.288208Z",
+      "commandType": "comment",
+      "key": "3db29881666bd32ac30c0e3ac6da60d5",
+      "status": "succeeded",
+      "params": {
+        "message": "variable bool_all_fields has value False"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.288341Z",
+      "completedAt": "2025-06-04T14:01:39.288414Z",
+      "notes": []
+    },
+    {
+      "id": "c8591154-9675-4ccd-ad8b-e3780b638523",
+      "createdAt": "2025-06-04T14:01:39.293402Z",
+      "commandType": "comment",
+      "key": "6737c86259de7f9822ce96dfae711ea6",
+      "status": "succeeded",
+      "params": {
+        "message": "variable bool_no_desc has value False"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.293542Z",
+      "completedAt": "2025-06-04T14:01:39.293614Z",
+      "notes": []
+    },
+    {
+      "id": "1448be47-0c14-4d7e-8557-4e9d521fb222",
+      "createdAt": "2025-06-04T14:01:39.298012Z",
+      "commandType": "comment",
+      "key": "e185251c69b3a774efa938717bf54463",
+      "status": "succeeded",
+      "params": {
+        "message": "variable str_choices_all_fields has value flex_1channel_50"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.298145Z",
+      "completedAt": "2025-06-04T14:01:39.298215Z",
+      "notes": []
+    },
+    {
+      "id": "b1deadc1-2e89-4e49-afcb-9f9c7fb0a020",
+      "createdAt": "2025-06-04T14:01:39.302414Z",
+      "commandType": "comment",
+      "key": "2105cd0529d1a09159563e5cbf21bd09",
+      "status": "succeeded",
+      "params": {
+        "message": "variable str_choices_all_many_fields has value E"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.302549Z",
+      "completedAt": "2025-06-04T14:01:39.306259Z",
+      "notes": []
+    },
+    {
+      "id": "a3614e6a-0229-4e10-bdf2-d9a77c8957dd",
+      "createdAt": "2025-06-04T14:01:39.306666Z",
+      "commandType": "comment",
+      "key": "ac96101154447a6c6539ce734d6fc597",
+      "status": "succeeded",
+      "params": {
+        "message": "variable str_choices_no_desc has value flex_1channel_50"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:39.306804Z",
+      "completedAt": "2025-06-04T14:01:39.306878Z",
+      "notes": []
+    }
+  ],
+  "labware": [],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [],
+  "commandAnnotations": []
+}

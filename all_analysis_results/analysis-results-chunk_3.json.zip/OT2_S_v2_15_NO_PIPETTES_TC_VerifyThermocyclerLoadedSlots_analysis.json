@@ -1,0 +1,227 @@
+{
+  "createdAt": "2025-06-04T14:01:40.941950Z",
+  "files": [
+    {
+      "name": "OT2_S_v2_15_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      15
+    ]
+  },
+  "metadata": {},
+  "result": "ok",
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "e22d643a-d69d-42ed-b3a9-34d93f540808",
+      "createdAt": "2025-06-04T14:01:40.875980Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-06-04T14:01:40.876350Z",
+      "completedAt": "2025-06-04T14:01:40.884373Z",
+      "notes": []
+    },
+    {
+      "id": "fc4d7f3c-15a3-41c2-ac69-369754b84799",
+      "createdAt": "2025-06-04T14:01:40.893249Z",
+      "commandType": "loadModule",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
+      "status": "succeeded",
+      "params": {
+        "model": "thermocyclerModuleV2",
+        "location": {
+          "slotName": "7"
+        }
+      },
+      "result": {
+        "moduleId": "939d5cea-ddd1-4ecd-beb3-08a131f48d96",
+        "definition": {
+          "otSharedSchema": "module/schemas/2",
+          "moduleType": "thermocyclerModuleType",
+          "model": "thermocyclerModuleV2",
+          "labwareOffset": {
+            "x": 0.0,
+            "y": 68.8,
+            "z": 108.96
+          },
+          "dimensions": {
+            "bareOverallHeight": 108.96,
+            "overLabwareHeight": 0.0,
+            "lidHeight": 61.7
+          },
+          "calibrationPoint": {
+            "x": 14.4,
+            "y": 64.93,
+            "z": 97.8
+          },
+          "displayName": "Thermocycler Module GEN2",
+          "quirks": [],
+          "slotTransforms": {
+            "ot3_standard": {
+              "B1": {
+                "labwareOffset": [
+                  [
+                    1,
+                    0,
+                    0,
+                    -20.005
+                  ],
+                  [
+                    0,
+                    1,
+                    0,
+                    -0.84
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    -98
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ],
+                "cornerOffsetFromSlot": [
+                  [
+                    1,
+                    0,
+                    0,
+                    -20.005
+                  ],
+                  [
+                    0,
+                    1,
+                    0,
+                    -0.84
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    -98
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            }
+          },
+          "compatibleWith": [],
+          "gripperOffsets": {
+            "default": {
+              "pickUpOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 4.6
+              },
+              "dropOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 5.6
+              }
+            }
+          }
+        },
+        "model": "thermocyclerModuleV2",
+        "serialNumber": "fake-serial-number-e39d7286-2b04-459f-b0ad-15ecc4c98e36"
+      },
+      "startedAt": "2025-06-04T14:01:40.893505Z",
+      "completedAt": "2025-06-04T14:01:40.905216Z",
+      "notes": []
+    }
+  ],
+  "labware": [
+    {
+      "id": "fixedTrash",
+      "loadName": "opentrons_1_trash_1100ml_fixed",
+      "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "location": {
+        "slotName": "12"
+      }
+    }
+  ],
+  "pipettes": [],
+  "modules": [
+    {
+      "id": "939d5cea-ddd1-4ecd-beb3-08a131f48d96",
+      "model": "thermocyclerModuleV2",
+      "location": {
+        "slotName": "7"
+      },
+      "serialNumber": "fake-serial-number-e39d7286-2b04-459f-b0ad-15ecc4c98e36"
+    }
+  ],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [],
+  "commandAnnotations": []
+}

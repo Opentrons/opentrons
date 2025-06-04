@@ -1,0 +1,122 @@
+{
+  "createdAt": "2025-06-04T14:01:36.574405Z",
+  "files": [
+    {
+      "name": "Flex_X_v2_16_NO_PIPETTES_TrashBinInStagingAreaCol4.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      16
+    ]
+  },
+  "metadata": {
+    "protocolName": "QA Protocol - Analysis Error - Trash Bin in Staging Area Column 4",
+    "author": "Derek Maggio <derek.maggio@opentrons.com>"
+  },
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "df7addcc-ae7f-4b56-93f8-f5ae8051bf11",
+      "createdAt": "2025-06-04T14:01:35.988540Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-06-04T14:01:35.988805Z",
+      "completedAt": "2025-06-04T14:01:35.988940Z",
+      "notes": []
+    }
+  ],
+  "labware": [],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "526e95d6-8201-4edf-8024-e844ce7de758",
+      "createdAt": "2025-06-04T14:01:36.025445Z",
+      "isDefined": false,
+      "errorType": "ExceptionInProtocolError",
+      "errorCode": "4000",
+      "detail": "ValueError [line 15]: Staging areas not permitted for trash bin.",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "526e95d6-8201-4edf-8024-e844ce7de758",
+          "createdAt": "2025-06-04T14:01:36.025445Z",
+          "isDefined": false,
+          "errorType": "PythonException",
+          "errorCode": "4000",
+          "detail": "ValueError: Staging areas not permitted for trash bin.",
+          "errorInfo": {
+            "args": "('Staging areas not permitted for trash bin.',)",
+            "traceback": "  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocols/execution/execute_python.py\", line 160, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_16_NO_PIPETTES_TrashBinInStagingAreaCol4.py\", line 15, in run\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocols/api_support/util.py\", line 389, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_api/protocol_context.py\", line 591, in load_trash_bin\n    raise ValueError(\"Staging areas not permitted for trash bin.\")\n",
+            "class": "ValueError"
+          },
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}

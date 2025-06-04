@@ -1,0 +1,234 @@
+{
+  "createdAt": "2025-06-04T14:01:35.939892Z",
+  "files": [
+    {
+      "name": "Flex_X_v2_16_NO_PIPETTES_TrashBinInStagingAreaCol3.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      16
+    ]
+  },
+  "metadata": {
+    "protocolName": "QA Protocol - Analysis Error - Trash Bin in Staging Area Column 3",
+    "author": "Derek Maggio <derek.maggio@opentrons.com>"
+  },
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "121d8414-a50d-42bc-8f98-2f1d2581fe0e",
+      "createdAt": "2025-06-04T14:01:35.679619Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-06-04T14:01:35.700264Z",
+      "completedAt": "2025-06-04T14:01:35.700476Z",
+      "notes": []
+    },
+    {
+      "id": "b6562dde-5339-4142-ac55-a73e3b054410",
+      "createdAt": "2025-06-04T14:01:35.714535Z",
+      "commandType": "loadLabware",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "addressableAreaName": "C4"
+        },
+        "loadName": "nest_1_reservoir_290ml",
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "labwareId": "bf965b0a-0898-41de-b816-e7f9311aed44",
+        "locationSequence": [
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "C4"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "stagingAreaRightSlot",
+              "stagingAreaSlotWithMagneticBlockV1"
+            ],
+            "cutoutId": "cutoutC3"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 1,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "NEST 1 Well Reservoir 290 mL",
+            "displayCategory": "reservoir",
+            "displayVolumeUnits": "mL",
+            "tags": []
+          },
+          "brand": {
+            "brand": "NEST",
+            "brandId": [
+              "360206",
+              "360266"
+            ],
+            "links": [
+              "https://www.nest-biotech.com/reagent-reserviors"
+            ]
+          },
+          "parameters": {
+            "format": "trough",
+            "quirks": [
+              "centerMultichannelOnWells",
+              "touchTipDisabled"
+            ],
+            "isTiprack": false,
+            "loadName": "nest_1_reservoir_290ml",
+            "isMagneticModuleCompatible": false
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [
+            [
+              "A1"
+            ]
+          ],
+          "dimensions": {
+            "yDimension": 85.47,
+            "zDimension": 44.4,
+            "xDimension": 127.76
+          },
+          "wells": {
+            "A1": {
+              "depth": 39.55,
+              "totalLiquidVolume": 290000,
+              "x": 63.88,
+              "y": 42.74,
+              "z": 4.85,
+              "shape": "rectangular",
+              "xDimension": 106.8,
+              "yDimension": 71.2
+            }
+          },
+          "groups": [
+            {
+              "wells": [
+                "A1"
+              ],
+              "metadata": {
+                "wellBottomShape": "v"
+              }
+            }
+          ],
+          "stackingOffsetWithLabware": {},
+          "stackingOffsetWithModule": {},
+          "allowedRoles": [],
+          "gripperOffsets": {}
+        }
+      },
+      "startedAt": "2025-06-04T14:01:35.714740Z",
+      "completedAt": "2025-06-04T14:01:35.726759Z",
+      "notes": []
+    }
+  ],
+  "labware": [
+    {
+      "id": "bf965b0a-0898-41de-b816-e7f9311aed44",
+      "loadName": "nest_1_reservoir_290ml",
+      "definitionUri": "opentrons/nest_1_reservoir_290ml/1",
+      "location": {
+        "addressableAreaName": "C4"
+      }
+    }
+  ],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "51a0be3d-5ed6-4dd9-a5b6-6e643789a183",
+      "createdAt": "2025-06-04T14:01:35.758951Z",
+      "isDefined": false,
+      "errorType": "ExceptionInProtocolError",
+      "errorCode": "4000",
+      "detail": "IncompatibleAddressableAreaError [line 16]: Error 4000 GENERAL_ERROR (IncompatibleAddressableAreaError): Cannot use Trash Bin in C3, not compatible with one or more of the following fixtures: Slot C4",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "51a0be3d-5ed6-4dd9-a5b6-6e643789a183",
+          "createdAt": "2025-06-04T14:01:35.758951Z",
+          "isDefined": false,
+          "errorType": "IncompatibleAddressableAreaError",
+          "errorCode": "4000",
+          "detail": "Cannot use Trash Bin in C3, not compatible with one or more of the following fixtures: Slot C4",
+          "errorInfo": {},
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}

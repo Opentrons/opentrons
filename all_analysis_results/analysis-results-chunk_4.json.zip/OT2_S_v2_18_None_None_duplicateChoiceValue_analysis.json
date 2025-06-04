@@ -1,0 +1,132 @@
+{
+  "createdAt": "2025-06-04T14:01:36.037317Z",
+  "files": [
+    {
+      "name": "OT2_S_v2_18_None_None_duplicateChoiceValue.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      18
+    ]
+  },
+  "metadata": {
+    "protocolName": "Duplicate choice value"
+  },
+  "result": "ok",
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": [
+    {
+      "displayName": "Pipette Name",
+      "variableName": "pipette",
+      "description": "What pipette to use during the protocol.",
+      "type": "str",
+      "choices": [
+        {
+          "displayName": "Single channel 50\u00b5L",
+          "value": "flex_1channel_50"
+        },
+        {
+          "displayName": "Eight Channel 50\u00b5L",
+          "value": "flex_8channel_50"
+        },
+        {
+          "displayName": "Single channel 50\u00b5L again",
+          "value": "flex_1channel_50"
+        }
+      ],
+      "value": "flex_1channel_50",
+      "default": "flex_1channel_50"
+    }
+  ],
+  "commands": [
+    {
+      "id": "e6c375ba-93ae-4879-b91c-e453d5060302",
+      "createdAt": "2025-06-04T14:01:35.996974Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-06-04T14:01:35.997202Z",
+      "completedAt": "2025-06-04T14:01:35.997324Z",
+      "notes": []
+    },
+    {
+      "id": "7dc7c09e-1dfd-476a-8eb0-d16ade882bef",
+      "createdAt": "2025-06-04T14:01:36.010738Z",
+      "commandType": "comment",
+      "key": "c9cac9dba72ab541665f112752004fbc",
+      "status": "succeeded",
+      "params": {
+        "message": "variable pipette has value flex_1channel_50"
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:36.010946Z",
+      "completedAt": "2025-06-04T14:01:36.011037Z",
+      "notes": []
+    }
+  ],
+  "labware": [],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [],
+  "commandAnnotations": []
+}

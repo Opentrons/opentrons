@@ -1,0 +1,115 @@
+{
+  "createdAt": "2025-06-04T14:01:34.192142Z",
+  "files": [
+    {
+      "name": "OT2_X_v2_13_None_None_PythonSyntaxError.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      13
+    ]
+  },
+  "metadata": {
+    "protocolName": "bad import",
+    "author": "Opentrons Engineering <engineering@opentrons.com>",
+    "source": "Software Testing Team",
+    "description": "import superspecialmagic",
+    "apiLevel": "2.13"
+  },
+  "result": "not-ok",
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": [],
+  "commands": [],
+  "labware": [],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "analysis-setup-error",
+      "createdAt": "2025-06-04T14:01:34.190764Z",
+      "isDefined": false,
+      "errorType": "UnexpectedAnalysisError",
+      "errorCode": "4000",
+      "detail": "No module named 'superspecialmagic'",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "analysis-setup-error",
+          "createdAt": "2025-06-04T14:01:34.190764Z",
+          "isDefined": false,
+          "errorType": "PythonException",
+          "errorCode": "4000",
+          "detail": "ModuleNotFoundError: No module named 'superspecialmagic'",
+          "errorInfo": {
+            "args": "(\"No module named 'superspecialmagic'\",)",
+            "msg": "No module named 'superspecialmagic'",
+            "name": "superspecialmagic",
+            "path": "None",
+            "traceback": "  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/cli/analyze.py\", line 304, in _do_analyze\n    await orchestrator.load(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_runner/run_orchestrator.py\", line 404, in load\n    await self._protocol_runner.load(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_runner/protocol_runner.py\", line 216, in load\n    self._protocol_executor.extract_run_parameters(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_runner/python_protocol_wrappers.py\", line 174, in extract_run_parameters\n    return exec_add_parameters(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocols/execution/execute_python.py\", line 123, in exec_add_parameters\n    exec(protocol.contents, new_globs)\n\n  File \"OT2_X_v2_13_None_None_PythonSyntaxError.py\", line 4, in <module>\n",
+            "class": "ModuleNotFoundError"
+          },
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}

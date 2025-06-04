@@ -1,0 +1,170 @@
+{
+  "createdAt": "2025-06-04T14:01:36.427837Z",
+  "files": [
+    {
+      "name": "Flex_X_v2_16_NO_PIPETTES_MM_MagneticModuleInFlexProtocol.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      16
+    ]
+  },
+  "metadata": {
+    "protocolName": "QA Protocol - Analysis Error - Magnetic Module in Flex Protocol",
+    "author": "Derek Maggio <derek.maggio@opentrons.com>"
+  },
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "9271b5db-322f-44e7-a712-3c9e745619a1",
+      "createdAt": "2025-06-04T14:01:36.282616Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-06-04T14:01:36.282906Z",
+      "completedAt": "2025-06-04T14:01:36.283051Z",
+      "notes": []
+    },
+    {
+      "id": "be82b970-3678-416d-8f34-4f097d6fe9e2",
+      "createdAt": "2025-06-04T14:01:36.309399Z",
+      "commandType": "loadModule",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
+      "status": "failed",
+      "params": {
+        "model": "magneticModuleV2",
+        "location": {
+          "slotName": "C1"
+        }
+      },
+      "error": {
+        "id": "3f627b7a-5997-405a-adf6-4a5ffd6db3ca",
+        "createdAt": "2025-06-04T14:01:36.311009Z",
+        "isDefined": false,
+        "errorType": "PythonException",
+        "errorCode": "4000",
+        "detail": "ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+        "errorInfo": {
+          "args": "('Module Type magneticModuleType does not have a related fixture ID.',)",
+          "traceback": "  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/execution/command_executor.py\", line 148, in execute\n    result = await command_impl.execute(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 131, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 195, in _ensure_module_location\n    cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/hardware_control/modules/types.py\", line 211, in to_module_fixture_id\n    raise ValueError(\n",
+          "class": "ValueError"
+        },
+        "wrappedErrors": []
+      },
+      "startedAt": "2025-06-04T14:01:36.309644Z",
+      "completedAt": "2025-06-04T14:01:36.311009Z",
+      "notes": [
+        {
+          "noteKind": "debugErrorRecovery",
+          "shortMessage": "Handling this command failure with FAIL_RUN.",
+          "longMessage": "Handling this command failure with FAIL_RUN.",
+          "source": "execution"
+        }
+      ]
+    }
+  ],
+  "labware": [],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "79a737c2-36d2-46e1-bd0a-2145b202e307",
+      "createdAt": "2025-06-04T14:01:36.320859Z",
+      "isDefined": false,
+      "errorType": "ExceptionInProtocolError",
+      "errorCode": "4000",
+      "detail": "ProtocolCommandFailedError [line 15]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): PythonException: ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "79a737c2-36d2-46e1-bd0a-2145b202e307",
+          "createdAt": "2025-06-04T14:01:36.320859Z",
+          "isDefined": false,
+          "errorType": "ProtocolCommandFailedError",
+          "errorCode": "4000",
+          "detail": "PythonException: ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+          "errorInfo": {},
+          "wrappedErrors": [
+            {
+              "id": "3f627b7a-5997-405a-adf6-4a5ffd6db3ca",
+              "createdAt": "2025-06-04T14:01:36.311009Z",
+              "isDefined": false,
+              "errorType": "PythonException",
+              "errorCode": "4000",
+              "detail": "ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+              "errorInfo": {
+                "args": "('Module Type magneticModuleType does not have a related fixture ID.',)",
+                "traceback": "  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/execution/command_executor.py\", line 148, in execute\n    result = await command_impl.execute(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 131, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 195, in _ensure_module_location\n    cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/hardware_control/modules/types.py\", line 211, in to_module_fixture_id\n    raise ValueError(\n",
+                "class": "ValueError"
+              },
+              "wrappedErrors": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}

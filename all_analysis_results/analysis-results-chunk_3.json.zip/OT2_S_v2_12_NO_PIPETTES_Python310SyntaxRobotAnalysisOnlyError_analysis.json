@@ -1,0 +1,164 @@
+{
+  "createdAt": "2025-06-04T14:01:41.057703Z",
+  "files": [
+    {
+      "name": "OT2_S_v2_12_NO_PIPETTES_Python310SyntaxRobotAnalysisOnlyError.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      12
+    ]
+  },
+  "metadata": {
+    "protocolName": "\ud83d\udee0 3.10 only Python \ud83d\udee0",
+    "author": "Opentrons Engineering <engineering@opentrons.com>",
+    "source": "Software Testing Team",
+    "description": "Python 3.10 Only",
+    "apiLevel": "2.12"
+  },
+  "result": "ok",
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "c618ce10-88ef-4505-bc0c-15e0cc220820",
+      "createdAt": "2025-06-04T14:01:40.975533Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-06-04T14:01:40.975780Z",
+      "completedAt": "2025-06-04T14:01:40.975949Z",
+      "notes": []
+    },
+    {
+      "id": "command.COMMENT-0",
+      "createdAt": "2025-06-04T14:01:40.997481Z",
+      "commandType": "comment",
+      "key": "command.COMMENT-0",
+      "status": "succeeded",
+      "params": {
+        "message": "Where is the point? (0,0) Origin is the point's location."
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:40.997481Z",
+      "completedAt": "2025-06-04T14:01:40.998094Z",
+      "notes": []
+    },
+    {
+      "id": "command.COMMENT-1",
+      "createdAt": "2025-06-04T14:01:40.998582Z",
+      "commandType": "comment",
+      "key": "command.COMMENT-1",
+      "status": "succeeded",
+      "params": {
+        "message": "Where is the point? (0,1) Y=1 and the point is on the y-axis."
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:40.998582Z",
+      "completedAt": "2025-06-04T14:01:40.999507Z",
+      "notes": []
+    },
+    {
+      "id": "command.COMMENT-2",
+      "createdAt": "2025-06-04T14:01:41.003929Z",
+      "commandType": "comment",
+      "key": "command.COMMENT-2",
+      "status": "succeeded",
+      "params": {
+        "message": "Where is the point? (1,0) X=1 and the point is on the x-axis."
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:41.003929Z",
+      "completedAt": "2025-06-04T14:01:41.009543Z",
+      "notes": []
+    },
+    {
+      "id": "command.COMMENT-3",
+      "createdAt": "2025-06-04T14:01:41.018195Z",
+      "commandType": "comment",
+      "key": "command.COMMENT-3",
+      "status": "succeeded",
+      "params": {
+        "message": "Where is the point? (1,1) The point is located somewhere else on the plane."
+      },
+      "result": {},
+      "startedAt": "2025-06-04T14:01:41.018195Z",
+      "completedAt": "2025-06-04T14:01:41.019686Z",
+      "notes": []
+    }
+  ],
+  "labware": [
+    {
+      "id": "fixedTrash",
+      "loadName": "opentrons_1_trash_1100ml_fixed",
+      "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "location": {
+        "slotName": "12"
+      }
+    }
+  ],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [],
+  "commandAnnotations": []
+}

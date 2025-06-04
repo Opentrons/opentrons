@@ -1,0 +1,170 @@
+{
+  "createdAt": "2025-06-04T14:01:35.583559Z",
+  "files": [
+    {
+      "name": "Flex_X_v2_16_NO_PIPETTES_TM_ModuleInCol2.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      16
+    ]
+  },
+  "metadata": {
+    "protocolName": "QA Protocol - Analysis Error - Module in Column 2",
+    "author": "Derek Maggio <derek.maggio@opentrons.com>"
+  },
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "912a4763-d95c-47be-9a85-960e87b640b5",
+      "createdAt": "2025-06-04T14:01:35.493300Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-06-04T14:01:35.493632Z",
+      "completedAt": "2025-06-04T14:01:35.493804Z",
+      "notes": []
+    },
+    {
+      "id": "147a1838-ad9a-499e-9bf6-19821aa21711",
+      "createdAt": "2025-06-04T14:01:35.506263Z",
+      "commandType": "loadModule",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
+      "status": "failed",
+      "params": {
+        "model": "temperatureModuleV2",
+        "location": {
+          "slotName": "C2"
+        }
+      },
+      "error": {
+        "id": "590323de-d853-49f5-bd63-8357bd15cad0",
+        "createdAt": "2025-06-04T14:01:35.515441Z",
+        "isDefined": false,
+        "errorType": "PythonException",
+        "errorCode": "4000",
+        "detail": "ValueError: A temperatureModuleType cannot be loaded into slot C2",
+        "errorInfo": {
+          "args": "('A temperatureModuleType cannot be loaded into slot C2',)",
+          "traceback": "  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/execution/command_executor.py\", line 148, in execute\n    result = await command_impl.execute(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 131, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 204, in _ensure_module_location\n    raise ValueError(\n",
+          "class": "ValueError"
+        },
+        "wrappedErrors": []
+      },
+      "startedAt": "2025-06-04T14:01:35.506469Z",
+      "completedAt": "2025-06-04T14:01:35.515441Z",
+      "notes": [
+        {
+          "noteKind": "debugErrorRecovery",
+          "shortMessage": "Handling this command failure with FAIL_RUN.",
+          "longMessage": "Handling this command failure with FAIL_RUN.",
+          "source": "execution"
+        }
+      ]
+    }
+  ],
+  "labware": [],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "51e66f8e-71ec-47fc-bfab-d77bf616bdc7",
+      "createdAt": "2025-06-04T14:01:35.539892Z",
+      "isDefined": false,
+      "errorType": "ExceptionInProtocolError",
+      "errorCode": "4000",
+      "detail": "ProtocolCommandFailedError [line 15]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): PythonException: ValueError: A temperatureModuleType cannot be loaded into slot C2",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "51e66f8e-71ec-47fc-bfab-d77bf616bdc7",
+          "createdAt": "2025-06-04T14:01:35.539892Z",
+          "isDefined": false,
+          "errorType": "ProtocolCommandFailedError",
+          "errorCode": "4000",
+          "detail": "PythonException: ValueError: A temperatureModuleType cannot be loaded into slot C2",
+          "errorInfo": {},
+          "wrappedErrors": [
+            {
+              "id": "590323de-d853-49f5-bd63-8357bd15cad0",
+              "createdAt": "2025-06-04T14:01:35.515441Z",
+              "isDefined": false,
+              "errorType": "PythonException",
+              "errorCode": "4000",
+              "detail": "ValueError: A temperatureModuleType cannot be loaded into slot C2",
+              "errorInfo": {
+                "args": "('A temperatureModuleType cannot be loaded into slot C2',)",
+                "traceback": "  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/execution/command_executor.py\", line 148, in execute\n    result = await command_impl.execute(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 131, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 204, in _ensure_module_location\n    raise ValueError(\n",
+                "class": "ValueError"
+              },
+              "wrappedErrors": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}

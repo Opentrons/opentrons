@@ -1,0 +1,246 @@
+{
+  "createdAt": "2025-06-04T14:01:35.698863Z",
+  "files": [
+    {
+      "name": "Flex_X_v2_16_NO_PIPETTES_TC_TrashBinAndThermocyclerConflict.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      16
+    ]
+  },
+  "metadata": {
+    "protocolName": "Thermocycler conflict 1"
+  },
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "32558a97-9b3c-470c-82e2-10d0def8f2b6",
+      "createdAt": "2025-06-04T14:01:35.570576Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-06-04T14:01:35.570775Z",
+      "completedAt": "2025-06-04T14:01:35.592052Z",
+      "notes": []
+    },
+    {
+      "id": "75408621-cb0a-4a95-b3e2-8aaeeeee24d4",
+      "createdAt": "2025-06-04T14:01:35.594437Z",
+      "commandType": "loadModule",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
+      "status": "succeeded",
+      "params": {
+        "model": "thermocyclerModuleV2",
+        "location": {
+          "slotName": "B1"
+        }
+      },
+      "result": {
+        "moduleId": "34289240-c760-46c3-942a-eede675a05b8",
+        "definition": {
+          "otSharedSchema": "module/schemas/2",
+          "moduleType": "thermocyclerModuleType",
+          "model": "thermocyclerModuleV2",
+          "labwareOffset": {
+            "x": 0.0,
+            "y": 68.8,
+            "z": 108.96
+          },
+          "dimensions": {
+            "bareOverallHeight": 108.96,
+            "overLabwareHeight": 0.0,
+            "lidHeight": 61.7
+          },
+          "calibrationPoint": {
+            "x": 14.4,
+            "y": 64.93,
+            "z": 97.8
+          },
+          "displayName": "Thermocycler Module GEN2",
+          "quirks": [],
+          "slotTransforms": {
+            "ot3_standard": {
+              "B1": {
+                "labwareOffset": [
+                  [
+                    1,
+                    0,
+                    0,
+                    -20.005
+                  ],
+                  [
+                    0,
+                    1,
+                    0,
+                    -0.84
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    -98
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ],
+                "cornerOffsetFromSlot": [
+                  [
+                    1,
+                    0,
+                    0,
+                    -20.005
+                  ],
+                  [
+                    0,
+                    1,
+                    0,
+                    -0.84
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    -98
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            }
+          },
+          "compatibleWith": [],
+          "gripperOffsets": {
+            "default": {
+              "pickUpOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 4.6
+              },
+              "dropOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 5.6
+              }
+            }
+          }
+        },
+        "model": "thermocyclerModuleV2",
+        "serialNumber": "fake-serial-number-ad28c7ed-505b-4511-9d9e-24108d2f335b"
+      },
+      "startedAt": "2025-06-04T14:01:35.594602Z",
+      "completedAt": "2025-06-04T14:01:35.596095Z",
+      "notes": []
+    }
+  ],
+  "labware": [],
+  "pipettes": [],
+  "modules": [
+    {
+      "id": "34289240-c760-46c3-942a-eede675a05b8",
+      "model": "thermocyclerModuleV2",
+      "location": {
+        "slotName": "B1"
+      },
+      "serialNumber": "fake-serial-number-ad28c7ed-505b-4511-9d9e-24108d2f335b"
+    }
+  ],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "957f65de-79ee-4a25-bb34-82306dcef699",
+      "createdAt": "2025-06-04T14:01:35.624162Z",
+      "isDefined": false,
+      "errorType": "ExceptionInProtocolError",
+      "errorCode": "4000",
+      "detail": "DeckConflictError [line 13]: thermocyclerModuleV2 in slot B1 prevents trash bin from using slot A1.",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "957f65de-79ee-4a25-bb34-82306dcef699",
+          "createdAt": "2025-06-04T14:01:35.624162Z",
+          "isDefined": false,
+          "errorType": "PythonException",
+          "errorCode": "4000",
+          "detail": "opentrons.motion_planning.deck_conflict.DeckConflictError: thermocyclerModuleV2 in slot B1 prevents trash bin from using slot A1.",
+          "errorInfo": {
+            "args": "('thermocyclerModuleV2 in slot B1 prevents trash bin from using slot A1.',)",
+            "traceback": "  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocols/execution/execute_python.py\", line 160, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_16_NO_PIPETTES_TC_TrashBinAndThermocyclerConflict.py\", line 13, in run\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocols/api_support/util.py\", line 389, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_api/protocol_context.py\", line 597, in load_trash_bin\n    trash_bin = self._core.load_trash_bin(slot_name, addressable_area_name)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_api/core/engine/protocol.py\", line 856, in load_trash_bin\n    self._add_disposal_location_to_engine(trash_bin)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_api/core/engine/protocol.py\", line 163, in _add_disposal_location_to_engine\n    deck_conflict.check(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_api/core/engine/deck_conflict.py\", line 182, in check\n    wrapped_deck_conflict.check(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/motion_planning/deck_conflict.py\", line 210, in check\n    raise DeckConflictError(\n",
+            "class": "DeckConflictError"
+          },
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}

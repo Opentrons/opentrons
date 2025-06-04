@@ -1,0 +1,122 @@
+{
+  "createdAt": "2025-06-04T14:01:36.720778Z",
+  "files": [
+    {
+      "name": "Flex_X_v2_16_NO_PIPETTES_TM_ModuleInStagingAreaCol4.py",
+      "role": "main"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      16
+    ]
+  },
+  "metadata": {
+    "protocolName": "QA Protocol - Analysis Error - Module in Staging Area Column 4",
+    "author": "Derek Maggio <derek.maggio@opentrons.com>"
+  },
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "30ef5551-3d87-4bd7-8e19-f1d40cca9e75",
+      "createdAt": "2025-06-04T14:01:36.558489Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-06-04T14:01:36.584015Z",
+      "completedAt": "2025-06-04T14:01:36.584200Z",
+      "notes": []
+    }
+  ],
+  "labware": [],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "1430add3-b308-40fb-ac0c-1f5ee7b46745",
+      "createdAt": "2025-06-04T14:01:36.610235Z",
+      "isDefined": false,
+      "errorType": "ExceptionInProtocolError",
+      "errorCode": "4000",
+      "detail": "ValueError [line 15]: Cannot load temperature module gen2 onto a staging slot.",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "1430add3-b308-40fb-ac0c-1f5ee7b46745",
+          "createdAt": "2025-06-04T14:01:36.610235Z",
+          "isDefined": false,
+          "errorType": "PythonException",
+          "errorCode": "4000",
+          "detail": "ValueError: Cannot load temperature module gen2 onto a staging slot.",
+          "errorInfo": {
+            "args": "('Cannot load temperature module gen2 onto a staging slot.',)",
+            "traceback": "  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocols/execution/execute_python.py\", line 160, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_16_NO_PIPETTES_TM_ModuleInStagingAreaCol4.py\", line 15, in run\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocols/api_support/util.py\", line 389, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_api/protocol_context.py\", line 936, in load_module\n    raise ValueError(f\"Cannot load {module_name} onto a staging slot.\")\n",
+            "class": "ValueError"
+          },
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}
