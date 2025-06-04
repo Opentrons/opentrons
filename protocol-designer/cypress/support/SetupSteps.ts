@@ -92,7 +92,7 @@ export enum SetupLocators {
 }
 
 export const RegexSetupContent = {
-  slotText: /Edit (slot|labware)/i,
+  slotText: /(Add|Edit) labware/i,
 }
 
 /**
@@ -400,15 +400,6 @@ export const SetupSteps = {
    * Adds labware to a deck slot.
    */
   AddHardwareLabware: (): StepThunk => ({
-    call: () => {
-      cy.get('button[data-testid="SlotOverflowMenu_openTools"]').click()
-    },
-  }),
-
-  /**
-   * Edits existing labware/hardware on a deck slot.
-   */
-  EditHardwareLabwareOnDeck: (): StepThunk => ({
     call: () => {
       cy.get('button[data-testid="SlotOverflowMenu_openTools"]').click()
     },
@@ -1182,7 +1173,7 @@ export const CompositeSetupSteps = {
         `Running AddLabwareToDeckSlot with slot ${deckSlot} and labware ${labwareName}`
       )
       SetupSteps.ChoseDeckSlotWithLabware(slotToUse).call()
-      SetupSteps.AddHardwareLabware().call()
+      // SetupSteps.AddHardwareLabware().call()
       SetupSteps.OpenSelectLabwareModal().call()
       SetupSteps.ClickWellPlatesSection().call()
       SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()

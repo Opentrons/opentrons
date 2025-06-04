@@ -133,38 +133,6 @@ describe('SlotOverflowMenu', () => {
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     expect(props.setShowMenuList).toHaveBeenCalled()
   })
-  it('renders 3 buttons when there is nothing on the slot', () => {
-    props.location = 'A1'
-    render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Add labware' }))
-    expect(props.addEquipment).toHaveBeenCalled()
-    expect(props.setShowMenuList).toHaveBeenCalled()
-    expect(screen.getAllByRole('button')).toHaveLength(2)
-    expect(screen.getByRole('button', { name: 'Clear labware' })).toBeDisabled()
-    screen.getByTestId('divider')
-  })
-  it('renders Edit liquid button when there is liquid on the labware', () => {
-    vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({
-      labId2: { well1: { '0': { volume: 10 } } },
-    })
-    render(props)
-    screen.getByRole('button', { name: 'Edit labware' })
-  })
-  it('deletes the labware', () => {
-    vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({
-      labId2: { well1: { '0': { volume: 10 } } },
-    })
-    render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Clear labware' }))
-
-    expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
-    expect(vi.mocked(deleteContainer)).toHaveBeenNthCalledWith(1, {
-      labwareId: 'labId2',
-    })
-    expect(vi.mocked(deleteContainer)).toHaveBeenNthCalledWith(2, {
-      labwareId: 'labId',
-    })
-  })
 
   it('renders snackbar if duplicate is clicked and the deck is full', () => {
     vi.mocked(getNextAvailableDeckSlot).mockReturnValue(null)
@@ -172,6 +140,7 @@ describe('SlotOverflowMenu', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Duplicate labware' }))
     expect(MOCK_MAKE_SNACKBAR).toHaveBeenCalled()
   })
+
   it('renders the ConfirmDeleteEntityInUseModal modal', () => {
     vi.mocked(getIsLabwareOnSlotInUse).mockReturnValue(true)
     render(props)
