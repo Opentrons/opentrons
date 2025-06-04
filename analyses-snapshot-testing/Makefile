@@ -159,5 +159,5 @@ generate-analyses:
 .PHONY: install-ot
 install-ot:
 	@echo "Installing the opentrons package from the local codebase"
-	uv pip install -e ../api
 	uv pip install -e ../shared-data/python
+	uv pip install -e ../api
