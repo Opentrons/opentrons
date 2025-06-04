@@ -143,6 +143,9 @@ jobs:
       - name: Sync the project
         working-directory: ./analyses-snapshot-testing
         run: make ci-setup
+      - name: Install Opentrons
+        working-directory: ./analyses-snapshot-testing
+        run: make install-ot
       - uses: actions/download-artifact@v4
         with:
           pattern: analyzed-*

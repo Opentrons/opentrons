@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -23,9 +24,12 @@ def snapshot_custom(snapshot: SerializableData) -> SerializableData:
 @pytest.fixture(scope="session")
 def analyze_protocols() -> None:
     """Once for the session, generate analyses for all protocols to test."""
-    tests = protocols_under_test()
+    # If we are in a CI environment, we skip the analysis generation
+    # Our workflow does this using chunks.
+    if os.getenv("CI") == "true":
+        return
     gen_analyses_files(
-        protocols=tests,
+        protocols=protocols_under_test(),
     )
 
 
