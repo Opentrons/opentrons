@@ -34,7 +34,7 @@ describe('Configurations', () => {
 
   it('should render test and mock components', () => {
     render(props)
-    screen.getByText('Configurations')
+    screen.getByText('Configuration')
     screen.getByText('mock LiquidButton')
     screen.getByText('mock HardwareStep')
   })
