@@ -54,6 +54,7 @@ def mock_move_to(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     ) as mock_move:
         yield mock_move
 
+
 @pytest.fixture
 def mock_find_edge_binary() -> Iterator[AsyncMock]:
     with patch(
@@ -63,6 +64,7 @@ def mock_find_edge_binary() -> Iterator[AsyncMock]:
         ),
     ) as mock_find_edge_binary:
         yield mock_find_edge_binary
+
 
 @pytest.fixture
 def mock_capacitive_probe(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
@@ -213,16 +215,12 @@ async def test_find_edge(
         )
 
 
-
-
 async def test_find_slot_center(
-    ot3_hardware: ThreadManager[OT3API],
-    mock_find_edge_binary: AsyncMock
+    ot3_hardware: ThreadManager[OT3API], mock_find_edge_binary: AsyncMock
 ) -> None:
     await ot3_hardware.home()
-    mock_capacitive_probe.side_effect = (_HIT, _MISS, _MISS)
-    mock_find_edge_binary.return_value = Point(0,0,0)
-    result = await find_slot_center_binary(
+    mock_find_edge_binary.return_value = Point(0, 0, 0)
+    await find_slot_center_binary(
         ot3_hardware,
         OT3Mount.RIGHT,
         Point(0, 0, 0),
@@ -236,7 +234,6 @@ async def test_find_slot_center(
         start_tolerance = settings.search_initial_tolerance_mm
         search_limit = settings.search_iteration_limit
         assert start_tolerance / (2**search_limit) == final_pass_distance
-
 
 
 @pytest.mark.parametrize(
