@@ -43036,20 +43036,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "Omni_Plate_with_Tilt_Adapter.json",
-      "role": "labware"
-    },
-    {
-      "name": "Omni_Tray_Single_Well_Plate.json",
-      "role": "labware"
-    },
-    {
-      "name": "pl_BacteriaInoculation_Flex_6plates.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_10_tuberack_nest_4x50ml_6x15ml_conical/1",

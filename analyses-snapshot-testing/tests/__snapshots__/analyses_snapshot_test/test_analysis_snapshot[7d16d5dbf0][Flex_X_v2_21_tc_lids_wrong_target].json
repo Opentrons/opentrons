@@ -2959,12 +2959,7 @@
       ]
     }
   ],
-  "files": [
-    {
-      "name": "Flex_X_v2_21_tc_lids_wrong_target.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_96_deep_well_temp_mod_adapter/1",

@@ -11898,16 +11898,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "Thermo_96_Well_Plate_2200_uL.json",
-      "role": "labware"
-    },
-    {
-      "name": "pl_Flex_Protein_Digestion_Protocol.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/1",

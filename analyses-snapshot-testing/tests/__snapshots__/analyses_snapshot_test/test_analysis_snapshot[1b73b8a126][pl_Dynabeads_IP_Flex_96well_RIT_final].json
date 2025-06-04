@@ -53974,12 +53974,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "pl_Dynabeads_IP_Flex_96well_RIT_final.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_3200ml_fixed/1",

@@ -23571,12 +23571,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "pl_Nanopore_Genomic_Ligation_v5_Final.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",

@@ -33086,12 +33086,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "Flex_S_2_15_P1000M_GRIP_HS_TM_MB_OmegaHDQDNAExtractionBacteria.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_3200ml_fixed/1",

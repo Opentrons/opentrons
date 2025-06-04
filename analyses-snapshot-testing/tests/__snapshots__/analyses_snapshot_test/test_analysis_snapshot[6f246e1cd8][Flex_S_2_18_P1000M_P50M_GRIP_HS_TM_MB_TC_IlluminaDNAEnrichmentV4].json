@@ -46316,12 +46316,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "Flex_S_2_18_P1000M_P50M_GRIP_HS_TM_MB_TC_IlluminaDNAEnrichmentV4.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/thermoscientificnunc_96_wellplate_1300ul/1",

@@ -59812,12 +59812,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "Flex_S_v2_15_P1000_96_GRIP_HS_MB_TM_MagMaxRNAExtraction.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_3200ml_fixed/1",

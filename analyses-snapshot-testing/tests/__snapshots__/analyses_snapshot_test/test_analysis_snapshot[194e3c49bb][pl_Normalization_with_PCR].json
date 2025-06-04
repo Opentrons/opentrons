@@ -9320,16 +9320,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "Axygen_96_Well_Plate_200_uL.json",
-      "role": "labware"
-    },
-    {
-      "name": "pl_Normalization_with_PCR.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_3200ml_fixed/1",

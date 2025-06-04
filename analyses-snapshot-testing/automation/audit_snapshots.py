@@ -19,8 +19,8 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
     theme = Theme({"error": "bold red", "success": "bold green", "info": "bold blue", "path": "yellow"})
     console = Console(theme=theme)
 
-    current_dir = Path(__file__).parent
-    snapshot_path = Path(current_dir, "__snapshots__", "analyses_snapshot_test")
+    project_root = Path(__file__).parent.parent
+    snapshot_path = Path(project_root, "tests", "__snapshots__", "analyses_snapshot_test")
     snapshot_json_files = list(snapshot_path.glob("**/*.json"))
 
     files_with_unexpected_errors = []
@@ -41,18 +41,13 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
             try:
                 with open(file_path, "r") as f:
                     data = json.load(f)
-
-                # which is best to check???
-                # they both give the same result
-                # errors_present = data["errors"] != []
-                errors_present = data["result"] != "ok"
-
+                errors_present = data.get("errors") != []
                 file_path_str = str(file_path)
                 if "Flex_S" in file_path_str or "OT2_S" in file_path_str or "pl_" in file_path_str:
                     if errors_present:
                         print(f"Error in {file_path}")
-                        for e in data["errors"]:
-                            for w in e["wrappedErrors"]:
+                        for e in data.get("errors", []):
+                            for w in e.get("wrappedErrors", []):
                                 for key in w.keys():
                                     print(f"{w[key]}")
                         files_with_unexpected_errors.append(file_path)

@@ -13473,16 +13473,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "BioRad_96_Well_Plate_200_uL.json",
-      "role": "labware"
-    },
-    {
-      "name": "pl_ExpressPlex_96_final.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_3200ml_fixed/1",

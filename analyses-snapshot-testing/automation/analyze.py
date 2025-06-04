@@ -5,7 +5,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import anyio
 
@@ -14,6 +14,8 @@ from opentrons.cli.analyze import _analyze, _Output  # type: ignore[import-not-f
 
 # Imports for pretty printing with Rich.
 from rich.progress import BarColumn, Progress, TextColumn, TimeElapsedColumn
+
+from automation.data.protocol import Protocol
 
 # Constants
 CUSTOM_LABWARE_DIR = Path(__file__).parent.parent / "files" / "labware"
@@ -152,6 +154,23 @@ def analyze_protocol_files(protocol_files: list[Path]) -> list[AnalysisResult]:
                     tg.start_soon(run_and_collect, file)
 
     asyncio.run(_run())
+    return results
+
+
+def gen_analyses_files(
+    protocols: Sequence[Protocol], output_dir: Path = Path(Path(__file__).parent.parent, "analysis_results")
+) -> list[AnalysisResult]:
+    """
+    Analyze a list of Protocol objects (automation.data.protocol.Protocol) and write analysis files to output_dir.
+    Returns a list of AnalysisResult objects.
+    """
+    protocol_files = [Path(proto.file_path) for proto in protocols]
+    results = analyze_protocol_files(protocol_files)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for result in results:
+        out_path = output_dir / f"{result.protocol_file.stem}_analysis.json"
+        with open(out_path, "w") as f:
+            json.dump(result.analysis, f, indent=2)
     return results
 
 

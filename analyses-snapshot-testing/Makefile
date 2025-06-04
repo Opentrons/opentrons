@@ -37,7 +37,7 @@ test-ci:
 
 .PHONY: audit
 audit:
-	uv run python tests/audit_snapshots.py
+	uv run python -m automation.audit_snapshots
 
 .PHONY: test-protocol-analysis
 test-protocol-analysis:
@@ -151,6 +151,10 @@ LIMIT ?= 10
 .PHONY: analyze
 analyze:
 	uv run python -m automation.test_analyze_api --limit $(LIMIT)
+
+.PHONY: generate-analyses
+generate-analyses:
+	uv run python -m automation.test_gen_analyses --limit $(LIMIT)
 
 .PHONY: install-ot
 install-ot:

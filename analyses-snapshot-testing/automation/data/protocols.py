@@ -837,11 +837,6 @@ class Protocols:
         file_extension="py",
         robot="Flex",
     )
-    pl_cherrypicking_csv_airgap: Protocol = Protocol(
-        file_stem="pl_cherrypicking_csv_airgap",
-        file_extension="py",
-        robot="Flex",
-    )
     pl_Dynabeads_IP_Flex_96well_final: Protocol = Protocol(
         file_stem="pl_Dynabeads_IP_Flex_96well_final",
         file_extension="py",

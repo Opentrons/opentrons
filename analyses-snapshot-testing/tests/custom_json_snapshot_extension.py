@@ -49,6 +49,12 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
         return data
 
     def process_field(self, key: str, value: Union[str, Any]) -> Union[str, Any]:
+        # Do not inspect the "files" key
+        # Then we can always just use all the custom labware for each analysis.
+        # If we don't do this, anytime we add custom labware,
+        # all protocol snapshots will be altered.
+        if key == "files":
+            return []
         if key in self.id_keys_to_replace:
             if isinstance(value, list):
                 return ["UUID"] * len(value)

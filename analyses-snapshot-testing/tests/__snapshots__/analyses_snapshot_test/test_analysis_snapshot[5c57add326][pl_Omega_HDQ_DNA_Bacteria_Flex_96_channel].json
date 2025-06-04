@@ -47014,12 +47014,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "pl_Omega_HDQ_DNA_Bacteria_Flex_96_channel.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_96_deep_well_adapter/1",

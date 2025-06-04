@@ -152,12 +152,7 @@
       ]
     }
   ],
-  "files": [
-    {
-      "name": "Flex_X_v2_16_NO_PIPETTES_TrashBinInStagingAreaCol3.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/1",

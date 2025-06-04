@@ -50787,12 +50787,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "pl_SamplePrep_MS_Cleanup_Flex_upto96.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2",

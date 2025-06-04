@@ -2598,12 +2598,7 @@
       ]
     }
   ],
-  "files": [
-    {
-      "name": "Flex_X_v2_21_plate_reader_no_close_lid.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/nest_96_wellplate_200ul_flat/2",

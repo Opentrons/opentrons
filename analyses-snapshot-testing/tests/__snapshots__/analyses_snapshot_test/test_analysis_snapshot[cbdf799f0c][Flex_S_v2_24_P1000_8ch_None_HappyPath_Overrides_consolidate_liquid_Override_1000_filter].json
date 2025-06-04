@@ -11799,12 +11799,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid_Override_1000_filter.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",

@@ -6585,19 +6585,16 @@
         "location": {
           "slotName": "D2"
         },
-        "namespace": "opentrons",
-        "version": 2
+        "namespace": "custom_beta",
+        "version": 1
       },
       "result": {
         "definition": {
           "allowedRoles": [],
           "brand": {
-            "brand": "Bio-Rad",
+            "brand": "BioRad",
             "brandId": [
               "hsp9601"
-            ],
-            "links": [
-              "http://www.bio-rad.com/en-us/sku/hsp9601-hard-shell-96-well-pcr-plates-low-profile-thin-wall-skirted-white-clear?ID=hsp9601"
             ]
           },
           "cornerOffsetFromSlot": {
@@ -6610,8 +6607,6 @@
             "yDimension": 85.48,
             "zDimension": 16.06
           },
-          "gripForce": 15.0,
-          "gripHeightFromLabwareBottom": 10.14,
           "gripperOffsets": {},
           "groups": [
             {
@@ -6720,11 +6715,11 @@
           ],
           "metadata": {
             "displayCategory": "wellPlate",
-            "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
+            "displayName": "BioRad 96 Well Plate 200 µL",
             "displayVolumeUnits": "µL",
             "tags": []
           },
-          "namespace": "opentrons",
+          "namespace": "custom_beta",
           "ordering": [
             [
               "A1",
@@ -6848,38 +6843,22 @@
             ]
           ],
           "parameters": {
-            "format": "96Standard",
-            "isMagneticModuleCompatible": true,
+            "format": "irregular",
+            "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "biorad_96_wellplate_200ul_pcr",
-            "magneticModuleEngageHeight": 18
+            "quirks": []
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {
             "opentrons_96_pcr_adapter": {
               "x": 0,
               "y": 0,
-              "z": 10.16
-            },
-            "opentrons_96_well_aluminum_block": {
-              "x": 0,
-              "y": 0,
-              "z": 15.41
+              "z": 13.41
             }
           },
-          "stackingOffsetWithModule": {
-            "magneticBlockV1": {
-              "x": 0,
-              "y": 0,
-              "z": 3.87
-            },
-            "thermocyclerModuleV2": {
-              "x": 0,
-              "y": 0,
-              "z": 10.75
-            }
-          },
-          "version": 2,
+          "stackingOffsetWithModule": {},
+          "version": 1,
           "wells": {
             "A1": {
               "depth": 14.81,
@@ -30606,12 +30585,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "pl_langone_pt2_ribo.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_3200ml_fixed/1",
@@ -30660,7 +30634,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/biorad_96_wellplate_200ul_pcr/2",
+      "definitionUri": "custom_beta/biorad_96_wellplate_200ul_pcr/1",
       "id": "UUID",
       "loadName": "biorad_96_wellplate_200ul_pcr",
       "location": {

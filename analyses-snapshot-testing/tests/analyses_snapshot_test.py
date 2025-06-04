@@ -1,32 +1,18 @@
 import json
-import os
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
 import pytest
+from automation.analyze import gen_analyses_files
+from automation.data.collect import protocols_under_test
 from automation.data.protocol import Protocol
-from automation.data.protocol_registry import ProtocolRegistry
-from citools.generate_analyses import ANALYSIS_SUFFIX, generate_analyses_from_test
+from citools.generate_analyses import ANALYSIS_SUFFIX
 from rich.console import Console
 from syrupy.types import SerializableData
 
 from tests.custom_json_snapshot_extension import CustomJSONSnapshotExtension
 
 console = Console()
-
-
-def protocols_under_test() -> List[Protocol]:
-    "Use the PROTOCOL_NAMES and OVERRIDE_PROTOCOL_NAMES environment variables to determine which protocols to test."
-    protocol_names = os.getenv("PROTOCOL_NAMES")
-    override_protocol_names = os.getenv("OVERRIDE_PROTOCOL_NAMES")
-    if not protocol_names:
-        exit("PROTOCOL_NAMES environment variable not set.")
-    if not override_protocol_names:
-        exit("OVERRIDE_PROTOCOL_NAMES environment variable not set.")
-    protocol_registry: ProtocolRegistry = ProtocolRegistry(protocol_names=protocol_names, override_protocol_names=override_protocol_names)
-    if not protocol_registry.protocols_to_test:
-        exit("No protocols were resolved from the protocol names provided. Exiting.")
-    return protocol_registry.protocols_to_test
 
 
 @pytest.fixture
@@ -38,12 +24,9 @@ def snapshot_custom(snapshot: SerializableData) -> SerializableData:
 def analyze_protocols() -> None:
     """Once for the session, generate analyses for all protocols to test."""
     tests = protocols_under_test()
-    # !!!!! Docker Image with tag of ANALYSIS_REF must already be created
-    analysis_ref = os.getenv("ANALYSIS_REF")
-    if not analysis_ref:
-        raise AssertionError("Environment variable ANALYSIS_REF not set.")
-    else:
-        generate_analyses_from_test(tag=analysis_ref, protocols=tests)
+    gen_analyses_files(
+        protocols=tests,
+    )
 
 
 def sort_all_lists(d: Any, sort_key: str | None = None) -> Any:
@@ -77,13 +60,10 @@ def sort_all_lists(d: Any, sort_key: str | None = None) -> Any:
 )
 @pytest.mark.usefixtures("analyze_protocols")
 def test_analysis_snapshot(snapshot_custom: SerializableData, protocol: Protocol) -> None:
-    analysis_ref = os.getenv("ANALYSIS_REF")
-    if not analysis_ref:
-        raise AssertionError("Environment variable TARGET not set.")
     analysis = Path(
         Path(__file__).parent.parent,
         "analysis_results",
-        f"{protocol.file_stem}_{analysis_ref}_{ANALYSIS_SUFFIX}",
+        f"{protocol.file_stem}_{ANALYSIS_SUFFIX}",
     )
     console.print(f"Analysis file: {analysis}")
     if analysis.exists():
