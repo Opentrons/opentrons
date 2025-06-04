@@ -3,6 +3,7 @@ import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 
+import { COLUMN } from '@opentrons/shared-data'
 import {
   consolidate,
   curryCommandCreator,
@@ -170,44 +171,57 @@ export const mergeSubstepRowsMultiChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[][] => {
   const { substepRows, channels, isMixStep, showDispenseVol } = args
-
-  const mergedRows: StepItemSourceDestRow[][] = []
-
-  for (let i = 0; i < substepRows.length; i += channels) {
-    const chunk = substepRows.slice(i, i + channels)
-
-    const row = range(chunk.length).map(channelIndex => {
-      const step = chunk[channelIndex]
-      const wellNameSource = step?.source?.wells?.[0]
-      const wellNameDest = step?.dest?.wells?.[0]
-
-      const source: SubstepWellData | undefined =
-        wellNameSource != null
-          ? {
-              well: wellNameSource,
-              preIngreds: step.source?.preIngreds ?? {},
-              postIngreds: step.source?.postIngreds ?? {},
-            }
-          : undefined
-
-      const dest: SubstepWellData | undefined =
-        wellNameDest != null
-          ? {
-              well: wellNameDest,
-              preIngreds: step.dest?.preIngreds ?? {},
-              postIngreds: step.dest?.postIngreds ?? {},
-            }
-          : undefined
-
-      return {
-        activeTips: step.activeTips,
-        source,
-        dest: isMixStep ? source : dest,
-        volume: showDispenseVol ? step.volume : step.volume,
+  const mergedRows = substepRows.reduce<StepItemSourceDestRow[][]>(
+    (acc, _, index) => {
+      if (index % channels !== 0) {
+        return acc
       }
-    })
-    mergedRows.push(row)
-  }
+
+      const chunk = substepRows.slice(index, index + channels)
+
+      const row = range(chunk.length).map(channelIndex => {
+        const step = chunk[channelIndex]
+        const wellNameSource = step?.source?.wells?.[0]
+        const wellNameDest = step?.dest?.wells?.[0]
+
+        const source: SubstepWellData | undefined =
+          wellNameSource != null
+            ? {
+                well: wellNameSource,
+                preIngreds: step.source?.preIngreds ?? {},
+                postIngreds: step.source?.postIngreds ?? {},
+              }
+            : undefined
+
+        const dest: SubstepWellData | undefined =
+          wellNameDest != null
+            ? {
+                well: wellNameDest,
+                preIngreds: step.dest?.preIngreds ?? {},
+                postIngreds: step.dest?.postIngreds ?? {},
+              }
+            : undefined
+
+        return {
+          activeTips: step.activeTips,
+          source,
+          dest: isMixStep ? source : dest,
+          volume: showDispenseVol ? step.volume : step.volume,
+        }
+      })
+      //  this is for a mixing step
+      const hasNoSourceOrDest = row.every(
+        item => item.source === undefined && item.dest === undefined
+      )
+
+      if (!hasNoSourceOrDest) {
+        acc.push(row)
+      }
+
+      return acc
+    },
+    []
+  )
 
   return mergedRows
 }
@@ -254,6 +268,10 @@ function transferLikeSubsteps(args: {
     return null
   }
 
+  let channels = pipetteSpec.channels
+  if (stepArgs.nozzles === COLUMN && channels === 96) {
+    channels = 8
+  }
   // Multichannel substeps
   if (pipetteSpec.channels > 1) {
     const substepRows = substepTimelineMultiChannel(
@@ -265,11 +283,10 @@ function transferLikeSubsteps(args: {
       {
         substepRows,
         isMixStep: stepArgs.commandCreatorFnName === 'mix',
-        channels: pipetteSpec.channels,
+        channels,
         showDispenseVol,
       }
     )
-
     return {
       substepType: 'sourceDest',
       multichannel: true,
