@@ -134,7 +134,10 @@ export function useAspirateSettingsConfig({
       copy: t('touch_tip'),
       value:
         state.touchTipAspirate !== undefined
-          ? t('touch_tip_value', { position: state.touchTipAspirate })
+          ? t('touch_tip_value', {
+              speed: state.touchTipAspirateSpeed,
+              position: state.touchTipAspirate,
+            })
           : '',
       enabled: !sourceIsReservoir,
       onClick: () => {
