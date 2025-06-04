@@ -15,6 +15,8 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
             ],
             "traceback": [
                 (r"line \d+,", "line N,"),
+                # Replace absolute paths (macOS, Linux, CI, etc.) with <PATH>
+                (r"(/Users/[^/]+/github/opentrons/opentrons|/home/runner/work/opentrons/opentrons)[^\s\"]*", "<PATH>"),
             ],
         }
         self.id_keys_to_replace = [
