@@ -512,6 +512,7 @@ class GeometryView:
             addressable_area_name
         )
 
+    # TOME TODO: I really think you throw all in labware origin math. All the labware related offsets should go there.
     def _get_module_specific_offsets(self, labware_id: str) -> Point:
         """Get the summed module-specific offset vector if a module is present in the stack.
 
@@ -521,7 +522,6 @@ class GeometryView:
         parent = labware_data.location
 
         if isinstance(parent, ModuleLocation):
-            # Effectively an OT-2 only offset.
             module_to_child = self._modules.get_nominal_offset_to_child(
                 module_id=parent.moduleId, addressable_areas=self._addressable_areas
             )

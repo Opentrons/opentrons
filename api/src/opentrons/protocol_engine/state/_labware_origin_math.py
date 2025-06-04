@@ -54,6 +54,34 @@ def get_parent_origin_to_lw_origin(
             return parent_origin_to_locating_feature + locating_feature_to_lw_origin
 
 
+def _get_overlap_offsets(
+    definition: LabwareDefinition,
+    lw_parent_location_info: LabwareParentLocationInfo,
+) -> OverlapOffset:
+    """Get the labware's overlap with its parent entity."""
+    if isinstance(lw_parent_location_info, LabwareDefinition2):
+        raise NotImplementedError()
+
+    elif isinstance(lw_parent_location_info, LabwareDefinition3):
+        return get_labware_overlap_offsets(
+            definition=definition,
+            below_labware_name=lw_parent_location_info.parameters.loadName,
+        )
+
+    elif isinstance(lw_parent_location_info, ModuleDefinition):
+        return get_module_overlap_offsets(
+            definition=definition, module_model=lw_parent_location_info.model
+        )
+
+    elif isinstance(lw_parent_location_info, AddressableArea):
+        # TOME TODO: Might be worth asking Max, are there any overlap offset equivalents for addressable areas?
+        return OverlapOffset(x=0, y=0, z=0)
+
+    else:
+        raise ValueError(f"Unsupported parent location info: {lw_parent_location_info}")
+
+
+# TOME TODO: This one seems to get added, but you need to be sure to add the on_labware_dimensions.
 def get_labware_overlap_offsets(
     definition: LabwareDefinition, below_labware_name: str
 ) -> OverlapOffset:
@@ -71,6 +99,9 @@ def get_labware_overlap_offsets(
     )
 
 
+# TOME TODO: I think this one is subtracted out effectively?
+#  Yeah, I think it's because of how the offest is defined. In the labware, it's the child relative to the parent.
+#  Here, it's the parent relative to the child.
 def get_module_overlap_offsets(
     definition: LabwareDefinition, module_model: ModuleModel
 ) -> OverlapOffset:
