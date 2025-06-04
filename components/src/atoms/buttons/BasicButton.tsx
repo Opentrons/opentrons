@@ -1,13 +1,14 @@
 import styled from 'styled-components'
 
 import { COLORS } from '../../helix-design-system'
+import { CURSOR_NOT_ALLOWED, CURSOR_POINTER } from '../../styles/cursor'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { StyledText } from '../StyledText/StyledText'
 
-import type { MouseEvent, ReactNode } from 'react'
+import type { MouseEvent } from 'react'
 
 interface BasicButtonProps {
-  children: ReactNode // Children prop to allow any ReactNode content
+  children: string // Content of basic button
   onClick: (event: MouseEvent<HTMLButtonElement>) => void // Function to handle button click events
   isDisabled?: boolean // Optional prop to control button aria-disabled
   underLine?: boolean // Optional prop to control underline styling
@@ -34,8 +35,9 @@ export function BasicButton({
 
   return (
     <StyledButton
+      data-testid={`basic_button_${children}`}
       onClick={handleButtonClick}
-      aria-disabled={isDisabled || undefined}
+      aria-disabled={isDisabled}
       underLine={underLine}
       tabIndex={tabIndex}
       {...props}
@@ -54,7 +56,8 @@ const StyledButton = styled.button<{
   padding: 0;
 
   color: ${props => (props['aria-disabled'] ? COLORS.grey40 : COLORS.black90)};
-  cursor: ${props => (props['aria-disabled'] ? 'not-allowed' : 'pointer')};
+  cursor: ${props =>
+    props['aria-disabled'] ? CURSOR_NOT_ALLOWED : CURSOR_POINTER};
 
   text-decoration: ${props =>
     props.underLine ? TYPOGRAPHY.textDecorationUnderline : 'none'};

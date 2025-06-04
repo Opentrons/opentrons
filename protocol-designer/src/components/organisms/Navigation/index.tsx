@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -5,7 +6,7 @@ import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  Btn,
+  BasicButton,
   COLORS,
   CURSOR_POINTER,
   Flex,
@@ -17,7 +18,6 @@ import {
 import { actions as loadFileActions } from '../../../load-file'
 import { getHasUnsavedChanges } from '../../../load-file/selectors'
 import { toggleNewProtocolModal } from '../../../navigation/actions'
-import { LINK_BUTTON_STYLE } from '../../atoms'
 import { SettingsIcon } from '../SettingsIcon'
 
 import type { ChangeEvent } from 'react'
@@ -28,6 +28,7 @@ export function Navigation(): JSX.Element | null {
   const location = useLocation()
   const navigate = useNavigate()
   const dispatch: ThunkDispatch<any> = useDispatch()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const loadFile = (fileChangeEvent: ChangeEvent<HTMLInputElement>): void => {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
     dispatch(toggleNewProtocolModal(false))
@@ -41,6 +42,12 @@ export function Navigation(): JSX.Element | null {
       window.confirm(t('alert:confirm_create_new') as string)
     ) {
       navigate('/createNew', { state: { modalResetKey: Date.now() } })
+    }
+  }
+
+  const handleImport = (): void => {
+    if (fileInputRef.current != null) {
+      fileInputRef.current.click()
     }
   }
 
@@ -58,18 +65,15 @@ export function Navigation(): JSX.Element | null {
         </StyledText>
       </Flex>
       <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
-        <Btn onClick={handleCreateNew} css={LINK_BUTTON_STYLE}>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {t('create_new')}
-          </StyledText>
-        </Btn>
+        <BasicButton onClick={handleCreateNew}>{t('create_new')}</BasicButton>
         <StyledLabel>
-          <Flex css={LINK_BUTTON_STYLE}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('import')}
-            </StyledText>
-          </Flex>
-          <input type="file" onChange={loadFile} aria-label={t('import')} />
+          <BasicButton onClick={handleImport}>{t('import')}</BasicButton>
+          <input
+            type="file"
+            onChange={loadFile}
+            aria-label={t('import')}
+            ref={fileInputRef}
+          />
         </StyledLabel>
         {location.pathname === '/createNew' ? null : <SettingsIcon />}
       </Flex>
