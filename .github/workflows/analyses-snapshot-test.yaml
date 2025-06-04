@@ -3,14 +3,6 @@ name: Analyses Snapshot Test
 on:
   workflow_dispatch:
     inputs:
-      ANALYSIS_REF:
-        description: 'Branch or tag that provides the analysis output at test runtime'
-        required: true
-        default: 'edge'
-      SNAPSHOT_REF:
-        description: 'Branch or tag that provides the snapshot and test code at test runtime'
-        required: true
-        default: 'edge'
       OPEN_PR_ON_FAILURE:
         description: 'If the test fails, open a PR to update the snapshots'
         type: boolean
@@ -46,8 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BASE_IMAGE_NAME: opentrons-python-base:3.10
-      ANALYSIS_REF: ${{ github.event.inputs.ANALYSIS_REF || github.head_ref || 'edge' }}
-      SNAPSHOT_REF: ${{ github.event.inputs.SNAPSHOT_REF || github.head_ref || 'edge' }}
+      REF: ${{ github.head_ref || 'edge' }}
       # If we're running because of workflow_dispatch, use the user input to decide
       # whether to open a PR on failure. Otherwise, there is no user input,
       # so we only open a PR if the PR has the label 'gen-analyses-snapshot-pr'
@@ -57,7 +48,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.SNAPSHOT_REF }}
+          ref: ${{ env.REF }}
 
       - name: Are the analyses snapshots in my PR branch in sync with the target branch?
         if: github.event_name == 'pull_request'
@@ -66,31 +57,11 @@ jobs:
           DIFF_OUTPUT=$(git diff HEAD origin/${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test)
           if [ -n "$DIFF_OUTPUT" ]; then
             echo "Analyses snapshots do NOT match ${{ env.PR_TARGET_BRANCH }} snapshots."
-            echo "Is this becasue you have not pulled and merged ${{ env.PR_TARGET_BRANCH }}?"
+            echo "Is this because you have not pulled and merged ${{ env.PR_TARGET_BRANCH }}?"
             echo "Or is this because you have already updated your snapshots and are all good 😊?"
           else
             echo "Analyses snapshots match ${{ env.PR_TARGET_BRANCH }} snapshots."
           fi
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build base image
-        id: build_base_image
-        uses: docker/build-push-action@v6
-        with:
-          context: analyses-snapshot-testing/citools
-          file: analyses-snapshot-testing/citools/Dockerfile.base
-          push: false
-          load: true
-          tags: ${{ env.BASE_IMAGE_NAME }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build analysis image
-        working-directory: analyses-snapshot-testing
-        run: make build-opentrons-analysis BASE_IMAGE_NAME=${{ env.BASE_IMAGE_NAME }} ANALYSIS_REF=${{ env.ANALYSIS_REF }} CACHEBUST=${{ github.run_number }}
-
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
@@ -99,6 +70,10 @@ jobs:
       - name: Sync the project
         working-directory: ./analyses-snapshot-testing
         run: make ci-setup
+
+      - name: Install Opentrons
+        working-directory: ./analyses-snapshot-testing
+        run: make install-ot
 
       - name: Run Test
         id: run_test
@@ -129,10 +104,10 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: 'fix(analyses-snapshot-testing): heal analyses snapshots'
-          title: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
+          title: 'fix(analyses-snapshot-testing): heal ${{ env.REF }} snapshots'
           body: 'This PR was requested on the PR https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
-          branch: 'analyses-snapshot-testing/${{ env.ANALYSIS_REF }}-from-${{ env.SNAPSHOT_REF }}'
-          base: ${{ env.SNAPSHOT_REF }}
+          branch: 'analyses-snapshot-testing/heal-${{ env.REF }}'
+          base: ${{ env.REF }}
 
       - name: Comment on feature PR
         if: always() && steps.create_pull_request.outcome == 'success' && github.event_name == 'pull_request'
@@ -150,9 +125,9 @@ jobs:
       - name: Create Snapshot update Request on edge overnight failure
         if: always() && steps.handle_failure.outcome == 'success' && github.event_name == 'schedule'
         uses: peter-evans/create-pull-request@v7
-        with: # scheduled run uses the default values for ANALYSIS_REF and SNAPSHOT_REF which are edge
-          commit-message: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
-          title: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
-          body: 'The ${{ env.ANALYSIS_REF }} overnight analyses snapshot test is failing. This PR was opened to alert us to the failure.'
-          branch: 'analyses-snapshot-testing/${{ env.ANALYSIS_REF }}-from-${{ env.SNAPSHOT_REF }}'
-          base: ${{ env.SNAPSHOT_REF }}
+        with:
+          commit-message: 'fix(analyses-snapshot-testing): heal ${{ env.REF}} snapshots'
+          title: 'fix(analyses-snapshot-testing): heal ${{ env.REF }} snapshots'
+          body: 'The ${{ env.REF }} overnight analyses snapshot test is failing. This PR was opened to alert us to the failure.'
+          branch: 'analyses-snapshot-testing/heal-${{ env.REF }}'
+          base: ${{ env.REF }}
