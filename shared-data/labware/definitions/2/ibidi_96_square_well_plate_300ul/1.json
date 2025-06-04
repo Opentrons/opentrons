@@ -1208,7 +1208,7 @@
         "quirks": [],
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "ibidi_96_wellplate_300ul"
+        "loadName": "ibidi_96_square_well_plate_300ul"
     },
     "namespace": "custom_beta",
     "version": 1,
