@@ -223,7 +223,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
         OT3AxisKind.X: 1.25,
         OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.5,
-        OT3AxisKind.P: 0.8,
+        OT3AxisKind.P: 1.0,
         OT3AxisKind.Z_G: 0.67,
         OT3AxisKind.Q: 1.5,
     },
