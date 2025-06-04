@@ -34,12 +34,14 @@ export const BODY_STYLE = css`
 
 interface SuccessProps extends ModuleSetupWizardStepProps {
   setSelectedModule: (module: AttachedModule | null) => void
+  attachedModuleOnLaunch?: AttachedModule | null
 }
 
 export function Success(props: SuccessProps): JSX.Element {
   const {
     proceed,
     attachedModule,
+    attachedModuleOnLaunch = null,
     isRobotMoving,
     isOnDevice,
     restartSetup,
@@ -69,7 +71,7 @@ export function Success(props: SuccessProps): JSX.Element {
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
         <>
-          {newModules.length > 0 ? (
+          {newModules.length > 0 && attachedModuleOnLaunch == null ? (
             isOnDevice ? (
               <SmallButton
                 buttonType="secondary"

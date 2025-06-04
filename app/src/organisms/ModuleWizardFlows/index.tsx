@@ -30,6 +30,7 @@ interface ModuleWizardFlowsProps {
   closeFlow: () => void
   robotName: string
   attachedModule?: AttachedModule
+  showSetupLauncher?: boolean
   isLoadedInRun?: boolean
   onComplete?: () => void
 }
@@ -41,6 +42,7 @@ export function ModuleWizardFlows(
     attachedModule: attachedModuleOnLaunch,
     robotName,
     isLoadedInRun = false,
+    showSetupLauncher = false,
     closeFlow,
     onComplete,
   } = props
@@ -70,10 +72,13 @@ export function ModuleWizardFlows(
   const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
     null
   )
+  const [showLaunchSetup, setShowLaunchSetup] = useState<boolean>(
+    showSetupLauncher
+  )
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
 
   if (wizardFlowBaseProps.attachedPipette == null) return null
-  if (wizardFlowBaseProps.attachedModule == null) {
+  if (showLaunchSetup || wizardFlowBaseProps.attachedModule == null) {
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
@@ -93,6 +98,8 @@ export function ModuleWizardFlows(
           buildFlowForSelectedModule={buildFlowForSelectedModule}
           selectedModule={selectedModule}
           setSelectedModule={setSelectedModule}
+          setShowLaunchSetup={setShowLaunchSetup}
+          attachedModuleOnLaunch={attachedModuleOnLaunch}
         />
       </ModuleWizardScreen>
     )
@@ -272,6 +279,7 @@ export function ModuleWizardFlows(
                 : handleCleanUpAndClose
             }
             attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedModuleOnLaunch={attachedModuleOnLaunch}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
             setSelectedModule={setSelectedModule}
           />
