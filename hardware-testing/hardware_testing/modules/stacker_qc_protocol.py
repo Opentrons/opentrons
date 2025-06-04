@@ -15,6 +15,7 @@ requirements = {
 
 
 def add_parameters(parameters: ParameterContext):
+    """Add parameters to the protocol."""
     parameters.add_str(
         variable_name="stacker_slot",
         display_name="Flex Stacker Slot",
