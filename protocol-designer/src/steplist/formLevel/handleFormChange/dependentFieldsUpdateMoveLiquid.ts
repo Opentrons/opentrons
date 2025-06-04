@@ -2,11 +2,7 @@ import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
 
-import {
-  ALL,
-  getPipetteSpecsV2,
-  NozzleConfigurationStyle,
-} from '@opentrons/shared-data'
+import { ALL, getPipetteSpecsV2 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -30,6 +26,7 @@ import {
   volumeInCapacityForMulti,
 } from './utils'
 
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   PipetteEntities,
@@ -510,7 +507,7 @@ const updatePatchOnPipetteChannelChange = (
   if (patch.pipette === undefined) return patch
   let update: FormPatch = {}
   const prevChannels = getChannels(rawForm.pipette as string, pipetteEntities)
-  const nextChannels =
+  const nChannels =
     typeof patch.pipette === 'string'
       ? getChannels(patch.pipette, pipetteEntities)
       : null
@@ -520,6 +517,22 @@ const updatePatchOnPipetteChannelChange = (
     ...patch,
     id,
     stepType,
+  }
+  let previousChannels = prevChannels
+  if (prevChannels === 96) {
+    if (rawForm.nozzles === ALL) {
+      previousChannels = 96
+    } else {
+      previousChannels = 8
+    }
+  }
+  let nextChannels = nChannels
+  if (nChannels === 96) {
+    if (rawForm.nozzles === ALL) {
+      nextChannels = 96
+    } else {
+      nextChannels = 8
+    }
   }
   const singleToMulti =
     prevChannels === 1 && (nextChannels === 8 || nextChannels === 96)
@@ -547,7 +560,7 @@ const updatePatchOnPipetteChannelChange = (
       }),
     }
   } else if (multiToSingle) {
-    let channels = 8
+    let channels: 8 | 96 = 8
     if (prevChannels === 96) {
       channels = 96
     }
@@ -562,7 +575,7 @@ const updatePatchOnPipetteChannelChange = (
         aspirate_wells: getAllWellsFromPrimaryWells(
           appliedPatch.aspirate_wells as string[],
           sourceLabware.def,
-          channels as 8 | 96
+          channels
         ),
         dispense_wells:
           destLabwareId.includes('trashBin') ||
@@ -576,7 +589,7 @@ const updatePatchOnPipetteChannelChange = (
             : getAllWellsFromPrimaryWells(
                 appliedPatch.dispense_wells as string[],
                 destLabware.def,
-                channels as 8 | 96
+                channels
               ),
       }
     }

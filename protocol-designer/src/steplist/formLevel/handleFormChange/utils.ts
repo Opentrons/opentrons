@@ -2,6 +2,7 @@ import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 
 import {
+  COLUMN,
   getAllLiquidClassDefs,
   getFlexNameConversion,
   linearInterpolate,
@@ -22,6 +23,7 @@ import type {
   LabwareDefinition2,
   LiquidHandlingPropertyByVolume,
   MixProperties,
+  NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
   PositionReference,
@@ -1063,4 +1065,18 @@ export const updateFieldsForLiquidClass = (args: {
       propsForFields[field].updateValue(value)
     }
   })
+}
+
+export const getChannelsFromNozzles = (
+  nozzles: NozzleConfigurationStyle | null,
+  pipette: string,
+  pipetteEntities: PipetteEntities
+): PipetteChannels => {
+  const pipetteChannels = getChannels(pipette, pipetteEntities)
+
+  let channels = pipetteChannels ?? 1
+  if (pipetteChannels === 96 && nozzles === COLUMN) {
+    channels = 8
+  }
+  return channels
 }
