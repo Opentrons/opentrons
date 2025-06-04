@@ -1,20 +1,18 @@
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
 
-import {
-  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
-  getModuleDisplayName,
-  getPipetteSpecsV2,
-  MOVABLE_TRASH_ADDRESSABLE_AREAS,
-  WASTE_CHUTE_ADDRESSABLE_AREAS,
-} from '@opentrons/shared-data'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 
-import { DEFAULT_MM_OFFSET_FROM_BOTTOM, FIXED_TRASH_ID } from '../constants'
 import {
-  createFile,
+  DEFAULT_MM_OFFSET_FROM_BOTTOM,
+  INITIAL_DECK_SETUP_STEP_ID,
+} from '../constants'
+import {
+  createPythonFile,
   getFileMetadata,
   getRobotStateTimeline,
 } from '../file-data/selectors'
+import { LocationUpdate } from '../load-file/migration/utils/getAdditionalEquipmentLocationUpdate'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
@@ -25,13 +23,6 @@ import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
 
 import type { Middleware } from 'redux'
-import type {
-  AddressableAreaName,
-  LoadLabwareCreateCommand,
-  LoadModuleCreateCommand,
-  LoadPipetteCreateCommand,
-  PipetteName,
-} from '@opentrons/shared-data'
 import type {
   ConsolidateArgs,
   DistributeArgs,
@@ -62,6 +53,11 @@ const PIPETTING_ARGS_FILTER_LIST = [
   'dispenseFlowRateUlSec',
 ]
 
+interface LiquidInfo {
+  liquidClass: string | null
+  displayColor: string
+  description: string | null
+}
 interface TransformedPipetteInfo {
   [pipetteId: string]: {
     name: string
@@ -338,94 +334,69 @@ export const reduxActionToAnalyticsEvent = (
     }
   }
   if (action.type === 'SAVE_PROTOCOL_FILE') {
-    const file = createFile(state)
-    const stepForms = getSavedStepForms(state)
-    const { commands, metadata, robot, liquids } = file
+    const file = createPythonFile(state)
+    const { metadata, robot, designerApplication } = file.designerApplication
+    const {
+      ingredients,
+      savedStepForms,
+      modules,
+      pipettes,
+      labware,
+    } = designerApplication.data
 
     const robotType = { robotType: robot.model }
-    const pipetteDisplayNames = commands
-      .filter(
-        (command): command is LoadPipetteCreateCommand =>
-          command.commandType === 'loadPipette'
-      )
-      ?.map(
-        command =>
-          getPipetteSpecsV2(command.params.pipetteName as PipetteName)
-            ?.displayName ?? command.params.pipetteName
-      )
-    const moduleModels = commands
-      .filter(
-        (command): command is LoadModuleCreateCommand =>
-          command.commandType === 'loadModule'
-      )
-      ?.map(command => getModuleDisplayName(command.params.model))
-    const labwareInfo = commands
-      .filter(
-        (command): command is LoadLabwareCreateCommand =>
-          command.commandType === 'loadLabware'
-      )
-      .reduce((acc: Record<string, string>, command) => {
-        acc[command.params.loadName] =
-          command.params.location === 'offDeck'
-            ? 'offDeck'
-            : Object.values(command.params.location).join('')
+    const pipetteDisplayNames = Object.values(pipettes).map(
+      pipette => getPipetteSpecsV2(pipette.pipetteName)?.displayName
+    )
+    const moduleModels = Object.values(modules).map(module => module.model)
+    const initialStep: Record<string, LocationUpdate> =
+      savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+
+    const {
+      trashBinLocationUpdate,
+      wasteChuteLocationUpdate,
+      gripperLocationUpdate,
+      stagingAreaLocationUpdate,
+      labwareLocationUpdate,
+    } = initialStep
+
+    const hasTrashBin = Object.keys(trashBinLocationUpdate).length > 0
+    const hasWasteChute = Object.keys(wasteChuteLocationUpdate).length > 0
+    const hasGripper = Object.keys(gripperLocationUpdate).length > 0
+    const numberOfSteps = {
+      numberOfSteps: Object.keys(savedStepForms).length - 1,
+    }
+    const stagingAreaSlots = Object.values(stagingAreaLocationUpdate).map(
+      location => location
+    )
+
+    const labwareInfo = Object.entries(labwareLocationUpdate).reduce(
+      (acc: Record<string, string>, [id, location]) => {
+        const displayName = labware[id].displayName
+        acc[displayName] = location
         return acc
-      }, {})
-
-    const numberOfSteps = { numberOfSteps: Object.keys(stepForms).length - 1 }
-    const trashCommands = commands?.some(
-      command =>
-        (command.commandType === 'moveToAddressableArea' &&
-          (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
-            command.params.addressableAreaName as AddressableAreaName
-          ) ||
-            command.params.addressableAreaName === FIXED_TRASH_ID)) ||
-        command.commandType === 'moveToAddressableAreaForDropTip'
-    )
-    const wasteChuteCommands = commands?.some(
-      command =>
-        (command.commandType === 'moveToAddressableArea' &&
-          WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
-            command.params.addressableAreaName as AddressableAreaName
-          )) ||
-        (command.commandType === 'moveLabware' &&
-          command.params.newLocation !== 'offDeck' &&
-          command.params.newLocation !== 'systemLocation' &&
-          'addressableAreaName' in command.params.newLocation &&
-          command.params.newLocation.addressableAreaName ===
-            'gripperWasteChute')
-    )
-    const hasGripperCommands = commands?.some(
-      command =>
-        command.commandType === 'moveLabware' &&
-        command.params.strategy === 'usingGripper'
+      },
+      {}
     )
 
-    const stagingAreaSlots = FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.filter(
-      location =>
-        !commands?.some(
-          command =>
-            (command.commandType === 'loadLabware' &&
-              command.params.location !== 'offDeck' &&
-              command.params.location !== 'systemLocation' &&
-              'addressableAreaName' in command.params.location &&
-              command.params.location.addressableAreaName === location) ||
-            (command.commandType === 'moveLabware' &&
-              command.params.newLocation !== 'offDeck' &&
-              command.params.newLocation !== 'systemLocation' &&
-              'addressableAreaName' in command.params.newLocation &&
-              command.params.newLocation.addressableAreaName === location)
-        )
-          ? null
-          : location
+    const liquids = Object.values(ingredients).reduce(
+      (acc: Record<string, LiquidInfo>, ingredient) => {
+        const displayName = ingredient.displayColor
+        acc[displayName] = {
+          liquidClass: ingredient.liquidClass ?? null,
+          displayColor: ingredient.displayColor,
+          description: ingredient.description,
+        }
+        return acc
+      },
+      {}
     )
-    const flattenedLiquids = flattenNestedProperties(liquids)
 
     const fixtureInfo = {
-      trashBin: trashCommands,
-      wasteChute: wasteChuteCommands,
+      trashBin: hasTrashBin,
+      wasteChute: hasWasteChute,
       stagingAreaSlots: stagingAreaSlots,
-      gripper: hasGripperCommands,
+      gripper: hasGripper,
     }
 
     const loadCommandInfo = {
@@ -439,13 +410,14 @@ export const reduxActionToAnalyticsEvent = (
         ...metadata,
         ...loadCommandInfo,
         ...robotType,
-        ...flattenedLiquids,
+        ...liquids,
         ...numberOfSteps,
         ...fixtureInfo,
         ...labwareInfo,
       },
     }
   }
+
   if (action.type === 'SET_FEATURE_FLAGS') {
     const a: SetFeatureFlagAction = action
     if (a.payload.OT_PD_ALLOW_ALL_TIPRACKS === true) {
