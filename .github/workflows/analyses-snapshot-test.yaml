@@ -74,14 +74,14 @@ jobs:
           git fetch origin ${{ github.event.pull_request.base.ref }}
           DIFF_OUTPUT=$(git diff HEAD origin/${{ github.event.pull_request.base.ref }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test)
           if [ -n "$DIFF_OUTPUT" ]; then
-            echo "### Analyses Snapshot Diff Check" >> $GITHUB_STEP_SUMMARY
+            echo "## Analyses Snapshot Diff Check" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo ":x: **Analyses snapshots do ~NOT~ match \`${{ github.event.pull_request.base.ref }}\` snapshots.**" >> $GITHUB_STEP_SUMMARY
+            echo "- :x: Analyses snapshots do **NOT** match \`${{ github.event.pull_request.base.ref }}\` snapshots." >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Is this because you have not pulled and merged \`${{ github.event.pull_request.base.ref }}\`?" >> $GITHUB_STEP_SUMMARY
-            echo "Or is this because you have already updated your snapshots and are all good 😊?" >> $GITHUB_STEP_SUMMARY
+            echo "  - Is this because you have not pulled and merged \`${{ github.event.pull_request.base.ref }}\`?" >> $GITHUB_STEP_SUMMARY
+            echo "  - Or is this because you have already updated your snapshots and are all good 😊?" >> $GITHUB_STEP_SUMMARY
           else
-            echo "### Analyses Snapshot Diff Check" >> $GITHUB_STEP_SUMMARY
+            echo "## Analyses Snapshot Diff Check" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo ":white_check_mark: **Analyses snapshots match \`${{ github.event.pull_request.base.ref }}\` snapshots.**" >> $GITHUB_STEP_SUMMARY
           fi
