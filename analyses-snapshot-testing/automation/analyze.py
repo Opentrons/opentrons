@@ -17,11 +17,11 @@ from rich.progress import BarColumn, Progress, TextColumn, TimeElapsedColumn
 
 from automation.data.protocol import Protocol
 
-# Constants
 CUSTOM_LABWARE_DIR = Path(__file__).parent.parent / "files" / "labware"
-ANALYSIS_TIMEOUT = 120  # Timeout per protocol in seconds
-
 custom_labware_files = list(CUSTOM_LABWARE_DIR.glob("*.json"))
+ANALYSIS_TIMEOUT = 120  # Timeout per protocol in seconds
+OUTPUT_DIR: Path = Path(Path(__file__).parent.parent, "analysis_results")
+OUTPUT_SUFFIX = "_analysis.json"
 
 
 @dataclass
@@ -157,19 +157,23 @@ def analyze_protocol_files(protocol_files: list[Path]) -> list[AnalysisResult]:
     return results
 
 
-def gen_analyses_files(
-    protocols: Sequence[Protocol], output_dir: Path = Path(Path(__file__).parent.parent, "analysis_results")
-) -> list[AnalysisResult]:
+def analysis_output_path(analysis: AnalysisResult) -> Path:
+    """
+    Get the output path for the analysis result of a given Protocol.
+    """
+    return OUTPUT_DIR / f"{analysis.protocol_file.stem}{OUTPUT_SUFFIX}"
+
+
+def gen_analyses_files(protocols: Sequence[Protocol]) -> list[AnalysisResult]:
     """
     Analyze a list of Protocol objects (automation.data.protocol.Protocol) and write analysis files to output_dir.
     Returns a list of AnalysisResult objects.
     """
     protocol_files = [Path(proto.file_path) for proto in protocols]
     results = analyze_protocol_files(protocol_files)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     for result in results:
-        out_path = output_dir / f"{result.protocol_file.stem}_analysis.json"
-        with open(out_path, "w") as f:
+        with open(analysis_output_path(result), "w") as f:
             json.dump(result.analysis, f, indent=2)
     return results
 

@@ -156,8 +156,27 @@ analyze:
 generate-analyses:
 	uv run python -m automation.test_gen_analyses --limit $(LIMIT)
 
+.PHONY: gen-chunks
+gen-chunks:
+	uv run python -m automation.data.collect
+
+CHUNK ?= chunk_0.json
+.PHONY: analyze-chunk
+analyze-chunk:
+	uv run python -m automation.analyze_from_chunk --chunk $(CHUNK)
+
 .PHONY: install-ot
 install-ot:
 	@echo "Installing the opentrons package from the local codebase"
 	uv pip install -e ../shared-data/python
 	uv pip install -e ../api
+
+.PHONY: clean-ar
+clean-ar:
+	@echo "Deleting all .json files in analyses-snapshot-testing/analysis_results"
+	rm -f analysis_results/*.json
+
+.PHONY: clean-chunks
+clean-chunks:
+	@echo "Deleting all .json files in analyses-snapshot-testing/chunks"
+	rm -f chunks/*.json

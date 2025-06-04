@@ -3,7 +3,7 @@
 import hashlib
 import os
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Any, Dict, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -62,3 +62,35 @@ class Protocol(BaseModel):
         hash_object = hashlib.sha1(self.file_stem.encode())
         # Convert to hexadecimal and truncate
         return hash_object.hexdigest()[:10]
+
+    def to_json(self) -> str:
+        """Serialize this Protocol instance to a JSON string.
+
+        Returns:
+            A JSON string representing this Protocol.
+        """
+        return self.model_dump_json()
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Protocol":
+        """Create a Protocol instance from a dictionary.
+
+        Args:
+            data: A dictionary with keys matching the Protocol fields.
+
+        Returns:
+            A Protocol instance initialized from the dictionary.
+        """
+        return cls.model_validate(data)
+
+    @classmethod
+    def from_json(cls, json_str: str) -> "Protocol":
+        """Deserialize a Protocol instance from a JSON string.
+
+        Args:
+            json_str: A JSON string representing a Protocol.
+
+        Returns:
+            A Protocol instance parsed from the JSON.
+        """
+        return cls.model_validate_json(json_str)
