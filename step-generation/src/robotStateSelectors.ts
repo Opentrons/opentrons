@@ -138,6 +138,7 @@ export function getNextTiprack(
   const filteredSortedTipRackIdsFor96Channel = sortedTipracksIds.filter(
     tiprackId => {
       const tipRackLocation = robotState.labware[tiprackId].stack[1]
+
       const adapterEntity = invariantContext.labwareEntities[tipRackLocation]
       const has96TiprackAdapterId =
         adapterEntity?.def.parameters.loadName ===
