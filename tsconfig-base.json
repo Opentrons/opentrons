@@ -12,7 +12,6 @@
     "noErrorTruncation": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"],
-    "include": ["./vitest.setup.ts"]
+    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"]
   }
 }
