@@ -249,7 +249,7 @@ export function DeckSetupToolbox(
               }
             />
             <StyledText desktopStyle="bodyLargeSemiBold">
-              {t('customize_slot')}
+              {t('edit_labware')}
             </StyledText>
           </Flex>
         }

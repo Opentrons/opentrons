@@ -41,7 +41,7 @@ export function HardwareInfo({
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const navigate = useNavigate()
   const isFlex = robotType === FLEX_ROBOT_TYPE
-  const tCSlot = isFlex ? 'A1, B1' : '7,8,10,11'
+  const tCSlot = isFlex ? 'A1+B1' : '7,8,10,11'
   const additionalEquipmentLength = Object.keys(additionalEquipment).length
 
   return (

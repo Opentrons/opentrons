@@ -22,7 +22,6 @@
   "convert_gen1_to_gen2": "To convert engage heights from GEN1 to GEN2, divide your engage height by 2.",
   "convert_gen2_to_gen1": "To convert engage heights from GEN2 to GEN1, multiply your engage height by 2.",
   "custom": "Custom labware definitions",
-  "customize_slot": "Customize slot",
   "deck_hardware": "Deck hardware",
   "deck_slots_full": "Deck slots are full",
   "define_liquid": "Define a liquid",

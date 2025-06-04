@@ -38,7 +38,13 @@ export function LiquidButton({
         name="water-drop"
         data-testid="water-drop"
       />
-      <StyledText desktopStyle="bodyDefaultSemiBold">{t('liquids')}</StyledText>
+      <StyledText
+        desktopStyle={
+          isInToolbox ? 'bodyDefaultRegular' : 'bodyDefaultSemiBold'
+        }
+      >
+        {t('liquids')}
+      </StyledText>
     </Btn>
   )
 }

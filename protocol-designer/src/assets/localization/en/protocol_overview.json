@@ -8,7 +8,7 @@
   "conflict_on_slot_labwares_tc": "Cannot add the Thermocycler due to conflicts with slots {{slots}}.",
   "conflict_on_slot_module": "Cannot add module to this slot due to a module conflict",
   "created": "Date created",
-  "deck_hardware": "Deck hardware",
+  "deck_hardware": "Deck Hardware",
   "deck_slot": "Deck slot",
   "description": "Description",
   "edit_protocol": "Edit protocol",
