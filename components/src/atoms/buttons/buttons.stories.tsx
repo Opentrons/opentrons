@@ -1,3 +1,4 @@
+import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
 import { Flex, STYLE_PROPS } from '../../primitives'
 import { DIRECTION_ROW } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
@@ -95,6 +96,14 @@ export const BasicButton: StoryObj<typeof BasicButtonComponent> = {
       },
       description:
         'Toggles the underline style for the button text (BasicButton only).',
+    },
+    iconName: {
+      options: Object.keys(ICON_DATA_BY_NAME),
+      control: {
+        type: 'select',
+      },
+      description:
+        'Optional icon to display alongside the button text (BasicButton only).',
     },
   },
   render: args => (

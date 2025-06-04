@@ -34,6 +34,13 @@ describe('BasicButton', () => {
     expect(button).toHaveStyle(`text-decoration: none`)
   })
 
+  it('renders basic button with icon', async () => {
+    props.iconName = 'alert'
+    render(props)
+    screen.getByTestId('basic_button_alert')
+    screen.getByRole('button', { name: 'basic button' })
+  })
+
   // TODO: need to update '@testing-library/user-event' v14+
   // it('has hover styles when not disabled', async () => {
   //   render(props)

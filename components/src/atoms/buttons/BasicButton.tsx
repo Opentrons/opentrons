@@ -1,11 +1,14 @@
 import styled from 'styled-components'
 
 import { COLORS } from '../../helix-design-system'
+import { Icon } from '../../icons'
+import { Flex } from '../../primitives'
 import { CURSOR_NOT_ALLOWED, CURSOR_POINTER } from '../../styles/cursor'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { StyledText } from '../StyledText/StyledText'
 
 import type { MouseEvent } from 'react'
+import type { IconName } from '../../icons'
 
 interface BasicButtonProps {
   children: string // Content of basic button
@@ -13,6 +16,7 @@ interface BasicButtonProps {
   isDisabled?: boolean // Optional prop to control button aria-disabled
   underLine?: boolean // Optional prop to control underline styling
   tabIndex?: number // Optional prop for tab index
+  iconName?: IconName // Optional prop for icon
 }
 
 export function BasicButton({
@@ -21,6 +25,7 @@ export function BasicButton({
   isDisabled = false,
   underLine = false,
   tabIndex = 0,
+  iconName,
   ...props
 }: BasicButtonProps): JSX.Element {
   const handleButtonClick = (event: MouseEvent<HTMLButtonElement>): void => {
@@ -42,7 +47,18 @@ export function BasicButton({
       tabIndex={tabIndex}
       {...props}
     >
-      <StyledText desktopStyle="bodyDefaultRegular">{children}</StyledText>
+      {iconName != null ? (
+        <Flex alignItems="center" gap={SPACING.spacing8}>
+          <Icon
+            name={iconName}
+            size="1.25rem"
+            data-testid={`basic_button_${iconName}`}
+          />
+          <StyledText desktopStyle="bodyDefaultRegular">{children}</StyledText>
+        </Flex>
+      ) : (
+        <StyledText desktopStyle="bodyDefaultRegular">{children}</StyledText>
+      )}
     </StyledButton>
   )
 }
@@ -53,7 +69,7 @@ const StyledButton = styled.button<{
 }>`
   background: none;
   border: none;
-  padding: 0;
+  padding: ${SPACING.spacing4};
 
   color: ${props => (props['aria-disabled'] ? COLORS.grey40 : COLORS.black90)};
   cursor: ${props =>
