@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  coordinateTupleToVector3D,
   getVectorDifference,
   getVectorInverse,
   getVectorSum,
@@ -96,6 +97,16 @@ describe('getVectorInverse', () => {
       x: -1.23,
       y: -0,
       z: 1.23,
+    })
+  })
+})
+
+describe('coordinateTupleToVector3D', () => {
+  it('should convert a CoordinateTuple to a Vector3D', () => {
+    expect(coordinateTupleToVector3D([1.2, 3.4, 5.6])).toStrictEqual({
+      x: 1.2,
+      y: 3.4,
+      z: 5.6,
     })
   })
 })
