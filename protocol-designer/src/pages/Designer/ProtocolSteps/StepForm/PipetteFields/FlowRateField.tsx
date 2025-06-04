@@ -71,6 +71,26 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
       ({ labwareDefURI }) => labwareDefURI === tiprack
     )?.def ?? null
 
+  let airGapByVolume: Array<[number, number]> = []
+  // no air gap included for mix step
+  if (formData?.stepType === 'moveLiquid') {
+    if (flowRateType === 'aspirate') {
+      airGapByVolume =
+        (liquidClassValuesForTip?.aspirate.retract.airGapByVolume as Array<
+          [number, number]
+        >) ?? []
+    } else if (flowRateType === 'dispense') {
+      airGapByVolume =
+        formData?.stepType === 'moveLiquid' &&
+        formData.path === 'multiDispense' &&
+        liquidClassValuesForTip != null &&
+        'multiDispense' in liquidClassValuesForTip
+          ? (liquidClassValuesForTip.multiDispense?.retract
+              .airGapByVolume as Array<[number, number]>) ?? []
+          : (liquidClassValuesForTip?.singleDispense.retract
+              .airGapByVolume as Array<[number, number]>) ?? []
+    }
+  }
   // if form type is 'mix', we will use single path
   const referenceVolumesForByVolumeInterpolation =
     pipette != null && tiprackDef != null && formData != null
@@ -90,10 +110,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
             (liquidClassValuesForTip?.multiDispense?.disposalByVolume as Array<
               [number, number]
             >) ?? null,
-          aspirateAirGap:
-            formData.aspirate_airGap_checkbox === true
-              ? formData.aspirate_airGap_volume
-              : null,
+          aspirateAirGapByVolume: airGapByVolume,
         }).referenceVolumes
       : null
   const [referenceVolumeFlowRate, referenceVolumeCorrection] =
