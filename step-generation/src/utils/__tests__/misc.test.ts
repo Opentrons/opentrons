@@ -55,6 +55,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 5,
       path: 'single',
       numDispenseWells: 1,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: null,
       disposalByVolume: null,
     })
@@ -80,6 +81,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 15,
       path: 'single',
       numDispenseWells: 1,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: null,
       disposalByVolume: null,
     })
@@ -99,6 +101,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 15,
       path: 'single',
       numDispenseWells: 1,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: null,
       disposalByVolume: null,
     })
@@ -111,6 +114,26 @@ describe('getTransferPlanAndReferenceVolumes', () => {
     expect(result.multiWellHandling.isSupported).toBe(false)
   })
 
+  it('should handle volumes exceeding tiprack max volume for single path with air gap', () => {
+    const result = getTransferPlanAndReferenceVolumes({
+      pipetteSpecs: MOCK_P300_SPECS,
+      tiprackDefinition: fixtureTiprack10ul,
+      volume: 10,
+      path: 'single',
+      numDispenseWells: 1,
+      aspirateAirGapByVolume: [[10, 2]],
+      conditioningByVolume: null,
+      disposalByVolume: null,
+    })
+    expect(result.referenceVolumes.airGap).toBeCloseTo(5)
+    expect(result.referenceVolumes.correctionAspirate).toBeCloseTo(5)
+    expect(result.referenceVolumes.correctionDispense).toBeCloseTo(5)
+    expect(result.referenceVolumes.pushOut).toBeCloseTo(5)
+    expect(result.referenceVolumes.flowRateAspirate).toBeCloseTo(5)
+    expect(result.referenceVolumes.flowRateDispense).toBeCloseTo(5)
+    expect(result.multiWellHandling.isSupported).toBe(false)
+  })
+
   it('should return correct values for multiAspirate path', () => {
     const result = getTransferPlanAndReferenceVolumes({
       pipetteSpecs: MOCK_P10_SPECS,
@@ -118,6 +141,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 3,
       path: 'multiAspirate',
       numDispenseWells: 1,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: null,
       disposalByVolume: null,
     })
@@ -144,6 +168,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 4,
       path: 'multiAspirate',
       numDispenseWells: 1,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: null,
       disposalByVolume: null,
     })
@@ -158,6 +183,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 4,
       path: 'multiAspirate',
       numDispenseWells: 1,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: null,
       disposalByVolume: null,
     })
@@ -172,6 +198,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 10,
       path: 'multiDispense',
       numDispenseWells: 3,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: [
         [20, 5],
         [40, 10],
@@ -200,6 +227,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 3,
       path: 'multiDispense',
       numDispenseWells: 4,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: [
         [5, 0],
         [7, 2],
@@ -228,6 +256,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 3,
       path: 'multiDispense',
       numDispenseWells: 4,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: [
         [5, 0],
         [7, 2],
@@ -256,6 +285,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 6,
       path: 'multiDispense',
       numDispenseWells: 2,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: [[10, 1]],
       disposalByVolume: [[10, 0.5]],
     })
@@ -282,6 +312,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 1,
       path: 'single',
       numDispenseWells: 1,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: null,
       disposalByVolume: null,
     })
@@ -304,6 +335,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       volume: 0.8,
       path: 'single',
       numDispenseWells: 1,
+      aspirateAirGapByVolume: [],
       conditioningByVolume: null,
       disposalByVolume: null,
     })
