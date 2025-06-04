@@ -189,7 +189,7 @@ jobs:
           commit-message: 'fix(analyses-snapshot-testing): heal analyses snapshots'
           title: 'fix(analyses-snapshot-testing): heal ${{ github.event.pull_request.head.ref }} snapshots'
           body: 'This PR was requested on the PR https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
-          branch: ${{ github.event.pull_request.head.ref }}
+          branch: 'analyses-snapshot-testing/heal-${{ github.event.pull_request.head.ref }}'
           base: ${{ github.event.pull_request.base.ref }}
 
       - name: Comment on feature PR
