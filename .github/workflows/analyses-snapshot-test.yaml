@@ -119,7 +119,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: analyzed-${{ matrix.chunk.chunk_id }}
-          path: analyses-snapshot-testing/analysis_results
+          path: analyses-snapshot-testing/analysis_results/**
 
   execute-tests:
     timeout-minutes: 5
