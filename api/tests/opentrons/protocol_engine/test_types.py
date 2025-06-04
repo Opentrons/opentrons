@@ -92,7 +92,6 @@ def test_simulated_probe_result_operand_math(
         r = op_1**op_2
         r = op_1 // op_2
         r = op_1 % op_2
-        r = op_1 % op_2
         r = op_1 < op_2
         r = op_1 > op_2
         r = op_1 >= op_2
