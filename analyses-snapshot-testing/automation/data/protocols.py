@@ -267,8 +267,8 @@ class Protocols:
         robot="OT2",
     )
 
-    OT2_X_v2_18_P300M_P20S_HS_TC_TM_SmokeTestV3: Protocol = Protocol(
-        file_stem="OT2_X_v2_18_P300M_P20S_HS_TC_TM_SmokeTestV3",
+    OT2_S_v2_18_P300M_P20S_HS_TC_TM_SmokeTestV3: Protocol = Protocol(
+        file_stem="OT2_S_v2_18_P300M_P20S_HS_TC_TM_SmokeTestV3",
         file_extension="py",
         robot="OT2",
     )
@@ -784,8 +784,8 @@ class Protocols:
         robot="OT2",
     )
 
-    OT2_X_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3: Protocol = Protocol(
-        file_stem="OT2_X_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3",
+    OT2_S_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3: Protocol = Protocol(
+        file_stem="OT2_S_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3",
         file_extension="py",
         robot="OT2",
     )
