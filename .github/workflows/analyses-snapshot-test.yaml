@@ -118,8 +118,10 @@ jobs:
       - name: Upload Analysis Results
         uses: actions/upload-artifact@v4
         with:
-          name: analyzed-${{ matrix.chunk.chunk_id }}
-          path: analyses-snapshot-testing/analysis_results/**
+          # Each chunk uploads its files as one artifact named after the chunk
+          name: analysis-results-${{ matrix.chunk.chunk_id }}.zip
+          path: analyses-snapshot-testing/analysis_results/*
+          if-no-files-found: error
 
   execute-tests:
     timeout-minutes: 5
@@ -146,10 +148,16 @@ jobs:
       - name: Install Opentrons
         working-directory: ./analyses-snapshot-testing
         run: make install-ot
-      - uses: actions/download-artifact@v4
+      - name: Download All Analysis Results
+        uses: actions/download-artifact@v4
         with:
-          pattern: analyzed-*
-          path: analyses-snapshot-testing/analysis_results
+          pattern: analysis-results-*
+          path: all_analysis_results
+      - name: Consolidate Analysis Results
+        run: |
+          find all_analysis_results -type f -exec cp {} analyses-snapshot-testing/analysis_results/ \;
+      - name: List All Gathered Files (for debug)
+        run: ls -lh analyses-snapshot-testing/analysis_results/
       - name: Run Test
         id: run_test
         working-directory: analyses-snapshot-testing
