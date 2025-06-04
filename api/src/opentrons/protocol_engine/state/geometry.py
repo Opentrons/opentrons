@@ -104,6 +104,7 @@ from .frustum_helpers import (
     find_height_at_well_volume,
 )
 from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
+from ._labware_origin_math import get_parent_origin_to_lw_origin
 
 
 _LOG = getLogger(__name__)
@@ -520,32 +521,11 @@ class GeometryView:
         This includes module calibration but excludes the calibration of the given labware.
         """
         slot_front_left = self.get_labware_parent_position(labware_id)
-        definition = self._labware.get_definition(labware_id)
+        parent_origin_to_lw_origin = get_parent_origin_to_lw_origin(
+            definition=self._labware.get_definition(labware_id),
+        )
 
-        if isinstance(definition, LabwareDefinition2):
-            slot_front_left_to_labware_front_left = Point(
-                definition.cornerOffsetFromSlot.x,
-                definition.cornerOffsetFromSlot.y,
-                definition.cornerOffsetFromSlot.z,
-            )
-            return slot_front_left + slot_front_left_to_labware_front_left
-        else:
-            assert_type(definition, LabwareDefinition3)
-
-            labware_footprint_left_x = definition.extents.footprint.backLeft.x
-            labware_footprint_front_y = definition.extents.footprint.frontRight.y
-            labware_footprint_bottom_z = definition.extents.total.backLeftBottom.z
-
-            labware_origin_to_labware_front_left_bottom = Point(
-                labware_footprint_left_x,
-                labware_footprint_front_y,
-                labware_footprint_bottom_z,
-            )
-            labware_front_left_bottom_to_labware_origin = (
-                -1 * labware_origin_to_labware_front_left_bottom
-            )
-
-            return slot_front_left + labware_front_left_bottom_to_labware_origin
+        return slot_front_left + parent_origin_to_lw_origin
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
