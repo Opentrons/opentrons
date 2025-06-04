@@ -85,7 +85,9 @@ export function getCutoutDisplayName(cutout: CutoutId): string {
   return cutout.replace('cutout', '')
 }
 
-export function getAADisplayName(aadressableArea: AddressableArea): string {
+export function getAADisplayName(
+  aadressableArea: AddressableAreaWithFakes
+): string {
   return aadressableArea.displayName
 }
 
