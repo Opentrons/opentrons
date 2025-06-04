@@ -2,7 +2,7 @@ import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
 
-import { ALL, getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { ALL, getPipetteSpecsV2, SINGLE } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -506,11 +506,15 @@ const updatePatchOnPipetteChannelChange = (
 ): FormPatch => {
   if (patch.pipette === undefined) return patch
   let update: FormPatch = {}
-  const prevChannels = getChannels(rawForm.pipette as string, pipetteEntities)
-  const nChannels =
+  const previousChannels = getChannels(
+    rawForm.pipette as string,
+    pipetteEntities
+  )
+  const nextChannels =
     typeof patch.pipette === 'string'
-      ? getChannels(patch.pipette, pipetteEntities)
+      ? getChannels(patch.pipette as string, pipetteEntities)
       : null
+
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch: FormPatch = {
     ...(stepData as FormPatch),
@@ -518,26 +522,11 @@ const updatePatchOnPipetteChannelChange = (
     id,
     stepType,
   }
-  let previousChannels = prevChannels
-  if (prevChannels === 96) {
-    if (rawForm.nozzles === ALL) {
-      previousChannels = 96
-    } else {
-      previousChannels = 8
-    }
-  }
-  let nextChannels = nChannels
-  if (nChannels === 96) {
-    if (rawForm.nozzles === ALL) {
-      nextChannels = 96
-    } else {
-      nextChannels = 8
-    }
-  }
+
   const singleToMulti =
-    prevChannels === 1 && (nextChannels === 8 || nextChannels === 96)
+    previousChannels === 1 && nextChannels === 8 && patch.nozzles !== SINGLE
   const multiToSingle =
-    (prevChannels === 8 || prevChannels === 96) && nextChannels === 1
+    previousChannels === 8 && rawForm.nozzles !== SINGLE && nextChannels === 1
 
   const pipetteId: string = appliedPatch.pipette as string
 
@@ -560,10 +549,6 @@ const updatePatchOnPipetteChannelChange = (
       }),
     }
   } else if (multiToSingle) {
-    let channels: 8 | 96 = 8
-    if (prevChannels === 96) {
-      channels = 96
-    }
     // multi-channel to single-channel: convert primary wells to all wells
     const sourceLabwareId: string = appliedPatch.aspirate_labware as string
     const destLabwareId: string = appliedPatch.dispense_labware as string
@@ -575,7 +560,7 @@ const updatePatchOnPipetteChannelChange = (
         aspirate_wells: getAllWellsFromPrimaryWells(
           appliedPatch.aspirate_wells as string[],
           sourceLabware.def,
-          channels
+          previousChannels
         ),
         dispense_wells:
           destLabwareId.includes('trashBin') ||
@@ -589,7 +574,7 @@ const updatePatchOnPipetteChannelChange = (
             : getAllWellsFromPrimaryWells(
                 appliedPatch.dispense_wells as string[],
                 destLabware.def,
-                channels
+                previousChannels
               ),
       }
     }

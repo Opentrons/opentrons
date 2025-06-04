@@ -1,13 +1,13 @@
 import pick from 'lodash/pick'
 
-import { ALL } from '@opentrons/shared-data'
+import { ALL, SINGLE } from '@opentrons/shared-data'
 
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import {
   chainPatchUpdaters,
   fieldHasChanged,
   getAllWellsFromPrimaryWells,
-  getChannelsFromNozzles,
+  getChannels,
   getDefaultWells,
 } from './utils'
 
@@ -59,26 +59,21 @@ const updatePatchOnPipetteChannelChange = (
 ): FormPatch => {
   if (patch.pipette === undefined) return patch
   let update = {}
-  const previousChannels = getChannelsFromNozzles(
-    rawForm.nozzles as null | NozzleConfigurationStyle,
+  const previousChannels = getChannels(
     rawForm.pipette as string,
     pipetteEntities
   )
   const nextChannels =
     typeof patch.pipette === 'string'
-      ? getChannelsFromNozzles(
-          rawForm.nozzles as null | NozzleConfigurationStyle,
-          patch.pipette,
-          pipetteEntities
-        )
+      ? getChannels(patch.pipette as string, pipetteEntities)
       : null
 
   const appliedPatch = { ...rawForm, ...patch }
 
   const singleToMulti =
-    previousChannels === 1 && (nextChannels === 8 || nextChannels === 96)
+    previousChannels === 1 && nextChannels === 8 && patch.nozzles !== SINGLE
   const multiToSingle =
-    (previousChannels === 8 || previousChannels === 96) && nextChannels === 1
+    previousChannels === 8 && rawForm.nozzles !== SINGLE && nextChannels === 1
 
   if (patch.pipette === null || singleToMulti) {
     // reset all well selection
@@ -92,10 +87,6 @@ const updatePatchOnPipetteChannelChange = (
       }),
     }
   } else if (multiToSingle) {
-    let channels: 8 | 96 = 8
-    if (previousChannels === 96) {
-      channels = 96
-    }
     // multi-channel to single-channel: convert primary wells to all wells
     const labwareId = appliedPatch.labware
 
@@ -105,7 +96,7 @@ const updatePatchOnPipetteChannelChange = (
         wells: getAllWellsFromPrimaryWells(
           appliedPatch.wells as string[],
           labwareDef,
-          channels
+          previousChannels
         ),
       }
     }
