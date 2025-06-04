@@ -233,24 +233,20 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   }
 
   if (isMultiChannelPipette && nozzles !== ALL) {
-    const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
-      nozzles,
-      prevRobotState,
+    const isAspirateSafePipetteMovement = getIsSafePipetteMovement({
+      robotState: prevRobotState,
       invariantContext,
-      pipette,
-      sourceLabware,
-      tipRack,
-      { x: aspirateXOffset, y: aspirateYOffset }
-    )
-    const isDispenseSafePipetteMovement = getIsSafePipetteMovement(
-      nozzles,
-      prevRobotState,
+      pipetteId: pipette,
+      labwareId: sourceLabware,
+      wellLocationOffset: { x: aspirateXOffset, y: aspirateYOffset },
+    })
+    const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
+      robotState: prevRobotState,
       invariantContext,
-      pipette,
-      destLabware,
-      tipRack,
-      { x: dispenseXOffset, y: dispenseYOffset }
-    )
+      pipetteId: pipette,
+      labwareId: destLabware,
+      wellLocationOffset: { x: dispenseXOffset, y: dispenseYOffset },
+    })
     if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
       errors.push(errorCreators.possiblePipetteCollision())
     }

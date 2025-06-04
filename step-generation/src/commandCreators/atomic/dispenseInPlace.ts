@@ -23,7 +23,7 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceAtomicParams> = (
   } = args
 
   const errors: CommandCreatorError[] = []
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
       errorCreators.noTipOnPipette({
         actionName: 'dispense',

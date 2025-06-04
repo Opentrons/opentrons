@@ -19,9 +19,12 @@ import {
 import type {
   AddressableAreaName,
   AspDispAirgapParams,
+  AspirateInPlaceParams,
   BlowoutParams,
   CreateCommand,
+  DispenseInPlaceParams,
   DispenseParams,
+  MoveToWellParams,
   TouchTipParams,
   WellLocation,
 } from '@opentrons/shared-data'
@@ -109,6 +112,13 @@ export const getFlowRateAndOffsetParamsMix = (): FlowRateAndOffsetParamsMix => (
 type MakeAspDispHelper<P> = (
   bakedParams?: Partial<P>
 ) => (well: string, volume: number, params?: Partial<P>) => CreateCommand
+type MakeAspDispCompoundHelper<P, P2> = (
+  bakedParams?: Partial<P>
+) => (
+  inPlaceParams: P,
+  moveToWellParams?: P2,
+  doMove?: boolean
+) => CreateCommand[]
 
 const _defaultAspirateParams = {
   pipetteId: DEFAULT_PIPETTE,
@@ -139,6 +149,40 @@ export const makeAspirateHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
     ...params,
   },
 })
+
+export const makeAspirateInPlaceHelper: MakeAspDispCompoundHelper<
+  AspirateInPlaceParams,
+  MoveToWellParams
+> = bakedParams => (aspirateInPlaceParams, moveToWellParams, doMove = true) => {
+  const moveCommand: CreateCommand | null =
+    doMove && moveToWellParams != null
+      ? {
+          commandType: 'moveToWell',
+          key: expect.any(String),
+          params: moveToWellParams,
+        }
+      : null
+  return [
+    ...(moveCommand != null ? [moveCommand] : []),
+    {
+      commandType: 'aspirateInPlace',
+      key: expect.any(String),
+      params: aspirateInPlaceParams,
+    },
+  ] as CreateCommand[]
+}
+
+export const makeDispenseInPlaceHelper: MakeAspDispCompoundHelper<
+  DispenseInPlaceParams,
+  MoveToWellParams
+> = bakedParams => (dispenseInPlaceParams, moveToWellParams) => [
+  {
+    commandType: 'dispenseInPlace',
+    key: expect.any(String),
+    params: dispenseInPlaceParams,
+  },
+]
+
 export const aspirateHelperLiquidClass = (submergeParams: {
   pipetteId: string
   labwareId: string

@@ -42,7 +42,6 @@ import type {
   CutoutFixtureId,
   CutoutId,
   LabwareDefinition2,
-  NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
   RobotType,
@@ -548,7 +547,9 @@ export function makeInitialRobotState(args: {
       pipettes: reduce(
         pipetteLocations,
         (acc, pipetteTemporalProperties, id) =>
-          pipetteTemporalProperties.mount ? { ...acc, [id]: false } : acc,
+          pipetteTemporalProperties.mount
+            ? { ...acc, [id]: { hasTip: false, tiprackURI: null } }
+            : acc,
         {}
       ),
       tipracks: reduce(
@@ -595,7 +596,6 @@ interface DispenseLocationHelperArgs {
   flowRate: number
   xOffset: number
   yOffset: number
-  nozzles: NozzleConfigurationStyle | null
   tipRack: string
   offsetFromBottomMm?: number
   well?: string
@@ -615,7 +615,6 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     xOffset,
     yOffset,
     tipRack,
-    nozzles,
   } = args
   const {
     labwareEntities,
@@ -651,7 +650,6 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
           },
         },
         tipRack,
-        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {

@@ -637,7 +637,10 @@ export interface TimelineFrame {
       }
     }
     pipettes: {
-      [pipetteId: string]: boolean // true if pipette has tip(s)
+      [pipetteId: string]: {
+        hasTip: boolean
+        tiprackURI: string | null
+      } // true if pipette has tip(s)
     }
   }
   liquidState: {

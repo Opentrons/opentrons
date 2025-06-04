@@ -90,7 +90,10 @@ const mockRobotState: TimelineFrame = {
       },
     },
     pipettes: {
-      mockPipette: false,
+      mockPipette: {
+        hasTip: false,
+        tiprackURI: null,
+      },
     },
   },
   liquidState: {
