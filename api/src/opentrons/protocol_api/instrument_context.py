@@ -1827,9 +1827,9 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
-        :param group_wells: For multi-channel transfers only. If set to True group together contiguous wells
-            given into a single transfer step, taking into account the tip configuration. If False, target
-            each well given with the primary nozzle. Defaults to True.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
 
         :meta private:
         """
@@ -1946,9 +1946,9 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
-        :param group_wells: For multi-channel transfers only. If set to True group together contiguous wells
-            given into a single transfer step, taking into account the tip configuration. If False, target
-            each well given with the primary nozzle. Defaults to True.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
 
         :meta private:
         """
@@ -2072,9 +2072,9 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
-        :param group_wells: For multi-channel transfers only. If set to True group together contiguous wells
-            given into a single transfer step, taking into account the tip configuration. If False, target
-            each well given with the primary nozzle. Defaults to True.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
 
         :meta private:
         """
