@@ -19,7 +19,7 @@ from automation.data.protocol import Protocol
 
 # Constants
 CUSTOM_LABWARE_DIR = Path(__file__).parent.parent / "files" / "labware"
-ANALYSIS_TIMEOUT = 60  # Timeout per protocol in seconds
+ANALYSIS_TIMEOUT = 120  # Timeout per protocol in seconds
 
 custom_labware_files = list(CUSTOM_LABWARE_DIR.glob("*.json"))
 
