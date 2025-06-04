@@ -167,7 +167,7 @@ The Heater-Shaker is fully programmable in Protocol Designer and the Python Prot
 
 Outside of protocols, the Opentrons App can display the current status of the Heater-Shaker and can directly control the heater, shaker, and labware latch.
 
-### Heater-Shaker specifcations
+### Heater-Shaker specifications
 
 | **Specification**               | **Details**  |
 |---------------------------------|--------------|
@@ -263,7 +263,7 @@ The Temperature Module is fully programmable in Protocol Designer and the Python
 
 Outside of protocols, the Opentrons App can display the current status of the Temperature Module and can directly control the temperature of the surface plate.
 
-### Temperature Module specifcations
+### Temperature Module specifications
 
 | **Specification**               | **Details**                                                                 |
 |----------------------------------|-----------------------------------------------------------------------------|
@@ -317,9 +317,9 @@ Outside of protocols, the Opentrons App can display the current status
 of the Thermocycler and can directly control the block temperature, lid
 temperature, and lid position.
 
-### Thermocycler specifcations
+### Thermocycler specifications
 
-| **Specification**                | **Details**                                      |
+| Specification                    | Details                                          |
 |----------------------------------|--------------------------------------------------|
 | **Dimensions (lid open)**        | 244.95 × 172 × 310.1 mm (L/W/H)                  |
 | **Dimensions (lid closed)**      | 244.95 × 172 × 170.35 mm (L/W/H)                 |

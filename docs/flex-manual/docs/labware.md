@@ -10,7 +10,7 @@ shop. And, Opentrons is always working to verify new labware
 definitions. See the Labware Library (linked above) for the latest
 listings.
 
-1.  **Labware concepts**
+## Labware concepts
 
 Labware encompasses more than just the objects placed on the deck and
 used in a protocol. To help you understand Opentrons labware, let's
@@ -85,7 +85,7 @@ chapter with an overview of the data components of a labware file and
 summarize the Opentrons features and services that help you create
 custom labware.
 
-1.  **Reservoirs**
+## Reservoirs
 
 The Opentrons Flex works by default with the single- and multi-well
 reservoirs listed below. Using these reservoirs helps reduce your prep
@@ -164,7 +164,7 @@ capacity, and other information in a JSON file. The Opentrons Flex needs
 this information to understand how to work with your custom labware. See
 the for more information.
 
-1.  **Well plates**
+## Well plates
 
 The Opentrons Flex works by default with well plates listed below. Using
 these well plates helps reduce your prep work burden because they're
@@ -501,7 +501,7 @@ The tip rack adapter is compatible with the Opentrons Flex Gripper. You
 can use the gripper to place fresh tip racks on the adapter or to pick
 up and move used tip racks into the waste chute.
 
-1.  **Tubes and tube racks**
+## Tubes and tube racks
 
 ![image](4361880fac1aae14b808948c9b77cb1c2448907f.jpg){width="8.09375in"
 height="6.479166666666667in"}
@@ -593,7 +593,7 @@ other information in a JSON file. The Opentrons Flex reads this
 information to understand how to work with your custom labware. See the
 for more information.
 
-1.  **Aluminum blocks**
+## Aluminum blocks
 
 Aluminum blocks ship with the Temperature Module GEN2 and can be
 purchased separately as a . The set includes a flat bottom plate, a
@@ -725,7 +725,7 @@ Tip Racks (unfiltered and filtered tips) ■ Opentrons Flex 96 Tip Rack 50
 listed above. The Flex Gripper may work with other ANSI/SLAS automation
 compliant labware, but this is not recommended.
 
-1.  **Custom labware definitions**
+## Custom labware definitions
 
 As discussed at the beginning of this chapter, custom labware is labware
 that's not listed in the Opentrons Labware Library. You can use other
@@ -743,7 +743,7 @@ These features accommodate different skill levels and ways of working.
 Creating your own labware, and using it with the Opentrons Flex, helps
 make the robot a versatile and powerful addition to your lab.
 
-##### CUSTOM LABWARE CREATOR
+#### Custom labware creator
 
 The is a no-code, web-based tool that uses a graphical interface to help
 you create a labware definition file. Labware Creator produces a JSON
@@ -751,7 +751,7 @@ labware definition file that you import into the Opentrons App. After
 that, your custom labware is available to the Flex robot and the Python
 API.
 
-##### CUSTOM LABWARE SERVICE
+#### Custom labware service
 
 Get in touch with us if the labware you'd like to use isn't available in
 the library, if you can't create your own definitions, or because a
@@ -865,11 +865,6 @@ height="0.23958333333333334in"}![image](f1bfc133e85232ff5805e7593ed58b26ae1c5874
 height="0.23958333333333334in"}![image](f1bfc133e85232ff5805e7593ed58b26ae1c5874.png){width="0.23958333333333334in"
 height="0.23958333333333334in"}![image](6873f8d4ea5a2990e78dfee7d7256523d8ad2648.png){width="0.23958333333333334in"
 height="0.23958333333333334in"}![image](5c88dd4c525340e78f4d2200171ae581c557b33d.png){width="0.23958333333333334in"
-height="0.23958333333333334in"}![image](5c88dd4c525340e78f4d2200171ae581c557b33d.png){width="0.23958333333333334in"
-height="0.23958333333333334in"}![image](f1bfc133e85232ff5805e7593ed58b26ae1c5874.png){width="0.23958333333333334in"
-height="0.23958333333333334in"}![image](f1bfc133e85232ff5805e7593ed58b26ae1c5874.png){width="0.23958333333333334in"
-height="0.23958333333333334in"}![image](6873f8d4ea5a2990e78dfee7d7256523d8ad2648.png){width="0.23958333333333334in"
-height="0.23958333333333334in"}![image](5c88dd4c525340e78f4d2200171ae581c557b33d.png){width="0.23958333333333334in"
 height="0.23958333333333334in"}![image](a91327128b4e4c7ebf850ff5ff0315ef67913111.png){width="0.23958333333333334in"
 height="0.23958333333333334in"} Irregular**
 
@@ -879,7 +874,7 @@ Our labware team will work to understand your needs and design custom
 labware definitions for you. See the form for more information. This is
 a fee-based service.
 
-##### PYTHON API
+#### Python API
 
 While you cannot create custom labware with our API, you can use custom
 labware with the available API methods. However, you need to define your

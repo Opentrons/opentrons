@@ -1,100 +1,57 @@
 # Protocol Development
 
-The Opentrons Flex system can run a wide variety of automated protocols,
-for tasks such as PCR, NGS, ELISA, and many more. You can run fully
-built and verified protocols, edit community protocols to suit your
-needs, or design protocols from scratch---with or without writing code.
+The Opentrons Flex system can run a wide variety of automated protocols, for tasks such as PCR, NGS, ELISA, and many more. You can run fully built and verified protocols, edit community protocols to suit your needs, or design protocols from scratch—with or without writing code.
 
-This chapter provides an overview of each of these protocol development
-methods, as well as giving guidance on how to adapt protocols written
-for the Opentrons OT-2 to run on Opentrons Flex.
+This chapter provides an overview of each of these protocol development methods, as well as giving guidance on how to adapt protocols written for the Opentrons OT-2 to run on Opentrons Flex.
 
-1.  **Pre-made protocols**
+## Pre-made protocols
 
 ### Protocol Library
 
-The Opentrons Protocol Library hosts protocols authored either by
-Opentrons itself or by members of the Opentrons community. To find a
-protocol that fits your target application, use the search field at the
-top of the .
+The Opentrons Protocol Library hosts protocols authored either by Opentrons itself or by members of the Opentrons community. To find a protocol that fits your target application, use the search field at the top of the [Protocol Library homepage](https://library.opentrons.com).
 
-You can also browse protocols by categories, like DNA/RNA, cell biology,
-cell and tissue culture, proteins, commercial assay kits, or molecular
-biology. There's even a category for protocols that create art by
-pipetting! Take some time to check out the protocols in our library.
-Understanding what's available---and making some cool pixel art---is a
-great way to learn about the features and capabilities of your robot
-before moving on to using real samples and reagents.
+You can also browse protocols by categories, like DNA/RNA, cell biology, cell and tissue culture, proteins, commercial assay kits, or molecular biology. There's even a category for protocols that create art by pipetting! Take some time to check out the protocols in our library. Understanding what's available—and making some cool pixel art—is a great way to learn about the features and capabilities of your robot before moving on to using real samples and reagents.
 
-##### SEARCHING FOR PROTOCOLS
+#### Searching for protocols
 
-The Protocol Library search returns results as you type. You can select
-a result from the search list or click **View All Results** to go to the
-full results page, which shows more details about each protocol and lets
-you filter them based on several criteria.
+The Protocol Library search returns results as you type. You can select a result from the search list or click **View All Results** to go to the full results page, which shows more details about each protocol and lets you filter them based on several criteria.
 
 Each protocol card will show:
 
-**Protocol name** The name of the protocol.
-
-**Verification** Badges indicate if the protocol is verified by
-Opentrons,
-
-a third-party manufacturer, or members of the community.
-
-**Time estimate** Approximately how long the protocol takes to run.
-
-**Description** A short summary of what the protocol does.
-
-**Robot model** Which Opentrons robots the protocol is compatible with.
-
-**Protocol editability** JSON protocols are editable in Protocol
-Designer, with no coding
-
-required. Python protocols are editable in any text editor, using the
-Python Protocol API.
-
-**Modules** Any hardware modules that are required.
+| **Category**                | **Description**                                                                                                                                         |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Protocol name**        | The name of the protocol.                                                                                                                               |
+| **Verification**         | Badges indicate if the protocol is verified by Opentrons, a third-party manufacturer, or members of the community.                                      |
+| **Time estimate**        | Approximately how long the protocol takes to run.                                                                                                       |
+| **Description**          | A short summary of what the protocol does.                                                                                                              |
+| **Robot model**          | Which Opentrons robots the protocol is compatible with.                                                                                                 |
+| **Protocol editability** | JSON protocols are editable in Protocol Designer, with no coding required. Python protocols are editable in any text editor, using the Python Protocol API. |
+| **Modules**              | Any hardware modules that are required.                                                                                                                 |
 
 In addition to these categories, in the sidebar you can filter results
 by:
 
-- **Pipettes:** Which pipettes the protocol uses (you can usually change
-  a protocol's pipettes, but it may affect the run time and the number
-  of tips consumed).
+- **Pipettes:** Which pipettes the protocol uses (you can usually change a protocol's pipettes, but it may affect the run time and the number of tips consumed).
 
-- **Categories:** Target applications, like DNA/RNA, cell biology,
-  proteins, etc.
+- **Categories:** Target applications, like DNA/RNA, cell biology, proteins, etc.
 
 - **Protocol version:** Show or hide older versions of protocols.
 
-##### PROTOCOL DETAILS
+#### Protocol details
 
-Click on a protocol to go to its detail page, which provides even more
-information. In addition to what is shown in search, here you can see:
+Click on a protocol to go to its detail page, which provides even more information. In addition to what is shown in search, here you can see:
 
-- **Supporting data:** Additional data, explanations, or links to
-  outside sources provided by the protocol author.
+- **Supporting data:** Additional data, explanations, or links to outside sources provided by the protocol author.
 
-- **What you'll need:** A complete list of all equipment needed for the
-  protocol, including the robot, modules, labware, pipettes, and
-  third-party kits.
+- **What you'll need:** A complete list of all equipment needed for the protocol, including the robot, modules, labware, pipettes, and third-party kits.
 
-- **Protocol steps:** A list of steps written by the protocol author, as
-  well as a visual deck map and list of liquids specified in the
-  protocol file.
+- **Protocol steps:** A list of steps written by the protocol author, as well as a visual deck map and list of liquids specified in the protocol file.
 
-The details page also provides basic instructions for downloading and
-running the protocol. For more information on importing a protocol to
-the Opentrons App and setting up a run, see the in the Software and
-Operation chapter.
+The details page also provides basic instructions for downloading and running the protocol. For more information on importing a protocol to the Opentrons App and setting up a run, see the [Transferring Protocols to Flex section][transferring-protocols-to-flex] in the Software and Operation chapter.
 
 ### Custom Protocol Development service
 
-Opentrons provides a for applications not already included in the
-Protocol Library. Our comprehensive authoring and validation service has
-a turnaround time of two weeks. As part of the service, Opentrons field
-applications scientists will:
+Opentrons provides a [Remote Custom Protocol Development service](https://opentrons.com/instrument-services) for applications not already included in the Protocol Library. Our comprehensive authoring and validation service has a turnaround time of two weeks. As part of the service, Opentrons field applications scientists will:
 
 - Develop the Python protocol.
 
@@ -104,23 +61,16 @@ applications scientists will:
 
 - Create deck and reagent setup instructions.
 
-- Optimize your protocol as much as needed within one week of initial
-  delivery.
+- Optimize your protocol as much as needed within one week of initial delivery.
 
-By default, Opentrons adds all custom protocols to the Protocol Library
-so the community can benefit from them. However, if your application
-requires privacy, you can opt out of inclusion in the Protocol Library.
+By default, Opentrons adds all custom protocols to the Protocol Library so the community can benefit from them. However, if your application requires privacy, you can opt out of inclusion in the Protocol Library.
 
-**Note:** The Custom Protocol Development service only writes Python
-protocols that control Opentrons hardware. It does not cover controlling
-the robot with code in other languages, nor does it cover controlling
-third-party hardware.
+!!! note
+    The Custom Protocol Development service only writes Python protocols that control Opentrons hardware. It does not cover controlling the robot with code in other languages, nor does it cover controlling third-party hardware.
 
-##### PROTOCOL REQUEST GUIDELINES
+#### Protocol request guidelines
 
-Describing your protocol in detail enables Opentrons field applications
-scientists to accurately code the automation that you need. Consider
-your protocol's requirements, including:
+Describing your protocol in detail enables Opentrons field applications scientists to accurately code the automation that you need. Consider your protocol's requirements, including:
 
 - Hardware (pipettes, gripper, modules, fixtures).
 
@@ -128,44 +78,25 @@ your protocol's requirements, including:
 
 Also consider special cases that apply to your protocol, like:
 
-- Liquids that are volatile, viscous, or otherwise behave differently
-  than water.
+- Liquids that are volatile, viscous, or otherwise behave differently than water.
 
 - Conservation of expensive reagents.
 
 - Sterility and cross-contamination.
 
-- Advanced pipetting techniques like air-gapping, high or low flow rate,
-  or pipetting at specific locations within wells.
+- Advanced pipetting techniques like air-gapping, high or low flow rate, or pipetting at specific locations within wells.
 
-To explain the movements the robot will make in executing the protocol,
-start with your initial deck state. Where should modules, labware, and
-trash containers be located? Which liquids will be in which labware, and
-in what quantities? Use the coordinate systems printed on the Opentrons
-Flex deck and on standard labware to describe these locations.
+To explain the movements the robot will make in executing the protocol, start with your initial deck state. Where should modules, labware, and trash containers be located? Which liquids will be in which labware, and in what quantities? Use the coordinate systems printed on the Opentrons Flex deck and on standard labware to describe these locations.
 
-Next, give step-by-step instructions on how Opentrons Flex should handle
-liquids, specifying quantities in microliters (µL) and giving exact
-source and destination locations (rows, columns, or individual wells of
-labware).
+Next, give step-by-step instructions on how Opentrons Flex should handle liquids, specifying quantities in microliters (µL) and giving exact source and destination locations (rows, columns, or individual wells of labware).
 
-In general, following the style of the methods section of an academic
-paper will help the Opentrons team understand your instructions. And
-always err on the side of providing extra information---it may be
-exactly the detail we need to write code for your protocol.
+In general, following the style of the methods section of an academic paper will help the Opentrons team understand your instructions. And always err on the side of providing extra information—it may be exactly the detail we need to write code for your protocol.
 
-##### CUSTOM PROTOCOL PRICING
+#### Custom protocol pricing
 
-Custom Protocol Development is a service available to all owners of
-Opentrons Flex systems. Opentrons provides remote and onsite protocol
-development services customized to your specific workflow. Price and
-development time are based on the complexity of your protocol and the
-related code. See the
+Custom Protocol Developmentis a service available to all owners of Opentrons Flex systems. Opentrons provides remote and onsite protocol development services customized to your specific workflow. Price and development time are based on the complexity of your protocol and the related code. See the [Instrument Services section](https://opentrons.com/instrument-services) of the Opentrons website to contact us for more information about our Custom Protocol Development offerings.
 
-of the Opentrons website to contact us for more information about our
-Custom Protocol Development offerings.
-
-1.  **Protocol Designer**
+## Protocol Designer
 
 is a web-based, no-code tool for developing protocols that run on
 Opentrons robots, including Opentrons Flex. You can use Protocol
@@ -201,20 +132,11 @@ Protocol Designer:
 
 **Icon Tab**
 
-![image](ef845f662b4774b7886ed904696a18de5998b647.png){width="1.09375in"
-height="1.375in"}
-
 The **File tab** is where you manage protocol files and specify hardware
 for use in your protocol.
 
-![image](86ac87059b5ca3a8e752d0c1f446569e5076ca76.png){width="1.09375in"
-height="1.375in"}
-
 The **Liquids tab** lets you define samples, reagents, and any other
 liquids that your robot will handle.
-
-![image](9dac3dfb506303c985d171abcd713720e2c7505f.png){width="1.09375in"
-height="1.25in"}
 
 The **Design tab** is where you specify the initial state of the deck,
 add steps that the robot will perform, and view the projected outcomes
@@ -225,14 +147,11 @@ with the Liquids and Design tabs, and then return to the File tab to
 export your work. The remainder of this section goes through the
 protocol creation process in detail.
 
-##### PART 1: CREATE A PROTOCOL
+#### Part 1: Create a protocol
 
 When you launch Protocol Designer, you'll begin on the **File** tab. In
 the left sidebar, click **Create New** to open the Create New Protocol
 dialog. Click on the image of Opentrons Flex and then click **Next**.
-
-![image](07b6b1998e0a24541a8122d850d2e91953563dbf.jpg){width="10.40625in"
-height="7.78125in"}
 
 Choosing to create a protocol for Opentrons Flex in Protocol Designer.
 
@@ -252,14 +171,13 @@ your protocol:
 3.  Additional hardware used in your protocol, such as modules, the
     gripper, or the waste chute. Only are shown.
 
-**Note:** You can't currently use multiple Heater-Shaker Modules or
-Magnetic Blocks in a JSON protocol. If your application requires them,
-you'll need to use a Python protocol. See the below.
+!!! note
+    You can't currently use multiple Heater-Shaker Modules or Magnetic Blocks in a JSON protocol. If your application requires them, you'll need to use a Python protocol. See the below.
 
 At any time, you can return to the File tab to rename your protocol, add
 an author name or description, or change your hardware configuration.
 
-##### PART 2: DEFINE LIQUIDS
+#### Part 2: Define liquids
 
 Move on to the **Liquids** tab to set up samples and reagents. This tab
 is only for *defining* types of liquids. You'll indicate the starting
@@ -277,7 +195,7 @@ Protocol Designer, in the Opentrons App, and on the touchscreen. You can
 use the default color, pick another preset color, or enter an RGB hex
 code to set a custom color.
 
-##### PART 3: LAY OUT THE DECK
+#### Part 3: Lay out the deck
 
 Go to the Design tab to do the final setup step, which is placing
 labware and liquids on the deck. The main view on this tab is the deck
@@ -290,9 +208,8 @@ protocol in their default locations. Hover over any open slot and click
 labware, or adapters. Drag and drop labware to an open slot to move it
 there, or to an occupied slot to swap the two pieces of labware.
 
-**Note:** You can't move modules or adapters around the deck map by drag
-and drop. This is to make it easier to move *labware* onto or off of a
-module.
+!!! note
+    You can'tmove modules or adapters around the deck map by drag and drop. This is to make it easier to move *labware* onto or off of a module.
 
 - To change a module's position, return to the **File** tab and click
   **Edit** next to the module name.
@@ -309,7 +226,7 @@ in μL. For example, if you select the first column on a 96-well plate
 and specify 100 μL, that will be 800 μL of liquid total (100 μL × 8
 wells).
 
-##### PART 4: ADD STEPS
+#### Part 4: Add steps
 
 At last, it's time to tell your robot how to move liquid around the
 deck. Click **Add Step** and choose the type of step.
@@ -332,8 +249,6 @@ deck. Click **Add Step** and choose the type of step.
     than for transfers, since all liquid returns to its starting
     location when mixing.
 
-<!-- -->
-
 - Gripper steps
 
   - **Move Labware:** Control the Flex Gripper or move labware around
@@ -344,8 +259,6 @@ deck. Click **Add Step** and choose the type of step.
     gripper to dispose labware by moving it into the waste chute. You
     need to move labware manually to move it off the deck (without
     disposing it).
-
-<!-- -->
 
 - Module steps
 
@@ -371,15 +284,13 @@ deck. Click **Add Step** and choose the type of step.
       for a certain time. Profiles do not change the temperature of the
       lid.
 
-<!-- -->
-
 - **Pause:** Prevent the protocol from continuing until one of three
   criteria is met. Pauses can require user intervention (pressing a
   button on the touchscreen or in the app), wait for a fixed time, or
   wait until a module reaches a target temperature. Timed pauses are
   useful for incubation or letting the Magnetic Block work.
 
-##### PART 5: EDIT STEPS
+#### Part 5: Edit steps
 
 Once you've created a step, preview its effects by hovering over it in
 the Protocol Timeline. Affected tips and wells will be highlighted, as
@@ -402,7 +313,7 @@ description of what the step does. Custom step names replace their
 default action descriptions (like "Transfer" and "Temperature") in the
 Protocol Timeline, making it easier to navigate around your protocol.
 
-##### PART 6: EXPORT YOUR PROTOCOL
+#### Part 6: Export your protocol
 
 When your protocol is complete, click **Final Deck State** to preview
 how the deck should appear at the end of your protocol. In this view (or
@@ -426,12 +337,10 @@ any JSON protocol file from the standard system file picker. Once
 loaded, you can edit any aspect of the protocol, including its name,
 description, hardware configuration, and steps.
 
-**Warning:** Importing a protocol will replace any other protocol that
-you've been working on in Protocol Designer. Be sure to export your work
-before importing another file, or open Protocol Designer in a second
-browser tab to work on multiple files at once.
+!!! warning
+    Importing a protocol will replace any other protocol that you've been working on in Protocol Designer. Be sure to export your work before importing another file, or open Protocol Designer in a second browser tab to work on multiple files at once.
 
-1.  **Python Protocol API**
+## Python Protocol API
 
 Writing protocol scripts in Python gives you the most fine-grained
 control of Opentrons Flex. Version 2 of the Python Protocol API is a
@@ -510,7 +419,7 @@ Certain features are only available in Python protocols, either because
 they are part of the API or because of the inherent flexibility of
 Python code.
 
-##### PARTIAL TIP PICKUP
+#### Partial tip pickup
 
 The Python API supports the most partial tip pickup configurations.
 Currently, JSON protocols only support column pickup with the 96-channel
@@ -527,7 +436,7 @@ Certain configurations allow changing which nozzles are used. For
 example, you can pick up a column of tips with either the left or right
 edge of the 96-channel pipette.
 
-##### RUNTIME PARAMETERS
+#### Runtime parameters
 
 Starting in API version 2.18, you can define user-customizable variables
 in your Python protocols. This gives you greater flexibility and puts
@@ -543,7 +452,7 @@ for information on writing them into protocols, and see the Runtime
 Parameters section of the Software and Operation chapter for information
 on changing parameter values during run setup.
 
-##### NON-BLOCKING COMMANDS
+#### Non-blocking commands
 
 Some module commands that take a long time to complete (such as heating
 from ambient temperature to a high temperature) can be run in a
@@ -551,7 +460,7 @@ from ambient temperature to a high temperature) can be run in a
 on to other pipetting tasks instead of waiting for the command to
 complete. Non-blocking commands are currently supported on the .
 
-##### MULTIPLE MODULES OF THE SAME TYPE
+#### Multiple modules of the same type
 
 The Python API only restricts module placement based on physical
 limitations. Protocol Designer can only place one of each type of module
@@ -560,7 +469,7 @@ module in any column 1 or 3 slot (except the Thermocycler Module, which
 only fits in slots A1 and B1). And it allows placing Magnetic Blocks in
 any working area slot.
 
-##### PYTHON PACKAGES
+#### Python packages
 
 Not only does the Python API support some features not included in
 Protocol Designer, but every Python protocol *is a Python script*, which
@@ -575,7 +484,7 @@ to **Advanced** and click **Add override path** in the Override Path to
 Python section. Choose the copy of python on your system that has access
 to the packages.
 
-1.  **OT-2 protocols**
+## OT-2 protocols
 
 There are hundreds of OT-2 protocols in the Protocol Library, and you
 may have created your own OT-2 protocols for your lab. Opentrons Flex
@@ -590,7 +499,7 @@ older protocols to take advantage of new features only offered on Flex.
 Using the Python Protocol API, you only have to change a few aspects of
 an OT-2 protocol for it to run on Flex.
 
-##### METADATA AND REQUIREMENTS
+#### Metadata and requirements
 
 The API requires you to declare that a protocol is designed to run on
 Flex. Use the robotType key in the new requirements dictionary. You
@@ -604,7 +513,7 @@ from opentrons import protocol_api
 
 requirements = {'robotType': 'Flex', 'apiLevel': '2.15'}
 
-##### PIPETTES AND TIP RACKS
+##### Pipettes and tip racks
 
 Flex uses different types of pipettes and tip racks than OT-2, which
 have their own load names in the API. Choose pipettes of the same
@@ -632,7 +541,7 @@ load_instrument(). Keep in mind that if you use smaller capacity tips
 than the original protocol, you may need to make further adjustments to
 avoid running out of tips, and the protocol may take longer to execute.
 
-##### DECK SLOTS
+#### Deck slots
 
 The API accepts OT-2 and Flex deck slot names interchangeably. It's good
 practice to use the coordinate deck slot format in Flex protocols (as in
@@ -648,7 +557,7 @@ A protocol that calls
 protocol.load_labware("opentrons_flex_96_tiprack_200ul", "1") would
 require you to place that tip rack in slot D1 on Flex.
 
-##### MODULES
+#### Modules
 
 Update module load names for the Temperature Module and Thermocycler
 Module to ones that are compatible with Flex, if necessary. Flex
