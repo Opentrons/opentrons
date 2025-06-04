@@ -23,3 +23,9 @@ figure.side-by-side p {
 figure.side-by-side img {
   width: 300px;
 }
+
+/* THEME STUFF */
+
+th {
+    background-color: #D0E6FE;
+}

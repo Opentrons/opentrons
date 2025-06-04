@@ -18,7 +18,7 @@ pieces of software is required to set up Flex and run your first
 protocol, but it's up to you to decide the balance of how you will
 control Flex in your daily workflow.
 
-1.  **Touchscreen operation**
+## Touchscreen operation
 
 You can use the touchscreen to control Flex whenever the robot is on. If
 your robot is on and the touchscreen is off, tap it once to wake the
@@ -75,7 +75,7 @@ Regardless of which section a protocol is in, its card or list entry
 includes information about when it was last run and when it was added to
 this robot.
 
-##### PIN A PROTOCOL
+#### Pin a protocol
 
 Long press on a protocol and tap **Pin protocol** to move it to the
 pinned protocols section. Conversely, long press a pinned protocol and
@@ -87,7 +87,7 @@ height="4.145833333333333in"}
 You can pin up to eight protocols. When you hit the maximum, you'll need
 to unpin a protocol before pinning another one.
 
-##### SORT PROTOCOLS
+#### Sort protocols
 
 Tap any of the three headers --- Protocol Name, Last Run, or Date Added
 --- to sort the All Protocols section.
@@ -97,7 +97,7 @@ to newest for dates). Tap again to reverse the sort order. The current
 sort criterion is highlighted in blue and the current sort order is
 indicated by an upward or downward arrow.
 
-##### DELETE A PROTOCOL
+#### Delete a protocol
 
 Long press on a protocol and tap **Delete protocol** to delete it
 directly from the All Protocols screen. Flex will prompt you for
@@ -120,7 +120,7 @@ common protocol actions. An indicator at the top left of the screen
 shows whether the protocol is ready to run, or whether you need to
 perform additional setup.
 
-##### SUMMARY TAB
+#### Summary tab
 
 ##### ![image](c4ac2c592676c1e4eb13cfe059c71b4adfc975b6.jpg){width="10.416666666666666in" height="5.739583333333333in"}
 
@@ -136,7 +136,7 @@ The Summary tab shows:
 
 - **Date added:** Timestamp when Flex received the protocol file.
 
-##### PARAMETERS TAB
+#### Parameters tab
 
 ##### ![image](fb209c456b5aac466119391d81666a5f275210bb.jpg){width="10.458333333333334in" height="6.291666666666667in"}
 
@@ -151,7 +151,7 @@ define their names, descriptions, and possible values. See in the Python
 API documentation for information on defining parameters and using their
 values. JSON protocols do not currently support this feature.
 
-##### HARDWARE TAB
+#### Hardware tab
 
 ##### ![image](2090e3e55ee316d3941ca4c6380713dc7504fdbe.jpg){width="10.416666666666666in" height="6.260416666666667in"}
 
@@ -162,7 +162,7 @@ pipette mount, right pipette mount, both mounts (for the 96-channel
 pipette), or the extension mount (for the gripper). For modules and
 fixtures, the location is the deck slot or slots that the item occupies.
 
-##### LABWARE TAB
+#### Labware tab
 
 ##### ![image](57c184e35709ee6f5c2dbc1be852065ce15f2df8.jpg){width="10.416666666666666in" height="6.260416666666667in"}
 
@@ -174,7 +174,7 @@ labware.
 
 Opentrons-verified labware is indicated with a blue checkmark.
 
-##### LIQUIDS TAB
+#### Liquids tab
 
 ##### ![image](2644fdcaf696da50fa6ad5d542ce742120147d97.jpg){width="10.416666666666666in" height="6.052083333333333in"}
 
@@ -184,7 +184,7 @@ the protocol author), the liquid name, and the total volume of liquid
 used across all wells. Use the Deck tab to see well-by-well initial
 positions of liquids.
 
-##### DECK TAB
+#### Deck tab
 
 ##### ![image](35e39b3a9b2669d00b21639fb40b22ebcc4eb56b.jpg){width="10.416666666666666in" height="6.260416666666667in"}
 
@@ -196,7 +196,7 @@ contents of each deck slot, tap **Start setup**, then tap **Labware**,
 and then tap **Map View**. There you can tap on any labware to see its
 type and custom label (if set by the protocol).
 
-##### ACTION BUTTONS
+#### Action buttons
 
 On any of the protocol detail tabs, three action buttons are available:
 
@@ -280,7 +280,7 @@ touchscreen controls are used for different parameter types.
 
 - **CSV:** Choose from a file picker.
 
-##### USING CSV DATA
+#### Using CSV data
 
 Flex looks for CSV files in the root directory of an attached USB drive
 or files that were used in a previous run of the same protocol. You can
@@ -302,7 +302,7 @@ When working with CSV files, keep in mind that:
 - You must leave the USB drive attached until you start the run, or Flex
   won't be able to access the CSV data that you chose.
 
-##### CONFIRMING RUNTIME PARAMETERS
+#### Confirming runtime parameters
 
 Parameter and CSV file selections are still editable until you tap
 **Confirm values**. Modifications become read-only after that. To make
@@ -535,13 +535,13 @@ There are two sections of the quick transfer screen:
 The remainder of this section goes through quick transfer features in
 detail.
 
-##### CREATING A QUICK TRANSFER
+#### Creating a quick transfer
 
 From the Quick Transfer tab on the touchscreen, tap **+ Quick
 transfer.** This starts a guided setup. Follow the instructions on the
 screen. You can run, save, pin, or delete the transfer when finished.
 
-##### DECK SLOTS AND HARDWARE REQUIREMENTS
+#### Deck slots and hardware requirements
 
 Quick transfers require a Flex pipette, a tip rack in slot B2, source
 labware in slot C2, and destination labware in slot D2. For tip
@@ -556,7 +556,7 @@ height="3.3645833333333335in"}
 If everything is set up correctly, you'll move on to selecting pipettes
 and tips.
 
-##### PIPETTES AND TIPS
+#### Pipettes and tips
 
 Creating a quick transfer involves selecting a pipette and appropriate
 tips. Quick transfer can use any
@@ -566,7 +566,7 @@ selecting a pipette tip, try to match the tip to a pipette of the same
 capacity or larger. For best performance, use the smallest tips that can
 hold the amount of liquid you need to aspirate.
 
-##### LABWARE
+#### Labware
 
 Quick transfer works with most of the labware in the . It omits labware
 from the source and destination menus when those items are incompatible
@@ -575,7 +575,7 @@ aspirate or dispense from tube racks. If you select a multi-channel
 pipette, quick transfer won't let you choose a tube rack as a source or
 destination.
 
-##### WELL SELECTION
+#### Well selection
 
 Well selection depends upon the pipette and labware you're using. When
 using a 1-or 8-channel pipette and a 96-well plate, you select
@@ -603,7 +603,7 @@ wells, or want to start over, tap **Reset** to clear your selections.
 After making instrument and well selections, you'll set the transfer
 volume and give your new quick transfer a name.
 
-##### TRANSFER VOLUMES AND NAME
+#### Transfer volumes and name
 
 You'll set the amount of liquid to transfer (in μL) after specifying the
 source and destination wells. You'll also have a chance to name the
@@ -611,7 +611,7 @@ transfer after setting the transfer volume. A good, concise name helps
 you find a quick transfer in a list of saved or pinned transfers and
 indicates what it does.
 
-##### ADVANCED SETTINGS
+#### Advanced settings
 
 These are available after you name a quick transfer and before you save
 it. If some settings are familiar to you that's because they're the same
@@ -661,7 +661,7 @@ well.
 Change tip Replace the tip at the start of the transfer, before every
 aspirate, or per source well.
 
-##### MANAGING TRANSFERS
+#### Managing transfers
 
 Click **Create Transfer** when you're satisfied with your transfer
 settings. After creating a quick transfer, you can run, save, or delete
@@ -709,7 +709,7 @@ height="5.395833333333333in"}
   having problems with an instrument, Opentrons Support will want to
   know the serial number.
 
-##### ATTACH AN INSTRUMENT
+#### Attach an instrument
 
 Choose an empty mount and then choose the type of instrument to install.
 Then connect and secure the instrument using its captive mounting
@@ -722,7 +722,7 @@ pipette already attached and you attempt to install the 96-channel
 pipette on the other mount, the touchscreen will give you instructions
 for detaching the 8-channel so the 96-channel can occupy both mounts.
 
-##### DETACH AN INSTRUMENT
+#### Detach an instrument
 
 Choose an attached instrument that you want to detach. Then loosen the
 instrument's captive mounting screws and remove it from the gantry. For
@@ -730,7 +730,7 @@ more details, follow the instructions on the touchscreen. Exact removal
 steps depend on the instrument you choose and the current setup of your
 robot.
 
-##### RECALIBRATE AN INSTRUMENT
+#### Recalibrate an instrument
 
 Choose an attached instrument that you want to recalibrate. Then connect
 the instrument's calibration probe or pin and begin the automated
@@ -851,7 +851,7 @@ among the various components installed on the robot.
 For more information on which fixtures you can configure in which slots,
 see the in the System Description chapter.
 
-##### ADDING AND REMOVING FIXTURES
+#### Adding and removing fixtures
 
 To add deck fixtures via the touchscreen:
 
@@ -878,7 +878,7 @@ A Flex configured with a staging area slot in D3, and no other fixtures.
 You can also configure the deck in the Opentrons App, on the robot
 details page for your Flex.
 
-##### RESOLVING DECK CONFLICTS
+#### Resolving deck conflicts
 
 Flex displays orange warning prompts when setting up a protocol run that
 conflicts with the current deck configuration. To resolve the conflict:
@@ -903,7 +903,7 @@ height="8.6875in"}
 This protocol requires a Heater-Shaker in slot D3, but the deck
 configuration indicates that the waste chute is in that location.
 
-##### FIXTURE STATUSES
+#### Fixture statuses
 
 The following table defines the statuses the robot generates when it
 compares its configured deck fixtures to your protocol.
@@ -942,7 +942,7 @@ locations. Configuration status is good.
 **Not connected** The module is not connected to the robot or is powered
 off. Once connected, there will be no location conflict.
 
-1.  **Opentrons App**
+## Opentrons App
 
 ### App installation
 
@@ -1132,7 +1132,7 @@ Proceeding to the Run Setup screen generates an entry in the list and
 counts towards the maximum of 20 runs, even if you never begin the
 protocol.
 
-1.  **Advanced operation**
+## Advanced operation
 
 ### Jupyter Notebook
 
