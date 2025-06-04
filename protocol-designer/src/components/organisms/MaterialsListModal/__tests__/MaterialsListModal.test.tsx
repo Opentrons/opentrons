@@ -94,7 +94,7 @@ describe('MaterialsListModal', () => {
   it('should render render text', () => {
     render(props)
     screen.getByText('Materials list')
-    screen.getByText('Deck Hardware')
+    screen.getByText('Deck hardware')
     screen.getByText('Labware')
     screen.getByText('Liquids')
   })
