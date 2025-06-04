@@ -2202,11 +2202,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [10.0, 0.0],
-              [100.0, 0.0],
-              [1000.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -2457,11 +2453,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [10.0, 0.0],
-              [100.0, 0.0],
-              [1000.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -3739,11 +3731,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [10.0, 0.0],
-              [100.0, 0.0],
-              [1000.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -3994,11 +3982,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [10.0, 0.0],
-              [100.0, 0.0],
-              [1000.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -5276,11 +5260,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [10.0, 0.0],
-              [100.0, 0.0],
-              [1000.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -5531,11 +5511,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [10.0, 0.0],
-              [100.0, 0.0],
-              [1000.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
