@@ -91,7 +91,7 @@ jobs:
     needs: collect-chunks
     strategy:
       matrix:
-        include: ${{ fromJson(needs.collect-chunks.outputs.matrix_json) }}
+        chunk: ${{ fromJson(needs.collect-chunks.outputs.matrix_json) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -113,11 +113,11 @@ jobs:
           name: chunks
           path: analyses-snapshot-testing/chunks/
       - name: Generate Analyses from Chunk
-        run: make analyze-chunk CHUNK=${{ matrix.chunk_id }}
+        run: make analyze-chunk CHUNK=${{ matrix.chunk.chunk_id }}
       - name: Upload Analysis Results
         uses: actions/upload-artifact@v4
         with:
-          name: analyzed-${{ matrix.chunk_id }}
+          name: analyzed-${{ matrix.chunk.chunk_id }}
           path: analyses-snapshot-testing/analysis_results
 
   execute-tests:

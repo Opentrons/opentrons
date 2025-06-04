@@ -63,7 +63,7 @@ def generate_protocol_chunks() -> None:
 
     # Write out matrix.json
     with open(MATRIX_FILE, "w") as f:
-        json.dump({"include": matrix_entries}, f, indent=2)
+        json.dump(matrix_entries, f, indent=2)
 
     print(f"✅ Created {len(chunks)} chunks for matrix job input.")
 
