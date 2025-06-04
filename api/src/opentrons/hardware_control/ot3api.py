@@ -303,11 +303,6 @@ class OT3API(
     async def get_serial_number(self) -> Optional[str]:
         return await self._backend.get_serial_number()
 
-    async def set_system_constraints_for_calibration(self) -> None:
-        self._backend.update_constraints_for_calibration_with_gantry_load(
-            self._gantry_load
-        )
-
     async def set_system_constraints_for_plunger_acceleration(
         self, mount: OT3Mount, acceleration: float
     ) -> None:
