@@ -437,10 +437,11 @@ export const getAAByAAId = (
   deckDefinition: DeckDefinition
 ): AddressableAreaWithFakes => {
   const deckDefWithFakeLocations = getDeckDefAAWithFakeAA(deckDefinition)
+  // there should be a match with addressableAreaId
   const aaItem = deckDefWithFakeLocations.locations.addressableAreas.find(
     (aaItem: AddressableAreaWithFakes) => aaItem.id === addressableAreaId
-  )
-  if (aaItem == undefined) {
+  ) as AddressableAreaWithFakes
+  if (aaItem == null) {
     console.error(`Could not find AddressableArea for ${addressableAreaId}`)
   }
   return aaItem

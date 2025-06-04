@@ -408,10 +408,10 @@ export interface DeckCalibrationPoint {
   displayName: string
 }
 
-type cutoutIdToCutoutFixtureId = { [cutoutId in CutoutId]?: CutoutFixtureId }
+type CutoutIdToCutoutFixtureId = { [cutoutId in CutoutId]?: CutoutFixtureId }
 
 export type CutoutFixtureGroup = {
-  [cutoutId in CutoutId]?: Array<cutoutIdToCutoutFixtureId>
+  [cutoutId in CutoutId]?: Array<CutoutIdToCutoutFixtureId>
 }
 
 export interface CutoutFixture {

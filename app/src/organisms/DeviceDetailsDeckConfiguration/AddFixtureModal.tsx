@@ -68,6 +68,7 @@ import type {
   CutoutId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { ConnectRobotSlideout } from '../Desktop/AppSettings/ConnectRobotSlideout'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -130,11 +131,15 @@ export function AddFixtureModal({
     width: '26.75rem',
   }
 
-  const aaNameMapToSlotId = {
-    flexStackerModuleV1D4: 'D4',
-    flexStackerModuleV1C4: 'C4',
-    flexStackerModuleV1B4: 'B4',
-    flexStackerModuleV1A4: 'A4',
+  const aaNameMapToSlotId: Record<AddressableAreaName, string> = {
+    D4 :"fakeD4",
+    C4: "fakeC4",
+    B4: "fakeB4",
+    A4: "fakeA4",
+    flexStackerModuleV1D4: 'fakeD4',
+    flexStackerModuleV1C4: 'fakeC4',
+    flexStackerModuleV1B4: 'fakeB4',
+    flexStackerModuleV1A4: 'fakeA4',
     magneticBlockV1D1: 'D1',
     magneticBlockV1C1: 'C1',
     magneticBlockV1B1: 'B1',
@@ -167,6 +172,14 @@ export function AddFixtureModal({
     heaterShakerV1C3: 'C3',
     heaterShakerV1B3: 'B3',
     heaterShakerV1A3: 'A3',
+    movableTrashD1: 'D1',
+    movableTrashC1: 'C1',
+    movableTrashB1: 'B1',
+    movableTrashA1: 'A1',
+    movableTrashD3: 'D3',
+    movableTrashC3: 'C3',
+    movableTrashB3: 'B3',
+    movableTrashA3: 'A3'
   } as const
 
   const MODULE_CUTOUT_FIXTURE_ID = [
@@ -181,23 +194,29 @@ export function AddFixtureModal({
     'flexStackerModuleV1WithMagneticBlockV1',
   ]
 
+  const getFlexDeckDefAAByFixtureIdForCutoutId = (
+    cutoutId: CutoutId
+  ): Record<CutoutFixtureId, AddressableAreaNamesWithFakes[]> => {
+    const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+    const availableCutoutFixtuers = deckDef.cutoutFixtures.filter(cf =>
+      cf.mayMountTo.includes(cutoutId)
+    )
+
+    return availableCutoutFixtuers.reduce(
+      (acc, { id, providesAddressableAreas }) => {
+        return { ...acc, [id]: providesAddressableAreas[cutoutId] }
+      },
+      {} as Record<CutoutFixtureId, AddressableAreaNamesWithFakes[]>
+    )
+  }
+
   const getModuleUnconfiguredFixtures = (
     unconfiguredMods: AttachedModule[],
     cutoutId: CutoutId,
     moduleModel: string
   ): CutoutConfigMap[][] => {
-    const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-    const availableCutoutFixtuers = deckDef.cutoutFixtures.filter(
-      cf =>
-        cf.mayMountTo.includes(cutoutId) &&
-        MODULE_CUTOUT_FIXTURE_ID.includes(cf.id)
-    )
-
-    const addressableAreasById = availableCutoutFixtuers.reduce(
-      (acc, { id, providesAddressableAreas }) => {
-        return { ...acc, [id]: providesAddressableAreas[cutoutId] }
-      },
-      {} as Record<CutoutFixtureId, AddressableAreaNamesWithFakes[]>
+    const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
+      cutoutId
     )
 
     console.log('addressableAreasById: ', addressableAreasById)
@@ -210,19 +229,46 @@ export function AddFixtureModal({
     let stackerOptions: CutoutConfigMap[][] = []
     if (moduleModel === FLEX_STACKER_MODULE_V1) {
       filteredMods.forEach((mod: AttachedModule) => {
-        stackerOptions.push([
-          {
-            cutoutId,
-            cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-            opentronsModuleSerialNumber: mod.serialNumber,
-          },
-        ])
+        const aaListStackerMagBlock =
+          addressableAreasById[FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE]
+        if (aaListStackerMagBlock != null) {
+          const aaStackerMagBlock = aaListStackerMagBlock.find(
+            (aa: AddressableAreaNamesWithFakes) =>
+              aaNameMapToSlotId[aa] == addressableArea.id
+          ) as AddressableAreaNamesWithFakes
+          stackerOptions.push([
+            {
+              cutoutId,
+              cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+              addressableAreaId: aaStackerMagBlock,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+        }
         if (cutoutId == 'cutoutD3') {
+          const aaListWithCover =
+            addressableAreasById[
+              FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE
+            ]
+          const aaListWithNoCover =
+            addressableAreasById[
+              FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+            ]
+
+          const aaWithCover = aaListWithCover.find(
+            (aa: AddressableAreaNamesWithFakes) =>
+              aaNameMapToSlotId[aa] == addressableArea.id
+          ) as AddressableAreaNamesWithFakes
+          const aaWithNoCover = aaListWithNoCover.find(
+            (aa: AddressableAreaNamesWithFakes) =>
+              aaNameMapToSlotId[aa] == addressableArea.id
+          ) as AddressableAreaNamesWithFakes
           stackerOptions.push(
             [
               {
                 cutoutId,
                 cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+                addressableAreaId: aaWithCover,
                 opentronsModuleSerialNumber: mod.serialNumber,
               },
             ],
@@ -230,6 +276,7 @@ export function AddFixtureModal({
               {
                 cutoutId,
                 cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+                addressableAreaId: aaWithNoCover,
                 opentronsModuleSerialNumber: mod.serialNumber,
               },
             ]
@@ -238,25 +285,24 @@ export function AddFixtureModal({
         const cutoutFixtureId = keys.find(
           key => key == moduleModel
         ) as CutoutFixtureId
-        const aaList = addressableAreasById[cutoutFixtureId]
-
-        console.log('aaList: ', aaList)
-        const aa = aaList.find(
-          aa => aaNameMapToSlotId[aa] == addressableArea.id
-        )
-        console.log('aa', aa)
-        if (aa == undefined) {
-          console.error(`Was not able to find aa for ${addressableArea.id}`)
-        }
-        else{
-          stackerOptions.push([
-            {
-              cutoutId,
-              addressableAreaId: aa,
-              cutoutFixtureId,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
+        const flexStackerAAItems = addressableAreasById[cutoutFixtureId]
+        if (flexStackerAAItems != null) {
+          const aa = flexStackerAAItems.find(
+            aa => aaNameMapToSlotId[aa] == addressableArea.id
+          )
+          console.log('aa', aa)
+          if (aa == undefined) {
+            console.error(`Was not able to find aa for ${addressableArea.id}`)
+          } else {
+            stackerOptions.push([
+              {
+                cutoutId,
+                addressableAreaId: aa,
+                cutoutFixtureId,
+                opentronsModuleSerialNumber: mod.serialNumber,
+              },
+            ])
+          }
         }
       })
       return [...stackerOptions]
@@ -285,6 +331,39 @@ export function AddFixtureModal({
         ]
       })
     }
+  }
+
+  const getThermoUnconfiguredFixtures = (
+    unconfiguredMods: AttachedModule[],
+    cutoutId: CutoutId
+  ): CutoutConfigMap[][] => {
+    const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+
+    const availableCutoutFixtuers = deckDef.cutoutFixtures.filter(
+      cf =>
+        cf.mayMountTo.includes(cutoutId) &&
+        MODULE_CUTOUT_FIXTURE_ID.includes(cf.id)
+    )
+    const fixtureGroup = availableCutoutFixtuers.map(
+      mod => mod.fixtureGroup[cutoutId] ?? []
+    )
+    const fixtureGroupItem = fixtureGroup.filter(x => x.length > 0)
+    console.log('fixtureGroupItem: ', fixtureGroupItem)
+
+    const matrix = unconfiguredMods
+      .filter(f => f.moduleModel === THERMOCYCLER_MODULE_V2)
+      .map(item =>
+        Object.keys(fixtureGroupItem).map((mod: string) => ({
+          cutoutId: mod as CutoutId,
+          addressableAreaId: THERMOCYCLER_MODULE_V2,
+          // how can I fix this to only pull the ones that are set?
+          cutoutFixtureId:
+            fixtureGroupItem[mod as keyof typeof fixtureGroupItem] ??
+            ('' as CutoutFixtureId),
+          opentronsModuleSerialNumber: item.serialNumber,
+        }))
+      )
+    return matrix
   }
 
   const getUnconfiguredMods = (
@@ -335,25 +414,48 @@ export function AddFixtureModal({
   const getModuleOptions = (
     cutoutId: CutoutId,
     unconfiguredMods: AttachedModule[]
-  ): CutoutConfig[][] => {
-    let availableOptions: CutoutConfig[][] = [
-      [
-        {
-          cutoutId,
-          cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
-        },
-      ],
-    ]
-    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
+  ): CutoutConfigMap[][] => {
+    let availableOptions: CutoutConfigMap[][] = []
+
+    const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
+      cutoutId
+    )
+    const aaListMagBlock = addressableAreasById[MAGNETIC_BLOCK_V1_FIXTURE]
+    if (aaListMagBlock != null) {
+      const aaMagBlock = aaListMagBlock.find(
+        (aa: AddressableAreaNamesWithFakes) =>
+          aaNameMapToSlotId[aa] == addressableArea.id
+      ) as AddressableAreaNamesWithFakes
+        availableOptions.push([
           {
             cutoutId,
-            cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-          },
-        ],
-      ]
+            cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
+            addressableAreaId: aaMagBlock,
+          }]
+      )
+    }
+    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+      const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
+        cutoutId
+      )
+      const aaListStagingAndMagBlock =
+        addressableAreasById[STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE]
+      if (aaListStagingAndMagBlock != null) {
+        const aaMagBlockWithStaging = aaListMagBlock.find(
+          (aa: AddressableAreaNamesWithFakes) =>
+            aaNameMapToSlotId[aa] == addressableArea.id
+        ) as AddressableAreaNamesWithFakes
+        availableOptions = [
+          ...availableOptions,
+          [
+            {
+              cutoutId,
+              cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+              addressableAreaId: aaMagBlockWithStaging,
+            },
+          ],
+        ]
+      }
     }
     if (unconfiguredMods.length > 0) {
       availableOptions = [
@@ -364,33 +466,55 @@ export function AddFixtureModal({
     return availableOptions
   }
 
-  const getFixtureOptions = (cutoutId: CutoutId): CutoutConfig[][] => {
-    let availableOptions: CutoutConfig[][] = []
-    if (
-      SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
-      SINGLE_LEFT_CUTOUTS.includes(cutoutId)
-    ) {
+  const getFixtureOptions = (cutoutId: CutoutId): CutoutConfigMap[][] => {
+    let availableOptions: CutoutConfigMap[][] = []
+      const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
+        cutoutId
+      )
+      console.log("addressableAreasById: ", addressableAreasById)
+      const aaListTrashBin =
+        addressableAreasById[TRASH_BIN_ADAPTER_FIXTURE]
+        console.log("aaListTrashBin: ", aaListTrashBin)
+        console.log(" aaNameMapToSlotId[aa]: ",  aaListTrashBin[0])
+        console.log("addressableArea.id: ", addressableArea.id)
+      if (aaListTrashBin != null) {
+        const TrashBinAA = aaListTrashBin.find(
+          (aa: AddressableAreaNamesWithFakes) =>
+            aaNameMapToSlotId[aa] == addressableArea.id
+        ) as AddressableAreaNamesWithFakes
+        console.log("TrashBinAA: ", TrashBinAA)
+        if(TrashBinAA != null){
       availableOptions = [
         ...availableOptions,
         [
           {
             cutoutId,
             cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+            addressableAreaId: TrashBinAA
           },
         ],
       ]
     }
-    if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
+  }
+    const aaListStagingArea =
+        addressableAreasById[STAGING_AREA_RIGHT_SLOT_FIXTURE]
+      if (aaListStagingArea != null) {
+        const stagingAreaAA = aaListStagingArea.find(
+          (aa: AddressableAreaNamesWithFakes) =>
+            aaNameMapToSlotId[aa] == addressableArea.id
+        ) as AddressableAreaNamesWithFakes
       availableOptions = [
         ...availableOptions,
         [
           {
             cutoutId,
             cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+            addressableAreaId: stagingAreaAA
           },
         ],
       ]
     }
+    console.log("availableOptions: ", availableOptions)
     return availableOptions
   }
 
@@ -399,7 +523,7 @@ export function AddFixtureModal({
     providedFixtureOptions: CutoutFixtureId[] | undefined,
     unconfiguredMods: AttachedModule[],
     optionStage: string
-  ): CutoutConfig[][] => {
+  ): CutoutConfigMap[][] => {
     if (providedFixtureOptions != null) {
       return providedFixtureOptions?.map(o => [
         {
@@ -491,37 +615,6 @@ export function AddFixtureModal({
 
     updateDeckConfiguration(newDeckConfig)
     closeModal()
-  }
-
-  const getThermoUnconfiguredFixtures = (
-    unconfiguredMods: AttachedModule[],
-    cutoutId: CutoutId
-  ): CutoutConfigMap[][] => {
-    const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-
-    const availableCutoutFixtuers = deckDef.cutoutFixtures.filter(
-      cf =>
-        cf.mayMountTo.includes(cutoutId) &&
-        MODULE_CUTOUT_FIXTURE_ID.includes(cf.id)
-    )
-    const fixtureGroup = availableCutoutFixtuers.map(
-      mod => mod.fixtureGroup[cutoutId] ?? []
-    )
-    const fixtureGroupItem = fixtureGroup[0][0]
-    const matrix = unconfiguredMods
-      .filter(f => f.moduleModel === THERMOCYCLER_MODULE_V2)
-      .map(item =>
-        Object.keys(fixtureGroupItem).map((mod: string) => ({
-          cutoutId: mod as CutoutId,
-          addressableAreaId: THERMOCYCLER_MODULE_V2,
-          // how can I fix this to only pull the ones that are set?
-          cutoutFixtureId:
-            fixtureGroupItem[mod as keyof typeof fixtureGroupItem] ??
-            ('' as CutoutFixtureId),
-          opentronsModuleSerialNumber: item.serialNumber,
-        }))
-      )
-    return matrix
   }
 
   const fixtureOptions = availableOptions.map(cutoutConfigs => {
