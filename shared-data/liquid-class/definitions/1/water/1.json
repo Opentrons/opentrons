@@ -1,7 +1,9 @@
 {
   "liquidClassName": "water",
-  "displayName": "Water",
+  "displayName": "Aqueous",
+  "description": "Deionized water",
   "schemaVersion": 1,
+  "version": 1,
   "namespace": "opentrons",
   "byPipette": [
     {
@@ -11,11 +13,13 @@
           "tiprack": "opentrons/opentrons_flex_96_tiprack_50ul/1",
           "aspirate": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -26,11 +30,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -42,7 +48,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -53,11 +59,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "aspiratePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [
               [1.0, 35.0],
@@ -82,11 +90,13 @@
           },
           "singleDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -97,11 +107,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -116,7 +128,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -127,11 +139,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[1.0, 50.0]],
             "correctionByVolume": [[0.0, 0.0]],
@@ -158,11 +172,13 @@
           },
           "multiDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -173,11 +189,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -192,7 +210,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -203,11 +221,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[50.0, 50.0]],
             "correctionByVolume": [[0.0, 0.0]],
@@ -238,11 +258,13 @@
           "tiprack": "opentrons/opentrons_flex_96_tiprack_50ul/1",
           "aspirate": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -253,11 +275,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -269,7 +293,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -280,11 +304,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "aspiratePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [
               [1.0, 35.0],
@@ -309,11 +335,13 @@
           },
           "singleDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -324,11 +352,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -343,7 +373,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -354,12 +384,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
-            },
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
+              },
             "flowRateByVolume": [[1.0, 50.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
@@ -385,11 +417,13 @@
           },
           "multiDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -400,11 +434,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -419,7 +455,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -430,11 +466,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[1.0, 50.0]],
             "correctionByVolume": [[0.0, 0.0]],
@@ -465,11 +503,13 @@
           "tiprack": "opentrons/opentrons_flex_96_tiprack_50ul/1",
           "aspirate": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -480,11 +520,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -496,7 +538,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -507,11 +549,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "aspiratePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [
               [5.0, 318.0],
@@ -536,11 +580,13 @@
           },
           "singleDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                    "x": 0,
+                    "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -551,13 +597,15 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
-              "speed": 50,
+            "speed": 50,
               "airGapByVolume": [
                 [1.0, 1.0],
                 [49.0, 1.0],
@@ -570,7 +618,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -581,12 +629,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
-            },
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+            }
+              },
             "flowRateByVolume": [
               [5.0, 318.0],
               [10.0, 478.0],
@@ -610,11 +660,13 @@
           },
           "multiDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -625,11 +677,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -644,7 +698,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -655,12 +709,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
-            },
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+            }
+              },
             "flowRateByVolume": [
               [5.0, 318.0],
               [10.0, 478.0],
@@ -689,11 +745,13 @@
           "tiprack": "opentrons/opentrons_flex_96_tiprack_200ul/1",
           "aspirate": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -704,11 +762,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -720,7 +780,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -731,11 +791,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "aspiratePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
@@ -756,11 +818,13 @@
           },
           "singleDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -771,11 +835,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -790,7 +856,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -801,12 +867,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
-            },
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+            }
+              },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
@@ -826,11 +894,13 @@
           },
           "multiDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -841,11 +911,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -860,7 +932,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -871,12 +943,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
-            },
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+            }
+              },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
@@ -901,11 +975,13 @@
           "tiprack": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
           "aspirate": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -916,11 +992,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -932,7 +1010,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -943,12 +1021,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
+            "aspiratePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
               "z": -1.5
-            },
+            }
+              },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "preWet": false,
@@ -968,11 +1048,13 @@
           },
           "singleDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -983,13 +1065,15 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
-              "speed": 50,
+            "speed": 50,
               "airGapByVolume": [
                 [10.0, 10.0],
                 [990.0, 10.0],
@@ -1002,7 +1086,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1013,12 +1097,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
-            },
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
+              },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
@@ -1038,11 +1124,13 @@
           },
           "multiDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -1053,11 +1141,13 @@
               }
             },
             "retract": {
+              "endPosition":  {
               "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -1072,7 +1162,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1083,12 +1173,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
-            },
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
+              },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
@@ -1118,11 +1210,13 @@
           "tiprack": "opentrons/opentrons_flex_96_tiprack_50ul/1",
           "aspirate": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -1133,13 +1227,15 @@
               }
             },
             "retract": {
+              "endPosition":{
               "positionReference": "well-top",
               "offset": {
                 "x": 0,
-                "y": 0,
-                "z": 2
-              },
-              "speed": 50,
+                  "y": 0,
+                  "z": 2
+              }
+            },
+            "speed": 50,
               "airGapByVolume": [
                 [1.0, 1.0],
                 [49.0, 1.0],
@@ -1149,7 +1245,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1160,12 +1256,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
+            "aspiratePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
               "z": -1.5
-            },
+            }
+              },
             "flowRateByVolume": [
               [5.0, 318.0],
               [10.0, 478.0],
@@ -1189,11 +1287,13 @@
           },
           "singleDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -1204,11 +1304,13 @@
               }
             },
             "retract": {
+              "endPosition":  {
               "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -1223,7 +1325,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1234,12 +1336,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
               "z": -1.5
-            },
+            }
+              },
             "flowRateByVolume": [
               [5.0, 318.0],
               [10.0, 478.0],
@@ -1263,11 +1367,13 @@
           },
           "multiDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -1278,11 +1384,13 @@
               }
             },
             "retract": {
+              "endPosition":  {
               "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -1297,7 +1405,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1308,12 +1416,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
             "offset": {
               "x": 0,
               "y": 0,
               "z": -1.5
-            },
+            }
+              },
             "flowRateByVolume": [
               [5.0, 318.0],
               [10.0, 478.0],
@@ -1342,11 +1452,13 @@
           "tiprack": "opentrons/opentrons_flex_96_tiprack_200ul/1",
           "aspirate": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -1357,11 +1469,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition":  {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -1373,7 +1487,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1384,12 +1498,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
+            "aspiratePosition": {
+              "positionReference": "liquid-meniscus",
             "offset": {
               "x": 0,
               "y": 0,
               "z": -1.5
-            },
+            }
+              },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "preWet": false,
@@ -1409,11 +1525,13 @@
           },
           "singleDispense": {
             "submerge": {
-              "positionReference": "well-top",
+              "startPosition": {
+                "positionReference": "well-top",
               "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -1424,11 +1542,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition":  {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -1443,7 +1563,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1454,12 +1574,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
               "z": -1.5
-            },
+            }
+              },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
@@ -1479,11 +1601,13 @@
           },
           "multiDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -1494,11 +1618,13 @@
               }
             },
             "retract": {
+              "endPosition":  {
               "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -1513,7 +1639,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1524,12 +1650,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
             "offset": {
               "x": 0,
               "y": 0,
               "z": -1.5
-            },
+            }
+              },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
@@ -1554,11 +1682,13 @@
           "tiprack": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
           "aspirate": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -1569,11 +1699,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -1585,7 +1717,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1596,12 +1728,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
+            "aspiratePosition": {
+              "positionReference": "liquid-meniscus",
             "offset": {
               "x": 0,
               "y": 0,
               "z": -1.5
-            },
+            }
+              },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "preWet": false,
@@ -1621,11 +1755,13 @@
           },
           "singleDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -1636,11 +1772,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 50,
               "airGapByVolume": [
@@ -1655,7 +1793,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1666,12 +1804,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
               "z": -1.5
-            },
+            }
+              },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
@@ -1691,11 +1831,13 @@
           },
           "multiDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 100,
               "delay": {
@@ -1706,12 +1848,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }},
               "speed": 50,
               "airGapByVolume": [
                 [10.0, 10.0],
@@ -1725,7 +1868,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1736,12 +1879,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
             "offset": {
               "x": 0,
               "y": 0,
               "z": -1.5
-            },
+            }
+              },
             "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
@@ -1771,11 +1916,13 @@
           "tiprack": "opentrons/opentrons_flex_96_tiprack_50ul/1",
           "aspirate": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 35,
               "delay": {
@@ -1786,11 +1933,13 @@
               }
             },
             "retract": {
+              "endPosition": {
               "positionReference": "well-top",
               "offset": {
                 "x": 0,
-                "y": 0,
-                "z": 2
+                  "y": 0,
+                  "z": 2
+              }
               },
               "speed": 35,
               "airGapByVolume": [
@@ -1802,7 +1951,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1813,11 +1962,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "aspiratePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[1.0, 200.0]],
             "correctionByVolume": [[0.0, 0.0]],
@@ -1838,11 +1989,13 @@
           },
           "singleDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 35,
               "delay": {
@@ -1853,11 +2006,13 @@
               }
             },
             "retract": {
+              "endPosition":  {
               "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }
               },
               "speed": 35,
               "airGapByVolume": [
@@ -1872,7 +2027,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1883,12 +2038,14 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
             "offset": {
               "x": 0,
               "y": 0,
               "z": -1.5
-            },
+            }
+              },
             "flowRateByVolume": [[1.0, 200.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
@@ -1908,11 +2065,13 @@
           },
           "multiDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 35,
               "delay": {
@@ -1923,12 +2082,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }},
               "speed": 35,
               "airGapByVolume": [
                 [1.0, 1.0],
@@ -1942,7 +2102,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1953,11 +2113,13 @@
                 }
               }
             },
+            "dispensePosition": {
             "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[1.0, 200.0]],
             "correctionByVolume": [[0.0, 0.0]],
@@ -1983,11 +2145,13 @@
           "tiprack": "opentrons/opentrons_flex_96_tiprack_200ul/1",
           "aspirate": {
             "submerge": {
+              "startPosition": {
               "positionReference": "well-top",
               "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 35,
               "delay": {
@@ -1998,12 +2162,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }},
               "speed": 35,
               "airGapByVolume": [
                 [1.0, 5.0],
@@ -2014,7 +2179,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2025,11 +2190,13 @@
                 }
               }
             },
+            "aspiratePosition": {
             "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[1.0, 200.0]],
             "correctionByVolume": [[0.0, 0.0]],
@@ -2050,11 +2217,13 @@
           },
           "singleDispense": {
             "submerge": {
+              "startPosition": {
               "positionReference": "well-top",
               "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 35,
               "delay": {
@@ -2065,11 +2234,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                    "z": 2
+                }
               },
               "speed": 35,
               "airGapByVolume": [
@@ -2084,7 +2255,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2095,11 +2266,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[1.0, 200.0]],
             "correctionByVolume": [[0.0, 0.0]],
@@ -2120,11 +2293,13 @@
           },
           "multiDispense": {
             "submerge": {
+              "startPosition": {
               "positionReference": "well-top",
               "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 35,
               "delay": {
@@ -2135,12 +2310,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
-              },
+              "endPosition":  {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                    "y": 0,
+                    "z": 2
+                }},
               "speed": 35,
               "airGapByVolume": [
                 [1.0, 5.0],
@@ -2154,7 +2330,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2165,11 +2341,13 @@
                 }
               }
             },
+            "dispensePosition": {
             "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[1.0, 200.0]],
             "correctionByVolume": [[0.0, 0.0]],
@@ -2195,11 +2373,13 @@
           "tiprack": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
           "aspirate": {
             "submerge": {
+              "startPosition": {
               "positionReference": "well-top",
               "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 35,
               "delay": {
@@ -2210,11 +2390,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                    "z": 2
+                }
               },
               "speed": 35,
               "airGapByVolume": [
@@ -2226,7 +2408,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2237,11 +2419,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "aspiratePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[1.0, 200.0]],
             "correctionByVolume": [[0.0, 0.0]],
@@ -2262,11 +2446,13 @@
           },
           "singleDispense": {
             "submerge": {
+              "startPosition": {
               "positionReference": "well-top",
               "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 35,
               "delay": {
@@ -2277,11 +2463,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                    "z": 2
+                }
               },
               "speed": 35,
               "airGapByVolume": [
@@ -2296,7 +2484,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2307,11 +2495,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[1.0, 200.0]],
             "correctionByVolume": [[0.0, 0.0]],
@@ -2332,11 +2522,13 @@
           },
           "multiDispense": {
             "submerge": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "startPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 35,
               "delay": {
@@ -2347,11 +2539,13 @@
               }
             },
             "retract": {
-              "positionReference": "well-top",
-              "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2
+              "endPosition": {
+                "positionReference": "well-top",
+                "offset": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 2
+                }
               },
               "speed": 35,
               "airGapByVolume": [
@@ -2366,7 +2560,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmToEdge": 0.5,
+                  "mmFromEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2377,11 +2571,13 @@
                 }
               }
             },
-            "positionReference": "liquid-meniscus",
-            "offset": {
-              "x": 0,
-              "y": 0,
-              "z": -1.5
+            "dispensePosition": {
+              "positionReference": "liquid-meniscus",
+              "offset": {
+                "x": 0,
+                "y": 0,
+                "z": -1.5
+              }
             },
             "flowRateByVolume": [[1.0, 200.0]],
             "correctionByVolume": [[0.0, 0.0]],
