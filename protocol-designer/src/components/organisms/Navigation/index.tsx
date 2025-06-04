@@ -82,7 +82,6 @@ export function Navigation(): JSX.Element | null {
 }
 
 const StyledLabel = styled.label`
-  height: 1.25rem;
   cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;

@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
+import { ALIGN_CENTER } from '../../styles'
 import { CURSOR_NOT_ALLOWED, CURSOR_POINTER } from '../../styles/cursor'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { StyledText } from '../StyledText/StyledText'
@@ -48,7 +49,7 @@ export function BasicButton({
       {...props}
     >
       {iconName != null ? (
-        <Flex alignItems="center" gap={SPACING.spacing8}>
+        <Flex alignItems={ALIGN_CENTER} gap={SPACING.spacing8}>
           <Icon
             name={iconName}
             size="1.25rem"
