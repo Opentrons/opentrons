@@ -1131,6 +1131,18 @@ class LabwareView:
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} cannot be loaded onto labware {below_labware.loadName}"
             )
+        elif (
+            labware_validation.validate_definition_is_lid(top_labware_definition)
+            and top_labware_definition.compatibleParentLabware is not None
+            and self.get_load_name(bottom_labware_id)
+            not in top_labware_definition.compatibleParentLabware
+        ):
+            # This parent is assumed to be compatible, unless the lid enumerates
+            # all its compatible parents and this parent is missing from the list.
+            raise ValueError(
+                f"Labware Lid {top_labware_definition.parameters.loadName} may not be loaded on parent labware"
+                f" {self.get_display_name(bottom_labware_id)}."
+            )
         elif isinstance(below_labware.location, ModuleLocation):
             below_definition = self.get_definition(labware_id=below_labware.id)
             if not labware_validation.validate_definition_is_adapter(
