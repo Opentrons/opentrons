@@ -24,7 +24,7 @@ export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
     },
   ]
   const errors: CommandCreatorError[] = []
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
       errorCreators.noTipOnPipette({
         actionName: 'aspirate',

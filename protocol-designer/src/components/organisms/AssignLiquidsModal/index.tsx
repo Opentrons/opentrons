@@ -41,11 +41,12 @@ const CONTAINER_WIDTH = '49.8125rem'
 
 interface AssignLiquidsModalProps {
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
+  setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
 }
 export function AssignLiquidsModal(
   props: AssignLiquidsModalProps
 ): JSX.Element | null {
-  const { showLiquidOverflowMenu } = props
+  const { showLiquidOverflowMenu, setDefineLiquidModal } = props
   const { t } = useTranslation('liquids')
   const [highlightedWells, setHighlightedWells] = useState<WellGroup | {}>({})
   const [showBadFormState, setShowBadFormState] = useState(false)
@@ -187,6 +188,7 @@ export function AssignLiquidsModal(
         <LiquidToolbox
           showBadFormState={showBadFormState}
           setShowBadFormState={setShowBadFormState}
+          setDefineLiquidModal={setDefineLiquidModal}
         />
       </Flex>
     </Flex>
