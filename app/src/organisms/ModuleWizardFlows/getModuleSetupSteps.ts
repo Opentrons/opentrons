@@ -25,6 +25,7 @@ export const getModuleSetupSteps = (
         { section: SECTIONS.SELECT_LOCATION },
         { section: SECTIONS.CLOSE_DOOR },
         { section: SECTIONS.INSTALL_SHUTTLE },
+        { section: SECTIONS.SHUTTLE_VALIDATION },
         { section: SECTIONS.SUCCESS },
       ]
     default:

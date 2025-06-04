@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { COLORS, LegacyStyledText } from '@opentrons/components'
+import { COLORS, LegacyStyledText, PrimaryButton } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import { i18n } from '/app/i18n'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -22,6 +23,7 @@ import { SelectModule } from './SelectModule'
 import { Success } from './Success'
 import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
+import { ValidateShuttle } from './ValidateShuttle'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { PipetteInformation } from '/app/redux/pipettes'
@@ -309,6 +311,27 @@ export const ModuleWizardFlows = (
           totalStepCount={totalStepCount}
         >
           <InstallShuttle
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            deckConfig={deckConfig}
+            attachedModule={
+              wizardFlowBaseProps.attachedModule as AttachedModule
+            }
+            attachedPipette={
+              wizardFlowBaseProps.attachedPipette as PipetteInformation
+            }
+          />
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.SHUTTLE_VALIDATION:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <ValidateShuttle
             {...currentStep}
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
