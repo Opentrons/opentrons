@@ -78,14 +78,16 @@ def test_roundtrips_well_info_summary(height: LiquidTrackingType | None) -> None
 
 @pytest.mark.parametrize("op_1", [SimulatedProbeResult(), 100.0, -5])
 @pytest.mark.parametrize("op_2", [SimulatedProbeResult(), 100.0, -5])
-def test_simulated_probe_result_operand_math(op_1: LiquidTrackingType, op_2: LiquidTrackingType) -> None:
+def test_simulated_probe_result_operand_math(
+    op_1: LiquidTrackingType, op_2: LiquidTrackingType
+) -> None:
     _error = None
     try:
         r = op_1 + op_2
         r = op_1 - op_2
         r = op_1 / op_2
         r = op_1 * op_2
-        r = op_1 ** op_2
+        r = op_1**op_2
         r = op_1 // op_2
         r = op_1 % op_2
         r = op_1 % op_2

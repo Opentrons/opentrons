@@ -53,51 +53,61 @@ class SimulatedProbeResult(BaseModel):
     def __mul__(
         self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
+        """Bypass multiplication and just return self."""
         return self
 
     def __rmul__(
         self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
+        """Bypass multiplication and just return self."""
         return self
 
     def __truediv__(
         self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
+        """Bypass division and just return self."""
         return self
 
     def __rtruediv__(
         self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
+        """Bypass division and just return self."""
         return self
 
     def __pow__(
         self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
+        """Bypass exponent math and just return self."""
         return self
 
     def __rpow__(
         self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
+        """Bypass exponent math and just return self."""
         return self
 
     def __mod__(
         self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
+        """Bypass modulus and just return self."""
         return self
 
     def __rmod__(
         self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
+        """Bypass modulus and just return self."""
         return self
 
     def __floordiv__(
         self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
+        """Bypass floor division and just return self."""
         return self
 
     def __rfloordiv__(
         self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
+        """Bypass floor division and just return self."""
         return self
 
     def __gt__(self, other: float | int | SimulatedProbeResult) -> bool:
