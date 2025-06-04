@@ -93,6 +93,7 @@ async def test_store_raises_if_full(
         contained_labware_bottom_first=_contained_labware(3),
         max_pool_count=3,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -123,6 +124,7 @@ async def test_store_raises_if_carriage_logically_empty(
         contained_labware_bottom_first=_contained_labware(1),
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -164,6 +166,7 @@ async def test_store_raises_if_not_configured(
         contained_labware_bottom_first=_contained_labware(contained_labware_count),
         max_pool_count=max_pool_count,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -219,6 +222,7 @@ async def test_store_raises_if_stall(
         contained_labware_bottom_first=[],
         max_pool_count=999,
         pool_overlap=0,
+        pool_height=0,
     )
 
     decoy.when(
@@ -394,6 +398,7 @@ async def test_store_raises_if_labware_does_not_match(
         contained_labware_bottom_first=[],
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
 
     decoy.when(
@@ -462,6 +467,7 @@ async def test_store(
         contained_labware_bottom_first=_contained_labware(1),
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
 
     decoy.when(

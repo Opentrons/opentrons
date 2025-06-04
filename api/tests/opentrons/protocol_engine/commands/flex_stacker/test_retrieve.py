@@ -138,6 +138,7 @@ async def test_retrieve_raises_when_empty(
         contained_labware_bottom_first=[],
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -170,6 +171,7 @@ async def test_retrieve_primary_only(
         contained_labware_bottom_first=_contained_labware(1),
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.labware.get_uri_from_definition(flex_50uL_tiprack)
@@ -254,6 +256,7 @@ async def test_retrieve_primary_and_lid(
         contained_labware_bottom_first=_contained_labware(2, with_lid=True),
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -373,6 +376,7 @@ async def test_retrieve_primary_and_adapter(
         contained_labware_bottom_first=_contained_labware(2, with_adapter=True),
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -500,6 +504,7 @@ async def test_retrieve_primary_adapter_and_lid(
         ),
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -710,6 +715,7 @@ async def test_retrieve_raises_recoverable_error(
         contained_labware_bottom_first=_contained_labware(1),
         max_pool_count=999,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)

@@ -391,6 +391,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 contained_labware_bottom_first=[],
                 max_pool_count=0,
                 pool_overlap=0,
+                pool_height=0,
             )
 
     def _update_additional_slots_occupied_by_thermocycler(

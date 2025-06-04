@@ -76,6 +76,7 @@ def subject(
             FlexStackerPoolConstraint(
                 max_pool_count=10,
                 pool_overlap=0,
+                pool_height=0,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=sentinel.lid_definition,
                 adapter_definition=sentinel.adapter_definition,
@@ -153,6 +154,7 @@ def subject(
             FlexStackerPoolConstraint(
                 max_pool_count=10,
                 pool_overlap=0,
+                pool_height=0,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=None,
                 adapter_definition=None,
@@ -194,6 +196,7 @@ def subject(
                 primary_definition=sentinel.primary_definition,
                 lid_definition=sentinel.lid_definition,
                 adapter_definition=None,
+                pool_height=0,
             ),
             [
                 StackerStoredLabwareGroup(
@@ -245,6 +248,7 @@ def subject(
             FlexStackerPoolConstraint(
                 max_pool_count=10,
                 pool_overlap=0,
+                pool_height=0,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=None,
                 adapter_definition=sentinel.adapter_definition,
@@ -338,6 +342,7 @@ async def test_set_stored_labware_happypath(
             contained_labware_bottom_first=[],
             max_pool_count=0,
             pool_overlap=0,
+            pool_height=0,
         )
     )
     decoy.when(
@@ -573,6 +578,7 @@ async def test_set_stored_labware_requires_empty_hopper(
             ],
             max_pool_count=6,
             pool_overlap=0,
+            pool_height=0,
         )
     )
     with pytest.raises(FlexStackerNotLogicallyEmptyError):
@@ -661,6 +667,7 @@ async def test_set_stored_labware_limits_count(
             contained_labware_bottom_first=[],
             max_pool_count=0,
             pool_overlap=0,
+            pool_height=0,
         )
     )
     decoy.when(
@@ -774,6 +781,7 @@ async def test_set_stored_labware_limits_count(
                 pool_constraint=FlexStackerPoolConstraint(
                     max_pool_count=2,
                     pool_overlap=0,
+                    pool_height=0,
                     primary_definition=flex_50uL_tiprack,
                     lid_definition=None,
                     adapter_definition=None,
@@ -861,6 +869,7 @@ async def test_set_stored_labware_exceeding_max(
             contained_labware_bottom_first=[],
             max_pool_count=0,
             pool_overlap=0,
+            pool_height=0,
         )
     )
     decoy.when(
