@@ -60,7 +60,7 @@ jobs:
           path: analyses-snapshot-testing/chunks/
       - name: Set Matrix
         id: set-matrix
-        run: echo "json=$(cat analyses-snapshot-testing/chunks/matrix.json)" >> $GITHUB_OUTPUT
+        run: echo "json=$(jq -c . analyses-snapshot-testing/chunks/matrix.json)" >> $GITHUB_OUTPUT
   diff-from-target-branch:
     timeout-minutes: 2
     runs-on: ubuntu-latest
