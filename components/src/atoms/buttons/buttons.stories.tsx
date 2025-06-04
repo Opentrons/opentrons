@@ -1,7 +1,6 @@
 import { Flex, STYLE_PROPS } from '../../primitives'
 import { DIRECTION_ROW } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
-import { StyledText } from '../StyledText'
 import { AlertPrimaryButton as AlertPrimaryButtonComponent } from './AlertPrimaryButton'
 import { AltPrimaryButton as AltPrimaryButtonComponent } from './AltPrimaryButton'
 import { BasicButton as BasicButtonComponent } from './BasicButton'
