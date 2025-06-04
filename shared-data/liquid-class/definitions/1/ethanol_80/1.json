@@ -1180,12 +1180,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [5.0, 0.0],
-              [10.0, 0.0],
-              [45.0, 0.0],
-              [50.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -1436,12 +1431,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [5.0, 0.0],
-              [10.0, 0.0],
-              [45.0, 0.0],
-              [50.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -2701,12 +2691,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [5.0, 0.0],
-              [10.0, 0.0],
-              [45.0, 0.0],
-              [50.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -2957,12 +2942,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [5.0, 0.0],
-              [10.0, 0.0],
-              [45.0, 0.0],
-              [50.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -4222,12 +4202,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [5.0, 0.0],
-              [10.0, 0.0],
-              [45.0, 0.0],
-              [50.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -4478,12 +4453,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [5.0, 0.0],
-              [10.0, 0.0],
-              [45.0, 0.0],
-              [50.0, 0.0]
-            ],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
