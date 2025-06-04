@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -36,7 +35,6 @@ import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { deselectAllWells } from '../../../well-selection/actions'
 import { getSelectedWells } from '../../../well-selection/selectors'
 import { LINK_BUTTON_STYLE } from '../../atoms'
-import { DefineLiquidsModal } from '../DefineLiquidsModal'
 import { LiquidCard } from './LiquidCard'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
@@ -62,15 +60,16 @@ interface ToolboxFormValues {
 interface LiquidToolboxProps {
   showBadFormState: boolean
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
+  setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
 }
 export function LiquidToolbox({
   showBadFormState,
   setShowBadFormState,
+  setDefineLiquidModal,
 }: LiquidToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
   const liquids = useSelector(getLiquidEntities)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const selectedWellGroups = useSelector(getSelectedWells)
@@ -267,14 +266,6 @@ export function LiquidToolbox({
 
   return (
     <>
-      {showDefineLiquidModal ? (
-        <DefineLiquidsModal
-          onClose={() => {
-            setDefineLiquidModal(false)
-          }}
-        />
-      ) : null}
-
       <Toolbox
         title={
           <StyledText desktopStyle="bodyLargeSemiBold">
