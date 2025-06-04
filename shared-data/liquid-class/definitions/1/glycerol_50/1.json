@@ -17,9 +17,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -33,9 +34,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "touchTip": {
@@ -92,9 +94,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -108,9 +111,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -171,9 +175,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -187,9 +192,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -257,9 +263,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -273,9 +280,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "touchTip": {
@@ -332,9 +340,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -348,9 +357,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -412,7 +422,7 @@
                 "offset": {
                   "x": 0,
                   "y": 0,
-                    "z": 2
+                  "z": 2
                 }
               },
               "speed": 4,
@@ -428,9 +438,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -498,9 +509,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -574,9 +586,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -590,9 +603,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -652,7 +666,7 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                "y": 0,
+                  "y": 0,
                   "z": 2
                 }
               },
@@ -670,7 +684,7 @@
                 "offset": {
                   "x": 0,
                   "y": 0,
-                    "z": 2
+                  "z": 2
                 }
               },
               "speed": 4,
@@ -735,7 +749,7 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                "y": 0,
+                  "y": 0,
                   "z": 2
                 }
               },
@@ -752,9 +766,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "touchTip": {
@@ -811,9 +826,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -886,9 +902,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -968,9 +985,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -1044,9 +1062,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -1119,9 +1138,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -1206,9 +1226,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -1222,7 +1243,7 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                "y": 0,
+                  "y": 0,
                   "z": 2
                 }
               },
@@ -1282,9 +1303,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -1298,9 +1320,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -1360,9 +1383,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -1376,9 +1400,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -1438,12 +1463,13 @@
           "aspirate": {
             "submerge": {
               "startPosition": {
-              "positionReference": "well-top",
+                "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -1457,9 +1483,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "touchTip": {
@@ -1513,12 +1540,13 @@
           "singleDispense": {
             "submerge": {
               "startPosition": {
-              "positionReference": "well-top",
+                "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -1588,12 +1616,13 @@
           "multiDispense": {
             "submerge": {
               "startPosition": {
-              "positionReference": "well-top",
+                "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -1604,12 +1633,13 @@
             },
             "retract": {
               "endPosition": {
-              "positionReference": "well-top",
+                "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -1669,12 +1699,13 @@
           "aspirate": {
             "submerge": {
               "startPosition": {
-              "positionReference": "well-top",
+                "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -1685,12 +1716,13 @@
             },
             "retract": {
               "endPosition": {
-              "positionReference": "well-top",
+                "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "touchTip": {
@@ -1748,7 +1780,7 @@
                 "offset": {
                   "x": 0,
                   "y": 0,
-                    "z": 2
+                  "z": 2
                 }
               },
               "speed": 4,
@@ -1764,9 +1796,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -1839,9 +1872,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -1909,7 +1943,7 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                "y": 0,
+                  "y": 0,
                   "z": 2
                 }
               },
@@ -1926,7 +1960,7 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                "y": 0,
+                  "y": 0,
                   "z": 2
                 }
               },
@@ -1986,9 +2020,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -1999,12 +2034,13 @@
             },
             "retract": {
               "endPosition": {
-              "positionReference": "well-top",
+                "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -2069,8 +2105,8 @@
                 "offset": {
                   "x": 0,
                   "y": 0,
-                    "z": 2
-                  }
+                  "z": 2
+                }
               },
               "speed": 4,
               "delay": {
@@ -2082,12 +2118,13 @@
             },
             "retract": {
               "endPosition": {
-              "positionReference": "well-top",
+                "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
@@ -2154,9 +2191,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -2167,12 +2205,13 @@
             },
             "retract": {
               "endPosition": {
-              "positionReference": "well-top",
+                "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "touchTip": {
@@ -2229,9 +2268,10 @@
                 "positionReference": "well-top",
                 "offset": {
                   "x": 0,
-                    "y": 0,
-                    "z": 2
-                }},
+                  "y": 0,
+                  "z": 2
+                }
+              },
               "speed": 4,
               "delay": {
                 "enable": false,
@@ -2246,7 +2286,7 @@
                 "offset": {
                   "x": 0,
                   "y": 0,
-                    "z": 2
+                  "z": 2
                 }
               },
               "speed": 4,
@@ -2305,7 +2345,7 @@
                 "offset": {
                   "x": 0,
                   "y": 0,
-                    "z": 2
+                  "z": 2
                 }
               },
               "speed": 4,
@@ -2405,7 +2445,7 @@
                 "offset": {
                   "x": 0,
                   "y": 0,
-                    "z": 2
+                  "z": 2
                 }
               },
               "speed": 4,
@@ -2466,7 +2506,7 @@
                 "offset": {
                   "x": 0,
                   "y": 0,
-                    "z": 2
+                  "z": 2
                 }
               },
               "speed": 4,
@@ -2483,7 +2523,7 @@
                 "offset": {
                   "x": 0,
                   "y": 0,
-                    "z": 2
+                  "z": 2
                 }
               },
               "speed": 4,
