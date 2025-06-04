@@ -12,7 +12,6 @@ import {
   getFileMetadata,
   getRobotStateTimeline,
 } from '../file-data/selectors'
-import { LocationUpdate } from '../load-file/migration/utils/getAdditionalEquipmentLocationUpdate'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
@@ -33,6 +32,7 @@ import type {
 import type { SetFeatureFlagAction } from '../feature-flags/actions'
 import type { FormData, StepIdType, StepType } from '../form-types'
 import type { RenameStepAction } from '../labware-ingred/actions'
+import type { LocationUpdate } from '../load-file/migration/utils/getAdditionalEquipmentLocationUpdate'
 import type { CreatePipettesAction } from '../step-forms/actions'
 import type { StepArgsAndErrors } from '../steplist'
 import type { BaseState } from '../types'
