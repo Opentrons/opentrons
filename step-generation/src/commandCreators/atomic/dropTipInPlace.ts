@@ -10,7 +10,7 @@ export const dropTipInPlace: CommandCreator<DropTipInPlaceParams> = (
 ) => {
   const { pipetteId } = args
   // No-op if there is no tip
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     return {
       commands: [],
     }
