@@ -132,7 +132,7 @@ export type ProtocolFile<
 > = ProtocolBase<DesignerApplicationData> &
   (OT2RobotMixin | OT3RobotMixin) &
   LabwareV2Mixin &
-  LiquidV2Mixin &
+  (LiquidV1Mixin | LiquidV2Mixin) &
   (CommandV8Mixin | CommandV9Mixin | CommandV10Mixin) &
   CommandAnnotationV1Mixin
 

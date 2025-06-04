@@ -20,7 +20,7 @@ import type {
   CommandV8Mixin,
   CreateCommand as CreateCommandV8,
   LabwareV2Mixin,
-  LiquidV2Mixin,
+  LiquidV1Mixin,
   LoadPipetteCreateCommand,
   OT2RobotMixin,
   OT3RobotMixin,
@@ -190,18 +190,9 @@ export const migrateFile = (
     },
   }
 
-  const migratedLiquidsWithLiquidClass = Object.entries(liquids).reduce<
-    LiquidV2Mixin['liquids']
-  >((acc, [liquidId, liquid]) => {
-    acc[liquidId] = {
-      ...liquid,
-      liquidClass: null,
-    }
-    return acc
-  }, {})
-  const liquidV2Mixin: LiquidV2Mixin = {
-    liquidSchemaId: 'opentronsLiquidSchemaV2',
-    liquids: migratedLiquidsWithLiquidClass,
+  const liquidV1Mixin: LiquidV1Mixin = {
+    liquidSchemaId: 'opentronsLiquidSchemaV1',
+    liquids,
   }
 
   const commandv8Mixin: CommandV8Mixin = {
@@ -218,7 +209,7 @@ export const migrateFile = (
     ...protocolBase,
     ...deckStructure,
     ...labwareV2Mixin,
-    ...liquidV2Mixin,
+    ...liquidV1Mixin,
     ...commandv8Mixin,
     ...commandAnnotionaV1Mixin,
   }

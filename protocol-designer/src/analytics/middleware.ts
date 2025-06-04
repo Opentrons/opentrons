@@ -420,11 +420,10 @@ export const reduxActionToAnalyticsEvent = (
           : location
     )
     const liquidClasses = {
-      liquidClasses: Object.values(liquids).map(
-        ({ liquidClass }) => liquidClass
+      liquidClasses: Object.values(liquids).map(liquid =>
+        'liquidClass' in liquid ? liquid.liquidClass : null
       ),
     }
-    console.log(liquidClasses)
 
     const fixtureInfo = {
       trashBin: trashCommands,
