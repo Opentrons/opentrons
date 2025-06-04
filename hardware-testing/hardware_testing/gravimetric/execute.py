@@ -369,6 +369,16 @@ def _run_trial(
     ui.print_info(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
 
     # RUN DISPENSE
+    print("trial.ctx",trial.ctx)
+    print("trial.pipette",trial.pipette)
+    print("trial.tip_volume",trial.tip_volume)
+    print("trial.well",trial.well)
+    print("trial.channel_offset",trial.channel_offset)
+    print("trial.channel_count",trial.channel_count)
+    print("trial.liquid_tracker",trial.liquid_tracker)
+    print("trial.blank",trial.blank)
+    print("trial.mode,",trial.mode,)
+    print("trial.cfg.increment",trial.cfg.increment)
     dispense_with_liquid_class(
         trial.ctx,
         trial.pipette,

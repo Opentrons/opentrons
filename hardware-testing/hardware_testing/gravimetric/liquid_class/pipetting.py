@@ -276,8 +276,10 @@ def _pipette_with_liquid_settings(  # noqa: C901
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
         if not blank:
-            pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
-
+            if pipette.name == "p200_96":
+                pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
+            elif pipette.name == "p50_multi_flex" or pipette.name == "p50_single_flex" or pipette.name =="p1000_single_flex" or pipette.name =="p1000_multi_flex":
+                pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
     def _dispense_on_approach() -> None:
         # remove trailing-air-gap
         if not blank:
@@ -308,7 +310,10 @@ def _pipette_with_liquid_settings(  # noqa: C901
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
         # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
         #       to avoid droplets from forming and falling off the tip
-        pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
+        if pipette.name == "p200_96":
+            pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
+        elif pipette.name == "p50_multi_flex" or pipette.name == "p50_single_flex" or pipette.name =="p1000_single_flex" or pipette.name =="p1000_multi_flex":
+            pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
 
     # PHASE 1: APPROACH
     pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
@@ -388,6 +393,7 @@ def aspirate_with_liquid_class(
     clear_accuracy_function: bool = False,
 ) -> None:
     """Aspirate with liquid class."""
+    print(pipette.name)
     if "50" in pipette.name:
         pip_size = 50
     elif "200" in pipette.name:
