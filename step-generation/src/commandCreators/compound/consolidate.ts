@@ -234,21 +234,17 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
   if (isMultiChannelPipette && nozzles !== ALL) {
     const isAspirateSafePipetteMovement = getIsSafePipetteMovement({
-      nozzleConfiguation: nozzles,
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
       labwareId: sourceLabware,
-      tipRackDefURI: tipRack,
       wellLocationOffset: { x: aspirateXOffset, y: aspirateYOffset },
     })
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
-      nozzleConfiguation: nozzles,
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
       labwareId: destLabware,
-      tipRackDefURI: tipRack,
       wellLocationOffset: { x: dispenseXOffset, y: dispenseYOffset },
     })
     if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
@@ -409,7 +405,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                       labwareId: destLabware,
                       wellName: destWell,
                       wellLocation: dispenseRetractLocation,
-                      nozzles,
                     }),
                   ]
                 : []),
@@ -516,7 +511,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               labwareId: sourceLabware,
               wellName: sourceWell,
               wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
-              nozzles,
             }),
           ]
           // TODO (nd, 05/20/2025): uncomment and refine below logic once meniscus-relative pipetting is supported in PD
@@ -544,7 +538,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               labwareId: sourceLabware,
               wellName: sourceWell,
               wellLocation: aspirateSubmergeLocation,
-              nozzles,
             }),
             curryCommandCreator(moveToWell, {
               pipetteId: pipette,
@@ -564,7 +557,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   z: aspirateZOffset,
                 },
               },
-              nozzles,
             }),
             ...(aspirateSubmergeDelay != null &&
             aspirateSubmergeDelay.seconds > 0
@@ -597,7 +589,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                         labwareId: sourceLabware,
                         wellName: sourceWell,
                         wellLocation: aspirateRetractLocation,
-                        nozzles,
                       }),
                     ]
                   : []),
@@ -655,7 +646,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 : {}),
               wellName: sourceWell,
               wellLocation: aspirateRetractLocation,
-              nozzles,
             }),
             ...(aspirateRetractDelay != null &&
             aspirateRetractDelay?.seconds > 0
@@ -687,7 +677,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 labwareId: destLabware,
                 wellName: destWell,
                 wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
-                nozzles,
               }),
               curryCommandCreator(moveToWell, {
                 pipetteId: pipette,
@@ -697,7 +686,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 ...(dispenseSubmergeSpeed != null
                   ? { speed: dispenseSubmergeSpeed }
                   : {}),
-                nozzles,
               }),
             ]
           : // destination is trash or waste chute
@@ -742,7 +730,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 labwareId: destLabware,
                 wellName: destWell,
                 wellLocation: dispenseSubmergeLocation,
-                nozzles,
               }),
               curryCommandCreator(moveToWell, {
                 pipetteId: pipette,
@@ -762,7 +749,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                     z: dispenseZOffset,
                   },
                 },
-                nozzles,
               }),
               ...(dispenseSubmergeDelay != null &&
               dispenseSubmergeDelay.seconds > 0
@@ -844,7 +830,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 z: blowoutOffsetFromTopMm,
               },
             },
-            nozzles,
           }),
 
           ...blowOutInPlaceCommand,

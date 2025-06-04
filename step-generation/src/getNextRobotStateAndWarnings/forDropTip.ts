@@ -24,5 +24,5 @@ export function forDropTip(
     robotStateAndWarnings,
   })
   robotState.tipState.pipettes[pipetteId].hasTip = false
-  robotState.tipState.pipettes[pipetteId].attachedTipURI = null
+  robotState.tipState.pipettes[pipetteId].tiprackURI = null
 }

@@ -1,4 +1,5 @@
 import {
+  ALL,
   FLEX_ROBOT_TYPE,
   getAddressableAreaFromSlotId,
   getDeckDefFromRobotType,
@@ -273,22 +274,18 @@ const getWellPosition = (
 
 //  util to use in step-generation for if the pipette movement is safe
 export const getIsSafePipetteMovement = (args: {
-  nozzleConfiguation: NozzleConfigurationStyle | null
   robotState: RobotState
   invariantContext: InvariantContext
   pipetteId: string
   labwareId: string
-  tipRackDefURI: string
   wellLocationOffset: Point
   wellTargetName?: string
 }): boolean => {
   const {
-    nozzleConfiguation,
     robotState,
     invariantContext,
     pipetteId,
     labwareId,
-    tipRackDefURI,
     wellLocationOffset,
     wellTargetName,
   } = args
@@ -301,18 +298,24 @@ export const getIsSafePipetteMovement = (args: {
   } = invariantContext
   const { labware: labwareState, tipState } = robotState
 
+  const pipetteEntity = pipetteEntities[pipetteId]
+  const nozzleConfiguration = robotState.pipettes[pipetteId]?.nozzles
+
   //  early exit if labwareId is a trashBin or wasteChute or if no nozzle is provided
   if (
     labwareEntities[labwareId] == null ||
     wellTargetName == null ||
-    nozzleConfiguation == null
+    nozzleConfiguration == null ||
+    nozzleConfiguration === ALL
   ) {
     return true
   }
 
-  const tiprackEntityId = Object.keys(labwareEntities).find(lwKey =>
-    lwKey.includes(tipRackDefURI)
-  )
+  const tiprackURI = tipState.pipettes[pipetteId]?.tiprackURI
+  const tiprackEntityId =
+    tiprackURI != null
+      ? Object.keys(labwareEntities).find(lwKey => lwKey.includes(tiprackURI))
+      : null
   const tiprackTipLength =
     tiprackEntityId != null
       ? labwareEntities[tiprackEntityId].def.parameters.tipLength
@@ -320,7 +323,6 @@ export const getIsSafePipetteMovement = (args: {
   const stagingAreaSlots = Object.values(stagingAreaEntities).map(
     stagingArea => stagingArea.location as string
   )
-  const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteHasTip = tipState.pipettes[pipetteId]?.hasTip ?? false
   // account for tip length if picking up tip
   const tipLength = pipetteHasTip ? tiprackTipLength ?? 0 : 0
@@ -337,10 +339,10 @@ export const getIsSafePipetteMovement = (args: {
     pipetteHasTip
   )
   let primaryNozzle = 'A12'
-  if (nozzleConfiguation === SINGLE && pipetteEntity.spec.channels === 96) {
+  if (nozzleConfiguration === SINGLE && pipetteEntity.spec.channels === 96) {
     primaryNozzle = 'H12'
   } else if (
-    nozzleConfiguation === SINGLE &&
+    nozzleConfiguration === SINGLE &&
     pipetteEntity.spec.channels === 8
   ) {
     primaryNozzle = 'H1'
@@ -348,7 +350,7 @@ export const getIsSafePipetteMovement = (args: {
 
   const isWithinPipetteExtents = getIsWithinPipetteExtents(
     wellTargetPoint,
-    nozzleConfiguation,
+    nozzleConfiguration,
     primaryNozzle
   )
   if (!isWithinPipetteExtents) {

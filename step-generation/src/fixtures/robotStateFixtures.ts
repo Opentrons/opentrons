@@ -342,7 +342,7 @@ export const getRobotStateWithTipStandard = (
   })
   robotStateWithTip.tipState.pipettes[DEFAULT_PIPETTE] = {
     hasTip: true,
-    attachedTipURI: 'tiprackId',
+    tiprackURI: 'tiprackId',
   }
   return robotStateWithTip
 }
@@ -358,7 +358,7 @@ export const getRobotStatePickedUpTipStandard = (
   })
   robotStatePickedUpOneTip.tipState.pipettes[DEFAULT_PIPETTE] = {
     hasTip: true,
-    attachedTipURI: 'tiprackId',
+    tiprackURI: 'tiprackId',
   }
   robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.A1 = false
   return robotStatePickedUpOneTip

@@ -639,7 +639,7 @@ export interface TimelineFrame {
     pipettes: {
       [pipetteId: string]: {
         hasTip: boolean
-        attachedTipURI: string | null
+        tiprackURI: string | null
       } // true if pipette has tip(s)
     }
   }

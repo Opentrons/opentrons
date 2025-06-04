@@ -367,12 +367,12 @@ exports[`makeInitialRobotState > matches snapshot 1`] = `
   "tipState": {
     "pipettes": {
       "p10SingleId": {
-        "attachedTipURI": null,
         "hasTip": false,
+        "tiprackURI": null,
       },
       "p300MultiId": {
-        "attachedTipURI": null,
         "hasTip": false,
+        "tiprackURI": null,
       },
     },
     "tipracks": {

@@ -296,7 +296,7 @@ describe('replaceTip', () => {
           pipettes: {
             p300MultiId: {
               hasTip: true,
-              attachedTipURI: 'tiprackId',
+              tiprackURI: 'tiprackId',
             },
           },
         },
@@ -343,7 +343,7 @@ describe('replaceTip', () => {
           pipettes: {
             p100096Id: {
               hasTip: true,
-              attachedTipURI: 'tiprackId',
+              tiprackURI: 'tiprackId',
             },
           },
         },

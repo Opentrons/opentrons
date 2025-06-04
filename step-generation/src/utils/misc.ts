@@ -42,7 +42,6 @@ import type {
   CutoutFixtureId,
   CutoutId,
   LabwareDefinition2,
-  NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
   RobotType,
@@ -549,7 +548,7 @@ export function makeInitialRobotState(args: {
         pipetteLocations,
         (acc, pipetteTemporalProperties, id) =>
           pipetteTemporalProperties.mount
-            ? { ...acc, [id]: { hasTip: false, attachedTipURI: null } }
+            ? { ...acc, [id]: { hasTip: false, tiprackURI: null } }
             : acc,
         {}
       ),
@@ -597,7 +596,6 @@ interface DispenseLocationHelperArgs {
   flowRate: number
   xOffset: number
   yOffset: number
-  nozzles: NozzleConfigurationStyle | null
   tipRack: string
   offsetFromBottomMm?: number
   well?: string
@@ -617,7 +615,6 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     xOffset,
     yOffset,
     tipRack,
-    nozzles,
   } = args
   const {
     labwareEntities,
@@ -653,7 +650,6 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
           },
         },
         tipRack,
-        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -715,7 +711,6 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
           origin: 'bottom',
           offset: { x: 0, y: 0, z: zOffset },
         },
-        nozzles: null,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -749,7 +744,6 @@ interface AirGapLocationArgs {
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
-  nozzles?: NozzleConfigurationStyle | null
 }
 export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
   args,
@@ -765,7 +759,6 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
     sourceId,
     sourceWell,
     volume,
-    nozzles,
   } = args
   const {
     labwareEntities,
@@ -799,7 +792,6 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
         wellName: dispenseAirGapWell,
         volume,
         type: 'dispense',
-        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -863,7 +855,6 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
           origin: 'bottom',
           offset: { x: 0, y: 0, z: zOffset },
         },
-        nozzles: null,
       }),
       curryCommandCreator(delay, {
         seconds: seconds,

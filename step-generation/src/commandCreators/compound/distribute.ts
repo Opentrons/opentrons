@@ -245,22 +245,18 @@ export const distribute: CommandCreator<DistributeArgs> = (
 
   if (isMultiChannelPipette && nozzles !== ALL) {
     const isAspirateSafePipetteMovement = getIsSafePipetteMovement({
-      nozzleConfiguation: nozzles,
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
       labwareId: sourceLabware,
-      tipRackDefURI: tipRack,
       wellLocationOffset: { x: aspirateXOffset, y: aspirateYOffset },
       wellTargetName: sourceWell,
     })
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
-      nozzleConfiguation: nozzles,
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
       labwareId: destLabware,
-      tipRackDefURI: tipRack,
       wellLocationOffset: { x: dispenseXOffset, y: dispenseYOffset },
       wellTargetName: destWells[0],
     })
@@ -307,7 +303,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
       labwareId: sourceLabware,
       wellName: sourceWell,
       wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
-      nozzles,
     }),
   ]
 
@@ -468,7 +463,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
           labwareId: sourceLabware,
           wellName: sourceWell,
           wellLocation: aspirateSubmergeLocation,
-          nozzles,
         }),
         curryCommandCreator(moveToWell, {
           pipetteId: pipette,
@@ -488,7 +482,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
               z: aspirateZOffset,
             },
           },
-          nozzles,
         }),
         ...(aspirateSubmergeDelay != null && aspirateSubmergeDelay.seconds > 0
           ? [
@@ -569,7 +562,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     labwareId: sourceLabware,
                     wellName: sourceWell,
                     wellLocation: aspirateRetractLocation,
-                    nozzles,
                   }),
                 ]
               : []),
@@ -651,7 +643,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
             : {}),
           wellName: sourceWell,
           wellLocation: aspirateRetractLocation,
-          nozzles,
         }),
         ...(aspirateRetractDelay != null && aspirateRetractDelay?.seconds > 0
           ? [
@@ -696,7 +687,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     labwareId: destLabware,
                     wellName: destinationWell,
                     wellLocation: dispenseSubmergeLocation,
-                    nozzles,
                   }),
                   ...(airGapInTip > 0
                     ? [
@@ -728,7 +718,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                         z: dispenseZOffset,
                       },
                     },
-                    nozzles,
                   }),
                   ...(dispenseSubmergeDelay != null &&
                   dispenseSubmergeDelay.seconds > 0
@@ -783,7 +772,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                       : {}),
                     wellName: destinationWell,
                     wellLocation: dispenseRetractLocation,
-                    nozzles,
                   }),
                   ...(dispenseRetractDelay != null &&
                   dispenseRetractDelay?.seconds > 0
@@ -872,7 +860,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                           labwareId: destLabware,
                           wellName: destinationWell,
                           wellLocation: dispenseRetractLocation,
-                          nozzles,
                         }),
                       ]
                     : []),
@@ -902,7 +889,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     z: blowoutOffsetFromTopMm,
                   },
                 },
-                nozzles,
               }),
               ...blowoutInPlaceCommand,
               ...getTouchTipAfterDispenseRetractCommands(true),
@@ -927,7 +913,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     z: blowoutOffsetFromTopMm,
                   },
                 },
-                nozzles,
               }),
               ...blowoutInPlaceCommand,
               // touch tip at source well with dispense touch tip parameters
@@ -954,7 +939,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                       labwareId: sourceLabware,
                       wellName: sourceWell,
                       wellLocation: { origin: WELL_ORIGIN_TOP },
-                      nozzles,
                     }),
                   ]
                 : []),

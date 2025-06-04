@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { ALL, getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { moveToWell } from '../commandCreators/atomic/moveToWell'
@@ -26,10 +26,7 @@ import {
   thermocyclerPipetteCollision,
 } from '../utils'
 
-import type {
-  NozzleConfigurationStyle,
-  WellOrigin,
-} from '@opentrons/shared-data'
+import type { WellOrigin } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/absorbanceReaderCollision')
@@ -58,7 +55,6 @@ describe('moveToWell', () => {
         origin: 'bottom' as WellOrigin,
         offset: { z: 1 },
       },
-      nozzles: ALL as NozzleConfigurationStyle,
     }
     const result = moveToWell(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
@@ -97,7 +93,6 @@ describe('moveToWell', () => {
       },
       minimumZHeight: 5,
       forceDirect: true,
-      nozzles: ALL as NozzleConfigurationStyle,
     }
     const result = moveToWell(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
@@ -131,7 +126,6 @@ describe('moveToWell', () => {
         pipetteId: 'badPipette',
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -144,7 +138,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: 'problematicLabwareId',
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -163,7 +156,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       initialRobotState
@@ -185,7 +177,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -213,7 +204,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -241,7 +231,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -270,7 +259,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -305,7 +293,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -347,7 +334,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -389,7 +375,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -437,7 +422,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: null,
       },
       invariantContext,
       robotStateWithTip
@@ -480,7 +464,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -506,7 +489,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -530,7 +512,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -554,7 +535,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip
@@ -579,7 +559,6 @@ describe('moveToWell', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        nozzles: ALL as NozzleConfigurationStyle,
       },
       invariantContext,
       robotStateWithTip

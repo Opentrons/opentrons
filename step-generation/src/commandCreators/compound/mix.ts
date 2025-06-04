@@ -1,7 +1,6 @@
 import flatMap from 'lodash/flatMap'
 
 import {
-  ALL,
   getCorrectionVolume,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   LOW_VOLUME_PIPETTES,
@@ -30,14 +29,13 @@ import {
 } from '../atomic'
 import { replaceTip } from './replaceTip'
 
-import type { WellLocation } from '@opentrons/shared-data'
+import type { MoveToWellParams, WellLocation } from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CurriedCommandCreator,
   InvariantContext,
   MixArgs,
 } from '../../types'
-import type { ExtendedMoveToWellParams } from '../atomic/moveToWell'
 
 const getDelayCommand = (seconds: number = 0): CurriedCommandCreator[] =>
   seconds > 0
@@ -130,7 +128,7 @@ export const mixInPlaceUtil = (args: {
   invariantContext: InvariantContext
   liquidClass: string | null
   tiprack: string
-  moveToWellParams?: ExtendedMoveToWellParams
+  moveToWellParams?: MoveToWellParams
 }): CurriedCommandCreator[] => {
   const {
     pipette,
@@ -263,7 +261,6 @@ export const mix: CommandCreator<MixArgs> = (
     tipRack,
     xOffset,
     yOffset,
-    nozzles,
     finalPushOut,
   } = data
 
@@ -320,24 +317,20 @@ export const mix: CommandCreator<MixArgs> = (
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
-  if (isMultiChannelPipette && nozzles !== ALL) {
+  if (isMultiChannelPipette) {
     const isAspirateSafePipetteMovement = getIsSafePipetteMovement({
-      nozzleConfiguation: data.nozzles,
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
       labwareId: labware,
-      tipRackDefURI: tipRack,
       wellLocationOffset: { x: xOffset, y: yOffset },
       wellTargetName: wells[0],
     })
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
-      nozzleConfiguation: data.nozzles,
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
       labwareId: labware,
-      tipRackDefURI: tipRack,
       wellLocationOffset: { x: xOffset, y: yOffset },
       wellTargetName: wells[0],
     })
@@ -369,7 +362,6 @@ export const mix: CommandCreator<MixArgs> = (
           curryCommandCreator(replaceTip, {
             pipette,
             dropTipLocation,
-            nozzles: data.nozzles ?? undefined,
             tipRack,
           }),
         ]
@@ -420,7 +412,6 @@ export const mix: CommandCreator<MixArgs> = (
               y: yOffset,
             },
           },
-          nozzles: data.nozzles,
         },
       })
       return [

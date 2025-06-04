@@ -1,4 +1,4 @@
-import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -21,16 +21,11 @@ import {
   uuid,
 } from '../../utils'
 
-import type {
-  CreateCommand,
-  DispenseParams,
-  NozzleConfigurationStyle,
-} from '@opentrons/shared-data'
+import type { CreateCommand, DispenseParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { Point } from '../../utils'
 
 export interface DispenseAtomicCommandParams extends DispenseParams {
-  nozzles: NozzleConfigurationStyle | null
   tipRack: string
   isAirGap?: boolean
 }
@@ -48,8 +43,6 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     flowRate,
     isAirGap,
     wellLocation,
-    nozzles,
-    tipRack,
     pushOut,
   } = args
   const actionName = 'dispense'
@@ -121,14 +114,11 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
 
   if (
     isMultiChannelPipette &&
-    nozzles !== ALL &&
     !getIsSafePipetteMovement({
-      nozzleConfiguation: nozzles,
       robotState: prevRobotState,
       invariantContext,
       pipetteId,
       labwareId,
-      tipRackDefURI: tipRack,
       wellLocationOffset: (wellLocation?.offset as Point) ?? {
         x: 0,
         y: 0,

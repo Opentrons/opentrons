@@ -35,7 +35,7 @@ export const forDropTipInPlace = (
   const entityId = robotState.pipettes[pipetteId].entityId ?? ''
   robotState.tipState.pipettes[pipetteId] = {
     hasTip: false,
-    attachedTipURI: null,
+    tiprackURI: null,
   }
 
   dispenseUpdateLiquidState({

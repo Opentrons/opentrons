@@ -29,7 +29,7 @@ describe('liquidProbe', () => {
     initialRobotState.tipState.pipettes = {
       [p300SingleId]: {
         hasTip: true,
-        attachedTipURI: 'tiprackId',
+        tiprackURI: 'tiprackId',
       },
     }
     const params: LiquidProbeParams = {
@@ -66,7 +66,7 @@ describe('liquidProbe', () => {
     robotStateWithTip.tipState.pipettes = {
       [p300SingleId]: {
         hasTip: false,
-        attachedTipURI: null,
+        tiprackURI: null,
       },
     }
     const params: LiquidProbeParams = {

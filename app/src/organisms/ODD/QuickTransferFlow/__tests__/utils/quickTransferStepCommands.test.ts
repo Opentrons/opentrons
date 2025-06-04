@@ -92,7 +92,7 @@ const mockRobotState: TimelineFrame = {
     pipettes: {
       mockPipette: {
         hasTip: false,
-        attachedTipURI: null,
+        tiprackURI: null,
       },
     },
   },

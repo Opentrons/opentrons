@@ -94,7 +94,6 @@ describe('getIsSafePipetteMovement', () => {
 
   it('returns true when the labware id is a trash bin', () => {
     const result = getIsSafePipetteMovement({
-      nozzleConfiguation: COLUMN,
       pipetteId: mockPipId,
       robotState: {
         labware: {},
@@ -121,7 +120,6 @@ describe('getIsSafePipetteMovement', () => {
         config: {} as any,
       },
       labwareId: 'mockId',
-      tipRackDefURI: 'mockTrashBin',
       wellLocationOffset: { x: 0, y: 0, z: 0 },
       wellTargetName: mockWellName,
     })
@@ -129,12 +127,19 @@ describe('getIsSafePipetteMovement', () => {
   })
   it('returns false when within pipette extents is false', () => {
     const result = getIsSafePipetteMovement({
-      nozzleConfiguation: COLUMN,
-      robotState: mockRobotState,
+      robotState: {
+        ...mockRobotState,
+        pipettes: {
+          ...mockRobotState.pipettes,
+          [mockPipId]: {
+            ...mockRobotState.pipettes[mockPipId],
+            nozzles: COLUMN,
+          },
+        },
+      },
       invariantContext: mockInvariantProperties,
       pipetteId: mockPipId,
       labwareId: mockLabwareId,
-      tipRackDefURI: mockTipUri,
       wellLocationOffset: { x: -12, y: -100, z: 20 },
       wellTargetName: mockWellName,
     })
@@ -153,12 +158,10 @@ describe('getIsSafePipetteMovement', () => {
       },
     }
     const result = getIsSafePipetteMovement({
-      nozzleConfiguation: COLUMN,
       robotState: mockRobotState,
       invariantContext: mockInvariantProperties,
       pipetteId: mockPipId,
       labwareId: mockLabwareId,
-      tipRackDefURI: mockTipUri,
       wellLocationOffset: { x: -1, y: 5, z: 20 },
       wellTargetName: mockWellName,
     })
@@ -171,12 +174,19 @@ describe('getIsSafePipetteMovement', () => {
       [mockAdapter]: { stack: [mockAdapter, 'D1'] },
     }
     const result = getIsSafePipetteMovement({
-      nozzleConfiguation: COLUMN,
-      robotState: mockRobotState,
+      robotState: {
+        ...mockRobotState,
+        pipettes: {
+          ...mockRobotState.pipettes,
+          [mockPipId]: {
+            ...mockRobotState.pipettes[mockPipId],
+            nozzles: COLUMN,
+          },
+        },
+      },
       invariantContext: mockInvariantProperties,
       pipetteId: mockPipId,
       labwareId: mockLabwareId,
-      tipRackDefURI: mockTipUri,
       wellLocationOffset: { x: -1, y: 5, z: 0 },
       wellTargetName: mockWellName,
     })
@@ -204,12 +214,19 @@ describe('getIsSafePipetteMovement', () => {
       },
     }
     const result = getIsSafePipetteMovement({
-      nozzleConfiguation: COLUMN,
-      robotState: mockRobotState,
+      robotState: {
+        ...mockRobotState,
+        pipettes: {
+          ...mockRobotState.pipettes,
+          [mockPipId]: {
+            ...mockRobotState.pipettes[mockPipId],
+            nozzles: COLUMN,
+          },
+        },
+      },
       invariantContext: mockInvariantProperties,
       pipetteId: mockPipId,
       labwareId: mockLabwareId,
-      tipRackDefURI: mockTipUri,
       wellLocationOffset: { x: 0, y: 0, z: 0 },
       wellTargetName: mockWellName,
     })

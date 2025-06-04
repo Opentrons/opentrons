@@ -1,4 +1,4 @@
-import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -50,7 +50,6 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     isAirGap,
     tipRack,
     wellLocation,
-    nozzles,
   } = args
   const actionName = 'aspirate'
   const labwareState = prevRobotState.labware
@@ -120,14 +119,11 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
 
   if (
     isMultiChannelPipette &&
-    nozzles !== ALL &&
     !getIsSafePipetteMovement({
-      nozzleConfiguation: nozzles,
       robotState: prevRobotState,
       invariantContext,
       pipetteId,
       labwareId,
-      tipRackDefURI: tipRack,
       wellLocationOffset: (wellLocation?.offset as Point) ?? {
         x: 0,
         y: 0,

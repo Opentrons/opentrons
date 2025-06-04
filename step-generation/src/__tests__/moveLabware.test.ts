@@ -760,7 +760,7 @@ describe('moveLabware', () => {
         pipettes: {
           p10SingleId: {
             hasTip: true,
-            attachedTipURI: 'tiprackId',
+            tiprackURI: 'tiprackId',
           },
         },
       },

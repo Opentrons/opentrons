@@ -29,11 +29,11 @@ describe('dropTip', () => {
           pipettes: {
             p300SingleId: {
               hasTip: true,
-              attachedTipURI: 'tiprackId',
+              tiprackURI: 'tiprackId',
             },
             p300MultiId: {
               hasTip: true,
-              attachedTipURI: 'tiprackId',
+              tiprackURI: 'tiprackId',
             },
           },
           tipracks: {} as any,
@@ -48,11 +48,11 @@ describe('dropTip', () => {
       expect(result.robotState.tipState.pipettes).toEqual({
         p300SingleId: {
           hasTip: false,
-          attachedTipURI: null,
+          tiprackURI: null,
         },
         p300MultiId: {
           hasTip: true,
-          attachedTipURI: 'tiprackId',
+          tiprackURI: 'tiprackId',
         },
       })
     })
@@ -67,11 +67,11 @@ describe('dropTip', () => {
           pipettes: {
             p300SingleId: {
               hasTip: true,
-              attachedTipURI: 'tiprackId',
+              tiprackURI: 'tiprackId',
             },
             p300MultiId: {
               hasTip: true,
-              attachedTipURI: 'tiprackId',
+              tiprackURI: 'tiprackId',
             },
           },
           tipracks: {} as any,
@@ -86,11 +86,11 @@ describe('dropTip', () => {
       expect(result.robotState.tipState.pipettes).toEqual({
         p300SingleId: {
           hasTip: true,
-          attachedTipURI: 'tiprackId',
+          tiprackURI: 'tiprackId',
         },
         p300MultiId: {
           hasTip: false,
-          attachedTipURI: null,
+          tiprackURI: null,
         },
       })
     })
@@ -103,11 +103,11 @@ describe('dropTip', () => {
           pipettes: {
             p300SingleId: {
               hasTip: true,
-              attachedTipURI: 'tiprackId',
+              tiprackURI: 'tiprackId',
             },
             p300MultiId: {
               hasTip: true,
-              attachedTipURI: 'tiprackId',
+              tiprackURI: 'tiprackId',
             },
           },
           tipracks: {} as any,
