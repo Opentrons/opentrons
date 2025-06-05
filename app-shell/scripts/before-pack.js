@@ -132,7 +132,7 @@ module.exports = function beforeBuild(context) {
         'pip',
         'install',
         `--target=${path.join(PYTHON_DESTINATION, sitePackages)}`,
-        path.join(__dirname, '../../shared-data/python'),
+        path.join(__dirname, '../../shared-data'),
         path.join(__dirname, '../../hardware[flex]'),
         path.join(__dirname, '../../api'),
         'pandas==1.4.3',

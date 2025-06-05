@@ -83,7 +83,7 @@ class SerialConnection:
             reset_buffer_before_write=reset_buffer_before_write,
         )
         name = name or port
-        return cls(
+        obj = cls(
             serial=serial,
             port=port,
             name=name,
@@ -93,6 +93,8 @@ class SerialConnection:
             alarm_keyword=alarm_keyword or "alarm",
             error_codes=error_codes,
         )
+        await obj.flush_input()
+        return obj
 
     def __init__(
         self,
@@ -311,6 +313,30 @@ class SerialConnection:
         """
         return response.strip()
 
+    async def flush_input(self) -> None:
+        """Empty the input buffer.
+
+        This is a pretty gross utility that may take a while and is intended to consume
+        blocks of text printed by the other side, for instance on boot.
+        """
+        self._serial.reset_input_buffer()
+        log.info("flushing input")
+        consecutive_empties = 0
+        async with self._serial.timeout_override("timeout", 0.1):
+            while True:
+                try:
+                    inp = await self._serial.read_until(b"\r\n")
+                    log.info(f"flush_input read: {inp!r}")
+                    if not inp:
+                        consecutive_empties += 1
+                        if consecutive_empties >= 5:
+                            return
+                    else:
+                        consecutive_empties = 0
+                except Exception:
+                    log.exception("timeout exception is")
+                    return
+
 
 class AsyncResponseSerialConnection(SerialConnection):
     @classmethod
@@ -365,7 +391,7 @@ class AsyncResponseSerialConnection(SerialConnection):
             reset_buffer_before_write=reset_buffer_before_write,
         )
         name = name or port
-        return cls(
+        obj = cls(
             serial=serial,
             port=port,
             name=name,
@@ -377,6 +403,7 @@ class AsyncResponseSerialConnection(SerialConnection):
             number_of_retries=number_of_retries,
             error_codes=error_codes,
         )
+        return obj
 
     def __init__(
         self,
