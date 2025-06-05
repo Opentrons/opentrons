@@ -487,40 +487,36 @@ The only necessary changes are the new arguments of `load_labware()` and `load_i
 The API accepts OT-2 and Flex deck slot names interchangeably. It's good practice to use the coordinate deck slot format in Flex protocols (as in the example in the previous subsection), but it's not required. The correspondence between deck slot numbers is as follows:
 
 <table>
-  <thead>
-    <tr>
-      <th>Flex</th>
-      <td>A1</td>
-      <td>A2</td>
-      <td>A3</td>
-      <td>B1</td>
-      <td>B2</td>
-      <td>B3</td>
-      <td>C1</td>
-      <td>C2</td>
-      <td>C3</td>
-      <td>D1</td>
-      <td>D2</td>
-      <td>D3</td>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>OT-2</th>
-      <td>10</td>
-      <td>11</td>
-      <td>Trash</td>
-      <td>7</td>
-      <td>8</td>
-      <td>9</td>
-      <td>4</td>
-      <td>5</td>
-      <td>6</td>
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-    </tr>
-  </tbody>
+  <tr>
+    <th>Flex</th>
+    <td>A1</td>
+    <td>A2</td>
+    <td>A3</td>
+    <td>B1</td>
+    <td>B2</td>
+    <td>B3</td>
+    <td>C1</td>
+    <td>C2</td>
+    <td>C3</td>
+    <td>D1</td>
+    <td>D2</td>
+    <td>D3</td>
+  </tr>
+  <tr>
+    <th>OT-2</th>
+    <td>10</td>
+    <td>11</td>
+    <td>Trash</td>
+    <td>7</td>
+    <td>8</td>
+    <td>9</td>
+    <td>4</td>
+    <td>5</td>
+    <td>6</td>
+    <td>1</td>
+    <td>2</td>
+    <td>3</td>
+  </tr>
 </table>
 
 A protocol that calls `#!python protocol.load_labware("opentrons_flex_96_tiprack_200ul", "1")` would require you to place that tip rack in slot D1 on Flex.

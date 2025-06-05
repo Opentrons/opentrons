@@ -1,200 +1,147 @@
 # Software and Operation
 
-There are multiple ways to control Opentrons Flex, depending on the
-needs of your lab. You can perform most functions either from the
-touchscreen or from a computer running the Opentrons App. This chapter
-will focus primarily on touchscreen operation, and will only cover
-features of the Opentrons App that are not possible on the touchscreen.
-It will also outline advanced control features, such as running Python
-code using the Jupyter Notebook server or from the command line of Flex.
+There are multiple ways to control Opentrons Flex, depending on the needs of your lab. You can perform most functions either from the touchscreen or from a computer running the Opentrons App. This chapter will focus primarily on touchscreen operation, and will only cover features of the Opentrons App that are not possible on the touchscreen. It will also outline advanced control features, such as running Python code using the Jupyter Notebook server or from the command line of Flex.
 
-One major difference between touchscreen and app operation is the
-software's relationship to the robot. The touchscreen is integrated, and
-therefore only controls the Flex robot that it's physically a part of.
-
-In contrast, the Opentrons App can control any number of Opentrons
-robots connected to the computer that's running the app. Using both
-pieces of software is required to set up Flex and run your first
-protocol, but it's up to you to decide the balance of how you will
-control Flex in your daily workflow.
+One major difference between touchscreen and app operation is the software's relationship to the robot. The touchscreen is integrated, and therefore only controls the Flex robot that it's physically a part of. In contrast, the Opentrons App can control any number of Opentrons robots connected to the computer that's running the app. Using both pieces of software is required to set up Flex and run your first protocol, but it's up to you to decide the balance of how you will control Flex in your daily workflow.
 
 ## Touchscreen operation
 
-You can use the touchscreen to control Flex whenever the robot is on. If
-your robot is on and the touchscreen is off, tap it once to wake the
-screen.
+You can use the touchscreen to control Flex whenever the robot is on. If your robot is on and the touchscreen is off, tap it once to wake the screen.
 
 ### Robot dashboard
 
-![image](69b5ed2166b3d8b65df44fd318b36e36b47e91bd.jpg){width="6.354166666666667in"
-height="3.3645833333333335in"}The dashboard is the main screen for the
-robot, accessible by tapping the robot's name in the top left corner of
-the touchscreen.
+<figure class="screenshot" markdown>
+![The robot dashboard, showing main navigation and recently run protocols.  ](images/touchscreen-dashboard.png "Robot dashboard")
+</figure>
 
-The dashboard provides quick access to recently run protocols. It
-displays protocols as large cards in a horizontal carousel. Green cards
-show protocols that are ready to run. Orange cards show protocols that
-require hardware setup or have a deck configuration conflict. The
-dashboard can display up to eight previously run protocols.
+The dashboard is the main screen for the robot, accessible by tapping the robot's name in the top left corner of the touchscreen.
 
-From the dashboard you can also perform actions that apply to the robot
-as a whole, rather than a particular protocol. Access these actions by
-tapping the three-dot (**⋮**) menu:
+The dashboard provides quick access to recently run protocols. It displays protocols as large cards in a horizontal carousel. Green cards show protocols that are ready to run. Orange cards show protocols that require hardware setup or have a deck configuration conflict. The dashboard can display up to eight previously run protocols.
 
-- **Home gantry:** Move the gantry to its home position at the back
-  right of the working area.
+From the dashboard you can also perform actions that apply to the robot as a whole, rather than a particular protocol. Access these actions by tapping the three-dot (⋮) menu:
+
+- **Home gantry:** Move the gantry to its home position at the back right of the working area.
 
 - **Restart robot:** Perform a soft restart of the robot.
 
 - **Deck configuration:** Manage deck fixture locations.
 
-- **Lights on/off:** Toggle the LED lights that illuminate the working
-  area.
+- **Lights on/off:** Toggle the LED lights that illuminate the working area.
 
-The top navigation on the dashboard provides access to the other main
-screens: All Protocols, Quick Transfer, Instruments, and Settings. Next
-we'll look at how to manage protocols on the All Protocols screen
+The top navigation on the dashboard provides access to the other main screens: All Protocols, Quick Transfer, Instruments, and Settings. Next we'll look at how to manage protocols on the All Protocols screen
 
 ### Protocol management
 
-The All Protocols screen is an interactive list of all protocols that
-you've stored on Opentrons Flex. (Sending a protocol to Flex requires
-the Opentrons App. See the below for details on that process.)
+The All Protocols screen is an interactive list of all protocols that you've stored on Opentrons Flex. (Sending a protocol to Flex requires the Opentrons App. See the [Transferring Protocols to Flex section][transferring-protocols-to-flex] below for details on that process.)
 
 There are two sections of the All Protocols screen:
 
-- Pinned protocols: Large cards in a horizontal carousel at the top of
-  the screen.
+- Pinned protocols: Large cards in a horizontal carousel at the top of the screen.
 
 - Other protocols: A vertical list at the bottom of the screen.
 
-![image](995ac6d5997d3a86b7f02587ffff4fbb3f922194.jpg){width="6.791666666666667in"
-height="3.96875in"}
+<figure class="screenshot" markdown>
+![The All Protocols screen, showing pinned protocols at the top and other protocols at the bottom.](images/touchscreen-all-protocols.png "All Protocols screen")
+</figure>
 
-Regardless of which section a protocol is in, its card or list entry
-includes information about when it was last run and when it was added to
-this robot.
+Regardless of which section a protocol is in, its card or list entry includes information about when it was last run and when it was added to this robot.
+
+!!! note
+    Flex can store a maximum of 20 unique protocols. It automatically deletes older protocols to maintain this limit. Use the Opentrons App if you need to manage a larger number of protocols.
 
 #### Pin a protocol
 
-Long press on a protocol and tap **Pin protocol** to move it to the
-pinned protocols section. Conversely, long press a pinned protocol and
-tap **Unpin protocol** to remove it from the section.
+Long press on a protocol and tap **Pin protocol** to move it to the pinned protocols section. Conversely, long press a pinned protocol and tap **Unpin protocol** to remove it from the section.
 
-![image](19d7633d262f0503186dc3a42c65c3c89aef71f0.jpg){width="6.947916666666667in"
-height="4.145833333333333in"}
+<figure class="screenshot" markdown>
+![The protocol long-press menu, with three options: Run protocol, Pin protocol, and Delete protocol.](images/touchscreen-protocol-menu.png "Protocol menu")
+</figure>
 
-You can pin up to eight protocols. When you hit the maximum, you'll need
-to unpin a protocol before pinning another one.
+You can pin up to eight protocols. When you hit the maximum, you'll need to unpin a protocol before pinning another one.
 
 #### Sort protocols
 
-Tap any of the three headers --- Protocol Name, Last Run, or Date Added
---- to sort the All Protocols section.
+Tap any of the three headers — Protocol Name, Last Run, or Date Added — to sort the All Protocols section.
 
-Tap once to sort protocols in ascending order (A to Z for names, oldest
-to newest for dates). Tap again to reverse the sort order. The current
-sort criterion is highlighted in blue and the current sort order is
-indicated by an upward or downward arrow.
+Tap once to sort protocols in ascending order (A to Z for names, oldest to newest for dates). Tap again to reverse the sort order. The current sort criterion is highlighted in blue and the current sort order is indicated by an upward or downward arrow.
 
 #### Delete a protocol
 
-Long press on a protocol and tap **Delete protocol** to delete it
-directly from the All Protocols screen. Flex will prompt you for
-confirmation that you want to delete the protocol file and all of its
-run history.
+Long press on a protocol and tap **Delete protocol** to delete it directly from the All Protocols screen. Flex will prompt you for confirmation that you want to delete the protocol file and all of its run history.
 
-![image](406612cc4533e089f6db8a8c2097f99ba3b37bbf.jpg){width="6.96875in"
-height="4.104166666666667in"}
+<figure class="screenshot" markdown>
+![Modal confirming whether to delete a protocol.](images/touchscreen-delete-protocol.png "Deleting a protocol")
+</figure>
 
-**Warning:** Run history is *not recoverable* after you delete a
-protocol on Flex. The protocol file itself is also not recoverable,
-although you may be able to resend the protocol to Flex if you've kept a
-copy of it on a computer.
+!!! warning
+    Run history is *not recoverable* after you delete a protocol on Flex. The protocol file itself is also not recoverable, although you may be able to resend the protocol to Flex if you've kept a copy of it on a computer.
 
 ### Protocol details
 
-Tap on any protocol to view its detail screen. This screen displays all
-of the types of information included in the protocol file, as well as
-common protocol actions. An indicator at the top left of the screen
-shows whether the protocol is ready to run, or whether you need to
-perform additional setup.
+Tap on any protocol to view its detail screen. This screen displays all of the types of information included in the protocol file, as well as common protocol actions. An indicator at the top left of the screen shows whether the protocol is ready to run, or whether you need to perform additional setup.
 
 #### Summary tab
 
-##### ![image](c4ac2c592676c1e4eb13cfe059c71b4adfc975b6.jpg){width="10.416666666666666in" height="5.739583333333333in"}
+<figure class="screenshot" markdown>
+![Summary of an RNA extraction protocol showing author, description, date, and action buttons.](images/touchscreen-protocol-summary.png "Protocol summary")
+</figure>
 
 The Summary tab shows:
 
-- **Protocol name:** For protocols with very long names, tap to toggle
-  between the full and truncated name.
+- **Protocol name:** For protocols with very long names, tap to toggle between the full and truncated name.
 
 - **Author:** Who created the protocol.
 
-- **Description:** For protocols with long descriptions, scroll to read
-  the full text.
+- **Description:** For protocols with long descriptions, scroll to read the full text.
 
 - **Date added:** Timestamp when Flex received the protocol file.
 
 #### Parameters tab
 
-##### ![image](fb209c456b5aac466119391d81666a5f275210bb.jpg){width="10.458333333333334in" height="6.291666666666667in"}
+<figure class="screenshot" markdown>
+![List of parameters for an RNA extraction protocol, such as number of samples, source sample volume, wash volume, and elution volume.](images/touchscreen-protocol-parameters.png "Protocol parameters")
+</figure>
 
-The Parameters tab lists all of the runtime parameters that you can
-configure from the touchscreen while setting up the protocol. The
-Default Value column shows the value that the protocol will use if you
-don't change it. The Range column shows the maximum and minimum, list of
-choices, or number of choices depending on the parameter type.
+The Parameters tab lists all of the runtime parameters that you can configure from the touchscreen while setting up the protocol. The Default Value column shows the value that the protocol will use if you don't change it. The Range column shows the maximum and minimum, list of choices, or number of choices depending on the parameter type.
 
-**Note:** Runtime parameters are only available in Python protocols that
-define their names, descriptions, and possible values. See in the Python
-API documentation for information on defining parameters and using their
-values. JSON protocols do not currently support this feature.
+!!! note
+    Runtime parameters are only available in Python protocols that define their names, descriptions, and possible values. See [Runtime Parameters](https://docs.opentrons.com/v2/runtime_parameters.html) in the Python API documentation for information on defining parameters and using their values. JSON protocols do not currently support this feature.
 
 #### Hardware tab
 
-##### ![image](2090e3e55ee316d3941ca4c6380713dc7504fdbe.jpg){width="10.416666666666666in" height="6.260416666666667in"}
+<figure class="screenshot" markdown>
+![List of hardware for an RNA extraction protocol, including pipette, gripper, and modules.](images/touchscreen-protocol-hardware.png "Protocol hardware")
+</figure>
 
-The Hardware tab is a list of all instruments, modules, and fixtures
-used in the protocol. The Location column tells you where the hardware
-needs to be attached to Flex. For instruments, location can be the left
-pipette mount, right pipette mount, both mounts (for the 96-channel
-pipette), or the extension mount (for the gripper). For modules and
-fixtures, the location is the deck slot or slots that the item occupies.
+The Hardware tab is a list of all instruments, modules, and fixtures used in the protocol. The Location column tells you where the hardware needs to be attached to Flex. For instruments, location can be the left pipette mount, right pipette mount, both mounts (for the 96-channel pipette), or the extension mount (for the gripper). For modules and fixtures, the location is the deck slot or slots that the item occupies.
 
 #### Labware tab
 
-##### ![image](57c184e35709ee6f5c2dbc1be852065ce15f2df8.jpg){width="10.416666666666666in" height="6.260416666666667in"}
+<figure class="screenshot" markdown>
+![List of labware for an RNA extraction protocol, such as deep well plates, reservoirs, and tip racks.](images/touchscreen-protocol-labware.png "Protocol labware")
+</figure>
 
-The Labware tab is a list of all labware used in the protocol. It shows
-the names and quantities of labware. It does not show their locations,
-since labware can be moved, added, or removed from the deck during the
-course of a protocol. Use the Deck tab to see initial positions of
-labware.
+The Labware tab is a list of all labware used in the protocol. It shows the names and quantities of labware. It does not show their locations, since labware can be moved, added, or removed from the deck during the course of a protocol. Use the Deck tab to see initial positions of labware.
 
 Opentrons-verified labware is indicated with a blue checkmark.
 
 #### Liquids tab
 
-##### ![image](2644fdcaf696da50fa6ad5d542ce742120147d97.jpg){width="10.416666666666666in" height="6.052083333333333in"}
+<figure class="screenshot" markdown>
+![List of liquids for an RNA extraction protocol, including various buffers.](images/touchscreen-protocol-liquids.png "Protocol liquids")
+</figure>
 
-The Liquids tab lists all liquids to be loaded into labware at the start
-of the protocol. It shows the color code of the liquid (as assigned by
-the protocol author), the liquid name, and the total volume of liquid
-used across all wells. Use the Deck tab to see well-by-well initial
-positions of liquids.
+The Liquids tab lists all liquids to be loaded into labware at the start of the protocol. It shows the color code of the liquid (as assigned by the protocol author), the liquid name, and the total volume of liquid used across all wells. Use the Deck tab to see well-by-well initial positions of liquids.
 
 #### Deck tab
 
-##### ![image](35e39b3a9b2669d00b21639fb40b22ebcc4eb56b.jpg){width="10.416666666666666in" height="6.260416666666667in"}
+<figure class="screenshot" markdown>
+![Deck map for an RNA extraction protocol, showing locations of labware on the Flex deck.](images/touchscreen-protocol-deck.png "Protocol deck map")
+</figure>
 
-The Deck tab shows a visual map of the deck at the beginning of the
-protocol.
+The Deck tab shows a visual map of the deck at the beginning of the protocol.
 
-For an interactive view that provides more information about the
-contents of each deck slot, tap **Start setup**, then tap **Labware**,
-and then tap **Map View**. There you can tap on any labware to see its
-type and custom label (if set by the protocol).
+For an interactive view that provides more information about the contents of each deck slot, tap **Start setup**, then tap **Labware**, and then tap **Map View**. There you can tap on any labware to see its type and custom label (if set by the protocol).
 
 #### Action buttons
 
@@ -206,64 +153,36 @@ On any of the protocol detail tabs, three action buttons are available:
 
 - **Delete protocol** (bottom right)
 
-Next we'll look at the steps for setting up and performing a protocol
-run.
+Next we'll look at the steps for setting up and performing a protocol run.
 
 ### Run setup
 
-When you start setup for a protocol, you'll see the "Prepare to run"
-screen, which summarizes all of the requirements for the protocol.
+When you start setup for a protocol, you'll see the "Prepare to run" screen, which summarizes all of the requirements for the protocol.
 
-![image](77f2299a0951dcf216917486f2e26fd836edafa4.jpg){width="9.833333333333334in"
-height="6.875in"}
+<figure class="screenshot" markdown>
+![Prepare to run screen for a nucleic acid purification protocol, showing instrument setup as complete (green); module and deck setup as incomplete (orange); and Labware Position Check, labware setup, and liquid setup as not started (grey).](images/touchscreen-prepare-to-run.png "Prepare to run")
+<figcaption>All sections of the "Prepare to run" screen. On the touchscreen, scroll the list to see all sections.</figcaption>
+</figure>
 
-All sections of the "Prepare to run" screen. On the touchscreen, scroll
-the list to see all sections.
+If hardware is not connected or calibrated, you will see a warning icon (exclamation point) and the row will be highlighted in orange. If all requirements are met, you will see a checkmark and the row will be highlighted in green.
 
-If hardware is not connected or calibrated, you will see a warning icon
-(exclamation point) and the row will be highlighted in orange. If all
-requirements are met, you will see a checkmark and the row will be
-highlighted in green.
+Tap any row with a right arrow to show more information for that category. (The one exception is tapping Labware Position Check, which begins that process. See the Labware Position Check section below for more details.)
 
-Tap any row with a right arrow to show more information for that
-category. (The one exception is tapping Labware Position Check, which
-begins that process. See the Labware Position Check section below for
-more details.)
+| Category   | Description |
+|------------|------------|
+| Instruments    | See if all instruments are attached to the correct mounts and calibrated.<br />Tap <b>Attach</b> or <b>Calibrate</b> to set up any that aren't. |
+| Parameters     | See the names, descriptions, and default values of runtime parameters for the protocol.<br />Tap a parameter to edit its value. See the Runtime Parameters section below for more details. |
+| Hardware       | See the locations and connection statuses of hardware on the deck.<br><ul><li>Tap :fontawesome-solid-circle-info: <b>Setup Instructions</b> to get detailed instructions.</li><li>Tap <b>Map View</b> to switch to a visual layout of hardware positions.</li></ul> |
+| Labware        | See the locations of labware. Each labware lists its initial deck location, and icons indicate labware that are on top of modules.<br />Tap <b>Map View</b> to switch to a visual layout of labware positions. |
+| Liquids        | See the types and total volumes of liquids.<br />Tap any liquid name to expand a list of well-by-well volumes. In turn, tap an individual volume row to show a visual layout of its location within labware. |
 
-**Category Description**
-
-Instruments See if all instruments are attached to the correct mounts
-and calibrated.
-
-Tap **Attach** or **Calibrate** to set up any that aren't.
-
-Parameters See the names, descriptions, and default values of runtime
-parameters for the protocol. Tap a parameter to edit its value. See the
-Runtime Parameters section below for more details.
-
-Hardware See the locations and connection statuses of hardware on the
-deck.
-
-- Tap ℹ **Setup Instructions** to get detailed .
-
-- Tap **Map View** to switch to a visual layout of hardware positions.
-
-Labware See the locations of labware. Each labware lists its initial
-deck location, and icons indicate labware that are on top of modules.
-Tap **Map View** to switch to a visual layout of labware positions.
-
-Liquids See the types and total volumes of liquids. Tap any liquid name
-to expand a list of well-by-well volumes. In turn, tap an individual
-volume row to show a visual layout of its location within labware.
-
-On any category screen, return to the "Prepare to run" screen by tapping
-the back arrow in the top left.
+On any category screen, return to the "Prepare to run" screen by tapping the back arrow in the top left.
 
 ### Runtime parameters
 
 Runtime parameters customize protocols during setup, letting you adjust
 pipette types, mount positions, aspirate/dispense volumes, labware
-types, and more---all without writing a new protocol.
+types, and more—all without writing a new protocol.
 
 ![image](7204d7bfd9ab88e892ec1cb38e56af7a6b8a7161.jpg){width="12.135416666666666in"
 height="7.322916666666667in"}
