@@ -1,14 +1,8 @@
-import head from 'lodash/head'
-
 import { ANY_LOCATION } from '@opentrons/api-client'
 import {
-  A1_ADDRESSABLE_AREA,
-  B1_ADDRESSABLE_AREA,
   C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
   getLabwareDefURI,
-  STANDARD_FLEX_SLOTS,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
 import { OFFSET_KIND_DEFAULT } from '/app/redux/protocol-runs'
@@ -19,6 +13,7 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   DefaultOffsetDetails,
+  LabwareLocationInfo,
   LabwareModuleStackupDetails,
   LocationSpecificOffsetDetails,
 } from '/app/redux/protocol-runs'
@@ -55,7 +50,10 @@ export function getDefaultOffsetDetailsForLabware(
       definitionUri: uri,
       kind: OFFSET_KIND_DEFAULT,
       // We always do default offset LPCing in this slot.
-      addressableAreaName: getValidDefaultOffsetLocation(params.protocolData),
+      addressableAreaName: getValidDefaultOffsetLocation(
+        params.lwLocInfo,
+        params.protocolData
+      ),
       lwOffsetLocSeq: ANY_LOCATION,
       closestBeneathAdapterId,
       // The only labware present on deck when configuring the default offset is the top-most labware itself.
@@ -151,29 +149,22 @@ function getFirstAdapterIdFrom(
 // NOTE: This util is meant to be temporary until product/design devise
 // an alternative method for default offset location selection.
 function getValidDefaultOffsetLocation(
+  lwLocInfo: LabwareLocationInfo[],
   protocolData: GetStackingInfoParams['protocolData']
 ): FlexAddressableAreaName {
-  const validLocations = new Set<FlexAddressableAreaName>(
-    STANDARD_FLEX_SLOTS as FlexAddressableAreaName[]
-  )
+  const isSlotC2Unavailable =
+    protocolData?.modules.some(
+      mod => mod.location.slotName === C2_ADDRESSABLE_AREA
+    ) ?? false
 
-  protocolData?.modules.forEach(mod => {
-    if (
-      mod.model === THERMOCYCLER_MODULE_V2 ||
-      mod.model === THERMOCYCLER_MODULE_V1
-    ) {
-      validLocations.delete(A1_ADDRESSABLE_AREA)
-      validLocations.delete(B1_ADDRESSABLE_AREA)
-    } else {
-      const slotName = mod.location.slotName as FlexAddressableAreaName
-      validLocations.delete(slotName)
-    }
-  })
-
-  if (validLocations.has(C2_ADDRESSABLE_AREA)) {
-    return C2_ADDRESSABLE_AREA
+  if (isSlotC2Unavailable) {
+    // Given all the LPC-able labware, find the first slot in which no module is
+    // loaded beneath that labware.
+    const locationWithNoModule = lwLocInfo.find(
+      aLwLocInfo => aLwLocInfo.closestBeneathModuleId == null
+    )
+    return locationWithNoModule?.addressableAreaName ?? C3_ADDRESSABLE_AREA
   } else {
-    // The fallback should never occur in practice.
-    return head(Array.from(validLocations)) ?? C2_ADDRESSABLE_AREA
+    return C2_ADDRESSABLE_AREA
   }
 }
