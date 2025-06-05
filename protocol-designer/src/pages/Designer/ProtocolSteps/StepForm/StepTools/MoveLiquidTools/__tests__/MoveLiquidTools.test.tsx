@@ -14,7 +14,6 @@ import { SecondStepsMoveLiquidTools } from '../SecondStepsMoveLiquidTools'
 
 import type { ComponentProps } from 'react'
 import type { FormData } from '../../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../../steplist'
 
 vi.mock('../../../../../../../feature-flags/selectors')
 vi.mock('../../../../../../../file-data/selectors')
@@ -38,7 +37,6 @@ describe('MoveLiquidTools', () => {
         liquidClass: { updateValue: vi.fn() },
       } as any,
       formData: {} as FormData,
-      visibleFormErrors: {} as StepFormErrors,
       tab: 'aspirate',
       setTab: vi.fn(),
       focusHandlers: {} as any,

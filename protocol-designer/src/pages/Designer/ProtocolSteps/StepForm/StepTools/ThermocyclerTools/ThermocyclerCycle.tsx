@@ -23,14 +23,14 @@ import {
 
 import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
-  enterValueWithinRange,
-  isTimeFormatMinutesSeconds,
-} from '../../../../../../steplist/fieldLevel/errors'
-import {
   maskToFloat,
   maskToInteger,
   maskToTime,
 } from '../../../../../../steplist/fieldLevel/processing'
+import {
+  enterValueWithinRange,
+  isTimeFormatMinutesSeconds,
+} from '../../../../../../steplist/fieldLevel/thermocyclerFieldErrors'
 import { uuid } from '../../../../../../utils'
 import { getStepIndex, getTimeFromString } from './utils'
 

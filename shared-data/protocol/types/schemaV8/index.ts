@@ -32,6 +32,21 @@ export interface CommandV10Mixin {
   commands: CreateCommand[]
 }
 
+export interface CommandV11Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV11'
+  commands: CreateCommand[]
+}
+
+export interface CommandV12Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV12'
+  commands: CreateCommand[]
+}
+
+export interface CommandV13Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV13'
+  commands: CreateCommand[]
+}
+
 export interface CommandAnnotationsStructure {
   commandAnnotationSchemaId: string
   commandAnnotations: any[]
@@ -133,7 +148,14 @@ export type ProtocolFile<
   (OT2RobotMixin | OT3RobotMixin) &
   LabwareV2Mixin &
   (LiquidV1Mixin | LiquidV2Mixin) &
-  (CommandV8Mixin | CommandV9Mixin | CommandV10Mixin) &
+  (
+    | CommandV8Mixin
+    | CommandV9Mixin
+    | CommandV10Mixin
+    | CommandV11Mixin
+    | CommandV12Mixin
+    | CommandV13Mixin
+  ) &
   CommandAnnotationV1Mixin
 
 export type ProtocolStructure = ProtocolBase<{}> &
