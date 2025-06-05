@@ -88,6 +88,7 @@ export function getCutoutDisplayName(cutout: CutoutId): string {
 export function getAADisplayName(
   aadressableAreaId: AddressableAreaNamesWithFakes
 ): string {
+  console.log('aadressableAreaId: ', aadressableAreaId)
   return getAAByAAId(
     aadressableAreaId,
     getDeckDefFromRobotType('OT-3 Standard')

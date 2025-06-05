@@ -1,6 +1,7 @@
 import {
   AddressableArea,
   AddressableAreaName,
+  AddressableAreaNamesWithFakes,
   AddressableAreaWithFakes,
   filterAAByAreaType,
   FLEX_ROBOT_TYPE,
@@ -38,7 +39,7 @@ interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
   handleClickAdd: (
     cutoutId: CutoutId,
-    addressableArea: AddressableAreaWithFakes
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   handleClickRemove: (
     cutoutId: CutoutId,
@@ -161,7 +162,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         <EmptyConfigItem
           data-testid={addressableAreaId}
           key={addressableAreaId}
-          addressableArea={addressableAreaId}
+          addressableAreaId={addressableAreaId}
           deckDefinition={deckDef}
           handleClickAdd={handleClickAdd}
           fixtureLocation={cutoutId}

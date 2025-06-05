@@ -467,18 +467,42 @@ export function AddFixtureModal({
     return availableOptions
   }
 
-  const getFixtureOptions = (cutoutId: CutoutId): CutoutConfigMap[][] => {
-    let availableOptions: CutoutConfigMap[][] = []
+  const getAddressableAreaIdForCutout = (
+    cutoutId: CutoutId,
+    fixtureId: CutoutFixtureId
+  ): AddressableAreaNamesWithFakes | null => {
     const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
       cutoutId
     )
-    const aaListTrashBin = addressableAreasById[TRASH_BIN_ADAPTER_FIXTURE]
-    if (aaListTrashBin != null) {
-      const TrashBinAA = aaListTrashBin.find(
+    const aaListForFixtureId = addressableAreasById[fixtureId] ?? []
+    return (
+      aaListForFixtureId.find(
         (aa: AddressableAreaNamesWithFakes) =>
           aaNameMapToSlotId[aa] == addressableAreaId
-      ) as AddressableAreaNamesWithFakes
-      if (TrashBinAA != null) {
+      ) ?? null
+    )
+  }
+
+  const getWasteChuteOptions = (cutoutId: CutoutId): CutoutConfigMap[][] => {
+    return WASTE_CHUTE_FIXTURES.map((fixture: CutoutFixtureId) => {
+      const wasteCuteId = getAddressableAreaIdForCutout(cutoutId, fixture)
+      if (wasteCuteId != null) {
+        return [
+          {
+            cutoutId,
+            cutoutFixtureId: fixture,
+            addressableAreaId: wasteCuteId,
+          },
+        ]
+      }
+      return []
+    })
+  }
+
+  const getFixtureOptions = (cutoutId: CutoutId): CutoutConfigMap[][] => {
+    let availableOptions: CutoutConfigMap[][] = []
+    const TrashBinAA = getAddressableAreaIdForCutout(cutoutId, TRASH_BIN_ADAPTER_FIXTURE)
+    if (TrashBinAA != null) {
         availableOptions = [
           ...availableOptions,
           [
@@ -490,14 +514,9 @@ export function AddFixtureModal({
           ],
         ]
       }
-    }
-    const aaListStagingArea =
-      addressableAreasById[STAGING_AREA_RIGHT_SLOT_FIXTURE]
-    if (aaListStagingArea != null) {
-      const stagingAreaAA = aaListStagingArea.find(
-        (aa: AddressableAreaNamesWithFakes) =>
-          aaNameMapToSlotId[aa] == addressableAreaId
-      ) as AddressableAreaNamesWithFakes
+
+    const stagingAreaAA = getAddressableAreaIdForCutout(cutoutId, STAGING_AREA_RIGHT_SLOT_FIXTURE)
+    if (stagingAreaAA != null){
       availableOptions = [
         ...availableOptions,
         [
@@ -509,7 +528,6 @@ export function AddFixtureModal({
         ],
       ]
     }
-    console.log('availableOptions: ', availableOptions)
     return availableOptions
   }
 
@@ -526,18 +544,17 @@ export function AddFixtureModal({
         )
         const aaProvidedFixtureOptions = addressableAreasById[o]
         if (aaProvidedFixtureOptions != null) {
-          const aaProvidedFixtureOptionsItems = aaProvidedFixtureOptions.find(
-            (aa: AddressableAreaNamesWithFakes) =>
-              aaNameMapToSlotId[aa] == addressableAreaId
-          ) as AddressableAreaNamesWithFakes
-          return [
-            {
-              cutoutId,
-              cutoutFixtureId: o,
-              addressableAreaId: aaProvidedFixtureOptionsItems,
-              opentronsModuleSerialNumber: undefined,
-            },
-          ]
+          const aaForFixture = getAddressableAreaIdForCutout(cutoutId, o)
+          if (aaForFixture != null){
+            return [
+              {
+                cutoutId,
+                cutoutFixtureId: o,
+                addressableAreaId: aaForFixture,
+                opentronsModuleSerialNumber: undefined,
+              },
+            ]
+          }
         }
         return []
       })
@@ -549,12 +566,7 @@ export function AddFixtureModal({
       return getModuleOptions(cutoutId, unconfiguredMods)
     }
     if (optionStage === 'wasteChuteOptions') {
-      return WASTE_CHUTE_FIXTURES.map(fixture => [
-        {
-          cutoutId,
-          cutoutFixtureId: fixture,
-        },
-      ])
+      return getWasteChuteOptions(cutoutId)
     }
     return []
   }
