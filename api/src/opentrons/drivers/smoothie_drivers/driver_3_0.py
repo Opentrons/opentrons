@@ -803,6 +803,8 @@ class SmoothieDriver:
         This methods writes a sequence of newline characters, which will
         guarantee Smoothieware responds with 'ok\r\nok\r\n' within 3 seconds
         """
+        if self._connection:
+            await self._connection.flush_input()
         await self._send_command(_command_builder(), timeout=SMOOTHIE_BOOT_TIMEOUT)
 
     async def _reset_from_error(self) -> None:
