@@ -1,3 +1,5 @@
+import { getSchema2Dimensions } from '@opentrons/shared-data'
+
 import {
   C_MED_DARK_GRAY,
   C_MED_GRAY,
@@ -5,8 +7,7 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   RobotCoordsText,
   TYPOGRAPHY,
-} from '@opentrons/components'
-import { getSchema2Dimensions } from '@opentrons/shared-data'
+} from '../..'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
