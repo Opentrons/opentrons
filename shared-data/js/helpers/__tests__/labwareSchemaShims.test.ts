@@ -1,8 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { getLabwareViewBox, getSchema2Dimensions } from '../..'
+import {
+  getDeckSlotOriginToLabwareOrigin,
+  getLabwareViewBox,
+  getSchema2Dimensions,
+} from '../..'
 
-import type { LabwareDefinition2, LabwareDefinition3 } from '../..'
+import type {
+  AddressableArea,
+  LabwareDefinition2,
+  LabwareDefinition3,
+} from '../..'
 
 describe('getSchema2Dimensions()', () => {
   it('should handle schema 2 definitions', () => {
@@ -99,6 +107,65 @@ describe('getLabwareViewBox()', () => {
       minY: -10,
       xDimension: 200,
       yDimension: 100,
+    }
+    expect(result).toStrictEqual(expectedResult)
+  })
+})
+
+describe('getDeckSlotOriginToLabwareOrigin()', () => {
+  it('should handle schema 2 labware definitions', () => {
+    const labwareDef: Partial<LabwareDefinition2> = {
+      schemaVersion: 2,
+      cornerOffsetFromSlot: {
+        // Should not affect result.
+        x: 10,
+        y: 20,
+        z: 30,
+      },
+    }
+    const addressableArea: Partial<AddressableArea> = {
+      boundingBox: {
+        xDimension: 200,
+        yDimension: 100,
+        zDimension: 0,
+      },
+    }
+    const result = getDeckSlotOriginToLabwareOrigin(
+      addressableArea as AddressableArea,
+      labwareDef as LabwareDefinition2
+    )
+    const expectedResult = labwareDef.cornerOffsetFromSlot
+    expect(result).toStrictEqual(expectedResult)
+  })
+  it('should handle schema 3 labware definitions', () => {
+    const labwareDef: Partial<LabwareDefinition3> = {
+      schemaVersion: 3,
+      extents: {
+        footprint: {
+          backLeft: { x: 0, y: 0 },
+          frontRight: { x: 200, y: -100 },
+        },
+        total: {
+          backLeftBottom: { x: -10, y: 10, z: 0 },
+          frontRightTop: { x: 210, y: -110, z: 1000 },
+        },
+      },
+    }
+    const addressableArea: Partial<AddressableArea> = {
+      boundingBox: {
+        xDimension: 2000,
+        yDimension: 1000,
+        zDimension: 0,
+      },
+    }
+    const result = getDeckSlotOriginToLabwareOrigin(
+      addressableArea as AddressableArea,
+      labwareDef as LabwareDefinition3
+    )
+    const expectedResult: typeof result = {
+      x: 0,
+      y: 100,
+      z: 0,
     }
     expect(result).toStrictEqual(expectedResult)
   })

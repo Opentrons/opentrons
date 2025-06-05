@@ -1,6 +1,15 @@
 /** Compatibility shims to ease transitioning between with labware schemas 2 and 3. */
 
-import type { LabwareDefinition, LabwareDefinition2 } from '../types'
+import { getVectorInverse, getVectorSum } from './vectorMath'
+
+import type {
+  AddressableArea,
+  LabwareDefinition,
+  LabwareDefinition2,
+  Vector3D,
+} from '../types'
+
+const VEC_ZERO: Vector3D = { x: 0, y: 0, z: 0 }
 
 /** Return dimensions of the total labware bounding box in the style of labware schema 2. */
 export function getSchema2Dimensions(
@@ -52,6 +61,56 @@ export function getLabwareViewBox(
       xDimension: maxX - minX,
       yDimension: maxY - minY,
     }
+  }
+}
+
+/**
+ * Return the offset from a deck slot's origin (the slot's front-left, -x, -y)
+ * to a labware's origin (varies depending on the labware),
+ * supposing the labware is placed in that slot.
+ */
+export function getDeckSlotOriginToLabwareOrigin(
+  // slotDefinition is currently unused by this limited implementation. A proper
+  // implementation would need it, so we're requiring it now to get callers in the habit.
+  slotDefinition: AddressableArea,
+  labwareDefinition: LabwareDefinition
+): Vector3D {
+  const slotOriginToSlotFrontLeft = VEC_ZERO
+
+  if (labwareDefinition.schemaVersion === 2) {
+    // For schema 2 labware, the labware origin is always its front-left-bottom (-x, -y, -z),
+    // and it's positioned with that corner in reference to the front-left (-x, -y) of the
+    // slot, plus an adjustment supplied by the labware (cornerOffsetFromSlot).
+    const slotFrontLeftToLabwareFrontLeftBottom =
+      labwareDefinition.cornerOffsetFromSlot
+    const labwareFrontLeftBottomToLabwareOrigin = VEC_ZERO
+    return getVectorSum(
+      slotOriginToSlotFrontLeft,
+      slotFrontLeftToLabwareFrontLeftBottom,
+      labwareFrontLeftBottomToLabwareOrigin
+    )
+  } else {
+    // For schema 3 labware, the labware origin can be at an arbitrary point in the labware.
+    // Also, how the labware is positioned relative to its parent varies depending on the context.
+    // Here, we're accounting for the variance in labware origin, but simplifying the positioning,
+    // for now, to always put the front-left-bottom (-x, -y, -z) of the labware at the front-left of
+    // the slot. This is good enough for current display purposes and matches the schema 2 behavior.
+    const slotFrontLeftToLabwareFrontLeftBottom = VEC_ZERO
+    const labwareOriginToLabwareFrontLeftBottom = {
+      x: labwareDefinition.extents.footprint.backLeft.x,
+      y: labwareDefinition.extents.footprint.frontRight.y,
+      // todo(mm, 2025-06-09): Using extents.total here seems wrong.
+      // I think extents.footprint needs a z-coord.
+      z: labwareDefinition.extents.total.backLeftBottom.z,
+    }
+    const labwareFrontLeftBottomToLabwareOrigin = getVectorInverse(
+      labwareOriginToLabwareFrontLeftBottom
+    )
+    return getVectorSum(
+      slotOriginToSlotFrontLeft,
+      slotFrontLeftToLabwareFrontLeftBottom,
+      labwareFrontLeftBottomToLabwareOrigin
+    )
   }
 }
 
