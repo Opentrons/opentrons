@@ -1801,7 +1801,7 @@ def test_define_liquid_class(
         expected_liquid_class
     )
     decoy.when(mock_core.robot_type).then_return(robot_type)
-    assert subject.define_liquid_class("volatile_90") == expected_liquid_class
+    assert subject.get_liquid_class("volatile_90") == expected_liquid_class
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])

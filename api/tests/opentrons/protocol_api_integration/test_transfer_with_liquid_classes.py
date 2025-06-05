@@ -40,7 +40,7 @@ def test_water_transfer_with_volume_more_than_tip_max(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with mock.patch.object(
         InstrumentCore,
         "pick_up_tip",
@@ -112,7 +112,7 @@ def test_order_of_water_transfer_steps(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -255,7 +255,7 @@ def test_order_of_water_transfer_steps_with_new_tip_per_destination(
         "nest_96_wellplate_200ul_flat", "C3"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -382,7 +382,7 @@ def test_order_of_water_transfer_steps_with_return_tip(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -537,7 +537,7 @@ def test_order_of_water_transfer_steps_with_no_new_tips(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     pipette_50.pick_up_tip()
     with (
         mock.patch.object(
@@ -664,7 +664,7 @@ def test_order_of_water_consolidate_steps(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -794,7 +794,7 @@ def test_order_of_water_consolidate_steps_larger_volume_than_tip(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -935,7 +935,7 @@ def test_order_of_water_consolidate_steps_with_no_new_tips(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     pipette_50.pick_up_tip()
     with (
         mock.patch.object(
@@ -1053,7 +1053,7 @@ def test_order_of_water_consolidate_steps_with_return_tip(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -1180,7 +1180,7 @@ def test_water_distribution_with_volume_more_than_tip_max(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[union-attr]
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out  # type: ignore[union-attr]
@@ -1240,7 +1240,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[union-attr]
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out  # type: ignore[union-attr]
@@ -1408,7 +1408,7 @@ def test_order_of_water_distribute_steps_using_one_to_one_transfers(
     arma_plate = simulated_protocol_context.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_50, tiprack)
     if not multi_dispense_props_present:
         water_props._multi_dispense = None
@@ -1562,7 +1562,7 @@ def test_order_of_water_distribution_steps_using_mixed_dispense(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     assert water_props.multi_dispense is not None
     water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
@@ -1767,7 +1767,7 @@ def test_water_distribute_steps_with_return_tip(
     arma_plate = simulated_protocol_context.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
 
     with (
         mock.patch.object(
@@ -1832,7 +1832,7 @@ def test_water_distribution_raises_error_for_disposal_vol_without_blowout(
     nest_plate = simulated_protocol_context.load_labware(
         "nest_96_wellplate_200ul_flat", "C3"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     water_props.multi_dispense.retract.blowout.enabled = False  # type: ignore[union-attr]
     with pytest.raises(
@@ -1879,7 +1879,7 @@ def test_water_transfer_with_lpd(
     arma_plate = simulated_protocol_context.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
 
     with (
         mock.patch.object(
@@ -1930,7 +1930,7 @@ def test_water_transfer_does_lpd_only_once_for_a_source_well(
     arma_plate = simulated_protocol_context.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
 
     with (
         mock.patch.object(
@@ -1977,7 +1977,7 @@ def test_water_distribution_with_lpd(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     assert water_props.multi_dispense is not None
     water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
@@ -2029,7 +2029,7 @@ def test_incompatible_transfers_skip_probing_even_with_lpd_on(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     assert water_props.multi_dispense is not None
     water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
@@ -2108,7 +2108,7 @@ def test_water_transfer_with_multi_channel_pipette(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -2162,7 +2162,7 @@ def test_raises_no_tips_available_error(
     arma_plate = simulated_protocol_context.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     expected_error_msg = (
         "No tip available among the tipracks assigned for flex_1channel_50:"
         " \\['Opentrons Flex 96 Tip Rack 50 µL in D1', 'Opentrons Flex 96 Tip Rack 50 µL in D2'\\]"

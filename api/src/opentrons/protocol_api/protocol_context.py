@@ -1372,12 +1372,12 @@ class ProtocolContext(CommandPublisher):
         )
 
     @requires_version(2, 23)
-    def define_liquid_class(
+    def get_liquid_class(
         self,
         name: str,
     ) -> LiquidClass:
         """
-        Define a liquid class for use in the protocol.
+        Get a liquid class instance for use in the protocol.
         ..
             This is intended for Opentrons internal use only and is not a guaranteed API.
 

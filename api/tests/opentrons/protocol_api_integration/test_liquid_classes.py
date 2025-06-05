@@ -20,7 +20,7 @@ def test_liquid_class_creation_and_property_fetching(
     tiprack = simulated_protocol_context.load_labware(
         "opentrons_flex_96_tiprack_50ul", "D1"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
 
     assert water.name == "water"
     assert water.display_name == "Aqueous"
@@ -44,7 +44,7 @@ def test_liquid_class_creation_and_property_fetching(
         water.display_name = "bar"  # type: ignore
 
     with pytest.raises(ValueError, match="Liquid class definition not found"):
-        simulated_protocol_context.define_liquid_class("non-existent-liquid")
+        simulated_protocol_context.get_liquid_class("non-existent-liquid")
 
 
 @pytest.mark.ot3_only
