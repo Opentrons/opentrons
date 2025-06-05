@@ -25,6 +25,7 @@ export interface StackingProps {
 }
 
 interface CustomizeExpandButtonProps extends StyleProps {
+  enableStackingFF: boolean
   allowInputField: boolean
   loadName: string
   buttonText: string
@@ -50,6 +51,7 @@ export function CustomizeExpandButton(
     stackingProps,
     allowInputField,
     loadName,
+    enableStackingFF,
   } = props
   const isLid =
     stackingProps != null &&
@@ -85,7 +87,7 @@ export function CustomizeExpandButton(
           <StyledText desktopStyle="bodyDefaultRegular">
             {buttonText}
           </StyledText>
-          {stackingProps != null && isSelected ? (
+          {stackingProps != null && enableStackingFF && isSelected ? (
             <Flex
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.blue10}
