@@ -371,9 +371,9 @@ export const reduxActionToAnalyticsEvent = (
     )
 
     const labwareInfo = Object.entries(labwareLocationUpdate).reduce(
-      (acc: Record<string, string>, [id, location]) => {
+      (acc: Record<string, { location: string }>, [id, location]) => {
         const displayName = labware[id].displayName
-        acc[displayName] = location
+        acc[displayName] = { location }
         return acc
       },
       {}
@@ -381,11 +381,16 @@ export const reduxActionToAnalyticsEvent = (
 
     const liquids = Object.values(ingredients).reduce(
       (acc: Record<string, LiquidInfo>, ingredient) => {
-        const displayName = ingredient.displayColor
+        const {
+          displayName,
+          liquidClass,
+          displayColor,
+          description,
+        } = ingredient
         acc[displayName] = {
-          liquidClass: ingredient.liquidClass ?? null,
-          displayColor: ingredient.displayColor,
-          description: ingredient.description,
+          liquidClass: liquidClass ?? null,
+          displayColor,
+          description,
         }
         return acc
       },
