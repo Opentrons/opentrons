@@ -22,7 +22,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Select model type.",
     )
 
-    parameters.add_int(
+    parameters.add_float(
         display_name="Target Temperature",
         variable_name="temp",
         default=25.5,
