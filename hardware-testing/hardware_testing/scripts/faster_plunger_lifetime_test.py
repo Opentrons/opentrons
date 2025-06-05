@@ -3,11 +3,13 @@ from typing import Tuple, Dict, Literal, Optional
 from typing_extensions import TypedDict
 
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.types import Mount
 from dataclasses import dataclass
 
 import time
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Axis, OT3Mount
+from hardware_testing.gravimetric.helpers import get_pipette_unique_name
 import enum
 import argparse
 import csv
@@ -84,12 +86,14 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
         print(f"Estimate: {est}, Encoder: {enc}, Aligned: {aligned}")
         return aligned
 
+    await api.cache_instruments()
     await api.home_z(OT3Mount.LEFT)
     # LOOP THROUGH CURRENTS + SPEEDS
     await api.home()
     today = datetime.now().strftime("%m-%d-%y_%H-%M")
+    pip_id = api.attached_pipettes[Mount.LEFT]["pipette_id"]
     with open(
-        f"/data/testing_data/P200H_test_plunger_speed_test_{today}.csv", "w", newline=""
+        f"/data/testing_data/P200H_LT_{pip_id}_{today}.csv", "w", newline=""
     ) as csvfile:
         test_data: TestData = {
             "time_sec": None,
