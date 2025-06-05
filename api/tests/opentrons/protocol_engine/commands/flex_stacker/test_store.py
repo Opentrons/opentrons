@@ -221,8 +221,8 @@ async def test_store_raises_if_stall(
         pool_lid_definition=None,
         contained_labware_bottom_first=[],
         max_pool_count=999,
-        pool_overlap=0,
-        pool_height=0,
+        pool_overlap=6,
+        pool_height=10,
     )
 
     decoy.when(
@@ -238,9 +238,6 @@ async def test_store_raises_if_stall(
     decoy.when(state_view.labware.get_definition("labware-id")).then_return(
         flex_50uL_tiprack
     )
-    decoy.when(
-        state_view.geometry.get_height_of_labware_stack([flex_50uL_tiprack])
-    ).then_return(4)
 
     decoy.when(state_view.geometry.get_location_sequence("labware-id")).then_return(
         [
@@ -466,8 +463,8 @@ async def test_store(
         pool_lid_definition=None,
         contained_labware_bottom_first=_contained_labware(1),
         max_pool_count=5,
-        pool_overlap=0,
-        pool_height=0,
+        pool_overlap=6,
+        pool_height=10,
     )
 
     decoy.when(
@@ -483,10 +480,6 @@ async def test_store(
     decoy.when(state_view.labware.get_definition("labware-id")).then_return(
         flex_50uL_tiprack
     )
-    decoy.when(
-        state_view.geometry.get_height_of_labware_stack([flex_50uL_tiprack])
-    ).then_return(4)
-
     decoy.when(state_view.geometry.get_location_sequence("labware-id")).then_return(
         [
             OnModuleLocationSequenceComponent(moduleId=stacker_id),

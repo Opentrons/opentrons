@@ -76,7 +76,7 @@ def subject(
             FlexStackerPoolConstraint(
                 max_pool_count=10,
                 pool_overlap=0,
-                pool_height=0,
+                pool_height=sentinel.pool_height,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=sentinel.lid_definition,
                 adapter_definition=sentinel.adapter_definition,
@@ -154,7 +154,7 @@ def subject(
             FlexStackerPoolConstraint(
                 max_pool_count=10,
                 pool_overlap=0,
-                pool_height=0,
+                pool_height=sentinel.pool_height,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=None,
                 adapter_definition=None,
@@ -196,7 +196,7 @@ def subject(
                 primary_definition=sentinel.primary_definition,
                 lid_definition=sentinel.lid_definition,
                 adapter_definition=None,
-                pool_height=0,
+                pool_height=sentinel.pool_height,
             ),
             [
                 StackerStoredLabwareGroup(
@@ -248,7 +248,7 @@ def subject(
             FlexStackerPoolConstraint(
                 max_pool_count=10,
                 pool_overlap=0,
-                pool_height=0,
+                pool_height=sentinel.pool_height,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=None,
                 adapter_definition=sentinel.adapter_definition,
@@ -629,6 +629,13 @@ async def test_set_stored_labware_requires_empty_hopper(
         ),
     ],
 )
+@pytest.mark.parametrize(
+    "default_overlap, overlap_override, actual_value_used",
+    [
+        (10.0, None, 10.0),
+        (10.0, 5.0, 5.0),
+    ],
+)
 async def test_set_stored_labware_limits_count(
     input_count: int | None,
     input_labware: list[StackerStoredLabwareGroup] | None,
@@ -640,6 +647,9 @@ async def test_set_stored_labware_limits_count(
     subject: SetStoredLabwareImpl,
     model_utils: ModelUtils,
     flex_50uL_tiprack: LabwareDefinition,
+    default_overlap: float,
+    overlap_override: float | None,
+    actual_value_used: float,
 ) -> None:
     """It should default and limit the input count."""
     module_id = "module-id"
@@ -654,6 +664,7 @@ async def test_set_stored_labware_limits_count(
         adapterLabware=None,
         initialCount=input_count,
         initialStoredLabware=input_labware,
+        poolOverlapOverride=overlap_override,
     )
     for i in range(len(output_labware)):
         decoy.when(model_utils.generate_id()).then_return(f"labware-{i+1}")
@@ -684,7 +695,7 @@ async def test_set_stored_labware_limits_count(
         state_view._labware.get_labware_overlap_offsets(
             flex_50uL_tiprack, "opentrons_flex_96_filtertiprack_50ul"
         )
-    ).then_return(OverlapOffset(x=0, y=0, z=0))
+    ).then_return(OverlapOffset(x=0, y=0, z=default_overlap))
 
     decoy.when(
         state_view.geometry.get_height_of_labware_stack([flex_50uL_tiprack])
@@ -692,9 +703,10 @@ async def test_set_stored_labware_limits_count(
 
     decoy.when(
         state_view.modules.stacker_max_pool_count_by_height(
-            module_id, sentinel.pool_height, 0.0
+            module_id, sentinel.pool_height, actual_value_used
         )
     ).then_return(2)
+
     # we need to control multiple return values from generate_id and it doesnt take
     # an argument so we can do this iter side-effecting thing
     labware_ids = iter(("labware-1", "labware-2"))
@@ -780,8 +792,8 @@ async def test_set_stored_labware_limits_count(
                 module_id=module_id,
                 pool_constraint=FlexStackerPoolConstraint(
                     max_pool_count=2,
-                    pool_overlap=0,
-                    pool_height=0,
+                    pool_overlap=actual_value_used,
+                    pool_height=sentinel.pool_height,
                     primary_definition=flex_50uL_tiprack,
                     lid_definition=None,
                     adapter_definition=None,
