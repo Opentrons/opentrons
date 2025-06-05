@@ -112,29 +112,35 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
             showDeckLayers
             viewBox={DECK_VIEW_BOX}
           >
-            {({ deckSlotsById }) =>
-              map(deckSlotsById, (slot: AddressableArea, slotId) => {
-                if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
-                let labwareDef = null
-                if (String(tipRack?.slot) === slotId) {
-                  labwareDef = tipRack?.definition
-                } else if (
-                  calBlock != null &&
-                  String(calBlock?.slot) === slotId
-                ) {
-                  labwareDef = calBlock?.definition
+            {({ addressableAreasById }) =>
+              map(
+                addressableAreasById,
+                (addressableArea, addressableAreaName) => {
+                  if (!addressableArea.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
+                  let labwareDef = null
+                  if (String(tipRack?.slot) === addressableAreaName) {
+                    labwareDef = tipRack?.definition
+                  } else if (
+                    calBlock != null &&
+                    String(calBlock?.slot) === addressableAreaName
+                  ) {
+                    labwareDef = calBlock?.definition
+                  }
+
+                  const slotDefPosition = getPositionFromSlotId(
+                    addressableArea.id,
+                    deckDef
+                  )
+
+                  return labwareDef != null ? (
+                    <CalibrationLabwareRender
+                      key={addressableAreaName}
+                      slotDefPosition={slotDefPosition}
+                      labwareDef={labwareDef}
+                    />
+                  ) : null
                 }
-
-                const slotDefPosition = getPositionFromSlotId(slot.id, deckDef)
-
-                return labwareDef != null ? (
-                  <CalibrationLabwareRender
-                    key={slotId}
-                    slotDefPosition={slotDefPosition}
-                    labwareDef={labwareDef}
-                  />
-                ) : null
-              })
+              )
             }
           </RobotWorkSpace>
         </Flex>

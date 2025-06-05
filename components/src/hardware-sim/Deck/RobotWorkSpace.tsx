@@ -6,11 +6,14 @@ import { Svg } from '../../primitives'
 import { DeckFromLayers } from './DeckFromLayers'
 
 import type { ReactNode } from 'react'
-import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
+import type { AddressableArea, DeckDefinition } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 
 export interface RobotWorkSpaceRenderProps {
-  deckSlotsById: { [slotId: string]: DeckSlot }
+  // todo(mm, 2025-06-05): Is this API still worthwhile? The parent of RobotWorkSpace
+  // already has access to the full DeckDefinition. Maybe it should iterate over
+  // the DeckDefinition's AddressableAreas itself?
+  addressableAreasById: { [addressableAreaId: string]: AddressableArea }
 }
 
 export interface RobotWorkSpaceProps extends StyleProps {
@@ -54,12 +57,12 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
   if (!deckDef && !viewBox) return null
 
   let wholeDeckViewBox
-  let deckSlotsById = {}
+  let addressableAreasById = {}
   if (deckDef != null) {
     const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
     const [deckXDimension, deckYDimension] = deckDef.dimensions
 
-    deckSlotsById = deckDef.locations.addressableAreas.reduce(
+    addressableAreasById = deckDef.locations.addressableAreas.reduce(
       (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
       {}
     )
@@ -87,7 +90,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
             robotType={OT2_ROBOT_TYPE}
           />
         ) : null}
-        {children?.({ deckSlotsById })}
+        {children?.({ addressableAreasById })}
       </g>
     </Svg>
   )
