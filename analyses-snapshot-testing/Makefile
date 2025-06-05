@@ -20,10 +20,6 @@ ruff-check:
 	uv run ruff format --check
 	uv run ruff check .
 
-.PHONY: ty
-ty:
-	uv run ty check ./automation ./citools
-
 .PHONY: format
 format: 
 	@echo "Running ruff"
@@ -201,3 +197,9 @@ clean-generated-protocols:
 .PHONY: clean
 clean: clean-ar clean-chunks clean-generated-protocols
 
+.PHONY: collect-audit
+collect-audit: 
+	uv run python -m automation.data.collect_audit
+
+.PHONY: prep
+prep: format ruff-check clean collect-audit

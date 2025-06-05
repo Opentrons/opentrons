@@ -43,8 +43,11 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
                     data = json.load(f)
                 errors_present = data.get("errors") != []
                 file_path_str = str(file_path)
-                if "Flex_S" in file_path_str or "OT2_S" in file_path_str or "pl_" in file_path_str:
-                    if errors_present:
+                # Check for error key at the top level of the JSON
+                # This happens when things are not found
+                has_error_key = "error" in data
+                if "Flex_S" in file_path_str or "OT2_S" in file_path_str or "pl_" in file_path_str or "PL_S" in file_path_str:
+                    if errors_present or has_error_key:
                         print(f"Error in {file_path}")
                         for e in data.get("errors", []):
                             for w in e.get("wrappedErrors", []):

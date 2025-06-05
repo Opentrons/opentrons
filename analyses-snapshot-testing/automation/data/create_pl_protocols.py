@@ -5,8 +5,7 @@ from typing import Any, Dict
 import httpx
 from rich import print
 
-PROTOCOL_DESTINATION = Path(__file__).parent.parent.parent / "files" / "protocols" / "protocol_library"
-LABWARE_DESTINATION = Path(__file__).parent.parent.parent / "files" / "labware"
+from automation.data.protocol import LABWARE_FOLDER, PROTOCOL_LIBRARY_PROTOCOLS_FOLDER
 
 headers = {
     "accept": "*/*",
@@ -95,6 +94,19 @@ def extract_api_level(protocol_text: str) -> str:
     return ""
 
 
+def extract_robot_type(protocol_text: str) -> str:
+    """
+    Extract the robot type from the protocol text.
+    Returns "Flex" if 'robotType': 'Flex' is found, otherwise "OT2".
+    """
+    import re
+
+    # Look for 'robotType': 'Flex' or "robotType": "Flex"
+    if re.search(r'["\']robotType["\']\s*:\s*["\']Flex["\']', protocol_text):
+        return "Flex"
+    return "OT2"
+
+
 def main():
     """
     Main function to fetch protocols from the Opentrons Protocol Library and save them to files.
@@ -112,19 +124,20 @@ def main():
     for protocol in protocols:
         slug = protocol["slug"]
         protocol_text = protocol["protocolText"]
+        robot_type = extract_robot_type(protocol_text)
         api_level = extract_api_level(protocol_text)
         if api_level:
-            file_name = f"PL_S_v{api_level}_{slug}.py"
+            file_name = f"{robot_type}_S_v{api_level}_PL_{slug}.py"
         else:
             raise ValueError(f"API level not found in protocol {slug}")
-        file_path = Path(PROTOCOL_DESTINATION, file_name)
+        file_path = Path(PROTOCOL_LIBRARY_PROTOCOLS_FOLDER, file_name)
         with open(file_path, "w") as f:
             f.write(protocol_text)
         written_count += 1
         custom_labware = protocol.get("customLabware")
         if custom_labware:
             for idx, labware in enumerate(custom_labware):
-                labware_file = Path(LABWARE_DESTINATION, f"{slug}_labware_{idx + 1}.json")
+                labware_file = Path(LABWARE_FOLDER, f"{slug}_labware_{idx + 1}.json")
                 with open(labware_file, "w") as lf:
                     json.dump(labware, lf, indent=2)
         if protocol.get("hasLp"):

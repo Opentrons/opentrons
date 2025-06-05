@@ -1,3 +1,6 @@
+# This file Manually maintained
+# So we may map the overrides
+from automation.data.protocol import GENERATORS_FOLDER
 from automation.data.protocol_with_overrides import ProtocolWithOverrides
 
 
@@ -18,6 +21,7 @@ class ProtocolsWithOverrides:
             "wrong_type_in_maximum",
             "wrong_type_in_unit",  # we going unit or suffix?
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     Flex_X_v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP: ProtocolWithOverrides = ProtocolWithOverrides(
@@ -29,6 +33,7 @@ class ProtocolsWithOverrides:
             "default_greater_than_maximum",
             "default_less_than_minimum",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     Flex_X_v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice: ProtocolWithOverrides = ProtocolWithOverrides(
@@ -37,6 +42,7 @@ class ProtocolsWithOverrides:
         robot="Flex",
         override_variable_name="type_to_test",
         overrides=["str_default_no_matching_choices", "float_default_no_matching_choices", "int_default_no_matching_choices"],
+        folder=GENERATORS_FOLDER,
     )
 
     # analyses-snapshot-testing/files/protocols/Flex_X_v2_20_96_and_8_Overrides_InvalidConfigs.py
@@ -56,6 +62,7 @@ class ProtocolsWithOverrides:
             "return_tip_error",
             "drop_tip_with_location",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     # analyses-snapshot-testing/files/protocols/Flex_X_v2_20_96_None_Overrides_TooTallLabware.py
@@ -90,6 +97,7 @@ class ProtocolsWithOverrides:
             "distribute_source_collision",
             "distribute_destination_collision",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     # analyses-snapshot-testing/files/protocols/OT2_X_v2_20_8_Overrides_InvalidConfigs.py
@@ -106,6 +114,7 @@ class ProtocolsWithOverrides:
             "return_tip_error",
             "drop_tip_with_location",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid.py
@@ -129,6 +138,7 @@ class ProtocolsWithOverrides:
             "1000_exceeds",
             "1000_filter_exceeds",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     # Flex_S_v2_24_96_HappyPath_Overrides_distribute_liquid.py
@@ -151,6 +161,7 @@ class ProtocolsWithOverrides:
             "200_under",
             "200_filter_under",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_96_HappyPath_Overrides_consolidate_liquid.py
@@ -174,6 +185,7 @@ class ProtocolsWithOverrides:
             "1000_filter",
             "1000_filter_exceeds",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_transfer_liquid.py
@@ -191,6 +203,7 @@ class ProtocolsWithOverrides:
             "1000",
             "1000_filter",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid.py
@@ -208,6 +221,7 @@ class ProtocolsWithOverrides:
             "1000",
             "1000_filter",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_distribute_liquid.py
@@ -225,4 +239,5 @@ class ProtocolsWithOverrides:
             "1000",  # was bug
             "1000_filter",
         ],
+        folder=GENERATORS_FOLDER,
     )

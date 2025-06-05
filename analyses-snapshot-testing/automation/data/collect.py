@@ -47,6 +47,7 @@ def generate_protocol_chunks() -> None:
     os.makedirs(CHUNK_DIR, exist_ok=True)
 
     protocols = protocols_under_test()
+    print(f"Found {len(protocols)} protocols to chunk from protocols_under_test().")
     serialized_protocols = [p.to_json() for p in protocols]
     chunks = chunk_list(serialized_protocols, CHUNK_SIZE)
 
