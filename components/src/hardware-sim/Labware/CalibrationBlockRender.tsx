@@ -47,10 +47,10 @@ export function CalibrationBlockRender(
             y={0}
             fill={C_MED_GRAY}
           />
-          <g transform="rotate(270)">
+          <g transform="rotate(270, 5, 55)">
             <RobotCoordsText
-              x={-55}
-              y={5}
+              x={5}
+              y={55}
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -58,10 +58,10 @@ export function CalibrationBlockRender(
               {TALL}
             </RobotCoordsText>
           </g>
-          <g transform="rotate(90)">
+          <g transform={`rotate(90, ${dimensions.xDimension - 5}, 25)`}>
             <RobotCoordsText
-              x={25}
-              y={-dimensions.xDimension + 5}
+              x={dimensions.xDimension - 5}
+              y={25}
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -93,10 +93,10 @@ export function CalibrationBlockRender(
             y={0}
             fill={C_MED_GRAY}
           />
-          <g transform="rotate(270)">
+          <g transform="rotate(270, 5, 55)">
             <RobotCoordsText
-              x={-55}
-              y={5}
+              x={5}
+              y={55}
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -104,10 +104,10 @@ export function CalibrationBlockRender(
               {SHORT}
             </RobotCoordsText>
           </g>
-          <g transform="rotate(90)">
+          <g transform={`rotate(90, ${dimensions.xDimension - 5}, 30)`}>
             <RobotCoordsText
-              x={30}
-              y={-dimensions.xDimension + 5}
+              x={dimensions.xDimension - 5}
+              y={30}
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
