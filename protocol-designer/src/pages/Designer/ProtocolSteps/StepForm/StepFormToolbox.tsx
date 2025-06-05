@@ -88,7 +88,6 @@ import type {
 } from '../../../../form-types'
 import type { FormWarningType } from '../../../../steplist'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FormErrorLocationType } from '../../../../steplist/formLevel/errors'
 import type { FocusHandlers, LiquidHandlingTab, StepFormProps } from './types'
 
 type StepFormMap = {

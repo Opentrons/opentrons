@@ -2,13 +2,13 @@ import uniqBy from 'lodash/uniqBy'
 
 import { THERMOCYCLER_PROFILE } from '../../constants'
 import { PROFILE_STEP } from '../../form-types'
-import { FormErrorLocationType } from './errors'
 
 import type { ReactNode } from 'react'
 import type {
   HydratedThermocyclerFormData,
   ProfileStepItem,
 } from '../../form-types'
+import type { FormErrorLocationType } from './errors'
 
 export interface ProfileFormError {
   title: string
