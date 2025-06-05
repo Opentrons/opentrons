@@ -86,9 +86,9 @@ export function getCutoutDisplayName(cutout: CutoutId): string {
 }
 
 export function getAADisplayName(
-  aadressableArea: AddressableAreaWithFakes
+  aadressableAreaId: AddressableAreaNamesWithFakes
 ): string {
-  return aadressableArea.displayName
+  return getAAByAAId(aadressableAreaId, getDeckDefFromRobotType('OT-3 Standard')).displayName 
 }
 
 // mapping of OT-2 deck slots to cutouts
@@ -556,12 +556,15 @@ export function getAddressableAreaNamesFromLoadedModule(
 }
 // note: we've decided not to translate these strings
 export function getFixtureDisplayName(
-  cutoutFixtureId: CutoutFixtureId | null,
+  cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
   usbPortNumber?: number | string
 ): string {
   switch (cutoutFixtureId) {
     case STAGING_AREA_RIGHT_SLOT_FIXTURE:
       return 'Staging area slot'
+    case FAKE_STAGING_AREA_RIGHT_SLOT:
+      // for debugging perpuses change to display name 
+        return 'Fake Staging area slot'
     case TRASH_BIN_ADAPTER_FIXTURE:
       return 'Trash bin'
     case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:

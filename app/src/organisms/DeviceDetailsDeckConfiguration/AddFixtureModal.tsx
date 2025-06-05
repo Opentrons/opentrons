@@ -72,7 +72,7 @@ import { ConnectRobotSlideout } from '../Desktop/AppSettings/ConnectRobotSlideou
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
-  addressableArea: AddressableAreaWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   closeModal: () => void
   providedFixtureOptions?: CutoutFixtureId[]
   isOnDevice?: boolean
@@ -86,7 +86,7 @@ type OptionStage =
 
 export function AddFixtureModal({
   cutoutId,
-  addressableArea,
+  addressableAreaId,
   closeModal,
   providedFixtureOptions,
   isOnDevice = false,

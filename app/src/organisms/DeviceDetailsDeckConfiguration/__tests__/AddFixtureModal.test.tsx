@@ -6,6 +6,7 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
+  AddressableAreaWithFakes,
   getFixtureDisplayName,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
@@ -39,7 +40,7 @@ describe('Touchscreen AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
-      addressableArea: {},
+      addressableAreaId: 'D3',     
       closeModal: mockCloseModal,
       isOnDevice: true,
     }
@@ -95,6 +96,7 @@ describe('Desktop AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
+      addressableAreaId: 'D3',
       closeModal: mockCloseModal,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({

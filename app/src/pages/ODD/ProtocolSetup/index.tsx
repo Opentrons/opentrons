@@ -28,6 +28,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import {
+  AddressableAreaNamesWithFakes,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
   getModuleDisplayName,
@@ -802,6 +803,7 @@ export function ProtocolSetup(): JSX.Element {
     !configBypassHeaterShakerAttachmentConfirmation
   )
   const [cutoutId, setCutoutId] = useState<CutoutId | null>(null)
+  const [addressableAreaId, setAddressableAreaId] = useState<AddressableAreaNamesWithFakes | null>(null)
   const [providedFixtureOptions, setProvidedFixtureOptions] = useState<
     CutoutFixtureId[]
   >([])
@@ -850,6 +852,7 @@ export function ProtocolSetup(): JSX.Element {
         runId={runId}
         setSetupScreen={setSetupScreen}
         setCutoutId={setCutoutId}
+        setAddressableAreaId={setAddressableAreaId}
         setProvidedFixtureOptions={setProvidedFixtureOptions}
       />
     ),
@@ -874,6 +877,7 @@ export function ProtocolSetup(): JSX.Element {
     'deck configuration': (
       <ProtocolSetupDeckConfiguration
         cutoutId={cutoutId}
+        addressableAreaId={addressableAreaId}
         runId={runId}
         setSetupScreen={setSetupScreen}
         providedFixtureOptions={providedFixtureOptions}

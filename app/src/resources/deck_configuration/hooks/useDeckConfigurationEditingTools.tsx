@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   AddressableArea,
+  AddressableAreaNamesWithFakes,
   AddressableAreaWithFakes,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -26,7 +27,7 @@ const DECK_CONFIG_REFETCH_INTERVAL = 5000
 interface DeckConfigurationEditingTools {
   addFixtureToCutout: (
     cutoutId: CutoutId,
-    addressableArea: AddressableAreaWithFakes
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   removeFixtureFromCutout: (
     cutoutId: CutoutId,
@@ -45,16 +46,16 @@ export function useDeckConfigurationEditingTools(
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
   const [
-    addressableArea,
-    setAddressableArea,
-  ] = useState<AddressableArea | null>(null)
+    addressableAreaId,
+    setAddressableAreaId,
+  ] = useState<AddressableAreaNamesWithFakes | null>(null)
 
   const addFixtureToCutout = (
     cutoutId: CutoutId,
-    addressableArea: AddressableArea
+    addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
     setTargetCutoutId(cutoutId)
-    setAddressableArea(addressableArea)
+    setAddressableAreaId(addressableAreaId)
   }
 
   const removeFixtureFromCutout = (
@@ -107,10 +108,10 @@ export function useDeckConfigurationEditingTools(
     addFixtureToCutout,
     removeFixtureFromCutout,
     addFixtureModal:
-      targetCutoutId != null && addressableArea != null ? (
+      targetCutoutId != null && addressableAreaId != null ? (
         <AddFixtureModal
           cutoutId={targetCutoutId}
-          addressableArea={addressableArea}
+          addressableAreaId={addressableAreaId}
           closeModal={() => {
             setTargetCutoutId(null)
           }}

@@ -16,6 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  AddressableAreaNamesWithFakes,
   FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
@@ -49,6 +50,7 @@ interface FixtureTableProps {
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   setCutoutId: (cutoutId: CutoutId) => void
+  setAddressableAreaId: (addressableAreaId: AddressableAreaNamesWithFakes) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
@@ -62,6 +64,7 @@ export function FixtureTable({
   mostRecentAnalysis,
   setSetupScreen,
   setCutoutId,
+  setAddressableAreaId,
   setProvidedFixtureOptions,
 }: FixtureTableProps): JSX.Element | null {
   const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
