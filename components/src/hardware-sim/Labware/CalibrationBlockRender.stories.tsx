@@ -41,7 +41,6 @@ export const Primary: Story = {
   argTypes: {
     labwareDef: {
       options: Object.keys(DEFS_BY_URI),
-      defaultValue: Object.keys(DEFS_BY_URI)[0],
       mapping: DEFS_BY_URI,
     },
   },
