@@ -212,7 +212,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 30.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -471,7 +475,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 30.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -735,7 +743,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 30.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -994,7 +1006,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 30.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1254,7 +1270,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1505,7 +1525,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1756,7 +1780,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2007,7 +2035,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2258,7 +2290,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2509,7 +2545,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2765,7 +2805,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3016,7 +3060,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3267,7 +3315,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3518,7 +3570,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3769,7 +3825,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -4020,7 +4080,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 40.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -4276,7 +4340,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 125.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -4527,7 +4595,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 125.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -4778,7 +4850,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 125.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -5029,7 +5105,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 125.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -5280,7 +5360,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 200.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -5531,7 +5615,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 200.0
+                }
               },
               "touchTip": {
                 "enable": false,
