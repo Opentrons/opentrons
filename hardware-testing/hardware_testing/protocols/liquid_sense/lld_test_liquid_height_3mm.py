@@ -1,5 +1,4 @@
 """Measure Liquid Height 3mm."""
-import math
 from typing import List, Tuple, Optional
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -29,11 +28,11 @@ VOLUMES_3MM_TOP_BOTTOM = {
     "nest_96_wellplate_200ul_flat": [259.8, 96.3, 0.0],
     "opentrons_96_wellplate_200ul_pcr_full_skirt": [150.2, 14.3, 0.0],
     "nest_96_wellplate_2ml_deep": [2060.4, 118.3, 0.0],
-    "nest_12_reservoir_15ml": [13236.1, 1219.0, 0.0],
+    "nest_12_reservoir_15ml": [13687.8, 1260.6, 0.0],
     "nest_96_wellplate_100ul_pcr_full_skirt": [150.8, 15.5, 0.0],
     "appliedbiosystemsmicroamp_384_wellplate_40ul": [26.2, 7.44, 0.0],
     "thermoscientificnunc_96_wellplate_1300ul": [1155.1, 73.5, 0.0],
-    "thermoscientificnunc_96_wellplate_2000ul": [1768.0, 73.5, 0.0],
+    "thermoscientificnunc_96_wellplate_2000ul": [1828.4, 76.0, 0.0],
     "biorad_96_wellplate_200ul_pcr": [161.2, 71.32, 17.9, 0.0],
     "nest_1_reservoir_290ml": [16570.4, 271690.5, 0.0],
     "corning_12_wellplate_6.9ml_flat": [5654.8, 1156.3, 0.0],
@@ -60,9 +59,6 @@ VOLUMES_3MM_TOP_BOTTOM = {
 
 SAME_TIP = True  # this is fine when using Ethanol (b/c it evaporates)
 RETURN_TIP = False
-DISPENSE_MM_FROM_MENISCUS = -0.5
-
-ASPIRATE_MM_FROM_MENISCUS = -2.0
 
 LIQUID_MOUNT = "right"
 LIQUID_PIPETTE_SIZE = 1000
@@ -72,19 +68,19 @@ PROBING_MOUNT = "left"
 PROBING_TIP_SIZE = 50
 PROBING_PIPETTE_SIZE = 50
 
-SLOT_LIQUID_TIPRACK = "C3"
+SLOT_LIQUID_TIPRACK = ["C3", "C2"]
 SLOT_PROBING_TIPRACK = "D3"
 SLOT_LABWARE = "D1"
 SLOT_RESERVOIR = "C1"
-SLOT_DIAL = "B3"
+SLOT_DIAL = "B2"
 
 ###########################################
 #  VARIABLES - END
 ###########################################
 
 
-metadata = {"protocolName": "lld-test-liquid-height-3mm-06dec"}
-requirements = {"robotType": "Flex", "apiLevel": "2.20"}
+metadata = {"protocolName": "lld-test-liquid-height-3mm-w/meniscus relative"}
+requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -95,6 +91,34 @@ def add_parameters(parameters: ParameterContext) -> None:
     protocols.create_labware_parameters(parameters)
     protocols.create_tube_volume_parameter(parameters)
     protocols.create_trials_parameter(parameters)
+    parameters.add_bool(
+        variable_name="liquid_pipette_probe_every_time",
+        display_name="Liq Pipette Probe Every Time",
+        description="Liq pipette probes every time.",
+        default=True,
+    )
+    parameters.add_float(
+        variable_name="DISPENSE_MM_FROM_MENISCUS",
+        display_name="Dispense mm from meniscus",
+        description="Dispense mm from meniscus.",
+        default=-0.5,
+        maximum=10.0,
+        minimum=-10.0,
+    )
+    parameters.add_float(
+        variable_name="ASPIRATE_MM_FROM_MENISCUS",
+        display_name="Aspirate mm from meniscus",
+        description="Aspirate mm from meniscus.",
+        default=-2.0,
+        maximum=10.0,
+        minimum=-10.0,
+    )
+    parameters.add_bool(
+        variable_name="calculate_height_from_api",
+        display_name="Calculate height from API",
+        description="Calculate height from API.",
+        default=True,
+    )
 
 
 _src_meniscus_height: Optional[float] = None
@@ -126,7 +150,6 @@ def _setup(
     ctx: ProtocolContext,
 ) -> Tuple[
     InstrumentContext,
-    Labware,
     InstrumentContext,
     Labware,
     Labware,
@@ -134,6 +157,7 @@ def _setup(
     Labware,
     int,
     int,
+    bool,
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
     # TODO: use runtime-variables instead of constants
@@ -141,11 +165,31 @@ def _setup(
     # Pipette Types
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
-    num_trials = ctx.params.num_of_trials  # type: ignore[attr-defined]
+    num_trials: int = ctx.params.num_of_trials  # type: ignore[attr-defined]
+    LABWARE = ctx.params.labware_type  # type: ignore[attr-defined]
+    tube_volume: int = ctx.params.tube_volume  # type: ignore[attr-defined]
+    labware: Labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
+    labware.load_empty(labware.wells())
+    labware_max_volume = labware["A1"].max_volume
+    print(f"Labware max volume: {labware_max_volume}")
+    liquid_pipette_probe_every_time: bool = (
+        ctx.params.liquid_pipette_probe_every_time  # type: ignore[attr-defined]
+    )
+    if labware_max_volume < 50:
+        LIQUID_TIP_SIZE = 50
+    else:
+        LIQUID_TIP_SIZE = 1000
     if left_mount != "None":
         probing_pipette = ctx.load_instrument(left_mount, "left")
+    liquid_rack_name = f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL"
+    liq_tip_racks = []
+    for slot in SLOT_LIQUID_TIPRACK:
+        tiprack = ctx.load_labware(liquid_rack_name, slot)
+        liq_tip_racks.append(tiprack)
     if right_mount != "None":
-        liquid_pipette = ctx.load_instrument(right_mount, "right")
+        liquid_pipette = ctx.load_instrument(
+            right_mount, "right", tip_racks=liq_tip_racks
+        )
         liquid_pip_name = right_mount
 
     ctx.load_trash_bin("A3")
@@ -153,16 +197,6 @@ def _setup(
     probing_rack_name = f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL"
     probing_rack = ctx.load_labware(probing_rack_name, SLOT_PROBING_TIPRACK)
 
-    LABWARE = ctx.params.labware_type  # type: ignore[attr-defined]
-    tube_volume = ctx.params.tube_volume  # type: ignore[attr-defined]
-
-    labware: Labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
-    labware_max_volume = labware["A1"].max_volume
-    print(f"Labware max volume: {labware_max_volume}")
-    if labware_max_volume < 50:
-        LIQUID_TIP_SIZE = 50
-    else:
-        LIQUID_TIP_SIZE = 1000
     liquid_pip_channels = liquid_pipette.channels
 
     if tube_volume == 15:
@@ -179,6 +213,24 @@ def _setup(
             0.0,
         ]
     volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
+    calculate_height_from_api = ctx.params.calculate_height_from_api  # type: ignore[attr-defined]
+    if calculate_height_from_api:
+        labware_depth = labware["A1"].depth
+        volumes_raw = [
+            labware["A1"].volume_from_height(height=3),
+            labware["A1"].volume_from_height(height=labware_depth / 2),
+            labware["A1"].volume_from_height(height=labware_depth - 3),
+        ]
+        for vol in volumes_raw:
+            if isinstance(vol, float):
+                volumes.append(round(vol, 1))
+        volumes.append(0.0)
+        print(
+            f"Using volumes found by API:\n"
+            f"  - 3 mm from bottom: {volumes[0]:.1f} µL\n"
+            f"  - Middle:           {volumes[1]:.1f} µL\n"
+            f"  - 3 mm from top:    {volumes[2]:.1f} µL"
+        )
     total_volume_to_aspirate = 0.0
     for one_vols in volumes:
         total_volume_to_aspirate += one_vols * num_trials
@@ -188,10 +240,10 @@ def _setup(
         RESERVOIR = "nest_1_reservoir_195ml"
 
     reservoir = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
+    ethanol = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
+    reservoir["A1"].load_liquid(ethanol, reservoir["A1"].max_volume - 1000)
     if len(labware.wells()) > 96:
         LIQUID_TIP_SIZE = 50
-    liquid_rack_name = f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL"
-    liquid_rack = ctx.load_labware(liquid_rack_name, SLOT_LIQUID_TIPRACK)
 
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
@@ -214,7 +266,6 @@ def _setup(
         _write_line_to_csv(ctx, ["depth", str(labware["A1"].depth)])
     return (
         liquid_pipette,
-        liquid_rack,
         probing_pipette,
         probing_rack,
         labware,
@@ -222,6 +273,7 @@ def _setup(
         dial,
         tube_volume,
         num_trials,
+        liquid_pipette_probe_every_time,
     )
 
 
@@ -254,7 +306,6 @@ def _get_test_wells(
                 "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical"
             ] = ["A1", "B1", "C1", "A2", "B2", "C2"]
             well_names = TEST_WELLS[channels][labware.load_name]
-            print(TEST_WELLS[channels][labware.load_name])
         else:
             well_names = TEST_WELLS[channels][labware.load_name]
     except KeyError:
@@ -262,8 +313,6 @@ def _get_test_wells(
             str(well_name).split(" ")[0].replace(" ", "")
             for well_name in labware.wells()
         ]
-        print(len(well_names))
-    print(well_names)
     amount_of_well_names = len(well_names)
     if amount_of_well_names < total_test_wells:
         wells_needed = total_test_wells - amount_of_well_names
@@ -344,21 +393,19 @@ def _test_for_finding_liquid_height(  # noqa: C901
     liquid_pipette: InstrumentContext,
     probing_pipette: InstrumentContext,
     dial: Labware,
-    liquid_tips: List[Well],
     probing_tips: List[Well],
     src_well: Well,
     wells: List[Well],
+    liquid_pipette_probe_every_time: bool,
 ) -> None:
     global _src_meniscus_height
-    assert len(liquid_tips) == len(
-        probing_tips
-    ), f"{len(liquid_tips)},{len(probing_tips)}"
-    assert len(liquid_tips) == len(wells), f"{len(liquid_tips)},{len(wells)}"
     trial_counter = 0
     _store_dial_baseline(ctx, probing_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
+    DISPENSE_MM_FROM_MENISCUS = ctx.params.DISPENSE_MM_FROM_MENISCUS  # type: ignore[attr-defined]
+    ASPIRATE_MM_FROM_MENISCUS = ctx.params.ASPIRATE_MM_FROM_MENISCUS  # type: ignore[attr-defined]
     all_corrected_heights: List[float] = []
-    for liq_tip, probe_tip, well in zip(liquid_tips, probing_tips, wells):
+    for probe_tip, well in zip(probing_tips, wells):
         trial_counter += 1
         # pickup probing tip, then measure Z-error
         if not probing_pipette.has_tip:
@@ -367,7 +414,6 @@ def _test_for_finding_liquid_height(  # noqa: C901
             # try and get any remaining droplets out of the way
             probing_pipette.aspirate().dispense().prepare_to_aspirate()
         tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
-        total_vol_in_tube = 0.0
         if volume:
             # transfer over and over until all volume is moved
             if volume < 15650:
@@ -381,73 +427,55 @@ def _test_for_finding_liquid_height(  # noqa: C901
                     liquid_pipette.flow_rate.aspirate, 50
                 )
                 liquid_pipette.flow_rate.blow_out = 100
-                if _src_meniscus_height is None:
-                    _src_meniscus_height = src_well.depth - 1.0
-                if src_well.diameter:
-                    src_well_z_ul_per_mm = math.pi * math.pow(
-                        src_well.diameter * 0.5, 2
-                    )
-                elif src_well.width is not None and src_well.length is not None:
-                    src_well_z_ul_per_mm = src_well.width * src_well.length
+                dispense_loc = well.meniscus(z=DISPENSE_MM_FROM_MENISCUS, target="end")
+                if not liquid_pipette.has_tip:
+                    liquid_pipette.pick_up_tip()
+                    # NOTE: only use new, dry tips to probe
+                    if not ctx.is_simulating():
+                        _src_meniscus_height = liquid_pipette.measure_liquid_height(
+                            src_well
+                        )  # type: ignore[assignment]
+                    else:
+                        _src_meniscus_height = 1.0
+                    if isinstance(_src_meniscus_height, float):
+                        commented_height = round(
+                            _src_meniscus_height or 0.0,
+                            2,
+                        )
+                    liquid_pipette.drop_tip()
                 else:
-                    src_well_z_ul_per_mm = 0.0
-
-                while need_to_transfer_per_ch > 0.001:
-                    transfer_vol = min(
-                        liquid_pipette.max_volume * 0.9, need_to_transfer_per_ch
-                    )
-                    if not liquid_pipette.has_tip:
-                        liquid_pipette.pick_up_tip(liq_tip)
-                        # NOTE: only use new, dry tips to probe
-                        if not ctx.is_simulating():
-                            _src_meniscus_height = (
-                                liquid_pipette.measure_liquid_height(src_well)  # type: ignore[assignment] # noqa: E501
-                                - src_well.bottom().point.z
-                            )
-                    else:
-                        # try and get any remaining droplets out of the way
-                        liquid_pipette.move_to(src_well.top(10))
-                        liquid_pipette.aspirate().blow_out().prepare_to_aspirate()
-                    # aspirate
-                    meniscus_shift_mm = transfer_vol / src_well_z_ul_per_mm
-                    draft_multiplier = 1.2 if src_well.diameter else 1.5
-                    _src_meniscus_height -= draft_multiplier * meniscus_shift_mm
-                    asp_mm = max(_src_meniscus_height + -2, 2)
-                    liquid_pipette.aspirate(transfer_vol, src_well.bottom(asp_mm))
-                    need_to_transfer_per_ch -= transfer_vol
+                    # try and get any remaining droplets out of the way
+                    liquid_pipette.move_to(src_well.top(10))
+                    liquid_pipette.aspirate().blow_out().prepare_to_aspirate()
+                liquid_pipette.transfer(
+                    need_to_transfer_per_ch,
+                    src_well.meniscus(z=ASPIRATE_MM_FROM_MENISCUS, target="end"),
+                    dispense_loc,
+                    new_tips="never",
+                    touch_tip=True,
+                    blow_out=True,
+                    blowout_location="destination well",
+                    air_gap=5,
+                )
+                if not liquid_pipette_probe_every_time:
                     ctx.comment(
-                        f"Aspirated {round(transfer_vol, 2)} from src, "
-                        f"removed {round(meniscus_shift_mm, 2)} mm, "
-                        f"now is {round(_src_meniscus_height, 2)} mm tall,"
-                        f"aspirating from {round(asp_mm, 2)} from bottom."
+                        f"Aspirated {round(volume, 2)} from src, "
+                        f"aspirating from {commented_height} from bottom."
                     )
-                    liquid_pipette.move_to(src_well.bottom(_src_meniscus_height + 5))
-                    ctx.delay(seconds=1.5)
-                    liquid_pipette.touch_tip(src_well, speed=30)
-                    did_air_gap = False
-                    if transfer_vol <= liquid_pipette.max_volume - 5:
-                        liquid_pipette.aspirate(5, src_well.top(2))
-                        did_air_gap = True
-                    # dispense
-                    if did_air_gap:
-                        liquid_pipette.dispense(5, well.top(5))
-                    # default will be to dispense from top
-                    if volume > well.max_volume * 0.5:
-                        dispense_loc = well.top(-3 + DISPENSE_MM_FROM_MENISCUS)
-                    else:
-                        dispense_loc = well.bottom(3 + DISPENSE_MM_FROM_MENISCUS)
-                    liquid_pipette.dispense(transfer_vol, dispense_loc)
-                    total_vol_in_tube += transfer_vol
-                    ctx.delay(seconds=1.5)
-                    liquid_pipette.move_to(well.top())
-                    ctx.delay(seconds=1.5)
-                    liquid_pipette.blow_out(well.top())
-                    ctx.delay(seconds=1.5)
-                    liquid_pipette.prepare_to_aspirate()
-                # get height of liquid
+                # liquid_pipette.move_to(src_well.bottom(_src_meniscus_height + 5))
+                ctx.delay(seconds=1.5)
+                # default will be to dispense from top
+                ctx.delay(seconds=1.5)
+                liquid_pipette.move_to(well.top())
+                ctx.delay(seconds=1.5)
+                liquid_pipette.blow_out(well.top())
+                ctx.delay(seconds=1.5)
+            # get height of liquid
             else:
                 ctx.pause("Fill well.")
-            height = probing_pipette.measure_liquid_height(well) - well.bottom().point.z
+            height = probing_pipette.measure_liquid_height(well)
+            if liquid_pipette_probe_every_time and liquid_pipette.has_tip:
+                liquid_pipette.drop_tip()
         else:
             is_empty = not probing_pipette.detect_liquid_presence(well)
             height = (
@@ -472,9 +500,12 @@ def _test_for_finding_liquid_height(  # noqa: C901
         # save data
         trial_data = [trial_counter, volume, height, tip_z_error, corrected_height]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
-
-    avg = sum(all_corrected_heights) / len(all_corrected_heights)
-    error_mm = (max(all_corrected_heights) - min(all_corrected_heights)) * 0.5
+    if len(all_corrected_heights) > 0:
+        avg = sum(all_corrected_heights) / len(all_corrected_heights)
+        error_mm = (max(all_corrected_heights) - min(all_corrected_heights)) * 0.5
+    else:
+        avg = 0.0
+        error_mm = 0.0
     error_percent = error_mm / avg if avg else 0.0
     _write_line_to_csv(ctx, ["average", str(round(avg, 3))])
     _write_line_to_csv(ctx, ["error (mm)", str(round(error_mm, 3))])
@@ -485,7 +516,6 @@ def run(ctx: ProtocolContext) -> None:
     """Run."""
     (
         liq_pipette,
-        liq_rack,
         probe_pipette,
         probe_rack,
         labware,
@@ -493,10 +523,9 @@ def run(ctx: ProtocolContext) -> None:
         dial,
         tube_volume,
         num_trials,
+        liquid_pipette_probe_every_time,
     ) = _setup(ctx)
-    channels_liquid = liq_pipette.channels
     channels_probe = probe_pipette.channels
-    test_tips_liquid = _get_test_tips(liq_rack, channels=channels_liquid)
     test_tips_probe = _get_test_tips(probe_rack, channels=channels_probe)
     # FIXME: calculate nominal volumes at +3mm from bottom and -3mm from top
     #        using Opentrons API (not Solidworks)
@@ -517,7 +546,7 @@ def run(ctx: ProtocolContext) -> None:
     test_wells = _get_test_wells(
         labware, channels=1, tube_volume=tube_volume, total_test_wells=total_test_wells
     )
-    stuff_lengths = len(test_tips_liquid), len(test_tips_probe), len(test_wells)
+    stuff_lengths = len(test_tips_probe), len(test_wells)
 
     assert min(stuff_lengths) >= num_trials * len(volumes), f"{stuff_lengths}"
     for _vol in volumes:
@@ -527,13 +556,13 @@ def run(ctx: ProtocolContext) -> None:
             liq_pipette,
             probe_pipette,
             dial,
-            liquid_tips=test_tips_liquid[:num_trials],
             probing_tips=test_tips_probe[:num_trials],
             src_well=reservoir["A1"],
             wells=test_wells[:num_trials],
+            liquid_pipette_probe_every_time=liquid_pipette_probe_every_time,
         )
         test_wells = test_wells[num_trials:]
-        test_tips_liquid = test_tips_liquid[num_trials:]
+        # test_tips_liquid = test_tips_liquid[num_trials:]
         test_tips_probe = test_tips_probe[num_trials:]
     if liq_pipette.has_tip:
         liq_pipette.return_tip() if RETURN_TIP else liq_pipette.drop_tip()

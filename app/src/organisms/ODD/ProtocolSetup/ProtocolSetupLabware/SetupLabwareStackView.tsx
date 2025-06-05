@@ -18,6 +18,10 @@ import {
   Tag,
   truncateString,
 } from '@opentrons/components'
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
 
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
@@ -88,6 +92,10 @@ export function SetupLabwareStackView({
   const hasLiquids = Object.keys(wellFill).length > 0
   const labwareDefinition =
     labwareDefinitionsByURI[selectedLabware.definitionUri]
+  const labwareCornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(
+    labwareDefinition
+  )
+  const labwareDimensions = getSchema2Dimensions(labwareDefinition)
 
   return (
     <>
@@ -174,7 +182,7 @@ export function SetupLabwareStackView({
             </StyledText>
           ) : null}
           <LabwareThumbnail
-            viewBox={`${labwareDefinition.cornerOffsetFromSlot.x} ${labwareDefinition.cornerOffsetFromSlot.y} ${labwareDefinition.dimensions.xDimension} ${labwareDefinition.dimensions.yDimension}`}
+            viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
           >
             <g
               onClick={() => {

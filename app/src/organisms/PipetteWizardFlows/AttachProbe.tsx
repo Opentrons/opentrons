@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  AnimationVideo,
   Banner,
   COLORS,
   Flex,
@@ -142,18 +143,15 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   const pipetteProbeVid = (
     <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
-      <video
+      <AnimationVideo
         css={css`
           max-width: 100%;
           max-height: 100%;
         `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
         data-testid={src}
       >
         <source src={src} />
-      </video>
+      </AnimationVideo>
     </Flex>
   )
 

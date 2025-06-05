@@ -13,7 +13,9 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
   selectIsAnyNecessaryDefaultOffsetMissing,
@@ -39,6 +41,10 @@ export function LPCSetupFlexBtns({
 }: LPCSetupFlexBtnsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const { makeSnackbar } = useToaster()
+  const { reportApplyOffsets } = useLPCAnalytics({
+    runId,
+    robotType: FLEX_ROBOT_TYPE,
+  })
   const lpcDisabledReason = useLPCDisabledReason({
     robotName,
     runId,
@@ -103,6 +109,7 @@ export function LPCSetupFlexBtns({
       )
         .then(() => {
           setOffsetsConfirmed(true)
+          reportApplyOffsets()
         })
         .catch(() => {
           makeSnackbar(t('failed_to_apply_offsets') as string)

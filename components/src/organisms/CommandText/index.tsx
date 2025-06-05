@@ -9,7 +9,7 @@ import { useCommandTextString } from './useCommandTextString'
 
 import type { ComponentProps } from 'react'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -36,7 +36,7 @@ type STProps = LegacySTProps | ModernSTProps
 
 interface BaseProps extends StyleProps {
   command: RunTimeCommand
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
   commandTextData: CommandTextData
   robotType: RobotType
   isOnDevice?: boolean

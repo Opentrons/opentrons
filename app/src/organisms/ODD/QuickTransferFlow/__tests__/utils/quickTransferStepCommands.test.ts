@@ -202,22 +202,17 @@ pipette.move_to(mock_labware_1["A1"].top(z=2))
 pipette.prepare_to_aspirate()
 pipette.move_to(mock_labware_1["A1"].bottom())
 pipette.move_to(mock_labware_1["A1"].bottom())
-pipette.aspirate(
-    volume=10,
-    rate=56 / pipette.flow_rate.aspirate,
-)
+pipette.aspirate(volume=10, flow_rate=56)
 pipette.move_to(mock_labware_1["A1"].bottom())
 pipette.move_to(mock_labware_2["B1"].bottom())
 pipette.move_to(mock_labware_2["B1"].bottom())
-pipette.dispense(
-    volume=10,
-    rate=80 / pipette.flow_rate.dispense,
-)
+pipette.dispense(volume=10, flow_rate=80)
 pipette.move_to(mock_labware_2["B1"].bottom())
 pipette.move_to(mock_labware_1["A1"].top())
 pipette.flow_rate.blow_out = 50
 pipette.blow_out()
-pipette.drop_tip()`.trimStart()
+pipette.drop_tip()
+`.trim()
     )
   })
   it('should generate a consolidate step in py', () => {
@@ -303,24 +298,27 @@ pipette.drop_tip()`.trimStart()
 # CONSOLIDATE STEP
 
 pipette.pick_up_tip(location=mock_tiprack_1)
-pipette.aspirate(
-    volume=10,
-    location=mock_labware_1["A1"].bottom(z=-1),
-    rate=56 / pipette.flow_rate.aspirate,
-)
-pipette.aspirate(
-    volume=10,
-    location=mock_labware_1["B1"].bottom(z=-1),
-    rate=56 / pipette.flow_rate.aspirate,
-)
-pipette.dispense(
-    volume=20,
-    location=mock_labware_2["B1"].bottom(z=-1),
-    rate=80 / pipette.flow_rate.dispense,
-)
+pipette.move_to(mock_labware_1["A1"].top(z=2))
+pipette.prepare_to_aspirate()
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.aspirate(volume=10, flow_rate=56)
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_1["B1"].top(z=2))
+pipette.move_to(mock_labware_1["B1"].bottom())
+pipette.move_to(mock_labware_1["B1"].bottom())
+pipette.aspirate(volume=10, flow_rate=56)
+pipette.move_to(mock_labware_1["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].top(z=2))
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.dispense(volume=20, flow_rate=80)
+pipette.move_to(mock_trash_bin_1)
 pipette.flow_rate.blow_out = 50
-pipette.blow_out(mock_trash_bin_1)
-pipette.drop_tip()`.trimStart()
+pipette.blow_out()
+pipette.drop_tip()
+`.trim()
     )
   })
   it('should generate a distribute step in py', () => {
@@ -329,6 +327,7 @@ pipette.drop_tip()`.trimStart()
       sourceWell: 'A1',
       destWells: ['A1', 'B1'],
       blowoutFlowRateUlSec: 50,
+      conditioningVolume: null,
       touchTipAfterAspirateMmFromEdge: null,
       liquidClass: null,
       aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
@@ -356,7 +355,7 @@ pipette.drop_tip()`.trimStart()
       dispenseRetractZOffset: 0,
       dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
       blowoutOffsetFromTopMm: -1,
-      blowoutLocation: 'source',
+      blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       mixBeforeAspirate: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
       pipette: 'mockPipette',
@@ -406,22 +405,25 @@ pipette.drop_tip()`.trimStart()
 # DISTRIBUTE STEP
 
 pipette.pick_up_tip(location=mock_tiprack_1)
-pipette.aspirate(
-    volume=20,
-    location=mock_labware_1["A1"].bottom(z=-1),
-    rate=56 / pipette.flow_rate.aspirate,
-)
-pipette.dispense(
-    volume=10,
-    location=mock_labware_2["A1"].bottom(z=-1),
-    rate=80 / pipette.flow_rate.dispense,
-)
-pipette.dispense(
-    volume=10,
-    location=mock_labware_2["B1"].bottom(z=-1),
-    rate=80 / pipette.flow_rate.dispense,
-)
-pipette.drop_tip()`.trimStart()
+pipette.move_to(mock_labware_1["A1"].top(z=2))
+pipette.prepare_to_aspirate()
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.aspirate(volume=20, flow_rate=56)
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_2["A1"].bottom())
+pipette.move_to(mock_labware_2["A1"].bottom())
+pipette.dispense(volume=10, flow_rate=80, push_out=0)
+pipette.move_to(mock_labware_2["A1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.dispense(volume=10, flow_rate=80)
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_1["A1"].top(z=-1))
+pipette.flow_rate.blow_out = 50
+pipette.blow_out()
+pipette.drop_tip()
+`.trim()
     )
   })
 })

@@ -1,14 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import {
-  Banner,
-  CURSOR_POINTER,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { InlineNotification } from '@opentrons/components'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 import { getGripperDisplayName } from '@opentrons/shared-data'
 
@@ -29,11 +23,6 @@ interface GripperCardProps {
   isRunActive: boolean
   isEstopNotDisengaged: boolean
 }
-const BANNER_LINK_CSS = css`
-  text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
-  cursor: ${CURSOR_POINTER};
-  margin-left: ${SPACING.spacing8};
-`
 
 const INSTRUMENT_CARD_STYLE = css`
   p {
@@ -144,27 +133,13 @@ export function GripperCard({
           }
           banner={
             attachedGripper?.ok && !isCalibrated ? (
-              <Banner type="error" marginBottom={SPACING.spacing4} width="100%">
-                {isEstopNotDisengaged ? (
-                  <LegacyStyledText as="p">
-                    {t('calibration_needed_without_link')}
-                  </LegacyStyledText>
-                ) : (
-                  <Trans
-                    t={t}
-                    i18nKey={'calibration_needed'}
-                    components={{
-                      calLink: (
-                        <LegacyStyledText
-                          as="p"
-                          css={BANNER_LINK_CSS}
-                          onClick={handleCalibrate}
-                        />
-                      ),
-                    }}
-                  />
-                )}
-              </Banner>
+              <InlineNotification
+                type="error"
+                message={t('calibration_needed_without_link')}
+                linkText={isEstopNotDisengaged ? undefined : t('calibrate_now')}
+                onLinkClick={isEstopNotDisengaged ? undefined : handleCalibrate}
+                minWidth="12.625rem"
+              />
             ) : null
           }
           isGripperAttached={attachedGripper != null}
@@ -180,19 +155,15 @@ export function GripperCard({
           css={INSTRUMENT_CARD_STYLE}
           description={t('instrument_attached')}
           banner={
-            <Banner
-              type={subsystemUpdateData != null ? 'warning' : 'error'}
-              marginBottom={SPACING.spacing4}
-            >
-              <Trans
-                t={t}
-                i18nKey={
-                  subsystemUpdateData != null
-                    ? 'firmware_update_occurring'
-                    : 'firmware_update_needed'
-                }
-              />
-            </Banner>
+            <InlineNotification
+              type={subsystemUpdateData != null ? 'alert' : 'error'}
+              message={
+                subsystemUpdateData != null
+                  ? t('firmware_update_occurring')
+                  : t('firmware_update_needed')
+              }
+              minWidth="12.625rem"
+            />
           }
           isEstopNotDisengaged={isEstopNotDisengaged}
         />

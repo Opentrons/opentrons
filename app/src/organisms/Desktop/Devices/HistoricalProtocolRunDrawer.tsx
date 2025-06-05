@@ -23,7 +23,6 @@ import {
 } from '@opentrons/components'
 import { useCsvFileQuery } from '@opentrons/react-api-client'
 import {
-  FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
@@ -271,14 +270,7 @@ export function HistoricalProtocolRunDrawer(
                   <DeckInfoLabel deckLabel={slotName} />
                   {offset.locationSequence?.some(
                     seq => seq.kind === 'onLabware'
-                  ) && (
-                    <DeckInfoLabel
-                      iconName={
-                        MODULE_ICON_NAME_BY_TYPE[FLEX_STACKER_MODULE_TYPE]
-                      }
-                      key="stacked-icon"
-                    />
-                  )}
+                  ) && <DeckInfoLabel iconName="stacked" key="stacked-icon" />}
                   {offset.location.moduleModel && (
                     <DeckInfoLabel
                       iconName={

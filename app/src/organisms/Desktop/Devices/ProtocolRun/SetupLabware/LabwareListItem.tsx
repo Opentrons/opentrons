@@ -28,6 +28,8 @@ import {
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getModuleType,
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -46,7 +48,7 @@ import type { MouseEvent } from 'react'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-  LabwareDefinition2,
+  LabwareDefinition,
   ModuleType,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
@@ -390,12 +392,15 @@ const LabwareThumbnail = styled.svg`
 `
 
 function StandaloneLabware(props: {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }): JSX.Element {
   const { definition } = props
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
+  const dimensions = getSchema2Dimensions(definition)
+
   return (
     <LabwareThumbnail
-      viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
+      viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
     >
       <LabwareRender
         definition={definition}

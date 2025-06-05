@@ -9,7 +9,7 @@ import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 
 import { RECOVERY_MAP } from '../constants'
 
-import type { LabwareDefinition2, LoadedLabware } from '@opentrons/shared-data'
+import type { LabwareDefinition, LoadedLabware } from '@opentrons/shared-data'
 import type { FailedCommand, RecoveryContentProps } from '../types'
 
 export const mockFailedCommand: FailedCommand = {
@@ -42,7 +42,7 @@ export const mockFailedCommand: FailedCommand = {
   notes: [],
 }
 
-const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition
 
 export const mockPickUpTipLabware: LoadedLabware = {
   id: 'MOCK_PickUpTipLabware_ID',

@@ -18,7 +18,11 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
 
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
@@ -86,6 +90,10 @@ export const SlotDetailModal = (
   )
 
   const labwareDefinition = definitionsByURI[selectedLabware.definitionUri]
+  const labwareCornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(
+    labwareDefinition
+  )
+  const labwareDimensions = getSchema2Dimensions(labwareDefinition)
 
   const commands = protocolData?.commands ?? []
   const liquids = parseLiquidsInLoadOrder(
@@ -221,7 +229,7 @@ export const SlotDetailModal = (
               ) : null}
             </Flex>
             <LabwareThumbnail
-              viewBox={`${labwareDefinition.cornerOffsetFromSlot.x} ${labwareDefinition.cornerOffsetFromSlot.y} ${labwareDefinition.dimensions.xDimension} ${labwareDefinition.dimensions.yDimension}`}
+              viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
               width={
                 selectedLiquidId != null && isVariedStack ? '20rem' : '29rem'
               }

@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -7,10 +7,11 @@ import { fireEvent, screen } from '@testing-library/react'
 import { ProtocolSteps } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { LiquidButton } from '../../../../components/molecules/LiquidButton'
 import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
+import { useProtocolExportHandler } from '../../../../resources/hooks'
 import {
+  getAdditionalEquipmentEntities,
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
@@ -39,13 +40,19 @@ vi.mock('../DraggableSidebar')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../components/organisms/Alerts')
-vi.mock('../../../../components/molecules/LiquidButton')
 vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../Timeline/utils')
 vi.mock('../../../../components/organisms/StepSummary')
+vi.mock('../../../../resources/hooks')
+
 const render = () => {
   return renderWithProviders(
-    <ProtocolSteps zoomedInSlot={null} showLiquidOverflowMenu={vi.fn()} />,
+    <ProtocolSteps
+      zoomedInSlot={null}
+      showLiquidOverflowMenu={vi.fn()}
+      targetWidth={235}
+      setTargetWidth={vi.fn()}
+    />,
     {
       i18nInstance: i18n,
     }
@@ -68,6 +75,7 @@ const MOCK_STEP_FORMS = {
     stepDetails: '',
   },
 }
+const mockHandleExportClick = vi.fn()
 
 describe('ProtocolSteps', () => {
   beforeEach(() => {
@@ -86,7 +94,6 @@ describe('ProtocolSteps', () => {
       selectionType: 'SINGLE_STEP_SELECTION_TYPE',
       id: '0522fde8-25a3-4840-b84a-af7282bd80d5',
     })
-    vi.mocked(LiquidButton).mockReturnValue(<div>mock LiquidButton</div>)
     vi.mocked(OffDeck).mockReturnValue(<div>mock OffDeck</div>)
     vi.mocked(getUnsavedForm).mockReturnValue(null)
     vi.mocked(getSelectedSubstep).mockReturnValue(null)
@@ -101,8 +108,15 @@ describe('ProtocolSteps', () => {
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       modules: {},
       labware: {},
-      additionalEquipmentOnDeck: {},
+      additionalEquipmentOnDeck: {
+        trash: { id: 'trash', location: 'cutoutA3', name: 'trashBin' },
+      },
       pipettes: {},
+    })
+    vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
+    vi.mocked(useProtocolExportHandler).mockReturnValue({
+      handleExportClick: mockHandleExportClick,
+      exportWarningModalElement: null,
     })
   })
 
@@ -143,8 +157,11 @@ describe('ProtocolSteps', () => {
     render()
     screen.getByText('Custom Pause')
   })
-  it('renders the liquids button', () => {
+
+  it('should render export button and call mock function when clicking it', () => {
     render()
-    screen.getByText('mock LiquidButton')
+    const exportButton = screen.getByRole('button', { name: 'Export' })
+    fireEvent.click(exportButton)
+    expect(mockHandleExportClick).toHaveBeenCalled()
   })
 })

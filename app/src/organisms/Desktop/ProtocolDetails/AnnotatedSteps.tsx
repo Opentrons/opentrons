@@ -23,7 +23,7 @@ import { CommandIcon } from '/app/molecules/Command'
 
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -135,7 +135,7 @@ interface AnnotatedGroupProps {
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   stepNumber: string
   isHighlighted: boolean
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
 }
 function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   const {
@@ -231,7 +231,7 @@ interface IndividualCommandProps {
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   stepNumber: string
   isHighlighted: boolean
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
 }
 function IndividualCommand({
   command,

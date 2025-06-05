@@ -518,15 +518,29 @@ class FlexStacker(mod_abc.AbstractModule):
         """
         await self._reader.get_installation_detected()
         await self._reader.get_limit_switch_status()
-        # we should always be able to home the X axis first
-        await self.home_axis(StackerAxis.X, Direction.RETRACT)
-        # If latch is open, we must first close it
-        if not ignore_latch and self.latch_state == LatchState.OPENED:
+        await self._reader.get_platform_sensor_state()
+
+        # Z axis is unknown, lets move it up in case it is holding a labware
+        if not ignore_latch:
+            if self.limit_switch_status[StackerAxis.Z] == StackerAxisState.UNKNOWN:
+                if self.latch_state == LatchState.OPENED:
+                    # self.latch_state is OPENED, so we need to home Z in the EXTEND direction
+                    await self.home_axis(StackerAxis.Z, Direction.EXTEND)
+                    await self.close_latch()
+
+        if (
+            # if the platform is on the z or if x has not been homed
+            self.platform_state == PlatformState.UNKNOWN
+            or self.limit_switch_status[StackerAxis.X] == StackerAxisState.UNKNOWN
+        ):
+            # if the z is not retracted, we need to make sure the x is retracted
+            # so we can retract the z properly later
             if self.limit_switch_status[StackerAxis.Z] != StackerAxisState.RETRACTED:
-                # it was likely in the middle of a dispense/store command
-                # z should be moved up before we can safely close the latch
-                await self.home_axis(StackerAxis.Z, Direction.EXTEND)
-            await self.close_latch()
+                await self.home_axis(StackerAxis.X, Direction.RETRACT)
+            else:
+                await self.home_axis(StackerAxis.X, Direction.EXTEND)
+
+        # Finally, retract Z and extend X if they are not already
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
         await self.home_axis(StackerAxis.X, Direction.EXTEND)
 
@@ -651,10 +665,12 @@ class FlexStacker(mod_abc.AbstractModule):
     async def _stacker_bar_idle(self) -> None:
         await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
 
-    async def identify(self) -> None:
+    async def identify(self, enable: bool, color_name: Optional[str] = None) -> None:
         """Identify the module."""
-        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE, reps=10)
-        if self._last_status_bar_event:
+        reps = -1 if enable else 0
+        color = LEDColor.from_name(color_name or LEDColor.BLUE.name)
+        await self.set_led_state(0.5, color, LEDPattern.PULSE, reps=reps)
+        if not enable and self._last_status_bar_event:
             await self._handle_status_bar_event(self._last_status_bar_event)
 
     def set_stacker_identify(self, state: bool) -> None:

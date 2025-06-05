@@ -39,11 +39,12 @@ import {
   selectTerminalItem,
 } from '../../../../ui/steps/actions/actions'
 import { AddStepButton } from './AddStepButton'
+import { Configurations } from './Configurations'
 import { DraggableSteps } from './DraggableSteps'
-import { HardwareStep } from './HardwareStep'
 import { PresavedStep } from './PresavedStep'
 import { TerminalItemStep } from './TerminalItemStep'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { StepIdType } from '../../../../form-types'
 import type { ThunkDispatch } from '../../../../types'
 
@@ -51,11 +52,13 @@ const SIDEBAR_MIN_WIDTH_FOR_ICON = 170
 const SIDEBAR_MIN_WIDTH_FOR_BACK_TEXT = 100
 interface TimelineToolboxProps {
   sidebarWidth: number
+  showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
 }
 
-export const TimelineToolbox = ({
+export function TimelineToolbox({
   sidebarWidth,
-}: TimelineToolboxProps): JSX.Element => {
+  showLiquidOverflowMenu,
+}: TimelineToolboxProps): JSX.Element {
   const { t } = useTranslation([
     'protocol_steps',
     'protocol_overview',
@@ -162,7 +165,10 @@ export const TimelineToolbox = ({
         gridGap={SPACING.spacing4}
         width="100%"
       >
-        <HardwareStep sidebarWidth={sidebarWidth} />
+        <Configurations
+          sidebarWidth={sidebarWidth}
+          showLiquidOverflowMenu={showLiquidOverflowMenu}
+        />
         <Flex
           padding={SPACING.spacing12}
           flexDirection={DIRECTION_COLUMN}

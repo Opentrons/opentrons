@@ -286,7 +286,7 @@ const VOLUME_REQUIRED: FormError = {
   page: 0,
 }
 const TIMES_REQUIRED: FormError = {
-  title: 'Repetitions required',
+  title: 'Enter an integer value greater than 0',
   dependentFields: ['times'],
   showAtForm: false,
   showAtField: true,
@@ -314,7 +314,7 @@ const MIX_LABWARE_REQUIRED: FormError = {
   page: 0,
 }
 const ASPIRATE_MIX_TIMES_REQUIRED: FormError = {
-  title: 'Repititions required',
+  title: 'Enter an integer value greater than 0',
   dependentFields: ['aspirate_mix_times'],
   showAtForm: false,
   showAtField: true,
@@ -346,7 +346,7 @@ const ASPIRATE_AIRGAP_VOLUME_REQUIRED: FormError = {
   tab: 'aspirate',
 }
 const DISPENSE_MIX_TIMES_REQUIRED: FormError = {
-  title: 'Repititions required',
+  title: 'Enter an integer value greater than 0',
   dependentFields: ['dispense_mix_checkbox', 'dispense_mix_times'],
   showAtForm: false,
   showAtField: true,
@@ -380,6 +380,14 @@ const DISPENSE_AIRGAP_VOLUME_REQUIRED: FormError = {
 const BLOWOUT_LOCATION_REQUIRED: FormError = {
   title: 'Blowout location required',
   dependentFields: ['blowout_checkbox', 'blowout_location'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+  tab: 'dispense',
+}
+const BLOWOUT_FLOW_RATE_REQUIRED: FormError = {
+  title: 'Flow rate required',
+  dependentFields: ['blowout_flowRate'],
   showAtForm: false,
   showAtField: true,
   page: 2,
@@ -970,6 +978,19 @@ export const blowoutLocationRequired = (
     fields.path === 'multiDispense'
   return (blowout_checkbox || isDisposalChecked) && blowout_location == null
     ? BLOWOUT_LOCATION_REQUIRED
+    : null
+}
+export const blowoutFlowRateRequired = (
+  fields: HydratedMixFormData | HydratedMoveLiquidFormData
+): FormError | null => {
+  const { blowout_checkbox, blowout_flowRate } = fields
+  const isDisposalChecked =
+    'disposalVolume_checkbox' in fields &&
+    'path' in fields &&
+    fields.disposalVolume_checkbox &&
+    fields.path === 'multiDispense'
+  return (blowout_checkbox || isDisposalChecked) && !blowout_flowRate
+    ? BLOWOUT_FLOW_RATE_REQUIRED
     : null
 }
 export const wavelengthRequired = (

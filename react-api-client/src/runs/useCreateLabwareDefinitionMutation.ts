@@ -9,11 +9,11 @@ import type {
   CreateLabwareDefinitionResponsePayload,
   HostConfig,
 } from '@opentrons/api-client'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 interface CreateLabwareDefinitionParams {
   runId: string
-  data: LabwareDefinition2
+  data: LabwareDefinition
 }
 
 export type UseCreateLabwareDefinitionMutationResult = UseMutationResult<

@@ -70,6 +70,8 @@ const EIGHT_FIVE_ZERO_RELEASE_BULLET_POINTS = [
   '9',
   '10',
   '11',
+  '12',
+  '13',
 ]
 
 export const useAnnouncements = (): Announcement[] => {
@@ -611,7 +613,7 @@ export const useAnnouncements = (): Announcement[] => {
           </Flex>
           <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('announcements.liquidClassAndPythonExport.body12')}
+              {t('announcements.liquidClassAndPythonExport.body14')}
             </StyledText>
             <StyledText desktopStyle="bodyDefaultRegular">
               <Trans
@@ -626,7 +628,7 @@ export const useAnnouncements = (): Announcement[] => {
                     />
                   ),
                 }}
-                i18nKey="announcements.liquidClassAndPythonExport.body13"
+                i18nKey="announcements.liquidClassAndPythonExport.body15"
               />
             </StyledText>
           </Flex>

@@ -1,7 +1,7 @@
-import type { LabwareDefinition2 } from '..'
+import type { LabwareDefinition } from '..'
 
 export function getTipTypeFromTipRackDefinition(
-  tipRackDef: LabwareDefinition2
+  tipRackDef: LabwareDefinition
 ): string {
   const tipVolume = Object.values(tipRackDef.wells)[0].totalLiquidVolume
   const tipType = `t${tipVolume}`

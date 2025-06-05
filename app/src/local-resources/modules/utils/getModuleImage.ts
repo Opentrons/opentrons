@@ -1,3 +1,4 @@
+import flexStackerModule from '/app/assets/images/flex_stacker_no_labware.png'
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
 import magneticBlockGen1 from '/app/assets/images/magnetic_block_gen_1.png'
 import magneticBlockGen1HighRes from '/app/assets/images/magnetic_block_gen_1@3x.png'
@@ -34,6 +35,8 @@ export function getModuleImage(
       return highRes ? magneticBlockGen1HighRes : magneticBlockGen1
     case 'absorbanceReaderV1':
       return absorbanceReader
+    case 'flexStackerModuleV1':
+      return flexStackerModule
     default:
       return 'Error: unknown module model'
   }

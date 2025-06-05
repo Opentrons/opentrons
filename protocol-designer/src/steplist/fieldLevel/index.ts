@@ -1,5 +1,4 @@
 import {
-  MAX_HEATER_SHAKER_DURATION_SECONDS,
   MAX_HEATER_SHAKER_MODULE_RPM,
   MAX_HEATER_SHAKER_MODULE_TEMP,
   MAX_TC_BLOCK_TEMP,
@@ -7,7 +6,6 @@ import {
   MAX_TC_LID_TEMP,
   MAX_TC_PROFILE_VOLUME,
   MAX_TEMP_MODULE_TEMP,
-  MIN_HEATER_SHAKER_DURATION_SECONDS,
   MIN_HEATER_SHAKER_MODULE_RPM,
   MIN_HEATER_SHAKER_MODULE_TEMP,
   MIN_TC_BLOCK_TEMP,
@@ -20,6 +18,7 @@ import { getStagingAreaAddressableAreas } from '../../utils'
 import {
   composeErrors,
   enterValueWithinRange,
+  greaterThanZero,
   isTimeFormat,
   isTimeFormatMinutesSeconds,
   maxFieldValue,
@@ -28,6 +27,7 @@ import {
   nonZero,
   realNumber,
   requiredField,
+  transferVolumeMax,
 } from './errors'
 import {
   composeMaskers,
@@ -53,6 +53,7 @@ import type {
   WasteChuteEntities,
 } from '@opentrons/step-generation'
 import type {
+  HydratedFormData,
   LabwareOrAdditionalEquipmentEntity,
   StepFieldName,
 } from '../../form-types'
@@ -88,15 +89,13 @@ const getLabwareOrAdditionalEquipmentEntity = (
   } else return null
 }
 
-const getIsAdapterLocation = (
+const getIsStackingLocation = (
   newLocation: string,
   labwareEntities: LabwareEntities
 ): boolean => {
-  if (labwareEntities[newLocation] == null) return false
-  return (
-    labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
-  )
+  return labwareEntities[newLocation] != null
 }
+
 const getIsAdditionalEquipmentLocation = (
   newLocation: string,
   wasteChuteEntities: WasteChuteEntities,
@@ -136,7 +135,7 @@ const getLabwareLocation = (
     return { moduleId: newLocationString }
   } else if (
     newLocationString != null &&
-    getIsAdapterLocation(newLocationString, state.labwareEntities)
+    getIsStackingLocation(newLocationString, state.labwareEntities)
   ) {
     return { labwareId: newLocationString }
   } else if (
@@ -165,7 +164,7 @@ const getPipetteEntity = (
 }
 
 interface StepFieldHelpers {
-  getErrors?: (arg0: unknown) => string[]
+  getErrors?: (arg0: unknown, data?: HydratedFormData) => string[]
   maskValue?: ValueMasker
   castValue?: ValueCaster
   hydrate?: (state: InvariantContext, id: string) => unknown
@@ -298,26 +297,17 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   dispense_retract_delay_seconds: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
   },
-  pauseHour: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-  },
-  pauseMinute: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-  },
-  pauseSecond: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-  },
   pipette: {
     getErrors: composeErrors(requiredField),
     hydrate: getPipetteEntity,
   },
   times: {
-    getErrors: composeErrors(requiredField),
+    getErrors: composeErrors(greaterThanZero),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(0)),
     castValue: Number,
   },
   volume: {
-    getErrors: composeErrors(requiredField, nonZero),
+    getErrors: composeErrors(requiredField, nonZero, transferVolumeMax),
     maskValue: composeMaskers(
       maskToFloat,
       onlyPositiveNumbers,
@@ -361,18 +351,6 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
         MIN_HEATER_SHAKER_MODULE_RPM,
         MAX_HEATER_SHAKER_MODULE_RPM
       )
-    ),
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-    castValue: Number,
-  },
-  heaterShakerTimerMinutes: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-    castValue: Number,
-  },
-  heaterShakerTimerSeconds: {
-    getErrors: composeErrors(
-      minFieldValue(MIN_HEATER_SHAKER_DURATION_SECONDS),
-      maxFieldValue(MAX_HEATER_SHAKER_DURATION_SECONDS)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
@@ -460,6 +438,10 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     maskValue: composeMaskers(trimDecimals(1)),
     castValue: numberOrNull,
   },
+  blowout_flowRate: {
+    maskValue: composeMaskers(trimDecimals(1)),
+    castValue: numberOrNull,
+  },
   pushOut_volume: {
     maskValue: composeMaskers(
       maskToFloat,
@@ -537,11 +519,15 @@ const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
 }
 export const getFieldErrors = (
   name: StepFieldName,
-  value: unknown
+  value: unknown,
+  hydratedFormData: HydratedFormData
 ): string[] => {
   const fieldErrorGetter =
     stepFieldHelperMap[name] && stepFieldHelperMap[name].getErrors
-  const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
+
+  const errors = fieldErrorGetter
+    ? fieldErrorGetter(value, hydratedFormData)
+    : []
   return errors
 }
 export const getProfileFieldErrors = (

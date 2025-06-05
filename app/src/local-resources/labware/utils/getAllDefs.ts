@@ -1,7 +1,7 @@
 import { getAllDefinitions } from '@opentrons/shared-data'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
-export function getAllDefs(): LabwareDefinition2[] {
+export function getAllDefs(): LabwareDefinition[] {
   return Object.values(getAllDefinitions())
 }

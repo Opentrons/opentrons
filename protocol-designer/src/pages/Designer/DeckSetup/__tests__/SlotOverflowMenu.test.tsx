@@ -16,7 +16,6 @@ import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import {
   deleteContainer,
   duplicateLabware,
-  openIngredientSelector,
 } from '../../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import { getNextAvailableDeckSlot } from '../../../../labware-ingred/utils'
@@ -127,11 +126,6 @@ describe('SlotOverflowMenu', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Edit labware' }))
     expect(props.addEquipment).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Rename labware' }))
-    screen.getByText('mock EditNickNameModal')
-    fireEvent.click(screen.getByRole('button', { name: 'Add liquid' }))
-    expect(mockNavigate).toHaveBeenCalled()
-    expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Duplicate labware' }))
     expect(vi.mocked(duplicateLabware)).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
@@ -145,8 +139,7 @@ describe('SlotOverflowMenu', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add labware' }))
     expect(props.addEquipment).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
-    expect(screen.getAllByRole('button')).toHaveLength(3)
-    expect(screen.getByRole('button', { name: 'Add liquid' })).toBeDisabled()
+    expect(screen.getAllByRole('button')).toHaveLength(2)
     expect(screen.getByRole('button', { name: 'Clear labware' })).toBeDisabled()
     screen.getByTestId('divider')
   })
@@ -155,11 +148,7 @@ describe('SlotOverflowMenu', () => {
       labId2: { well1: { '0': { volume: 10 } } },
     })
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Edit labware' }))
-
-    fireEvent.click(screen.getByRole('button', { name: 'Edit liquid' }))
-    expect(mockNavigate).toHaveBeenCalled()
-    expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
+    screen.getByRole('button', { name: 'Edit labware' })
   })
   it('deletes the labware', () => {
     vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({

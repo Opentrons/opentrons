@@ -60,7 +60,7 @@ import type { ThunkDispatch } from '../../types'
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'
 
-const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
+export const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
   'loadLabware',
   'loadModule',
   'loadPipette',

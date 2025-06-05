@@ -37,6 +37,8 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 - No longer allow touch tip with incompatible labware. This changes the behavior of imported protocols that had touch tip on incompatible labware.
 - If multiple labware end up in the same slot at the same time due to deleting/rearranging steps, an error appears on the protocol timeline.
 - If a Heater-Shaker step is created with a a heater set and a timer, the protocol will now wait until the temperature is reached before counting down the timer.
+- If the timer of a Heater-Shaker step is toggled on and off, the timer input field no longer errors.
+- Successfully delete a defined liquid that has not been assigned to any location.
 
 Running a protocol created in Protocol Designer now requires Opentrons App version 8.5.0 or newer.
 

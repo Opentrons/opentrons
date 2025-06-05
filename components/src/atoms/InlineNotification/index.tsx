@@ -13,6 +13,7 @@ import {
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { MouseEventHandler } from 'react'
 import type { IconProps } from '../../icons'
 import type { StyleProps } from '../../primitives'
@@ -23,7 +24,7 @@ export interface InlineNotificationProps extends StyleProps {
   /** name constant of the icon to display */
   type: InlineNotificationType
   /** InlineNotification contents */
-  heading: string
+  heading?: string
   message?: string
   /** Optional dynamic width based on contents */
   hug?: boolean
@@ -79,46 +80,16 @@ export function InlineNotification(
     color: INLINE_NOTIFICATION_PROPS_BY_TYPE[type].color,
     size: '100%',
   }
+  const backgroundColor =
+    INLINE_NOTIFICATION_PROPS_BY_TYPE[type].backgroundColor
+
   return (
     <Flex
-      alignItems={ALIGN_CENTER}
-      backgroundColor={INLINE_NOTIFICATION_PROPS_BY_TYPE[type].backgroundColor}
       data-testid={`InlineNotification_${type}`}
-      flexDirection={DIRECTION_ROW}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      width={hug ? 'max-content' : '100%'}
-      css={css`
-        gap: ${SPACING.spacing8};
-        border-radius: ${BORDERS.borderRadius4};
-        padding: ${SPACING.spacing8} ${SPACING.spacing12};
-        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-          gap: ${SPACING.spacing12};
-          border-radius: ${BORDERS.borderRadius8};
-          padding: ${SPACING.spacing12} ${SPACING.spacing16};
-        }
-      `}
+      css={INLINE_NOTIFICATION_WRAPPER_STYLES(backgroundColor, hug)}
     >
-      <Flex
-        justifyContent={JUSTIFY_FLEX_START}
-        alignItems={ALIGN_CENTER}
-        flexDirection={DIRECTION_ROW}
-        css={css`
-          gap: ${SPACING.spacing8};
-          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            gap: ${SPACING.spacing12};
-          }
-        `}
-      >
-        <Box
-          css={css`
-            width: ${SPACING.spacing16};
-            height: ${SPACING.spacing16};
-            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-              width: 1.75rem;
-              height: 1.75rem;
-            }
-          `}
-        >
+      <Flex css={INLINE_NOTIFICATION_FLEX_STYLE}>
+        <Box css={INLINE_NOTIFICATION_BOX_STYLE}>
           <Icon {...iconProps} aria-label={`icon_${type}`} />
         </Box>
         <Flex flex="1" alignItems={ALIGN_CENTER}>
@@ -126,22 +97,26 @@ export function InlineNotification(
             oddStyle="bodyTextRegular"
             desktopStyle="bodyDefaultRegular"
           >
-            <span
-              css={`
-                font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-              `}
-            >
-              {fullHeading}
-            </span>
-            {/* this break is because the desktop wants this on two lines, but also wants/
-              inline text layout on ODD. Soooo here you go */}
-            <br
-              css={`
-                @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-                  display: none;
-                }
-              `}
-            />
+            {heading != null && (
+              <>
+                <span
+                  css={`
+                    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+                  `}
+                >
+                  {fullHeading}
+                </span>
+                {/* this break is because the desktop wants this on two lines, but also wants/
+                  inline text layout on ODD. Soooo here you go */}
+                <br
+                  css={`
+                    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                      display: none;
+                    }
+                  `}
+                />
+              </>
+            )}
             {message != null && fullmessage}
           </StyledText>
         </Flex>
@@ -166,28 +141,13 @@ export function InlineNotification(
           <Btn
             data-testid="InlineNotification_close-button"
             onClick={onCloseClick}
-            css={css`
-              width: 28px;
-              height: 28px;
-              @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-                width: ${SPACING.spacing48};
-                height: ${SPACING.spacing48};
-              }
-            `}
-            width=""
+            css={INLINE_NOTIFICATION_CLOSE_BUTTON_STYLE}
             height="fit-content"
           >
             <Icon
               aria-label="close_icon"
               name="close"
-              css={css`
-                width: 28px;
-                height: 28px;
-                @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-                  width: ${SPACING.spacing48};
-                  height: ${SPACING.spacing48};
-                }
-              `}
+              css={INLINE_NOTIFICATION_ICON_STYLE}
             />
           </Btn>
         )}
@@ -195,3 +155,59 @@ export function InlineNotification(
     </Flex>
   )
 }
+
+const INLINE_NOTIFICATION_WRAPPER_STYLES = (
+  backgroundColor: string,
+  hug: boolean
+): FlattenSimpleInterpolation => css`
+  background-color: ${backgroundColor};
+  align-items: ${ALIGN_CENTER};
+  flex-direction: ${DIRECTION_ROW};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  width: ${hug ? 'max-content' : '100%'};
+  gap: ${SPACING.spacing8};
+  border-radius: ${BORDERS.borderRadius4};
+  padding: ${SPACING.spacing8} ${SPACING.spacing12};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    gap: ${SPACING.spacing12};
+    border-radius: ${BORDERS.borderRadius8};
+    padding: ${SPACING.spacing12} ${SPACING.spacing16};
+  }
+`
+
+const INLINE_NOTIFICATION_FLEX_STYLE = css`
+  justify-content: ${JUSTIFY_FLEX_START};
+  align-items: ${ALIGN_CENTER};
+  flex-direction: ${DIRECTION_ROW};
+  gap: ${SPACING.spacing8};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    gap: ${SPACING.spacing12};
+  }
+`
+
+const INLINE_NOTIFICATION_BOX_STYLE = css`
+  width: 1rem;
+  height: 1rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+`
+
+const INLINE_NOTIFICATION_CLOSE_BUTTON_STYLE = css`
+  width: 1.75rem;
+  height: 1.75rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 3rem;
+    height: 3rem;
+  }
+`
+
+const INLINE_NOTIFICATION_ICON_STYLE = css`
+  width: 1.75rem;
+  height: 1.75rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 3rem;
+    height: 3rem;
+  }
+`

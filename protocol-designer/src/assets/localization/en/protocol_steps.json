@@ -21,10 +21,12 @@
     "targetTemperature": "Must be between 4 and 95˚C",
     "targetHeaterShakerTemperature": "Must be between 37 and 95˚C",
     "blockTargetTempHold": "Must be between 4 and 99˚C",
-    "lidTargetTempHold": "Must be between 37 and 110˚C"
+    "lidTargetTempHold": "Must be between 37 and 110˚C",
+    "volume": "Must be between 0 and {{max}}"
   },
   "change_tips": "Change tips",
   "column": "Column",
+  "configurations": "Configurations",
   "consolidate": "Conslidate",
   "of": "of",
   "comfirm_reset_settings": {
@@ -181,7 +183,8 @@
   "touch_tip_position": "Touch tip position from top",
   "transfer": "Transfer",
   "unknown_module": "Unknown module",
-  "valid_range": "Valid range between {{min}} - {{max}} {{unit}}",
+  "unoccupied_stack": "Stack of {{name}}",
+  "valid_range": "Must be between 0.1 and {{max}} {{unit}}",
   "view_details": "View details",
   "volume_per_well": "Volume per well",
   "well_name": "Well {{wellName}}",

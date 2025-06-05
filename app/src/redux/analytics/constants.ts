@@ -122,6 +122,13 @@ export const ANALYTICS_LANGUAGE_UPDATED_DESKTOP_APP_SETTINGS: 'languageUpdatedDe
  */
 
 export const ANALYTICS_LPC_ANALYSIS_KIND: 'lpcAnalysisKind' = 'lpcAnalysisKind'
+export const ANALYTICS_LPC_LAUNCH: 'lpcLaunch' = 'lpcLaunch'
+export const ANALYTICS_LPC_APPLY_OFFSETS: 'lpcApplyOffsets' = 'lpcApplyOffsets'
+export const ANALYTICS_LPC_SAVE_OFFSET: 'lpcSaveOffset' = 'lpcSaveOffset'
+export const ANALYTICS_LPC_SAVE_OFFSET_TO_RUN_RECORD: 'lpcSaveOffsetToRunRecord' =
+  'lpcSaveOffsetToRunRecord'
+export const ANALYTICS_LPC_OFFSET_SOURCE_RESOLUTION: 'lpcOffsetSourceResolution' =
+  'lpcOffsetSourceResolution'
 
 /**
  * Module Actions Analytics

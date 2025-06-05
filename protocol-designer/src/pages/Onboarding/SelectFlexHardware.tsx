@@ -32,7 +32,7 @@ export function SelectHardware(props: WizardTileProps): JSX.Element | null {
     <HandleEnter onEnter={handleProceed}>
       <WizardBody
         robotType={FLEX_ROBOT_TYPE}
-        stepNumber={3}
+        stepNumber={2}
         subStepNumber={5}
         header={t('configure_deck_hardware')}
         subHeader={t('place_hardware')}

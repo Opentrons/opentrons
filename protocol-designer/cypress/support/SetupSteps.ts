@@ -53,7 +53,7 @@ export enum SetupContent {
   WellPlatesCat = 'Well plates',
   AddLiquid = 'Add liquid',
   DefineALiquid = 'Define a liquid',
-  LiquidButton = 'Liquid',
+  LiquidButton = 'Liquids',
   SampleLiquidName = 'My liquid!',
   ProtocolSteps = 'Protocol steps',
   AddStep = 'Add Step',
@@ -265,7 +265,7 @@ export const SetupSteps = {
    */
   AddHeaterShaker: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="cutoutD1"]').click()
+      cy.get('button[data-testid="D1"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.HeaterShaker).click()
       cy.get('button[data-testid="Heater-Shaker Module GEN1"]').click()
@@ -277,7 +277,7 @@ export const SetupSteps = {
    */
   AddTempdeck2: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="cutoutC1"]').click()
+      cy.get('button[data-testid="C1"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.Tempdeck2).click()
       cy.get('button[data-testid="Temperature Module GEN2"]').click()
@@ -289,7 +289,7 @@ export const SetupSteps = {
    */
   AddMagBlock: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="cutoutB2"]').click()
+      cy.get('button[data-testid="B2"]').click()
       cy.contains(SetupContent.MagBlock).click()
       cy.get('button[data-testid="Magnetic Block GEN1"]').click()
     },
@@ -333,7 +333,7 @@ export const SetupSteps = {
 
   AddPlateReader: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="cutoutD3"]').click()
+      cy.get('button[data-testid="D3"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.PlateReader).click()
       cy.get(
@@ -397,7 +397,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Adds hardware/labware to a deck slot.
+   * Adds labware to a deck slot.
    */
   AddHardwareLabware: (): StepThunk => ({
     call: () => {
@@ -464,7 +464,7 @@ export const SetupSteps = {
    */
   AddLiquid: (): StepThunk => ({
     call: () => {
-      cy.contains('button', SetupContent.AddLiquid).click()
+      cy.get('button[data-testid="LabwareCard_addLiquid_button"]').click()
     },
   }),
   /**
@@ -717,7 +717,7 @@ export const SetupSteps = {
   // Continue to the next part of the transfer form
   Continue: (): StepThunk => ({
     call: () => {
-      cy.contains('Continue').click()
+      cy.contains('Continue').click({ force: true })
     },
   }),
 
@@ -951,7 +951,7 @@ export const SetupVerifications = {
     call: () => {
       cy.contains(SetupContent.ModulePageH).should('be.visible')
       cy.contains(SetupContent.ModulePageB).should('be.visible')
-      cy.get('button[data-testid="cutoutB1"]').click()
+      cy.get('button[data-testid="B1"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.Thermocycler).should('be.visible')
       cy.contains(SetupContent.HeaterShaker).should('be.visible')
@@ -1001,7 +1001,7 @@ export const SetupVerifications = {
 
   AbsorbanceNotSelectable: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="cutoutD3"]').click()
+      cy.get('button[data-testid="D3"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.PlateReader)
       cy.get('[data-testid="ModalHeader_icon_close_Add to slot D3"]').click()
@@ -1111,14 +1111,14 @@ export const CompositeSetupSteps = {
     heatershaker?: boolean
     magblock?: boolean
     tempdeck?: boolean
-    platereader?: boolean
+    plateReader?: boolean
   }): StepThunk => ({
     call: () => {
       const thermocycler = options.thermocycler ?? false
       const heatershaker = options.heatershaker ?? false
       const magblock = options.magblock ?? false
       const tempdeck = options.tempdeck ?? false
-      const platereader = options.platereader ?? false
+      const plateReader = options.plateReader ?? false
       cy.log(`Running FlexSetup with options: ${JSON.stringify(options)}`)
       SetupVerifications.OnStep1().call()
       SetupVerifications.FlexSelected().call()
@@ -1159,7 +1159,7 @@ export const CompositeSetupSteps = {
         SetupSteps.AddTempdeck2().call()
       }
 
-      if (platereader) {
+      if (plateReader) {
         SetupSteps.AddPlateReader().call()
       }
 

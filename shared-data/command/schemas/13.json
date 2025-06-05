@@ -830,6 +830,47 @@
       "title": "CloseLabwareLatchParams",
       "type": "object"
     },
+    "CloseLatchCreate": {
+      "description": "A request to execute a Flex Stacker CloseLatch command.",
+      "properties": {
+        "commandType": {
+          "const": "flexStacker/closeLatch",
+          "default": "flexStacker/closeLatch",
+          "enum": ["flexStacker/closeLatch"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/CloseLatchParams"
+        }
+      },
+      "required": ["params"],
+      "title": "CloseLatchCreate",
+      "type": "object"
+    },
+    "CloseLatchParams": {
+      "description": "The parameters defining how a stacker should close its latch.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "CloseLatchParams",
+      "type": "object"
+    },
     "ColumnNozzleLayoutConfiguration": {
       "description": "Information required for nozzle configurations of type ROW and COLUMN.",
       "properties": {
@@ -1969,22 +2010,6 @@
           "description": "How full the labware pool should now be. If None, default to the maximum amount of the currently-configured labware the pool can hold. If this number is larger than the maximum the pool can hold, it will be clamped to the maximum. If this number is smaller than the current amount of labware the pool holds, it will be clamped to that minimum. Do not use the value in the parameters as an outside observer; instead, use the count value from the results.",
           "title": "Count"
         },
-        "labwareToStore": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/StackerStoredLabwareGroup"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "A list of IDs that should be initially stored in the stacker.\n\nIf specified, the first element of the list is the labware on the physical bottom that will be the first labware retrieved.\n\nThis is a complex field. The following must be true for the field to be valid:\n- If this field is specified, then either initialCount must not be specified, or this field must have exactly initalCount elements\n- Each element must contain an id for each corresponding labware details field (i.e. if lidLabware is specified, each element must have\n  a lidLabwareId) and must not contain an id for a corresponding labware details field that is not specified (i.e., if adapterLabware\n  is not specified, each element must not have an adapterLabwareId).\n\nThe behavior of the command depends on the values of both this field and initialCount.\n- If this field is not specified and initialCount is not specified, the command will create the maximum number of labware objects\n  the stacker can hold according to the labware pool specifications.\n- If this field is not specified and initialCount is specified to be 0, the command will create 0 labware objects and the stacker will be empty.\n- If this field is not specified and initialCount is specified to be non-0, the command will create initialCount labware objects of\n  each specified labware type (primary, lid, and adapter), with appropriate positions, and arbitrary IDs, loaded into the stacker\n- If this field is specified (and therefore initialCount is not specified or is specified to be the length of this field) then the\n  command will create labware objects with the IDs specified in this field and appropriate positions, loaded into the stacker.\n\nBehavior is also different depending on whether the labware identified by ID in this field exist or not. Either all labware specified\nin this field must exist, or all must not exist.\n\nFurther,\n- If the labware exist, they must be of the same type as identified in the primaryLabware field.\n- If the labware exist and the adapterLabware field is specified, each labware must be currently loaded on a labware of the same kind as\n  specified in the adapterLabware field, and that labware must be loaded off-deck\n- If the labware exist and the adapterLabware field is not specified, each labware must be currently loaded off deck directly\n- If the labware exist and the lidLabware field is specified, each labware must currently have a loaded lid of the same kind as specified\n  in the lidLabware field\n- If the labware exist and the lidLabware field is not specified, each labware must not currently have a lid\n- If the labware exist, they must have nothing loaded underneath them or above them other than what is mentioned above\n\nIf all the above are true, when this command executes the labware will be immediately moved into InStackerHopper. If any of the above\nare not true, analysis will fail.\n",
-          "title": "Labwaretostore"
-        },
         "message": {
           "default": null,
           "description": "The message to display on connected clients during a manualWithPause strategy fill.",
@@ -2148,51 +2173,6 @@
       "title": "HomeParams",
       "type": "object"
     },
-    "IdentifyModuleCreate": {
-      "description": "A request to execute an IdentifyModule command.",
-      "properties": {
-        "commandType": {
-          "const": "identifyModule",
-          "default": "identifyModule",
-          "enum": ["identifyModule"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/IdentifyModuleParams"
-        }
-      },
-      "required": ["params"],
-      "title": "IdentifyModuleCreate",
-      "type": "object"
-    },
-    "IdentifyModuleParams": {
-      "description": "The parameters defining the module to be identified.",
-      "properties": {
-        "model": {
-          "$ref": "#/$defs/ModuleModel",
-          "description": "The model of the module"
-        },
-        "moduleId": {
-          "description": "Unique ID of the module",
-          "title": "Moduleid",
-          "type": "string"
-        }
-      },
-      "required": ["model", "moduleId"],
-      "title": "IdentifyModuleParams",
-      "type": "object"
-    },
     "InitializeCreate": {
       "description": "A request to execute an Absorbance Reader measurement.",
       "properties": {
@@ -2318,9 +2298,9 @@
         }
       },
       "required": [
-        "tiprack",
         "aspirate",
         "singleDispense",
+        "tiprack",
         "liquidClassName",
         "pipetteModel"
       ],
@@ -3933,6 +3913,47 @@
       "title": "OpenLabwareLatchParams",
       "type": "object"
     },
+    "OpenLatchCreate": {
+      "description": "A request to execute a Flex Stacker OpenLatch command.",
+      "properties": {
+        "commandType": {
+          "const": "flexStacker/openLatch",
+          "default": "flexStacker/openLatch",
+          "enum": ["flexStacker/openLatch"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/OpenLatchParams"
+        }
+      },
+      "required": ["params"],
+      "title": "OpenLatchCreate",
+      "type": "object"
+    },
+    "OpenLatchParams": {
+      "description": "The parameters defining how a stacker should open its latch.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "OpenLatchParams",
+      "type": "object"
+    },
     "PickUpTipCreate": {
       "description": "Pick up tip command creation request model.",
       "properties": {
@@ -4039,6 +4060,53 @@
       "enum": ["well-bottom", "well-top", "well-center", "liquid-meniscus"],
       "title": "PositionReference",
       "type": "string"
+    },
+    "PrepareShuttleCreate": {
+      "description": "A request to execute a Flex Stacker PrepareShuttle command.",
+      "properties": {
+        "commandType": {
+          "const": "flexStacker/prepareShuttle",
+          "default": "flexStacker/prepareShuttle",
+          "enum": ["flexStacker/prepareShuttle"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/PrepareShuttleParams"
+        }
+      },
+      "required": ["params"],
+      "title": "PrepareShuttleCreate",
+      "type": "object"
+    },
+    "PrepareShuttleParams": {
+      "description": "The parameters for a PrepareShuttle command.",
+      "properties": {
+        "ignoreLatch": {
+          "default": false,
+          "description": "Ignore the latch state of the shuttle",
+          "title": "Ignorelatch",
+          "type": "boolean"
+        },
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "PrepareShuttleParams",
+      "type": "object"
     },
     "PrepareToAspirateCreate": {
       "description": "Prepare for aspirate command creation request model.",
@@ -4549,22 +4617,22 @@
       "description": "Input parameters for a labware retrieval command.",
       "properties": {
         "adapterId": {
-          "description": "Do not use. Present for internal backward compatibility.",
+          "description": "An optional ID to assign to an adapter. If None, an ID will be generated.",
           "title": "Adapterid",
           "type": "string"
         },
         "displayName": {
-          "description": "Do not use. Present for internal backward compatibility.",
+          "description": "An optional user-specified display name or label for this labware.",
           "title": "Displayname",
           "type": "string"
         },
         "labwareId": {
-          "description": "Do not use. Present for internal backward compatibility.",
+          "description": "An optional ID to assign to this labware. If None, an ID will be generated.",
           "title": "Labwareid",
           "type": "string"
         },
         "lidId": {
-          "description": "Do not use. Present for internal backward compatibility.",
+          "description": "An optional ID to assign to a lid. If None, an ID will be generated.",
           "title": "Lidid",
           "type": "string"
         },
@@ -5025,24 +5093,8 @@
             }
           ],
           "default": null,
-          "description": "The number of labware that should be initially stored in the stacker. This number will be silently clamped to\nthe maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker.\n\nThis field works with the initialStoredLabware field in a complex way.\n\nThe following must be true for initialCount to be valid:\n  - It is not specified, and initialStoredLabware is not specified, in which case the stacker will start empty\n  - It is not specified, and initialStoredLabware is specified, in which case the contents of the stacker are entirely\n    determined by initialStoredLabware.\n  - It is specified, and initialStoredLabware is specified, in which case the length of initialStoredLabware must be\n    exactly initialCount, and the contents of the stacker will be determined by initialStoredLabware.\n",
+          "description": "The number of labware that should be initially stored in the stacker. This number will be silently clamped to the maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker.",
           "title": "Initialcount"
-        },
-        "initialStoredLabware": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/StackerStoredLabwareGroup"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "A list of IDs that should be initially stored in the stacker.\n\nIf specified, the first element of the list is the labware on the physical bottom that will be the first labware retrieved.\n\nThis is a complex field. The following must be true for the field to be valid:\n- If this field is specified, then either initialCount must not be specified, or this field must have exactly initalCount elements\n- Each element must contain an id for each corresponding labware details field (i.e. if lidLabware is specified, each element must have\n  a lidLabwareId) and must not contain an id for a corresponding labware details field that is not specified (i.e., if adapterLabware\n  is not specified, each element must not have an adapterLabwareId).\n\nThe behavior of the command depends on the values of both this field and initialCount.\n- If this field is not specified and initialCount is not specified, the command will create the maximum number of labware objects\n  the stacker can hold according to the labware pool specifications.\n- If this field is not specified and initialCount is specified to be 0, the command will create 0 labware objects and the stacker will be empty.\n- If this field is not specified and initialCount is specified to be non-0, the command will create initialCount labware objects of\n  each specified labware type (primary, lid, and adapter), with appropriate positions, and arbitrary IDs, loaded into the stacker\n- If this field is specified (and therefore initialCount is not specified or is specified to be the length of this field) then the\n  command will create labware objects with the IDs specified in this field and appropriate positions, loaded into the stacker.\n\nBehavior is also different depending on whether the labware identified by ID in this field exist or not. Either all labware specified\nin this field must exist, or all must not exist.\n\nFurther,\n- If the labware exist, they must be of the same type as identified in the primaryLabware field.\n- If the labware exist and the adapterLabware field is specified, each labware must be currently loaded on a labware of the same kind as\n  specified in the adapterLabware field, and that labware must be loaded off-deck\n- If the labware exist and the adapterLabware field is not specified, each labware must be currently loaded off deck directly\n- If the labware exist and the lidLabware field is specified, each labware must currently have a loaded lid of the same kind as specified\n  in the lidLabware field\n- If the labware exist and the lidLabware field is not specified, each labware must not currently have a lid\n- If the labware exist, they must have nothing loaded underneath them or above them other than what is mentioned above\n\nIf all the above are true, when this command executes the labware will be immediately moved into InStackerHopper. If any of the above\nare not true, analysis will fail.\n",
-          "title": "Initialstoredlabware"
         },
         "lidLabware": {
           "$ref": "#/$defs/StackerStoredLabwareDetails",
@@ -5357,28 +5409,6 @@
       },
       "required": ["loadName", "namespace", "version"],
       "title": "StackerStoredLabwareDetails",
-      "type": "object"
-    },
-    "StackerStoredLabwareGroup": {
-      "description": "Represents one group of labware stored in a stacker hopper.",
-      "properties": {
-        "adapterLabwareId": {
-          "default": null,
-          "title": "Adapterlabwareid",
-          "type": "string"
-        },
-        "lidLabwareId": {
-          "default": null,
-          "title": "Lidlabwareid",
-          "type": "string"
-        },
-        "primaryLabwareId": {
-          "title": "Primarylabwareid",
-          "type": "string"
-        }
-      },
-      "required": ["primaryLabwareId"],
-      "title": "StackerStoredLabwareGroup",
       "type": "object"
     },
     "StatusBarAnimation": {
@@ -5784,196 +5814,6 @@
       },
       "required": ["axes"],
       "title": "UnsafeEngageAxesParams",
-      "type": "object"
-    },
-    "UnsafeFlexStackerCloseLatchCreate": {
-      "description": "A request to execute a Flex Stacker UnsafeFlexStackerCloseLatch command.",
-      "properties": {
-        "commandType": {
-          "const": "unsafe/flexStacker/closeLatch",
-          "default": "unsafe/flexStacker/closeLatch",
-          "enum": ["unsafe/flexStacker/closeLatch"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/UnsafeFlexStackerCloseLatchParams"
-        }
-      },
-      "required": ["params"],
-      "title": "UnsafeFlexStackerCloseLatchCreate",
-      "type": "object"
-    },
-    "UnsafeFlexStackerCloseLatchParams": {
-      "description": "The parameters defining how a stacker should close its latch.",
-      "properties": {
-        "moduleId": {
-          "description": "Unique ID of the Flex Stacker",
-          "title": "Moduleid",
-          "type": "string"
-        }
-      },
-      "required": ["moduleId"],
-      "title": "UnsafeFlexStackerCloseLatchParams",
-      "type": "object"
-    },
-    "UnsafeFlexStackerManualRetrieveCreate": {
-      "description": "A request to execute a Flex Stacker manual retrieve command.",
-      "properties": {
-        "commandType": {
-          "const": "unsafe/flexStacker/manualRetrieve",
-          "default": "unsafe/flexStacker/manualRetrieve",
-          "enum": ["unsafe/flexStacker/manualRetrieve"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/UnsafeFlexStackerManualRetrieveParams"
-        }
-      },
-      "required": ["params"],
-      "title": "UnsafeFlexStackerManualRetrieveCreate",
-      "type": "object"
-    },
-    "UnsafeFlexStackerManualRetrieveParams": {
-      "description": "Input parameters for a labware retrieval command.",
-      "properties": {
-        "adapterId": {
-          "description": "Do not use. Present for internal backward compatibility.",
-          "title": "Adapterid",
-          "type": "string"
-        },
-        "displayName": {
-          "description": "Do not use. Present for internal backward compatibility.",
-          "title": "Displayname",
-          "type": "string"
-        },
-        "labwareId": {
-          "description": "Do not use. Present for internal backward compatibility.",
-          "title": "Labwareid",
-          "type": "string"
-        },
-        "lidId": {
-          "description": "Do not use. Present for internal backward compatibility.",
-          "title": "Lidid",
-          "type": "string"
-        },
-        "moduleId": {
-          "description": "Unique ID of the Flex Stacker.",
-          "title": "Moduleid",
-          "type": "string"
-        }
-      },
-      "required": ["moduleId"],
-      "title": "UnsafeFlexStackerManualRetrieveParams",
-      "type": "object"
-    },
-    "UnsafeFlexStackerOpenLatchCreate": {
-      "description": "A request to execute a Flex Stacker UnsafeFlexStackerOpenLatch command.",
-      "properties": {
-        "commandType": {
-          "const": "unsafe/flexStacker/openLatch",
-          "default": "unsafe/flexStacker/openLatch",
-          "enum": ["unsafe/flexStacker/openLatch"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/UnsafeFlexStackerOpenLatchParams"
-        }
-      },
-      "required": ["params"],
-      "title": "UnsafeFlexStackerOpenLatchCreate",
-      "type": "object"
-    },
-    "UnsafeFlexStackerOpenLatchParams": {
-      "description": "The parameters defining how a stacker should open its latch.",
-      "properties": {
-        "moduleId": {
-          "description": "Unique ID of the Flex Stacker",
-          "title": "Moduleid",
-          "type": "string"
-        }
-      },
-      "required": ["moduleId"],
-      "title": "UnsafeFlexStackerOpenLatchParams",
-      "type": "object"
-    },
-    "UnsafeFlexStackerPrepareShuttleCreate": {
-      "description": "A request to execute a Flex Stacker UnsafeFlexStackerPrepareShuttle command.",
-      "properties": {
-        "commandType": {
-          "const": "unsafe/flexStacker/prepareShuttle",
-          "default": "unsafe/flexStacker/prepareShuttle",
-          "enum": ["unsafe/flexStacker/prepareShuttle"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/UnsafeFlexStackerPrepareShuttleParams"
-        }
-      },
-      "required": ["params"],
-      "title": "UnsafeFlexStackerPrepareShuttleCreate",
-      "type": "object"
-    },
-    "UnsafeFlexStackerPrepareShuttleParams": {
-      "description": "The parameters for a UnsafeFlexStackerPrepareShuttle command.",
-      "properties": {
-        "ignoreLatch": {
-          "default": false,
-          "description": "Ignore the latch state of the shuttle",
-          "title": "Ignorelatch",
-          "type": "boolean"
-        },
-        "moduleId": {
-          "description": "Unique ID of the Flex Stacker",
-          "title": "Moduleid",
-          "type": "string"
-        }
-      },
-      "required": ["moduleId"],
-      "title": "UnsafeFlexStackerPrepareShuttleParams",
       "type": "object"
     },
     "UnsafePlaceLabwareCreate": {
@@ -6829,8 +6669,11 @@
       "dispenseWhileTracking": "#/$defs/DispenseWhileTrackingCreate",
       "dropTip": "#/$defs/DropTipCreate",
       "dropTipInPlace": "#/$defs/DropTipInPlaceCreate",
+      "flexStacker/closeLatch": "#/$defs/CloseLatchCreate",
       "flexStacker/empty": "#/$defs/EmptyCreate",
       "flexStacker/fill": "#/$defs/FillCreate",
+      "flexStacker/openLatch": "#/$defs/OpenLatchCreate",
+      "flexStacker/prepareShuttle": "#/$defs/PrepareShuttleCreate",
       "flexStacker/retrieve": "#/$defs/RetrieveCreate",
       "flexStacker/setStoredLabware": "#/$defs/SetStoredLabwareCreate",
       "flexStacker/store": "#/$defs/StoreCreate",
@@ -6844,7 +6687,6 @@
       "heaterShaker/setTargetTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate",
       "heaterShaker/waitForTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate",
       "home": "#/$defs/HomeCreate",
-      "identifyModule": "#/$defs/IdentifyModuleCreate",
       "liquidProbe": "#/$defs/LiquidProbeCreate",
       "loadLabware": "#/$defs/LoadLabwareCreate",
       "loadLid": "#/$defs/LoadLidCreate",
@@ -6894,10 +6736,6 @@
       "unsafe/blowOutInPlace": "#/$defs/UnsafeBlowOutInPlaceCreate",
       "unsafe/dropTipInPlace": "#/$defs/UnsafeDropTipInPlaceCreate",
       "unsafe/engageAxes": "#/$defs/UnsafeEngageAxesCreate",
-      "unsafe/flexStacker/closeLatch": "#/$defs/UnsafeFlexStackerCloseLatchCreate",
-      "unsafe/flexStacker/manualRetrieve": "#/$defs/UnsafeFlexStackerManualRetrieveCreate",
-      "unsafe/flexStacker/openLatch": "#/$defs/UnsafeFlexStackerOpenLatchCreate",
-      "unsafe/flexStacker/prepareShuttle": "#/$defs/UnsafeFlexStackerPrepareShuttleCreate",
       "unsafe/placeLabware": "#/$defs/UnsafePlaceLabwareCreate",
       "unsafe/ungripLabware": "#/$defs/UnsafeUngripLabwareCreate",
       "unsafe/updatePositionEstimators": "#/$defs/UpdatePositionEstimatorsCreate",
@@ -6974,9 +6812,6 @@
     },
     {
       "$ref": "#/$defs/LoadModuleCreate"
-    },
-    {
-      "$ref": "#/$defs/IdentifyModuleCreate"
     },
     {
       "$ref": "#/$defs/LoadPipetteCreate"
@@ -7147,6 +6982,15 @@
       "$ref": "#/$defs/EmptyCreate"
     },
     {
+      "$ref": "#/$defs/CloseLatchCreate"
+    },
+    {
+      "$ref": "#/$defs/OpenLatchCreate"
+    },
+    {
+      "$ref": "#/$defs/PrepareShuttleCreate"
+    },
+    {
       "$ref": "#/$defs/CalibrateGripperCreate"
     },
     {
@@ -7175,18 +7019,6 @@
     },
     {
       "$ref": "#/$defs/UnsafePlaceLabwareCreate"
-    },
-    {
-      "$ref": "#/$defs/UnsafeFlexStackerManualRetrieveCreate"
-    },
-    {
-      "$ref": "#/$defs/UnsafeFlexStackerCloseLatchCreate"
-    },
-    {
-      "$ref": "#/$defs/UnsafeFlexStackerOpenLatchCreate"
-    },
-    {
-      "$ref": "#/$defs/UnsafeFlexStackerPrepareShuttleCreate"
     },
     {
       "$ref": "#/$defs/MoveAxesRelativeCreate"

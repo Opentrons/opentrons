@@ -1,6 +1,6 @@
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export const PROTOCOL_ID = 'fake_protocol_id'
 export const MOCK_RTP_DATA = [
@@ -82,7 +82,7 @@ export const MOCK_RTP_DATA = [
     default: 'none',
   },
 ]
-export const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
+export const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition
 export const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
   status: 'completed',

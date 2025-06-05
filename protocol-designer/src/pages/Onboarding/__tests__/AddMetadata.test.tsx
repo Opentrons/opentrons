@@ -55,7 +55,7 @@ describe('AddMetadata', () => {
 
   it('renders all the text and fields', () => {
     render(props)
-    screen.getByText('Step 4')
+    screen.getByText('Step 3')
     screen.getByText('Tell us about your protocol')
     screen.getByText('Name')
     screen.getByText('Description')

@@ -1,3 +1,5 @@
+import { getFullStackFromLabwares, getSlotInLocationStack } from '../utils'
+
 import type { MoveLabwareParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
@@ -9,8 +11,15 @@ export function forMoveLabware(
   const { labwareId, newLocation } = params
   const { robotState } = robotStateAndWarnings
   const { modules, labware } = robotState
+  const initialDeckSlot = getSlotInLocationStack(labware[labwareId].stack)
+  const fullStackFromLabwares = getFullStackFromLabwares(
+    labware,
+    initialDeckSlot
+  )
+  const index = fullStackFromLabwares.indexOf(labwareId)
+  const labwareToMove = fullStackFromLabwares.slice(0, index + 1) // includes labwareId you're moving
 
-  const newLocationStack = [labwareId]
+  const newLocationStack: string[] = []
   if (newLocation === 'offDeck' || newLocation === 'systemLocation') {
     newLocationStack.push(newLocation)
   } else if ('moduleId' in newLocation) {
@@ -23,10 +32,14 @@ export function forMoveLabware(
   } else if ('labwareId' in newLocation) {
     const labwareId = newLocation.labwareId
     const labwareIdStack = labware[labwareId].stack
-    newLocationStack.push(labwareId, ...labwareIdStack)
+    newLocationStack.push(...labwareIdStack)
   } else if ('addressableAreaName' in newLocation) {
     newLocationStack.push(newLocation.addressableAreaName)
   }
-
-  robotState.labware[labwareId].stack = newLocationStack
+  labwareToMove.forEach((id, i) => {
+    if (labware[id] != null) {
+      const stackBelow = labwareToMove.slice(i + 1) // what's under labware you're moving
+      robotState.labware[id].stack = [id, ...stackBelow, ...newLocationStack]
+    }
+  })
 }

@@ -57,10 +57,16 @@ export function HardwareConfigurator(
       const hasModule = Object.values(modules).some(
         module => module.cutoutId === cutoutId
       )
+      //  since we are adding cutoutA1 in moduleConfig if
+      //  there is a TC
+      const hasTCAndCutoutA1 =
+        Object.values(modules).some(
+          module => module.type === THERMOCYCLER_MODULE_TYPE
+        ) && cutoutId === 'cutoutA1'
       const hasFixture = Object.values(fixtures).some(
         fixture => fixture.cutoutId === cutoutId
       )
-      return !hasModule && !hasFixture
+      return !hasModule && !hasFixture && !hasTCAndCutoutA1
     }
   )
   const moduleConfig: DeckConfiguration = Object.values(modules).flatMap(

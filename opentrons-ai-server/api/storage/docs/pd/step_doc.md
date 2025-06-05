@@ -3295,8 +3295,8 @@ Steps:
 
 ## Examples for OT-2 and Flex
 
-<Example1-for-OT2-with-all-modules>
-All OT-2 modules involved
+1. <Example1-for-OT2-with-all-modules>
+   All OT-2 modules involved
 
 ```json
 {
@@ -3538,8 +3538,8 @@ All OT-2 modules involved
 
 </Example1-for-OT2-with-all-modules>
 
-<Example2-for-Flex-with-all-modules>
-All Flex modules involved
+2. <Example2-for-Flex-with-all-modules>
+   All Flex modules involved
 
 ```json
 {
@@ -3813,7 +3813,7 @@ All Flex modules involved
 
 </Example2-for-Flex-with-all-modules>
 
-<Example-serial-dilution>
+3. <Example-serial-dilution>
 
 Input:
 
@@ -4834,7 +4834,7 @@ Output protocol:
 
 </Example-serial-dilution>
 
-<Example-serial-dilution-with-multi-channel>
+4. <Example-serial-dilution-with-multi-channel>
 
 Input
 
@@ -5202,7 +5202,7 @@ Output
 
 </Example-serial-dilution-with-multi-channel>
 
-<Example-PCR>
+5. <Example-PCR>
 
 Input:
 
@@ -6312,3 +6312,950 @@ Output:
 ```
 
 </Example-PCR>
+
+6. <Example-thermocycler-move-falcon-tubes>
+
+Input
+
+```text
+Application:
+- Basic aliquoting
+
+Description:
+- transfer
+
+Pipette mount(s):
+- flex_1channel_1000 is mounted on the left
+- with the Flex Gripper
+
+Modules:
+- thermocyclerModuleV2 with opentrons_96_wellplate_200ul_pcr_full_skirt
+
+Fixtures:
+- Trash bin
+
+Labware:
+- opentrons_flex_96_filtertiprack_1000ul x 1
+- opentrons_15_tuberack_falcon_15ml_conical x 4
+- opentrons_96_wellplate_200ul_pcr_full_skirt x 1
+
+Liquids:
+- Liquid 1: Add 200 ul for each well of falcon tubes. Serialized from 1 to 60.
+
+Steps
+1. Using a new tip for each transfer, transfer 100ul of sample from up to 60 individual 15ml falcon tubes in a rack into a PCR plate. Add the samples column wise so A1 then B2 etc. Number each sample incrementally from 1 to 60
+
+2. Thermocycler: open the lid
+
+3. Using the gripper move the plate from the deck into the thermocycler
+
+4. Thermocycler: close the lid
+
+5. Set the Thermocycler block temperature to 99 C. Set the temperature of the lid to 105 C. Incubate the samples in the Thermocycler for 30 minutes then reduce the block and lid temperature to 5 C and 37C respectively
+
+6. Hold for 5 minutes
+
+7. Open the lid of the thermocycler
+
+8. Using the gripper move the PCR plate to a space on the deck
+```
+
+Output
+
+```json
+{
+  "metadata": {
+    "protocolName": "Transfer",
+    "description": "Moving 100ul of sample from 15ml falcon tubes into pcr plate, seal and digest"
+  },
+  "designerApplication": {
+    "data": {
+      "pipetteTiprackAssignments": {
+        "pipette_left": ["opentrons/opentrons_flex_96_filtertiprack_1000ul/1"]
+      },
+      "ingredients": {
+        "0": {
+          "displayName": "sample",
+          "description": null,
+          "displayColor": "#50d5ffff",
+          "liquidGroupId": "0"
+        }
+      },
+      "ingredLocations": {
+        "labware-4": {
+          "A1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C5": {
+            "0": {
+              "volume": 200
+            }
+          }
+        },
+        "labware-5": {
+          "A1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C5": {
+            "0": {
+              "volume": 200
+            }
+          }
+        },
+        "labware-6": {
+          "A1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C5": {
+            "0": {
+              "volume": 200
+            }
+          }
+        },
+        "labware-3": {
+          "A1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C3": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C4": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B5": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C5": {
+            "0": {
+              "volume": 200
+            }
+          }
+        }
+      },
+      "savedStepForms": {
+        "__INITIAL_DECK_SETUP_STEP__": {
+          "labwareLocationUpdate": {
+            "labware-1": "C1",
+            "labware-2": "D1",
+            "labware-3": "C2",
+            "labware-4": "D2",
+            "labware-5": "D3",
+            "labware-6": "C3"
+          },
+          "pipetteLocationUpdate": {
+            "pipette_left": "left"
+          },
+          "moduleLocationUpdate": {
+            "tc-1": "B1"
+          },
+          "trashBinLocationUpdate": {
+            "trashbin-1": "cutoutA3"
+          },
+          "wasteChuteLocationUpdate": {},
+          "stagingAreaLocationUpdate": {},
+          "gripperLocationUpdate": {
+            "gripper-1": "mounted"
+          }
+        },
+        "step-1": {
+          "id": "step-1",
+          "stepType": "moveLiquid",
+          "stepName": "transfer",
+          "stepDetails": "",
+          "aspirate_airGap_checkbox": false,
+          "aspirate_airGap_volume": null,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-4",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": 1,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "A1",
+            "B1",
+            "C1",
+            "A2",
+            "B2",
+            "C2",
+            "A3",
+            "B3",
+            "C3",
+            "A4",
+            "B4",
+            "C4",
+            "A5",
+            "B5",
+            "C5"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "always",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": null,
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": false,
+          "dispense_mix_times": null,
+          "dispense_mix_volume": null,
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "A1",
+            "B1",
+            "A2",
+            "B2",
+            "A3",
+            "B3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9",
+            "A10",
+            "A11",
+            "A12"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "100"
+        },
+        "step-2": {
+          "id": "step-2",
+          "stepType": "moveLiquid",
+          "stepName": "transfer",
+          "stepDetails": "",
+          "aspirate_airGap_checkbox": false,
+          "aspirate_airGap_volume": null,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-5",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": 1,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "A1",
+            "B1",
+            "C1",
+            "A2",
+            "B2",
+            "C2",
+            "A3",
+            "B3",
+            "C3",
+            "A4",
+            "B4",
+            "C4",
+            "A5",
+            "B5",
+            "C5"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "always",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": null,
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": false,
+          "dispense_mix_times": null,
+          "dispense_mix_volume": null,
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "C1",
+            "C2",
+            "C3",
+            "B4",
+            "C4",
+            "B5",
+            "C5",
+            "B6",
+            "C6",
+            "B7",
+            "B8",
+            "B9",
+            "B10",
+            "B11",
+            "B12"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "100"
+        },
+        "step-3": {
+          "id": "step-3",
+          "stepType": "moveLiquid",
+          "stepName": "transfer",
+          "stepDetails": "",
+          "aspirate_airGap_checkbox": false,
+          "aspirate_airGap_volume": null,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-6",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": 1,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "A1",
+            "B1",
+            "C1",
+            "A2",
+            "B2",
+            "C2",
+            "A3",
+            "B3",
+            "C3",
+            "A4",
+            "B4",
+            "C4",
+            "A5",
+            "B5",
+            "C5"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "always",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": null,
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": false,
+          "dispense_mix_times": null,
+          "dispense_mix_volume": null,
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "C7",
+            "D7",
+            "C8",
+            "D8",
+            "C9",
+            "D9",
+            "C10",
+            "C11",
+            "C12"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "100"
+        },
+        "step-4": {
+          "id": "step-4",
+          "stepType": "moveLiquid",
+          "stepName": "transfer",
+          "stepDetails": "",
+          "aspirate_airGap_checkbox": false,
+          "aspirate_airGap_volume": null,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_mmFromBottom": null,
+          "aspirate_delay_seconds": "1",
+          "aspirate_flowRate": "716",
+          "aspirate_labware": "labware-3",
+          "aspirate_mix_checkbox": false,
+          "aspirate_mix_times": null,
+          "aspirate_mix_volume": null,
+          "aspirate_mmFromBottom": 1,
+          "aspirate_touchTip_checkbox": false,
+          "aspirate_touchTip_mmFromBottom": null,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells_grouped": false,
+          "aspirate_wells": [
+            "A1",
+            "B1",
+            "C1",
+            "A2",
+            "B2",
+            "C2",
+            "A3",
+            "B3",
+            "C3",
+            "A4",
+            "B4",
+            "C4",
+            "A5",
+            "B5",
+            "C5"
+          ],
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
+          "blowout_checkbox": false,
+          "blowout_flowRate": null,
+          "blowout_location": null,
+          "blowout_z_offset": 0,
+          "changeTip": "always",
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
+          "dispense_delay_checkbox": false,
+          "dispense_delay_mmFromBottom": null,
+          "dispense_delay_seconds": "1",
+          "dispense_flowRate": null,
+          "dispense_labware": "labware-2",
+          "dispense_mix_checkbox": false,
+          "dispense_mix_times": null,
+          "dispense_mix_volume": null,
+          "dispense_mmFromBottom": null,
+          "dispense_touchTip_checkbox": false,
+          "dispense_touchTip_mmFromBottom": null,
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_wells": [
+            "E1",
+            "E2",
+            "E3",
+            "E4",
+            "E5",
+            "E6",
+            "E7",
+            "E8",
+            "E9",
+            "D10",
+            "E10",
+            "D11",
+            "E11",
+            "D12",
+            "E12"
+          ],
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": null,
+          "dropTip_location": "trashbin-1",
+          "nozzles": null,
+          "path": "single",
+          "pipette": "pipette_left",
+          "preWetTip": false,
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+          "volume": "100"
+        },
+        "step-5": {
+          "id": "step-5",
+          "stepType": "thermocycler",
+          "stepName": "thermocycler",
+          "stepDetails": "",
+          "blockIsActive": false,
+          "blockIsActiveHold": false,
+          "blockTargetTemp": null,
+          "blockTargetTempHold": null,
+          "lidIsActive": false,
+          "lidIsActiveHold": false,
+          "lidOpen": true,
+          "lidOpenHold": null,
+          "lidTargetTemp": null,
+          "lidTargetTempHold": null,
+          "moduleId": "tc-1",
+          "orderedProfileItems": [],
+          "profileItemsById": {},
+          "profileTargetLidTemp": null,
+          "profileVolume": null,
+          "thermocyclerFormType": "thermocyclerState"
+        },
+        "step-6": {
+          "id": "step-6",
+          "stepType": "moveLabware",
+          "stepName": "move",
+          "stepDetails": "",
+          "labware": "labware-2",
+          "newLocation": "tc-1",
+          "useGripper": true
+        },
+        "step-7": {
+          "id": "step-7",
+          "stepType": "thermocycler",
+          "stepName": "thermocycler",
+          "stepDetails": "",
+          "blockIsActive": false,
+          "blockIsActiveHold": false,
+          "blockTargetTemp": "",
+          "blockTargetTempHold": null,
+          "lidIsActive": false,
+          "lidIsActiveHold": false,
+          "lidOpen": false,
+          "lidOpenHold": null,
+          "lidTargetTemp": "",
+          "lidTargetTempHold": null,
+          "moduleId": "tc-1",
+          "orderedProfileItems": [],
+          "profileItemsById": {},
+          "profileTargetLidTemp": null,
+          "profileVolume": null,
+          "thermocyclerFormType": "thermocyclerState"
+        },
+        "step-8": {
+          "id": "step-8",
+          "stepType": "thermocycler",
+          "stepName": "thermocycler",
+          "stepDetails": "",
+          "blockIsActive": false,
+          "blockIsActiveHold": true,
+          "blockTargetTemp": null,
+          "blockTargetTempHold": "5",
+          "lidIsActive": false,
+          "lidIsActiveHold": true,
+          "lidOpen": false,
+          "lidOpenHold": null,
+          "lidTargetTemp": null,
+          "lidTargetTempHold": "37",
+          "moduleId": "tc-1",
+          "orderedProfileItems": ["ba55d5bf-6f64-43c0-a0f6-52f312c021e6"],
+          "profileItemsById": {
+            "ba55d5bf-6f64-43c0-a0f6-52f312c021e6": {
+              "durationMinutes": "30",
+              "durationSeconds": "00",
+              "id": "ba55d5bf-6f64-43c0-a0f6-52f312c021e6",
+              "temperature": "99",
+              "title": "1",
+              "type": "profileStep"
+            }
+          },
+          "profileTargetLidTemp": "105",
+          "profileVolume": "100",
+          "thermocyclerFormType": "thermocyclerProfile"
+        },
+        "step-9": {
+          "id": "step-9",
+          "stepType": "pause",
+          "stepName": "pause",
+          "stepDetails": "",
+          "moduleId": null,
+          "pauseAction": "untilTime",
+          "pauseMessage": "wait for 5 minutes",
+          "pauseTemperature": null,
+          "pauseTime": "00:05:00"
+        },
+        "step-10": {
+          "id": "step-10",
+          "stepType": "thermocycler",
+          "stepName": "thermocycler",
+          "stepDetails": "",
+          "blockIsActive": false,
+          "blockIsActiveHold": false,
+          "blockTargetTemp": "",
+          "blockTargetTempHold": null,
+          "lidIsActive": false,
+          "lidIsActiveHold": false,
+          "lidOpen": true,
+          "lidOpenHold": null,
+          "lidTargetTemp": "",
+          "lidTargetTempHold": null,
+          "moduleId": "tc-1",
+          "orderedProfileItems": [],
+          "profileItemsById": {},
+          "profileTargetLidTemp": null,
+          "profileVolume": null,
+          "thermocyclerFormType": "thermocyclerState"
+        },
+        "step-11": {
+          "id": "step-11",
+          "stepType": "moveLabware",
+          "stepName": "move",
+          "stepDetails": "",
+          "labware": "labware-2",
+          "newLocation": "D1",
+          "useGripper": true
+        }
+      },
+      "orderedStepIds": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4",
+        "step-5",
+        "step-6",
+        "step-7",
+        "step-8",
+        "step-9",
+        "step-10",
+        "step-11"
+      ],
+      "pipettes": {
+        "pipette_left": {
+          "pipetteName": "p1000_single_flex"
+        }
+      },
+      "modules": {
+        "tc-1": {
+          "model": "thermocyclerModuleV2"
+        }
+      },
+      "labware": {
+        "labware-1": {
+          "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 µL",
+          "labwareDefURI": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1"
+        },
+        "labware-2": {
+          "displayName": "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
+          "labwareDefURI": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2"
+        },
+        "labware-3": {
+          "displayName": "Opentrons 15 Tube Rack with Falcon 15 mL Conical",
+          "labwareDefURI": "opentrons/opentrons_15_tuberack_falcon_15ml_conical/1"
+        },
+        "labware-4": {
+          "displayName": "Opentrons 15 Tube Rack with Falcon 15 mL Conical (1)",
+          "labwareDefURI": "opentrons/opentrons_15_tuberack_falcon_15ml_conical/1"
+        },
+        "labware-5": {
+          "displayName": "Opentrons 15 Tube Rack with Falcon 15 mL Conical (2)",
+          "labwareDefURI": "opentrons/opentrons_15_tuberack_falcon_15ml_conical/1"
+        },
+        "labware-6": {
+          "displayName": "Opentrons 15 Tube Rack with Falcon 15 mL Conical (3)",
+          "labwareDefURI": "opentrons/opentrons_15_tuberack_falcon_15ml_conical/1"
+        }
+      }
+    }
+  },
+  "robot": {
+    "model": "OT-3 Standard",
+    "deckId": "ot3_standard"
+  },
+  "labwareDefinitions": {}
+}
+```
+
+</Example-thermocycler-move-falcon-tubes>

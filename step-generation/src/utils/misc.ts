@@ -10,6 +10,7 @@ import {
   getIsTiprack,
   getLabwareDefURI,
   getWellNamePerMultiTip,
+  linearInterpolate,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
@@ -43,6 +44,7 @@ import type {
   LabwareDefinition2,
   NozzleConfigurationStyle,
   PipetteChannels,
+  PipetteV2Specs,
   RobotType,
 } from '@opentrons/shared-data'
 import type {
@@ -53,6 +55,7 @@ import type {
   LabwareEntity,
   LabwareTemporalProperties,
   LocationLiquidState,
+  PathOption,
   PipetteEntity,
   RobotState,
   SourceAndDest,
@@ -931,4 +934,173 @@ export const getTopmostLabwareOnModuleFromStackRobotState = (
   return Object.values(labware)
     .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
     .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
+}
+
+const _getTotalVolumeForMultiDispense = (
+  targetVol: number,
+  conditioningByVolume: Array<[number, number]>,
+  disposalByVolume: Array<[number, number]>,
+  includeConditioning: boolean = true
+): number => {
+  const interpolatedConditioningVolume =
+    linearInterpolate(targetVol, conditioningByVolume) ?? 0
+  const interpolatedDisposalVolume =
+    linearInterpolate(targetVol, disposalByVolume) ?? 0
+  return (
+    targetVol +
+    (includeConditioning ? interpolatedConditioningVolume : 0) +
+    interpolatedDisposalVolume
+  )
+}
+
+export const getTransferPlanAndReferenceVolumes = (args: {
+  pipetteSpecs: PipetteV2Specs
+  tiprackDefinition: LabwareDefinition2 | null
+  volume: number
+  path: PathOption
+  numDispenseWells: number
+  conditioningByVolume: Array<[number, number]> | null
+  disposalByVolume: Array<[number, number]> | null
+  aspirateAirGap?: number | null
+}): {
+  referenceVolumes: {
+    airGap: number
+    correctionAspirate: number
+    correctionDispense: number
+    pushOut: number
+    flowRateAspirate: number
+    flowRateDispense: number
+    conditioning?: number
+    disposal?: number
+  }
+  multiWellHandling: {
+    isSupported: boolean
+    numWellsToFitInTip?: number
+  }
+} => {
+  const {
+    path,
+    volume,
+    pipetteSpecs,
+    tiprackDefinition,
+    conditioningByVolume,
+    disposalByVolume,
+    numDispenseWells,
+    aspirateAirGap,
+  } = args
+  const { liquids } = pipetteSpecs
+  const isInLowVolumeMode =
+    volume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const maxWorkingVolumePipette = isInLowVolumeMode
+    ? liquids.lowVolumeDefault.maxVolume
+    : liquids.default.maxVolume
+  const maxWorkingVolumeTip = tiprackDefinition?.wells.A1.totalLiquidVolume
+  const maxWorkingVolume =
+    (maxWorkingVolumeTip == null
+      ? maxWorkingVolumePipette
+      : Math.min(maxWorkingVolumePipette, maxWorkingVolumeTip)) -
+    (aspirateAirGap ?? 0)
+  const numAspirations = Math.ceil(volume / maxWorkingVolume)
+  const minVolumeForMultiAspirateDispense = volume * 2
+  const isMultiDispenseAvailable =
+    conditioningByVolume != null &&
+    disposalByVolume != null &&
+    maxWorkingVolume >=
+      minVolumeForMultiAspirateDispense +
+        (linearInterpolate(
+          minVolumeForMultiAspirateDispense,
+          conditioningByVolume
+        ) ?? 0) +
+        (linearInterpolate(
+          minVolumeForMultiAspirateDispense,
+          disposalByVolume
+        ) ?? 0)
+  const isMultiAspirateAvailable =
+    maxWorkingVolume > minVolumeForMultiAspirateDispense
+
+  // early return if multiAspirate/multiDispense cannot be accommodated
+  if (
+    path === 'single' ||
+    (path === 'multiDispense' && !isMultiDispenseAvailable) ||
+    (path === 'multiAspirate' && !isMultiAspirateAvailable)
+  ) {
+    const volumePerAspiration = volume / numAspirations
+    return {
+      referenceVolumes: {
+        airGap: volumePerAspiration,
+        correctionAspirate: volumePerAspiration,
+        correctionDispense: volumePerAspiration,
+        pushOut: volumePerAspiration,
+        flowRateAspirate: volumePerAspiration,
+        flowRateDispense: volumePerAspiration,
+      },
+      multiWellHandling: {
+        isSupported: false,
+      },
+    }
+  }
+
+  if (path === 'multiDispense') {
+    let totalVolumeForMultiDispense: number = 0
+    let numDestinationsPerAspiration: number = 0
+    for (let i = 0; i < numDispenseWells; i++) {
+      const next = _getTotalVolumeForMultiDispense(
+        (i + 1) * volume,
+        conditioningByVolume ?? [],
+        disposalByVolume ?? []
+      )
+      if (next > maxWorkingVolume) {
+        break
+      } else {
+        totalVolumeForMultiDispense = (i + 1) * volume
+        numDestinationsPerAspiration += 1
+      }
+    }
+    return {
+      referenceVolumes: {
+        airGap: _getTotalVolumeForMultiDispense(
+          totalVolumeForMultiDispense,
+          conditioningByVolume ?? [],
+          disposalByVolume ?? [],
+          false
+        ),
+        correctionAspirate: _getTotalVolumeForMultiDispense(
+          totalVolumeForMultiDispense,
+          conditioningByVolume ?? [],
+          disposalByVolume ?? []
+        ),
+        correctionDispense: volume,
+        pushOut: volume,
+        conditioning: totalVolumeForMultiDispense,
+        disposal: totalVolumeForMultiDispense,
+        flowRateAspirate: _getTotalVolumeForMultiDispense(
+          totalVolumeForMultiDispense,
+          conditioningByVolume ?? [],
+          disposalByVolume ?? []
+        ),
+        flowRateDispense: volume,
+      },
+      multiWellHandling: {
+        isSupported: true,
+        numWellsToFitInTip: numDestinationsPerAspiration,
+      },
+    }
+  }
+  // path is valid multiAspirate
+  const maxSourcesPerAspiration = Math.floor(maxWorkingVolume / volume)
+  const volumeTotalAspiration = maxSourcesPerAspiration * volume
+  return {
+    referenceVolumes: {
+      airGap: volumeTotalAspiration,
+      correctionAspirate: volumeTotalAspiration,
+      correctionDispense: volumeTotalAspiration,
+      pushOut: volumeTotalAspiration,
+      flowRateAspirate: volume,
+      flowRateDispense: volumeTotalAspiration,
+    },
+    multiWellHandling: {
+      isSupported: true,
+      numWellsToFitInTip: maxSourcesPerAspiration,
+    },
+  }
 }

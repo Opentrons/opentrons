@@ -112,6 +112,7 @@ def run(protocol: ProtocolContext) -> None:
     reagent_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp_block, "Reagent Plate"
     )
+    lid = protocol.load_lid_stack("custom_opentrons_tough_universal_lid", "B4", 2)
     # ========== SECOND ROW ==========
     MAG_PLATE_SLOT: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
@@ -758,7 +759,6 @@ def run(protocol: ProtocolContext) -> None:
                     p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                     p50_tips += 1
                     tipcheck()
-
             if STEP_PCR == 1:
                 protocol.comment("==============================================")
                 protocol.comment("--> AMPLIFICATION")
@@ -775,7 +775,6 @@ def run(protocol: ProtocolContext) -> None:
                     p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                     p50_tips += 1
                     tipcheck()
-
                 protocol.comment("--> Adding EPM")
                 EPMVol = 20
                 EPMMixRep = 10 if DRYRUN is False else 1

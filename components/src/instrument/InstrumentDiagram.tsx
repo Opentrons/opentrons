@@ -43,8 +43,6 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
   return (
     <Flex
       className={className}
-      transform={mount === 'right' ? 'scaleX(-1)' : ''}
-      filter={mount === 'right' ? 'FlipH' : ''}
       {...styleProps}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}

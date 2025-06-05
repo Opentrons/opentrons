@@ -1,4 +1,4 @@
-import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
+import type { LabwareDefinition, PipetteModel } from '@opentrons/shared-data'
 import type { Mount } from '../../pipettes/types'
 import type { CalibrationLabware } from '../types'
 // calibration check session types
@@ -60,7 +60,7 @@ export interface CalibrationCheckInstrument {
   tipRackDisplay: string
   tipRackUri: string
   serial: string
-  defaultTipracks: LabwareDefinition2[]
+  defaultTipracks: LabwareDefinition[]
 }
 
 export interface CalibrationCheckComparison {

@@ -22,7 +22,7 @@ export interface QuickTransferSummaryState {
   preWetTip: boolean
   mixOnAspirate?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   delayAspirate?: {
     delayDuration: number
@@ -33,7 +33,7 @@ export interface QuickTransferSummaryState {
   tipPositionDispense: number
   mixOnDispense?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   delayDispense?: {
     delayDuration: number
@@ -60,6 +60,7 @@ touchTipDispense = -(destWellHeight - prevTouchTipDispense)
 ## [WIP] Version 1.2.0
 
 Due to changes in the Quick Transfer setup flow, there will be changes to QuickTransferWizardState and QuickTransferSummaryState. The changes are as follows:
+the comment `this has been added` will be removed before feature freeze.
 
 ```ts
 export interface QuickTransferWizardState {
@@ -97,9 +98,14 @@ export interface QuickTransferSummaryState {
   preWetTip: boolean
   mixOnAspirate?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   submergeAspirate?: {
+    // this has been added
+    speed: number
+    positionFromBottom: number
+  }
+  retractAspirate?: {
     // this has been added
     speed: number
     positionFromBottom: number
@@ -114,9 +120,14 @@ export interface QuickTransferSummaryState {
   tipPositionDispense: number
   mixOnDispense?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   submergeDispense?: {
+    // this has been added
+    speed: number
+    positionFromBottom: number
+  }
+  retractDispense?: {
     // this has been added
     speed: number
     positionFromBottom: number
@@ -133,5 +144,6 @@ export interface QuickTransferSummaryState {
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
   liquidClass: LiquidClass // this has been added
+  pushOut: boolean // this has been added
 }
 ```

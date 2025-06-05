@@ -17,10 +17,12 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
+import { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck'
 import {
   selectConflictTimestampInfo,
   sourceOffsetsFromDatabase,
@@ -43,13 +45,19 @@ export function LabwareOffsetsConflictModal({
   const dispatch = useDispatch()
   const tsInfo = useSelector(selectConflictTimestampInfo(runId))
   const tsFormatted = formatTimestamp(tsInfo.timestamp ?? '')
+  const { reportOffsetSourceResolution } = useLPCAnalytics({
+    runId,
+    robotType: FLEX_ROBOT_TYPE,
+  })
 
   const onRunRecordOffsets = (): void => {
     dispatch(sourceOffsetsFromRun(runId))
+    reportOffsetSourceResolution('fromRunRecord')
   }
 
   const onDatabaseOffsets = (): void => {
     dispatch(sourceOffsetsFromDatabase(runId))
+    reportOffsetSourceResolution('fromDatabase')
   }
 
   return createPortal(

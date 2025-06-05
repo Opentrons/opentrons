@@ -40,12 +40,6 @@ describe('dispenseInPlace', () => {
         },
       },
     ])
-    expect(res.python).toBe(
-      `
-mock_pipette.dispense(
-    volume=10,
-    rate=10 / mock_pipette.flow_rate.dispense,
-)`.trimStart()
-    )
+    expect(res.python).toBe(`mock_pipette.dispense(volume=10, flow_rate=10)`)
   })
 })
