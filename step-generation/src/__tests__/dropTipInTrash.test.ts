@@ -37,7 +37,7 @@ const invariantContext: InvariantContext = {
 }
 const prevRobotState: RobotState = {
   ...getInitialRobotStateStandard(invariantContext),
-  tipState: { pipettes: { [mockId]: true } } as any,
+  tipState: { pipettes: { [mockId]: { hasTip: true } } } as any,
 }
 
 describe('dropTipInTrash', () => {

@@ -20,10 +20,12 @@ import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
 import type {
   LabwareDefinition2,
+  LiquidV2Mixin,
   LoadLabwareCreateCommand,
   PipetteV2Specs,
   ProtocolFile,
 } from '@opentrons/shared-data'
+import type { Ingredients } from '@opentrons/step-generation'
 import type { PDMetadata } from '../../file-types'
 import type { FormData } from '../../form-types'
 
@@ -42,11 +44,17 @@ const getMigratedBlowoutFlowRate = (
 export const migrateFile = (
   appData: ProtocolFile<PDMetadata>
 ): ProtocolFile<PDMetadata> => {
-  const { designerApplication, commands, labwareDefinitions, robot } = appData
+  const {
+    designerApplication,
+    commands,
+    labwareDefinitions,
+    robot,
+    liquids,
+  } = appData
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
-  const { savedStepForms } = designerApplication.data
+  const { savedStepForms, ingredients } = designerApplication.data
   const { model: robotType } = robot
   const loadLabwareCommands = commands.filter(
     (command): command is LoadLabwareCreateCommand =>
@@ -56,6 +64,16 @@ export const migrateFile = (
     commands,
     labwareDefinitions
   )
+
+  const migratedIngredients: Ingredients = Object.entries(
+    ingredients
+  ).reduce<Ingredients>((acc, [id, ingredient]) => {
+    acc[id] = {
+      ...ingredient,
+      liquidClass: null,
+    }
+    return acc
+  }, {})
 
   const savedStepsWithUpdatedMoveLiquidFields = Object.values(
     savedStepForms
@@ -79,10 +97,16 @@ export const migrateFile = (
         aspirateLabwareUri
       ].parameters.quirks?.includes('touchTipDisabled')
       const dispenseLabwareUri =
-        equipmentLoadInfoFromCommands.labware[dispense_labware].labwareDefURI
-      const isDispenseLabwareTouchtipDisabled = labwareDefinitions[
-        dispenseLabwareUri
-      ].parameters.quirks?.includes('touchTipDisabled')
+        equipmentLoadInfoFromCommands.labware[dispense_labware]?.labwareDefURI
+
+      const isDispenseLabwareTouchtipDisabled =
+        //  dispense is in a waste chute/trash bin
+        labwareDefinitions[dispenseLabwareUri] == null
+          ? true
+          : labwareDefinitions[dispenseLabwareUri].parameters.quirks?.includes(
+              'touchTipDisabled'
+            )
+
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
         labwareDefinitions,
         loadLabwareCommands,
@@ -278,6 +302,19 @@ export const migrateFile = (
     {}
   )
 
+  const migratedLiquidsWithLiquidClass = Object.entries(liquids).reduce<
+    LiquidV2Mixin['liquids']
+  >((acc, [liquidId, liquid]) => {
+    acc[liquidId] = {
+      ...liquid,
+      liquidClass: null,
+    }
+    return acc
+  }, {})
+  const liquidV2Mixin: LiquidV2Mixin = {
+    liquidSchemaId: 'opentronsLiquidSchemaV2',
+    liquids: migratedLiquidsWithLiquidClass,
+  }
   return {
     ...appData,
     metadata: {
@@ -288,6 +325,7 @@ export const migrateFile = (
       ...designerApplication,
       data: {
         ...designerApplication.data,
+        ingredients: migratedIngredients,
         savedStepForms: {
           ...designerApplication.data.savedStepForms,
           ...savedStepsWithUpdatedMoveLiquidFields,
@@ -295,5 +333,6 @@ export const migrateFile = (
         },
       },
     },
+    ...liquidV2Mixin,
   }
 }

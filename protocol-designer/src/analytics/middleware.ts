@@ -419,7 +419,11 @@ export const reduxActionToAnalyticsEvent = (
           ? null
           : location
     )
-    const flattenedLiquids = flattenNestedProperties(liquids)
+    const liquidClasses = {
+      liquidClasses: Object.values(liquids).map(liquid =>
+        'liquidClass' in liquid ? liquid.liquidClass : null
+      ),
+    }
 
     const fixtureInfo = {
       trashBin: trashCommands,
@@ -439,7 +443,7 @@ export const reduxActionToAnalyticsEvent = (
         ...metadata,
         ...loadCommandInfo,
         ...robotType,
-        ...flattenedLiquids,
+        ...liquidClasses,
         ...numberOfSteps,
         ...fixtureInfo,
         ...labwareInfo,

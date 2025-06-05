@@ -59,7 +59,7 @@ export const blowOutInWell: CommandCreator<BlowoutParams> = (
     )
   }
 
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
       errorCreators.noTipOnPipette({
         actionName,

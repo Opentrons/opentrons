@@ -36,7 +36,7 @@ export const touchTip: CommandCreator<TouchTipAtomicParams> = (
     )
   }
 
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
       noTipOnPipette({
         actionName,
