@@ -64,7 +64,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -327,7 +327,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -595,7 +595,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -858,7 +858,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -1126,7 +1126,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -1381,7 +1381,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -1636,7 +1636,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -1891,7 +1891,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -2146,7 +2146,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -2231,7 +2231,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [[0.0, 40.0]],
@@ -2316,7 +2316,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [[0.0, 40.0]],
@@ -2401,7 +2401,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -2486,7 +2486,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [[0.0, 40.0]],
@@ -2571,7 +2571,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [[0.0, 40.0]],
@@ -2661,7 +2661,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -2916,7 +2916,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -3171,7 +3171,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -3426,7 +3426,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -3681,7 +3681,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -3766,7 +3766,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [[0.0, 40.0]],
@@ -3851,7 +3851,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [[0.0, 40.0]],
@@ -3936,7 +3936,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -4021,7 +4021,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [[0.0, 40.0]],
@@ -4106,7 +4106,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [[0.0, 40.0]],
@@ -4196,7 +4196,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -4451,7 +4451,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -4706,7 +4706,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -4961,7 +4961,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -5216,7 +5216,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -5301,7 +5301,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [[0.0, 40.0]],
@@ -5471,7 +5471,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [
@@ -5556,7 +5556,7 @@
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2.0
+                "z": 2
               }
             },
             "flowRateByVolume": [[0.0, 40.0]],
