@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  AnimationVideo,
   Flex,
   LegacyStyledText,
   RESPONSIVENESS,
@@ -25,9 +26,7 @@ const BODY_STYLE = css`
   }
 `
 
-export const DetachProbe = (
-  props: ModuleSetupWizardStepProps
-): JSX.Element | null => {
+export function DetachProbe(props: ModuleSetupWizardStepProps): JSX.Element {
   const { attachedPipette, proceed, goBack } = props
   const { t, i18n } = useTranslation('module_wizard_flows')
 
@@ -45,33 +44,26 @@ export const DetachProbe = (
       break
   }
 
-  const pipetteDetachProbeVid = (
-    <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-      <video
-        css={css`
-          max-width: 100%;
-          max-height: 100%;
-        `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
-      >
-        <source src={pipetteDetachProbeVideoSource} />
-      </video>
-    </Flex>
-  )
-
-  const bodyText = (
-    <LegacyStyledText css={BODY_STYLE}>
-      {t('detach_probe_description')}
-    </LegacyStyledText>
-  )
-
   return (
     <GenericWizardTile
       header={i18n.format(t('detach_probe'), 'capitalize')}
-      rightHandBody={pipetteDetachProbeVid}
-      bodyText={bodyText}
+      rightHandBody={
+        <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
+          <AnimationVideo
+            css={css`
+              max-width: 100%;
+              max-height: 100%;
+            `}
+          >
+            <source src={pipetteDetachProbeVideoSource} />
+          </AnimationVideo>
+        </Flex>
+      }
+      bodyText={
+        <LegacyStyledText css={BODY_STYLE}>
+          {t('detach_probe_description')}
+        </LegacyStyledText>
+      }
       proceedButtonText={t('complete_calibration')}
       proceed={proceed}
       back={goBack}

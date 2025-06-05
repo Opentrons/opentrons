@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from numpy import interp
-from typing import Optional, Dict, Sequence, Tuple, List
+from typing import Optional, Dict, Sequence, Tuple, List, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    TransferProperties as SharedDataTransferProperties,
     AspirateProperties as SharedDataAspirateProperties,
     SingleDispenseProperties as SharedDataSingleDispenseProperties,
     MultiDispenseProperties as SharedDataMultiDispenseProperties,
@@ -23,7 +24,6 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
     Coordinate,
 )
-
 from . import validation
 
 
@@ -61,6 +61,11 @@ class LiquidHandlingPropertyByVolume:
             return float(
                 interp(validated_volume, self._sorted_volumes, self._sorted_values)
             )
+
+    def set_for_all_volumes(self, value: float) -> None:
+        """Override all existing volume-dependent values with the given value."""
+        self.clear_values()
+        self.set_for_volume(0, value)
 
     def set_for_volume(self, volume: float, value: float) -> None:
         """Add a new volume and value for the property for the interpolation curve."""
@@ -778,12 +783,20 @@ def build_multi_dispense_properties(
 
 
 def build_transfer_properties(
-    by_tip_type_setting: SharedByTipTypeSetting,
+    transfer_properties: Union[SharedDataTransferProperties, SharedByTipTypeSetting],
 ) -> TransferProperties:
+    if isinstance(transfer_properties, SharedByTipTypeSetting):
+        _transfer_properties = SharedDataTransferProperties(
+            aspirate=transfer_properties.aspirate,
+            singleDispense=transfer_properties.singleDispense,
+            multiDispense=transfer_properties.multiDispense,
+        )
+    else:
+        _transfer_properties = transfer_properties
     return TransferProperties(
-        _aspirate=build_aspirate_properties(by_tip_type_setting.aspirate),
-        _dispense=build_single_dispense_properties(by_tip_type_setting.singleDispense),
+        _aspirate=build_aspirate_properties(_transfer_properties.aspirate),
+        _dispense=build_single_dispense_properties(_transfer_properties.singleDispense),
         _multi_dispense=build_multi_dispense_properties(
-            by_tip_type_setting.multiDispense
+            _transfer_properties.multiDispense
         ),
     )

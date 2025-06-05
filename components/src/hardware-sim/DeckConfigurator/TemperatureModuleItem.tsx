@@ -1,40 +1,49 @@
+import { useTranslation } from 'react-i18next'
+
+import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+
+import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import { Btn, Text } from '../../primitives'
+import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
+  COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_3_X_ADJUSTMENT,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  TRASH_BIN_DISPLAY_NAME,
   Y_ADJUSTMENT,
 } from './constants'
 
 import type {
-  CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface TrashBinConfigFixtureProps {
+// TODO(BC, 2024-03-21): This component is almost identical to HeaterShakerFixture, consider consolidating?
+
+interface TemperatureModuleFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  cutoutFixtureId: CutoutFixtureId
+  cutoutFixtureId: CutoutFixtureIdsWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
   selected?: boolean
 }
 
-export function TrashBinConfigFixture(
-  props: TrashBinConfigFixtureProps
+export function TemperatureModuleItem(
+  props: TemperatureModuleFixtureProps
 ): JSX.Element {
+  const { t } = useTranslation('deck_configuration')
+
   const {
     deckDefinition,
     handleClickRemove,
@@ -43,7 +52,7 @@ export function TrashBinConfigFixture(
     selected = false,
   } = props
 
-  const trashBinCutout = deckDefinition.locations.cutouts.find(
+  const cutoutDef = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
 
@@ -52,24 +61,25 @@ export function TrashBinConfigFixture(
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
    * the adjustment for x is different for right side/left side
    */
-  const [xSlotPosition = 0, ySlotPosition = 0] = trashBinCutout?.position ?? []
+  const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
 
-  const isColumnOne =
-    fixtureLocation === 'cutoutA1' ||
-    fixtureLocation === 'cutoutB1' ||
-    fixtureLocation === 'cutoutC1' ||
-    fixtureLocation === 'cutoutD1'
+  const isColumnOne = SINGLE_LEFT_CUTOUTS.includes(fixtureLocation)
   const xAdjustment = isColumnOne
     ? COLUMN_1_X_ADJUSTMENT
-    : COLUMN_3_X_ADJUSTMENT
+    : COLUMN_DEFAULT_X_ADJUSTMENT
   const x = xSlotPosition + xAdjustment
 
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
+
   return (
     <RobotCoordsForeignObject
-      width={COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH}
+      width={
+        isColumnOne
+          ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
+          : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
+      }
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
@@ -87,9 +97,14 @@ export function TrashBinConfigFixture(
             : () => {}
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {TRASH_BIN_DISPLAY_NAME}
-        </Text>
+        <StyledText
+          oddStyle="smallBodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
+          css={TYPOGRAPHY.smallBodyTextSemiBold}
+        >
+          {t('temperature')}
+        </StyledText>
+
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

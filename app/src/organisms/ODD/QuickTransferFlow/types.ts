@@ -64,6 +64,7 @@ export interface QuickTransferSummaryState {
   path: PathOption
   tipPositionAspirate: number
   preWetTip: boolean
+  pushOut: boolean
   mixOnAspirate?: {
     mixVolume: number
     repetitions: number
@@ -150,6 +151,7 @@ export type QuickTransferSummaryAction =
   | SetRetractDispense
   | SetChangeTip
   | SetDropTipLocation
+  | SetPushOut
 
 interface SetAspirateFlowRateAction {
   type: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
@@ -187,6 +189,7 @@ interface SetDelayAspirate {
 interface SetTouchTipAspirate {
   type: typeof ACTIONS.SET_TOUCH_TIP_ASPIRATE
   position?: number
+  touchTipAspirateSpeed?: number
 }
 interface SetAirGapAspirate {
   type: typeof ACTIONS.SET_AIR_GAP_ASPIRATE
@@ -224,6 +227,7 @@ interface SetDelayDispense {
 interface SetTouchTipDispense {
   type: typeof ACTIONS.SET_TOUCH_TIP_DISPENSE
   position?: number
+  touchTipDispenseSpeed?: number
 }
 interface SetBlowOut {
   type: typeof ACTIONS.SET_BLOW_OUT
@@ -289,4 +293,9 @@ interface SetDestWellsAction {
 interface SetVolumeAction {
   type: typeof ACTIONS.SET_VOLUME
   volume: number
+}
+
+interface SetPushOut {
+  type: typeof ACTIONS.SET_PUSH_OUT
+  pushOut: boolean
 }

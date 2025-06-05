@@ -121,15 +121,16 @@ export function useDispenseSettingsConfig({
         }
       },
     },
-    // ToDo replace dummy configs for push out
     {
       option: 'dispense_push_out',
       copy: t('push_out'),
-      value: 'dummy Push Out',
-      enabled: false,
+      value:
+        state.pushOut != null && state.pushOut
+          ? t('option_enabled')
+          : t('option_disabled'),
+      enabled: true,
       onClick: () => {
-        // (kk: 04/07/2025)ToDo add push out
-        // setSelectedSetting('push_out')
+        setSelectedSetting('dispense_push_out')
       },
     },
     {
@@ -161,6 +162,21 @@ export function useDispenseSettingsConfig({
         } else {
           setSelectedSetting('dispense_blow_out')
         }
+      },
+    },
+    {
+      option: 'dispense_touch_tip',
+      copy: t('touch_tip'),
+      value:
+        state.touchTipDispense !== undefined
+          ? t('touch_tip_value', {
+              speed: state.touchTipDispenseSpeed,
+              position: state.touchTipDispense,
+            })
+          : '',
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting('dispense_touch_tip')
       },
     },
     {

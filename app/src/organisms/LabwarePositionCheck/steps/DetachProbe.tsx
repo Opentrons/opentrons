@@ -1,8 +1,12 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import styled from 'styled-components'
+import { css } from 'styled-components'
 
-import { LegacyStyledText, StyledText } from '@opentrons/components'
+import {
+  AnimationVideo,
+  LegacyStyledText,
+  StyledText,
+} from '@opentrons/components'
 
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
@@ -110,10 +114,8 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
             </StyledText>
           }
         />
-        <StyledVideo
-          autoPlay
-          loop
-          controls={false}
+        <AnimationVideo
+          css={VIDEO_STYLE}
           src={probeVideo()}
           data-testid="probe-video"
         />
@@ -122,7 +124,7 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
   )
 }
 
-const StyledVideo = styled.video`
+const VIDEO_STYLE = css`
   height: 100%;
   width: 100%;
 `

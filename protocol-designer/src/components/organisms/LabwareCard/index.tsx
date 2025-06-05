@@ -20,14 +20,15 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getEnableStacking } from '../../../feature-flags/selectors'
 import { openIngredientSelector } from '../../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
+import { getAllLabwareIdsOfCertainURIOnStack } from '../../../utils'
 import { LINK_BUTTON_STYLE } from '../../atoms'
+import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
 import { getLiquidIdsOnLabware } from '../utils'
 
@@ -47,15 +48,11 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { t } = useTranslation('starting_deck_state')
   const { def } = labware
   const enableStacking = useSelector(getEnableStacking)
+  const [showQuantityModal, setShowQuantityModal] = useState<boolean>(false)
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
-  const allLabwareIdsOnStack = Object.values(deckSetupLabware).reduce<string[]>(
-    (acc, { labwareDefURI, stack, id }) => {
-      return labwareDefURI === labware.labwareDefURI &&
-        getSlotInLocationStack(stack) === getSlotInLocationStack(labware.stack)
-        ? [...acc, id]
-        : acc
-    },
-    []
+  const allLabwareIdsOnStack = getAllLabwareIdsOfCertainURIOnStack(
+    deckSetupLabware,
+    labware
   )
   const nickNames = useSelector(getLabwareNicknamesById)
   const allWellContentsForActiveItem = useSelector(
@@ -76,7 +73,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const canModifyQuantity =
     labware.def.stackLimit != null && labware.def.stackLimit > 1
 
-  let editButton
+  let editButton: null | string = null
   if (isLid && canModifyQuantity) {
     editButton = t('edit_quantity')
   } else if (!isAdapterOrTiprack && canModifyQuantity && enableStacking) {
@@ -85,86 +82,108 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     editButton = t('edit_liquid')
   }
 
+  const handleOnClick = (): void => {
+    if (editButton === t('edit_quantity')) {
+      setShowQuantityModal(true)
+    } else {
+      dispatch(openIngredientSelector(labware.id))
+      navigate('/liquids')
+    }
+  }
   return (
-    <Box position={POSITION_RELATIVE}>
-      {showOverflowMenu ? (
-        <LabwareCardOverflowMenu
-          setShowOverflowMenu={setShowOverflowMenu}
-          labwareIds={allLabwareIdsOnStack}
+    <>
+      {showQuantityModal ? (
+        <EditLabwareQuantityModal
+          onClose={() => {
+            setShowQuantityModal(false)
+          }}
+          labwareId={labware.id}
+          allLabwareIdsOnStack={allLabwareIdsOnStack}
         />
       ) : null}
-      <ListItem type="default" backgroundColor={COLORS.grey30}>
-        <Flex
-          gridGap={SPACING.spacing16}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          position={POSITION_RELATIVE}
-          width="100%"
-        >
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            alignItems={ALIGN_START}
-            gridGap={SPACING.spacing16}
-            padding={SPACING.spacing16}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              <StyledText desktopStyle="bodyDefaultSemiBold">
-                {nickName}
-              </StyledText>
-              {isNicknameDifferent ? (
-                <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-                  {displayName}
-                </StyledText>
-              ) : null}
-              {lidDisplayName != null ? (
-                <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-                  {t('with_lid', { name: lidDisplayName })}
-                </StyledText>
-              ) : null}
-
-              <Flex gridGap={SPACING.spacing8}>
-                {!isAdapterOrTiprack && !isLid ? (
-                  <LiquidInfoDisplay
-                    text={
-                      liquidIds.length === 0
-                        ? t('no_liquids_added')
-                        : t('num_liquid', { count: liquidIds.length })
-                    }
-                  />
-                ) : null}
-                {quantity > 1 ? (
-                  <LiquidInfoDisplay
-                    text={`Quantity: ${quantity.toString()}`}
-                  />
-                ) : null}
-              </Flex>
-            </Flex>
-            {editButton != null ? (
-              <Btn
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                css={LINK_BUTTON_STYLE}
-                onClick={() => {
-                  dispatch(openIngredientSelector(labware.id))
-                  navigate('/liquids')
-                }}
-                data-testid="LabwareCard_addLiquid_button"
-              >
-                <StyledText desktopStyle="captionRegular">
-                  {editButton}
-                </StyledText>
-              </Btn>
-            ) : null}
-          </Flex>
-        </Flex>
-        <Flex padding={`${SPACING.spacing4} ${SPACING.spacing4} 0 0`}>
-          <OverflowBtn
-            data-testid="LabwareCard_overflowBtn"
-            onClick={() => {
-              setShowOverflowMenu(true)
-            }}
+      <Box position={POSITION_RELATIVE}>
+        {showOverflowMenu ? (
+          <LabwareCardOverflowMenu
+            setShowOverflowMenu={setShowOverflowMenu}
+            labwareIds={allLabwareIdsOnStack}
           />
-        </Flex>
-      </ListItem>
-    </Box>
+        ) : null}
+        <ListItem type="default" backgroundColor={COLORS.grey30}>
+          <Flex
+            gridGap={SPACING.spacing16}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            position={POSITION_RELATIVE}
+            width="100%"
+          >
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              alignItems={ALIGN_START}
+              gridGap={SPACING.spacing16}
+              padding={SPACING.spacing16}
+            >
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <StyledText desktopStyle="bodyDefaultSemiBold">
+                  {nickName}
+                </StyledText>
+                {isNicknameDifferent ? (
+                  <StyledText
+                    desktopStyle="captionRegular"
+                    color={COLORS.grey60}
+                  >
+                    {displayName}
+                  </StyledText>
+                ) : null}
+                {lidDisplayName != null ? (
+                  <StyledText
+                    desktopStyle="captionRegular"
+                    color={COLORS.grey60}
+                  >
+                    {t('with_lid', { name: lidDisplayName })}
+                  </StyledText>
+                ) : null}
+
+                <Flex gridGap={SPACING.spacing8}>
+                  {!isAdapterOrTiprack && !isLid ? (
+                    <LiquidInfoDisplay
+                      text={
+                        liquidIds.length === 0
+                          ? t('no_liquids_added')
+                          : t('num_liquid', { count: liquidIds.length })
+                      }
+                    />
+                  ) : null}
+                  {quantity > 1 ? (
+                    <LiquidInfoDisplay
+                      text={`Quantity: ${quantity.toString()}`}
+                    />
+                  ) : null}
+                </Flex>
+              </Flex>
+              {editButton != null ? (
+                <Btn
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                  css={LINK_BUTTON_STYLE}
+                  onClick={handleOnClick}
+                  data-testid="LabwareCard_addLiquid_button"
+                >
+                  <StyledText desktopStyle="captionRegular">
+                    {editButton}
+                  </StyledText>
+                </Btn>
+              ) : null}
+            </Flex>
+          </Flex>
+          <Flex padding={`${SPACING.spacing4} ${SPACING.spacing4} 0 0`}>
+            <OverflowBtn
+              data-testid="LabwareCard_overflowBtn"
+              onClick={() => {
+                setShowOverflowMenu(true)
+              }}
+            />
+          </Flex>
+        </ListItem>
+      </Box>
+    </>
   )
 }
 

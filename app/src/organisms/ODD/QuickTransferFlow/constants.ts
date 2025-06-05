@@ -29,6 +29,7 @@ export const ACTIONS = {
   SET_DROP_TIP_LOCATION: 'SET_DROP_TIP_LOCATION',
   SET_FLOW_RATE: 'SET_FLOW_RATE',
   SET_LIQUID_CLASS: 'SET_LIQUID_CLASS',
+  SET_PUSH_OUT: 'SET_PUSH_OUT',
 } as const
 
 export const DISTRIBUTE = 'distribute'
@@ -222,4 +223,5 @@ export const DISPENSE_SETTING_OPTIONS = {
   DISPENSE_BLOW_OUT: 'dispense_blow_out',
   DISPENSE_SUBMERGE: 'dispense_submerge',
   DISPENSE_RETRACT: 'dispense_retract',
+  DISPENSE_PUSH_OUT: 'dispense_push_out',
 } as const

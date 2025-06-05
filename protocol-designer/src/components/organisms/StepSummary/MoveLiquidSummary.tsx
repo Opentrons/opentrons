@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 
 import { getLiquidDisplay } from './getLiquidDisplay'
-import { getWellsForStepSummary } from './utils'
+import { getLiquidIdsForStepSummary, getWellsForStepSummary } from './utils'
 
 import type {
   AdditionalEquipmentEntities,
@@ -74,16 +74,12 @@ export function MoveLiquidSummary(props: MoveLiquidSummaryProps): JSX.Element {
     moveLiquidType = 'distribute'
   }
 
-  const liquidIds =
-    liquidState.labware[aspirate_labware] != null
-      ? [
-          ...new Set(
-            aspirateWells.flatMap(well =>
-              Object.keys(liquidState.labware[aspirate_labware][well])
-            )
-          ),
-        ]
-      : []
+  const liquidIds = getLiquidIdsForStepSummary(
+    liquidState,
+    aspirate_labware as string,
+    aspirateWells
+  )
+
   const liquidInfo = liquidIds.map(id => liquidEntities[id])
   const liquidDisplay = getLiquidDisplay(liquidInfo, t)
 

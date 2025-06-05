@@ -14,6 +14,7 @@ import { BeforeBeginning } from './BeforeBeginning'
 import { CloseDoor } from './CloseStackerDoor'
 import { SECTIONS } from './constants'
 import { DetachProbe } from './DetachProbe'
+import { useSendIdentifyModule } from './hooks'
 import { InstallShuttle } from './InstallShuttle'
 import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
@@ -24,23 +25,24 @@ import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import type { PipetteInformation } from '/app/redux/pipettes'
 
 interface ModuleWizardFlowsProps {
   closeFlow: () => void
   robotName: string
   attachedModule?: AttachedModule
+  showSetupLauncher?: boolean
   isLoadedInRun?: boolean
   onComplete?: () => void
 }
 
-export const ModuleWizardFlows = (
+export function ModuleWizardFlows(
   props: ModuleWizardFlowsProps
-): JSX.Element | null => {
+): JSX.Element | null {
   const {
     attachedModule: attachedModuleOnLaunch,
     robotName,
     isLoadedInRun = false,
+    showSetupLauncher = false,
     closeFlow,
     onComplete,
   } = props
@@ -66,14 +68,27 @@ export const ModuleWizardFlows = (
     }
   }, [])
 
+  const sendIdentifyModule = useSendIdentifyModule()
+  const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
+    null
+  )
+  const [showLaunchSetup, setShowLaunchSetup] = useState<boolean>(
+    showSetupLauncher
+  )
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
 
   if (wizardFlowBaseProps.attachedPipette == null) return null
-  if (wizardFlowBaseProps.attachedModule == null) {
+  if (showLaunchSetup || wizardFlowBaseProps.attachedModule == null) {
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
-        handleCleanUpAndClose={handleCleanUpAndClose}
+        isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
+        handleCleanUpAndClose={() => {
+          if (selectedModule != null) {
+            sendIdentifyModule(selectedModule, false)
+          }
+          handleCleanUpAndClose()
+        }}
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
       >
@@ -81,6 +96,10 @@ export const ModuleWizardFlows = (
           {...currentStep}
           {...wizardFlowBaseProps}
           buildFlowForSelectedModule={buildFlowForSelectedModule}
+          selectedModule={selectedModule}
+          setSelectedModule={setSelectedModule}
+          setShowLaunchSetup={setShowLaunchSetup}
+          attachedModuleOnLaunch={attachedModuleOnLaunch}
         />
       </ModuleWizardScreen>
     )
@@ -92,6 +111,7 @@ export const ModuleWizardFlows = (
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+        isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={handleCleanUpAndClose}
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
@@ -109,6 +129,7 @@ export const ModuleWizardFlows = (
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+        isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={handleCleanUpAndClose}
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
@@ -120,7 +141,7 @@ export const ModuleWizardFlows = (
           subHeader={
             <Trans
               t={t}
-              i18nKey={'branded:module_setup_failed'}
+              i18nKey="branded:module_setup_failed"
               values={{ error: wizardFlowBaseProps.errorMessage }}
               components={{
                 block: <LegacyStyledText as="p" />,
@@ -134,6 +155,7 @@ export const ModuleWizardFlows = (
     return (
       <ModuleWizardScreen
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+        isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={handleCleanUpAndClose}
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
@@ -149,6 +171,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -156,12 +179,8 @@ export const ModuleWizardFlows = (
           <BeforeBeginning
             {...currentStep}
             {...wizardFlowBaseProps}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -169,6 +188,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -179,12 +199,8 @@ export const ModuleWizardFlows = (
             deckConfig={deckConfig}
             createMaintenanceRun={createMaintenanceRun}
             isLoadedInRun={isLoadedInRun}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -192,6 +208,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -201,12 +218,8 @@ export const ModuleWizardFlows = (
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
             setCreatedAdapterId={setCreatedAdapterId}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -214,6 +227,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -223,12 +237,8 @@ export const ModuleWizardFlows = (
             {...wizardFlowBaseProps}
             adapterId={createdAdapterId}
             deckConfig={deckConfig}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -236,6 +246,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -243,12 +254,8 @@ export const ModuleWizardFlows = (
           <DetachProbe
             {...currentStep}
             {...wizardFlowBaseProps}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -257,6 +264,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -270,12 +278,10 @@ export const ModuleWizardFlows = (
                 ? () => {}
                 : handleCleanUpAndClose
             }
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedModuleOnLaunch={attachedModuleOnLaunch}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
+            setSelectedModule={setSelectedModule}
           />
         </ModuleWizardScreen>
       )
@@ -283,6 +289,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -291,12 +298,8 @@ export const ModuleWizardFlows = (
             {...currentStep}
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -304,6 +307,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -312,12 +316,8 @@ export const ModuleWizardFlows = (
             {...currentStep}
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )
@@ -325,6 +325,7 @@ export const ModuleWizardFlows = (
       return (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
           handleCleanUpAndClose={handleCleanUpAndClose}
           currentStepIndex={currentStepIndex}
           totalStepCount={totalStepCount}
@@ -332,12 +333,8 @@ export const ModuleWizardFlows = (
           <UpdateFirmware
             {...currentStep}
             {...wizardFlowBaseProps}
-            attachedModule={
-              wizardFlowBaseProps.attachedModule as AttachedModule
-            }
-            attachedPipette={
-              wizardFlowBaseProps.attachedPipette as PipetteInformation
-            }
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
             robotName={robotName}
             patchModuleAfterUpdate={patchModuleAfterUpdate}
           />

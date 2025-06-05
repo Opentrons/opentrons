@@ -40,13 +40,13 @@ export function TwoColLwInfoAndDeck(
     MANUAL_REPLACE_AND_RETRY,
     HOME_AND_RETRY,
     MANUAL_FILL_AND_RETRY_NEW_TIPS,
-    MANUAL_REPLACE_STACKER_AND_RETRY,
-    MANUAL_LOAD_IN_STACKER_AND_SKIP,
-    LOAD_LABWARE_SHUTTLE_AND_RETRY,
-    HOPPER_MANUAL_LOAD_AND_RETRY,
-    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
-    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
-    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    STACKER_STALLED_RETRY,
+    STACKER_STALLED_SKIP,
+    STACKER_SHUTTLE_MISSING_RETRY,
+    STACKER_HOPPER_EMPTY_RETRY,
+    STACKER_HOPPER_EMPTY_SKIP,
+    STACKER_SHUTTLE_EMPTY_RETRY,
+    STACKER_SHUTTLE_EMPTY_SKIP,
   } = RECOVERY_MAP
   const { manualRetrieve } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
@@ -56,17 +56,21 @@ export function TwoColLwInfoAndDeck(
     labwareQuantity,
   } = failedLabwareUtils
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
-  const { step } = recoveryMap
+  const { route, step } = recoveryMap
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
-    switch (step) {
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
-        void manualRetrieve().then(() => proceedNextStep())
+    if (
+      (route === STACKER_HOPPER_EMPTY_SKIP.ROUTE &&
+        step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE) ||
+      (route === STACKER_STALLED_SKIP.ROUTE &&
+        step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE)
+    ) {
+      void manualRetrieve().then(() => proceedNextStep())
+    } else {
+      void proceedNextStep()
     }
-    void proceedNextStep()
   }
 
   const {
@@ -96,25 +100,24 @@ export function TwoColLwInfoAndDeck(
           })
         }
       }
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case STACKER_STALLED_RETRY.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
         return t('ensure_stacker_has_labware')
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_STALLED_SKIP.ROUTE:
+      case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         if (
-          step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
-          step ===
-            HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS
-              .HOPPER_MANUAL_REPLACE ||
-          step === MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
+          step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE ||
+          step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE ||
+          step === STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
         ) {
           return t('load_labware_into_labware_shuttle')
         } else {
           return t('ensure_stacker_has_labware')
         }
-      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+      case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
         return t('ensure_stacker_has_labware')
-      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+      case STACKER_HOPPER_EMPTY_RETRY.ROUTE:
         return t('load_labware_into_stacker', { quantity: labwareQuantity })
       default:
         console.error(
@@ -137,22 +140,21 @@ export function TwoColLwInfoAndDeck(
           ? t('replace_tips_and_select_loc_partial_tip')
           : t('replace_tips_and_select_location')
       }
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+      case STACKER_STALLED_RETRY.ROUTE:
+      case STACKER_HOPPER_EMPTY_RETRY.ROUTE:
         return t('make_sure_loaded_correct_number_of_labware_stacker')
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_STALLED_SKIP.ROUTE:
+      case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
         if (
-          step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
-          step ===
-            HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOPPER_MANUAL_REPLACE
+          step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE ||
+          step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE
         ) {
           return null
         } else {
           return t('make_sure_loaded_correct_number_of_labware_stacker')
         }
-      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
         return t('make_sure_loaded_correct_number_of_labware_stacker')
       default:
         console.error(
@@ -177,13 +179,13 @@ export function TwoColLwInfoAndDeck(
     typeof InterventionContent
   >['infoProps']['layout'] => {
     switch (selectedRecoveryOption) {
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
-      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_STALLED_SKIP.ROUTE:
+      case STACKER_STALLED_RETRY.ROUTE:
+      case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
+      case STACKER_HOPPER_EMPTY_RETRY.ROUTE:
+      case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         return 'stacked'
       default:
         return 'default'

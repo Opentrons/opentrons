@@ -2,6 +2,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  AnimationVideo,
   COLORS,
   Flex,
   LegacyStyledText,
@@ -150,72 +151,60 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       inProgressText: t('stand_back_gripper_is_calibrating'),
       inProgressImage: (
         <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
-          <video
+          <AnimationVideo
             css={css`
               max-width: 100%;
               max-height: 100%;
             `}
-            autoPlay={true}
-            loop={true}
-            controls={false}
             aria-label="calibrating front jaw"
           >
             <source src={calibratingFrontJaw} />
-          </video>
+          </AnimationVideo>
         </Flex>
       ),
       header: t('insert_pin_into_front_jaw'),
       body: t('move_pin_from_storage_to_front_jaw'),
       buttonText: t('begin_calibration'),
       prepImage: (
-        <video
+        <AnimationVideo
           css={css`
             max-width: 100%;
             max-height: 20rem;
           `}
-          autoPlay={true}
-          loop={true}
-          controls={false}
           aria-label="move calibration pin from storage location to front jaw"
         >
           <source src={movePinStorageToFront} />
-        </video>
+        </AnimationVideo>
       ),
     },
     [MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW]: {
       inProgressText: t('stand_back_gripper_is_calibrating'),
       inProgressImage: (
         <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
-          <video
+          <AnimationVideo
             css={css`
               max-width: 100%;
               max-height: 100%;
             `}
-            autoPlay={true}
-            loop={true}
-            controls={false}
             aria-label="calibrating rear jaw"
           >
             <source src={calibratingRearJaw} />
-          </video>
+          </AnimationVideo>
         </Flex>
       ),
       header: t('insert_pin_into_rear_jaw'),
       body: t('move_pin_from_front_to_rear_jaw'),
       buttonText: t('continue_calibration'),
       prepImage: (
-        <video
+        <AnimationVideo
           css={css`
             max-width: 100%;
             max-height: 20rem;
           `}
-          autoPlay={true}
-          loop={true}
-          controls={false}
           aria-label="move calibration pin from front jaw to rear jaw"
         >
           <source src={movePinFrontToRear} />
-        </video>
+        </AnimationVideo>
       ),
     },
     [REMOVE_PIN_FROM_REAR_JAW]: {
@@ -224,18 +213,15 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       body: t('move_pin_from_rear_jaw_to_storage'),
       buttonText: t('complete_calibration'),
       prepImage: (
-        <video
+        <AnimationVideo
           css={css`
             max-width: 100%;
             max-height: 20rem;
           `}
-          autoPlay={true}
-          loop={true}
-          controls={false}
           aria-label="move calibration rear jaw to storage"
         >
           <source src={movePinRearToStorage} />
-        </video>
+        </AnimationVideo>
       ),
     },
   }

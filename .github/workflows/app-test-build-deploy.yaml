@@ -211,32 +211,6 @@ jobs:
           python-version: '3.10'
       - name: check make version
         run: make --version
-      - name: 'Configure Windows code signing environment'
-        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
-        shell: bash
-        run: |
-          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64_V2 }}" | base64 --decode > /d/Certificate_pkcs12.p12
-          echo "${{ secrets.WINDOWS_CSC_B64}}" | base64 --decode > /d/opentrons_labworks_inc.crt
-          echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH
-          echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH
-          echo "C:\Program Files\DigiCert\DigiCert Keylocker Tools" >> $GITHUB_PATH
-
-      - name: 'Setup Windows code signing helpers'
-        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
-        shell: cmd
-        env:
-          SM_HOST: ${{ secrets.SM_HOST_V2 }}
-          SM_CLIENT_CERT_FILE: "D:\\Certificate_pkcs12.p12"
-          SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD_V2}}
-          SM_API_KEY: ${{secrets.SM_API_KEY_V2}}
-        run: |
-          curl -X GET  https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download -H "x-api-key:${{secrets.SM_API_KEY_V2}}" -o Keylockertools-windows-x64.msi
-          msiexec /i Keylockertools-windows-x64.msi /quiet /qn
-          smksp_registrar.exe list
-          smctl.exe keypair ls
-          C:\Windows\System32\certutil.exe -csp "DigiCert Signing Manager KSP" -key -user
-          smksp_cert_sync.exe
-          smctl.exe healthcheck --all
 
       # Do the frontend dist bundle
       - name: 'bundle ${{matrix.variant}} frontend'
@@ -247,6 +221,32 @@ jobs:
         run: |
           make -C app dist
 
+      - name: Install and Invoke TrustedSigning @0.5.3 on dummy executable
+        # Work around from https://github.com/electron-userland/electron-builder/issues/9076#issuecomment-2855541018
+        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
+        shell: pwsh
+        run: |
+            Install-Module -Name TrustedSigning -RequiredVersion 0.5.3 -Force -Repository PSGallery
+            # Create a dummy executable file
+            $dummyExePath = Join-Path -Path $env:GITHUB_WORKSPACE -ChildPath "dummy.exe"
+            Set-Content -Path $dummyExePath -Value "This is a dummy executable for testing purposes."
+            # Invoke Trusted Signing on the dummy executable
+            # Necessary to force dependency resolution
+            try {
+              Invoke-TrustedSigning `
+                -Endpoint 'https://eus.codesigning.azure.net/' `
+                -CertificateProfileName 'dummyName' `
+                -CodeSigningAccountName 'dummyName' `
+                -TimestampRfc3161 'http://timestamp.acs.microsoft.com' `
+                -TimestampDigest 'SHA256' `
+                -FileDigest 'SHA256' `
+                -Files $dummyExePath
+            } catch {
+              Write-Host "Invoke-TrustedSigning failed: $($_.Exception.Message)"
+              # Prevent the script from exiting with a non-zero status
+              exit 0
+            }
+
       # build the desktop app and deploy it
       - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
         if: matrix.target == 'desktop'
@@ -255,13 +255,9 @@ jobs:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
           OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
           WINDOWS_SIGN: ${{ format('{0}', contains(needs.determine-build-type.outputs.type, 'release')) }}
-          SM_CODE_SIGNING_CERT_SHA1_HASH: ${{secrets.SM_CODE_SIGNING_CERT_SHA1_HASH_V2}}
-          SM_KEYPAIR_ALIAS: ${{secrets.SM_KEYPAIR_ALIAS_V2}}
-          SM_HOST: ${{ secrets.SM_HOST_V2 }}
-          SM_CLIENT_CERT_FILE: "D:\\Certificate_pkcs12.p12"
-          SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD_V2}}
-          SM_API_KEY: ${{secrets.SM_API_KEY_V2}}
-          WINDOWS_CSC_FILEPATH: "D:\\opentrons_labworks_inc.crt"
+          AZURE_TENANT_ID: ${{secrets.AZURE_TENANT_ID}}
+          AZURE_CLIENT_ID: ${{secrets.AZURE_CLIENT_ID}}
+          AZURE_CLIENT_SECRET: ${{secrets.AZURE_CLIENT_SECRET}}
           CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS_V2 }}
           CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS_V2 }}
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID_V2 }}

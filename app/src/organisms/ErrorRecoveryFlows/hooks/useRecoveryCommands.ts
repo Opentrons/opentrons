@@ -203,7 +203,7 @@ export function useRecoveryCommands({
         ? storeOrRetriveFailedCommandParams.moduleId
         : ''
     return {
-      commandType: 'flexStacker/openLatch',
+      commandType: 'unsafe/flexStacker/openLatch',
       params: {
         moduleId: moduleId,
       },
@@ -223,7 +223,7 @@ export function useRecoveryCommands({
         ? storeOrRetriveFailedCommandParams.moduleId
         : ''
     return {
-      commandType: 'flexStacker/closeLatch',
+      commandType: 'unsafe/flexStacker/closeLatch',
       params: {
         moduleId: moduleId,
       },
@@ -456,9 +456,9 @@ export function isAssumeFalsePositiveResumeKind(
   switch (errorKind) {
     case ERROR_KINDS.TIP_NOT_DETECTED:
     case ERROR_KINDS.TIP_DROP_FAILED:
-    case ERROR_KINDS.STALL_WHILE_STACKING:
-    case ERROR_KINDS.SHUTTLE_MISSING:
-    case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
+    case ERROR_KINDS.STACKER_STALLED:
+    case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
+    case ERROR_KINDS.STACKER_HOPPER_EMPTY:
       return true
     default:
       return false
