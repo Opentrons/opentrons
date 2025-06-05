@@ -1,6 +1,6 @@
 def get_values(*names):
     import json
-    _all_values = json.loads("""[{"name": "DryRun", "type": "dropDown", "label": "Is this a test run?", "options": [{"label": "Yes", "value": true}, {"label": "No", "value": false}]}, {"name": "Plates", "type": "dropDown", "label": "How many plates are being processed?", "options": [{"label": "1", "value": "1"}, {"label": "2", "value": "2"}]}]""")
+    _all_values = json.loads("""{"DryRun": true, "Plates": "1"}""")
     return [_all_values[n] for n in names]
 
 

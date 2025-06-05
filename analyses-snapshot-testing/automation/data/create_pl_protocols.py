@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import Any, Dict
 
 import httpx
 from rich import print
@@ -50,17 +49,26 @@ json_data = {
 }
 
 
-def make_get_values_fn(params: Dict[str, Any]) -> str:
+def make_get_values_fn(params: list) -> str:
     """
     Generate a Python get_values function for protocol parameters.
 
     Args:
-        params: Dict of parameter names to their default values.
+        params: List[dict] describing parameters.
 
     Returns:
         String containing the get_values function for protocol files.
     """
-    json_params = json.dumps(params).replace("\\n", "\\\\n").replace('\\"', '\\\\"').replace("\\r", "")
+    default_values = {}
+    for p in params:
+        if "default" in p:
+            default_values[p["name"]] = p["default"]
+        elif p.get("type") == "dropDown" and p.get("options"):
+            default_values[p["name"]] = p["options"][0]["value"]
+        else:
+            default_values[p["name"]] = None
+
+    json_params = json.dumps(default_values).replace("\\n", "\\\\n").replace('\\"', '\\\\"').replace("\\r", "")
     fn = f"""def get_values(*names):
     import json
     _all_values = json.loads(\"\"\"{json_params}\"\"\")

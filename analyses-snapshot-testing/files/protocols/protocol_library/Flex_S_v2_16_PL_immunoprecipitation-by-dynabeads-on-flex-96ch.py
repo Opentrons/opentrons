@@ -1,6 +1,6 @@
 def get_values(*names):
     import json
-    _all_values = json.loads("""[{"name": "NUM_COL", "type": "int", "label": "Columns of Samples (96-well Plate, up to 12)", "default": 12}, {"name": "INCUBATION_ON_DECK", "type": "dropDown", "label": "Incubation on Flex", "default": 1, "options": [{"label": "Yes", "value": 1}, {"label": "No", "value": 0}]}, {"name": "INCUBATION_MIN", "type": "int", "label": "If Incubation on Flex, Incubation Time (in minutes)?", "default": 60}, {"name": "READY_FOR_SDSPAGE", "type": "dropDown", "label": "Eluates Ready for SDS-PAGE?", "default": 1, "options": [{"label": "Yes", "value": 1}, {"label": "No", "value": 0}]}]""")
+    _all_values = json.loads("""{"NUM_COL": 12, "INCUBATION_ON_DECK": 1, "INCUBATION_MIN": 60, "READY_FOR_SDSPAGE": 1}""")
     return [_all_values[n] for n in names]
 
 

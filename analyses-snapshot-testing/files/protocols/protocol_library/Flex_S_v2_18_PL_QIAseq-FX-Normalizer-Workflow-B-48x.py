@@ -1,6 +1,6 @@
 def get_values(*names):
     import json
-    _all_values = json.loads("""[{"name": "DRYRUN", "type": "dropDown", "label": "Dry Run", "options": [{"label": "no", "value": false}, {"label": "yes", "value": true}]}, {"name": "USE_GRIPPER", "type": "dropDown", "label": "Use Gripper", "options": [{"label": "yes", "value": true}, {"label": "no", "value": false}]}, {"name": "TIP_TRASH", "type": "dropDown", "label": "Trash Tips", "options": [{"label": "yes", "value": true}, {"label": "no", "value": false}]}, {"name": "DEACTIVATE_TEMP", "type": "dropDown", "label": "Deactivate Temperatures", "options": [{"label": "yes", "value": true}, {"label": "no", "value": false}]}, {"name": "COLUMNS", "type": "int", "label": "Columns of Samples", "default": 3}, {"name": "FRAGTIME", "type": "int", "label": "Fragmentation Time", "default": 15}, {"name": "PCRCYCLES", "type": "int", "label": "PCR Cycles", "default": 6}, {"name": "DEFAULT_OFFSETS", "type": "dropDown", "label": "Default Module Offsets", "options": [{"label": "yes", "value": true}, {"label": "no", "value": false}]}]""")
+    _all_values = json.loads("""{"DRYRUN": false, "USE_GRIPPER": true, "TIP_TRASH": true, "DEACTIVATE_TEMP": true, "COLUMNS": 3, "FRAGTIME": 15, "PCRCYCLES": 6, "DEFAULT_OFFSETS": true}""")
     return [_all_values[n] for n in names]
 
 

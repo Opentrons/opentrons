@@ -1,6 +1,6 @@
 def get_values(*names):
     import json
-    _all_values = json.loads("""[{"name": "number_of_samples", "type": "int", "label": "sample number", "default": 96}, {"name": "right_pipette", "type": "dropDown", "label": "right pipette type", "options": [{"label": "GEN2 P300 Multi", "value": "p300_multi_gen2"}, {"label": "GEN2 P20 Multi", "value": "p20_multi_gen2"}, {"label": "GEN1 P1000 Multi", "value": "p1000_multi"}, {"label": "GEN1 P300 Multi", "value": "p300_multi"}, {"label": "GEN1 P50 Multi", "value": "p50_multi"}, {"label": "GEN1 P10 Multi", "value": "p10_multi"}, {"label": "none", "value": null}]}, {"name": "left_pipette", "type": "dropDown", "label": "left pipette type", "options": [{"label": "GEN2 P300 Multi", "value": "p300_multi_gen2"}, {"label": "GEN2 P20 Multi", "value": "p20_multi_gen2"}, {"label": "GEN1 P1000 Multi", "value": "p1000_multi"}, {"label": "GEN1 P300 Multi", "value": "p300_multi"}, {"label": "GEN1 P50 Multi", "value": "p50_multi"}, {"label": "GEN1 P10 Multi", "value": "p10_multi"}, {"label": "none", "value": null}]}, {"name": "mastermix_volume", "type": "float", "label": "mastermix volume (in ul)", "default": 18}, {"name": "DNA_volume", "type": "float", "label": "DNA volume (in ul)", "default": 2}]""")
+    _all_values = json.loads("""{"number_of_samples": 96, "right_pipette": "p300_multi_gen2", "left_pipette": "p300_multi_gen2", "mastermix_volume": 18, "DNA_volume": 2}""")
     return [_all_values[n] for n in names]
 
 

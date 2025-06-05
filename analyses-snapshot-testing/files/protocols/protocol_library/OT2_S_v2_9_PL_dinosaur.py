@@ -1,6 +1,6 @@
 def get_values(*names):
     import json
-    _all_values = json.loads("""[{"name": "p300_mount", "type": "dropDown", "label": "P300 Single Channel GEN2 Mount Position", "options": [{"label": "Left", "value": "left"}, {"label": "Right", "value": "right"}]}, {"name": "tip_type", "type": "dropDown", "label": "Tip Rack Type", "options": [{"label": "Opentrons 96 Tip Rack 300 uL", "value": "opentrons_96_tiprack_300ul"}, {"label": "Opentrons 96 Filter Tip Rack 200 uL", "value": "opentrons_96_filtertiprack_200ul"}]}, {"name": "plate_type", "type": "dropDown", "label": "Plate Type", "options": [{"label": "Bio-Rad 96 Well Plate 200 uL PCR", "value": "biorad_96_wellplate_200ul_pcr"}, {"label": "NEST 96 Well Plate 100 uL PCR Full Skirt", "value": "nest_96_wellplate_100ul_pcr_full_skirt"}, {"label": "Corning 96 Well Plate 360 \u00b5L Flat", "value": "corning_96_wellplate_360ul_flat"}, {"label": "NEST 96 Well Plate 200 \u00b5L Flat", "value": "nest_96_wellplate_200ul_flat"}]}]""")
+    _all_values = json.loads("""{"p300_mount": "left", "tip_type": "opentrons_96_tiprack_300ul", "plate_type": "biorad_96_wellplate_200ul_pcr"}""")
     return [_all_values[n] for n in names]
 
 

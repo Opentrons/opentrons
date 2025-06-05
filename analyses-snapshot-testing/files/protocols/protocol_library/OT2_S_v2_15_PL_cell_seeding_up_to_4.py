@@ -1,6 +1,6 @@
 def get_values(*names):
     import json
-    _all_values = json.loads("""[{"name": "PIPET_LOCATION", "type": "dropDown", "label": "P1000 pipet on the left or right?", "options": [{"label": "Right", "value": 1}, {"label": "Left", "value": 2}]}, {"name": "plate_type_1", "type": "dropDown", "label": "Type of plate on Slot 11", "options": [{"label": "24", "value": 24}, {"label": "6", "value": 6}, {"label": "12", "value": 12}, {"label": "0, if no plate", "value": 0}]}, {"name": "plate_type_2", "type": "dropDown", "label": "Type of plate on Slot 8", "options": [{"label": "24", "value": 24}, {"label": "6", "value": 6}, {"label": "12", "value": 12}, {"label": "0, if no plate", "value": 0}]}, {"name": "plate_type_3", "type": "dropDown", "label": "Type of plate on Slot 5", "options": [{"label": "24", "value": 24}, {"label": "6", "value": 6}, {"label": "12", "value": 12}, {"label": "0, if no plate", "value": 0}]}, {"name": "plate_type_4", "type": "dropDown", "label": "Type of plate on Slot 2", "options": [{"label": "24", "value": 24}, {"label": "6", "value": 6}, {"label": "12", "value": 12}, {"label": "0, if no plate", "value": 0}]}]""")
+    _all_values = json.loads("""{"PIPET_LOCATION": 1, "plate_type_1": 24, "plate_type_2": 24, "plate_type_3": 24, "plate_type_4": 24}""")
     return [_all_values[n] for n in names]
 
 

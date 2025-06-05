@@ -1,6 +1,6 @@
 def get_values(*names):
     import json
-    _all_values = json.loads("""[{"name": "p300_mount", "type": "dropDown", "label": "P300 8-channel GEN2 pipette mount", "options": [{"label": "right", "value": "right"}, {"label": "left", "value": "left"}]}]""")
+    _all_values = json.loads("""{"p300_mount": "right"}""")
     return [_all_values[n] for n in names]
 
 
