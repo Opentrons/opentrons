@@ -15,7 +15,7 @@ from opentrons.protocols.advanced_control.transfers.common import (
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_water_transfer_with_volume_more_than_tip_max(
     simulated_protocol_context: ProtocolContext,
@@ -87,7 +87,7 @@ def test_water_transfer_with_volume_more_than_tip_max(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_transfer_steps(
     simulated_protocol_context: ProtocolContext,
@@ -238,7 +238,7 @@ def test_order_of_water_transfer_steps(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_transfer_steps_with_new_tip_per_destination(
     simulated_protocol_context: ProtocolContext,
@@ -357,7 +357,7 @@ def test_order_of_water_transfer_steps_with_new_tip_per_destination(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_transfer_steps_with_return_tip(
     simulated_protocol_context: ProtocolContext,
@@ -512,7 +512,7 @@ def test_order_of_water_transfer_steps_with_return_tip(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_transfer_steps_with_no_new_tips(
     simulated_protocol_context: ProtocolContext,
@@ -639,7 +639,7 @@ def test_order_of_water_transfer_steps_with_no_new_tips(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_consolidate_steps(
     simulated_protocol_context: ProtocolContext,
@@ -769,7 +769,7 @@ def test_order_of_water_consolidate_steps(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_consolidate_steps_larger_volume_than_tip(
     simulated_protocol_context: ProtocolContext,
@@ -910,7 +910,7 @@ def test_order_of_water_consolidate_steps_larger_volume_than_tip(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_consolidate_steps_with_no_new_tips(
     simulated_protocol_context: ProtocolContext,
@@ -1028,7 +1028,7 @@ def test_order_of_water_consolidate_steps_with_no_new_tips(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_consolidate_steps_with_return_tip(
     simulated_protocol_context: ProtocolContext,
@@ -1160,7 +1160,7 @@ def test_order_of_water_consolidate_steps_with_return_tip(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_water_distribution_with_volume_more_than_tip_max(
     simulated_protocol_context: ProtocolContext,
@@ -1220,7 +1220,7 @@ def test_water_distribution_with_volume_more_than_tip_max(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_distribution_steps_using_multi_dispense(
     simulated_protocol_context: ProtocolContext,
@@ -1380,7 +1380,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 @pytest.mark.parametrize(
     ["distribute_volume", "multi_dispense_props_present"],
@@ -1542,7 +1542,7 @@ def test_order_of_water_distribute_steps_using_one_to_one_transfers(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_distribution_steps_using_mixed_dispense(
     simulated_protocol_context: ProtocolContext,
@@ -1742,7 +1742,7 @@ def test_order_of_water_distribution_steps_using_mixed_dispense(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_water_distribute_steps_with_return_tip(
     simulated_protocol_context: ProtocolContext,
@@ -1816,7 +1816,7 @@ def test_water_distribute_steps_with_return_tip(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_water_distribution_raises_error_for_disposal_vol_without_blowout(
     simulated_protocol_context: ProtocolContext,
@@ -1851,7 +1851,7 @@ def test_water_distribution_raises_error_for_disposal_vol_without_blowout(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 @pytest.mark.parametrize(
     ["new_tip", "expected_number_of_calls"],
@@ -1903,7 +1903,7 @@ def test_water_transfer_with_lpd(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 @pytest.mark.parametrize(
     "new_tip",
@@ -1954,7 +1954,7 @@ def test_water_transfer_does_lpd_only_once_for_a_source_well(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_water_distribution_with_lpd(
     simulated_protocol_context: ProtocolContext,
@@ -2006,7 +2006,7 @@ def test_water_distribution_with_lpd(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_incompatible_transfers_skip_probing_even_with_lpd_on(
     simulated_protocol_context: ProtocolContext,
@@ -2083,7 +2083,7 @@ def test_incompatible_transfers_skip_probing_even_with_lpd_on(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_water_transfer_with_multi_channel_pipette(
     simulated_protocol_context: ProtocolContext,
@@ -2140,7 +2140,7 @@ def test_water_transfer_with_multi_channel_pipette(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_raises_no_tips_available_error(
     simulated_protocol_context: ProtocolContext,

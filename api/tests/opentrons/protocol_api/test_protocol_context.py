@@ -1797,7 +1797,7 @@ def test_define_liquid_class(
     expected_liquid_class = LiquidClass(
         _name="volatile_100", _display_name="volatile 100%", _by_pipette_setting={}
     )
-    decoy.when(mock_core.define_liquid_class("volatile_90", 1)).then_return(
+    decoy.when(mock_core.get_liquid_class("volatile_90", 1)).then_return(
         expected_liquid_class
     )
     decoy.when(mock_core.robot_type).then_return(robot_type)

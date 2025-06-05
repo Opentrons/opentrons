@@ -9,7 +9,7 @@ from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_liquid_class_creation_and_property_fetching(
     simulated_protocol_context: ProtocolContext,
