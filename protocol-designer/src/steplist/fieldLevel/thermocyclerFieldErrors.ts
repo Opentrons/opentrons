@@ -10,7 +10,7 @@ export type ErrorChecker = (
 export const isTimeFormatMinutesSeconds: ErrorChecker = (
   value: unknown
 ): string | null => {
-  const timeRegex = new RegExp(/^(?:[0-9]?\d):[0-5]\d$/g)
+  const timeRegex = /^(?:[0-9]?\d):(?:[0-5]\d|[0-9])$/g
   return (typeof value === 'string' && timeRegex.test(value)) || !value
     ? null
     : 'Must be a valid time (mm:ss)'
