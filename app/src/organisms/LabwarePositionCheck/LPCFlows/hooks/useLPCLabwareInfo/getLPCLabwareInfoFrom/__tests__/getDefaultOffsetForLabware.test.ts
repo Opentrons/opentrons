@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { ANY_LOCATION } from '@opentrons/api-client'
 import {
-  C3_ADDRESSABLE_AREA,
   C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 
