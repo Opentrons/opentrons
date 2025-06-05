@@ -17,23 +17,15 @@ import {
   capitalizeFirstLetter,
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
-  getFormLevelError,
 } from '../utils'
 
 import type { PipetteChannels } from '@opentrons/shared-data'
+import type { FormErrorLocationType } from '../../../../../steplist/formLevel/errors'
 
 const BASE_VISIBLE_FORM_ERROR = {
   title: 'form level error title',
   dependentFields: ['field1', 'field2'],
-}
-
-const MAPPED_ERRORS = {
-  field1: {
-    title: 'form level error title',
-    dependentFields: ['field1', 'field2'],
-    showAtField: true,
-    showAtForm: true,
-  },
+  location: 'form' as FormErrorLocationType,
 }
 
 describe('getBlowoutLocationOptionsForForm', () => {
@@ -104,52 +96,28 @@ describe('capitalizeFirstLetter', () => {
 })
 
 describe('getFormErrorsMappedToField', () => {
-  it('should flatten form-level errors to an object keyed by each implicated field with form-level error as the value', () => {
+  it('should return no errors since they are form level', () => {
     const result = getFormErrorsMappedToField([BASE_VISIBLE_FORM_ERROR])
-    expect(result).toEqual({
-      field1: {
-        ...BASE_VISIBLE_FORM_ERROR,
-        showAtField: true,
-        showAtForm: true,
-      },
-      field2: {
-        ...BASE_VISIBLE_FORM_ERROR,
-        showAtField: true,
-        showAtForm: true,
-      },
-    })
+    expect(result).toEqual({ field1: [], field2: [] })
   })
-  it('should maintain booleans for showAtForm and showAtField', () => {
+  it('should render errors for field level', () => {
     const result = getFormErrorsMappedToField([
-      { ...BASE_VISIBLE_FORM_ERROR, showAtForm: false },
+      { ...BASE_VISIBLE_FORM_ERROR, location: 'field' },
     ])
     expect(result).toEqual({
-      field1: {
-        ...BASE_VISIBLE_FORM_ERROR,
-        showAtField: true,
-        showAtForm: false,
-      },
-      field2: {
-        ...BASE_VISIBLE_FORM_ERROR,
-        showAtField: true,
-        showAtForm: false,
-      },
+      field1: [
+        {
+          ...BASE_VISIBLE_FORM_ERROR,
+          location: 'field',
+        },
+      ],
+      field2: [
+        {
+          ...BASE_VISIBLE_FORM_ERROR,
+          location: 'field',
+        },
+      ],
     })
-  })
-})
-
-describe('getFormLevelError', () => {
-  it('shows form-level error at field when showAtField is true', () => {
-    const result = getFormLevelError('field1', MAPPED_ERRORS)
-    expect(result).toEqual('form level error title')
-  })
-
-  it('shows no form-level error at field when showAtField is false', () => {
-    const result = getFormLevelError('field1', {
-      ...MAPPED_ERRORS,
-      field1: { ...MAPPED_ERRORS.field1, showAtField: false },
-    })
-    expect(result).toBeNull()
   })
 })
 

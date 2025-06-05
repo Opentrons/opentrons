@@ -20,7 +20,6 @@ import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
-import { getFieldErrors } from '../../steplist/fieldLevel'
 import {
   getFormErrors,
   getFormWarnings,
@@ -30,7 +29,6 @@ import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFo
 import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
 import { getLocationStackTopToBottom } from '../../utils'
 import { denormalizePipetteEntities, getHydratedForm } from '../utils'
-import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 
 import type { Selector } from 'reselect'
 import type { ComponentProps } from 'react'
@@ -58,18 +56,8 @@ import type {
 } from '@opentrons/step-generation'
 import type {
   FormData,
-  HydratedAbsorbanceReaderFormData,
-  HydratedCommentFormData,
   HydratedFormData,
-  HydratedHeaterShakerFormData,
-  HydratedMagnetFormData,
-  HydratedMixFormData,
-  HydratedMoveLabwareFormData,
-  HydratedMoveLiquidFormData,
-  HydratedPauseFormData,
-  HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
-  ProfileItem,
   StepIdType,
 } from '../../form-types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
@@ -641,72 +629,6 @@ const _dynamicMoveLabwareFieldFormErrors = (
   return getMoveLabwareFormErrors(hydratedForm, invariantContext)
 }
 
-export const _hasFieldLevelErrors = (
-  hydratedForm: HydratedFormData
-): boolean => {
-  const getHasFieldErrors = <T extends HydratedFormData>(form: T): boolean => {
-    for (const fieldName of Object.keys(form) as Array<keyof T>) {
-      const value = form[fieldName]
-
-      if (
-        form.stepType === 'thermocycler' &&
-        fieldName === 'profileItemsById'
-      ) {
-        if (getProfileItemsHaveErrors(value as Record<string, ProfileItem>)) {
-          return true
-        }
-      } else {
-        // TODO: fieldName includes id, stepType, etc... this is weird #3161
-        const fieldErrors = getFieldErrors(
-          fieldName as string,
-          value,
-          hydratedForm
-        )
-
-        if (fieldErrors && fieldErrors.length > 0) {
-          return true
-        }
-      }
-    }
-    return false
-  }
-
-  switch (hydratedForm.stepType) {
-    case 'thermocycler':
-      return getHasFieldErrors(hydratedForm as HydratedThermocyclerFormData)
-
-    case 'mix':
-      return getHasFieldErrors(hydratedForm as HydratedMixFormData)
-
-    case 'absorbanceReader':
-      return getHasFieldErrors(hydratedForm as HydratedAbsorbanceReaderFormData)
-
-    case 'comment':
-      return getHasFieldErrors(hydratedForm as HydratedCommentFormData)
-
-    case 'heaterShaker':
-      return getHasFieldErrors(hydratedForm as HydratedHeaterShakerFormData)
-
-    case 'magnet':
-      return getHasFieldErrors(hydratedForm as HydratedMagnetFormData)
-
-    case 'moveLabware':
-      return getHasFieldErrors(hydratedForm as HydratedMoveLabwareFormData)
-
-    case 'moveLiquid':
-      return getHasFieldErrors(hydratedForm as HydratedMoveLiquidFormData)
-
-    case 'pause':
-      return getHasFieldErrors(hydratedForm as HydratedPauseFormData)
-
-    case 'temperature':
-      return getHasFieldErrors(hydratedForm as HydratedTemperatureFormData)
-
-    default:
-      return false
-  }
-}
-
 export const _hasFormLevelErrors = (
   hydratedForm: HydratedFormData,
   invariantContext: InvariantContext
@@ -740,10 +662,7 @@ export const _formHasErrors = (
   hydratedForm: HydratedFormData,
   invariantContext: InvariantContext
 ): boolean => {
-  return (
-    _hasFieldLevelErrors(hydratedForm) ||
-    _hasFormLevelErrors(hydratedForm, invariantContext)
-  )
+  return _hasFormLevelErrors(hydratedForm, invariantContext)
 }
 export const getInvariantContext: Selector<
   BaseState,
