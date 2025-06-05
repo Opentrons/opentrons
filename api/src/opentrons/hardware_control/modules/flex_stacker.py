@@ -74,8 +74,8 @@ OFFSET_SM = 5.0
 OFFSET_MD = 10.0
 OFFSET_LG = 20.0
 
-# height limit in mm of labware to use OFFSET_MD used when storing labware.
-MEDIUM_LABWARE_Z_LIMIT = 20.0
+# height limit in mm of labware to use OFFSET_SM used when storing labware.
+LARGE_LABWARE_Z_LIMIT = 100.0
 
 
 class FlexStacker(mod_abc.AbstractModule):
@@ -420,14 +420,6 @@ class FlexStacker(mod_abc.AbstractModule):
 
         # Move platform along the X then Z axis
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
-
-        # TODO: (AA 2025-04-03) - The EVT Flex Stacker hardware has issues
-        # reading the platform sensor on the extended side. This is a temporary
-        # workaround to avoid the sensor check on the extended side and should be
-        # removed once dvt hardware is available. We should move this check
-        # to `prepare_for_action` instead
-        await self.verify_shuttle_location(PlatformState.RETRACTED)
-
         await self._move_and_home_axis(StackerAxis.Z, Direction.EXTEND, OFFSET_SM)
 
         # Transfer
@@ -452,21 +444,16 @@ class FlexStacker(mod_abc.AbstractModule):
         """Stores a labware in the stacker."""
         await self._prepare_for_action()
 
-        # Move X then Z axis
-        offset = 0 if labware_height < MEDIUM_LABWARE_Z_LIMIT else OFFSET_LG * 2
-        distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
+        # Move X
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
 
-        # TODO: (AA 2025-04-03) - The EVT Flex Stacker hardware has issues
-        # reading the platform sensor on the extended side. This is a temporary
-        # workaround to avoid the sensor check on the extended side and should be
-        # removed once dvt hardware is available. We should move this check
-        # to `prepare_for_action` instead
-        await self.verify_shuttle_location(PlatformState.RETRACTED)
-
+        # Check that labware was detected
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
 
+        # Move the Z so the labware sits right under any labware already stored
+        offset = OFFSET_SM if labware_height < LARGE_LABWARE_Z_LIMIT else OFFSET_LG * 2
+        distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
         # Transfer
@@ -474,10 +461,9 @@ class FlexStacker(mod_abc.AbstractModule):
         z_speed = (
             STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed or 0
         ) / 2
-        await self.move_axis(
+        await self._move_and_home_axis(
             StackerAxis.Z, Direction.EXTEND, (labware_height / 2), z_speed
         )
-        await self.home_axis(StackerAxis.Z, Direction.EXTEND, z_speed)
         await self.close_latch()
 
         # Move Z then X axis
@@ -489,7 +475,11 @@ class FlexStacker(mod_abc.AbstractModule):
         return True
 
     async def _move_and_home_axis(
-        self, axis: StackerAxis, direction: Direction, offset: float = 0
+        self,
+        axis: StackerAxis,
+        direction: Direction,
+        offset: float = 0,
+        speed: Optional[float] = None,
     ) -> bool:
         """Move the axis in a direction by the given offset in mm and home it.
 
@@ -497,8 +487,8 @@ class FlexStacker(mod_abc.AbstractModule):
         before this function gets called. Do not use this function if the axis
         has not been homed/has recently stalled."""
         distance = MAX_TRAVEL[axis] - offset
-        await self.move_axis(axis, direction, distance)
-        return await self.home_axis(axis, direction)
+        await self.move_axis(axis, direction, distance, speed)
+        return await self.home_axis(axis, direction, speed)
 
     async def _prepare_for_action(self) -> bool:
         """Helper to prepare axis for dispensing or storing labware."""
@@ -665,12 +655,12 @@ class FlexStacker(mod_abc.AbstractModule):
     async def _stacker_bar_idle(self) -> None:
         await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
 
-    async def identify(self, enable: bool, color_name: Optional[str] = None) -> None:
+    async def identify(self, start: bool, color_name: Optional[str] = None) -> None:
         """Identify the module."""
-        reps = -1 if enable else 0
+        reps = -1 if start else 0
         color = LEDColor.from_name(color_name or LEDColor.BLUE.name)
         await self.set_led_state(0.5, color, LEDPattern.PULSE, reps=reps)
-        if not enable and self._last_status_bar_event:
+        if not start and self._last_status_bar_event:
             await self._handle_status_bar_event(self._last_status_bar_event)
 
     def set_stacker_identify(self, state: bool) -> None:
