@@ -15,6 +15,9 @@ performance-metrics = {file = "../performance-metrics", editable = true}
 numpy = "==1.22.3"
 packaging = "==22.0"
 pyusb = "==1.2.1"
+# transitive dependency. 3.22 introduces a build plugin called coherent.licensed that
+# is not safe to have installed when another project is being built.
+zipp = "==3.21.0"
 
 [dev-packages]
 # atomicwrites and colorama are pytest dependencies on windows,

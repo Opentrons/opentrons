@@ -19,6 +19,9 @@ filetype = "==1.2.0"
 systemd-python = { version = "==234", markers="sys_platform == 'linux'" }
 server-utils = {editable = true, path = "./../server-utils"}
 system_server = {path = ".", editable = true}
+# transitive dependency. 3.22 introduces a build plugin called coherent.licensed that
+# is not safe to have installed when another project is being built.
+zipp = "==3.21.0"
 
 [dev-packages]
 flake8 = "==7.0.0"
