@@ -32,6 +32,7 @@ import {
   getEnableTimelineScrubber,
 } from '../../feature-flags/selectors'
 import { selectors as fileSelectors } from '../../file-data'
+import { getRobotStateTimeline } from '../../file-data/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { actions as loadFileActions } from '../../load-file'
 import { useProtocolExportHandler } from '../../resources/hooks'
@@ -48,11 +49,6 @@ import { ProtocolMetadata } from './ProtocolMetadata'
 import { ScrubberContainer } from './ScrubberContainer'
 import { StartingDeck } from './StartingDeck'
 import { StepsInfo } from './StepsInfo'
-import {
-  getUnusedEntities,
-  getUnusedStagingAreas,
-  getUnusedTrash,
-} from './utils'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../types'
@@ -97,11 +93,12 @@ export function ProtocolOverview(): JSX.Element {
   const allIngredientGroupFields = useSelector(
     labwareIngredSelectors.allIngredientGroupFields
   )
+  const robotTimeline = useSelector(getRobotStateTimeline)
+  const hasCommands = robotTimeline.timeline.length > 0
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [showMaterialsListModal, setShowMaterialsListModal] = useState<boolean>(
     false
   )
-  const fileData = useSelector(fileSelectors.createFile)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const liquids = useSelector(getLiquidEntities)
@@ -122,58 +119,11 @@ export function ProtocolOverview(): JSX.Element {
     pipettes,
   } = initialDeckSetup
 
-  const nonLoadCommands =
-    fileData?.commands.filter(
-      command => !LOAD_COMMANDS.includes(command.commandType)
-    ) ?? []
-  const gripperInUse =
-    fileData?.commands.find(
-      command =>
-        (command.commandType === 'moveLabware' &&
-          command.params.strategy === 'usingGripper') ||
-        command.commandType === 'absorbanceReader/closeLid' ||
-        command.commandType === 'absorbanceReader/openLid'
-    ) != null
-  const noCommands = fileData != null ? nonLoadCommands.length === 0 : true
-  const modulesWithoutStep = getUnusedEntities(
-    modulesOnDeck,
-    savedStepForms,
-    'moduleId',
-    robotType
-  )
-  const pipettesWithoutStep = getUnusedEntities(
-    initialDeckSetup.pipettes,
-    savedStepForms,
-    'pipette',
-    robotType
-  )
-  const isGripperAttached = Object.values(additionalEquipment).some(
-    equipment => equipment?.name === 'gripper'
-  )
-  const gripperWithoutStep = isGripperAttached && !gripperInUse
-
-  const { trashBinUnused, wasteChuteUnused } = getUnusedTrash(
-    additionalEquipmentOnDeck,
-    fileData?.commands
-  )
-  const fixtureWithoutStep: Fixture = {
-    trashBin: trashBinUnused,
-    wasteChute: wasteChuteUnused,
-    stagingAreaSlots: getUnusedStagingAreas(
-      additionalEquipmentOnDeck,
-      fileData?.commands
-    ),
-  }
-
   const {
     handleExportClick,
     exportWarningModalElement,
   } = useProtocolExportHandler({
-    noCommands,
-    modulesWithoutStep,
-    pipettesWithoutStep,
-    gripperWithoutStep,
-    fixtureWithoutStep,
+    hasCommands,
     onConfirmExport: () => {
       dispatch(loadFileActions.saveProtocolFile())
     },
