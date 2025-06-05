@@ -14,7 +14,7 @@ const DEFS_BY_URI = Object.fromEntries(
 )
 
 
-const meta = {
+const meta: Meta<typeof CalibrationBlockRender> = {
   component: CalibrationBlockRender,
   decorators: [
     (Story, context) => {
@@ -28,7 +28,7 @@ const meta = {
       </RobotWorkSpace>
     }
   ]
-} satisfies Meta<typeof CalibrationBlockRender>
+}
 
 export default meta;
 type Story = StoryObj<typeof meta>
