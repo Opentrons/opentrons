@@ -133,7 +133,7 @@ export interface LiquidEntity {
   description: string | null
   pythonName: string
   liquidGroupId: string
-  liquidClass?: string
+  liquidClass?: string | null
 }
 
 export interface LiquidEntities {

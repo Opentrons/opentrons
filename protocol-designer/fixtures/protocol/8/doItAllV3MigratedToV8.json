@@ -31,7 +31,8 @@
           "displayName": "Water",
           "description": null,
           "displayColor": "#b925ff",
-          "liquidGroupId": "0"
+          "liquidGroupId": "0",
+          "liquidClass": null
         }
       },
       "ingredLocations": {
@@ -2664,12 +2665,13 @@
       }
     }
   },
-  "liquidSchemaId": "opentronsLiquidSchemaV1",
+  "liquidSchemaId": "opentronsLiquidSchemaV2",
   "liquids": {
     "0": {
       "displayName": "Water",
       "description": "",
-      "displayColor": "#b925ff"
+      "displayColor": "#b925ff",
+      "liquidClass": null
     }
   },
   "commandSchemaId": "opentronsCommandSchemaV10",
