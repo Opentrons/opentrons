@@ -86,7 +86,7 @@ jobs:
           NODE_OPTIONS: '--max-old-space-size=5120'
           OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
           OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
-          OT_PD_SENTRY_DSN: ${{ secrets.OT_PD_SENTRY_DNS }}
+          OT_PD_SENTRY_DSN: ${{ secrets.OT_PD_SENTRY_DSN }}
           OT_PD_SENTRY_DEV_DSN: ${{ secrets.OT_PD_SENTRY_DEV_DSN }}
         run: |
           make -C protocol-designer NODE_ENV=development
