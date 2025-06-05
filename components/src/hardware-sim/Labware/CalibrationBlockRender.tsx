@@ -10,6 +10,8 @@ import { getSchema2Dimensions } from '@opentrons/shared-data'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
+// These strings match what's physically etched on the calibration block,
+// so they probably shouldn't be localized.
 const SHORT = 'SHORT'
 const TALL = 'TALL'
 
