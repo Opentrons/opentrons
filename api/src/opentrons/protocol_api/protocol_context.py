@@ -1388,7 +1388,7 @@ class ProtocolContext(CommandPublisher):
         return self._core.get_liquid_class(name=name, version=DEFAULT_LC_VERSION)
 
     @requires_version(2, 24)
-    def define_custom_liquid_class(
+    def define_liquid_class(
         self,
         name: str,
         properties: Dict[str, Dict[str, TransferPropertiesDict]],

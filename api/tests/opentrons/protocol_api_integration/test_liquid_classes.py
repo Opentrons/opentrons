@@ -61,7 +61,7 @@ def test_custom_liquid_class_creation_and_property_fetching(
     tiprack = simulated_protocol_context.load_labware(
         "opentrons_flex_96_tiprack_50ul", "D1"
     )
-    custom_water = simulated_protocol_context.define_custom_liquid_class(
+    custom_water = simulated_protocol_context.define_liquid_class(
         name="water_50",
         properties=minimal_transfer_properties_dict,
         display_name="Custom Aqueous",
