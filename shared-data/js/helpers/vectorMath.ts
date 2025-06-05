@@ -18,3 +18,11 @@ export function getVectorDifference(
     z: pointA.z - pointB.z,
   }
 }
+
+export function getVectorInverse(vector: Vector3D): Vector3D {
+  return {
+    x: -vector.x,
+    y: -vector.y,
+    z: -vector.z,
+  }
+}

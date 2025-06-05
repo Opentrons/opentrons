@@ -51,3 +51,13 @@ describe('getVectorDifference', () => {
     ).toStrictEqual({ x: -2, y: -4, z: -6 })
   })
 })
+
+describe('getVectorInverse', () => {
+  it('should negate each component', () => {
+    expect(getVectorInverse({ x: 1.23, y: 0, z: -1.23 })).toStrictEqual({
+      x: -1.23,
+      y: -0,
+      z: 1.23,
+    })
+  })
+})
