@@ -152,7 +152,11 @@
                 "z": -0.5
               }
             },
-            "flowRateByVolume": [[0.0, 7.0]],
+            "flowRateByVolume": [
+              [1.0, 7.0],
+              [10.0, 30.0],
+              [50.0, 30.0]
+            ],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.7],
@@ -403,7 +407,11 @@
                 "z": -0.5
               }
             },
-            "flowRateByVolume": [[0.0, 7.0]],
+            "flowRateByVolume": [
+              [1.0, 7.0],
+              [10.0, 30.0],
+              [50.0, 30.0]
+            ],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.7],
@@ -659,7 +667,11 @@
                 "z": -0.5
               }
             },
-            "flowRateByVolume": [[0.0, 7.0]],
+            "flowRateByVolume": [
+              [1.0, 7.0],
+              [10.0, 30.0],
+              [50.0, 30.0]
+            ],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.5],
@@ -910,7 +922,11 @@
                 "z": -0.5
               }
             },
-            "flowRateByVolume": [[0.0, 7.0]],
+            "flowRateByVolume": [
+              [1.0, 7.0],
+              [10.0, 30.0],
+              [50.0, 30.0]
+            ],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.5],
