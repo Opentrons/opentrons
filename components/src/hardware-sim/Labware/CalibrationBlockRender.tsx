@@ -15,6 +15,8 @@ import type { LabwareDefinition } from '@opentrons/shared-data'
 const SHORT = 'SHORT'
 const TALL = 'TALL'
 
+const TEXT_MARGIN = 5
+
 interface CalibrationBlockRenderProps {
   labwareDef: LabwareDefinition
 }
@@ -47,10 +49,17 @@ export function CalibrationBlockRender(
             y={0}
             fill={C_MED_GRAY}
           />
-          <g transform="rotate(270, 5, 55)">
+          <g
+            transform={`rotate(
+              270,
+              ${TEXT_MARGIN},
+              ${dimensions.yDimension / 2}
+            )`}
+          >
             <RobotCoordsText
-              x={5}
-              y={55}
+              x={TEXT_MARGIN}
+              y={dimensions.yDimension / 2}
+              textAnchor="middle"
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -58,10 +67,17 @@ export function CalibrationBlockRender(
               {TALL}
             </RobotCoordsText>
           </g>
-          <g transform={`rotate(90, ${dimensions.xDimension - 5}, 25)`}>
+          <g
+            transform={`rotate(
+              90,
+              ${dimensions.xDimension - TEXT_MARGIN},
+              ${dimensions.yDimension / 2}
+            )`}
+          >
             <RobotCoordsText
-              x={dimensions.xDimension - 5}
-              y={25}
+              x={dimensions.xDimension - TEXT_MARGIN}
+              y={dimensions.yDimension / 2}
+              textAnchor="middle"
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -93,10 +109,17 @@ export function CalibrationBlockRender(
             y={0}
             fill={C_MED_GRAY}
           />
-          <g transform="rotate(270, 5, 55)">
+          <g
+            transform={`rotate(
+              270,
+              ${TEXT_MARGIN},
+              ${dimensions.yDimension / 2}
+            )`}
+          >
             <RobotCoordsText
-              x={5}
-              y={55}
+              x={TEXT_MARGIN}
+              y={dimensions.yDimension / 2}
+              textAnchor="middle"
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -104,10 +127,17 @@ export function CalibrationBlockRender(
               {SHORT}
             </RobotCoordsText>
           </g>
-          <g transform={`rotate(90, ${dimensions.xDimension - 5}, 30)`}>
+          <g
+            transform={`rotate(
+              90,
+              ${dimensions.xDimension - TEXT_MARGIN},
+              ${dimensions.yDimension / 2}
+            )`}
+          >
             <RobotCoordsText
-              x={dimensions.xDimension - 5}
-              y={30}
+              x={dimensions.xDimension - TEXT_MARGIN}
+              y={dimensions.yDimension / 2}
+              textAnchor="middle"
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
