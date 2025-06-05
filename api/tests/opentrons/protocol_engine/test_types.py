@@ -74,3 +74,30 @@ def test_roundtrips_well_info_summary(height: LiquidTrackingType | None) -> None
         assert isinstance(outp.probed_volume, SimulatedProbeResult)
     else:
         assert outp == inp
+
+
+@pytest.mark.parametrize("op_1", [SimulatedProbeResult(), 100.0, -5])
+@pytest.mark.parametrize("op_2", [SimulatedProbeResult(), 100.0, -5])
+def test_simulated_probe_result_operand_math(
+    op_1: LiquidTrackingType, op_2: LiquidTrackingType
+) -> None:
+    """Ensure that math operators can be used with SimulatedProbeResult."""
+    _error = None
+    r: LiquidTrackingType | None = None
+    try:
+        r = op_1 + op_2
+        r = op_1 - op_2
+        r = op_1 / op_2
+        r = op_1 * op_2
+        r = op_1**op_2
+        r = op_1 // op_2
+        r = op_1 % op_2
+        r = op_1 < op_2
+        r = op_1 > op_2
+        r = op_1 >= op_2
+        r = op_1 <= op_2
+        r = op_1 == op_2
+    except Exception as _e:
+        _error = _e
+    assert _error is None
+    assert r is not None
