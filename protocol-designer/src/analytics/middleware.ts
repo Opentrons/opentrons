@@ -379,22 +379,15 @@ export const reduxActionToAnalyticsEvent = (
       {}
     )
 
-    const liquids = Object.values(ingredients).reduce(
-      (acc: Record<string, LiquidInfo>, ingredient) => {
-        const {
-          displayName,
-          liquidClass,
-          displayColor,
-          description,
-        } = ingredient
-        acc[displayName] = {
-          liquidClass: liquidClass ?? null,
-          displayColor,
-          description,
+    const liquidClasses = Object.values(ingredients).reduce(
+      (acc: string[], ingredient) => {
+        const { liquidClass } = ingredient
+        if (liquidClass != null) {
+          acc.push(liquidClass)
         }
         return acc
       },
-      {}
+      []
     )
 
     const fixtureInfo = {
@@ -415,7 +408,7 @@ export const reduxActionToAnalyticsEvent = (
         ...metadata,
         ...loadCommandInfo,
         ...robotType,
-        ...liquids,
+        ...liquidClasses,
         ...numberOfSteps,
         ...fixtureInfo,
         ...labwareInfo,

@@ -37,13 +37,15 @@
           "displayName": "Water",
           "description": null,
           "displayColor": "#b925ff",
-          "liquidGroupId": "0"
+          "liquidGroupId": "0",
+          "liquidClass": null
         },
         "1": {
           "displayName": "Samples",
           "description": null,
           "displayColor": "#ffd600",
-          "liquidGroupId": "1"
+          "liquidGroupId": "1",
+          "liquidClass": null
         }
       },
       "ingredLocations": {
@@ -4057,17 +4059,19 @@
       }
     }
   },
-  "liquidSchemaId": "opentronsLiquidSchemaV1",
+  "liquidSchemaId": "opentronsLiquidSchemaV2",
   "liquids": {
     "0": {
       "displayName": "Water",
       "description": "",
-      "displayColor": "#b925ff"
+      "displayColor": "#b925ff",
+      "liquidClass": null
     },
     "1": {
       "displayName": "Samples",
       "description": "",
-      "displayColor": "#ffd600"
+      "displayColor": "#ffd600",
+      "liquidClass": null
     }
   },
   "commandSchemaId": "opentronsCommandSchemaV10",

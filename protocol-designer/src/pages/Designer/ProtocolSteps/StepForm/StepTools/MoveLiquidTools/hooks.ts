@@ -38,7 +38,7 @@ export function useAssignLiquidClass(
   const liquidClasses = getAllLiquidClassDefs()
   const liquidClassToLiquidsMap: Record<string, string[]> = {}
   Object.values(liquids).forEach(({ displayName, liquidClass }) => {
-    if (liquidClass !== undefined) {
+    if (liquidClass != null) {
       if (!liquidClassToLiquidsMap[liquidClass]) {
         liquidClassToLiquidsMap[liquidClass] = []
       }
