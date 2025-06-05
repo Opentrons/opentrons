@@ -52,7 +52,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
         paddingX={SPACING.spacing16}
       >
         <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('protocol_steps:heater_shaker_settings')}
+          {t('protocol_steps:heater_shaker_state')}
         </StyledText>
         <ToggleExpandStepFormField
           {...propsForFields.targetHeaterShakerTemperature}

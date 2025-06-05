@@ -875,7 +875,7 @@ export const shakeTimeRequired = (
 }
 
 const isTimeFormatMinutesSeconds = (value: string | null): boolean => {
-  const timeRegex = new RegExp(/^\d+:[0-5]?\d$/g)
+  const timeRegex = new RegExp(/^(?:[0-9]?\d):[0-5]\d$/g)
   return value != null && timeRegex.test(value)
 }
 

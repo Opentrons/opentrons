@@ -10,7 +10,7 @@ export type ErrorChecker = (
 export const isTimeFormatMinutesSeconds: ErrorChecker = (
   value: unknown
 ): string | null => {
-  const timeRegex = new RegExp(/^\d+:[0-5]?\d$/g)
+  const timeRegex = new RegExp(/^(?:[0-9]?\d):[0-5]\d$/g)
   return (typeof value === 'string' && timeRegex.test(value)) || !value
     ? null
     : 'Must be a valid time (mm:ss)'
@@ -30,4 +30,4 @@ export const enterValueWithinRange = (
 ): ErrorChecker => (value: unknown): string | null =>
   !value || (Number(value) <= maximum && Number(value) >= minimum)
     ? null
-    : `Enter a value within the specified range`
+    : 'Enter a value within the specified range'

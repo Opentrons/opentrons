@@ -69,7 +69,7 @@
       "open": "open"
     }
   },
-  "heater_shaker_settings": "Heater-Shaker state",
+  "heater_shaker_state": "Heater-Shaker state",
   "in": "in",
   "into": "into",
   "labware_to": "{{labware}} to",

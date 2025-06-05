@@ -21,7 +21,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     setTab,
   } = props
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
-  console.log('propsForFields', propsForFields)
   const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
     'aspirate_labware',
