@@ -20,9 +20,8 @@ PYTHON_OPENTRONS_ROBOT_SERVER_POST_INSTALL_TARGET_HOOKS = PYTHON_OPENTRONS_ROBOT
 PYTHON_OPENTRONS_ROBOT_SERVER_SERVICE_FILE_NAME=opentrons-robot-server.service
 PYTHON_OPENTRONS_ROBOT_SERVER_DEPENDENCIES = host-python-hatch-vcs-tunable host-python-hatch-dependency-coversion
 PYTHON_OPENTRONS_ROBOT_SERVER_ENV = \
-  HATCH_VCS_TUNABLE_RAW_OPTIONS="root=$(shell realpath --relative-to=$(PYTHON_OPENTRONS_ROBOT_SERVER_BUILDDIR) $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH))" \
   HATCH_VCS_TUNABLE_TAG_PATTERN="$(call git_tag_regex_for_project,$(PROJECT))" \
-  HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
+  HATCH_VCS_TUNABLE_RAW_OPTIONS="$(call hatch_raw_options_for_project,$(PROJECT));root=$(shell realpath --relative-to=$(PYTHON_OPENTRONS_ROBOT_SERVER_BUILDDIR) $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH))"
 
 define PYTHON_OPENTRONS_ROBOT_SERVER_INSTALL_VERSION
 	echo '$(call OTROBOTSERVER_CALL_PBU,dump_br_version)' > $(BINARIES_DIR)/opentrons-robot-server-version.json

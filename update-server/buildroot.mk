@@ -19,9 +19,8 @@ PYTHON_OPENTRONS_UPDATE_SERVER_SUBDIR = update-server
 PYTHON_OPENTRONS_UPDATE_SERVER_POST_INSTALL_TARGET_HOOKS = PYTHON_OPENTRONS_UPDATE_SERVER_INSTALL_VERSION
 PYTHON_OPENTRONS_UPDATE_SERVER_DEPENDENCIES = host-python-hatch-vcs-tunable host-python-hatch-dependency-coversion
 PYTHON_OPENTRONS_UPDATE_SERVER_ENV = \
-  HATCH_VCS_TUNABLE_RAW_OPTIONS="root=$(shell realpath --relative-to=$(PYTHON_OPENTRONS_UPDATE_SERVER_BUILDDIR) $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH))" \
   HATCH_VCS_TUNABLE_TAG_PATTERN="$(call git_tag_regex_for_project,$(PROJECT))" \
-  HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
+  HATCH_VCS_TUNABLE_RAW_OPTIONS="$(call hatch_raw_options_for_project,$(PROJECT));root=$(shell realpath --relative-to=$(PYTHON_OPENTRONS_UPDATE_SERVER_BUILDDIR) $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH))"
 
 define OTUS_DUMP_BR_VERSION
   $(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py update-server robot-stack dump_br_version)
