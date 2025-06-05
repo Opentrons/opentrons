@@ -32,7 +32,6 @@ export const migrateFile = (
       description: ingredient.description ?? null,
       liquidGroupId: id,
       displayColor: liquids[id].displayColor ?? swatchColors(id),
-      liquidClass: null,
     }
     return acc
   }, {})
