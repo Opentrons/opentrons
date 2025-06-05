@@ -289,7 +289,7 @@ CONFIG_ELEMENTS = (
     ConfigElement(
         "gripper_jaw_width_dir",
         "Gripper Jaw Width Directory",
-        Path("robot") / "gripper_jaw",
+        Path("robot") / "gripper_jaw_width_data",
         ConfigElementType.DIR,
         "The dir where gripper jaw width data is stored",
     ),

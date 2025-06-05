@@ -184,7 +184,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         return None
 
     def update_jaw_open_position_from_closed_position(
-        self, jaw_at_closed: float
+        self, jaw_at_closed: float | None
     ) -> None:
         """Update the estimation of the jaw position at open based on reading it at closed.
 
@@ -194,7 +194,9 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         is closed, and then altering the logical open position so that it is whatever it needs
         to be for the logical closed position to be the same as the config.
         """
-
+        if jaw_at_closed is None:
+            self._encoder_position_at_jaw_closed = jaw_at_closed
+            return
         jaw_min = self._config.geometry.jaw_width["min"]
         jaw_nominal_max = self._config.geometry.jaw_width["max"]
         if (
@@ -235,7 +237,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
 
         return self._jaw_max_offset is not None
 
-    # might have to replicate this for jaw_width
     def reset_offset(self, to_default: bool) -> None:
         """Tempoarily reset the gripper offsets to default values."""
         if to_default:
@@ -244,6 +245,16 @@ class Gripper(AbstractInstrument[GripperDefinition]):
             self._calibration_offset = load_gripper_calibration_offset(
                 gripper_id=self._gripper_id
             )
+
+    def reset_jaw_width_calibration(self, to_default: bool) -> None:
+        """Temporarily reset the gripper jaw width measurement."""
+        if to_default:
+            loaded_jaw_width_data = load_gripper_jaw_width(gripper_id=None)
+        else:
+            loaded_jaw_width_data = load_gripper_jaw_width(gripper_id=self._gripper_id)
+        self.update_jaw_open_position_from_closed_position(
+            jaw_at_closed=loaded_jaw_width_data.encoder_position_at_jaw_closed
+        )
 
     def save_offset(self, delta: Point) -> GripperCalibrationOffset:
         """Save a new gripper offset."""

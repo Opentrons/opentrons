@@ -56,6 +56,7 @@ class GripperHandler:
         self._gripper = new_gripper
 
     async def reset(self) -> None:
+        # TODO(cm): do we want to reset the gripper jaw width here as well?
         self._gripper = None
 
     @property
@@ -81,6 +82,13 @@ class GripperHandler:
         gripper = self.get_gripper()
         self._log.info(f"Saving gripper {gripper.gripper_id} offset: {delta}")
         return gripper.save_offset(delta)
+
+    def reset_gripper_jaw_width_data(self, to_default: bool) -> None:
+        """
+        Temporarily reset the gripper jaw width calibration default value.
+        """
+        gripper = self.get_gripper()
+        gripper.reset_offset(to_default)
 
     def get_critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         if not self._gripper:
